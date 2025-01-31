@@ -168,5 +168,4 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
   public BinaryResourceHolder provideBinaryResource(String filenameWithFingerprint) {
     return BinaryResourceUrlUtility.provideBinaryResource(filenameWithFingerprint, getModel()::getAttachment);
   }
-
 }

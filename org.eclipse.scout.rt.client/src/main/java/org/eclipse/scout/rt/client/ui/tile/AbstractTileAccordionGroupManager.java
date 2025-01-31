@@ -31,5 +31,4 @@ public abstract class AbstractTileAccordionGroupManager<T extends ITile> impleme
   public Comparator<IGroup> getComparator() {
     return null;
   }
-
 }

@@ -113,12 +113,12 @@ public class ExecutionSemaphore implements IExecutionSemaphore {
    * Acquires a permit from this semaphore, blocking until one is available, or the thread is interrupted.
    *
    * @param task
-   *          the task to acquire a permit for.
+   *     the task to acquire a permit for.
    * @param queuePosition
-   *          the position where to place the task in the queue of competing tasks if no permit is free at the time of
-   *          invocation.
+   *     the position where to place the task in the queue of competing tasks if no permit is free at the time of
+   *     invocation.
    * @throws ThreadInterruptedError
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    */
   protected void acquire(final IFuture<?> task, final QueuePosition queuePosition) {
     assertSameSemaphore(task);
@@ -161,12 +161,12 @@ public class ExecutionSemaphore implements IExecutionSemaphore {
    * Otherwise, this method returns immediately.
    *
    * @param task
-   *          the task to acquire a permit for.
+   *     the task to acquire a permit for.
    * @param queuePosition
-   *          the position where to place the task in the queue of competing tasks if no permit is free at the time of
-   *          invocation.
+   *     the position where to place the task in the queue of competing tasks if no permit is free at the time of
+   *     invocation.
    * @param permitAcquiredCallback
-   *          the callback to be invoked once the given task acquired a permit.
+   *     the callback to be invoked once the given task acquired a permit.
    * @return <code>true</code> if acquired a permit, or <code>false</code> otherwise.
    */
   protected boolean compete(final IFuture<?> task, final QueuePosition queuePosition, final IPermitAcquiredCallback permitAcquiredCallback) {
@@ -211,7 +211,7 @@ public class ExecutionSemaphore implements IExecutionSemaphore {
    * Releases a permit, returning it to the semaphore.
    *
    * @param permitOwner
-   *          the task to release the permit from.
+   *     the task to release the permit from.
    */
   protected void release(final IFuture<?> permitOwner) {
     assertSameSemaphore(permitOwner);
@@ -241,7 +241,7 @@ public class ExecutionSemaphore implements IExecutionSemaphore {
    * notify any waiting thread outside this semaphore's lock.
    *
    * @return the {@link AcquisitionTask} a permit was assigned to, or <code>null</code> if either no permit was
-   *         available, or the queue was empty.
+   * available, or the queue was empty.
    */
   protected AcquisitionTask assignOnePermit() {
     m_writeLock.lock();

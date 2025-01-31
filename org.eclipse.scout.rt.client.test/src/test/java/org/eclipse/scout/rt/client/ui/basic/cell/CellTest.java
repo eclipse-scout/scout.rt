@@ -366,5 +366,4 @@ public class CellTest {
     c.removeErrorStatus(ParsingFailedStatus.class);
     assertNull(c.getErrorStatus());
   }
-
 }

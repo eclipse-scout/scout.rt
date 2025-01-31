@@ -27,19 +27,19 @@ public interface IRestClientHelper {
    * Creates a new {@link WebTarget} that uses the default exception transformer defined by the implementing class.
    *
    * @param resourcePath
-   *          Path to the resource, relative to the API root. This path must <i>not</i> contain template strings (they
-   *          would be encoded).
+   *     Path to the resource, relative to the API root. This path must <i>not</i> contain template strings (they
+   *     would be encoded).
    */
   WebTarget target(String resourcePath);
 
   /**
    * @param resourcePath
-   *          Path to the resource, relative to the API root. This path must <i>not</i> contain template strings (they
-   *          would be encoded).
+   *     Path to the resource, relative to the API root. This path must <i>not</i> contain template strings (they
+   *     would be encoded).
    * @param exceptionTransformer
-   *          optional {@link IRestClientExceptionTransformer} used by the returned {@link WebTarget} and any objects it
-   *          creates to transform {@link WebApplicationException}s and {@link jakarta.ws.rs.ProcessingException}s. The
-   *          {@code null}-transformer returns the passed exception unchanged.
+   *     optional {@link IRestClientExceptionTransformer} used by the returned {@link WebTarget} and any objects it
+   *     creates to transform {@link WebApplicationException}s and {@link jakarta.ws.rs.ProcessingException}s. The
+   *     {@code null}-transformer returns the passed exception unchanged.
    */
   WebTarget target(String resourcePath, IRestClientExceptionTransformer exceptionTransformer);
 

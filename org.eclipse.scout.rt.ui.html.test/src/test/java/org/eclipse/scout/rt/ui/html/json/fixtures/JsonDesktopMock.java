@@ -37,5 +37,4 @@ public class JsonDesktopMock extends JsonDesktop<IDesktop> {
   public JSONObject toJson() {
     return new JSONObject();
   }
-
 }

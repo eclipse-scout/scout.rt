@@ -50,5 +50,4 @@ public class JsonFormTableControl<TABLE_CONTROL extends IFormTableControl> exten
   public String getObjectType() {
     return "FormTableControl";
   }
-
 }

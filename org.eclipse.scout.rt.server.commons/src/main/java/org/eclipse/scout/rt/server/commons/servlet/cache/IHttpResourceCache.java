@@ -34,7 +34,7 @@ public interface IHttpResourceCache {
    * Removes a cached object with the given key.
    *
    * @param cacheKey
-   *          The key of the object to return.
+   *     The key of the object to return.
    * @return removed object or null, if it was not cached
    */
   HttpCacheObject remove(HttpCacheKey cacheKey);

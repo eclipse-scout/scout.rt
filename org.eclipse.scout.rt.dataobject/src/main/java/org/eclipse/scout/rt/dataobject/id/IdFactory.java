@@ -41,7 +41,7 @@ public class IdFactory {
    * use the concrete factory methods e.g. {@code MyIdClass.of(value)} to create new id instances whenever possible.
    *
    * @throws PlatformException
-   *           if an exception occurred while creating the id
+   *     if an exception occurred while creating the id
    */
   public <ID extends IId> ID createInternal(Class<ID> idClass, Object... values) {
     try {

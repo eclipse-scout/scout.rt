@@ -146,5 +146,4 @@ public class HtmlFileLoader extends AbstractResourceLoader {
   protected HtmlDocumentParser createHtmlDocumentParser(HtmlDocumentParserParameters params) {
     return new HtmlDocumentParser(params);
   }
-
 }

@@ -118,6 +118,5 @@ public class ICalBeanTest {
     assertNotNull(endProps);
     assertEquals(ICalProperties.PROP_VALUE_VEVENT, endProps.get(0).getValue());
     assertEquals(ICalProperties.PROP_VALUE_ICALENDAR, endProps.get(1).getValue());
-
   }
 }

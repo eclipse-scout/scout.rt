@@ -31,18 +31,18 @@ public class ItemDataChangeEvent extends DataChangeEvent {
    * <p>
    *
    * @param source
-   *          the source of the event
+   *     the source of the event
    * @param objectType
-   *          used so a listener can distinct between various data change event. Typically you'd use the
-   *          <code>.class</code> property of that entity as objectType
+   *     used so a listener can distinct between various data change event. Typically you'd use the
+   *     <code>.class</code> property of that entity as objectType
    * @param changeStatus
-   *          a constant value from {@link ChangeStatus}. Specifies the change status of the entity (e.g. inserted,
-   *          updated, deleted or not changed)
+   *     a constant value from {@link ChangeStatus}. Specifies the change status of the entity (e.g. inserted,
+   *     updated, deleted or not changed)
    * @param key
-   *          the key of the entity that has been modified
+   *     the key of the entity that has been modified
    * @param data
-   *          (optional) data a listener can use, typically the data of an entity that has been inserted or updated or
-   *          the entity itself
+   *     (optional) data a listener can use, typically the data of an entity that has been inserted or updated or
+   *     the entity itself
    */
   public ItemDataChangeEvent(Object source, Class<?> objectType, int changeStatus, Object key, Object data) {
     super(source, objectType, changeStatus);

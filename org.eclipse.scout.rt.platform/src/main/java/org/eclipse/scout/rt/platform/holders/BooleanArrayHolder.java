@@ -23,5 +23,4 @@ public class BooleanArrayHolder extends Holder<Boolean[]> {
   public BooleanArrayHolder(Boolean[] value) {
     super(Boolean[].class, value);
   }
-
 }

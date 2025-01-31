@@ -109,7 +109,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
 
   /**
    * @return Returns <code>true</code> if values of the given column are not imported from and exported to a
-   *         {@link AbstractTableFieldBeanData}.
+   * {@link AbstractTableFieldBeanData}.
    * @since 3.10.0-M5
    */
   protected boolean isColumnIgnored(IColumn<?> column) {

@@ -48,5 +48,4 @@ public interface IClipboardField extends IValueField<Collection<BinaryResource>>
   boolean isReadOnly();
 
   void setReadOnly(boolean b);
-
 }

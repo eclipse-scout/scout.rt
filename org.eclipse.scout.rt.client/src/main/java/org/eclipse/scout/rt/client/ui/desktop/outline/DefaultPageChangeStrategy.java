@@ -86,5 +86,4 @@ public class DefaultPageChangeStrategy implements IPageChangeStrategy {
       outline.setSearchForm(searchForm);
     }
   }
-
 }

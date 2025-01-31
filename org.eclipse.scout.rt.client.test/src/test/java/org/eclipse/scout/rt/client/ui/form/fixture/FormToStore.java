@@ -152,5 +152,4 @@ public class FormToStore extends AbstractForm {
   public void clickCancel() {
     getFieldByClass(CancelButton.class).doClick();
   }
-
 }

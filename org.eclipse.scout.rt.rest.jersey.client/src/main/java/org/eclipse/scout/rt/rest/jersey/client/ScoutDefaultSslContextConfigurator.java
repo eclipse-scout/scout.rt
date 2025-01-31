@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.rest.jersey.client;
 import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.SSLContext;
+
 import jakarta.ws.rs.client.ClientBuilder;
 
 import org.eclipse.scout.rt.rest.client.IGlobalRestClientConfigurator;

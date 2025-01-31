@@ -67,5 +67,4 @@ class LookupRows {
   static final List<? extends ILookupRow<Long>> firstRow() {
     return CollectionUtility.arrayList(ROW_1);
   }
-
 }

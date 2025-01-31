@@ -52,10 +52,10 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
    * <em>sessionId</em> is created via {@link ServerSessionProvider}.
    *
    * @param serverRunContext
-   *          applied during session start, and to get the session's {@link Subject}.
+   *     applied during session start, and to get the session's {@link Subject}.
    * @return session found in cache, or a new session on cache miss.
    * @throws RuntimeException
-   *           if session creation failed.
+   *     if session creation failed.
    */
   @Override
   public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext) {
@@ -67,14 +67,14 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
    * <em>sessionId</em> is not specified. On cache miss, a new session is created via {@link ServerSessionProvider}.
    *
    * @param sessionId
-   *          unique session ID to identify the cached session. If <code>null</code>, the context's {@link Subject} is
-   *          used for identification. On cache miss, this <em>sessionId</em> is used to create a new session, or a
-   *          random UUID if <code>null</code>.
+   *     unique session ID to identify the cached session. If <code>null</code>, the context's {@link Subject} is
+   *     used for identification. On cache miss, this <em>sessionId</em> is used to create a new session, or a
+   *     random UUID if <code>null</code>.
    * @param serverRunContext
-   *          applied during session start, and to get the session's {@link Subject}.
+   *     applied during session start, and to get the session's {@link Subject}.
    * @return session found in cache, or a new session on cache miss.
    * @throws RuntimeException
-   *           if session creation failed.
+   *     if session creation failed.
    */
   @Override
   public <SESSION extends IServerSession> SESSION provide(final String sessionId, final ServerRunContext serverRunContext) {
@@ -96,8 +96,7 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
     serverSession = super.provide(sessionId, serverRunContext);
 
     // 4. Cache the new server session, or return present session if created by another thread in the meantime (optimistic locking).
-    @SuppressWarnings("unchecked")
-    final SESSION cachedServerSession = (SESSION) m_cache.putIfAbsent(sessionCacheKey, serverSession);
+    @SuppressWarnings("unchecked") final SESSION cachedServerSession = (SESSION) m_cache.putIfAbsent(sessionCacheKey, serverSession);
     if (cachedServerSession != null) {
       serverSession = cachedServerSession;
     }
@@ -109,7 +108,7 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
    * Removes all entries with the specified {@link IServerSession} from this cache instance.
    *
    * @param session
-   *          The server session to remove. Must not be {@code null}.
+   *     The server session to remove. Must not be {@code null}.
    */
   public void remove(IServerSession session) {
     remove(assertNotNull(session).getId());
@@ -119,7 +118,7 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
    * Removes all entries with the specified {@link IServerSession} from this cache instance.
    *
    * @param sessionId
-   *          The id of the server session to remove. Must not be {@code null}.
+   *     The id of the server session to remove. Must not be {@code null}.
    */
   public void remove(String sessionId) {
     assertNotNull(sessionId);

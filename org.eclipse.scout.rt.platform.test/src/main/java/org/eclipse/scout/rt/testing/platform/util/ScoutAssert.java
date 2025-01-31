@@ -70,7 +70,8 @@ public final class ScoutAssert {
       fail();
     }
     int actualIndex = 0;
-    expectedLoop: for (Object expectedElement : expected) {
+    expectedLoop:
+    for (Object expectedElement : expected) {
       for (int j = actualIndex; j < actual.length; j++) { //NOSONAR
         if (expectedElement.equals(actual[j])) {
           actualIndex = j + 1;
@@ -122,7 +123,7 @@ public final class ScoutAssert {
    * compares two textfiles
    *
    * @param charsetName
-   *          The name of a supported {@link java.nio.charset.Charset </code>charset<code>}
+   *     The name of a supported {@link java.nio.charset.Charset </code>charset<code>}
    */
   public static void assertTextFileEquals(File expectedFile, File actualFile, String charsetName) {
     if (!expectedFile.exists()) {
@@ -145,9 +146,9 @@ public final class ScoutAssert {
    * functionality to throw a {@link ComparisonFailure} also for non-String objects.
    *
    * @param expected
-   *          expected value
+   *     expected value
    * @param actual
-   *          actual value
+   *     actual value
    */
   public static void assertEqualsWithComparisonFailure(Object expected, Object actual) {
     assertEqualsWithComparisonFailure(null, expected, actual);
@@ -162,11 +163,11 @@ public final class ScoutAssert {
    * its functionality to throw a {@link ComparisonFailure} also for non-String objects.
    *
    * @param message
-   *          the identifying message for the {@link ComparisonFailure} (<code>null</code> okay)
+   *     the identifying message for the {@link ComparisonFailure} (<code>null</code> okay)
    * @param expected
-   *          expected value
+   *     expected value
    * @param actual
-   *          actual value
+   *     actual value
    */
   public static void assertEqualsWithComparisonFailure(String message, Object expected, Object actual) {
     if (!ObjectUtility.equals(expected, actual)) {

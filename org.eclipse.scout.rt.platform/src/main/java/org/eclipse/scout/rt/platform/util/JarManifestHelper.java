@@ -43,7 +43,7 @@ public class JarManifestHelper {
 
   /**
    * @return map with all attributes of {@link Manifest} defined by JAR containing the given
-   *         {@code manifestResourceBase} class or empty map if reading attributes fails.
+   * {@code manifestResourceBase} class or empty map if reading attributes fails.
    */
   public Map<String, String> getAttributes(Class<?> manifestResourceBase) {
     try {
@@ -116,7 +116,7 @@ public class JarManifestHelper {
 
   /**
    * @return full class name of given class {@code manifestResourceBase} including name of all enclosing classes and a
-   *         {@code .class} suffix
+   * {@code .class} suffix
    */
   protected String toClassName(Class<?> manifestResourceBase) {
     String className = manifestResourceBase.getName() + ".class";

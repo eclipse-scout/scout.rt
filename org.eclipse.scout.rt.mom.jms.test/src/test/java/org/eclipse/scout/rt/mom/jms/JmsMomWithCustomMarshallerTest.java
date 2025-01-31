@@ -130,5 +130,4 @@ public class JmsMomWithCustomMarshallerTest extends AbstractJmsMomTest {
       return env;
     }
   }
-
 }

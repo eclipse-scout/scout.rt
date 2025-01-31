@@ -99,7 +99,6 @@ public class RunContextChainInterceptorTest {
     finally {
       COLOR_TL.set(backup);
     }
-
   }
 
   private class ActivitiyLogInterceptorProducer implements IRunContextChainInterceptorProducer<RunContext> {
@@ -123,7 +122,6 @@ public class RunContextChainInterceptorTest {
         public boolean isEnabled() {
           return true;
         }
-
       };
     }
   }
@@ -154,7 +152,6 @@ public class RunContextChainInterceptorTest {
       finally {
         COLOR_TL.set(backup);
       }
-
     }
 
     @Override

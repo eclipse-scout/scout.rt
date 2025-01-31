@@ -56,7 +56,7 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractSmartC
 
   /**
    * @return true if leading and trailing whitespace should be stripped from the entered text while validating the
-   *         value. default is true.
+   * value. default is true.
    * @since 6.1
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)

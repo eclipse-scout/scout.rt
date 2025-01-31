@@ -128,5 +128,4 @@ public class BatchLookupServiceClientProxy implements IBatchLookupService {
   private IBatchLookupService getTargetService() {
     return BEANS.get(IServerBatchLookupService.class);
   }
-
 }

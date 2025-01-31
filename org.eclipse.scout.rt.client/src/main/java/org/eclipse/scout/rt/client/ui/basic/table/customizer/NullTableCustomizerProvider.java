@@ -20,5 +20,4 @@ public class NullTableCustomizerProvider implements ITableCustomizerProvider {
   public ITableCustomizer createTableCustomizer(ITable table) {
     return null;
   }
-
 }

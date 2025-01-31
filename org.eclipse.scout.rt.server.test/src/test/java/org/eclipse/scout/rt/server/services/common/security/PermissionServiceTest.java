@@ -9,9 +9,7 @@
  */
 package org.eclipse.scout.rt.server.services.common.security;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.security.Permission;
 import java.util.List;
@@ -99,7 +97,6 @@ public class PermissionServiceTest {
     public AbstractPermissionServiceMock() {
       super();
     }
-
   }
 
   static class PermissionService_Default_Mock extends AbstractPermissionServiceMock {

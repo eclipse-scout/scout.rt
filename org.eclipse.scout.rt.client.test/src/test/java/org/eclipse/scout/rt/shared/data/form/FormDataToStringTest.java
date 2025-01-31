@@ -103,7 +103,6 @@ public class FormDataToStringTest {
       public class InnerProperty extends AbstractPropertyData<String> {
         private static final long serialVersionUID = 1L;
       }
-
     }
 
     public class IntArrayValue extends AbstractValueFieldData<int[]> {
@@ -118,5 +117,4 @@ public class FormDataToStringTest {
       private static final long serialVersionUID = 1L;
     }
   }
-
 }

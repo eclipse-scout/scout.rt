@@ -40,9 +40,9 @@ public class FastBeanInfo {
 
   /**
    * @return the property descriptor for that name
-   *         <p>
-   *         This method is lenient and checks for upper and lower case named properties. For example
-   *         {@link #getPropertyDescriptor("vATRate")} will also check for property "VATRate" and vis versa.
+   * <p>
+   * This method is lenient and checks for upper and lower case named properties. For example
+   * {@link #getPropertyDescriptor("vATRate")} will also check for property "VATRate" and vis versa.
    */
   public FastPropertyDescriptor getPropertyDescriptor(String name) {
     FastPropertyDescriptor p = m_propertyMap.get(name);

@@ -91,12 +91,12 @@ public class JsonFileChooserAcceptAttributeBuilder {
 
   /**
    * @param mimeType
-   *          never null
+   *     never null
    * @param ext
-   *          without leading '*' or '.'. May be null.
+   *     without leading '*' or '.'. May be null.
    * @return the text used in the accept tag in the input element, never null
-   *         <p>
-   *         typically this is the mime type or the file extension with a leading '.'
+   * <p>
+   * typically this is the mime type or the file extension with a leading '.'
    */
   protected String convertToAcceptType(String mimeType, String ext) {
     switch (mimeType) {

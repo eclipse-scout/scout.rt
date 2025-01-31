@@ -24,5 +24,4 @@ public interface ITableRowTileMapping extends IPropertyObserver {
   ITile getTile();
 
   TableRowTileMapping withTile(ITile tile);
-
 }

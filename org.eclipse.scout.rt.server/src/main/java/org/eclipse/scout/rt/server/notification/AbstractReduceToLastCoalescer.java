@@ -22,5 +22,4 @@ public abstract class AbstractReduceToLastCoalescer<T> implements ICoalescer<T> 
   public List<T> coalesce(List<T> list) {
     return CollectionUtility.arrayList(CollectionUtility.lastElement(list));
   }
-
 }

@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * Not thread safe, to be accessed in client model job.
  *
  * @param T
- *          event type
+ *     event type
  */
 @Bean
 public abstract class AbstractEventBuffer<T extends IModelEvent> {
@@ -106,9 +106,9 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
    * Removes all events of the same type from the list.
    *
    * @param type
-   *          Event type to remove from the list.
+   *     Event type to remove from the list.
    * @param events
-   *          List to filter. Must not be <code>null</code>.
+   *     List to filter. Must not be <code>null</code>.
    */
   protected void remove(int type, List<T> events) {
     remove(Collections.singleton(type), events);
@@ -118,9 +118,9 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
    * Removes all events of the same type from the list.
    *
    * @param types
-   *          List of event types to remove from the list. Must not be <code>null</code>.
+   *     List of event types to remove from the list. Must not be <code>null</code>.
    * @param events
-   *          List to filter. Must not be <code>null</code>.
+   *     List to filter. Must not be <code>null</code>.
    */
   protected void remove(Set<Integer> types, List<T> events) {
     events.removeIf(event -> types.contains(event.getType()));

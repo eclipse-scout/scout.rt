@@ -87,7 +87,7 @@ public class FormBasedAccessController implements IAccessController {
    * requested resource.
    *
    * @return <code>true</code> if the request was handled (caller should exit chain), or <code>false</code> if nothing
-   *         was done (caller should continue by invoking subsequent authenticators).
+   * was done (caller should continue by invoking subsequent authenticators).
    */
   @SuppressWarnings({"squid:RedundantThrowsDeclarationCheck", "DuplicatedCode"}) // required so that overriding subclasses can throw ServletExceptions
   protected boolean handleAuthRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -198,7 +198,7 @@ public class FormBasedAccessController implements IAccessController {
    * attacks, and sets a 403 HTTP status code.
    *
    * @param status
-   *          is a {@link ICredentialVerifier} AUTH_* constant
+   *     is a {@link ICredentialVerifier} AUTH_* constant
    */
   protected void handleForbidden(int status, HttpServletResponse response) throws IOException {
     if (m_config.getStatus403WaitMillis() > 0L) {

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.mom.jms;
 
 import static org.junit.Assert.*;
+
 import java.io.Serializable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;

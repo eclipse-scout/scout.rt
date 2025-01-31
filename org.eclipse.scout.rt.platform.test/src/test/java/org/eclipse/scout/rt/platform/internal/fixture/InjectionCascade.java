@@ -30,5 +30,4 @@ public class InjectionCascade {
     m_d1.assertInit();
     m_d2.assertInit();
   }
-
 }

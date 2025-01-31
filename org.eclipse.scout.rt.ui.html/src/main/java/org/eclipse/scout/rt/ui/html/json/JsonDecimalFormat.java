@@ -42,5 +42,4 @@ public class JsonDecimalFormat implements IJsonObject {
     json.put("roundingMode", getDecimalFormat().getRoundingMode().name());
     return json;
   }
-
 }

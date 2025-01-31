@@ -177,5 +177,4 @@ public class SVGUtilityTest {
     SVGUtility.removeHyperlink(e);
     Assert.assertTrue(isXMLEqual(doc, baseline));
   }
-
 }

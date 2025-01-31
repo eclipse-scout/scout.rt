@@ -41,7 +41,9 @@ public final class BeanInstanceUtil {
 
   private static final Logger LOG = LoggerFactory.getLogger(BeanInstanceUtil.class);
 
-  /** Stack to keep track of beans being created to avoid circular dependencies */
+  /**
+   * Stack to keep track of beans being created to avoid circular dependencies
+   */
   private static final ThreadLocal<Deque<Class<?>>> INSTANTIATION_STACK = ThreadLocal.withInitial(ArrayDeque::new);
 
   private BeanInstanceUtil() {
@@ -51,7 +53,7 @@ public final class BeanInstanceUtil {
    * Creates a new bean instance.
    *
    * @param beanClazz
-   *          not null
+   *     not null
    * @return the newly created instance
    */
   public static <T> T createBean(Class<T> beanClazz) {
@@ -111,7 +113,7 @@ public final class BeanInstanceUtil {
    * Returns a new supplier which can be used multiple times to create a new initialized instance for given bean class.
    *
    * @param beanClazz
-   *          type of beans to create
+   *     type of beans to create
    * @return new supplier to create bean instances
    */
   public static <T> Supplier<T> beanInstanceCreator(Class<T> beanClazz) {
@@ -131,11 +133,11 @@ public final class BeanInstanceUtil {
    * current thread already in progress (possibly due to circular dependencies).
    *
    * @param instanceCreator
-   *          instance creator which will be called
+   *     instance creator which will be called
    * @param beanClazz
-   *          beanClazz to be checked
+   *     beanClazz to be checked
    * @throws BeanCreationException
-   *           if the bean is already bean instantiation is already in progress
+   *     if the bean is already bean instantiation is already in progress
    */
   public static <T> T createAndAssertNoCircularDependency(Supplier<T> instanceCreator, Class<?> beanClazz) {
     Deque<Class<?>> stack = INSTANTIATION_STACK.get();
@@ -185,7 +187,7 @@ public final class BeanInstanceUtil {
   /**
    * @return Constructor with {@link InjectBean} annotation
    * @throws BeanCreationException
-   *           in case of multiple {@link InjectBean} annotated constructors
+   *     in case of multiple {@link InjectBean} annotated constructors
    */
   @SuppressWarnings("unchecked")
   private static <T> Constructor<T> findInjectionConstructor(Class<T> clazz) {
@@ -235,10 +237,10 @@ public final class BeanInstanceUtil {
    * The method is package-private for testing purposes.
    *
    * @param clazz
-   *          The class {@link PostConstruct}-annotated methods are searched in.
+   *     The class {@link PostConstruct}-annotated methods are searched in.
    * @return Returns a collection of <em>accessible</em> {@link PostConstruct} methods.
    * @throws BeanCreationException
-   *           If unsupported methods are annotated with {@link PostConstruct} (i.e. those with parameters)
+   *     If unsupported methods are annotated with {@link PostConstruct} (i.e. those with parameters)
    */
   static Collection<Method> collectPostConstructMethods(Class<?> clazz) {
     return collectNonStaticMethodsWithAnnotation(clazz, PostConstruct.class, false, true);

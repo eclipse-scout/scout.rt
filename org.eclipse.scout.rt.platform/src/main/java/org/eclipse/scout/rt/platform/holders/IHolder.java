@@ -23,5 +23,4 @@ public interface IHolder<T> {
    * @return the holder type if available.
    */
   Class<T> getHolderType();
-
 }

@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.exception;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.junit.Before;

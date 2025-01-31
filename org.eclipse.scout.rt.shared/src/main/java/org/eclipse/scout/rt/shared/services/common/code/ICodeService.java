@@ -69,8 +69,8 @@ public interface ICodeService extends IService {
    * not be desired after invalidation!
    *
    * @param listener
-   *          The listener to add. All entries in the cache which accept the given {@link ICacheEntryFilter} have been
-   *          invalidated.
+   *     The listener to add. All entries in the cache which accept the given {@link ICacheEntryFilter} have been
+   *     invalidated.
    */
   void addInvalidationListener(ICacheInvalidationListener<CodeTypeCacheKey, ICodeType<?, ?>> listener);
 

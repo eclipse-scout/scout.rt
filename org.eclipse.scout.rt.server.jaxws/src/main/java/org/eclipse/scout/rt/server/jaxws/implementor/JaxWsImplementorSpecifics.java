@@ -214,7 +214,7 @@ public class JaxWsImplementorSpecifics {
 
   /**
    * @return Returns <code>true</code> if the given port is valid and can be reused for another invocation (typically in
-   *         a different transaction).
+   * a different transaction).
    */
   public boolean isValid(final Object port) {
     return true;

@@ -27,5 +27,4 @@ public class DefaultGroupManager<T extends ITile> extends AbstractTileAccordionG
   public Object getId() {
     return ID;
   }
-
 }

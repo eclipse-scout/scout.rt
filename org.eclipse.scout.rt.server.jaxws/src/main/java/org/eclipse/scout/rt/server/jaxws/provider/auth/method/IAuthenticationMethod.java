@@ -13,6 +13,7 @@ import java.security.Principal;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
+
 import jakarta.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -32,11 +33,11 @@ public interface IAuthenticationMethod {
    * Challenges the client for authentication and verifies credentials against the given {@link ICredentialVerifier}.
    *
    * @param messageContext
-   *          to access the SOAP message or HTTP headers.
+   *     to access the SOAP message or HTTP headers.
    * @param credentialVerifier
-   *          used to verify a user's credentials.
+   *     used to verify a user's credentials.
    * @param principalProducer
-   *          used to produce {@link Principal} objects for authenticated users.
+   *     used to produce {@link Principal} objects for authenticated users.
    * @return authenticated {@link Principal}, or <code>null</code> if forbidden.
    */
   @SuppressWarnings("squid:S00112")

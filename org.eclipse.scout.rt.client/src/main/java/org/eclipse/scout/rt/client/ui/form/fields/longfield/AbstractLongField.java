@@ -86,5 +86,4 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
   protected ILongFieldExtension<? extends AbstractLongField> createLocalExtension() {
     return new LocalLongFieldExtension<>(this);
   }
-
 }

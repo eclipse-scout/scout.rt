@@ -126,5 +126,4 @@ public class TableOrganizer implements ITableOrganizer {
   protected ITable getTable() {
     return m_table;
   }
-
 }

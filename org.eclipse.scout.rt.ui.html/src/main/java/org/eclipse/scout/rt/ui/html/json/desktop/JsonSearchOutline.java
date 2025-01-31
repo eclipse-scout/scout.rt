@@ -67,5 +67,4 @@ public class JsonSearchOutline<SEARCH_OUTLINE extends ISearchOutline> extends Js
     addPropertyEventFilterCondition(ISearchOutline.PROP_SEARCH_QUERY, query);
     getModel().getUIFacade().search(query);
   }
-
 }

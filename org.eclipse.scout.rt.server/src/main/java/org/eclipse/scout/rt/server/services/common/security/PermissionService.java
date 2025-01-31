@@ -69,7 +69,7 @@ public class PermissionService implements IPermissionService {
 
   /**
    * @return Permission classes from class inventory. By default all direct subclasses of {@link Permission} and
-   *         {@link BasicPermission} that are available in the {@link ClassInventory} are returned.
+   * {@link BasicPermission} that are available in the {@link ClassInventory} are returned.
    */
   protected Set<IClassInfo> getPermissionsFromInventory() {
     IClassInventory inv = ClassInventory.get();
@@ -88,7 +88,7 @@ public class PermissionService implements IPermissionService {
    * </ul>
    *
    * @param permInfo
-   *          the class to be checked
+   *     the class to be checked
    * @return Returns <code>true</code> if the class used by this service. <code>false</code> otherwise.
    */
   protected boolean acceptClass(IClassInfo permInfo) {
@@ -99,11 +99,10 @@ public class PermissionService implements IPermissionService {
    * Checks whether the given class name is a potential permission class and used by this service.
    *
    * @param className
-   *          the class name to be checked
+   *     the class name to be checked
    * @return Returns <code>true</code> by default.
    */
   protected boolean acceptClassName(String className) {
     return true;
   }
-
 }

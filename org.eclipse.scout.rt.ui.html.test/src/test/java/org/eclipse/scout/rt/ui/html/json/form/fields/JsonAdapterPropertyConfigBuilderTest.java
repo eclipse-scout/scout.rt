@@ -49,5 +49,4 @@ public class JsonAdapterPropertyConfigBuilderTest {
     assertFalse(config.isGlobal());
     assertSame(actionFilter, config.getFilter());
   }
-
 }

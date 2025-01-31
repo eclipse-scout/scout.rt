@@ -49,7 +49,7 @@ public abstract class AbstractExceptionMapper<E extends Throwable> implements Ex
    * error information. Otherwise, clients relying on the entity would fail.
    *
    * @param exception
-   *          the exception to map to a response.
+   *     the exception to map to a response.
    * @return a response mapped from the supplied exception.
    */
   protected abstract Response toResponseImpl(E exception);

@@ -93,7 +93,7 @@ public abstract class AbstractTableFieldTile extends AbstractFormFieldTile<Table
    * To change the order or specify the insert position use {@link IColumn#setOrder(double)}.
    *
    * @param columns
-   *          live and mutable collection of configured columns, not yet initialized
+   *     live and mutable collection of configured columns, not yet initialized
    */
   protected void injectColumnsInternal(OrderedCollection<IColumn<?>> columns) {
   }
@@ -104,7 +104,7 @@ public abstract class AbstractTableFieldTile extends AbstractFormFieldTile<Table
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
    * @param menus
-   *          live and mutable collection of configured menus
+   *     live and mutable collection of configured menus
    */
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }

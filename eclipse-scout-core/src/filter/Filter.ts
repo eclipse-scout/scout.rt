@@ -23,6 +23,7 @@ export interface Filter<TElem extends FilterElement> {
 
 export interface FilterElement {
   filterAccepted: boolean;
+
   setFilterAccepted(accepted: boolean);
 }
 
@@ -60,7 +61,9 @@ export interface UpdateFilteredElementsOptions {
 
 export interface Filterable<TElem extends FilterElement> {
   isTextFilterFieldVisible(): boolean;
+
   filters: Filter<TElem>[];
   filteredElementsDirty?: boolean;
+
   updateFilteredElements?(result: FilterResult<TElem>, options: UpdateFilteredElementsOptions);
 }

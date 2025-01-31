@@ -229,7 +229,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     public void execLoadSession(ServerSessionLoadSessionChain chain) {
       getOwner().execLoadSession();
     }
-
   }
 
   protected final void interceptLoadSession() {

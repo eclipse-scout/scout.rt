@@ -90,5 +90,4 @@ public abstract class AbstractDataModelOperatorField extends AbstractSmartField<
   public IDataModelAttribute getAttribute() {
     return ((DataModelOperatorLookupCall) getLookupCall()).getAttribute();
   }
-
 }

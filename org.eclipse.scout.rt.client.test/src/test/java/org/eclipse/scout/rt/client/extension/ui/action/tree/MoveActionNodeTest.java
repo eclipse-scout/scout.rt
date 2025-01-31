@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.client.extension.ui.action.tree;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import java.util.List;
 

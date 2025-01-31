@@ -56,7 +56,6 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a single object.
-   *
    */
   @Test
   public void testShowDeleteConfirmationMessageOneObject() {
@@ -66,7 +65,6 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a single object in a list. Bug 440433.
-   *
    */
   @Test
   public void testShowDeleteConfirmationMessageSingletonList() {
@@ -76,7 +74,6 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a null parameter.
-   *
    */
   @Test
   public void testShowDeleteConfirmationMessageNull() {
@@ -86,7 +83,6 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a null object as parameter.
-   *
    */
   @Test
   public void testShowDeleteConfirmationMessageNullObject() {
@@ -97,7 +93,6 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an empty array.
-   *
    */
   @Test
   public void testShowDeleteConfirmationMessageEmptyArray() {
@@ -107,7 +102,6 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an empty list. Bug 440433.
-   *
    */
   @Test
   public void testShowDeleteConfirmationMessageEmptyList() {
@@ -117,7 +111,6 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an empty array.
-   *
    */
   @Test
   public void testShowDeleteConfirmationMessageEmptyArrayTextX() {
@@ -127,7 +120,6 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an empty list. Bug 440433.
-   *
    */
   @Test
   public void testShowDeleteConfirmationMessageEmptyListTextX() {
@@ -137,7 +129,6 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an simple array.
-   *
    */
   @Test
   public void testShowDeleteConfirmationMessageArray() {
@@ -166,7 +157,6 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an array containing a null.
-   *
    */
   @Test
   public void testShowDeleteConfirmationMessageArrayTextX() {
@@ -176,7 +166,6 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a list containing a null. Bug 440433.
-   *
    */
   @Test
   public void testShowDeleteConfirmationMessageListTextX() {
@@ -186,7 +175,6 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a big array.
-   *
    */
   @Test
   public void testShowDeleteConfirmationMessageBigArray() {
@@ -197,7 +185,6 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a big list. Bug 440433.
-   *
    */
   @Test
   public void testShowDeleteConfirmationMessageBigList() {
@@ -239,5 +226,4 @@ public class MessageBoxTest {
     assertEquals("No button text", TEXTS.get("NoButton"), messageBox.getNoButtonText());
     assertEquals("Cancel button text", null, messageBox.getCancelButtonText());
   }
-
 }

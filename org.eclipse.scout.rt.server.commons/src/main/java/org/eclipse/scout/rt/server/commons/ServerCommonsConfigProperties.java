@@ -45,7 +45,7 @@ public final class ServerCommonsConfigProperties {
     @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Enable or disable changing UrlHints using URL parameters in the browser address line.\n"
-          + "By default has the same value as the config property '%s' meaning it is by default only enabled in development mode.",
+              + "By default has the same value as the config property '%s' meaning it is by default only enabled in development mode.",
           BEANS.get(PlatformDevModeProperty.class).getKey());
     }
 
@@ -112,9 +112,9 @@ public final class ServerCommonsConfigProperties {
     @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Configures individual Content Security Policy (CSP) directives.\n"
-          + "See https://www.w3.org/TR/CSP2/ and the Bean '%s' for more details.\n"
-          + "The value must be provided as a Map.\n"
-          + "Example: scout.cspDirective[img-src]='self' data: https://media.example.com",
+              + "See https://www.w3.org/TR/CSP2/ and the Bean '%s' for more details.\n"
+              + "The value must be provided as a Map.\n"
+              + "Example: scout.cspDirective[img-src]='self' data: https://media.example.com",
           ContentSecurityPolicy.class.getName());
     }
   }

@@ -126,10 +126,10 @@ public class FutureSet {
    * Returns <code>true</code>, if all Futures which are accepted by the given filter match the specified matcher.
    *
    * @param filter
-   *          to limit the Futures to be matched by the matcher. If <code>null</code>, all contained Futures are
-   *          checked.
+   *     to limit the Futures to be matched by the matcher. If <code>null</code>, all contained Futures are
+   *     checked.
    * @param matcher
-   *          to match the filtered Futures.
+   *     to match the filtered Futures.
    * @return <code>true</code> if all Futures accepted by the specified Filter are successfully matched.
    */
   public boolean matchesEvery(final Predicate<IFuture<?>> filter, final Predicate<JobFutureTask<?>> matcher) {
@@ -160,15 +160,15 @@ public class FutureSet {
    * cancelled, or the timeout elapses.
    *
    * @param filter
-   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited.
+   *     filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited.
    * @param timeout
-   *          the maximal time to wait.
+   *     the maximal time to wait.
    * @param unit
-   *          unit of the given timeout.
+   *     unit of the given timeout.
    * @throws InterruptedException
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    * @throws TimeoutException
-   *           if the wait timed out.
+   *     if the wait timed out.
    */
   public void awaitDone(final Predicate<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException {
     Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout={}]", timeout);
@@ -196,15 +196,15 @@ public class FutureSet {
    * premature cancellation.
    *
    * @param filter
-   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited.
+   *     filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited.
    * @param timeout
-   *          the maximal time to wait.
+   *     the maximal time to wait.
    * @param unit
-   *          unit of the given timeout.
+   *     unit of the given timeout.
    * @throws InterruptedException
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    * @throws TimeoutException
-   *           if the wait timed out.
+   *     if the wait timed out.
    */
   public void awaitFinished(final Predicate<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException {
     Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout={}]", timeout);
@@ -234,7 +234,7 @@ public class FutureSet {
    * <p>
    *
    * @param filter
-   *          to limit the Futures to be returned. If <code>null</code>, all Futures are returned.
+   *     to limit the Futures to be returned. If <code>null</code>, all Futures are returned.
    * @return futures accepted by the given filter.
    */
   public final Set<IFuture<?>> values(final Predicate<IFuture<?>> filter) {
@@ -251,11 +251,11 @@ public class FutureSet {
    * Cancels all Futures which are accepted by the given {@link Predicate}.
    *
    * @param filter
-   *          to limit the Futures to be cancelled. If <code>null</code>, all contained Futures are cancelled.
+   *     to limit the Futures to be cancelled. If <code>null</code>, all contained Futures are cancelled.
    * @param interruptIfRunning
-   *          <code>true</code> to interrupt in-progress jobs.
+   *     <code>true</code> to interrupt in-progress jobs.
    * @return <code>true</code> if all Futures matching the Filter are cancelled successfully, or <code>false</code>, if
-   *         a Future could not be cancelled, typically because already completed normally.
+   * a Future could not be cancelled, typically because already completed normally.
    */
   public boolean cancel(final Predicate<IFuture<?>> filter, final boolean interruptIfRunning) {
     final Set<Boolean> success = new HashSet<>();

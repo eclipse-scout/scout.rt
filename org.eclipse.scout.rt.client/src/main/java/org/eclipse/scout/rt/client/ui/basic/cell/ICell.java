@@ -34,18 +34,18 @@ public interface ICell {
 
   /**
    * @return the cell text
-   *         <p>
-   *         This can be plain text or html text depending on {@link #isHtmlEnabled()}
-   *         <p>
-   *         In order to get human readable plain text call {@link #toPlainText()}
+   * <p>
+   * This can be plain text or html text depending on {@link #isHtmlEnabled()}
+   * <p>
+   * In order to get human readable plain text call {@link #toPlainText()}
    */
   String getText();
 
   /**
    * @return the cell text in plain text format
-   *         <p>
-   *         If {@link #isHtmlEnabled()} is set to false then this is the same as {@link #getText()}. Else
-   *         {@link HtmlHelper#toPlainText(String)} is called by {@link HTML}{@link #toPlainText()}.
+   * <p>
+   * If {@link #isHtmlEnabled()} is set to false then this is the same as {@link #getText()}. Else
+   * {@link HtmlHelper#toPlainText(String)} is called by {@link HTML}{@link #toPlainText()}.
    * @since 9.0
    */
   default String toPlainText() {
@@ -92,5 +92,4 @@ public interface ICell {
   boolean isContentValid();
 
   boolean isMandatoryFulfilled();
-
 }

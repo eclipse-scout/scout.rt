@@ -24,5 +24,4 @@ public abstract class AbstractBinaryConfigProperty extends AbstractConfigPropert
     }
     return bytes;
   }
-
 }

@@ -56,7 +56,7 @@ public class ClientUIPreferences {
   /**
    * @return a new instance of the {@link ClientUIPreferences}
    * @throws IllegalArgumentException
-   *           When no {@link IClientSession} is available in the current thread context ( {@link ISession#CURRENT}).
+   *     When no {@link IClientSession} is available in the current thread context ( {@link ISession#CURRENT}).
    */
   public static ClientUIPreferences getInstance() {
     return getInstance(ClientSessionProvider.currentSession());
@@ -533,7 +533,6 @@ public class ClientUIPreferences {
     if (flush) {
       flush();
     }
-
   }
 
   public void removeAllTableColumnPreferences(ITable table, String configName) {
@@ -570,7 +569,6 @@ public class ClientUIPreferences {
       }
     }
     flush();
-
   }
 
   public void setAllTableColumnPreferences(ITable table) {
@@ -1035,9 +1033,9 @@ public class ClientUIPreferences {
    * Sets a custom client preference data object for the given custom client preference ID.
    *
    * @param customClientPreferenceId
-   *          Required ID
+   *     Required ID
    * @param customClientPreference
-   *          Might be <code>null</code> to remove an already stored custom client preference data object.
+   *     Might be <code>null</code> to remove an already stored custom client preference data object.
    */
   public void setCustomClientPreference(CustomClientPreferenceId customClientPreferenceId, ICustomClientPreferenceDo customClientPreference) {
     assertNotNull(customClientPreferenceId, "customClientPreferenceId is required");
@@ -1056,7 +1054,7 @@ public class ClientUIPreferences {
 
   /**
    * @return A custom client preference data object for the given custom client preference ID, or <code>null</code> if
-   *         no custom client preference is available for the given ID.
+   * no custom client preference is available for the given ID.
    */
   public <T extends ICustomClientPreferenceDo> T getCustomClientPreference(CustomClientPreferenceId customClientPreferenceId, Class<T> customClientPreferenceClass) {
     if (m_prefs == null) {

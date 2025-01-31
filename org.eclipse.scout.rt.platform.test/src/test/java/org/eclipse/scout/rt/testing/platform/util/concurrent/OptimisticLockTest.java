@@ -64,5 +64,4 @@ public class OptimisticLockTest {
     assertFalse(l.isAcquired());
     assertTrue(l.isReleased());
   }
-
 }

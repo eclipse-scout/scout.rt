@@ -48,7 +48,7 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
    * Creates a new alphanumeric comparator.
    *
    * @param ignoreCase
-   *          whether the case should be ignored when comparing strings
+   *     whether the case should be ignored when comparing strings
    */
   public AlphanumericComparator(boolean ignoreCase) {
     m_ignoreCase = ignoreCase;

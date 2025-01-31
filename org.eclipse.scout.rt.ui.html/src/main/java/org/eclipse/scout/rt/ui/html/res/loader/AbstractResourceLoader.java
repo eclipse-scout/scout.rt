@@ -31,8 +31,8 @@ public abstract class AbstractResourceLoader implements IResourceLoader {
 
   /**
    * @param cache
-   *          The {@link IHttpResourceCache} to use for this loader. May be <code>null</code> (which means no caching
-   *          for this loader).
+   *     The {@link IHttpResourceCache} to use for this loader. May be <code>null</code> (which means no caching
+   *     for this loader).
    */
   protected AbstractResourceLoader(IHttpResourceCache cache) {
     m_cache = cache; // may also be null

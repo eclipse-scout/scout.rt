@@ -42,10 +42,10 @@ public interface ITokenVerifier {
    * Attempts to verify the given token.
    *
    * @param tokenParts
-   *          The decoded tokens to verify. Multiple parts are split by "-" / "." / "_" / "~" (see
-   *          https://datatracker.ietf.org/doc/html/rfc6750#section-2.1)
+   *     The decoded tokens to verify. Multiple parts are split by "-" / "." / "_" / "~" (see
+   *     https://datatracker.ietf.org/doc/html/rfc6750#section-2.1)
    * @return Result of the verification; one of {@link #AUTH_OK}, {@link #AUTH_FORBIDDEN},
-   *         {@link #AUTH_CREDENTIALS_REQUIRED}, {@link #AUTH_FAILED}
+   * {@link #AUTH_CREDENTIALS_REQUIRED}, {@link #AUTH_FAILED}
    */
   int verify(List<byte[]> tokenParts) throws IOException;
 }

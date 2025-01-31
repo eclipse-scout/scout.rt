@@ -148,5 +148,4 @@ public class CellExtension implements ICellSpecialization {
   public void setMandatory(boolean mandatory) {
     m_mandatory = mandatory;
   }
-
 }

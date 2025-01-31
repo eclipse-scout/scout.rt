@@ -29,7 +29,6 @@ public class IdInventory {
 
   private static final Logger LOG = LoggerFactory.getLogger(IdInventory.class);
 
-
   protected final Map<String, Class<? extends IId>> m_nameToClassMap = new HashMap<>();
   protected final Map<Class<? extends IId>, String> m_classToNameMap = new HashMap<>();
   protected final Map<Class<? extends IId>, Boolean> m_classToIdSignatureMap = new HashMap<>();
@@ -96,7 +95,7 @@ public class IdInventory {
 
   /**
    * @return the type name of the id class as defined by the {@link IdTypeName} annotation or <code>null</code> if the
-   *         annotation is not present.
+   * annotation is not present.
    */
   public String getTypeName(Class<? extends IId> idClass) {
     return m_classToNameMap.get(idClass);
@@ -106,7 +105,7 @@ public class IdInventory {
    * Convenience method for {@code IdInventory.getTypeName(id.getClass())}.
    *
    * @return the type name of the {@link IId} as defined by the {@link IdTypeName} annotation or <code>null</code> if
-   *         the annotation is not present.
+   * the annotation is not present.
    */
   public String getTypeName(IId id) {
     if (id == null) {
@@ -124,7 +123,7 @@ public class IdInventory {
 
   /**
    * @return Whether the {@link IId} needs to be serialized and deserialized using a signature or not. For more details
-   *         see {@link IdSignature}.
+   * see {@link IdSignature}.
    */
   public boolean isIdSignature(Class<? extends IId> idClass) {
     synchronized (m_classToIdSignatureMap) {

@@ -147,7 +147,6 @@ public class PageWithTableGroupingWithSortingTest {
           //invalid config on purpose
           return true;
         }
-
       }
 
       @Order(20)
@@ -156,7 +155,6 @@ public class PageWithTableGroupingWithSortingTest {
         protected String getConfiguredHeaderText() {
           return "Bit 2";
         }
-
       }
 
       @Order(30)
@@ -165,7 +163,6 @@ public class PageWithTableGroupingWithSortingTest {
         protected String getConfiguredHeaderText() {
           return "Bit 1";
         }
-
       }
 
       @Order(40)
@@ -175,9 +172,6 @@ public class PageWithTableGroupingWithSortingTest {
           return "Value";
         }
       }
-
     }
-
   }
-
 }

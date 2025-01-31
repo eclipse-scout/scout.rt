@@ -13,5 +13,4 @@ package org.eclipse.scout.rt.platform.events;
 public interface ISnapshotCollector {
 
   void add(String context, Object listener);
-
 }

@@ -27,8 +27,8 @@ public interface IWrappedFormField<T extends IForm> extends IFormField {
 
   /**
    * @return the current inner form.
-   *         <p>
-   *         <b>Please note:</b> This form may already be closed!
+   * <p>
+   * <b>Please note:</b> This form may already be closed!
    */
   T getInnerForm();
 
@@ -45,17 +45,17 @@ public interface IWrappedFormField<T extends IForm> extends IFormField {
    * Form will be closed if <code>manageFormLifeCycle</code> was set to <code>true</code>.
    *
    * @param form
-   *          The form to wrap
+   *     The form to wrap
    * @param manageFormLifeCycle
-   *          If <code>true</code>, the {@link IForm} is started with the currently set {@link IFormHandler}, or with
-   *          {@link NullFormHandler} if not set, and is closed once this {@link IFormField} is disposed, or another
-   *          inner form is set. If <code>false</code>, the caller is responsible for starting and closing the Form.
+   *     If <code>true</code>, the {@link IForm} is started with the currently set {@link IFormHandler}, or with
+   *     {@link NullFormHandler} if not set, and is closed once this {@link IFormField} is disposed, or another
+   *     inner form is set. If <code>false</code>, the caller is responsible for starting and closing the Form.
    */
   void setInnerForm(T form, boolean manageFormLifeCycle);
 
   /**
    * @return {@code true} if the lifecycle of the {@link IForm} is managed by the {@link IWrappedFormField},
-   *         {@code false} otherwise.
+   * {@code false} otherwise.
    */
   boolean isManageInnerFormLifeCycle();
 

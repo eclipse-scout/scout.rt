@@ -44,5 +44,4 @@ public class VerticalSmartGroupBoxBodyGrid extends AbstractGroupBoxBodyGrid {
     }
     setGridRows(matrix.getRowCount());
   }
-
 }

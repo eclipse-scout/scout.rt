@@ -196,5 +196,4 @@ public class ColumnVisibilityTest {
     public class Test3Column extends AbstractColumn<Object> {
     }
   }
-
 }

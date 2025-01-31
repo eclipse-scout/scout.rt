@@ -16,5 +16,4 @@ public interface ICodeVisitor<CODE extends ICode<?>> {
    * @return true=continue visiting, false=end visiting
    */
   boolean visit(CODE code, int treeLevel);
-
 }

@@ -29,9 +29,9 @@ public class BeanAnnotationsInitStatement extends Statement {
    * Creates a statement to register fields annotated with {@link BeanMock} or {@link Mock}.
    *
    * @param next
-   *          next {@link Statement} to be executed.
+   *     next {@link Statement} to be executed.
    * @param target
-   *          the target test object
+   *     the target test object
    */
   public BeanAnnotationsInitStatement(final Statement next, final Object target) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");

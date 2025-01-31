@@ -9,11 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import java.io.InputStream;
 import java.io.Serializable;

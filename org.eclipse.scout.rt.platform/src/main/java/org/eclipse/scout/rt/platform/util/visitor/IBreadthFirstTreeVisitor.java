@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.platform.util.visitor;
 /**
  * Visitor to traverse an element tree in a <i>Breadth-First</i> (BFS) strategy.
  *
- * @since 8.0
  * @see TreeVisitResult
  * @see TreeTraversals
+ * @since 8.0
  */
 @FunctionalInterface
 public interface IBreadthFirstTreeVisitor<T> {
@@ -23,13 +23,13 @@ public interface IBreadthFirstTreeVisitor<T> {
    * Visit callback.
    *
    * @param element
-   *          The visited element. Is never {@code null}.
+   *     The visited element. Is never {@code null}.
    * @param level
-   *          The level depth of the traversal. The root element on which the visit was started has the level {@code 0}.
-   *          Their children {@code 1} and so on.
+   *     The level depth of the traversal. The root element on which the visit was started has the level {@code 0}.
+   *     Their children {@code 1} and so on.
    * @param index
-   *          The index of the current element in the list of children of the parent. The root element on which the
-   *          visit was started has always the index {@code 0} even if it is not the first in the list of its parent!
+   *     The index of the current element in the list of children of the parent. The root element on which the
+   *     visit was started has always the index {@code 0} even if it is not the first in the list of its parent!
    * @return a {@link TreeVisitResult} indicating how to continue visiting. Must not be {@code null}.
    * @see TreeVisitResult#CONTINUE
    * @see TreeVisitResult#SKIP_SIBLINGS

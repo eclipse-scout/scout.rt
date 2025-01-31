@@ -24,5 +24,4 @@ public class DefaultValuesLoader extends AbstractResourceLoader {
   public BinaryResource loadResource(String pathInfo) throws IOException {
     return BEANS.get(IDefaultValuesFilterService.class).getCombinedDefaultValuesConfigurationFile(pathInfo);
   }
-
 }

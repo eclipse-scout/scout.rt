@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
  * {@link NamespaceVersion}.
  *
  * @see AbstractDoValueUntypedMigrationHandler for a handler allowing to rename and therefore change the type T of the
- *      migrated value.
+ * migrated value.
  */
 public abstract class AbstractDoValueMigrationHandler<T> extends AbstractDoValueUntypedMigrationHandler<T> {
 

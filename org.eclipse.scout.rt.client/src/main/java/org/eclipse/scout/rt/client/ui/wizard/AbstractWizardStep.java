@@ -182,9 +182,9 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
 
   /**
    * @param stepKind
-   *          any of the STEP_* constants activate this step normally creates a form, calls
-   *          {@link IForm#startWizardStep(IWizardStep, Class)} on the form and places the form inside the wizard
-   *          {@link IWizard#setWizardForm(IForm)}
+   *     any of the STEP_* constants activate this step normally creates a form, calls
+   *     {@link IForm#startWizardStep(IWizardStep, Class)} on the form and places the form inside the wizard
+   *     {@link IWizard#setWizardForm(IForm)}
    */
   @Order(10)
   @ConfigOperation
@@ -193,7 +193,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
 
   /**
    * @param stepKind
-   *          any of the STEP_* constants deactivate this step
+   *     any of the STEP_* constants deactivate this step
    */
   @Order(20)
   @ConfigOperation
@@ -216,9 +216,9 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
    * When the cached form is stored (it may still be open) this method is called.
    *
    * @param activation
-   *          true if this method is called by the wizard itself by {@link IWizardStep#activate(int)},
-   *          {@link IWizardStep#deactivate(int)} or {@link IWizardStep#dispose()} The default implementation does
-   *          nothing.
+   *     true if this method is called by the wizard itself by {@link IWizardStep#activate(int)},
+   *     {@link IWizardStep#deactivate(int)} or {@link IWizardStep#dispose()} The default implementation does
+   *     nothing.
    */
   @Order(40)
   @ConfigOperation
@@ -229,9 +229,9 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
    * When the cached form is discarded (save was either not requested or it was forcedly closed) this method is called.
    *
    * @param activation
-   *          true if this method is called by the wizard itself by {@link IWizardStep#activate(int)},
-   *          {@link IWizardStep#deactivate(int)} or {@link IWizardStep#dispose()} The default implementation does
-   *          nothing.
+   *     true if this method is called by the wizard itself by {@link IWizardStep#activate(int)},
+   *     {@link IWizardStep#deactivate(int)} or {@link IWizardStep#dispose()} The default implementation does
+   *     nothing.
    */
   @Order(50)
   @ConfigOperation
@@ -242,9 +242,9 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
    * When the cached form is closed (after some store and/or a discard operation) this method is called.
    *
    * @param activation
-   *          true if this method is called by the wizard itself by {@link IWizardStep#activate(int)},
-   *          {@link IWizardStep#deactivate(int)} or {@link IWizardStep#dispose()} The default implementation calls
-   *          {@link IWizard#doNextStep()} iff activation=false and form was saved (formDataChanged=true)
+   *     true if this method is called by the wizard itself by {@link IWizardStep#activate(int)},
+   *     {@link IWizardStep#deactivate(int)} or {@link IWizardStep#dispose()} The default implementation calls
+   *     {@link IWizard#doNextStep()} iff activation=false and form was saved (formDataChanged=true)
    */
   @Order(60)
   @ConfigOperation

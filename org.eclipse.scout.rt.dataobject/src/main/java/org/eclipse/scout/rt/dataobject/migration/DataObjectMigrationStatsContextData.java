@@ -80,7 +80,7 @@ public class DataObjectMigrationStatsContextData implements IDataObjectMigration
    * Accumulation of raw data object migration duration. To be called after migration of a single data object.
    *
    * @param startNano
-   *          {@link System#nanoTime()} when migration was started
+   *     {@link System#nanoTime()} when migration was started
    */
   protected void addMigrationDuration(long startNano) {
     m_accumulatedMigrationDurationNano.add(System.nanoTime() - startNano);
@@ -95,10 +95,10 @@ public class DataObjectMigrationStatsContextData implements IDataObjectMigration
 
   /**
    * @param name
-   *          Name to print for entities
+   *     Name to print for entities
    * @param entityCount
-   *          Number of entities processed (optional), can be different than the number of calls made to
-   *          {@link DataObjectMigrator#migrateDataObject(DataObjectMigrationContext, IDataObject, Class)}.
+   *     Number of entities processed (optional), can be different than the number of calls made to
+   *     {@link DataObjectMigrator#migrateDataObject(DataObjectMigrationContext, IDataObject, Class)}.
    */
   public void printStats(String name, Integer entityCount) {
     LOG.info("Data object migration of {}{} entities finished in {} ms (accumulated raw data object migration took {} ms). Changed {} of {} processed data objects.",

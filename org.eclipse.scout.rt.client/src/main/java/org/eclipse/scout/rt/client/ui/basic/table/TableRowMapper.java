@@ -40,11 +40,11 @@ public class TableRowMapper {
   /**
    * Convenience for mapping the values of this row to holders such as form fields and value containers
    *
-   * @see #exportRowData() and @see {@link #importRowData()}
    * @param enableExport
-   *          if true then the corresponding row value is included in {@link #exportRowData()}
+   *     if true then the corresponding row value is included in {@link #exportRowData()}
    * @param enableImport
-   *          if true then the corresponding row value is included in {@link #importRowData()}
+   *     if true then the corresponding row value is included in {@link #importRowData()}
+   * @see #exportRowData() and @see {@link #importRowData()}
    */
   public <T> void addMapping(IColumn<T> col, IHolder<T> holder, boolean enableExport, boolean enableImport) {
     if (enableExport) {
@@ -90,5 +90,4 @@ public class TableRowMapper {
       }
     }
   }
-
 }

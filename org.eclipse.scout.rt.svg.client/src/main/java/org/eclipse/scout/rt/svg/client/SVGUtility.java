@@ -86,7 +86,7 @@ public final class SVGUtility {
    * {@link #readSVGDocumentForGraphicalModification(InputStream)} instead.
    *
    * @param in
-   *          input stream the SVG document is read from.
+   *     input stream the SVG document is read from.
    * @return Returns the SVG document.
    */
   public static SVGDocument readSVGDocument(InputStream in) {
@@ -132,9 +132,9 @@ public final class SVGUtility {
    * If the documents needs not be manipulated, use {@link #readSVGDocument(InputStream)} instead.
    *
    * @param in
-   *          input stream the SVG document is read from.
+   *     input stream the SVG document is read from.
    * @return Returns a bridge context that holds references to the SVG document as well as to the GVT tree wrapping
-   *         objects.
+   * objects.
    */
   public static BridgeContext readSVGDocumentForGraphicalModification(InputStream in) {
     SVGDocument doc = readSVGDocument(in);
@@ -221,7 +221,7 @@ public final class SVGUtility {
    * to be attached to the svg document.
    *
    * @param rowGap
-   *          in px
+   *     in px
    */
   @SuppressWarnings("squid:S2583")
   public static void setTextContent(Element e, String value, final Float rowGap) {
@@ -277,8 +277,8 @@ public final class SVGUtility {
 
   /**
    * @param textContent
-   *          the text content on a node by using the child text node. Use this instead of e.setTextContent to be
-   *          compatible with batik 1.6 (jdk 1.4)
+   *     the text content on a node by using the child text node. Use this instead of e.setTextContent to be
+   *     compatible with batik 1.6 (jdk 1.4)
    */
   public static void setTextContent(Element e, String textContent) {
     //remove children
@@ -294,10 +294,10 @@ public final class SVGUtility {
    * This feature is experimental as a convenience since svg does not support native text operations.
    *
    * @param contextElement
-   *          is the {@link SVGTextContentElement} containing optional style and font information context for the
-   *          wrapping algorithm
+   *     is the {@link SVGTextContentElement} containing optional style and font information context for the
+   *     wrapping algorithm
    * @param wordWrap
-   *          in px
+   *     in px
    * @return the wrapped text with additional newline characters where it was wrapped.
    */
   public static String wrapText(SVGTextContentElement contextElement, String text, Float wordWrap) {
@@ -404,14 +404,14 @@ public final class SVGUtility {
    * This feature is experimental as a convenience since svg does not support native text operations.
    *
    * @param contextElement
-   *          is the {@link SVGTextContentElement} containing optional style and font information context for the
-   *          wrapping algorithm
+   *     is the {@link SVGTextContentElement} containing optional style and font information context for the
+   *     wrapping algorithm
    * @param text
-   *          is one line of text (no newlines)
+   *     is one line of text (no newlines)
    * @param clipWidth
-   *          in px
+   *     in px
    * @return the text clipped to fit the clipWidth. If the text is too large it is cropped and "..." is appended at the
-   *         end.
+   * end.
    */
   public static String clipText(SVGTextContentElement contextElement, String text, float clipWidth) {
     if (text == null || text.isEmpty()) {
@@ -456,10 +456,10 @@ public final class SVGUtility {
    * This feature is experimental as a convenience since svg does not support native text operations.
    *
    * @param contextElement
-   *          is the {@link SVGTextContentElement} containing optional style and font information context for the
-   *          wrapping algorithm
+   *     is the {@link SVGTextContentElement} containing optional style and font information context for the
+   *     wrapping algorithm
    * @param text
-   *          is one line of text (no newlines)
+   *     is one line of text (no newlines)
    * @return the text width in pixels
    */
   public static float getTextWidth(SVGTextContentElement contextElement, String text) {

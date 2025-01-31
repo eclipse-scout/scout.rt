@@ -61,9 +61,9 @@ public class ICalVEventBuilder {
    * Adds start and (optionally) end date.
    *
    * @param startDate
-   *          The start date.
+   *     The start date.
    * @param endDate
-   *          The optional end date.
+   *     The optional end date.
    * @return this instance
    */
   public ICalVEventBuilder withScheduling(LocalDate startDate, LocalDate endDate) {
@@ -84,11 +84,11 @@ public class ICalVEventBuilder {
    * Adds start and (optionally) end date.
    *
    * @param startDate
-   *          The start date. The UTC time zone is used to interpret the {@link Date}.
+   *     The start date. The UTC time zone is used to interpret the {@link Date}.
    * @param endDate
-   *          The optional end date. The UTC time zone is used to interpret the {@link Date}.
+   *     The optional end date. The UTC time zone is used to interpret the {@link Date}.
    * @param allDay
-   *          Specifies if it is an all-day event. If {@code true}, the time is ignored.
+   *     Specifies if it is an all-day event. If {@code true}, the time is ignored.
    * @return this instance
    */
   public ICalVEventBuilder withScheduling(Date startDate, Date endDate, Boolean allDay) {
@@ -99,14 +99,14 @@ public class ICalVEventBuilder {
    * Adds start and (optionally) end date.
    *
    * @param startDate
-   *          The start date. The UTC time zone is used to interpret the {@link Date}.
+   *     The start date. The UTC time zone is used to interpret the {@link Date}.
    * @param endDate
-   *          The optional end date. The UTC time zone is used to interpret the {@link Date}.
+   *     The optional end date. The UTC time zone is used to interpret the {@link Date}.
    * @param allDay
-   *          Specifies if it is an all-day event. If {@code true}, the time is ignored.
+   *     Specifies if it is an all-day event. If {@code true}, the time is ignored.
    * @param zone
-   *          The {@link TimeZone} of the given {@link Date} arguments. Specifies in which timezone the given dates
-   *          should be interpreted and therefore which date the iCal event will have. Only used for allDay events.
+   *     The {@link TimeZone} of the given {@link Date} arguments. Specifies in which timezone the given dates
+   *     should be interpreted and therefore which date the iCal event will have. Only used for allDay events.
    * @return this instance
    */
   public ICalVEventBuilder withScheduling(Date startDate, Date endDate, Boolean allDay, TimeZone zone) {

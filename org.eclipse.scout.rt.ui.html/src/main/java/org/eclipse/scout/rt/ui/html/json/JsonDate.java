@@ -86,8 +86,8 @@ public class JsonDate implements IJsonObject {
    * Returns the value as a JSON string in one of the canonical formats. Both date and time parts are returned.
    *
    * @param utc
-   *          If <code>true</code>, the date is normalized to the UTC time zone. The return value will then end with a
-   *          <code>'Z'</code> character. Otherwise, the local time zone is used (no trailing <code>'Z'</code>).
+   *     If <code>true</code>, the date is normalized to the UTC time zone. The return value will then end with a
+   *     <code>'Z'</code> character. Otherwise, the local time zone is used (no trailing <code>'Z'</code>).
    */
   public String asJsonString(boolean utc) {
     return asJsonString(utc, true, true);
@@ -97,16 +97,16 @@ public class JsonDate implements IJsonObject {
    * Returns the value as a JSON string in one of the canonical formats.
    *
    * @param utc
-   *          If <code>true</code>, the date is normalized to the UTC time zone. The return value will then end with a
-   *          <code>'Z'</code> character. Otherwise, the local time zone is used (no trailing <code>'Z'</code>).
+   *     If <code>true</code>, the date is normalized to the UTC time zone. The return value will then end with a
+   *     <code>'Z'</code> character. Otherwise, the local time zone is used (no trailing <code>'Z'</code>).
    * @param date
-   *          If <code>true</code>, the "date part" (year/month/date) is included in the return value. If the date is
-   *          not of concern, you can omit it in the output (and save some space) by setting this parameter to
-   *          <code>false</code>.
+   *     If <code>true</code>, the "date part" (year/month/date) is included in the return value. If the date is
+   *     not of concern, you can omit it in the output (and save some space) by setting this parameter to
+   *     <code>false</code>.
    * @param time
-   *          If <code>true</code>, the "time part" (hours/minutes/seconds/milliseconds) is included in the return
-   *          value. If the time is not of concern, you can omit it in the output (and save some space) by setting this
-   *          parameter to <code>false</code>.
+   *     If <code>true</code>, the "time part" (hours/minutes/seconds/milliseconds) is included in the return
+   *     value. If the time is not of concern, you can omit it in the output (and save some space) by setting this
+   *     parameter to <code>false</code>.
    */
   public String asJsonString(boolean utc, boolean date, boolean time) {
     if (!date && !time) {

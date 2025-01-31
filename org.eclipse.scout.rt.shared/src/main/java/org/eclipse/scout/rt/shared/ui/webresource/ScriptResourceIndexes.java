@@ -48,13 +48,13 @@ public class ScriptResourceIndexes {
    * Gets all assets that are required by the given entry point.
    *
    * @param entryPoint
-   *          The entry point name. Must not be {@code null}.
+   *     The entry point name. Must not be {@code null}.
    * @param minified
-   *          Specifies if minified or unminified assets should be returned.
+   *     Specifies if minified or unminified assets should be returned.
    * @param cacheEnabled
-   *          Specifies if the assets should be cached.
+   *     Specifies if the assets should be cached.
    * @return An unmodifiable {@link Set} holding the path to all assets (chunks) that are required by the given entry
-   *         point. Never returns {@code null}.
+   * point. Never returns {@code null}.
    */
   public static Set<String> getAssetsForEntryPoint(String entryPoint, boolean minified, boolean cacheEnabled) {
     return INSTANCE.get().getAssets(entryPoint, minified, cacheEnabled);
@@ -65,9 +65,9 @@ public class ScriptResourceIndexes {
    * asset fingerprint).
    *
    * @param path
-   *          The unminified path for which the minified path should be returned.
+   *     The unminified path for which the minified path should be returned.
    * @param cacheEnabled
-   *          Specifies if the assets should be cached.
+   *     Specifies if the assets should be cached.
    * @return The minified path corresponding to the input or the input path if no minified version can be found.
    */
   public static String getMinifiedPath(String path, boolean cacheEnabled) {
@@ -134,12 +134,12 @@ public class ScriptResourceIndexes {
    * the supplier is executed if the cache is not enabled.
    *
    * @param cache
-   *          The cache to use. Must not be {@code null}.
+   *     The cache to use. Must not be {@code null}.
    * @param cacheEnabled
-   *          Specifies if the caching is enabled. if {@code false} always the {@link Supplier} is executed and the
-   *          cache is not touched.
+   *     Specifies if the caching is enabled. if {@code false} always the {@link Supplier} is executed and the
+   *     cache is not touched.
    * @param elementSupplier
-   *          The {@link Supplier} that returns the value. Must not be {@code null} and must not return {@code null}.
+   *     The {@link Supplier} that returns the value. Must not be {@code null} and must not return {@code null}.
    * @return The computed (or cached) value.
    */
   protected <R> R computeIfAbsentOrDevMode(AtomicReference<R> cache, boolean cacheEnabled, Supplier<R> elementSupplier) {

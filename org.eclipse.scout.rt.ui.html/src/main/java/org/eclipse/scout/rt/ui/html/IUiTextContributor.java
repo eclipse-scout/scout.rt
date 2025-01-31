@@ -24,7 +24,7 @@ public interface IUiTextContributor extends IApiExposedItemContributor<String> {
 
   /**
    * @param textKeys
-   *          live set to modify
+   *     live set to modify
    */
   @Override
   void contribute(Set<String> textKeys);

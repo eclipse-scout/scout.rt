@@ -20,5 +20,4 @@ public class UuidProvider implements IUuidProvider {
   public UUID createUuid() {
     return UUID.randomUUID();
   }
-
 }

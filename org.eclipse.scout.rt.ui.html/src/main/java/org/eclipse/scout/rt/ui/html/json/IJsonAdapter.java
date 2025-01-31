@@ -20,7 +20,7 @@ import org.json.JSONObject;
  * Creates JSON output for a Scout model object.
  *
  * @param <T>
- *          Type of Scout model
+ *     Type of Scout model
  */
 public interface IJsonAdapter<T> extends IJsonObject {
 

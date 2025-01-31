@@ -29,7 +29,7 @@ public interface ITransaction extends ICancellable {
 
   /**
    * @throws TransactionCancelledError
-   *           if {@link #isCancelled()}
+   *     if {@link #isCancelled()}
    * @since 9.0
    */
   default void checkCancelled() {
@@ -47,7 +47,7 @@ public interface ITransaction extends ICancellable {
    * Registers the given transaction member to participate in the <code>2-phase-commit-protocol (2PC)</code>.
    *
    * @throws FutureCancelledError
-   *           if the transaction is cancelled.
+   *     if the transaction is cancelled.
    */
   void registerMember(ITransactionMember member);
 
@@ -65,7 +65,7 @@ public interface ITransaction extends ICancellable {
    * returned. This allows the member to participate in the <code>2-phase-commit-protocol (2PC)</code>.
    *
    * @return transaction member registered, or which was produced by the given mapping function, or null in case the
-   *         transaction has been cancelled.
+   * transaction has been cancelled.
    */
   <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsentAndNotCancelled(String memberId, Function<String, TRANSACTION_MEMBER> producer);
 
@@ -111,7 +111,7 @@ public interface ITransaction extends ICancellable {
    *
    * @return <code>true</code> if the commit phase 1 was successful on all members.
    * @throws FutureCancelledError
-   *           if the transaction is cancelled.
+   *     if the transaction is cancelled.
    */
   boolean commitPhase1();
 

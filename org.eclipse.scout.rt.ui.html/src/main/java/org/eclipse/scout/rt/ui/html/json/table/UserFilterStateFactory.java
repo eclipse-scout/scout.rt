@@ -32,5 +32,4 @@ public class UserFilterStateFactory implements IUserFilterStateFactory {
     }
     return null;
   }
-
 }

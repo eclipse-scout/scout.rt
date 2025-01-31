@@ -23,5 +23,4 @@ public interface ILogoutService extends IService {
    * session and new login will be needed to continue working
    */
   void logout();
-
 }

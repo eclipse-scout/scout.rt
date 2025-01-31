@@ -22,5 +22,4 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 public interface IBinaryResourceConsumer extends IUploadable {
 
   void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties);
-
 }

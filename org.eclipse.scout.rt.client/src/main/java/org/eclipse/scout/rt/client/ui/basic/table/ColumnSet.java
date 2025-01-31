@@ -224,7 +224,6 @@ public class ColumnSet {
     public void setAggregationFunction(String aggregationFunction) {
       m_aggregationFunction = aggregationFunction;
     }
-
   }
 
   private P_SortingAndGroupingConfig createSortingAndGroupingConfig(IColumn<?> col, String configName) {
@@ -306,7 +305,6 @@ public class ColumnSet {
     }
 
     applyGrouping(columnConfigs);
-
   }
 
   public void resetSortingAndGrouping() {
@@ -712,11 +710,11 @@ public class ColumnSet {
 
   /**
    * @param multiSort
-   *          True: Multiple sort columns are supported, which means the given column is added to the list of sort
-   *          columns, if not added yet.<br>
-   *          False: The selected column is set as the (new) primary sort column.<br>
+   *     True: Multiple sort columns are supported, which means the given column is added to the list of sort
+   *     columns, if not added yet.<br>
+   *     False: The selected column is set as the (new) primary sort column.<br>
    * @param ascending
-   *          Specifies the new sort direction
+   *     Specifies the new sort direction
    */
   public void handleSortEvent(IColumn col, boolean multiSort, boolean ascending) {
     col = resolveColumn(col);
@@ -1446,5 +1444,4 @@ public class ColumnSet {
       updateColumnStructure();
     }
   }
-
 }

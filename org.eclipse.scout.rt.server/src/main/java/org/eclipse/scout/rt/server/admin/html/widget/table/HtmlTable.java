@@ -118,5 +118,4 @@ public class HtmlTable extends HtmlComponent {
     }
     return result;
   }
-
 }

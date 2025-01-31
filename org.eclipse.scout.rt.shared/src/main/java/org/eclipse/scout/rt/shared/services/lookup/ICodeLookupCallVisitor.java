@@ -18,5 +18,4 @@ public interface ICodeLookupCallVisitor<KEY_TYPE> {
    * @return true=continue visiting, false=end visiting
    */
   boolean visit(CodeLookupCall<KEY_TYPE> call, ICode<KEY_TYPE> code, int treeLevel);
-
 }

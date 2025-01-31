@@ -57,11 +57,11 @@ public interface ITableUIFacade {
   /**
    * @param column
    * @param multiSort
-   *          True: Multiple sort columns are supported, which means the given column is added to the list of sort
-   *          columns, if not added yet.<br>
-   *          False: The selected column is set as the (new) primary sort column.<br>
+   *     True: Multiple sort columns are supported, which means the given column is added to the list of sort
+   *     columns, if not added yet.<br>
+   *     False: The selected column is set as the (new) primary sort column.<br>
    * @param ascending
-   *          Specifies the new sort direction
+   *     Specifies the new sort direction
    */
   void fireHeaderSortFromUI(IColumn<?> column, boolean multiSort, boolean ascending);
 
@@ -90,8 +90,8 @@ public interface ITableUIFacade {
 
   /**
    * @return the editing field or group box or null if no editing is available right now
-   *         <p>
-   *         The ui should call {@link #completeCellEditFromUI()} or {@link #cancelCellEditFromUI()} at some time.
+   * <p>
+   * The ui should call {@link #completeCellEditFromUI()} or {@link #cancelCellEditFromUI()} at some time.
    */
   IFormField prepareCellEditFromUI(ITableRow row, IColumn<?> col);
 
@@ -103,7 +103,7 @@ public interface ITableUIFacade {
 
   /**
    * @param reloadReason
-   *          see {@link IReloadReason}
+   *     see {@link IReloadReason}
    */
   void fireTableReloadFromUI(String reloadReason);
 

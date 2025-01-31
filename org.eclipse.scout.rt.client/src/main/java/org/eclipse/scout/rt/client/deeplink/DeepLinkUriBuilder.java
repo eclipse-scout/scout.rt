@@ -93,5 +93,4 @@ public final class DeepLinkUriBuilder {
   public URI createURI() {
     return m_builder.createURI();
   }
-
 }

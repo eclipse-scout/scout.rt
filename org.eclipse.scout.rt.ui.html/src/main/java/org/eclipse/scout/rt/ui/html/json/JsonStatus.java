@@ -72,5 +72,4 @@ public class JsonStatus implements IJsonObject {
     }
     return status;
   }
-
 }

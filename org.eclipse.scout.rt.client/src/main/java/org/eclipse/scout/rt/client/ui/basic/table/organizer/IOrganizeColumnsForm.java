@@ -18,5 +18,4 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 public interface IOrganizeColumnsForm extends IForm {
 
   void reload();
-
 }

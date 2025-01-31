@@ -37,5 +37,4 @@ public class SimpleConfigPropertyProvider implements IPropertyProvider {
   public List<Entry<String, String>> readProperties() {
     return m_properties;
   }
-
 }

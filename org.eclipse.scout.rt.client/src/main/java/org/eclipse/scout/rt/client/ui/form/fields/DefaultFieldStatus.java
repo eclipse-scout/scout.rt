@@ -37,5 +37,4 @@ public class DefaultFieldStatus extends Status {
   public DefaultFieldStatus(String message, String iconId, int severity, int code) {
     super(message, severity, code, iconId);
   }
-
 }

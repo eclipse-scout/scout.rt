@@ -118,5 +118,4 @@ public abstract class AbstractIcons implements Serializable {
   public static final String LongArrowUpBold = "font:\uF176";
   public static final String LongArrowLeftBold = "font:\uF177";
   public static final String LongArrowRightBold = "font:\uF178";
-
 }

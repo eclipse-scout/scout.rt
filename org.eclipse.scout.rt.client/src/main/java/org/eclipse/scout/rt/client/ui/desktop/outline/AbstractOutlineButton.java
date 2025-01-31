@@ -79,7 +79,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
    * </ul>
    *
    * @throws ProcessingException
-   *           if initialization fails
+   *     if initialization fails
    */
   @Override
   protected void execInitField() {
@@ -131,7 +131,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
    * desktop) if {@code selected} is {@code true}, does nothing otherwise.
    *
    * @param selection
-   *          the state of the toggle button
+   *     the state of the toggle button
    */
   @Override
   protected final void execSelectionChanged(boolean selection) {
@@ -143,5 +143,4 @@ public abstract class AbstractOutlineButton extends AbstractButton {
       }
     }
   }
-
 }

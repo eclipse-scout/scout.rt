@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.dataobject.enumeration;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,7 +24,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.Assertions.*;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

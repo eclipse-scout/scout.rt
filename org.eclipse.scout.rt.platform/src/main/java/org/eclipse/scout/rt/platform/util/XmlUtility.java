@@ -212,13 +212,13 @@ public final class XmlUtility {
    * Gets all child {@link Element}s having given tagName (case-sensitive) and an attribute with the given value.
    *
    * @param parent
-   *          The parent {@link Element}
+   *     The parent {@link Element}
    * @param tagName
-   *          The tag name of the child elements.
+   *     The tag name of the child elements.
    * @param requiredAttributeName
-   *          The name of the attribute the child elements must have.
+   *     The name of the attribute the child elements must have.
    * @param requiredAttributeValue
-   *          The value of the attribute with given name.
+   *     The value of the attribute with given name.
    * @return A {@link List} with all child {@link Element} having given tagName and an attribute with the given value.
    */
   public static List<Element> getChildElementsWithAttributes(Element parent, String tagName, String requiredAttributeName, String requiredAttributeValue) {
@@ -243,7 +243,7 @@ public final class XmlUtility {
    * Removes all attributes from given {@link Element}.
    *
    * @param element
-   *          The element
+   *     The element
    */
   public static void clearAttributes(Element element) {
     NamedNodeMap attributes = element.getAttributes();
@@ -258,14 +258,14 @@ public final class XmlUtility {
    * This method is intended to be used with {@link #setObjectAttribute(Element, String, Object)}.
    *
    * @param element
-   *          The element on which the attribute exists.
+   *     The element on which the attribute exists.
    * @param attribName
-   *          The name of the attribute.
+   *     The name of the attribute.
    * @return The deserialized object that is stored in the given attribute.
    * @throws IOException
-   *           If there is an error deserializing the data.
+   *     If there is an error deserializing the data.
    * @throws ClassNotFoundException
-   *           If there is an error deserializing the data.
+   *     If there is an error deserializing the data.
    */
   public static Object getObjectAttribute(Element element, String attribName) throws IOException, ClassNotFoundException {
     Object o = null;
@@ -281,13 +281,13 @@ public final class XmlUtility {
    * Saves the given object into an attribute with given name on the given {@link Element}.
    *
    * @param element
-   *          The element on which the given object should be saved.
+   *     The element on which the given object should be saved.
    * @param attribName
-   *          The attribute name in which the given object should be saved.
+   *     The attribute name in which the given object should be saved.
    * @param o
-   *          The object that should be stored.
+   *     The object that should be stored.
    * @throws IOException
-   *           If there is an error
+   *     If there is an error
    */
   public static void setObjectAttribute(Element element, String attribName, Object o) throws IOException {
     String base64 = null;
@@ -302,11 +302,11 @@ public final class XmlUtility {
    * Wellforms the given xml {@link Document} and flushes the result into the given output stream.
    *
    * @param document
-   *          The document to wellform.
+   *     The document to wellform.
    * @param out
-   *          The {@link OutputStream} that takes the wellformed document.
+   *     The {@link OutputStream} that takes the wellformed document.
    * @throws ProcessingException
-   *           if there is an exception wellforming the document.
+   *     if there is an exception wellforming the document.
    */
   public static void wellformDocument(Document document, OutputStream out) {
     wellformDocument(document, new StreamResult(out));
@@ -322,11 +322,11 @@ public final class XmlUtility {
    * Wellforms the given xml {@link Document} and flushes the result into the given {@link File}.
    *
    * @param document
-   *          The document to wellform.
+   *     The document to wellform.
    * @param f
-   *          The {@link File} where the result should be saved.
+   *     The {@link File} where the result should be saved.
    * @throws ProcessingException
-   *           if there is an exception wellforming the document or saving the result in the file.
+   *     if there is an exception wellforming the document or saving the result in the file.
    */
   public static void wellformDocument(Document document, File f) {
     File dir = f.getParentFile();
@@ -348,11 +348,11 @@ public final class XmlUtility {
    * Wellforms the given xml {@link Document} and flushes the result into the given {@link Writer}
    *
    * @param document
-   *          The document to wellform.
+   *     The document to wellform.
    * @param writer
-   *          The {@link Writer} where the result should be saved.
+   *     The {@link Writer} where the result should be saved.
    * @throws ProcessingException
-   *           if there is an exception wellforming the document or saving the result in the {@link Writer}.
+   *     if there is an exception wellforming the document or saving the result in the {@link Writer}.
    */
   public static void wellformDocument(Document document, Writer writer) {
     wellformDocument(document, new StreamResult(writer));
@@ -383,10 +383,10 @@ public final class XmlUtility {
    * Wellforms the given xml {@link Document} and returns the result as {@link String}.
    *
    * @param document
-   *          The document to wellform
+   *     The document to wellform
    * @return A {@link String} containing the xml {@link Document} content.
    * @throws ProcessingException
-   *           if there is an exception wellforming the document.
+   *     if there is an exception wellforming the document.
    */
   public static String wellformDocument(Document document) {
     StringWriter writer = new StringWriter();
@@ -398,10 +398,10 @@ public final class XmlUtility {
    * Takes the given xml input, creates an xml {@link Document} and returnes it as wellformed {@link String}.
    *
    * @param rawXml
-   *          The xml input.
+   *     The xml input.
    * @return A {@link String} containing the wellformed xml.
    * @throws ProcessingException
-   *           if there is an exception wellforming the input xml.
+   *     if there is an exception wellforming the input xml.
    */
   public static String wellformXml(String rawXml) {
     return wellformDocument(getXmlDocument(rawXml));
@@ -412,7 +412,7 @@ public final class XmlUtility {
    * The root element can be retrieved using {@link Document#getDocumentElement()}.
    *
    * @param rootTagName
-   *          The name of the root tag.
+   *     The name of the root tag.
    * @return The new document.
    */
   public static Document createNewXmlDocument(String rootTagName) {
@@ -432,10 +432,10 @@ public final class XmlUtility {
    * Creates an xml {@link Document} filled with the given {@link InputStream}.
    *
    * @param is
-   *          The input stream to use as data source.
+   *     The input stream to use as data source.
    * @return A xml {@link Document} containing the data of the given {@link InputStream}.
    * @throws ProcessingException
-   *           if there is an error reading from the {@link InputStream} or parsing the content.
+   *     if there is an error reading from the {@link InputStream} or parsing the content.
    */
   public static Document getXmlDocument(InputStream is) {
     try {
@@ -450,10 +450,10 @@ public final class XmlUtility {
    * Creates an xml {@link Document} filled with the content of the given {@link File}.
    *
    * @param f
-   *          The {@link File} to use as data source.
+   *     The {@link File} to use as data source.
    * @return A xml {@link Document} containing the data of the given {@link File}.
    * @throws ProcessingException
-   *           if there is an error reading from the {@link File} or parsing the content.
+   *     if there is an error reading from the {@link File} or parsing the content.
    */
   public static Document getXmlDocument(File f) {
     try {
@@ -468,10 +468,10 @@ public final class XmlUtility {
    * Creates an xml {@link Document} filled with the content of the given {@link URL}.
    *
    * @param url
-   *          The {@link URL} to use as data source.
+   *     The {@link URL} to use as data source.
    * @return A xml {@link Document} containing the data of the given {@link URL}.
    * @throws ProcessingException
-   *           if there is an error reading from the {@link URL} or parsing the content.
+   *     if there is an error reading from the {@link URL} or parsing the content.
    */
   public static Document getXmlDocument(URL url) {
     try (InputStream is = url.openStream()) {
@@ -486,10 +486,10 @@ public final class XmlUtility {
    * Creates an xml {@link Document} filled with the content of the given {@link String}.
    *
    * @param rawXml
-   *          The {@link String} holding the xml content.
+   *     The {@link String} holding the xml content.
    * @return A xml {@link Document} containing the data of the given {@link String}.
    * @throws ProcessingException
-   *           if there is an error parsing the content of the {@link String} into a {@link Document}.
+   *     if there is an error parsing the content of the {@link String} into a {@link Document}.
    */
   public static Document getXmlDocument(String rawXml) {
     try {
@@ -504,10 +504,10 @@ public final class XmlUtility {
    * Gets the first child {@link Element} of the given parent {@link Element} that has the given tag name.
    *
    * @param parent
-   *          The parent {@link Element}
+   *     The parent {@link Element}
    * @param tagName
-   *          The case-sensitive tag name the child {@link Element} must have. May be null. Then the first child element
-   *          with any name is returned.
+   *     The case-sensitive tag name the child {@link Element} must have. May be null. Then the first child element
+   *     with any name is returned.
    * @return The first child {@link Element} of the given parent {@link Element} having given tag name.
    */
   public static Element getFirstChildElement(Element parent, String tagName) {
@@ -525,7 +525,7 @@ public final class XmlUtility {
    * Gets all child {@link Element}s of the given parent {@link Element}.
    *
    * @param parent
-   *          The parent element.
+   *     The parent element.
    * @return A {@link List} containing all child {@link Element} of the given parent {@link Element}.
    */
   public static List<Element> getChildElements(Element parent) {
@@ -536,12 +536,12 @@ public final class XmlUtility {
    * Gets all child {@link Element}s of the given parent {@link Element} having the given tag name.
    *
    * @param parent
-   *          The parent {@link Element}.
+   *     The parent {@link Element}.
    * @param tagName
-   *          The case-sensitive tag name of the child {@link Element}s to return. May be null. In this case all child
-   *          {@link Element}s are returned.
+   *     The case-sensitive tag name of the child {@link Element}s to return. May be null. In this case all child
+   *     {@link Element}s are returned.
    * @return A {@link List} containing all child {@link Element} of given parent {@link Element} having the given tag
-   *         name.
+   * name.
    */
   public static List<Element> getChildElements(Element parent, String tagName) {
     final NodeList children = parent.getChildNodes();

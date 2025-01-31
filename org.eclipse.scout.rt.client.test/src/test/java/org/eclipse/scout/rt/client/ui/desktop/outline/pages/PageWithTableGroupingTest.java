@@ -70,7 +70,6 @@ public class PageWithTableGroupingTest {
     //add another grouping column:
     table.getUIFacade().fireHeaderGroupFromUI(b1, true, true);
     assertGroupingState(table, CollectionUtility.arrayList(b2, b1), CollectionUtility.<IColumn> emptyArrayList());
-
   }
 
   @Test
@@ -108,7 +107,6 @@ public class PageWithTableGroupingTest {
     setup();
 
     assertGroupingState(table, CollectionUtility.arrayList(b3, b2), CollectionUtility.arrayList(b1));
-
   }
 
   public static class PageWithTableOutline extends AbstractOutline {
@@ -168,7 +166,6 @@ public class PageWithTableGroupingTest {
         protected boolean getConfiguredGrouped() {
           return true;
         }
-
       }
 
       @Order(20)
@@ -195,7 +192,6 @@ public class PageWithTableGroupingTest {
         protected int getConfiguredSortIndex() {
           return 3;
         }
-
       }
 
       @Order(40)
@@ -205,9 +201,6 @@ public class PageWithTableGroupingTest {
           return "Value";
         }
       }
-
     }
-
   }
-
 }

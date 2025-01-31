@@ -33,5 +33,4 @@ public class ClientNotificationClusterNotification implements Serializable {
     tsb.attr("ClientNotificationMessage", m_cnMessages);
     return tsb.toString();
   }
-
 }

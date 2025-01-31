@@ -103,5 +103,4 @@ public class JsonLookupCallResult<T> implements IJsonObject {
     }
     return new JsonLookupCallResult<>(result, multipleColumns, keyMapper).toJson();
   }
-
 }

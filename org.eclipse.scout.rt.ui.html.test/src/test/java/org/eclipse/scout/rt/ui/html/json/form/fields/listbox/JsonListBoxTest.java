@@ -116,7 +116,5 @@ public class JsonListBoxTest {
       result.add(new LookupRow<>(1L, "b"));
       result.add(new LookupRow<>(2L, "c"));
     }
-
   }
-
 }

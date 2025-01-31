@@ -172,7 +172,6 @@ public class JsonBeanTest {
     public void setDate(Date date) {
       m_date = date;
     }
-
   }
 
   public static class BeanWithCollection {
@@ -185,7 +184,6 @@ public class JsonBeanTest {
     public void setLongs(List<Long> longs) {
       m_longs = longs;
     }
-
   }
 
   public static class BeanWithByteArray {
@@ -198,7 +196,6 @@ public class JsonBeanTest {
     public void setBytes(byte[] bytes) {
       m_bytes = bytes;
     }
-
   }
 
   public static class BeanWithMap {
@@ -211,7 +208,6 @@ public class JsonBeanTest {
     public void setMap(Map<Object, Object> map) {
       m_map = map;
     }
-
   }
 
   public static class BeanWithIgnoredProperty {
@@ -244,6 +240,5 @@ public class JsonBeanTest {
     public void setIgnoredDefault(String ignoredDefault) {
       m_ignoredDefault = ignoredDefault;
     }
-
   }
 }

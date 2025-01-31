@@ -28,8 +28,8 @@ import org.mockito.Mockito;
 /**
  * JUnit tests for {@link AbstractSqlStyle}
  *
- * @since 3.9.0
  * @author awe, msc, kle
+ * @since 3.9.0
  */
 @SuppressWarnings("resource")
 public class AbstractSqlStyleTest {
@@ -157,7 +157,7 @@ public class AbstractSqlStyleTest {
    * {@link AbstractSqlStyle#writeBind(PreparedStatement, int, SqlBind)}
    *
    * @param nullType
-   *          {@link Types} null type for preparedStatement
+   *     {@link Types} null type for preparedStatement
    * @throws SQLException
    */
   private void verifySetNullCalledOnPS(int nullType) throws SQLException {

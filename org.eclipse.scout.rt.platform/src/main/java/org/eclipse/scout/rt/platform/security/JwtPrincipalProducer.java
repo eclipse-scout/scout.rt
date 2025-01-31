@@ -26,13 +26,13 @@ public class JwtPrincipalProducer implements IPrincipalProducer, IPrincipalProdu
 
   /**
    * @param username
-   *          or userId
+   *     or userId
    * @param params
-   *          <br/>
-   *          [0] = id_token resp. jwtTokenString<br/>
-   *          [1] = access_token, Optional<br/>
-   *          [2] = refresh_token, Optional<br/>
-   *          [3] = oid, Optional
+   *     <br/>
+   *     [0] = id_token resp. jwtTokenString<br/>
+   *     [1] = access_token, Optional<br/>
+   *     [2] = refresh_token, Optional<br/>
+   *     [3] = oid, Optional
    * @return the new {@link Principal}
    */
   @Override
@@ -46,15 +46,15 @@ public class JwtPrincipalProducer implements IPrincipalProducer, IPrincipalProdu
 
   /**
    * @param username
-   *          or userId
+   *     or userId
    * @param jwtTokenString
-   *          id_token
+   *     id_token
    * @param accessToken
-   *          access_token
+   *     access_token
    * @param refreshToken
-   *          refresh_token
+   *     refresh_token
    * @param oid
-   *          unique object id, UUID
+   *     unique object id, UUID
    * @return a new {@link JwtPrincipal}
    */
   public JwtPrincipal produceJwt(String username, String jwtTokenString, String accessToken, String refreshToken, String oid) {

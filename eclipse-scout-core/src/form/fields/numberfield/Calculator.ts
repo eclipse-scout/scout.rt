@@ -7,6 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
+
 /*
  * A simple calculator similar to eval but safe in use.
  * Supports the following format:

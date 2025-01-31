@@ -29,5 +29,4 @@ public interface ISessionListener extends EventListener {
    * Method invoked once the session state changed.
    */
   void sessionChanged(SessionEvent event);
-
 }

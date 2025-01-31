@@ -176,5 +176,4 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
     }
     return true;
   }
-
 }

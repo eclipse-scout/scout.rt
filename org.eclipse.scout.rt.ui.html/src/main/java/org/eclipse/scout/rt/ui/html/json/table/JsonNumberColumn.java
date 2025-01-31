@@ -45,5 +45,4 @@ public class JsonNumberColumn<T extends INumberColumn<?>> extends JsonColumn<T> 
   public boolean isValueRequired() {
     return true;
   }
-
 }

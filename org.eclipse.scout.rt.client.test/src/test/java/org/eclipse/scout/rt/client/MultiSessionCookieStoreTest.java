@@ -93,7 +93,6 @@ public class MultiSessionCookieStoreTest {
     ISession.CURRENT.remove();
     assertTrue("Cookie store should have contained cookie", cookieStore.remove(s_testuri1, COOKIE1));
     assertTrue(CollectionUtility.isEmpty(cookieStore.getCookies()));
-
   }
 
   /**

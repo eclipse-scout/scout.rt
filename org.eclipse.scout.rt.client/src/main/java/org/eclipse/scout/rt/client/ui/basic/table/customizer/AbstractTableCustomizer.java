@@ -50,5 +50,4 @@ public abstract class AbstractTableCustomizer implements ITableCustomizer {
   @Override
   public void setSerializedData(byte[] data) {
   }
-
 }

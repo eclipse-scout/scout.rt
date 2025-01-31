@@ -17,5 +17,4 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 public interface IProposalFieldUIFacade<VALUE> extends ISmartFieldUIFacade<VALUE> {
 
   void setValueAsStringFromUI(String value);
-
 }

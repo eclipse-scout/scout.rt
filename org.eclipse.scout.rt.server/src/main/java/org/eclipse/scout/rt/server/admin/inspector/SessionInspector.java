@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.security.auth.Subject;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -103,7 +104,7 @@ public class SessionInspector {
 
   private void manageCallInspectorList(long timeoutMillis) {
     synchronized (m_callListLock) {
-      for (Iterator it = m_callList.iterator(); it.hasNext();) {
+      for (Iterator it = m_callList.iterator(); it.hasNext(); ) {
         CallInspector c = (CallInspector) it.next();
         if (c.isTimeout(timeoutMillis)) {
           it.remove();

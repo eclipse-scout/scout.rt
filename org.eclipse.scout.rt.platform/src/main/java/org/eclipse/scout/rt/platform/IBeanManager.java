@@ -20,16 +20,16 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
  * The {@link IBeanManager} is a dynamic registry of {@link IBean}s which allows to register, unregister and retrieve
  * {@link IBean}s based on their Java {@link Class}.
  *
- * @since 5.1
  * @see IBean
+ * @since 5.1
  */
 public interface IBeanManager {
 
   /**
    * @param beanClazz
-   *          The {@link Class} defining the class hierarchy to return.
+   *     The {@link Class} defining the class hierarchy to return.
    * @return All {@link IBean}s below the given class hierarchy regardless if they have a {@link Replace} annotation or
-   *         not.
+   * not.
    */
   <T> List<IBean<T>> getRegisteredBeans(Class<T> beanClazz);
 
@@ -39,7 +39,7 @@ public interface IBeanManager {
    * specified {@code beanClazz}.
    *
    * @param beanClazz
-   *          The {@link Class} defining the bean to return.
+   *     The {@link Class} defining the bean to return.
    * @return {@link IBean} with exact matching {@code beanClazz} or null if no matching bean could be found
    */
   <T> IBean<T> getRegisteredBean(Class<?> beanClazz);
@@ -64,10 +64,10 @@ public interface IBeanManager {
    * </ul>
    *
    * @param beanClazz
-   *          The {@link Class} defining the class hierarchy to search the {@link IBean} in.
+   *     The {@link Class} defining the class hierarchy to search the {@link IBean} in.
    * @return The most specific {@link IBean} according to the description above.
    * @throws AssertionException
-   *           When the result is not unique or no {@link IBean} could be found.
+   *     When the result is not unique or no {@link IBean} could be found.
    */
   <T> IBean<T> getBean(Class<T> beanClazz);
 
@@ -78,10 +78,10 @@ public interface IBeanManager {
    * For a definition of the most specific {@link IBean} see {@link #getBean(Class)}.
    *
    * @param beanClazz
-   *          The {@link Class} defining the class hierarchy to search the {@link IBean} in.
+   *     The {@link Class} defining the class hierarchy to search the {@link IBean} in.
    * @return The most specific {@link IBean} or <code>null</code> if no {@link IBean} could be found.
    * @throws AssertionException
-   *           When the result is not unique.
+   *     When the result is not unique.
    */
   <T> IBean<T> optBean(Class<T> beanClazz);
 
@@ -92,9 +92,9 @@ public interface IBeanManager {
    * For a definition of the most specific {@link IBean} see {@link #getBean(Class)}.
    *
    * @param beanClazz
-   *          The {@link Class} defining the class hierarchy to search the {@link IBean} in.
+   *     The {@link Class} defining the class hierarchy to search the {@link IBean} in.
    * @return The most specific {@link IBean} or <code>null</code> if no {@link IBean} or no unique {@link IBean} could
-   *         be found.
+   * be found.
    */
   <T> IBean<T> uniqueBean(Class<T> beanClazz);
 
@@ -103,9 +103,9 @@ public interface IBeanManager {
    * annotation value.
    *
    * @param beanClazz
-   *          The {@link Class} defining the class hierarchy to return.
+   *     The {@link Class} defining the class hierarchy to return.
    * @return A {@link List} holding all {@link IBean}s that are part of the given class hierarchy and have not been
-   *         replaced by a child class (using {@link Replace} annotation).
+   * replaced by a child class (using {@link Replace} annotation).
    */
   <T> List<IBean<T>> getBeans(Class<T> beanClazz);
 
@@ -113,7 +113,7 @@ public interface IBeanManager {
    * Checks whether there is a registered bean for the specified {@code clazz}.
    *
    * @return {@code true} if {@code clazz} is a registered bean (even if the {@code clazz} is replaced by another bean),
-   *         else {@code false}
+   * else {@code false}
    */
   <T> boolean isBean(Class<T> clazz);
 
@@ -122,7 +122,7 @@ public interface IBeanManager {
    * {@link IBeanManager#registerBean(BeanMetaData)} with a new {@link BeanMetaData#BeanMetaData(Class)}
    *
    * @param clazz
-   *          The bean class to register.
+   *     The bean class to register.
    * @return the registered {@link IBean}.
    */
   <T> IBean<T> registerClass(Class<T> clazz);
@@ -132,7 +132,7 @@ public interface IBeanManager {
    * {@link IBean#getBeanClazz()} == clazz
    *
    * @param clazz
-   *          The class describing which {@link IBean}s to unregister.
+   *     The class describing which {@link IBean}s to unregister.
    */
   <T> void unregisterClass(Class<T> clazz);
 
@@ -140,7 +140,7 @@ public interface IBeanManager {
    * Registers a new {@link IBean} with the given bean description.
    *
    * @param beanData
-   *          The bean description used to register a new {@link IBean}.
+   *     The bean description used to register a new {@link IBean}.
    * @return The newly registered {@link IBean}.
    */
   <T> IBean<T> registerBean(BeanMetaData beanData);
@@ -149,7 +149,7 @@ public interface IBeanManager {
    * Unregisters the given {@link IBean}.
    *
    * @param bean
-   *          The {@link IBean} to unregister.
+   *     The {@link IBean} to unregister.
    */
   void unregisterBean(IBean<?> bean);
 }

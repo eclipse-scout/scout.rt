@@ -239,9 +239,9 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    * <p>
    *
    * @param oldCode
-   *          is the old (configured) code that is dumped after this call
+   *     is the old (configured) code that is dumped after this call
    * @param newCode
-   *          is the new code that replaces the old code
+   *     is the new code that replaces the old code
    */
   @ConfigOperation
   @Order(20)
@@ -532,10 +532,10 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    * <p>
    * Add a new root code, overwrite (drop) existing root code
    *
-   * @since 4.0
    * @param index
-   *          if index is -1 and the codeId existed before, then it is replaced at the same position. If index is -1 and
-   *          the codeId did not exist, then the code is appended to the end.
+   *     if index is -1 and the codeId existed before, then it is replaced at the same position. If index is -1 and
+   *     the codeId did not exist, then the code is appended to the end.
+   * @since 4.0
    */
   protected void addRootCodeInternal(int index, CODE code) {
     if (code == null) {
@@ -562,8 +562,8 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    * <p>
    * Remove a root code
    *
-   * @since 4.0
    * @return the index the code had in the list or -1
+   * @since 4.0
    */
   protected int removeRootCodeInternal(CODE_ID codeId) {
     CODE droppedCode = m_rootCodeMap.get(codeId);
@@ -572,7 +572,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     }
     int index = -1;
     if (m_rootCodeList != null) {
-      for (Iterator<CODE> it = m_rootCodeList.iterator(); it.hasNext();) {
+      for (Iterator<CODE> it = m_rootCodeList.iterator(); it.hasNext(); ) {
         index++;
         CODE candidateCode = it.next();
         if (candidateCode == droppedCode) {
@@ -672,6 +672,5 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     public void execOverwriteCode(CodeTypeWithGenericOverwriteCodeChain chain, ICodeRow<CODE_ID> oldCode, ICodeRow<CODE_ID> newCode) {
       getOwner().execOverwriteCode(oldCode, newCode);
     }
-
   }
 }

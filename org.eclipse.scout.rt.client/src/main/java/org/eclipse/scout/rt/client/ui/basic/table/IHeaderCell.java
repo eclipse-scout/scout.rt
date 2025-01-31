@@ -34,7 +34,7 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
 
   /**
    * @return The column index as present in the code. This index has nothing to do with the current view index of this
-   *         column in the table.
+   * column in the table.
    */
   int getColumnIndex();
 
@@ -47,7 +47,7 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
 
   /**
    * @param sortAscending
-   *          if this column is sorted ascending
+   *     if this column is sorted ascending
    * @return {@code true} if the value has been changed, {@code false} otherwise.
    */
   boolean setSortAscending(boolean sortAscending);
@@ -61,21 +61,21 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
 
   /**
    * @param sortActive
-   *          If sorting should be active for this column.
+   *     If sorting should be active for this column.
    * @return @return {@code true} if the value has been changed, {@code false} otherwise.
    */
   boolean setSortActive(boolean sortActive);
 
   /**
    * @return true if column is either a permanent head sort column or a permanent tail sort column.<br>
-   *         This means that the column remains sort column unless explicitly removed using
-   *         {@link ColumnSet#clearPermanentHeadSortColumns()} or {@link ColumnSet#clearPermanentTailSortColumns()}
+   * This means that the column remains sort column unless explicitly removed using
+   * {@link ColumnSet#clearPermanentHeadSortColumns()} or {@link ColumnSet#clearPermanentTailSortColumns()}
    */
   boolean isSortPermanent();
 
   /**
    * @param sortPermanent
-   *          if this column should be sorted permanent
+   *     if this column should be sorted permanent
    * @return @return {@code true} if the value has been changed, {@code false} otherwise.
    * @see #isSortPermanent()
    */
@@ -88,7 +88,7 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
 
   /**
    * @param groupingActive
-   *          If grouping is active for this column.
+   *     If grouping is active for this column.
    * @return @return {@code true} if the value has been changed, {@code false} otherwise.
    */
   boolean setGroupingActive(boolean groupingActive);
@@ -100,8 +100,8 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
 
   /**
    * @param text
-   *          the new header text for this column. May contain HTML tags to format it if {@link #isHtmlEnabled()} is
-   *          active. In that case it is the responsibility of the caller to ensure only safe HTML is inserted (XSS).
+   *     the new header text for this column. May contain HTML tags to format it if {@link #isHtmlEnabled()} is
+   *     active. In that case it is the responsibility of the caller to ensure only safe HTML is inserted (XSS).
    * @return @return {@code true} if the value has been changed, {@code false} otherwise.
    * @see #isHtmlEnabled()
    */
@@ -114,7 +114,7 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
 
   /**
    * @param iconId
-   *          The icon id of this column header.
+   *     The icon id of this column header.
    * @return @return {@code true} if the value has been changed, {@code false} otherwise.
    */
   boolean setIconId(String iconId);
@@ -126,8 +126,8 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
 
   /**
    * @param tooltipText
-   *          The tooltip text of this header. May contain HTML tags to format it if {@link #isTooltipHtmlEnabled()} is
-   *          active. In that case it is the responsibility of the caller to ensure only safe HTML is inserted (XSS).
+   *     The tooltip text of this header. May contain HTML tags to format it if {@link #isTooltipHtmlEnabled()} is
+   *     active. In that case it is the responsibility of the caller to ensure only safe HTML is inserted (XSS).
    * @return @return {@code true} if the value has been changed, {@code false} otherwise.
    * @see #isTooltipHtmlEnabled()
    */
@@ -141,8 +141,8 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
 
   /**
    * @param tooltipHtmlEnabled
-   *          If HTML is enabled for the tooltip text. If enabled, it is the responsibility of the caller of
-   *          {@link #setTooltipText(String)} to ensure only safe HTML is inserted (XSS).
+   *     If HTML is enabled for the tooltip text. If enabled, it is the responsibility of the caller of
+   *     {@link #setTooltipText(String)} to ensure only safe HTML is inserted (XSS).
    * @return @return {@code true} if the value has been changed, {@code false} otherwise.
    * @see #setTooltipText(String)
    */
@@ -155,7 +155,7 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
 
   /**
    * @param horizontalAlignment
-   *          The new horizontal alignment. See {@link IColumn#getHorizontalAlignment()}
+   *     The new horizontal alignment. See {@link IColumn#getHorizontalAlignment()}
    * @return @return {@code true} if the value has been changed, {@code false} otherwise.
    * @see IColumn#getHorizontalAlignment()
    */
@@ -169,8 +169,8 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
 
   /**
    * @param htmlEnabled
-   *          If HTML is enabled for the header text. If enabled, it is the responsibility of the caller of
-   *          {@link #setText(String)} to ensure only safe HTML is inserted (XSS).
+   *     If HTML is enabled for the header text. If enabled, it is the responsibility of the caller of
+   *     {@link #setText(String)} to ensure only safe HTML is inserted (XSS).
    * @return @return {@code true} if the value has been changed, {@code false} otherwise.
    * @see #setText(String)
    */
@@ -183,7 +183,7 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
 
   /**
    * @param menuEnabled
-   *          If menu is enabled for the header cell.
+   *     If menu is enabled for the header cell.
    * @return @return {@code true} if the value has been changed, {@code false} otherwise.
    */
   boolean setMenuEnabled(boolean menuEnabled);
@@ -195,7 +195,7 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
 
   /**
    * @param backgroundColor
-   *          The background color of the header.
+   *     The background color of the header.
    * @return @return {@code true} if the value has been changed, {@code false} otherwise.
    */
   boolean setBackgroundColor(String backgroundColor);
@@ -207,7 +207,7 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
 
   /**
    * @param foregroundColor
-   *          The font color of the header
+   *     The font color of the header
    * @return @return {@code true} if the value has been changed, {@code false} otherwise.
    */
   boolean setForegroundColor(String foregroundColor);
@@ -219,7 +219,7 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
 
   /**
    * @param font
-   *          The font of the header or {@code null} to use the default font.
+   *     The font of the header or {@code null} to use the default font.
    * @return @return {@code true} if the value has been changed, {@code false} otherwise.
    */
   boolean setFont(FontSpec font);

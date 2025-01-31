@@ -20,7 +20,7 @@ public interface ICancellable {
    * Attempts to cancel the execution of this {@link ICancellable}.
    *
    * @param interruptIfRunning
-   *          <code>true</code> if the thread executing this {@link ICancellable} should be interrupted.
+   *     <code>true</code> if the thread executing this {@link ICancellable} should be interrupted.
    * @return <code>false</code> if cancellation failed, typically because it has already cancelled or completed.
    */
   boolean cancel(boolean interruptIfRunning);

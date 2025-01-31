@@ -25,5 +25,4 @@ public class MockBeanMetaDataProducer implements IBeanAnnotationMetaDataProducer
         .withProducer(new MockBeanInstanceProducer())
         .withOrder(MOCK_BEAN_ORDER);
   }
-
 }

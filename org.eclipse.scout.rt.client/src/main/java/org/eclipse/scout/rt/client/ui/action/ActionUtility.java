@@ -126,7 +126,7 @@ public final class ActionUtility {
 
   /**
    * @deprecated will be removed in 24.1, use
-   *             {@link MenuUtility#updateContextMenuEnabledState(AbstractContextMenu, BooleanSupplier, IMenuType...)}.
+   * {@link MenuUtility#updateContextMenuEnabledState(AbstractContextMenu, BooleanSupplier, IMenuType...)}.
    */
   @Deprecated
   public static void updateContextMenuEnabledState(AbstractContextMenu<? extends IWidget> contextMenu, BooleanSupplier selectionEnabledStateSupplier, IMenuType... menuTypes) {
@@ -135,7 +135,7 @@ public final class ActionUtility {
 
   /**
    * @deprecated will be removed in 24.1, use
-   *             {@link MenuUtility#updateEnabledStateOfMenus(IWidget, boolean, IMenuType...)}.
+   * {@link MenuUtility#updateEnabledStateOfMenus(IWidget, boolean, IMenuType...)}.
    */
   @Deprecated
   public static void updateEnabledStateOfMenus(IWidget widget, boolean enabled, IMenuType... menuTypes) {

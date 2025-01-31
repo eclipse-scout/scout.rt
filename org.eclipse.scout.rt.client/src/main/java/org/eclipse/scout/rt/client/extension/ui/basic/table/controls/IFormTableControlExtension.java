@@ -16,5 +16,4 @@ import org.eclipse.scout.rt.client.ui.basic.table.controls.AbstractTableControl;
 public interface IFormTableControlExtension<OWNER extends AbstractTableControl> extends IActionExtension<OWNER> {
 
   void execInitForm(TableControlInitFormChain chain);
-
 }

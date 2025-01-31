@@ -76,5 +76,4 @@ public class BeanAnnotations {
     }
     m_regs = null;
   }
-
 }

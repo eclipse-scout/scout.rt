@@ -27,8 +27,8 @@ public interface IHtmlContent extends CharSequence, Serializable {
 
   /**
    * @param newLineToBr
-   *          {@code true} if new lines should be replaced by &lt;br&gt; tags, {@code false} otherwise (default is
-   *          {@code true}).
+   *     {@code true} if new lines should be replaced by &lt;br&gt; tags, {@code false} otherwise (default is
+   *     {@code true}).
    */
   IHtmlContent withNewLineToBr(boolean newLineToBr);
 }

@@ -15,12 +15,14 @@ package org.eclipse.scout.rt.testing.platform.runner.parameterized;
  */
 public abstract class AbstractScoutTestParameter implements IScoutTestParameter {
 
-  /** Name of the test parameter. */
+  /**
+   * Name of the test parameter.
+   */
   private final String m_name;
 
   /**
    * @param name
-   *          of the test parameter
+   *     of the test parameter
    */
   public AbstractScoutTestParameter(String name) {
     m_name = name;

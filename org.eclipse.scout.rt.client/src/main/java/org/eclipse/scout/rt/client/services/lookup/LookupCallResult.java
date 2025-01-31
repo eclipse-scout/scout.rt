@@ -40,5 +40,4 @@ public class LookupCallResult<LOOKUP_KEY> implements ILookupCallResult<LOOKUP_KE
   public List<ILookupRow<LOOKUP_KEY>> getLookupRows() {
     return m_lookupRows;
   }
-
 }

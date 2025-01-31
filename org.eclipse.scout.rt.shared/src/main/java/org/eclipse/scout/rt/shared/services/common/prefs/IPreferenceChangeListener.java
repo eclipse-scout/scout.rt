@@ -14,8 +14,8 @@ import java.util.EventListener;
 /**
  * Listener to be notified about changes in a preference node.
  *
- * @since 5.1
  * @see IPreferences#addPreferenceChangeListener(IPreferenceChangeListener)
+ * @since 5.1
  */
 @FunctionalInterface
 public interface IPreferenceChangeListener extends EventListener {
@@ -24,8 +24,7 @@ public interface IPreferenceChangeListener extends EventListener {
    * Callback when the preferences of the observed preference node has been changed.
    *
    * @param event
-   *          Event object containing the details about the change.
+   *     Event object containing the details about the change.
    */
   void preferenceChange(PreferenceChangeEvent event);
-
 }

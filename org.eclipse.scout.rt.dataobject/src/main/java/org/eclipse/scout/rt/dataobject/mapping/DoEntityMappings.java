@@ -68,8 +68,8 @@ public class DoEntityMappings<DO_ENTITY extends IDoEntity, PEER> {
    * Generic mapping, only use if otherwise not possible.
    *
    * @param fromDoConsumer
-   *          Make sure to handle node existence check (i.e. {@link DoNode#exists()}) manually before setting any value
-   *          in target.
+   *     Make sure to handle node existence check (i.e. {@link DoNode#exists()}) manually before setting any value
+   *     in target.
    */
   public <VALUE> DoEntityMappings<DO_ENTITY, PEER> with(BiConsumer<PEER, DO_ENTITY> toDoConsumer, BiConsumer<DO_ENTITY, PEER> fromDoConsumer) {
     m_mappings.add(new IDoEntityMapping<>() {
@@ -301,8 +301,8 @@ public class DoEntityMappings<DO_ENTITY extends IDoEntity, PEER> {
    * Adds a mapping for a contribution with an add predicate.
    *
    * @param addPredicate
-   *          Contribution is only added if predicate returns <code>true</code>. Recommended for optional contributions
-   *          which should only be present if e.g. non-empty.
+   *     Contribution is only added if predicate returns <code>true</code>. Recommended for optional contributions
+   *     which should only be present if e.g. non-empty.
    */
   public <CONTRIBUTION_DO_ENTITY extends IDoEntityContribution> DoEntityMappings<DO_ENTITY, PEER> withContribution(
       Class<CONTRIBUTION_DO_ENTITY> contributionClass,
@@ -350,8 +350,8 @@ public class DoEntityMappings<DO_ENTITY extends IDoEntity, PEER> {
    * Adds a mapping for a contribution allowing to use an own sub peer class.
    *
    * @param addPredicate
-   *          Contribution is only added if predicate returns <code>true</code>. Recommended for optional contributions
-   *          which should only be present if e.g. non-empty.
+   *     Contribution is only added if predicate returns <code>true</code>. Recommended for optional contributions
+   *     which should only be present if e.g. non-empty.
    */
   public <CONTRIBUTION_DO_ENTITY extends IDoEntityContribution, SUB_PEER extends PEER> DoEntityMappings<DO_ENTITY, PEER> withContribution(
       Class<CONTRIBUTION_DO_ENTITY> contributionClass,

@@ -31,7 +31,7 @@ public interface IAdaptable {
    * Asks the adaptable object to provide a representation of the given type.
    *
    * @param type
-   *          the requested type.
+   *     the requested type.
    * @return the object requested, or <code>null</code> if not supported by the adaptable object.
    */
   <T> T getAdapter(Class<T> type);

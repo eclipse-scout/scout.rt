@@ -23,5 +23,4 @@ public abstract class AbstractClipboardFieldExtension<OWNER extends AbstractClip
   public AbstractClipboardFieldExtension(OWNER owner) {
     super(owner);
   }
-
 }

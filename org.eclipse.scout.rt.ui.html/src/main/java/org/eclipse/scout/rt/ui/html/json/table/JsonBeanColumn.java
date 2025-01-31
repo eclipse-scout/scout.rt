@@ -45,5 +45,4 @@ public class JsonBeanColumn<T extends IColumn<?>> extends JsonColumn<T> {
       ((JsonBean) jsonObject).setBinaryResourceMediator(getJsonTable().getBinaryResourceMediator());
     }
   }
-
 }

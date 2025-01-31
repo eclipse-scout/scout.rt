@@ -313,5 +313,4 @@ public class CodeService implements ICodeService {
     List<Class<? extends ICodeType<?, ?>>> list = CollectionUtility.arrayList(allCodeTypeClasses);
     return getCodeTypes(list);
   }
-
 }

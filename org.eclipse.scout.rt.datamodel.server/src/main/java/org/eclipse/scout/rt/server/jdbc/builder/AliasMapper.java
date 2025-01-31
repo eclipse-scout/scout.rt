@@ -87,13 +87,13 @@ public class AliasMapper {
 
   /**
    * @param entityName
-   *          with or without the @ delimiters (lenient), for example
-   *          <ul>
-   *          <li>PERSON</li>
-   *          <li>TASK</li>
-   *          <li>@PERSON@</li>
-   *          <li>@TASK@</li>
-   *          </ul>
+   *     with or without the @ delimiters (lenient), for example
+   *     <ul>
+   *     <li>PERSON</li>
+   *     <li>TASK</li>
+   *     <li>@PERSON@</li>
+   *     <li>@TASK@</li>
+   *     </ul>
    * @return the alias for an entity, for example p, t etc.
    */
   public String getRootAlias(String entityName) {
@@ -102,15 +102,15 @@ public class AliasMapper {
 
   /**
    * @param entityName
-   *          with or without the @ delimiters (lenient), for example
-   *          <ul>
-   *          <li>PERSON</li>
-   *          <li>TASK</li>
-   *          <li>@PERSON@</li>
-   *          <li>@TASK@</li>
-   *          </ul>
+   *     with or without the @ delimiters (lenient), for example
+   *     <ul>
+   *     <li>PERSON</li>
+   *     <li>TASK</li>
+   *     <li>@PERSON@</li>
+   *     <li>@TASK@</li>
+   *     </ul>
    * @param alias
-   *          for example p, t etc.
+   *     for example p, t etc.
    */
   public void setRootAlias(String entityName, String alias) {
     m_rootAliases.put(cleanEntityName(entityName), alias);
@@ -126,13 +126,13 @@ public class AliasMapper {
 
   /**
    * @param entityName
-   *          with or without the @ delimiters (lenient), for example
-   *          <ul>
-   *          <li>PERSON</li>
-   *          <li>TASK</li>
-   *          <li>@PERSON@</li>
-   *          <li>@TASK@</li>
-   *          </ul>
+   *     with or without the @ delimiters (lenient), for example
+   *     <ul>
+   *     <li>PERSON</li>
+   *     <li>TASK</li>
+   *     <li>@PERSON@</li>
+   *     <li>@TASK@</li>
+   *     </ul>
    * @return the alias for an entity, for example p, t etc.
    */
   public String getNodeAlias(Object node, String entityName) {
@@ -147,15 +147,15 @@ public class AliasMapper {
 
   /**
    * @param entityName
-   *          with or without the @ delimiters (lenient), for example
-   *          <ul>
-   *          <li>PERSON</li>
-   *          <li>TASK</li>
-   *          <li>@PERSON@</li>
-   *          <li>@TASK@</li>
-   *          </ul>
+   *     with or without the @ delimiters (lenient), for example
+   *     <ul>
+   *     <li>PERSON</li>
+   *     <li>TASK</li>
+   *     <li>@PERSON@</li>
+   *     <li>@TASK@</li>
+   *     </ul>
    * @param alias
-   *          for example p, t etc.
+   *     for example p, t etc.
    */
   public void setNodeAlias(Object node, String entityName, String alias) {
     Map<String, String> map = m_nodeAliases.computeIfAbsent(node, k -> new HashMap<>());
@@ -231,5 +231,4 @@ public class AliasMapper {
     }
     return s;
   }
-
 }

@@ -76,5 +76,4 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
   protected IBigDecimalFieldExtension<? extends AbstractBigDecimalField> createLocalExtension() {
     return new LocalBigDecimalFieldExtension<>(this);
   }
-
 }

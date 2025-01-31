@@ -91,13 +91,13 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
    * processed to create a {@link ServiceTunnelResponse}.
    *
    * @param call
-   *          the original call
+   *     the original call
    * @param callData
-   *          the data created by the {@link IServiceTunnelContentHandler} used by this tunnel Create url connection and
-   *          write post data (if required)
+   *     the data created by the {@link IServiceTunnelContentHandler} used by this tunnel Create url connection and
+   *     write post data (if required)
    * @throws IOException
-   *           override this method to customize the creation of the {@link HttpResponse} see
-   *           {@link #addCustomHeaders(HttpRequest, ServiceTunnelRequest, byte[])}
+   *     override this method to customize the creation of the {@link HttpResponse} see
+   *     {@link #addCustomHeaders(HttpRequest, ServiceTunnelRequest, byte[])}
    */
   protected HttpResponse executeRequest(ServiceTunnelRequest call, byte[] callData) throws IOException {
     // fast check of wrong URL's for this tunnel
@@ -128,13 +128,13 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
 
   /**
    * @param httpRequest
-   *          request object
+   *     request object
    * @param method
-   *          GET or POST override this method to add custom HTTP headers
+   *     GET or POST override this method to add custom HTTP headers
    * @param call
-   *          request information
+   *     request information
    * @param callData
-   *          data as byte array
+   *     data as byte array
    * @throws IOException
    * @since 6.0
    */
@@ -167,7 +167,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
 
   /**
    * @return msgEncoder used to encode and decode a request / response to and from the binary stream. Default is the
-   *         {@link BinaryServiceTunnelContentHandler} which handles binary messages
+   * {@link BinaryServiceTunnelContentHandler} which handles binary messages
    */
   public IServiceTunnelContentHandler getContentHandler() {
     return m_contentHandler;
@@ -175,8 +175,8 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
 
   /**
    * @param msgEncoder
-   *          that can encode and decode a request / response to and from the binary stream. Default is the
-   *          {@link BinaryServiceTunnelContentHandler} which handles binary messages
+   *     that can encode and decode a request / response to and from the binary stream. Default is the
+   *     {@link BinaryServiceTunnelContentHandler} which handles binary messages
    */
   public void setContentHandler(IServiceTunnelContentHandler e) {
     m_contentHandler = e;

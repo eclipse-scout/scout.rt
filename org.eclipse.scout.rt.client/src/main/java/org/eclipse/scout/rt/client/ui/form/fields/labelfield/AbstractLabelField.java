@@ -183,5 +183,4 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
   protected ILabelFieldExtension<? extends AbstractLabelField> createLocalExtension() {
     return new LocalLabelFieldExtension<>(this);
   }
-
 }

@@ -420,7 +420,7 @@ public class UiSession implements IUiSession {
    * where the browser sends a cookie that doesn't match the user-settings which should not happen often.
    *
    * @return Whether the page must be reloaded by the browser (required when theme changes after client-session has been
-   *         initialized)
+   * initialized)
    */
   protected boolean initUiThemeInternal(HttpServletRequest req, HttpServletResponse resp, Map<String, String> sessionStartupParams) {
     ModelJobs.assertModelThread(); // because we change the model ("theme" property on the desktop)
@@ -462,8 +462,8 @@ public class UiSession implements IUiSession {
   protected JsonClientSession<?> createClientSessionAdapter(final IClientSession clientSession) {
     // Ensure adapter is created in model job, because the model might be accessed during the adapter's initialization
     final IFuture<JsonClientSession<?>> future = ModelJobs.schedule(() -> (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter), ModelJobs.newInput(
-        ClientRunContexts.copyCurrent()
-            .withSession(clientSession, true))
+            ClientRunContexts.copyCurrent()
+                .withSession(clientSession, true))
         .withName("Starting JsonClientSession")
         .withExceptionHandling(null, false /* propagate */)); // exception handling done by caller
 
@@ -493,9 +493,9 @@ public class UiSession implements IUiSession {
       uiFacade.fireGuiAttached();
       BEANS.get(UiThreadInterruption.class).detectAndClear(this, "startDesktop run end");
     }, ModelJobs.newInput(
-        ClientRunContexts.copyCurrent()
-            .withSession(m_clientSession, true)
-            .withProperties(sessionStartupParams)) // Make startup parameters available at {@link PropertyMap#CURRENT} during desktop attaching
+            ClientRunContexts.copyCurrent()
+                .withSession(m_clientSession, true)
+                .withProperties(sessionStartupParams)) // Make startup parameters available at {@link PropertyMap#CURRENT} during desktop attaching
         .withName("Starting Desktop")
         .withExceptionHandling(null, false /* propagate */)); // exception handling done by caller
 
@@ -510,7 +510,7 @@ public class UiSession implements IUiSession {
 
   protected void putInitializationStartupData(final String clientSessionAdapterId) {
     final IFuture<Locale> future = ModelJobs.schedule(m_clientSession::getLocale, ModelJobs.newInput(ClientRunContexts.copyCurrent()
-        .withSession(m_clientSession, true))
+            .withSession(m_clientSession, true))
         .withName("Looking up Locale")
         .withExceptionHandling(null, false)); // exception handling done by caller
 
@@ -631,11 +631,11 @@ public class UiSession implements IUiSession {
    * {@link Runnable} is executed in the current thread.
    *
    * @param runnable
-   *          {@link Runnable} to be executed.
+   *     {@link Runnable} to be executed.
    * @param name
-   *          name of the model job that is triggered.
+   *     name of the model job that is triggered.
    * @param wait
-   *          If {@code true}, method waits for the model job to complete.
+   *     If {@code true}, method waits for the model job to complete.
    */
   protected void runInModelJob(Runnable runnable, String name, boolean wait) {
     assertNotNull(runnable, "runnable is required");
@@ -784,7 +784,7 @@ public class UiSession implements IUiSession {
 
   /**
    * @return <code>true</code> if the given request has already been processed. The check is based on the sequence
-   *         number of the given request. If the request has no sequence number the method returns <code>false</code>.
+   * number of the given request. If the request has no sequence number the method returns <code>false</code>.
    */
   protected boolean isAlreadyProcessed(JsonRequest jsonRequest) {
     Long requestSequenceNo = jsonRequest.getSequenceNo();
@@ -850,7 +850,7 @@ public class UiSession implements IUiSession {
 
       // 3. Transform the response to JSON.
       final IFuture<JSONObject> future = ModelJobs.schedule(newResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext.copy()
-          .withRunMonitor(BEANS.get(RunMonitor.class))) // separate RunMonitor to not cancel 'response-to-json' job once processing is cancelled
+              .withRunMonitor(BEANS.get(RunMonitor.class))) // separate RunMonitor to not cancel 'response-to-json' job once processing is cancelled
           .withName("Transforming response to JSON")
           .withExecutionHint(UiJobs.EXECUTION_HINT_RESPONSE_TO_JSON)
           .withExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST, jsonRequest.getRequestType() == RequestType.POLL_REQUEST)
@@ -939,7 +939,7 @@ public class UiSession implements IUiSession {
 
   /**
    * @return a new {@link Callable} that returns the current {@link JsonResponse} as JSON and prepares a new current
-   *         json response for future jobs. The callable <b>must</b> be called from a model job.
+   * json response for future jobs. The callable <b>must</b> be called from a model job.
    */
   protected Callable<JSONObject> newResponseToJsonTransformer() {
     return () -> {
@@ -998,7 +998,7 @@ public class UiSession implements IUiSession {
 
       // 3. Transform the response to JSON.
       final IFuture<JSONObject> future = ModelJobs.schedule(newResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext.copy()
-          .withRunMonitor(BEANS.get(RunMonitor.class))) // separate RunMonitor to not cancel 'response-to-json' job once processing is cancelled
+              .withRunMonitor(BEANS.get(RunMonitor.class))) // separate RunMonitor to not cancel 'response-to-json' job once processing is cancelled
           .withName("Transforming response to JSON")
           .withExecutionHint(UiJobs.EXECUTION_HINT_RESPONSE_TO_JSON)
           .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
@@ -1427,9 +1427,9 @@ public class UiSession implements IUiSession {
    * Gets the {@link IUiSession} of the given {@link JSONObject}.
    *
    * @param req
-   *          The {@link HttpServletRequest} for which the {@link IUiSession} should be returned.
+   *     The {@link HttpServletRequest} for which the {@link IUiSession} should be returned.
    * @param jsonObject
-   *          The {@link JSONObject} that contains the content of the request.
+   *     The {@link JSONObject} that contains the content of the request.
    * @return The {@link IUiSession} of the given {@link HttpServletRequest} or <code>null</code>.
    */
   public static IUiSession get(HttpServletRequest req, JSONObject jsonObject) {
@@ -1444,9 +1444,9 @@ public class UiSession implements IUiSession {
    * Gets the {@link IUiSession} of the given {@link JsonRequest}.
    *
    * @param req
-   *          The {@link HttpServletRequest} for which the {@link IUiSession} should be returned.
+   *     The {@link HttpServletRequest} for which the {@link IUiSession} should be returned.
    * @param jsonReq
-   *          The {@link JsonRequest}.
+   *     The {@link JsonRequest}.
    * @return The {@link IUiSession} of the given {@link HttpServletRequest} or <code>null</code>.
    */
   public static IUiSession get(HttpServletRequest req, JsonRequest jsonReq) {
@@ -1460,9 +1460,9 @@ public class UiSession implements IUiSession {
    * Gets the {@link IUiSession} with the given id from the given {@link HttpServletRequest}.
    *
    * @param req
-   *          The {@link HttpServletRequest} for which the {@link IUiSession} should be returned.
+   *     The {@link HttpServletRequest} for which the {@link IUiSession} should be returned.
    * @param uiSessionId
-   *          The id of the UI session.
+   *     The id of the UI session.
    * @return The {@link IUiSession} of the given {@link HttpServletRequest} or <code>null</code>.
    */
   public static IUiSession get(HttpServletRequest req, String uiSessionId) {

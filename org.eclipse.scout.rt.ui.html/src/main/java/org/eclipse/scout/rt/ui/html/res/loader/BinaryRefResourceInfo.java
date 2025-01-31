@@ -46,7 +46,7 @@ public class BinaryRefResourceInfo {
 
   /**
    * @param path
-   *          decoded path (non url-encoded)
+   *     decoded path (non url-encoded)
    */
   public static BinaryRefResourceInfo fromPath(String path) {
     BinaryRefResourcePathComponents parts = BinaryRefResourcePathComponents.fromPath(path);
@@ -69,7 +69,7 @@ public class BinaryRefResourceInfo {
 
     /**
      * @param path
-     *          decoded path (non url-encoded)
+     *     decoded path (non url-encoded)
      * @see BinaryRefResourceInfo#fromPath(String)
      */
     public static BinaryRefResourcePathComponents fromPath(String path) {

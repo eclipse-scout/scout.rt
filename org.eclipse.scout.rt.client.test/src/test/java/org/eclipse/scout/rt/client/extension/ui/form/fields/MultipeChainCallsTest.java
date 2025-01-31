@@ -41,7 +41,6 @@ public class MultipeChainCallsTest extends AbstractLocalExtensionTestCase {
       nameFieldExecValidateCounter.incrementAndGet();
       return super.execValidateValue(rawValue);
     }
-
   }
 
   private static final AtomicInteger nameFieldExtExecValidateCounter = new AtomicInteger(0);
@@ -60,7 +59,5 @@ public class MultipeChainCallsTest extends AbstractLocalExtensionTestCase {
       Assert.assertEquals(chainVal01, chainVal02);
       return super.execValidateValue(chain, rawValue);
     }
-
   }
-
 }

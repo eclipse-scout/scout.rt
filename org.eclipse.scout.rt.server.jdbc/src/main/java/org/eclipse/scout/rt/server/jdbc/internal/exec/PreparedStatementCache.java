@@ -113,7 +113,7 @@ public class PreparedStatementCache extends AbstractTransactionMember implements
 
   @Override
   public void release() {
-    for (Iterator<Entry<String, PreparedStatement>> iterator = m_statementCache.entrySet().iterator(); iterator.hasNext();) {
+    for (Iterator<Entry<String, PreparedStatement>> iterator = m_statementCache.entrySet().iterator(); iterator.hasNext(); ) {
       Entry<String, PreparedStatement> entry = iterator.next();
       iterator.remove();
       closePreparedStatement(entry.getValue());

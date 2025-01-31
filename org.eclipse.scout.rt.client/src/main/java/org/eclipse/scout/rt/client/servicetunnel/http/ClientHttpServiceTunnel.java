@@ -86,7 +86,7 @@ public class ClientHttpServiceTunnel extends HttpServiceTunnel implements IClien
    * dispatch notifications in a client job and ensure to wait for dispatched notifications
    *
    * @param notifications
-   *          the notifications to dispatch
+   *     the notifications to dispatch
    */
   protected void dispatchClientNotifications(final List<ClientNotificationMessage> notifications) {
     if (CollectionUtility.isEmpty(notifications)) {
@@ -94,10 +94,10 @@ public class ClientHttpServiceTunnel extends HttpServiceTunnel implements IClien
     }
     final IBlockingCondition cond = Jobs.newBlockingCondition(true);
     Jobs.schedule(() -> {
-      ClientNotificationDispatcher notificationDispatcher = BEANS.get(ClientNotificationDispatcher.class);
-      notificationDispatcher.dispatchNotifications(notifications);
-    }, Jobs.newInput()
-        .withRunContext(ClientRunContexts.copyCurrent()))
+          ClientNotificationDispatcher notificationDispatcher = BEANS.get(ClientNotificationDispatcher.class);
+          notificationDispatcher.dispatchNotifications(notifications);
+        }, Jobs.newInput()
+            .withRunContext(ClientRunContexts.copyCurrent()))
         .whenDone(event -> cond.setBlocking(false), null);
     cond.waitFor();
   }

@@ -124,11 +124,11 @@ public final class FileUtility {
    * time stamps and file size match, will overwrite otherwise.
    *
    * @param source
-   *          the source file
+   *     the source file
    * @param dest
-   *          the destination file
+   *     the destination file
    * @throws IOException
-   *           if an error occurs during the copy operation
+   *     if an error occurs during the copy operation
    */
   public static void copyFile(File source, File dest) throws IOException {
     if (!source.exists()) {
@@ -169,9 +169,9 @@ public final class FileUtility {
           dest.getParentFile().mkdirs();
         }
         try (FileInputStream in = new FileInputStream(source);
-            FileChannel input = in.getChannel();
-            FileOutputStream out = new FileOutputStream(dest);
-            FileChannel output = out.getChannel()) {
+             FileChannel input = in.getChannel();
+             FileOutputStream out = new FileOutputStream(dest);
+             FileChannel output = out.getChannel()) {
 
           int maxCount = (mbCount * KILO_BYTE * KILO_BYTE) - (32 * KILO_BYTE);
           long size = input.size();
@@ -339,7 +339,7 @@ public final class FileUtility {
    * according to the grammar in the RFC.
    *
    * @param f
-   *          The file for which the content type should be returned.
+   *     The file for which the content type should be returned.
    * @return The content type or null if it could not be determined.
    */
   public static String getContentType(File f) {
@@ -351,9 +351,9 @@ public final class FileUtility {
 
   /**
    * @param path
-   *          may also be an invalid path
-   *          <p>
-   *          see {@link #getMimeType(Path)}
+   *     may also be an invalid path
+   *     <p>
+   *     see {@link #getMimeType(Path)}
    */
   public static String getMimeType(String path) {
     try {
@@ -382,7 +382,7 @@ public final class FileUtility {
    * If path is null or none of the {@link IMimeTypeDetector} decides then application/octet-stream is returned.
    *
    * @param path
-   *          The path for which the content type should be returned (including content inspection).
+   *     The path for which the content type should be returned (including content inspection).
    * @return The content type, never null
    */
   public static String getMimeType(Path path) {
@@ -405,7 +405,7 @@ public final class FileUtility {
   /**
    * @param file
    * @return the file-extension of the given file or null when file has no file-extension. Example "foo.png" will return
-   *         "png".
+   * "png".
    */
   public static String getFileExtension(File file) {
     if (file == null) {
@@ -417,7 +417,7 @@ public final class FileUtility {
   /**
    * @param fileName
    * @return the file-extension of the given file or null when file has no file-extension. Example "foo.png" will return
-   *         "png".
+   * "png".
    */
   public static String getFileExtension(String fileName) {
     String[] parts = getFilenameParts(fileName);
@@ -436,7 +436,6 @@ public final class FileUtility {
       return null;
     }
     return getFilenameParts(file.getName());
-
   }
 
   /**
@@ -548,7 +547,7 @@ public final class FileUtility {
    * Uses {@link #toValidFilename(String)} to check
    *
    * @return <tt>false</tt> if <tt>filename</tt> is not a valid filename<br/>
-   *         <tt>true</tt> if <tt>filename</tt> is a valid filename
+   * <tt>true</tt> if <tt>filename</tt> is a valid filename
    */
   public static boolean isValidFilename(String filename) {
     return toValidFilename(filename).equals(filename);
@@ -576,9 +575,9 @@ public final class FileUtility {
    * Creates a BinaryResource representing a zip file containing the provided BinaryResources.
    *
    * @param zipFilename
-   *          Name of zip file.
+   *     Name of zip file.
    * @param resources
-   *          BinaryResources to put in zip archive.
+   *     BinaryResources to put in zip archive.
    * @return BinaryResource representing a zip archive.
    */
   public static BinaryResource zip(String zipFilename, Collection<BinaryResource> resources) {
@@ -589,13 +588,13 @@ public final class FileUtility {
    * Creates a BinaryResource representing a zip file containing the provided BinaryResources.
    *
    * @param zipFilename
-   *          Name of zip file.
+   *     Name of zip file.
    * @param resources
-   *          BinaryResources to put in zip archive.
+   *     BinaryResources to put in zip archive.
    * @param avoidFileNameConflicts
-   *          If set to <tt>true</tt>, unique file names will be used to avoid {@link IOException} due to file name
-   *          conflicts. It may cause differences in file names and order between <tt>resources</tt> and the resulting
-   *          zip file.
+   *     If set to <tt>true</tt>, unique file names will be used to avoid {@link IOException} due to file name
+   *     conflicts. It may cause differences in file names and order between <tt>resources</tt> and the resulting
+   *     zip file.
    * @return BinaryResource representing a zip archive.
    */
   public static BinaryResource zip(String zipFilename, Collection<BinaryResource> resources, boolean avoidFileNameConflicts) {
@@ -692,7 +691,7 @@ public final class FileUtility {
    * For BinaryResources with non-unique file names a new BinaryResource is created with a counting suffix: '(x)'.
    *
    * @param resources
-   *          BinaryResources to put in zip archive.
+   *     BinaryResources to put in zip archive.
    * @return BinaryResources with unique file names
    */
   public static Collection<BinaryResource> getBinaryResourcesWithUniqueFileNames(Collection<BinaryResource> resources) {

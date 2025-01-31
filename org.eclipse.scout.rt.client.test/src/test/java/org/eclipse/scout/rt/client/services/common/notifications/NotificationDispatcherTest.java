@@ -70,11 +70,11 @@ public class NotificationDispatcherTest {
     final String stringNotification = "A simple string notification";
 
     Jobs.schedule(() -> {
-      final ClientNotificationDispatcher dispatcher = BEANS.get(ClientNotificationDispatcher.class);
-      dispatcher.dispatchForSession((IClientSession) IClientSession.CURRENT.get(), stringNotification, mock(ClientNotificationAddress.class));
-      waitForPendingNotifications(dispatcher);
-    }, Jobs.newInput()
-        .withRunContext(ClientRunContexts.copyCurrent()))
+          final ClientNotificationDispatcher dispatcher = BEANS.get(ClientNotificationDispatcher.class);
+          dispatcher.dispatchForSession((IClientSession) IClientSession.CURRENT.get(), stringNotification, mock(ClientNotificationAddress.class));
+          waitForPendingNotifications(dispatcher);
+        }, Jobs.newInput()
+            .withRunContext(ClientRunContexts.copyCurrent()))
         .whenDone(event -> cond.setBlocking(false), null);
     cond.waitFor();
     Mockito.verify(m_globalNotificationHandler, Mockito.times(1)).handleNotification(Mockito.any(Serializable.class));
@@ -86,13 +86,13 @@ public class NotificationDispatcherTest {
     final IBlockingCondition cond = Jobs.newBlockingCondition(true);
 
     Jobs.schedule(() -> {
-      ClientNotificationDispatcher dispatcher = BEANS.get(ClientNotificationDispatcher.class);
-      dispatcher.dispatchForSession((IClientSession) IClientSession.CURRENT.get(), new Notification01(), mock(ClientNotificationAddress.class));
-      dispatcher.dispatchForSession((IClientSession) IClientSession.CURRENT.get(), new Notification02(), mock(ClientNotificationAddress.class));
-      dispatcher.dispatchForSession((IClientSession) IClientSession.CURRENT.get(), new Notification02(), mock(ClientNotificationAddress.class));
-      waitForPendingNotifications(dispatcher);
-    }, Jobs.newInput()
-        .withRunContext(ClientRunContexts.copyCurrent()))
+          ClientNotificationDispatcher dispatcher = BEANS.get(ClientNotificationDispatcher.class);
+          dispatcher.dispatchForSession((IClientSession) IClientSession.CURRENT.get(), new Notification01(), mock(ClientNotificationAddress.class));
+          dispatcher.dispatchForSession((IClientSession) IClientSession.CURRENT.get(), new Notification02(), mock(ClientNotificationAddress.class));
+          dispatcher.dispatchForSession((IClientSession) IClientSession.CURRENT.get(), new Notification02(), mock(ClientNotificationAddress.class));
+          waitForPendingNotifications(dispatcher);
+        }, Jobs.newInput()
+            .withRunContext(ClientRunContexts.copyCurrent()))
         .whenDone(event -> cond.setBlocking(false), null);
     cond.waitFor();
     Mockito.verify(m_globalNotificationHandler, Mockito.times(3)).handleNotification(Mockito.any(Serializable.class));

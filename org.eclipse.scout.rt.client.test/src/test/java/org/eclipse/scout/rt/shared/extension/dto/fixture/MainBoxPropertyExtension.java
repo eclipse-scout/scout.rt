@@ -33,5 +33,4 @@ public class MainBoxPropertyExtension extends AbstractGroupBoxExtension<MainBox>
   public void setLongValue(Long value) {
     m_longValue = value;
   }
-
 }

@@ -9,11 +9,7 @@
  */
 package org.eclipse.scout.rt.dataobject.migration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -275,46 +271,46 @@ public class DataObjectMigrationInventoryTest {
 
     assertEquals(Arrays.asList(CharlieFixture_2.VERSION, BravoFixture_3.VERSION, CharlieFixture_3.VERSION, CharlieFixture_4.VERSION, CharlieFixture_5.VERSION),
         s_inventory.getVersions(CollectionUtility.hashMap(
-            new ImmutablePair<>("charlieFixture.BuildingFixture", CharlieFixture_1.VERSION),
-            new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_1.VERSION)),
+                new ImmutablePair<>("charlieFixture.BuildingFixture", CharlieFixture_1.VERSION),
+                new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_1.VERSION)),
             null));
 
     assertEquals(Arrays.asList(CharlieFixture_3.VERSION, CharlieFixture_4.VERSION, CharlieFixture_5.VERSION),
         s_inventory.getVersions(CollectionUtility.hashMap(
-            new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-            new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_2.VERSION)),
+                new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
+                new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_2.VERSION)),
             null));
 
     assertEquals(Arrays.asList(CharlieFixture_4.VERSION, CharlieFixture_5.VERSION),
         s_inventory.getVersions(CollectionUtility.hashMap(
-            new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-            new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_3.VERSION)),
+                new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
+                new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_3.VERSION)),
             null));
 
     assertEquals(Arrays.asList(CharlieFixture_5.VERSION),
         s_inventory.getVersions(CollectionUtility.hashMap(
-            new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-            new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_4.VERSION)),
+                new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
+                new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_4.VERSION)),
             null));
 
     assertEquals(CollectionUtility.emptyArrayList(),
         s_inventory.getVersions(CollectionUtility.hashMap(
-            new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-            new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_5.VERSION)),
+                new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
+                new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_5.VERSION)),
             null));
 
     // With limit of toVersion
     assertEquals(Arrays.asList(CharlieFixture_3.VERSION),
         s_inventory.getVersions(CollectionUtility.hashMap(
-            new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-            new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_2.VERSION)),
+                new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
+                new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_2.VERSION)),
             CharlieFixture_3.VERSION));
 
     // With limit of toVersion (lower than first returned version CharlieFixture_3)
     assertEquals(Collections.emptyList(),
         s_inventory.getVersions(CollectionUtility.hashMap(
-            new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-            new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_2.VERSION)),
+                new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
+                new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_2.VERSION)),
             CharlieFixture_2.VERSION));
   }
 

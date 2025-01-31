@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  *          .withStartIn(5, TimeUnit.SECONDS)
  *          .withSchedule(FixedDelayScheduleBuilder.repeatForever(10, TimeUnit.SECONDS)));
  * </pre>
- *
+ * <p>
  * The following code snippet illustrates how the job is finally run:
  *
  * <pre>
@@ -61,9 +61,9 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  * });
  * </pre>
  *
- * @since 5.1
  * @see IJobManager
  * @see RunContext
+ * @since 5.1
  */
 public final class Jobs {
 
@@ -109,9 +109,9 @@ public final class Jobs {
    * </pre>
    *
    * @param runnable
-   *          <code>IRunnable</code> to be executed.
+   *     <code>IRunnable</code> to be executed.
    * @param input
-   *          information about the job with execution instructions for the job manager to run the job.
+   *     information about the job with execution instructions for the job manager to run the job.
    * @return Future to interact with the job like waiting for its completion or to cancel its execution.
    * @see IJobManager#schedule(IRunnable, JobInput)
    */
@@ -154,11 +154,11 @@ public final class Jobs {
    * </pre>
    *
    * @param callable
-   *          <code>Callable</code> to be executed.
+   *     <code>Callable</code> to be executed.
    * @param input
-   *          information about the job with execution instructions for the job manager to run the job.
+   *     information about the job with execution instructions for the job manager to run the job.
    * @return Future to interact with the job like waiting for its completion, or to cancel its execution, or to get its
-   *         computation result.
+   * computation result.
    * @see IJobManager#schedule(Callable, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable, final JobInput input) {
@@ -234,7 +234,7 @@ public final class Jobs {
    * attempts will result in an {@link AssertionException}.
    *
    * @param permits
-   *          the number of permits.
+   *     the number of permits.
    */
   public static IExecutionSemaphore newExecutionSemaphore(final int permits) {
     return BEANS.get(ExecutionSemaphore.class).withPermits(permits);
@@ -249,7 +249,7 @@ public final class Jobs {
    * See {@link IBlockingCondition} for more information.
    *
    * @param blocking
-   *          initial blocking-state of the blocking condition.
+   *     initial blocking-state of the blocking condition.
    */
   public static IBlockingCondition newBlockingCondition(final boolean blocking) {
     return BEANS.get(IJobManager.class).newBlockingCondition(blocking);

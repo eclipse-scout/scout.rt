@@ -44,7 +44,6 @@ public class BeanManagerIsBeanTest {
     assertFalse(context.isBean(String.class));
   }
 
-
   @Test
   public void testUnregisterBean() throws InterruptedException {
     long startTime = System.nanoTime();

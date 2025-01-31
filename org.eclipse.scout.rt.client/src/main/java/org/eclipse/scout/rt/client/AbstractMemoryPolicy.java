@@ -217,9 +217,9 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
     for (FastPropertyDescriptor prop : pi.getPropertyDescriptors()) {
       if (prop.getReadMethod() != null
           && (Date.class.isAssignableFrom(prop.getPropertyType())
-              || Number.class.isAssignableFrom(prop.getPropertyType())
-              || String.class.isAssignableFrom(prop.getPropertyType())
-              || long.class.isAssignableFrom(prop.getPropertyType()))) {
+                  || Number.class.isAssignableFrom(prop.getPropertyType())
+                  || String.class.isAssignableFrom(prop.getPropertyType())
+                  || long.class.isAssignableFrom(prop.getPropertyType()))) {
         // only accept Numbers, Strings or Dates
         try {
           b.append("/");
@@ -264,7 +264,6 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
         storeUserFilterState(e.getTable(), id);
         break;
     }
-
   }
 
   protected void storeUserFilterState(ITable t, String pageTableIdentifier) {

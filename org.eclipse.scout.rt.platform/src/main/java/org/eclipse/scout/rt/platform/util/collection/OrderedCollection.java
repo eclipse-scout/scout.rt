@@ -63,7 +63,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
    * Adds an {@link IOrdered} object to this collection without changing its order.
    *
    * @param o
-   *          The {@link IOrdered} object to add.
+   *     The {@link IOrdered} object to add.
    * @return Returns <code>true</code> if the given ordered object has been added. Otherwise <code>false</code>.
    */
   public boolean addOrdered(ORDERED o) {
@@ -96,9 +96,9 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
    * Removes the given element form this ordered collection.
    *
    * @param o
-   *          The object to remove.
+   *     The object to remove.
    * @return Returns <code>true</code> if the given element was part of this ordered collection. Otherwise
-   *         <code>false</code>.
+   * <code>false</code>.
    */
   public boolean remove(Object o) {
     return m_orderedObjects.remove(o);
@@ -108,9 +108,9 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
    * Removes the given elements form this ordered collection.
    *
    * @param o
-   *          The object to remove.
+   *     The object to remove.
    * @return Returns <code>true</code> if the given element was part of this ordered collection. Otherwise
-   *         <code>false</code>.
+   * <code>false</code>.
    */
   public boolean removeAll(Collection<?> c) {
     if (CollectionUtility.isEmpty(c)) {
@@ -216,7 +216,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
     }
     ensureSorted();
     int i = 0;
-    for (Iterator<ORDERED> it = m_orderedObjects.iterator(); it.hasNext();) {
+    for (Iterator<ORDERED> it = m_orderedObjects.iterator(); it.hasNext(); ) {
       ORDERED reference = it.next();
       if (i == index) {
         it.remove();
@@ -312,7 +312,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
     }
 
     int i = 1;
-    for (ListIterator<ORDERED> it = cleanObjects.listIterator(cleanObjects.size()); it.hasPrevious();) {
+    for (ListIterator<ORDERED> it = cleanObjects.listIterator(cleanObjects.size()); it.hasPrevious(); ) {
       ORDERED o = it.previous();
       addOrdered(o, baseOrder - i * DEFAULT_ORDER_STEP);
       i++;
@@ -428,7 +428,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
 
   private ORDERED getAdjacentObject(ORDERED reference, boolean previous) {
     ensureSorted();
-    for (ListIterator<ORDERED> it = m_orderedObjects.listIterator(); it.hasNext();) {
+    for (ListIterator<ORDERED> it = m_orderedObjects.listIterator(); it.hasNext(); ) {
       // 1. search reference object
       ORDERED next = it.next();
       if (next != reference) {
@@ -464,7 +464,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
    * @return
    */
   private boolean insertAfter(Collection<? extends ORDERED> objectsToAdd, ORDERED reference, double baseOrder, double delta) {
-    for (ListIterator<ORDERED> it = m_orderedObjects.listIterator(); it.hasNext();) {
+    for (ListIterator<ORDERED> it = m_orderedObjects.listIterator(); it.hasNext(); ) {
       // 1. search reference Object
       if (it.next() != reference) {
         continue;

@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.job.filter.future;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.TimeUnit;
@@ -49,6 +48,5 @@ public class SingleExecutionFutureFilterTest {
     Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1, future2, future3)
         .toFilter(), true);
-
   }
 }

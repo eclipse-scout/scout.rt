@@ -181,7 +181,6 @@ public class SmartFieldTest {
             return "control-alternate-f11";
           }
         }
-
       }
 
       @Order(100)
@@ -252,7 +251,6 @@ public class SmartFieldTest {
       checkLookupAllowed();
       return super.getDataByRec(call);
     }
-
   }
 
   public static class StyleLookupCall extends LookupCall<Long> {

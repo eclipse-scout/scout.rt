@@ -82,7 +82,7 @@ public interface IObjectSerializer {
 
   /**
    * @return a new {@link ObjectInputStream} based on this object serializer, using {@link #getBlacklist()} and
-   *         {@link #getWhitelist()}
+   * {@link #getWhitelist()}
    */
   ObjectInputStream createObjectInputStream(InputStream in) throws IOException;
 }

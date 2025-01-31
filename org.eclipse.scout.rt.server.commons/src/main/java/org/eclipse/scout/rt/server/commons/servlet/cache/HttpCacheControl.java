@@ -65,12 +65,12 @@ public class HttpCacheControl {
    * {@link RequestDispatcher#forward(jakarta.servlet.ServletRequest, jakarta.servlet.ServletResponse)}
    *
    * @param obj
-   *          is the cache object that decides if cache is to be used or not, may be null to disable caching
+   *     is the cache object that decides if cache is to be used or not, may be null to disable caching
    * @return true if the obj hasn't changed in the meantime. The {@link HttpServletResponse#SC_NOT_MODIFIED} response is
-   *         sent to the http response by this method and the caller should end its processing of this request.
-   *         <p>
-   *         false if the obj again needs to be fully returned, Etag, IfModifiedSince and MaxAge headers were set if
-   *         appropriate. If no caching is desired then the necessary headers were set.
+   * sent to the http response by this method and the caller should end its processing of this request.
+   * <p>
+   * false if the obj again needs to be fully returned, Etag, IfModifiedSince and MaxAge headers were set if
+   * appropriate. If no caching is desired then the necessary headers were set.
    */
   public boolean checkAndSetCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheObject obj) {
     if (!UrlHints.isCacheHint(req)) {

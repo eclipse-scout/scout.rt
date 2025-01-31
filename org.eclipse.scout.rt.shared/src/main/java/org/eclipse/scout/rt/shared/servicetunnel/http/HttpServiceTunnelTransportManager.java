@@ -44,5 +44,4 @@ public class HttpServiceTunnelTransportManager extends AbstractHttpTransportMana
       }
     }
   }
-
 }

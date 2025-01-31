@@ -34,9 +34,9 @@ public class ModelContextProxy {
    * methods.
    *
    * @param object
-   *          The object to be proxied.
+   *     The object to be proxied.
    * @param modelContext
-   *          The {@link ModelContext} to be applied when invoking the object's methods.
+   *     The {@link ModelContext} to be applied when invoking the object's methods.
    * @return proxied object.
    */
   @SuppressWarnings("unchecked")

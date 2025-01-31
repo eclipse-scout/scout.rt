@@ -627,5 +627,4 @@ public class RecurrencePattern implements Serializable {
     buf.append("]");
     return buf.toString();
   }
-
 }

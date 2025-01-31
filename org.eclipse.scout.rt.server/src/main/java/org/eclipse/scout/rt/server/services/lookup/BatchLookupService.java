@@ -73,5 +73,4 @@ public class BatchLookupService implements IServerBatchLookupService {
     }
     return result;
   }
-
 }

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FieldStatus, GroupBox, Menu, scout, SmartField, Status, StringField} from '../../../src/index';
+import {GroupBox, Menu, scout, SmartField, Status, StringField} from '../../../src/index';
 import {FormSpecHelper, JQueryTesting} from '../../../src/testing/index';
 
 describe('FieldStatus', () => {

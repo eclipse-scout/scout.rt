@@ -95,9 +95,6 @@ public class TableLoadingPerfTest {
       protected String getConfiguredCssClass() {
         return "testClass";
       }
-
     }
-
   }
-
 }

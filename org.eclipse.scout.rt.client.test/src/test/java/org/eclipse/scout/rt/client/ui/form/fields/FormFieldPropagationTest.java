@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 

@@ -61,5 +61,4 @@ public class PiggyBackClientNotificationTest {
     assertEquals(1, res.getNotifications().size());
     assertEquals("testNotification", res.getNotifications().get(0).getNotification());
   }
-
 }

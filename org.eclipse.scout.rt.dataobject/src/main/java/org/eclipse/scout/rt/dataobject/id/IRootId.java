@@ -37,9 +37,9 @@ public interface IRootId extends IId {
    * <b>Important:</b> The return value of this method and should never be used as stable serialized representation of
    * this identifier. See {@link IdCodec} for various serialization representations of an {@link IId}.
    *
+   * @return a string representation of the id for logging and debugging and purpose.
    * @see IIds#toString(IRootId)
    * @see IdCodec
-   * @return a string representation of the id for logging and debugging and purpose.
    */
   String unwrapAsString();
 }

@@ -38,5 +38,4 @@ public class JsonOutlineTable<T extends ITable> extends JsonTable<T> {
     putProperty(json, "nodeId", nodeId);
     return json;
   }
-
 }

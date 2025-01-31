@@ -37,7 +37,9 @@ public class DefaultPermissionCollection extends AbstractPermissionCollection {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultPermissionCollection.class);
 
-  /** content is effective immutable and protected by {@link #isReadOnly()} */
+  /**
+   * content is effective immutable and protected by {@link #isReadOnly()}
+   */
   private final Map<PermissionId, List<IPermission>> m_permissions;
   private final List<Permission> m_javaPermissions;
 

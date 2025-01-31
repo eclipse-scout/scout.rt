@@ -122,5 +122,4 @@ public class AttachmentSupport {
         .collect(Collectors.toSet());
     toDelete.forEach(filename -> m_attachments.remove(filename));
   }
-
 }

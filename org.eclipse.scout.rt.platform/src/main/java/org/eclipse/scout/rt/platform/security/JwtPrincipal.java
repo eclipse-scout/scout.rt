@@ -32,9 +32,9 @@ public class JwtPrincipal implements Principal, Serializable {
 
   /**
    * @param name
-   *          is the username or userId
+   *     is the username or userId
    * @param jwtTokenString
-   *          oidc token string
+   *     oidc token string
    */
   public JwtPrincipal(String name, String jwtTokenString) {
     if (name == null) {
@@ -70,7 +70,7 @@ public class JwtPrincipal implements Principal, Serializable {
 
   /**
    * @param subject
-   *          is optional
+   *     is optional
    * @return the JSON web token from the subject if it contains a {@link JwtPrincipal}
    */
   public static String jwtTokenString(Subject subject) {

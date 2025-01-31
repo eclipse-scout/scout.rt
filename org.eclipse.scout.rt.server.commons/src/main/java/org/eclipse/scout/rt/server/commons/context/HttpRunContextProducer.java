@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.commons.context;
 import java.security.AccessController;
 
 import javax.security.auth.Subject;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -52,8 +53,8 @@ public class HttpRunContextProducer {
    * Fills the {@link RunContext} specified based on the values of the given {@link HttpServletRequest}.
    *
    * @param existing
-   *          This is the context that should be extended with the attributes from the {@link HttpServletRequest}. May
-   *          be {@code null}. In that case a new one is created.
+   *     This is the context that should be extended with the attributes from the {@link HttpServletRequest}. May
+   *     be {@code null}. In that case a new one is created.
    */
   public RunContext produce(HttpServletRequest req, HttpServletResponse resp, RunContext existing) {
     RunContext contextToFill = existing;

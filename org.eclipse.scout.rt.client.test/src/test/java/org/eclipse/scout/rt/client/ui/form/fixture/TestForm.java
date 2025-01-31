@@ -120,7 +120,6 @@ public class TestForm extends AbstractForm {
         @Order(20)
         public class Text2Field extends AbstractStringField {
         }
-
       }
     }
 

@@ -86,7 +86,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
    * Subclasses can override this method. The default does nothing.
    *
    * @param pageList
-   *          live collection to add child pages to this page
+   *     live collection to add child pages to this page
    */
   @ConfigOperation
   @Order(90)
@@ -446,5 +446,4 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   protected IPageWithNodesExtension<? extends AbstractPageWithNodes> createLocalExtension() {
     return new LocalPageWithNodesExtension<>(this);
   }
-
 }

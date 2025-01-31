@@ -9,9 +9,7 @@
  */
 package org.eclipse.scout.rt.server.job.filter.event;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;

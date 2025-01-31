@@ -25,12 +25,12 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.server.admin.inspector.CallInspector;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
-import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceWithoutAuthorization;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -231,7 +231,7 @@ public class ServiceOperationInvoker {
 
   /**
    * @return true unless there is a {@link RemoteServiceWithoutAuthorization} on the called method or interface in the
-   *         class tree
+   * class tree
    * @since 6.1
    */
   protected boolean mustAuthorize(Class<?> interfaceClass, Class<?> implClass, Method interfaceMethod, Object[] args) {

@@ -12,10 +12,11 @@ package org.eclipse.scout.rt.server.jaxws.adapter;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.StringUtility;

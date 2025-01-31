@@ -182,5 +182,4 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
   protected String filterSqlByRec(String sqlSelect) {
     return StringUtility.removeTagBounds(StringUtility.removeTags(sqlSelect, new String[]{"key", "text", "all"}), "rec");
   }
-
 }

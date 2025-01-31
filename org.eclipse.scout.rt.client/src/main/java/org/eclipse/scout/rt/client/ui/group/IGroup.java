@@ -68,7 +68,7 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
    * Changes the visible property of this {@link IFormField} to the given value.
    *
    * @param visible
-   *          The new visible value.
+   *     The new visible value.
    */
   void setVisible(boolean b);
 
@@ -81,7 +81,7 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
    * Changes the visible-granted property of this {@link IFormField} to the given value.
    *
    * @param visible
-   *          The new visible-granted value.
+   *     The new visible-granted value.
    */
   void setVisibleGranted(boolean b);
 

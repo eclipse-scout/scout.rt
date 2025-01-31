@@ -41,9 +41,9 @@ public final class TypeFactoryUtility {
    * optional {@link JsonToken} if invoked during deserialization.
    *
    * @param parametrizedType
-   *          type of declared {@link DoNode}
+   *     type of declared {@link DoNode}
    * @param currentToken
-   *          optional {@link JsonToken} of the deserialization in progress
+   *     optional {@link JsonToken} of the deserialization in progress
    */
   public static AttributeType toAttributeType(ParameterizedType parametrizedType, JsonToken currentToken) {
     if (ObjectUtility.isOneOf(parametrizedType.getRawType(), DoList.class, DoSet.class, DoCollection.class)) {

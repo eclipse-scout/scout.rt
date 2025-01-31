@@ -32,34 +32,63 @@ public interface ICertificateProvider {
    * Similar to: openssl req -nodes -newkey rsa:4096 -days 3650 -x509 -keyout cert_private.key -out cert_public.pem
    *
    * @param certificateAlias
-   *          is the alias used in the keystore for accessing the certificate, this is not the certificate name (DN)
+   *     is the alias used in the keystore for accessing the certificate, this is not the certificate name (DN)
    * @param x500Name
-   *          or Subject DN or Issuer DN. For example "CN=host.domain.com,C=CH,ST=ZH,L=Zurich,O=My Company". X.500 name
-   *          format is:
+   *     or Subject DN or Issuer DN. For example "CN=host.domain.com,C=CH,ST=ZH,L=Zurich,O=My Company". X.500 name
+   *     format is:
    *
-   *          <pre>
-  CN: CommonName: host.domain.com<br>
-  C: CountryName: CH<br>
-  S: StateOrProvinceName: ZH<br>
-  L: Locality: Zurich<br>
-  O: Organization: My Company<br>
-  OU: OrganizationalUnit<br>
-   *          </pre>
-   *
+   *     <pre>
+   *     CN: CommonName: host.domain.com<br>
+   *     C: CountryName: CH<br>
+   *     S: StateOrProvinceName: ZH<br>
+   *     L: Locality: Zurich<br>
+   *     O: Organization: My Company<br>
+   *     OU: OrganizationalUnit<br>
+   *              </pre>
    * @param storePass
-   *          the password used to unlock the keystore, or {@code null}.
+   *     the password used to unlock the keystore, or {@code null}.
    * @param keyPass
-   *          the password to protect the key, or {@code null}.
+   *     the password to protect the key, or {@code null}.
    * @param keyBits
-   *          typically 4096
+   *     typically 4096
    * @param validDays
-   *          typically 365 days
+   *     typically 365 days
    * @since 22.0
    */
   KeyStore createSelfSignedCertificate(String certificateAlias, String x500Name, char[] storePass, char[] keyPass, int keyBits, int validDays);
 
   /**
    * Create a self-signed X509 certificate with public key and private key in a JKS keystore.
+   * <p>
+   * Similar to: openssl req -nodes -newkey rsa:4096 -days 3650 -x509 -keyout cert_private.key -out cert_public.pem
+   *
+   * @param certificateAlias
+   *     is the alias used in the keystore for accessing the certificate, this is not the certificate name (DN)
+   * @param x500Name
+   *     or Subject DN or Issuer DN. For example "CN=host.domain.com,C=CH,ST=ZH,L=Zurich,O=My Company". X.500 name
+   *     format is:
+   *
+   *     <pre>
+   *         CN: CommonName: host.domain.com<br>
+   *         C: CountryName: CH<br>
+   *         S: StateOrProvinceName: ZH<br>
+   *         L: Locality: Zurich<br>
+   *         O: Organization: My Company<br>
+   *         OU: OrganizationalUnit<br>
+   *                  </pre>
+   * @param storePass
+   *     the password used to unlock the keystore, or {@code null}.
+   * @param keyPass
+   *     the password to protect the key, or {@code null}.
+   * @since 22.0
+   */
+  default KeyStore createSelfSignedCertificate(String certificateAlias, String x500Name, char[] storePass, char[] keyPass) {
+    return createSelfSignedCertificate(certificateAlias, x500Name, storePass, keyPass, 4096, 365);
+  }
+
+  /**
+   * Create a self-signed X509 certificate with public key and private key in a JKS keystore. The Keystore will be
+   * written to the given {@link OutputStream}.
    * <p>
    * Similar to: openssl req -nodes -newkey rsa:4096 -days 3650 -x509 -keyout cert_private.key -out cert_public.pem
    *
@@ -81,43 +110,12 @@ public interface ICertificateProvider {
    *     the password used to unlock the keystore, or {@code null}.
    * @param keyPass
    *     the password to protect the key, or {@code null}.
-   * @since 22.0
-   */
-  default KeyStore createSelfSignedCertificate(String certificateAlias, String x500Name, char[] storePass, char[] keyPass) {
-    return createSelfSignedCertificate(certificateAlias, x500Name, storePass, keyPass, 4096, 365);
-  }
-
-  /**
-   * Create a self-signed X509 certificate with public key and private key in a JKS keystore. The Keystore will be
-   * written to the given {@link OutputStream}.
-   * <p>
-   * Similar to: openssl req -nodes -newkey rsa:4096 -days 3650 -x509 -keyout cert_private.key -out cert_public.pem
-   *
-   * @param certificateAlias
-   *          is the alias used in the keystore for accessing the certificate, this is not the certificate name (DN)
-   * @param x500Name
-   *          or Subject DN or Issuer DN. For example "CN=host.domain.com,C=CH,ST=ZH,L=Zurich,O=My Company". X.500 name
-   *          format is:
-   *
-   *          <pre>
-  CN: CommonName: host.domain.com<br>
-  C: CountryName: CH<br>
-  S: StateOrProvinceName: ZH<br>
-  L: Locality: Zurich<br>
-  O: Organization: My Company<br>
-  OU: OrganizationalUnit<br>
-   *          </pre>
-   *
-   * @param storePass
-   *          the password used to unlock the keystore, or {@code null}.
-   * @param keyPass
-   *          the password to protect the key, or {@code null}.
    * @param keyBits
-   *          typically 4096
+   *     typically 4096
    * @param validDays
-   *          typically 365 days
+   *     typically 365 days
    * @param out
-   *          where to write the generated keystore to. The result is written in java key store file format.
+   *     where to write the generated keystore to. The result is written in java key store file format.
    * @since 22.0
    */
   default void createSelfSignedCertificate(String certificateAlias, String x500Name, char[] storePass, char[] keyPass, int keyBits, int validDays, OutputStream out) {
@@ -135,11 +133,11 @@ public interface ICertificateProvider {
    * X509 certificate is created in this file.
    *
    * @param keyStorePath
-   *          must be a valid URI pointing to a file on the local file system. E.g.
-   *          file:///C:/Users/usr/Desktop/my-store.jks
+   *     must be a valid URI pointing to a file on the local file system. E.g.
+   *     file:///C:/Users/usr/Desktop/my-store.jks
    * @param x500Name
-   *          Must be a valid x500 name (see {@link #createSelfSignedCertificate(String, String, char[], char[])} for
-   *          details).
+   *     Must be a valid x500 name (see {@link #createSelfSignedCertificate(String, String, char[], char[])} for
+   *     details).
    * @see #createSelfSignedCertificate(String, String, char[], char[], int, int, OutputStream)
    * @since 22.0
    */

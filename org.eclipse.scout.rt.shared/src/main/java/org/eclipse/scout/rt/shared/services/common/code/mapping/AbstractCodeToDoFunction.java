@@ -152,7 +152,7 @@ public abstract class AbstractCodeToDoFunction<EXPLICIT_SOURCE extends ICode<?>,
 
   /**
    * @return the {@link Function} used to convert a Code id to a {@link String}. By default {@link #convertId(Object)}
-   *         is used.
+   * is used.
    */
   public Function<Object, String> getIdConverter() {
     return m_idConverter;
@@ -163,7 +163,7 @@ public abstract class AbstractCodeToDoFunction<EXPLICIT_SOURCE extends ICode<?>,
    * is used. May be used to change the conversion logic application wide.
    *
    * @param idConverter
-   *          The new conversion {@link Function}. {@code null} values are ignored.
+   *     The new conversion {@link Function}. {@code null} values are ignored.
    */
   public void setIdConverter(Function<Object, String> idConverter) {
     if (idConverter == null) {
@@ -180,7 +180,7 @@ public abstract class AbstractCodeToDoFunction<EXPLICIT_SOURCE extends ICode<?>,
    * {@link Object#toString()} will be invoked.
    *
    * @param id
-   *          The id to convert or {@code null}.
+   *     The id to convert or {@code null}.
    * @return The {@link String} representation of the id or {@code null} if the id was {@code null}.
    * @see ICodeTypeDoIdConverter
    */

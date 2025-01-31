@@ -26,22 +26,22 @@ public interface IClientSessionRegistry {
    * session yet.
    *
    * @param session
-   *          {@link IClientSession}
+   *     {@link IClientSession}
    * @param sessionId
-   *          {@link} id of the session
+   *     {@link} id of the session
    */
   void register(IClientSession session, String sessionId);
 
   /**
    * @param sessionid
-   *          the id of the session, see {@link ISession#getId()}
+   *     the id of the session, see {@link ISession#getId()}
    * @return the session for a given id
    */
   IClientSession getClientSession(String sessionid);
 
   /**
    * @param userId
-   *          the user of the session, see {@link ISession#getUserId()}
+   *     the user of the session, see {@link ISession#getUserId()}
    * @return the session for a given userid
    */
   List<IClientSession> getClientSessionsForUser(String userId);
@@ -50,5 +50,4 @@ public interface IClientSessionRegistry {
    * @return all registered client sessions
    */
   List<IClientSession> getAllClientSessions();
-
 }

@@ -15,5 +15,4 @@ import java.util.EventListener;
 public interface ContextMenuListener extends EventListener {
 
   void contextMenuChanged(ContextMenuEvent event);
-
 }

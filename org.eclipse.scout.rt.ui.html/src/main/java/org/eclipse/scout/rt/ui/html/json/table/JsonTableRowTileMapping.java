@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.table;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowTileMapping;
@@ -61,5 +60,4 @@ public class JsonTableRowTileMapping<TABLE_ROW_TILE_MAPPING extends ITableRowTil
       }
     });
   }
-
 }

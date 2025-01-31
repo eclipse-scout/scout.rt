@@ -29,5 +29,4 @@ public interface IStatementProcessor {
    * Simulate the execution of the statement and dump output to System.out
    */
   void simulate();
-
 }

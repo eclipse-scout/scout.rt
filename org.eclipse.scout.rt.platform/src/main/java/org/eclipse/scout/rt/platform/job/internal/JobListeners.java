@@ -40,11 +40,11 @@ public class JobListeners {
    * previous registration is replaced.
    *
    * @param listener
-   *          listener to be registered.
+   *     listener to be registered.
    * @param filter
-   *          filter to only get notified about events of interest - that is for events accepted by the filter.
+   *     filter to only get notified about events of interest - that is for events accepted by the filter.
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
-   *         unregister the listener.
+   * unregister the listener.
    */
   IRegistrationHandle add(final Predicate<JobEvent> filter, final IJobListener listener) {
     final IFuture[] futures = getFilteredFutures(filter);
@@ -87,7 +87,7 @@ public class JobListeners {
    * This method never throws an exception.
    *
    * @param eventToFire
-   *          The event to fire.
+   *     The event to fire.
    */
   public void notifyListeners(final JobEvent eventToFire) {
     notifyGlobalListeners(eventToFire);

@@ -16,5 +16,4 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 public interface IServerSessionExtension<OWNER extends AbstractServerSession> extends IExtension<OWNER> {
 
   void execLoadSession(ServerSessionLoadSessionChain chain);
-
 }

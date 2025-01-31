@@ -22,15 +22,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import jakarta.annotation.Generated;
-import jakarta.annotation.Resource;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
-import jakarta.jws.HandlerChain;
-import jakarta.jws.WebService;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -41,6 +37,11 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+
+import jakarta.annotation.Generated;
+import jakarta.annotation.Resource;
+import jakarta.jws.HandlerChain;
+import jakarta.jws.WebService;
 import jakarta.xml.ws.WebServiceClient;
 import jakarta.xml.ws.WebServiceContext;
 

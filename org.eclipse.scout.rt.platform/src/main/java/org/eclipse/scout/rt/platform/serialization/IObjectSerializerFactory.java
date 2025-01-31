@@ -21,15 +21,15 @@ public interface IObjectSerializerFactory {
    * classes may share expensive objects like class loaders.
    *
    * @param objectReplacer
-   *          an {@link IObjectReplacer} instance of <code>null</code>
+   *     an {@link IObjectReplacer} instance of <code>null</code>
    * @return
    */
   IObjectSerializer createObjectSerializer(IObjectReplacer objectReplacer);
 
   /**
    * @return Returns an environment-dependent ClassLoader that is able to load all classes that are available in the
-   *         running environment. The class loader should also be used by {@link IObjectSerializer}s returned by
-   *         {@link #createObjectSerializer(IObjectReplacer)}. At least it has to support the same set of classes.
+   * running environment. The class loader should also be used by {@link IObjectSerializer}s returned by
+   * {@link #createObjectSerializer(IObjectReplacer)}. At least it has to support the same set of classes.
    */
   ClassLoader getClassLoader();
 }

@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
 import static org.junit.Assert.*;
+
 import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -159,7 +160,6 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
       protected int getConfiguredWidth() {
         return 70;
       }
-
     }
 
     @Order(5)
@@ -179,7 +179,6 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
       protected int getConfiguredWidth() {
         return 70;
       }
-
     }
 
     @Order(10)
@@ -300,7 +299,5 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
         return 160;
       }
     }
-
   }
-
 }

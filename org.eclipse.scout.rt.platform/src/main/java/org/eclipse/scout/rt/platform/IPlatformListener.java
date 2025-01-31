@@ -24,8 +24,7 @@ public interface IPlatformListener extends EventListener {
    * Informs about a state change in the current {@link IPlatform}.
    *
    * @param event
-   *          The event describing the state change.
+   *     The event describing the state change.
    */
   void stateChanged(PlatformEvent event);
-
 }

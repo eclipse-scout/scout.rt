@@ -147,5 +147,4 @@ public interface ITileAccordion<T extends ITile> extends IAccordion, IExtensible
   default void removeTileGridListener(TileGridListener listener) {
     tileGridListeners().remove(listener);
   }
-
 }

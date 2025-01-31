@@ -23,5 +23,4 @@ public class IntegerArrayHolder extends Holder<Integer[]> {
   public IntegerArrayHolder(Integer[] value) {
     super(Integer[].class, value);
   }
-
 }

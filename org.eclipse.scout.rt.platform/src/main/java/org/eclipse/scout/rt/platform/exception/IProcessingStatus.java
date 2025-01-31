@@ -13,7 +13,9 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 
 public interface IProcessingStatus extends IStatus {
 
-  /** a fatal error */
+  /**
+   * a fatal error
+   */
   int FATAL = 0x10000000;
 
   /**
@@ -28,5 +30,4 @@ public interface IProcessingStatus extends IStatus {
   String getBody();
 
   Throwable getException();
-
 }

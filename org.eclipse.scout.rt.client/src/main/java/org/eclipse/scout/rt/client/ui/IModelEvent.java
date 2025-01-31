@@ -16,5 +16,4 @@ package org.eclipse.scout.rt.client.ui;
 public interface IModelEvent {
 
   int getType();
-
 }

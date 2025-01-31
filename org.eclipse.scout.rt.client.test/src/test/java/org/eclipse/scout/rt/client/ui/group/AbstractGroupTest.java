@@ -62,5 +62,4 @@ public class AbstractGroupTest {
     assertEquals(visible, group.isVisible(IDimensions.VISIBLE));
     assertEquals(custom, group.isVisible(CUSTOM_DIMENSION));
   }
-
 }

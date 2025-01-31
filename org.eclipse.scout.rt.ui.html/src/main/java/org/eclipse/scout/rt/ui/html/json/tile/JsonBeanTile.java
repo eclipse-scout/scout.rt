@@ -81,5 +81,4 @@ public class JsonBeanTile<BEAN_TILE extends IBeanTile<?>> extends JsonTile<BEAN_
   public BinaryResourceHolder provideBinaryResource(String filename) {
     return m_binaryResourceMediator.getBinaryResourceHolder(filename);
   }
-
 }

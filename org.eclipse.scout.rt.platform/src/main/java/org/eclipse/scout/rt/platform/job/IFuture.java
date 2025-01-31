@@ -70,8 +70,8 @@ public interface IFuture<RESULT> extends ICancellable {
    * an attempt to stop the job.
    *
    * @param interruptIfRunning
-   *          <code>true</code> if the thread executing this job should be interrupted; otherwise, in-progress jobs are
-   *          allowed to complete.
+   *     <code>true</code> if the thread executing this job should be interrupted; otherwise, in-progress jobs are
+   *     allowed to complete.
    * @return <code>false</code> if the job could not be cancelled, typically because it has already completed normally.
    */
   @Override
@@ -105,7 +105,7 @@ public interface IFuture<RESULT> extends ICancellable {
    * cancelled or the computation failed.
    *
    * @throws ThreadInterruptedError
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    */
   void awaitDone();
 
@@ -114,13 +114,13 @@ public interface IFuture<RESULT> extends ICancellable {
    * This method does not throw an exception if cancelled, or the computation failed.
    *
    * @param timeout
-   *          the maximal time to wait for the job to complete.
+   *     the maximal time to wait for the job to complete.
    * @param unit
-   *          unit of the timeout.
+   *     unit of the timeout.
    * @throws ThreadInterruptedError
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    * @throws TimedOutError
-   *           if the wait timed out.
+   *     if the wait timed out.
    */
   void awaitDone(long timeout, TimeUnit unit);
 
@@ -129,13 +129,13 @@ public interface IFuture<RESULT> extends ICancellable {
    * or by an exception, or that it will never commence execution due to a premature cancellation.
    *
    * @param timeout
-   *          the maximal time to wait for the job to complete.
+   *     the maximal time to wait for the job to complete.
    * @param unit
-   *          unit of the timeout.
+   *     unit of the timeout.
    * @throws ThreadInterruptedError
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    * @throws TimedOutError
-   *           if the wait timed out.
+   *     if the wait timed out.
    */
   void awaitFinished(long timeout, TimeUnit unit);
 
@@ -146,11 +146,11 @@ public interface IFuture<RESULT> extends ICancellable {
    *
    * @return the job's result.
    * @throws ThreadInterruptedError
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    * @throws FutureCancelledError
-   *           if the job was cancelled.
+   *     if the job was cancelled.
    * @throws RuntimeException
-   *           if the job throws an exception, and is translated by {@link DefaultRuntimeExceptionTranslator}.
+   *     if the job throws an exception, and is translated by {@link DefaultRuntimeExceptionTranslator}.
    */
   RESULT awaitDoneAndGet();
 
@@ -162,14 +162,14 @@ public interface IFuture<RESULT> extends ICancellable {
    * Use a specific {@link IExceptionTranslator} to control exception translation.
    *
    * @param exceptionTranslator
-   *          to translate the job's exception if the job threw an exception.
+   *     to translate the job's exception if the job threw an exception.
    * @return the job's result.
    * @throws ThreadInterruptedError
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    * @throws FutureCancelledError
-   *           if the job was cancelled.
+   *     if the job was cancelled.
    * @throws EXCEPTION
-   *           if the job throws an exception, and is translated by the given {@link IExceptionTranslator}.
+   *     if the job throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
   <EXCEPTION extends Throwable> RESULT awaitDoneAndGet(Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION;
 
@@ -180,18 +180,18 @@ public interface IFuture<RESULT> extends ICancellable {
    * {@link ThreadInterruptedError} if the current thread was interrupted while waiting.
    *
    * @param timeout
-   *          the maximal time to wait for the job to complete.
+   *     the maximal time to wait for the job to complete.
    * @param unit
-   *          unit of the timeout.
+   *     unit of the timeout.
    * @return the job's result.
    * @throws ThreadInterruptedError
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    * @throws FutureCancelledError
-   *           if the job was cancelled.
+   *     if the job was cancelled.
    * @throws TimedOutError
-   *           if the wait timed out.
+   *     if the wait timed out.
    * @throws RuntimeException
-   *           if the job throws an exception, and is translated by {@link DefaultRuntimeExceptionTranslator}.
+   *     if the job throws an exception, and is translated by {@link DefaultRuntimeExceptionTranslator}.
    */
   RESULT awaitDoneAndGet(long timeout, TimeUnit unit);
 
@@ -204,20 +204,20 @@ public interface IFuture<RESULT> extends ICancellable {
    * Use a specific {@link IExceptionTranslator} to control exception translation.
    *
    * @param timeout
-   *          the maximal time to wait for the job to complete.
+   *     the maximal time to wait for the job to complete.
    * @param unit
-   *          unit of the timeout.
+   *     unit of the timeout.
    * @param exceptionTranslator
-   *          to translate the job's exception if the job threw an exception.
+   *     to translate the job's exception if the job threw an exception.
    * @return the job's result.
    * @throws ThreadInterruptedError
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    * @throws FutureCancelledError
-   *           if the job was cancelled.
+   *     if the job was cancelled.
    * @throws TimedOutError
-   *           if the wait timed out.
+   *     if the wait timed out.
    * @throws EXCEPTION
-   *           if the job throws an exception, and is translated by the given {@link IExceptionTranslator}.
+   *     if the job throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
   <EXCEPTION extends Throwable> RESULT awaitDoneAndGet(long timeout, TimeUnit unit, Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION;
 
@@ -250,10 +250,10 @@ public interface IFuture<RESULT> extends ICancellable {
    * </pre>
    *
    * @param callback
-   *          callback invoked upon transition into 'done' state.
+   *     callback invoked upon transition into 'done' state.
    * @param runContext
-   *          optional {@link RunContext} to invoke the handler on behalf, or <code>null</code> to not invoke on a
-   *          specific {@link RunContext}.
+   *     optional {@link RunContext} to invoke the handler on behalf, or <code>null</code> to not invoke on a
+   *     specific {@link RunContext}.
    * @return The future to support for method chaining.
    */
   IFuture<RESULT> whenDone(IDoneHandler<RESULT> callback, RunContext runContext);
@@ -272,14 +272,14 @@ public interface IFuture<RESULT> extends ICancellable {
    * cancelled as well. Propagation of cancellation works only the other way round.
    *
    * @param function
-   *          the function to be executed upon completion of <code>this</code> future, and is invoked only if neither
-   *          <code>this</code> future, nor the function's future, nor the {@link RunMonitor} associated with the
-   *          function's job input is cancelled.
-   *          <p>
-   *          The function's first argument is provided with <code>this</code> future's result and the second with
-   *          <code>this</code> future's exception (if any).
+   *     the function to be executed upon completion of <code>this</code> future, and is invoked only if neither
+   *     <code>this</code> future, nor the function's future, nor the {@link RunMonitor} associated with the
+   *     function's job input is cancelled.
+   *     <p>
+   *     The function's first argument is provided with <code>this</code> future's result and the second with
+   *     <code>this</code> future's exception (if any).
    * @param input
-   *          input to schedule the function.
+   *     input to schedule the function.
    * @return the future representing the asynchronous execution of the function.
    */
   <FUNCTION_RESULT> IFuture<FUNCTION_RESULT> whenDoneSchedule(BiFunction<RESULT, Throwable, FUNCTION_RESULT> function, JobInput input);
@@ -297,9 +297,9 @@ public interface IFuture<RESULT> extends ICancellable {
    * is already registered, that previous registration is replaced.
    *
    * @param listener
-   *          listener to be registered.
+   *     listener to be registered.
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
-   *         unregister the listener.
+   * unregister the listener.
    */
   IRegistrationHandle addListener(IJobListener listener);
 
@@ -319,11 +319,11 @@ public interface IFuture<RESULT> extends ICancellable {
    * </pre>
    *
    * @param filter
-   *          filter to only get notified about events of interest - that is for events accepted by the filter.
+   *     filter to only get notified about events of interest - that is for events accepted by the filter.
    * @param listener
-   *          listener to be registered.
+   *     listener to be registered.
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
-   *         unregister the listener.
+   * unregister the listener.
    */
   IRegistrationHandle addListener(Predicate<JobEvent> filter, IJobListener listener);
 
@@ -332,9 +332,9 @@ public interface IFuture<RESULT> extends ICancellable {
    * job lifecycle events, or when waiting for job completion, or by the job manager.
    *
    * @param hint
-   *          the hint to be associated with this {@link IFuture}.
+   *     the hint to be associated with this {@link IFuture}.
    * @return <code>true</code> if this {@link IFuture} did not already contain the specified hint, or <code>false</code>
-   *         otherwise.
+   * otherwise.
    */
   boolean addExecutionHint(String hint);
 
@@ -342,7 +342,7 @@ public interface IFuture<RESULT> extends ICancellable {
    * Removes an execution hint from this {@link IFuture}. Has no effect if not associated yet.
    *
    * @param hint
-   *          the hint to be removed from this {@link IFuture}.
+   *     the hint to be removed from this {@link IFuture}.
    * @return <code>true</code> if this {@link IFuture} contained the specified hint, or <code>false</code> otherwise.
    */
   boolean removeExecutionHint(String hint);

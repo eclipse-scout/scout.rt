@@ -30,7 +30,7 @@ import org.junit.Assert;
  * of using {@link XmlUtility} which provides hardened factory methods.
  *
  * @see <a href="https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html">XML
- *      External Entity Prevention Cheat Sheet</a>
+ * External Entity Prevention Cheat Sheet</a>
  */
 public class XmlFactoriesTestSupport {
 

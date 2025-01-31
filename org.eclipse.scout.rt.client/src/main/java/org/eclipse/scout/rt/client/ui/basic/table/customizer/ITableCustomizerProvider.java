@@ -22,5 +22,4 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 public interface ITableCustomizerProvider {
 
   ITableCustomizer createTableCustomizer(ITable table);
-
 }

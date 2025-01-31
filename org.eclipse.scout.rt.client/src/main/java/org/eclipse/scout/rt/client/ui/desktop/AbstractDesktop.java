@@ -251,6 +251,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   /*
    * Configuration
    */
+
   /**
    * Configures the title of this desktop. The title is typically used as title for the main application window.
    * <p>
@@ -283,7 +284,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   /**
    * @return <code>true</code> if UI keystrokes to select view tabs are enabled, <code>false</code> otherwise. Default
-   *         value is <code>true</code>.
+   * value is <code>true</code>.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(30)
@@ -293,8 +294,8 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   /**
    * @return optional modifier to use for UI keystrokes to select view tabs (only relevant when
-   *         {@link #isSelectViewTabsKeyStrokesEnabled()} is <code>true</code>). Default value is
-   *         {@link IKeyStroke#CONTROL}.
+   * {@link #isSelectViewTabsKeyStrokesEnabled()} is <code>true</code>). Default value is
+   * {@link IKeyStroke#CONTROL}.
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(40)
@@ -320,8 +321,8 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    *
-   * @since 6.0
    * @see IIconProviderService
+   * @since 6.0
    */
   protected String getConfiguredLogoId() {
     return null;
@@ -341,7 +342,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   /**
    * @return the value to be assigned initially to the <i>navigationVisible</i> property when <code>displayStyle</code>
-   *         = {@link IDesktop#DISPLAY_STYLE_DEFAULT}. This value is ignored for all other display styles.
+   * = {@link IDesktop#DISPLAY_STYLE_DEFAULT}. This value is ignored for all other display styles.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(70)
@@ -351,8 +352,8 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   /**
    * @return the value to be assigned initially to the <i>navigationHandleVisible</i> property when
-   *         <code>displayStyle</code> = {@link IDesktop#DISPLAY_STYLE_DEFAULT}. This value is ignored for all other
-   *         display styles.
+   * <code>displayStyle</code> = {@link IDesktop#DISPLAY_STYLE_DEFAULT}. This value is ignored for all other
+   * display styles.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(75)
@@ -362,7 +363,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   /**
    * @return the value to be assigned initially to the <i>headerVisible</i> property when <code>displayStyle</code> =
-   *         {@link IDesktop#DISPLAY_STYLE_DEFAULT}. This value is ignored for all other display styles.
+   * {@link IDesktop#DISPLAY_STYLE_DEFAULT}. This value is ignored for all other display styles.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(80)
@@ -372,7 +373,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   /**
    * @return the value to be assigned initially to the <i>benchVisible</i> property when <code>displayStyle</code> =
-   *         {@link IDesktop#DISPLAY_STYLE_DEFAULT}. This value is ignored for all other display styles.
+   * {@link IDesktop#DISPLAY_STYLE_DEFAULT}. This value is ignored for all other display styles.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(90)
@@ -420,7 +421,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   /**
    * @return the value to be assigned initially to the <i>dense</i> property. This value is ignored for
-   *         <code>displayStyle</code> = {@link IDesktop#DISPLAY_STYLE_COMPACT}.
+   * <code>displayStyle</code> = {@link IDesktop#DISPLAY_STYLE_COMPACT}.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
@@ -498,9 +499,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * Subclasses can override this method. The default does nothing.
    *
    * @param oldOutline
-   *          old outline that was active before
+   *     old outline that was active before
    * @param newOutline
-   *          new outline that is active after the change
+   *     new outline that is active after the change
    */
   @ConfigOperation
   @Order(70)
@@ -514,7 +515,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * implementation simply returns the given form.
    *
    * @param form
-   *          the form which is about to show.
+   *     the form which is about to show.
    * @return the form to show, or <code>null</code> to not show the form.
    */
   @ConfigOperation
@@ -530,9 +531,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * This default implementation does nothing.
    *
    * @param oldForm
-   *          is the search form of the old (not selected anymore) page or {@code null}
+   *     is the search form of the old (not selected anymore) page or {@code null}
    * @param newForm
-   *          is the search form of the new (selected) page or {@code null}
+   *     is the search form of the new (selected) page or {@code null}
    */
   @Order(90)
   @ConfigOperation
@@ -546,9 +547,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * This default implementation does nothing.
    *
    * @param oldForm
-   *          is the detail form of the old (not selected anymore) page or {@code null}
+   *     is the detail form of the old (not selected anymore) page or {@code null}
    * @param newForm
-   *          is the detail form of the new (selected) page or {@code null}
+   *     is the detail form of the new (selected) page or {@code null}
    */
   @Order(100)
   @ConfigOperation
@@ -563,9 +564,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * visibility). See also {@link #getPageDetailForm()} .
    *
    * @param oldTable
-   *          is the table of the old (not selected anymore) table page or {@code null}
+   *     is the table of the old (not selected anymore) table page or {@code null}
    * @param newTable
-   *          is the table of the new (selected) table page or {@code null}
+   *     is the table of the new (selected) table page or {@code null}
    */
   @Order(110)
   @ConfigOperation
@@ -579,7 +580,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * The default implementation does nothing.
    *
    * @param tablePage
-   *          the table page that has been (re)loaded
+   *     the table page that has been (re)loaded
    */
   @Order(120)
   @ConfigOperation
@@ -723,7 +724,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * </p>
    *
    * @param desktopExtensions
-   *          a live list can be modified.
+   *     a live list can be modified.
    */
   protected void injectDesktopExtensions(List<IDesktopExtension> desktopExtensions) {
     List<IDesktopExtension> extensions = BEANS.all(IDesktopExtension.class);
@@ -1590,7 +1591,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   /**
    * @return request or URL parameters available at the time the Scout session/desktop has been attached. This map will
-   *         be available after the desktop has been created but before the openFromUI and attachedFromUI are called.
+   * be available after the desktop has been created but before the openFromUI and attachedFromUI are called.
    */
   @Override
   public PropertyMap getStartupRequestParams() {
@@ -2218,8 +2219,8 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * error execDefaultView is called.
    *
    * @param deepLinkPath
-   *          The deep-link path which was passed as URL parameter to the Scout application (if available). This
-   *          parameter may be null. See: {@link IDeepLinks}.
+   *     The deep-link path which was passed as URL parameter to the Scout application (if available). This
+   *     parameter may be null. See: {@link IDeepLinks}.
    */
   protected void activateDefaultView(String deepLinkPath) {
     if (safeHandleDeepLink(deepLinkPath)) {
@@ -2262,7 +2263,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * the business-logic failed to find the resource addressed by the deep-link (similar to the 404 HTTP error status).
    *
    * @throws DeepLinkException
-   *           when deep-link could not be executed
+   *     when deep-link could not be executed
    */
   protected boolean handleDeepLink(String deepLinkPath) throws DeepLinkException {
     if (hasApplicationModalElement()) {

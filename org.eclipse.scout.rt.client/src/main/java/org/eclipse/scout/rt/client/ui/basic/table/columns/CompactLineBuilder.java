@@ -90,7 +90,7 @@ public class CompactLineBuilder {
    * label and the second one on the bottom.
    *
    * @param table
-   *          necessary to check the {@link ITable#isMultilineText()} if
+   *     necessary to check the {@link ITable#isMultilineText()} if
    */
   protected boolean shouldConvertTextNlToBr(ITable table) {
     if (!isShowLabel() && table.isMultilineText()) {

@@ -98,7 +98,7 @@ public class DataObjectMigrationInventory {
 
   /**
    * @return All context data classes ({@link IDoStructureMigrationTargetContextData} annotated with
-   *         {@link DoStructureMigrationContextDataTarget}).
+   * {@link DoStructureMigrationContextDataTarget}).
    */
   protected Collection<Class<? extends IDoStructureMigrationTargetContextData>> getAllContextDataClasses() {
     //noinspection unchecked
@@ -333,9 +333,9 @@ public class DataObjectMigrationInventory {
    * Validates a {@link IDoValueMigrationHandler} for unique value migration ID and valid type version.
    *
    * @param validatedValueMigrationHandlers
-   *          Map of already validated value migration handlers, used to check for unique value migration IDs
+   *     Map of already validated value migration handlers, used to check for unique value migration IDs
    * @param valueMigrationHandler
-   *          Value migration handler to be validated
+   *     Value migration handler to be validated
    */
   protected void validateValueMigrationHandler(IDoValueMigrationHandler valueMigrationHandler, Map<DoValueMigrationId, IDoValueMigrationHandler<?>> validatedValueMigrationHandlers) {
     // Check for duplicate value migration ID
@@ -354,8 +354,8 @@ public class DataObjectMigrationInventory {
 
   /**
    * @return Unmodifiable list of all available {@link IDoValueMigrationHandler}s, ordered by type version. Migration
-   *         handlers with the same type version are ordered according to sort order provided by the bean manager (order
-   *         annotation and fully qualified class name).
+   * handlers with the same type version are ordered according to sort order provided by the bean manager (order
+   * annotation and fully qualified class name).
    */
   public List<IDoValueMigrationHandler<?>> getValueMigrationHandlers() {
     return m_valueMigrationHandlers.values().stream()
@@ -381,10 +381,10 @@ public class DataObjectMigrationInventory {
    * of all type names defines the starting point.
    *
    * @param typeNames
-   *          Map from type name to version.
+   *     Map from type name to version.
    * @param toVersion
-   *          <code>null</code> to return versions up to the newest version or a known type version to only return
-   *          versions up to the provided version.
+   *     <code>null</code> to return versions up to the newest version or a known type version to only return
+   *     versions up to the provided version.
    * @return List of versions for which migrations must be applied, might be an empty list (never <code>null</code>).
    */
   public List<NamespaceVersion> getVersions(Map<String, NamespaceVersion> typeNames, NamespaceVersion toVersion) {
@@ -436,11 +436,11 @@ public class DataObjectMigrationInventory {
    * that would migrate that data object.
    *
    * @param typeName
-   *          Current type name
+   *     Current type name
    * @param version
-   *          Current type version
+   *     Current type version
    * @return <code>true</code> if the associated DO entity is either up-to-date or a migration is available for this
-   *         type name.
+   * type name.
    */
   public boolean isUpToDateOrMigrationAvailable(String typeName, NamespaceVersion version) {
     Pair<FindNextMigrationHandlerVersionStatus, NamespaceVersion> result = findNextMigrationHandlerVersion(typeName, version);
@@ -511,10 +511,10 @@ public class DataObjectMigrationInventory {
    * is the first version > provided version this type name is affected by a migration handler.
    *
    * @param version
-   *          Type version of given type name (might be <code>null</code> if persisted without a type version yet)
+   *     Type version of given type name (might be <code>null</code> if persisted without a type version yet)
    * @return Non-<code>null</code> pair of status and lowest possible version or <code>null</code> namespace version if
-   *         there will be no migration handler that migrates this data object (already the newest version or due to
-   *         other reasons).
+   * there will be no migration handler that migrates this data object (already the newest version or due to
+   * other reasons).
    */
   protected Pair<FindNextMigrationHandlerVersionStatus, NamespaceVersion> findNextMigrationHandlerVersion(String typeName, NamespaceVersion version) {
     // Example used within comments:
@@ -659,7 +659,7 @@ public class DataObjectMigrationInventory {
 
     /**
      * @param versions
-     *          Versions (<code>null</code> versions are not allowed).
+     *     Versions (<code>null</code> versions are not allowed).
      */
     public ByNamespaceVersionComparator(List<NamespaceVersion> versions) {
       m_ordering = createOrdering(versions);

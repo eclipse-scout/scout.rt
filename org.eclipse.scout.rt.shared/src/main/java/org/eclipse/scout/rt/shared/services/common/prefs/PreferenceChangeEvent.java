@@ -14,9 +14,9 @@ import java.util.EventObject;
 /**
  * Describes a preference change.
  *
- * @since 5.1
  * @see IPreferenceChangeListener
  * @see IPreferences#addPreferenceChangeListener(IPreferenceChangeListener)
+ * @since 5.1
  */
 public class PreferenceChangeEvent extends EventObject {
 

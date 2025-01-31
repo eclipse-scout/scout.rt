@@ -41,7 +41,7 @@ public final class EntityPath implements IDataModelPath {
   /**
    * @param entityPath
    * @param useCopyOfList
-   *          if true then the entityPath list is assumed to be mutable and a copy of it is taken.
+   *     if true then the entityPath list is assumed to be mutable and a copy of it is taken.
    */
   EntityPath(List<IDataModelEntity> entityPath, boolean useCopyOfList) {
     if (entityPath == null || entityPath.isEmpty()) {
@@ -216,5 +216,4 @@ public final class EntityPath implements IDataModelPath {
     buf.append("]");
     return buf.toString();
   }
-
 }

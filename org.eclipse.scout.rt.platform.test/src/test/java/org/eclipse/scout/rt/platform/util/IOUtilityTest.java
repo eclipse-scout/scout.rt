@@ -463,7 +463,6 @@ public class IOUtilityTest {
 
     assertNull(IOUtility.removeByteOrderMark(null));
     assertArrayEquals(new byte[]{(byte) 0xef, (byte) 0xbb}, IOUtility.removeByteOrderMark(new byte[]{(byte) 0xef, (byte) 0xbb}));
-
   }
 
   private byte[] mergeArrays(byte[] a, byte[] b) {

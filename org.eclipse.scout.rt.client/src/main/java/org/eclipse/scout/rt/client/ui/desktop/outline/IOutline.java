@@ -100,7 +100,7 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
 
   /**
    * @param pageTypes
-   *          Must be classes that implement {@link IPage}.
+   *     Must be classes that implement {@link IPage}.
    * @see #refreshPages(List)
    */
   void refreshPages(Class<?>... pageTypes);
@@ -125,9 +125,9 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
    * search- forms. The first visible and selectable node will be selected if requested and such a node exists.
    *
    * @param selectFirstNode
-   *          Specifies if the first visible and selectable {@link IPage} should be selected after the reset. If
-   *          {@code false} no {@link IPage} will be selected and the selection of the outline will be {@code null}. In
-   *          the UI the {@link IPage} tiles will be displayed instead of a page content.
+   *     Specifies if the first visible and selectable {@link IPage} should be selected after the reset. If
+   *     {@code false} no {@link IPage} will be selected and the selection of the outline will be {@code null}. In
+   *     the UI the {@link IPage} tiles will be displayed instead of a page content.
    */
   void resetOutline(boolean selectFirstNode);
 
@@ -207,7 +207,7 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
    * </ul>
    *
    * @param page
-   *          The {@link IPage} for which the menus should be calculated.
+   *     The {@link IPage} for which the menus should be calculated.
    * @return A {@link List} holding the {@link IMenu}s for the specified page.
    */
   List<IMenu> getMenusForPage(IPage<?> page);
@@ -236,5 +236,4 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
    * @since 7.0
    */
   ClientRunContext createDisplayParentRunContext();
-
 }

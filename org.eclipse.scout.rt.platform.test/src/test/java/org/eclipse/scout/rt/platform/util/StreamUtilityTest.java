@@ -125,7 +125,7 @@ public class StreamUtilityTest {
 
   @Test
   public void testToMapWithDuplicatedKeyReplacingValue() {
-    Pair<String, String>[] items = new Pair[] { ImmutablePair.of("key1", "valueA"),  ImmutablePair.of("key2", "valueB"),  ImmutablePair.of("key1", "valueC")};
+    Pair<String, String>[] items = new Pair[]{ImmutablePair.of("key1", "valueA"), ImmutablePair.of("key2", "valueB"), ImmutablePair.of("key1", "valueC")};
     Map<String, String> result = Stream.of(items).collect(StreamUtility.toMap(Pair::getLeft, Pair::getRight, StreamUtility.replacingMerger()));
     assertEquals(2, result.size());
     assertEquals("valueC", result.get("key1"));
@@ -134,7 +134,7 @@ public class StreamUtilityTest {
 
   @Test
   public void testToMapWithDuplicatedKeyDefaultRemappingFunction() {
-    Pair<String, String>[] items = new Pair[] { ImmutablePair.of("key1", "valueA"),  ImmutablePair.of("key2", "valueB"),  ImmutablePair.of("key1", "valueC")};
+    Pair<String, String>[] items = new Pair[]{ImmutablePair.of("key1", "valueA"), ImmutablePair.of("key2", "valueB"), ImmutablePair.of("key1", "valueC")};
     Map<String, String> result = Stream.of(items).collect(StreamUtility.toMap(Pair::getLeft, Pair::getRight));
     assertEquals(2, result.size());
     assertEquals("valueC", result.get("key1"));
@@ -150,7 +150,7 @@ public class StreamUtilityTest {
 
   @Test
   public void testToLinkedHashMapDuplicatedKey() {
-    Pair<String, String>[] items = new Pair[] { ImmutablePair.of("key1", "valueA"),  ImmutablePair.of("key2", "valueB"),  ImmutablePair.of("key1", "valueC")};
+    Pair<String, String>[] items = new Pair[]{ImmutablePair.of("key1", "valueA"), ImmutablePair.of("key2", "valueB"), ImmutablePair.of("key1", "valueC")};
     Map<String, String> map = Stream.of(items).collect(StreamUtility.toLinkedHashMap(Pair::getLeft, Pair::getRight));
     assertEquals("valueC", map.get("key1"));
     assertEquals("valueB", map.get("key2"));

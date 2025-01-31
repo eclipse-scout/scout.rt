@@ -83,7 +83,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
    * {@link DataModelConstants#AGGREGATION_COUNT} if valid and else to the first valid aggregation available or null.
    *
    * @param attribute
-   *          the new attribute
+   *     the new attribute
    */
   @ConfigOperation
   @Order(100)
@@ -129,5 +129,4 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
   protected IDataModelAggregationFieldExtension<? extends AbstractDataModelAggregationField> createLocalExtension() {
     return new LocalDataModelAggregationFieldExtension<>(this);
   }
-
 }

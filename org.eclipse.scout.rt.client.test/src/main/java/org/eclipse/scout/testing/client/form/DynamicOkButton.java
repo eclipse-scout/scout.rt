@@ -27,5 +27,4 @@ public class DynamicOkButton extends AbstractOkButton {
   public String getFieldId() {
     return (String) getProperty("id");
   }
-
 }

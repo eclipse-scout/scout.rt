@@ -23,5 +23,4 @@ public abstract class AbstractCodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER ext
   public AbstractCodeTypeExtension(OWNER owner) {
     super(owner);
   }
-
 }

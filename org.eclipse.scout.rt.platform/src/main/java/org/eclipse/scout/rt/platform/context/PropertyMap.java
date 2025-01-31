@@ -121,6 +121,5 @@ public class PropertyMap implements Iterable<Entry<Object, Object>> {
     }
 
     return propertyMap.contains(property);
-
   }
 }

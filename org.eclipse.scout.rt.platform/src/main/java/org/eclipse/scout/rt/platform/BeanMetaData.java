@@ -42,7 +42,6 @@ public class BeanMetaData {
     readStaticAnnotations(clazz, false);
     inheritOrderIfRequired(clazz);
     m_initialInstance = initialInstance;
-
   }
 
   public BeanMetaData(IBean<?> template) {
@@ -127,7 +126,7 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    * @throws IllegalArgumentException
-   *           if argument initialInstance is not null and is not an instance of the bean class.
+   *     if argument initialInstance is not null and is not an instance of the bean class.
    */
   public BeanMetaData withInitialInstance(Object initialInstance) {
     if (initialInstance != null && !m_beanClazz.isInstance(initialInstance)) {
@@ -199,9 +198,9 @@ public class BeanMetaData {
    * Gets the {@link Annotation} instance for the given {@link Annotation} {@link Class}.
    *
    * @param annotationClazz
-   *          The {@link Annotation} {@link Class} to search.
+   *     The {@link Annotation} {@link Class} to search.
    * @return The {@link Annotation} instance if this annotation exists for this {@link BeanMetaData} or
-   *         <code>null</code> otherwise.
+   * <code>null</code> otherwise.
    */
   @SuppressWarnings("unchecked")
   public <ANNOTATION extends Annotation> ANNOTATION getBeanAnnotation(Class<ANNOTATION> annotationClazz) {
@@ -221,7 +220,7 @@ public class BeanMetaData {
    * Replaces all annotations in this {@link BeanMetaData} with the ones provided.
    *
    * @param annotations
-   *          The new annotations.
+   *     The new annotations.
    */
   public void setBeanAnnotations(Map<Class<? extends Annotation>, Annotation> annotations) {
     m_beanAnnotations.clear();
@@ -242,7 +241,7 @@ public class BeanMetaData {
    * Adds all {@link Annotation}s in the given {@link Collection}.
    *
    * @param annotations
-   *          The {@link Annotation}s to add.
+   *     The {@link Annotation}s to add.
    * @return this
    */
   public BeanMetaData withAnnotations(Collection<Annotation> annotations) {

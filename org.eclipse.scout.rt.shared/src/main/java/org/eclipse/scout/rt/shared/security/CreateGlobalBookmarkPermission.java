@@ -19,5 +19,4 @@ public class CreateGlobalBookmarkPermission extends AbstractPermission {
   public CreateGlobalBookmarkPermission() {
     super(ID);
   }
-
 }

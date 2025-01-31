@@ -32,8 +32,8 @@ public class ColumnDescriptor {
 
   /**
    * @param propertyName
-   *          Name of the corresponding property in the "additional table row data" ({@link AbstractTableRowData}) or
-   *          <code>null</code> if this descriptor describes the first (default) column.
+   *     Name of the corresponding property in the "additional table row data" ({@link AbstractTableRowData}) or
+   *     <code>null</code> if this descriptor describes the first (default) column.
    */
   public ColumnDescriptor(String propertyName) {
     m_propertyName = propertyName;
@@ -41,12 +41,12 @@ public class ColumnDescriptor {
 
   /**
    * @param propertyName
-   *          Name of the corresponding property in the "additional table row data" ({@link AbstractTableRowData}) or
-   *          <code>null</code> if this descriptor describes the first (default) column.
+   *     Name of the corresponding property in the "additional table row data" ({@link AbstractTableRowData}) or
+   *     <code>null</code> if this descriptor describes the first (default) column.
    * @param text
-   *          Header text of this column.
+   *     Header text of this column.
    * @param width
-   *          Width of this column in pixel.
+   *     Width of this column in pixel.
    */
   public ColumnDescriptor(String propertyName, String text, int width) {
     m_propertyName = propertyName;
@@ -56,7 +56,7 @@ public class ColumnDescriptor {
 
   /**
    * @return Name of the corresponding property in the "additional table row data" ({@link AbstractTableRowData}) or
-   *         <code>null</code> if this descriptor describes the first (default) column.
+   * <code>null</code> if this descriptor describes the first (default) column.
    */
   public String getPropertyName() {
     return m_propertyName;
@@ -71,7 +71,7 @@ public class ColumnDescriptor {
 
   /**
    * @param objectType
-   *          Object type of this column (e.g. 'BooleanColumn').
+   *     Object type of this column (e.g. 'BooleanColumn').
    */
   public ColumnDescriptor withObjectType(String objectType) {
     m_objectType = objectType;
@@ -87,7 +87,7 @@ public class ColumnDescriptor {
 
   /**
    * @param text
-   *          Header text of this column.
+   *     Header text of this column.
    */
   public ColumnDescriptor withText(String text) {
     m_text = text;
@@ -103,7 +103,7 @@ public class ColumnDescriptor {
 
   /**
    * @param headerIconId
-   *          Header icon-id of this column.
+   *     Header icon-id of this column.
    */
   public ColumnDescriptor withHeaderIconId(String headerIconId) {
     m_headerIconId = headerIconId;

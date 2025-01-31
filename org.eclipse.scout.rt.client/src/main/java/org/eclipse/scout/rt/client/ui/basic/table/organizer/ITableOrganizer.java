@@ -29,5 +29,4 @@ public interface ITableOrganizer {
   void removeColumn(IColumn column);
 
   void modifyColumn(IColumn column);
-
 }

@@ -395,7 +395,6 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
       public Object prepareValueForToJson(Object value) {
         return JsonBenchLayoutData.toJson((BenchLayoutData) value);
       }
-
     });
     putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_DISPLAY_STYLE, model) {
       @Override

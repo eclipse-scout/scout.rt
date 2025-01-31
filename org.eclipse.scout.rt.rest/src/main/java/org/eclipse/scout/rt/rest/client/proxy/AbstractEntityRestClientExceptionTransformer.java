@@ -78,7 +78,7 @@ public abstract class AbstractEntityRestClientExceptionTransformer implements IR
    * Transform logic if there is no special logic for current {@link Response.Status}
    *
    * @return {@code null} if there is no special transformation for given status family required else transformed
-   *         exception
+   * exception
    */
   protected RuntimeException transformByResponseStatusFamily(Response.Status.Family family, RuntimeException e, Response response) {
     switch (family) {
@@ -101,9 +101,9 @@ public abstract class AbstractEntityRestClientExceptionTransformer implements IR
    * logic is called to transform the exception.
    *
    * @param entityExceptionSupplier
-   *          responsible to read entity and then providing new exception
+   *     responsible to read entity and then providing new exception
    * @param fallbackExceptionSupplier
-   *          creates fallback exception in case entity reading fails
+   *     creates fallback exception in case entity reading fails
    * @return transformed exception
    */
   protected RuntimeException safeTransformEntityErrorResponse(RuntimeException e, Response response, Supplier<RuntimeException> entityExceptionSupplier, Supplier<RuntimeException> fallbackExceptionSupplier) {

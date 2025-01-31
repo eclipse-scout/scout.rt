@@ -25,7 +25,7 @@ public class ChartColumnParam implements IChartColumnParam {
 
   /**
    * @param column
-   *          may be <code>null</code>
+   *     may be <code>null</code>
    */
   public ChartColumnParam(IColumn<?> column, int columnModifier) {
     m_column = column;
@@ -84,5 +84,4 @@ public class ChartColumnParam implements IChartColumnParam {
     }
     return true;
   }
-
 }

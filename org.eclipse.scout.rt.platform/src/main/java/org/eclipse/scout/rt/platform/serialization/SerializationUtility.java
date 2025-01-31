@@ -57,7 +57,7 @@ public final class SerializationUtility {
    * Create a blacklist policy
    *
    * @param regexLists
-   *          regex expressions separated with comma
+   *     regex expressions separated with comma
    * @return a composite regex based on the individual regex
    * @since 11.0
    */
@@ -69,7 +69,7 @@ public final class SerializationUtility {
    * Create a whitelist policy
    *
    * @param regexLists
-   *          regex expressions separated with comma
+   *     regex expressions separated with comma
    * @return a composite regex based on the individual regex
    * @since 11.0
    */
@@ -85,12 +85,12 @@ public final class SerializationUtility {
    * This policy contains the following regex
    *
    * <pre>
-  \[.*
-  (byte|char|short|int|long|double|float|boolean)
-  java\..*
-  org\.eclipse\.scout\..*
-  org\.eclipsescout\..*
-  net\.sourceforge\.spnego\.SpnegoAuthenticatorWithCache.*
+   * \[.*
+   * (byte|char|short|int|long|double|float|boolean)
+   * java\..*
+   * org\.eclipse\.scout\..*
+   * org\.eclipsescout\..*
+   * net\.sourceforge\.spnego\.SpnegoAuthenticatorWithCache.*
    * </pre>
    *
    * @since 11.0
@@ -109,7 +109,7 @@ public final class SerializationUtility {
    * Create a blacklist or a whitelist policy
    *
    * @param regexLists
-   *          regex expressions separated with comma
+   *     regex expressions separated with comma
    * @return a composite regex based on the individual regex
    * @since 11.0
    */
@@ -136,7 +136,7 @@ public final class SerializationUtility {
 
   /**
    * @return Returns an environment-dependent {@link ClassLoader} that is able to load all classes that are available in
-   *         the running environment.
+   * the running environment.
    */
   public static ClassLoader getClassLoader() {
     return FACTORY.getClassLoader();

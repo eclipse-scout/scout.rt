@@ -129,6 +129,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   /*
    * Configuration
    */
+
   /**
    * Configures the search form to be used with this table page. The search form is lazily
    * {@linkplain #ensureSearchFormCreated() created} and {@linkplain #ensureSearchFormStarted() started}.
@@ -171,8 +172,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * <p>
    * Subclasses can override this method. Default is {@code true}.
    *
-   * @since 5.1
    * @see ITable#setTableStatusVisible(boolean)
+   * @since 5.1
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(130)
@@ -192,9 +193,9 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * <p>
    * Subclasses can override this method. Default is {@code false}.
    *
-   * @since 6.0
    * @see #execCreateChildPage(ITableRow)
    * @see #createDefaultChildPage(ITableRow)
+   * @since 6.0
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(140)
@@ -230,7 +231,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * into the table using {@link ITable#replaceRowsByMatrix(Object)}.
    *
    * @param filter
-   *          a search filter, guaranteed not to be {@code null}
+   *     a search filter, guaranteed not to be {@code null}
    * @since 3.10.0-M1
    */
   @ConfigOperation
@@ -322,7 +323,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * Subclasses can override this method. The default returns {@code null}.
    *
    * @param row
-   *          a table row for which a new child page should be created
+   *     a table row for which a new child page should be created
    * @return a new child page for {@code row}
    */
   @ConfigOperation
@@ -1088,5 +1089,4 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   protected IPageWithTableExtension<T, ? extends AbstractPageWithTable<T>> createLocalExtension() {
     return new LocalPageWithTableExtension<>(this);
   }
-
 }

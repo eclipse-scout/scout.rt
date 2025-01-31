@@ -21,7 +21,7 @@ public interface IReloadHandler {
 
   /**
    * @param reloadReason
-   *          {@link IReloadReason}
+   *     {@link IReloadReason}
    */
   void reload(String reloadReason);
 }

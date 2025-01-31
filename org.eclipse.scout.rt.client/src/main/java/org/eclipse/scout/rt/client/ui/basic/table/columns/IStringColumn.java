@@ -30,7 +30,7 @@ public interface IStringColumn extends IColumn<String> {
    * Sets the display format of this column.
    *
    * @param s
-   *          Either {@code null}, {@link #FORMAT_LOWER} or {@link #FORMAT_UPPER}.
+   *     Either {@code null}, {@link #FORMAT_LOWER} or {@link #FORMAT_UPPER}.
    */
   void setDisplayFormat(String s);
 
@@ -39,5 +39,4 @@ public interface IStringColumn extends IColumn<String> {
   void setMaxLength(int len);
 
   int getMaxLength();
-
 }

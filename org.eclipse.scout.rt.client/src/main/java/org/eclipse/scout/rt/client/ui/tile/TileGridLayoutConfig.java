@@ -30,7 +30,7 @@ public class TileGridLayoutConfig extends LogicalGridLayoutConfig {
 
   /**
    * @return the maximum width in pixels to use for the content. The maximum is disabled if this value is
-   *         <code>&lt;= 0</code>.
+   * <code>&lt;= 0</code>.
    */
   public int getMaxWidth() {
     return m_maxWidth;
@@ -38,8 +38,8 @@ public class TileGridLayoutConfig extends LogicalGridLayoutConfig {
 
   /**
    * @param maxWidth
-   *          the maximum width in pixels to use for the content. The maximum is disabled if this value is
-   *          <code>&lt;= 0</code>
+   *     the maximum width in pixels to use for the content. The maximum is disabled if this value is
+   *     <code>&lt;= 0</code>
    */
   public void setMaxWidth(int maxWidth) {
     m_maxWidth = maxWidth;

@@ -111,5 +111,4 @@ public final class UserAgents {
   public static UserAgent createByIdentifier(String userAgent) {
     return createByIdentifier(BEANS.get(IUserAgentParser.class), userAgent);
   }
-
 }

@@ -350,8 +350,8 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
 
   /**
    * @return the child nodes of the given nodes which are kept by the map {@link #m_childNodes}. This method is
-   *         typically used on delete operations because {@link ITreeNode#getChildNodes()} may not contain the deleted
-   *         nodes anymore.
+   * typically used on delete operations because {@link ITreeNode#getChildNodes()} may not contain the deleted
+   * nodes anymore.
    * @see #m_childNodes
    */
   protected Set<ITreeNode> getChildNodes(ITreeNode node) {
@@ -858,10 +858,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
 
   /**
    * @return the nodeId for the given node. Returns <code>null</code> if the node is the invisible root node or
-   *         <code>null</code> itself. Use {@link #optNodeId(ITreeNode)} to prevent an exception when no nodeId could be
-   *         found.
+   * <code>null</code> itself. Use {@link #optNodeId(ITreeNode)} to prevent an exception when no nodeId could be
+   * found.
    * @throws UiException
-   *           when no nodeId is found for the given node
+   *     when no nodeId is found for the given node
    */
   public String getNodeId(ITreeNode node) {
     if (node == null) {
@@ -879,7 +879,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
 
   /**
    * @return the nodeId for the given node or <code>null</code> if the node has no nodeId assigned. Also returns
-   *         <code>null</code> if the node is the invisible root node or <code>null</code> itself.
+   * <code>null</code> if the node is the invisible root node or <code>null</code> itself.
    */
   public String optNodeId(ITreeNode node) {
     if (node == null) {
@@ -979,7 +979,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
    * Returns a treeNode for the given nodeId.
    *
    * @throws UiException
-   *           when no node is found for the given nodeId
+   *     when no node is found for the given nodeId
    */
   public ITreeNode getTreeNodeForNodeId(String nodeId) {
     ITreeNode node = optTreeNodeForNodeId(nodeId);

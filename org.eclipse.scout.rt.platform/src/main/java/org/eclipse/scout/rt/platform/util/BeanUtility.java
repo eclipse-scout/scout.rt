@@ -86,8 +86,8 @@ public final class BeanUtility {
 
   /**
    * @param lenient
-   *          true just logs warnings on exceptions, false throws exceptions set all properties on to, filtering with
-   *          filter
+   *     true just logs warnings on exceptions, false throws exceptions set all properties on to, filtering with
+   *     filter
    */
   public static void setProperties(Object to, Map<String, Object> map, boolean lenient, IPropertyFilter filter) {
     FastBeanInfo toInfo = getFastBeanInfo(to.getClass(), null);
@@ -161,9 +161,9 @@ public final class BeanUtility {
    * Creates a new instance of the given class and init parameters. The constructor is derived from the parameter types.
    *
    * @param c
-   *          The class a new instance is created for.
+   *     The class a new instance is created for.
    * @param parameters
-   *          The parameter objects the new instance is initialized with.
+   *     The parameter objects the new instance is initialized with.
    * @return Returns a new instance of the given class or <code>null</code>, if no matching constructor can be found.
    * @since 3.8.1
    */
@@ -185,11 +185,11 @@ public final class BeanUtility {
    * resulting object is initialized with the given parameters.
    *
    * @param c
-   *          The class a new instance is created for.
+   *     The class a new instance is created for.
    * @param parameterTypes
-   *          The parameter types used for determining the constructor used for creating the new instance.
+   *     The parameter types used for determining the constructor used for creating the new instance.
    * @param parameters
-   *          The parameter objects the new instance is initialized with.
+   *     The parameter objects the new instance is initialized with.
    * @return Returns a new instance of the given class or <code>null</code>, if no matching constructor can be found.
    * @since 3.8.1
    */
@@ -211,14 +211,14 @@ public final class BeanUtility {
    * Finds the best matching constructor in the given class having the given parameter types or super classes of them.
    *
    * @param c
-   *          The class the constructor is searched for.
+   *     The class the constructor is searched for.
    * @param parameterTypes
-   *          A possibly empty vararg list of required constructor parameter types.
+   *     A possibly empty vararg list of required constructor parameter types.
    * @return Returns the exact constructor of the given class and the given list of parameter types, the best matching
-   *         one or <code>null</code>, if none can be found.
+   * one or <code>null</code>, if none can be found.
    * @throws ProcessingException
-   *           A {@link ProcessingException} is thrown if there are multiple constructors satisfying the given
-   *           constructor specification.
+   *     A {@link ProcessingException} is thrown if there are multiple constructors satisfying the given
+   *     constructor specification.
    * @since 3.8.1
    */
   public static <T> Constructor<T> findConstructor(Class<T> c, Class<?>... parameterTypes) {
@@ -341,12 +341,12 @@ public final class BeanUtility {
    * </table>
    *
    * @param declaredType
-   *          The method parameter's declared type.
+   *     The method parameter's declared type.
    * @param actualType
-   *          The type of the object used in the actual method invocation.
+   *     The type of the object used in the actual method invocation.
    * @return Returns -1 if the distance cannot be computed or the declared type is not assignable from the actual type.
-   *         It returns 0 for a perfect match (i.e. <code>declaredType == actualType</code> and a number &gt;0
-   *         otherwise.
+   * It returns 0 for a perfect match (i.e. <code>declaredType == actualType</code> and a number &gt;0
+   * otherwise.
    * @since 3.8.1
    */
   public static int computeTypeDistance(Class<?> declaredType, Class<?> actualType) {

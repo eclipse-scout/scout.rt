@@ -19,5 +19,4 @@ public class DisplayableOutlineFilter<T extends IOutline> implements Predicate<T
   public boolean test(T element) {
     return element.isVisibleGranted();
   }
-
 }

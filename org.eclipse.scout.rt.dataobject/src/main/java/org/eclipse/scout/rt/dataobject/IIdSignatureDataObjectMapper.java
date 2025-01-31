@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.dataobject.id.IId;
 
 /**
  * Interface to a data mapper that uses signatures for all {@link IId} instances.
- * 
+ *
  * @see IDataObjectMapper
  */
 public interface IIdSignatureDataObjectMapper extends IDataObjectMapper {

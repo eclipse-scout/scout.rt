@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  *   ...
  * }
  * </pre>
- *
+ * <p>
  * The value is actually used when deserializing a data object to its Java representation (to find the corresponding
  * data object). It is also written when serializing the data object so that it is directly known when sending the
  * serialized object back to the deserializer.

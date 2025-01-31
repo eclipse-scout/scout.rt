@@ -30,5 +30,4 @@ public abstract class AbstractGroupExtension<OWNER_FIELD extends AbstractGroup> 
   public void execInitGroup(GroupInitGroupChain chain) {
     chain.execInitGroup();
   }
-
 }

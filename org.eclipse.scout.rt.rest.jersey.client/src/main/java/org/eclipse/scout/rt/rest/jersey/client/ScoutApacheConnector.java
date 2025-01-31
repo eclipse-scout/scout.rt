@@ -120,9 +120,9 @@ public class ScoutApacheConnector implements Connector {
    * Create Scout Apache HTTP Client connector.
    *
    * @param client
-   *          JAX-RS client instance for which the connector is being created.
+   *     JAX-RS client instance for which the connector is being created.
    * @param config
-   *          client configuration.
+   *     client configuration.
    */
   public ScoutApacheConnector(Client client, Configuration config) {
     HttpClientBuilder clientBuilder = HttpClientBuilder.create();
@@ -253,7 +253,7 @@ public class ScoutApacheConnector implements Connector {
 
   /**
    * @deprecated This method will be removed with Scout release 25.1. Use the configuration property to change this
-   *             configuration or override method {@link #getMaxConnectionsTotal(Configuration)}.
+   * configuration or override method {@link #getMaxConnectionsTotal(Configuration)}.
    */
   @Deprecated
   @SuppressWarnings("DeprecatedIsStillUsed")

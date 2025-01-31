@@ -19,5 +19,4 @@ public interface IServiceInventory {
    * @return plain or html styled text describing the current inventory of the service
    */
   String getInventory();
-
 }

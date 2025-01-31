@@ -83,5 +83,4 @@ public interface IMenu extends IActionNode<IMenu> {
    * @param newValue
    */
   void handleOwnerValueChanged(Object newValue);
-
 }

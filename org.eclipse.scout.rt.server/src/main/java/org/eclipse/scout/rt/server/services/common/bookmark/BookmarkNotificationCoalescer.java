@@ -22,5 +22,4 @@ public class BookmarkNotificationCoalescer implements ICoalescer<BookmarkChanged
     // reduce to one
     return CollectionUtility.arrayList(CollectionUtility.firstElement(notifications));
   }
-
 }

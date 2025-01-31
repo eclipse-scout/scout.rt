@@ -163,5 +163,4 @@ public class RemoteFileServlet extends HttpServlet {
     rfs.streamRemoteFile(remoteFile, resp.getOutputStream());
     return true;
   }
-
 }

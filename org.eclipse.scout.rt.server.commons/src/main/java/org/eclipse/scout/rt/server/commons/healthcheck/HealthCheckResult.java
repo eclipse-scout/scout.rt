@@ -40,7 +40,7 @@ public final class HealthCheckResult {
 
   /**
    * @return {@code true} if all health checks where executed successful, otherwise {@code false} if at least one check
-   *         failed.
+   * failed.
    */
   public boolean isSuccess() {
     return m_failed.isEmpty();

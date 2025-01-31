@@ -17,5 +17,4 @@ public interface ILegacyCodeLookupCallVisitor<CODE_ID_TYPE> {
    * @return true=continue visiting, false=end visiting
    */
   boolean visit(LegacyCodeLookupCall<CODE_ID_TYPE> call, ICode<CODE_ID_TYPE> code, int treeLevel);
-
 }

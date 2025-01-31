@@ -78,7 +78,6 @@ public class DynamicFieldGridDataTest {
       protected int getConfiguredMaxLength() {
         return 128;
       }
-
     }
 
     @Order(1000)
@@ -89,7 +88,6 @@ public class DynamicFieldGridDataTest {
         return getClass().getSimpleName();
       }
     }
-
   }
 
   class DynamicGroupBox extends AbstractGroupBox {
@@ -143,6 +141,5 @@ public class DynamicFieldGridDataTest {
         return 2;
       }
     }
-
   }
 }

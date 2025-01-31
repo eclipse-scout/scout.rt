@@ -28,7 +28,7 @@ import java.util.TreeSet;
  * // more of my code
  * TuningUtility.stopTimer(&quot;myCode&quot;);
  * </pre>
- *
+ * <p>
  * results in the output
  *
  * <pre>
@@ -48,7 +48,7 @@ import java.util.TreeSet;
  * }
  * TuningUtility.finishAll();
  * </pre>
- *
+ * <p>
  * results in the output
  *
  * <pre>
@@ -90,7 +90,7 @@ public final class TuningUtility {
    * </p>
    *
    * @param name
-   *          of the timer, used in the output
+   *     of the timer, used in the output
    * @return time spent in nanoseconds, -1 if no timer was started
    */
   public static long stopTimer(String name) {
@@ -101,12 +101,12 @@ public final class TuningUtility {
    * Stops a timer
    *
    * @param name
-   *          of the timer, used to store the result for multiple measurements and for output
+   *     of the timer, used to store the result for multiple measurements and for output
    * @param print
-   *          <code>true</code> prints as output how much time was spent since the start, the output is also suppressed
-   *          if there is not timer to stop
+   *     <code>true</code> prints as output how much time was spent since the start, the output is also suppressed
+   *     if there is not timer to stop
    * @param addToBatch
-   *          <code>true</code> the measurement is stored internally
+   *     <code>true</code> the measurement is stored internally
    * @return time spent in nanoseconds, -1 if no timer was started
    */
   public static long stopTimer(String name, boolean print, boolean addToBatch) {
@@ -133,8 +133,8 @@ public final class TuningUtility {
    * print out a list of all timers that were stored (added to a batch)
    *
    * @param clearTimers
-   *          <code>true</code> if any timers have not been stopped yet, they will be removed first. A warning message
-   *          is still printed.<code>false</code> only a note will be printed, but unfinished timers will not be stopped
+   *     <code>true</code> if any timers have not been stopped yet, they will be removed first. A warning message
+   *     is still printed.<code>false</code> only a note will be printed, but unfinished timers will not be stopped
    */
   public static void finishAll(boolean clearTimers) {
     if (!TIMER_STACK.isEmpty()) {

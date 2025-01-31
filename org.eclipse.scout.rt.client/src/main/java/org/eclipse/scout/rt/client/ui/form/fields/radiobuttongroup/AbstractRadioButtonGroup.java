@@ -160,10 +160,10 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
 
   /**
    * @param call
-   *          that produced this result
+   *     that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
-   *          supported
+   *     live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *     supported
    */
   @ConfigOperation
   @Order(270)
@@ -244,7 +244,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    * To change the order or specify the insert position use {@link IFormField#setOrder(double)}.
    *
    * @param fields
-   *          live and mutable collection of configured fields, yet not initialized
+   *     live and mutable collection of configured fields, yet not initialized
    */
   protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
     if (getLookupCall() == null) {

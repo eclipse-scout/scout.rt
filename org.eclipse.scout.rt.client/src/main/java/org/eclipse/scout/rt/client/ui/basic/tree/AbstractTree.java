@@ -162,6 +162,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   /*
    * Configuration
    */
+
   /**
    * Configures the title of the tree.
    */
@@ -245,8 +246,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
    * </p>
    *
    * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
-   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
-   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   * {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   * {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
    */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(51)
@@ -260,8 +261,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
    * Subclasses can override this method. Default is {@code 0} (no drop support).
    *
    * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
-   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
-   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   * {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   * {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
    */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(52)
@@ -284,7 +285,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   /**
    * @return true: deleted nodes are automatically erased<br>
-   *         false: deleted nodes are cached for later processing (service deletion)
+   * false: deleted nodes are cached for later processing (service deletion)
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(60)
@@ -572,7 +573,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
    * Subclasses can override this method.
    *
    * @param nodes
-   *          list of nodes which have been checked or unchecked (never null).
+   *     list of nodes which have been checked or unchecked (never null).
    */
   @ConfigOperation
   @Order(90)
@@ -786,7 +787,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
    * @param menus
-   *          live and mutable collection of configured menus
+   *     live and mutable collection of configured menus
    */
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
@@ -1457,7 +1458,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
         //uncheck others in single-check mode
         if (checked && !isMultiCheck()) {
-          for (Iterator<ITreeNode> it = m_checkedNodes.iterator(); it.hasNext();) {
+          for (Iterator<ITreeNode> it = m_checkedNodes.iterator(); it.hasNext(); ) {
             if (it.next() != node) {
               it.remove();
             }
@@ -2718,7 +2719,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   /**
    * @return the new tree node for this node data or null to skip this node. It is the responsibility of this method to
-   *         add the new node to the tree.
+   * add the new node to the tree.
    */
   protected ITreeNode importTreeNodeData(ITreeNode parentNode, AbstractTreeFieldData treeData, TreeNodeData nodeData) {
     return null;
@@ -3019,7 +3020,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     public void setDisplayStyleFromUI(String style) {
       setDisplayStyle(style);
     }
-
   }// end private class
 
   /**

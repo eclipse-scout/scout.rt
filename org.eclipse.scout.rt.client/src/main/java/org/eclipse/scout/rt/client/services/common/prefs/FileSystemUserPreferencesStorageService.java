@@ -124,8 +124,8 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
     }
 
     try (FileOutputStream fos = new FileOutputStream(prefsLocation, false);
-        BufferedOutputStream out = new BufferedOutputStream(fos);
-        OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
+         BufferedOutputStream out = new BufferedOutputStream(fos);
+         OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
       props.store(writer, null);
       out.flush();
       fos.getFD().sync();
@@ -139,7 +139,7 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
     LOG.debug("loading preferences from file '{}'.", prefsLocation.getAbsolutePath());
     Properties result = new Properties();
     try (InputStream input = new BufferedInputStream(new FileInputStream(prefsLocation));
-        Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8)) {
+         Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8)) {
       result.load(reader);
     }
     catch (IOException e) {

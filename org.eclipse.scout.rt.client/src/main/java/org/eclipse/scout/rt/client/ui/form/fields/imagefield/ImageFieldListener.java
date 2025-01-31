@@ -15,5 +15,4 @@ import java.util.EventListener;
 public interface ImageFieldListener extends EventListener {
 
   void imageFieldChanged(ImageFieldEvent e);
-
 }

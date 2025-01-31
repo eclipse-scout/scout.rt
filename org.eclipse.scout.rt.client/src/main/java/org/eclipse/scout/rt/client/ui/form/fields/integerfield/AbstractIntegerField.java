@@ -86,5 +86,4 @@ public abstract class AbstractIntegerField extends AbstractNumberField<Integer> 
   protected IIntegerFieldExtension<? extends AbstractIntegerField> createLocalExtension() {
     return new LocalIntegerFieldExtension<>(this);
   }
-
 }

@@ -477,7 +477,6 @@ public class TableFieldTest {
 
     P_TableField tableField4 = createTableField(true);
     runImportFormFieldBeanDataWithAllRowStates(tableField4);
-
   }
 
   @Test

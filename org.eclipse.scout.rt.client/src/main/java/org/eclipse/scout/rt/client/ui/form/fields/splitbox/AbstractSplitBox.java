@@ -398,5 +398,4 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   protected ISplitBoxExtension<? extends AbstractSplitBox> createLocalExtension() {
     return new LocalSplitBoxExtension<>(this);
   }
-
 }

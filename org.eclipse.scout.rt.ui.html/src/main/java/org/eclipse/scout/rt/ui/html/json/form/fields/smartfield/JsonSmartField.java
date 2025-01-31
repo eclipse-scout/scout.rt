@@ -486,6 +486,5 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     protected Object lookupRowToJson(ILookupRow<VALUE> lookupRow, boolean multipleColumns) {
       return JsonSmartField.this.lookupRowToJson(lookupRow, multipleColumns);
     }
-
   }
 }

@@ -32,9 +32,9 @@ public interface IConfigProperty<DATA_TYPE> {
    * a default value is returned.
    *
    * @param namespace
-   *          The namespace of the property or <code>null</code>.
+   *     The namespace of the property or <code>null</code>.
    * @return The current value of this property. <code>null</code>, if and only if both the value and the default value
-   *         are null.
+   * are null.
    */
   DATA_TYPE getValue(String namespace);
 
@@ -42,9 +42,9 @@ public interface IConfigProperty<DATA_TYPE> {
    * Gets the configured value. If nothing is configured a default value is returned.
    *
    * @return The current value of this property. <code>null</code>, if and only if both the value and the default value
-   *         are null.
+   * are null.
    * @throws PlatformException
-   *           if there was an error reading the value.
+   *     if there was an error reading the value.
    */
   DATA_TYPE getValue();
 
@@ -54,7 +54,7 @@ public interface IConfigProperty<DATA_TYPE> {
    * Adds a new {@link IConfigChangedListener} to this property.
    *
    * @param listener
-   *          The new listener. May not be <code>null</code>.
+   *     The new listener. May not be <code>null</code>.
    */
   default void addListener(IConfigChangedListener listener) {
     configChangedListeners().add(listener);
@@ -64,7 +64,7 @@ public interface IConfigProperty<DATA_TYPE> {
    * Removes an {@link IConfigChangedListener} from this property.
    *
    * @param listener
-   *          The listener to remove. May not be <code>null</code>.
+   *     The listener to remove. May not be <code>null</code>.
    */
   default void removeListener(IConfigChangedListener listener) {
     configChangedListeners().remove(listener);
@@ -72,7 +72,7 @@ public interface IConfigProperty<DATA_TYPE> {
 
   /**
    * @return The description of the property. This may contain a textual description of what the property configures and
-   *         may also include data type restrictions.
+   * may also include data type restrictions.
    */
   String description();
 
@@ -89,7 +89,7 @@ public interface IConfigProperty<DATA_TYPE> {
    * Sets a new value to this config property.
    *
    * @param newValue
-   *          The new value.
+   *     The new value.
    */
   void setValue(DATA_TYPE newValue);
 
@@ -97,9 +97,9 @@ public interface IConfigProperty<DATA_TYPE> {
    * Sets a new value to this config property.
    *
    * @param newValue
-   *          The new value.
+   *     The new value.
    * @param namespace
-   *          The namespace of the new value.
+   *     The namespace of the new value.
    */
   void setValue(DATA_TYPE newValue, String namespace);
 

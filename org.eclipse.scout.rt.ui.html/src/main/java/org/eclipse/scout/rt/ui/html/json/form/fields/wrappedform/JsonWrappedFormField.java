@@ -51,5 +51,4 @@ public class JsonWrappedFormField<WRAPPED_FORM_FIELD extends IWrappedFormField<?
       }
     });
   }
-
 }

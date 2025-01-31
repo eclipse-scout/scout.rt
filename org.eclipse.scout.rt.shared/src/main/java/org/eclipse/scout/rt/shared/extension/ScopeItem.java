@@ -48,7 +48,7 @@ public class ScopeItem {
 
   /**
    * @return Returns <code>true</code> if the last segment has been met. (Depending on the traversing strategy the last
-   *         segment is the class identifier's first or last segment).
+   * segment is the class identifier's first or last segment).
    */
   public boolean isLastSegment() {
     if (m_topDownStrategy) {

@@ -67,5 +67,4 @@ public interface IClusterSynchronizationService extends IService {
    * @return <code>true</code>, if started and listening to cluster notifications
    */
   boolean isEnabled();
-
 }

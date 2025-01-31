@@ -94,5 +94,4 @@ public abstract class AbstractIntegerColumn extends AbstractNumberColumn<Integer
   protected IIntegerColumnExtension<? extends AbstractIntegerColumn> createLocalExtension() {
     return new LocalIntegerColumnExtension<>(this);
   }
-
 }

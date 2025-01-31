@@ -289,5 +289,4 @@ public class FormDataStatementBuilderCheck {
   protected void addBodyLine(String s) {
     m_body.add(s);
   }
-
 }

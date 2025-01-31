@@ -83,7 +83,6 @@ public class FormWithTableFieldTest {
     TableFormData formData = new TableFormData();
     form.exportFormData(formData);
     assertEquals(1, formData.getLorem().getRowCount());
-
   }
 
   @FormData(value = TableFormData.class, sdkCommand = FormData.SdkCommand.CREATE)

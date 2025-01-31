@@ -16,5 +16,4 @@ public interface ISvgFieldUIFacade {
   void fireAppLinkActionFromUI(String ref);
 
   void fireClickFromUI(SVGPoint point);
-
 }

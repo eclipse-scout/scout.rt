@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.listbox;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;

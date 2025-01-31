@@ -36,5 +36,4 @@ public class JdbcHealthCecker extends AbstractHealthChecker {
     }
     return false;
   }
-
 }

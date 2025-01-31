@@ -27,7 +27,7 @@ public class PathInfoFilter {
 
   /**
    * @param simplePattern
-   *          pattern list (with wildcard '*') comma, newline or whitespace separated
+   *     pattern list (with wildcard '*') comma, newline or whitespace separated
    */
   public PathInfoFilter(String simplePattern) {
     this(simplePatternListToRegex(simplePattern));
@@ -75,5 +75,4 @@ public class PathInfoFilter {
   public boolean accepts(String pathInfo) {
     return pathInfo != null && m_pattern != null && m_pattern.matcher(pathInfo).matches();
   }
-
 }

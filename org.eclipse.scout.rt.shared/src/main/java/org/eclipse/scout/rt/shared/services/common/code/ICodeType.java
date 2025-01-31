@@ -21,9 +21,9 @@ import org.eclipse.scout.rt.shared.services.common.code.mapping.ICodeTypeToDoFun
  * Values are cached on client and server.
  *
  * @param <CODE_TYPE_ID>
- *          type of the codetype: see {@link #getId()}
+ *     type of the codetype: see {@link #getId()}
  * @param <CODE_ID>
- *          type of the code: see {@link #getCode(Object)}
+ *     type of the code: see {@link #getCode(Object)}
  */
 public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends IExtensibleObject, ITypeWithClassId {
 
@@ -67,13 +67,13 @@ public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends IExtensibleObject, ITy
 
   /**
    * @return the index (starting at 0) of this code, -1 when not found <br>
-   *         When the code type is a tree, the top-down-left-right traversal index is used
+   * When the code type is a tree, the top-down-left-right traversal index is used
    */
   int getCodeIndex(final CODE_ID id);
 
   /**
    * @return the index (starting at 0) of this code, -1 when not found <br>
-   *         When the code type is a tree, the top-down-left-right traversal index is used
+   * When the code type is a tree, the top-down-left-right traversal index is used
    */
   int getCodeIndex(final ICode<CODE_ID> c);
 

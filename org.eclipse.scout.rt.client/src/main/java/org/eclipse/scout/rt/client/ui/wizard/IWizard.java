@@ -190,7 +190,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
    * Convenience method
    *
    * @return {@link IWizardStep#STEP_NEXT} or {@link IWizardStep#STEP_PREVIOUS} Note: If from or to is null then
-   *         STEP_NEXT is returned.
+   * STEP_NEXT is returned.
    */
   int getStepKind(IWizardStep<? extends IForm> from, IWizardStep<? extends IForm> to);
 
@@ -198,15 +198,15 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
    * Convenience method
    *
    * @param from
-   *          step
+   *     step
    * @param includeFrom
-   *          if and only if this is true, the list begins with the <tt>from</tt> step, regardless <tt>from</tt> is null
-   *          or not
+   *     if and only if this is true, the list begins with the <tt>from</tt> step, regardless <tt>from</tt> is null
+   *     or not
    * @param to
-   *          step
+   *     step
    * @param includeTo
-   *          if and only if this is true, the list ends with the <tt>to</tt> step, regardless <tt>to</tt> is null or
-   *          not
+   *     if and only if this is true, the list ends with the <tt>to</tt> step, regardless <tt>to</tt> is null or
+   *     not
    * @return a new non null list of all steps between <tt>from</tt> and <tt>to</tt> step.
    */
   List<IWizardStep<? extends IForm>> getStepSpan(IWizardStep<? extends IForm> from, boolean includeFrom, IWizardStep<? extends IForm> to, boolean includeTo);
@@ -253,12 +253,12 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
    * set the current wizard state
    *
    * @param jumpForward
-   *          true simply jumps to the new step, false activates/deactivates every step inbetween the old and the new
-   *          step
+   *     true simply jumps to the new step, false activates/deactivates every step inbetween the old and the new
+   *     step
    * @param jumpBackward
-   *          true simply jumps to the new step, false activates/deactivates every step inbetween the old and the new
-   *          step The jump parameters are only relevant if the new step is not the direct previous or next step of the
-   *          old step.
+   *     true simply jumps to the new step, false activates/deactivates every step inbetween the old and the new
+   *     step The jump parameters are only relevant if the new step is not the direct previous or next step of the
+   *     old step.
    */
   void activateStep(IWizardStep<? extends IForm> step, boolean jumpForward, boolean jumpBackward);
 
@@ -308,13 +308,13 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
    * default wizard container form is {@link DefaultWizardContainerForm}.
    *
    * @throws AssertionException
-   *           when the return value is <code>null</code>.
+   *     when the return value is <code>null</code>.
    */
   IWizardContainerForm createContainerForm();
 
   /**
    * @return the wizard's container form (created in {@link #createContainerForm()} - thus, the result should never be
-   *         <code>null</code>).
+   * <code>null</code>).
    */
   IWizardContainerForm getContainerForm();
 

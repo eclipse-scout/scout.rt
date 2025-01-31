@@ -75,13 +75,13 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     final List<DeletedNodesRemover> deletedNodesRemoverList = new LinkedList<>();
     Set<ITreeNode> newNodes = null;
 
-    for (ListIterator<TreeEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
+    for (ListIterator<TreeEvent> it = events.listIterator(events.size()); it.hasPrevious(); ) {
       final TreeEvent event = it.previous();
       final int type = event.getType();
 
       // process deleted nodes remover first so that unused nodes are removed from delete events
       if (!deletedNodesRemoverList.isEmpty()) {
-        for (Iterator<DeletedNodesRemover> removerIt = deletedNodesRemoverList.iterator(); removerIt.hasNext();) {
+        for (Iterator<DeletedNodesRemover> removerIt = deletedNodesRemoverList.iterator(); removerIt.hasNext(); ) {
           DeletedNodesRemover remover = removerIt.next();
           boolean finished = remover.removeDeletedNodes(event);
           if (finished) {
@@ -179,7 +179,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     final Map<ITreeNode, TreeEventMerger> eventMergerByParent = new HashMap<>();
     int previousEventType = -1;
 
-    for (ListIterator<TreeEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
+    for (ListIterator<TreeEvent> it = events.listIterator(events.size()); it.hasPrevious(); ) {
       final TreeEvent event = it.previous();
       final int type = event.getType();
 
@@ -241,7 +241,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     Map<Integer, List<TreeEvent>> predecessorEventsOfSameType = new HashMap<>();
     int currentEventGroupType = -1;
 
-    for (ListIterator<TreeEvent> it = events.listIterator(); it.hasNext();) {
+    for (ListIterator<TreeEvent> it = events.listIterator(); it.hasNext(); ) {
       final TreeEvent event = it.next();
 
       if (event.getType() != currentEventGroupType) {
@@ -281,7 +281,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
 
   /**
    * @return the next event's type or <code>-1</code> if {@link ListIterator#hasNext()} returns <code>false</code>. The
-   *         iterator is moved back to its initial position (i.e. {@link ListIterator#previous()}).
+   * iterator is moved back to its initial position (i.e. {@link ListIterator#previous()}).
    */
   protected int lookAheadEventType(ListIterator<TreeEvent> it) {
     if (!it.hasNext()) {
@@ -360,7 +360,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
 
   /**
    * @param type
-   *          {@link TreeEvent} type
+   *     {@link TreeEvent} type
    * @return <code>true</code>, if previous events of the same type can be ignored. <code>false</code> otherwise
    */
   protected boolean isIgnorePrevious(int type) {
@@ -534,7 +534,6 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         m_targetEvent.setNodes(m_mergedNodes);
       }
       m_mergedNodes = null;
-
     }
 
     protected void completeMergedCommonParentNode() {
@@ -607,7 +606,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         event.removeNodes(m_allNodesToRemove, m_removedNodesCollector);
       }
 
-      for (Iterator<ITreeNode> it = m_nodesToRemove.iterator(); it.hasNext();) {
+      for (Iterator<ITreeNode> it = m_nodesToRemove.iterator(); it.hasNext(); ) {
         final ITreeNode nodeToRemove = it.next();
 
         if (m_removedNodesCollector.contains(nodeToRemove)) {

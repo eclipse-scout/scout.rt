@@ -20,5 +20,4 @@ public interface ITileGridUIFacade<T extends ITile> {
   void handleTileClickFromUI(T tile, MouseButton mouseButton);
 
   void handleTileActionFromUI(T tile);
-
 }

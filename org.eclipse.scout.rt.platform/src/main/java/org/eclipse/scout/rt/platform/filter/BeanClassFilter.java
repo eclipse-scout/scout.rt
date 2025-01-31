@@ -23,11 +23,10 @@ public class BeanClassFilter implements Predicate<IClassInfo> {
    * Checks whether the given class can be registered as a bean
    *
    * @return Returns <code>true</code> if the class is instantiable and not ignored with {@link IgnoreBean},
-   *         <code>false</code> otherwise.
+   * <code>false</code> otherwise.
    */
   @Override
   public boolean test(IClassInfo ci) {
     return ci.isInstanciable() && !ci.hasAnnotation(IgnoreBean.class);
   }
-
 }

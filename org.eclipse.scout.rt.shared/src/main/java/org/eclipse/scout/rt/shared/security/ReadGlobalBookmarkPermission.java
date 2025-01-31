@@ -19,5 +19,4 @@ public class ReadGlobalBookmarkPermission extends AbstractPermission {
   public ReadGlobalBookmarkPermission() {
     super(ID);
   }
-
 }

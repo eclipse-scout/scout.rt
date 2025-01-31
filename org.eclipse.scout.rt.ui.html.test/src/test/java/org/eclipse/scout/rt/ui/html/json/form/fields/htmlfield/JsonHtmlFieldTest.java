@@ -58,5 +58,4 @@ public class JsonHtmlFieldTest extends BaseFormFieldTest {
     JSONObject json = m_htmlField.toJson();
     assertEquals("<img src=\"dynamic/" + m_session.getUiSessionId() + "/" + m_htmlField.getId() + "/test_resource\" alt=\"\">", json.get(IHtmlField.PROP_DISPLAY_TEXT));
   }
-
 }

@@ -61,11 +61,11 @@ public class RestRequestCancellationRegistry {
 
   /**
    * @param requestId
-   *          id of the request
+   *     id of the request
    * @param userId
-   *          id of the user that submits the cancellation request
+   *     id of the user that submits the cancellation request
    * @param requestNotExistsHandler
-   *          handler that is executed in the case the request could not be found
+   *     handler that is executed in the case the request could not be found
    * @return {@code true} if the cancellation request was successful, {@code false} otherwise
    */
   public boolean cancel(String requestId, Object userId, BiFunction<String, Object, Boolean> requestNotExistsHandler) {

@@ -31,5 +31,4 @@ public interface ITreeBoxExtension<T, OWNER extends AbstractTreeBox<T>> extends 
   void execPrepareLookup(TreeBoxPrepareLookupChain<T> chain, ILookupCall<T> call, ITreeNode parent);
 
   void execFilterLookupResult(TreeBoxFilterLookupResultChain<T> chain, ILookupCall<T> call, List<ILookupRow<T>> result);
-
 }

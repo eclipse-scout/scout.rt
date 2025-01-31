@@ -115,5 +115,4 @@ public final class FastBeanUtility {
     }
     return methodsList.toArray(new Method[0]);
   }
-
 }

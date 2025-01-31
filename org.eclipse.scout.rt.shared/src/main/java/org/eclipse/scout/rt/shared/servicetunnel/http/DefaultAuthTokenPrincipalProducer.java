@@ -33,9 +33,9 @@ public class DefaultAuthTokenPrincipalProducer implements IPrincipalProducer2 {
 
   /**
    * @param username
-   *          or userId
+   *     or userId
    * @param params
-   *          The {@link DefaultAuthToken} by default adds as first custom param the type of principal, 'jwt' or 'saml'.
+   *     The {@link DefaultAuthToken} by default adds as first custom param the type of principal, 'jwt' or 'saml'.
    * @return the created principal
    */
   @Override

@@ -96,7 +96,7 @@ public final class JsonAdapterUtility {
 
   /**
    * @return a {@link JSONArray} with the IDs of the given adapters that accept the given filter (or all adapters of the
-   *         filter is <code>null</code>).
+   * filter is <code>null</code>).
    */
   public static <T> JSONArray adapterIdsToJson(Collection<IJsonAdapter<T>> adapters, Predicate<T> filter) {
     if (adapters == null) {

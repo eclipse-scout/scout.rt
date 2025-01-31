@@ -28,11 +28,11 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
  * It is guaranteed that every element is only visited once per traversal.<br>
  * Except the traversal strategy the order of the elements is undefined.
  *
- * @since 8.0
  * @see IDepthFirstTreeVisitor
  * @see IBreadthFirstTreeVisitor
  * @see ITreeTraversal
  * @see TreeVisitResult
+ * @since 8.0
  */
 public final class TreeTraversals {
 
@@ -43,15 +43,15 @@ public final class TreeTraversals {
    * Creates a new {@link ITreeTraversal} using a <i>Breadth-First</i> traversal strategy.
    *
    * @param visitor
-   *          The {@link IBreadthFirstTreeVisitor} to use during the traversal. Must not be {@code null}.
+   *     The {@link IBreadthFirstTreeVisitor} to use during the traversal. Must not be {@code null}.
    * @param childrenSupplier
-   *          A {@link Function} that returns the child elements of a given parent. Must not be {@code null}.<br>
-   *          The result of the {@link Function} itself may be {@code null}. The element passed to the {@link Function}
-   *          is never {@code null}.
+   *     A {@link Function} that returns the child elements of a given parent. Must not be {@code null}.<br>
+   *     The result of the {@link Function} itself may be {@code null}. The element passed to the {@link Function}
+   *     is never {@code null}.
    * @return A <i>Breadth-First</i> {@link ITreeTraversal} that calls the specified {@link IBreadthFirstTreeVisitor} and
-   *         uses the specified {@link Function} to calculate child elements. Never returns {@code null}.
+   * uses the specified {@link Function} to calculate child elements. Never returns {@code null}.
    * @throws AssertionException
-   *           if one of the arguments is {@code null}.
+   *     if one of the arguments is {@code null}.
    * @see IBreadthFirstTreeVisitor
    * @see ITreeTraversal
    */
@@ -63,15 +63,15 @@ public final class TreeTraversals {
    * Creates a new {@link ITreeTraversal} using a <i>Depth-First</i> traversal strategy.
    *
    * @param visitor
-   *          The {@link IDepthFirstTreeVisitor} to use during the traversal. Must not be {@code null}.
+   *     The {@link IDepthFirstTreeVisitor} to use during the traversal. Must not be {@code null}.
    * @param childrenSupplier
-   *          A {@link Function} that returns the child elements of a given parent. Must not be {@code null}.<br>
-   *          The result of the {@link Function} itself may be {@code null}. The element passed to the {@link Function}
-   *          is never {@code null}.
+   *     A {@link Function} that returns the child elements of a given parent. Must not be {@code null}.<br>
+   *     The result of the {@link Function} itself may be {@code null}. The element passed to the {@link Function}
+   *     is never {@code null}.
    * @return A <i>Depth-First</i> {@link ITreeTraversal} that calls the specified {@link IDepthFirstTreeVisitor} and
-   *         uses the specified {@link Function} to calculate child elements. Never returns {@code null}.
+   * uses the specified {@link Function} to calculate child elements. Never returns {@code null}.
    * @throws AssertionException
-   *           if one of the arguments is {@code null}.
+   *     if one of the arguments is {@code null}.
    * @see IDepthFirstTreeVisitor
    * @see ITreeTraversal
    */

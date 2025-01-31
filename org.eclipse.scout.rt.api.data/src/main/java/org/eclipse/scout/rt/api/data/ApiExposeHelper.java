@@ -52,7 +52,7 @@ public class ApiExposeHelper {
 
   /**
    * @return The value of the {@link ObjectType} annotation of the instance given (declared directly on the class or one
-   *         of its super classes). If the annotation is not present or has no value {@code null} is returned.
+   * of its super classes). If the annotation is not present or has no value {@code null} is returned.
    */
   public String objectTypeOf(Object instance) {
     if (instance == null) {
@@ -63,7 +63,7 @@ public class ApiExposeHelper {
 
   /**
    * @return The value of the {@link ObjectType} annotation of the class given (declared directly on the class or one of
-   *         its super classes). If the annotation is not present or has no value {@code null} is returned.
+   * its super classes). If the annotation is not present or has no value {@code null} is returned.
    */
   public String objectTypeOf(Class<?> clazz) {
     ObjectType annotation = getAnnotation(clazz, ObjectType.class);
@@ -84,10 +84,10 @@ public class ApiExposeHelper {
    * the instance or the doEntity is {@code null}.
    *
    * @param instance
-   *          The instance whose class has the {@link ObjectType} annotation that should be read.
+   *     The instance whose class has the {@link ObjectType} annotation that should be read.
    * @param doEntity
-   *          The target {@link IDoEntity} that should receive the {@value #OBJECT_TYPE_ATTRIBUTE_NAME} annotation
-   *          value.
+   *     The target {@link IDoEntity} that should receive the {@value #OBJECT_TYPE_ATTRIBUTE_NAME} annotation
+   *     value.
    */
   public void setObjectTypeToDo(Object instance, IDoEntity doEntity) {
     if (instance == null) {
@@ -103,10 +103,10 @@ public class ApiExposeHelper {
    * or the doEntity is {@code null}.
    *
    * @param fromClass
-   *          The class that has the {@link ObjectType} annotation that should be read.
+   *     The class that has the {@link ObjectType} annotation that should be read.
    * @param doEntity
-   *          The target {@link IDoEntity} that should receive the {@value #OBJECT_TYPE_ATTRIBUTE_NAME} annotation
-   *          value.
+   *     The target {@link IDoEntity} that should receive the {@value #OBJECT_TYPE_ATTRIBUTE_NAME} annotation
+   *     value.
    */
   public void setObjectTypeToDo(Class<?> fromClass, IDoEntity doEntity) {
     if (doEntity == null || fromClass == null) {
@@ -124,7 +124,7 @@ public class ApiExposeHelper {
 
   /**
    * @return The value of the {@link FieldName} annotation of the instance given (declared directly on the class or one
-   *         of its super classes). If the annotation is not present or has no value {@code null} is returned.
+   * of its super classes). If the annotation is not present or has no value {@code null} is returned.
    */
   public String fieldNameOf(Object instance) {
     if (instance == null) {
@@ -135,7 +135,7 @@ public class ApiExposeHelper {
 
   /**
    * @return The value of the {@link FieldName} annotation of the class given (declared directly on the class or one of
-   *         its super classes). If the annotation is not present or has no value {@code null} is returned.
+   * its super classes). If the annotation is not present or has no value {@code null} is returned.
    */
   public String fieldNameOf(Class<?> clazz) {
     if (clazz == null) {

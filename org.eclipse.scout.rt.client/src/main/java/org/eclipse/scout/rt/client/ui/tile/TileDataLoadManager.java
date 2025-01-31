@@ -53,11 +53,11 @@ public class TileDataLoadManager {
     // these tiles are not visible and will be reloaded automatically when activated, no need to display an error to the user
     // if the job is canceled elsewhere (i.e. no permit is available etc.) tiles might be visible and user needs to see an error message
     Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
-        .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
-        .andMatchState(JobState.DONE)
-        .andMatchName(ITileGrid.ASYNC_LOAD_JOBNAME_PREFIX)
-        .andMatchNotExecutionHint(MANUAL_CANCELLATION_MARKER)
-        .toFilter(),
+            .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
+            .andMatchState(JobState.DONE)
+            .andMatchName(ITileGrid.ASYNC_LOAD_JOBNAME_PREFIX)
+            .andMatchNotExecutionHint(MANUAL_CANCELLATION_MARKER)
+            .toFilter(),
         event -> {
           if (event.getData().getFuture().isCancelled()) { // still needed, MANUAL_CANCELLATION_MARKER used to filter Jobs cancelled manually, Jobs cancelled e.g. when expired should be handled here
             final ClientRunContext runContext = (ClientRunContext) event.getData().getFuture().getJobInput().getRunContext();
@@ -97,7 +97,7 @@ public class TileDataLoadManager {
   public void runInModelJob(IRunnable r) {
     ModelJobs.schedule(r,
         ModelJobs.newInput(ClientRunContexts.copyCurrent()
-            .withRunMonitor(BEANS.get(RunMonitor.class))) // do not use same RunMonitor since it might have been canceled and job will not execute in that case
+                .withRunMonitor(BEANS.get(RunMonitor.class))) // do not use same RunMonitor since it might have been canceled and job will not execute in that case
             .withName("setting tile data"));
   }
 

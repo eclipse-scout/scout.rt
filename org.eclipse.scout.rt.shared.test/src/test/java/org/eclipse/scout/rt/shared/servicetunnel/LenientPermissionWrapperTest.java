@@ -74,11 +74,11 @@ public class LenientPermissionWrapperTest {
 
   public static void assertPermissionsEqual(Permissions expected, Permissions actual) {
     ArrayList<Permission> e = new ArrayList<>();
-    for (Enumeration<Permission> en = expected.elements(); en.hasMoreElements();) {
+    for (Enumeration<Permission> en = expected.elements(); en.hasMoreElements(); ) {
       e.add(en.nextElement());
     }
     ArrayList<Permission> a = new ArrayList<>();
-    for (Enumeration<Permission> en = actual.elements(); en.hasMoreElements();) {
+    for (Enumeration<Permission> en = actual.elements(); en.hasMoreElements(); ) {
       a.add(en.nextElement());
     }
     assertEquals(e, a);

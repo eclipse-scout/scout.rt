@@ -22,7 +22,7 @@ import ch.qos.logback.classic.jul.LevelChangePropagator;
  * <pre>
  * &lt;contextListener class="org.eclipse.scout.rt.platform.logger.logback.AutoRegisteringJulLevelChangePropagator"/&gt;
  * </pre>
- *
+ * <p>
  * The optional nested element <em>removeRootHandlers</em> controls whether handlers are removed from the root logger.
  * Its default value is <code>true</code>.
  *

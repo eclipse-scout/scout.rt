@@ -24,5 +24,4 @@ public class InvalidSequenceStatus extends Status {
   public InvalidSequenceStatus(String message) {
     super(message, ERROR);
   }
-
 }

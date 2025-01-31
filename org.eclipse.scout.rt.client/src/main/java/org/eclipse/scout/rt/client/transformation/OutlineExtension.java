@@ -25,5 +25,4 @@ public class OutlineExtension extends AbstractOutlineExtension<AbstractOutline> 
     super.execInitTree(chain);
     BEANS.get(IDeviceTransformationService.class).getDeviceTransformer().transformOutline(getOwner());
   }
-
 }

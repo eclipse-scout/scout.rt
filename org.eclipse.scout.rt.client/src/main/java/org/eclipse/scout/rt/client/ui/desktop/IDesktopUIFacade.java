@@ -39,9 +39,9 @@ public interface IDesktopUIFacade {
    * The default case is to pass <code>false</code> as parameter.
    *
    * @param forcedClosing
-   *          If set to <code>true</code> all vetos to stop the closing process (see
-   *          {@link AbstractDesktop#doBeforeClosingInternal()} will be ignored. Otherwise if set to <code>false</code>
-   *          vetos are accepted.
+   *     If set to <code>true</code> all vetos to stop the closing process (see
+   *     {@link AbstractDesktop#doBeforeClosingInternal()} will be ignored. Otherwise if set to <code>false</code>
+   *     vetos are accepted.
    */
   void closeFromUI(boolean forcedClosing);
 
@@ -62,7 +62,7 @@ public interface IDesktopUIFacade {
    * GUI fires this event when user clicks on back/forward button in the navigation history of the browser.
    *
    * @param deepLinkPath
-   *          The deep-link path which belongs to the activated history entry. This parameter may be null.
+   *     The deep-link path which belongs to the activated history entry. This parameter may be null.
    */
   void historyEntryActivateFromUI(String deepLinkPath);
 

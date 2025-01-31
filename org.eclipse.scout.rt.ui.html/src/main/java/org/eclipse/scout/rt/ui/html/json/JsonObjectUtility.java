@@ -53,7 +53,7 @@ public final class JsonObjectUtility {
     }
     String[] names = new String[source.length()];
     int i = 0;
-    for (Iterator<String> it = source.keys(); it.hasNext();) {
+    for (Iterator<String> it = source.keys(); it.hasNext(); ) {
       String key = it.next();
       names[i++] = key;
     }
@@ -64,9 +64,9 @@ public final class JsonObjectUtility {
    * Puts every property from source to target.
    *
    * @param target
-   *          target object
+   *     target object
    * @param source
-   *          source object
+   *     source object
    */
   public static void putProperties(JSONObject target, JSONObject source) {
     if (target == null || source == null) {
@@ -82,9 +82,9 @@ public final class JsonObjectUtility {
    * {@link JSONObject}, the method is called recursively on those two objects.
    *
    * @param target
-   *          target object
+   *     target object
    * @param source
-   *          source object
+   *     source object
    */
   public static void mergeProperties(JSONObject target, JSONObject source) {
     if (target == null || source == null) {
@@ -201,10 +201,10 @@ public final class JsonObjectUtility {
    * Valid data types are: boolean, int, long, String, byte[], array of before mentioned types.
    *
    * @param jsonObject
-   *          {@link JSONObject}
+   *     {@link JSONObject}
    * @param throwForMissingProperty
-   *          when set to true then throws an exception if a json property does not exist in the java object, when set
-   *          to false ignores this event.
+   *     when set to true then throws an exception if a json property does not exist in the java object, when set
+   *     to false ignores this event.
    */
   public static <T> T jsonObjectPropertyToJava(JSONObject jsonObject, String propertyName, Class<T> type, boolean throwForMissingProperty) {
     Object jval = getTyped(jsonObject, propertyName, type);
@@ -216,7 +216,7 @@ public final class JsonObjectUtility {
    * This is the inverse operation to {@link JSONObject#wrap(Object)}
    *
    * @param obj
-   *          The {@link JSONObject} to unwrap or {@code null}.
+   *     The {@link JSONObject} to unwrap or {@code null}.
    * @return A {@link LinkedHashMap} holding all attributes of the given {@link JSONObject}.
    */
   @SuppressWarnings("findbugs:EC_UNRELATED_TYPES_USING_POINTER_EQUALITY")
@@ -234,7 +234,7 @@ public final class JsonObjectUtility {
    * This is the inverse operation to {@link JSONObject#wrap(Object)}
    *
    * @param jsonArr
-   *          The {@link JSONArray} to unwrap or {@code null}.
+   *     The {@link JSONArray} to unwrap or {@code null}.
    * @return An {@link Object} array holding all items of the given {@link JSONArray}.
    */
   @SuppressWarnings("findbugs:EC_UNRELATED_TYPES_USING_POINTER_EQUALITY")
@@ -259,7 +259,7 @@ public final class JsonObjectUtility {
    * This is the inverse operation to {@link JSONObject#wrap(Object)}
    *
    * @param o
-   *          The {@link Object} to unwrap or {@code null}.
+   *     The {@link Object} to unwrap or {@code null}.
    * @return The unwrapped object.
    */
   public static Object unwrap(Object o) {
@@ -283,10 +283,10 @@ public final class JsonObjectUtility {
    * Valid data types are: boolean, int, long, String, byte[], array of before mentioned types.
    *
    * @param jsonArray
-   *          {@link JSONArray}
+   *     {@link JSONArray}
    * @param throwForMissingProperty
-   *          when set to true then throws an exception if a json property does not exist in the java object, when set
-   *          to false ignores this event.
+   *     when set to true then throws an exception if a json property does not exist in the java object, when set
+   *     to false ignores this event.
    */
   public static <T> T jsonArrayElementToJava(JSONArray jsonArray, int index, Class<T> type, boolean throwForMissingProperty) {
     if (type == Void.class) {
@@ -387,7 +387,7 @@ public final class JsonObjectUtility {
 
   /**
    * @return null, {@link JSONObject}, {@link JSONArray} or a basic type (int, long, boolean, byte[], String) depending
-   *         on the value of <code>type</code>
+   * on the value of <code>type</code>
    */
   @SuppressWarnings("DuplicatedCode")
   private static Object getTyped(JSONObject jsonObject, String propertyName, Class<?> type) {
@@ -429,7 +429,7 @@ public final class JsonObjectUtility {
 
   /**
    * @return null, {@link JSONObject}, {@link JSONArray} or a basic type (int, long, boolean, byte[], String) depending
-   *         on the value of <code>type</code>
+   * on the value of <code>type</code>
    */
   @SuppressWarnings("DuplicatedCode")
   private static Object getTyped(JSONArray jsonArray, int index, Class<?> type) {

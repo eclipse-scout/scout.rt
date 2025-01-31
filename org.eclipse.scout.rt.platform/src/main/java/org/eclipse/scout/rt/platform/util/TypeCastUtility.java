@@ -70,7 +70,7 @@ public final class TypeCastUtility {
    * Casts an object into a specific type.
    *
    * @throws IllegalArgumentException
-   *           if the cast failed.
+   *     if the cast failed.
    */
   @SuppressWarnings("unchecked")
   public static <T> T castValue(Object object, Class<T> castType) {
@@ -79,7 +79,7 @@ public final class TypeCastUtility {
 
   /**
    * @param type
-   *          not null
+   *     not null
    * @return either the same type or if the type is a primitive type, the wrapper type of that primitive type
    */
   public static Class<?> getNonPrimitiveType(Class<?> type) {
@@ -91,9 +91,9 @@ public final class TypeCastUtility {
 
   /**
    * @param type
-   *          not null
+   *     not null
    * @return either the same type or if the type is a wrapper type, the primitive type of that wrapper type. May return
-   *         null if there is no primitive type for the given type
+   * null if there is no primitive type for the given type
    */
   public static Class<?> getPrimitiveType(Class<?> type) {
     if (!type.isPrimitive()) {
@@ -1933,14 +1933,14 @@ public final class TypeCastUtility {
 
   /**
    * @return the actual (declared) type of the generics parameter with index genericsParameterIndex on
-   *         genericsOwnerClass.
-   *         <p>
-   *         The generics parameter is defined on the genericsOwnerClass
-   *         <p>
-   *         The actual type must be declared on the queryClass
-   *         <p>
-   *         Example: queryType=LongArrayHolder, genericsOwnerClass=IHolder.class, genericsParameterIndex=0 since
-   *         IHolder has only one, returns Long[].class
+   * genericsOwnerClass.
+   * <p>
+   * The generics parameter is defined on the genericsOwnerClass
+   * <p>
+   * The actual type must be declared on the queryClass
+   * <p>
+   * Example: queryType=LongArrayHolder, genericsOwnerClass=IHolder.class, genericsParameterIndex=0 since
+   * IHolder has only one, returns Long[].class
    */
   public static Class getGenericsParameterClass(Class queryClass, Class genericsOwnerClass, int genericsParameterIndex) {
     return instance.getGenericsParameterClassImpl(queryClass, genericsOwnerClass, genericsParameterIndex);

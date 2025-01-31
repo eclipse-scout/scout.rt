@@ -54,9 +54,9 @@ import java.util.concurrent.locks.ReentrantLock;
  * {@link Iterator} interfaces.
  *
  * @param <K>
- *          the type of keys maintained by this map
+ *     the type of keys maintained by this map
  * @param <V>
- *          the type of mapped values
+ *     the type of mapped values
  * @since 5.2
  */
 @SuppressWarnings("squid:S2160")
@@ -83,9 +83,9 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
    * Creates a new map in which entries expire after a given time to live.
    *
    * @param timeToLiveDuration
-   *          if greater than zero, entries expire after the given duration
+   *     if greater than zero, entries expire after the given duration
    * @param timeToLiveUnit
-   *          unit of timeToLive
+   *     unit of timeToLive
    */
   public ConcurrentExpiringMap(long timeToLiveDuration, TimeUnit timeToLiveUnit) {
     this(new ConcurrentHashMap<>(), timeToLiveUnit.toMillis(timeToLiveDuration), false, false, 0, 0);
@@ -99,11 +99,11 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
    * at most the given targetSize.
    *
    * @param timeToLiveDuration
-   *          if greater than zero, entries expire after the given duration
+   *     if greater than zero, entries expire after the given duration
    * @param timeToLiveUnit
-   *          unit of timeToLive
+   *     unit of timeToLive
    * @param targetSize
-   *          if greater than zero, entries may be evicted at a put operation until the map reaches this size
+   *     if greater than zero, entries may be evicted at a put operation until the map reaches this size
    */
   public ConcurrentExpiringMap(long timeToLiveDuration, TimeUnit timeToLiveUnit, int targetSize) {
     this(new ConcurrentHashMap<>(), timeToLiveUnit.toMillis(timeToLiveDuration), true, false, targetSize, defaultOverflowSize(targetSize));
@@ -115,11 +115,11 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
    * This constructor is useful if the timeToLiveDuration should be changed.
    *
    * @param map
-   *          instance to copy
+   *     instance to copy
    * @param timeToLiveDuration
-   *          if greater than zero, entries expire after the given duration
+   *     if greater than zero, entries expire after the given duration
    * @param timeToLiveUnit
-   *          unit of timeToLive
+   *     unit of timeToLive
    */
   public ConcurrentExpiringMap(ConcurrentExpiringMap<K, V> map, long timeToLiveDuration, TimeUnit timeToLiveUnit) {
     this(map.m_elementMap, timeToLiveUnit.toMillis(timeToLiveDuration), map.m_touchOnGet, map.m_touchOnIterate, map.m_targetSize, map.m_overflowSize);
@@ -132,9 +132,9 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
    * preserved.
    *
    * @param map
-   *          instance to copy
+   *     instance to copy
    * @param targetSize
-   *          if greater than zero, entries may be evicted at a put operation until the map reaches this size
+   *     if greater than zero, entries may be evicted at a put operation until the map reaches this size
    */
   public ConcurrentExpiringMap(ConcurrentExpiringMap<K, V> map, int targetSize) {
     this(map.m_elementMap, map.m_timeToLive, map.m_touchOnGet, map.m_touchOnIterate, targetSize, sameRatioOverflowSize(targetSize, map.m_targetSize, map.m_overflowSize));
@@ -142,13 +142,13 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
 
   /**
    * @param elementMap
-   *          {@link ConcurrentMap} that contains {@link ExpiringElement}s
+   *     {@link ConcurrentMap} that contains {@link ExpiringElement}s
    * @param timeToLiveDurationMillis
-   *          if greater than zero, entries expire after the given duration
+   *     if greater than zero, entries expire after the given duration
    * @param touchOnGet
-   *          if true, {@link #get(Object)} operation updates the timestamp of an entry
+   *     if true, {@link #get(Object)} operation updates the timestamp of an entry
    * @param targetSize
-   *          if greater than zero, entries may be evicted at a put operation until the map reaches this size
+   *     if greater than zero, entries may be evicted at a put operation until the map reaches this size
    */
   public ConcurrentExpiringMap(ConcurrentMap<K, ExpiringElement<V>> elementMap, long timeToLiveDurationMillis, boolean touchOnGet, int targetSize) {
     this(elementMap, timeToLiveDurationMillis, touchOnGet, false, targetSize, defaultOverflowSize(targetSize));
@@ -156,20 +156,20 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
 
   /**
    * @param elementMap
-   *          {@link ConcurrentMap} that contains {@link ExpiringElement}s
+   *     {@link ConcurrentMap} that contains {@link ExpiringElement}s
    * @param timeToLiveDurationMillis
-   *          if greater than zero, entries expire after the given duration
+   *     if greater than zero, entries expire after the given duration
    * @param touchOnGet
-   *          if true, {@link #get(Object)} operation updates the timestamp of an entry
+   *     if true, {@link #get(Object)} operation updates the timestamp of an entry
    * @param touchOnIterate
-   *          if true, iterating through the entries updates the timestamp of entries
+   *     if true, iterating through the entries updates the timestamp of entries
    * @param targetSize
-   *          if greater than zero, entries may be evicted at a put operation until the map reaches this size
+   *     if greater than zero, entries may be evicted at a put operation until the map reaches this size
    * @param overflowSize
-   *          if greater than zero and the map is bigger than this size, oldest entries are evicted until targetSize is
-   *          reached
+   *     if greater than zero and the map is bigger than this size, oldest entries are evicted until targetSize is
+   *     reached
    * @throws IllegalArgumentException
-   *           if targetSize is greater than zero but overflow size is not greater than targetSize
+   *     if targetSize is greater than zero but overflow size is not greater than targetSize
    */
   public ConcurrentExpiringMap(ConcurrentMap<K, ExpiringElement<V>> elementMap, long timeToLiveDurationMillis, boolean touchOnGet, boolean touchOnIterate, int targetSize, int overflowSize) {
     m_elementMap = elementMap;
@@ -281,7 +281,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
    * Like the {@link #get(Object)} operation but forces an update of the timeout
    *
    * @param key
-   *          the key whose associated value is to be returned
+   *     the key whose associated value is to be returned
    * @return the value to which the specified key is mapped, or {@code null} if this map contains no mapping for the key
    */
   public V getAndTouch(Object key) {

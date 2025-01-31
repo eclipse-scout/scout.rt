@@ -88,11 +88,11 @@ public final class DateUtility {
    * Formats the specified date and time with the given patterns as defined in {@link DateFormat}.
    *
    * @param d
-   *          date to format
+   *     date to format
    * @param dateFormat
-   *          date format
+   *     date format
    * @param timeFormat
-   *          time format
+   *     time format
    * @return formatted date as {@link String}
    */
   public static String formatDateTime(Date d, int dateFormat, int timeFormat) {
@@ -139,9 +139,9 @@ public final class DateUtility {
    * Returns <code>true</code> if, and only if the given String is a valid date according to the given date format.
    *
    * @param s
-   *          date
+   *     date
    * @param pattern
-   *          date format
+   *     date format
    * @return <code>true</code> if, and only if the given String is a valid date according to the given date format.
    */
   public static boolean isValidDate(String s, String pattern) {
@@ -185,9 +185,9 @@ public final class DateUtility {
    * Adds a number of days to a date.
    *
    * @param count
-   *          days is truncated to second and can be negative
+   *     days is truncated to second and can be negative
    * @param d
-   *          may be <code>null</code>
+   *     may be <code>null</code>
    */
   public static Date addDays(Date d, double count) {
     if (d == null) {
@@ -398,9 +398,9 @@ public final class DateUtility {
    * Truncates to monday, see ISO 8601
    *
    * @param c
-   *          Calendar to truncate
+   *     Calendar to truncate
    * @param adjustIncrement
-   *          -1 to back in time, +1 to go forward
+   *     -1 to back in time, +1 to go forward
    */
   public static void truncCalendarToIsoWeek(Calendar c, int adjustIncrement) {
     truncCalendarToWeek(c, adjustIncrement, Calendar.MONDAY);
@@ -410,7 +410,7 @@ public final class DateUtility {
    * truncate the calendar to week
    *
    * @param adjustIncrement
-   *          +1 or -1
+   *     +1 or -1
    */
   public static void truncCalendarToWeek(Calendar c, int adjustIncrement, int firstDayOfWeek) {
     if (c == null) {
@@ -760,7 +760,7 @@ public final class DateUtility {
 
   /**
    * @param d
-   *          a value in [0..1[ representing a day
+   *     a value in [0..1[ representing a day
    * @return the time value as date in the range from 00:00 - 23:59:59
    * @see #convertDateToDoubleTime(Date) inverse function
    */
@@ -793,7 +793,7 @@ public final class DateUtility {
 
   /**
    * @param time
-   *          a time (hh:mm:ss) in the interval 00:00:00 - 23:59:59
+   *     a time (hh:mm:ss) in the interval 00:00:00 - 23:59:59
    * @return the time value as a double in the range from [0..1[
    * @see #convertDoubleTimeToDate(Number) inverse function
    */
@@ -873,9 +873,9 @@ public final class DateUtility {
    * </ul>
    *
    * @param start
-   *          the start date, inclusive
+   *     the start date, inclusive
    * @param end
-   *          the end date, exclusive
+   *     the end date, exclusive
    * @return <code>-1</code> in case of an error (e.g. parameter is null)
    */
   public static int getDaysBetween(Date start, Date end) {
@@ -907,9 +907,9 @@ public final class DateUtility {
    * </ul>
    *
    * @param start
-   *          the start date, inclusive
+   *     the start date, inclusive
    * @param end
-   *          the end date, exclusive
+   *     the end date, exclusive
    * @return <code>-1</code> in case of an error (e.g. parameter is null)
    */
   public static int getHoursBetween(Date start, Date end) {
@@ -937,9 +937,9 @@ public final class DateUtility {
    * </ul>
    *
    * @param start
-   *          the start date, inclusive
+   *     the start date, inclusive
    * @param end
-   *          the end date, exclusive
+   *     the end date, exclusive
    * @return <code>-1</code> in case of an error (e.g. parameter is null)
    */
   public static int getMinutesBetween(Date start, Date end) {

@@ -119,7 +119,7 @@ public class SqlParser {
 
     /**
      * @return true if the operation can be performed and the context was added, returns false when the operation is a
-     *         loop and the context was NOT added
+     * loop and the context was NOT added
      */
     public ParseStep checkAndAdd(String method, List<IToken> list) {
       ParseStep step = new ParseStep(method, !list.isEmpty() ? list.get(0) : null);

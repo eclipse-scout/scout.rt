@@ -26,5 +26,4 @@ public interface ITileAccordionExtension<T extends ITile, A extends AbstractTile
   void execTileClick(TileClickChain<T> chain, T tile, MouseButton mouseButton);
 
   void execTileAction(TileActionChain<T> chain, T tile);
-
 }

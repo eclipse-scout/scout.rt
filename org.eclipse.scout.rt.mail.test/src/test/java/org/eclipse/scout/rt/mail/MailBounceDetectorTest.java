@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.mail;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

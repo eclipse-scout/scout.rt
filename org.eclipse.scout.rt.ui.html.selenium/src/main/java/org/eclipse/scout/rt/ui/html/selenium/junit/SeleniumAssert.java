@@ -26,9 +26,9 @@ public final class SeleniumAssert {
    * Fails when the given element does not contain all the given CSS classes.
    *
    * @param expectedCssClass
-   *          A single CSS class-name or multiple CSS class-names separated by space. Example: <code>'menu-item'</code>
-   *          or <code>'menu-item selected'</code>. If multiple CSS class-names are given, the given element must have
-   *          all of these classes, otherwise the assertion will fail.
+   *     A single CSS class-name or multiple CSS class-names separated by space. Example: <code>'menu-item'</code>
+   *     or <code>'menu-item selected'</code>. If multiple CSS class-names are given, the given element must have
+   *     all of these classes, otherwise the assertion will fail.
    */
   public static void assertCssClass(AbstractSeleniumTest test, WebElement element, String expectedCssClass) {
     test.waitUntil(SeleniumExpectedConditions.elementToHaveCssClass(element, expectedCssClass));
@@ -72,5 +72,4 @@ public final class SeleniumAssert {
   public static void assertElementStaleness(AbstractSeleniumTest test, WebElement element) {
     assertTrue(test.waitUntilElementStaleness(element));
   }
-
 }

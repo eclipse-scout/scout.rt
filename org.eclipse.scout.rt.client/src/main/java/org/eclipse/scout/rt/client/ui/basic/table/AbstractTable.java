@@ -414,7 +414,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Subclasses can override this method. Default is {@code false}.
    *
    * @return {@code true} if deleted rows are automatically erased, {@code false} if deleted nodes are cached for later
-   *         processing.
+   * processing.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(50)
@@ -569,8 +569,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Subclasses can override this method. Default is {@code 0} (no drop support).
    *
    * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
-   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
-   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   * {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   * {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
    */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(190)
@@ -587,8 +587,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * </p>
    *
    * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
-   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
-   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   * {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   * {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
    */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(190)
@@ -648,8 +648,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * <p>
    * Subclasses can override this method. Default is {@link TriState#UNDEFINED}
    *
-   * @return
-   *         <ul>
+   * @return <ul>
    *         <li>{@link TriState#TRUE} if the tooltip should always be shown if the cell content is truncated</li>
    *         <li>{@link TriState#FALSE} if the tooltip should never be shown</li>
    *         <li>{@link TriState#UNDEFINED} cell tooltip is only shown if it is not possible to resize the column</li>
@@ -692,7 +691,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * </p>
    *
    * @param rows
-   *          Table rows that were dragged (unmodifiable list).
+   *     Table rows that were dragged (unmodifiable list).
    * @return A transferable object representing the given rows.
    */
   @ConfigOperation
@@ -707,9 +706,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Subclasses can override this method. The default does nothing.
    *
    * @param row
-   *          Table row on which the transferable object was dropped (row may be null for empty space drop).
+   *     Table row on which the transferable object was dropped (row may be null for empty space drop).
    * @param t
-   *          Transferable object that was dropped on the row.
+   *     Transferable object that was dropped on the row.
    */
   @ConfigOperation
   @Order(20)
@@ -723,7 +722,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * table).
    *
    * @param rows
-   *          The selected table rows to copy.
+   *     The selected table rows to copy.
    * @return A transferable object representing the given rows or null to not populate the clipboard.
    */
   @ConfigOperation
@@ -819,7 +818,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
-   * Called after {@link AbstractColumn#execDecorateCell(Cell,ITableRow)} on the column to decorate the cell.
+   * Called after {@link AbstractColumn#execDecorateCell(Cell, ITableRow)} on the column to decorate the cell.
    * <p>
    * Subclasses can override this method. The default does nothing.
    */
@@ -854,9 +853,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Subclasses can override this method. The default fires a {@link TableEvent#TYPE_ROW_CLICK} event.
    *
    * @param row
-   *          that was clicked (never null).
+   *     that was clicked (never null).
    * @param mouseButton
-   *          the mouse button ({@link MouseButton}) which triggered this method
+   *     the mouse button ({@link MouseButton}) which triggered this method
    */
   @ConfigOperation
   @Order(80)
@@ -872,7 +871,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * configured, fires a {@link TableEvent#TYPE_ROW_ACTION} event.
    *
    * @param row
-   *          that was activated (never null).
+   *     that was activated (never null).
    */
   @ConfigOperation
   @Order(90)
@@ -898,7 +897,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Subclasses can override this method. The default does nothing.
    *
    * @param rows
-   *          an unmodifiable list of the selected rows, may be empty but not null.
+   *     an unmodifiable list of the selected rows, may be empty but not null.
    */
   @ConfigOperation
   @Order(100)
@@ -911,7 +910,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Subclasses can override this method. The default does nothing.
    *
    * @param row
-   *          that is going to be decorated.
+   *     that is going to be decorated.
    */
   @ConfigOperation
   @Order(110)
@@ -934,7 +933,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Subclasses can override this method.
    *
    * @param rows
-   *          list of rows which have been checked or unchecked (never null).
+   *     list of rows which have been checked or unchecked (never null).
    */
   @ConfigOperation
   @Order(130)
@@ -958,8 +957,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
    * @param menus
-   *          a live collection of the menus. Add additional header menus to this list optionally add some separators at
-   *          the end.
+   *     a live collection of the menus. Add additional header menus to this list optionally add some separators at
+   *     the end.
    */
   protected void addHeaderMenus(OrderedCollection<IMenu> menus) {
     menus.addLast(new OrganizeColumnsMenu(this));
@@ -1078,78 +1077,77 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     // add Convenience observer for drag & drop callbacks, event history and ui sort possible check
     addTableListener(new TableAdapter() {
 
-      @Override
-      public void tableChanged(TableEvent e) {
-        //event history
-        IEventHistory<TableEvent> h = getEventHistory();
-        if (h != null) {
-          h.notifyEvent(e);
-        }
-        //dnd
-        switch (e.getType()) {
-          case TableEvent.TYPE_ROWS_DRAG_REQUEST: {
-            if (e.getDragObject() == null) {
-              try {
-                e.setDragObject(interceptDrag(e.getRows()));
-              }
-              catch (RuntimeException ex) {
-                BEANS.get(ExceptionHandler.class).handle(ex);
-              }
-            }
-            break;
-          }
-          case TableEvent.TYPE_ROW_DROP_ACTION: {
-            if (e.getDropObject() != null && isEnabled()) {
-              try {
-                interceptDrop(e.getFirstRow(), e.getDropObject());
-              }
-              catch (RuntimeException ex) {
-                BEANS.get(ExceptionHandler.class).handle(ex);
-              }
-            }
-            break;
-          }
-          case TableEvent.TYPE_ROWS_COPY_REQUEST: {
-            if (e.getCopyObject() == null) {
-              try {
-                e.setCopyObject(interceptCopy(e.getRows()));
-              }
-              catch (RuntimeException ex) {
-                BEANS.get(ExceptionHandler.class).handle(ex);
-              }
-            }
-            break;
-          }
-          case TableEvent.TYPE_ALL_ROWS_DELETED:
-          case TableEvent.TYPE_ROWS_DELETED:
-          case TableEvent.TYPE_ROWS_INSERTED:
-          case TableEvent.TYPE_ROWS_UPDATED: {
-            if (isValueChangeTriggerEnabled()) {
-              try {
-                interceptContentChanged();
-              }
-              catch (RuntimeException ex) {
-                BEANS.get(ExceptionHandler.class).handle(ex);
-              }
-            }
-            break;
-          }
-          case TableEvent.TYPE_ROWS_CHECKED:
-            try {
-              interceptRowsChecked(e.getRows());
-            }
-            catch (RuntimeException ex) {
-              BEANS.get(ExceptionHandler.class).handle(ex);
-            }
-            break;
-          case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
-          case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
-            checkIfColumnPreventsUiSortForTable();
-            break;
-        }
-      }
-
-    }, TableEvent.TYPE_ROWS_DRAG_REQUEST, TableEvent.TYPE_ROW_DROP_ACTION, TableEvent.TYPE_ROWS_COPY_REQUEST, TableEvent.TYPE_ALL_ROWS_DELETED, TableEvent.TYPE_ROWS_DELETED, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED,
+                       @Override
+                       public void tableChanged(TableEvent e) {
+                         //event history
+                         IEventHistory<TableEvent> h = getEventHistory();
+                         if (h != null) {
+                           h.notifyEvent(e);
+                         }
+                         //dnd
+                         switch (e.getType()) {
+                           case TableEvent.TYPE_ROWS_DRAG_REQUEST: {
+                             if (e.getDragObject() == null) {
+                               try {
+                                 e.setDragObject(interceptDrag(e.getRows()));
+                               }
+                               catch (RuntimeException ex) {
+                                 BEANS.get(ExceptionHandler.class).handle(ex);
+                               }
+                             }
+                             break;
+                           }
+                           case TableEvent.TYPE_ROW_DROP_ACTION: {
+                             if (e.getDropObject() != null && isEnabled()) {
+                               try {
+                                 interceptDrop(e.getFirstRow(), e.getDropObject());
+                               }
+                               catch (RuntimeException ex) {
+                                 BEANS.get(ExceptionHandler.class).handle(ex);
+                               }
+                             }
+                             break;
+                           }
+                           case TableEvent.TYPE_ROWS_COPY_REQUEST: {
+                             if (e.getCopyObject() == null) {
+                               try {
+                                 e.setCopyObject(interceptCopy(e.getRows()));
+                               }
+                               catch (RuntimeException ex) {
+                                 BEANS.get(ExceptionHandler.class).handle(ex);
+                               }
+                             }
+                             break;
+                           }
+                           case TableEvent.TYPE_ALL_ROWS_DELETED:
+                           case TableEvent.TYPE_ROWS_DELETED:
+                           case TableEvent.TYPE_ROWS_INSERTED:
+                           case TableEvent.TYPE_ROWS_UPDATED: {
+                             if (isValueChangeTriggerEnabled()) {
+                               try {
+                                 interceptContentChanged();
+                               }
+                               catch (RuntimeException ex) {
+                                 BEANS.get(ExceptionHandler.class).handle(ex);
+                               }
+                             }
+                             break;
+                           }
+                           case TableEvent.TYPE_ROWS_CHECKED:
+                             try {
+                               interceptRowsChecked(e.getRows());
+                             }
+                             catch (RuntimeException ex) {
+                               BEANS.get(ExceptionHandler.class).handle(ex);
+                             }
+                             break;
+                           case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
+                           case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
+                             checkIfColumnPreventsUiSortForTable();
+                             break;
+                         }
+                       }
+                     }, TableEvent.TYPE_ROWS_DRAG_REQUEST, TableEvent.TYPE_ROW_DROP_ACTION, TableEvent.TYPE_ROWS_COPY_REQUEST, TableEvent.TYPE_ALL_ROWS_DELETED, TableEvent.TYPE_ROWS_DELETED, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED,
         TableEvent.TYPE_ROWS_CHECKED, TableEvent.TYPE_COLUMN_HEADERS_UPDATED, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
   }
 
@@ -1284,7 +1282,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * To change the order or specify the insert position use {@link IColumn#setOrder(double)}.
    *
    * @param columns
-   *          live and mutable collection of configured columns, not yet initialized
+   *     live and mutable collection of configured columns, not yet initialized
    */
   protected void injectColumnsInternal(OrderedCollection<IColumn<?>> columns) {
     ITableCustomizer c = getTableCustomizer();
@@ -1299,7 +1297,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
    * @param menus
-   *          live and mutable collection of configured menus
+   *     live and mutable collection of configured menus
    */
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
@@ -2870,7 +2868,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   /**
    * @return a copy of a row<br>
-   *         when the row is changed it has to be applied to the table using modifyRow(row);
+   * when the row is changed it has to be applied to the table using modifyRow(row);
    */
   @Override
   public ITableRow getRow(int rowIndex) {
@@ -2997,7 +2995,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   /**
    * @return a copy of a deleted row<br>
-   *         when the row is changed it has to be applied to the table using modifyRow(row);
+   * when the row is changed it has to be applied to the table using modifyRow(row);
    */
   @Override
   public List<ITableRow> getDeletedRows() {
@@ -3634,15 +3632,15 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Gets if the given cell values are equal to the given search values
    *
    * @param searchValues
-   *          The values to search in the given cells. Must not be <code>null</code>.
+   *     The values to search in the given cells. Must not be <code>null</code>.
    * @param keyColumns
-   *          The columns describing the cells to be searched. Must not be <code>null</code>.
+   *     The columns describing the cells to be searched. Must not be <code>null</code>.
    * @param row
-   *          The row holding the cells to be searched. Must not be <code>null</code>.
+   *     The row holding the cells to be searched. Must not be <code>null</code>.
    * @return <code>true</code> if the cells described by the given columns and row have the same content as the given
-   *         searchValues. <code>false</code> otherwise. If the number of columns is different from the number of search
-   *         values only the columns are searched for which a search value exists (
-   *         <code>min(searchValues.size(), keyColumns.size()</code>).
+   * searchValues. <code>false</code> otherwise. If the number of columns is different from the number of search
+   * values only the columns are searched for which a search value exists (
+   * <code>min(searchValues.size(), keyColumns.size()</code>).
    */
   protected boolean areCellsEqual(List<?> searchValues, List<IColumn<?>> keyColumns, ITableRow row) {
     int keyIndex = 0;
@@ -4291,7 +4289,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Subclasses can override this method. The default does nothing.
    *
    * @param options
-   *          Set of constants of {@link IResetColumnsOption}
+   *     Set of constants of {@link IResetColumnsOption}
    */
   @ConfigOperation
   @Order(90)
@@ -5093,7 +5091,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     protected ITableRow createEmptyTableRow() {
       return new TableRow(getColumnSet());
     }
-
   }
 
   private static class P_CellEditorContext {

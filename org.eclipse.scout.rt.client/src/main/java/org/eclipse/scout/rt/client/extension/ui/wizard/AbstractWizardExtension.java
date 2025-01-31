@@ -117,5 +117,4 @@ public abstract class AbstractWizardExtension<OWNER extends AbstractWizard> exte
   public void execFinish(WizardFinishChain chain) {
     chain.execFinish();
   }
-
 }

@@ -21,8 +21,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-import jakarta.annotation.PostConstruct;
 import javax.security.auth.Subject;
+
+import jakarta.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
@@ -101,9 +102,9 @@ public class RunContext implements IAdaptable {
    * not return a result.
    *
    * @param runnable
-   *          runnable to be run.
+   *     runnable to be run.
    * @throws RuntimeException
-   *           if the runnable throws an exception, and is translated by {@link DefaultRuntimeExceptionTranslator}.
+   *     if the runnable throws an exception, and is translated by {@link DefaultRuntimeExceptionTranslator}.
    */
   public void run(final IRunnable runnable) {
     call(Callables.callable(runnable));
@@ -114,11 +115,11 @@ public class RunContext implements IAdaptable {
    * during execution.
    *
    * @param runnable
-   *          runnable to be run.
+   *     runnable to be run.
    * @param exceptionTranslator
-   *          to translate exceptions thrown during execution.
+   *     to translate exceptions thrown during execution.
    * @throws EXCEPTION
-   *           if the runnable throws an exception, and is translated by the given {@link IExceptionTranslator}.
+   *     if the runnable throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
   public <EXCEPTION extends Throwable> void run(final IRunnable runnable, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
     call(Callables.callable(runnable), exceptionTranslator);
@@ -129,10 +130,10 @@ public class RunContext implements IAdaptable {
    * a result.
    *
    * @param callable
-   *          callable to be run.
+   *     callable to be run.
    * @return the return value of the callable.
    * @throws RuntimeException
-   *           if the callable throws an exception, and is translated by {@link DefaultRuntimeExceptionTranslator}.
+   *     if the callable throws an exception, and is translated by {@link DefaultRuntimeExceptionTranslator}.
    */
   public <RESULT> RESULT call(final Callable<RESULT> callable) {
     return call(callable, DefaultRuntimeExceptionTranslator.class);
@@ -143,12 +144,12 @@ public class RunContext implements IAdaptable {
    * during execution.
    *
    * @param callable
-   *          callable to be run.
+   *     callable to be run.
    * @param exceptionTranslator
-   *          to translate exceptions thrown during execution.
+   *     to translate exceptions thrown during execution.
    * @return the return value of the callable.
    * @throws EXCEPTION
-   *           if the callable throws an exception, and is translated by the given {@link IExceptionTranslator}.
+   *     if the callable throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
   @SuppressWarnings("squid:S1181")
   public <RESULT, EXCEPTION extends Throwable> RESULT call(final Callable<RESULT> callable, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
@@ -175,8 +176,7 @@ public class RunContext implements IAdaptable {
     final CallableChain<RESULT> contributions = new CallableChain<>();
     interceptCallableChain(contributions);
 
-    @SuppressWarnings("unchecked")
-    final TransactionProcessor<RESULT> transactionProcessor = BEANS.get(TransactionProcessor.class)
+    @SuppressWarnings("unchecked") final TransactionProcessor<RESULT> transactionProcessor = BEANS.get(TransactionProcessor.class)
         .withCallerTransaction(m_transaction)
         .withTransactionScope(m_transactionScope)
         .withNewTransactionSupplier(m_newTransactionSupplier)
@@ -203,7 +203,7 @@ public class RunContext implements IAdaptable {
    * Method invoked to contribute to the {@link CallableChain} to initialize this context.
    *
    * @param callableChain
-   *          The chain used to construct the context.
+   *     The chain used to construct the context.
    */
   protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
     // intercept method for sub classes
@@ -552,8 +552,7 @@ public class RunContext implements IAdaptable {
     // Create a copy of the current 'thread-local' processors, and update their values to their current value.
     m_threadLocalProcessors = new HashMap<>(currentRunContext.m_threadLocalProcessors.size());
     for (final ThreadLocalProcessor<?> threadLocalProcessor : currentRunContext.m_threadLocalProcessors.values()) {
-      @SuppressWarnings("unchecked")
-      final ThreadLocal<Object> threadLocal = (ThreadLocal<Object>) threadLocalProcessor.getThreadLocal();
+      @SuppressWarnings("unchecked") final ThreadLocal<Object> threadLocal = (ThreadLocal<Object>) threadLocalProcessor.getThreadLocal();
       m_threadLocalProcessors.put(threadLocal, new ThreadLocalProcessor<>(threadLocal, threadLocal.get()));
     }
 

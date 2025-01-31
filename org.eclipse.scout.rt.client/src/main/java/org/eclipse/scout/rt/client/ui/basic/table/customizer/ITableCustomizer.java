@@ -21,7 +21,7 @@ public interface ITableCustomizer {
    * Append custom columns
    *
    * @param columns
-   *          live and mutable collection of configured columns, not yet initialized
+   *     live and mutable collection of configured columns, not yet initialized
    */
   void injectCustomColumns(OrderedCollection<IColumn<?>> columns);
 
@@ -67,8 +67,7 @@ public interface ITableCustomizer {
    * This key will be used when persisting the customizer's serialized state in the application's preferences.
    *
    * @return either the key or null if this customizer is volatile and should therefore not be persisted in the
-   *         preferences
+   * preferences
    */
   String getPreferencesKey();
-
 }

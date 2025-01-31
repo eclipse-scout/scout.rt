@@ -33,5 +33,4 @@ public abstract class AbstractMenuSeparator extends AbstractMenu {
   protected final void execSelectionChanged(boolean selection) {
     // void
   }
-
 }

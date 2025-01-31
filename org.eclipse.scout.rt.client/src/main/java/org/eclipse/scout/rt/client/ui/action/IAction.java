@@ -191,7 +191,7 @@ public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimensio
 
   /**
    * @param horizontalAlignment
-   *          negative for left and positive for right alignment
+   *     negative for left and positive for right alignment
    */
   void setHorizontalAlignment(byte horizontalAlignment);
 

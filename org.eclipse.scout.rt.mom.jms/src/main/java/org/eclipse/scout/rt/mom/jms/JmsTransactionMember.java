@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.mom.jms;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import jakarta.jms.JMSException;
 import jakarta.jms.Session;

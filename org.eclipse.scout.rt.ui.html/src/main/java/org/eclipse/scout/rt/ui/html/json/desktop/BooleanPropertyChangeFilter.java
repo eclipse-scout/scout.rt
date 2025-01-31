@@ -36,5 +36,4 @@ public class BooleanPropertyChangeFilter implements IPropertyChangeEventFilterCo
   public String getPropertyName() {
     return m_propertyName;
   }
-
 }

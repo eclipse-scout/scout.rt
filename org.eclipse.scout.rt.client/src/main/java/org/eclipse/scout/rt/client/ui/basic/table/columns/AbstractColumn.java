@@ -383,7 +383,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * Subclasses can override this method. Default is {@code false}.
    *
    * @return {@code true} if this column value belongs to the primary key of the surrounding table, {@code false}
-   *         otherwise.
+   * otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(90)
@@ -666,8 +666,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
-   * @see IColumn#isUiSortPossible()
    * @return {@code true} to allow simplified sorting e.g. by web browser, <code>false</code> otherwise.
+   * @see IColumn#isUiSortPossible()
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(220)
@@ -724,9 +724,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * Subclasses can override this method. The default calls {@link #parseValueInternal(ITableRow, Object)}.
    *
    * @param row
-   *          Table row for which to parse the raw value.
+   *     Table row for which to parse the raw value.
    * @param rawValue
-   *          Raw value to parse.
+   *     Raw value to parse.
    * @return Value in correct type, derived from rawValue.
    */
   @ConfigOperation
@@ -744,9 +744,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * Subclasses can override this method. The default calls {@link #validateValueInternal(ITableRow, Object)}.
    *
    * @param row
-   *          Table row for which to validate the raw value.
+   *     Table row for which to validate the raw value.
    * @param rawValue
-   *          Already parsed raw value to validate.
+   *     Already parsed raw value to validate.
    * @return Validated value
    */
   @ConfigOperation
@@ -761,9 +761,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * Subclasses can override this method. The default does nothing.
    *
    * @param cell
-   *          Cell to decorate.
+   *     Cell to decorate.
    * @param row
-   *          Table row of cell.
+   *     Table row of cell.
    */
   @ConfigOperation
   @Order(40)
@@ -776,7 +776,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * Subclasses can override this method. The default does nothing.
    *
    * @param cell
-   *          Header cell to decorate.
+   *     Header cell to decorate.
    */
   @ConfigOperation
   @Order(50)
@@ -797,7 +797,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * {@link #cellValueToEditor(ITableRow, IFormField)}.
    *
    * @param row
-   *          on which editing occurs
+   *     on which editing occurs
    * @return a field for editing.
    */
   @ConfigOperation
@@ -822,9 +822,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * The mapping from the field value to the cell value is achieved using {@link #editFieldToCellValue(IFormField)}
    *
    * @param row
-   *          on which editing occurred.
+   *     on which editing occurred.
    * @param editingField
-   *          Field which was used to edit cell value (as returned by {@link #interceptPrepareEdit(ITableRow)}).
+   *     Field which was used to edit cell value (as returned by {@link #interceptPrepareEdit(ITableRow)}).
    */
   @ConfigOperation
   @Order(62)
@@ -836,7 +836,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * Map the values of a cell to the editing form field. The default implementation assumes a value field.
    *
    * @throws ProcessingException
-   *           if the field is not a value field
+   *     if the field is not a value field
    */
   protected void editorValueToCell(ITableRow row, IFormField editorField) {
     if (!(editorField instanceof IValueField<?>)) {
@@ -873,11 +873,11 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * Map the values of a cell to the editing form field. The default implementation assumes a value field.
    *
    * @param row
-   *          the row that is currently edited
+   *     the row that is currently edited
    * @param editorField
-   *          the field to edit the value
+   *     the field to edit the value
    * @throws ProcessingException
-   *           if the field is not a value field
+   *     if the field is not a value field
    */
   @SuppressWarnings("unchecked")
   protected void cellValueToEditor(ITableRow row, IFormField editorField) {
@@ -2212,7 +2212,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     public void execDisposeColumn(ColumnDisposeColumnChain<VALUE> chain) {
       getOwner().execDisposeColumn();
     }
-
   }
 
   protected final void interceptCompleteEdit(ITableRow row, IFormField editingField) {
@@ -2262,5 +2261,4 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     ColumnDisposeColumnChain<VALUE> chain = new ColumnDisposeColumnChain<>(extensions);
     chain.execDisposeColumn();
   }
-
 }

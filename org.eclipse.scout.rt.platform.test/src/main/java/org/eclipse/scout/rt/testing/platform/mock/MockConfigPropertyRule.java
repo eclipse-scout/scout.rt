@@ -33,7 +33,7 @@ public class MockConfigPropertyRule<DATA_TYPE> implements TestRule {
 
   /**
    * @param defaultValue
-   *          the initial value, this value is always restored before each test
+   *     the initial value, this value is always restored before each test
    */
   public MockConfigPropertyRule(Class<? extends IConfigProperty<DATA_TYPE>> configPropertyClazz, DATA_TYPE defaultValue) {
     m_configPropertyClazz = configPropertyClazz;

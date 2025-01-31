@@ -20,5 +20,4 @@ public interface ITypeWithSettableClassId extends ITypeWithClassId {
    * If no classId was set with this setter or <code>null</code> is set, {@link #classId()} returns a default classId.
    */
   void setClassId(String classId);
-
 }

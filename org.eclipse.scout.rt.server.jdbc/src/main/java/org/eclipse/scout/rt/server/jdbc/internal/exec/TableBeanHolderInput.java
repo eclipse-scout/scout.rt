@@ -110,5 +110,4 @@ class TableBeanHolderInput implements IBindInput {
       return sqlStyle.buildBindFor(value, m_getterMethod.getReturnType());
     }
   }
-
 }

@@ -20,5 +20,4 @@ import java.util.EventListener;
 public interface IDataChangeListener extends EventListener {
 
   void dataChanged(DataChangeEvent event);
-
 }

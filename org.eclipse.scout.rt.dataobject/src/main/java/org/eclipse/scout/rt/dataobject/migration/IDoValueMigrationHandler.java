@@ -205,10 +205,10 @@ public interface IDoValueMigrationHandler<T> {
    * This method is called in order to collect applicable value migration handlers before visiting a data object.
    *
    * @param ctx
-   *          Migration context with a non-<code>null</code>
-   *          {@link DoValueMigrationIdsContextData#getAppliedValueMigrationIds()}.
+   *     Migration context with a non-<code>null</code>
+   *     {@link DoValueMigrationIdsContextData#getAppliedValueMigrationIds()}.
    * @return <code>true</code> if value migration is accepted and therefore considered for execution, <code>false</code>
-   *         otherwise.
+   * otherwise.
    */
   boolean accept(DataObjectMigrationContext ctx);
 
@@ -225,7 +225,7 @@ public interface IDoValueMigrationHandler<T> {
    * such a data object before any modification, use {@link DataObjectHelper#cloneLenient(IDoEntity)}.
    *
    * @param value
-   *          never {@code null}
+   *     never {@code null}
    **/
   Object migrate(DataObjectMigrationContext ctx, T value);
 }

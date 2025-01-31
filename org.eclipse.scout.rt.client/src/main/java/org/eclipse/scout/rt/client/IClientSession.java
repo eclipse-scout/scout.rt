@@ -42,7 +42,7 @@ public interface IClientSession extends ISession, IPropertyObserver {
    * Sets the given {@link Locale} to the session and {@link NlsLocale#CURRENT}.
    *
    * @param locale
-   *          Locale to be set.
+   *     Locale to be set.
    */
   void setLocale(Locale locale);
 
@@ -55,13 +55,13 @@ public interface IClientSession extends ISession, IPropertyObserver {
    * Sets the given {@link UserAgent} to the session and {@link UserAgent#CURRENT}.
    *
    * @param userAgent
-   *          {@link UserAgent} to be set.
+   *     {@link UserAgent} to be set.
    */
   void setUserAgent(UserAgent userAgent);
 
   /**
    * @return the public {@link URI} in the browser which hosts this application (typically ending in /index.html or
-   *         similar)
+   * similar)
    */
   URI getBrowserURI();
 
@@ -83,7 +83,7 @@ public interface IClientSession extends ISession, IPropertyObserver {
 
   /**
    * @return the {@link IDesktop} associated with this {@link IClientSession}, or a virtual {@link IDesktop} with
-   *         limited functionality if not set yet.
+   * limited functionality if not set yet.
    */
   IDesktop getDesktopElseVirtualDesktop();
 
@@ -98,8 +98,8 @@ public interface IClientSession extends ISession, IPropertyObserver {
 
   /**
    * @return the desktop model associated with this client session
-   *         <p>
-   *         Desktop is available only after {@link #start(String)} and
+   * <p>
+   * Desktop is available only after {@link #start(String)} and
    */
   IDesktop getDesktop();
 
@@ -107,11 +107,11 @@ public interface IClientSession extends ISession, IPropertyObserver {
    * Sets the desktop model associated with this client session.
    *
    * @param desktop
-   *          Must not be null.
+   *     Must not be null.
    * @throws IllegalStateException
-   *           if this session already has a desktop set
+   *     if this session already has a desktop set
    * @throws IllegalArgumentException
-   *           if the given desktop is null
+   *     if the given desktop is null
    */
   void setDesktop(IDesktop desktop);
 

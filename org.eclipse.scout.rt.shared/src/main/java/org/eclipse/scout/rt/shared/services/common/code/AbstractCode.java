@@ -484,7 +484,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
     }
     int index = -1;
     if (m_codeList != null) {
-      for (Iterator<ICode<T>> it = m_codeList.iterator(); it.hasNext();) {
+      for (Iterator<ICode<T>> it = m_codeList.iterator(); it.hasNext(); ) {
         index++;
         ICode<T> candidateCode = it.next();
         if (candidateCode == droppedCode) {

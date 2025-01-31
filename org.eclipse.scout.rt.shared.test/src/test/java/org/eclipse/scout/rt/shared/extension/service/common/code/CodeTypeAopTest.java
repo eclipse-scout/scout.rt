@@ -44,7 +44,6 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
     Assert.assertEquals(1, execCreateCodesCounter.get());
     Assert.assertEquals(1, execLoadCodesCounter.get());
     Assert.assertEquals(0, execOverwriteCodeCounter.get());
-
   }
 
   public static class CountryCodeType extends AbstractCodeType<Long, Long> {
@@ -206,7 +205,5 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
       execOverwriteCodeCounter.incrementAndGet();
       super.execOverwriteCode(chain, oldCode, newCode);
     }
-
   }
-
 }

@@ -59,5 +59,4 @@ public class OutlineEvent extends TreeEvent {
   public void setBuffered(boolean buffered) {
     m_buffered = buffered;
   }
-
 }

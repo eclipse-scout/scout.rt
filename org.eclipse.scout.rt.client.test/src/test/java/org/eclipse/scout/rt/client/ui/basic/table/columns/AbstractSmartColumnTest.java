@@ -9,9 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -74,5 +72,4 @@ public class AbstractSmartColumnTest {
       }
     }
   }
-
 }

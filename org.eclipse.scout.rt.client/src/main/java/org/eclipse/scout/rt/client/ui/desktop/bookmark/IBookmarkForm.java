@@ -17,7 +17,7 @@ public interface IBookmarkForm extends IForm {
 
   /**
    * @param bookmark
-   *          the bookmark to be modified
+   *     the bookmark to be modified
    */
   void setBookmark(Bookmark bookmark);
 
@@ -30,7 +30,7 @@ public interface IBookmarkForm extends IForm {
    * Set the top-level folder where the bookmark is located
    *
    * @param rootFolder
-   *          top-level folder
+   *     top-level folder
    */
   void setBookmarkRootFolder(BookmarkFolder rootFolder);
 
@@ -46,7 +46,7 @@ public interface IBookmarkForm extends IForm {
 
   /**
    * @param folder
-   *          the folder where the bookmark is located
+   *     the folder where the bookmark is located
    */
   void setFolder(BookmarkFolder folder);
 

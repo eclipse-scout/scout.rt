@@ -42,9 +42,9 @@ public class HealthCheckService {
    * Executes all active {@link IHealthChecker} checks.
    *
    * @param category
-   *          An optional parameter category may be specified, to run only some {@link IHealthChecker} classes. See
-   *          {@link IHealthChecker#acceptCategory(HealthCheckCategoryId)} for further explanation of filtering. If no
-   *          category is specified (e.g. value {@code null}) all active checks are executed.
+   *     An optional parameter category may be specified, to run only some {@link IHealthChecker} classes. See
+   *     {@link IHealthChecker#acceptCategory(HealthCheckCategoryId)} for further explanation of filtering. If no
+   *     category is specified (e.g. value {@code null}) all active checks are executed.
    */
   public HealthCheckResult check(HealthCheckCategoryId category) {
     List<IHealthChecker> checks = getActiveHealthCheckers(category);
@@ -91,7 +91,7 @@ public class HealthCheckService {
 
   /**
    * @param category
-   *          nullable category to be checked; if category is null this parameter is ignored
+   *     nullable category to be checked; if category is null this parameter is ignored
    * @return <code>false</code> to ignore given <code>IHealthChecker</code>
    */
   protected boolean execAcceptCheck(IHealthChecker check, HealthCheckCategoryId category) {

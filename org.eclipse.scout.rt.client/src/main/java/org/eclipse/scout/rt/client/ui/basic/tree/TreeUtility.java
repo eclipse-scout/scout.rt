@@ -101,8 +101,8 @@ public final class TreeUtility {
    * Returns the ancestor of the given node which resides at the given level.
    *
    * @param level
-   *          The level to look for the ancestor. The level has to be <= than node.getLevel(); Otherwise null will
-   *          returned.
+   *     The level to look for the ancestor. The level has to be <= than node.getLevel(); Otherwise null will
+   *     returned.
    */
   public static ITreeNode findAncestorNodeAtLevel(ITreeNode node, int level) {
     if (node == null) {

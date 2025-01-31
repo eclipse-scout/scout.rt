@@ -50,5 +50,4 @@ public class JsonOutlineViewButton<OUTLINE_VIEW_BUTTON extends IOutlineViewButto
     });
     getJsonProperty(IAction.PROP_SELECTED).addLazyProperty(getJsonProperty("outline"));
   }
-
 }
