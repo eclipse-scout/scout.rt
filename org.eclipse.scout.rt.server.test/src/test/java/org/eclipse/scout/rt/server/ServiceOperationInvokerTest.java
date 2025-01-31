@@ -16,8 +16,14 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -115,4 +121,76 @@ public class ServiceOperationInvokerTest {
     assertEquals(data, res.getData());
   }
 
+  @Test
+  public void testGetPublicMethod() {
+    ServiceOperationInvoker invoker = new ServiceOperationInvoker();
+    assertNull(invoker.getPublicMethod(Fixture.class, "privateMethod", int.class));
+    assertNull(invoker.getPublicMethod(Fixture.class, "defaultMethod", long.class));
+    assertNull(invoker.getPublicMethod(Fixture.class, "protectedMethod", float.class));
+    runTestGetPublicMethod(invoker, Fixture.class, "publicMethod", double.class);
+
+    assertNull(invoker.getPublicMethod(SubFixture.class, "privateSubMethod", int.class));
+    assertNull(invoker.getPublicMethod(SubFixture.class, "defaultSubMethod", long.class));
+    assertNull(invoker.getPublicMethod(SubFixture.class, "protectedSubMethod", float.class));
+    runTestGetPublicMethod(invoker, SubFixture.class, "publicMethod", double.class);
+    runTestGetPublicMethod(invoker, SubFixture.class, "publicSubMethod", double.class);
+  }
+
+  protected void runTestGetPublicMethod(ServiceOperationInvoker invoker, Class clazz, String methodName, Class paramType) {
+    Method m = invoker.getPublicMethod(clazz, methodName, paramType);
+    assertEquals(methodName, m.getName());
+    assertEquals(paramType, m.getParameterTypes()[0]);
+    assertEquals(void.class, m.getReturnType());
+  }
+
+  @Test
+  public void testGetAllDeclaredMethods() {
+    ServiceOperationInvoker invoker = new ServiceOperationInvoker();
+    Method[] methods = invoker.getPublicMethods(Fixture.class);
+    // NOTE: do not assert method count and exact method set since test framework agents could add additional methods (e.g. $jacocoInit method used for profiling)
+    assertTrue(CollectionUtility.containsAll(Arrays.stream(methods).map(Method::getName).collect(Collectors.toSet()), Set.of("publicMethod")));
+    assertSame(methods, invoker.getPublicMethods(Fixture.class));
+
+    Method[] methodsSub = invoker.getPublicMethods(SubFixture.class);
+    // NOTE: do not assert method count and exact method set since test framework agents could add additional methods (e.g. $jacocoInit method used for profiling)
+    assertTrue(CollectionUtility.containsAll(Arrays.stream(methodsSub).map(Method::getName).collect(Collectors.toSet()), Set.of("publicSubMethod", "publicMethod")));
+    assertSame(methodsSub, invoker.getPublicMethods(SubFixture.class));
+  }
+
+  @SuppressWarnings("unused")
+  private static class Fixture {
+    private void privateMethod(int i) {
+    }
+
+    void defaultMethod(long l) {
+    }
+
+    protected void protectedMethod(float f) {
+    }
+
+    public void publicMethod(double d) {
+    }
+  }
+
+
+  @SuppressWarnings("unused")
+  private static class SubFixture extends Fixture {
+    private void privateSubMethod(int i) {
+    }
+
+    void defaultSubMethod(long l) {
+    }
+
+    protected void protectedSubMethod(float f) {
+    }
+
+    public void publicSubMethod(double d) {
+    }
+
+    @Override
+    public void publicMethod(double d) {
+      // overridden method fixture
+      super.publicMethod(d);
+    }
+  }
 }

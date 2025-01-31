@@ -10,7 +10,10 @@
 package org.eclipse.scout.rt.server;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -25,12 +28,12 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.server.admin.inspector.CallInspector;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
-import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceWithoutAuthorization;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -46,6 +49,8 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class ServiceOperationInvoker {
   private static final Logger LOG = LoggerFactory.getLogger(ServiceOperationInvoker.class);
+
+  protected final Map<Class, Method[]> m_publicMethodCache = new ConcurrentHashMap<>();
 
   /**
    * Invoke the service associated with the {@link ServiceTunnelRequest}. <br>
@@ -158,12 +163,8 @@ public class ServiceOperationInvoker {
     }
 
     //check: method is defined on service interface itself
-    Method verifyMethod;
-    try {
-      verifyMethod = interfaceClass.getMethod(interfaceMethod.getName(), interfaceMethod.getParameterTypes());
-    }
-    catch (NoSuchMethodException | RuntimeException t) {
-      LOG.debug("Could not lookup service method", t);
+    Method verifyMethod = getPublicMethod(interfaceClass, interfaceMethod.getName(), interfaceMethod.getParameterTypes());
+    if (verifyMethod == null) {
       throw new SecurityException("access denied (code 1c).");
     }
     //exists
@@ -183,13 +184,7 @@ public class ServiceOperationInvoker {
     Class<?> c = implClass;
     while (c != null) {
       //method level
-      Method m = null;
-      try {
-        m = c.getMethod(interfaceMethod.getName(), interfaceMethod.getParameterTypes());
-      }
-      catch (NoSuchMethodException | RuntimeException t) {
-        LOG.debug("Could not lookup service method", t);
-      }
+      Method m = getPublicMethod(c, interfaceMethod.getName(), interfaceMethod.getParameterTypes());
       if (m != null && m.isAnnotationPresent(RemoteServiceAccessDenied.class)) {
         throw new SecurityException("access denied (code 2b).");
       }
@@ -239,13 +234,7 @@ public class ServiceOperationInvoker {
     Class<?> c = implClass;
     while (c != null) {
       //method level
-      Method m = null;
-      try {
-        m = c.getMethod(interfaceMethod.getName(), interfaceMethod.getParameterTypes());
-      }
-      catch (NoSuchMethodException | RuntimeException t) {
-        LOG.debug("Could not lookup service method", t);
-      }
+      Method m = getPublicMethod(c, interfaceMethod.getName(), interfaceMethod.getParameterTypes());
       if (m != null && m.isAnnotationPresent(RemoteServiceWithoutAuthorization.class)) {
         //granted
         return false;
@@ -315,5 +304,25 @@ public class ServiceOperationInvoker {
     }
     p.setStackTrace(new StackTraceElement[0]);
     return p;
+  }
+
+  /**
+   * @return public {@link Method} of class {@code clazz} with given {@code methodName} and {@code parameterTypes} or
+   * {@code null} if no matching method could be found.
+   */
+  protected Method getPublicMethod(Class<?> clazz, String methodName, Class... parameterTypes) {
+    for (Method method : getPublicMethods(clazz)) {
+      if (method.getName().equals(methodName) && Arrays.equals(method.getParameterTypes(), parameterTypes)) {
+        return method;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * @return array of {@link Method} with all public methods of given {@code clazz}.
+   */
+  protected Method[] getPublicMethods(Class<?> clazz) {
+    return m_publicMethodCache.computeIfAbsent(clazz, Class::getMethods);
   }
 }
