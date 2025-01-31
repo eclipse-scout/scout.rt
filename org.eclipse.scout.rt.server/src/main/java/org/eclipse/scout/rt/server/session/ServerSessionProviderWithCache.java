@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -98,6 +98,8 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
     // 4. Cache the new server session, or return present session if created by another thread in the meantime (optimistic locking).
     @SuppressWarnings("unchecked") final SESSION cachedServerSession = (SESSION) m_cache.putIfAbsent(sessionCacheKey, serverSession);
     if (cachedServerSession != null) {
+      LOG.trace("Found a cached server session, using that one instead - stopping the replaced one.");
+      serverSession.stop();
       serverSession = cachedServerSession;
     }
 

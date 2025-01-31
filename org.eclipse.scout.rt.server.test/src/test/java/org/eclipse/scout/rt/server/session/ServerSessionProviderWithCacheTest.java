@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,9 +11,15 @@ package org.eclipse.scout.rt.server.session;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.security.auth.Subject;
 
@@ -34,7 +40,6 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.JUnitServerSessionProviderWithCache;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +50,6 @@ public class ServerSessionProviderWithCacheTest {
 
   private static List<IBean<?>> s_beans;
   private IBean<ServerSessionProviderWithCache> m_sessionProviderBean;
-  private List<IServerSession> m_sessions;
 
   @BeforeClass
   public static void beforeClass() {
@@ -65,15 +69,19 @@ public class ServerSessionProviderWithCacheTest {
     BEANS.getBeanManager().registerClass(JUnitServerSessionProviderWithCache.class);
   }
 
-  @Before
-  public void before() {
-    m_sessions = new ArrayList<>();
-  }
-
   @After
   public void after() {
-    m_sessions.forEach(IServerSession::stop);
-    m_sessions = null;
+    FixtureServerSessionProviderWithCache optBean = BEANS.opt(FixtureServerSessionProviderWithCache.class);
+    if (optBean != null) {
+      ConcurrentExpiringMap<CompositeObject, IServerSession> cache = optBean.m_cache;
+      if (cache != null) {
+        cache.forEach((c, s) -> s.stop());
+        cache.clear();
+      }
+    }
+
+    FixtureServerSession.s_startedCount.set(0);
+    FixtureServerSession.s_stoppedCount.set(0);
 
     if (m_sessionProviderBean != null) {
       BeanTestingHelper.get().unregisterBean(m_sessionProviderBean);
@@ -134,7 +142,7 @@ public class ServerSessionProviderWithCacheTest {
     assertEquals("anna", session.getUserId());
 
     long sleepMillis = System.currentTimeMillis() - sessionCreatedMillis // time elapsed since session was created
-        + FixtureServerSessionProviderWithCache.CACHE_TTL_MILLIS
+        + FixtureServerSessionProviderWithCache.s_fixedCacheTimeToLiveMillis
         + 5; // add some more millis
     if (sleepMillis >= 0) {
       SleepUtil.sleepSafe(sleepMillis, TimeUnit.MILLISECONDS);
@@ -158,6 +166,38 @@ public class ServerSessionProviderWithCacheTest {
     assertTrue(session.isStopped());
   }
 
+  @Test
+  public void testParallelProvideSession() throws InterruptedException {
+    createAndRegisterFixtureSessionProviderWithCache(30000);
+
+    ExecutorService executorService = Executors.newFixedThreadPool(10);
+    try {
+      assertEquals(
+          1, // distinct count should be 1 = all 20 sessions are the same
+          executorService.invokeAll(IntStream.range(0, 20).mapToObj(s -> (Callable<FixtureServerSession>) () -> provideSession(null, "foo")).collect(Collectors.toList())) // request 20 sessions in parallel in multiple threads
+              .stream()
+              .map(f -> {
+                try {
+                  return f.get();
+                }
+                catch (InterruptedException | ExecutionException e) {
+                  throw new RuntimeException(e);
+                }
+              })
+              .distinct()
+              .limit(2)
+              .count());
+    }
+    finally {
+      executorService.shutdown();
+      assertTrue(executorService.awaitTermination(30, TimeUnit.MILLISECONDS)); // everything should be terminated immediately (actually already with get calls above)
+    }
+
+    // during parallel calls multiple sessions may have been started
+    // however all sessions except one must also be stopped (the ones which were not used)
+    assertEquals(FixtureServerSession.s_startedCount.get() - 1, FixtureServerSession.s_stoppedCount.get());
+  }
+
   // --- test support ---------------------------------------------------------
 
   private ServerSessionProviderWithCache createAndRegisterDefaultSessionProviderWithCache() {
@@ -165,17 +205,21 @@ public class ServerSessionProviderWithCacheTest {
   }
 
   private ServerSessionProviderWithCache createAndRegisterFixtureSessionProviderWithCache() {
+    return createAndRegisterFixtureSessionProviderWithCache(10);
+  }
+
+  private ServerSessionProviderWithCache createAndRegisterFixtureSessionProviderWithCache(long cacheTtlMillis) {
+    FixtureServerSessionProviderWithCache.s_fixedCacheTimeToLiveMillis = cacheTtlMillis;
     return registerSessionProviderWithCache(new FixtureServerSessionProviderWithCache());
   }
 
   private ServerSessionProviderWithCache registerSessionProviderWithCache(ServerSessionProviderWithCache sessionProvider) {
-    m_sessionProviderBean = BeanTestingHelper.get().registerBean(new BeanMetaData(ServerSessionProviderWithCache.class).withInitialInstance(sessionProvider));
+    m_sessionProviderBean = BeanTestingHelper.get().registerBean(new BeanMetaData(sessionProvider.getClass()).withInitialInstance(sessionProvider).withReplace(true));
     return sessionProvider;
   }
 
   private FixtureServerSession provideSession(String sessionId, String userId) {
     IServerSession s = m_sessionProviderBean.getInstance().provide(sessionId, ServerRunContexts.empty().withSubject(createSubject(userId)));
-    m_sessions.add(s);
     return Assertions.assertInstance(s, FixtureServerSession.class);
   }
 
@@ -193,6 +237,8 @@ public class ServerSessionProviderWithCacheTest {
     private static final long serialVersionUID = 1L;
     private volatile boolean m_started;
     private volatile boolean m_stopped;
+    protected static volatile AtomicInteger s_startedCount = new AtomicInteger();
+    protected static volatile AtomicInteger s_stoppedCount = new AtomicInteger();
 
     public FixtureServerSession() {
       super(true);
@@ -202,12 +248,14 @@ public class ServerSessionProviderWithCacheTest {
     protected void execLoadSession() {
       super.execLoadSession();
       m_started = true;
+      s_startedCount.incrementAndGet();
     }
 
     @Override
     public void stop() {
       super.stop();
       m_stopped = true;
+      s_stoppedCount.incrementAndGet();
     }
 
     public boolean isStarted() {
@@ -221,11 +269,14 @@ public class ServerSessionProviderWithCacheTest {
 
   private static class FixtureServerSessionProviderWithCache extends ServerSessionProviderWithCache {
 
-    static final long CACHE_TTL_MILLIS = 10;
+    protected static long s_fixedCacheTimeToLiveMillis = 10;
+
+    protected ConcurrentExpiringMap<CompositeObject, IServerSession> m_cache;
 
     @Override
     protected ConcurrentExpiringMap<CompositeObject, IServerSession> createSessionCache(long ttl) {
-      return super.createSessionCache(CACHE_TTL_MILLIS);
+      m_cache = super.createSessionCache(s_fixedCacheTimeToLiveMillis);
+      return m_cache;
     }
   }
 }
