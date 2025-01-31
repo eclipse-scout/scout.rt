@@ -33,5 +33,4 @@ public class JsonByteArray implements IJsonObject {
     }
     return Base64Utility.encode(m_bytes);
   }
-
 }

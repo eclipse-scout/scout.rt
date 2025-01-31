@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.config.ConfigUtility;
 public final class ListenerListRegistry {
 
   private static IListenerListProfiler globalInstance;
+
   static {
     if (ConfigUtility.getPropertyBoolean(EnableListenerListProfiling.KEY, false)) {
       globalInstance = new DefaultListenerListProfiler();

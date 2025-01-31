@@ -38,5 +38,4 @@ public class DateColumnUserFilterState extends ColumnUserFilterState {
   public void setDateTo(Date dateTo) {
     m_dateTo = dateTo;
   }
-
 }

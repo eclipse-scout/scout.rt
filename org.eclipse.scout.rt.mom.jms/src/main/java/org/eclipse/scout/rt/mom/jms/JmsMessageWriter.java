@@ -33,8 +33,8 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 /**
  * Allows to write a JMS message.
  *
- * @since 6.1
  * @see JmsMomImplementor
+ * @since 6.1
  */
 @Bean
 public class JmsMessageWriter {

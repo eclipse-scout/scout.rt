@@ -232,7 +232,7 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
           return;
         }
         ModelJobs.schedule(() -> setResult(new LookupCallResult(lookupRows, m_queryParam, null)), ModelJobs.newInput(runContext)
-            .withName("Updating {}", AbstractTagField.this.getClass().getName()))
+                .withName("Updating {}", AbstractTagField.this.getClass().getName()))
             .awaitDone(); // block the current thread until completed
       }
       catch (ThreadInterruptedError e) { // NOSONAR

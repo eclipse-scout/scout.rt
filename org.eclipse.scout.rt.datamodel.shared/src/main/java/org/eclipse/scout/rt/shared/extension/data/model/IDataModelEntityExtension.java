@@ -16,5 +16,4 @@ import org.eclipse.scout.rt.shared.extension.data.model.DataModelEntityChains.Da
 public interface IDataModelEntityExtension<OWNER extends AbstractDataModelEntity> extends IExtension<OWNER> {
 
   void execInitEntity(DataModelEntityInitEntityChain chain);
-
 }

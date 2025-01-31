@@ -24,5 +24,4 @@ public class SharedContextNotificationCoalescer implements ICoalescer<SharedCont
   public List<SharedContextChangedNotification> coalesce(List<SharedContextChangedNotification> notifications) {
     return CollectionUtility.arrayList(CollectionUtility.lastElement(notifications));
   }
-
 }

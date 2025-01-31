@@ -47,7 +47,7 @@ public abstract class AbstractProposalField<VALUE> extends AbstractSmartField<VA
 
   /**
    * @return true if leading and trailing whitespace should be stripped from the entered text while validating the
-   *         value. default is true.
+   * value. default is true.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   protected boolean getConfiguredTrimText() {

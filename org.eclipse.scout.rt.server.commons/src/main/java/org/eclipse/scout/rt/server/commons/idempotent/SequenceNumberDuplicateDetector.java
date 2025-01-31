@@ -66,21 +66,21 @@ public class SequenceNumberDuplicateDetector implements LongPredicate {
    * numbers of the last maxAge timeframe, but at least cacheSize elements.
    *
    * @param cacheSizeGuide
-   *          is the number of entries that the cache tries to maintain. The cache may become larger upon high request
-   *          load but will later try to resize to this size. Typical values are in the range 25 to 1000.
+   *     is the number of entries that the cache tries to maintain. The cache may become larger upon high request
+   *     load but will later try to resize to this size. Typical values are in the range 25 to 1000.
    * @param maxAge
-   *          is the time while sequence numbers remain cached. This value must be larger than the expected network
-   *          latency or the expected backlog wait time.
-   *          <p>
-   *          Typical latency time is around 10-200ms thus a maxAge of 1-5 minutes is safe.
-   *          <p>
-   *          In addition the http client may have a backlog of waiting http calls. Thus a batch of 1000 calls may reach
-   *          this duplicate detector on the server side seconds or even minutes after the http call has been queued in
-   *          the client.
+   *     is the time while sequence numbers remain cached. This value must be larger than the expected network
+   *     latency or the expected backlog wait time.
+   *     <p>
+   *     Typical latency time is around 10-200ms thus a maxAge of 1-5 minutes is safe.
+   *     <p>
+   *     In addition the http client may have a backlog of waiting http calls. Thus a batch of 1000 calls may reach
+   *     this duplicate detector on the server side seconds or even minutes after the http call has been queued in
+   *     the client.
    * @param maxAgeUnit
    * @param acceptPotentialDuplicates
-   *          accept (true) or deny (false) potential duplicates. If a request key is delayed by more than maxAge and is
-   *          smaller than the smallest key in the cached window then it is declared a potential duplicate.
+   *     accept (true) or deny (false) potential duplicates. If a request key is delayed by more than maxAge and is
+   *     smaller than the smallest key in the cached window then it is declared a potential duplicate.
    */
   public SequenceNumberDuplicateDetector(int cacheSizeGuide, long maxAge, TimeUnit maxAgeUnit, boolean acceptPotentialDuplicates) {
     Assertions.assertTrue(cacheSizeGuide >= 1, "cacheSizeGuide ({}) must be at least 1");

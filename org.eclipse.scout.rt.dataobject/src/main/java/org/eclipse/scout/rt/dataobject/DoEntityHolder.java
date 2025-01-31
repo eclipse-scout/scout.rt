@@ -33,5 +33,4 @@ public class DoEntityHolder<T extends IDoEntity> extends DataObjectHolder<T> {
   public DoEntityHolder(Class<T> clazz, T value) {
     super(clazz, value);
   }
-
 }

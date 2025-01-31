@@ -75,7 +75,6 @@ public class DynamicFieldTest {
       protected int getConfiguredMaxLength() {
         return 128;
       }
-
     }
 
     @Order(1000)
@@ -86,7 +85,6 @@ public class DynamicFieldTest {
         return getClass().getSimpleName();
       }
     }
-
   }
 
   class DynamicStringField extends AbstractStringField {

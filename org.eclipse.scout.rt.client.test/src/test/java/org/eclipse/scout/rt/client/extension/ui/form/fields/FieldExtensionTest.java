@@ -75,7 +75,6 @@ public class FieldExtensionTest extends AbstractLocalExtensionTestCase {
       public class NameField extends AbstractStringField {
 
       }
-
     }
 
     public class StartHandler extends AbstractFormHandler {

@@ -89,7 +89,6 @@ public class HttpRedirectTest {
     }
     resp.setContentType("text/plain;charset=UTF-8");
     resp.getOutputStream().println("HTTP-GET:Hello " + req.getParameter("foo"));
-
   }
 
   private void fixtureServletPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -153,7 +152,6 @@ public class HttpRedirectTest {
       assertEquals("HTTP-GET:Hello null", text); // http response 302 leads to a redirect as a GET request
       assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
       assertEquals(new String(bytes), 21, bytes.length);//text + CR + LF
-
     }
     assertEquals(200, resp.getStatusCode());
     //two calls due to redirect
@@ -176,7 +174,6 @@ public class HttpRedirectTest {
       assertEquals("HTTP-POST:bar", text); // http response 302 leads to a redirect as a GET request
       assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
       assertEquals(new String(bytes), 15, bytes.length);//text + CR + LF
-
     }
     assertEquals(200, resp.getStatusCode());
     //two calls due to redirect

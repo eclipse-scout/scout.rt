@@ -298,7 +298,6 @@ public class FormDataInjectionTest {
 
     public static class Box extends AbstractBoxData {
       private static final long serialVersionUID = 1L;
-
     }
   }
 
@@ -311,7 +310,6 @@ public class FormDataInjectionTest {
 
     public static class Name extends AbstractValueFieldData<String> {
       private static final long serialVersionUID = 1L;
-
     }
   }
 
@@ -336,7 +334,6 @@ public class FormDataInjectionTest {
       @Replace
       public static class NameEx extends AbstractBoxData.Name {
         private static final long serialVersionUID = 1L;
-
       }
     }
   }

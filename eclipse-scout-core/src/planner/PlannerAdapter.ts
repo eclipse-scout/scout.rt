@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, DateRange, dates, defaultValues, Event, ModelAdapter, objects, Planner, PlannerActivity, PlannerActivityModel, PlannerResource, PlannerResourceModel, PlannerResourcesSelectedEvent, RemoteEvent} from '../index';
+import {App, DateRange, dates, defaultValues, Event, ModelAdapter, objects, Planner, PlannerActivityModel, PlannerResourceModel, PlannerResourcesSelectedEvent, RemoteEvent} from '../index';
 
 export class PlannerAdapter extends ModelAdapter {
   declare widget: Planner;

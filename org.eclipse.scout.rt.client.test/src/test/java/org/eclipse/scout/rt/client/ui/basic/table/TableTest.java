@@ -174,7 +174,6 @@ public class TableTest {
     assertRowCount(1, 0, table);
     asssertNoTable(row1);
     assertStatusAndTable(table, ITableRow.STATUS_NON_CHANGED, row2);
-
   }
 
   /**
@@ -234,7 +233,6 @@ public class TableTest {
 
     table.discardAllRows();
     assertRowCount(0, 0, table);
-
   }
 
   /**

@@ -21,9 +21,9 @@ public interface IHttpProxyRequestOptionsModifier {
    * Modifies the given {@link HttpProxyRequestOptions}.
    *
    * @param options
-   *          to modify
+   *     to modify
    * @param context
-   *          of the given {@link HttpProxyRequestOptions}
+   *     of the given {@link HttpProxyRequestOptions}
    */
   void modify(HttpProxyRequestOptions options, HttpProxyRequestContext context);
 }

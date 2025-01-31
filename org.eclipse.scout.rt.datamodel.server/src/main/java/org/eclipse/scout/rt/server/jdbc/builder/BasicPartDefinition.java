@@ -42,15 +42,15 @@ public class BasicPartDefinition implements DataModelConstants {
 
   /**
    * @param valueType
-   *          {@link AbstractPropertyData} or {@link AbstractFormFieldData}
+   *     {@link AbstractPropertyData} or {@link AbstractFormFieldData}
    * @param sqlAttribute
-   *          contains bind names :a, :b, :c for the values of the values correcpsonding to valueTypes
-   *          <p>
-   *          If different bind names are used,
-   *          {@link BasicPartDefinition#createInstanceImpl(FormDataStatementBuilder, List, List, List, Map)} shoult be
-   *          overridden
+   *     contains bind names :a, :b, :c for the values of the values correcpsonding to valueTypes
+   *     <p>
+   *     If different bind names are used,
+   *     {@link BasicPartDefinition#createInstanceImpl(FormDataStatementBuilder, List, List, List, Map)} shoult be
+   *     overridden
    * @param operator
-   *          any of the {@link DataModelConstants#OPERATOR_}* values
+   *     any of the {@link DataModelConstants#OPERATOR_}* values
    */
   public BasicPartDefinition(Class<?> valueType, String sqlAttribute, int operator) {
     this(new Class[]{valueType}, sqlAttribute, operator, false);
@@ -157,8 +157,8 @@ public class BasicPartDefinition implements DataModelConstants {
 
   /**
    * @return array of {@link ClassIdentifier} class identifiers (fields, properties) that are accepted by this part
-   *         definition. This is used by {@link BasicPartDefinition#accept(AbstractFormData)} and
-   *         {@link BasicPartDefinition#createInstance(FormDataStatementBuilder, AbstractFormData, Map)}
+   * definition. This is used by {@link BasicPartDefinition#accept(AbstractFormData)} and
+   * {@link BasicPartDefinition#createInstance(FormDataStatementBuilder, AbstractFormData, Map)}
    */
   protected ClassIdentifier[] getValueTypeClassIdentifiers() {
     return m_valueTypeClassIdentifiers;
@@ -168,14 +168,14 @@ public class BasicPartDefinition implements DataModelConstants {
    * Computes whether this {@link BasicPartDefinition} takes part in building the filter criterion.
    *
    * @param formData
-   *          the form data to be checked.
+   *     the form data to be checked.
    * @return <code>true</code> if the properties in the form data are sufficient in order to append this part to the
-   *         result statement This will result in a call to
-   *         {@link BasicPartDefinition#createInstanceImpl(FormDataStatementBuilder, List, List, List, Map)} building
-   *         that part.
-   *         <p>
-   *         Default accepts when any of the value of the valueType set is set (isValueSet) and has a non-null value in
-   *         the form data
+   * result statement This will result in a call to
+   * {@link BasicPartDefinition#createInstanceImpl(FormDataStatementBuilder, List, List, List, Map)} building
+   * that part.
+   * <p>
+   * Default accepts when any of the value of the valueType set is set (isValueSet) and has a non-null value in
+   * the form data
    */
   public boolean accept(AbstractFormData formData) {
     Map<Integer, Map<String, AbstractFormFieldData>> fieldsBreathFirstMap = formData.getAllFieldsRec();
@@ -209,17 +209,17 @@ public class BasicPartDefinition implements DataModelConstants {
    *
    * @param builder
    * @param formData
-   *          the form data to be checked.
+   *     the form data to be checked.
    * @return the result EntityContribution. null if that part is to be ignored
-   *         <p>
-   *         normally calls
-   *         {@link FormDataStatementBuilder#createSqlPart(Integer, String, int, List, List, boolean, Map)}
-   *         <p>
-   *         Can make use of alias markers such as @Person@.LAST_NAME, these are resolved in the
-   *         {@link FormDataStatementBuilder}
-   *         <p>
-   *         Only additional bind values - other than the bindValues passed to createStatementPart - must be added using
-   *         {@link FormDataStatementBuilder#addBind(String, Object)}
+   * <p>
+   * normally calls
+   * {@link FormDataStatementBuilder#createSqlPart(Integer, String, int, List, List, boolean, Map)}
+   * <p>
+   * Can make use of alias markers such as @Person@.LAST_NAME, these are resolved in the
+   * {@link FormDataStatementBuilder}
+   * <p>
+   * Only additional bind values - other than the bindValues passed to createStatementPart - must be added using
+   * {@link FormDataStatementBuilder#addBind(String, Object)}
    */
   public EntityContribution createInstance(FormDataStatementBuilder builder, AbstractFormData formData, Map<String, String> parentAliasMap) {
     Map<Integer, Map<String, AbstractFormFieldData>> fieldsBreathFirstMap = formData.getAllFieldsRec();
@@ -277,5 +277,4 @@ public class BasicPartDefinition implements DataModelConstants {
   protected String createInstanceImpl(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) {
     return builder.createSqlPart(AGGREGATION_NONE, getSqlAttribute(), getOperation(), bindNames, bindValues, isPlainBind(), parentAliasMap);
   }
-
 }

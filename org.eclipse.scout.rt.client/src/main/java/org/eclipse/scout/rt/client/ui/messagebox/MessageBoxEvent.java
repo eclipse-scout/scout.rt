@@ -63,5 +63,4 @@ public class MessageBoxEvent extends EventObject implements IModelEvent {
     buf.append("]");
     return buf.toString();
   }
-
 }

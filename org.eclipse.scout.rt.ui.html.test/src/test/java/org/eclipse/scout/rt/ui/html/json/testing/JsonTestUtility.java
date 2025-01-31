@@ -155,9 +155,9 @@ public final class JsonTestUtility {
 
   /**
    * @param eventType
-   *          Optional. If set only events with the given type will be returned.
+   *     Optional. If set only events with the given type will be returned.
    * @param adapterId
-   *          Optional. If set only events for the given id will be returned.
+   *     Optional. If set only events for the given id will be returned.
    */
   public static List<JsonEvent> extractEventsFromResponse(JsonResponse response, String eventType, String adapterId) throws JSONException {
     response.fireProcessBufferedEvents();
@@ -173,7 +173,7 @@ public final class JsonTestUtility {
 
   /**
    * @param eventType
-   *          Optional. If set only events with the given type will be returned.
+   *     Optional. If set only events with the given type will be returned.
    */
   public static List<JsonEvent> extractEventsFromResponse(JsonResponse response, String eventType) throws JSONException {
     return extractEventsFromResponse(response, eventType, null);
@@ -181,7 +181,7 @@ public final class JsonTestUtility {
 
   /**
    * @param adapterId
-   *          Optional. If set only events for the given id will be returned.
+   *     Optional. If set only events for the given id will be returned.
    */
   public static List<JsonPropertyChangeEvent> extractPropertyChangeEvents(JsonResponse response, String adapterId) throws JSONException {
     List<JsonPropertyChangeEvent> result = new ArrayList<>();

@@ -96,7 +96,6 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
         return getModel().isOutlineOverviewVisible();
       }
     });
-
   }
 
   @Override
@@ -315,7 +314,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   /**
    * @return <code>true</code> if the page has a detail form that is not closed, <code>false</code> otherwise (closed
-   *         forms should not be attached, because the close event causes the JSON adapter to be disposed)
+   * forms should not be attached, because the close event causes the JSON adapter to be disposed)
    */
   protected boolean hasDetailForm(IPage<?> page) {
     return (page.getDetailForm() != null && !page.getDetailForm().isFormClosed());

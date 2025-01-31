@@ -202,7 +202,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
 
   /**
    * @return the value of the HTTP header <code>X-Scout-#ACK</code> as {@link Long}, or <code>null</code> if value is
-   *         not set or not a number.
+   * not set or not a number.
    */
   protected Long getAckSequenceNo(HttpServletRequest req) {
     String ackSeqNoStr = req.getHeader("X-Scout-#ACK");
@@ -295,9 +295,9 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
 
   /**
    * @param uploadable
-   *          is the JsonAdapter that triggers the upload
+   *     is the JsonAdapter that triggers the upload
    * @return the set of accepted lowercase file extensions or media types for that uploadable. If the set contains '*'
-   *         then all files are accepted.
+   * then all files are accepted.
    * @since 10.x
    */
   protected Set<String> getValidFileExtensionsFor(IUploadable uploadable, Map<String, String> uploadProperties) {
@@ -357,7 +357,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
 
   /**
    * @throws RejectedResourceException
-   *           when filename extension is not accepted
+   *     when filename extension is not accepted
    */
   protected void verifyFileName(Set<String> validFileExtensions, String filename, String ext) {
     if (!validFileExtensions.isEmpty() && !validFileExtensions.contains("*") && !validFileExtensions.contains(ext)) {
@@ -369,7 +369,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
    * Checks if the uploaded file exceeds the maximum allowed upload size for given {@code uploadable}.
    *
    * @throws RejectedResourceException
-   *           when size of part exceeds the allowed upload size
+   *     when size of part exceeds the allowed upload size
    */
   protected void verifyMaximumUploadSize(IUploadable uploadable, Part part) {
     if (part.getSize() > uploadable.getMaximumUploadSize()) {
@@ -381,7 +381,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
    * Checks the resource to be upload for malware
    *
    * @throws UnsafeResourceException
-   *           when unsafe
+   *     when unsafe
    */
   protected void verifyFileSafety(BinaryResource res) {
     //do malware scan and log issues
@@ -390,7 +390,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
 
   /**
    * @throws RejectedResourceException
-   *           when not compliant
+   *     when not compliant
    */
   protected void verifyFileIntegrity(BinaryResource res) {
     if (!MimeTypes.verifyMagic(res)) {

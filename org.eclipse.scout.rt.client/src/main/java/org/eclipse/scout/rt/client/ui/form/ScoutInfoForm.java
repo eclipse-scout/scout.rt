@@ -80,8 +80,8 @@ public class ScoutInfoForm extends AbstractForm {
 
   protected String createHtmlBody() {
     final IHtmlContent html = HTML.div(
-        createLogoHtml(),
-        HTML.div(createTitleHtml(), createHtmlTable(getProperties())).cssClass("scout-info-form-text-container"))
+            createLogoHtml(),
+            HTML.div(createTitleHtml(), createHtmlTable(getProperties())).cssClass("scout-info-form-text-container"))
         .cssClass("scout-info-form-container");
     return html.toHtml();
   }

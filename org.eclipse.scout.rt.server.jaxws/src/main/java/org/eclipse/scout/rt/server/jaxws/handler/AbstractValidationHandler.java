@@ -14,6 +14,7 @@ import java.net.URL;
 
 import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
+
 import jakarta.xml.ws.LogicalMessage;
 import jakarta.xml.ws.WebServiceException;
 import jakarta.xml.ws.handler.Handler;
@@ -111,7 +112,7 @@ public abstract class AbstractValidationHandler implements LogicalHandler<Logica
 
   /**
    * @return Gets the location on the classpath where the XSD root file can be found. (e.g.
-   *         <code>WEB-INF/wsdl/MyWebService/schema.xsd</code>).
+   * <code>WEB-INF/wsdl/MyWebService/schema.xsd</code>).
    */
   protected abstract String getSchemaPath();
 }

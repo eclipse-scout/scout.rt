@@ -108,5 +108,4 @@ public class SoapServiceTunnelContentHandlerTest {
     assertEquals(testValue, readResponse.getData());
     assertTrue(String.format("sizeUncompressed: %s, sizeCompressed: %s", sizeUncompressed, sizeCompressed), sizeUncompressed > sizeCompressed);
   }
-
 }

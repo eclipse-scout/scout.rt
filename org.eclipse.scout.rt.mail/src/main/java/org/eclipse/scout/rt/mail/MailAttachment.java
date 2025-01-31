@@ -72,7 +72,7 @@ public class MailAttachment {
 
   /**
    * @return the content type (MIME type), as passed to the constructor. May be <code>null</code>. In this case, the
-   *         name extension might give a hint to determine the content type.
+   * name extension might give a hint to determine the content type.
    */
   public String getContentType() {
     return m_contentType;

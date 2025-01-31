@@ -125,6 +125,7 @@ public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends Abstract
   public Collection<String> getAcceptedUploadFileExtensions() {
     return getModel().getFileExtensions();
   }
+
   @Override
   public void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties) {
     getModel().getUIFacade().setResultFromUI(binaryResources);

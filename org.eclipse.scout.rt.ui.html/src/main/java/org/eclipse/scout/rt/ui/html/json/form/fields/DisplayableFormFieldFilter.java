@@ -19,5 +19,4 @@ public class DisplayableFormFieldFilter<T extends IFormField> implements Predica
   public boolean test(T element) {
     return element.isVisibleGranted();
   }
-
 }

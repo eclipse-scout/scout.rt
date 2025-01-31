@@ -187,24 +187,24 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    * form:
    * <p>
    * <code>
-   *   Statement s2 = new YourInterceptor2(<strong>next</strong>); // executed 3th<br/>
-   *   Statement s1 = new YourInterceptor1(s2); // executed 2nd<br/>
-   *   Statement head = <i>super.interceptClassLevelStatement(s1)</i>; // executed 1st<br/>
-   *   return head;
+   * Statement s2 = new YourInterceptor2(<strong>next</strong>); // executed 3th<br/>
+   * Statement s1 = new YourInterceptor1(s2); // executed 2nd<br/>
+   * Statement head = <i>super.interceptClassLevelStatement(s1)</i>; // executed 1st<br/>
+   * return head;
    * </code>
    * </p>
    * To be invoked <strong>before</strong> the super class contributions, you can use constructions of the following
    * form:
    * <p>
    * <code>
-   *   Statement s2 = <i>super.interceptClassLevelStatement(<strong>next</strong>)</i>; // executed 3th<br/>
-   *   Statement s1 = new YourInterceptor2(s2); // executed 2nd<br/>
-   *   Statement head = new YourInterceptor1(s1); // executed 1st<br/>
-   *   return head;
+   * Statement s2 = <i>super.interceptClassLevelStatement(<strong>next</strong>)</i>; // executed 3th<br/>
+   * Statement s1 = new YourInterceptor2(s2); // executed 2nd<br/>
+   * Statement head = new YourInterceptor1(s1); // executed 1st<br/>
+   * return head;
    * </code>
    *
    * @param next
-   *          subsequent {@link Statement}.
+   *     subsequent {@link Statement}.
    * @return the head of the chain to be invoked first.
    */
   protected Statement interceptClassLevelStatement(final Statement next, final Class<?> testClass) {
@@ -225,24 +225,24 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    * form:
    * <p>
    * <code>
-   *   Statement s2 = new YourInterceptor2(<strong>next</strong>); // executed 3th<br/>
-   *   Statement s1 = new YourInterceptor1(s2); // executed 2nd<br/>
-   *   Statement head = <i>super.interceptMethodLevelStatement(s1)</i>; // executed 1st<br/>
-   *   return head;
+   * Statement s2 = new YourInterceptor2(<strong>next</strong>); // executed 3th<br/>
+   * Statement s1 = new YourInterceptor1(s2); // executed 2nd<br/>
+   * Statement head = <i>super.interceptMethodLevelStatement(s1)</i>; // executed 1st<br/>
+   * return head;
    * </code>
    * </p>
    * To be invoked <strong>before</strong> the super class contributions, you can use constructions of the following
    * form:
    * <p>
    * <code>
-   *   Statement s2 = <i>super.interceptMethodLevelStatement(<strong>next</strong>)</i>; // executed 3th<br/>
-   *   Statement s1 = new YourInterceptor2(s2); // executed 2nd<br/>
-   *   Statement head = new YourInterceptor1(s1); // executed 1st<br/>
-   *   return head;
+   * Statement s2 = <i>super.interceptMethodLevelStatement(<strong>next</strong>)</i>; // executed 3th<br/>
+   * Statement s1 = new YourInterceptor2(s2); // executed 2nd<br/>
+   * Statement head = new YourInterceptor1(s1); // executed 1st<br/>
+   * return head;
    * </code>
    *
    * @param next
-   *          subsequent {@link Statement}.
+   *     subsequent {@link Statement}.
    * @return the head of the chain to be invoked first.
    */
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
@@ -332,7 +332,6 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
       m_interceptedBeforeStatement.evaluate();
       m_statement.evaluate();
     }
-
   }
 
   protected static class InterceptedAfterStatement extends Statement {

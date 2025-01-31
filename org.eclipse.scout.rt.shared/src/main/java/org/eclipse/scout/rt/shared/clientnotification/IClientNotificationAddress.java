@@ -32,13 +32,13 @@ public interface IClientNotificationAddress extends Serializable {
 
   /**
    * @return <code>true</code>, if a notification should be dispatched once for every available session,
-   *         <code>false</code> otherwise.
+   * <code>false</code> otherwise.
    */
   boolean isNotifyAllSessions();
 
   /**
    * @return <code>true</code>, if a notification should be dispatched once per UI server node, <code>false</code>
-   *         otherwise.
+   * otherwise.
    */
   boolean isNotifyAllNodes();
 

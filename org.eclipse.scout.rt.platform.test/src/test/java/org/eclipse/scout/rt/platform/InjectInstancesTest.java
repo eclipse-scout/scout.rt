@@ -35,7 +35,6 @@ public class InjectInstancesTest {
     m_bean02 = Platform.get().getBeanManager().registerClass(Bean02.class);
     m_bean03 = Platform.get().getBeanManager().registerClass(MyBean01.class);
     m_bean04 = Platform.get().getBeanManager().registerClass(MyBean02.class);
-
   }
 
   @Test

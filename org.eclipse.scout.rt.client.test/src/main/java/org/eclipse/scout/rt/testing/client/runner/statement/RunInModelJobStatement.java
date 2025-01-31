@@ -36,7 +36,7 @@ public class RunInModelJobStatement extends Statement {
     else {
       final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
       ModelJobs.schedule(invoker, ModelJobs.newInput(ClientRunContexts.copyCurrent())
-          .withName("Running JUnit test in model job"))
+              .withName("Running JUnit test in model job"))
           .awaitDone();
       invoker.throwOnError();
     }

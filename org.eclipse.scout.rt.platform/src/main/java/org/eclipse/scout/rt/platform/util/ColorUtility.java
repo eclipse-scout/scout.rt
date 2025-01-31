@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.regex.Pattern;
 
 public final class ColorUtility {
@@ -53,5 +53,4 @@ public final class ColorUtility {
   public static String rgbToText(int red, int green, int blue) {
     return String.format("#%02x%02x%02x", red, green, blue);
   }
-
 }

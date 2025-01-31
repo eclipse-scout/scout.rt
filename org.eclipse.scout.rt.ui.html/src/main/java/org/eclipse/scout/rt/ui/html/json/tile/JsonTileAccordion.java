@@ -51,5 +51,4 @@ public class JsonTileAccordion<T extends ITileAccordion> extends JsonAccordion<T
       }
     });
   }
-
 }

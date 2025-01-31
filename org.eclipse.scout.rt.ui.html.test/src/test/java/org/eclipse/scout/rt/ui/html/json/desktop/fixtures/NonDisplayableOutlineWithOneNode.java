@@ -29,5 +29,4 @@ public class NonDisplayableOutlineWithOneNode extends AbstractOutline {
     super.initConfig();
     setVisibleGranted(false);
   }
-
 }

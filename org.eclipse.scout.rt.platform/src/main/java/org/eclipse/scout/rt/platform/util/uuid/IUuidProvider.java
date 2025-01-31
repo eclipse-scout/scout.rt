@@ -23,5 +23,4 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 public interface IUuidProvider {
 
   UUID createUuid();
-
 }

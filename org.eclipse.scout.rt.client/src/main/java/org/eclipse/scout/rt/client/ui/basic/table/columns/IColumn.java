@@ -283,7 +283,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
 
   /**
    * @return <code>true</code>, if the column width is fixed, meaning that it is not changed by resizing/auto-resizing
-   *         and cannot be resized by the user.
+   * and cannot be resized by the user.
    */
   boolean isFixedWidth();
 
@@ -291,7 +291,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
 
   /**
    * @return <code>true</code>, if the column position is fixed, meaning that it cannot be moved by the user. Also,
-   *         other columns cannot be moved beyond a fixed column.
+   * other columns cannot be moved beyond a fixed column.
    */
   boolean isFixedPosition();
 
@@ -312,7 +312,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
 
   /**
    * @return Returns whether the column is visible to the user using the three properties visible, displayable and
-   *         visiblePermission.
+   * visiblePermission.
    */
   boolean isVisible();
 
@@ -339,10 +339,10 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
 
   /**
    * @return true if this cell (row, column) is editable <b>and</b> the column is editable {@link #isEditable()}
-   *         <p>
-   *         It does NOT check if the column is visible, this is done in {@link ITable#isCellEditable(int, int)} et al.
-   *         <p>
-   *         Note that this is not a java bean method and thus not thread-safe
+   * <p>
+   * It does NOT check if the column is visible, this is done in {@link ITable#isCellEditable(int, int)} et al.
+   * <p>
+   * Note that this is not a java bean method and thus not thread-safe
    */
   boolean isCellEditable(ITableRow row);
 
@@ -422,7 +422,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   /**
    * @return value in correct type, derived from rawValue
    * @throws ProcessingException
-   *           parse AND validate value
+   *     parse AND validate value
    */
   VALUE/* validValue */ parseValue(ITableRow row, Object rawValue);
 
@@ -439,7 +439,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * When saved, the method {@link #completeEdit(ITableRow, IFormField)} is called on this column.
    *
    * @param row
-   *          on which editing occurs
+   *     on which editing occurs
    * @return a field for editing, use super.prepareEdit(row) for the default implementation.
    */
   IFormField prepareEdit(ITableRow row);

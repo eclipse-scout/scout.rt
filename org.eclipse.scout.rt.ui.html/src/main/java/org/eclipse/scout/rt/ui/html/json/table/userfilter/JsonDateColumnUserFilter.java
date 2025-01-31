@@ -52,5 +52,4 @@ public class JsonDateColumnUserFilter extends JsonColumnUserFilter<DateColumnUse
     json.put("dateTo", dateToJson(getFilterState().getDateTo()));
     return json;
   }
-
 }

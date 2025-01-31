@@ -95,5 +95,4 @@ public class HttpCacheKeyTest {
     Assert.assertNotEquals(new HttpCacheKey(null), new HttpCacheKey(null, Collections.singletonMap(null, null)));
     Assert.assertNotEquals(new HttpCacheKey(null), new HttpCacheKey(null, Collections.singletonMap("a", "v")));
   }
-
 }

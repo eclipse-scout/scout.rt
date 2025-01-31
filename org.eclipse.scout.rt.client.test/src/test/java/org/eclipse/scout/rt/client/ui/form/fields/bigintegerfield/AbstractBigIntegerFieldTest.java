@@ -9,9 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -148,5 +146,4 @@ public class AbstractBigIntegerFieldTest extends AbstractBigIntegerField {
     m_formatter.setMaximumFractionDigits(fractionDigits);
     return m_formatter.format(number);
   }
-
 }

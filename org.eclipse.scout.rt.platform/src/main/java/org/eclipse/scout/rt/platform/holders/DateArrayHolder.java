@@ -25,5 +25,4 @@ public class DateArrayHolder extends Holder<Date[]> {
   public DateArrayHolder(Date[] value) {
     super(Date[].class, value);
   }
-
 }

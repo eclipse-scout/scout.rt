@@ -35,5 +35,4 @@ public interface ILookupCallProvisioningService extends IService {
    * @return a new cloned and provisioned instance of the lookup call template.
    */
   <T> ILookupCall<T> newClonedInstance(ILookupCall<T> templateCall, IProvisioningContext context);
-
 }

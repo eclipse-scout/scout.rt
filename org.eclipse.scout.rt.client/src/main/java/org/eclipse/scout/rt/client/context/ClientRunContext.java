@@ -45,9 +45,9 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * client state among different threads, or allows temporary state changes to be done for the time of executing some
  * code.
  *
- * @since 5.1
  * @see ClientRunContexts
  * @see RunContext
+ * @since 5.1
  */
 public class ClientRunContext extends RunContext {
 
@@ -171,8 +171,8 @@ public class ClientRunContext extends RunContext {
    * context has that {@link ISession} set in {@link ISession#CURRENT} thread-local.
    *
    * @param applySessionProperties
-   *          <code>true</code> to apply session properties like {@link Locale}, {@link Subject}, {@link UserAgent} and
-   *          {@link IDesktop} to this context.
+   *     <code>true</code> to apply session properties like {@link Locale}, {@link Subject}, {@link UserAgent} and
+   *     {@link IDesktop} to this context.
    */
   public ClientRunContext withSession(final IClientSession session, final boolean applySessionProperties) {
     m_session = session;

@@ -31,5 +31,4 @@ public class DefaultConfigFileLoader implements IConfigFileLoader {
       throw new IllegalArgumentException("Unable to parse properties file from url '" + source.toExternalForm() + "'.", t);
     }
   }
-
 }

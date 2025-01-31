@@ -103,7 +103,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
    * Will throw a CancellationException if the future is already cancelled.
    *
    * @throws ThreadInterruptedError
-   *           if the current thread is cancelled
+   *     if the current thread is cancelled
    */
   protected void checkAlreadyCancelled(ServiceTunnelRequest serviceRequest) {
     final RunMonitor monitor = RunMonitor.CURRENT.get();
@@ -138,7 +138,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
    * response.
    *
    * @param t0
-   *          System time before the request has been started (may be used for performance analyzing).
+   *     System time before the request has been started (may be used for performance analyzing).
    */
   protected void afterTunnel(long t0, ServiceTunnelResponse serviceResponse) {
   }

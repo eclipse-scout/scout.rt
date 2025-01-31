@@ -261,7 +261,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
       return false;
     }
     boolean removed = false;
-    for (Iterator<? extends ITreeNode> it = m_nodes.iterator(); it.hasNext();) {
+    for (Iterator<? extends ITreeNode> it = m_nodes.iterator(); it.hasNext(); ) {
       final ITreeNode node = it.next();
       if (nodesToRemove.contains(node) || nodesToRemove.contains(m_commonParentNode)) {
         it.remove();

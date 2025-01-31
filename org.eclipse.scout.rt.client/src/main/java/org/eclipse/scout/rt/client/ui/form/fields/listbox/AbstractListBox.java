@@ -95,6 +95,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   /*
    * Configuration
    */
+
   /**
    * Configure a lookup call to fill listbox with values.
    *
@@ -133,8 +134,8 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
 
   /**
    * @return true: a filter is added to the listbox table that only accepts rows that are active or checked.<br>
-   *         Default is true<br>
-   *         Affects {@link ITable#getFilteredRows()}
+   * Default is true<br>
+   * Affects {@link ITable#getFilteredRows()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
@@ -144,8 +145,8 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
 
   /**
    * @return true: a filter is added to the listbox table that only accepts checked rows<br>
-   *         Default is false<br>
-   *         Affects {@link ITable#getFilteredRows()}<br>
+   * Default is false<br>
+   * Affects {@link ITable#getFilteredRows()}<br>
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(280)
@@ -202,10 +203,10 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
 
   /**
    * @param call
-   *          that produced this result
+   *     that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
-   *          supported
+   *     live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *     supported
    */
   @ConfigOperation
   @Order(260)
@@ -865,9 +866,9 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     }
   }
 
-/*
- * Implementation of ICompositeField
- */
+  /*
+   * Implementation of ICompositeField
+   */
 
   @Override
   public <F extends IFormField> F getFieldByClass(Class<F> widgetClassToFind) {

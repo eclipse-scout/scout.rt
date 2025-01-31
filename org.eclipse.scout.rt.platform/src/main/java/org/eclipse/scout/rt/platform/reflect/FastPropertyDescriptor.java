@@ -51,9 +51,9 @@ public class FastPropertyDescriptor {
    * Gets the Class object for the property.
    *
    * @return The Java type info for the property. Note that the "Class" object may describe a built-in Java type such as
-   *         "int". The result may be "null" if this is an indexed property that does not support non-indexed access.
-   *         <p>
-   *         This is the type that will be returned by the ReadMethod.
+   * "int". The result may be "null" if this is an indexed property that does not support non-indexed access.
+   * <p>
+   * This is the type that will be returned by the ReadMethod.
    */
   public Class<?> getPropertyType() {
     return m_propertyType;
@@ -85,7 +85,7 @@ public class FastPropertyDescriptor {
    * Gets the method that should be used to write the property value.
    *
    * @return The method that should be used to write the property value. May return null if the property can't be
-   *         written.
+   * written.
    */
   public Method getWriteMethod() {
     return m_writeMethod;

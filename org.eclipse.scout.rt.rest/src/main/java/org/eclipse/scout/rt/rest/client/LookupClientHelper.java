@@ -31,11 +31,11 @@ public class LookupClientHelper {
    * {@code restriction} object.
    *
    * @param <LOOKUP_ROW>
-   *          Lookup row type
+   *     Lookup row type
    * @param <ID>
-   *          Lookup row key type
+   *     Lookup row key type
    * @param <RESTRICTION>
-   *          Restriction object type
+   *     Restriction object type
    */
   public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>> LookupResponse<LOOKUP_ROW> lookup(Class<? extends IRestClientHelper> clientHelperType, String resourcePath,
       String path, RESTRICTION restriction) {

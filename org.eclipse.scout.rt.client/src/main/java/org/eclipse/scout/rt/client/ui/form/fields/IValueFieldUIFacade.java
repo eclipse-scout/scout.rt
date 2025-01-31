@@ -23,5 +23,4 @@ public interface IValueFieldUIFacade<VALUE> {
   void setDisplayTextFromUI(String text);
 
   void setErrorStatusFromUI(IStatus errorStatus);
-
 }

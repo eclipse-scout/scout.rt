@@ -41,5 +41,4 @@ public class IconSpec {
   public void setContent(byte[] content) {
     m_content = content;
   }
-
 }

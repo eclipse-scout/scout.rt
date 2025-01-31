@@ -47,13 +47,13 @@ import org.slf4j.LoggerFactory;
  * {@code
  * <?xml version="1.0" encoding="UTF-8"?>
  * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv=
-"http://schemas.xmlsoap.org/soap/envelope/">
+ * "http://schemas.xmlsoap.org/soap/envelope/">
  *   <soapenv:Body>
  *     <request version="3.0.0" format="de_CH" language="de_CH" service=
-"org.eclipse.scout.rt.shared.services.common.ping.IPingService" operation="ping"/>
+ * "org.eclipse.scout.rt.shared.services.common.ping.IPingService" operation="ping"/>
  *     <data>...</data>
  *     <info ts="20080715114301917" origin=
-"192.168.1.105">For maximum performance, data is reduced, compressed and base64 encoded.</info>
+ * "192.168.1.105">For maximum performance, data is reduced, compressed and base64 encoded.</info>
  *   </soapenv:Body>
  * </soapenv:Envelope>
  * }
@@ -65,36 +65,36 @@ import org.slf4j.LoggerFactory;
  * {@code
  * <?xml version="1.0" encoding="UTF-8"?>
  * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv=
-"http://schemas.xmlsoap.org/soap/envelope/">
+ * "http://schemas.xmlsoap.org/soap/envelope/">
  *   <soapenv:Body>
  *     <response status="OK" type="String"/>
  *     <data>...</data>
  *     <info ts="20080715114301917" origin=
-"192.168.3.2">For maximum performance, data is reduced, compressed and base64 encoded.</info>
+ * "192.168.3.2">For maximum performance, data is reduced, compressed and base64 encoded.</info>
  *   </soapenv:Body>
  * </soapenv:Envelope>
  * }
  * </pre>
- *
+ * <p>
  * Example response (error):
  *
  * <pre>
  * {@code
  * <?xml version="1.0" encoding="UTF-8"?>
  * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv=
-"http://schemas.xmlsoap.org/soap/envelope/">
+ * "http://schemas.xmlsoap.org/soap/envelope/">
  *   <soapenv:Body>
  *     <response status="ERROR">
  *       <exception type="SecurityException">Access denied</exception>
  *     </response>
  *     <data>...</data>
  *     <info ts="20080715114301917" origin=
-"192.168.3.2">For maximum performance, data is reduced, compressed and base64 encoded.</info>
+ * "192.168.3.2">For maximum performance, data is reduced, compressed and base64 encoded.</info>
  *   </soapenv:Body>
  * </soapenv:Envelope>
  * }
  * </pre>
- *
+ * <p>
  * In order to enable/disable content compression, use the system property or config.properties property:
  * <code>org.eclipse.scout.serviceTunnel.compress=true</code>
  * <p>

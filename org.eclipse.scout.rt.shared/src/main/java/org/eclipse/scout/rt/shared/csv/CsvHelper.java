@@ -230,17 +230,17 @@ public class CsvHelper {
 
   /**
    * @param reader
-   *          read data from
+   *     read data from
    * @param readNameHeader
-   *          stream contains a column header line
+   *     stream contains a column header line
    * @param readTypeHeader
-   *          stream contains a column type line
+   *     stream contains a column type line
    * @param headerRowCount
-   *          total number of header lines
+   *     total number of header lines
    * @param rowCount
-   *          may be negative if unknown
+   *     may be negative if unknown
    * @param allowVariableColumnCount
-   *          true if not all lines have the same number of columns
+   *     true if not all lines have the same number of columns
    */
   public void importData(IDataConsumer dataConsumer, Reader reader, boolean readNameHeader, boolean readTypeHeader, int headerRowCount, int rowCount, boolean allowVariableColumnCount) {
     String cell = null;
@@ -341,9 +341,9 @@ public class CsvHelper {
    * Writes the header rows to the writer.
    *
    * @param writeNames
-   *          write a line for the column names
+   *     write a line for the column names
    * @param writeTypes
-   *          write a line for the data types
+   *     write a line for the data types
    */
   public void exportHeaderRows(Writer writer, boolean writeNames, boolean writeTypes) {
     String line = null;
@@ -378,7 +378,7 @@ public class CsvHelper {
    * Writes data rows to the writer.
    *
    * @param closeWriter
-   *          true->will close the writer
+   *     true->will close the writer
    */
   public void exportDataRow(Object[] row, Writer writer, boolean closeWriter) {
     String line = null;
@@ -490,7 +490,7 @@ public class CsvHelper {
   protected String exportRow(Collection<String> strings) {
     StringBuilder buf = new StringBuilder();
     if (strings != null) {
-      for (Iterator<String> it = strings.iterator(); it.hasNext();) {
+      for (Iterator<String> it = strings.iterator(); it.hasNext(); ) {
         buf.append(encodeText(it.next()));
         if (it.hasNext() && getSeparatorChar() != 0x00) {
           buf.append(getSeparatorChar());

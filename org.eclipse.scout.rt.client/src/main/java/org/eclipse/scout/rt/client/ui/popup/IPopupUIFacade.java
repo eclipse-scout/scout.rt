@@ -16,5 +16,4 @@ public interface IPopupUIFacade {
    * This request might be ignored when the popup is not ready for closing or in pending state.
    */
   void firePopupClosingFromUI();
-
 }

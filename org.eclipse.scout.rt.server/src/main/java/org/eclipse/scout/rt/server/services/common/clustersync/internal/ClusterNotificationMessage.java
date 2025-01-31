@@ -38,5 +38,4 @@ public class ClusterNotificationMessage implements IClusterNotificationMessage {
   public String toString() {
     return "ClusterNotificationMessage [m_notification=" + m_notification + ", m_props=" + m_props + "]";
   }
-
 }

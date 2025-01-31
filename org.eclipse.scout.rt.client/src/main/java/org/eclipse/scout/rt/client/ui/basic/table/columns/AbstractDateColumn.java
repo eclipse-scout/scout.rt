@@ -258,5 +258,4 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   protected IDateColumnExtension<? extends AbstractDateColumn> createLocalExtension() {
     return new LocalDateColumnExtension<>(this);
   }
-
 }

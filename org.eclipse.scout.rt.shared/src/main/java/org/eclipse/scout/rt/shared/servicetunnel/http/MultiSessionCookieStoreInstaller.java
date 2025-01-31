@@ -52,9 +52,9 @@ public class MultiSessionCookieStoreInstaller {
    * are deployed separately)
    *
    * @return {@code true} if a {@link MultiSessionCookieStore} was already installed by same deployment, else returns
-   *         {@code false}.
+   * {@code false}.
    * @throws PlatformException
-   *           if a {@link MultiSessionCookieStore} was already installed by another deployment
+   *     if a {@link MultiSessionCookieStore} was already installed by another deployment
    */
   protected boolean checkMultiSessionCookieStoreAlreadyInstalled(CookieHandler cookieHandler) {
     if (cookieHandler != null) {

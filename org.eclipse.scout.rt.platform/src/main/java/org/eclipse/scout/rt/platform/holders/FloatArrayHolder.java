@@ -23,5 +23,4 @@ public class FloatArrayHolder extends Holder<Float[]> {
   public FloatArrayHolder(Float[] value) {
     super(Float[].class, value);
   }
-
 }

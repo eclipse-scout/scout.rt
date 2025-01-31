@@ -14,5 +14,4 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 public interface IOutlineViewButton extends IViewButton {
 
   IOutline getOutline();
-
 }

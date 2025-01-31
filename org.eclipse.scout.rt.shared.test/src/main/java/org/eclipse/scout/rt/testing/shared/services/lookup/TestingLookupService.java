@@ -106,5 +106,4 @@ public class TestingLookupService implements ILookupService<Long> {
     }
     return Pattern.compile(StringUtility.toRegExPattern(s), Pattern.DOTALL);
   }
-
 }

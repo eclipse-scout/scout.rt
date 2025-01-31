@@ -39,7 +39,7 @@ public final class ObjectUtility {
 
   /**
    * @return {@code value} if it is not {@code null}, otherwise the {@code valueSupplierWhenNull} is called to supply an
-   *         alternative which is returned. If {@code valueSupplierWhenNull} is absent, {@code null} is returned.
+   * alternative which is returned. If {@code valueSupplierWhenNull} is absent, {@code null} is returned.
    */
   public static <T> T nvlOpt(T value, Supplier<T> valueSupplierWhenNull) {
     if (value != null) {
@@ -73,9 +73,9 @@ public final class ObjectUtility {
    * </p>
    *
    * @param a
-   *          the first Object to be compared.
+   *     the first Object to be compared.
    * @param b
-   *          the second Object to be compared.
+   *     the second Object to be compared.
    * @return <code>true</code> if a is the same as b, <code>false</code> otherwise.
    */
   @SuppressWarnings("squid:S1201")
@@ -118,9 +118,9 @@ public final class ObjectUtility {
    * Indicates whether some Object a is not "equal to" another Object b. See {@link #equals} for more detail.
    *
    * @param a
-   *          the second Object to be compared.
+   *     the second Object to be compared.
    * @param b
-   *          the second Object to be compared.
+   *     the second Object to be compared.
    * @return <code>true</code> if a is not same as b, <code>false</code> otherwise.
    */
   public static <T> boolean notEquals(T a, T b) {
@@ -130,11 +130,10 @@ public final class ObjectUtility {
   /**
    * Null-safe implementation of {@code a.compareTo(b)}.
    *
-   * @return
-   *         <li>{@code 0} if both values are {@code null}
-   *         <li>{@code -1} if a is {@code null} and b is not {@code null}
-   *         <li>{@code 1} if b is {@code null} and a is not {@code null}
-   *         <li>{@code a.compareTo(b)} if both values are not {@code null}
+   * @return <li>{@code 0} if both values are {@code null}
+   * <li>{@code -1} if a is {@code null} and b is not {@code null}
+   * <li>{@code 1} if b is {@code null} and a is not {@code null}
+   * <li>{@code a.compareTo(b)} if both values are not {@code null}
    */
   public static <T extends Comparable<T>> int compareTo(T a, T b) {
     if (a == null && b == null) {
@@ -170,7 +169,7 @@ public final class ObjectUtility {
 
   /**
    * @return {@code true} if the given object is equal to an element in the given array. The objects are compared using
-   *         {@link #equals}.
+   * {@link #equals}.
    */
   public static boolean isOneOf(Object o, Object[] elements) {
     if (elements == null || elements.length < 1) {
@@ -181,7 +180,7 @@ public final class ObjectUtility {
 
   /**
    * @return {@code true} if the given object is equal to the first element or an element in the given varargs array.
-   *         The objects are compared using {@link #equals}.
+   * The objects are compared using {@link #equals}.
    */
   public static boolean isOneOf(Object o, Object first, Object... elements) {
     if (equals(o, first)) {
@@ -192,7 +191,7 @@ public final class ObjectUtility {
 
   /**
    * @return {@code true} if the given object is equal to an element in the given {@link Collection}. The objects are
-   *         compared using {@link #equals}.
+   * compared using {@link #equals}.
    */
   public static boolean isOneOf(Object o, Collection<?> elements) {
     if (CollectionUtility.isEmpty(elements)) {

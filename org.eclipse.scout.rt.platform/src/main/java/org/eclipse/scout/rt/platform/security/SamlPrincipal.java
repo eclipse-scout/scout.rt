@@ -26,9 +26,9 @@ public class SamlPrincipal implements Principal, Serializable {
 
   /**
    * @param name
-   *          is the username or userId
+   *     is the username or userId
    * @param sessionIndex
-   *          saml session index
+   *     saml session index
    */
   public SamlPrincipal(String name, String sessionIndex) {
     if (name == null) {

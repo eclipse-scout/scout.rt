@@ -90,7 +90,6 @@ public class OrganizeColumnsFormTest {
       pageList.add(page);
       m_page = page;
     }
-
   }
 
   public static class TestPage extends AbstractPageWithNodes {
@@ -112,5 +111,4 @@ public class OrganizeColumnsFormTest {
       return "Child";
     }
   }
-
 }

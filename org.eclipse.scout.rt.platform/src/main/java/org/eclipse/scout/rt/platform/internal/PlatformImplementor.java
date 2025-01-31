@@ -181,7 +181,7 @@ public class PlatformImplementor implements IPlatform {
 
     if (scoutHeadless && !graphicsEnvironmentHeadless) {
       LOG.warn("{} is 'true', but GraphicsEnvironment.isHeadless() reports 'false'. AWT seems to have been already initialized. "
-          + "Please try setting the system property {}=true manually when starting the VM. You can turn off this message by setting {}=false",
+              + "Please try setting the system property {}=true manually when starting the VM. You can turn off this message by setting {}=false",
           SCOUT_HEADLESS_PROPERTY, AWT_HEADLESS_PROPERTY, SCOUT_HEADLESS_PROPERTY);
     }
   }

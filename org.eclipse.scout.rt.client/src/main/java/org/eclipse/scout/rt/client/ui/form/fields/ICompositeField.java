@@ -92,7 +92,7 @@ public interface ICompositeField extends IFormField {
 
   /**
    * @return Returns an <b>unmodifiable</b> map with all fields by their actual class that were moved from this
-   *         composite field into another one. Never returns null.
+   * composite field into another one. Never returns null.
    */
   Map<Class<? extends IFormField>, IFormField> getMovedFields();
 }

@@ -19,5 +19,4 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
 public interface ICodeExtension<T, OWNER extends AbstractCode<T>> extends IExtension<OWNER> {
 
   List<? extends ICode<T>> execCreateChildCodes(CodeCreateChildCodesChain<T> chain);
-
 }

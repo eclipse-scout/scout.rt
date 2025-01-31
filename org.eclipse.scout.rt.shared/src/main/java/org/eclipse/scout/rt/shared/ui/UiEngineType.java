@@ -40,5 +40,4 @@ public enum UiEngineType implements IUiEngineType {
   public static UiEngineType createByIdentifier(String identifier) {
     return valueOf(identifier);
   }
-
 }

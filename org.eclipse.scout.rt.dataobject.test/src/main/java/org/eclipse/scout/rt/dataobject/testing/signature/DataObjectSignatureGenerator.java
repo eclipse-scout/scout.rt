@@ -126,12 +126,12 @@ public class DataObjectSignatureGenerator {
   protected static final Pattern VALUE_TYPE_PATTERN = Pattern.compile(""
       + "("
       + StringUtility.join("|",
-          VALUE_TYPE_DO_PREFIX,
-          VALUE_TYPE_DO_INTERFACE_PREFIX,
-          VALUE_TYPE_ENUM_PREFIX,
-          VALUE_TYPE_ID_PREFIX,
-          VALUE_TYPE_ID_INTERFACE_PREFIX,
-          VALUE_TYPE_CLASS_PREFIX)
+      VALUE_TYPE_DO_PREFIX,
+      VALUE_TYPE_DO_INTERFACE_PREFIX,
+      VALUE_TYPE_ENUM_PREFIX,
+      VALUE_TYPE_ID_PREFIX,
+      VALUE_TYPE_ID_INTERFACE_PREFIX,
+      VALUE_TYPE_CLASS_PREFIX)
       + ")"
       + "\\["
       + "([\\w.\\-]+)"
@@ -181,14 +181,14 @@ public class DataObjectSignatureGenerator {
    * Creates the data object signature.
    *
    * @param packageNamePrefixes
-   *          Only data object with matching package name prefixes are added to signature. Processing occurs for all
-   *          data objects.
+   *     Only data object with matching package name prefixes are added to signature. Processing occurs for all
+   *     data objects.
    * @param dataObjectPredicate
-   *          Allows to filter for certain data object classes, e.g. exclude data objects from test packages for
-   *          processing
+   *     Allows to filter for certain data object classes, e.g. exclude data objects from test packages for
+   *     processing
    * @param attributePredicate
-   *          Allows to filter for certain data object attributes, e.g. exclude a certain attribute of a specific data
-   *          object from further processing because verified separately.
+   *     Allows to filter for certain data object attributes, e.g. exclude a certain attribute of a specific data
+   *     object from further processing because verified separately.
    */
   public DataObjectSignatureDo createSignature(Set<String> packageNamePrefixes, Predicate<Class<? extends IDoEntity>> dataObjectPredicate, BiPredicate<Class<? extends IDoEntity>, String> attributePredicate) {
     applySanityChecks();
@@ -295,7 +295,7 @@ public class DataObjectSignatureGenerator {
    * Only data object with {@link TypeVersion} must be processed.
    *
    * @param doEntityClass
-   *          Class of data entity having type name annotation (provided from {@link DataObjectInventory})
+   *     Class of data entity having type name annotation (provided from {@link DataObjectInventory})
    */
   protected EntityDataObjectSignatureDo processDoEntity(Class<? extends IDoEntity> doEntityClass) {
     List<AttributeDataObjectSignatureDo> attributes = new LinkedList<>();

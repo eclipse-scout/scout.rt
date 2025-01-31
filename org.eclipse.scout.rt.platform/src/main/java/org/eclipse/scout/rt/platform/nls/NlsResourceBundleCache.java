@@ -35,7 +35,9 @@ public class NlsResourceBundleCache {
   private final Class<?> m_wrapperClass;
   private final ConcurrentMap<Locale, NlsResourceBundle> m_resourceBundles;
 
-  /** constant indicating that no resource bundle exists */
+  /**
+   * constant indicating that no resource bundle exists
+   */
   private static final NlsResourceBundle NONEXISTENT_BUNDLE = new NlsResourceBundle(null, Collections.emptyMap());
 
   public NlsResourceBundleCache(String resourceBundleName, Class wrapperClass) {
@@ -47,8 +49,8 @@ public class NlsResourceBundleCache {
     if (Platform.get().inDevelopmentMode() && CONFIG.getPropertyValue(DevelopmentTextsFileWatcherEnabledProperty.class)) {
       try {
         BEANS.get(NlsFileWatcher.class).watch(m_resourceBundleName, (path) -> {
-            m_resourceBundles.clear();
-            LOG.info("Cleared bundle cache for nls resource bundle {}", m_resourceBundleName);
+          m_resourceBundles.clear();
+          LOG.info("Cleared bundle cache for nls resource bundle {}", m_resourceBundleName);
         }, m_wrapperClass.getClassLoader());
       }
       catch (IOException e) {

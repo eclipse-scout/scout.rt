@@ -88,7 +88,8 @@ public class GzipServletFilter implements Filter {
         GzipServletResponseWrapper gzipResp = (GzipServletResponseWrapper) resp;
         gzipResp.finish();
       }
-    } else {
+    }
+    else {
       req.getAsyncContext().addListener(new AsyncListener() {
         @Override
         public void onComplete(AsyncEvent event) throws IOException {

@@ -31,9 +31,9 @@ public class HttpCacheObject implements Serializable {
 
   /**
    * @param cacheKey
-   *          not null
+   *     not null
    * @param resource
-   *          not null
+   *     not null
    */
   public HttpCacheObject(HttpCacheKey cacheKey, BinaryResource resource) {
     m_cacheKey = Assertions.assertNotNull(cacheKey);
@@ -58,7 +58,7 @@ public class HttpCacheObject implements Serializable {
 
   /**
    * @return an ETAG if the resource's {@link BinaryResource#getContentLength()} and
-   *         {@link BinaryResource#getFingerprint()} are both not -1
+   * {@link BinaryResource#getFingerprint()} are both not -1
    */
   public String createETag() {
     if (m_resource.getFingerprint() != -1L && m_resource.getContentLength() != -1L) {

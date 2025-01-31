@@ -57,8 +57,8 @@ public abstract class AbstractPropertyObserver implements IPropertyObserver {
 
   /**
    * @return {@code true} if config values are stored in {@link BasicPropertySupport}, this is the current default.
-   *         Otherwise, a supplier should be used to return the config value see
-   *         {@link BasicPropertySupport#getProperty(String, Supplier)}
+   * Otherwise, a supplier should be used to return the config value see
+   * {@link BasicPropertySupport#getProperty(String, Supplier)}
    */
   protected boolean isStoreConfigValues() {
     return STORE_CONFIG_VALUES.get();

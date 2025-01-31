@@ -35,7 +35,7 @@ public final class Sessions {
 
   /**
    * @return session associated with the current thread, or <code>null</code> if not set, or if not of the expected
-   *         type.
+   * type.
    */
   public static <SESSION extends ISession> SESSION currentSession(final Class<SESSION> type) {
     ISession session = ISession.CURRENT.get();
@@ -65,7 +65,7 @@ public final class Sessions {
    * {@link IAccessControlService#getUserIdOfCurrentSubject()} is called.
    *
    * @return current user id or <code>null</code> if user id can not be extracted from current {@link RunContext} and
-   *         {@link Subject}
+   * {@link Subject}
    */
   public static String getCurrentUserId() {
     ISession session = ISession.CURRENT.get();

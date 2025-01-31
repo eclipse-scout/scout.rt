@@ -36,5 +36,4 @@ public interface ISubscriptionStats {
    * @return timestamp of last received message, not including errors
    */
   Date lastMessageReceivedTimestamp();
-
 }

@@ -27,7 +27,7 @@ public interface IUploadable {
 
   /**
    * @return the set of accepted lowercase file extensions or media types for that uploadable. '*' is supported but not
-   *         recommended!
+   * recommended!
    */
   default Collection<String> getAcceptedUploadFileExtensions() {
     return null;

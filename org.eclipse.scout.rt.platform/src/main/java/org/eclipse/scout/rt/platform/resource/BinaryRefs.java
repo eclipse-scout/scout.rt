@@ -42,7 +42,7 @@ public final class BinaryRefs {
    * URI [binref:/documents/1337]'. Use this for user interactions.
    *
    * @param uris
-   *          may be null or empty or contain null elements
+   *     may be null or empty or contain null elements
    * @return non null modifiable map containing display text for all URIs
    */
   public static Map<URI, String> getDisplayTexts(Collection<URI> uris) {
@@ -58,9 +58,9 @@ public final class BinaryRefs {
    * Usually, the display text of a binary ref URI is simply the filename. Use this for user interactions.
    *
    * @param uris
-   *          may be null or empty or contain null elements, any non binref URI is ignored
+   *     may be null or empty or contain null elements, any non binref URI is ignored
    * @param fallbackFunction
-   *          custom function called in case a URI display text could not determined
+   *     custom function called in case a URI display text could not determined
    * @return non null modifiable map containing display text for all URIs
    */
   public static Map<URI, String> getDisplayTexts(Collection<URI> uris, Function<URI, String> fallbackFunction) {
@@ -74,7 +74,7 @@ public final class BinaryRefs {
    * 'Unknown URI [binref:/documents/1337]'. Use this for user interactions.
    *
    * @param uri
-   *          may be null
+   *     may be null
    * @return returns null if no URI is provided else a non-null, non-empty string
    */
   public static String getDisplayText(URI uri) {
@@ -86,7 +86,7 @@ public final class BinaryRefs {
    * In contrast to {@link #getDisplayTexts} returns only valid filenames from the referenced BinaryResource.
    *
    * @param uris
-   *          may be null or empty or contain null elements
+   *     may be null or empty or contain null elements
    * @return non null modifiable map containing filenames
    */
   public static Map<URI, String> getFilenames(Collection<URI> uris) {
@@ -105,7 +105,7 @@ public final class BinaryRefs {
    * Looks up content types for provided URIs. Content type are returned only for resources which were found.
    *
    * @param uris
-   *          may be null or empty or contain null elements
+   *     may be null or empty or contain null elements
    * @return non null modifiable map containing content types
    */
   public static Map<URI, String> getContentTypes(Collection<URI> uris) {
@@ -124,7 +124,7 @@ public final class BinaryRefs {
    *
    * @return BinaryResource of URI or null if URI is null or not a binref URI
    * @throws VetoException
-   *           if for given binref URI no handler or content can be found
+   *     if for given binref URI no handler or content can be found
    */
   public static BinaryResource loadBinaryResource(URI uri) {
     return BEANS.get(BinaryRefSupport.class).loadBinaryResource(uri);

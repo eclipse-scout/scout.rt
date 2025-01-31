@@ -102,11 +102,11 @@ public class ICalVCardHelper {
    * {@link Date} which results in the same text representation for the UTC timezone.
    *
    * @param d
-   *          The date. Must not be {@code null}.
+   *     The date. Must not be {@code null}.
    * @param zone
-   *          The {@link TimeZone} in which to read the {@link Date}.
+   *     The {@link TimeZone} in which to read the {@link Date}.
    * @return A {@link Date} which has the same text representation in UTC as the given {@link Date} in the given
-   *         {@link TimeZone}.
+   * {@link TimeZone}.
    */
   public Date removeTimeZoneOffset(Date d, TimeZone zone) {
     Locale locale = NlsLocale.get();
@@ -188,9 +188,9 @@ public class ICalVCardHelper {
    * </p>
    *
    * @param values
-   *          to be backslash escaped
+   *     to be backslash escaped
    * @return The structured value, according to RFC-2426 or RFC-5545 respectively (concatenation of the given values
-   *         (after escaping special characters), delimited by the SEMI-COLON character).
+   * (after escaping special characters), delimited by the SEMI-COLON character).
    */
   public String composeStructuredValueFromSingleValues(String... values) {
     return concatenateStrings(String.valueOf(STRUCTURED_VALUE_DELIMITER),
@@ -203,9 +203,9 @@ public class ICalVCardHelper {
    * </p>
    *
    * @param values
-   *          MUST NOT contain any SEMI-COLON characters unless they are escaped by a BACKSLASH character.
+   *     MUST NOT contain any SEMI-COLON characters unless they are escaped by a BACKSLASH character.
    * @return The structured value, according to RFC-2426 or RFC-5545 respectively (concatenation of the given values,
-   *         delimited by the SEMI-COLON character).
+   * delimited by the SEMI-COLON character).
    */
   public String composeStructuredValue(String... values) {
     return concatenateStrings(String.valueOf(STRUCTURED_VALUE_DELIMITER), values);
@@ -220,9 +220,9 @@ public class ICalVCardHelper {
    * </p>
    *
    * @param values
-   *          to be backslash escaped and concatenated
+   *     to be backslash escaped and concatenated
    * @return The list of values, according to RFC-2426 or RFC-5545 respectively (concatenation of the given values
-   *         (after escaping special characters), delimited by the COMMA character).
+   * (after escaping special characters), delimited by the COMMA character).
    */
   public String concatenateListOfValues(String... values) {
     return concatenateStrings(String.valueOf(LIST_OF_VALUES_DELIMITER),
@@ -234,9 +234,9 @@ public class ICalVCardHelper {
    * front of them.
    *
    * @param c
-   *          character to be escaped
+   *     character to be escaped
    * @param values
-   *          possibly containing character to be escaped
+   *     possibly containing character to be escaped
    * @return values where occurrences of the given <code>c</code> are backslash escaped
    */
   public String[] backslashEscape(char c, String... values) {
@@ -270,17 +270,17 @@ public class ICalVCardHelper {
    * </p>
    *
    * @param chars
-   *          characters to be escaped
+   *     characters to be escaped
    * @param values
-   *          possibly containing characters to be escaped
+   *     possibly containing characters to be escaped
    * @return values where characters are backslash escaped in the following order (ignoring '\\' and multiple
-   *         occurrences in <code>chars</code>):
-   *         <ul>
-   *         <li><code>\</code> -> <code>\\</code>
-   *         <li>chars[0] -> <code>\</code>chars[0]
-   *         <li>chars[1] -> <code>\</code>chars[1]
-   *         <li>etc..
-   *         </ul>
+   * occurrences in <code>chars</code>):
+   * <ul>
+   * <li><code>\</code> -> <code>\\</code>
+   * <li>chars[0] -> <code>\</code>chars[0]
+   * <li>chars[1] -> <code>\</code>chars[1]
+   * <li>etc..
+   * </ul>
    */
   public String[] backslashEscape(char[] chars, String... values) {
     if (values == null) {
@@ -307,7 +307,7 @@ public class ICalVCardHelper {
 
   /**
    * @return <code>true</code> if, and only if, support for the named charset is available in the current Java virtual
-   *         machine, <code>false</code> otherwise (does not throw exceptions)
+   * machine, <code>false</code> otherwise (does not throw exceptions)
    */
   public boolean isCharacterSetSupported(String charset) {
     try {

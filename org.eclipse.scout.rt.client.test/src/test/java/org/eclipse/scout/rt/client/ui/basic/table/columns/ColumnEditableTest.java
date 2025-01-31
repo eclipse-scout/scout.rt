@@ -9,10 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -121,9 +118,7 @@ public class ColumnEditableTest {
       protected boolean getConfiguredEditable() {
         return true;
       }
-
     }
-
   }
 
   /**
@@ -151,9 +146,6 @@ public class ColumnEditableTest {
         super.execDecorateCell(cell, row);
         cell.setEditable(row.getRowIndex() == 0);
       }
-
     }
-
   }
-
 }

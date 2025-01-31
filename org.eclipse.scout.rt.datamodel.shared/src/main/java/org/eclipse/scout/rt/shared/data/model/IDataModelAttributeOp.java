@@ -34,8 +34,8 @@ public interface IDataModelAttributeOp {
 
   /**
    * @return the field type to display to select a value for using this operation, use
-   *         {@link IComposerAttribute#TYPE_INHERITED} when the type of the attribute should be used see
-   *         {@link IComposerAttribute}.TYPE_* values
+   * {@link IComposerAttribute#TYPE_INHERITED} when the type of the attribute should be used see
+   * {@link IComposerAttribute}.TYPE_* values
    */
   int getType();
 
@@ -45,9 +45,9 @@ public interface IDataModelAttributeOp {
   int getOperator();
 
   /**
-   * @since 10.0
    * @return the lookupCall to be used when of type {@link IComposerAttribute#TYPE_SMART} and another lookupCall than
-   *         that of the attribute is needed.
+   * that of the attribute is needed.
+   * @since 10.0
    */
   default ILookupCall<?> getLookupCall() {
     return null;

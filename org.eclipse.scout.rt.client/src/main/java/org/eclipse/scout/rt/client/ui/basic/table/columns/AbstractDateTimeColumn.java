@@ -29,5 +29,4 @@ public abstract class AbstractDateTimeColumn extends AbstractDateColumn {
   protected boolean getConfiguredHasTime() {
     return true;
   }
-
 }

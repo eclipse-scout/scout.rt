@@ -16,11 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import jakarta.jws.WebService;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+
+import jakarta.jws.WebService;
 import jakarta.xml.ws.WebServiceClient;
 import jakarta.xml.ws.handler.LogicalHandler;
 import jakarta.xml.ws.handler.soap.SOAPHandler;
@@ -169,8 +170,7 @@ public class EntryPointDefinition {
   public List<HandlerDefinition> getHandlerChain() {
     final List<HandlerDefinition> handlerChain = new ArrayList<>();
 
-    @SuppressWarnings("unchecked")
-    final List<AnnotationValue> handlerAnnotationValues = (List<AnnotationValue>) AnnotationUtil.getAnnotationValue(m_annotationMirror, "handlerChain", m_env.getElementUtils()).getValue();
+    @SuppressWarnings("unchecked") final List<AnnotationValue> handlerAnnotationValues = (List<AnnotationValue>) AnnotationUtil.getAnnotationValue(m_annotationMirror, "handlerChain", m_env.getElementUtils()).getValue();
 
     for (final AnnotationValue handlerAnnotationValue : handlerAnnotationValues) {
       final AnnotationMirror handlerAnnotation = (AnnotationMirror) handlerAnnotationValue.getValue();
@@ -210,7 +210,7 @@ public class EntryPointDefinition {
 
   /**
    * @return <code>true</code> if the WSDL location is to be derived from {@link WebServiceClient} annotation on service
-   *         class.
+   * class.
    */
   public boolean isWsdlLocationDerived() {
     return WebServiceEntryPoint.DERIVED.equals(getWsdlLocation());

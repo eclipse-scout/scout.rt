@@ -17,7 +17,7 @@ import java.util.List;
  * JSON object for a model and also to propagate property change events to the browser-side client.
  *
  * @param <MODEL_ELEMENT>
- *          Type of model object
+ *     Type of model object
  */
 @SuppressWarnings("squid:S00118")
 public abstract class JsonProperty<MODEL_ELEMENT> {

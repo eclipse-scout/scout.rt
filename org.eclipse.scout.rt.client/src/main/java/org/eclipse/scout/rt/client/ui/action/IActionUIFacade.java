@@ -19,7 +19,7 @@ public interface IActionUIFacade {
    * {@link #fireActionFromUI()} must be called as well, regardless of whether the selection state changed.
    *
    * @param selected
-   *          <code>true</code> if selected, <code>false</code> otherwise.
+   *     <code>true</code> if selected, <code>false</code> otherwise.
    * @see #fireActionFromUI()
    */
   void setSelectedFromUI(boolean selected);

@@ -54,8 +54,8 @@ public interface ICalendarAppointment extends ICalendarItem {
 
   /**
    * @param a
-   *          One of {@link #STATUS_BUSY}, {@link #STATUS_FREE}, {@link #STATUS_OUTOFOFFICE}, {@link #STATUS_TENTATIVE},
-   *          {@link #STATUS_WORKING_ELSEWHERE}
+   *     One of {@link #STATUS_BUSY}, {@link #STATUS_FREE}, {@link #STATUS_OUTOFOFFICE}, {@link #STATUS_TENTATIVE},
+   *     {@link #STATUS_WORKING_ELSEWHERE}
    */
   void setBusyStatus(int a);
 
@@ -64,5 +64,4 @@ public interface ICalendarAppointment extends ICalendarItem {
   void removeRecipientEmail(String recipientEmail);
 
   void removeAllRecipientEmail();
-
 }

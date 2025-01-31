@@ -15,8 +15,8 @@ import org.eclipse.scout.rt.shared.ISession;
 /**
  * User preference service that is capable to persist preferences to a preference store.
  *
- * @since 5.1
  * @see Preferences#get(ISession, String)
+ * @since 5.1
  */
 public interface IUserPreferencesStorageService extends IUserPreferencesService {
 
@@ -24,10 +24,9 @@ public interface IUserPreferencesStorageService extends IUserPreferencesService 
    * Flushes the given {@link IPreferences} to the persistent store.
    *
    * @param prefs
-   *          The preferences to store.
+   *     The preferences to store.
    * @throws ProcessingException
-   *           On an error while storing the given preferences.
+   *     On an error while storing the given preferences.
    */
   void flush(IPreferences prefs);
-
 }

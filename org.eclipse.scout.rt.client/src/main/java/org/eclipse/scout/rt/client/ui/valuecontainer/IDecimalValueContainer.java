@@ -54,7 +54,7 @@ public interface IDecimalValueContainer<T extends Number> extends INumberValueCo
 
   /**
    * @return true when both positive and negative suffixes correspond to the local specific (depending on
-   *         {@link NlsLocale#get()}) percentage symbol
+   * {@link NlsLocale#get()}) percentage symbol
    */
   boolean isPercent();
 
@@ -77,5 +77,4 @@ public interface IDecimalValueContainer<T extends Number> extends INumberValueCo
   void setMultiplier(int i);
 
   int getMultiplier();
-
 }

@@ -122,9 +122,9 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
      * Updates the thread name with the given name and some optional execution information.
      *
      * @param threadName
-     *          the name of the thread
+     *     the name of the thread
      * @param executionInfo
-     *          optional info to be appended to the thread name, else <code>null</code>.
+     *     optional info to be appended to the thread name, else <code>null</code>.
      */
     public void updateThreadName(final String threadName, final String executionInfo) {
       String name = String.format("%s-%s", ObjectUtility.nvl(threadName, m_originalThreadName), m_sequence);

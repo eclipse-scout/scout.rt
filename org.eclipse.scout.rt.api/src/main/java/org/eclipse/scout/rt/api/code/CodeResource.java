@@ -51,9 +51,9 @@ public class CodeResource implements IRestResource {
    * Gets all CodeTypes which should be published to the UI on application startup (bootstrap)
    *
    * @param allLanguages
-   *          {@code true} if all application languages should be exported. {@code false} if only the texts for the
-   *          current {@link NlsLocale} should be part of the response. Customize {@link #getApplicationLanguages()} to
-   *          specify the supported application languages.
+   *     {@code true} if all application languages should be exported. {@code false} if only the texts for the
+   *     current {@link NlsLocale} should be part of the response. Customize {@link #getApplicationLanguages()} to
+   *     specify the supported application languages.
    * @return List of the CodeTypes.
    */
   @PUT

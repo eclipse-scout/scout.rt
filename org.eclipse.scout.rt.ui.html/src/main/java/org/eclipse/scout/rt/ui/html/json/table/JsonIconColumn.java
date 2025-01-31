@@ -32,5 +32,4 @@ public class JsonIconColumn<T extends IIconColumn> extends JsonColumn<T> {
   public Object cellValueToJson(Object value) {
     return MainJsonObjectFactory.get().createJsonObject(value).toJson();
   }
-
 }

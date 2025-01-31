@@ -13,5 +13,4 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 public class CustomProcessingException extends ProcessingException {
   private static final long serialVersionUID = 1L;
-
 }

@@ -35,7 +35,7 @@ public final class BlockingCountDownLatch {
    * Creates a {@link BlockingCountDownLatch} with default timeouts of 30 seconds.
    *
    * @param count
-   *          the number of times {@link #countDown} must be invoked before threads can pass through {@link #await}
+   *     the number of times {@link #countDown} must be invoked before threads can pass through {@link #await}
    */
   public BlockingCountDownLatch(final int count) {
     this(count, 30, TimeUnit.SECONDS);
@@ -45,11 +45,11 @@ public final class BlockingCountDownLatch {
    * Creates a {@link BlockingCountDownLatch} with default timeouts of 30 seconds.
    *
    * @param count
-   *          the number of times {@link #countDown} must be invoked before threads can pass through {@link #await}
+   *     the number of times {@link #countDown} must be invoked before threads can pass through {@link #await}
    * @param defaultAwaitTime
-   *          default timeout to wait for in {@link #await()} and {@link #countDownAndBlock()}.
+   *     default timeout to wait for in {@link #await()} and {@link #countDownAndBlock()}.
    * @param defaultAwaitUnit
-   *          unit of the timeout.
+   *     unit of the timeout.
    */
   public BlockingCountDownLatch(final int count, final long defaultAwaitTime, final TimeUnit defaultAwaitUnit) {
     m_count = count;

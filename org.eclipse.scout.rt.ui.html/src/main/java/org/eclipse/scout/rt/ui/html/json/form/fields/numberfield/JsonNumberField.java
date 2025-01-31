@@ -55,5 +55,4 @@ public class JsonNumberField<T extends INumberField<? extends Number>> extends J
       }
     });
   }
-
 }

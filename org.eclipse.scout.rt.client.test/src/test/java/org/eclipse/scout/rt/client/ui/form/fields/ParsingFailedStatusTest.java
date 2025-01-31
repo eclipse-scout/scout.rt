@@ -32,5 +32,4 @@ public class ParsingFailedStatusTest {
     assertEquals("Foo", status.getMessage());
     assertEquals(0, status.getCode()); // default value for in members
   }
-
 }

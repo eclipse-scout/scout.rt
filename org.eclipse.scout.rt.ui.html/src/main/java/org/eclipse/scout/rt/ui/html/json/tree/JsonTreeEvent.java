@@ -37,7 +37,7 @@ public class JsonTreeEvent extends EventObject {
 
   /**
    * @return a flat collection of every inserted node. The collection also contains every inserted child node even if
-   *         the parent is already in it.
+   * the parent is already in it.
    */
   public Collection<? extends ITreeNode> getNodes() {
     return m_nodes;

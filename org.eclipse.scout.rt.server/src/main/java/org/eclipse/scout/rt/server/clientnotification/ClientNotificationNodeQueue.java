@@ -100,13 +100,13 @@ public class ClientNotificationNodeQueue {
       }
     }
     if (!droppedNotifications.isEmpty()) {
-        Function<Stream<? extends ClientNotificationMessage>, String> infoExtractor = s -> s
-            .map(m -> m.getNotification().getClass().getSimpleName() + " -> " + m.getAddress().prettyPrint())
-            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-            .entrySet().stream()
-            .sorted(Entry.<String, Long> comparingByValue().reversed())
-            .map(e -> e.getKey() + " (" + e.getValue() + "x)")
-            .collect(Collectors.joining(", ", "[", "]"));
+      Function<Stream<? extends ClientNotificationMessage>, String> infoExtractor = s -> s
+          .map(m -> m.getNotification().getClass().getSimpleName() + " -> " + m.getAddress().prettyPrint())
+          .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+          .entrySet().stream()
+          .sorted(Entry.<String, Long> comparingByValue().reversed())
+          .map(e -> e.getKey() + " (" + e.getValue() + "x)")
+          .collect(Collectors.joining(", ", "[", "]"));
 
       LOG.error("Notification queue capacity reached. Added {}, removed oldest {} notification messages. [clientNodeId={}, lastConsumeAccess={}, newNotifications={}, droppedNotifications={}]",
           notifications.size(), droppedNotifications.size(), getNodeId(), getLastConsumeAccessFormatted(), infoExtractor.apply(notifications.stream()), infoExtractor.apply(droppedNotifications.stream()));

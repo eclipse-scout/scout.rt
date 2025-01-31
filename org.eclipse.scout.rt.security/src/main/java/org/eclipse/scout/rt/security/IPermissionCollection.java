@@ -29,14 +29,14 @@ public interface IPermissionCollection {
 
   /**
    * @param permission
-   *          if {@code null}, false is returned
+   *     if {@code null}, false is returned
    * @see PermissionCollection#implies(Permission)
    */
   boolean implies(Permission permission);
 
   /**
    * @param permission
-   *          if {@code null}, false is returned
+   *     if {@code null}, false is returned
    * @see PermissionCollection#implies(Permission)
    */
   boolean implies(IPermission permission);
@@ -113,12 +113,11 @@ public interface IPermissionCollection {
    * Sets custom value assigned to the permission collection
    *
    * @param valueType
-   *          not null
+   *     not null
    * @param value
-   *          may be null
+   *     may be null
    * @throws AssertionException
-   *           if permission collection is read only
+   *     if permission collection is read only
    */
   <T extends Serializable> void setValue(Class<T> valueType, T value);
-
 }

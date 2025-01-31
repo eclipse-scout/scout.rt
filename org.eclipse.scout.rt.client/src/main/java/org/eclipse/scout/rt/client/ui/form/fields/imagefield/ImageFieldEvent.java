@@ -90,5 +90,4 @@ public class ImageFieldEvent extends EventObject implements IModelEvent {
   public BoundsSpec getZoomRectangle() {
     return m_rect;
   }
-
 }

@@ -80,11 +80,11 @@ public class GlobalTrustManager {
    * Installs the global trustmanager for the given server socket protocol and trustmanager algorithm.
    *
    * @param protocol
-   *          the server socket protocol (e.g. TLS or SSL) used to identify the protocol implementing {@link SSLContext}
-   *          . This context is injected with a custom {@link TrustManager} to further check server identity with
-   *          certificates located not only in keystore but also in 'externalfiles/certificates' folder.
+   *     the server socket protocol (e.g. TLS or SSL) used to identify the protocol implementing {@link SSLContext}
+   *     . This context is injected with a custom {@link TrustManager} to further check server identity with
+   *     certificates located not only in keystore but also in 'externalfiles/certificates' folder.
    * @param tmAlgorithm
-   *          {@link TrustManager} algorithm (e.g. SunX509 or IbmX509)
+   *     {@link TrustManager} algorithm (e.g. SunX509 or IbmX509)
    */
   public void installGlobalTrustManager(String protocol, String tmAlgorithm) {
     X509TrustManager globalTrustManager;
@@ -164,7 +164,7 @@ public class GlobalTrustManager {
    * instance can be used where the default {@link SSLContext} is not used.
    *
    * @param tmAlgorithm
-   *          {@link TrustManager} algorithm (e.g. SunX509 or IbmX509)
+   *     {@link TrustManager} algorithm (e.g. SunX509 or IbmX509)
    * @return new {@link X509TrustManager}
    * @see #installGlobalTrustManager()
    */

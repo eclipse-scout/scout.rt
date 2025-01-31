@@ -53,7 +53,7 @@ public interface ILoggerSupport {
    * Sets the scout log level of the logger with given name.
    *
    * @param level
-   *          a level or <code>null</code>.
+   *     a level or <code>null</code>.
    */
   void setLogLevel(String name, LogLevel level);
 
@@ -61,7 +61,7 @@ public interface ILoggerSupport {
    * Sets the scout log level of the given class' logger.
    *
    * @param level
-   *          a level or <code>null</code>.
+   *     a level or <code>null</code>.
    */
   void setLogLevel(Class<?> clazz, LogLevel level);
 
@@ -69,7 +69,7 @@ public interface ILoggerSupport {
    * Sets the scout log level of the given slf4j logger
    *
    * @param level
-   *          a level or <code>null</code>.
+   *     a level or <code>null</code>.
    */
   void setLogLevel(Logger logger, LogLevel level);
 

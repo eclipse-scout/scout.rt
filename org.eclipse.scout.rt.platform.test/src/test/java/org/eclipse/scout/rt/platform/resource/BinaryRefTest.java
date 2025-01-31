@@ -197,5 +197,4 @@ public class BinaryRefTest {
       return Paths.get(uri.getPath()).getFileName().toString();
     }
   }
-
 }

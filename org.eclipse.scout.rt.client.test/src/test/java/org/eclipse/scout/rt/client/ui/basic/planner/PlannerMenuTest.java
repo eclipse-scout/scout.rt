@@ -159,5 +159,4 @@ public class PlannerMenuTest {
       super.setContextMenu(contextMenu);
     }
   }
-
 }

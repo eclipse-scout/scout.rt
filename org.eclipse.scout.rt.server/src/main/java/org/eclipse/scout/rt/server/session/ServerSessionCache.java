@@ -44,11 +44,11 @@ public class ServerSessionCache {
    * {@link IServerSessionLifecycleHandler}, if none exists.
    *
    * @param sessionLifecycleHandler
-   *          for creating and destroying scout sessions. Must not be {@code null}.
+   *     for creating and destroying scout sessions. Must not be {@code null}.
    * @param httpSession
-   *          must not be {@code null}.
+   *     must not be {@code null}.
    * @return new or existing {@link IServerSession} or {@code null} if no server session could be found on the
-   *         class-path.
+   * class-path.
    */
   public IServerSession getOrCreate(IServerSessionLifecycleHandler sessionLifecycleHandler, HttpSession httpSession) {
     Object scoutSession = httpSession.getAttribute(SERVER_SESSION_KEY);
@@ -88,9 +88,9 @@ public class ServerSessionCache {
    * available.
    *
    * @param scoutSessionId
-   *          is the groupId referencing multiple http sessions
+   *     is the groupId referencing multiple http sessions
    * @param httpSessionId
-   *          must not be {@code null}.
+   *     must not be {@code null}.
    */
   public void removeHttpSession(String scoutSessionId, String httpSessionId) {
     final ServerSessionEntry removedEntry = m_lockBySessionId.remove(scoutSessionId, entry -> removeEntry(entry, httpSessionId));

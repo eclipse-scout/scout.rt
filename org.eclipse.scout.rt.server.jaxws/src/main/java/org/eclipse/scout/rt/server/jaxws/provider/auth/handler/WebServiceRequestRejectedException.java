@@ -29,7 +29,7 @@ public class WebServiceRequestRejectedException extends Exception {
 
   /**
    * @param httpStatusCode
-   *          HTTP status code to be set in {@link HTTPException}.
+   *     HTTP status code to be set in {@link HTTPException}.
    */
   public WebServiceRequestRejectedException(final int httpStatusCode) {
     m_httpStatusCode = httpStatusCode;

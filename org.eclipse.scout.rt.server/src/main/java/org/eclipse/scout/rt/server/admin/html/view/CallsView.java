@@ -321,5 +321,4 @@ public class CallsView extends DefaultView {
     p.endTableCell();
     p.endTableRow();
   }
-
 }

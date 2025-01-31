@@ -57,5 +57,4 @@ public abstract class AbstractOutlineExtension<OWNER extends AbstractOutline> ex
   public void execInitDefaultDetailForm(OutlineInitDefaultDetailFormChain chain) {
     chain.execInitDefaultDetailForm();
   }
-
 }

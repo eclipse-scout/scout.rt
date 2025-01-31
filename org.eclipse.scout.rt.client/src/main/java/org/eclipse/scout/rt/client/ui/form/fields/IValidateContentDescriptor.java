@@ -36,8 +36,8 @@ public interface IValidateContentDescriptor {
    * Set the name of this descriptor. This is the name that will be displayed to the user.
    *
    * @param displayText
-   *          The new text. May be {@code null}. In that case a default text is generated (based on location a label of
-   *          the field).
+   *     The new text. May be {@code null}. In that case a default text is generated (based on location a label of
+   *     the field).
    * @return this instance
    */
   IValidateContentDescriptor setDisplayText(String displayText);
@@ -49,7 +49,7 @@ public interface IValidateContentDescriptor {
 
   /**
    * @return A {@link Consumer} that will be executed by the framework to show the problem location (jump to the
-   *         problem).
+   * problem).
    */
   Consumer<IValidateContentDescriptor> getProblemLocationActivator();
 
@@ -57,7 +57,7 @@ public interface IValidateContentDescriptor {
    * Replaces the strategy to show the problem location (jump to the problem).
    *
    * @param locationActivator
-   *          The new activator or {@code null}.
+   *     The new activator or {@code null}.
    * @return this instance
    */
   IValidateContentDescriptor setProblemLocationActivator(Consumer<IValidateContentDescriptor> locationActivator);
@@ -68,7 +68,7 @@ public interface IValidateContentDescriptor {
    * consumer first and the existing one afterwards.
    *
    * @param before
-   *          The additional task to execute before the existing one.
+   *     The additional task to execute before the existing one.
    * @return this instance
    */
   IValidateContentDescriptor problemLocationActivatorButBefore(Consumer<IValidateContentDescriptor> before);
@@ -79,7 +79,7 @@ public interface IValidateContentDescriptor {
    * consumer first and the given one afterwards.
    *
    * @param after
-   *          The additional task to execute before the existing one.
+   *     The additional task to execute before the existing one.
    * @return this instance
    */
   IValidateContentDescriptor problemLocationActivatorAndThen(Consumer<? super IValidateContentDescriptor> after);

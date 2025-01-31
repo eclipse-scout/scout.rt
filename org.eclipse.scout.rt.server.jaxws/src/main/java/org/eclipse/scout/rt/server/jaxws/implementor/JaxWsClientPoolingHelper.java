@@ -40,7 +40,7 @@ public class JaxWsClientPoolingHelper {
 
   /**
    * @return Returns <code>true</code> if the given JAX-WS runtime environment supports pooling of ports. Otherwise
-   *         <code>false</code>.
+   * <code>false</code>.
    */
   public boolean isPoolingSupported() {
     return m_resetMethod != null && m_getTubesMethod != null;
@@ -69,7 +69,7 @@ public class JaxWsClientPoolingHelper {
 
   /**
    * @return Returns <code>true</code> if the given port is valid and can be used for another invocation. Otherwise
-   *         <code>false</code>.
+   * <code>false</code>.
    */
   public boolean isValid(Object port) {
     Assertions.assertNotNull(port);

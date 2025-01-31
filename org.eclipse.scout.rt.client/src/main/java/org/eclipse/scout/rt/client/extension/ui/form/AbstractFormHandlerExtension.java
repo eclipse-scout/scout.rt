@@ -64,5 +64,4 @@ public abstract class AbstractFormHandlerExtension<OWNER extends AbstractFormHan
   public void execFinally(FormHandlerFinallyChain chain) {
     chain.execFinally();
   }
-
 }

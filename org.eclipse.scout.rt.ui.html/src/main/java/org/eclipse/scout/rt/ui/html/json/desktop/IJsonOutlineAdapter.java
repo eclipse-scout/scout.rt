@@ -21,5 +21,4 @@ public interface IJsonOutlineAdapter {
    * Returns the JSON node ID for the given table row.
    */
   String getNodeId(ITableRow tableRow);
-
 }

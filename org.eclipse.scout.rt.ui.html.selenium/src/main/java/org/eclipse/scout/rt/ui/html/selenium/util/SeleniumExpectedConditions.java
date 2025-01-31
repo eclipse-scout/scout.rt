@@ -265,9 +265,9 @@ public final class SeleniumExpectedConditions {
 
   /**
    * @param parentElement
-   *          if not null, findElement below the given parent, if null, findElements in document
+   *     if not null, findElement below the given parent, if null, findElements in document
    * @param divClass
-   *          css class of child div
+   *     css class of child div
    * @return Number of child divs found by the expected condition
    */
   public static ExpectedCondition<List<WebElement>> containerToHaveNumberOfChildDivs(final WebElement parentElement, final String divClass, final int numDivs) {
@@ -296,7 +296,7 @@ public final class SeleniumExpectedConditions {
 
   /**
    * @param parentElement
-   *          if not null, findElement below the given parent, if null, findElements in document
+   *     if not null, findElement below the given parent, if null, findElements in document
    * @return The table-rows found by the expected condition
    */
   public static ExpectedCondition<List<WebElement>> tableToHaveNumberOfRows(final WebElement parentElement, final int numRows) {
@@ -305,12 +305,12 @@ public final class SeleniumExpectedConditions {
 
   /**
    * @param parentElement
-   *          if not null, findElement below the given parent, if null, findElements in document
+   *     if not null, findElement below the given parent, if null, findElements in document
    * @param rowText
-   *          optional text of element table-row, compared with 'contains'. When rowText is null no text comparison is
-   *          done and only the number of rows is checked.
+   *     optional text of element table-row, compared with 'contains'. When rowText is null no text comparison is
+   *     done and only the number of rows is checked.
    * @param numRows
-   *          expected number of rows the table must have
+   *     expected number of rows the table must have
    * @return The table-rows found by the expected condition
    */
   public static ExpectedCondition<List<WebElement>> tableToHaveNumberOfRows(final WebElement parentElement, final String rowText, final int numRows) {

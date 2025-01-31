@@ -25,5 +25,4 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 public interface ICodeLookupCallFactoryService extends IService {
 
   <T> CodeLookupCall<T> newInstance(Class<? extends ICodeType<?, T>> codeTypeClass);
-
 }

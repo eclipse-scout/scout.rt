@@ -26,5 +26,4 @@ public final class ColumnTestUtility {
     field.parseAndSetValue(value);
     column.completeEdit(row, field);
   }
-
 }

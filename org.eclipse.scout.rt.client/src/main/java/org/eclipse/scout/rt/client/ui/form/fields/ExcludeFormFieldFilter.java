@@ -24,7 +24,7 @@ public class ExcludeFormFieldFilter implements IFormFieldFilter {
 
   /**
    * @param fields
-   *          the fields that should not be accepted by the filter.
+   *     the fields that should not be accepted by the filter.
    */
   public ExcludeFormFieldFilter(IFormField... fields) {
     if (fields != null && fields.length > 0) {

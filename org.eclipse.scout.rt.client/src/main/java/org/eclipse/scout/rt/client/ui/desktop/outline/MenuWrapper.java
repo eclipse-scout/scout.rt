@@ -26,7 +26,7 @@ public class MenuWrapper {
    * Returns a wrapper for the given menu, or if the menu is already a wrapper instance, the same menu-instance.
    *
    * @param menu
-   *          Menu to wrap
+   *     Menu to wrap
    * @return Newly wrapped menu if the the menu is not already wrapped, same menu otherwise.
    */
   public static IMenu wrapMenuIfNotWrapped(IMenu menu) {
@@ -38,9 +38,9 @@ public class MenuWrapper {
    * again.
    *
    * @param menu
-   *          Menu to wrap
+   *     Menu to wrap
    * @param menuTypeMapper
-   *          function to map one menu type to another. The mapper is applied to child menus too.
+   *     function to map one menu type to another. The mapper is applied to child menus too.
    * @return Wrapped menu
    */
   public static IMenu wrapMenu(IMenu menu, IMenuTypeMapper menuTypeMapper) {
@@ -52,11 +52,11 @@ public class MenuWrapper {
    * again.
    *
    * @param menu
-   *          Menu to wrap
+   *     Menu to wrap
    * @param menuTypeMapper
-   *          function to map one menu type to another. The mapper is applied to child menus too.
+   *     function to map one menu type to another. The mapper is applied to child menus too.
    * @param menuFilter
-   *          Filter used when wrapping child menus.
+   *     Filter used when wrapping child menus.
    * @return Wrapped menu
    */
   public static IMenu wrapMenu(IMenu menu, IMenuTypeMapper menuTypeMapper, Predicate<IMenu> menuFilter) {

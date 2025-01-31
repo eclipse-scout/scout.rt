@@ -85,5 +85,4 @@ public class TreeNodeData implements Serializable, Cloneable {
   public void setTexts(List<String> a) {
     m_texts = CollectionUtility.arrayList(a);
   }
-
 }

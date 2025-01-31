@@ -261,5 +261,4 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     super.addField(f);
     setSelectedTab(findNewSelectedTab(null));
   }
-
 }

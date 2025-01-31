@@ -197,7 +197,6 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
         return true;
       }
     }
-
   }
 
   @Order(20)
@@ -319,5 +318,4 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
   public CheckedStateRadioButtonGroup getCheckedStateRadioButtonGroup() {
     return getFieldByClass(CheckedStateRadioButtonGroup.class);
   }
-
 }

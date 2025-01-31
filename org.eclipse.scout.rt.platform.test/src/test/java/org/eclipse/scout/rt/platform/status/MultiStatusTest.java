@@ -286,5 +286,4 @@ public class MultiStatusTest {
       setCode(7);
     }
   }
-
 }

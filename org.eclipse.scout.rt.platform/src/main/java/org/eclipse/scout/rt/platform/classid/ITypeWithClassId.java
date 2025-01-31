@@ -30,5 +30,4 @@ public interface ITypeWithClassId {
    * @return a unique id
    */
   String classId();
-
 }

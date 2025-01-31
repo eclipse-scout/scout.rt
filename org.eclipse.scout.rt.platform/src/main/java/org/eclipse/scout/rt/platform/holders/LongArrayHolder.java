@@ -29,5 +29,4 @@ public class LongArrayHolder extends Holder<Long[]> {
   public LongArrayHolder(Integer[] value) {
     super(Long[].class, (value != null ? TypeCastUtility.castValue(value, Long[].class) : null));
   }
-
 }

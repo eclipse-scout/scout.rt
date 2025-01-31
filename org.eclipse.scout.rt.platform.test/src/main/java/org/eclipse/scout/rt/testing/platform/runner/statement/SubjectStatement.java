@@ -33,9 +33,9 @@ public class SubjectStatement extends Statement {
    * Creates a statement to execute the following statements under a particular user.
    *
    * @param next
-   *          next {@link Statement} to be executed.
+   *     next {@link Statement} to be executed.
    * @param annotation
-   *          {@link RunWithSubject}-annotation to read the user.
+   *     {@link RunWithSubject}-annotation to read the user.
    */
   public SubjectStatement(final Statement next, final RunWithSubject annotation) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");

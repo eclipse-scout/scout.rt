@@ -88,7 +88,7 @@ public final class SeleniumUtil {
    * This query solves the problem that we don't want to find partial matches for a CSS class-name when we query 'class'
    * attribute in the DOM. See
    * <a href="https://stackoverflow.com/questions/1604471/how-can-i-find-an-element-by-css-class-with-xpath">
-   *   how-can-i-find-an-element-by-css-class-with-xpath</a>
+   * how-can-i-find-an-element-by-css-class-with-xpath</a>
    */
   private static String cssClassQuery(String cssClass) {
     return "contains(concat(' ', normalize-space(@class), ' '), ' " + cssClass + " ')";
@@ -110,7 +110,7 @@ public final class SeleniumUtil {
 
   /**
    * @return An attribute from the given DOM element <em>or</em> when the attribute does not exist on the element, the
-   *         same attribute from the parent of the given element (which is convenient for tests with form-fields).
+   * same attribute from the parent of the given element (which is convenient for tests with form-fields).
    */
   public static String getAttribute(WebElement element, String attributeName) {
     // find attribute on element (buttons)
@@ -162,7 +162,7 @@ public final class SeleniumUtil {
 
   /**
    * @return a CSS selector for the given model class, with double-quoted strings. Example:<br>
-   *         <code>data-modelclass="com.bsiag.widgets.FooBar$MainBox"</code>
+   * <code>data-modelclass="com.bsiag.widgets.FooBar$MainBox"</code>
    */
   public static String getModelClassCssSelector(Class<?> modelClass) {
     return ATTR_DATA_MODELCLASS + "=\"" + modelClass.getName() + "\"";
@@ -248,8 +248,8 @@ public final class SeleniumUtil {
 
   /**
    * @return the inner text of the given element. Unlike Selenium's {@link WebElement#getText()}, this method returns
-   *         the text even if the element is currently not visible on screen. If there is no text, <code>null</code> is
-   *         returned (instead of the empty string).
+   * the text even if the element is currently not visible on screen. If there is no text, <code>null</code> is
+   * returned (instead of the empty string).
    */
   public static String getText(WebElement element) {
     if (element == null) {

@@ -26,20 +26,19 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 public interface IFormFieldInjection {
   /**
    * @param container
-   *          is the container field that is being added potential injected fields
+   *     is the container field that is being added potential injected fields
    * @param fields
-   *          live and mutable collection of currently (configured) fields, not yet initialized or added to the
-   *          container field
+   *     live and mutable collection of currently (configured) fields, not yet initialized or added to the
+   *     container field
    */
   void injectFields(IFormField container, OrderedCollection<IFormField> fields);
 
   /**
    * @param container
-   *          is the container field the given field classes are created for
+   *     is the container field the given field classes are created for
    * @param fieldList
-   *          live and mutable list of configured field classes (i.e. yet not instantiated)
+   *     live and mutable list of configured field classes (i.e. yet not instantiated)
    * @since 3.8.2 (moved to IFormFieldInjection in 3.10.0-M3)
    */
   void filterFields(IFormField container, List<Class<? extends IFormField>> fieldList);
-
 }

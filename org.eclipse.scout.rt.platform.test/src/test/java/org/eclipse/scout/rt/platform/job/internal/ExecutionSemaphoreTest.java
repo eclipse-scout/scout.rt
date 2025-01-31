@@ -169,10 +169,10 @@ public class ExecutionSemaphoreTest {
 
     // job-9
     Jobs.schedule(() -> {
-      protocol.add("job-9-running");
-    }, Jobs.newInput()
-        .withName("job-9")
-        .withExecutionSemaphore(semaphore))
+          protocol.add("job-9-running");
+        }, Jobs.newInput()
+            .withName("job-9")
+            .withExecutionSemaphore(semaphore))
         .awaitDone();
 
     assertEquals(CollectionUtility.hashSet(

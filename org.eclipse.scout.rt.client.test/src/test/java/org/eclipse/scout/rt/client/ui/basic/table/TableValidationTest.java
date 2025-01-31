@@ -56,8 +56,6 @@ public class TableValidationTest {
       protected boolean getConfiguredEditable() {
         return true;
       }
-
     }
-
   }
 }

@@ -139,7 +139,6 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
             getTable().setTableChanging(true);
             getTable().discardAllRows();
             rowList = getTable().addRows(rowList);
-
           }
           finally {
             getTable().setTableChanging(false);
@@ -307,7 +306,6 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
       }
       colSet.setVisibleColumns(newOrder);
       ClientUIPreferences.getInstance().setAllTableColumnPreferences(newCols.get(0).getTable());
-
     }
 
     @Override

@@ -132,8 +132,8 @@ public class ScoutDataObjectModuleContext {
 
   /**
    * @return <code>true</code> if lenient serialization/deserialization should be used. Non-lenient
-   *         serialization/deserialization will fail if types don't match the expected ones according to the given
-   *         structure.
+   * serialization/deserialization will fail if types don't match the expected ones according to the given
+   * structure.
    */
   public boolean isLenientMode() {
     return BooleanUtility.nvl(get(LENIENT_MODE_KEY, Boolean.class));

@@ -28,7 +28,7 @@ public class BenchLayoutData {
    * Aware the settings are not cached over different browsers nor systems.
    *
    * @param cacheKey
-   *          the key used in the session store of the browser.
+   *     the key used in the session store of the browser.
    * @return this fluent API
    */
   public BenchLayoutData withCacheKey(String cacheKey) {
@@ -153,5 +153,4 @@ public class BenchLayoutData {
     }
     return true;
   }
-
 }

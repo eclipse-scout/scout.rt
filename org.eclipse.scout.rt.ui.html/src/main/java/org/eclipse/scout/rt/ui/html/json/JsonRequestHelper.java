@@ -110,7 +110,7 @@ public class JsonRequestHelper {
 
   /**
    * @return {@link JSONObject} to indicate that the UI is running with an older version of the code and the page has to
-   *         be reloaded.
+   * be reloaded.
    */
   public JSONObject createVersionMismatchResponse() {
     final JsonResponse response = new JsonResponse();
@@ -129,8 +129,8 @@ public class JsonRequestHelper {
 
   /**
    * @param redirectUrl
-   *          optional, URL where to redirect the UI. If <code>null</code>, session is informed about session
-   *          termination, but no redirection happens.
+   *     optional, URL where to redirect the UI. If <code>null</code>, session is informed about session
+   *     termination, but no redirection happens.
    * @return {@link JSONObject} to indicate that the session was terminated.
    */
   public JSONObject createSessionTerminatedResponse(final String redirectUrl) {

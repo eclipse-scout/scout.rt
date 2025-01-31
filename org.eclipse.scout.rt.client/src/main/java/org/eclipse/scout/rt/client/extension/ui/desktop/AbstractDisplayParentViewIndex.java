@@ -56,7 +56,7 @@ public abstract class AbstractDisplayParentViewIndex implements IIndex<IDisplayP
    * returns position where element should be inserted in form list.
    *
    * @param element
-   *          element to calculate position.
+   *     element to calculate position.
    * @return
    */
   protected abstract int calculatePositionForElement(IForm element);
@@ -106,7 +106,7 @@ public abstract class AbstractDisplayParentViewIndex implements IIndex<IDisplayP
    * Returns the elements that correspond to the given index value in the order as inserted.
    *
    * @param index
-   *          the index to look elements for.
+   *     the index to look elements for.
    * @return elements ordered as inserted, or an empty {@link List} if no found.
    */
   public List<IForm> get(final IDisplayParent index) {
@@ -117,7 +117,7 @@ public abstract class AbstractDisplayParentViewIndex implements IIndex<IDisplayP
    * Method invoked to calculate the index value for the given element.
    *
    * @param element
-   *          the element to calculate its index value.
+   *     the element to calculate its index value.
    * @return the index value, or <code>null</code> to not add to the index.
    */
   protected IDisplayParent calculateIndexFor(IForm form) {

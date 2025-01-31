@@ -28,5 +28,4 @@ public interface IBookmarkNode {
    * @return the folder where the bookmark was located for further processing
    */
   BookmarkFolder getParentFolder();
-
 }

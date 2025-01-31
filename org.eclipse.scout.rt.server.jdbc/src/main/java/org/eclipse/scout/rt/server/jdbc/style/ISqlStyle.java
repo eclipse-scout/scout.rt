@@ -31,14 +31,14 @@ import org.eclipse.scout.rt.server.jdbc.SqlBind;
  * <pre>
  * String condition = &quot;AND NVL(start_date, SYSDATE) &gt; :date&quot;;
  * </pre>
- *
+ * <p>
  * the code
  *
  * <pre>
  * {@link ISqlStyle} style = service.getSqlStyle();
  * String condition = &quot;AND &quot; + style.nvl(&quot;start_date&quot;, &quot;end_date&quot;) + &quot;(start_date, end_date) &gt; :date&quot;;
  * </pre>
- *
+ * <p>
  * is used. On Oracle it will be translated to <code>NVL(start_date, end_date)</code>, but when running MSSQL you would
  * get <code>ISNULL(start_date, end_date)</code>
  * </p>
@@ -75,7 +75,7 @@ public interface ISqlStyle extends Serializable {
    * <pre>
    * createNotLike(&quot;P.NAME&quot;, PLAIN_BIND_MARKER_PREFIX + &quot;'%test'&quot;)
    * </pre>
-   *
+   * <p>
    * to generate <code>P.NAME not like '%test'</code> instead of <code>P.NAME not like :'%test'</code>
    */
   String PLAIN_BIND_MARKER_PREFIX = "&";
@@ -101,10 +101,10 @@ public interface ISqlStyle extends Serializable {
    * bind factory see {@link #isBlobEnabled()}, {@link #isClobEnabled()} and {@link #isLargeString(String)}
    *
    * @param o
-   *          the value to be bound. If the value is a {@link IHolder} then its content value is used
+   *     the value to be bound. If the value is a {@link IHolder} then its content value is used
    * @param nullType
-   *          only used in case o is null. If the type is a {@link IHolder} type then its component type is used Ignored
-   *          otherwise.
+   *     only used in case o is null. If the type is a {@link IHolder} type then its component type is used Ignored
+   *     otherwise.
    */
   SqlBind buildBindFor(Object o, Class nullType);
 
@@ -173,7 +173,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * @return <code>true</code> to handle string as <code>CLOB</code> resp. <code>LONG VARCHAR</code> or
-   *         <code>false</code> to handle string as simple {@link String} see {@link #isClobEnabled()}
+   * <code>false</code> to handle string as simple {@link String} see {@link #isClobEnabled()}
    */
   boolean isLargeString(String s);
 
@@ -464,7 +464,7 @@ public interface ISqlStyle extends Serializable {
    * Style can handle arrays as bind or as literal replacement.
    *
    * @return true if calls to {@link ISqlStyle#createInList(String, Object)} or
-   *         {@link ISqlStyle#createNotInList(String, Object)} produce SQL binds.
+   * {@link ISqlStyle#createNotInList(String, Object)} produce SQL binds.
    */
   boolean isCreatingInListGeneratingBind(Object array);
 

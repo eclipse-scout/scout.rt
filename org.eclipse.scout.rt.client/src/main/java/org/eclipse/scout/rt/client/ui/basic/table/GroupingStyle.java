@@ -23,5 +23,4 @@ public enum GroupingStyle {
    * Aggregation rows in table are displayed on the bottom of a row group (default).
    */
   BOTTOM
-
 }

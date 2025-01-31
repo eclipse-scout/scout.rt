@@ -23,7 +23,7 @@ public final class Enums {
    * Null-safe version of {@link IEnum#stringValue()}.
    *
    * @return {@link IEnum#stringValue()} if given {@code enumInstnce} is not {@code null}, returns {@code null}
-   *         otherwise.
+   * otherwise.
    */
   public static String toStringValue(IEnum enumInstance) {
     if (enumInstance == null) {

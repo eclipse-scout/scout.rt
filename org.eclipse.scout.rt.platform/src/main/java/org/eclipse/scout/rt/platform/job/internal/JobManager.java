@@ -236,9 +236,9 @@ public class JobManager implements IJobManager {
    * Creates the Future to be given to {@link ExecutorService} and registers it with this job manager.
    *
    * @param callable
-   *          callable to be given to the executor for execution.
+   *     callable to be given to the executor for execution.
    * @param input
-   *          input that describes the job to be executed.
+   *     input that describes the job to be executed.
    */
   protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final Callable<RESULT> callable, final JobInput input) {
     final RunMonitor runMonitor = Assertions.assertNotNull(input.getRunContext() != null ? input.getRunContext().getRunMonitor() : BEANS.get(RunMonitor.class), "'RunMonitor' required if providing a 'RunContext'");
@@ -323,7 +323,7 @@ public class JobManager implements IJobManager {
    * this.interceptCallableChain(callableChain, future, runMonitor, input);
    * callableChain.addLast(new YourDecorator());
    * </pre>
-   *
+   * <p>
    * To be invoked <strong>before</strong> the super class contributions, you can use constructions of the following
    * form:
    *
@@ -333,7 +333,7 @@ public class JobManager implements IJobManager {
    * </pre>
    *
    * @param callableChain
-   *          the chain to intercept the {@link Callable} before execution.
+   *     the chain to intercept the {@link Callable} before execution.
    */
   protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain, final JobFutureTask<?> future, final RunMonitor runMonitor, final JobInput input) {
     callableChain
@@ -355,7 +355,7 @@ public class JobManager implements IJobManager {
    * Registers the given future.
    *
    * @throws AssertionException
-   *           if the job manager is shut down.
+   *     if the job manager is shut down.
    */
   protected void registerFuture(final JobFutureTask<?> future) {
     m_shutdownLock.readLock().lock();

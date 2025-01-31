@@ -98,5 +98,4 @@ public class JsonAdapterRegistryTest {
 
     desktop.removeDesktopListener(listener, DesktopEvent.TYPE_FORM_SHOW);
   }
-
 }

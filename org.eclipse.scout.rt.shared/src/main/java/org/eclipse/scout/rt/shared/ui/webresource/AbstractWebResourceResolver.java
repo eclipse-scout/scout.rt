@@ -119,8 +119,7 @@ public abstract class AbstractWebResourceResolver implements IWebResourceResolve
 
   /**
    * @return The {@link URL urls} for the resourcePath given or {@code null} or an empty {@link Stream} if the resource
-   *         could not be found.
+   * could not be found.
    */
   protected abstract Stream<URL> getResourceImpl(String resourcePath);
-
 }

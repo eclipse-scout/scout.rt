@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 public interface IChildNodeIndexLookup {
   /**
    * @return the index of this node in its {@link ITreeNode#getParentNode()} child list. If this node has no parent or
-   *         is filtered then -1 is returned.
+   * is filtered then -1 is returned.
    */
   int childNodeIndexOf(ITreeNode node);
 }

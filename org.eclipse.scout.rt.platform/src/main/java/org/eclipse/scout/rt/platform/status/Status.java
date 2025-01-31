@@ -35,7 +35,7 @@ public class Status implements IStatus, Serializable {
 
   /**
    * @param severity
-   *          {@link #ERROR}, {@link #WARNING}, {@link #INFO}
+   *     {@link #ERROR}, {@link #WARNING}, {@link #INFO}
    */
   public Status(int severity) {
     this(null, severity);
@@ -52,7 +52,7 @@ public class Status implements IStatus, Serializable {
    * Status with message and severity.
    *
    * @param severity
-   *          {@link #ERROR}, {@link #WARNING}, {@link #INFO}
+   *     {@link #ERROR}, {@link #WARNING}, {@link #INFO}
    */
   public Status(String message, int severity) {
     this(message, severity, 0);
@@ -62,7 +62,7 @@ public class Status implements IStatus, Serializable {
    * Status with message and severity, error code
    *
    * @param severity
-   *          {@link #ERROR}, {@link #WARNING}, {@link #INFO}
+   *     {@link #ERROR}, {@link #WARNING}, {@link #INFO}
    */
   public Status(String message, int severity, int code) {
     this(message, severity, code, null);
@@ -262,5 +262,4 @@ public class Status implements IStatus, Serializable {
     }
     return true;
   }
-
 }

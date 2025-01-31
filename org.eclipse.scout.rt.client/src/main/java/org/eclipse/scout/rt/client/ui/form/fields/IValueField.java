@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
  * Basic interface for all user fields where user inputs a value
  *
  * @see ITextField, ISmartField, INumberField, IDateField, IFileChooser, IListBox, ITreeBox, ICheckBox, IRadioButton,
- *      IToogleButton
+ * IToogleButton
  */
 public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IResettableFormField {
   /*
@@ -137,7 +137,7 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IResetta
    * Sets if the default system menus (cut, copy, paste) should be added automatically to the menus of this field.
    *
    * @param b
-   *          true if the menus should be available automatically, false otherwise.
+   *     true if the menus should be available automatically, false otherwise.
    */
   void setAutoAddDefaultMenus(boolean b);
 

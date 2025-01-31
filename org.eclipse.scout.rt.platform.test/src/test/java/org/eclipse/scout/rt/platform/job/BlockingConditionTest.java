@@ -61,15 +61,15 @@ public class BlockingConditionTest {
     final P_ExceptionCapturer exceptionCapturer = new P_ExceptionCapturer();
 
     Jobs.schedule(() -> {
-      try {
-        blockingCondition.waitFor(1, TimeUnit.NANOSECONDS, "hint-blocking");
-        fail("TimedOutError expected");
-      }
-      catch (TimedOutError e) {
-        assertFalse("hint not unset", IFuture.CURRENT.get().containsExecutionHint("hint-blocking"));
-      }
-    }, Jobs.newInput()
-        .withExceptionHandling(exceptionCapturer, true))
+          try {
+            blockingCondition.waitFor(1, TimeUnit.NANOSECONDS, "hint-blocking");
+            fail("TimedOutError expected");
+          }
+          catch (TimedOutError e) {
+            assertFalse("hint not unset", IFuture.CURRENT.get().containsExecutionHint("hint-blocking"));
+          }
+        }, Jobs.newInput()
+            .withExceptionHandling(exceptionCapturer, true))
         .awaitDone();
 
     exceptionCapturer.throwOnError();

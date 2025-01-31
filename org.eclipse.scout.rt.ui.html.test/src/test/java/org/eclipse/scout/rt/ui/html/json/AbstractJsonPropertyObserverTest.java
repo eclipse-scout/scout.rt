@@ -123,5 +123,4 @@ public class AbstractJsonPropertyObserverTest {
     Assert.assertNotNull(property);
     Assert.assertEquals(property.modelValue(), CUSTOM);
   }
-
 }

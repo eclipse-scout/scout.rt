@@ -23,5 +23,4 @@ public interface IStringFieldExtension<OWNER extends AbstractStringField> extend
   void execAction(StringFieldLinkActionChain chain);
 
   TransferObject execDragRequest(StringFieldDragRequestChain chain);
-
 }

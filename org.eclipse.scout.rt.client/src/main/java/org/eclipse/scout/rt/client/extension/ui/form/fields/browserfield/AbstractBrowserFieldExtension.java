@@ -29,5 +29,4 @@ public abstract class AbstractBrowserFieldExtension<OWNER extends AbstractBrowse
   public void execExternalWindowStateChanged(BrowserFieldExternalWindowStateChangedChain chain, boolean state) {
     chain.execExternalWindowStateChanged(state);
   }
-
 }

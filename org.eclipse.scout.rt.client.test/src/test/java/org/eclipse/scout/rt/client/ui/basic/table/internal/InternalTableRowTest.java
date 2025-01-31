@@ -172,5 +172,4 @@ public class InternalTableRowTest {
     public class TestColumn extends AbstractStringColumn {
     }
   }
-
 }

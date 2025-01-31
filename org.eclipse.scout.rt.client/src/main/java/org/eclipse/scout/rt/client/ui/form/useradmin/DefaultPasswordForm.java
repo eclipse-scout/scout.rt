@@ -207,5 +207,4 @@ public class DefaultPasswordForm extends AbstractForm {
       ModelJobs.schedule((IRunnable) session::stop, ModelJobs.newInput(ClientRunContexts.empty().withSession(session, false)));
     }
   }
-
 }

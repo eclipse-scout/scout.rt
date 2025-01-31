@@ -48,9 +48,9 @@ class DelayedExecutor {
 
   /**
    * @param executor
-   *          executor to run the 'Dispatch-Loop-Runnable' and execute offered Runnables.
+   *     executor to run the 'Dispatch-Loop-Runnable' and execute offered Runnables.
    * @param threadName
-   *          the thread-name of the 'Dispatch-Loop-Runnable'.
+   *     the thread-name of the 'Dispatch-Loop-Runnable'.
    */
   DelayedExecutor(final ExecutorService executor, final String threadName) {
     m_executor = executor;
@@ -66,9 +66,9 @@ class DelayedExecutor {
    * operation should be done asynchronously within a separate job.
    *
    * @param runnable
-   *          the Runnable to be executed some time in the future.
+   *     the Runnable to be executed some time in the future.
    * @param fireTime
-   *          the time the Runnable should commence execution. Must not be <code>null</code>.
+   *     the time the Runnable should commence execution. Must not be <code>null</code>.
    */
   public void schedule(final Runnable runnable, final Date fireTime) {
     Assertions.assertNotNull(fireTime, "FireTime must not be null");

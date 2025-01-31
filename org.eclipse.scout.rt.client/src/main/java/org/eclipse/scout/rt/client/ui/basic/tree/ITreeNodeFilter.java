@@ -20,5 +20,4 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 public interface ITreeNodeFilter {
 
   boolean accept(ITreeNode node, int level);
-
 }

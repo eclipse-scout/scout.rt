@@ -100,7 +100,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, ITypeWithCla
 
   /**
    * @return true if the lookup results should be displayed multiline for non-multiline ISmartFields <br />
-   *         (Note: This property has no effect if the ISmartField itself is configured multiline)
+   * (Note: This property has no effect if the ISmartField itself is configured multiline)
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(30)
@@ -193,7 +193,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, ITypeWithCla
 
   /**
    * @return {@link TriState#TRUE} if only active rows should be fetched, {@link TriState#FALSE} if only incative rows
-   *         should be fetched and {@link TriState#UNDEFINED} if active and inactive rows should be fetched
+   * should be fetched and {@link TriState#UNDEFINED} if active and inactive rows should be fetched
    */
   @Override
   public TriState getActive() {

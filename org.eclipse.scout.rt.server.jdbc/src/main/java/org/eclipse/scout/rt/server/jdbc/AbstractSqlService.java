@@ -712,8 +712,8 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
 
   /**
    * @return the class loaded by the first bundle with a matching symbolic name Example: name
-   *         "com.myapp.shared.core.security.ReadDataPermission" is loaded by the bundle with symbolic name
-   *         "com.myapp.shared.core".
+   * "com.myapp.shared.core.security.ReadDataPermission" is loaded by the bundle with symbolic name
+   * "com.myapp.shared.core".
    */
   @SuppressWarnings("squid:S1643")
   private Class loadBundleClassLenient(Map<String, List<Class<?>>> map, String name) {

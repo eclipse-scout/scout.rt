@@ -139,7 +139,7 @@ public abstract class AbstractFormMenu<FORM extends IForm> extends AbstractMenu 
    * first time.
    *
    * @param form
-   *          the {@link IForm} to be initialized.
+   *     the {@link IForm} to be initialized.
    */
   @ConfigOperation
   @Order(120)

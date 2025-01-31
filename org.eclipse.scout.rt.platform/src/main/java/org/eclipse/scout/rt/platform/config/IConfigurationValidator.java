@@ -29,9 +29,9 @@ public interface IConfigurationValidator {
    * and it may log some details. This helps to log all errors instead of only showing the first.
    *
    * @param key
-   *          The key to validate.
+   *     The key to validate.
    * @param value
-   *          The value of the property to validate.
+   *     The value of the property to validate.
    * @return {@code true} if the given pair is accepted. {@code false} if it is invalid or this validator cannot decide.
    */
   boolean isValid(String key, String value);

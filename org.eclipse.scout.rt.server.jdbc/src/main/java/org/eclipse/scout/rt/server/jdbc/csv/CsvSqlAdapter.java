@@ -51,29 +51,29 @@ public class CsvSqlAdapter {
    * Export a table's data into a file
    *
    * @param f
-   *          file to write data to
+   *     file to write data to
    * @param contentLocale
-   *          see {@link CsvHelper}
+   *     see {@link CsvHelper}
    * @param colSeparator
-   *          see {@link CsvHelper}
+   *     see {@link CsvHelper}
    * @param textDelimiter
-   *          see {@link CsvHelper}
+   *     see {@link CsvHelper}
    * @param tableName
-   *          database table to export from
+   *     database table to export from
    * @param groupKeyColumnName
-   *          the column where the id for this import is stored (or null if not used)
+   *     the column where the id for this import is stored (or null if not used)
    * @param groupKeyValue
-   *          the id for this csv import
+   *     the id for this csv import
    * @param lineNumberColumnName
-   *          where the line number starting with 1 is stored
+   *     where the line number starting with 1 is stored
    * @param csvColumnNames
-   *          the names that should appear in the csv file
+   *     the names that should appear in the csv file
    * @param writeColumnNames
-   *          the sql names that are exported
+   *     the sql names that are exported
    * @param csvColumnTypes
-   *          the csv types of the corresponding column
+   *     the csv types of the corresponding column
    * @param writeColumnTypes
-   *          the sql types of the corresponding column
+   *     the sql types of the corresponding column
    */
   @SuppressWarnings("squid:S00107")
   public void exportDataFromTable(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String tableName, String groupKeyColumnName, Object groupKeyValue, String lineNumberColumnName,
@@ -106,25 +106,25 @@ public class CsvSqlAdapter {
    * Export sql select data into a file
    *
    * @param f
-   *          file to write data to
+   *     file to write data to
    * @param contentLocale
-   *          see {@link CsvHelper}
+   *     see {@link CsvHelper}
    * @param colSeparator
-   *          see {@link CsvHelper}
+   *     see {@link CsvHelper}
    * @param textDelimiter
-   *          see {@link CsvHelper}
+   *     see {@link CsvHelper}
    * @param sqlSelect
-   *          the source sql statement
+   *     the source sql statement
    * @param bindBase
-   *          the necessary jdbc binds
+   *     the necessary jdbc binds
    * @param csvColumnNames
-   *          the names that should appear in the csv file
+   *     the names that should appear in the csv file
    * @param writeColumnNames
-   *          the sql names that are exported
+   *     the sql names that are exported
    * @param csvColumnTypes
-   *          the csv types of the corresponding column
+   *     the csv types of the corresponding column
    * @param writeColumnTypes
-   *          the sql types of the corresponding column
+   *     the sql types of the corresponding column
    */
   @SuppressWarnings("squid:S00107")
   public void exportDataWithSql(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String sqlSelect, NVPair[] bindBase, List<String> csvColumnNames, boolean writeColumnNames,
@@ -181,7 +181,7 @@ public class CsvSqlAdapter {
     else {
       StringBuilder buf = new StringBuilder();
       buf.append("SELECT ");
-      for (Iterator<String> it = cols.iterator(); it.hasNext();) {
+      for (Iterator<String> it = cols.iterator(); it.hasNext(); ) {
         String colName = it.next();
         buf.append(colName);
         if (it.hasNext()) {

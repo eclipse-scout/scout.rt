@@ -46,9 +46,9 @@ public class PropertiesUtility {
    * </ol>
    *
    * @param properties
-   *          {@link Properties} object
+   *     {@link Properties} object
    * @param failOnProblems
-   *          true to throw {@link IllegalArgumentException} on problems, false to just log as debug
+   *     true to throw {@link IllegalArgumentException} on problems, false to just log as debug
    */
   public static void resolveVariables(Properties properties, boolean failOnProblems) {
     BinaryOperator<String> variableReplacer = (key, variableName) -> {
@@ -73,9 +73,9 @@ public class PropertiesUtility {
    * </ol>
    *
    * @param properties
-   *          properties map (key -> value)
+   *     properties map (key -> value)
    * @param failOnProblems
-   *          true to throw {@link IllegalArgumentException} on problems, false to just log as debug
+   *     true to throw {@link IllegalArgumentException} on problems, false to just log as debug
    */
   public static void resolveVariables(Map<String, String> properties, boolean failOnProblems) {
     BinaryOperator<String> variableReplacer = (key, variableName) -> {
@@ -93,11 +93,11 @@ public class PropertiesUtility {
    * Find override value of ky using the variable replacer
    *
    * @param propertyKey
-   *          The property key.
+   *     The property key.
    * @param variableReplacer
-   *          maps a variable name to its variable value
+   *     maps a variable name to its variable value
    * @return A {@link String} with the original value of this property key or the replaced value due to a System
-   *         property or env value override with the same name as the property key.
+   * property or env value override with the same name as the property key.
    */
   public static String resolveKeyOverride(String propertyKey, BinaryOperator<String> variableReplacer) {
     return variableReplacer.apply(propertyKey, propertyKey);
@@ -108,14 +108,14 @@ public class PropertiesUtility {
    * application context.
    *
    * @param propertyKey
-   *          The key of the property to resolve.
+   *     The key of the property to resolve.
    * @param value
-   *          The expression to resolve.
+   *     The expression to resolve.
    * @param variablePattern
-   *          The pattern for variables, such as <code>${var}</code>. The pattern must contain group(1) as the variable
-   *          name upon a match.
+   *     The pattern for variables, such as <code>${var}</code>. The pattern must contain group(1) as the variable
+   *     name upon a match.
    * @param variableReplacer
-   *          maps a variable name to its variable value
+   *     maps a variable name to its variable value
    * @return A {@link String} where all variables have been replaced with their values.
    */
   @SuppressWarnings("squid:S1149")

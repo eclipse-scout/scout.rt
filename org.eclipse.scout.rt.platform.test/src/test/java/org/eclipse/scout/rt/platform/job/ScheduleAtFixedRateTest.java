@@ -215,19 +215,19 @@ public class ScheduleAtFixedRateTest {
   public void testSwallowException() {
     final AtomicInteger counter = new AtomicInteger();
     Jobs.getJobManager().schedule(() -> {
-      if (counter.incrementAndGet() == 2) {
-        RunMonitor.CURRENT.get().cancel(false);
-      }
-      else {
-        throw new Exception("expected JUnit test exception");
-      }
-    }, Jobs.newInput()
-        .withRunContext(RunContexts.empty())
-        .withExceptionHandling(null, true/* swallow */ )
-        .withExecutionTrigger(Jobs.newExecutionTrigger()
-            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                .withIntervalInMilliseconds(1)
-                .repeatForever())))
+          if (counter.incrementAndGet() == 2) {
+            RunMonitor.CURRENT.get().cancel(false);
+          }
+          else {
+            throw new Exception("expected JUnit test exception");
+          }
+        }, Jobs.newInput()
+            .withRunContext(RunContexts.empty())
+            .withExceptionHandling(null, true/* swallow */)
+            .withExecutionTrigger(Jobs.newExecutionTrigger()
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                    .withIntervalInMilliseconds(1)
+                    .repeatForever())))
         .awaitDone(10, TimeUnit.SECONDS);
     assertEquals(2, counter.get());
   }
@@ -236,19 +236,19 @@ public class ScheduleAtFixedRateTest {
   public void testPropagatedException() {
     final AtomicInteger counter = new AtomicInteger();
     Jobs.getJobManager().schedule(() -> {
-      if (counter.incrementAndGet() == 2) {
-        RunMonitor.CURRENT.get().cancel(false);
-      }
-      else {
-        throw new Exception("expected JUnit test exception");
-      }
-    }, Jobs.newInput()
-        .withRunContext(RunContexts.empty())
-        .withExceptionHandling(null, false /* propagated */ )
-        .withExecutionTrigger(Jobs.newExecutionTrigger()
-            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                .withIntervalInMilliseconds(1)
-                .repeatForever())))
+          if (counter.incrementAndGet() == 2) {
+            RunMonitor.CURRENT.get().cancel(false);
+          }
+          else {
+            throw new Exception("expected JUnit test exception");
+          }
+        }, Jobs.newInput()
+            .withRunContext(RunContexts.empty())
+            .withExceptionHandling(null, false /* propagated */)
+            .withExecutionTrigger(Jobs.newExecutionTrigger()
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                    .withIntervalInMilliseconds(1)
+                    .repeatForever())))
         .awaitDone(10, TimeUnit.SECONDS);
     assertEquals(1, counter.get());
   }
@@ -260,18 +260,18 @@ public class ScheduleAtFixedRateTest {
 
     final AtomicInteger counter = new AtomicInteger();
     Jobs.getJobManager().schedule(() -> {
-      if (counter.incrementAndGet() == 2) {
-        RunMonitor.CURRENT.get().cancel(false);
-      }
-      else {
-        throw new Exception("expected JUnit test exception");
-      }
-    }, Jobs.newInput()
-        .withRunContext(RunContexts.empty())
-        .withExecutionTrigger(Jobs.newExecutionTrigger()
-            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                .withIntervalInMilliseconds(1)
-                .repeatForever())))
+          if (counter.incrementAndGet() == 2) {
+            RunMonitor.CURRENT.get().cancel(false);
+          }
+          else {
+            throw new Exception("expected JUnit test exception");
+          }
+        }, Jobs.newInput()
+            .withRunContext(RunContexts.empty())
+            .withExecutionTrigger(Jobs.newExecutionTrigger()
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                    .withIntervalInMilliseconds(1)
+                    .repeatForever())))
         .awaitDone(10, TimeUnit.SECONDS);
     assertEquals(1, counter.get());
   }
@@ -280,12 +280,12 @@ public class ScheduleAtFixedRateTest {
   public void testRepetiveWithTotalCount() {
     final AtomicInteger counter = new AtomicInteger();
     Jobs.getJobManager().schedule(() -> {
-      counter.incrementAndGet();
-    }, Jobs.newInput()
-        .withExecutionTrigger(Jobs.newExecutionTrigger()
-            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                .withIntervalInSeconds(1) // with 1s, no consolidation should be occur.
-                .withRepeatCount(3))))
+          counter.incrementAndGet();
+        }, Jobs.newInput()
+            .withExecutionTrigger(Jobs.newExecutionTrigger()
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                    .withIntervalInSeconds(1) // with 1s, no consolidation should be occur.
+                    .withRepeatCount(3))))
         .awaitDone(10, TimeUnit.SECONDS);
     assertEquals(4, counter.get());
   }
@@ -294,13 +294,13 @@ public class ScheduleAtFixedRateTest {
   public void testRepetiveWithEndTime() {
     final AtomicInteger counter = new AtomicInteger();
     Jobs.getJobManager().schedule(() -> {
-      counter.incrementAndGet();
-    }, Jobs.newInput()
-        .withExecutionTrigger(Jobs.newExecutionTrigger()
-            .withEndIn(1, TimeUnit.SECONDS)
-            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                .withIntervalInMilliseconds(1)
-                .repeatForever())))
+          counter.incrementAndGet();
+        }, Jobs.newInput()
+            .withExecutionTrigger(Jobs.newExecutionTrigger()
+                .withEndIn(1, TimeUnit.SECONDS)
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                    .withIntervalInMilliseconds(1)
+                    .repeatForever())))
         .awaitDone(10, TimeUnit.SECONDS);
 
     assertTrue(counter.get() > 10);

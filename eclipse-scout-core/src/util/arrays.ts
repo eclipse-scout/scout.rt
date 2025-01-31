@@ -234,7 +234,7 @@ export const arrays = {
     if (arr.length === 0) {
       return elements;
     }
-    for (let i= 0; i < arr.length; i++) {
+    for (let i = 0; i < arr.length; i++) {
       if (i === position) {
         elements.push(elementToMove);
       }

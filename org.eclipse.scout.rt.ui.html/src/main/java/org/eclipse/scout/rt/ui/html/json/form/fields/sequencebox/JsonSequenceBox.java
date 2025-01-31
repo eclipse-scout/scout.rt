@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 
 /**
  * @param <T>
- *          Model of SequenceBox
+ *     Model of SequenceBox
  */
 public class JsonSequenceBox<T extends ISequenceBox> extends JsonCompositeField<T, IFormField> {
 

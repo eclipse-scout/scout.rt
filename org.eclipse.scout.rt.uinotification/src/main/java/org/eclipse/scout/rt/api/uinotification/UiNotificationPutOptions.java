@@ -23,8 +23,8 @@ public class UiNotificationPutOptions {
 
   /**
    * @param timeout
-   *          Time in milliseconds before the notification expires and can be removed from the registry by the cleanup
-   *          job.
+   *     Time in milliseconds before the notification expires and can be removed from the registry by the cleanup
+   *     job.
    */
   public UiNotificationPutOptions withTimeout(Long timeout) {
     m_timeout = timeout;
@@ -37,8 +37,8 @@ public class UiNotificationPutOptions {
 
   /**
    * @param transactional
-   *          Whether the notification should be put into the registry only if the current transaction is committed
-   *          successfully or not. Default is {@code true}.
+   *     Whether the notification should be put into the registry only if the current transaction is committed
+   *     successfully or not. Default is {@code true}.
    */
   public UiNotificationPutOptions withTransactional(Boolean transactional) {
     m_transactional = transactional;
@@ -51,7 +51,7 @@ public class UiNotificationPutOptions {
 
   /**
    * @param publishOverCluster
-   *          Whether the notification is published to all other cluster nodes or not. Default is {@code true}.
+   *     Whether the notification is published to all other cluster nodes or not. Default is {@code true}.
    */
   public UiNotificationPutOptions withPublishOverCluster(Boolean publishOverCluster) {
     m_publishOverCluster = publishOverCluster;

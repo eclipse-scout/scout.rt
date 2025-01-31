@@ -97,7 +97,6 @@ public class VerticalGridMatrix implements IGridMatrix {
       }
     }
     return true;
-
   }
 
   private void reorganizeGridAbove(int x, int y, int w) {
@@ -155,7 +154,6 @@ public class VerticalGridMatrix implements IGridMatrix {
     m_cursor.reset();
     m_cells.putAll(reorgMatrix.getCells());
     m_fieldGridDatas.putAll(reorgMatrix.getFieldGridDatas());
-
   }
 
   private boolean nextFree(int w, int h) {

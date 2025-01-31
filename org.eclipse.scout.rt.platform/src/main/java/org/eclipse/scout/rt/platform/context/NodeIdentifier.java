@@ -39,8 +39,8 @@ public class NodeIdentifier {
   /**
    * Returns the identifier of the current node.
    *
-   * @deprecated Use typed {@link org.eclipse.scout.rt.dataobject.id.NodeId} instead
    * @see org.eclipse.scout.rt.dataobject.id.NodeId#current()
+   * @deprecated Use typed {@link org.eclipse.scout.rt.dataobject.id.NodeId} instead
    */
   @Deprecated
   public String get() {

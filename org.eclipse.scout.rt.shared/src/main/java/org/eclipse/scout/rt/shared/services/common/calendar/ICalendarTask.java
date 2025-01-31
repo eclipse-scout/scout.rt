@@ -28,5 +28,4 @@ public interface ICalendarTask extends ICalendarItem {
   Date getComplete();
 
   void setComplete(Date a);
-
 }

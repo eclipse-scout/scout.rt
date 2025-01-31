@@ -52,9 +52,9 @@ public class DataObjectSignatureComparator {
 
   /**
    * @param oldTypeName
-   *          Old {@link TypeName}
+   *     Old {@link TypeName}
    * @param newTypeName
-   *          New {@link TypeName}
+   *     New {@link TypeName}
    */
   public void addTypeNameRenaming(String oldTypeName, String newTypeName) {
     m_typeNameRenamings.put(oldTypeName, newTypeName);
@@ -62,9 +62,9 @@ public class DataObjectSignatureComparator {
 
   /**
    * @param oldEnumName
-   *          Old {@link EnumName}
+   *     Old {@link EnumName}
    * @param newEnumName
-   *          New {@link EnumName}
+   *     New {@link EnumName}
    */
   public void addEnumNameRenaming(String oldEnumName, String newEnumName) {
     m_enumNameRenamings.put(oldEnumName, newEnumName);
@@ -72,9 +72,9 @@ public class DataObjectSignatureComparator {
 
   /**
    * @param oldTypeId
-   *          Old {@link IdTypeName}
+   *     Old {@link IdTypeName}
    * @param newTypeId
-   *          New {@link IdTypeName}
+   *     New {@link IdTypeName}
    */
   public void addTypeIdRenaming(String oldTypeId, String newTypeId) {
     m_typeIdRenamings.put(oldTypeId, newTypeId);
@@ -82,9 +82,9 @@ public class DataObjectSignatureComparator {
 
   /**
    * @param oldClassName
-   *          Old fully qualified class name
+   *     Old fully qualified class name
    * @param newClassName
-   *          New fully qualified class name
+   *     New fully qualified class name
    */
   public void addClassNameRenaming(String oldClassName, String newClassName) {
     m_classNameRenamings.put(oldClassName, newClassName);

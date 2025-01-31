@@ -47,25 +47,25 @@ public final class BinaryResource implements Serializable {
 
   /**
    * @param filename
-   *          A valid file name (with or without path information), preferably with file extension to allow automatic
-   *          detection of MIME type. Examples: <code>"image.jpg"</code>, <code>"icons/eye.png"</code>
+   *     A valid file name (with or without path information), preferably with file extension to allow automatic
+   *     detection of MIME type. Examples: <code>"image.jpg"</code>, <code>"icons/eye.png"</code>
    * @param contentType
-   *          MIME type of the resource. Example: <code>"image/jpeg"</code>. If this value is omitted, it is recommended
-   *          to ensure that the argument <i>filename</i> has a valid file extension, which can then be used to
-   *          determine the MIME type.
-   *          <p>
-   *          null contentType is replaced by {@link FileUtility#getMimeType(java.nio.file.Path)}
+   *     MIME type of the resource. Example: <code>"image/jpeg"</code>. If this value is omitted, it is recommended
+   *     to ensure that the argument <i>filename</i> has a valid file extension, which can then be used to
+   *     determine the MIME type.
+   *     <p>
+   *     null contentType is replaced by {@link FileUtility#getMimeType(java.nio.file.Path)}
    * @param charset
    * @param content
-   *          The resource's content as byte array. The fingerprint for the given content is calculated automatically.
+   *     The resource's content as byte array. The fingerprint for the given content is calculated automatically.
    * @param lastModified
-   *          default -1
-   *          <p>
-   *          "Last modified" timestamp of the resource (in milliseconds a.k.a. UNIX time). <code>-1</code> if unknown.
+   *     default -1
+   *     <p>
+   *     "Last modified" timestamp of the resource (in milliseconds a.k.a. UNIX time). <code>-1</code> if unknown.
    * @param cachingAllowed
-   *          default false
+   *     default false
    * @param cacheMaxAge
-   *          default 0
+   *     default 0
    */
   // explicitly package private, only called by BinaryResources and second constructor
   @SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
@@ -134,7 +134,7 @@ public final class BinaryResource implements Serializable {
 
   /**
    * @return the charset (character encoding), as passed to the constructor. May be <code>null</code> for non-text
-   *         resources.
+   * resources.
    */
   public String getCharset() {
     return m_charset;
@@ -178,8 +178,8 @@ public final class BinaryResource implements Serializable {
 
   /**
    * @return a checksum-style fingerprint of the binary content. This fingerprint was calculated during the constructor
-   *         by applying the Adler32 algorithm to the content. If the content is <code>null</code>, this method returns
-   *         <code>-1</code>.
+   * by applying the Adler32 algorithm to the content. If the content is <code>null</code>, this method returns
+   * <code>-1</code>.
    */
   public long getFingerprint() {
     return m_fingerprint;
@@ -210,7 +210,7 @@ public final class BinaryResource implements Serializable {
 
   /**
    * @return a new {@link BinaryResource} that represents the same content, but has another name with the same file
-   *         extension
+   * extension
    */
   public BinaryResource createAliasWithSameExtension(String newNameWithoutExtension) {
     String fileExtension = FileUtility.getFileExtension(m_filename);

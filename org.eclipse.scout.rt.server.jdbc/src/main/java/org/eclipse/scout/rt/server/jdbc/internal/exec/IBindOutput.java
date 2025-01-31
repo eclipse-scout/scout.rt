@@ -38,5 +38,4 @@ interface IBindOutput {
   void setReplaceToken(ISqlStyle style);
 
   void consumeValue(Object value);
-
 }

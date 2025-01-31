@@ -44,7 +44,7 @@ public interface ITableCompactHandler {
    * Processes the html template and creates a string based on the values of the bean.
    *
    * @param bean
-   *          the bean that contains the data for a specific row
+   *     the bean that contains the data for a specific row
    * @return the final string ready to be displayed. It contains html, so make sure html is enabled for the target.
    */
   String buildValue(CompactBean bean);
@@ -67,8 +67,8 @@ public interface ITableCompactHandler {
 
   /**
    * @param maxContentLines
-   *          the maximum number of lines in the content block. If {@link #isMoreLinkAvailable()} is true and the more
-   *          link would only reveal one line, the number is automatically increased by 1.
+   *     the maximum number of lines in the content block. If {@link #isMoreLinkAvailable()} is true and the more
+   *     link would only reveal one line, the number is automatically increased by 1.
    */
   ITableCompactHandler withMaxContentLines(int maxContentLines);
 

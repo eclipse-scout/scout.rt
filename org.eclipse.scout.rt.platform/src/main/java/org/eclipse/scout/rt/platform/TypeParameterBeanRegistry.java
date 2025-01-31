@@ -57,7 +57,7 @@ public class TypeParameterBeanRegistry<BEAN> {
    * Registers the given beans.
    *
    * @return A token representing the registration of the given beans. This token can later be used to unregister the
-   *         beans.
+   * beans.
    */
   public IRegistrationHandle registerBeans(final List<BEAN> beans) {
     final List<IRegistrationHandle> registrations = new ArrayList<>();
@@ -77,7 +77,7 @@ public class TypeParameterBeanRegistry<BEAN> {
    * Registers the given bean by using its (first) generic type parameter as key.
    *
    * @return A token representing the registration of the given bean. This token can later be used to unregister the
-   *         bean.
+   * bean.
    */
   public IRegistrationHandle registerBean(final BEAN bean) {
     final Class genericTypeParameter = TypeCastUtility.getGenericsParameterClass(bean.getClass(), m_beanType);
@@ -88,7 +88,7 @@ public class TypeParameterBeanRegistry<BEAN> {
    * Registers the given bean using the given {@code genericTypeParameter} as key.
    *
    * @return A token representing the registration of the given bean. This token can later be used to unregister the
-   *         bean.
+   * bean.
    */
   public IRegistrationHandle registerBean(final BEAN bean, final Class<?> genericTypeParameter) {
     m_computedLookupTypes.clear();
@@ -114,7 +114,7 @@ public class TypeParameterBeanRegistry<BEAN> {
    * </p>
    *
    * @param lookupType
-   *          generic parameter type, not <code>null</code>.
+   *     generic parameter type, not <code>null</code>.
    */
   public List<BEAN> getBeans(final Class<?> lookupType) {
     updateLookupTypeHierarchyIndex(lookupType);

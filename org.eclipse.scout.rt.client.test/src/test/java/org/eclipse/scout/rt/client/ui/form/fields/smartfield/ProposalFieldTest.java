@@ -254,7 +254,6 @@ public class ProposalFieldTest {
     protected ILookupService<Long> createLookupService() {
       return new P_LookupService();
     }
-
   }
 
   public static class P_LookupService implements ILookupService<Long> {

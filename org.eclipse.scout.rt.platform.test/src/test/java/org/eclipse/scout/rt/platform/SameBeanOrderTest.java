@@ -63,5 +63,4 @@ public class SameBeanOrderTest {
   private static class BBean implements ITestBean {
 
   }
-
 }

@@ -92,7 +92,7 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData i
 
   /**
    * @return Creates, adds and returns a new {@link AbstractTableRowData}. Its row state is initialized with
-   *         {@link AbstractTableRowData#STATUS_NON_CHANGED} and its type is the one returned by {@link #getRowType()}.
+   * {@link AbstractTableRowData#STATUS_NON_CHANGED} and its type is the one returned by {@link #getRowType()}.
    */
   @Override
   public AbstractTableRowData addRow() {
@@ -120,7 +120,7 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData i
 
   /**
    * @return Creates a new {@link AbstractTableRowData} without adding it to this {@link AbstractTableFieldBeanData}.
-   *         Its actual type is the one returned by {@link #getRowType()}.
+   * Its actual type is the one returned by {@link #getRowType()}.
    */
   public abstract AbstractTableRowData createRow();
 

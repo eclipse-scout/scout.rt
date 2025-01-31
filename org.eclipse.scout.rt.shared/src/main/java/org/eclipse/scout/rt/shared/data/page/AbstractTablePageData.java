@@ -51,7 +51,7 @@ public abstract class AbstractTablePageData extends AbstractTableFieldBeanData {
    * limited.
    *
    * @return Returns <code>true</code> if the rows of this table page data contain only a subset of the records
-   *         available in the data source. Otherwise <code>false</code>.
+   * available in the data source. Otherwise <code>false</code>.
    */
   public boolean isLimitedResult() {
     return m_limitedResult;
@@ -80,7 +80,7 @@ public abstract class AbstractTablePageData extends AbstractTableFieldBeanData {
    * bean has been limited.
    *
    * @param estimatedRowCount
-   *          an estimation of the total available row count, 0 by default (not set)
+   *     an estimation of the total available row count, 0 by default (not set)
    * @since 9.0
    */
   public void setEstimatedRowCount(long estimatedRowCount) {

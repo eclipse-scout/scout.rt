@@ -28,9 +28,9 @@ public class Coordinates implements Serializable {
 
   /**
    * @param latitude
-   *          Latitude (φ, y coordinate)
+   *     Latitude (φ, y coordinate)
    * @param longitude
-   *          Longitude (λ, x coordinate)
+   *     Longitude (λ, x coordinate)
    */
   public Coordinates(String latitude, String longitude) {
     m_latitude = latitude;
@@ -39,9 +39,9 @@ public class Coordinates implements Serializable {
 
   /**
    * @param latitude
-   *          Latitude (φ, y coordinate)
+   *     Latitude (φ, y coordinate)
    * @param longitude
-   *          Longitude (λ, x coordinate)
+   *     Longitude (λ, x coordinate)
    */
   public Coordinates(BigDecimal latitude, BigDecimal longitude) {
     m_latitude = (latitude == null ? null : latitude.toPlainString());

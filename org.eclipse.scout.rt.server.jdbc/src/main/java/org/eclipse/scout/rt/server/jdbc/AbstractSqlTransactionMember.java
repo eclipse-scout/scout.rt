@@ -24,7 +24,9 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
   private final HashSet<Statement> m_activeStatements = new HashSet<>();
   private boolean m_cancelled;
 
-  /** true during completion phase (commit/rollback) */
+  /**
+   * true during completion phase (commit/rollback)
+   */
   private boolean m_finishingTransaction;
 
   public AbstractSqlTransactionMember(String transactionMemberId) {
@@ -45,7 +47,7 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
    * {@link org.eclipse.scout.rt.platform.transaction.ITransaction#cancel(boolean)}
    *
    * @param statement
-   *          the statement to be registered
+   *     the statement to be registered
    * @throws SQLException
    */
   public void registerActiveStatement(Statement statement) throws SQLException {
@@ -61,7 +63,7 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
    * Removes a statement
    *
    * @param statement
-   *          the statement to be removed
+   *     the statement to be removed
    */
   public void unregisterActiveStatement(Statement statement) {
     synchronized (m_activeStatementsLock) {

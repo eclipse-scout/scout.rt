@@ -25,7 +25,7 @@ public class JsonPropertyChangeEvent extends JsonEvent {
 
   /**
    * @param target
-   *          Event target (usually, an adapter ID)
+   *     Event target (usually, an adapter ID)
    */
   public JsonPropertyChangeEvent(String target) {
     super(target, JsonEventType.PROPERTY.getEventType(), null);

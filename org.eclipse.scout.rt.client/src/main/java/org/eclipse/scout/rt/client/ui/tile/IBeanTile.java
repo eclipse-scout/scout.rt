@@ -22,5 +22,4 @@ public interface IBeanTile<BEAN> extends ITile, IAppLinkCapable {
   BEAN getBean();
 
   void setBean(BEAN bean);
-
 }

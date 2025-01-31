@@ -92,7 +92,6 @@ public class ReUseVsReplaceTest {
 
     Assert.assertEquals(FooParamEx2.class, context.getBean(FooParamEx2.class).getBeanClazz());
     Assert.assertEquals(1, context.getBeans(FooParamEx2.class).size());
-
   }
 
   private static class FooParam {
@@ -114,5 +113,4 @@ public class ReUseVsReplaceTest {
   @Replace
   private static class FooParamEx1Ex extends FooParamEx1 {
   }
-
 }

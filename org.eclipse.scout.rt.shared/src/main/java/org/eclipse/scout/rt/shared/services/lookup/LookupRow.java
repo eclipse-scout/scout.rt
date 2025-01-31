@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * Row representing a result of a lookup.
  *
  * @param <ID_TYPE>
- *          type of the lookup key
+ *     type of the lookup key
  */
 public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookupRow<ID_TYPE> {
   private static final long serialVersionUID = 0L;
@@ -54,22 +54,22 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
    * Creates a new lookup row with the given cells as data.
    *
    * @param cells
-   *          array containing the following values:<br>
-   *          Object key (use keyClass to specify the type of the key) <br>
-   *          String text <br>
-   *          String iconId <br>
-   *          String tooltip <br>
-   *          String background color <br>
-   *          String foreground color <br>
-   *          String font <br>
-   *          Boolean enabled <br>
-   *          Object parentKey used in hierarchical structures to point to the parents primary key <br>
-   *          Boolean active (0,1) see {@link TriState#parse(Object)}
+   *     array containing the following values:<br>
+   *     Object key (use keyClass to specify the type of the key) <br>
+   *     String text <br>
+   *     String iconId <br>
+   *     String tooltip <br>
+   *     String background color <br>
+   *     String foreground color <br>
+   *     String font <br>
+   *     Boolean enabled <br>
+   *     Object parentKey used in hierarchical structures to point to the parents primary key <br>
+   *     Boolean active (0,1) see {@link TriState#parse(Object)}
    * @param maxColumnIndex
-   *          index describing the last column in cells that should be evaluated
+   *     index describing the last column in cells that should be evaluated
    * @param keyClass
-   *          Describes the class of the key column (first column) in the given cells. This must correspond to the
-   *          generic type of this lookup row.
+   *     Describes the class of the key column (first column) in the given cells. This must correspond to the
+   *     generic type of this lookup row.
    */
   @SuppressWarnings("unchecked")
   public LookupRow(Object[] cells, int maxColumnIndex, Class<?> keyClass) {

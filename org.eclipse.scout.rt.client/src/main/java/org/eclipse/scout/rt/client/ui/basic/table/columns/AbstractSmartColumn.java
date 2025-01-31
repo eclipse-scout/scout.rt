@@ -148,7 +148,7 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
    * Subclasses can override this method. Default is {@code false}.
    *
    * @return {@code true} if data behind the smart column is hierarchical (and the smartfield should represent it that
-   *         way), {@code false} otherwise.
+   * way), {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(310)
@@ -173,7 +173,7 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
 
   /**
    * @return true: inactive rows are display together with active rows<br>
-   *         false: inactive rows ae only displayed when selected by the model
+   * false: inactive rows ae only displayed when selected by the model
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
@@ -321,7 +321,6 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
           }
         }
       }
-
     }
     catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
@@ -476,7 +475,6 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
     public void execPrepareLookup(SmartColumnPrepareLookupChain<VALUE> chain, ILookupCall<VALUE> call, ITableRow row) {
       getOwner().execPrepareLookup(call, row);
     }
-
   }
 
   /**
@@ -523,5 +521,4 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
       menus.addAllOrdered(contributedMenus);
     }
   }
-
 }

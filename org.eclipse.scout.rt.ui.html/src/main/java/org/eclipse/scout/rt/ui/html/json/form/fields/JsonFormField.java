@@ -342,5 +342,4 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
   protected void handleModelContextMenuCurrentMenuTypesChanged(Set<? extends IMenuType> currentMenuTypes) {
     addPropertyChangeEvent(PROP_CURRENT_MENU_TYPES, menuTypesToJson(currentMenuTypes));
   }
-
 }

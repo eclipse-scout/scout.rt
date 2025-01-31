@@ -79,5 +79,4 @@ public class ClientNotificationNodeQueueTest {
       m_queue.put(new ClientNotificationMessage(allNodes, "test" + i, true, "cid"));
     }
   }
-
 }

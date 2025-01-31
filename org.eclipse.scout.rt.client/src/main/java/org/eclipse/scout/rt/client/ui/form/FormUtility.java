@@ -77,9 +77,9 @@ public final class FormUtility {
    * With this method it's possible to set the mark strategy of all tab boxes of the given form.
    *
    * @param form
-   *          the form
+   *     the form
    * @param strategy
-   *          one of {@link ITabBox#MARK_STRATEGY_EMPTY}, {@link ITabBox#MARK_STRATEGY_SAVE_NEEDED}
+   *     one of {@link ITabBox#MARK_STRATEGY_EMPTY}, {@link ITabBox#MARK_STRATEGY_SAVE_NEEDED}
    * @since 3.8.2
    */
   public static void setTabBoxMarkStrategy(IForm form, int strategy) {

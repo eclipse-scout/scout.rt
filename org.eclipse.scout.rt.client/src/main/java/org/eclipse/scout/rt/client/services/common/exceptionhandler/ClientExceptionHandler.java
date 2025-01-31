@@ -75,8 +75,8 @@ public class ClientExceptionHandler extends ExceptionHandler {
         else {
           try {
             ModelJobs.schedule(() -> showException(t), ModelJobs.newInput(ClientRunContexts.copyCurrent())
-                .withExceptionHandling(null, true)
-                .withName("Visualizing PlatformException"))
+                    .withExceptionHandling(null, true)
+                    .withName("Visualizing PlatformException"))
                 .awaitDone();
           }
           catch (final ThreadInterruptedError e) { // NOSONAR

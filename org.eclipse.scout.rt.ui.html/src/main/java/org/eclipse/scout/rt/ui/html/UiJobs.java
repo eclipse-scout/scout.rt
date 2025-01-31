@@ -68,9 +68,9 @@ public class UiJobs {
    * interaction'.
    *
    * @param clientSession
-   *          session to calculate the jobs to wait for; must not be <code>null</code>.
+   *     session to calculate the jobs to wait for; must not be <code>null</code>.
    * @param exceptionHandler
-   *          to handle {@link TimedOutError} or {@link ThreadInterruptedError}.
+   *     to handle {@link TimedOutError} or {@link ThreadInterruptedError}.
    */
   public void awaitModelJobs(final IClientSession clientSession, final Class<? extends ExceptionHandler> exceptionHandler) {
     Assertions.assertNotNull(clientSession, "'ClientSession' must not be null");
@@ -128,14 +128,14 @@ public class UiJobs {
    * interaction'.
    *
    * @param future
-   *          the {@link IFuture} to wait until 'done' or requiring 'user interaction'.
+   *     the {@link IFuture} to wait until 'done' or requiring 'user interaction'.
    * @return the job's result or {@code null} if {@link ModelJobs#EXECUTION_HINT_UI_INTERACTION_REQUIRED} is set.
    * @throws FutureCancelledError
-   *           if the job is cancelled.
+   *     if the job is cancelled.
    * @throws ThreadInterruptedError
-   *           if the current thread is interrupted while waiting for the job to complete.
+   *     if the current thread is interrupted while waiting for the job to complete.
    * @throws RuntimeException
-   *           if the job completed with an exception.
+   *     if the job completed with an exception.
    */
   public <RESULT> RESULT awaitAndGet(final IFuture<RESULT> future) {
     await(new FutureFilter(future));
@@ -157,9 +157,9 @@ public class UiJobs {
    * interaction'.
    *
    * @throws ThreadInterruptedError
-   *           if the current thread is interrupted while waiting for the job to complete.
+   *     if the current thread is interrupted while waiting for the job to complete.
    * @throws TimedOutError
-   *           if the job did not complete within the maximal timeout.
+   *     if the job did not complete within the maximal timeout.
    */
   public void await(final Predicate<IFuture<?>> filter) {
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()

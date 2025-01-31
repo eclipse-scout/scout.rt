@@ -24,5 +24,4 @@ public abstract class AbstractDataModelEntityExtension<OWNER extends AbstractDat
   public void execInitEntity(DataModelEntityInitEntityChain chain) {
     chain.execInitEntity();
   }
-
 }

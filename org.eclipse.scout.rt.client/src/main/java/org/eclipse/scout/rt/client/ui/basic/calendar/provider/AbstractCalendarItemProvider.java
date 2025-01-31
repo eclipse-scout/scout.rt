@@ -107,6 +107,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   /*
    * Configuration
    */
+
   /**
    * @return true, if this calendar item should be draggable in the UI, false otherwise.
    */
@@ -249,7 +250,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
    * @param menus
-   *          live and mutable collection of configured menus
+   *     live and mutable collection of configured menus
    */
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
@@ -322,8 +323,8 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     else {
       try {
         ModelJobs.schedule(() -> {
-          propertySupport.setPropertyBool(PROP_LOAD_IN_PROGRESS, loadInProgress);
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
+              propertySupport.setPropertyBool(PROP_LOAD_IN_PROGRESS, loadInProgress);
+            }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
             .awaitDone();
       }
       catch (ThreadInterruptedError e) { // NOSONAR
@@ -521,5 +522,4 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     CalendarItemProviderAutoAssignItemChain chain = new CalendarItemProviderAutoAssignItemChain(extensions);
     chain.execAutoAssignCalendarItems(item);
   }
-
 }

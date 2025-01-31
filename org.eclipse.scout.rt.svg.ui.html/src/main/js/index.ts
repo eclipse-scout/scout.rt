@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {ObjectFactory} from '@eclipse-scout/core';
+import * as self from './index';
 
 export * from './svg/SvgField';
 export * from './svg/SvgFieldModel';
 export * from './svg/SvgFieldEventMap';
 export * from './svg/SvgFieldAdapter';
-
-import * as self from './index';
 
 export default self;
 

@@ -36,5 +36,4 @@ public interface IPropertyHolder extends IContributionOwner {
    * @param v
    */
   <T extends AbstractPropertyData> void setPropertyByClass(Class<T> c, T v);
-
 }

@@ -94,7 +94,7 @@ public class ClusterMom extends AbstractMomTransport {
    * <strong>scout.mom.cluster.environment[java.naming.provider.url]=failover:(peer://mom/cluster?persistent=false)</strong>
    * scout.mom.cluster.environment[connectionFactoryNames]=ClusterMom
    * </pre>
-   *
+   * <p>
    * Example to start an embedded broker which accepts remote connections from other hosts:
    *
    * <pre>
@@ -104,7 +104,7 @@ public class ClusterMom extends AbstractMomTransport {
    * <strong>scout.mom.cluster.environment[java.naming.provider.url]=vm:(broker:(tcp://0.0.0.0:5050)?persistent=false</strong>
    * scout.mom.cluster.environment[connectionFactoryNames]=ClusterMom
    * </pre>
-   *
+   * <p>
    * Example to connect to a remote broker:
    *
    * <pre>

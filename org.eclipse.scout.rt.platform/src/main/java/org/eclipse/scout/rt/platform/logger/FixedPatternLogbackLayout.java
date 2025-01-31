@@ -102,7 +102,7 @@ public class FixedPatternLogbackLayout extends LayoutBase<ILoggingEvent> {
    * Adds an MDC key rename.
    *
    * @param mdcRename
-   *          Format: [mdc key]=[new name]
+   *     Format: [mdc key]=[new name]
    */
   public void addMdcRename(String mdcRename) {
     String[] parts = mdcRename.split("=", 2);
@@ -120,7 +120,7 @@ public class FixedPatternLogbackLayout extends LayoutBase<ILoggingEvent> {
    * Adds an MDC exclusion.
    *
    * @param mdcKey
-   *          MDC key to exclude from logging.
+   *     MDC key to exclude from logging.
    */
   public void addMdcExclusion(String mdcKey) {
     m_mdcExclusions.add(mdcKey);
@@ -132,7 +132,7 @@ public class FixedPatternLogbackLayout extends LayoutBase<ILoggingEvent> {
    * This is only necessary to override a default exclusion. All non-excluded MDC keys are included by default.
    *
    * @param mdcKey
-   *          MDC key to override exclusion for.
+   *     MDC key to override exclusion for.
    */
   public void addMdcInclusion(String mdcKey) {
     m_mdcExclusions.remove(mdcKey);

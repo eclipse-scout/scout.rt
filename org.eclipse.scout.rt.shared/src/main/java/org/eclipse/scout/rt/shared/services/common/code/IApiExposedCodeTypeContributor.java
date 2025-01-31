@@ -21,8 +21,8 @@ import org.eclipse.scout.rt.platform.Bean;
 public interface IApiExposedCodeTypeContributor extends IApiExposedItemContributor<ICodeType> {
   /**
    * @param codeTypes
-   *          Live {@link Set} of {@link ICodeType} which are published in the Scout REST resource. The {@link Set} may
-   *          be directly modified.
+   *     Live {@link Set} of {@link ICodeType} which are published in the Scout REST resource. The {@link Set} may
+   *     be directly modified.
    */
   @Override
   void contribute(Set<ICodeType> codeTypes);

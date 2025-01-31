@@ -45,10 +45,10 @@ public interface ICode<T> extends ITypeWithClassId, IOrdered {
    * <p>
    * Add a new code as child of this code, overwrite (drop) existing code
    *
-   * @since 4.0
    * @param index
-   *          if index is -1 and the codeId existed before, then it is replaced at the same position. If index is -1 and
-   *          the codeId did not exist, then the code is appended to the end.
+   *     if index is -1 and the codeId existed before, then it is replaced at the same position. If index is -1 and
+   *     the codeId did not exist, then the code is appended to the end.
+   * @since 4.0
    */
   void addChildCodeInternal(int index, ICode<T> code);
 
@@ -58,8 +58,8 @@ public interface ICode<T> extends ITypeWithClassId, IOrdered {
    * <p>
    * Remove a child code of this code
    *
-   * @since 4.0
    * @return the index the code had in the list or -1
+   * @since 4.0
    */
   int removeChildCodeInternal(T codeId);
 

@@ -26,13 +26,13 @@ public final class ClazzUtil {
    * Resolves the concrete class as describes by the given <code>@Clazz</code> annotation.
    *
    * @param annotation
-   *          meta-data for the class to be resolved.
+   *     meta-data for the class to be resolved.
    * @param expectedType
-   *          the class type expected.
+   *     the class type expected.
    * @param source
-   *          used in case the resolution fails to give some more details about the origin.
+   *     used in case the resolution fails to give some more details about the origin.
    * @throws PlatformException
-   *           is thrown if the class could not be resolved.
+   *     is thrown if the class could not be resolved.
    */
   public static <T> Class<T> resolve(final Clazz annotation, final Class<T> expectedType, final String source) {
     final Class<?> clazz = annotation.value();

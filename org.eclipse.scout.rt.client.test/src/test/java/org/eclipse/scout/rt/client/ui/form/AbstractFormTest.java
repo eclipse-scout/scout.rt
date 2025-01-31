@@ -115,8 +115,8 @@ public class AbstractFormTest {
     String htmlErrorMessage = "";
 
     String expectedErrorMessage = HTML.fragment(
-        HTML.div(TEXTS.get("FormEmptyMandatoryFieldsMessage")),
-        HTML.ul(HTML.li(form.getStringField().getFullyQualifiedLabel(IValidateContentDescriptor.LABEL_SEPARATOR))))
+            HTML.div(TEXTS.get("FormEmptyMandatoryFieldsMessage")),
+            HTML.ul(HTML.li(form.getStringField().getFullyQualifiedLabel(IValidateContentDescriptor.LABEL_SEPARATOR))))
         .toHtml();
 
     try {
@@ -140,8 +140,8 @@ public class AbstractFormTest {
     String htmlErrorMessage = "";
 
     String expectedErrorMessage = HTML.fragment(
-        HTML.div(TEXTS.get("FormEmptyMandatoryFieldsMessage")),
-        HTML.ul(HTML.li(form.getMainBox().getFullyQualifiedLabel(IValidateContentDescriptor.LABEL_SEPARATOR) + IValidateContentDescriptor.LABEL_SEPARATOR + "String Field")))
+            HTML.div(TEXTS.get("FormEmptyMandatoryFieldsMessage")),
+            HTML.ul(HTML.li(form.getMainBox().getFullyQualifiedLabel(IValidateContentDescriptor.LABEL_SEPARATOR) + IValidateContentDescriptor.LABEL_SEPARATOR + "String Field")))
         .toHtml();
 
     try {
@@ -198,7 +198,6 @@ public class AbstractFormTest {
       protected String getConfiguredLabel() {
         return "Main Box";
       }
-
     }
   }
 

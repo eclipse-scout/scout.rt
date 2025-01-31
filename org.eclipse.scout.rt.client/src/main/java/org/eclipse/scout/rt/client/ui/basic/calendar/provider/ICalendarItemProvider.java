@@ -71,5 +71,4 @@ public interface ICalendarItemProvider extends IPropertyObserver {
   void onItemAction(ICalendarItem item);
 
   void onItemMoved(ICalendarItem item, Date fromDate, Date toDate);
-
 }

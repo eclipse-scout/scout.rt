@@ -92,7 +92,7 @@ public interface IBrowserField extends IFormField {
    * default.
    *
    * @throws RuntimeException
-   *           when the internal validation fails
+   *     when the internal validation fails
    */
   void setLocation(String location);
 
@@ -130,13 +130,13 @@ public interface IBrowserField extends IFormField {
    * Sends a message to the embedded web page ({@code iframe}).
    *
    * @param message
-   *          The message to send. Can be a {@link String}, a {@link Number}, a {@link Boolean} or an
-   *          {@link IDataObject}. All other objects are ignored.
+   *     The message to send. Can be a {@link String}, a {@link Number}, a {@link Boolean} or an
+   *     {@link IDataObject}. All other objects are ignored.
    * @param targetOrigin
-   *          The expected origin of the receiving {@code window}. If the origin does not match, the browser will not
-   *          dispatch the message for security reasons. See the
-   *          <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">documentation</a> for
-   *          details.
+   *     The expected origin of the receiving {@code window}. If the origin does not match, the browser will not
+   *     dispatch the message for security reasons. See the
+   *     <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">documentation</a> for
+   *     details.
    * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">window.postMessage (MDN)</a>
    */
   void postMessage(Object message, String targetOrigin);
@@ -159,11 +159,11 @@ public interface IBrowserField extends IFormField {
    * </p>
    *
    * @param sandboxEnabled
-   *          <code>true</code> if sandboxing is to be turned on
+   *     <code>true</code> if sandboxing is to be turned on
    * @see #isSandboxEnabled()
    * @see #setSandboxPermissions(EnumSet)
    * @see <a href="http://www.w3.org/TR/html5/embedded-content-0.html#attr-iframe-sandbox">HTML 5 specification: Iframe
-   *      sandbox</a>
+   * sandbox</a>
    */
   void setSandboxEnabled(boolean sandboxEnabled);
 
@@ -183,7 +183,7 @@ public interface IBrowserField extends IFormField {
    * </p>
    *
    * @param sandboxPermission
-   *          Sandbox permissions to lift restrictions on the content
+   *     Sandbox permissions to lift restrictions on the content
    * @see #getSandboxPermissions()
    * @see #setSandboxEnabled(boolean)
    */
@@ -200,15 +200,15 @@ public interface IBrowserField extends IFormField {
 
   /**
    * @return a list of origin URIs from which this field will receive messages posted via <i>postMessage</i>. If this is
-   *         {@code null} or empty, messages from all origins are accepted.
+   * {@code null} or empty, messages from all origins are accepted.
    * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">window.postMessage (MDN)</a>
    */
   List<String> getTrustedMessageOrigins();
 
   /**
    * @param trustedMessageOrigins
-   *          A list of origin URIs from which this field will receive messages posted via <i>postMessage</i>. If this
-   *          is {@code null} or empty, messages from all origins are accepted.
+   *     A list of origin URIs from which this field will receive messages posted via <i>postMessage</i>. If this
+   *     is {@code null} or empty, messages from all origins are accepted.
    * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">window.postMessage (MDN)</a>
    */
   void setTrustedMessageOrigins(List<String> trustedMessageOrigins);
@@ -225,7 +225,7 @@ public interface IBrowserField extends IFormField {
    * Property can only be changed during initialization, it can not be changed during runtime.
    *
    * @param showInExternalWindow
-   *          <code>false</code> to disable &lt;iframe&gt; usage, <code>true</code> otherwise.
+   *     <code>false</code> to disable &lt;iframe&gt; usage, <code>true</code> otherwise.
    * @see #isShowInExternalWindow()
    */
   void setShowInExternalWindow(boolean showInExternalWindow);

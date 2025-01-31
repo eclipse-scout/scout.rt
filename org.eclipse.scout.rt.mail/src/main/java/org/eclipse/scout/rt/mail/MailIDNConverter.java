@@ -27,7 +27,7 @@ public class MailIDNConverter {
    * sömeöne@example.com -> sömeöne@example.com
    *
    * @param email
-   *          email address to convert.
+   *     email address to convert.
    * @return punycode encoded email address.
    */
   public String toASCII(String email) {
@@ -40,7 +40,7 @@ public class MailIDNConverter {
    * someone@xn--exmple-cua.com -> someone@exämple.com
    *
    * @param email
-   *          punycode encoded email address.
+   *     punycode encoded email address.
    * @return email address as Unicode String.
    */
   public String toUnicode(String email) {
@@ -52,9 +52,9 @@ public class MailIDNConverter {
    * reduce boilerplate code.
    *
    * @param email
-   *          email address
+   *     email address
    * @param conversionMethod
-   *          convert function
+   *     convert function
    * @return converted email address
    */
   protected String convertToCharset(String email, Function<String, String> conversionMethod) {
@@ -74,12 +74,12 @@ public class MailIDNConverter {
    * Note: If the length of the local part is above 64, a {@link ProcessingException} is thrown.
    *
    * @param email
-   *          full email address.
+   *     full email address.
    * @param index
-   *          index of the '@' symbol.
+   *     index of the '@' symbol.
    * @return local-part of the email.
    * @throws IllegalArgumentException
-   *           if the length of the local part is above 64 characters.
+   *     if the length of the local part is above 64 characters.
    */
   protected String getLocalPart(String email, int index) {
     String localPart = email.substring(0, index);
@@ -99,12 +99,12 @@ public class MailIDNConverter {
    * example.com
    *
    * @param email
-   *          full email address.
+   *     full email address.
    * @param index
-   *          index of the '@' symbol.
+   *     index of the '@' symbol.
    * @return domain-part of the email.
    * @throws IllegalArgumentException
-   *           if the length of the local part is above 255 characters.
+   *     if the length of the local part is above 255 characters.
    */
   protected String getDomainPart(String email, int index) {
     String domainPart = email.substring(index + 1);
@@ -122,7 +122,7 @@ public class MailIDNConverter {
    * Finds the null-safe index of the '@' symbol in a given email address.
    *
    * @param email
-   *          email address.
+   *     email address.
    * @return first index of the '@' symbol or {@code -1} if there is no occurrence or if the email is null or empty.
    */
   protected int getSplitIndex(String email) {

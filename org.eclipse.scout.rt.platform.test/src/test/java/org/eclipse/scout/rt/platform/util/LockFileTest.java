@@ -56,5 +56,4 @@ public class LockFileTest {
     b.unlock();
     b.unlock();
   }
-
 }

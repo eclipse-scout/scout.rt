@@ -33,10 +33,10 @@ public interface IDataObjectVisitorExtension<T> {
    * Visit implementation for given value. The value itself doesn't need to be handled, only its children.
    *
    * @param value
-   *          Value to handle its children
+   *     Value to handle its children
    * @param chain
-   *          Visit chain to call for children (<code>null</code>-safe chain call). Do not call chain for value itself,
-   *          would result in an endless recursive loop.
+   *     Visit chain to call for children (<code>null</code>-safe chain call). Do not call chain for value itself,
+   *     would result in an endless recursive loop.
    */
   void visit(T value, Consumer<Object> chain);
 
@@ -52,10 +52,10 @@ public interface IDataObjectVisitorExtension<T> {
    * existing instance, but creating a new instance instead.
    *
    * @param value
-   *          Value to handle its children
+   *     Value to handle its children
    * @param chain
-   *          'Replace or visit' chain to call for children (<code>null</code>-safe chain call). Do not call chain for
-   *          value itself, would result in an endless recursive loop
+   *     'Replace or visit' chain to call for children (<code>null</code>-safe chain call). Do not call chain for
+   *     value itself, would result in an endless recursive loop
    * @return Same or replaced value
    */
   T replaceOrVisit(T value, UnaryOperator<Object> chain);

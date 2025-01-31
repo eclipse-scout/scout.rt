@@ -34,5 +34,4 @@ public interface IPageWithTableExtension<T extends ITable, OWNER extends Abstrac
   void execInitSearchForm(PageWithTableInitSearchFormChain<? extends ITable> chain);
 
   List<IMenu> execComputeTableEmptySpaceMenus(PageWithTableComputeTableEmptySpaceMenusChain<? extends ITable> chain);
-
 }

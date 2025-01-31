@@ -20,7 +20,7 @@ public interface IBasicFieldUIFacade {
    * Triggers parsing the text and setting a new value.
    *
    * @param value
-   *          new value of the display text in the ui.
+   *     new value of the display text in the ui.
    */
   void parseAndSetValueFromUI(String value);
 
@@ -30,7 +30,7 @@ public interface IBasicFieldUIFacade {
    * when a new value is set.
    *
    * @param text
-   *          new value of the display text in the ui.
+   *     new value of the display text in the ui.
    */
   void setDisplayTextFromUI(String text);
 }

@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {ObjectFactory} from '@eclipse-scout/core';
+import * as self from './index';
 
 export * from './chart/Chart';
 export * from './chart/ChartAdapter';
@@ -38,8 +39,6 @@ export * from './table/controls/ChartTableUserFilter';
 export * from './table/controls/ChartTableUserFilterModel';
 export * from './table/controls/ChartTableControlAdapter';
 export * from './table/controls/ChartTableControlLayout';
-
-import * as self from './index';
 
 export default self;
 

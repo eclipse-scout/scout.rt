@@ -24,14 +24,14 @@ public interface IDataModelEntity extends IPropertyObserver, IOrdered, IVisibleD
 
   /**
    * @return meta data for the attribute, default returns null
-   *         <p>
-   *         This method is useful and should be overridden when dynamic attributes are used, where multiple attributes
-   *         of the same type (Class) occur in the same {@link IDataModel}. This meta map contains the distinguishing
-   *         map of these multiple instances.
-   *         <p>
-   *         If the map is not filled or null, the comparison is only based on the type ({@link #getClass()})
-   *         <p>
-   *         see {@link DataModelUtility}
+   * <p>
+   * This method is useful and should be overridden when dynamic attributes are used, where multiple attributes
+   * of the same type (Class) occur in the same {@link IDataModel}. This meta map contains the distinguishing
+   * map of these multiple instances.
+   * <p>
+   * If the map is not filled or null, the comparison is only based on the type ({@link #getClass()})
+   * <p>
+   * see {@link DataModelUtility}
    */
   Map<String, String> getMetaDataOfEntity();
 
@@ -63,7 +63,7 @@ public interface IDataModelEntity extends IPropertyObserver, IOrdered, IVisibleD
    * that may have cycles
    *
    * @param instanceMap
-   *          map containing all previously created entities, there should be only one entity per type
+   *     map containing all previously created entities, there should be only one entity per type
    */
   void initializeChildEntities(Map<Class<? extends IDataModelEntity>, IDataModelEntity> instanceMap);
 
@@ -89,8 +89,8 @@ public interface IDataModelEntity extends IPropertyObserver, IOrdered, IVisibleD
    * <code>false</code>. However the one of the friend entity return <code>true</code>.
    *
    * @return Returns <code>true</code> (default) if this entity can occur multiple times in the context of its parent
-   *         entity. Otherwise the entity is considered many-to-one, i.e. this entity can occur at most one time within
-   *         the context of its parent entity.
+   * entity. Otherwise the entity is considered many-to-one, i.e. this entity can occur at most one time within
+   * the context of its parent entity.
    * @since 3.8.0
    */
   boolean isOneToMany();
@@ -99,7 +99,7 @@ public interface IDataModelEntity extends IPropertyObserver, IOrdered, IVisibleD
    * Controls the multiplicity of this entity in the context of its parent entity.
    *
    * @param b
-   *          <code>true</code> if this entity is referenced at most one time by its parent entity.
+   *     <code>true</code> if this entity is referenced at most one time by its parent entity.
    * @see #isOneToMany()
    * @since 3.8.0
    */

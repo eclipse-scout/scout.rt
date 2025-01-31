@@ -34,5 +34,4 @@ public interface IFormHandlerExtension<OWNER extends AbstractFormHandler> extend
   boolean execCheckFields(FormHandlerCheckFieldsChain chain);
 
   void execFinally(FormHandlerFinallyChain chain);
-
 }

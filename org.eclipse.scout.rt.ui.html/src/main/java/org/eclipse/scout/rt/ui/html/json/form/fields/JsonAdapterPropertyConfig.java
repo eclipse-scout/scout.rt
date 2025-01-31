@@ -51,5 +51,4 @@ public class JsonAdapterPropertyConfig {
   public Predicate<Object> getFilter() {
     return (Predicate<Object>) m_filter;
   }
-
 }

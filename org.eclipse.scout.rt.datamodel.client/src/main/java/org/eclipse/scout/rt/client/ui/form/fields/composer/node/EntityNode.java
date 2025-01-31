@@ -183,5 +183,4 @@ public class EntityNode extends AbstractComposerNode {
   @ClassId("ebef316f-f872-4143-bacf-68b47139e536")
   public class AddEntityPlaceholderOnEntityMenu extends AbstractMenuSeparator {
   }
-
 }

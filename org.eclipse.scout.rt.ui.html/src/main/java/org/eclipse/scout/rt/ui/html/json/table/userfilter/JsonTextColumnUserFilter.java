@@ -39,5 +39,4 @@ public class JsonTextColumnUserFilter extends JsonColumnUserFilter<TextColumnUse
     json.put("freeText", getFilterState().getFreeText());
     return json;
   }
-
 }

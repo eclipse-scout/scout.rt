@@ -33,12 +33,12 @@ public class CharsetDetectorTest {
   @Test
   public void testWithStream() {
     Map.of(
-        "iso88591.txt", "ISO-8859-1",
-        "iso88595.txt", "ISO-8859-5",
-        "utf8.txt", "UTF-8",
-        "utf16-be-bom.txt", "UTF-16BE",
-        "utf16-le-bom.txt", "UTF-16LE",
-        "win1252.txt", "windows-1252")
+            "iso88591.txt", "ISO-8859-1",
+            "iso88595.txt", "ISO-8859-5",
+            "utf8.txt", "UTF-8",
+            "utf16-be-bom.txt", "UTF-16BE",
+            "utf16-le-bom.txt", "UTF-16LE",
+            "win1252.txt", "windows-1252")
         .forEach((fileName, expectedEncodingName) -> assertEquals(expectedEncodingName, guess(fileName).name()));
   }
 

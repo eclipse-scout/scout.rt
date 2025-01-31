@@ -103,7 +103,6 @@ public class ColumnAutoResizeTest {
         protected int getConfiguredWidth() {
           return 100;
         }
-
       }
 
       @Order(20)

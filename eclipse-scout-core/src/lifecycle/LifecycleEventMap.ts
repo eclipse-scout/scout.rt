@@ -9,7 +9,6 @@
  */
 import {Event, EventMap, Lifecycle, Status} from '../index';
 
-
 export interface LifecycleValidateEvent<TValidationResult, L extends Lifecycle<TValidationResult> = Lifecycle<TValidationResult>> extends Event<L> {
   status: Status;
 }

@@ -466,7 +466,6 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     public void execInitGroup(GroupInitGroupChain chain) {
       getOwner().execInitGroup();
     }
-
   }
 
   @Override

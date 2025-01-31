@@ -144,7 +144,6 @@ public class FormDataCloneTest {
 
       public City() {
       }
-
     }
 
     public class Currency extends AbstractValueFieldData<Long> {
@@ -227,7 +226,5 @@ public class FormDataCloneTest {
         }
       }
     }
-
   }
-
 }

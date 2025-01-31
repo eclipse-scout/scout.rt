@@ -16,8 +16,8 @@ import java.util.Set;
 /**
  * Represents an index with the functionality to index elements.
  *
- * @since 5.1
  * @see IndexedStore
+ * @since 5.1
  */
 public interface IIndex<INDEX, ELEMENT> extends Iterable<ELEMENT> {
 
@@ -25,9 +25,9 @@ public interface IIndex<INDEX, ELEMENT> extends Iterable<ELEMENT> {
    * Adds the given element to this index. If already contained, calculated indices are first removed.
    *
    * @param element
-   *          the element to be indexed.
+   *     the element to be indexed.
    * @return <code>true</code> if being added to the index, <code>false</code> otherwise. Typically, an element is not
-   *         added to the index if the calculated index value results in <code>null</code>.
+   * added to the index if the calculated index value results in <code>null</code>.
    */
   boolean addToIndex(final ELEMENT element);
 
@@ -35,7 +35,7 @@ public interface IIndex<INDEX, ELEMENT> extends Iterable<ELEMENT> {
    * Removes the given element from this index.
    *
    * @param element
-   *          the element to be removed from this index.
+   *     the element to be removed from this index.
    * @return <code>true</code> if removed from this index, <code>false</code> if not contained in this index.
    */
   boolean removeFromIndex(final ELEMENT element);

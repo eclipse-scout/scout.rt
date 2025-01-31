@@ -22,8 +22,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jakarta.jms.Message;
 import javax.naming.NamingException;
+
+import jakarta.jms.Message;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;

@@ -28,5 +28,4 @@ public class DynamicStringField extends AbstractStringField {
   public String getFieldId() {
     return (String) getProperty("id");
   }
-
 }

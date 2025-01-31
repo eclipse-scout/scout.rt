@@ -22,9 +22,9 @@ import org.eclipse.scout.rt.platform.util.BeanUtility;
  * cache-wrapper. Instead, use {@link #withAdditionalCustomWrapper(Class, Object...)} to add additional behavior.
  *
  * @param <K>
- *          the type of keys maintained by this cache
+ *     the type of keys maintained by this cache
  * @param <V>
- *          the type of mapped values
+ *     the type of mapped values
  * @since 5.2
  */
 @Bean
@@ -33,15 +33,15 @@ public interface ICacheBuilder<K, V> {
   /**
    * Calls {@link CacheRegistryService} which creates a new cache according to this builder
    *
-   * @throws IllegalStateException
-   *           if no cacheId or value-resolver is set
-   * @throws IllegalArgumentException
-   *           if an additional custom wrapper does not have a public constructor with a single argument of type
-   *           {@link ICache} or cannot be instantiated
-   * @throws AssertionException
-   *           if there is already a cache with this cacheId and #withReplaceIfExists is false and #withThrowIfExists is
-   *           true (Default)
    * @return created cache instance or existing instance depending on #withReplaceIfExists and #withThrowIfExists
+   * @throws IllegalStateException
+   *     if no cacheId or value-resolver is set
+   * @throws IllegalArgumentException
+   *     if an additional custom wrapper does not have a public constructor with a single argument of type
+   *     {@link ICache} or cannot be instantiated
+   * @throws AssertionException
+   *     if there is already a cache with this cacheId and #withReplaceIfExists is false and #withThrowIfExists is
+   *     true (Default)
    */
   ICache<K, V> build();
 
@@ -49,7 +49,7 @@ public interface ICacheBuilder<K, V> {
    * Required property which must be for each cache unique.
    *
    * @param cacheId
-   *          for the created cache
+   *     for the created cache
    * @return this builder
    */
   ICacheBuilder<K, V> withCacheId(String cacheId);
@@ -94,55 +94,55 @@ public interface ICacheBuilder<K, V> {
 
   /**
    * @param shared
-   *          a shared cache is used in client and server part of the application. Clients are notified about cache
-   *          invalidations at server but not vice versa. (Default false)
+   *     a shared cache is used in client and server part of the application. Clients are notified about cache
+   *     invalidations at server but not vice versa. (Default false)
    * @return this builder
    */
   ICacheBuilder<K, V> withShared(boolean shared);
 
   /**
    * @param remoteValueResolverEnabled
-   *          Usually an application client of a shared cache uses the remote cache to resolve a cache value. With this
-   *          property, this behavior can be disabled and the client uses the local value resolver too. This may be
-   *          useful if a cache value is not {@link Serializable}. (Default true)
+   *     Usually an application client of a shared cache uses the remote cache to resolve a cache value. With this
+   *     property, this behavior can be disabled and the client uses the local value resolver too. This may be
+   *     useful if a cache value is not {@link Serializable}. (Default true)
    * @return this builder
    */
   CacheBuilder<K, V> withRemoteValueResolverEnabled(boolean remoteValueResolverEnabled);
 
   /**
    * @param threadSafe
-   *          if set to false, cache does not use a thread-safe implementation. (Default true)
+   *     if set to false, cache does not use a thread-safe implementation. (Default true)
    * @return this builder
    */
   ICacheBuilder<K, V> withThreadSafe(boolean threadSafe);
 
   /**
    * @param clusterEnabled
-   *          if true a cache that runs in a clustered server (<code>IClusterSynchronizationService#isEnabled()</code>)
-   *          will publish cache invalidations to the cluster. (Default false)
+   *     if true a cache that runs in a clustered server (<code>IClusterSynchronizationService#isEnabled()</code>)
+   *     will publish cache invalidations to the cluster. (Default false)
    * @return this builder
    */
   ICacheBuilder<K, V> withClusterEnabled(boolean clusterEnabled);
 
   /**
    * @param transactional
-   *          if true changes in a server cache will be published to other transactions at commit phase. (Default false)
+   *     if true changes in a server cache will be published to other transactions at commit phase. (Default false)
    * @return this builder
    */
   ICacheBuilder<K, V> withTransactional(boolean transactional);
 
   /**
    * @param transactionalFastForward
-   *          if true a fresh resolved value for which no previous mapping exists in a transactional server cache is
-   *          directly publish to other transactions rather than at commit phase. (Default false)
+   *     if true a fresh resolved value for which no previous mapping exists in a transactional server cache is
+   *     directly publish to other transactions rather than at commit phase. (Default false)
    * @return this builder
    */
   ICacheBuilder<K, V> withTransactionalFastForward(boolean transactionalFastForward);
 
   /**
    * @param singleton
-   *          if true the created cache is used to cache at most one item. The cache builder can return a more efficient
-   *          implementation. The cache implementation is not required to enforce one value. (Default false)
+   *     if true the created cache is used to cache at most one item. The cache builder can return a more efficient
+   *     implementation. The cache implementation is not required to enforce one value. (Default false)
    * @return this builder
    */
   ICacheBuilder<K, V> withSingleton(boolean singleton);
@@ -158,14 +158,14 @@ public interface ICacheBuilder<K, V> {
    * cache entry.
    *
    * @param timeToLiveDuration
-   *          time to live duration
+   *     time to live duration
    * @param timeToLiveUnit
-   *          time to live unit
+   *     time to live unit
    * @param touchOnGet
-   *          if true getting a value will reset the time to live of a cache entry
+   *     if true getting a value will reset the time to live of a cache entry
    * @return this builder
    * @throws IllegalArgumentException
-   *           if readTimeToLive is negative
+   *     if readTimeToLive is negative
    */
   ICacheBuilder<K, V> withTimeToLive(Long timeToLiveDuration, TimeUnit timeToLiveUnit, boolean touchOnGet);
 
@@ -176,7 +176,7 @@ public interface ICacheBuilder<K, V> {
    * The current policy that is used to evict elements is least recently used (LRU).
    *
    * @param sizeBound
-   *          the target size that map should have approximately.
+   *     the target size that map should have approximately.
    * @return this builder
    */
   ICacheBuilder<K, V> withSizeBound(Integer sizeBound);
@@ -188,10 +188,10 @@ public interface ICacheBuilder<K, V> {
    * deadlocks if the {@link #withValueResolver(ICacheValueResolver)} itself may be blocked.
    *
    * @param maxConcurrentResolve
-   *          maximum concurrent resolves
+   *     maximum concurrent resolves
    * @return this builder
    * @throws IllegalArgumentException
-   *           if maxConcurrentResolve is negative
+   *     if maxConcurrentResolve is negative
    */
   ICacheBuilder<K, V> withMaxConcurrentResolve(Integer maxConcurrentResolve);
 
@@ -202,8 +202,8 @@ public interface ICacheBuilder<K, V> {
    * details.
    *
    * @param arguments
-   *          any additional arguments (beside the first {@link ICache} argument) used to create the cache wrapper
-   *          instance
+   *     any additional arguments (beside the first {@link ICache} argument) used to create the cache wrapper
+   *     instance
    * @return this builder
    */
   ICacheBuilder<K, V> withAdditionalCustomWrapper(Class<? extends ICache> cacheClass, Object... arguments);
@@ -212,5 +212,4 @@ public interface ICacheBuilder<K, V> {
    * Removes the additional custom cache wrapper of the given type.
    */
   void removeAdditionalCustomWrapper(Class<? extends ICache> cacheClass);
-
 }

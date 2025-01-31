@@ -37,9 +37,9 @@ public class ConfigPropertyProvider implements IPropertyProvider {
    * Create a new instance.<br>
    *
    * @param systemPropertyKeyOrUrl
-   *          The name of a system property ({@link System#getProperty(String)}) holding the url to the
-   *          config.properties<br>
-   *          If this value is null or empty then the key is assumed to be the url to the file.
+   *     The name of a system property ({@link System#getProperty(String)}) holding the url to the
+   *     config.properties<br>
+   *     If this value is null or empty then the key is assumed to be the url to the file.
    */
   public ConfigPropertyProvider(String systemPropertyKeyOrUrl) {
     this(systemPropertyKeyOrUrl, systemPropertyKeyOrUrl);
@@ -49,15 +49,15 @@ public class ConfigPropertyProvider implements IPropertyProvider {
    * Create a new instance with the given property url.<br>
    *
    * @param systemPropertyKey
-   *          The name of a system property ({@link System#getProperty(String)}) holding the url to the
-   *          config.properties<br>
+   *     The name of a system property ({@link System#getProperty(String)}) holding the url to the
+   *     config.properties<br>
    * @param defaultFileUrl
-   *          <ul>
-   *          <li>A {@link String} that contains a valid {@link URL} in external form containing at least one colon (:)
-   *          to define a schema/protocol.</li>
-   *          <li>A {@link String} without any protocol or schema that holds an absolute path on the java classpath.
-   *          Such a string can also have a <code>classpath:</code> prefix.</li>
-   *          </ul>
+   *     <ul>
+   *              <li>A {@link String} that contains a valid {@link URL} in external form containing at least one colon (:)
+   *              to define a schema/protocol.</li>
+   *              <li>A {@link String} without any protocol or schema that holds an absolute path on the java classpath.
+   *              Such a string can also have a <code>classpath:</code> prefix.</li>
+   *              </ul>
    */
   public ConfigPropertyProvider(String systemPropertyKey, String defaultFileUrl) {
     String value = systemPropertyKey != null ? System.getProperty(systemPropertyKey) : null;
@@ -173,7 +173,7 @@ public class ConfigPropertyProvider implements IPropertyProvider {
    * </ul>
    *
    * @param filePath
-   *          The absolute file path. May be {@code null}.
+   *     The absolute file path. May be {@code null}.
    * @return An {@link URL} pointing to the file if it can be found. {@code null} otherwise.
    */
   public static URL getResourceUrl(String filePath) {

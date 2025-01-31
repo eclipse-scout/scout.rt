@@ -332,5 +332,4 @@ public class IntoParser {
   private void addIntoToken(ValueOutputToken t) {
     m_intoList.add(t);
   }
-
 }

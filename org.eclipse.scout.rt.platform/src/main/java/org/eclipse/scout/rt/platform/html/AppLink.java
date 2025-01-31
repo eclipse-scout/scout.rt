@@ -29,9 +29,9 @@ public class AppLink implements Serializable {
    * Creates an app link bean
    *
    * @param ref
-   *          Reference
+   *     Reference
    * @param name
-   *          Name of the app link
+   *     Name of the app link
    */
   public AppLink(String ref, String name) {
     m_ref = ref;

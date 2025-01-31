@@ -166,5 +166,4 @@ public class BatchLookupResultCache {
     }
     return true;
   }
-
 }

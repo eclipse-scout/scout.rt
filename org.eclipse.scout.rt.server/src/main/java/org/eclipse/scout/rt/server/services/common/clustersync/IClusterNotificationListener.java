@@ -23,5 +23,4 @@ public interface IClusterNotificationListener extends EventListener {
    * @param notificationMessage
    */
   void onNotification(IClusterNotificationMessage message);
-
 }

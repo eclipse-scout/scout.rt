@@ -16,7 +16,7 @@ public interface IPublishSubscribeMessageListener {
    * Method invoked to handle a message received from a subscribed channel.
    *
    * @param message
-   *          message received.
+   *     message received.
    */
   void onMessage(IClusterNotificationMessage message);
 }

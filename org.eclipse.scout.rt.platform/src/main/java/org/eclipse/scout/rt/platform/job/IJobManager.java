@@ -74,9 +74,9 @@ public interface IJobManager {
    * <code>BEANS.get(IJobManager.class).schedule(...).awaitDone();</code>
    *
    * @param runnable
-   *          <code>IRunnable</code> to be executed.
+   *     <code>IRunnable</code> to be executed.
    * @param input
-   *          information about the job with execution instructions for the job manager to run the job.
+   *     information about the job with execution instructions for the job manager to run the job.
    * @return Future to interact with the job like waiting for its completion or to cancel its execution.
    */
   IFuture<Void> schedule(IRunnable runnable, JobInput input);
@@ -103,11 +103,11 @@ public interface IJobManager {
    * <code>Object result = BEANS.get(IJobManager.class).schedule(...).awaitDoneAndGet();</code>
    *
    * @param callable
-   *          <code>Callable</code> to be executed.
+   *     <code>Callable</code> to be executed.
    * @param input
-   *          information about the job with execution instructions for the job manager to run the job.
+   *     information about the job with execution instructions for the job manager to run the job.
    * @return Future to interact with the job like waiting for its completion, or to cancel its execution, or to get its
-   *         computation result.
+   * computation result.
    */
   <RESULT> IFuture<RESULT> schedule(Callable<RESULT> callable, JobInput input);
 
@@ -127,8 +127,8 @@ public interface IJobManager {
    * </pre>
    *
    * @param filter
-   *          filter to limit the Futures to be checked for their 'done-state'. If <code>null</code>, all Futures are
-   *          checked.
+   *     filter to limit the Futures to be checked for their 'done-state'. If <code>null</code>, all Futures are
+   *     checked.
    * @return <code>true</code> if all Futures matching the given Filter are in 'done-state'.
    */
   boolean isDone(Predicate<IFuture<?>> filter);
@@ -150,15 +150,15 @@ public interface IJobManager {
    * </pre>
    *
    * @param filter
-   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited.
+   *     filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited.
    * @param timeout
-   *          the maximal time to wait.
+   *     the maximal time to wait.
    * @param unit
-   *          unit of the given timeout.
+   *     unit of the given timeout.
    * @throws ThreadInterruptedError
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    * @throws TimedOutError
-   *           if the wait timed out.
+   *     if the wait timed out.
    */
   void awaitDone(Predicate<IFuture<?>> filter, long timeout, TimeUnit unit);
 
@@ -168,15 +168,15 @@ public interface IJobManager {
    * premature cancellation.
    *
    * @param filter
-   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited.
+   *     filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited.
    * @param timeout
-   *          the maximal time to wait for the job to complete.
+   *     the maximal time to wait for the job to complete.
    * @param unit
-   *          unit of the timeout.
+   *     unit of the timeout.
    * @throws ThreadInterruptedError
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    * @throws TimedOutError
-   *           if the wait timed out.
+   *     if the wait timed out.
    */
   void awaitFinished(Predicate<IFuture<?>> filter, long timeout, TimeUnit unit);
 
@@ -199,7 +199,7 @@ public interface IJobManager {
    * </pre>
    *
    * @param filter
-   *          to limit the Futures to be returned. If <code>null</code>, all Futures are returned.
+   *     to limit the Futures to be returned. If <code>null</code>, all Futures are returned.
    * @return futures accepted by the given filter.
    */
   Set<IFuture<?>> getFutures(Predicate<IFuture<?>> filter);
@@ -220,11 +220,11 @@ public interface IJobManager {
    * </pre>
    *
    * @param filter
-   *          to limit the Futures to be cancelled. If <code>null</code>, all Futures are cancelled.
+   *     to limit the Futures to be cancelled. If <code>null</code>, all Futures are cancelled.
    * @param interruptIfRunning
-   *          <code>true</code> to interrupt in-progress tasks.
+   *     <code>true</code> to interrupt in-progress tasks.
    * @return <code>true</code> if all Futures matching the Filter are cancelled successfully, or <code>false</code>, if
-   *         a Future could not be cancelled, typically because already completed normally.
+   * a Future could not be cancelled, typically because already completed normally.
    */
   boolean cancel(Predicate<IFuture<?>> filter, boolean interruptIfRunning);
 
@@ -237,7 +237,7 @@ public interface IJobManager {
    * See {@link IBlockingCondition} for more information.
    *
    * @param blocking
-   *          initial blocking-state of the blocking condition.
+   *     initial blocking-state of the blocking condition.
    */
   IBlockingCondition newBlockingCondition(boolean blocking);
 
@@ -246,9 +246,9 @@ public interface IJobManager {
    * that previous registration is replaced.
    *
    * @param listener
-   *          listener to be registered.
+   *     listener to be registered.
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
-   *         unregister the listener.
+   * unregister the listener.
    */
   IRegistrationHandle addListener(IJobListener listener);
 
@@ -269,11 +269,11 @@ public interface IJobManager {
    * </pre>
    *
    * @param filter
-   *          filter to only get notified about events of interest - that is for events accepted by the filter.
+   *     filter to only get notified about events of interest - that is for events accepted by the filter.
    * @param listener
-   *          listener to be registered.
+   *     listener to be registered.
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
-   *         unregister the listener.
+   * unregister the listener.
    */
   IRegistrationHandle addListener(Predicate<JobEvent> filter, IJobListener listener);
 

@@ -96,5 +96,4 @@ public class ApacheHttpResponse extends LowLevelHttpResponse {
   public void disconnect() throws IOException {
     m_request.abort();
   }
-
 }

@@ -33,7 +33,7 @@ public interface IPageExtension<OWNER extends AbstractPage> extends ITreeNodeExt
 
   /**
    * @param reloadReason
-   *          {@link IReloadReason}
+   *     {@link IReloadReason}
    * @since 16.1
    */
   void execReloadPage(PageReloadPageChain chain, String reloadReason);

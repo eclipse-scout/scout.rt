@@ -63,11 +63,11 @@ public interface IDoStructureMigrationHandler {
    * of the corresponding data object is updated.
    *
    * @param ctx
-   *          Context
+   *     Context
    * @param doEntity
-   *          Raw DO entity to apply migration, according to {@link #getTypeNames()} (non-<code>null</code>)
+   *     Raw DO entity to apply migration, according to {@link #getTypeNames()} (non-<code>null</code>)
    * @return <code>true</code> if data object was changed in any way (including type version update only),
-   *         <code>false</code> otherwise.
+   * <code>false</code> otherwise.
    */
   boolean applyMigration(DataObjectMigrationContext ctx, IDoEntity doEntity);
 }

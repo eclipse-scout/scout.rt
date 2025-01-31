@@ -114,9 +114,9 @@ public class TablePageState extends AbstractPageState {
 
   /**
    * @param complete
-   *          if search was completed (i.e. is valid and can be run)
+   *     if search was completed (i.e. is valid and can be run)
    * @param state
-   *          CRC of serialized search filter data
+   *     CRC of serialized search filter data
    */
   public void setSearchFilterState(boolean complete, String state) {
     m_searchFilterComplete = complete;
@@ -146,7 +146,7 @@ public class TablePageState extends AbstractPageState {
 
   /**
    * @param tableCustomizer
-   *          serialized TableCustomizer data for persistent storage with bookmark
+   *     serialized TableCustomizer data for persistent storage with bookmark
    */
   public void setTableCustomizerData(byte[] tableCustomizer) {
     m_tableCustomizerData = tableCustomizer;

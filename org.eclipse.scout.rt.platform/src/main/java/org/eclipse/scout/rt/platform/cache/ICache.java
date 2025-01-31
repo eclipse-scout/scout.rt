@@ -31,9 +31,9 @@ import org.eclipse.scout.rt.platform.util.IAdaptable;
  * Use {@link ICacheBuilder} to create a cache instance. Each cache instance is registered as {@link Bean}.
  *
  * @param <K>
- *          the type of keys maintained by this cache
+ *     the type of keys maintained by this cache
  * @param <V>
- *          the type of mapped values
+ *     the type of mapped values
  * @see ICacheValueResolver
  * @see ICacheBuilder
  * @see AbstractCacheWrapper
@@ -57,7 +57,7 @@ public interface ICache<K, V> extends IAdaptable {
    * is called to fetch or recompute the value. The value is then stored in the local cache.
    *
    * @param key
-   *          if null, null is returned.
+   *     if null, null is returned.
    */
   V get(K key);
 
@@ -73,11 +73,11 @@ public interface ICache<K, V> extends IAdaptable {
    * Invalidate cache entries corresponding to the given {@link ICacheEntryFilter}.
    *
    * @param filter
-   *          used to match entries that should be invalidated
+   *     used to match entries that should be invalidated
    * @param propagate
-   *          true if the invalidation should be propagated to other nodes. In case of a client cache, the invalidation
-   *          is propagated to the server. In case of a server cache the invalidation is propagated to other server
-   *          cluster nodes. Note that a server propagates invalidations always to its connected clients.
+   *     true if the invalidation should be propagated to other nodes. In case of a client cache, the invalidation
+   *     is propagated to the server. In case of a server cache the invalidation is propagated to other server
+   *     cluster nodes. Note that a server propagates invalidations always to its connected clients.
    */
   void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate);
 
@@ -95,5 +95,4 @@ public interface ICache<K, V> extends IAdaptable {
    * @return an unmodifiable view of the map on which this cache is based on. Never null.
    */
   Map<K, V> getUnmodifiableMap();
-
 }

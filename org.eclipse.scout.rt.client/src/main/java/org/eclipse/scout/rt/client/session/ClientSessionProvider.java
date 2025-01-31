@@ -35,10 +35,10 @@ public class ClientSessionProvider {
    * {@link #provide(String, ClientRunContext)} instead.
    *
    * @param clientRunContext
-   *          applied during session start.
+   *     applied during session start.
    * @return the new session, is not <code>null</code>.
    * @throws RuntimeException
-   *           if session creation failed.
+   *     if session creation failed.
    */
   public <SESSION extends IClientSession> SESSION provide(final ClientRunContext clientRunContext) {
     return provide(null, clientRunContext);
@@ -48,12 +48,12 @@ public class ClientSessionProvider {
    * Creates and initializes a new {@link IClientSession} with data as specified by the given {@link ClientRunContext}.
    *
    * @param sessionId
-   *          unique session ID, or <code>null</code> to use a random {@link UUID}.
+   *     unique session ID, or <code>null</code> to use a random {@link UUID}.
    * @param clientRunContext
-   *          applied during session start.
+   *     applied during session start.
    * @return the new session, is not <code>null</code>.
    * @throws RuntimeException
-   *           if session creation failed.
+   *     if session creation failed.
    */
   public <SESSION extends IClientSession> SESSION provide(final String sessionId, final ClientRunContext clientRunContext) {
     final String sid = sessionId != null ? sessionId : Sessions.randomSessionId();
@@ -61,22 +61,21 @@ public class ClientSessionProvider {
     // Create the session with the given context applied.
     return clientRunContext.call(() -> {
       // 1. Create an empty session instance.
-      @SuppressWarnings("unchecked")
-      final SESSION session = (SESSION) BEANS.get(IClientSession.class);
+      @SuppressWarnings("unchecked") final SESSION session = (SESSION) BEANS.get(IClientSession.class);
 
       // 2. Enable this session to receive client notifications.
       registerSessionForNotifications(session, sid);
 
       // 3. Load the session in the model thread.
       return ModelJobs.schedule(() -> {
-        beforeStartSession(session, sid);
-        session.start(sid);
-        afterStartSession(session);
-        return session;
-      }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
-          .withSession(session, true))
-          .withName("Starting ClientSession [sessionId={}]", sid)
-          .withExceptionHandling(null, false))
+            beforeStartSession(session, sid);
+            session.start(sid);
+            afterStartSession(session);
+            return session;
+          }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
+                  .withSession(session, true))
+              .withName("Starting ClientSession [sessionId={}]", sid)
+              .withExceptionHandling(null, false))
           .awaitDoneAndGet();
     });
   }

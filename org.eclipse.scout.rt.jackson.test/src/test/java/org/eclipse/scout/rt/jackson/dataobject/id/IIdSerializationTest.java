@@ -223,7 +223,7 @@ public class IIdSerializationTest {
     TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
     assertThrows(ClassCastException.class, () -> marshalledLenient.getIUuId());
     //noinspection deprecation
-    assertEquals(UnknownId.of(null, "unknown"),  marshalledLenient.get("iUuId"));
+    assertEquals(UnknownId.of(null, "unknown"), marshalledLenient.get("iUuId"));
     assertEquals("unknown", marshalledLenient.get("iUuId", UnknownId.class).unwrap());
 
     // assert roundtrip back to JSON is equals
@@ -240,7 +240,7 @@ public class IIdSerializationTest {
     Map<IUuId, String> map = marshalledLenient.getIUuIdMap(); // accessing this way works due to missing checks for generics at runtime
     assertEquals(1, map.size());
     //noinspection AssertBetweenInconvertibleTypes,deprecation
-    assertEquals(UnknownId.of("scout.unknown","unknown"), CollectionUtility.firstElement(map.keySet())); // string is returned as key because lenient data object mapper is used
+    assertEquals(UnknownId.of("scout.unknown", "unknown"), CollectionUtility.firstElement(map.keySet())); // string is returned as key because lenient data object mapper is used
     assertEquals("value", CollectionUtility.firstElement(map.values()));
 
     // assert roundtrip back to JSON is equals
@@ -257,7 +257,7 @@ public class IIdSerializationTest {
     Map<IUuId, TestItemDo> map = marshalledLenient.getIUuIdDoMap(); // accessing this way works due to missing checks for generics at runtime
     assertEquals(1, map.size());
     //noinspection AssertBetweenInconvertibleTypes,deprecation
-    assertEquals(UnknownId.of("scout.unknown","unknown"), CollectionUtility.firstElement(map.keySet())); // string is returned as key because lenient data object mapper is used
+    assertEquals(UnknownId.of("scout.unknown", "unknown"), CollectionUtility.firstElement(map.keySet())); // string is returned as key because lenient data object mapper is used
     assertEquals(BEANS.get(TestItemDo.class).withId("1"), CollectionUtility.firstElement(map.values())); // typed
 
     // assert roundtrip back to JSON is equals

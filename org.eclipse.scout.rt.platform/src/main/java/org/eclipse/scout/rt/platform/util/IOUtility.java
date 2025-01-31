@@ -110,7 +110,7 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
-   *          input reader
+   *     input reader
    * @return the content bytes
    */
   public static byte[] readBytes(InputStream in) {
@@ -123,9 +123,9 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
-   *          input reader
+   *     input reader
    * @param len
-   *          optional known length or -1 if unknown
+   *     optional known length or -1 if unknown
    * @return the content bytes
    */
   public static byte[] readBytes(InputStream in, int len) {
@@ -163,9 +163,9 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
-   *          input reader
+   *     input reader
    * @param charset
-   *          optional charset, if null is provided, the system default encoding is used
+   *     optional charset, if null is provided, the system default encoding is used
    * @return the content string
    */
   public static String readString(InputStream in, String charset) {
@@ -178,7 +178,7 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
-   *          input reader
+   *     input reader
    * @return the content string
    */
   public static String readStringUTF8(InputStream in) {
@@ -191,11 +191,11 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
-   *          input reader
+   *     input reader
    * @param charset
-   *          optional charset, if null is provided, the system default encoding is used
+   *     optional charset, if null is provided, the system default encoding is used
    * @param len
-   *          optional known length in bytes or -1 if unknown
+   *     optional known length in bytes or -1 if unknown
    * @return the content string
    */
   public static String readString(InputStream in, String charset, int len) {
@@ -218,7 +218,7 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
-   *          input reader
+   *     input reader
    * @return the content string
    */
   public static String readString(Reader in) {
@@ -231,9 +231,9 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
-   *          input reader
+   *     input reader
    * @param maxLen
-   *          max number of characters to read or -1 if the whole stream should be read.
+   *     max number of characters to read or -1 if the whole stream should be read.
    * @return the content string
    */
   public static String readString(Reader in, int maxLen) {
@@ -277,7 +277,7 @@ public final class IOUtility {
 
   public static byte[] uncompressGzip(byte[] b) throws IOException {
     try (BufferedInputStream in = new BufferedInputStream(new GZIPInputStream(new ByteArrayInputStream(b)));
-        ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+         ByteArrayOutputStream out = new ByteArrayOutputStream()) {
       int val;
       while ((val = in.read()) >= 0) {
         out.write(val);
@@ -293,11 +293,11 @@ public final class IOUtility {
    * performed. If this fails again or Cp437 is not supported by the JVM used, an <code>IllegalArgumentException</code>
    * is thrown.
    *
-   * @return A collection of binary resources contained in the ZIP archive
    * @param zipArchive
-   *          file to unzip
+   *     file to unzip
    * @param filterPattern
-   *          optional filter, may be null
+   *     optional filter, may be null
+   * @return A collection of binary resources contained in the ZIP archive
    */
   public static Collection<BinaryResource> unzip(byte[] zipArchive, Pattern filterPattern) throws IOException {
     try {
@@ -319,13 +319,13 @@ public final class IOUtility {
    * Unzips the given ZIP archive as a collection of BinaryResources. Unzipping happens in-memory, no files are written.
    * The optional parameter <code>entryNameFilterPattern</code> allows to filter the ZIP for matching file entries.
    *
-   * @return A collection of binary resources contained in the ZIP archive
    * @param zipArchive
-   *          binary data
+   *     binary data
    * @param charset
-   *          the charset to use for the unzipping
+   *     the charset to use for the unzipping
    * @param filterPattern
-   *          optional filter, may be null
+   *     optional filter, may be null
+   * @return A collection of binary resources contained in the ZIP archive
    */
   public static Collection<BinaryResource> unzip(byte[] zipArchive, Pattern filterPattern, Charset charset) throws IOException {
     try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipArchive), charset)) {
@@ -369,9 +369,9 @@ public final class IOUtility {
    * Reads all text lines from the {@link URL} specified.
    *
    * @param url
-   *          The {@link URL} to read from. Must not be {@code null}.
+   *     The {@link URL} to read from. Must not be {@code null}.
    * @param charset
-   *          The {@link Charset} used to read the url content. Must not be {@code null}.
+   *     The {@link Charset} used to read the url content. Must not be {@code null}.
    * @return A {@link List} with all lines
    */
   public static List<String> readAllLinesFromUrl(URL url, Charset charset) throws IOException {
@@ -386,11 +386,11 @@ public final class IOUtility {
    * {@link #readBinaryResource(URL, String)} to specify a different name.
    *
    * @param url
-   *          URL pointing to the file's location
+   *     URL pointing to the file's location
    * @return a {@link BinaryResource} with the content of the file specified by the given URL or {@code null} if the URL
-   *         is {@code null}.
+   * is {@code null}.
    * @throws ProcessingException
-   *           if reading the file content failed for some reason.
+   *     if reading the file content failed for some reason.
    */
   public static BinaryResource readBinaryResource(URL url) {
     if (url == null) {
@@ -405,13 +405,13 @@ public final class IOUtility {
    * the binary resource is set to the given "targetName".
    *
    * @param url
-   *          URL pointing to the file's location
+   *     URL pointing to the file's location
    * @param targetName
-   *          File name to be used for the resulting binary resource, i.e. {@link BinaryResource#getFilename()}.
+   *     File name to be used for the resulting binary resource, i.e. {@link BinaryResource#getFilename()}.
    * @return a {@link BinaryResource} with the content of the file specified by the given URL or {@code null} if the URL
-   *         is {@code null}.
+   * is {@code null}.
    * @throws ProcessingException
-   *           if reading the file content failed for some reason.
+   *     if reading the file content failed for some reason.
    */
   public static BinaryResource readBinaryResource(URL url, String targetName) {
     if (url == null) {
@@ -570,9 +570,9 @@ public final class IOUtility {
    * deleted when the virtual machine terminates.
    *
    * @param fileName
-   *          If no or an empty filename is given, a random fileName will be created.
+   *     If no or an empty filename is given, a random fileName will be created.
    * @param content
-   *          If no content is given, an empty file will be created
+   *     If no content is given, an empty file will be created
    * @return A new temporary file with specified content
    */
   public static File createTempFile(String fileName, byte[] content) {
@@ -584,12 +584,12 @@ public final class IOUtility {
    * deleted when the virtual machine terminates.
    *
    * @param fileName
-   *          If no or an empty filename is given, a random fileName will be created.
+   *     If no or an empty filename is given, a random fileName will be created.
    * @param content
-   *          If no content is given, an empty file will be created
+   *     If no content is given, an empty file will be created
    * @param directory
-   *          The directory in which the temporary file is to be created, or {@code null} if the default temp directory
-   *          is to be used
+   *     The directory in which the temporary file is to be created, or {@code null} if the default temp directory
+   *     is to be used
    * @return A new temporary file with specified content
    */
   public static File createTempFile(String fileName, File directory, byte[] content) {
@@ -632,15 +632,15 @@ public final class IOUtility {
    * Content stream is closed automatically.
    *
    * @param content
-   *          data to be written to the temporary file.
+   *     data to be written to the temporary file.
    * @param filename
-   *          file name prefix (the system will automatically add an arbitrary identifier to this prefix to generate a
-   *          unique file name)
+   *     file name prefix (the system will automatically add an arbitrary identifier to this prefix to generate a
+   *     unique file name)
    * @param extension
-   *          file name suffix (must include the colon, e.g. {@code ".tmp"})
+   *     file name suffix (must include the colon, e.g. {@code ".tmp"})
    * @return newly created temporary file
    * @throws ProcessingException
-   *           if file creation failed
+   *     if file creation failed
    */
   public static File createTempFile(InputStream content, String filename, String extension) {
     return createTempFile(content, filename, extension, null);
@@ -652,18 +652,18 @@ public final class IOUtility {
    * Content stream is closed automatically.
    *
    * @param content
-   *          data to be written to the temporary file.
+   *     data to be written to the temporary file.
    * @param filename
-   *          file name prefix (the system will automatically add an arbitrary identifier to this prefix to generate a
-   *          unique file name)
+   *     file name prefix (the system will automatically add an arbitrary identifier to this prefix to generate a
+   *     unique file name)
    * @param extension
-   *          file name suffix (must include the colon, e.g. {@code ".tmp"})
+   *     file name suffix (must include the colon, e.g. {@code ".tmp"})
    * @param directory
-   *          The directory in which the temporary file is to be created, or {@code null} if the default temp directory
-   *          is to be used
+   *     The directory in which the temporary file is to be created, or {@code null} if the default temp directory
+   *     is to be used
    * @return newly created temporary file
    * @throws ProcessingException
-   *           if file creation failed
+   *     if file creation failed
    */
   public static File createTempFile(InputStream content, String filename, String extension, File directory) {
     try {
@@ -684,14 +684,14 @@ public final class IOUtility {
    * <i>.suffix</i> and will be located in the default temp folder.
    *
    * @param prefix
-   *          The prefix of the temporary file
+   *     The prefix of the temporary file
    * @param suffix
-   *          The suffix of the temporary file. Don't forget the colon, for example <b>.tmp</b>
+   *     The suffix of the temporary file. Don't forget the colon, for example <b>.tmp</b>
    * @param content
-   *          data to be written to the temporary file.
+   *     data to be written to the temporary file.
    * @return A new temporary file with the specified content
    * @throws ProcessingException
-   *           if file creation failed
+   *     if file creation failed
    */
   public static File createTempFile(String prefix, String suffix, byte[] content) {
     return createTempFile(prefix, suffix, null, content);
@@ -703,17 +703,17 @@ public final class IOUtility {
    * <i>.suffix</i> and will be located in the specified directory.
    *
    * @param prefix
-   *          The prefix of the temporary file
+   *     The prefix of the temporary file
    * @param suffix
-   *          The suffix of the temporary file. Don't forget the colon, for example <b>.tmp</b>
+   *     The suffix of the temporary file. Don't forget the colon, for example <b>.tmp</b>
    * @param directory
-   *          The directory in which the temporary file is to be created, or {@code null} if the default temp directory
-   *          is to be used
+   *     The directory in which the temporary file is to be created, or {@code null} if the default temp directory
+   *     is to be used
    * @param content
-   *          data to be written to the temporary file.
+   *     data to be written to the temporary file.
    * @return A new temporary file with the specified content
    * @throws ProcessingException
-   *           if file creation failed
+   *     if file creation failed
    */
   public static File createTempFile(String prefix, String suffix, File directory, byte[] content) {
     File f = null;
@@ -736,10 +736,10 @@ public final class IOUtility {
    * Delete a directory and all containing files and directories
    *
    * @param dir
-   *          directory to be deleted
+   *     directory to be deleted
    * @return true if the directory is successfully deleted or does not exists; false otherwise
    * @throws SecurityException
-   *           - If a security manager exists and its check methods deny read or delete access
+   *     - If a security manager exists and its check methods deny read or delete access
    */
   public static boolean deleteDirectory(File dir) {
     if (dir != null && dir.exists()) {
@@ -903,7 +903,7 @@ public final class IOUtility {
    * Furthermore, "%20" is used to represent spaces instead of "+".
    *
    * @param url
-   *          the URL string which shall be encoded
+   *     the URL string which shall be encoded
    * @return the encoded URL string
    */
   public static String urlEncode(String url) {
@@ -925,7 +925,7 @@ public final class IOUtility {
    * <code>url</code> is null or an empty string respectively. Any leading / trailing whitespaces are omitted.
    *
    * @param encodedUrl
-   *          the encoded URL string which shall be decoded
+   *     the encoded URL string which shall be decoded
    * @return the decoded URL string
    */
   public static String urlDecode(String encodedUrl) {
@@ -977,11 +977,11 @@ public final class IOUtility {
    * file to itself using a Printwriter without autoflushing is safe.)
    *
    * @param writer
-   *          a PrintWriter for the destination file
+   *     a PrintWriter for the destination file
    * @param file
-   *          source file
+   *     source file
    * @throws ProcessingException
-   *           if an {@link IOException} occurs (e.g. if file does not exists)
+   *     if an {@link IOException} occurs (e.g. if file does not exists)
    */
   public static void appendFile(PrintWriter writer, File file) {
     try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -997,12 +997,12 @@ public final class IOUtility {
 
   /**
    * @param file
-   *          file to read from
+   *     file to read from
    * @param charsetName
-   *          The name of a supported {@link Charset </code>charset<code>}
+   *     The name of a supported {@link Charset </code>charset<code>}
    * @return List containing all lines of the file as Strings
    * @throws ProcessingException
-   *           if an {@link IOException} occurs (e.g. if file does not exists)
+   *     if an {@link IOException} occurs (e.g. if file does not exists)
    */
   public static List<String> readLines(File file, String charsetName) {
     try {

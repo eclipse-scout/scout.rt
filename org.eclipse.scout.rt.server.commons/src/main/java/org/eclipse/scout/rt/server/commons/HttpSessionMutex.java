@@ -43,11 +43,11 @@ public final class HttpSessionMutex implements HttpSessionListener {
    * sessions.
    *
    * @param httpSession
-   *          The {@link HttpSession} to prepare. Must not be {@code null}.
+   *     The {@link HttpSession} to prepare. Must not be {@code null}.
    * @throws AssertionException
-   *           if the given HTTP session is <code>null</code>.
+   *     if the given HTTP session is <code>null</code>.
    * @throws IllegalStateException
-   *           if the given HTTP session is invalid.
+   *     if the given HTTP session is invalid.
    */
   private void initMutex(HttpSession httpSession) {
     // we do not synchronize here because we expect to be called by the listener only.
@@ -66,20 +66,20 @@ public final class HttpSessionMutex implements HttpSessionListener {
    * and servlet containers.
    *
    * @param httpSession
-   *          The {@link HttpSession} for which the mutex object should be returned. Must not be {@code null}.
+   *     The {@link HttpSession} for which the mutex object should be returned. Must not be {@code null}.
    * @return A mutex for the given session. Never returns {@code null}.
    * @throws AssertionException
-   *           if the given HTTP session is <code>null</code>.
+   *     if the given HTTP session is <code>null</code>.
    * @throws IllegalStateException
-   *           if the given HTTP session is invalid.
+   *     if the given HTTP session is invalid.
    * @see HttpSessionListener
    * @see <a href=
-   *      "http://stackoverflow.com/questions/9802165/is-synchronization-within-an-httpsession-feasible">is-synchronization-within-an-httpsession-feasible<a>
+   * "http://stackoverflow.com/questions/9802165/is-synchronization-within-an-httpsession-feasible">is-synchronization-within-an-httpsession-feasible<a>
    * @see <a href=
-   *      "http://stackoverflow.com/questions/616601/is-httpsession-thread-safe-are-set-get-attribute-thread-safe-operations">is-httpsession-thread-safe-are-set-get-attribute-thread-safe-operations</a>
+   * "http://stackoverflow.com/questions/616601/is-httpsession-thread-safe-are-set-get-attribute-thread-safe-operations">is-httpsession-thread-safe-are-set-get-attribute-thread-safe-operations</a>
    * @see <a href=
-   *      "https://github.com/spring-projects/spring-framework/blob/master/spring-web/src/main/java/org/springframework/web/util/WebUtils.java">Spring
-   *      Implementation of method getSessionMutex</a>
+   * "https://github.com/spring-projects/spring-framework/blob/master/spring-web/src/main/java/org/springframework/web/util/WebUtils.java">Spring
+   * Implementation of method getSessionMutex</a>
    */
   public static Object of(HttpSession httpSession) {
     Object mutex = assertNotNull(httpSession).getAttribute(SESSION_MUTEX_ATTRIBUTE_NAME);

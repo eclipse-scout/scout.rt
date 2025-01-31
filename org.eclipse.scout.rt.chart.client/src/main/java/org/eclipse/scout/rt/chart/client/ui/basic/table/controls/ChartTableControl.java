@@ -113,5 +113,4 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
   public IChartColumnParam getAggregation() {
     return (IChartColumnParam) propertySupport.getProperty(PROP_CHART_AGGREGATION);
   }
-
 }

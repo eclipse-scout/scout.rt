@@ -33,8 +33,8 @@ public interface IJmsSessionProvider {
 
   /**
    * @return JMS {@link Session}
-   *         <p>
-   *         Do not cache or keep references to this value, it may change during failover
+   * <p>
+   * Do not cache or keep references to this value, it may change during failover
    */
   Session getSession() throws JMSException;
 
@@ -46,7 +46,7 @@ public interface IJmsSessionProvider {
    *
    * @return lazy created JMS {@link MessageProducer}
    * @throws JMSException
-   *           if the session fails to create a {@link MessageProducer} due to some internal error.
+   *     if the session fails to create a {@link MessageProducer} due to some internal error.
    */
   MessageProducer getProducer() throws JMSException;
 
@@ -58,7 +58,7 @@ public interface IJmsSessionProvider {
    *
    * @return lazy created JMS {@link MessageConsumer}
    * @throws JMSException
-   *           if the session fails to create a {@link MessageConsumer} due to some internal error.
+   *     if the session fails to create a {@link MessageConsumer} due to some internal error.
    */
   MessageConsumer getConsumer(SubscribeInput input) throws JMSException;
 
@@ -70,7 +70,7 @@ public interface IJmsSessionProvider {
    *
    * @return lazy created JMS {@link TemporaryQueue}
    * @throws JMSException
-   *           if the session fails to create a {@link TemporaryQueue} due to some internal error.
+   *     if the session fails to create a {@link TemporaryQueue} due to some internal error.
    */
   TemporaryQueue getTemporaryQueue() throws JMSException;
 
@@ -81,8 +81,8 @@ public interface IJmsSessionProvider {
    * connection and not the session and exists as long as the connection is alive.
    *
    * @throws JMSException
-   *           If there are existing receivers still using it or if the JMS provider fails to delete the temporary queue
-   *           due to some internal error.
+   *     If there are existing receivers still using it or if the JMS provider fails to delete the temporary queue
+   *     due to some internal error.
    */
   void deleteTemporaryQueue() throws JMSException;
 
@@ -102,18 +102,18 @@ public interface IJmsSessionProvider {
 
   /**
    * @param receiveTimeoutMillis
-   *          0 for no timeout
+   *     0 for no timeout
    * @return the next message or null if the consumer has no more messages
    * @throws JMSException
-   *           if the jms connection was closed and failover was not possible
+   *     if the jms connection was closed and failover was not possible
    * @since 6.1 moved to this interface in 10.0
    */
   Message receive(SubscribeInput subscribeInput, long receiveTimeoutMillis) throws JMSException;
 
   /**
    * @return subscription statistics since the last (re-)connect
-   *         <p>
-   *         Used in {@link JmsSubscription#awaitStarted(int, java.util.concurrent.TimeUnit)} and for unit testing
+   * <p>
+   * Used in {@link JmsSubscription#awaitStarted(int, java.util.concurrent.TimeUnit)} and for unit testing
    * @since 6.1 moved to this interface in 10.0
    */
   ISubscriptionStats getStats();

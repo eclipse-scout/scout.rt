@@ -492,7 +492,6 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     public LocalDateFieldExtension(OWNER owner) {
       super(owner);
     }
-
   }
 
   @Override

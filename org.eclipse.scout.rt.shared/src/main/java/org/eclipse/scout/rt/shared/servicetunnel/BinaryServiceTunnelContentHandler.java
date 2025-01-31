@@ -119,5 +119,4 @@ public class BinaryServiceTunnelContentHandler extends AbstractServiceTunnelCont
     }
     return true;
   }
-
 }

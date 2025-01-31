@@ -47,7 +47,7 @@ public enum TileGridMenuType implements IMenuType {
    * Updates the visibility of every single menu (including child menus) according to the given acceptedMenuTypes.
    *
    * @param filter
-   *          (optional) menus are filtered with this predicate before visibility is updated
+   *     (optional) menus are filtered with this predicate before visibility is updated
    */
   public static void updateMenuVisibilities(IContextMenu contextMenu, Set<IMenuType> acceptedMenuTypes, Predicate<IAction> filter) {
     final Predicate<IMenu> activeFilter = MenuUtility.createMenuFilterMenuTypes(acceptedMenuTypes, false);

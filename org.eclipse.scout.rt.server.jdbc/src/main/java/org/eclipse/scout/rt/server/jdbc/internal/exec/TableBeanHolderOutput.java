@@ -118,5 +118,4 @@ class TableBeanHolderOutput implements IBindOutput {
       table.removeRow(table.getRowCount() - 1);
     }
   }
-
 }

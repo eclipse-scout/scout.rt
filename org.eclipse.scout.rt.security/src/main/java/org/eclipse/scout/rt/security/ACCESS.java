@@ -30,7 +30,7 @@ public final class ACCESS {
    * </code>
    *
    * @param permission
-   *          if {@code null}, false is returned
+   *     if {@code null}, false is returned
    * @return true if access is granted
    */
   public static boolean check(Permission permission) {
@@ -41,7 +41,7 @@ public final class ACCESS {
    * Throws an exception if {@link #check(Permission)} fails for the given permission.
    *
    * @throws AccessForbiddenException
-   *           thrown if access is not granted
+   *     thrown if access is not granted
    * @see IPermission#getAccessCheckFailedMessage()
    */
   public static void checkAndThrow(Permission permission) {
@@ -61,7 +61,7 @@ public final class ACCESS {
    * The access check failed message is taken from the <em>first</em> permission.
    *
    * @throws AccessForbiddenException
-   *           thrown if access is not granted
+   *     thrown if access is not granted
    * @see IPermission#getAccessCheckFailedMessage()
    */
   public static void checkAnyAndThrow(Permission... permissions) {
@@ -81,7 +81,7 @@ public final class ACCESS {
    * The access check failed message is taken from the <em>first</em> permission for which access was not granted.
    *
    * @throws AccessForbiddenException
-   *           thrown if access is not granted
+   *     thrown if access is not granted
    * @see IPermission#getAccessCheckFailedMessage()
    */
   public static void checkAllAndThrow(Permission... permissions) {

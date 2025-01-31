@@ -171,11 +171,11 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
 
   /**
    * @return all fields of the form data and all its external template field datas in a map with qualified ids<br>
-   *         The array of returned fields is the result of a top-down breadth-first tree traversal
-   *         <p>
-   *         Example:
+   * The array of returned fields is the result of a top-down breadth-first tree traversal
+   * <p>
+   * Example:
    *
-   *         <pre>
+   * <pre>
    * A
    *   U
    *     E
@@ -185,8 +185,8 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    *   X
    *   Y
    *         </pre>
-   *
-   *         would be returned as A B U V X Y E F
+   * <p>
+   * would be returned as A B U V X Y E F
    */
   public Map<Integer, Map<String/* qualified field id */, AbstractFormFieldData>> getAllFieldsRec() {
     Map<Integer, Map<String, AbstractFormFieldData>> breadthFirstMap = new TreeMap<>();
@@ -247,12 +247,12 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    * Searches the given form field data in this form data as well as in all externally referenced template field data.
    *
    * @param breadthFirstMap
-   *          The breadth-first search map as returned by {@link AbstractFormData#getAllFieldsRec()}. If
-   *          <code>null</code>, a new map is created.
+   *     The breadth-first search map as returned by {@link AbstractFormData#getAllFieldsRec()}. If
+   *     <code>null</code>, a new map is created.
    * @param valueTypeIdentifier
-   *          The class identifier to be searched in the form data.
+   *     The class identifier to be searched in the form data.
    * @return Returns the form data's {@link AbstractFormFieldData} of the given valueType or <code>null</code>, if it
-   *         does not exist.
+   * does not exist.
    */
   public AbstractFormFieldData findFieldByClass(Map<Integer, Map<String, AbstractFormFieldData>> breadthFirstMap, ClassIdentifier valueTypeIdentifier) {
     if (breadthFirstMap == null) {
@@ -276,11 +276,11 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
 
   /**
    * @return all properties of the form data and all its external template field data in a map with qualified ids<br>
-   *         The array of returned fields is the result of a top-down breadth-first tree traversal
-   *         <p>
-   *         Example:
+   * The array of returned fields is the result of a top-down breadth-first tree traversal
+   * <p>
+   * Example:
    *
-   *         <pre>
+   * <pre>
    * A (p1, p4)
    *   U
    *     E (p3)
@@ -290,8 +290,8 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    *   X (p2)
    *   Y
    *         </pre>
-   *
-   *         would be returned as p1, p4, p2, p3
+   * <p>
+   * would be returned as p1, p4, p2, p3
    */
   public Map<Integer, Map<String/* qualified property id */, AbstractPropertyData<?>>> getAllPropertiesRec() {
     Map<Integer, Map<String, AbstractPropertyData<?>>> breadthFirstMap = new TreeMap<>();
@@ -320,12 +320,12 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    * Searches the given property data in this form data as well as in all externally referenced template field data.
    *
    * @param breadthFirstMap
-   *          The breadth-first search map as returned by {@link AbstractFormData#getAllPropertiesRec()}. If
-   *          <code>null</code>, a new map is created.
+   *     The breadth-first search map as returned by {@link AbstractFormData#getAllPropertiesRec()}. If
+   *     <code>null</code>, a new map is created.
    * @param valueType
-   *          The type to be searched in the form data.
+   *     The type to be searched in the form data.
    * @return Returns the form data's {@link AbstractPropertyData} of the given valueType or <code>null</code>, if it
-   *         does not exist.
+   * does not exist.
    */
   public AbstractPropertyData<?> findPropertyByClass(Map<Integer, Map<String, AbstractPropertyData<?>>> breadthFirstMap, ClassIdentifier valueTypeClassIdentifier) {
     if (breadthFirstMap == null) {
@@ -362,11 +362,11 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    *
    * @param valueTypeIdentifier
    * @param fullyQualifiedFieldId
-   *          The fully qualified fieldId.
+   *     The fully qualified fieldId.
    * @param obj
-   *          The object representing the last segment.
+   *     The object representing the last segment.
    * @return Returns <code>true</code> if all segments of the given class identifier are part of the fully qualified
-   *         field id. <code>false</code> otherwise.
+   * field id. <code>false</code> otherwise.
    */
   private boolean matchesAllParts(ClassIdentifier valueTypeIdentifier, String fullyQualifiedFieldId, Object obj) {
     // check last segment by class

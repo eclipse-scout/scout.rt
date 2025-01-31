@@ -25,6 +25,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 import jakarta.jms.Connection;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.DeliveryMode;
@@ -37,9 +41,6 @@ import jakarta.jms.Queue;
 import jakarta.jms.Session;
 import jakarta.jms.TemporaryQueue;
 import jakarta.jms.Topic;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import org.eclipse.scout.rt.dataobject.id.IIds;
 import org.eclipse.scout.rt.dataobject.id.NodeId;
@@ -655,10 +656,10 @@ public class JmsMomImplementor implements IMomImplementor {
 
   /**
    * @return a shared {@link Connection} to JMS broker. This method may block until a connection is available.
-   *         <p>
-   *         Do not keep references to this value, it may change after reconnect attempts.
-   *         <p>
-   *         see {@link #isConnected()} which is not blocking
+   * <p>
+   * Do not keep references to this value, it may change after reconnect attempts.
+   * <p>
+   * see {@link #isConnected()} which is not blocking
    */
   public Connection getConnection() {
     try {

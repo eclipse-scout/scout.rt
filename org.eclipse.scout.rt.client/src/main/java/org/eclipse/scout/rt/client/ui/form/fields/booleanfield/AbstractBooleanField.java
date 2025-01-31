@@ -64,9 +64,9 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
    * </ul>
    * The default is <code>false</code>.
    *
-   * @since 6.1
    * @return <code>true</code> if this check box supports the so-called "tri-state" and allows setting the value to
-   *         <code>null</code> to represent the "undefined" value.
+   * <code>null</code> to represent the "undefined" value.
+   * @since 6.1
    */
   @Order(220)
   @ConfigProperty(ConfigProperty.BOOLEAN)

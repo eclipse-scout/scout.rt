@@ -18,5 +18,4 @@ import java.util.function.Predicate;
 public interface IPropertyChangeEventFilterCondition extends Predicate<PropertyChangeEvent> {
 
   String getPropertyName();
-
 }

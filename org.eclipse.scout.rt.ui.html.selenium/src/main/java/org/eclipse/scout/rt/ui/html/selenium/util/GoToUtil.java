@@ -54,5 +54,4 @@ public final class GoToUtil {
     test.assertCssClass(viewTab, "selected");
     return test.waitUntilView();
   }
-
 }

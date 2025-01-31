@@ -28,7 +28,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
   /**
    * @return sql data with the following columns
    *
-   *         <pre>
+   * <pre>
    * ID    NUMBER required
    * DATA  BINARY BookmarkFolder object required
    *         </pre>
@@ -42,7 +42,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
   /**
    * @return sql data with the following columns
    *
-   *         <pre>
+   * <pre>
    * ID    NUMBER required
    * DATA  BINARY BookmarkFolder object required
    *         </pre>
@@ -70,7 +70,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    *   //DELETE
    * }
    * </pre>
-   *
+   * <p>
    * SQL Examples:
    *
    * <pre>
@@ -110,7 +110,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    *   //DELETE
    * }
    * </pre>
-   *
+   * <p>
    * SQL Examples:
    *
    * <pre>
@@ -136,7 +136,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
   /**
    * @param id
    * @param binary
-   *          data
+   *     data
    * @return the {@link BookmarkFolder} created by the binary data
    */
   @ConfigOperation

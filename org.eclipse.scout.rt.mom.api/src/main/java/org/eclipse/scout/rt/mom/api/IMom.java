@@ -81,16 +81,16 @@ public interface IMom {
    * Publishes the given message to the given destination.
    *
    * @param destination
-   *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
-   *          documentation for more information about the difference between topic and queue based messaging.
+   *     specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
+   *     documentation for more information about the difference between topic and queue based messaging.
    * @param transferObject
-   *          specifies the transfer object to be sent to the destination.<br>
-   *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
-   *          that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
+   *     specifies the transfer object to be sent to the destination.<br>
+   *     The object is marshalled into its transport representation using the {@link IMarshaller} registered for
+   *     that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
    * @param input
-   *          specifies how to publish the message.
+   *     specifies how to publish the message.
    * @param <DTO>
-   *          the type of the transfer object to be published.
+   *     the type of the transfer object to be published.
    * @see IMom#subscribe(IDestination, IMessageListener, SubscribeInput)
    */
   <DTO> void publish(IDestination<DTO> destination, DTO transferObject, PublishInput input);
@@ -99,16 +99,16 @@ public interface IMom {
    * Subscribes the given listener to receive messages sent to the given destination.
    *
    * @param destination
-   *          specifies the target to consume messages from, and is either a topic (pub/sub) or queue (P2P). See
-   *          {@link IMom} documentation for more information about the difference between topic and queue based
-   *          messaging.
+   *     specifies the target to consume messages from, and is either a topic (pub/sub) or queue (P2P). See
+   *     {@link IMom} documentation for more information about the difference between topic and queue based
+   *     messaging.
    * @param listener
-   *          specifies the listener to receive messages.
+   *     specifies the listener to receive messages.
    * @param input
-   *          specifies how to subscribe for messages.
-   * @return subscription handle to unsubscribe from the destination.
+   *     specifies how to subscribe for messages.
    * @param <DTO>
-   *          the type of the transfer object a subscription is created for.
+   *     the type of the transfer object a subscription is created for.
+   * @return subscription handle to unsubscribe from the destination.
    * @see IMom#publish(IDestination, Object, PublishInput)
    */
   <DTO> ISubscription subscribe(IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input);
@@ -130,28 +130,28 @@ public interface IMom {
    * waiting for the reply.
    *
    * @param destination
-   *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
-   *          documentation for more information about the difference between topic and queue based messaging.
+   *     specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
+   *     documentation for more information about the difference between topic and queue based messaging.
    * @param requestObject
-   *          specifies the transfer object to be sent to the destination.<br>
-   *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
-   *          that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
+   *     specifies the transfer object to be sent to the destination.<br>
+   *     The object is marshalled into its transport representation using the {@link IMarshaller} registered for
+   *     that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
    * @param input
-   *          specifies how to publish the message. Transacted publish of the request is not supported.
+   *     specifies how to publish the message. Transacted publish of the request is not supported.
+   * @param <REQUEST>
+   *     the type of the request object
+   * @param <REPLY>
+   *     the type of the reply object
    * @return the reply of the consumer.
    * @throws ThreadInterruptedError
-   *           if interrupted while waiting for the reply to receive. If interrupted, an interruption request is sent to
-   *           the consumer(s).
+   *     if interrupted while waiting for the reply to receive. If interrupted, an interruption request is sent to
+   *     the consumer(s).
    * @throws TimedOutError
-   *           if the timeout specified via {@link PublishInput#withRequestReplyTimeout(long, TimeUnit)} elapsed. If
-   *           elapsed, an interruption request is sent to the consumer(s).
+   *     if the timeout specified via {@link PublishInput#withRequestReplyTimeout(long, TimeUnit)} elapsed. If
+   *     elapsed, an interruption request is sent to the consumer(s).
    * @throws RuntimeException
-   *           if the request failed because the replier threw an exception. If threw a {@link RuntimeException}, it is
-   *           that exception which is thrown.
-   * @param <REQUEST>
-   *          the type of the request object
-   * @param <REPLY>
-   *          the type of the reply object
+   *     if the request failed because the replier threw an exception. If threw a {@link RuntimeException}, it is
+   *     that exception which is thrown.
    * @see IMom#reply(IBiDestination, IRequestListener, SubscribeInput)
    */
   <REQUEST, REPLY> REPLY request(IBiDestination<REQUEST, REPLY> destination, REQUEST requestObject, PublishInput input);
@@ -160,18 +160,18 @@ public interface IMom {
    * Subscribes the given listener to receive messages from 'request-reply' communication sent to the given destination.
    *
    * @param destination
-   *          specifies the target to consume messages from, and is either a topic (pub/sub) or queue (P2P). See
-   *          {@link IMom} documentation for more information about the difference between topic and queue based
-   *          messaging.
+   *     specifies the target to consume messages from, and is either a topic (pub/sub) or queue (P2P). See
+   *     {@link IMom} documentation for more information about the difference between topic and queue based
+   *     messaging.
    * @param listener
-   *          specifies the listener to receive messages.
+   *     specifies the listener to receive messages.
    * @param input
-   *          specifies how to subscribe for messages.
-   * @return subscription handle to unsubscribe from the destination.
+   *     specifies how to subscribe for messages.
    * @param <REQUEST>
-   *          the type of the request object
+   *     the type of the request object
    * @param <REPLY>
-   *          the type of the reply object
+   *     the type of the reply object
+   * @return subscription handle to unsubscribe from the destination.
    * @see IMom#request(IBiDestination, Object, PublishInput)
    */
   <REQUEST, REPLY> ISubscription reply(IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, SubscribeInput input);
@@ -186,8 +186,8 @@ public interface IMom {
    * MOM instance.
    *
    * @param durableSubscriptionName
-   *          The same name that was used to create the durable subscription (see
-   *          {@link SubscribeInput#withDurableSubscription(String)}).
+   *     The same name that was used to create the durable subscription (see
+   *     {@link SubscribeInput#withDurableSubscription(String)}).
    */
   void cancelDurableSubscription(String durableSubscriptionName);
 

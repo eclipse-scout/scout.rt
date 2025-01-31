@@ -142,7 +142,6 @@ public class ExceptionProcessorTest {
           public void handle(Throwable t) {
             error.set(t);
           }
-
         }, true);
 
     CallableChain<String> chain = new CallableChain<>();

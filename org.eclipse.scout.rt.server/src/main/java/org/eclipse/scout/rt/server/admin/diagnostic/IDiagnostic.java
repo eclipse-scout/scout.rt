@@ -20,5 +20,4 @@ public interface IDiagnostic {
   void addSubmitButtonsHTML(List<List<String>> result);
 
   void call(String action, Object[] values);
-
 }

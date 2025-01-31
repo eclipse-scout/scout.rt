@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.nls;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.Locale;
 import java.util.Map;

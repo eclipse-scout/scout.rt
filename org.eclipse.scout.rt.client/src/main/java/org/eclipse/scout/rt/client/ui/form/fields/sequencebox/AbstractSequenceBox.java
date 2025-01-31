@@ -76,11 +76,11 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
 
   /**
    * @return true: A value change trigger ensures that all fields in the range box have consistent (ascending values) by
-   *         calling {@link #execCheckFromTo(IValueField[], int)}
-   *         <p>
-   *         Examples:
+   * calling {@link #execCheckFromTo(IValueField[], int)}
+   * <p>
+   * Examples:
    *
-   *         <pre>
+   * <pre>
    * fromField.value &lt;= toField.value
    * minField.value &lt;= preferredField.value &lt;= maxField.value
    *         </pre>
@@ -107,9 +107,9 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
    * Only active when {@link #isAutoCheckFromTo()} resp. {@link #getConfiguredAutoCheckFromTo()} is set to true
    *
    * @param valueFields
-   *          all value fields in the range box that have the same {@link IHolder#getHolderType()} and are comparable
+   *     all value fields in the range box that have the same {@link IHolder#getHolderType()} and are comparable
    * @param changedIndex
-   *          the field that triggered the change
+   *     the field that triggered the change
    */
   @ConfigOperation
   @Order(200)

@@ -49,13 +49,13 @@ public final class MultipartPart {
    * {@link #ofField(String, String)} can be used instead.
    *
    * @param partName
-   *          Name of part (mandatory)
+   *     Name of part (mandatory)
    * @param filename
-   *          Filename (optional)
+   *     Filename (optional)
    * @param contentType
-   *          Content type (optional)
+   *     Content type (optional)
    * @param inputStream
-   *          Input stream (mandatory)
+   *     Input stream (mandatory)
    */
   public static MultipartPart of(String partName, String filename, String contentType, InputStream inputStream) {
     return new MultipartPart(partName, filename, contentType, inputStream);
@@ -65,12 +65,12 @@ public final class MultipartPart {
    * Create a file field part.
    *
    * @param partName
-   *          Name of part (mandatory)
+   *     Name of part (mandatory)
    * @param filename
-   *          Filename (recommended because content type is deduced from filename extension, otherwise
-   *          {@link MediaType#APPLICATION_OCTET_STREAM} is used)
+   *     Filename (recommended because content type is deduced from filename extension, otherwise
+   *     {@link MediaType#APPLICATION_OCTET_STREAM} is used)
    * @param inputStream
-   *          Input stream (mandatory)
+   *     Input stream (mandatory)
    */
   public static MultipartPart ofFile(String partName, String filename, InputStream inputStream) {
     String contentType = FileUtility.getContentTypeForExtension(FileUtility.getFileExtension(filename));
@@ -81,9 +81,9 @@ public final class MultipartPart {
    * Creates a text field part, uses {@link StandardCharsets#UTF_8} for value encoding and no content type.
    *
    * @param partName
-   *          Name of part (mandatory)
+   *     Name of part (mandatory)
    * @param value
-   *          Text value (mandatory)
+   *     Text value (mandatory)
    */
   public static MultipartPart ofField(String partName, String value) {
     assertNotNull(value, "value is required");

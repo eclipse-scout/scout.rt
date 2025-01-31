@@ -54,7 +54,7 @@ public interface IExecutionSemaphore {
    *
    * @return <code>this</code> to support for method chaining.
    * @throws AssertionException
-   *           if the semaphore is <em>sealed</em>.
+   *     if the semaphore is <em>sealed</em>.
    */
   IExecutionSemaphore withPermits(int permits);
 

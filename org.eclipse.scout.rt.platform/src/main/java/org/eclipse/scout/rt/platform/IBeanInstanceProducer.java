@@ -25,7 +25,7 @@ public interface IBeanInstanceProducer<T> {
    * Creates an instance for the given {@link IBean}.
    *
    * @param bean
-   *          The {@link IBean} to create the instance for.
+   *     The {@link IBean} to create the instance for.
    * @return The created instance or <code>null</code>.
    */
   T produce(IBean<T> bean);

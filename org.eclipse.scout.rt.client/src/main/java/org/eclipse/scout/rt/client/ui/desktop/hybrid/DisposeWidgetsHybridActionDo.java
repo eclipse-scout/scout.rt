@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.client.ui.desktop.hybrid;
 import java.util.Collection;
 import java.util.List;
 
+import jakarta.annotation.Generated;
+
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.TypeName;
-
-import jakarta.annotation.Generated;
 
 @TypeName("scout.DisposeWidgetsHybridAction")
 public class DisposeWidgetsHybridActionDo extends DoEntity {

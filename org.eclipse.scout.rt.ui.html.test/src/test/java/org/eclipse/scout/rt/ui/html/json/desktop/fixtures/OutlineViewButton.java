@@ -20,5 +20,4 @@ public class OutlineViewButton extends AbstractOutlineViewButton {
   public OutlineViewButton(IDesktop desktop, Class<? extends IOutline> outlineType) {
     super(desktop, outlineType);
   }
-
 }

@@ -75,5 +75,4 @@ public class TextKeyTextProviderService implements ITextProviderService {
       }
     }
   }
-
 }

@@ -17,5 +17,6 @@ import org.eclipse.scout.rt.platform.Bean;
 @Bean
 public interface IAntiCsrfFilterExclusion {
   boolean isIgnored(ContainerRequestContext requestContext);
+
   boolean isIgnored(ClientRequestContext requestContext);
 }

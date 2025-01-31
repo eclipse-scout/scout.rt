@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.security.auth.Subject;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -69,10 +70,10 @@ public class ServletFilterHelper {
    * entered a '/' at the end.
    *
    * @param includeServletPath
-   *          true: include the servletPath in the decision if a redirect should be sent.<br/>
-   *          false: only use the contextPath to decide if a redirect should be sent.
+   *     true: include the servletPath in the decision if a redirect should be sent.<br/>
+   *     false: only use the contextPath to decide if a redirect should be sent.
    * @return true if a redirect was sent to the browser. Only idempotent request methods are potentially redirected. See
-   *         {@link #isIdempotent(HttpServletRequest)}.
+   * {@link #isIdempotent(HttpServletRequest)}.
    */
   public boolean redirectIncompleteBasePath(HttpServletRequest request, HttpServletResponse response, boolean includeServletPath) throws IOException {
     if (isIdempotent(request)) {
@@ -114,9 +115,9 @@ public class ServletFilterHelper {
    * put a principal to the {@link HttpSession} as {@link #SESSION_ATTRIBUTE_FOR_PRINCIPAL}
    *
    * @param req
-   *          The request holding the {@link HttpSession} on which the principal should be stored.
+   *     The request holding the {@link HttpSession} on which the principal should be stored.
    * @param principal
-   *          The principal to put on the session of the given request.
+   *     The principal to put on the session of the given request.
    */
   public void putPrincipalOnSession(HttpServletRequest req, Principal principal) {
     HttpSession session = req.getSession();
@@ -153,9 +154,9 @@ public class ServletFilterHelper {
    * and there is a remote user set on {@link HttpServletRequest}, a {@link Principal} is created for that remote user.
    *
    * @param servletRequest
-   *          the current request.
+   *     the current request.
    * @param principalProducer
-   *          used to create a principal objects.
+   *     used to create a principal objects.
    * @return authenticated principal, or <code>null</code> if not found.
    */
   public Principal findPrincipal(HttpServletRequest servletRequest, IPrincipalProducer principalProducer) {

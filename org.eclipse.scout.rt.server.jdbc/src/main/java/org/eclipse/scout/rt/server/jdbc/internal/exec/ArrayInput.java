@@ -145,5 +145,4 @@ class ArrayInput implements IBindInput {
     }
     return null;
   }
-
 }

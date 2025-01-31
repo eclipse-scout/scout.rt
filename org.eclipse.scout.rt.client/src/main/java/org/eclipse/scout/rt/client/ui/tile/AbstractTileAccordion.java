@@ -765,7 +765,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
    * Subclasses can override this method. The default does nothing.
    *
    * @param tiles
-   *          an unmodifiable list of the selected tiles, may be empty but not null.
+   *     an unmodifiable list of the selected tiles, may be empty but not null.
    */
   @ConfigOperation
   @Order(100)
@@ -778,7 +778,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
    * Subclasses can override this method. The default does nothing.
    *
    * @param tile
-   *          that was clicked
+   *     that was clicked
    */
   @ConfigOperation
   @Order(110)
@@ -791,7 +791,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
    * Subclasses can override this method. The default does nothing.
    *
    * @param tile
-   *          to perform the action for
+   *     to perform the action for
    */
   @ConfigOperation
   @Order(120)
@@ -832,7 +832,6 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     public void execTileAction(TileActionChain<T> chain, T tile) {
       getOwner().execTileAction(tile);
     }
-
   }
 
   protected final void interceptTilesSelected(List<T> tiles) {
@@ -879,5 +878,4 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
       return 0;
     }
   }
-
 }

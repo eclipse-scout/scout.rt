@@ -126,7 +126,7 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
 
   /**
    * @param mode
-   *          value from {@link IPlannerDisplayMode}
+   *     value from {@link IPlannerDisplayMode}
    */
   void setDisplayMode(int mode);
 

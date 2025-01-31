@@ -32,10 +32,10 @@ public final class HttpCacheKey implements Serializable {
 
   /**
    * @param resourcePath
-   *          optional
+   *     optional
    * @param attributes
-   *          an (optional) array of arbitrary cache attributes which may be exclusive for a certain type of
-   *          cache-object. For instance a HTML-document will store the 'theme' here.
+   *     an (optional) array of arbitrary cache attributes which may be exclusive for a certain type of
+   *     cache-object. For instance a HTML-document will store the 'theme' here.
    */
   public HttpCacheKey(String resourcePath, Map<String, String> attributes) {
     m_resourcePath = resourcePath;

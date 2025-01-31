@@ -214,7 +214,7 @@ public class TableCompactHandler implements ITableCompactHandler {
 
   /**
    * @return the columns based on {@link #isUseOnlyVisibleColumns()} sorted by the provided title and content columns
-   *         (title columns come first, then content columns, then the remaining columns)
+   * (title columns come first, then content columns, then the remaining columns)
    */
   @Override
   public List<IColumn<?>> getColumns() {
@@ -405,11 +405,11 @@ public class TableCompactHandler implements ITableCompactHandler {
 
   /**
    * @param bean
-   *          the bean for the current row
+   *     the bean for the current row
    * @param column
-   *          the currently processed column
+   *     the currently processed column
    * @param row
-   *          the current row
+   *     the current row
    */
   protected void updateBean(CompactBean bean, IColumn<?> column, ITableRow row) {
     if (getTitleBuilder().accept(column)) {

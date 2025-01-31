@@ -98,7 +98,7 @@ public class LockedFile implements Closeable {
    * {@link LockedFile#isReadOnly()}
    *
    * @param t
-   *          The new last-modified time, measured in milliseconds since the epoch (00:00:00 GMT, January 1, 1970)
+   *     The new last-modified time, measured in milliseconds since the epoch (00:00:00 GMT, January 1, 1970)
    * @return {@code true} if and only if the operation succeeded.
    */
   public boolean setLastModified(long t) throws IOException {
@@ -116,7 +116,7 @@ public class LockedFile implements Closeable {
 
   /**
    * @return a {@link InputStream} to this locked file, do NOT close this {@link InputStream} unless you want to close
-   *         the {@link LockedFile} and release the lock
+   * the {@link LockedFile} and release the lock
    */
   public InputStream newInputStream() throws IOException {
     m_raFile.seek(0);
@@ -125,8 +125,8 @@ public class LockedFile implements Closeable {
 
   /**
    * @return an {@link OutputStream} to this {@link LockedFile}. Do NOT close this {@link OutputStream} unless you want
-   *         to close the {@link LockedFile} and release the lock! This method fails if this {@link LockedFile}
-   *         {@link #isReadOnly()}.
+   * to close the {@link LockedFile} and release the lock! This method fails if this {@link LockedFile}
+   * {@link #isReadOnly()}.
    */
   public OutputStream newOutputStream() throws IOException {
     m_raFile.seek(0);

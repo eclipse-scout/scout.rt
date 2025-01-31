@@ -47,7 +47,6 @@ public class DownloadHandlerStorage {
     public IOpenUriAction getOpenUriAction() {
       return m_openUriAction;
     }
-
   }
 
   /**
@@ -97,9 +96,9 @@ public class DownloadHandlerStorage {
 
   /**
    * @param key
-   *          key to remove after TTL has expired
+   *     key to remove after TTL has expired
    * @param ttl
-   *          time to live in milliseconds
+   *     time to live in milliseconds
    */
   protected void scheduleRemoval(final String key, long ttl) {
     final IFuture<?> oldFuture = m_futureMap.put(key, Jobs.schedule(() -> removeOnTimeout(key), Jobs.newInput()
@@ -147,7 +146,6 @@ public class DownloadHandlerStorage {
       }
     }
     return resHolderWithAction;
-
   }
 
   protected boolean containsDownloadInterceptor(BinaryResourceHolder holder) {

@@ -15,8 +15,8 @@ import java.util.function.BiConsumer;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.lookup.IQueryParam;
-import org.eclipse.scout.rt.client.services.lookup.LookupCallResult;
 import org.eclipse.scout.rt.client.services.lookup.IQueryParam.QueryBy;
+import org.eclipse.scout.rt.client.services.lookup.LookupCallResult;
 import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
@@ -106,5 +106,4 @@ public class HierarchicalSmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmart
       throw new IllegalStateException();
     }
   }
-
 }

@@ -28,5 +28,4 @@ public interface IClientServiceTunnel extends IServiceTunnel {
    * used polling interval will be max(2000ms,N*700ms) -&gt; 7000ms
    */
   void setAnalyzeNetworkLatency(boolean b);
-
 }

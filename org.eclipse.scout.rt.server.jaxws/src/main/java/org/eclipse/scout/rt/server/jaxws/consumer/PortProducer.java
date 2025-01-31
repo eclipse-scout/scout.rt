@@ -20,6 +20,7 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.xml.namespace.QName;
+
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.WebServiceException;
 import jakarta.xml.ws.WebServiceFeature;
@@ -67,8 +68,7 @@ public class PortProducer<SERVICE extends Service, PORT> implements IPortProvide
     try {
       // Create the service
       final Constructor<? extends Service> constructor = m_serviceClazz.getConstructor(URL.class, QName.class);
-      @SuppressWarnings("unchecked")
-      final SERVICE service = (SERVICE) constructor.newInstance(m_wsdlLocation, new QName(m_targetNamespace, m_serviceName));
+      @SuppressWarnings("unchecked") final SERVICE service = (SERVICE) constructor.newInstance(m_wsdlLocation, new QName(m_targetNamespace, m_serviceName));
 
       // Install the handler chain
       service.setHandlerResolver(portInfo -> {
@@ -79,8 +79,7 @@ public class PortProducer<SERVICE extends Service, PORT> implements IPortProvide
           handlerChain.set(i, proxyHandler(handlerChain.get(i)));
         }
 
-        @SuppressWarnings("unchecked")
-        final List<Handler> handlers = TypeCastUtility.castValue(handlerChain, List.class);
+        @SuppressWarnings("unchecked") final List<Handler> handlers = TypeCastUtility.castValue(handlerChain, List.class);
         return handlers;
       });
 

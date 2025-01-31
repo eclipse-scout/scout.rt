@@ -23,5 +23,4 @@ public class TableOrganizerProvider implements ITableOrganizerProvider {
   public ITableOrganizer createTableOrganizer(ITable table) {
     return new TableOrganizer(table);
   }
-
 }

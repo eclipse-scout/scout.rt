@@ -29,5 +29,4 @@ public interface IHtmlCapable {
    * @return true, if the cell may contain html that needs to be rendered. false otherwise.
    */
   boolean isHtmlEnabled();
-
 }

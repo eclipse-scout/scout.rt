@@ -20,7 +20,7 @@ public interface IFormFieldFilter {
    * specifies if the given field should be further processed.
    *
    * @param field
-   *          The field to check.
+   *     The field to check.
    * @return true if the given field should be processed. false otherwise.
    * @see {@link AbstractForm#importFormData(org.eclipse.scout.rt.shared.data.form.AbstractFormData, boolean, org.eclipse.scout.rt.platform.reflect.IPropertyFilter, IFormFieldFilter)}
    */

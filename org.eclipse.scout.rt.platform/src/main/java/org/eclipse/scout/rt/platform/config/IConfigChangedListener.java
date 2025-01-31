@@ -20,7 +20,7 @@ public interface IConfigChangedListener extends EventListener {
    * Callback indicating that the given event occurred.
    *
    * @param event
-   *          The event describing the change.
+   *     The event describing the change.
    */
   void configPropertyChanged(ConfigPropertyChangeEvent event);
 }

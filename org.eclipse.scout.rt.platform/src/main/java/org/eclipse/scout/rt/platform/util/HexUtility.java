@@ -53,7 +53,7 @@ public final class HexUtility {
    * Hex encodes the supplied block of data. Line wrapping is not applied on output.
    *
    * @param bytes
-   *          The block of data that is to be Hex encoded.
+   *     The block of data that is to be Hex encoded.
    * @return A <code>String</code> containing the encoded data.
    */
   public static String encode(byte[] bytes) {
@@ -79,7 +79,7 @@ public final class HexUtility {
    * Decodes the supplied Hex encoded string.
    *
    * @param hex
-   *          The Hex encoded string that is to be decoded.
+   *     The Hex encoded string that is to be decoded.
    * @return A <code>byte[]</code> containing the decoded data block.
    */
   public static byte[] decode(String hex) {
@@ -212,5 +212,4 @@ public final class HexUtility {
       }
     }
   }
-
 }

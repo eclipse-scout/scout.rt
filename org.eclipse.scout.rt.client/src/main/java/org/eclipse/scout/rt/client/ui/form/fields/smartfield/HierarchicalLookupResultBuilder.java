@@ -20,8 +20,8 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallResult;
 import org.eclipse.scout.rt.client.services.lookup.IQueryParam;
-import org.eclipse.scout.rt.client.services.lookup.LookupCallResult;
 import org.eclipse.scout.rt.client.services.lookup.IQueryParam.QueryBy;
+import org.eclipse.scout.rt.client.services.lookup.LookupCallResult;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class HierarchicalLookupResultBuilder<VALUE> {
   /**
    * @param lookupRows
    * @param selectedKey
-   *          selected key or null
+   *     selected key or null
    * @return
    */
   protected List<ILookupRow<VALUE>> getRowsWithParents(List<ILookupRow<VALUE>> lookupRows, VALUE parent) {
@@ -62,7 +62,6 @@ public class HierarchicalLookupResultBuilder<VALUE> {
             allRows.add(row.getKey());
             res.add(row);
           }
-
         }
       }
     }
@@ -213,5 +212,4 @@ public class HierarchicalLookupResultBuilder<VALUE> {
       return m_rows.get().get(key);
     }
   }
-
 }

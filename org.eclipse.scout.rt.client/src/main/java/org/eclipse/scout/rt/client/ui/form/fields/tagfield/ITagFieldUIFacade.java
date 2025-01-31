@@ -16,5 +16,4 @@ public interface ITagFieldUIFacade {
   void setValueFromUI(Set<String> value);
 
   void lookupByTextFromUI(String proposal);
-
 }

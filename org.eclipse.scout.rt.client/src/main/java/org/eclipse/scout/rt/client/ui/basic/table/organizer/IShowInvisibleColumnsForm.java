@@ -23,5 +23,4 @@ public interface IShowInvisibleColumnsForm extends IForm {
   void startModify();
 
   IShowInvisibleColumnsForm withInsertAfterColumn(IColumn<?> insertAfterColumn);
-
 }

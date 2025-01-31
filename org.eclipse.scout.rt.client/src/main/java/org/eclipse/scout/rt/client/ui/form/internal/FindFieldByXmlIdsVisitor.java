@@ -76,7 +76,7 @@ public class FindFieldByXmlIdsVisitor implements Consumer<IFormField> {
 
   /**
    * @return Returns the rank of the given field's fieldId path and the one requested by this visitor. A perfect match
-   *         yields the largest number. 0 is returned if there is no match at all.
+   * yields the largest number. 0 is returned if there is no match at all.
    */
   private int getFieldIdRank(IFormField f) {
     // Class primary type
@@ -100,8 +100,8 @@ public class FindFieldByXmlIdsVisitor implements Consumer<IFormField> {
 
   /**
    * @return Returns the rank of the given field's enclosing field path and the one the is requested by this visitor. A
-   *         perfect match yields 0. Every mismatch reduces the match by 1. Hence the smallest (negative) number has the
-   *         worst match.
+   * perfect match yields 0. Every mismatch reduces the match by 1. Hence the smallest (negative) number has the
+   * worst match.
    */
   private int getEnclosingFieldPathRank(IFormField f) {
     int rank = 0;

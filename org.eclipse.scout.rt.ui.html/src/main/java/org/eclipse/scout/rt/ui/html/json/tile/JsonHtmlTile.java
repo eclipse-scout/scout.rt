@@ -50,5 +50,4 @@ public class JsonHtmlTile<T extends IHtmlTile> extends JsonTile<T> implements IB
     BinaryResource attachment = getModel().getAttachment(filename);
     return attachment == null ? null : new BinaryResourceHolder(attachment);
   }
-
 }

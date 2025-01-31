@@ -61,9 +61,9 @@ public class BeanHierarchy<T> {
 
   /**
    * @return the exact matching {@link IBean} for specified {@code beanClazz}. The {@link IBean} is returned even if the
-   *         {@code beanClazz} was replaced by another bean implementation or is not the most specific bean for the
-   *         specified {@code beanClazz}. Returns {@code null} if no bean is available for the specified
-   *         {@code beanClazz}.
+   * {@code beanClazz} was replaced by another bean implementation or is not the most specific bean for the
+   * specified {@code beanClazz}. Returns {@code null} if no bean is available for the specified
+   * {@code beanClazz}.
    */
   public IBean<T> getExactBean(Class<?> beanClazz) {
     List<IBean<T>> beans = CollectionUtility.arrayList(m_beans);
@@ -83,8 +83,8 @@ public class BeanHierarchy<T> {
 
   /**
    * @return the most significant bean in this hierarchy - filtered and ordered by {@link Order} and {@link Replace} -
-   *         that represent the type of this hierarchy. This means when B replaces A using {@link Replace} then A is not
-   *         part of the result. Also if C extends A without {@link Replace} then C is not part of the result.
+   * that represent the type of this hierarchy. This means when B replaces A using {@link Replace} then A is not
+   * part of the result. Also if C extends A without {@link Replace} then C is not part of the result.
    */
   public List<IBean<T>> querySingle() {
     return query(true);
@@ -92,8 +92,8 @@ public class BeanHierarchy<T> {
 
   /**
    * @return all beans in this hierarchy - filtered and ordered by {@link Order} and {@link Replace} - that represent
-   *         the type of this hierarchy. This means when B replaces A using {@link Replace} then A is not part of the
-   *         result. But if C extends A without {@link Replace} then C is part of the result.
+   * the type of this hierarchy. This means when B replaces A using {@link Replace} then A is not part of the
+   * result. But if C extends A without {@link Replace} then C is part of the result.
    */
   public List<IBean<T>> queryAll() {
     return query(false);
@@ -106,7 +106,7 @@ public class BeanHierarchy<T> {
 
   /**
    * @return A copy of m_beans with duplicate beans removed sorted first by {@link #ORDER_COMPARATOR} and second by
-   *         bean-insertion-order.
+   * bean-insertion-order.
    */
   protected List<IBean<T>> sortedBeanCopy() {
     ArrayList<IBean<T>> sorted = new ArrayList<>(m_beans);
@@ -214,11 +214,11 @@ public class BeanHierarchy<T> {
 
   /**
    * @return the exact matching {@link IBean} for the specified {@code beanClazz} according to {@code Order}. The
-   *         {@link IBean} is returned even if the {@code beanClazz} was replaced by another bean implementation or is
-   *         not the most specific bean for the specified {@code beanClazz}. Returns {@code null} if no bean is
-   *         available for the specified {@code beanClazz}.
-   *         <p>
-   *         <b>The list of beans is expected to be sorted using {@link #ORDER_COMPARATOR}.</b>
+   * {@link IBean} is returned even if the {@code beanClazz} was replaced by another bean implementation or is
+   * not the most specific bean for the specified {@code beanClazz}. Returns {@code null} if no bean is
+   * available for the specified {@code beanClazz}.
+   * <p>
+   * <b>The list of beans is expected to be sorted using {@link #ORDER_COMPARATOR}.</b>
    */
   protected static <T> IBean<T> getExactBean(List<IBean<T>> list, Class<?> beanClazz) {
     for (IBean<T> bean : list) {

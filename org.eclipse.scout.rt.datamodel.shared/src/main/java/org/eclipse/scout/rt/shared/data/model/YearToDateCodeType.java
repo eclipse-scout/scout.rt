@@ -139,5 +139,4 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
       return ID;
     }
   }
-
 }

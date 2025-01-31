@@ -25,5 +25,4 @@ public interface IHttpTransportFactory {
    * Create a new {@link HttpTransport} for the specific {@link IHttpTransportManager}.
    */
   HttpTransport newHttpTransport(IHttpTransportManager manager);
-
 }

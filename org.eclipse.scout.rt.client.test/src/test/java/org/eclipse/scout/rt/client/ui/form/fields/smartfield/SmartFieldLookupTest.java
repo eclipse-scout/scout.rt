@@ -249,7 +249,6 @@ public class SmartFieldLookupTest {
       protected void execPrepareRecLookup(ILookupCall<Long> call, Long parentKey) {
         call.setMaster(testMasterValue);
       }
-
     };
     field.setLookupCall(new TestLookupCall());
     List<? extends ILookupRow<Long>> rows2 = field.callSubTreeLookup(1L);
@@ -264,7 +263,6 @@ public class SmartFieldLookupTest {
       protected void execFilterRecLookupResult(ILookupCall<Long> call, List<ILookupRow<Long>> result) {
         result.clear();
       }
-
     };
     field.setLookupCall(new TestLookupCall());
     List<? extends ILookupRow<Long>> rows2 = field.callSubTreeLookup(1L);
@@ -323,5 +321,4 @@ public class SmartFieldLookupTest {
       return masterValue.equals(argument.getMaster());
     };
   }
-
 }

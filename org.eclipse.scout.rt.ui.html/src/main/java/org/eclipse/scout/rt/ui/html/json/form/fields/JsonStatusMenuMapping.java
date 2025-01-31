@@ -76,5 +76,4 @@ public class JsonStatusMenuMapping<T extends IStatusMenuMapping> extends Abstrac
       }
     });
   }
-
 }

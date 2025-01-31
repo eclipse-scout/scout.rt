@@ -15,5 +15,4 @@ import java.util.EventListener;
 public interface ISvgFieldListener extends EventListener {
 
   void handleSvgFieldEvent(SvgFieldEvent e);
-
 }

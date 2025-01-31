@@ -36,7 +36,6 @@ import org.json.JSONObject;
  * <p>
  * Valid data types are: boolean, int, long, String, byte[], array, {@link Collection} of before mentioned types and
  * {@link Map} with String as key and value as one of before mentioned types.
- *
  */
 public class JsonBean implements IJsonObject {
 
@@ -161,5 +160,4 @@ public class JsonBean implements IJsonObject {
     }
     return jsonObject;
   }
-
 }

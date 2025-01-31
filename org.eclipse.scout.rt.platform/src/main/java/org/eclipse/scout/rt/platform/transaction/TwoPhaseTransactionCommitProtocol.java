@@ -76,7 +76,7 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
         if (Thread.currentThread().isInterrupted()) {
           LOG.debug("Exception during commit of XA transaction [2PC-phase='commit', tx={}] due to interruption.", tx, e);
         }
-        else{
+        else {
           LOG.error("Unexpected error during commit of XA transaction [2PC-phase='commit', tx={}]", tx, e);
         }
         tx.addFailure(e);
@@ -92,7 +92,7 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
   /**
    * @return <code>true</code> on success, or <code>false</code> on failure.
    * @throws RuntimeException
-   *           if an error occurs during commit phase 1.
+   *     if an error occurs during commit phase 1.
    * @see ITransaction#commitPhase1()
    */
   protected boolean commitPhase1(final ITransaction tx) {
@@ -100,9 +100,9 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
   }
 
   /**
-   * @see ITransaction#commitPhase2()
    * @throws RuntimeException
-   *           if an error occurs during commit phase 2.
+   *     if an error occurs during commit phase 2.
+   * @see ITransaction#commitPhase2()
    */
   protected void commitPhase2(final ITransaction tx) {
     tx.commitPhase2();

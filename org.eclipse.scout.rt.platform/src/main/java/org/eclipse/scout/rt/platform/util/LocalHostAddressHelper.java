@@ -46,8 +46,8 @@ public class LocalHostAddressHelper {
    * When using the {@link InetAddress#getHostName()} method in an environment where neither a proper DNS
    * lookup nor an <tt>/etc/hosts</tt> entry exists for a given host, the following exception will be thrown: <code>
    * java.net.UnknownHostException: &lt;hostname&gt;: &lt;hostname&gt;
-     *  at java.net.InetAddress.getLocalHost(InetAddress.java:1425)
-     *   ...
+   * at java.net.InetAddress.getLocalHost(InetAddress.java:1425)
+   * ...
    * </code>
    * <p>
    * This method tries to parse the hostname out of the exception and returns {@value #UNKNOWN} if no hostname can be

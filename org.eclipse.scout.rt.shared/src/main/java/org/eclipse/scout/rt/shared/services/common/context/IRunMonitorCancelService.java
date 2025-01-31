@@ -34,7 +34,7 @@ public interface IRunMonitorCancelService extends IService {
    * includes {@link RunContext} executions, jobs and transactions.
    *
    * @param requestSequence
-   *          <code>requestSequence</code> to identify the {@link RunMonitor} to cancel.
+   *     <code>requestSequence</code> to identify the {@link RunMonitor} to cancel.
    * @return <code>true</code> if cancel was successful, <code>false</code> otherwise.
    */
   boolean cancel(long requestSequence);

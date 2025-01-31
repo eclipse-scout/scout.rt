@@ -89,8 +89,8 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   /**
    * @param scrollToSelection
-   *          true: advices the attached ui to make the current selection visible. The current selection will be
-   *          scrolled to visible (again, whenever the table size changes).
+   *     true: advices the attached ui to make the current selection visible. The current selection will be
+   *     scrolled to visible (again, whenever the table size changes).
    */
   void setScrollToSelection(boolean scrollToSelection);
 
@@ -173,7 +173,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    * to expand all nodes under the given parent node, parent node inclusive.
    *
    * @param parent
-   *          the start node for the expansion.
+   *     the start node for the expansion.
    */
   void expandAll(ITreeNode parent);
 
@@ -181,7 +181,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    * to collapse all nodes under the given parent node, parent node inclusive.
    *
    * @param parent
-   *          the start node for collapsing.
+   *     the start node for collapsing.
    */
   void collapseAll(ITreeNode parent);
 
@@ -267,7 +267,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   /**
    * @param eventTypes
-   *          of {@link TreeEvent} TYPE_*
+   *     of {@link TreeEvent} TYPE_*
    */
   default void addTreeListener(TreeListener listener, Integer... eventTypes) {
     treeListeners().add(listener, false, eventTypes);
@@ -283,7 +283,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    * Use {@link AbstractTree#addTreeListener(TreeListener, Integer...)} in all other cases
    *
    * @param eventTypes
-   *          of {@link TreeEvent} TYPE_*
+   *     of {@link TreeEvent} TYPE_*
    */
   default void addUITreeListener(TreeListener listener, Integer... eventTypes) {
     treeListeners().addLastCalled(listener, false, eventTypes);
@@ -291,11 +291,11 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   /**
    * @return the {@link IEventHistory} associated with this tree
-   *         <p>
-   *         The default implementation is a {@link DefaultTreeEventHistory} and created by
-   *         {@link AbstractTree#createEventHistory()}
-   *         <p>
-   *         This method is thread safe.
+   * <p>
+   * The default implementation is a {@link DefaultTreeEventHistory} and created by
+   * {@link AbstractTree#createEventHistory()}
+   * <p>
+   * This method is thread safe.
    * @since 3.8
    */
   IEventHistory<TreeEvent> getEventHistory();
@@ -313,7 +313,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    * programmatically using {@link #selectNodes(Collection, boolean)}.
    *
    * @param multiSelect
-   *          {@code true} if it should be possible to select multiple nodes. {@code false} otherwise.
+   *     {@code true} if it should be possible to select multiple nodes. {@code false} otherwise.
    */
   void setMultiSelect(boolean multiSelect);
 
@@ -365,8 +365,8 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   /**
    * @param lazy
-   *          true to expand the node lazily, false if not. Only has an effect if the expanded is set to true, see also
-   *          {@link ITreeNode#isExpandedLazy()}
+   *     true to expand the node lazily, false if not. Only has an effect if the expanded is set to true, see also
+   *     {@link ITreeNode#isExpandedLazy()}
    */
   void setNodeExpanded(ITreeNode node, boolean expanded, boolean lazy);
 
@@ -528,14 +528,14 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   /**
    * @return if {@code true}, the attached UI will save or restore its horizontal and vertical coordinates of its
-   *         scrollbars.
+   * scrollbars.
    */
   boolean isSaveAndRestoreScrollbars();
 
   /**
    * @param saveAndRestoreScrollbars
-   *          {@code true} advices the attached UI to save or restore its horizontal and vertical coordinates of its
-   *          scrollbars.
+   *     {@code true} advices the attached UI to save or restore its horizontal and vertical coordinates of its
+   *     scrollbars.
    */
   void setSaveAndRestoreScrollbars(boolean saveAndRestoreScrollbars);
 

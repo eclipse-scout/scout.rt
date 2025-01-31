@@ -72,5 +72,4 @@ public interface ITableExtension<TABLE extends AbstractTable> extends IExtension
   TransferObject execDrag(TableDragChain chain, List<ITableRow> rows);
 
   ITile execCreateTile(TableCreateTileChain chain, ITableRow row);
-
 }

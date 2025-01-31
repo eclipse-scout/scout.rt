@@ -13,5 +13,4 @@ package org.eclipse.scout.rt.client.ui.form.fields.groupbox;
 public interface IGroupBoxUIFacade {
 
   void setExpandedFromUI(boolean expanded);
-
 }

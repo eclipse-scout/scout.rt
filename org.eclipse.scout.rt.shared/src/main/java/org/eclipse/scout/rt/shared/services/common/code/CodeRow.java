@@ -27,7 +27,7 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
    * This constructor only works if you are using a subclass of CodeRow.
    *
    * @param cells
-   *          array containing the values
+   *     array containing the values
    */
   protected CodeRow(Object[] cells) {
     this(cells, cells.length - 1);
@@ -37,9 +37,9 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
    * This constructor only works if you are using a subclass of CodeRow.
    *
    * @param cells
-   *          array containing the values
+   *     array containing the values
    * @param maxColumnIndex
-   *          upper bound for column to be used
+   *     upper bound for column to be used
    */
   protected CodeRow(Object[] cells, int maxColumnIndex) {
     this(cells, maxColumnIndex, null);
@@ -47,9 +47,9 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
 
   /**
    * @param cells
-   *          array containing the values
+   *     array containing the values
    * @param clazz
-   *          ID_TYPE of the Key
+   *     ID_TYPE of the Key
    */
   public CodeRow(Object[] cells, Class<? extends ID_TYPE> clazz) {
     this(cells, cells.length - 1, clazz);
@@ -75,11 +75,11 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
    * </p>
    *
    * @param cells
-   *          array containing the values
+   *     array containing the values
    * @param maxColumnIndex
-   *          upper bound for column to be used
+   *     upper bound for column to be used
    * @param clazz
-   *          ID_TYPE of the Key
+   *     ID_TYPE of the Key
    */
   @SuppressWarnings("unchecked")
   public CodeRow(Object[] cells, int maxColumnIndex, Class<? extends ID_TYPE> clazz) {

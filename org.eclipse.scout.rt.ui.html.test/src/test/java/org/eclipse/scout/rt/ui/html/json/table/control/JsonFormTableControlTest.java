@@ -148,5 +148,4 @@ public class JsonFormTableControlTest {
     data.put("selected", selected);
     return new JsonEvent(adapterId, "property", data);
   }
-
 }

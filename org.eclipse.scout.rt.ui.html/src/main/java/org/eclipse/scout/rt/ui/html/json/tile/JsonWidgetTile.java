@@ -39,5 +39,4 @@ public class JsonWidgetTile<T extends IWidgetTile> extends JsonTile<T> {
       }
     });
   }
-
 }

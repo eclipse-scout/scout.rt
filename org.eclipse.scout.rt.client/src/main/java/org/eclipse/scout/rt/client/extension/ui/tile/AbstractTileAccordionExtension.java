@@ -26,5 +26,4 @@ public abstract class AbstractTileAccordionExtension<T extends ITile, TILES exte
   public void execTilesSelected(TilesSelectedChain<T> chain, List<T> tiles) {
     chain.execTilesSelected(tiles);
   }
-
 }

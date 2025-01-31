@@ -173,6 +173,5 @@ class TestTableBean extends AbstractTableFieldBeanData {
     public void setRowData(String rowData) {
       m_rowData = rowData;
     }
-
   }
 }

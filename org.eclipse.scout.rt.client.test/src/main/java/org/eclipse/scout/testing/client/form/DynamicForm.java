@@ -41,5 +41,4 @@ public class DynamicForm extends AbstractForm {
   public void start(IFormHandler handler) {
     startInternal(handler);
   }
-
 }

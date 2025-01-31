@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.status;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
@@ -52,5 +51,4 @@ public class StatusTest {
   class TestStatus2 extends Status {
     private static final long serialVersionUID = 1L;
   }
-
 }

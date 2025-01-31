@@ -31,5 +31,4 @@ public class TableField<T extends ITable> extends AbstractTableField<T> {
   protected T createTable() {
     return m_table;
   }
-
 }

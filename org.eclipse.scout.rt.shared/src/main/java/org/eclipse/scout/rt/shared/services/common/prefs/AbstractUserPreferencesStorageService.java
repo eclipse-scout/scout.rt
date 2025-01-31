@@ -18,8 +18,8 @@ import org.eclipse.scout.rt.shared.ISession;
 /**
  * Abstract implementation to store the preferences on the session.
  *
- * @since 5.1
  * @see Preferences#get(ISession, String)
+ * @since 5.1
  */
 public abstract class AbstractUserPreferencesStorageService implements IUserPreferencesStorageService {
 

@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.tile;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -506,7 +505,6 @@ public class TileAccordionTest {
       public class TileGrid extends AbstractTileGrid<P_Tile> {
 
       }
-
     }
 
     @Override
@@ -555,7 +553,6 @@ public class TileAccordionTest {
     public Object getId() {
       return ID;
     }
-
   }
 
   private static class P_SortingTileGroupManager extends AbstractTileAccordionGroupManager<P_Tile> {
@@ -581,7 +578,6 @@ public class TileAccordionTest {
     public Comparator<IGroup> getComparator() {
       return new P_Comparator();
     }
-
   }
 
   private static class P_Comparator implements Comparator<IGroup> {
@@ -627,6 +623,5 @@ public class TileAccordionTest {
     public Object getId() {
       return ID;
     }
-
   }
 }

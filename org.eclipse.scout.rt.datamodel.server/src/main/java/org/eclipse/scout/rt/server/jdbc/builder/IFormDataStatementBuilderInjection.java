@@ -51,5 +51,4 @@ public interface IFormDataStatementBuilderInjection {
    * The contents can be manipulated, be careful what to change.
    */
   void postBuildAttribute(ComposerAttributeNodeData node, AttributeStrategy attributeStrategy, EntityContribution contrib);
-
 }

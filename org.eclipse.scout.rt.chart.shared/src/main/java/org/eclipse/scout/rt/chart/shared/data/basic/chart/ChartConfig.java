@@ -219,12 +219,12 @@ public class ChartConfig implements IChartConfig {
    * Modifies the {@link #m_properties} map depending on the given {@link ModifyMode}.
    *
    * @param modifyMode
-   *          Specific {@link ModifyMode} like put or remove.
+   *     Specific {@link ModifyMode} like put or remove.
    * @param name
-   *          The name of the property. Recursive properties have to be separated by "." and indices of arrays have to
-   *          be specified in the form "[i]" (e.g. "options.legend.position", "options.scales.xAxes[0].scaleLabel").
+   *     The name of the property. Recursive properties have to be separated by "." and indices of arrays have to
+   *     be specified in the form "[i]" (e.g. "options.legend.position", "options.scales.xAxes[0].scaleLabel").
    * @param value
-   *          The value of the property or null for {@link ModifyMode}s that don't need a value.
+   *     The value of the property or null for {@link ModifyMode}s that don't need a value.
    * @return The Object returned by the specific operation.
    */
   protected Object modifyProperties(ModifyMode modifyMode, String name, Object value) {
@@ -289,9 +289,9 @@ public class ChartConfig implements IChartConfig {
    * Splits a given list expression into the name of the list and the index (e.g. "list[3]" -> "list", 3).
    *
    * @param listExpression
-   *          The list expression in the form name of the list followed by the index in square brackets.
+   *     The list expression in the form name of the list followed by the index in square brackets.
    * @return A {@link Pair} containing the name of the list as left and the index as right value or {@code null} if the
-   *         given listExpression does not match the required form.
+   * given listExpression does not match the required form.
    */
   protected static Pair<String, Integer> splitListExpression(String listExpression) {
     Matcher arrayIndexMatcher = ARRAY_INDEX_PATTERN.matcher(listExpression);

@@ -70,7 +70,7 @@ public class ConfigPropertyChangeEvent {
 
   /**
    * @return The type of event. One of {@link #TYPE_VALUE_CHANGED}, {@link #TYPE_INVALIDATE},
-   *         {@link #TYPE_VALUE_INITIALIZED}.
+   * {@link #TYPE_VALUE_INITIALIZED}.
    */
   public int getType() {
     return m_type;

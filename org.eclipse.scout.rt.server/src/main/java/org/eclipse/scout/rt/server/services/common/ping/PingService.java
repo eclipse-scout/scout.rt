@@ -17,5 +17,4 @@ public class PingService implements IPingService {
   public String ping(String s) {
     return s;
   }
-
 }

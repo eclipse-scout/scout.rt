@@ -16,7 +16,7 @@ import java.util.EventObject;
  * intended to be used internally by objects that implement the {@link IEventEmitter} interface.
  *
  * @param <EVENT>
- *          Event type that is fired.
+ *     Event type that is fired.
  * @since 22.0
  */
 public class EventSupport<EVENT extends EventObject> {

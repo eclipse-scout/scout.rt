@@ -55,5 +55,4 @@ public class ClusterNodeStatusInfoTest {
     assertEquals(TEST_USER, current.getLastChangedUserId());
     assertNotNull(current.getLastChangedDate());
   }
-
 }

@@ -25,5 +25,4 @@ public interface IQueryParam<T> {
   T getKey();
 
   String getText();
-
 }

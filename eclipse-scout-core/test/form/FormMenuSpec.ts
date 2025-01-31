@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper} from '../../src/testing/index';
-import {ContextMenuPopup, Desktop, FormMenu, FormMenuModel, Menu, MenuBar, menus, scout} from '../../src/index';
+import {ContextMenuPopup, Desktop, FormMenu, FormMenuModel, MenuBar, menus, scout} from '../../src/index';
 
 describe('FormMenu', () => {
   let session: SandboxSession, desktop: Desktop, helper: FormSpecHelper;

@@ -59,7 +59,7 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
 
   /**
    * @param aggregationTypes
-   *          array of {@link DataModelConstants#AGGREGATION_*}
+   *     array of {@link DataModelConstants#AGGREGATION_*}
    */
   void setAggregationTypes(int[] aggregationTypes);
 
@@ -93,7 +93,7 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
    * This property is only supported for {@link DataModelConstants#TYPE_SMART}.
    *
    * @return {@code true} if the attribute should only show a proposal list if a search text is entered by the user.
-   *         {@code false} (which is the default) if all proposals should be shown if no text search is done.
+   * {@code false} (which is the default) if all proposals should be shown if no text search is done.
    */
   boolean isSearchRequired();
 
@@ -103,8 +103,8 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
    * This property is only supported for {@link DataModelConstants#TYPE_SMART}.
    *
    * @param searchRequired
-   *          {@code true} if the attribute should only show a proposal list if a search text is entered by the user.
-   *          {@code false} (which is the default) if all proposals should be shown if no text search is done.
+   *     {@code true} if the attribute should only show a proposal list if a search text is entered by the user.
+   *     {@code false} (which is the default) if all proposals should be shown if no text search is done.
    */
   void setSearchRequired(boolean searchRequired);
 
@@ -128,14 +128,14 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
 
   /**
    * @return meta data for the attribute, default returns null
-   *         <p>
-   *         This method is useful and should be overridden when dynamic attributes are used, where multiple attributes
-   *         of the same type (Class) occur in the same {@link IDataModel}. This meta map contains the distinguishing
-   *         map of these multiple instances.
-   *         <p>
-   *         If the map is not filled or null, the comparison is only based on the type ({@link #getClass()})
-   *         <p>
-   *         see {@link DataModelUtility}
+   * <p>
+   * This method is useful and should be overridden when dynamic attributes are used, where multiple attributes
+   * of the same type (Class) occur in the same {@link IDataModel}. This meta map contains the distinguishing
+   * map of these multiple instances.
+   * <p>
+   * If the map is not filled or null, the comparison is only based on the type ({@link #getClass()})
+   * <p>
+   * see {@link DataModelUtility}
    */
   Map<String, String> getMetaDataOfAttribute();
 
@@ -158,7 +158,7 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
    * Formats the provided raw value according to the defined attribute type.
    *
    * @param rawValue
-   *          Raw value to format.
+   *     Raw value to format.
    * @return Formatted value
    */
   String formatValue(Object rawValue);

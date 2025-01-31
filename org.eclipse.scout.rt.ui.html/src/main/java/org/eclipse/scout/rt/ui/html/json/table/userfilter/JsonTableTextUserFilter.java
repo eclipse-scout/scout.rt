@@ -29,5 +29,4 @@ public class JsonTableTextUserFilter<T extends TableTextUserFilterState> extends
     json.put("text", getFilterState().getText());
     return json;
   }
-
 }

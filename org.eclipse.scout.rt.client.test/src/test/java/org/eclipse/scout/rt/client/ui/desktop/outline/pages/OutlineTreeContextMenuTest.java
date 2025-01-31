@@ -144,7 +144,6 @@ public class OutlineTreeContextMenuTest {
         protected Set<? extends IMenuType> getConfiguredMenuTypes() {
           return CollectionUtility.hashSet(TableMenuType.EmptySpace);
         }
-
       }
 
       @Order(15)
@@ -159,7 +158,6 @@ public class OutlineTreeContextMenuTest {
         protected Set<? extends IMenuType> getConfiguredMenuTypes() {
           return CollectionUtility.hashSet(TableMenuType.EmptySpace);
         }
-
       }
 
       @Order(20)

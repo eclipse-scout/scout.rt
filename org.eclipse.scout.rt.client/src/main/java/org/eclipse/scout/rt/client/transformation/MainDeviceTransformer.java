@@ -39,7 +39,8 @@ public class MainDeviceTransformer implements IDeviceTransformer {
    * Method to set the transformers manually. Use this carefully, transformers can also be set automatically by
    * {@link #getTransformers()}.
    *
-   * @param transformers to bet set, can be null
+   * @param transformers
+   *     to bet set, can be null
    */
   public void setTransformers(List<IDeviceTransformer> transformers) {
     m_transformers = transformers;
