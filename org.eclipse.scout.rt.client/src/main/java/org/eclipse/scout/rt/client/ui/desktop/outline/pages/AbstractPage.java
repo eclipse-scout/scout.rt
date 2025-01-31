@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.AbstractPageExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.ComputeParentTablePageMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageCalculateVisibleChain;
@@ -77,12 +77,17 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
+import org.eclipse.scout.rt.shared.extension.ContributionComposite;
+import org.eclipse.scout.rt.shared.extension.IContributionOwner;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ClassId("ef0d789e-dfbf-4715-9ab7-eedaefc936f3")
-public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode implements IPage<T> {
+public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode implements IPage<T>, IContributionOwner, IExtensibleObject {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPage.class);
 
@@ -131,6 +136,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * Currently used: {@link #PAGE_ACTIVATED}, {@link #SHOW_TILE_OVERVIEW}, {@link #COMPACT_ROOT}
    */
   byte m_flags2;
+
+  private final ObjectExtensions<AbstractPage, IPageExtension<? extends AbstractPage>> m_objectExtensions;
+
+  protected IContributionOwner m_contributionHolder;
 
   @Override
   protected List<IMenu> lazyCreateAndInitializeMenus() {
@@ -287,11 +296,20 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     super(false);
     m_userPreferenceContext = userPreferenceContext;
     m_localTreeListener = createLocalTreeListener();
+    m_objectExtensions = new ObjectExtensions<>(this, false);
+    m_contributionHolder = new ContributionComposite(this);
     if (callInitializer) {
       callInitializer();
     }
   }
 
+  @Override
+  protected void callInitializer() {
+    if (!isInitialized()) {
+      interceptInitConfig();
+      super.callInitializer();
+    }
+  }
   /*
    * Configuration
    */
@@ -631,6 +649,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     setShowTileOverview(getConfiguredShowTileOverview());
     setOverviewIconId(getConfiguredOverviewIconId());
     setNavigateButtonsVisible(getConfiguredNavigateButtonsVisible());
+  }
+
+  protected final void interceptInitConfig() {
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
   /*
@@ -1173,73 +1195,73 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   private void interceptReloadPage(String reloadReason) {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PageReloadPageChain chain = new PageReloadPageChain(extensions);
     chain.execReloadPage(reloadReason);
   }
 
   protected final void interceptPageDataLoaded() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PagePageDataLoadedChain chain = new PagePageDataLoadedChain(extensions);
     chain.execPageDataLoaded();
   }
 
   protected final void interceptPageActivated() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PagePageActivatedChain chain = new PagePageActivatedChain(extensions);
     chain.execPageActivated();
   }
 
   protected final void interceptDataChanged(Object... dataTypes) {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PageDataChangedChain chain = new PageDataChangedChain(extensions);
     chain.execDataChanged(dataTypes);
   }
 
   protected final void interceptInitPage() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PageInitPageChain chain = new PageInitPageChain(extensions);
     chain.execInitPage();
   }
 
   protected final void interceptPageDeactivated() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PagePageDeactivatedChain chain = new PagePageDeactivatedChain(extensions);
     chain.execPageDeactivated();
   }
 
   protected final void interceptDisposePage() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PageDisposePageChain chain = new PageDisposePageChain(extensions);
     chain.execDisposePage();
   }
 
   protected final void interceptInitDetailForm() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PageInitDetailFormChain chain = new PageInitDetailFormChain(extensions);
     chain.execInitDetailForm();
   }
 
   protected final void interceptInitTable() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PageInitTableChain chain = new PageInitTableChain(extensions);
     chain.execInitTable();
   }
 
   protected final void interceptDetailFormActivated() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PageDetailFormActivatedChain chain = new PageDetailFormActivatedChain(extensions);
     chain.execDetailFormActivated();
   }
 
   protected final boolean interceptCalculateVisible() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PageCalculateVisibleChain chain = new PageCalculateVisibleChain(extensions);
     return chain.execCalculateVisible();
   }
 
   protected final List<IMenu> interceptComputeParentTablePageMenus(IPageWithTable<?> parentTablePage) {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     ComputeParentTablePageMenusChain chain = new ComputeParentTablePageMenusChain(extensions);
     return chain.execComputeParentTablePageMenus(parentTablePage);
   }
@@ -1256,7 +1278,46 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     };
   }
 
-  protected static class LocalPageExtension<OWNER extends AbstractPage> extends LocalTreeNodeExtension<OWNER> implements IPageExtension<OWNER> {
+  /**
+   * Executes the given runnable in the extension context, in which this page object was created.
+   *
+   * @see ObjectExtensions#runInExtensionContext(Runnable)
+   */
+  protected void runInExtensionContext(Runnable runnable) {
+    m_objectExtensions.runInExtensionContext(runnable);
+  }
+
+  @Override
+  public <S extends IExtension<?>> S getExtension(Class<S> c) {
+    return m_objectExtensions.getExtension(c);
+  }
+
+  @Override
+  public final List<? extends IPageExtension<? extends AbstractPage>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  @Override
+  public final List<Object> getAllContributions() {
+    return m_contributionHolder.getAllContributions();
+  }
+
+  @Override
+  public final <S> List<S> getContributionsByClass(Class<S> type) {
+    return m_contributionHolder.getContributionsByClass(type);
+  }
+
+  @Override
+  public final <S> S getContribution(Class<S> contribution) {
+    return m_contributionHolder.getContribution(contribution);
+  }
+
+  @Override
+  public final <S> S optContribution(Class<S> contribution) {
+    return m_contributionHolder.optContribution(contribution);
+  }
+
+  protected static class LocalPageExtension<OWNER extends AbstractPage> extends AbstractPageExtension<OWNER> {
 
     public LocalPageExtension(OWNER owner) {
       super(owner);
@@ -1324,7 +1385,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
   }
 
-  @Override
   protected IPageExtension<? extends AbstractPage> createLocalExtension() {
     return new LocalPageExtension<AbstractPage>(this);
   }
