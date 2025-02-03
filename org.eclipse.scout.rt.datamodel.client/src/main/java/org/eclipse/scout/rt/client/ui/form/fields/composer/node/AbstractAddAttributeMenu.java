@@ -86,5 +86,4 @@ public abstract class AbstractAddAttributeMenu extends AbstractMenu {
       m_field.addAttributeNode(m_parentNode, a, null, op, values, displayValues);
     }
   }
-
 }

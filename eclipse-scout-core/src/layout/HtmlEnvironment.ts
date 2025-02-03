@@ -10,6 +10,7 @@
 import {App, EventEmitter, HtmlEnvironmentEventMap, scout, styles} from '../index';
 
 let instance;
+
 /**
  * @singleton
  */

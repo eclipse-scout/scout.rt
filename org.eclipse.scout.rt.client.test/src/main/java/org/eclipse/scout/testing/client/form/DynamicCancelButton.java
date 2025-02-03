@@ -27,5 +27,4 @@ public class DynamicCancelButton extends AbstractCancelButton {
   public String getFieldId() {
     return (String) getProperty("id");
   }
-
 }

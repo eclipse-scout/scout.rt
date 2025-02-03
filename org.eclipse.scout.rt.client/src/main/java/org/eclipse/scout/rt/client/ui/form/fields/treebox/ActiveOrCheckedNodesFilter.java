@@ -36,5 +36,4 @@ class ActiveOrCheckedNodesFilter extends CheckedNodesFilter {
       return super.accept(node, level);
     }
   }
-
 }

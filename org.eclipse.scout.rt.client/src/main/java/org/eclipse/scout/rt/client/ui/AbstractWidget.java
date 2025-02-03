@@ -323,7 +323,7 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
    * Subclasses can override this method. Default is {@code true}.
    *
    * @return {@code true} if this widget is only enabled if all parent widgets are enabled as well. {@code false} if the
-   *         enabled state of this widget is independent of the parent widgets.
+   * enabled state of this widget is independent of the parent widgets.
    * @see #setInheritAccessibility(boolean)
    * @see #isEnabledIncludingParents()
    */
@@ -479,7 +479,6 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
           else {
             field.setEnabled(enabled, dimension);
           }
-
         });
       }
     }

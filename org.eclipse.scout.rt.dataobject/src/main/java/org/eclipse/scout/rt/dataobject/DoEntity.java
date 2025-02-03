@@ -55,9 +55,9 @@ public class DoEntity implements IDoEntity {
 
   /**
    * @return Node of attribute {@code attributeName} or {@code null}, if attribute is not available.
-   *         <p>
-   *         The attribute node is either a {@link DoValue}, a {@link DoList}, a {@link DoSet} or a {@link DoCollection}
-   *         wrapper object.
+   * <p>
+   * The attribute node is either a {@link DoValue}, a {@link DoList}, a {@link DoSet} or a {@link DoCollection}
+   * wrapper object.
    */
   @Override
   public DoNode<?> getNode(String attributeName) {
@@ -66,7 +66,7 @@ public class DoEntity implements IDoEntity {
 
   /**
    * @return {@code true} if attribute with name {@code attributeName} exists (attribute value could be null), otherwise
-   *         {@code false}
+   * {@code false}
    */
   @Override
   public boolean has(String attributeName) {

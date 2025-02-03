@@ -17,5 +17,4 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 public interface ISmartColumnExtension<VALUE, OWNER extends AbstractSmartColumn<VALUE>> extends IColumnExtension<VALUE, OWNER> {
 
   void execPrepareLookup(SmartColumnPrepareLookupChain<VALUE> chain, ILookupCall<VALUE> call, ITableRow row);
-
 }

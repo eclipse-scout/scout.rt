@@ -36,5 +36,4 @@ public abstract class AbstractTileExtension<OWNER_FIELD extends AbstractTile> ex
   public void execLoadData(TileLoadDataTileChain chain) {
     chain.execLoadData();
   }
-
 }

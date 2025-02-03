@@ -68,7 +68,7 @@ public final class ScriptRequest {
    * Parses a request {@link String} into an optional {@link ScriptRequest} instance.
    *
    * @return An empty {@link Optional} if the {@link String} specified is no valid script request. Otherwise the
-   *         {@link Optional} contains a parsed {@link ScriptRequest} instance.
+   * {@link Optional} contains a parsed {@link ScriptRequest} instance.
    */
   public static Optional<ScriptRequest> tryParse(String scriptRequestPath) {
     if (!StringUtility.hasText(scriptRequestPath)) {
@@ -87,21 +87,21 @@ public final class ScriptRequest {
    * Parses the specified elements into an optional {@link ScriptRequest} instance.
    *
    * @param path
-   *          The parent path of the resource having a trailing slash. May be {@code null} but must be specified to be
-   *          valid according to {@link #SCRIPT_URL_PATTERN}.
+   *     The parent path of the resource having a trailing slash. May be {@code null} but must be specified to be
+   *     valid according to {@link #SCRIPT_URL_PATTERN}.
    * @param baseName
-   *          The file name (without extension and trailing dot). May be {@code null} but must be specified to be valid
-   *          according to {@link #SCRIPT_URL_PATTERN}.
+   *     The file name (without extension and trailing dot). May be {@code null} but must be specified to be valid
+   *     according to {@link #SCRIPT_URL_PATTERN}.
    * @param fingerprint
-   *          A hex fingerprint (see {@link BinaryResource#getFingerprintAsHexString()) for the resource. May be
-   *          {@code null}.
+   *     A hex fingerprint (see {@link BinaryResource#getFingerprintAsHexString()) for the resource. May be
+   *     {@code null}.
    * @param min
-   *          {@code true} if the path should contain the minimize keyword. {@code false} otherwise.
+   *     {@code true} if the path should contain the minimize keyword. {@code false} otherwise.
    * @param extension
-   *          The file extension without leading dot. May be {@code null} but must be 'js', 'css' or 'less' to be valid
-   *          according to {@link #SCRIPT_URL_PATTERN}.
+   *     The file extension without leading dot. May be {@code null} but must be 'js', 'css' or 'less' to be valid
+   *     according to {@link #SCRIPT_URL_PATTERN}.
    * @return An empty {@link Optional} if the elements specified are not valid. Otherwise the {@link Optional} contains
-   *         a parsed {@link ScriptRequest} instance.
+   * a parsed {@link ScriptRequest} instance.
    */
   public static Optional<ScriptRequest> tryParse(String path, String baseName, String fingerprint, boolean min, String extension) {
     return tryParse(toFullPath(path, baseName, fingerprint, min, extension));
@@ -109,7 +109,7 @@ public final class ScriptRequest {
 
   /**
    * @return The path segment of the request including a trailing slash (if present). May be {@code  null} if the
-   *         request does not contain a path information.
+   * request does not contain a path information.
    */
   public String path() {
     return m_path;
@@ -117,7 +117,7 @@ public final class ScriptRequest {
 
   /**
    * @return The basename of the resource which is the resource filename without extension. This element is always
-   *         present (never {@code null}).
+   * present (never {@code null}).
    */
   public String baseName() {
     return m_baseName;
@@ -125,7 +125,7 @@ public final class ScriptRequest {
 
   /**
    * @return The hex fingerprint of the request (without a preceding dash). May be {@code null} if no fingerprint was
-   *         included in the request (e.g. in dev mode).
+   * included in the request (e.g. in dev mode).
    * @see BinaryResource#getFingerprintAsHexString()
    */
   public String fingerprint() {
@@ -134,7 +134,7 @@ public final class ScriptRequest {
 
   /**
    * @return {@code true} if the request included the minimized keyword (see {@link #MINIMIZED_URL_KEYWORD}).
-   *         {@code false} otherwise.
+   * {@code false} otherwise.
    */
   public boolean minimized() {
     return m_minimized;
@@ -156,7 +156,7 @@ public final class ScriptRequest {
 
   /**
    * @return The request path without the fingerprint. This is the path where the resource should be located on the
-   *         classpath
+   * classpath
    */
   public String lookupPath() {
     return toString(false, true);
@@ -192,10 +192,10 @@ public final class ScriptRequest {
    * Converts this {@link ScriptRequest} into its {@link String} representation.
    *
    * @param fingerprint
-   *          {@code true} if the fingerprint (if available) should be included in the resulting path.
+   *     {@code true} if the fingerprint (if available) should be included in the resulting path.
    * @param min
-   *          {@code true} if the minimize keyword should be included in the resulting path. It can only be included if
-   *          this request has the minimized flag.
+   *     {@code true} if the minimize keyword should be included in the resulting path. It can only be included if
+   *     this request has the minimized flag.
    * @return The request as {@link String} optionally including fingerprint and/or minimize keyword.
    * @see #toString(boolean, boolean, boolean, boolean, boolean)
    * @see #fullPath()
@@ -208,16 +208,16 @@ public final class ScriptRequest {
    * Converts this {@link ScriptRequest} into its {@link String} representation.
    *
    * @param path
-   *          {@code true} if the path should be included in the resulting path.
+   *     {@code true} if the path should be included in the resulting path.
    * @param baseName
-   *          {@code true} if the baseName should be included in the resulting path.
+   *     {@code true} if the baseName should be included in the resulting path.
    * @param fingerprint
-   *          {@code true} if the fingerprint (if available) should be included in the resulting path.
+   *     {@code true} if the fingerprint (if available) should be included in the resulting path.
    * @param min
-   *          {@code true} if the minimize keyword should be included in the resulting path. It can only be included if
-   *          this request has the minimized flag.
+   *     {@code true} if the minimize keyword should be included in the resulting path. It can only be included if
+   *     this request has the minimized flag.
    * @param extension
-   *          {@code true} if the extension should be included in the resulting path.
+   *     {@code true} if the extension should be included in the resulting path.
    * @return The request as {@link String} having all the enabled components.
    * @see #toString(boolean, boolean)
    * @see #fullPath()
@@ -230,22 +230,22 @@ public final class ScriptRequest {
    * Creates a script request path having the specified components.
    *
    * @param path
-   *          The parent path of the resource having a trailing slash. May be {@code null} but must be specified to be
-   *          valid according to {@link #SCRIPT_URL_PATTERN}.
+   *     The parent path of the resource having a trailing slash. May be {@code null} but must be specified to be
+   *     valid according to {@link #SCRIPT_URL_PATTERN}.
    * @param baseName
-   *          The file name (without extension and trailing dot). May be {@code null} but must be specified to be valid
-   *          according to {@link #SCRIPT_URL_PATTERN}.
+   *     The file name (without extension and trailing dot). May be {@code null} but must be specified to be valid
+   *     according to {@link #SCRIPT_URL_PATTERN}.
    * @param fingerprint
-   *          A hex fingerprint (see {@link BinaryResource#getFingerprintAsHexString()) for the resource. May be
-   *          {@code null}.
+   *     A hex fingerprint (see {@link BinaryResource#getFingerprintAsHexString()) for the resource. May be
+   *     {@code null}.
    * @param min
-   *          {@code true} if the path should contain the minimize keyword. {@code false} otherwise.
+   *     {@code true} if the path should contain the minimize keyword. {@code false} otherwise.
    * @param extension
-   *          The file extension without leading dot. May be {@code null} but must be 'js', 'css' or 'less' to be valid
-   *          according to {@link #SCRIPT_URL_PATTERN}.
+   *     The file extension without leading dot. May be {@code null} but must be 'js', 'css' or 'less' to be valid
+   *     according to {@link #SCRIPT_URL_PATTERN}.
    * @return A script request path with the specified components that conforms to the format defined by
-   *         {@link #SCRIPT_URL_PATTERN}. It can only be parsed using {@link #tryParse(String)} if the specified
-   *         components are valid.
+   * {@link #SCRIPT_URL_PATTERN}. It can only be parsed using {@link #tryParse(String)} if the specified
+   * components are valid.
    */
   public static String toFullPath(String path, String baseName, String fingerprint, boolean min, String extension) {
     StringBuilder result = new StringBuilder();

@@ -208,15 +208,15 @@ public class JobScheduleTest {
     final Set<Thread> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
 
     Jobs.getJobManager().schedule(() -> {
-      protocol.add(Thread.currentThread());
+          protocol.add(Thread.currentThread());
 
-      Jobs.getJobManager().schedule(() -> {
-        protocol.add(Thread.currentThread());
-      }, Jobs.newInput()
-          .withRunContext(RunContexts.copyCurrent()))
-          .awaitDoneAndGet();
-    }, Jobs.newInput()
-        .withRunContext(RunContexts.copyCurrent()))
+          Jobs.getJobManager().schedule(() -> {
+                protocol.add(Thread.currentThread());
+              }, Jobs.newInput()
+                  .withRunContext(RunContexts.copyCurrent()))
+              .awaitDoneAndGet();
+        }, Jobs.newInput()
+            .withRunContext(RunContexts.copyCurrent()))
         .awaitDoneAndGet();
 
     assertEquals(2, protocol.size());
@@ -333,11 +333,11 @@ public class JobScheduleTest {
 
     long tScheduled = System.currentTimeMillis();
     String result = Jobs.getJobManager().schedule(() -> {
-      tRunning.set(System.currentTimeMillis());
-      return "executed";
-    }, Jobs.newInput()
-        .withExecutionTrigger(Jobs.newExecutionTrigger()
-            .withStartIn(2, TimeUnit.SECONDS)))
+          tRunning.set(System.currentTimeMillis());
+          return "executed";
+        }, Jobs.newInput()
+            .withExecutionTrigger(Jobs.newExecutionTrigger()
+                .withStartIn(2, TimeUnit.SECONDS)))
         .awaitDoneAndGet(5, TimeUnit.SECONDS);
 
     assertEquals("executed", result);

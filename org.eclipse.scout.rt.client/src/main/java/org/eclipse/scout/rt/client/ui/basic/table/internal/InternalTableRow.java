@@ -413,9 +413,9 @@ public class InternalTableRow extends TableRow implements ICellObserver {
     }
   }
 
-/*
- * Implementation of ICellObserver
- */
+  /*
+   * Implementation of ICellObserver
+   */
   @Override
   public Object validateValue(ICell cell, Object value) {
     Object oldValue = cell.getValue();

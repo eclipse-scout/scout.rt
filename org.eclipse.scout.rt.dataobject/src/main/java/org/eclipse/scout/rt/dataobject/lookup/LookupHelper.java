@@ -50,23 +50,23 @@ public class LookupHelper {
    * LookupResponse containing a list of mapped lookup rows.
    *
    * @param <LOOKUP_ROW>
-   *          Type of lookup row (subclass of {@link AbstractLookupRowDo})
+   *     Type of lookup row (subclass of {@link AbstractLookupRowDo})
    * @param <ID>
-   *          Primary key type of data items
+   *     Primary key type of data items
    * @param <RESTRICTION>
-   *          Type of lookup restriction (subclass of {@link AbstractLookupRestrictionDo}
+   *     Type of lookup restriction (subclass of {@link AbstractLookupRestrictionDo}
    * @param <DATA>
-   *          Type of data items
+   *     Type of data items
    * @param restriction
-   *          Lookup call restriction object used to filter the stream of data
+   *     Lookup call restriction object used to filter the stream of data
    * @param data
-   *          Stream of data items
+   *     Stream of data items
    * @param idAccessor
-   *          Accessor method to get the ID of a data item
+   *     Accessor method to get the ID of a data item
    * @param textAccessor
-   *          Accessor method to get the text of a data item
+   *     Accessor method to get the text of a data item
    * @param rowClass
-   *          Class type of lookup row to create
+   *     Class type of lookup row to create
    */
   public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>, DATA> LookupResponse<LOOKUP_ROW> filterData(RESTRICTION restriction,
       Stream<DATA> data,
@@ -81,23 +81,23 @@ public class LookupHelper {
    * LookupResponse containing a list of mapped lookup rows.
    *
    * @param <LOOKUP_ROW>
-   *          Type of lookup row (subclass of {@link AbstractLookupRowDo})
+   *     Type of lookup row (subclass of {@link AbstractLookupRowDo})
    * @param <ID>
-   *          Primary key type of data items
+   *     Primary key type of data items
    * @param <RESTRICTION>
-   *          Type of lookup restriction (subclass of {@link AbstractLookupRestrictionDo}
+   *     Type of lookup restriction (subclass of {@link AbstractLookupRestrictionDo}
    * @param <DATA>
-   *          Type of data items
+   *     Type of data items
    * @param restriction
-   *          Lookup call restriction object used to filter the stream of data
+   *     Lookup call restriction object used to filter the stream of data
    * @param data
-   *          Stream of data items
+   *     Stream of data items
    * @param idAccessor
-   *          Accessor method to get the ID of a data item
+   *     Accessor method to get the ID of a data item
    * @param textAccessor
-   *          Accessor method to get the text of a data item
+   *     Accessor method to get the text of a data item
    * @param rowClass
-   *          Class type of lookup row to create
+   *     Class type of lookup row to create
    */
   public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>, DATA> LookupResponse<LOOKUP_ROW> filterData(RESTRICTION restriction,
       Stream<DATA> data,
@@ -113,25 +113,25 @@ public class LookupHelper {
    * LookupResponse containing a list of mapped lookup rows.
    *
    * @param <LOOKUP_ROW>
-   *          Type of lookup row (subclass of {@link AbstractLookupRowDo})
+   *     Type of lookup row (subclass of {@link AbstractLookupRowDo})
    * @param <ID>
-   *          Primary key type of data items
+   *     Primary key type of data items
    * @param <RESTRICTION>
-   *          Type of lookup restriction (subclass of {@link AbstractLookupRestrictionDo}
+   *     Type of lookup restriction (subclass of {@link AbstractLookupRestrictionDo}
    * @param <DATA>
-   *          Type of data items
+   *     Type of data items
    * @param restriction
-   *          Lookup call restriction object used to filter the stream of data
+   *     Lookup call restriction object used to filter the stream of data
    * @param data
-   *          Stream of data items
+   *     Stream of data items
    * @param idAccessor
-   *          Accessor method to get the ID of a data item
+   *     Accessor method to get the ID of a data item
    * @param textAccessor
-   *          Accessor method to get the text of a data item
+   *     Accessor method to get the text of a data item
    * @param activeAccessor
-   *          Accessor method to get the active state of a data item
+   *     Accessor method to get the active state of a data item
    * @param rowClass
-   *          Class type of lookup row to create
+   *     Class type of lookup row to create
    */
   public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>, DATA> LookupResponse<LOOKUP_ROW> filterData(RESTRICTION restriction,
       Stream<DATA> data,
@@ -146,9 +146,9 @@ public class LookupHelper {
    * Filter stream of {@code data} according to specified {@code restriction} and <b> using an additional custom filter
    * {@code additionalFilter}</b> and converts the stream to a LookupResponse containing a list of mapped lookup rows.
    *
-   * @see LookupHelper#filterData(AbstractLookupRestrictionDo, Stream, Function, Function, Class)
    * @param additionalFilter
-   *          Additional filter for stream of data
+   *     Additional filter for stream of data
+   * @see LookupHelper#filterData(AbstractLookupRestrictionDo, Stream, Function, Function, Class)
    */
   public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>, DATA> LookupResponse<LOOKUP_ROW> filterData(RESTRICTION restriction,
       Stream<DATA> data,
@@ -165,13 +165,13 @@ public class LookupHelper {
    * {@code additionalFilter}</b>. Converts the stream to a LookupResponse containing a list of mapped lookup rows
    * <b>using an additional custom {@code additionalMapper}</b>
    *
-   * @see LookupHelper#filterData(AbstractLookupRestrictionDo, Stream, Function, Function, Class)
    * @param additionalFilter
-   *          Additional filter for stream of data
+   *     Additional filter for stream of data
    * @param additionalMapper
-   *          Additional mapper to map custom properties from data object to lookup row type
+   *     Additional mapper to map custom properties from data object to lookup row type
    * @param lookupRowDoComparator
-   *          Comparator the resulting {@link AbstractLookupRowDo} as sorted with. No sorting if Comparator is null.
+   *     Comparator the resulting {@link AbstractLookupRowDo} as sorted with. No sorting if Comparator is null.
+   * @see LookupHelper#filterData(AbstractLookupRestrictionDo, Stream, Function, Function, Class)
    */
   @SuppressWarnings("squid:S00107")
   public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>, DATA> LookupResponse<LOOKUP_ROW> filterData(RESTRICTION restriction,
@@ -212,11 +212,11 @@ public class LookupHelper {
    * {@code filterData} methods instead.
    *
    * @param restriction
-   *          Lookup call restriction object used to filter the stream of data
+   *     Lookup call restriction object used to filter the stream of data
    * @param enumClass
-   *          {@link IEnum} class all values are taken from
+   *     {@link IEnum} class all values are taken from
    * @param rowClass
-   *          Class type of lookup row to create
+   *     Class type of lookup row to create
    */
   public <LOOKUP_ROW extends AbstractLookupRowDo<ENUM>, ENUM extends Enum<?> & IEnum, RESTRICTION extends AbstractLookupRestrictionDo<ENUM>> LookupResponse<LOOKUP_ROW> filterEnum(RESTRICTION restriction,
       Class<ENUM> enumClass,
@@ -236,11 +236,11 @@ public class LookupHelper {
    * {@code filterData} methods instead.
    *
    * @param restriction
-   *          Lookup call restriction object used to filter the stream of data
+   *     Lookup call restriction object used to filter the stream of data
    * @param enumClass
-   *          {@link IEnum} class all values are taken from
+   *     {@link IEnum} class all values are taken from
    * @param rowClass
-   *          Class type of lookup row to create
+   *     Class type of lookup row to create
    */
   public <LOOKUP_ROW extends AbstractLookupRowDo<ENUM>, ENUM extends Enum<?> & IEnum, RESTRICTION extends AbstractLookupRestrictionDo<ENUM>> LookupResponse<LOOKUP_ROW> filterEnumKeepSorting(RESTRICTION restriction,
       Class<ENUM> enumClass,

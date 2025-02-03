@@ -100,8 +100,8 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
   /**
    * @param callInitConfig
-   *          true if {@link #callInitializer()} should automatically be invoked, false if the subclass invokes
-   *          {@link #callInitializer()} itself
+   *     true if {@link #callInitializer()} should automatically be invoked, false if the subclass invokes
+   *     {@link #callInitializer()} itself
    */
   public AbstractDataModelAttribute(boolean callInitConfig) {
     m_objectExtensions = new ObjectExtensions<>(this, false);
@@ -181,7 +181,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * This property is only supported for {@link DataModelConstants#TYPE_SMART}.
    *
    * @return {@code true} if the data model should only show a proposal list if a search text is entered by the user.
-   *         {@code false} (which is the default) if all proposals should be shown if no text search is done.
+   * {@code false} (which is the default) if all proposals should be shown if no text search is done.
    */
   @Order(50)
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -625,11 +625,11 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * </ul>
    *
    * @param rawValue
-   *          Raw value to format
+   *     Raw value to format
    * @param hasDate
-   *          True if the formatted value should show the date.
+   *     True if the formatted value should show the date.
    * @param hasTime
-   *          True if the formatted value should show the time.
+   *     True if the formatted value should show the time.
    * @return Formatted value: raw value casted to Date, date format according to date & time specification
    */
   protected String formatDate(Object rawValue, boolean hasDate, boolean hasTime) {
@@ -659,11 +659,11 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * </ul>
    *
    * @param rawValue
-   *          Raw value to format
+   *     Raw value to format
    * @param groupingUsed
-   *          True if grouping should be used for formatting
+   *     True if grouping should be used for formatting
    * @param percent
-   *          True if a percent number format should be used for formatting
+   *     True if a percent number format should be used for formatting
    * @return Formatted value: raw value casted to BigDecimal, number format with 2 fraction digits
    */
   protected String formatBigDecimal(Object rawValue, boolean groupingUsed, boolean percent) {
@@ -696,9 +696,9 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * </ul>
    *
    * @param rawValue
-   *          Raw value to format
+   *     Raw value to format
    * @param groupingUsed
-   *          True if grouping should be used for formatting
+   *     True if grouping should be used for formatting
    * @return Formatted value: raw value casted to Integer, number format with no fraction digits
    */
   protected String formatInteger(Object rawValue, boolean groupingUsed) {
@@ -719,9 +719,9 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * </ul>
    *
    * @param rawValue
-   *          Raw value to format
+   *     Raw value to format
    * @param groupingUsed
-   *          True if grouping should be used for formatting
+   *     True if grouping should be used for formatting
    * @return Formatted value: raw value casted to Long, number format with no fraction digits
    */
   protected String formatLong(Object rawValue, boolean groupingUsed) {
@@ -745,11 +745,11 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * exception. In case of failure, the return value is the empty string.
    *
    * @param rawValue
-   *          Raw value to format
+   *     Raw value to format
    * @param codeTypeClass
-   *          Code type class
+   *     Code type class
    * @param lookupCall
-   *          Lookup call (not used if code type class is set)
+   *     Lookup call (not used if code type class is set)
    * @return Formatted value: key is resolved by code type / lookup call
    */
   @SuppressWarnings("unchecked")
@@ -805,7 +805,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * </ul>
    *
    * @param rawValue
-   *          Raw value to format
+   *     Raw value to format
    * @return Formatted value: raw value is casted to String
    */
   protected String formatString(Object rawValue) {
@@ -816,7 +816,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * Formats the raw value for unknown attribute types
    *
    * @param rawValue
-   *          Raw value to format
+   *     Raw value to format
    * @return Formatted value: raw value is casted to String
    */
   protected String formatObject(Object rawValue) {
@@ -843,7 +843,6 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     public void execPrepareLookup(DataModelAttributePrepareLookupChain chain, ILookupCall<?> call) {
       getOwner().execPrepareLookup(call);
     }
-
   }
 
   protected final void interceptInitAttribute() {

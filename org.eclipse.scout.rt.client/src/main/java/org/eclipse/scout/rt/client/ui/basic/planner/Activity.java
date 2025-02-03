@@ -109,15 +109,15 @@ public class Activity<RESOURCE_ID, ACTIVITY_ID> extends MemoryOptimizedObject {
 
   /**
    * @param row
-   *          <ul>
-   *          <li>resource of type RI
-   *          <li>activityId of type AI
-   *          <li>startTime of type {@link Date}
-   *          <li>endTime of type {@link Date}
-   *          <li>text of type {@link String}
-   *          <li>tooltipText of type {@link String}
-   *          <li>value of type {@link Number}
-   *          </ul>
+   *     <ul>
+   *              <li>resource of type RI
+   *              <li>activityId of type AI
+   *              <li>startTime of type {@link Date}
+   *              <li>endTime of type {@link Date}
+   *              <li>text of type {@link String}
+   *              <li>tooltipText of type {@link String}
+   *              <li>value of type {@link Number}
+   *              </ul>
    */
   public Activity(Object[] row) {
     if (row == null || row.length < 2) {

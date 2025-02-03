@@ -29,5 +29,4 @@ public final class DeepLinkUrlParameter {
 
   private DeepLinkUrlParameter() {
   }
-
 }

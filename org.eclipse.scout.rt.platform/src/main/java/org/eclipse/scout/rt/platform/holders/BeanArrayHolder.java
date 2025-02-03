@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator
 
 /**
  * @param <T>
- *          the type of beans stored in the holder
+ *     the type of beans stored in the holder
  * @since 3.0
  */
 public class BeanArrayHolder<T> implements IBeanArrayHolder<T>, Serializable {
@@ -80,7 +80,7 @@ public class BeanArrayHolder<T> implements IBeanArrayHolder<T>, Serializable {
     EnumSet<State> state = EnumSet.noneOf(State.class);
     Collections.addAll(state, states);
     if (state.isEmpty() || (state.contains(State.INSERTED) && state.contains(State.UPDATED)
-        && state.contains(State.DELETED) && state.contains(State.NON_CHANGED))) {
+                                && state.contains(State.DELETED) && state.contains(State.NON_CHANGED))) {
       return m_list.size();
     }
     int ret = 0;
@@ -100,7 +100,7 @@ public class BeanArrayHolder<T> implements IBeanArrayHolder<T>, Serializable {
       Collections.addAll(state, states);
     }
     if (state.isEmpty() || (state.contains(State.INSERTED) && state.contains(State.UPDATED)
-        && state.contains(State.DELETED) && state.contains(State.NON_CHANGED))) {
+                                && state.contains(State.DELETED) && state.contains(State.NON_CHANGED))) {
       ret = m_list;
     }
     else {

@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -50,5 +49,4 @@ public class BooleanUtilityTest {
   public void testDefaultValue() {
     assertEquals(BooleanUtility.nvl(null, true), true);
   }
-
 }

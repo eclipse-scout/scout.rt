@@ -75,5 +75,4 @@ public class DefaultUserAgentParser implements IUserAgentParser {
         userAgent.getUiSystem().getIdentifier(), DELIMITER,
         uiDeviceId);
   }
-
 }

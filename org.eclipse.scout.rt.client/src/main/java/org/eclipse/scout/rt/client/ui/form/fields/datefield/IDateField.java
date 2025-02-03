@@ -79,16 +79,16 @@ public interface IDateField extends IValueField<Date> {
 
   /**
    * @param autoDate
-   *          The date to be used when setting a value "automatically", e.g. when the date picker is opened initially or
-   *          when a date or time is entered and the other component has to be filled. <code>null</code> means "use
-   *          current date and time".
+   *     The date to be used when setting a value "automatically", e.g. when the date picker is opened initially or
+   *     when a date or time is entered and the other component has to be filled. <code>null</code> means "use
+   *     current date and time".
    */
   void setAutoDate(Date autoDate);
 
   /**
    * @return the date to be used when setting a value "automatically", e.g. when the date picker is opened initially or
-   *         when a date or time is entered and the other component has to be filled. If the return value is
-   *         <code>null</code>, the current date and time should be used.
+   * when a date or time is entered and the other component has to be filled. If the return value is
+   * <code>null</code>, the current date and time should be used.
    */
   Date getAutoDate();
 
@@ -110,5 +110,4 @@ public interface IDateField extends IValueField<Date> {
   void setAllowedDates(List<Date> allowedDates);
 
   List<Date> getAllowedDates();
-
 }

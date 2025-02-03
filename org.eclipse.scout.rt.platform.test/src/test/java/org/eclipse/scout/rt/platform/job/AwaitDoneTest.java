@@ -152,7 +152,6 @@ public class AwaitDoneTest {
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
         .toFilter(), 10, TimeUnit.SECONDS);
-
   }
 
   /**

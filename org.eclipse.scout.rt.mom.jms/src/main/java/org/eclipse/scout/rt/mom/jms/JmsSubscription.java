@@ -97,8 +97,8 @@ public class JmsSubscription implements ISubscription {
    * <li>the current thread {@link Thread#isInterrupted()}</li>
    *
    * @param time
-   *          the intended wait time, value of {@link JmsMomImplementor#WAIT_TIME_INFINITE} may be used to wait
-   *          infinitely
+   *     the intended wait time, value of {@link JmsMomImplementor#WAIT_TIME_INFINITE} may be used to wait
+   *     infinitely
    * @since 6.1
    */
   public boolean awaitStarted(int time, TimeUnit unit) {
@@ -120,5 +120,4 @@ public class JmsSubscription implements ISubscription {
       Thread.yield();
     }
   }
-
 }

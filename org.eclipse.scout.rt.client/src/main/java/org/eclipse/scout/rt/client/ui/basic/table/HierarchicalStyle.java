@@ -20,5 +20,4 @@ public enum HierarchicalStyle {
    * The parent rows will be displayed as structure elements. No actions on parent rows.
    */
   STRUCTURED
-
 }

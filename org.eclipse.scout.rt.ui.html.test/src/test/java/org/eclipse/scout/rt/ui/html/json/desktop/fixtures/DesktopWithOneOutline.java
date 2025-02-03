@@ -25,5 +25,4 @@ public class DesktopWithOneOutline extends AbstractDesktop {
     outlines.add(OutlineWithOneNode.class);
     return outlines;
   }
-
 }

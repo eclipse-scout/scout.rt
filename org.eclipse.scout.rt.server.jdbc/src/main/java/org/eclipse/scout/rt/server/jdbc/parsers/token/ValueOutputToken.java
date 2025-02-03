@@ -96,5 +96,4 @@ public class ValueOutputToken implements IToken {
     b.append("]");
     return b.toString();
   }
-
 }

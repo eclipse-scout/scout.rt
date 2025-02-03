@@ -168,7 +168,6 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
     DecimalFormat format = getFormat();
     assertNotSame("public getter should not return internal instance", getFormatInternal(), format);
     assertEquals("internal instance and copy returned by public getter should be equal", getFormatInternal(), format);
-
   }
 
   @Test
@@ -240,7 +239,6 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
 
     assertTrue("expected tracker to be notified, when value changed", formatTracker.m_notified);
     assertFalse("expected new setting in property change notification", ((DecimalFormat) formatTracker.m_cachedProperty).isGroupingUsed());
-
   }
 
   @Test
@@ -292,7 +290,6 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
     DecimalFormat newFormat = (DecimalFormat) ((DecimalFormat) formatTracker.m_cachedProperty).clone();
     newFormat.setGroupingUsed(true);
     assertEquals("expected no other difference in new format", oldFormat, newFormat);
-
   }
 
   @Test
@@ -314,7 +311,6 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
     DecimalFormat newFormat = (DecimalFormat) ((DecimalFormat) formatTracker.m_cachedProperty).clone();
     newFormat.setRoundingMode(RoundingMode.HALF_UP);
     assertEquals("expected no other difference in new format", oldFormat, newFormat);
-
   }
 
   @Test

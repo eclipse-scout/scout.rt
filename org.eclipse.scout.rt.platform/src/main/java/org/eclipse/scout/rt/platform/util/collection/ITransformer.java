@@ -19,7 +19,7 @@ public interface ITransformer<F, T> {
    * Transforms the specified element to the target type
    *
    * @param x
-   *          The input element
+   *     The input element
    * @return The transformed value in the target type.
    */
   T transform(F x);
@@ -28,7 +28,7 @@ public interface ITransformer<F, T> {
    * Reverts the transformation.
    *
    * @param y
-   *          The transformed element in the target type.
+   *     The transformed element in the target type.
    * @return The reverted input element.
    */
   F revert(T y);

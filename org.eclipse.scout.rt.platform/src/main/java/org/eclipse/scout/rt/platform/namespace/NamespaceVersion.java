@@ -40,7 +40,7 @@ public final class NamespaceVersion {
 
   /**
    * @param namespaceVersion
-   *          string with a namespace prefix: [namespace]-[version number]
+   *     string with a namespace prefix: [namespace]-[version number]
    * @return new {@link NamespaceVersion} or <code>null</code> if input is <code>null</code> or empty.
    */
   public static NamespaceVersion of(String namespaceVersion) {

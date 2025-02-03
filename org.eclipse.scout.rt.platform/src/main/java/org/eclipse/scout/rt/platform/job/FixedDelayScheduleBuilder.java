@@ -66,9 +66,9 @@ public final class FixedDelayScheduleBuilder extends ScheduleBuilder<IFixedDelay
    * {@link JobInput#withExceptionHandling(ExceptionHandler, boolean)}.
    *
    * @param fixedDelay
-   *          the delay between successive runs.
+   *     the delay between successive runs.
    * @param unit
-   *          the time unit of the <code>delay</code> argument.
+   *     the time unit of the <code>delay</code> argument.
    */
   public static FixedDelayScheduleBuilder repeatForever(final long fixedDelay, final TimeUnit unit) {
     return new FixedDelayScheduleBuilder(IFixedDelayTrigger.REPEAT_INDEFINITELY, fixedDelay, unit);
@@ -83,11 +83,11 @@ public final class FixedDelayScheduleBuilder extends ScheduleBuilder<IFixedDelay
    * handling mechanism. See {@link JobInput#withExceptionHandling(ExceptionHandler, boolean)}.
    *
    * @param repeatCount
-   *          the maximum number of repetitions.
+   *     the maximum number of repetitions.
    * @param fixedDelay
-   *          the delay between successive runs.
+   *     the delay between successive runs.
    * @param unit
-   *          the time unit of the <code>delay</code> argument.
+   *     the time unit of the <code>delay</code> argument.
    */
   public static FixedDelayScheduleBuilder repeatForTotalCount(final long repeatCount, final long fixedDelay, final TimeUnit unit) {
     return new FixedDelayScheduleBuilder(repeatCount, fixedDelay, unit);

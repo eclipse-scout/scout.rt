@@ -19,5 +19,4 @@ public interface IPlannerDisplayMode extends ICalendarDisplayMode {
 
   int CALENDAR_WEEK = 5;
   int YEAR = 6;
-
 }

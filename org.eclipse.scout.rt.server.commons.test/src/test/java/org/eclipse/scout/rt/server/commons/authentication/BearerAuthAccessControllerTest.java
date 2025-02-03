@@ -117,7 +117,7 @@ public class BearerAuthAccessControllerTest {
    * Provides a response object that provides the set error codes to the statusCodeHolder
    *
    * @param statusCodeHolder
-   *          IntegerHolder that holds the error status if set
+   *     IntegerHolder that holds the error status if set
    */
   private HttpServletResponse setupHttpServletResponseMock(final IntegerHolder statusCodeHolder) throws IOException {
     HttpServletResponse response = Mockito.mock(HttpServletResponse.class);

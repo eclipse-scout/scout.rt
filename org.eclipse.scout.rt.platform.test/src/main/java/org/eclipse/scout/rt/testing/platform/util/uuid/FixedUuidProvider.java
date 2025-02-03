@@ -32,5 +32,4 @@ public class FixedUuidProvider implements IUuidProvider {
   public UUID createUuid() {
     return m_uuid;
   }
-
 }

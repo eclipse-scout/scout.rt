@@ -54,7 +54,7 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
    * {@link IClientSession}.
    *
    * @param listener
-   *          {@link INotificationListener}
+   *     {@link INotificationListener}
    */
   public void addListener(INotificationListener<T> listener) {
     addListener(ClientSessionProvider.currentSession(), listener);
@@ -66,9 +66,9 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
    * {@link IClientSession}.
    *
    * @param listener
-   *          {@link INotificationListener}
+   *     {@link INotificationListener}
    * @param session
-   *          {@link IClientSession}
+   *     {@link IClientSession}
    */
   public void addListener(IClientSession session, INotificationListener<T> listener) {
     Assertions.assertNotNull(session, "client session can not be null");
@@ -115,7 +115,7 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
    * Returns the {@link INotificationListener}s for a given session.
    *
    * @param session
-   *          {@link IClientSession}
+   *     {@link IClientSession}
    * @return {@link INotificationListener}s
    */
   public List<INotificationListener<T>> getListeners(IClientSession session) {

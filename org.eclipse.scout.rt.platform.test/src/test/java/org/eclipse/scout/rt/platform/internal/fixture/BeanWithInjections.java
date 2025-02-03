@@ -71,5 +71,4 @@ public class BeanWithInjections {
     Assert.assertEquals(offset + 5, Math.max(m_init1.getInstanceIndex(), m_init2.getInstanceIndex()));
     Assert.assertEquals(offset + 6, m_postConstruct.getInstanceIndex());
   }
-
 }

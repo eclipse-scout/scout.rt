@@ -216,6 +216,5 @@ public class ClientUIPreferencesTest {
     @Override
     protected void load(String userScope, String nodeId, IPreferences prefsToFill) {
     }
-
   }
 }

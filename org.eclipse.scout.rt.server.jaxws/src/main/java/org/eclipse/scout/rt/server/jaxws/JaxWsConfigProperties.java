@@ -100,7 +100,7 @@ public final class JaxWsConfigProperties {
     @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Fully qualified class name of the JAX-WS implementor to use. The class must extend '%s'.\n"
-          + "By default, JAX-WS Metro (not bundled with JRE) is used. For that to work, add the Maven dependency to JAX-WS Metro to your server application's pom.xml: com.sun.xml.ws:jaxws-rt:2.2.10.",
+              + "By default, JAX-WS Metro (not bundled with JRE) is used. For that to work, add the Maven dependency to JAX-WS Metro to your server application's pom.xml: com.sun.xml.ws:jaxws-rt:2.2.10.",
           JaxWsImplementorSpecifics.class.getName());
     }
 

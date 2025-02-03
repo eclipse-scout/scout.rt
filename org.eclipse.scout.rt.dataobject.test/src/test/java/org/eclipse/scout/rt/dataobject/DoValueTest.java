@@ -35,7 +35,8 @@ public class DoValueTest {
   }
 
   protected Consumer<DoNode<String>> m_lazyCreate = attribute -> {
-    /* nop */ };
+    /* nop */
+  };
 
   @Test
   public void testCreateExists() {

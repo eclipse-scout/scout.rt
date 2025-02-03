@@ -47,5 +47,4 @@ public interface ISmartFieldExtension<VALUE, OWNER extends AbstractSmartField<VA
   void execFilterRecLookupResult(SmartFieldFilterRecLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result);
 
   void execPrepareKeyLookup(SmartFieldPrepareKeyLookupChain<VALUE> chain, ILookupCall<VALUE> call, VALUE key);
-
 }

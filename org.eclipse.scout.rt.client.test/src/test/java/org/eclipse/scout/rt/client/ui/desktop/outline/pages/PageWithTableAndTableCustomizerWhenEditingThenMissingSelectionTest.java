@@ -193,7 +193,6 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
           dataChanged("Account");
         }
       }
-
     }
   }
 }

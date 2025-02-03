@@ -70,5 +70,4 @@ public class DoBinaryResourceDeserializer extends StdDeserializer<BinaryResource
 
     return builder.build();
   }
-
 }

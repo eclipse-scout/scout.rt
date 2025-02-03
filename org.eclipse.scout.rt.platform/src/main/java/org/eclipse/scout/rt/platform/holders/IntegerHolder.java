@@ -23,5 +23,4 @@ public class IntegerHolder extends Holder<Integer> {
   public IntegerHolder(Integer value) {
     super(Integer.class, value);
   }
-
 }

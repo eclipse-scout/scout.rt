@@ -56,5 +56,4 @@ public class PageWithTableGroupingTestHelper {
     }
     return null;
   }
-
 }

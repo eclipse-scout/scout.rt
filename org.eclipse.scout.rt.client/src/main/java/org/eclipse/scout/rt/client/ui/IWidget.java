@@ -58,7 +58,7 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
 
   /**
    * @return {@code true} if {@link #init()} has been called, {@code false} if not. Also returns false if the widget has
-   *         been disposed.
+   * been disposed.
    */
   boolean isInitDone();
 
@@ -83,7 +83,7 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
 
   /**
    * @return {@code true} if {@link #dispose()} has been called, {@code false} if not. Also returns {@code false} if the
-   *         widget has been initialized again after it was disposed.
+   * widget has been initialized again after it was disposed.
    */
   boolean isDisposeDone();
 
@@ -93,10 +93,10 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * The visit performs a pre-order traversal. Every {@link IWidget} is only visited once.
    *
    * @param visitor
-   *          The visitor to call. Must not be {@code null}. The {@link IWidget} passed to the {@link Consumer} is never
-   *          {@code null}.
+   *     The visitor to call. Must not be {@code null}. The {@link IWidget} passed to the {@link Consumer} is never
+   *     {@code null}.
    * @throws AssertionException
-   *           if the visitor is {@code null}.
+   *     if the visitor is {@code null}.
    */
   void visit(Consumer<IWidget> visitor);
 
@@ -107,14 +107,14 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * called for {@link IWidget}s that are of the specified type.
    *
    * @param visitor
-   *          The visitor to call. Must not be {@code null}. The {@link IWidget} passed to the {@link Consumer} is never
-   *          {@code null}.
+   *     The visitor to call. Must not be {@code null}. The {@link IWidget} passed to the {@link Consumer} is never
+   *     {@code null}.
    * @param <T>
-   *          The type of widget that should be visited.
+   *     The type of widget that should be visited.
    * @param type
-   *          The type of widget that should be visited.
+   *     The type of widget that should be visited.
    * @throws AssertionException
-   *           if one of the arguments is {@code null}.
+   *     if one of the arguments is {@code null}.
    */
   <T extends IWidget> void visit(Consumer<T> visitor, Class<T> type);
 
@@ -125,11 +125,11 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * The visit performs a pre-order traversal. Every {@link IWidget} is only visited once.
    *
    * @param visitor
-   *          The visitor to call. Must not be {@code null}. The {@link IWidget} passed to the {@link Function} is never
-   *          {@code null}. The {@link Function} returns a {@link TreeVisitResult} to control the traversal.
+   *     The visitor to call. Must not be {@code null}. The {@link IWidget} passed to the {@link Function} is never
+   *     {@code null}. The {@link Function} returns a {@link TreeVisitResult} to control the traversal.
    * @return The {@link TreeVisitResult} of the last call to the specified {@link Function}.
    * @throws AssertionException
-   *           if the visitor is {@code null}.
+   *     if the visitor is {@code null}.
    * @see TreeVisitResult
    */
   TreeVisitResult visit(Function<IWidget, TreeVisitResult> visitor);
@@ -142,15 +142,15 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * called for {@link IWidget}s that are of the specified type.
    *
    * @param visitor
-   *          The visitor to call. Must not be {@code null}. The {@link IWidget} passed to the {@link Function} is never
-   *          {@code null}. The {@link Function} returns a {@link TreeVisitResult} to control the traversal.
+   *     The visitor to call. Must not be {@code null}. The {@link IWidget} passed to the {@link Function} is never
+   *     {@code null}. The {@link Function} returns a {@link TreeVisitResult} to control the traversal.
    * @param type
-   *          The type of widget that should be visited.
+   *     The type of widget that should be visited.
    * @param <T>
-   *          The type of widget that should be visited.
+   *     The type of widget that should be visited.
    * @return The {@link TreeVisitResult} of the last call to the specified {@link Function}.
    * @throws AssertionException
-   *           if one of the arguments is {@code null}.
+   *     if one of the arguments is {@code null}.
    * @see TreeVisitResult
    */
   <T extends IWidget> TreeVisitResult visit(Function<T, TreeVisitResult> visitor, Class<T> type);
@@ -162,10 +162,10 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * returned by {@link IDepthFirstTreeVisitor#preVisit(Object, int, int)}. Every {@link IWidget} is only visited once.
    *
    * @param visitor
-   *          The {@link IDepthFirstTreeVisitor} to call. Must not be {@code null}.
+   *     The {@link IDepthFirstTreeVisitor} to call. Must not be {@code null}.
    * @return The {@link TreeVisitResult} of the last call to the specified {@link IDepthFirstTreeVisitor}.
    * @throws AssertionException
-   *           if the visitor is {@code null}.
+   *     if the visitor is {@code null}.
    * @see IDepthFirstTreeVisitor
    * @see TreeVisitResult
    */
@@ -179,14 +179,14 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * The specified visitor is only called for {@link IWidget}s that are of the specified type.
    *
    * @param visitor
-   *          The {@link IDepthFirstTreeVisitor} to call. Must not be {@code null}.
+   *     The {@link IDepthFirstTreeVisitor} to call. Must not be {@code null}.
    * @param type
-   *          The type of widget that should be visited.
+   *     The type of widget that should be visited.
    * @param <T>
-   *          The type of widget that should be visited.
+   *     The type of widget that should be visited.
    * @return The {@link TreeVisitResult} of the last call to the specified {@link IDepthFirstTreeVisitor}.
    * @throws AssertionException
-   *           if one of the arguments is {@code null}.
+   *     if one of the arguments is {@code null}.
    * @see IDepthFirstTreeVisitor
    * @see TreeVisitResult
    */
@@ -200,14 +200,14 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * The specified visitor is only called for {@link IWidget}s that are of the specified type.
    *
    * @param visitor
-   *          The {@link IBreadthFirstTreeVisitor} to use. Must not be {@code null}.
+   *     The {@link IBreadthFirstTreeVisitor} to use. Must not be {@code null}.
    * @param type
-   *          The type of widget that should be visited.
+   *     The type of widget that should be visited.
    * @param <T>
-   *          The type of widget that should be visited.
+   *     The type of widget that should be visited.
    * @return The {@link TreeVisitResult} of the last call to the specified {@link IBreadthFirstTreeVisitor}.
    * @throws AssertionException
-   *           if one of the arguments is {@code null}.
+   *     if one of the arguments is {@code null}.
    * @see IBreadthFirstTreeVisitor
    * @see TreeVisitResult
    */
@@ -220,10 +220,10 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * returned by {@link IBreadthFirstTreeVisitor#visit(Object, int, int)}. Every {@link IWidget} is only visited once.
    *
    * @param visitor
-   *          The {@link IBreadthFirstTreeVisitor} to use. Must not be {@code null}.
+   *     The {@link IBreadthFirstTreeVisitor} to use. Must not be {@code null}.
    * @return The {@link TreeVisitResult} of the last call to the specified {@link IBreadthFirstTreeVisitor}.
    * @throws AssertionException
-   *           if the visitor is {@code null}.
+   *     if the visitor is {@code null}.
    * @see IBreadthFirstTreeVisitor
    * @see TreeVisitResult
    */
@@ -231,7 +231,7 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
 
   /**
    * @return All child {@link IWidget}s. The resulting {@link List} is never {@code null} and does not contain any
-   *         {@code null} elements.
+   * {@code null} elements.
    */
   List<? extends IWidget> getChildren();
 
@@ -258,10 +258,10 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * searched in a pre-order traversal.
    *
    * @param widgetClassToFind
-   *          The class of the widget. Must not be {@code null}.
+   *     The class of the widget. Must not be {@code null}.
    * @return The first widget that is {@code instanceof} the given class or {@code null}.
    * @throws AssertionException
-   *           if widgetClassToFind is {@code null}.
+   *     if widgetClassToFind is {@code null}.
    */
   <T extends IWidget> T getWidgetByClass(Class<T> widgetClassToFind);
 
@@ -275,9 +275,9 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
 
   /**
    * @return {@code true} if this widget is enabled.
-   *         <p>
-   *         The result of this method does not respect any parent widgets. Use {@link #isEnabledIncludingParents()}
-   *         whenever necessary.
+   * <p>
+   * The result of this method does not respect any parent widgets. Use {@link #isEnabledIncludingParents()}
+   * whenever necessary.
    */
   boolean isEnabled();
 
@@ -288,13 +288,13 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * widget (if other dimensions are still disabled).
    *
    * @param enabled
-   *          the new enabled state.
+   *     the new enabled state.
    */
   void setEnabled(boolean enabled);
 
   /**
    * @return {@code true} if this widget respects the enabled state of parent widgets. If property is set to
-   *         {@code false}, this widget may be enabled even if parent widgets are disabled.
+   * {@code false}, this widget may be enabled even if parent widgets are disabled.
    */
   boolean isInheritAccessibility();
 
@@ -315,7 +315,7 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
 
   /**
    * @param enabledGranted
-   *          the new value for the enabled granted dimension.
+   *     the new value for the enabled granted dimension.
    */
   void setEnabledGranted(boolean enabledGranted);
 
@@ -323,10 +323,10 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * Changes the default enabled dimension of this widget to the given value.
    *
    * @param enabled
-   *          The new enabled value.
+   *     The new enabled value.
    * @param updateParents
-   *          if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
-   *          argument only has an effect if the new enabled state is {@code true}.
+   *     if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
+   *     argument only has an effect if the new enabled state is {@code true}.
    */
   void setEnabled(boolean enabled, boolean updateParents);
 
@@ -334,13 +334,13 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * Changes the default enabled dimension of this widget to the given value.
    *
    * @param enabled
-   *          The new enabled value.
+   *     The new enabled value.
    * @param updateParents
-   *          if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
-   *          argument only has an effect if the new enabled state is {@code true}.
+   *     if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
+   *     argument only has an effect if the new enabled state is {@code true}.
    * @param updateChildren
-   *          if <code>true</code> the enabled properties of all child widgets (recursive) are updated to same value as
-   *          well.
+   *     if <code>true</code> the enabled properties of all child widgets (recursive) are updated to same value as
+   *     well.
    */
   void setEnabled(boolean enabled, boolean updateParents, boolean updateChildren);
 
@@ -348,10 +348,10 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * Changes the granted enabled dimension of this widget to the given value.
    *
    * @param enabled
-   *          The new enable-granted value.
+   *     The new enable-granted value.
    * @param updateParents
-   *          if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
-   *          argument only has an effect if the new enabled state is {@code true}.
+   *     if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
+   *     argument only has an effect if the new enabled state is {@code true}.
    */
   void setEnabledGranted(boolean enabled, boolean updateParents);
 
@@ -359,13 +359,13 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * Changes the granted enabled dimension of this widget to the given value.
    *
    * @param enabled
-   *          The new enable-granted value.
+   *     The new enable-granted value.
    * @param updateParents
-   *          if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
-   *          argument only has an effect if the new enabled state is {@code true}.
+   *     if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
+   *     argument only has an effect if the new enabled state is {@code true}.
    * @param updateChildren
-   *          if <code>true</code> the enabled properties of all child widgets (recursive) are updated to same value as
-   *          well.
+   *     if <code>true</code> the enabled properties of all child widgets (recursive) are updated to same value as
+   *     well.
    */
   void setEnabledGranted(boolean enabled, boolean updateParents, boolean updateChildren);
 
@@ -374,11 +374,11 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * {@link Predicate} specified.
    *
    * @param filter
-   *          A {@link Predicate} that is called for each enabled dimension. The corresponding enabled-bit of this
-   *          widget must be equal to the result of the {@link Predicate}. In case {@code null} is passed all bits are
-   *          compared against {@code true} (which is the same as {@link #isEnabled()}).
+   *     A {@link Predicate} that is called for each enabled dimension. The corresponding enabled-bit of this
+   *     widget must be equal to the result of the {@link Predicate}. In case {@code null} is passed all bits are
+   *     compared against {@code true} (which is the same as {@link #isEnabled()}).
    * @return {@code true} if all enabled dimensions bits have the same value as returned by the specified
-   *         {@link Predicate}.
+   * {@link Predicate}.
    */
   boolean isEnabled(Predicate<String> filter);
 
@@ -386,17 +386,17 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * Changes the enabled-state value of the given dimension.
    *
    * @param enabled
-   *          The new enabled-state value for the given dimension.
+   *     The new enabled-state value for the given dimension.
    * @param updateParents
-   *          if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
-   *          argument only has an effect if the new enabled state is {@code true}.
+   *     if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
+   *     argument only has an effect if the new enabled state is {@code true}.
    * @param dimension
-   *          The dimension to change. Must not be <code>null</code>.
+   *     The dimension to change. Must not be <code>null</code>.
    * @throws AssertionException
-   *           if the given dimension is <code>null</code>.
+   *     if the given dimension is <code>null</code>.
    * @throws IllegalStateException
-   *           if too many dimensions are used. <b>Note:</b> these dimensions are shared amongst all items of an
-   *           application. They are not available by instance but by class!
+   *     if too many dimensions are used. <b>Note:</b> these dimensions are shared amongst all items of an
+   *     application. They are not available by instance but by class!
    */
   void setEnabled(boolean enabled, boolean updateParents, String dimension);
 
@@ -404,20 +404,20 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * Changes the enabled-state value of the given dimension.
    *
    * @param enabled
-   *          The new enabled-state value for the given dimension.
+   *     The new enabled-state value for the given dimension.
    * @param updateParents
-   *          if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
-   *          argument only has an effect if the new enabled state is {@code true}.
+   *     if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
+   *     argument only has an effect if the new enabled state is {@code true}.
    * @param updateChildren
-   *          if <code>true</code> the enabled properties of all child widgets (recursive) are updated to same value as
-   *          well.
+   *     if <code>true</code> the enabled properties of all child widgets (recursive) are updated to same value as
+   *     well.
    * @param dimension
-   *          The dimension to change. Must not be <code>null</code>.
+   *     The dimension to change. Must not be <code>null</code>.
    * @throws AssertionException
-   *           if the given dimension is <code>null</code>.
+   *     if the given dimension is <code>null</code>.
    * @throws IllegalStateException
-   *           if too many dimensions are used. <b>Note:</b> these dimensions are shared amongst all elements of an
-   *           application. They are not available by instance but by class!
+   *     if too many dimensions are used. <b>Note:</b> these dimensions are shared amongst all elements of an
+   *     application. They are not available by instance but by class!
    */
   void setEnabled(boolean enabled, boolean updateParents, boolean updateChildren, String dimension);
 
@@ -430,7 +430,7 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
 
   /**
    * @return The first parent widget that is {@code instanceof} the given type or {@code null} if no such parent can be
-   *         found.
+   * found.
    */
   <T extends IWidget> T getParentOfType(Class<T> type);
 
@@ -443,8 +443,8 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
 
   /**
    * @return {@code true} if this widget is enabled for all dimensions and all parent widgets are enabled for all
-   *         dimensions as well. The parent widgets are only considered as long as {@link #isInheritAccessibility()} is
-   *         {@code true}.
+   * dimensions as well. The parent widgets are only considered as long as {@link #isInheritAccessibility()} is
+   * {@code true}.
    */
   boolean isEnabledIncludingParents();
 
@@ -452,7 +452,7 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * Visits all parent widgets. The receiver itself is not visited
    *
    * @param visitor
-   *          The visitor to call. Must not be {@code null}.
+   *     The visitor to call. Must not be {@code null}.
    */
   boolean visitParents(Consumer<IWidget> visitor);
 
@@ -460,7 +460,7 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * Visits all parent widgets that are {@code instanceof} the given type filter. The receiver itself is not visited.
    *
    * @param visitor
-   *          The visitor to call. Must not be {@code null}.
+   *     The visitor to call. Must not be {@code null}.
    */
   <T extends IWidget> boolean visitParents(Consumer<T> visitor, Class<T> typeFilter);
 
@@ -468,8 +468,8 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * Visits all parent widgets as long as the {@link Predicate} specified returns {@code true}.
    *
    * @param visitor
-   *          The visitor to call. Must not be {@code null}. The visit aborts when the {@link Predicate} returns
-   *          {@code false}.
+   *     The visitor to call. Must not be {@code null}. The visit aborts when the {@link Predicate} returns
+   *     {@code false}.
    */
   boolean visitParents(Predicate<IWidget> visitor);
 
@@ -478,8 +478,8 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * specified returns {@code true}.
    *
    * @param visitor
-   *          The visitor to call. Must not be {@code null}. The visit aborts when the {@link Predicate} returns
-   *          {@code false}.
+   *     The visitor to call. Must not be {@code null}. The visit aborts when the {@link Predicate} returns
+   *     {@code false}.
    */
   <T extends IWidget> boolean visitParents(Predicate<T> visitor, Class<T> typeFilter);
 
@@ -522,5 +522,4 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
   }
 
   WidgetListeners widgetListeners();
-
 }

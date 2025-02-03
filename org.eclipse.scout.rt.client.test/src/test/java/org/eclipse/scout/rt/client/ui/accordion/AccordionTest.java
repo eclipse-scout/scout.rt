@@ -133,7 +133,6 @@ public class AccordionTest {
     public class TileGrid extends AbstractTileGrid<P_Tile> {
 
     }
-
   }
 
   private static class P_Tile extends AbstractTile {

@@ -32,7 +32,6 @@ public class PostConstructTest {
     m_bean01 = Platform.get().getBeanManager().registerClass(Bean01.class);
     m_bean02 = Platform.get().getBeanManager().registerClass(Bean02.class);
     m_bean04 = Platform.get().getBeanManager().registerClass(Bean04.class);
-
   }
 
   /**
@@ -58,7 +57,6 @@ public class PostConstructTest {
     new1 = BEANS.get(Bean02.class);
     Assert.assertEquals(1, new1.getSuperInitCount());
     Assert.assertEquals(1, new1.getInitCount());
-
   }
 
   @Test
@@ -69,7 +67,6 @@ public class PostConstructTest {
     new1 = BEANS.get(Bean04.class);
     Assert.assertEquals(1, new1.getBean04InitCount());
     Assert.assertEquals(1, new1.getAbstractBean03InitCount());
-
   }
 
   @AfterClass
@@ -101,7 +98,6 @@ public class PostConstructTest {
     public int getSuperInitCount() {
       return m_superInitCount.get();
     }
-
   }
 
   private static class Bean02 extends AbstractBean02 {
@@ -143,5 +139,4 @@ public class PostConstructTest {
       return m_Bean04Init.get();
     }
   }
-
 }

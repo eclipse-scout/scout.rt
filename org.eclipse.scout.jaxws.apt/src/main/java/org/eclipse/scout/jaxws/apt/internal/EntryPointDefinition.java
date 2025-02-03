@@ -169,8 +169,7 @@ public class EntryPointDefinition {
   public List<HandlerDefinition> getHandlerChain() {
     final List<HandlerDefinition> handlerChain = new ArrayList<>();
 
-    @SuppressWarnings("unchecked")
-    final List<AnnotationValue> handlerAnnotationValues = (List<AnnotationValue>) AnnotationUtil.getAnnotationValue(m_annotationMirror, "handlerChain", m_env.getElementUtils()).getValue();
+    @SuppressWarnings("unchecked") final List<AnnotationValue> handlerAnnotationValues = (List<AnnotationValue>) AnnotationUtil.getAnnotationValue(m_annotationMirror, "handlerChain", m_env.getElementUtils()).getValue();
 
     for (final AnnotationValue handlerAnnotationValue : handlerAnnotationValues) {
       final AnnotationMirror handlerAnnotation = (AnnotationMirror) handlerAnnotationValue.getValue();
@@ -210,7 +209,7 @@ public class EntryPointDefinition {
 
   /**
    * @return <code>true</code> if the WSDL location is to be derived from {@link WebServiceClient} annotation on service
-   *         class.
+   * class.
    */
   public boolean isWsdlLocationDerived() {
     return WebServiceEntryPoint.DERIVED.equals(getWsdlLocation());

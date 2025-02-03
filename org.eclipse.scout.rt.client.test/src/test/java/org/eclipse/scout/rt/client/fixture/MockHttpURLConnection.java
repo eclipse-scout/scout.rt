@@ -87,5 +87,4 @@ public abstract class MockHttpURLConnection extends HttpURLConnection {
   }
 
   protected abstract void mockHttpServlet(InputStream servletIn, OutputStream servletOut);
-
 }

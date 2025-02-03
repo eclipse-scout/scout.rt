@@ -31,11 +31,11 @@ public interface IComposerValueField extends IFormField {
 
   /**
    * @return array of field value(s), null when field has invalid or missing values
-   *         <p>
-   *         Note: listbox and treebox have <b>one</b> value that is an array, so returning an array with the first
-   *         element being an array: [[a,b,c,d] ]
-   *         <p>
-   *         Note: "between a and b" field has <b>two</b> values so returning an array with two elements: [a, b ]
+   * <p>
+   * Note: listbox and treebox have <b>one</b> value that is an array, so returning an array with the first
+   * element being an array: [[a,b,c,d] ]
+   * <p>
+   * Note: "between a and b" field has <b>two</b> values so returning an array with two elements: [a, b ]
    */
   List<Object> getValues();
 
@@ -43,5 +43,4 @@ public interface IComposerValueField extends IFormField {
    * @return the texts of the values of the selected field
    */
   List<String> getTexts();
-
 }

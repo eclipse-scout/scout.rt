@@ -76,7 +76,7 @@ public interface IPlatform {
    *
    * @return The {@link IBeanManager} of the platform.
    * @throws PlatformException
-   *           if the platform is in the {@link State#PlatformInvalid} state
+   *     if the platform is in the {@link State#PlatformInvalid} state
    */
   IBeanManager getBeanManager();
 
@@ -96,7 +96,7 @@ public interface IPlatform {
    * Starts the platform.
    *
    * @throws PlatformException
-   *           When the platform is already started or there is an error during startup.
+   *     When the platform is already started or there is an error during startup.
    */
   void start();
 
@@ -104,7 +104,7 @@ public interface IPlatform {
    * Stops the platform and releases all resources.
    *
    * @throws IllegalArgumentException
-   *           if the platform cannot be stopped because it is not running yet.
+   *     if the platform cannot be stopped because it is not running yet.
    */
   void stop();
 
@@ -114,5 +114,4 @@ public interface IPlatform {
    * @return <code>true</code> if the platform is running in development mode. <code>false</code> otherwise.
    */
   boolean inDevelopmentMode();
-
 }

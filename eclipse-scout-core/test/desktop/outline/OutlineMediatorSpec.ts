@@ -121,7 +121,6 @@ describe('OutlineMediator', () => {
     expect(page.childNodes[1].filterAccepted).toBe(true); // filter is accepted for 'Bar'
   });
 
-
   it('onPageSelected', () => {
     const modelRows = [
       tableHelper.createModelRow('0', ['Foo']),

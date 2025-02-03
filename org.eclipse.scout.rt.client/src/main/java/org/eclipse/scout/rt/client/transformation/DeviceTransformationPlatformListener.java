@@ -28,5 +28,4 @@ public class DeviceTransformationPlatformListener implements IPlatformListener {
       BEANS.get(IExtensionRegistry.class).register(FormFieldExtension.class);
     }
   }
-
 }

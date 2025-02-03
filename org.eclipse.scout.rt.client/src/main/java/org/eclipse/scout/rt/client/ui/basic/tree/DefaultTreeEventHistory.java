@@ -45,5 +45,4 @@ public class DefaultTreeEventHistory extends AbstractEventHistory<TreeEvent> {
       }
     }
   }
-
 }

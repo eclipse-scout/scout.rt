@@ -47,11 +47,11 @@ public class DesktopNotification extends Notification implements IDesktopNotific
    * Creates a notification with the given attributes.
    *
    * @param status
-   *          see {@link #getStatus()}
+   *     see {@link #getStatus()}
    * @param duration
-   *          see {@link #getDuration()}
+   *     see {@link #getDuration()}
    * @param closable
-   *          see {@link #isClosable()}
+   *     see {@link #isClosable()}
    */
   public DesktopNotification(IStatus status, long duration, boolean closable) {
     this(status, duration, closable, false);
@@ -61,13 +61,13 @@ public class DesktopNotification extends Notification implements IDesktopNotific
    * Creates a notification with the given attributes.
    *
    * @param status
-   *          see {@link #getStatus()}
+   *     see {@link #getStatus()}
    * @param duration
-   *          see {@link #getDuration()}
+   *     see {@link #getDuration()}
    * @param closable
-   *          see {@link #isClosable()}
+   *     see {@link #isClosable()}
    * @param htmlEnabled
-   *          see {@link #isHtmlEnabled()}
+   *     see {@link #isHtmlEnabled()}
    */
   public DesktopNotification(IStatus status, long duration, boolean closable, boolean htmlEnabled) {
     this(status, duration, closable, htmlEnabled, null);
@@ -77,15 +77,15 @@ public class DesktopNotification extends Notification implements IDesktopNotific
    * Creates a notification with the given attributes.
    *
    * @param status
-   *          see {@link #getStatus()}
+   *     see {@link #getStatus()}
    * @param duration
-   *          see {@link #getDuration()}
+   *     see {@link #getDuration()}
    * @param closable
-   *          see {@link #isClosable()}
+   *     see {@link #isClosable()}
    * @param htmlEnabled
-   *          see {@link #isHtmlEnabled()}
+   *     see {@link #isHtmlEnabled()}
    * @param appLinkConsumer
-   *          see {@link #getAppLinkConsumer()}
+   *     see {@link #getAppLinkConsumer()}
    */
   public DesktopNotification(IStatus status, long duration, boolean closable, boolean htmlEnabled, Consumer<String> appLinkConsumer) {
     super(status, closable, htmlEnabled, appLinkConsumer);

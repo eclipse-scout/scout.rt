@@ -49,5 +49,4 @@ public class MimeTypeDetectorTest {
   public void testGetMimeType_Space() {
     assertEquals("application/octet-stream", FileUtility.getContentTypeForExtension(" "));
   }
-
 }

@@ -18,8 +18,8 @@ import java.util.function.Consumer;
  * {@link DataObjectHelper#normalize(IDataObject)} may be used to apply a deterministic order to {@link DoSet}.
  *
  * @param <V>
- *          If instances within set are {@link Comparable}, they must be mutually comparable (required for order
- *          normalization). E.g. do not use {@code DoSet<Object>} and add {@link Integer} and {@link Long} values).
+ *     If instances within set are {@link Comparable}, they must be mutually comparable (required for order
+ *     normalization). E.g. do not use {@code DoSet<Object>} and add {@link Integer} and {@link Long} values).
  * @see DoEntity#doSet(String) creator method
  */
 @SuppressWarnings("squid:S2333") // redundant final

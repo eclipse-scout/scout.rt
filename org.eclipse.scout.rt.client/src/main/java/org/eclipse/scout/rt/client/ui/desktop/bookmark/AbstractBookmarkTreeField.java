@@ -96,7 +96,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    * published bookmark
    *
    * @param command
-   *          the command to publish a bookmark
+   *     the command to publish a bookmark
    */
   public void injectPublishBookmarkCommand(IPublishBookmarkCommand command) {
     m_publishBookmarkCommand = command;
@@ -107,7 +107,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    * note: The command should at least open the bookmark, by calling {@link IDesktop#activateBookmark()}
    *
    * @param command
-   *          the command to be executed when a user opens a bookmark
+   *     the command to be executed when a user opens a bookmark
    */
   public void injectOpenBookmarkCommand(IOpenBookmarkCommand command) {
     m_openBookmarkCommand = command;
@@ -162,7 +162,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
   /**
    * @param bookmarks
-   *          selected for deletion
+   *     selected for deletion
    * @return the row-level permission to delete bookmarks, default is {@link getDeletePermission()}
    */
   protected Permission getDeletePermission(List<Bookmark> bookmarks) {
@@ -171,7 +171,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
   /**
    * @param bookmarks
-   *          selected for update
+   *     selected for update
    * @return the row-level permission to update bookmarks, default is {@link getUpdatePermission()}
    */
   protected Permission getUpdatePermission(List<Bookmark> bookmarks) {
@@ -180,7 +180,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
   /**
    * @param bookmark
-   *          selected for publishing
+   *     selected for publishing
    * @return the row-level permission to publish this bookmark, default is {@link getPublishPermission()}
    */
   protected Permission getPublishPermission(Bookmark bookmark) {
@@ -629,7 +629,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           }
         }
       }
-
     }
 
     private boolean isProtected() {
@@ -932,6 +931,5 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       ITreeNode node = BookmarkNode.this;
       return (BookmarkFolder) node.getParentNode().getCell().getValue();
     }
-
   }
 }

@@ -31,5 +31,4 @@ public abstract class AbstractInterruptionError extends PlatformError {
   protected AbstractInterruptionError(final FormattingTuple format) {
     super(format.getMessage(), format.getThrowable());
   }
-
 }

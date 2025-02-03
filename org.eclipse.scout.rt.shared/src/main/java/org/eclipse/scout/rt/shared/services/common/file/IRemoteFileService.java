@@ -21,20 +21,20 @@ public interface IRemoteFileService extends IService {
 
   /**
    * @return RemoteFile when spec.getLastModified() is different than on server, null otherwise <br>
-   *         If the realFile.lastModified is <= spec.lastModified then no content is returned assuming that the caller
-   *         already has the content. <br>
-   *         spec normally doesn't contain any content
-   *         <p>
-   *         Example with no path: path=null, name="template.dot" <br>
-   *         Example with relative path: path="templates/word", name="template.dot" <br>
-   *         Example with absolute jndi path: path="/WEB-INF/resources/templates/word", name="template.dot" <br>
-   *         Example with absolute filesystem path: path="C:/TEMP/resources/templates/word", name="template.dot" <br>
+   * If the realFile.lastModified is <= spec.lastModified then no content is returned assuming that the caller
+   * already has the content. <br>
+   * spec normally doesn't contain any content
+   * <p>
+   * Example with no path: path=null, name="template.dot" <br>
+   * Example with relative path: path="templates/word", name="template.dot" <br>
+   * Example with absolute jndi path: path="/WEB-INF/resources/templates/word", name="template.dot" <br>
+   * Example with absolute filesystem path: path="C:/TEMP/resources/templates/word", name="template.dot" <br>
    */
   RemoteFile getRemoteFile(RemoteFile spec);
 
   /**
    * @return RemoteFile of specified file block. Use this method to get a large file from server to client. <br>
-   *         The flag hasMoreParts indicates if there are more parts to follow.
+   * The flag hasMoreParts indicates if there are more parts to follow.
    */
   RemoteFile getRemoteFilePart(RemoteFile spec, long blockNumber);
 
@@ -48,8 +48,8 @@ public interface IRemoteFileService extends IService {
 
   /**
    * @return all files specified in foldePath and filter including existingFileInfoOnClient <br>
-   *         Note: existing files that have not changed, are returned without content <br>
-   *         spec normally doesn't contain any content
+   * Note: existing files that have not changed, are returned without content <br>
+   * spec normally doesn't contain any content
    */
   RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient);
 
@@ -62,5 +62,4 @@ public interface IRemoteFileService extends IService {
    * @see #getRemoteFile(RemoteFile)
    */
   void streamRemoteFile(RemoteFile spec, OutputStream out);
-
 }

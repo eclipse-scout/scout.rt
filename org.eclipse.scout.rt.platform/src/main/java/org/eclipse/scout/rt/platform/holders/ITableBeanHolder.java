@@ -28,13 +28,13 @@ public interface ITableBeanHolder {
 
   /**
    * @return Creates, adds and returns a new {@link ITableBeanRowHolder}. Its row state is initialized with
-   *         {@link ITableBeanRowHolder#STATUS_NON_CHANGED} and its type is the one returned by {@link #getRowType()}.
+   * {@link ITableBeanRowHolder#STATUS_NON_CHANGED} and its type is the one returned by {@link #getRowType()}.
    */
   ITableBeanRowHolder addRow();
 
   /**
    * @return Returns the type of the rows managed by this
-   *         {@link org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData}.
+   * {@link org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData}.
    */
   Class<? extends ITableBeanRowHolder> getRowType();
 

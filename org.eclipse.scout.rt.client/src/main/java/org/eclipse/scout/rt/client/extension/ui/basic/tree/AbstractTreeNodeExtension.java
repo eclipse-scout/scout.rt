@@ -36,5 +36,4 @@ public abstract class AbstractTreeNodeExtension<OWNER extends AbstractTreeNode> 
   public void execDispose(TreeNodeDisposeChain chain) {
     chain.execDispose();
   }
-
 }

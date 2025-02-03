@@ -72,7 +72,7 @@ public abstract class AbstractDataObjectSignatureTest {
    * Allows to filter for certain data object classes, e.g. exclude data objects from test packages for processing
    *
    * @return <code>true</code> if the provided data object class should be processed for signature generation,
-   *         <code>false</code> otherwise.
+   * <code>false</code> otherwise.
    */
   protected boolean acceptDataObject(Class<? extends IDoEntity> dataObjectClass) {
     return true;
@@ -83,7 +83,7 @@ public abstract class AbstractDataObjectSignatureTest {
    * from further processing because verified separately.
    *
    * @return <code>true</code> if the provided data object attribute should be processed for signature generation,
-   *         <code>false</code> otherwise.
+   * <code>false</code> otherwise.
    */
   protected boolean acceptAttribute(Class<? extends IDoEntity> dataObjectClass, String attributeName) {
     return true;

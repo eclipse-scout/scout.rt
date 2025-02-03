@@ -35,7 +35,7 @@ import java.lang.annotation.Target;
  *   }
  * }
  * </pre>
- *
+ * <p>
  * Wherever now an IUserPreferencesService is used the custom instance is returned. <br>
  * <h3>Usage on form fields</h3> If this annotation is added to a form field in an extended form, it works like the
  * {@link org.eclipse.scout.rt.platform.extension.InjectFieldTo} annotation except that the original field is removed.
@@ -72,7 +72,7 @@ import java.lang.annotation.Target;
  *   }
  * }
  * </pre>
- *
+ * <p>
  * If the field is not defined on the form itself, but on a template class, the template class must be replaced first
  * and the field itself must be replaced below the replaced template class, for example:
  *

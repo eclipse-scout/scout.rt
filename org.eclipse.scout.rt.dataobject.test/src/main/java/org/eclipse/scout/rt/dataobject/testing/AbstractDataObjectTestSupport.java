@@ -15,7 +15,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -141,9 +146,9 @@ public abstract class AbstractDataObjectTestSupport {
    * Checks if the file should be checked for missing test
    *
    * @param path
-   *          path of the file
+   *     path of the file
    * @param content
-   *          content of the file
+   *     content of the file
    * @return <code>true</code> if the file should be checked
    */
   protected abstract boolean acceptFile(Path path, String content);
@@ -162,9 +167,9 @@ public abstract class AbstractDataObjectTestSupport {
    * Checks if the file one of the expected test files
    *
    * @param path
-   *          path of the file
+   *     path of the file
    * @param content
-   *          content of the file
+   *     content of the file
    * @return <code>true</code> if the file is an expected test file
    */
   protected abstract boolean acceptTestFile(Path path, String content);

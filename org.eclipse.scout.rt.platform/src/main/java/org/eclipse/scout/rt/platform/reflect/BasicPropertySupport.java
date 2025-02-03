@@ -204,11 +204,11 @@ public class BasicPropertySupport implements IListenerListWithManagement {
    * Gets the property with given name.
    *
    * @param name
-   *          The name of the property.
+   *     The name of the property.
    * @param type
-   *          The expected type of the property. The value will be cast to this type.
+   *     The expected type of the property. The value will be cast to this type.
    * @return The value of the property with the name specified or {@code null} if the property does not exist or has the
-   *         value {@code null}.
+   * value {@code null}.
    */
   public <T> T getProperty(String name, Class<T> type) {
     return type.cast(m_props.get(name));
@@ -218,9 +218,9 @@ public class BasicPropertySupport implements IListenerListWithManagement {
    * Returns the property with given name. If the property is null, the defaultSupplier will be evaluated.
    *
    * @param name
-   *          The name of the property.
+   *     The name of the property.
    * @param defaultSupplier
-   *          The supplier if the value is null
+   *     The supplier if the value is null
    * @return The value of the property with the name specified or the defaultSupplier if the property does not exist.
    */
   @SuppressWarnings("unchecked")
@@ -580,10 +580,10 @@ public class BasicPropertySupport implements IListenerListWithManagement {
    * Returns whether there are any listeners registerd (unspecific or specific for the given propertyName)
    *
    * @param propertyName
-   *          <br>
-   *          if null, returns true if any unspecific Listeners are registered else false<br>
-   *          if not null, returns true if any Listeners specific for the given propertyName - or unspecifc are
-   *          registered
+   *     <br>
+   *     if null, returns true if any unspecific Listeners are registered else false<br>
+   *     if not null, returns true if any Listeners specific for the given propertyName - or unspecifc are
+   *     registered
    */
   public boolean hasListeners(String propertyName) {
     synchronized (m_listenerLock) {

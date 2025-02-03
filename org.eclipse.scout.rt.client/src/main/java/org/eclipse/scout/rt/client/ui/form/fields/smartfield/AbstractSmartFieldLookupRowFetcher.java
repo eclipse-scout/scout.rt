@@ -54,5 +54,4 @@ public abstract class AbstractSmartFieldLookupRowFetcher<LOOKUP_KEY> implements 
     // Always propagate the event of an executed search to the listeners even if the search result did not change. Thus, the proposal popup is opened for every search.
     m_propertySupport.setPropertyAlwaysFire(PROP_SEARCH_RESULT, result);
   }
-
 }

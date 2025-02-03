@@ -87,5 +87,4 @@ public abstract class AbstractBigIntegerColumn extends AbstractNumberColumn<BigI
   protected IBigIntegerColumnExtension<? extends AbstractBigIntegerColumn> createLocalExtension() {
     return new LocalBigIntegerColumnExtension<>(this);
   }
-
 }

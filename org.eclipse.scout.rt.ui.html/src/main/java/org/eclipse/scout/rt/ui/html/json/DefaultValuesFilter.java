@@ -57,7 +57,7 @@ public class DefaultValuesFilter {
 
   /**
    * @param defaultValuesConfiguration
-   *          a {@link JSONObject} with two properties: {@value #PROP_DEFAULTS} and {@value #PROP_OBJECT_TYPE_HIERARCHY}
+   *     a {@link JSONObject} with two properties: {@value #PROP_DEFAULTS} and {@value #PROP_OBJECT_TYPE_HIERARCHY}
    */
   public void importConfiguration(JSONObject defaultValuesConfiguration) {
     if (defaultValuesConfiguration == null) {
@@ -75,10 +75,10 @@ public class DefaultValuesFilter {
     if (jsonDefaults == null) {
       return;
     }
-    for (Iterator<String> it = jsonDefaults.keys(); it.hasNext();) {
+    for (Iterator<String> it = jsonDefaults.keys(); it.hasNext(); ) {
       String type = it.next();
       JSONObject jsonProperties = jsonDefaults.optJSONObject(type);
-      for (Iterator<String> it2 = jsonProperties.keys(); it2.hasNext();) {
+      for (Iterator<String> it2 = jsonProperties.keys(); it2.hasNext(); ) {
         String prop = it2.next();
         Object value = jsonProperties.opt(prop);
         // Add to map
@@ -115,7 +115,7 @@ public class DefaultValuesFilter {
     if (targetMap == null) {
       throw new IllegalArgumentException("Argument 'targetMap' must not be null");
     }
-    for (Iterator<String> it = json.keys(); it.hasNext();) {
+    for (Iterator<String> it = json.keys(); it.hasNext(); ) {
       String objectType = it.next();
       Object subHierarchy = json.opt(objectType);
 
@@ -170,7 +170,7 @@ public class DefaultValuesFilter {
     }
     FilterState filterState = new FilterState();
     for (String t : objectTypeHierarchy) {
-      for (Iterator<String> it = json.keys(); it.hasNext();) {
+      for (Iterator<String> it = json.keys(); it.hasNext(); ) {
         String prop = it.next();
         Object value = json.opt(prop);
         filterState.pushProperty(prop);
@@ -255,12 +255,12 @@ public class DefaultValuesFilter {
    * Removes all properties from "valueObject" where the value matches the corresponding value in "defaultValueObject".
    *
    * @return <code>true</code> of the two objects are completely equal and no properties remain in "valueObject". This
-   *         means that the valueObject itself MAY be removed. Return value <code>false</code> means that not all
-   *         properties are equal (but nevertheless, some properties may have been removed from valueObject).
+   * means that the valueObject itself MAY be removed. Return value <code>false</code> means that not all
+   * properties are equal (but nevertheless, some properties may have been removed from valueObject).
    */
   protected boolean filterDefaultObject(JSONObject valueObject, JSONObject defaultValueObject, FilterState filterState) {
     boolean sameKeys = CollectionUtility.equalsCollection(valueObject.keySet(), defaultValueObject.keySet());
-    for (Iterator<String> it = valueObject.keys(); it.hasNext();) {
+    for (Iterator<String> it = valueObject.keys(); it.hasNext(); ) {
       String prop = it.next();
       filterState.pushProperty(prop);
       if (!filterState.isCurrentPropertyProcessed()) {
@@ -383,7 +383,7 @@ public class DefaultValuesFilter {
         return m_propertyStack.peek();
       }
       StringBuilder sb = new StringBuilder();
-      for (Iterator<String> it = m_propertyStack.descendingIterator(); it.hasNext();) {
+      for (Iterator<String> it = m_propertyStack.descendingIterator(); it.hasNext(); ) {
         if (sb.length() > 0) {
           sb.append(".");
         }

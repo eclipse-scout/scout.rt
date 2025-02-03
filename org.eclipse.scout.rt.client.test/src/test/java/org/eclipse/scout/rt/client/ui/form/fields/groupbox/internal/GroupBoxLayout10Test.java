@@ -137,7 +137,6 @@ public class GroupBoxLayout10Test extends AbstractGroupBoxLayoutTest {
       protected String getConfiguredLabel() {
         return "Field 02";
       }
-
     }
 
     @Order(30)
@@ -161,7 +160,6 @@ public class GroupBoxLayout10Test extends AbstractGroupBoxLayoutTest {
       protected String getConfiguredLabel() {
         return "Field 04";
       }
-
     }
 
     @Order(50)
@@ -171,7 +169,6 @@ public class GroupBoxLayout10Test extends AbstractGroupBoxLayoutTest {
       protected String getConfiguredLabel() {
         return "Field 05";
       }
-
     }
 
     @Order(60)
@@ -186,7 +183,6 @@ public class GroupBoxLayout10Test extends AbstractGroupBoxLayoutTest {
       protected int getConfiguredGridW() {
         return 2;
       }
-
     }
 
     @Order(100)

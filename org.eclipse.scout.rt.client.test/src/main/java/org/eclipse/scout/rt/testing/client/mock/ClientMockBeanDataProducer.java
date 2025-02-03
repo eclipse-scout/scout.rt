@@ -26,5 +26,4 @@ public class ClientMockBeanDataProducer implements IBeanAnnotationMetaDataProduc
         .withOrder(MOCK_BEAN_ORDER)
         .withoutAnnotation(TunnelToServer.class);
   }
-
 }

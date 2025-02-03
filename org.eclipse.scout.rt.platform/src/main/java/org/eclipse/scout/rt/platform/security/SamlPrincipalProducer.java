@@ -26,10 +26,10 @@ public class SamlPrincipalProducer implements IPrincipalProducer, IPrincipalProd
 
   /**
    * @param username
-   *          or userId
+   *     or userId
    * @param params
-   *          <br/>
-   *          [0] = sessionIndex
+   *     <br/>
+   *     [0] = sessionIndex
    * @return the new {@link Principal}
    */
   @Override
@@ -40,9 +40,9 @@ public class SamlPrincipalProducer implements IPrincipalProducer, IPrincipalProd
 
   /**
    * @param username
-   *          or userId
+   *     or userId
    * @param sessionIndex
-   *          session_index
+   *     session_index
    * @return a new {@link SamlPrincipal}
    */
   public SamlPrincipal produceSaml(String username, String sessionIndex) {

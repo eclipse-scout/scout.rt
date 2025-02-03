@@ -33,5 +33,4 @@ public abstract class AbstractTemplateUsingOtherTemplateGroupBox extends Abstrac
   @Order(20)
   public class UsingOtherTemplateBox extends AbstractTestGroupBox {
   }
-
 }

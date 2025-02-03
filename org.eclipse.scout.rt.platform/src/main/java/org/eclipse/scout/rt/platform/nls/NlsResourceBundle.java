@@ -37,9 +37,9 @@ public final class NlsResourceBundle {
 
   /**
    * @param parent
-   *          may be null
+   *     may be null
    * @param textMap
-   *          non null map without any null keys or null values
+   *     non null map without any null keys or null values
    */
   public NlsResourceBundle(NlsResourceBundle parent, Map<String, String> textMap) {
     m_parent = parent;
@@ -82,7 +82,7 @@ public final class NlsResourceBundle {
    * Lookups recursively the text mapping using {@link #getTextMap()} and {@link #getParent()}.
    *
    * @param key
-   *          not null
+   *     not null
    * @return null if there is no mapping for given key else most specific mapping found
    */
   public String getText(String key) {

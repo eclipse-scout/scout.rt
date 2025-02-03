@@ -25,5 +25,4 @@ public class ProposalFieldUIFacade<VALUE> extends SmartFieldUIFacade<VALUE> impl
   public IProposalField<VALUE> getProposalField() {
     return (IProposalField<VALUE>) getSmartField();
   }
-
 }

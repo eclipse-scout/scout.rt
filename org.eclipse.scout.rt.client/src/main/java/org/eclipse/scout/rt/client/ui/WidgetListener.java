@@ -15,5 +15,4 @@ import java.util.EventListener;
 public interface WidgetListener extends EventListener {
 
   void widgetChanged(WidgetEvent event);
-
 }

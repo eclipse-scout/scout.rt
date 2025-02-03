@@ -56,7 +56,6 @@ public class ApplicationsScopedTest {
   public static void unregisterBeans() {
     Platform.get().getBeanManager().unregisterBean(m_bean01);
     Platform.get().getBeanManager().unregisterBean(m_bean02);
-
   }
 
   private static interface ITestObject {
@@ -76,5 +75,4 @@ public class ApplicationsScopedTest {
   private static class Bean02 extends AbstractBean02 {
 
   }
-
 }

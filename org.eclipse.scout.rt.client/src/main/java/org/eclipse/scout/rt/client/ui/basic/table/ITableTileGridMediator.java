@@ -48,5 +48,4 @@ public interface ITableTileGridMediator extends IPropertyObserver {
   TileGridLayoutConfig getTileGridLayoutConfig();
 
   boolean isWithPlaceholders();
-
 }

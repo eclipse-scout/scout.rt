@@ -50,7 +50,7 @@ public class LenientPermissionsWrapper implements Serializable {
     List<LenientPermissionWrapper> list = null;
     if (m_permissions != null) {
       list = new ArrayList<>();
-      for (Enumeration<Permission> en = m_permissions.elements(); en.hasMoreElements();) {
+      for (Enumeration<Permission> en = m_permissions.elements(); en.hasMoreElements(); ) {
         Permission perm = en.nextElement();
         if (perm != null) {
           list.add(new LenientPermissionWrapper(perm));
@@ -75,5 +75,4 @@ public class LenientPermissionsWrapper implements Serializable {
       }
     }
   }
-
 }

@@ -31,7 +31,6 @@ public class JsonStringFieldTest extends BaseFormFieldTest {
     protected boolean getConfiguredMultilineText() {
       return true;
     }
-
   };
 
   private JsonStringField m_stringField = new JsonStringField<IStringField>(m_model, m_session, m_session.createUniqueId(), new JsonAdapterMock());

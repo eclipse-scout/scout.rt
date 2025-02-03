@@ -47,25 +47,25 @@ public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> implements ILoo
    * Convenience function to transform Object[][] data into LookupRow[]
    *
    * @param maxColumnIndex
-   *          the maximum column index to be used to create the code rows, all column indexes >= columnCount are ignored
+   *     the maximum column index to be used to create the code rows, all column indexes >= columnCount are ignored
    * @param data
-   *          The Object[][] must contain rows with the elements in the following order:
-   *          <ul>
-   *          <li>Object key
-   *          <li>String text
-   *          <li>String iconId
-   *          <li>String tooltip
-   *          <li>String background color
-   *          <li>String foreground color
-   *          <li>String font
-   *          <li>Boolean enabled
-   *          <li>Object parentKey used in hierarchical structures to point to the parents primary key
-   *          <li>Boolean active (0,1) see {@link TriState#parse(Object)}
-   *          </ul>
+   *     The Object[][] must contain rows with the elements in the following order:
+   *     <ul>
+   *     <li>Object key
+   *     <li>String text
+   *     <li>String iconId
+   *     <li>String tooltip
+   *     <li>String background color
+   *     <li>String foreground color
+   *     <li>String font
+   *     <li>Boolean enabled
+   *     <li>Object parentKey used in hierarchical structures to point to the parents primary key
+   *     <li>Boolean active (0,1) see {@link TriState#parse(Object)}
+   *     </ul>
    * @param call
    * @param keyClass
-   *          Class describing the type of the key column in the data. Usually corresponds to the LOOKUP_ROW_KEY_TYPE
-   *          type parameter of the lookup service.
+   *     Class describing the type of the key column in the data. Usually corresponds to the LOOKUP_ROW_KEY_TYPE
+   *     type parameter of the lookup service.
    */
   public static <KEY_TYPE> List<ILookupRow<KEY_TYPE>> createLookupRowArray(Object[][] data, int maxColumnIndex, ILookupCall<KEY_TYPE> call, Class<?> keyClass) {
     List<ILookupRow<KEY_TYPE>> list = new ArrayList<>(data.length);

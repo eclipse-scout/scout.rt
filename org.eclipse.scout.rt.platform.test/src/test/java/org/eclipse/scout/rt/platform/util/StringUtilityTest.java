@@ -794,5 +794,4 @@ public class StringUtilityTest {
     assertEquals("Company", StringUtility.removeSuffixes("CompanyFormData", "Form", "Data"));
     assertEquals("CompanyForm", StringUtility.removeSuffixes("CompanyFormData", "Data", "Form"));
   }
-
 }

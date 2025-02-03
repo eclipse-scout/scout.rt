@@ -21,5 +21,4 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 public interface IGridMatrix {
 
   boolean computeGridData(List<IFormField> fields);
-
 }

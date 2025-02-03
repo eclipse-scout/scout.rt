@@ -66,5 +66,4 @@ public interface IFormExtension<OWNER_FORM extends AbstractForm> extends IExtens
   void execOnCloseRequest(FormOnCloseRequestChain chain, boolean kill, Set<Integer> enabledButtonSystemTypes);
 
   void execDataChanged(FormDataChangedChain chain, Object... dataTypes);
-
 }

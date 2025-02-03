@@ -530,5 +530,4 @@ public class BindParser {
     m_tokenList.add(t);
     m_lastTokenEndIndex = endIndex;
   }
-
 }

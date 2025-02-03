@@ -50,9 +50,9 @@ public class ServiceTunnelRequest implements Serializable {
 
   /**
    * @return the request sequence for this session
-   *         <p>
-   *         The sequence can be used to find and manipulate transactions of the same session. Such a scenario is used
-   *         when cancelling "old" lookup requests using {@link IRunMonitorCancelService#cancel(long)}
+   * <p>
+   * The sequence can be used to find and manipulate transactions of the same session. Such a scenario is used
+   * when cancelling "old" lookup requests using {@link IRunMonitorCancelService#cancel(long)}
    */
   public long getRequestSequence() {
     return m_requestSequence;
@@ -67,7 +67,7 @@ public class ServiceTunnelRequest implements Serializable {
 
   /**
    * @param sessionId
-   *          (<code>null</code>, if not defined)
+   *     (<code>null</code>, if not defined)
    */
   public void setSessionId(String sessionId) {
     m_sessionId = sessionId;

@@ -47,5 +47,4 @@ public class ChartAxisBean implements IChartAxisBean {
   public void setLabel(String label) {
     m_label = label;
   }
-
 }

@@ -121,7 +121,7 @@ public class CookieAccessController implements IAccessController {
 
   /**
    * @param value
-   *          to be signed
+   *     to be signed
    * @return signed value in the format <code>base64(signature):value</code>
    */
   protected String signValue(String value) {
@@ -136,7 +136,7 @@ public class CookieAccessController implements IAccessController {
 
   /**
    * @param signedValue
-   *          value in the format <code>base64(signature):value</code>
+   *     value in the format <code>base64(signature):value</code>
    * @return the verified value extracted from the signedValue
    */
   protected String verifyValue(String signedValue) {

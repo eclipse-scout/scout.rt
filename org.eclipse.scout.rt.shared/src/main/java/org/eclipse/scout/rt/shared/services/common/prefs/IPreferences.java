@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.prefs;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
+import java.util.prefs.BackingStoreException;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
@@ -20,9 +21,9 @@ import org.eclipse.scout.rt.shared.ISession;
 /**
  * Preferences store for a single node of a single user scope.
  *
- * @since 5.1
  * @see Preferences#get(ISession, String)
  * @see IUserPreferencesService
+ * @since 5.1
  */
 public interface IPreferences extends Serializable {
 
@@ -30,13 +31,13 @@ public interface IPreferences extends Serializable {
    * Associates the specified <code>value</code> with the specified <code>key</code> in this node.
    *
    * @param key
-   *          Key with which the specified value is to be associated. Must not be <code>null</code>.
+   *     Key with which the specified value is to be associated. Must not be <code>null</code>.
    * @param value
-   *          Value to be associated with the specified <code>key</code>. If the value is null, the <code>key</code> is
-   *          removed from this node.
+   *     Value to be associated with the specified <code>key</code>. If the value is null, the <code>key</code> is
+   *     removed from this node.
    * @return <code>true</code> if this preference node has been changed. <code>false</code> otherwise.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
+   *     If the <code>key</code> is <code>null</code>.
    */
   boolean put(String key, String value);
 
@@ -45,13 +46,13 @@ public interface IPreferences extends Serializable {
    * there is no value associated with the <code>key</code>.
    *
    * @param key
-   *          Key whose associated value is to be returned. Must not be <code>null</code>.
+   *     Key whose associated value is to be returned. Must not be <code>null</code>.
    * @param def
-   *          The value to be returned in case that this node has no value associated with the given <code>key</code>.
+   *     The value to be returned in case that this node has no value associated with the given <code>key</code>.
    * @return The value associated with <code>key</code>, or <code>def</code> if no value is associated with
-   *         <code>key</code>.
+   * <code>key</code>.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
+   *     If the <code>key</code> is <code>null</code>.
    */
   String get(String key, String def);
 
@@ -60,12 +61,12 @@ public interface IPreferences extends Serializable {
    * in conjunction with {@link #getList(String, List)} method.
    *
    * @param key
-   *          Key with which the value is to be associated. Must not be <code>null</code>.
+   *     Key with which the value is to be associated. Must not be <code>null</code>.
    * @param values
-   *          Values that are to be associated with <code>key</code>.
+   *     Values that are to be associated with <code>key</code>.
    * @return <code>true</code> if this preference node has been changed. <code>false</code> otherwise.
    * @throws IllegalArgumentException
-   *           If either the <code>key</code> or <code>values</code> is <code>null</code>.
+   *     If either the <code>key</code> or <code>values</code> is <code>null</code>.
    * @see #getList(String, List)
    * @since 5.2
    */
@@ -77,14 +78,14 @@ public interface IPreferences extends Serializable {
    * for use in conjunction with the {@link #putList(String, List)} method.
    *
    * @param key
-   *          Key whose associated value is to be returned as a <code>long</code>. Must not be <code>null</code>.
+   *     Key whose associated value is to be returned as a <code>long</code>. Must not be <code>null</code>.
    * @param defaultValues
-   *          The value to be returned in case that this node has no value associated with <code>key</code> or the
-   *          associated value cannot be interpreted as a <code>long</code>.
+   *     The value to be returned in case that this node has no value associated with <code>key</code> or the
+   *     associated value cannot be interpreted as a <code>long</code>.
    * @return The list with values associated with <code>key</code> in this node, or <code>def</code> if the associated
-   *         value does not exist or cannot be interpreted as a <code>long</code> type.
+   * value does not exist or cannot be interpreted as a <code>long</code> type.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
+   *     If the <code>key</code> is <code>null</code>.
    * @see #putList(String, List)
    * @since 5.2
    */
@@ -94,10 +95,10 @@ public interface IPreferences extends Serializable {
    * Removes the value associated with the specified <code>key</code> in this node, if any.
    *
    * @param key
-   *          Key whose mapping is to be removed from this node. Must not be <code>null</code>.
+   *     Key whose mapping is to be removed from this node. Must not be <code>null</code>.
    * @return <code>true</code> if this preference node has been changed. <code>false</code> otherwise.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
+   *     If the <code>key</code> is <code>null</code>.
    */
   boolean remove(String key);
 
@@ -113,13 +114,13 @@ public interface IPreferences extends Serializable {
    * intended for use in conjunction with {@link #getInt(String, int)} method.
    *
    * @param key
-   *          Key with which the value is to be associated. Must not be <code>null</code>.
+   *     Key with which the value is to be associated. Must not be <code>null</code>.
    * @param value
-   *          Value that is to be associated with <code>key</code>.
+   *     Value that is to be associated with <code>key</code>.
    * @return <code>true</code> if this preference node has been changed. <code>false</code> otherwise.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
-   * @see #getInt(String,int)
+   *     If the <code>key</code> is <code>null</code>.
+   * @see #getInt(String, int)
    */
   boolean putInt(String key, int value);
 
@@ -130,14 +131,14 @@ public interface IPreferences extends Serializable {
    * {@link #putInt(String, int)} method.
    *
    * @param key
-   *          Key whose associated value is to be returned as an <code>int</code>. Must not be <code>null</code>.
+   *     Key whose associated value is to be returned as an <code>int</code>. Must not be <code>null</code>.
    * @param def
-   *          The value to be returned in case that this node has no value associated with <code>key</code> or the
-   *          associated value cannot be interpreted as an <code>int</code>.
+   *     The value to be returned in case that this node has no value associated with <code>key</code> or the
+   *     associated value cannot be interpreted as an <code>int</code>.
    * @return The <code>int</code> value associated with <code>key</code> in this node, or <code>def</code> if the
-   *         associated value does not exist or cannot be interpreted as an <code>int</code> type.
+   * associated value does not exist or cannot be interpreted as an <code>int</code> type.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
+   *     If the <code>key</code> is <code>null</code>.
    * @see #putInt(String, int)
    */
   int getInt(String key, int def);
@@ -147,13 +148,13 @@ public interface IPreferences extends Serializable {
    * intended for use in conjunction with {@link #getLong(String, long)} method.
    *
    * @param key
-   *          Key with which the value is to be associated. Must not be <code>null</code>.
+   *     Key with which the value is to be associated. Must not be <code>null</code>.
    * @param value
-   *          Value that is to be associated with <code>key</code>.
+   *     Value that is to be associated with <code>key</code>.
    * @return <code>true</code> if this preference node has been changed. <code>false</code> otherwise.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
-   * @see #getLong(String,long)
+   *     If the <code>key</code> is <code>null</code>.
+   * @see #getLong(String, long)
    */
   boolean putLong(String key, long value);
 
@@ -164,14 +165,14 @@ public interface IPreferences extends Serializable {
    * {@link #putLong(String, long)} method.
    *
    * @param key
-   *          Key whose associated value is to be returned as a <code>long</code>. Must not be <code>null</code>.
+   *     Key whose associated value is to be returned as a <code>long</code>. Must not be <code>null</code>.
    * @param def
-   *          The value to be returned in case that this node has no value associated with <code>key</code> or the
-   *          associated value cannot be interpreted as a <code>long</code>.
+   *     The value to be returned in case that this node has no value associated with <code>key</code> or the
+   *     associated value cannot be interpreted as a <code>long</code>.
    * @return The <code>long</code> value associated with <code>key</code> in this node, or <code>def</code> if the
-   *         associated value does not exist or cannot be interpreted as a <code>long</code> type.
+   * associated value does not exist or cannot be interpreted as a <code>long</code> type.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
+   *     If the <code>key</code> is <code>null</code>.
    * @see #putLong(String, long)
    */
   long getLong(String key, long def);
@@ -181,13 +182,13 @@ public interface IPreferences extends Serializable {
    * is intended for use in conjunction with {@link #getBoolean(String, boolean)} method.
    *
    * @param key
-   *          Key with which the value is to be associated. Must not be <code>null</code>.
+   *     Key with which the value is to be associated. Must not be <code>null</code>.
    * @param value
-   *          Value that is to be associated with <code>key</code>.
+   *     Value that is to be associated with <code>key</code>.
    * @return <code>true</code> if this preference node has been changed. <code>false</code> otherwise.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
-   * @see #getBoolean(String,boolean)
+   *     If the <code>key</code> is <code>null</code>.
+   * @see #getBoolean(String, boolean)
    */
   boolean putBoolean(String key, boolean value);
 
@@ -198,14 +199,14 @@ public interface IPreferences extends Serializable {
    * {@link #putBoolean(String, boolean)} method.
    *
    * @param key
-   *          Key whose associated value is to be returned as a <code>boolean</code>. Must not be <code>null</code>.
+   *     Key whose associated value is to be returned as a <code>boolean</code>. Must not be <code>null</code>.
    * @param def
-   *          The value to be returned in case that this node has no value associated with <code>key</code> or the
-   *          associated value cannot be interpreted as a <code>boolean</code>.
+   *     The value to be returned in case that this node has no value associated with <code>key</code> or the
+   *     associated value cannot be interpreted as a <code>boolean</code>.
    * @return The <code>boolean</code> value associated with <code>key</code> in this node, or <code>def</code> if the
-   *         associated value does not exist or cannot be interpreted as a <code>boolean</code> type.
+   * associated value does not exist or cannot be interpreted as a <code>boolean</code> type.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
+   *     If the <code>key</code> is <code>null</code>.
    * @see #putBoolean(String, boolean)
    */
   boolean getBoolean(String key, boolean def);
@@ -215,13 +216,13 @@ public interface IPreferences extends Serializable {
    * intended for use in conjunction with {@link #getFloat(String, float)} method.
    *
    * @param key
-   *          Key with which the value is to be associated. Must not be <code>null</code>.
+   *     Key with which the value is to be associated. Must not be <code>null</code>.
    * @param value
-   *          Value that is to be associated with <code>key</code>.
+   *     Value that is to be associated with <code>key</code>.
    * @return <code>true</code> if this preference node has been changed. <code>false</code> otherwise.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
-   * @see #getFloat(String,float)
+   *     If the <code>key</code> is <code>null</code>.
+   * @see #getFloat(String, float)
    */
   boolean putFloat(String key, float value);
 
@@ -232,14 +233,14 @@ public interface IPreferences extends Serializable {
    * {@link #putFloat(String, float)} method.
    *
    * @param key
-   *          Key whose associated value is to be returned as a <code>float</code>. Must not be <code>null</code>.
+   *     Key whose associated value is to be returned as a <code>float</code>. Must not be <code>null</code>.
    * @param def
-   *          The value to be returned in case that this node has no value associated with <code>key</code> or the
-   *          associated value cannot be interpreted as a <code>float</code>.
+   *     The value to be returned in case that this node has no value associated with <code>key</code> or the
+   *     associated value cannot be interpreted as a <code>float</code>.
    * @return The <code>float</code> value associated with <code>key</code> in this node, or <code>def</code> if the
-   *         associated value does not exist or cannot be interpreted as a <code>float</code> type.
+   * associated value does not exist or cannot be interpreted as a <code>float</code> type.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
+   *     If the <code>key</code> is <code>null</code>.
    * @see #putFloat(String, float)
    */
   float getFloat(String key, float def);
@@ -249,13 +250,13 @@ public interface IPreferences extends Serializable {
    * intended for use in conjunction with {@link #getDouble(String, double)} method.
    *
    * @param key
-   *          Key with which the value is to be associated. Must not be <code>null</code>.
+   *     Key with which the value is to be associated. Must not be <code>null</code>.
    * @param value
-   *          Value that is to be associated with <code>key</code>.
+   *     Value that is to be associated with <code>key</code>.
    * @return <code>true</code> if this preference node has been changed. <code>false</code> otherwise.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
-   * @see #getDouble(String,double)
+   *     If the <code>key</code> is <code>null</code>.
+   * @see #getDouble(String, double)
    */
   boolean putDouble(String key, double value);
 
@@ -266,14 +267,14 @@ public interface IPreferences extends Serializable {
    * {@link #putDouble(String, double)} method.
    *
    * @param key
-   *          Key whose associated value is to be returned as a <code>double</code>. Must not be <code>null</code>.
+   *     Key whose associated value is to be returned as a <code>double</code>. Must not be <code>null</code>.
    * @param def
-   *          The value to be returned in case that this node has no value associated with <code>key</code> or the
-   *          associated value cannot be interpreted as a <code>double</code>.
+   *     The value to be returned in case that this node has no value associated with <code>key</code> or the
+   *     associated value cannot be interpreted as a <code>double</code>.
    * @return The <code>double</code> value associated with <code>key</code> in this node, or <code>def</code> if the
-   *         associated value does not exist or cannot be interpreted as a <code>double</code> type.
+   * associated value does not exist or cannot be interpreted as a <code>double</code> type.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
+   *     If the <code>key</code> is <code>null</code>.
    * @see #putDouble(String, double)
    */
   double getDouble(String key, double def);
@@ -283,13 +284,13 @@ public interface IPreferences extends Serializable {
    * intended for use in conjunction with {@link #getByteArray(String, byte[])} method.
    *
    * @param key
-   *          Key with which the value is to be associated. Must not be <code>null</code>.
+   *     Key with which the value is to be associated. Must not be <code>null</code>.
    * @param value
-   *          Value that is to be associated with <code>key</code>.
+   *     Value that is to be associated with <code>key</code>.
    * @return <code>true</code> if this preference node has been changed. <code>false</code> otherwise.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
-   * @see #getByteArray(String,byte[])
+   *     If the <code>key</code> is <code>null</code>.
+   * @see #getByteArray(String, byte[])
    */
   boolean putByteArray(String key, byte[] value);
 
@@ -300,14 +301,14 @@ public interface IPreferences extends Serializable {
    * {@link #putByteArray(String, byte[])} method.
    *
    * @param key
-   *          Key whose associated value is to be returned as a <code>byte[]</code>. Must not be <code>null</code>.
+   *     Key whose associated value is to be returned as a <code>byte[]</code>. Must not be <code>null</code>.
    * @param def
-   *          The value to be returned in case that this node has no value associated with <code>key</code> or the
-   *          associated value cannot be interpreted as a <code>byte[]</code>.
+   *     The value to be returned in case that this node has no value associated with <code>key</code> or the
+   *     associated value cannot be interpreted as a <code>byte[]</code>.
    * @return The <code>byte[]</code> value associated with <code>key</code> in this node, or <code>def</code> if the
-   *         associated value does not exist or cannot be interpreted as a <code>byte[]</code> type.
+   * associated value does not exist or cannot be interpreted as a <code>byte[]</code> type.
    * @throws IllegalArgumentException
-   *           If the <code>key</code> is <code>null</code>.
+   *     If the <code>key</code> is <code>null</code>.
    * @see #putByteArray(String, byte[])
    */
   byte[] getByteArray(String key, byte[] def);
@@ -365,9 +366,9 @@ public interface IPreferences extends Serializable {
    * Flushes any changes in the contents of this node to the persistent store (if any).
    *
    * @return <code>true</code> if this node has been successfully flushed to the store. <code>false</code> if this node
-   *         is not dirty (there are no changes since the last flush) or there is no persistent store configured.
+   * is not dirty (there are no changes since the last flush) or there is no persistent store configured.
    * @throws ProcessingException
-   *           On an error while persisting this node.
+   *     On an error while persisting this node.
    */
   boolean flush();
 
@@ -377,7 +378,7 @@ public interface IPreferences extends Serializable {
    * Adds the given {@link IPreferenceChangeListener} to the list of listeners to be notified about preference changes.
    *
    * @param listener
-   *          The listener to add.
+   *     The listener to add.
    */
   default void addPreferenceChangeListener(IPreferenceChangeListener listener) {
     preferenceChangeListeners().add(listener);
@@ -388,7 +389,7 @@ public interface IPreferences extends Serializable {
    * changes.
    *
    * @param listener
-   *          The listener to remove.
+   *     The listener to remove.
    */
   default void removePreferenceChangeListener(IPreferenceChangeListener listener) {
     preferenceChangeListeners().remove(listener);

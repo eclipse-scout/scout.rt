@@ -24,12 +24,12 @@ public class ConnectionErrorDetector {
       String simpleName = cause.getClass().getSimpleName();
       String message = cause.getMessage();
       if ((cause instanceof SocketException
-          || "EofException".equalsIgnoreCase(simpleName)
-          || "ClientAbortException".equalsIgnoreCase(simpleName)
-          || cause instanceof InterruptedIOException
-          || "IOException".equalsIgnoreCase(simpleName))
+               || "EofException".equalsIgnoreCase(simpleName)
+               || "ClientAbortException".equalsIgnoreCase(simpleName)
+               || cause instanceof InterruptedIOException
+               || "IOException".equalsIgnoreCase(simpleName))
           && (StringUtility.containsStringIgnoreCase(message, "Connection reset by peer")
-           || StringUtility.containsStringIgnoreCase(message, "Broken pipe"))) {
+                  || StringUtility.containsStringIgnoreCase(message, "Broken pipe"))) {
         return true;
       }
       // set previous cause

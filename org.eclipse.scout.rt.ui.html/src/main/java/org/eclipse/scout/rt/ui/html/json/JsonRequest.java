@@ -50,7 +50,7 @@ public class JsonRequest {
    * Creates a new (validated) JsonRequest instance.
    *
    * @throws AssertionException
-   *           if mandatory property 'uiSessionId' is not set for a request other than 'STARTUP' or 'PING' request.
+   *     if mandatory property 'uiSessionId' is not set for a request other than 'STARTUP' or 'PING' request.
    */
   public JsonRequest(JSONObject request) {
     final RequestType requestType = RequestType.valueOf(request);

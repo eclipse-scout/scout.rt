@@ -649,5 +649,4 @@ public interface DataModelConstants {
   int AGGREGATION_AVG = 5;
   int AGGREGATION_MEDIAN = 6;
   //max is 6
-
 }

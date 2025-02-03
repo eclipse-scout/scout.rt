@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.internal;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.internal.fixture.DirectlyAnnotatedBean;

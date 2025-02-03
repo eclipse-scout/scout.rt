@@ -35,7 +35,7 @@ public interface IExceptionTranslator<EXCEPTION extends Throwable> {
    * is because an Error indicates a serious problem due to an abnormal condition.
    *
    * @param throwable
-   *          to be translated
+   *     to be translated
    */
   EXCEPTION translate(Throwable throwable);
 }

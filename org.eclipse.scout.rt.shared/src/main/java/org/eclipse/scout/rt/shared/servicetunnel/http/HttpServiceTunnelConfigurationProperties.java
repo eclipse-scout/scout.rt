@@ -64,8 +64,8 @@ public final class HttpServiceTunnelConfigurationProperties {
     @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Specifies the default total maximum connections property for the HTTP service tunnel.\n"
-          + "Overrides the value from '%s' for the service tunnel.\n"
-          + "The default value is 2048.",
+              + "Overrides the value from '%s' for the service tunnel.\n"
+              + "The default value is 2048.",
           BEANS.get(ApacheHttpTransportMaxConnectionsTotalProperty.class).getKey());
     }
   }

@@ -113,7 +113,7 @@ public class Crypter {
    * Decrypts the encrypted data.
    *
    * @param encryptedData
-   *          Encrypted data as returned by {@link #encrypt(String)}.
+   *     Encrypted data as returned by {@link #encrypt(String)}.
    */
   public String decrypt(String encryptedData) {
     return decrypt(encryptedData, false);
@@ -123,7 +123,7 @@ public class Crypter {
    * Decrypts the encrypted data.
    *
    * @param encryptedData
-   *          Encrypted data as returned by {@link #encryptUrlSafe(String)}.
+   *     Encrypted data as returned by {@link #encryptUrlSafe(String)}.
    */
   public String decryptUrlSafe(String encryptedData) {
     return decrypt(encryptedData, true);

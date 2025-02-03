@@ -60,5 +60,4 @@ public interface ITreeExtension<OWNER extends AbstractTree> extends IExtension<O
   TransferObject execDrag(TreeDragNodeChain chain, ITreeNode node);
 
   void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, List<ITreeNode> nodes, boolean checked, boolean enabledNodesOnly);
-
 }

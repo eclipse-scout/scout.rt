@@ -21,9 +21,9 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * {@link DataObjectHelper#normalize(IDataObject)} may be used to apply a deterministic order to {@link DoCollection}.
  *
  * @param <V>
- *          If instances within collection are {@link Comparable}, they must be mutually comparable (required for order
- *          normalization). E.g. do not use {@code DoCollection<Object>} and add {@link Integer} and {@link String}
- *          values).
+ *     If instances within collection are {@link Comparable}, they must be mutually comparable (required for order
+ *     normalization). E.g. do not use {@code DoCollection<Object>} and add {@link Integer} and {@link String}
+ *     values).
  * @see DoEntity#doCollection(String) creator method
  */
 @SuppressWarnings("squid:S2333") // redundant final

@@ -85,8 +85,8 @@ public class CompactLine {
       return "";
     }
     return HTML.div(
-        span(raw(label)).cssClass("compact-cell-line-label"),
-        span(raw(value)).cssClass("compact-cell-line-value"))
+            span(raw(label)).cssClass("compact-cell-line-label"),
+            span(raw(value)).cssClass("compact-cell-line-value"))
         .cssClass("compact-cell-line").toHtml();
   }
 }

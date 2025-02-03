@@ -54,8 +54,8 @@ public final class BinaryResources {
 
   /**
    * @param filename
-   *          A valid file name (with or without path information), preferably with file extension to allow automatic
-   *          detection of MIME type. Examples: <code>"image.jpg"</code>, <code>"icons/eye.png"</code>
+   *     A valid file name (with or without path information), preferably with file extension to allow automatic
+   *     detection of MIME type. Examples: <code>"image.jpg"</code>, <code>"icons/eye.png"</code>
    */
   public BinaryResources withFilename(String filename) {
     m_filename = filename;
@@ -64,11 +64,11 @@ public final class BinaryResources {
 
   /**
    * @param contentType
-   *          MIME type of the resource. Example: <code>"image/jpeg"</code>. If this value is omitted, it is recommended
-   *          to ensure that the argument <i>filename</i> has a valid file extension, which can then be used to
-   *          determine the MIME type.
-   *          <p>
-   *          null contentType is replaced by {@link FileUtility#getContentTypeForExtension(String)}
+   *     MIME type of the resource. Example: <code>"image/jpeg"</code>. If this value is omitted, it is recommended
+   *     to ensure that the argument <i>filename</i> has a valid file extension, which can then be used to
+   *     determine the MIME type.
+   *     <p>
+   *     null contentType is replaced by {@link FileUtility#getContentTypeForExtension(String)}
    */
   public BinaryResources withContentType(String contentType) {
     m_contentType = contentType;
@@ -79,7 +79,7 @@ public final class BinaryResources {
    * Convenience method that supports {@link Charset}.
    *
    * @param charset
-   *          Charset for encoding
+   *     Charset for encoding
    */
   public BinaryResources withCharset(Charset charset) {
     m_charset = charset == null ? null : charset.name();
@@ -88,7 +88,7 @@ public final class BinaryResources {
 
   /**
    * @param charset
-   *          Charset for encoding
+   *     Charset for encoding
    */
   public BinaryResources withCharset(String charset) {
     m_charset = charset;
@@ -97,7 +97,7 @@ public final class BinaryResources {
 
   /**
    * @param content
-   *          The resource's content as byte array. The fingerprint for the given content is calculated automatically.
+   *     The resource's content as byte array. The fingerprint for the given content is calculated automatically.
    */
   public BinaryResources withContent(byte[] content) {
     m_content = content;
@@ -115,11 +115,11 @@ public final class BinaryResources {
 
   /**
    * @param content
-   *          The resource's content as string, the provided encoding will be used. If <code>null</code>, content and
-   *          charset will be <code>null</code>. The fingerprint for the given content is calculated automatically.
+   *     The resource's content as string, the provided encoding will be used. If <code>null</code>, content and
+   *     charset will be <code>null</code>. The fingerprint for the given content is calculated automatically.
    * @param charset
-   *          Charset to use for string content encoding and as {@link BinaryResource} charset. If <code>null</code> is
-   *          provided, {@link StandardCharsets#UTF_8} is used.
+   *     Charset to use for string content encoding and as {@link BinaryResource} charset. If <code>null</code> is
+   *     provided, {@link StandardCharsets#UTF_8} is used.
    */
   public BinaryResources withContent(String content, Charset charset) {
     if (charset == null) {
@@ -134,7 +134,7 @@ public final class BinaryResources {
 
   /**
    * @param lastModified
-   *          "Last modified" timestamp of the resource (in milliseconds a.k.a. UNIX time). <code>-1</code> if unknown.
+   *     "Last modified" timestamp of the resource (in milliseconds a.k.a. UNIX time). <code>-1</code> if unknown.
    */
   public BinaryResources withLastModified(long lastModified) {
     m_lastModified = lastModified;

@@ -124,12 +124,12 @@ public class CompactBean {
    * content).
    *
    * @param removeEmptyContentLines
-   *          true, to remove empty content lines.
+   *     true, to remove empty content lines.
    * @param maxContentLines
-   *          the number of content lines to consider. Empty lines are not counted.
+   *     the number of content lines to consider. Empty lines are not counted.
    * @param moreLinkAvailable
-   *          if true, maxContentLines may be increased by 1 if the more link would reveal only one line. Does not have
-   *          any effect if it is false.
+   *     if true, maxContentLines may be increased by 1 if the more link would reveal only one line. Does not have
+   *     any effect if it is false.
    */
   public void transform(boolean removeEmptyContentLines, int maxContentLines, boolean moreLinkAvailable) {
     CompactLine titleLine = getTitleLine();

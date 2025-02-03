@@ -406,9 +406,9 @@ public class DateUtilityTest {
 
   /**
    * @param input
-   *          Double to be converted
+   *     Double to be converted
    * @param expectedDate
-   *          with the Pattern 'yyyy-MM-dd HH:mm:ss.SSS'
+   *     with the Pattern 'yyyy-MM-dd HH:mm:ss.SSS'
    */
   private void testConvertDoubleTimeToDate(Double input, String expectedDate) {
     Date value = DateUtility.convertDoubleTimeToDate(input);
@@ -483,14 +483,13 @@ public class DateUtilityTest {
 
     testConvertDateToDoubleTime("1969-12-05 00:00:00.000", 0.0);
     testConvertDateToDoubleTime("1969-12-05 18:00:00.000", 0.75);
-
   }
 
   /**
    * @param input
-   *          Date defined with the Pattern 'yyyy-MM-dd_HH:mm:ss.SSS'
+   *     Date defined with the Pattern 'yyyy-MM-dd_HH:mm:ss.SSS'
    * @param expected
-   *          Double DoubleTime as defined in {@link DateUtility#convertDateToDoubleTime(java.util.Date)}
+   *     Double DoubleTime as defined in {@link DateUtility#convertDateToDoubleTime(java.util.Date)}
    */
   private void testConvertDateToDoubleTime(String input, Double expected) {
     assertEquals("Conversion Date <" + input + "> to DoubleTime", expected, DateUtility.convertDateToDoubleTime(DateUtility.parse(input, YEAR_DATE_TIME_PATTERN)));
@@ -554,7 +553,7 @@ public class DateUtilityTest {
 
   /**
    * @param input
-   *          Date defined with the Pattern 'yyyy-MM-dd_HH:mm:ss.SSS'
+   *     Date defined with the Pattern 'yyyy-MM-dd_HH:mm:ss.SSS'
    */
   private void testConvertDateToDoubleTimeToDate(String input) {
     assertEquals("Conversion Date <" + input + "> to DoubleTime and to Date", DateUtility.parse(input, YEAR_DATE_TIME_PATTERN),
@@ -619,7 +618,7 @@ public class DateUtilityTest {
 
   /**
    * @param input
-   *          Double DoubleTime as defined in {@link DateUtility#convertDateToDoubleTime(java.util.Date)}
+   *     Double DoubleTime as defined in {@link DateUtility#convertDateToDoubleTime(java.util.Date)}
    */
   private void testConvertDoubleTimeToDateToDoubleTime(Double input) {
     assertEquals("Conversion Date <" + input + "> to DoubleTime and to Date", input, DateUtility.convertDateToDoubleTime(DateUtility.convertDoubleTimeToDate(input)));
@@ -1070,7 +1069,7 @@ public class DateUtilityTest {
    * Parses the given string into a {@link Calendar}.
    *
    * @param dateString
-   *          staring representation using format yyyy-MM-dd HH:mm:ss.SSS
+   *     staring representation using format yyyy-MM-dd HH:mm:ss.SSS
    */
   public static Calendar calendarOf(String dateString) {
     return DateUtility.convertDate(dateOf(dateString));
@@ -1080,7 +1079,7 @@ public class DateUtilityTest {
    * Parses the given string into a {@link Date}.
    *
    * @param dateString
-   *          staring representation using format yyyy-MM-dd HH:mm:ss.SSS
+   *     staring representation using format yyyy-MM-dd HH:mm:ss.SSS
    */
   public static Date dateOf(String dateString) {
     return DateUtility.parse(dateString, YEAR_DATE_TIME_PATTERN);

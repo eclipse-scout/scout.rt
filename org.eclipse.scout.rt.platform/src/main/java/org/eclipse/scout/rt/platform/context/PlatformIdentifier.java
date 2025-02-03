@@ -49,5 +49,4 @@ public final class PlatformIdentifier {
   public static void set(String s) {
     platformIdentifier = s;
   }
-
 }

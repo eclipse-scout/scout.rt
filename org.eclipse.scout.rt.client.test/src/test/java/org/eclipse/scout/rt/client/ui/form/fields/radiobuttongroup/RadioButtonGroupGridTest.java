@@ -11,8 +11,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup;
 
 import static java.util.Collections.unmodifiableList;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;

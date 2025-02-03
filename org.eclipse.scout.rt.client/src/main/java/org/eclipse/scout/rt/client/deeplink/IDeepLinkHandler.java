@@ -30,10 +30,10 @@ public interface IDeepLinkHandler {
   /**
    * Executes the deep-link action on the model.
    *
-   * @throws DeepLinkException
-   *           when something went wrong while executing the {@link #handleImpl(Matcher, IClientSession)} method. For
-   *           instance the user has no permissions to view the requested resource or the resource is not available
    * @return True if this handler has handled the given path, false otherwise
+   * @throws DeepLinkException
+   *     when something went wrong while executing the {@link #handleImpl(Matcher, IClientSession)} method. For
+   *     instance the user has no permissions to view the requested resource or the resource is not available
    */
   boolean handle(String path) throws DeepLinkException;
 
@@ -41,5 +41,4 @@ public interface IDeepLinkHandler {
    * @return the name of this handler as used in the deep-link URL.
    */
   String getName();
-
 }

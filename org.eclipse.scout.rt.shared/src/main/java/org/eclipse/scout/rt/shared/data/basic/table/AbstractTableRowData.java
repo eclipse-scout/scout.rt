@@ -110,9 +110,9 @@ public abstract class AbstractTableRowData extends AbstractContributionComposite
    * </p>
    *
    * @param id
-   *          id whose mapping is to be removed
+   *     id whose mapping is to be removed
    * @return the previous custom column value associated with <code>id</code>, or <code>null</code> if there was no
-   *         mapping for <code>id</code>.
+   * mapping for <code>id</code>.
    */
   public Object removeCustomValue(String id) {
     if (m_customValues == null) {

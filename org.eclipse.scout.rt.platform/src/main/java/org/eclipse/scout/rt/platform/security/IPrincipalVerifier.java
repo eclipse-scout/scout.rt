@@ -20,7 +20,7 @@ public interface IPrincipalVerifier {
    * Attempts to verify the given principal.
    *
    * @param principal
-   *          the principal to verify
+   *     the principal to verify
    * @return Result of the verification; true if valid, false if invalid
    */
   boolean verify(Principal principal);

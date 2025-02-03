@@ -179,7 +179,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
 
   /**
    * @return index.html for requests on root (empty or /) and also for deep-link requests, for all other requests the
-   *         pathInfo from the given request
+   * pathInfo from the given request
    */
   protected String resolvePathInfoEx(HttpServletRequest req) {
     String pathInfo = req.getPathInfo();
@@ -191,5 +191,4 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     }
     return pathInfo;
   }
-
 }

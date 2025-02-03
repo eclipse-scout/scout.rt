@@ -76,9 +76,9 @@ public final class SharedConfigProperties {
     @Override
     public String description() {
       return "Specifies if the application should look for web resources (like .js, .html or .css) on the local filesystem. " +
-        "If true, the resources will be searched in modules that follow the Scout naming conventions (e.g. name.ui.app.dev, name.ui.app, name.ui) on the local filesystem first and (if not found) on the classpath second. " +
-        "If false, the resources are searched on the Java classpath only. " +
-        "By default this property is true in dev mode and false otherwise.";
+          "If true, the resources will be searched in modules that follow the Scout naming conventions (e.g. name.ui.app.dev, name.ui.app, name.ui) on the local filesystem first and (if not found) on the classpath second. " +
+          "If false, the resources are searched on the Java classpath only. " +
+          "By default this property is true in dev mode and false otherwise.";
     }
   }
 

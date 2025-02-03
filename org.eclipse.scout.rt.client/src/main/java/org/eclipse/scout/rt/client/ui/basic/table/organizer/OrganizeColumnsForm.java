@@ -286,7 +286,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             finally {
               getTable().setTableChanging(false);
             }
-
           }
 
           @ClassId("359e1e7e-26f0-411d-baf1-2ba9f554212d")
@@ -369,7 +368,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 row.getCellForUpdate(getConfigNameColumn()).setEditable(false);
                 getTable().sort();
               }
-
             }
 
             @Order(20)
@@ -384,7 +382,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               protected int getConfiguredSortIndex() {
                 return 0;
               }
-
             }
 
             @Order(10)
@@ -418,7 +415,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                   getTable().setTableChanging(false);
                 }
               }
-
             }
 
             @Order(20)
@@ -570,7 +566,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
             }
           }
-
         }
       }
 
@@ -682,7 +677,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                       getTable().setTableChanging(false);
                     }
                   }
-
                 }
               }
             }
@@ -855,7 +849,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               protected int getConfiguredWidth() {
                 return 120;
               }
-
             }
 
             @Order(40)
@@ -906,7 +899,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               protected boolean getConfiguredFixedWidth() {
                 return true;
               }
-
             }
 
             @Order(60)
@@ -927,7 +919,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               protected boolean getConfiguredFixedWidth() {
                 return true;
               }
-
             }
 
             @Order(70)
@@ -999,7 +990,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                   setValue(row, newWidth);
                 }
               }
-
             }
 
             // prevents the scrollbar from overlapping the WidthColumn
@@ -1027,7 +1017,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 // touch devices don't have a regular scrollbar -> no need to show the column
                 return !UserAgentUtility.isTouchDevice();
               }
-
             }
 
             @Order(10)
@@ -1068,7 +1057,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               protected void execAction() {
                 execAddColumnAction();
               }
-
             }
 
             @Order(20)

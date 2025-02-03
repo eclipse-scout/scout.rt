@@ -30,9 +30,9 @@ public class RegisterBeanStatement extends Statement {
    * Creates a statement to register a bean during the time of executing subsequent statements.
    *
    * @param next
-   *          next {@link Statement} to be executed.
+   *     next {@link Statement} to be executed.
    * @param beanMetaData
-   *          describes the bean to be registered.
+   *     describes the bean to be registered.
    */
   public RegisterBeanStatement(final Statement next, final BeanMetaData beanMetaData) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");

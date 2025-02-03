@@ -177,7 +177,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
    * The default value is {@code false}.
    *
    * @return {@code true} if the smartfield should only show a proposal list if a search text is entered by the user.
-   *         {@code false} (which is the default) if all proposals should be shown if no text search is done.
+   * {@code false} (which is the default) if all proposals should be shown if no text search is done.
    */
   @Order(315)
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -213,7 +213,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   /**
    * @return true: inactive rows are display together with active rows<br>
-   *         false: inactive rows ae only displayed when selected by the model
+   * false: inactive rows ae only displayed when selected by the model
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
@@ -311,10 +311,10 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   /**
    * @param call
-   *          that produced this result
+   *     that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
-   *          supported
+   *     live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *     supported
    */
   @ConfigOperation
   @Order(280)
@@ -323,10 +323,10 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   /**
    * @param call
-   *          that produced this result
+   *     that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
-   *          supported
+   *     live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *     supported
    */
   @ConfigOperation
   @Order(290)
@@ -335,10 +335,10 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   /**
    * @param call
-   *          that produced this result
+   *     that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
-   *          supported
+   *     live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *     supported
    */
   @ConfigOperation
   @Order(300)
@@ -347,10 +347,10 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   /**
    * @param call
-   *          that produced this result
+   *     that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
-   *          supported
+   *     live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *     supported
    */
   @ConfigOperation
   @Order(310)
@@ -359,10 +359,10 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   /**
    * @param call
-   *          that produced this result
+   *     that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
-   *          supported
+   *     live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *     supported
    */
   @ConfigOperation
   @Order(320)
@@ -618,7 +618,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   /**
    * @param wildcard
-   *          Wildcard character used in lookup calls
+   *     Wildcard character used in lookup calls
    */
   @Override
   public void setWildcard(String wildcard) {
@@ -648,7 +648,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
    * Checks if the current context row is still valid. If the current context row is not set, it is considered valid.
    *
    * @param validKey
-   *          Valid key
+   *     Valid key
    * @return {@code true} if the current context row is valid, {@code false} otherwise.
    */
   protected boolean isCurrentLookupRowValid(VALUE validKey) {
@@ -703,7 +703,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   /**
    * @param lookupRow
-   *          Lookup row used to resolve the value
+   *     Lookup row used to resolve the value
    * @return a property from the lookup row which is used as value (usually this is the key of the lookup row)
    */
   protected VALUE getValueFromLookupRow(ILookupRow<VALUE> lookupRow) {
@@ -1311,7 +1311,6 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
             .attr("activeState", activeState)
             .toString();
       }
-
     };
   }
 
@@ -1412,7 +1411,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
    * fetching completed.
    *
    * @return {@link IFuture} if data is fetched asynchronously, or <code>null</code> for synchronous fetching, or if
-   *         using {@link LocalLookupCall}.
+   * using {@link LocalLookupCall}.
    */
   private IFuture<Void> fetchLookupRows(final ILookupRowProvider<VALUE> dataProvider, final ILookupRowFetchedCallback<VALUE> callback, final boolean asynchronousFetching, final int maxRowCount) {
     cancelPotentialLookup();
@@ -1452,7 +1451,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
               return;
             }
             ModelJobs.schedule(() -> updateField(rows, exception), ModelJobs.newInput(callerRunContext)
-                .withName("Updating {}", AbstractSmartField.this.getClass().getName()))
+                    .withName("Updating {}", AbstractSmartField.this.getClass().getName()))
                 .awaitDone(); // block the current thread until completed
           }
           catch (ThreadInterruptedError e) { // NOSONAR

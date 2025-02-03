@@ -92,5 +92,4 @@ public class BufferedServletInputStream extends ServletInputStream {
   public int getLength() {
     return m_rawData.length;
   }
-
 }

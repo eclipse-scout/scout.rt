@@ -30,10 +30,10 @@ public interface IWizardProgressField extends IFormField {
 
   /**
    * @return the wizard associated with the current form (IForm{@link #getWizard()}). For a wizard container form, this
-   *         is the wizard specified in the constructor. For a wizard inner form, this is the wizard specified when
-   *         starting the inner form ({@link IForm#startWizardStep(IWizardStep)}). The return value may be
-   *         <code>null</code>, e.g. when an inner wizard form is not started or the field is used outside the wizard
-   *         context.
+   * is the wizard specified in the constructor. For a wizard inner form, this is the wizard specified when
+   * starting the inner form ({@link IForm#startWizardStep(IWizardStep)}). The return value may be
+   * <code>null</code>, e.g. when an inner wizard form is not started or the field is used outside the wizard
+   * context.
    */
   IWizard getWizard();
 

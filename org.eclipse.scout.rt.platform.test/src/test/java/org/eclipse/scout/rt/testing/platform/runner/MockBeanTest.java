@@ -30,5 +30,4 @@ public class MockBeanTest {
 
   public static interface ITestA {
   }
-
 }

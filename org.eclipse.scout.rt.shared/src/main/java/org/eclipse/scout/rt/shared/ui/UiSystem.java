@@ -25,5 +25,4 @@ public enum UiSystem implements IUiSystem {
   public static UiSystem createByIdentifier(String identifier) {
     return valueOf(identifier);
   }
-
 }

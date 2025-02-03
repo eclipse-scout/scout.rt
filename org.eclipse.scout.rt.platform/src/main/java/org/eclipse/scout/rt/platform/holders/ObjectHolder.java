@@ -23,5 +23,4 @@ public class ObjectHolder extends Holder<Object> {
   public ObjectHolder(Object value) {
     super(Object.class, value);
   }
-
 }

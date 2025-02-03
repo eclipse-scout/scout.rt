@@ -30,5 +30,4 @@ public class BookmarkServiceEvent extends EventObject {
   public int getType() {
     return m_type;
   }
-
 }

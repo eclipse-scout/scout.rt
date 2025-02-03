@@ -9,11 +9,8 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.planner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -256,51 +253,51 @@ public class PlannerEventBufferTest {
     assertEquals(PlannerEvent.TYPE_RESOURCES_DELETED, events.get(1).getType());
   }
 
-//
-//  @Test
-//  public void testInsertChangeResourceOrder() {
-//    final PlannerEvent insert1 = new PlannerEvent(mock(IPlanner.class), PlannerEvent.TYPE_RESOURCES_INSERTED, mockResources(0, 1, 2, 3, 4));
-//    final PlannerEvent insert2 = new PlannerEvent(mock(IPlanner.class), PlannerEvent.TYPE_RESOURCES_INSERTED, mockResources(6, 5));
-//    final PlannerEvent orderChanged = new PlannerEvent(mock(IPlanner.class), PlannerEvent.TYPE_RESOURCE_ORDER_CHANGED, mockResources(6, 5, 4, 3, 2, 1, 0));
-//    m_testBuffer.add(insert1);
-//    m_testBuffer.add(insert2);
-//    m_testBuffer.add(orderChanged);
-//    final List<PlannerEvent> events = m_testBuffer.consumeAndCoalesceEvents();
-//    assertEquals(1, events.size());
-//    assertEquals(PlannerEvent.TYPE_RESOURCES_INSERTED, events.get(0).getType());
-//    assertEquals(7, events.get(0).getResourceCount());
-//    assertEquals(6, events.get(0).getResources().get(0).getResourceIndex());
-//    assertEquals(4, events.get(0).getResources().get(2).getResourceIndex());
-//    assertEquals(0, events.get(0).getResources().get(6).getResourceIndex());
-//  }
-//
-//
-//  /**
-//   * If two resources are deleted separately, both should be present in the event list. This test checks that checks are
-//   * _not_
-//   * done by checking for the same resourceIndex.
-//   */
-//  @Test
-//  public void testDeleteTwoResources() {
-//    List<Resource> mockResources = mockResources(0, 1, 2, 3, 4);
-//    IPlanner planner = mock(IPlanner.class);
-//    final PlannerEvent event1 = new PlannerEvent(planner, PlannerEvent.TYPE_RESOURCES_UPDATED, Collections.singletonList(mockResources.get(2)));
-//    final PlannerEvent event2 = new PlannerEvent(planner, PlannerEvent.TYPE_RESOURCES_DELETED, Collections.singletonList(mockResources.get(2)));
-//    final PlannerEvent event3 = new PlannerEvent(planner, PlannerEvent.TYPE_RESOURCES_UPDATED, Collections.singletonList(mockResources.get(3)));
-//    final PlannerEvent event4 = new PlannerEvent(planner, PlannerEvent.TYPE_RESOURCES_DELETED, Collections.singletonList(mockResources.get(3)));
-//    final PlannerEvent event5 = new PlannerEvent(planner, PlannerEvent.TYPE_RESOURCE_ORDER_CHANGED, Arrays.asList(mockResources.get(4), mockResources.get(1), mockResources.get(0)));
-//    m_testBuffer.add(event1);
-//    m_testBuffer.add(event2);
-//    m_testBuffer.add(event3);
-//    m_testBuffer.add(event4);
-//    m_testBuffer.add(event5);
-//    final List<PlannerEvent> events = m_testBuffer.consumeAndCoalesceEvents();
-//    assertEquals(2, events.size());
-//    assertEquals(PlannerEvent.TYPE_RESOURCES_DELETED, events.get(0).getType());
-//    assertEquals(2, events.get(0).getResourceCount());
-//    assertEquals(PlannerEvent.TYPE_RESOURCE_ORDER_CHANGED, events.get(1).getType());
-//    assertEquals(3, events.get(1).getResourceCount());
-//  }
+  //
+  //  @Test
+  //  public void testInsertChangeResourceOrder() {
+  //    final PlannerEvent insert1 = new PlannerEvent(mock(IPlanner.class), PlannerEvent.TYPE_RESOURCES_INSERTED, mockResources(0, 1, 2, 3, 4));
+  //    final PlannerEvent insert2 = new PlannerEvent(mock(IPlanner.class), PlannerEvent.TYPE_RESOURCES_INSERTED, mockResources(6, 5));
+  //    final PlannerEvent orderChanged = new PlannerEvent(mock(IPlanner.class), PlannerEvent.TYPE_RESOURCE_ORDER_CHANGED, mockResources(6, 5, 4, 3, 2, 1, 0));
+  //    m_testBuffer.add(insert1);
+  //    m_testBuffer.add(insert2);
+  //    m_testBuffer.add(orderChanged);
+  //    final List<PlannerEvent> events = m_testBuffer.consumeAndCoalesceEvents();
+  //    assertEquals(1, events.size());
+  //    assertEquals(PlannerEvent.TYPE_RESOURCES_INSERTED, events.get(0).getType());
+  //    assertEquals(7, events.get(0).getResourceCount());
+  //    assertEquals(6, events.get(0).getResources().get(0).getResourceIndex());
+  //    assertEquals(4, events.get(0).getResources().get(2).getResourceIndex());
+  //    assertEquals(0, events.get(0).getResources().get(6).getResourceIndex());
+  //  }
+  //
+  //
+  //  /**
+  //   * If two resources are deleted separately, both should be present in the event list. This test checks that checks are
+  //   * _not_
+  //   * done by checking for the same resourceIndex.
+  //   */
+  //  @Test
+  //  public void testDeleteTwoResources() {
+  //    List<Resource> mockResources = mockResources(0, 1, 2, 3, 4);
+  //    IPlanner planner = mock(IPlanner.class);
+  //    final PlannerEvent event1 = new PlannerEvent(planner, PlannerEvent.TYPE_RESOURCES_UPDATED, Collections.singletonList(mockResources.get(2)));
+  //    final PlannerEvent event2 = new PlannerEvent(planner, PlannerEvent.TYPE_RESOURCES_DELETED, Collections.singletonList(mockResources.get(2)));
+  //    final PlannerEvent event3 = new PlannerEvent(planner, PlannerEvent.TYPE_RESOURCES_UPDATED, Collections.singletonList(mockResources.get(3)));
+  //    final PlannerEvent event4 = new PlannerEvent(planner, PlannerEvent.TYPE_RESOURCES_DELETED, Collections.singletonList(mockResources.get(3)));
+  //    final PlannerEvent event5 = new PlannerEvent(planner, PlannerEvent.TYPE_RESOURCE_ORDER_CHANGED, Arrays.asList(mockResources.get(4), mockResources.get(1), mockResources.get(0)));
+  //    m_testBuffer.add(event1);
+  //    m_testBuffer.add(event2);
+  //    m_testBuffer.add(event3);
+  //    m_testBuffer.add(event4);
+  //    m_testBuffer.add(event5);
+  //    final List<PlannerEvent> events = m_testBuffer.consumeAndCoalesceEvents();
+  //    assertEquals(2, events.size());
+  //    assertEquals(PlannerEvent.TYPE_RESOURCES_DELETED, events.get(0).getType());
+  //    assertEquals(2, events.get(0).getResourceCount());
+  //    assertEquals(PlannerEvent.TYPE_RESOURCE_ORDER_CHANGED, events.get(1).getType());
+  //    assertEquals(3, events.get(1).getResourceCount());
+  //  }
 
   private PlannerEvent createTestUpdateEvent() {
     return new PlannerEvent(mock(IPlanner.class), PlannerEvent.TYPE_RESOURCES_UPDATED, mockResources(0, 1));

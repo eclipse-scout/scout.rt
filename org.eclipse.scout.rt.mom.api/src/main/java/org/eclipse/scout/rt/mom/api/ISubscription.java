@@ -62,5 +62,4 @@ public interface ISubscription extends IDisposable {
    * @return stats of this subscription since the session was started or null
    */
   ISubscriptionStats getStats();
-
 }

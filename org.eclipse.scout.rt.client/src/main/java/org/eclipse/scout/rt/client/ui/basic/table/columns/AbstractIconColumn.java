@@ -39,5 +39,4 @@ public abstract class AbstractIconColumn extends AbstractColumn<String> implemen
   protected int getConfiguredHorizontalAlignment() {
     return 0;
   }
-
 }

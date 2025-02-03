@@ -164,7 +164,6 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
             getTable().setTableChanging(true);
             getTable().discardAllRows();
             rowList = getTable().addRows(rowList);
-
           }
           finally {
             getTable().setTableChanging(false);
@@ -220,11 +219,8 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
             protected int getConfiguredWidth() {
               return 200;
             }
-
           }
-
         }
-
       }
     }
 
@@ -237,7 +233,6 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
     @ClassId("f6b3f35e-f935-4cd3-94cf-a085ab5dd6b2")
     public class CancelButton extends AbstractCancelButton {
     }
-
   }
 
   public class ModifyHandler extends AbstractFormHandler {
@@ -292,14 +287,12 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
       }
       colSet.setVisibleColumns(newOrder);
       ClientUIPreferences.getInstance().setAllTableColumnPreferences(newCols.get(0).getTable());
-
     }
 
     @Override
     protected void execLoad() {
       getColumnsTableField().reloadTableData();
     }
-
   }
 
   @Override
@@ -307,5 +300,4 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
     m_insertAfterColumn = insertAfterColumn;
     return this;
   }
-
 }

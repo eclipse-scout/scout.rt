@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;

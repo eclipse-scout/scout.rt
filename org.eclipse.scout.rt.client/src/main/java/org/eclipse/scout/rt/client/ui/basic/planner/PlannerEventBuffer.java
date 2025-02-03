@@ -74,8 +74,8 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
    * stopped, when a event that may change resource indexes is encountered.
    *
    * @return a list with the same resources as 'resourcesToRemove', except those that were removed from an event whose
-   *         type matches one of the 'creationTypes'. This allows for completely removing a resource that was created
-   *         and deleted in the same request.
+   * type matches one of the 'creationTypes'. This allows for completely removing a resource that was created
+   * and deleted in the same request.
    */
   protected List<Resource> removeResourcesFromPreviousEvents(List<? extends Resource> resourcesToRemove, List<PlannerEvent> events, Integer... creationTypes) {
     List<Integer> creationTypesList = Arrays.asList(creationTypes);
@@ -84,7 +84,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
     for (Resource resourceToRemove : resourcesToRemove) {
       boolean resourceRemovedFromCreationEvent = false;
 
-      for (ListIterator<PlannerEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
+      for (ListIterator<PlannerEvent> it = events.listIterator(events.size()); it.hasPrevious(); ) {
         PlannerEvent event = it.previous();
         boolean removed = removeResource(event, resourceToRemove);
         if (removed && creationTypesList.contains(event.getType())) {
@@ -106,7 +106,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
   protected boolean removeResource(PlannerEvent event, Resource resourceToRemove) {
     boolean removed = false;
     List<? extends Resource> resources = event.getResources();
-    for (Iterator<? extends Resource> it = resources.iterator(); it.hasNext();) {
+    for (Iterator<? extends Resource> it = resources.iterator(); it.hasNext(); ) {
       Resource resource = it.next();
       if (resource == resourceToRemove) {
         it.remove();
@@ -151,7 +151,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
    * change the resource order.
    */
   protected void updatePreviousResource(PlannerEvent event, List<PlannerEvent> events, int type) {
-    for (ListIterator<PlannerEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
+    for (ListIterator<PlannerEvent> it = events.listIterator(events.size()); it.hasPrevious(); ) {
       PlannerEvent previous = it.previous();
       if (previous.getType() == type) {
         List<? extends Resource> resources = event.getResources();
@@ -165,7 +165,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
   }
 
   protected void replaceResources(PlannerEvent event, List<? extends Resource> newResources) {
-    for (Iterator<? extends Resource> it = newResources.iterator(); it.hasNext();) {
+    for (Iterator<? extends Resource> it = newResources.iterator(); it.hasNext(); ) {
       Resource newResource = it.next();
       boolean replaced = tryReplaceResource(event, newResource);
       if (replaced) {
@@ -198,7 +198,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
    * events from the list.
    */
   protected void coalesceConsecutivePrevious(PlannerEvent event, List<PlannerEvent> list) {
-    for (ListIterator<PlannerEvent> it = list.listIterator(list.size()); it.hasPrevious();) {
+    for (ListIterator<PlannerEvent> it = list.listIterator(list.size()); it.hasPrevious(); ) {
       PlannerEvent previous = it.previous();
       if (event.getType() == previous.getType()) {
         merge(previous, event);
@@ -242,7 +242,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
    * COLUMN_HEADERS_UPDATED)
    */
   protected PlannerEvent findInsertionBeforeResourceOrderChanged(List<PlannerEvent> events) {
-    for (ListIterator<PlannerEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
+    for (ListIterator<PlannerEvent> it = events.listIterator(events.size()); it.hasPrevious(); ) {
       PlannerEvent previous = it.previous();
       if (previous.getType() == PlannerEvent.TYPE_RESOURCES_INSERTED) {
         return previous;
@@ -269,7 +269,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
       PlannerEvent event = events.get(i);
 
       List<PlannerEvent> subList = events.subList(i + 1, events.size());
-      for (Iterator<PlannerEvent> it = subList.iterator(); it.hasNext();) {
+      for (Iterator<PlannerEvent> it = subList.iterator(); it.hasNext(); ) {
         PlannerEvent next = it.next();
         if (next.getType() != event.getType()) {
           // Stop when a node of different type occurs
@@ -323,7 +323,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
 
   /**
    * @param type
-   *          {@link PlannerEvent} type
+   *     {@link PlannerEvent} type
    * @return true, if previous events of the same type can be ignored. false otherwise
    */
   protected boolean isIgnorePrevious(int type) {

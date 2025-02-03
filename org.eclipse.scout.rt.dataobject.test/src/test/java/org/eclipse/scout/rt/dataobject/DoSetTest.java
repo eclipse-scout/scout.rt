@@ -58,7 +58,8 @@ public class DoSetTest {
   }
 
   protected Consumer<DoNode<Set<String>>> m_lazyCreate = attribute -> {
-    /* nop */ };
+    /* nop */
+  };
 
   @Test
   public void testCreateExists() {

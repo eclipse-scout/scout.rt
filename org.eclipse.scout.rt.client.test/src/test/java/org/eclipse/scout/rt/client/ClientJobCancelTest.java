@@ -60,7 +60,6 @@ public class ClientJobCancelTest {
         new BeanMetaData(MockServerProcessingCancelService.class)
             .withInitialInstance(new MockServerProcessingCancelService())
             .withApplicationScoped(true).withOrder(-1));
-
   }
 
   @After

@@ -337,7 +337,6 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
       case Types.NULL: {
         try {
           ps.setNull(jdbcBindIndex, Types.NULL);
-
         }
         catch (SQLException e) { // NOSONAR
           ps.setNull(jdbcBindIndex, Types.VARCHAR);
@@ -1084,8 +1083,8 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
    * converted to <code>java.lang.Long</code>, with a scale they are converted to <code>java.lang.Double</code>. By
    * default <code>DecimalConversion.NONE</code> will be returned.
    *
-   * @since 3.10.0-M2
    * @return strategy for the decimal conversion
+   * @since 3.10.0-M2
    */
   protected DecimalConversion getConfiguredDecimalConversionStrategy() {
     return DecimalConversion.NONE;
@@ -1116,5 +1115,4 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
 
     public abstract Object convertDecimalType(BigDecimal bd);
   }
-
 }

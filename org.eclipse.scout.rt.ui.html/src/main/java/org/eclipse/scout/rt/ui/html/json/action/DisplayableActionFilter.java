@@ -19,5 +19,4 @@ public class DisplayableActionFilter<T extends IAction> implements Predicate<T> 
   public boolean test(T element) {
     return element.isVisibleGranted();
   }
-
 }

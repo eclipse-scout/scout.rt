@@ -18,5 +18,4 @@ public interface ICalendarItemDescriptionElement {
   String getAppLink();
 
   ICalendarItemDescriptionElement copy();
-
 }

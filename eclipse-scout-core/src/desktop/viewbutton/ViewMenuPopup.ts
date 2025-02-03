@@ -114,5 +114,6 @@ export class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupModel {
     this.close();
   }
 }
+
 export type ViewButtonTileModel = CompositeTileModel & { viewMenu?: ViewButton };
 export type ViewButtonTile = CompositeTile & { viewMenu?: ViewButton };

@@ -71,9 +71,9 @@ public class RunMonitor implements ICancellable {
    * no effect.
    *
    * @param interruptIfRunning
-   *          <code>true</code> to interrupt the executing thread, or else <code>false</code>.
+   *     <code>true</code> to interrupt the executing thread, or else <code>false</code>.
    * @return <code>true</code> if this monitor was not cancelled yet and all registered {@link ICancellable}s could be
-   *         cancelled successfully.
+   * cancelled successfully.
    */
   @Override
   public boolean cancel(final boolean interruptIfRunning) {

@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.shared.data.colorscheme.IColorScheme;
  *   }
  * }
  * </pre>
- *
+ * <p>
  * and represents the config of a chart.
  */
 @Bean
@@ -65,10 +65,10 @@ public interface IChartConfig extends Serializable {
    * Add a property.
    *
    * @param name
-   *          The name of the property. Recursive properties have to be separated by "." and indices of arrays have to
-   *          be specified in the form "[i]" (e.g. "options.legend.position", "options.scales.xAxes[0].scaleLabel").
+   *     The name of the property. Recursive properties have to be separated by "." and indices of arrays have to
+   *     be specified in the form "[i]" (e.g. "options.legend.position", "options.scales.xAxes[0].scaleLabel").
    * @param value
-   *          The value of the property. Has to be not null.
+   *     The value of the property. Has to be not null.
    * @return The modified {@link ChartConfig} object.
    */
   IChartConfig withProperty(String name, Object value);
@@ -77,8 +77,8 @@ public interface IChartConfig extends Serializable {
    * Remove a property.
    *
    * @param name
-   *          The name of the property. Recursive properties have to be separated by "." and indices of arrays have to
-   *          be specified in the form "[i]" (e.g. "options.legend.position", "options.scales.xAxes[0].scaleLabel").
+   *     The name of the property. Recursive properties have to be separated by "." and indices of arrays have to
+   *     be specified in the form "[i]" (e.g. "options.legend.position", "options.scales.xAxes[0].scaleLabel").
    * @return The modified {@link ChartConfig} object.
    */
   IChartConfig removeProperty(String name);
@@ -87,8 +87,8 @@ public interface IChartConfig extends Serializable {
    * Get a property.
    *
    * @param name
-   *          The name of the property. Recursive properties have to be separated by "." and indices of arrays have to
-   *          be specified in the form "[i]" (e.g. "options.legend.position", "options.scales.xAxes[0].scaleLabel").
+   *     The name of the property. Recursive properties have to be separated by "." and indices of arrays have to
+   *     be specified in the form "[i]" (e.g. "options.legend.position", "options.scales.xAxes[0].scaleLabel").
    * @return The value of the property or {@code null} if it is not set.
    */
   Object getProperty(String name);
@@ -98,7 +98,7 @@ public interface IChartConfig extends Serializable {
    *
    * @return A recursive map with all properties. E.g.:
    *
-   *         <pre>
+   * <pre>
    *         "options"<br>
    *          - "legend"<br>
    *            - "position": "bottom"<br>
@@ -112,7 +112,7 @@ public interface IChartConfig extends Serializable {
    *
    * @return A flat map with all properties. E.g.:
    *
-   *         <pre>
+   * <pre>
    *         "options.legend.position": "bottom"<br>
    *         "options.legend.display": true<br>
    *         </pre>

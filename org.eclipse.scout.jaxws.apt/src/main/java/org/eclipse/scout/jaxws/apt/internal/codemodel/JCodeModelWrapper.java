@@ -84,5 +84,4 @@ public final class JCodeModelWrapper {
   public void build(CodeWriter out) throws IOException {
     m_model.build(out);
   }
-
 }

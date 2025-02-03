@@ -33,10 +33,10 @@ public class ComposerEntityNodeData extends TreeNodeData {
 
   /**
    * @return all attributes contained in the subtree of this entity that are part of this entity
-   *         <p>
-   *         This includes all direct attributes and all attributes under either/or nodes.
-   *         <p>
-   *         This excludes all other child entities and their attributes.
+   * <p>
+   * This includes all direct attributes and all attributes under either/or nodes.
+   * <p>
+   * This excludes all other child entities and their attributes.
    */
   public List<ComposerAttributeNodeData> getContainingAttributeNodes() {
     List<ComposerAttributeNodeData> list = new ArrayList<>();

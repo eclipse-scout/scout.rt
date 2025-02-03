@@ -64,11 +64,11 @@ public abstract class AbstractDoStructureMigrationHandlerTest {
 
   /**
    * @param filenamePrefix
-   *          Filename prefix of file in resource folder
+   *     Filename prefix of file in resource folder
    * @param fromVersionClass
-   *          From version is only required to determine to file to load that contains the previous version (source)
+   *     From version is only required to determine to file to load that contains the previous version (source)
    * @param toVersionClass
-   *          To version is required to determine the file to load that contains the expected data object (target)
+   *     To version is required to determine the file to load that contains the expected data object (target)
    */
   public void testMigration(String filenamePrefix, Class<? extends ITypeVersion> fromVersionClass, Class<? extends ITypeVersion> toVersionClass, IDataObjectMigrationLocalContextData... initialLocalContextData) throws IOException {
     testMigration(filenamePrefix, BEANS.get(fromVersionClass).getVersion().unwrap(), toVersionClass, initialLocalContextData);

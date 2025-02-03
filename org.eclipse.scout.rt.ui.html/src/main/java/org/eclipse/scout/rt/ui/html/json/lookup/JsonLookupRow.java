@@ -99,5 +99,4 @@ public class JsonLookupRow<T> implements IJsonObject {
     }
     return new JsonLookupRow<>(lookupRow, multipleColumns, keyMapper).toJson();
   }
-
 }

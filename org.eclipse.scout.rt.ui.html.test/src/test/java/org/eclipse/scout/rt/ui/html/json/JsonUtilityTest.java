@@ -54,5 +54,4 @@ public class JsonUtilityTest {
     }
     assertEquals("{\n  \"defaults\": {\n    \"FormField\": {\n      \"enabled\": true\n    }\n  }\n}\n", JsonUtility.stripCommentsFromJson(json));
   }
-
 }

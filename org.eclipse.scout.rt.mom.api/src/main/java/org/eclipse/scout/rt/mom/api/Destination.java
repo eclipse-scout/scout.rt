@@ -9,13 +9,12 @@
  */
 package org.eclipse.scout.rt.mom.api;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNullOrEmpty;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.util.Collections;
 import java.util.Map;
 
-import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.Assertions.*;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
 /**
@@ -35,17 +34,17 @@ class Destination<REQUEST, REPLY> implements IBiDestination<REQUEST, REPLY> {
 
   /**
    * @param name
-   *          the symbolic name for the destination
+   *     the symbolic name for the destination
    * @param destinationType
-   *          the type of the resource that this destination represents, e.g. {@link DestinationType#QUEUE}
+   *     the type of the resource that this destination represents, e.g. {@link DestinationType#QUEUE}
    * @param resolveMethod
-   *          the method how to resolve the actual destination, e.g. {@link ResolveMethod#JNDI}
+   *     the method how to resolve the actual destination, e.g. {@link ResolveMethod#JNDI}
    * @param properties
-   *          optional map of additional properties used to resolve the destination (may be set to <code>null</code> if
-   *          no properties are required)
+   *     optional map of additional properties used to resolve the destination (may be set to <code>null</code> if
+   *     no properties are required)
    * @throws AssertionException
-   *           if one of <code>name</code>, <code>type</code> or <code>resolveMethod</code> is <code>null</code> or
-   *           empty
+   *     if one of <code>name</code>, <code>type</code> or <code>resolveMethod</code> is <code>null</code> or
+   *     empty
    */
   public Destination(final String name, final IDestinationType type, IResolveMethod resolveMethod, Map<String, String> properties) {
     m_name = assertNotNullOrEmpty(name, "destination name not specified");

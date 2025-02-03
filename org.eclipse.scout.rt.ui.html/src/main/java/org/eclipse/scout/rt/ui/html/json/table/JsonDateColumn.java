@@ -80,5 +80,4 @@ public class JsonDateColumn<T extends IDateColumn> extends JsonColumn<T> {
     }
     return null;
   }
-
 }

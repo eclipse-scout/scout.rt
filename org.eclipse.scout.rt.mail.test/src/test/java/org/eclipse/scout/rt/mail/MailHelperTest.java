@@ -64,7 +64,7 @@ public class MailHelperTest {
    * Message without sender can be created
    *
    * @throws ProcessingException
-   *           ,MessagingException
+   *     ,MessagingException
    */
   @Test
   public void testMimeMessageWithoutSender() {
@@ -759,14 +759,14 @@ public class MailHelperTest {
    * </ul>
    *
    * @param message
-   *          Mime message to verify
+   *     Mime message to verify
    * @param plainText
-   *          Plain text (null of no plain text is available)
+   *     Plain text (null of no plain text is available)
    * @param htmlText
-   *          HTML (null of no html is available)
+   *     HTML (null of no html is available)
    * @param attachmentFilenames
-   *          Filenames of attachments (use {@link MimeUtility#encodeText(String)} in case the filename has
-   *          non-supported chars)
+   *     Filenames of attachments (use {@link MimeUtility#encodeText(String)} in case the filename has
+   *     non-supported chars)
    */
   protected static void verifyMimeMessage(MimeMessage message, String plainText, String htmlText, String... attachmentFilenames) throws IOException, MessagingException {
     if (plainText != null) {

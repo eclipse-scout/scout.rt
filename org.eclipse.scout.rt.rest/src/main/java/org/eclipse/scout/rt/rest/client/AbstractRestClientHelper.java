@@ -55,7 +55,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
   /**
    * @return a supplier of {@link Client} instances used for {@link #target(String)}. The default implementation returns
-   *         a supplier that always provides the same {@link Client} instance.
+   * a supplier that always provides the same {@link Client} instance.
    */
   protected Supplier<Client> createClientSupplier() {
     Client client = createClient();
@@ -171,7 +171,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
   /**
    * @return list of context resolvers for this REST client helper. Result is modifiable and never <code>null</code>.
-   *         Can be overridden by subclasses. The default returns all {@link ContextResolver} beans.
+   * Can be overridden by subclasses. The default returns all {@link ContextResolver} beans.
    */
   protected List<ContextResolver> getContextResolversToRegister() {
     return new ArrayList<>(BEANS.all(ContextResolver.class));
@@ -179,7 +179,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
   /**
    * @return list of request filters for this REST client helper. Result is modifiable and never <code>null</code>. Can
-   *         be overridden by subclasses. The default returns all {@link IGlobalRestRequestFilter} beans.
+   * be overridden by subclasses. The default returns all {@link IGlobalRestRequestFilter} beans.
    */
   protected List<ClientRequestFilter> getRequestFiltersToRegister() {
     return new ArrayList<>(BEANS.all(IGlobalRestRequestFilter.class));
@@ -187,7 +187,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
   /**
    * @return list of client configurators for this REST client helper. Result is modifiable and never <code>null</code>.
-   *         Can be overridden by subclasses. The default returns all {@link IGlobalRestClientConfigurator} beans.
+   * Can be overridden by subclasses. The default returns all {@link IGlobalRestClientConfigurator} beans.
    */
   protected List<IGlobalRestClientConfigurator> getClientConfigurators() {
     return new ArrayList<>(BEANS.all(IGlobalRestClientConfigurator.class));
@@ -195,7 +195,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
   /**
    * @return proxied {@link Client} instance that delegates {@link WebApplicationException}s and
-   *         {@link javax.ws.rs.ProcessingException}s to {@link #transformException(RuntimeException, Response)}.
+   * {@link javax.ws.rs.ProcessingException}s to {@link #transformException(RuntimeException, Response)}.
    */
   public Client client() {
     return client(this::transformException);
@@ -203,8 +203,8 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
   /**
    * @return proxied {@link Client} instance that delegates {@link WebApplicationException}s and
-   *         {@link javax.ws.rs.ProcessingException}s to the given {@link IRestClientExceptionTransformer}. The
-   *         {@code null}-transformer returns the passed exception unchanged.
+   * {@link javax.ws.rs.ProcessingException}s to the given {@link IRestClientExceptionTransformer}. The
+   * {@code null}-transformer returns the passed exception unchanged.
    */
   public Client client(IRestClientExceptionTransformer exceptionTransformer) {
     return getProxyFactory().createClientProxy(internalClient(), exceptionTransformer);
@@ -242,7 +242,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
   /**
    * @return the given baseUri if it is valid (otherwise, an exception is thrown)
    * @throws RemoteSystemUnavailableException
-   *           if the given baseUri is not set
+   *     if the given baseUri is not set
    */
   protected String validateBaseUri(String baseUri) {
     if (!StringUtility.hasText(baseUri)) {

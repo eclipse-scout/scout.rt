@@ -41,7 +41,7 @@ public class WhenDoneScheduleTest {
   @Test
   public void testCascading() {
     IFuture<String> future = Jobs.schedule(
-        () -> "a", Jobs.newInput())
+            () -> "a", Jobs.newInput())
         .whenDoneSchedule((result, u) -> result + "b", Jobs.newInput())
         .whenDoneSchedule((result, u) -> result + "c", Jobs.newInput())
         .whenDoneSchedule((result, u) -> result + "d", Jobs.newInput());
@@ -57,10 +57,10 @@ public class WhenDoneScheduleTest {
     final RuntimeException exception4 = new RuntimeException("JUnit test exception 4");
 
     IFuture<String> future = Jobs.schedule(
-        (Callable<String>) () -> {
-          throw exception1;
-        }, Jobs.newInput()
-            .withExceptionHandling(null, false))
+            (Callable<String>) () -> {
+              throw exception1;
+            }, Jobs.newInput()
+                .withExceptionHandling(null, false))
         .whenDoneSchedule((BiFunction<String, Throwable, String>) (result, e) -> {
           assertSame(exception1, e);
           throw exception2;

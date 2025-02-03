@@ -24,5 +24,4 @@ public class JsonTableControl<TABLE_CONTROL extends ITableControl> extends JsonA
   public String getObjectType() {
     return "TableControl";
   }
-
 }

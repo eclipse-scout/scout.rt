@@ -45,7 +45,7 @@ public class DoStructureMigrationHelper {
 
   /**
    * @param doEntity
-   *          Raw data object (typed data objects don't have a type attribute).
+   *     Raw data object (typed data objects don't have a type attribute).
    */
   public String getType(IDoEntity doEntity) {
     assertNotNull(doEntity, "doEntity is required");
@@ -56,9 +56,9 @@ public class DoStructureMigrationHelper {
    * Set the {@link #TYPE_ATTRIBUTE_NAME} to the provided data object with the provided type name
    *
    * @param doEntity
-   *          Add type attribute to this data object.
+   *     Add type attribute to this data object.
    * @param typeName
-   *          The typeName of the type attribute.
+   *     The typeName of the type attribute.
    */
   public void setType(IDoEntity doEntity, String typeName) {
     assertNotNull(doEntity, "doEntity is required");
@@ -67,7 +67,7 @@ public class DoStructureMigrationHelper {
 
   /**
    * @param doEntity
-   *          Raw data object (typed data objects don't have a type version attribute).
+   *     Raw data object (typed data objects don't have a type version attribute).
    */
   public NamespaceVersion getTypeVersion(IDoEntity doEntity) {
     assertNotNull(doEntity, "doEntity is required");
@@ -78,9 +78,9 @@ public class DoStructureMigrationHelper {
    * Set the {@link #TYPE_VERSION_ATTRIBUTE_NAME} to the provided data object with the provided value.
    *
    * @param doEntity
-   *          Add type version attribute to this raw data object.
+   *     Add type version attribute to this raw data object.
    * @param version
-   *          The value of the type version attribute.
+   *     The value of the type version attribute.
    */
   public void setTypeVersion(IDoEntity doEntity, NamespaceVersion version) {
     assertNotNull(doEntity, "doEntity is required");
@@ -91,7 +91,7 @@ public class DoStructureMigrationHelper {
    * Updates the type version of the data object.
    *
    * @return <code>true</code> if the new version was set, <code>false</code> if the type version was already up-to-date
-   *         (equal).
+   * (equal).
    */
   public boolean updateTypeVersion(IDoEntity doEntity, NamespaceVersion newVersion) {
     assertNotNull(doEntity, "doEntity is required");
@@ -111,7 +111,7 @@ public class DoStructureMigrationHelper {
    * If the map is empty this means that no raw {@link IDoEntity} (i.e. one with a type name) was found.
    *
    * @param rawDataObject
-   *          Raw data object. If a typed data object is provided, no versions will be returned.
+   *     Raw data object. If a typed data object is provided, no versions will be returned.
    * @return Map of type name to type version
    */
   public Map<String, NamespaceVersion> collectRawDataObjectTypeVersions(IDataObject rawDataObject) {
@@ -175,7 +175,7 @@ public class DoStructureMigrationHelper {
    * versions are already up-to-date or unknown namespaces are present).
    *
    * @return <code>true</code> if for at least one type name {@link #isMigrationRequired(String, NamespaceVersion)}
-   *         returns <code>true</code>.
+   * returns <code>true</code>.
    */
   public boolean isAnyMigrationRequired(Map<String, String> typeVersionsByTypeName) {
     if (CollectionUtility.isEmpty(typeVersionsByTypeName)) {
@@ -252,7 +252,7 @@ public class DoStructureMigrationHelper {
    * Renames an attribute on the data object.
    *
    * @return <code>true</code> if the attribute node with 'attributeName' exists and was renamed, <code>false</code>
-   *         otherwise.
+   * otherwise.
    */
   public boolean renameAttribute(IDoEntity doEntity, String attributeName, String newAttributeName) {
     if (!doEntity.has(attributeName)) {

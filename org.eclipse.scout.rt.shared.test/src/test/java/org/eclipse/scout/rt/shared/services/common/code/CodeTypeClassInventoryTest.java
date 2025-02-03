@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.common.code;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collection;
 
@@ -68,5 +67,4 @@ public class CodeTypeClassInventoryTest {
       return super.test(ci) && ObjectUtility.notEquals(ci.name(), TestCodeType1.class.getName());
     }
   }
-
 }

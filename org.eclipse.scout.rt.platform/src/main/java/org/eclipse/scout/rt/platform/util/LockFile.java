@@ -64,9 +64,9 @@ public class LockFile {
    * Returns with lock acquired.
    *
    * @throws TimedOutError
-   *           if the lock could not be acquired within timeout
+   *     if the lock could not be acquired within timeout
    * @throws ProcessingException
-   *           if an error occurred while acquiring the lock
+   *     if an error occurred while acquiring the lock
    */
   public synchronized void lock(int timeout, TimeUnit unit) {
     long waitUntilNanoTime = System.nanoTime() + unit.toNanos(timeout);

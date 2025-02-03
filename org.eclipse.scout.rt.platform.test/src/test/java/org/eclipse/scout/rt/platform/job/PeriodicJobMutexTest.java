@@ -87,19 +87,19 @@ public class PeriodicJobMutexTest {
       // expected: that job must not commence execution until the periodic job completes this iteration
       // However, to circumvent deadlock-detection, schedule this job within another job, that is not mutex owner
       Jobs.schedule(() -> {
-        try {
-          Jobs.schedule(() -> {
-            protocol.add("running-2");
+            try {
+              Jobs.schedule(() -> {
+                    protocol.add("running-2");
+                  }, Jobs.newInput()
+                      .withExecutionSemaphore(executionSemaphore)
+                      .withExecutionHint(JOB_IDENTIFIER))
+                  .awaitDone(200, TimeUnit.MILLISECONDS);
+            }
+            catch (TimedOutError e) {
+              protocol.add("timeout-because-mutex-owner");
+            }
           }, Jobs.newInput()
-              .withExecutionSemaphore(executionSemaphore)
               .withExecutionHint(JOB_IDENTIFIER))
-              .awaitDone(200, TimeUnit.MILLISECONDS);
-        }
-        catch (TimedOutError e) {
-          protocol.add("timeout-because-mutex-owner");
-        }
-      }, Jobs.newInput()
-          .withExecutionHint(JOB_IDENTIFIER))
           .awaitDone();
 
       // Schedule other job with same mutex

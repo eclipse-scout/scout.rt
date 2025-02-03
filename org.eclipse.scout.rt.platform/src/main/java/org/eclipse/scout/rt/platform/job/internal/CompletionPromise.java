@@ -114,10 +114,10 @@ class CompletionPromise<RESULT> {
    * method returns immediately, and the callback invoked upon transition into 'done' state.
    *
    * @param handler
-   *          handler invoked upon transition into 'done' state.
+   *     handler invoked upon transition into 'done' state.
    * @param runContext
-   *          optional {@link RunContext} to invoke the handler on behalf, or <code>null</code> to not invoke on a
-   *          specific {@link RunContext}.
+   *     optional {@link RunContext} to invoke the handler on behalf, or <code>null</code> to not invoke on a
+   *     specific {@link RunContext}.
    */
   public void whenDone(final IDoneHandler<RESULT> handler, final RunContext runContext) {
     final PromiseHandler<RESULT> promiseHandler = new PromiseHandler<>(handler, runContext);
@@ -144,11 +144,11 @@ class CompletionPromise<RESULT> {
    *
    * @return the computed result
    * @throws ExecutionException
-   *           if the computation threw an exception.
+   *     if the computation threw an exception.
    * @throws InterruptedException
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    * @throws CancellationException
-   *           if the computation was cancelled.
+   *     if the computation was cancelled.
    * @see Future#get()
    */
   public RESULT awaitDoneAndGet() throws InterruptedException, ExecutionException {
@@ -170,18 +170,18 @@ class CompletionPromise<RESULT> {
    * its result, if available.
    *
    * @param timeout
-   *          the maximum time to wait
+   *     the maximum time to wait
    * @param unit
-   *          the time unit of the timeout argument
+   *     the time unit of the timeout argument
    * @return the computed result
    * @throws ExecutionException
-   *           if the computation threw an exception.
+   *     if the computation threw an exception.
    * @throws InterruptedException
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    * @throws CancellationException
-   *           if the computation was cancelled.
+   *     if the computation was cancelled.
    * @throws TimeoutException
-   *           if the wait timed out.
+   *     if the wait timed out.
    * @see Future#get(long, TimeUnit)
    */
   public RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
@@ -209,13 +209,13 @@ class CompletionPromise<RESULT> {
    * or by an exception, or that it will never commence execution due to a premature cancellation.
    *
    * @param timeout
-   *          the maximum time to wait
+   *     the maximum time to wait
    * @param unit
-   *          the time unit of the timeout argument
+   *     the time unit of the timeout argument
    * @throws InterruptedException
-   *           if the current thread was interrupted while waiting.
+   *     if the current thread was interrupted while waiting.
    * @throws TimeoutException
-   *           if the wait timed out.
+   *     if the wait timed out.
    */
   public void awaitFinished(final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException {
     Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout={}]", timeout);
@@ -263,11 +263,11 @@ class CompletionPromise<RESULT> {
    *
    * @return the computed result
    * @throws IllegalStateException
-   *           if the future in not in 'done' state yet.
+   *     if the future in not in 'done' state yet.
    * @throws ExecutionException
-   *           if the computation threw an exception.
+   *     if the computation threw an exception.
    * @throws CancellationException
-   *           if the computation was cancelled.
+   *     if the computation was cancelled.
    */
   private static <RESULT> RESULT retrieveFinalValue(final Future<RESULT> future) throws ExecutionException {
     try {

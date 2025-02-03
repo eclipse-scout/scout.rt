@@ -55,7 +55,7 @@ public class ClientSessionStopHelper {
     LOG.debug("Stop client session {} due to {}", clientSession.getId(), stopReason);
     return ModelJobs.schedule(() -> callStop(clientSession, force),
         ModelJobs.newInput(ClientRunContexts.empty()
-            .withSession(clientSession, true))
+                .withSession(clientSession, true))
             .withExecutionHint(STOP_JOB_HINT)
             .withName("Stop client session {} due to {}", clientSession.getId(), stopReason));
   }
@@ -94,8 +94,8 @@ public class ClientSessionStopHelper {
    * Schedule a repeated timer that watches until {@link #cancelRunningJobsExceptCurrentJob(IClientSession)} and then
    * checks if there are still running jobs and cancels them.
    *
-   * @see {@link JobCompletionDelayOnSessionShutdown}
    * @return the watcher job
+   * @see {@link JobCompletionDelayOnSessionShutdown}
    */
   public IFuture<?> scheduleJobTerminationLoop(final IClientSession session) {
     return Jobs.schedule(() -> {

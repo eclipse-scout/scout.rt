@@ -90,7 +90,7 @@ public class RadioButtonGroupGrid implements ICompositeFieldGrid<ICompositeField
 
   /**
    * @return the default number of columns based on the height of the field and the number of visible buttons (legacy
-   *         case). The value is always > 0
+   * case). The value is always > 0
    */
   protected int calcDefaultGridColumnCount() {
     GridData parentData = m_group.getGridData();

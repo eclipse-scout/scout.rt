@@ -23,5 +23,4 @@ public interface ICalendarField<T extends ICalendar> extends IValueField<Date> {
    * Convenience for {@link ICalendar#reloadCalendarItems()}
    */
   void reloadCalendarItems();
-
 }

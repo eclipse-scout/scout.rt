@@ -42,13 +42,13 @@ public interface INumberValueContainer<T extends Number> {
    *
    * @param format
    * @throws IllegalArgumentException
-   *           if format is null
+   *     if format is null
    */
   void setFormat(DecimalFormat format);
 
   /**
    * @return A copy of the internal DecimalFormat instance. Changes on the returned instance have no effect on the
-   *         internal instance.
+   * internal instance.
    */
   DecimalFormat getFormat();
 
@@ -92,7 +92,7 @@ public interface INumberValueContainer<T extends Number> {
    * Sets the maximum number of digits allowed in the integer portion of a number.
    *
    * @param maxIntegerDigits
-   *          the maximum number of digits allowed
+   *     the maximum number of digits allowed
    */
   void setMaxIntegerDigits(int maxIntegerDigits);
 

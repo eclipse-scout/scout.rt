@@ -26,5 +26,4 @@ public enum UiDeviceType implements IUiDeviceType {
   public static IUiDeviceType createByIdentifier(String identifier) {
     return valueOf(identifier);
   }
-
 }

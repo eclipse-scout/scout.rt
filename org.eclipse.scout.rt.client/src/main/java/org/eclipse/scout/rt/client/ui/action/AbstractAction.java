@@ -106,6 +106,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   /*
    * Configuration
    */
+
   /**
    * Configures the icon for this action.
    * <p>
@@ -192,7 +193,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
 
   /**
    * @return true if the AbstractAction should be rendered as a separating line. If true, the AbstractAction can not
-   *         trigger any action ({@link #execAction()})
+   * trigger any action ({@link #execAction()})
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
@@ -265,7 +266,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
    * Called whenever the selection (of toggle-action) is changed.
    *
    * @param selection
-   *          the new selection state
+   *     the new selection state
    */
   @ConfigOperation
   @Order(32)
@@ -692,7 +693,6 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
     public void execDispose(ActionDisposeChain chain) {
       getOwner().execDispose();
     }
-
   }
 
   protected final void interceptSelectionChanged(boolean selection) {
@@ -739,5 +739,4 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   protected void disposeActionInternal() {
     // NOP
   }
-
 }

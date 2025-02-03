@@ -20,5 +20,4 @@ public interface ILookupCallResult<LOOKUP_KEY> {
   Throwable getException();
 
   List<ILookupRow<LOOKUP_KEY>> getLookupRows();
-
 }

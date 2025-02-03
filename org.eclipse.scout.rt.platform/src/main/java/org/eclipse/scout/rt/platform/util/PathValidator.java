@@ -53,7 +53,7 @@ public class PathValidator {
    * Validates the specified path {@link String}.
    *
    * @param path
-   *          The path that should be validated. May be {@code null}.
+   *     The path that should be validated. May be {@code null}.
    * @return {@code true} if the path is valid. {@code false} otherwise.
    */
   public static boolean isValid(String path) {
@@ -71,9 +71,9 @@ public class PathValidator {
    * Validates the specified path {@link String}.
    *
    * @param path
-   *          The path that should be validated. May be {@code null}.
+   *     The path that should be validated. May be {@code null}.
    * @throws Exception
-   *           if the validation failed
+   *     if the validation failed
    */
   public void validate(String path) {
     if (path == null || path.isEmpty()) {

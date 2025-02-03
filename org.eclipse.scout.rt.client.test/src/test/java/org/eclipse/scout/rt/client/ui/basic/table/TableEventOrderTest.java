@@ -83,5 +83,4 @@ public class TableEventOrderTest {
     public class SecondColumn extends AbstractStringColumn {
     }
   }
-
 }

@@ -41,5 +41,4 @@ public class IconLocator {
     }
     return spec;
   }
-
 }

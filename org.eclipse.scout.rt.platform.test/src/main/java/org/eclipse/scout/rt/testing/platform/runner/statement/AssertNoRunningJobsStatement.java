@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
 import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -129,7 +130,7 @@ public class AssertNoRunningJobsStatement extends Statement {
 
     /**
      * @return Returns <code>true</code> if the the initial statement was not executed by a job and the current thread
-     *         is the initial thread.
+     * is the initial thread.
      */
     private boolean isScheduledByInitialThread() {
       return m_initialThread != null && m_initialThread == Thread.currentThread();
@@ -137,7 +138,7 @@ public class AssertNoRunningJobsStatement extends Statement {
 
     /**
      * @return Returns <code>true</code> if the initial statement was executed by a job and the currently running job is
-     *         the initial job.
+     * the initial job.
      */
     private boolean isScheduledByInitialJob() {
       return m_initialJobFuture != null && m_initialJobFuture == IFuture.CURRENT.get();
@@ -145,7 +146,7 @@ public class AssertNoRunningJobsStatement extends Statement {
 
     /**
      * @return Returns <code>true</code> if the currently running job has been directly or indirectly scheduled by the
-     *         initial thread or the initial job.
+     * initial thread or the initial job.
      */
     private boolean isScheduledByDescendantJob() {
       final IFuture<?> future = IFuture.CURRENT.get();

@@ -43,5 +43,4 @@ public interface IPlannerExtension<RI, AI, OWNER extends AbstractPlanner<RI, AI>
   void execViewRangeChanged(PlannerViewRangeChangedChain<RI, AI> chain, Range<Date> viewRange);
 
   void execDisplayModeChanged(PlannerDisplayModeChangedChain<RI, AI> chain, int displayMode);
-
 }

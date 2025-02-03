@@ -21,5 +21,4 @@ public final class TestPermissionLevels {
 
   public static final PermissionLevel GRANTED = PermissionLevel.register(LEVEL_GRANTED, "GRANTED", true, () -> "GRANTED");
   public static final PermissionLevel DENIED = PermissionLevel.register(LEVEL_DENIED, "DENIED", true, () -> "DENIED");
-
 }

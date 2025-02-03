@@ -266,7 +266,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * replace the shared variable map with a new version.
    *
    * @param newMap
-   *          map to replace the current one with
+   *     map to replace the current one with
    */
   @Override
   public void replaceSharedVariableMapInternal(SharedVariableMap newMap) {
@@ -278,7 +278,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * available or the timeout is reached.
    *
    * @throws ProcessingException
-   *           if interrupted (and the variables are not initialized)
+   *     if interrupted (and the variables are not initialized)
    */
   protected void initializeSharedVariables() {
     BEANS.get(IPingService.class).ping("");
@@ -506,7 +506,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     public void execLoadSession(ClientSessionLoadSessionChain chain) {
       getOwner().execLoadSession();
     }
-
   }
 
   protected final void interceptStoreSession() {

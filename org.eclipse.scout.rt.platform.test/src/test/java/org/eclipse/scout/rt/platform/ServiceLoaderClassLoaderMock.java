@@ -37,11 +37,11 @@ public class ServiceLoaderClassLoaderMock extends ClassLoader {
 
   /**
    * @param parent
-   *          class loader
+   *     class loader
    * @param serviceInterface
-   *          the interface class to be used in subsequent queries to {@link ServiceLoader#load(Class)}
+   *     the interface class to be used in subsequent queries to {@link ServiceLoader#load(Class)}
    * @param implementationClass
-   *          the implementationClass class to be returned by {@link ServiceLoader#load(Class)}
+   *     the implementationClass class to be returned by {@link ServiceLoader#load(Class)}
    */
   public <T> ServiceLoaderClassLoaderMock(ClassLoader parent, Class<T> serviceInterfaceClass, Class<? extends T> implementationClass) {
     super(parent);

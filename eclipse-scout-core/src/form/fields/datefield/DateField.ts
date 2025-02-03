@@ -1834,6 +1834,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     this.trigger('acceptInput', event);
   }
 }
+
 export type DateFieldPredictionResult = {
   date: Date;
   text: string;

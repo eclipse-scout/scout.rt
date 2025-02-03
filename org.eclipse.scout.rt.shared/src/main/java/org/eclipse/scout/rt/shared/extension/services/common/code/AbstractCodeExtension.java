@@ -30,5 +30,4 @@ public abstract class AbstractCodeExtension<T, OWNER extends AbstractCode<T>> ex
   public List<? extends ICode<T>> execCreateChildCodes(CodeCreateChildCodesChain<T> chain) {
     return chain.execCreateChildCodes();
   }
-
 }

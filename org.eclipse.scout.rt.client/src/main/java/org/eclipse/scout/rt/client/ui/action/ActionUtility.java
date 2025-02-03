@@ -120,10 +120,10 @@ public final class ActionUtility {
    * action-nodes} (having at least one of the given menu types) are updated according to the value of the supplier.
    *
    * @param contextMenu
-   *          The {@link AbstractContextMenu} to update. Must not be {@code null}.
+   *     The {@link AbstractContextMenu} to update. Must not be {@code null}.
    * @param selectionEnabledStateSupplier
-   *          Only invoked if the container of the context menu itself is enabled. Returns if all selected elements of
-   *          the container are enabled ({@code true}) or not.
+   *     Only invoked if the container of the context menu itself is enabled. Returns if all selected elements of
+   *     the container are enabled ({@code true}) or not.
    * @see #updateEnabledStateOfMenus(IWidget, boolean, IMenuType...)
    * @see UpdateMenuEnabledStateVisitor
    */
@@ -140,12 +140,12 @@ public final class ActionUtility {
    * one of the given menu types) of the given {@link IWidget}.
    *
    * @param widget
-   *          The {@link IWidget} whose {@link IActionNode actions} should be changed (recursively). Must not be
-   *          {@code null}.
+   *     The {@link IWidget} whose {@link IActionNode actions} should be changed (recursively). Must not be
+   *     {@code null}.
    * @param enabled
-   *          The new enabled state of the {@link IActionNode actions} found.
+   *     The new enabled state of the {@link IActionNode actions} found.
    * @param menuTypes
-   *          The menu types to update
+   *     The menu types to update
    */
   public static void updateEnabledStateOfMenus(IWidget widget, boolean enabled, IMenuType... menuTypes) {
     Predicate<IAction> menusToUpdate = createMenuFilterMenuTypes(false, menuTypes);

@@ -50,7 +50,6 @@ public class ExecMethodExtensionTest extends AbstractLocalExtensionTestCase {
 
     nameField.getUIFacade().parseAndSetValueFromUI("berndExtension");
     Assert.assertNotNull(nameField.getErrorStatus());
-
   }
 
   public class MyForm extends AbstractForm {
@@ -80,7 +79,6 @@ public class ExecMethodExtensionTest extends AbstractLocalExtensionTestCase {
           return super.execValidateValue(rawValue);
         }
       }
-
     }
 
     public class StartHandler extends AbstractFormHandler {
@@ -105,6 +103,5 @@ public class ExecMethodExtensionTest extends AbstractLocalExtensionTestCase {
       }
       return retVal;
     }
-
   }
 }

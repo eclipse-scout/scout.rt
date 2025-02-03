@@ -23,5 +23,4 @@ public interface IButtonUIFacade {
   void fireButtonClickFromUI();
 
   void setSelectedFromUI(boolean b);
-
 }

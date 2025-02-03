@@ -37,7 +37,7 @@ public abstract class AbstractMultiValueIndex<INDEX, ELEMENT> extends AbstractMu
    * Method invoked to calculate the index value for the given element.
    *
    * @param element
-   *          the element to calculate its index value.
+   *     the element to calculate its index value.
    * @return the index value, or <code>null</code> to not add the element to this index.
    */
   protected abstract INDEX calculateIndexFor(final ELEMENT element);

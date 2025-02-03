@@ -16,7 +16,7 @@ import java.util.EventObject;
  * {@link EventSupport} instance. Event listeners can be added or removed.
  *
  * @param <EVENT>
- *          Event type that is fired.
+ *     Event type that is fired.
  * @since 22.0
  */
 @FunctionalInterface

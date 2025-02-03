@@ -27,10 +27,10 @@ public final class CONFIG {
    * property is returned ({@link IConfigProperty#getValue()}).
    *
    * @param clazz
-   *          the config class
+   *     the config class
    * @return The value of the given {@link IConfigProperty}.
    * @throws PlatformException
-   *           if the property is invalid
+   *     if the property is invalid
    */
   public static <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz) {
     return getPropertyValue(clazz, null);
@@ -41,12 +41,12 @@ public final class CONFIG {
    * property is returned ({@link IConfigProperty#getValue()}).
    *
    * @param clazz
-   *          the config class
+   *     the config class
    * @param namespace
-   *          The namespace of the property value to get.
+   *     The namespace of the property value to get.
    * @return The value of the given {@link IConfigProperty}.
    * @throws PlatformException
-   *           if the property is invalid
+   *     if the property is invalid
    */
   public static <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz, String namespace) {
     return BEANS.get(clazz).getValue(namespace);

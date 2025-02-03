@@ -55,5 +55,4 @@ public final class UserAgentUtility {
       return UserAgents.createDefault();
     }
   }
-
 }

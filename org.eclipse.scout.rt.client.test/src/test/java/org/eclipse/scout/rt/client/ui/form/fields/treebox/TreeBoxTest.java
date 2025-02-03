@@ -350,7 +350,6 @@ public class TreeBoxTest {
       public Set<Long> getInitValue() {
         return initialValues;
       }
-
     };
     treeBox.init();
     treeBox.resetValue();
@@ -385,7 +384,6 @@ public class TreeBoxTest {
     protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
       return TreeBoxLookupCall.class;
     }
-
   }
 
   public class AutoSelectTreeBox extends AbstractTreeBox<Long> {
@@ -436,7 +434,6 @@ public class TreeBoxTest {
       else {
         return rawValue;
       }
-
     }
 
     public class ValidatingTreeBoxTree extends DefaultTreeBoxTree {
@@ -445,7 +442,6 @@ public class TreeBoxTest {
       protected boolean getConfiguredMultiCheck() {
         return true;
       }
-
     }
   }
 
@@ -474,5 +470,4 @@ public class TreeBoxTest {
       return list;
     }
   }
-
 }

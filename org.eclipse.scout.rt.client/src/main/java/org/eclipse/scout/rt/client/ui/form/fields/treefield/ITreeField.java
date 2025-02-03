@@ -30,7 +30,7 @@ public interface ITreeField extends IFormField {
    * Install a (new) tree into the tree field.
    *
    * @param externallyManaged
-   *          true means init, dispose, load and store are not handled by the tree field
+   *     true means init, dispose, load and store are not handled by the tree field
    */
   void setTree(ITree newTree, boolean externallyManaged);
 
@@ -44,5 +44,4 @@ public interface ITreeField extends IFormField {
   void loadChildNodes(ITreeNode parentNode);
 
   void doSave();
-
 }

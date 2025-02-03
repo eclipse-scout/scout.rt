@@ -147,12 +147,12 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
    * </ul>
    *
    * @param newOwnerValue
-   *          depending on the owner the newOwnerValue differs.
-   *          <ul>
-   *          <li>for {@link ITree} it is the current selection {@link Set} of {@link ITreeNode}'s.</li>
-   *          <li>for {@link ITable} it is the current selection {@link List} of {@link ITableRow}'s.</li>
-   *          <li>for {@link IValueField} it is the current value.</li>
-   *          </ul>
+   *     depending on the owner the newOwnerValue differs.
+   *     <ul>
+   *     <li>for {@link ITree} it is the current selection {@link Set} of {@link ITreeNode}'s.</li>
+   *     <li>for {@link ITable} it is the current selection {@link List} of {@link ITableRow}'s.</li>
+   *     <li>for {@link IValueField} it is the current value.</li>
+   *     </ul>
    */
   @ConfigOperation
   @Order(50)

@@ -46,7 +46,7 @@ import org.junit.runners.model.Statement;
  *    ...
  * }
  * </pre>
- *
+ * <p>
  * Execution:
  * <ul>
  * <li>Each test-method is executed in a separate transaction - meaning that the transaction boundary starts before

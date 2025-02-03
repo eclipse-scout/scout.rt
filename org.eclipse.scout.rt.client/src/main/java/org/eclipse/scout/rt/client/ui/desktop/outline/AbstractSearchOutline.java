@@ -136,6 +136,5 @@ public abstract class AbstractSearchOutline extends AbstractOutline implements I
         popUIProcessor();
       }
     }
-
   }
 }

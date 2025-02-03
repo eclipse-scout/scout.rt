@@ -217,7 +217,7 @@ public class ServicesView extends DefaultView {
     p.startTableRow();
     p.startTableCell();
     String prefix = "";
-    for (Iterator it = interfaceHierarchy.iterator(); it.hasNext();) {
+    for (Iterator it = interfaceHierarchy.iterator(); it.hasNext(); ) {
       Class c = (Class) it.next();
       p.print(prefix + c.getName());
       if (it.hasNext()) {
@@ -228,7 +228,7 @@ public class ServicesView extends DefaultView {
     p.endTableCell();
     p.startTableCell();
     prefix = "";
-    for (Iterator it = classHierarchy.iterator(); it.hasNext();) {
+    for (Iterator it = classHierarchy.iterator(); it.hasNext(); ) {
       Class c = (Class) it.next();
       p.print(prefix + c.getName());
       if (it.hasNext()) {
@@ -378,5 +378,4 @@ public class ServicesView extends DefaultView {
     }
     return sig.toString();
   }
-
 }

@@ -22,5 +22,4 @@ public interface ISubscriptionStats extends org.eclipse.scout.rt.mom.api.ISubscr
    * @return true if the subscription is just before or inside a call to MessageConsumer#receive
    */
   boolean invokingReceive();
-
 }

@@ -26,7 +26,7 @@ public class BeanAnnotationsCleanupStatement extends Statement {
    * Creates a statement to remove previously registered {@link BeanMock} fields.
    *
    * @param previous
-   *          previous {@link Statement} to be executed.
+   *     previous {@link Statement} to be executed.
    */
   public BeanAnnotationsCleanupStatement(final Statement previous) {
     m_previous = Assertions.assertNotNull(previous, "next statement must not be null");

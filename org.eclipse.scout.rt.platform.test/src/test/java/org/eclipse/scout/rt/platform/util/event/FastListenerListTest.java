@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.util.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ import org.junit.Test;
 public class FastListenerListTest {
 
   /**
-   * Test for {@link FastListenerList#add( java.util.EventListener)}
+   * Test for {@link FastListenerList#add(java.util.EventListener)}
    */
   @Test
   public void testAdd() {
@@ -40,7 +39,7 @@ public class FastListenerListTest {
   }
 
   /**
-   * Test for {@link FastListenerList#add( java.util.EventListener)}
+   * Test for {@link FastListenerList#add(java.util.EventListener)}
    */
   @Test
   public void testRemove() {
@@ -54,7 +53,7 @@ public class FastListenerListTest {
   }
 
   /**
-   * Test for {@link FastListenerList#removeAll( java.util.EventListener)}
+   * Test for {@link FastListenerList#removeAll(java.util.EventListener)}
    */
   @Test
   public void testRemoveAll() {

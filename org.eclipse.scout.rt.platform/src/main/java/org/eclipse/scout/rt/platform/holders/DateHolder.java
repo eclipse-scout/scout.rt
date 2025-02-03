@@ -25,5 +25,4 @@ public class DateHolder extends Holder<Date> {
   public DateHolder(Date value) {
     super(Date.class, value);
   }
-
 }

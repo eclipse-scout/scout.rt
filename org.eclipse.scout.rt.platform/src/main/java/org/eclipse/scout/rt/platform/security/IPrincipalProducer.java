@@ -26,7 +26,7 @@ public interface IPrincipalProducer {
 
   /**
    * @param username
-   *          or userId
+   *     or userId
    * @return a principal based on the username
    */
   Principal produce(String username);

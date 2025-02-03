@@ -151,7 +151,7 @@ export class Tile extends Widget implements TileModel {
   }
 
   get filterAccepted(): boolean {
-    return this.getProperty( 'filterAccepted');
+    return this.getProperty('filterAccepted');
   }
 
   /** @internal */

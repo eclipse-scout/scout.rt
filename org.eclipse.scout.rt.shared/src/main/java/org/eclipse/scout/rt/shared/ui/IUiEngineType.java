@@ -23,5 +23,4 @@ public interface IUiEngineType extends Serializable {
    * @return unique id
    */
   String getIdentifier();
-
 }

@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
  * one hour. To change any of these properties override {@link #createCacheBuilder()}.
  *
  * @param <K>
- *          the type of keys maintained the cache
+ *     the type of keys maintained the cache
  * @since 4.3.0 (Mars-M5)
  */
 public abstract class AbstractAccessControlService<K> implements IAccessControlService {

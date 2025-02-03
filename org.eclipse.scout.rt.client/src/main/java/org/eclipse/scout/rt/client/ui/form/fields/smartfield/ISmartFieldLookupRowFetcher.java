@@ -25,5 +25,4 @@ public interface ISmartFieldLookupRowFetcher<LOOKUP_KEY> {
   void update(IQueryParam<LOOKUP_KEY> queryParam, boolean synchronous);
 
   ILookupCallResult<LOOKUP_KEY> getResult();
-
 }

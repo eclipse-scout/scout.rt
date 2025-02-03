@@ -81,13 +81,13 @@ public class JandexClassInventoryTest {
 
   /**
    * <pre>
-    IFixtureInterface1
-      FixtureImpl1
-        FixtureImpl1Sub
-      IFixtureInterface2
-        IFixtureInterface2Sub1
-        IFixtureInterface2Sub2
-          FixtureImpl2
+   * IFixtureInterface1
+   * FixtureImpl1
+   * FixtureImpl1Sub
+   * IFixtureInterface2
+   * IFixtureInterface2Sub1
+   * IFixtureInterface2Sub2
+   * FixtureImpl2
    * </pre>
    */
   @Test
@@ -150,13 +150,13 @@ public class JandexClassInventoryTest {
    * interface that has implementor classes and some subinterfaces
    *
    * <pre>
-    IFixtureInterface1
-      FixtureImpl1
-        FixtureImpl1Sub
-      IFixtureInterface2
-        IFixtureInterface2Sub1
-        IFixtureInterface2Sub2
-          FixtureImpl2
+   * IFixtureInterface1
+   * FixtureImpl1
+   * FixtureImpl1Sub
+   * IFixtureInterface2
+   * IFixtureInterface2Sub1
+   * IFixtureInterface2Sub2
+   * FixtureImpl2
    * </pre>
    */
   public interface IFixtureInterface1 {

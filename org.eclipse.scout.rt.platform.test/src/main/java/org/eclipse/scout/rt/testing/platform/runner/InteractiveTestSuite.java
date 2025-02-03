@@ -242,5 +242,4 @@ public class InteractiveTestSuite extends Runner {
       }
     }
   }
-
 }

@@ -25,7 +25,7 @@ public interface IDoEntityMapperExtension<DO_ENTITY extends IDoEntity, PEER> {
 
   /**
    * @param mappings
-   *          Mappings to extend.
+   *     Mappings to extend.
    */
   void extendMappings(DoEntityMappings<DO_ENTITY, PEER> mappings);
 }

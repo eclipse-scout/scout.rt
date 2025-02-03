@@ -23,5 +23,4 @@ public abstract class AbstractPathConfigProperty extends AbstractConfigProperty<
     }
     return Paths.get(value);
   }
-
 }

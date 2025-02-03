@@ -38,9 +38,9 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return Node of attribute {@code attributeName} or {@code null}, if attribute is not available.
-   *         <p>
-   *         The attribute node is either a {@link DoValue}, {@link DoList}, {@link DoSet} or a {@link DoCollection}
-   *         wrapper object.
+   * <p>
+   * The attribute node is either a {@link DoValue}, {@link DoList}, {@link DoSet} or a {@link DoCollection}
+   * wrapper object.
    */
   DoNode<?> getNode(String attributeName);
 
@@ -97,7 +97,7 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return {@code true} if attribute with name {@code attributeName} exists (attribute value could be null), otherwise
-   *         {@code false}
+   * {@code false}
    */
   boolean has(String attributeName);
 
@@ -146,10 +146,10 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return {@link Optional} of node with attribute {@code attributeName} or empty {@link Optional}, if attribute is
-   *         not available.
-   *         <p>
-   *         The attribute node is either a {@link DoValue}, {@link DoList}, {@link DoSet} or a {@link DoCollection}
-   *         wrapper object.
+   * not available.
+   * <p>
+   * The attribute node is either a {@link DoValue}, {@link DoList}, {@link DoSet} or a {@link DoCollection}
+   * wrapper object.
    */
   default Optional<DoNode<?>> optNode(String attributeName) {
     return Optional.ofNullable(getNode(attributeName));
@@ -169,7 +169,7 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return Value of attribute {@code attributeName} casted to specified {@code type} or {@code null} if attribute is
-   *         not available.
+   * not available.
    * @see IDoEntity#getNode(String) to get the wrapped {@link DoNode} attribute
    */
   default <T> T get(String attributeName, Class<T> type) {
@@ -179,7 +179,7 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return Value of attribute {@code attributeName} mapped to a custom type using specified {@code mapper} or
-   *         {@code null} if attribute is not available.
+   * {@code null} if attribute is not available.
    */
   default <T> T get(String attributeName, Function<Object, T> mapper) {
     assertNotNull(mapper, "provided mapper function is null");
@@ -188,10 +188,10 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return List value of attribute {@code attributeName}. If the attribute is not available, an empty list is added as
-   *         attribute value into this entity and the list is returned.
+   * attribute value into this entity and the list is returned.
    * @see IDoEntity#getNode(String) to get the wrapped attribute node
    * @see IDoEntity#optList(String, Class) to get a list attribute without adding the attribute into this entity if it
-   *      is not available
+   * is not available
    */
   default List<Object> getList(String attributeName) {
     return getList(attributeName, Object.class);
@@ -199,10 +199,10 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return List value of attribute {@code attributeName} casted to specified {@code type}. If the attribute is not
-   *         available, an empty list is added as attribute value into this entity and the list is returned.
+   * available, an empty list is added as attribute value into this entity and the list is returned.
    * @see IDoEntity#getNode(String) to get the wrapped attribute node
    * @see IDoEntity#optList(String, Class) to get a list attribute without adding the attribute into this entity if it
-   *      is not available
+   * is not available
    */
   @SuppressWarnings("unchecked")
   default <T> List<T> getList(String attributeName, Class<T> type) {
@@ -215,10 +215,10 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return Value of list attribute {@code attributeName}, each element mapped to a custom type using specified
-   *         {@code mapper}. If the attribute is not available, an empty list is added as attribute value into this
-   *         entity and the list is returned.
+   * {@code mapper}. If the attribute is not available, an empty list is added as attribute value into this
+   * entity and the list is returned.
    * @see IDoEntity#optList(String, Class) to get a list attribute without adding the attribute into this entity if it
-   *      is not available
+   * is not available
    */
   default <T> List<T> getList(String attributeName, Function<Object, T> mapper) {
     assertNotNull(mapper, "provided mapper function is null");
@@ -227,7 +227,7 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return Optional list value of attribute {@code attributeName}. If the attribute is not available, an empty
-   *         optional is returned.
+   * optional is returned.
    * @see IDoEntity#getNode(String) to get the wrapped attribute node
    */
   default Optional<List<Object>> optList(String attributeName) {
@@ -236,7 +236,7 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return Optional list value of attribute {@code attributeName} casted to specified {@code type}. If the attribute
-   *         is not available, an empty optional is returned.
+   * is not available, an empty optional is returned.
    * @see IDoEntity#getNode(String) to get the wrapped attribute node
    */
   @SuppressWarnings("unchecked")
@@ -247,9 +247,9 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return Value of attribute {@code attributeName} converted to {@link BigDecimal} or {@code null} if attribute is
-   *         not available.
+   * not available.
    * @throws AssertionException
-   *           if attribute value is not instance of {@link BigDecimal}
+   *     if attribute value is not instance of {@link BigDecimal}
    */
   default BigDecimal getDecimal(String attributeName) {
     return TypeCastUtility.castValue(Assertions.assertType(get(attributeName), Number.class), BigDecimal.class);
@@ -257,9 +257,9 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return Value of list attribute {@code attributeName} converted to a list of {@link BigDecimal}. If the attribute
-   *         is not available, an empty list is added as attribute value into this entity and the list is returned.
+   * is not available, an empty list is added as attribute value into this entity and the list is returned.
    * @throws AssertionException
-   *           if a list item value is not instance of {@link Number}
+   *     if a list item value is not instance of {@link Number}
    */
   default List<BigDecimal> getDecimalList(String attributeName) {
     return getList(attributeName, item -> TypeCastUtility.castValue(Assertions.assertType(item, Number.class), BigDecimal.class));
@@ -267,9 +267,9 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return Value of attribute {@code attributeName} casted to {@link Boolean} or {@code null} if attribute is not
-   *         available.
+   * available.
    * @throws AssertionException
-   *           if attribute value is not instance of {@link Boolean}
+   *     if attribute value is not instance of {@link Boolean}
    */
   default Boolean getBoolean(String attributeName) {
     return Assertions.assertType(get(attributeName), Boolean.class);
@@ -277,9 +277,9 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return Value of list attribute {@code attributeName} casted to {@link List<Boolean>}. If the attribute is not
-   *         available, an empty list is added as attribute value into this entity and the list is returned.
+   * available, an empty list is added as attribute value into this entity and the list is returned.
    * @throws AssertionException
-   *           if a list item value is not instance of {@link Boolean}
+   *     if a list item value is not instance of {@link Boolean}
    */
   default List<Boolean> getBooleanList(String attributeName) {
     return getList(attributeName, item -> Assertions.assertType(item, Boolean.class));
@@ -287,9 +287,9 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return Value of attribute {@code attributeName} casted to {@link String} or {@code null} if attribute is not
-   *         available.
+   * available.
    * @throws AssertionException
-   *           if attribute value is not instance of {@link String}
+   *     if attribute value is not instance of {@link String}
    */
   default String getString(String attributeName) {
     return Assertions.assertType(get(attributeName), String.class);
@@ -297,9 +297,9 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return Value of list attribute {@code attributeName} casted to {@link String}. If the attribute is not available,
-   *         an empty list is added as attribute value into this entity and the list is returned.
+   * an empty list is added as attribute value into this entity and the list is returned.
    * @throws AssertionException
-   *           if a list item value is not instance of {@link String}
+   *     if a list item value is not instance of {@link String}
    */
   default List<String> getStringList(String attributeName) {
     return getList(attributeName, item -> Assertions.assertType(item, String.class));
@@ -360,7 +360,7 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return Existing DO entity contribution for this contribution class if available, otherwise creates a new DO entity
-   *         contribution instance, adds it to the contributions and returns it.
+   * contribution instance, adds it to the contributions and returns it.
    */
   default <CONTRIBUTION extends IDoEntityContribution> CONTRIBUTION contribution(Class<CONTRIBUTION> contributionClass) {
     if (!hasContribution(contributionClass)) {
@@ -389,7 +389,7 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * @return <code>true</code> if the DO entity contribution for this contribution class is available,
-   *         <code>false</code> otherwise.
+   * <code>false</code> otherwise.
    */
   default boolean hasContribution(Class<? extends IDoEntityContribution> contributionClass) {
     return getContribution(contributionClass) != null;
@@ -399,7 +399,7 @@ public interface IDoEntity extends IDataObject {
    * Adds a new DO entity contribution. An existing contribution for the same contribution class is overridden.
    *
    * @param contribution
-   *          Contribution to add.
+   *     Contribution to add.
    */
   default void putContribution(IDoEntityContribution contribution) {
     assertNotNull(contribution, "contribution is required");

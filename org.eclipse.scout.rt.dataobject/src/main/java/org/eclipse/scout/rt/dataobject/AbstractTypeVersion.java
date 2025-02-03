@@ -47,7 +47,7 @@ public abstract class AbstractTypeVersion implements ITypeVersion {
 
   /**
    * @param version
-   *          Version
+   *     Version
    */
   protected AbstractTypeVersion(NamespaceVersion version) {
     m_version = assertNotNull(version, "version is required");

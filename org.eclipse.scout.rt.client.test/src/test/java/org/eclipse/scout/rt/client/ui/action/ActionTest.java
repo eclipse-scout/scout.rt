@@ -89,7 +89,6 @@ public class ActionTest {
     assertEquals(3, execActionHolder.getValue().intValue());
     assertEquals(2, execToggleHolder.getValue().intValue());
     assertFalse(b.isSelected());
-
   }
 
   @Test

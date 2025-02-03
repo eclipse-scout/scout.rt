@@ -94,7 +94,6 @@ public class ExtendAbstractStringFieldTest extends AbstractLocalExtensionTestCas
           prenameFieldExecInitFieldCounter.incrementAndGet();
         }
       }
-
     }
 
     public class StartHandler extends AbstractFormHandler {

@@ -110,7 +110,7 @@ public class IdCodec {
    *
    * @return {@code IId} parsed from {@code qualifiedId}
    * @throws PlatformException
-   *           if the given string does not match the expected format or the referenced class is not found.
+   *     if the given string does not match the expected format or the referenced class is not found.
    */
   public IId fromQualified(String qualifiedId) {
     return fromQualifiedInternal(qualifiedId, false);
@@ -120,7 +120,7 @@ public class IdCodec {
    * Parses a string in the format {@code [type-name]:[raw-id;raw-id;...]}.
    *
    * @return {@code IId} parsed from {@code qualifiedId} or {@code null} if the given string does not match the expected
-   *         format or the referenced class is not found.
+   * format or the referenced class is not found.
    */
   public IId fromQualifiedLenient(String qualifiedId) {
     return fromQualifiedInternal(qualifiedId, true);
@@ -131,7 +131,7 @@ public class IdCodec {
    *
    * @return {@code IId} parsed from {@code qualifiedId} or {@code null} if the given class or string is {@code null}
    * @throws PlatformException
-   *           if the given string does not match the expected format
+   *     if the given string does not match the expected format
    */
   public <ID extends IId> ID fromUnqualified(Class<ID> idClass, String unqualifiedId) {
     if (idClass == null) {
@@ -185,9 +185,9 @@ public class IdCodec {
    * Parses a string in the format {@code [type-name]:[raw-id;raw-id;...]}.
    *
    * @param lenient
-   *          If the structure of the given {@code qualifiedId} is invalid and {@code lenient} flag is set to
-   *          {@code true}, value {@code null} is returned. If {@code lenient} flag is set to {@code false}, an
-   *          exception is thrown.
+   *     If the structure of the given {@code qualifiedId} is invalid and {@code lenient} flag is set to
+   *     {@code true}, value {@code null} is returned. If {@code lenient} flag is set to {@code false}, an
+   *     exception is thrown.
    * @return {@code IId} parsed from {@code qualifiedId}
    */
   protected IId fromQualifiedInternal(String qualifiedId, boolean lenient) {
@@ -222,7 +222,7 @@ public class IdCodec {
    *
    * @return {@code IId} parsed from {@code qualifiedId} or {@code null} if the given class or string is {@code null}
    * @throws PlatformException
-   *           if the given string does not match the expected format
+   *     if the given string does not match the expected format
    */
   protected <ID extends IId> ID fromUnqualifiedUnchecked(Class<ID> idClass, String unqualifiedId) {
     String[] rawComponents = unqualifiedId.split(";", -1 /* force empty strings for empty components */);

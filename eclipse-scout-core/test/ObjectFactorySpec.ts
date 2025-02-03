@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Action, Button, KeyStroke, NumberField, ObjectFactory, scout, StringField} from '../src/index';
+import {Action, Button, NumberField, ObjectFactory, scout, StringField} from '../src/index';
 import {LocaleSpecHelper} from '../src/testing/index';
 import {InitModelOf} from '../src/scout';
 

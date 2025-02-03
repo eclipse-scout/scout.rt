@@ -45,8 +45,8 @@ public interface IFileChooser {
    * </ul>
    *
    * @param displayParent
-   *          like {@link IDesktop}, {@link IOutline}, {@link IForm}, or <code>null</code> to derive the
-   *          {@link IDisplayParent} from the current calling context.
+   *     like {@link IDesktop}, {@link IOutline}, {@link IForm}, or <code>null</code> to derive the
+   *     {@link IDisplayParent} from the current calling context.
    */
   void setDisplayParent(IDisplayParent displayParent);
 
@@ -62,14 +62,14 @@ public interface IFileChooser {
 
   /**
    * @return a list containing any of media types, mime types and file extensions.
-   *         <p>
-   *         media and mime types are specified using at least a subtype (such containing a '/')
-   *         <p>
-   *         File extensions are specified without leading '.'
-   *         <p>
-   *         Example 1: [txt, csv, text/xml]
-   *         <p>
-   *         Example 2: [text/plain, text/csv, xml]
+   * <p>
+   * media and mime types are specified using at least a subtype (such containing a '/')
+   * <p>
+   * File extensions are specified without leading '.'
+   * <p>
+   * Example 1: [txt, csv, text/xml]
+   * <p>
+   * Example 2: [text/plain, text/csv, xml]
    */
   List<String> getFileExtensions();
 
@@ -94,7 +94,7 @@ public interface IFileChooser {
 
   /**
    * @param maximumUploadSize
-   *          maximum size for upload in bytes.
+   *     maximum size for upload in bytes.
    */
   void setMaximumUploadSize(long maximumUploadSize);
 

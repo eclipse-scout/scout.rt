@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.client.ui;
 
-
 /**
  * TODO [24.1] pbz remove this class
  *

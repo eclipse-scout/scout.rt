@@ -71,7 +71,7 @@ public class IdInventory {
 
   /**
    * @return the type name of the id class as defined by the {@link IdTypeName} annotation or <code>null</code> if the
-   *         annotation is not present.
+   * annotation is not present.
    */
   public String getTypeName(Class<? extends IId> idClass) {
     return m_classToNameMap.get(idClass);
@@ -81,7 +81,7 @@ public class IdInventory {
    * Convenience method for {@code IdInventory.getTypeName(id.getClass())}.
    *
    * @return the type name of the {@link IId} as defined by the {@link IdTypeName} annotation or <code>null</code> if
-   *         the annotation is not present.
+   * the annotation is not present.
    */
   public String getTypeName(IId id) {
     if (id == null) {

@@ -90,9 +90,8 @@ public class LookupRowHelper {
     }
     else {
       ModelJobs.schedule(runnable::run, ModelJobs.newInput(ClientRunContexts.copyCurrent())
-          .withExceptionHandling(null, false))
+              .withExceptionHandling(null, false))
           .awaitDone();
     }
   }
-
 }

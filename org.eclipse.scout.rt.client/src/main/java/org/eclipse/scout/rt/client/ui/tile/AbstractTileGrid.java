@@ -158,7 +158,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
    * @param menus
-   *          live and mutable collection of configured menus
+   *     live and mutable collection of configured menus
    */
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
@@ -566,7 +566,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
    * Subclasses can override this method. The default does nothing.
    *
    * @param tiles
-   *          an unmodifiable list of the selected tiles, may be empty but not null.
+   *     an unmodifiable list of the selected tiles, may be empty but not null.
    */
   @ConfigOperation
   @Order(100)
@@ -579,7 +579,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
    * Subclasses can override this method. The default does nothing.
    *
    * @param tile
-   *          that was clicked
+   *     that was clicked
    */
   @ConfigOperation
   @Order(110)
@@ -592,7 +592,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
    * Subclasses can override this method. The default does nothing.
    *
    * @param tile
-   *          to perform the action for
+   *     to perform the action for
    */
   @ConfigOperation
   @Order(120)
@@ -871,7 +871,6 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     public void handleTileActionFromUI(T tile) {
       doTileAction(tile);
     }
-
   }
 
   @Override
@@ -928,7 +927,6 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     public void execTileAction(TileActionChain<T> chain, T tile) {
       getOwner().execTileAction(tile);
     }
-
   }
 
   protected final void interceptTilesSelected(List<T> tiles) {
@@ -985,5 +983,4 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
       }
     }
   }
-
 }

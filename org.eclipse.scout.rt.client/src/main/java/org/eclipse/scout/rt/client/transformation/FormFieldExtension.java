@@ -32,5 +32,4 @@ public class FormFieldExtension extends AbstractFormFieldExtension<AbstractFormF
     super.execDisposeField(chain);
     BEANS.get(IDeviceTransformationService.class).getDeviceTransformer().notifyFieldDisposed(getOwner());
   }
-
 }

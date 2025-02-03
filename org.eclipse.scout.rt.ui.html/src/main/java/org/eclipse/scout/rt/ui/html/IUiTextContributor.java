@@ -24,7 +24,7 @@ public interface IUiTextContributor {
 
   /**
    * @param textKeys
-   *          live set to add the contributed text keys to (never <code>null</code>)
+   *     live set to add the contributed text keys to (never <code>null</code>)
    */
   void contributeUiTextKeys(Set<String> textKeys);
 }

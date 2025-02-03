@@ -490,5 +490,4 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     TreeFieldSaveInsertedNodeChain chain = new TreeFieldSaveInsertedNodeChain(extensions);
     chain.execSaveInsertedNode(row);
   }
-
 }

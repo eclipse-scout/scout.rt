@@ -187,5 +187,4 @@ public class ConfigurableProxySelector extends ProxySelector {
   public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
     LOG.error("Connection to {} using {} as proxy failed.", uri, sa, ioe);
   }
-
 }

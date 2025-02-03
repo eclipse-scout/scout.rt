@@ -27,8 +27,8 @@ import io.opentelemetry.instrumentation.runtimemetrics.java8.Threads;
  * {@link IMetricProvider} which serves the default Java runtime environment metrics (jvm)
  *
  * @see <a href=
- *      "https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/runtime-telemetry/runtime-telemetry-java8/library">JVM
- *      Metrics</a>
+ * "https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/runtime-telemetry/runtime-telemetry-java8/library">JVM
+ * Metrics</a>
  */
 public class JvmMetricProvider implements IMetricProvider {
 

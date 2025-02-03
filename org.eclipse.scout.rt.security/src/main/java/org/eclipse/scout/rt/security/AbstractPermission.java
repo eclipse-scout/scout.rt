@@ -25,7 +25,7 @@ public abstract class AbstractPermission extends Permission implements IPermissi
 
   /**
    * @param name
-   *          returned by {@link #getName()}
+   *     returned by {@link #getName()}
    */
   public AbstractPermission(String name) {
     super(name);

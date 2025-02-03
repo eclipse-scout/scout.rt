@@ -9,9 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.util.date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -67,5 +65,4 @@ public class DateProviderTest {
     assertTrue("Provided timezone should have same rules as default timezone", currentTimeZone.hasSameRules(tz));
     assertEquals("Provided timezone should have same ID as default timezone", currentTimeZone.getID(), tz.getID());
   }
-
 }

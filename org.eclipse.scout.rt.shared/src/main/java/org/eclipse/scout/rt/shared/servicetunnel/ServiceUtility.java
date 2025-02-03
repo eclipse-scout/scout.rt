@@ -38,8 +38,8 @@ public class ServiceUtility {
    *
    * @return the result of the service invocation.
    * @throws RuntimeException
-   *           if the service invocation failed. Hence, runtime exceptions are propagated, any other exception is
-   *           translated into {@link PlatformException}.
+   *     if the service invocation failed. Hence, runtime exceptions are propagated, any other exception is
+   *     translated into {@link PlatformException}.
    */
   @SuppressWarnings("squid:S1181") // Throwable and Error should not be caught
   public Object invoke(final Object service, final Method operation, final Object[] args) {

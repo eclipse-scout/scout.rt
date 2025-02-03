@@ -59,11 +59,11 @@ public interface IExtensionRegistry extends IService {
    * </ol>
    *
    * @param extensionOrContributionClass
-   *          The extension or contribution class that should be registered. Must not be null and must either be a
-   *          primary class or a static class. See above for other restrictions on the given
-   *          extensionOrContributionClass parameter.
+   *     The extension or contribution class that should be registered. Must not be null and must either be a
+   *     primary class or a static class. See above for other restrictions on the given
+   *     extensionOrContributionClass parameter.
    * @throws IllegalExtensionException
-   *           if the extensionOrContributionClass does not fulfill the restrictions described above.
+   *     if the extensionOrContributionClass does not fulfill the restrictions described above.
    */
   void register(Class<?> extensionOrContributionClass);
 
@@ -100,13 +100,13 @@ public interface IExtensionRegistry extends IService {
    * </ol>
    *
    * @param extensionOrContributionClass
-   *          The extension or contribution class that should be applied to the given owner. Must not be null and must
-   *          either be a primary class or a static class. See above for other restrictions on the given
-   *          extensionOrContributionClass parameter.
+   *     The extension or contribution class that should be applied to the given owner. Must not be null and must
+   *     either be a primary class or a static class. See above for other restrictions on the given
+   *     extensionOrContributionClass parameter.
    * @param ownerClass
-   *          The owner class that should be modified. May be null. See above for restrictions on the owner parameter.
+   *     The owner class that should be modified. May be null. See above for restrictions on the owner parameter.
    * @throws IllegalExtensionException
-   *           if one of the parameters does not fulfill the restrictions described above.
+   *     if one of the parameters does not fulfill the restrictions described above.
    */
   void register(Class<?> extensionOrContributionClass, Class<?> ownerClass);
 
@@ -146,16 +146,16 @@ public interface IExtensionRegistry extends IService {
    * </ol>
    *
    * @param extensionOrContributionClass
-   *          The extension or contribution class that should be applied to the given owner. Must not be null and must
-   *          either be a primary class or a static class. See above for other restrictions on the given
-   *          extensionOrContributionClass parameter.
+   *     The extension or contribution class that should be applied to the given owner. Must not be null and must
+   *     either be a primary class or a static class. See above for other restrictions on the given
+   *     extensionOrContributionClass parameter.
    * @param ownerClass
-   *          The owner class that should be modified. May be null. See above for restrictions on the owner parameter.
+   *     The owner class that should be modified. May be null. See above for restrictions on the owner parameter.
    * @param order
-   *          The order to be used for the given contribution. May be null. See above for restrictions on the order
-   *          parameter.
+   *     The order to be used for the given contribution. May be null. See above for restrictions on the order
+   *     parameter.
    * @throws IllegalExtensionException
-   *           if one of the parameters does not fulfill the restrictions described above.
+   *     if one of the parameters does not fulfill the restrictions described above.
    */
   void register(Class<?> extensionOrContributionClass, Class<?> ownerClass, Double order);
 
@@ -192,14 +192,14 @@ public interface IExtensionRegistry extends IService {
    * </ol>
    *
    * @param extensionOrContributionClass
-   *          The extension or contribution class that should be applied to the given owner. Must not be null and must
-   *          either be a primary class or a static class. See above for other restrictions on the given
-   *          extensionOrContributionClass parameter.
+   *     The extension or contribution class that should be applied to the given owner. Must not be null and must
+   *     either be a primary class or a static class. See above for other restrictions on the given
+   *     extensionOrContributionClass parameter.
    * @param ownerClassIdentifier
-   *          The {@link ClassIdentifier} describing the owner that should be modified. May be null. See above for
-   *          restrictions on the owner parameter.
+   *     The {@link ClassIdentifier} describing the owner that should be modified. May be null. See above for
+   *     restrictions on the owner parameter.
    * @throws IllegalExtensionException
-   *           if one of the parameters does not fulfill the restrictions described above.
+   *     if one of the parameters does not fulfill the restrictions described above.
    * @see ClassIdentifier
    */
   void register(Class<?> extensionOrContributionClass, ClassIdentifier ownerClassIdentifier);
@@ -240,17 +240,17 @@ public interface IExtensionRegistry extends IService {
    * </ol>
    *
    * @param extensionOrContributionClass
-   *          The extension or contribution class that should be applied to the given owner. Must not be null and must
-   *          either be a primary class or a static class. See above for other restrictions on the given
-   *          extensionOrContributionClass parameter.
+   *     The extension or contribution class that should be applied to the given owner. Must not be null and must
+   *     either be a primary class or a static class. See above for other restrictions on the given
+   *     extensionOrContributionClass parameter.
    * @param ownerClassIdentifier
-   *          The {@link ClassIdentifier} describing the owner that should be modified. May be null. See above for
-   *          restrictions on the owner parameter.
+   *     The {@link ClassIdentifier} describing the owner that should be modified. May be null. See above for
+   *     restrictions on the owner parameter.
    * @param order
-   *          The order to be used for the given contribution. May be null. See above for restrictions on the order
-   *          parameter.
+   *     The order to be used for the given contribution. May be null. See above for restrictions on the order
+   *     parameter.
    * @throws IllegalExtensionException
-   *           if one of the parameters does not fulfill the restrictions described above.
+   *     if one of the parameters does not fulfill the restrictions described above.
    * @see ClassIdentifier
    */
   void register(Class<?> extensionOrContributionClass, ClassIdentifier ownerClassIdentifier, Double order);
@@ -259,11 +259,11 @@ public interface IExtensionRegistry extends IService {
    * Registers a move operation for the given {@link IOrdered} model class without changing its current container.
    *
    * @param modelClass
-   *          The model class that should be moved. Must not be null.
+   *     The model class that should be moved. Must not be null.
    * @param newOrder
-   *          The new order.
+   *     The new order.
    * @throws IllegalExtensionException
-   *           If the modelClass is null.
+   *     If the modelClass is null.
    */
   void registerMove(Class<? extends IOrdered> modelClass, double newOrder);
 
@@ -276,11 +276,11 @@ public interface IExtensionRegistry extends IService {
    * {@link IMoveModelObjectToRootMarker} as target class.
    *
    * @param modelClass
-   *          The model class that should be moved. Must not be null.
+   *     The model class that should be moved. Must not be null.
    * @param newOrder
-   *          The new order or null if the order should not be changed.
+   *     The new order or null if the order should not be changed.
    * @throws IllegalExtensionException
-   *           If the modelClass is null or the given model class cannot be moved into another container.
+   *     If the modelClass is null or the given model class cannot be moved into another container.
    */
   void registerMoveToRoot(Class<? extends IOrdered> modelClass, Double newOrder);
 
@@ -290,20 +290,20 @@ public interface IExtensionRegistry extends IService {
    * At least a new order or a new container must be specified.
    *
    * @param modelClass
-   *          The model class that should be moved. Must not be null.
+   *     The model class that should be moved. Must not be null.
    * @param newOrder
-   *          The new order. If null, the existing order is not changed.
+   *     The new order. If null, the existing order is not changed.
    * @param newContainerClass
-   *          The new container class. The container is not changed if it is null. A matching model object is moved to
-   *          top level if the new container class is {@link IMoveModelObjectToRootMarker}.
+   *     The new container class. The container is not changed if it is null. A matching model object is moved to
+   *     top level if the new container class is {@link IMoveModelObjectToRootMarker}.
    * @throws IllegalExtensionException
-   *           In the following cases:
-   *           <ul>
-   *           <li>If the modelClass is null</li>
-   *           <li>If neither a new order nor a new container has been specified</li>
-   *           <li>If the new container is the model itself</li>
-   *           <li>If the given container is not supported for the given model</li>
-   *           </ul>
+   *     In the following cases:
+   *     <ul>
+   *     <li>If the modelClass is null</li>
+   *     <li>If neither a new order nor a new container has been specified</li>
+   *     <li>If the new container is the model itself</li>
+   *     <li>If the given container is not supported for the given model</li>
+   *     </ul>
    */
   void registerMove(Class<? extends IOrdered> modelClass, Double newOrder, Class<? extends IOrdered> newContainerClass);
 
@@ -313,12 +313,12 @@ public interface IExtensionRegistry extends IService {
    * The given model will be moved to the given new order without changing its current container.
    *
    * @param modelClassIdentifier
-   *          The {@link ClassIdentifier} for the model for which the order should be changed.
+   *     The {@link ClassIdentifier} for the model for which the order should be changed.
    * @param newOrder
-   *          The new order.
+   *     The new order.
    * @throws IllegalExtensionException
-   *           If the modelClass is null or the last segment of the {@link ClassIdentifier} is no {@link IOrdered}
-   *           class.
+   *     If the modelClass is null or the last segment of the {@link ClassIdentifier} is no {@link IOrdered}
+   *     class.
    * @see ClassIdentifier
    */
   void registerMove(ClassIdentifier modelClassIdentifier, double newOrder);
@@ -330,21 +330,21 @@ public interface IExtensionRegistry extends IService {
    * At least a new order or a new container must be specified.
    *
    * @param modelClassIdentifier
-   *          The {@link ClassIdentifier} for the model for which the order should be changed.
+   *     The {@link ClassIdentifier} for the model for which the order should be changed.
    * @param newOrder
-   *          The new order. If null, the existing order is not changed.
+   *     The new order. If null, the existing order is not changed.
    * @param newContainerClass
-   *          The new container class. The container is not changed if it is null. A matching model object is moved to
-   *          top level if the new container class is {@link IMoveModelObjectToRootMarker}.
+   *     The new container class. The container is not changed if it is null. A matching model object is moved to
+   *     top level if the new container class is {@link IMoveModelObjectToRootMarker}.
    * @throws IllegalExtensionException
-   *           In the following cases:
-   *           <ul>
-   *           <li>If the modelClassIdentifier is null</li>
-   *           <li>If neither a new order nor a new container has been specified</li>
-   *           <li>If the new container is the model itself</li>
-   *           <li>If the given container is not supported for the given model</li>
-   *           <li>If the last segment of the given modelClassIdentifier is no {@link IOrdered} class.</li>
-   *           </ul>
+   *     In the following cases:
+   *     <ul>
+   *     <li>If the modelClassIdentifier is null</li>
+   *     <li>If neither a new order nor a new container has been specified</li>
+   *     <li>If the new container is the model itself</li>
+   *     <li>If the given container is not supported for the given model</li>
+   *     <li>If the last segment of the given modelClassIdentifier is no {@link IOrdered} class.</li>
+   *     </ul>
    * @see ClassIdentifier
    */
   void registerMove(ClassIdentifier modelClassIdentifier, Double newOrder, Class<? extends IOrdered> newContainerClass);
@@ -356,23 +356,23 @@ public interface IExtensionRegistry extends IService {
    * At least a new order or a new container must be specified.
    *
    * @param modelClassIdentifer
-   *          The {@link ClassIdentifier} for the model for which the order should be changed.
+   *     The {@link ClassIdentifier} for the model for which the order should be changed.
    * @param newOrder
-   *          The new order. If null, the existing order is not changed.
+   *     The new order. If null, the existing order is not changed.
    * @param newContainerClassIdentifier
-   *          The {@link ClassIdentifier} describing the container in which the given modelClassIdentifer should be
-   *          moved. The container is not changed if it is null. A matching model object is moved to top level if the
-   *          newContainerClassIdentifier only contains {@link IMoveModelObjectToRootMarker}.
+   *     The {@link ClassIdentifier} describing the container in which the given modelClassIdentifer should be
+   *     moved. The container is not changed if it is null. A matching model object is moved to top level if the
+   *     newContainerClassIdentifier only contains {@link IMoveModelObjectToRootMarker}.
    * @throws IllegalExtensionException
-   *           In the following cases:
-   *           <ul>
-   *           <li>If the modelClassIdentifier is null</li>
-   *           <li>If neither a new order nor a new container has been specified</li>
-   *           <li>If the new container is the model itself</li>
-   *           <li>If the given container is not supported for the given model</li>
-   *           <li>If the last segment of the given modelClassIdentifier or newContainerClassIdentifier is no
-   *           {@link IOrdered} class.</li>
-   *           </ul>
+   *     In the following cases:
+   *     <ul>
+   *     <li>If the modelClassIdentifier is null</li>
+   *     <li>If neither a new order nor a new container has been specified</li>
+   *     <li>If the new container is the model itself</li>
+   *     <li>If the given container is not supported for the given model</li>
+   *     <li>If the last segment of the given modelClassIdentifier or newContainerClassIdentifier is no
+   *     {@link IOrdered} class.</li>
+   *     </ul>
    * @see ClassIdentifier
    */
   void registerMove(ClassIdentifier modelClassIdentifer, Double newOrder, ClassIdentifier newContainerClassIdentifier);
@@ -386,12 +386,12 @@ public interface IExtensionRegistry extends IService {
    * {@link IMoveModelObjectToRootMarker} as target class.
    *
    * @param modelClassIdentifer
-   *          The {@link ClassIdentifier} describing the object to be moved.
+   *     The {@link ClassIdentifier} describing the object to be moved.
    * @param newOrder
-   *          The new order or null if the order should not be changed.
+   *     The new order or null if the order should not be changed.
    * @throws IllegalExtensionException
-   *           If the modelClassIdentifer is null or the given model class cannot be moved into another container or the
-   *           last segment of the given modelClassIdentifer is no {@link IOrdered} class.
+   *     If the modelClassIdentifer is null or the given model class cannot be moved into another container or the
+   *     last segment of the given modelClassIdentifer is no {@link IOrdered} class.
    */
   void registerMoveToRoot(ClassIdentifier modelClassIdentifer, Double newOrder);
 
@@ -400,12 +400,12 @@ public interface IExtensionRegistry extends IService {
    * If it is an {@link IExtension} also the nested contributions are deregistered.
    *
    * @param extensionOrContributionClass
-   *          The extension or contribution that should be removed from this {@link IExtensionRegistry}. May not be
-   *          null.
+   *     The extension or contribution that should be removed from this {@link IExtensionRegistry}. May not be
+   *     null.
    * @return <code>true</code> if the {@link IExtensionRegistry} has been changed. <code>false</code> if nothing has
-   *         been deregistered.
+   * been deregistered.
    * @throws IllegalExtensionException
-   *           If the extensionOrContributionClass is null.
+   *     If the extensionOrContributionClass is null.
    * @see #register(Class)
    */
   boolean deregister(Class<?> extensionOrContributionClass);
@@ -414,13 +414,13 @@ public interface IExtensionRegistry extends IService {
    * Deregisters the given move registration.
    *
    * @param modelClass
-   *          The model for which the move should be deregistered. Must not be null.
+   *     The model for which the move should be deregistered. Must not be null.
    * @param newOrder
-   *          Describes the new order of the move that should be deregistered.
+   *     Describes the new order of the move that should be deregistered.
    * @return <code>true</code> if the {@link IExtensionRegistry} has been changed. <code>false</code> if nothing has
-   *         been deregistered.
+   * been deregistered.
    * @throws IllegalExtensionException
-   *           if the modelClass is null.
+   *     if the modelClass is null.
    * @see #registerMove(Class, double)
    */
   boolean deregisterMove(Class<? extends IOrdered> modelClass, double newOrder);
@@ -429,17 +429,17 @@ public interface IExtensionRegistry extends IService {
    * Deregisters the given move registration.
    *
    * @param modelClass
-   *          The model for which the move should be deregistered. Must not be null.
+   *     The model for which the move should be deregistered. Must not be null.
    * @param newOrder
-   *          Describes the new order of the move that should be deregistered. May be null in case the move only changes
-   *          the container.
+   *     Describes the new order of the move that should be deregistered. May be null in case the move only changes
+   *     the container.
    * @param newContainerClass
-   *          The new container of the move that should be deregistered. May be null in case the move only changes the
-   *          order.
+   *     The new container of the move that should be deregistered. May be null in case the move only changes the
+   *     order.
    * @return <code>true</code> if the {@link IExtensionRegistry} has been changed. <code>false</code> if nothing has
-   *         been deregistered.
+   * been deregistered.
    * @throws IllegalExtensionException
-   *           if the modelClass is null or newOrder and newContainerClass are null.
+   *     if the modelClass is null or newOrder and newContainerClass are null.
    * @see #registerMove(Class, Double, Class)
    */
   boolean deregisterMove(Class<? extends IOrdered> modelClass, Double newOrder, Class<? extends IOrdered> newContainerClass);
@@ -448,17 +448,17 @@ public interface IExtensionRegistry extends IService {
    * Deregisters the given move registration.
    *
    * @param modelClassIdentifier
-   *          The {@link ClassIdentifier} of the model for which the move should be deregistered.
+   *     The {@link ClassIdentifier} of the model for which the move should be deregistered.
    * @param newOrder
-   *          Describes the new order of the move that should be deregistered. May be null in case the move only changes
-   *          the container.
+   *     Describes the new order of the move that should be deregistered. May be null in case the move only changes
+   *     the container.
    * @param newContainerClass
-   *          The new container of the move that should be deregistered. May be null in case the move only changes the
-   *          order.
+   *     The new container of the move that should be deregistered. May be null in case the move only changes the
+   *     order.
    * @return <code>true</code> if the {@link IExtensionRegistry} has been changed. <code>false</code> if nothing has
-   *         been deregistered.
+   * been deregistered.
    * @throws IllegalExtensionException
-   *           if the modelClass is null or newOrder and newContainerClass are null.
+   *     if the modelClass is null or newOrder and newContainerClass are null.
    */
   boolean deregisterMove(ClassIdentifier modelClassIdentifier, Double newOrder, Class<? extends IOrdered> newContainerClass);
 
@@ -466,17 +466,17 @@ public interface IExtensionRegistry extends IService {
    * Deregisters the given move registration.
    *
    * @param modelClassIdentifier
-   *          The {@link ClassIdentifier} of the model for which the move should be deregistered.
+   *     The {@link ClassIdentifier} of the model for which the move should be deregistered.
    * @param newOrder
-   *          Describes the new order of the move that should be deregistered. May be null in case the move only changes
-   *          the container.
+   *     Describes the new order of the move that should be deregistered. May be null in case the move only changes
+   *     the container.
    * @param newContainerClassIdentifier
-   *          The new container of the move that should be deregistered. May be null in case the move only changes the
-   *          order.
+   *     The new container of the move that should be deregistered. May be null in case the move only changes the
+   *     order.
    * @return <code>true</code> if the {@link IExtensionRegistry} has been changed. <code>false</code> if nothing has
-   *         been deregistered.
+   * been deregistered.
    * @throws IllegalExtensionException
-   *           if the modelClass is null or newOrder and newContainerClass are null.
+   *     if the modelClass is null or newOrder and newContainerClass are null.
    */
   boolean deregisterMove(ClassIdentifier modelClassIdentifier, Double newOrder, ClassIdentifier newContainerClassIdentifier);
 }

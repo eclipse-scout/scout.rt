@@ -66,7 +66,7 @@ public class ExpiringDuplicateMessageFilter extends TurboFilter {
    * The allowed number of repetitions before a message is filtered.
    *
    * @param allowedRepetitions
-   *          number of allowed repetitions
+   *     number of allowed repetitions
    */
   public void setAllowedRepetitions(int allowedRepetitions) {
     this.m_allowedRepetitions = allowedRepetitions;
@@ -88,7 +88,7 @@ public class ExpiringDuplicateMessageFilter extends TurboFilter {
    * Sets the time to live of the underlying {@link ConcurrentExpiringMap}
    *
    * @param ttl
-   *          Time to live in minutes
+   *     Time to live in minutes
    */
   public void setTtl(long ttl) {
     m_ttl = ttl;

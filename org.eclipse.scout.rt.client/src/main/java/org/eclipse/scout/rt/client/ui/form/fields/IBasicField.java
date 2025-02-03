@@ -36,5 +36,4 @@ public interface IBasicField<T> extends IValueField<T> {
   void setUpdateDisplayTextOnModifyDelay(int delay);
 
   int getUpdateDisplayTextOnModifyDelay();
-
 }

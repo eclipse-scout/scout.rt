@@ -311,7 +311,6 @@ public class PlannerTest {
     public static void reset() {
       calledInterceptors.clear();
     }
-
   }
 
   class CapturingPlannerAdapter extends PlannerAdapter {
@@ -329,5 +328,4 @@ public class PlannerTest {
 
   public static class P_Planner extends AbstractPlanner<Integer, Integer> {
   }
-
 }

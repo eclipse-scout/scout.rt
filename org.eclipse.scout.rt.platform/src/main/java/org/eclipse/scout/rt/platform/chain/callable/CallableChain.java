@@ -96,9 +96,9 @@ public class CallableChain<RESULT> {
   /**
    * Adds the given decorator at the index position to the chain to wrap the execution of a {@link Callable}.
    *
-   * @throws IndexOutOfBoundsException
-   *           if the index is out of range (<tt>index &lt; 0 || index &gt; size()</tt>)
    * @return <code>this</code> in order to support method chaining.
+   * @throws IndexOutOfBoundsException
+   *     if the index is out of range (<tt>index &lt; 0 || index &gt; size()</tt>)
    */
   public CallableChain<RESULT> add(int index, ICallableDecorator decorator) {
     m_chainables.add(index, decorator);
@@ -130,9 +130,9 @@ public class CallableChain<RESULT> {
   /**
    * Adds the given interceptor at the index position to the chain to wrap the execution of a {@link Callable}.
    *
-   * @throws IndexOutOfBoundsException
-   *           if the index is out of range (<tt>index &lt; 0 || index &gt; size()</tt>)
    * @return <code>this</code> in order to support method chaining.
+   * @throws IndexOutOfBoundsException
+   *     if the index is out of range (<tt>index &lt; 0 || index &gt; size()</tt>)
    */
   public CallableChain<RESULT> add(int index, ICallableInterceptor<RESULT> interceptor) {
     m_chainables.add(index, interceptor);
@@ -160,10 +160,10 @@ public class CallableChain<RESULT> {
    * Invokes {@link Callable#call()} and lets all added processors to participate in the invocation.
    *
    * @param command
-   *          the command to be executed.
+   *     the command to be executed.
    * @return the result of the command.
    * @throws Exception
-   *           thrown during execution of the command.
+   *     thrown during execution of the command.
    */
   public RESULT call(final Callable<RESULT> command) throws Exception {
     return new Chain<>(m_chainables, command).continueChain();
@@ -181,7 +181,7 @@ public class CallableChain<RESULT> {
    * calling handler is the last handler in the chain, to finally invoke the {@link Callable}.
    *
    * @param <RESULT>
-   *          the result type of the {@link Callable} to be invoked.
+   *     the result type of the {@link Callable} to be invoked.
    */
   public static class Chain<RESULT> {
 
@@ -199,7 +199,7 @@ public class CallableChain<RESULT> {
      *
      * @return the {@link Callable}'s return value to pass along to the invoker.
      * @throws Exception
-     *           the {@link Callable}'s exception to pass along to the invoker.
+     *     the {@link Callable}'s exception to pass along to the invoker.
      */
     public RESULT continueChain() throws Exception {
       // List of decorators invoked in this round.
@@ -216,8 +216,7 @@ public class CallableChain<RESULT> {
             }
           }
           else if (next instanceof ICallableInterceptor && ((ICallableInterceptor) next).isEnabled()) {
-            @SuppressWarnings("unchecked")
-            final ICallableInterceptor<RESULT> interceptor = ((ICallableInterceptor<RESULT>) next);
+            @SuppressWarnings("unchecked") final ICallableInterceptor<RESULT> interceptor = ((ICallableInterceptor<RESULT>) next);
             return interceptor.intercept(this);
           }
         }

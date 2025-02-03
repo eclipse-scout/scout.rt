@@ -42,7 +42,6 @@ public class HtmlContentBuilderTest {
       rows.add(createRowString(prefix, i));
     }
     return "<table>" + CollectionUtility.format(rows, "") + "</table>";
-
   }
 
   private String createRowString(String prefix, int i) {
@@ -60,5 +59,4 @@ public class HtmlContentBuilderTest {
   private IHtmlTableRow createRow(String prefix, int i) {
     return HTML.tr(HTML.td("A" + prefix + i), HTML.td("B" + prefix + i));
   }
-
 }

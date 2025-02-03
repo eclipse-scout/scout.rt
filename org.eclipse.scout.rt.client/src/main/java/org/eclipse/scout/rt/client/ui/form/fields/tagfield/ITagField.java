@@ -30,7 +30,7 @@ public interface ITagField extends IValueField<Set<String>> {
 
   /**
    * @param maxLength
-   *          of the text in this field. Negative values are automatically converted to 0.
+   *     of the text in this field. Negative values are automatically converted to 0.
    */
   void setMaxLength(int maxLength);
 

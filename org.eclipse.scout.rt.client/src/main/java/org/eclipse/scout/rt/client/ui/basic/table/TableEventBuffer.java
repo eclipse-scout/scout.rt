@@ -92,13 +92,13 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     final Set<Integer> rowRelatedEventTypes = getRowRelatedEvents();
     final List<DeletedRowsRemover> deletedRowsRemoverList = new LinkedList<>();
 
-    for (ListIterator<TableEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
+    for (ListIterator<TableEvent> it = events.listIterator(events.size()); it.hasPrevious(); ) {
       final TableEvent event = it.previous();
       final int type = event.getType();
 
       // process deleted rows remover first so that unused rows are removed from delete events
       if (!deletedRowsRemoverList.isEmpty()) {
-        for (Iterator<DeletedRowsRemover> removerIt = deletedRowsRemoverList.iterator(); removerIt.hasNext();) {
+        for (Iterator<DeletedRowsRemover> removerIt = deletedRowsRemoverList.iterator(); removerIt.hasNext(); ) {
           final DeletedRowsRemover remover = removerIt.next();
           remover.removeDeletedRows(event);
           if (!isRowOrderUnchanged(type)) {
@@ -163,7 +163,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     }
 
     final List<CommonRowsRemover> commonRowsRemovers = new LinkedList<>();
-    for (ListIterator<TableEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
+    for (ListIterator<TableEvent> it = events.listIterator(events.size()); it.hasPrevious(); ) {
       final TableEvent event = it.previous();
       final int type = event.getType();
 
@@ -203,14 +203,14 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     final Map<Integer, TableEvent> initialEventByType = new HashMap<>();
     final Map<Integer, TableEventMerger> eventMergerByType = new HashMap<>();
 
-    for (ListIterator<TableEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
+    for (ListIterator<TableEvent> it = events.listIterator(events.size()); it.hasPrevious(); ) {
       final TableEvent event = it.previous();
       final int type = event.getType();
       final boolean rowRelatedEvent = isRowRelatedEvent(type);
 
       // clean-up initial event and event merger maps
       if (!initialEventByType.isEmpty()) {
-        for (Iterator<Entry<Integer, TableEvent>> initialEventIt = initialEventByType.entrySet().iterator(); initialEventIt.hasNext();) {
+        for (Iterator<Entry<Integer, TableEvent>> initialEventIt = initialEventByType.entrySet().iterator(); initialEventIt.hasNext(); ) {
           final Entry<Integer, TableEvent> entry = initialEventIt.next();
           final int previousEventType = entry.getKey().intValue();
           if (type != previousEventType && rowRelatedEvent == isRowRelatedEvent(previousEventType)) {
@@ -262,7 +262,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     }
 
     List<Integer> eventIndexesToDelete = new ArrayList<>();
-    for (ListIterator<TableEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
+    for (ListIterator<TableEvent> it = events.listIterator(events.size()); it.hasPrevious(); ) {
       final int eventIndex = it.previousIndex();
       final TableEvent event = it.previous();
       if (event.getType() == TableEvent.TYPE_ROW_ORDER_CHANGED) {
@@ -326,7 +326,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     // list in FORWARD direction (so the oldest event will be kept).
     Map<Integer, List<TableEvent>> predecessorEventsOfSameType = new HashMap<>();
     int currentEventGroupType = -1;
-    for (ListIterator<TableEvent> it = events.listIterator(); it.hasNext();) {
+    for (ListIterator<TableEvent> it = events.listIterator(); it.hasNext(); ) {
       final TableEvent event = it.next();
 
       if (event.getType() != currentEventGroupType) {
@@ -366,7 +366,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
 
   /**
    * @return the next event's type or <code>-1</code> if {@link ListIterator#hasNext()} returns <code>false</code>. The
-   *         iterator is moved back to its initial position (i.e. {@link ListIterator#previous()}).
+   * iterator is moved back to its initial position (i.e. {@link ListIterator#previous()}).
    */
   protected int lookAheadEventType(ListIterator<TableEvent> it) {
     if (!it.hasNext()) {
@@ -463,7 +463,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
 
   /**
    * @param type
-   *          {@link TableEvent} type
+   *     {@link TableEvent} type
    * @return true, if previous events of the same type can be ignored. false otherwise
    */
   protected boolean isIgnorePrevious(int type) {

@@ -52,5 +52,4 @@ public class AbstractIntegerColumnTest extends AbstractIntegerColumn {
     IIntegerField field = (IIntegerField) column.prepareEditInternal(row);
     assertEquals("mandatory property to be progagated to field", column.isMandatory(), field.isMandatory());
   }
-
 }

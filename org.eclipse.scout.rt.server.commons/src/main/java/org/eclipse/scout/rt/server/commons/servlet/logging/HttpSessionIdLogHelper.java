@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * {@link HttpSessionIdLogModeProperty system property} is provided to change the output format.
  *
  * @see <a href="https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html#data-to-exclude">OWASP Logging
- *      Cheat Sheet</a>
+ * Cheat Sheet</a>
  */
 @ApplicationScoped
 public class HttpSessionIdLogHelper {
@@ -47,7 +47,7 @@ public class HttpSessionIdLogHelper {
    * attribute under the key {@link #SESSION_ATTRIBUTE}.
    *
    * @return either the full HTTP session ID, an obfuscated and truncated version of it, or {@code null}, depending on
-   *         the value of the system property {@link HttpSessionIdLogModeProperty}.
+   * the value of the system property {@link HttpSessionIdLogModeProperty}.
    */
   public String getSessionIdForLogging(HttpSession session) {
     if (session == null) {

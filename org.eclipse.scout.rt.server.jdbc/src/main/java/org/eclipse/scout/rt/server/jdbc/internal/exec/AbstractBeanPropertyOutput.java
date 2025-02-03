@@ -144,5 +144,4 @@ abstract class AbstractBeanPropertyOutput implements IBindOutput {
   public String toString() {
     return getClass().getSimpleName() + "[bindType=" + getBindType() + ", name=" + m_propertyName + ", source=" + m_source + "]";
   }
-
 }

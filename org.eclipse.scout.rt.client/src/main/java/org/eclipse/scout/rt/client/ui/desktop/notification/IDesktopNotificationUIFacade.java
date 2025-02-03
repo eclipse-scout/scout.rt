@@ -14,5 +14,4 @@ import org.eclipse.scout.rt.client.ui.notification.INotificationUIFacade;
 public interface IDesktopNotificationUIFacade extends INotificationUIFacade {
 
   void setNativeNotificationShownFromUI(boolean shown);
-
 }

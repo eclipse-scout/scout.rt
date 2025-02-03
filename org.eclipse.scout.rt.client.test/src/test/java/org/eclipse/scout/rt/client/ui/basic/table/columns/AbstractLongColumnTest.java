@@ -54,5 +54,4 @@ public class AbstractLongColumnTest extends AbstractLongColumn {
     ILongField field = (ILongField) column.prepareEditInternal(row);
     assertEquals("mandatory property to be progagated to field", column.isMandatory(), field.isMandatory());
   }
-
 }

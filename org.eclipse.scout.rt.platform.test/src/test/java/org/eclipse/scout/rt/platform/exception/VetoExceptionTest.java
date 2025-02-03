@@ -9,12 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.exception;
 
-import static org.eclipse.scout.rt.platform.html.HTML.bold;
-import static org.eclipse.scout.rt.platform.html.HTML.fragment;
-import static org.eclipse.scout.rt.platform.html.HTML.li;
-import static org.eclipse.scout.rt.platform.html.HTML.ul;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.eclipse.scout.rt.platform.html.HTML.*;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.junit.Before;

@@ -18,5 +18,4 @@ public interface IAttachment {
   boolean isReferenced();
 
   void setReferenced(boolean referenced);
-
 }

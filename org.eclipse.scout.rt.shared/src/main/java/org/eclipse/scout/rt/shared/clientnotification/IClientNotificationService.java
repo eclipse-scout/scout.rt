@@ -28,7 +28,7 @@ public interface IClientNotificationService {
    * Register a session with the corresponding user and client node
    *
    * @param nodeId
-   *          unique id of the client node
+   *     unique id of the client node
    */
   void registerNode(NodeId nodeId);
 
@@ -36,7 +36,7 @@ public interface IClientNotificationService {
    * Unregister a node with all its registered session and users.
    *
    * @param nodeId
-   *          unique id of the client node
+   *     unique id of the client node
    */
   void unregisterNode(NodeId nodeId);
 
@@ -44,7 +44,7 @@ public interface IClientNotificationService {
    * Receive new notifications relevant for the given node
    *
    * @param nodeId
-   *          unique id of the client node
+   *     unique id of the client node
    * @return list of new notification messages never <code>null</code>
    */
   List<ClientNotificationMessage> getNotifications(NodeId nodeId);

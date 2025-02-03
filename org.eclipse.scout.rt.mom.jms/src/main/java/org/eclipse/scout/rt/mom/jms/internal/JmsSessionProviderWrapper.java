@@ -85,7 +85,7 @@ public class JmsSessionProviderWrapper implements IJmsSessionProvider {
    * <p>
    *
    * @throws no
-   *           exceptions
+   *     exceptions
    */
   public void invalidate() {
     if (isClosing()) {

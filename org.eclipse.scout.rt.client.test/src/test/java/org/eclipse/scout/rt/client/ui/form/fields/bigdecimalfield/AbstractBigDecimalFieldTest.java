@@ -9,10 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -56,7 +53,6 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(42.8532), parseValueInternal(formatWithFractionDigits(42.8532, 4)));
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(-42.77234), parseValueInternal(formatWithFractionDigits(-42.77234, 5)));
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(0), parseValueInternal(formatWithFractionDigits(0.00000, 5)));
-
   }
 
   @Test
@@ -94,7 +90,6 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
     setFractionDigits(2);
     setMultiplier(1000000000);
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(0.00000005988d), parseValueInternal(formatWithFractionDigits(59.88, 2)));
-
   }
 
   @Test
@@ -159,5 +154,4 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
     m_formatter.setMaximumFractionDigits(fractionDigits);
     return m_formatter.format(number);
   }
-
 }

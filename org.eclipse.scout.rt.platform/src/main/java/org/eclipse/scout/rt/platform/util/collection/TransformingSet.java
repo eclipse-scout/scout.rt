@@ -35,9 +35,9 @@ public class TransformingSet<F, T> extends AbstractSet<T> implements Serializabl
 
   /**
    * @param sourceSet
-   *          The wrapped {@link Set}. Must not be {@code null}.
+   *     The wrapped {@link Set}. Must not be {@code null}.
    * @param function
-   *          The wrapping {@link ITransformer} function. Must not be {@code null}.
+   *     The wrapping {@link ITransformer} function. Must not be {@code null}.
    */
   public TransformingSet(Set<F> sourceSet, ITransformer<T, F> function) {
     this.m_wrappedSet = assertNotNull(sourceSet);

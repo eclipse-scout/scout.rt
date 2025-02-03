@@ -29,8 +29,8 @@ public interface IExtensibleObject {
    * Gets the extension of this object that exactly matches the given class.
    *
    * @param c
-   *          The filter class to specify which {@link IExtension} to return. This class must exactly match. no
-   *          <code>instanceof</code> is performed.
+   *     The filter class to specify which {@link IExtension} to return. This class must exactly match. no
+   *     <code>instanceof</code> is performed.
    * @return The requested {@link IExtension} if it exists for this object or null.
    */
   <T extends IExtension<?>> T getExtension(Class<T> c);

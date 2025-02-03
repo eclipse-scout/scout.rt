@@ -41,9 +41,9 @@ public class IdExternalFormatter {
    * Parses a string in the format <code>"[type-name]:[raw-id]"</code>.
    *
    * @throws IllegalArgumentException
-   *           if the given string does not match the expected format.
+   *     if the given string does not match the expected format.
    * @throws ProcessingException
-   *           If the referenced class is not found
+   *     If the referenced class is not found
    */
   public IId fromExternalForm(String externalForm) {
     return m_codec.get().fromQualified(externalForm);
@@ -59,7 +59,7 @@ public class IdExternalFormatter {
 
   /**
    * @return the type name of the id class as defined by the {@link IdTypeName} annotation or <code>null</code> if the
-   *         annotation is not present.
+   * annotation is not present.
    */
   public String getTypeName(Class<? extends IId> idClass) {
     return m_inventory.get().getTypeName(idClass);
@@ -74,7 +74,7 @@ public class IdExternalFormatter {
 
   /**
    * @return the type name of the {@link IId} as defined by the {@link IdTypeName} annotation or <code>null</code> if
-   *         the annotation is not present.
+   * the annotation is not present.
    */
   public String getTypeName(IId id) {
     return m_inventory.get().getTypeName(id.getClass());

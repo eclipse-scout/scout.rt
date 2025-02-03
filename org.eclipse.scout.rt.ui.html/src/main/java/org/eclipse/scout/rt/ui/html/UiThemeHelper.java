@@ -104,11 +104,11 @@ public class UiThemeHelper {
    * Callback to validate the extracted theme name before returning to the application.
    *
    * @param themeName
-   *          The theme name as extracted. The name may come from the current {@link HttpSession}, the cookie associated
-   *          with the current {@link HttpServletRequest} or the application configuration. See
-   *          {@link #getTheme(HttpServletRequest)}.
+   *     The theme name as extracted. The name may come from the current {@link HttpSession}, the cookie associated
+   *     with the current {@link HttpServletRequest} or the application configuration. See
+   *     {@link #getTheme(HttpServletRequest)}.
    * @return The validated name. Clients may modify the input value as required. The resulting theme name must exist in
-   *         the application.
+   * the application.
    */
   protected String validateTheme(String themeName) {
     return themeName;
@@ -116,12 +116,12 @@ public class UiThemeHelper {
 
   /**
    * @param resp
-   *          May be null, since this method can be called during a client-job, when no response is available. In that
-   *          case no cookie is written.
+   *     May be null, since this method can be called during a client-job, when no response is available. In that
+   *     case no cookie is written.
    * @param session
-   *          HTTP session
+   *     HTTP session
    * @param theme
-   *          <code>null</code> will reset the theme to the configured theme
+   *     <code>null</code> will reset the theme to the configured theme
    */
   public void storeTheme(HttpServletResponse resp, HttpSession session, String theme) {
     theme = ObjectUtility.nvl(theme, getConfiguredTheme());
@@ -133,7 +133,7 @@ public class UiThemeHelper {
 
   /**
    * @return <code>true</code> if the given theme is equal to 'default'. Note that this is <b>not</b> the same as
-   *         checking for equality to {@link #getConfiguredTheme()}!
+   * checking for equality to {@link #getConfiguredTheme()}!
    */
   public boolean isDefaultTheme(String theme) {
     return ObjectUtility.equals(theme, UiThemeProperty.DEFAULT_THEME);

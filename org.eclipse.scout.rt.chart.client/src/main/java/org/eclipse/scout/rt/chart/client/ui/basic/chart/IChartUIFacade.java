@@ -21,11 +21,11 @@ public interface IChartUIFacade {
    * For all parameters: use null when parameter is not used or set by a chart type.
    *
    * @param xIndex
-   *          number
+   *     number
    * @param yIndex
-   *          number
+   *     number
    * @param datasetIndex
-   *          number
+   *     number
    */
   void fireValueClickFromUI(BigDecimal xIndex, BigDecimal yIndex, Integer datasetIndex);
 }

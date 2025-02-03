@@ -31,5 +31,4 @@ public abstract class AbstractPositiveLongConfigProperty extends AbstractConfigP
 
     return Long.parseLong(value);
   }
-
 }

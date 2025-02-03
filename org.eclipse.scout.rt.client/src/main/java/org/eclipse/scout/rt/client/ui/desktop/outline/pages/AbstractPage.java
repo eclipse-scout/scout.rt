@@ -188,7 +188,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * parent.
    *
    * @return Returns a {@link ClientRunContext} created by {@link IOutline#createDisplayParentRunContext()} or just a
-   *         copy of the current one, if {@link #getOutline()} returns <code>null</code>. Never <code>null</code>.
+   * copy of the current one, if {@link #getOutline()} returns <code>null</code>. Never <code>null</code>.
    * @since 7.0
    */
   protected ClientRunContext createDisplayParentRunContext() {
@@ -454,7 +454,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * </ol>
    *
    * @see IDesktop#dataChanged(Object...) and
-   *      {@link IDesktop#fireDataChangeEvent(org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent)}
+   * {@link IDesktop#fireDataChangeEvent(org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent)}
    */
   @ConfigOperation
   @Order(55)
@@ -514,7 +514,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * {@link #getTree()} and {@link ITree#setTreeChanging(boolean)}.
    *
    * @param reloadReason
-   *          {@link IReloadReason}
+   *     {@link IReloadReason}
    */
   @ConfigOperation
   @Order(58)
@@ -606,7 +606,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * If this behavior is not desired return an empty list or filter the menus for your needs instead.
    *
    * @param parentTablePage
-   *          Parent table page
+   *     Parent table page
    * @return A list (non-null) of single selection menus.
    */
   @Order(150)
@@ -664,7 +664,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * to perform permission checks on initialization.
    *
    * @return {@code true} for a late (before loading data), {@code false} for an early (on initialization) permission
-   *         check
+   * check
    */
   protected boolean isCalculateVisibleLate() {
     return false;
@@ -1025,7 +1025,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   @Override
   public List<IMenu> computeParentTablePageMenus(IPageWithTable<?> parentTablePage) {
     return interceptComputeParentTablePageMenus(parentTablePage);
-
   }
 
   @Override

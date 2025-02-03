@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {defaultValues, RemoteEvent, RemoteResponse, Table, TableAdapter, TableRow, TableTextUserFilter} from '../../src/index';
+import {defaultValues, RemoteEvent, RemoteResponse, Table, TableRow, TableTextUserFilter} from '../../src/index';
 import {LocaleSpecHelper, SpecTable, SpecTableAdapter, TableModelWithCells, TableSpecHelper} from '../../src/testing/index';
 
 describe('TableAdapter', () => {

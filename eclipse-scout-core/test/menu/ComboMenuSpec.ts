@@ -11,7 +11,7 @@ import {ComboMenu, EllipsisMenu, Menu, scout, Session} from '../../src/index';
 
 describe('ComboMenu', () => {
 
-  let session:Session, $sandbox: JQuery;
+  let session: Session, $sandbox: JQuery;
 
   beforeEach(() => {
     setFixtures(sandbox());

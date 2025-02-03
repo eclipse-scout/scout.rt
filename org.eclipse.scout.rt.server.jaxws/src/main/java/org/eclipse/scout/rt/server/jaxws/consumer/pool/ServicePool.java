@@ -65,8 +65,7 @@ public class ServicePool<SERVICE extends Service> extends AbstractNonBlockingPoo
     try {
       // Create the service
       final Constructor<? extends Service> constructor = m_serviceClazz.getConstructor(URL.class, QName.class);
-      @SuppressWarnings("unchecked")
-      final SERVICE service = (SERVICE) constructor.newInstance(m_wsdlLocation, new QName(m_targetNamespace, m_serviceName));
+      @SuppressWarnings("unchecked") final SERVICE service = (SERVICE) constructor.newInstance(m_wsdlLocation, new QName(m_targetNamespace, m_serviceName));
 
       // Install the handler chain
       service.setHandlerResolver(portInfo -> {
@@ -77,8 +76,7 @@ public class ServicePool<SERVICE extends Service> extends AbstractNonBlockingPoo
           handlerChain.set(i, proxyHandler(handlerChain.get(i)));
         }
 
-        @SuppressWarnings("unchecked")
-        final List<Handler> handlers = TypeCastUtility.castValue(handlerChain, List.class);
+        @SuppressWarnings("unchecked") final List<Handler> handlers = TypeCastUtility.castValue(handlerChain, List.class);
         return handlers;
       });
 

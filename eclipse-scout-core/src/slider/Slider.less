@@ -55,6 +55,7 @@
 
   /* Get rid of Firefox's focus border. See:
      https://stackoverflow.com/questions/71074/how-to-remove-firefoxs-dotted-outline-on-buttons-as-well-as-links */
+
   &::-moz-focus-inner {
     border: 0;
   }
@@ -83,6 +84,7 @@ input[type=range] {
   }
 
   /* ---- Webkit, Chrome ---- */
+
   &:not(.ms-edge)::-webkit-slider-runnable-track {
     .track();
     background: @track-color;
@@ -99,6 +101,7 @@ input[type=range] {
   }
 
   /* ---- Firefox ---- */
+
   &::-moz-range-track {
     .track();
     background: @track-color;
@@ -113,6 +116,7 @@ input[type=range] {
   }
 
   /* ---- Internet Explorer, Edge ---- */
+
   &::-ms-track {
     .track();
     background: transparent;
@@ -124,12 +128,15 @@ input[type=range] {
   &::-ms-fill-lower {
     background: @track-color;
   }
+
   &::-ms-fill-upper {
     background: @track-color;
   }
+
   &::-ms-thumb {
     .thumb(@thumb-border-width);
   }
+
   &:focus::-ms-thumb {
     .thumb-focus();
   }

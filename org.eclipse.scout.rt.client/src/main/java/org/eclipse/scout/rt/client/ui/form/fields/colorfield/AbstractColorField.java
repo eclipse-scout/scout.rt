@@ -103,5 +103,4 @@ public abstract class AbstractColorField extends AbstractBasicField<String> impl
   protected IColorFieldExtension<? extends AbstractColorField> createLocalExtension() {
     return new LocalColorFieldExtension<>(this);
   }
-
 }

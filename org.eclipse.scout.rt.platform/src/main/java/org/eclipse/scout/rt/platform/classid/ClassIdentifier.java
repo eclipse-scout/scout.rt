@@ -33,7 +33,7 @@ import java.util.Arrays;
  *   }
  * }
  * </pre>
- *
+ * <p>
  * A class identifier distinguishes between the <code>InnerClass</code> used within <code>Foo.A</code> and the one used
  * within <code>Foo.B</code>. I.e <code>new ClassIdentifier(Foo.A.class, Foo.A.InnerClass.class)</code> is not the same
  * as <code>new ClassIdentifier(Foo.B.class, Foo.B.InnerClass.class)</code>, whereas

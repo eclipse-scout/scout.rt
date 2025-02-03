@@ -415,5 +415,4 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
       }
     }
   }
-
 }

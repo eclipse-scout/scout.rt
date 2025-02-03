@@ -85,7 +85,7 @@ import java.lang.annotation.Target;
  * &#64FormData(sdkCommand=FormData.SdkCommand.IGNORE)
  * public class NameField extends AbstractStringField{...
  * </pre>
- *
+ * <p>
  * The NameField will not be considered in the form data. The NameField is an inner type in a form.
  * <h4>Ignore on abstract form fields</h4>
  *
@@ -93,7 +93,7 @@ import java.lang.annotation.Target;
  * &#64FormData(defaultSubtypeSdkCommand=FormData.DefaultSubtypeSdkCommand.IGNORE)
  * public abstract class AbstractNameField extends AbstractStringField{...
  * </pre>
- *
+ * <p>
  * Any subtype of AbstractFormField will be ignored in its form data. The AbstractNameField is a primary type.
  * <h4>Template Groupbox</h4>
  *
@@ -101,7 +101,7 @@ import java.lang.annotation.Target;
  * &#64FormData(value=AbstractTemplateGroupBoxData.class, defaultSubtypeSdkCommand=FormData.DefaultSubtypeSdkCommand.CREATE, sdkCommand=FormData.SdkCommand.CREATE)
  * public abstract class AbstractTemplateGroupBox extends AbstractGroupBox{...
  * </pre>
- *
+ * <p>
  * The <code>FormData.DefaultSubtypeSdkCommand.CREATE</code> ensures the creation of a FormData class for every subclass
  * of this groupbox. The value <code>AbstractTemplateGroupBoxData.class</code> ensures that every generated FormData
  * class of every subclass of this groupbox extends AbstractTemplateGroupBoxData (instead of the default

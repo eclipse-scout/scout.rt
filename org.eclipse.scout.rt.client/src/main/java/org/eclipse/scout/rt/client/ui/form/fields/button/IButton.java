@@ -112,7 +112,7 @@ public interface IButton extends IFormField {
 
   /**
    * @param b
-   *          toggle and radio button state
+   *     toggle and radio button state
    */
   void setSelected(boolean b);
 
@@ -154,5 +154,4 @@ public interface IButton extends IFormField {
   BinaryResource getAttachment(String filename);
 
   void setAttachments(Collection<? extends BinaryResource> attachments);
-
 }

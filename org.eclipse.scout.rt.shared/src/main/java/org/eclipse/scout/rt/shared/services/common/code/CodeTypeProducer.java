@@ -22,5 +22,4 @@ public class CodeTypeProducer implements IBeanInstanceProducer<ICodeType<?, ?>> 
   public ICodeType<?, ?> produce(IBean<ICodeType<?, ?>> bean) {
     return BEANS.get(ICodeService.class).getCodeType(bean.getBeanClazz());
   }
-
 }

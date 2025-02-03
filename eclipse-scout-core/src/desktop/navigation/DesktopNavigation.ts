@@ -287,4 +287,5 @@ export class DesktopNavigation extends Widget implements DesktopNavigationModel 
     }
   }
 }
+
 export type DesktopNavigationLayoutData = LayoutData & { fullWidth?: boolean };

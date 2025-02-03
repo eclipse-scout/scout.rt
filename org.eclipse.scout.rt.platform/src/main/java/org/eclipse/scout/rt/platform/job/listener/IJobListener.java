@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 /**
  * Listener to be notified about job events.
  *
- * @since 5.1
  * @see JobEvent
+ * @since 5.1
  */
 @FunctionalInterface
 public interface IJobListener extends EventListener {
@@ -33,7 +33,7 @@ public interface IJobListener extends EventListener {
    * The implementor is responsible to handle the event in the proper {@link RunContext}.
    *
    * @param event
-   *          describes the event occurred.
+   *     describes the event occurred.
    */
   void changed(JobEvent event);
 }

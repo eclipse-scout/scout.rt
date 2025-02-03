@@ -45,9 +45,9 @@ public class FinalValue<VALUE> {
    * Sets the specified value as final value, or throws {@link AssertionException} if already set.
    *
    * @param value
-   *          value to set
+   *     value to set
    * @throws AssertionException
-   *           if a final value is already set.
+   *     if a final value is already set.
    */
   public void set(final VALUE value) {
     Assertions.assertSame(m_value.get(), NULL_VALUE, "{} already set.", getClass().getSimpleName());
@@ -69,10 +69,10 @@ public class FinalValue<VALUE> {
    * threads but only first available value is used. The producer is responsible for dealing with this fact.
    *
    * @param producer
-   *          to produce the final value if no final value is set yet.
+   *     to produce the final value if no final value is set yet.
    * @return the final value.
    * @throws RuntimeException
-   *           if the producer throws an exception
+   *     if the producer throws an exception
    */
   @SuppressWarnings("unchecked")
   public VALUE setIfAbsentAndGet(final Callable<VALUE> producer) {
@@ -84,7 +84,7 @@ public class FinalValue<VALUE> {
    * Sets the specified value as final value, but only if not set yet.
    *
    * @return <code>true</code>, if the value was set with the given producer, <code>false</code>, if a value already
-   *         exited.
+   * exited.
    */
   public boolean setIfAbsent(final VALUE value) {
     return setIfAbsent(() -> value);
@@ -96,11 +96,11 @@ public class FinalValue<VALUE> {
    * threads but only first available value is used. The producer is responsible for dealing with this fact.
    *
    * @param producer
-   *          to produce the final value if no final value is set yet.
+   *     to produce the final value if no final value is set yet.
    * @return <code>true</code>, if the value was set with the given producer, <code>false</code>, if a value already
-   *         exited.
+   * exited.
    * @throws RuntimeException
-   *           if the producer throws an exception
+   *     if the producer throws an exception
    */
   public boolean setIfAbsent(final Callable<VALUE> producer) {
     Object value = m_value.get();

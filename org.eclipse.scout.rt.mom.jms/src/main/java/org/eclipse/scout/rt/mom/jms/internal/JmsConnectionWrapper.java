@@ -201,8 +201,8 @@ public class JmsConnectionWrapper {
 
   /**
    * @return the current connection, may block until a connection is available
-   *         <p>
-   *         Do not keep references to this value, it may change after reconnect attempts.
+   * <p>
+   * Do not keep references to this value, it may change after reconnect attempts.
    */
   public Connection getConnection() throws JMSException {
     int retry = 0;

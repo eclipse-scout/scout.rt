@@ -30,7 +30,7 @@ public interface IPermission {
    * {@link PermissionLevel} which was granted within an {@link IPermissionCollection}.
    *
    * @return granted permission level or {@code null} if and only if this permission is not part of an
-   *         {@link IPermissionCollection}
+   * {@link IPermissionCollection}
    */
   PermissionLevel getLevel();
 
@@ -87,5 +87,4 @@ public interface IPermission {
    * @see DefaultPermissionCollection
    */
   void assignPermissionCollection(IPermissionCollection permissionCollection);
-
 }

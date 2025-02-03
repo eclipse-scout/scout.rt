@@ -80,5 +80,4 @@ public class JsonLabel<T extends ILabel> extends AbstractJsonWidget<T> implement
     BinaryResource attachment = getModel().getAttachment(filename);
     return attachment == null ? null : new BinaryResourceHolder(attachment);
   }
-
 }

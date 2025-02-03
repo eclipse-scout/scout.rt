@@ -59,5 +59,4 @@ public interface IDesktopExtension<DESKTOP extends AbstractDesktop> extends IExt
   void execDefaultView(DesktopDefaultViewChain chain);
 
   void execLogoAction(DesktopLogoActionChain chain);
-
 }

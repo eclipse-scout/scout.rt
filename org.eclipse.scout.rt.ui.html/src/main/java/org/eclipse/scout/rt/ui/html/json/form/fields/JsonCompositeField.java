@@ -62,5 +62,4 @@ public class JsonCompositeField<COMPOSITE_FIELD extends ICompositeField, F exten
   protected String getModelFieldsPropertyName() {
     return "fields";
   }
-
 }

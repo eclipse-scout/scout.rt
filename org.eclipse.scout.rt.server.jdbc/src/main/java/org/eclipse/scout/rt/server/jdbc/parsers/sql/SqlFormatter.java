@@ -379,5 +379,4 @@ public class SqlFormatter {
     }
     return false;
   }
-
 }

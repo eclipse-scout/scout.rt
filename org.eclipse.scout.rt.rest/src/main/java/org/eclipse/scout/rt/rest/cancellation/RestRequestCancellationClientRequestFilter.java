@@ -37,8 +37,8 @@ public class RestRequestCancellationClientRequestFilter implements ClientRequest
 
   /**
    * @param requestCanceller
-   *          consumes the requestId of an aborted request in order to perform the actual cancel operation (i.e. sending
-   *          a cancel request to an appropriate REST resource).
+   *     consumes the requestId of an aborted request in order to perform the actual cancel operation (i.e. sending
+   *     a cancel request to an appropriate REST resource).
    */
   public RestRequestCancellationClientRequestFilter(Consumer<String> requestCanceller) {
     m_requestCanceller = requestCanceller;

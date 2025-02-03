@@ -101,5 +101,4 @@ public class JsonOutlineViewButtonTest {
   private static JsonEvent createJsonActionEvent(String adapterId) throws JSONException {
     return new JsonEvent(adapterId, "action", null);
   }
-
 }

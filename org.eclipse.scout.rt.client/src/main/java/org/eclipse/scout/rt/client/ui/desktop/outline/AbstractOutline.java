@@ -244,7 +244,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    * The default does nothing.
    *
    * @param pageList
-   *          live collection to add pages to the outline tree
+   *     live collection to add pages to the outline tree
    */
   @ConfigOperation
   @Order(90)

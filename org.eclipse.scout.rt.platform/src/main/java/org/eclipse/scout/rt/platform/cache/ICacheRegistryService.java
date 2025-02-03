@@ -22,7 +22,7 @@ public interface ICacheRegistryService {
    * Register a cache. Use {@link #get(String)} to query the registry for a cache with a given id.
    *
    * @throws AssertionException
-   *           if there is already a cache with this cache id
+   *     if there is already a cache with this cache id
    */
   <K, V> void register(ICache<K, V> cache);
 
@@ -50,7 +50,7 @@ public interface ICacheRegistryService {
    * Returns a previously registered cache
    *
    * @throws AssertionException
-   *           if not found
+   *     if not found
    */
   <K, V> ICache<K, V> get(String cacheId);
 
@@ -58,5 +58,4 @@ public interface ICacheRegistryService {
    * @return a previously registered cache or <code>null</code>, if not found.
    */
   <K, V> ICache<K, V> opt(String cacheId);
-
 }

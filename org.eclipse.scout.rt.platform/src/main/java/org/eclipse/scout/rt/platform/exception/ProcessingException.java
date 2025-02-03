@@ -46,10 +46,10 @@ public class ProcessingException extends PlatformException {
    * same as if using {@link Logger SLF4j Logger}.
    *
    * @param message
-   *          the message with support for <em>formatting anchors</em> in the form of {} pairs.
+   *     the message with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param args
-   *          optional arguments to substitute <em>formatting anchors</em> in the message, with the last argument used
-   *          as the exception's cause if of type {@link Throwable} and not referenced in the message.
+   *     optional arguments to substitute <em>formatting anchors</em> in the message, with the last argument used
+   *     as the exception's cause if of type {@link Throwable} and not referenced in the message.
    */
   public ProcessingException(final String message, final Object... args) {
     super(message, args);

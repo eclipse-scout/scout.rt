@@ -76,7 +76,6 @@ public class GroupBoxLayout09Test extends AbstractGroupBoxLayoutTest {
 
     // field04
     assertGridData(1, 2, 1, 2, groupBox.getFieldByClass(GroupBoxLayout09Test.LayoutGroupBox.Field04.class).getGridData());
-
   }
 
   @Test
@@ -99,7 +98,6 @@ public class GroupBoxLayout09Test extends AbstractGroupBoxLayoutTest {
 
     // field04
     assertGridData(1, 2, 1, 2, groupBox.getFieldByClass(GroupBoxLayout09Test.LayoutGroupBox.Field04.class).getGridData());
-
   }
 
   public class LayoutGroupBox extends AbstractGroupBox {
@@ -115,7 +113,6 @@ public class GroupBoxLayout09Test extends AbstractGroupBoxLayoutTest {
       protected String getConfiguredLabel() {
         return "Field 01";
       }
-
     }
 
     @Order(20)
@@ -129,7 +126,6 @@ public class GroupBoxLayout09Test extends AbstractGroupBoxLayoutTest {
       protected int getConfiguredGridW() {
         return 2;
       }
-
     }
 
     @Order(30)
@@ -139,7 +135,6 @@ public class GroupBoxLayout09Test extends AbstractGroupBoxLayoutTest {
       protected String getConfiguredLabel() {
         return "Field 03";
       }
-
     }
 
     @Order(40)
@@ -154,7 +149,6 @@ public class GroupBoxLayout09Test extends AbstractGroupBoxLayoutTest {
       protected int getConfiguredGridH() {
         return 2;
       }
-
     }
 
     @Order(200)

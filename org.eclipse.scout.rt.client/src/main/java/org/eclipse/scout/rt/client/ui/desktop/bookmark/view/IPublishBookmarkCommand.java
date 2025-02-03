@@ -26,5 +26,4 @@ public interface IPublishBookmarkCommand {
    * and calls {@link IBookmarkStorageService#publishBookmarkData(BookmarkFolder, java.util.Map)}
    */
   void publishBookmark(BookmarkFolder publishFolder);
-
 }

@@ -88,7 +88,6 @@ public class DefaultValuesFilterServiceTest {
     public URL contributeDefaultValuesConfigurationUrl() {
       return ResourceBase.class.getResource("json/DefaultValuesFilterServiceTest_defaults_override_original.json");
     }
-
   }
 
   @Order(100)
@@ -99,6 +98,5 @@ public class DefaultValuesFilterServiceTest {
     public URL contributeDefaultValuesConfigurationUrl() {
       return ResourceBase.class.getResource("json/DefaultValuesFilterServiceTest_defaults_override.json");
     }
-
   }
 }

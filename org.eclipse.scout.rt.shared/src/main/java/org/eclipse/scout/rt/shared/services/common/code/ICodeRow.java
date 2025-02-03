@@ -108,5 +108,4 @@ public interface ICodeRow<KEY_TYPE> extends ILookupRow<KEY_TYPE> {
   double getOrder();
 
   ICodeRow<KEY_TYPE> withOrder(double order);
-
 }

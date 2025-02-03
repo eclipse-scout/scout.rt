@@ -9,9 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -103,7 +101,6 @@ public class AbstractDecimalColumnTest extends AbstractDecimalColumn<BigDecimal>
     assertEquals("expected multiplier-property set to 1000 after using convenience setter", 1000, getMultiplier());
     assertEquals("expected multiplier-property set to 1000 after using convenience setter", 1000, format.getMultiplier());
     assertEquals("expected fractionDigits-property set to 3 after using setter", 3, getFractionDigits());
-
   }
 
   @Test
@@ -123,7 +120,6 @@ public class AbstractDecimalColumnTest extends AbstractDecimalColumn<BigDecimal>
     assertTrue("expected percent-property to be propagated to field", field.isPercent());
     assertEquals("expected multiplier-property to be propagated to field", 100, field.getMultiplier());
     assertEquals("expected fractionDigits-property to be propagated to field", 3, field.getFractionDigits());
-
   }
 
   @Test
@@ -253,5 +249,4 @@ public class AbstractDecimalColumnTest extends AbstractDecimalColumn<BigDecimal>
     ScoutAssert.assertComparableEquals("expected getter to return new setting", 6, getFractionDigits());
     ScoutAssert.assertComparableEquals("expected new setting in property change notification", 6, (Integer) propertyTracker.m_cachedProperty);
   }
-
 }

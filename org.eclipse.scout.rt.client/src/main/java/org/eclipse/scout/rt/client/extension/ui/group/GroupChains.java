@@ -24,7 +24,6 @@ public final class GroupChains {
     public AbstractGroupChain(List<? extends IGroupExtension<? extends AbstractGroup>> extensions) {
       super(extensions, IGroupExtension.class);
     }
-
   }
 
   public static class GroupDisposeGroupChain extends AbstractGroupChain {
@@ -60,5 +59,4 @@ public final class GroupChains {
       callChain(methodInvocation);
     }
   }
-
 }

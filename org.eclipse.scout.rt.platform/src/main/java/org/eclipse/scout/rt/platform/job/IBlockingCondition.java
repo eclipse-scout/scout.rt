@@ -27,8 +27,8 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
  * A blocking condition is often used by model jobs to wait for something to happen, but to allow another model job to
  * run while waiting. A typical use case would be to wait for a MessageBox to be closed.
  *
- * @since 5.1
  * @see Jobs#newBlockingCondition(boolean)
+ * @since 5.1
  */
 public interface IBlockingCondition {
 
@@ -48,8 +48,8 @@ public interface IBlockingCondition {
    * asynchronously.
    *
    * @param blocking
-   *          <code>true</code> to arm this condition, or <code>false</code> to invalidate it and release all waiting
-   *          threads.
+   *     <code>true</code> to arm this condition, or <code>false</code> to invalidate it and release all waiting
+   *     threads.
    */
   void setBlocking(boolean blocking);
 
@@ -66,13 +66,13 @@ public interface IBlockingCondition {
    * semaphore aware jobs, this method returns with the semaphore permit re-acquired.
    *
    * @param executionHints
-   *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
-   *          effect if not running on behalf of a job.
+   *     optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
+   *     effect if not running on behalf of a job.
    * @throws ThreadInterruptedError
-   *           if the current thread's interrupted status is set when it enters this method, or if it is interrupted
-   *           while waiting. The thread's interrupted status is still set. Additionally for semaphore aware jobs, this
-   *           method returns with the semaphore permit re-acquired. However, this condition may still be in
-   *           <em>blocking state</em>.
+   *     if the current thread's interrupted status is set when it enters this method, or if it is interrupted
+   *     while waiting. The thread's interrupted status is still set. Additionally for semaphore aware jobs, this
+   *     method returns with the semaphore permit re-acquired. However, this condition may still be in
+   *     <em>blocking state</em>.
    */
   void waitFor(String... executionHints);
 
@@ -93,21 +93,21 @@ public interface IBlockingCondition {
    * returns with the semaphore permit re-acquired.
    *
    * @param timeout
-   *          the maximal time to wait.
+   *     the maximal time to wait.
    * @param unit
-   *          unit of the given timeout.
+   *     unit of the given timeout.
    * @param executionHints
-   *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
-   *          effect if not running on behalf of a job.
+   *     optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
+   *     effect if not running on behalf of a job.
    * @throws ThreadInterruptedError
-   *           if the current thread's interrupted status is set when it enters this method, or if it is interrupted
-   *           while waiting. The thread's interrupted status is still set. Additionally for semaphore aware jobs, this
-   *           method returns with the semaphore permit re-acquired. However, this condition may still be in
-   *           <em>blocking state</em>.
+   *     if the current thread's interrupted status is set when it enters this method, or if it is interrupted
+   *     while waiting. The thread's interrupted status is still set. Additionally for semaphore aware jobs, this
+   *     method returns with the semaphore permit re-acquired. However, this condition may still be in
+   *     <em>blocking state</em>.
    * @throws TimedOutError
-   *           if the wait timed out.<br/>
-   *           For semaphore aware jobs, this method returns with the semaphore permit re-acquired. However, this
-   *           condition may still be in <em>blocking state</em>.
+   *     if the wait timed out.<br/>
+   *     For semaphore aware jobs, this method returns with the semaphore permit re-acquired. However, this
+   *     condition may still be in <em>blocking state</em>.
    */
   void waitFor(long timeout, TimeUnit unit, String... executionHints);
 }

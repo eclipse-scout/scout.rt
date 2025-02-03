@@ -45,5 +45,4 @@ public abstract class AbstractEventHistory<T> implements IEventHistory<T> {
   public Collection<T> getRecentEvents() {
     return m_cache.values();
   }
-
 }

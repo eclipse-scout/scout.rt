@@ -17,5 +17,4 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 public interface IBeanAnnotationMetaDataProducer {
 
   BeanMetaData produce(Class<?> type);
-
 }

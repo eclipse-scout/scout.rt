@@ -42,5 +42,4 @@ public final class LookupJobHelper {
     bc.waitFor();
     futureRes.awaitDone();
   }
-
 }

@@ -56,8 +56,9 @@ public class OutlineDeepLinkHandler extends AbstractDeepLinkHandler {
   }
 
   /**
-   * @param startup Set to true on startup while the default view is activated. Hides the
-   *                path in the URL when set to true.
+   * @param startup
+   *     Set to true on startup while the default view is activated. Hides the
+   *     path in the URL when set to true.
    */
   public BrowserHistoryEntry createBrowserHistoryEntry(IOutline outline, boolean startup) {
     return DeepLinkUriBuilder.createRelative()

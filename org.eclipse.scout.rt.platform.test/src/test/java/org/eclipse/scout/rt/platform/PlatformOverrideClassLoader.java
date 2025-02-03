@@ -24,9 +24,9 @@ public class PlatformOverrideClassLoader extends ServiceLoaderClassLoaderMock {
 
   /**
    * @param parent
-   *          class loader
+   *     class loader
    * @param platformOverrideClass
-   *          the {@link IPlatform} class to be used in {@link Platform#get()}
+   *     the {@link IPlatform} class to be used in {@link Platform#get()}
    */
   public PlatformOverrideClassLoader(ClassLoader parent, Class<? extends IPlatform> platformOverrideClass) {
     super(parent, IPlatform.class, platformOverrideClass);

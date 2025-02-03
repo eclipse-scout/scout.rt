@@ -21,5 +21,4 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 public interface ITableCompactHandlerProvider {
 
   ITableCompactHandler createCompactHandler(ITable table);
-
 }

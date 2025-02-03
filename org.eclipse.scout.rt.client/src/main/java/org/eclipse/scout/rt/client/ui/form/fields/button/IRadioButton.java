@@ -31,7 +31,7 @@ public interface IRadioButton<T> extends IButton {
 
   /**
    * @param o
-   *          radio button value
+   *     radio button value
    * @since moved to {@link IRadioButton} in 4.0.0-M7
    */
   void setRadioValue(T radioValue);

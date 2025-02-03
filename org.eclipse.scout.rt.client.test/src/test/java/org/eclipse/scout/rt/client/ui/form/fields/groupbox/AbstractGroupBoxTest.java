@@ -44,7 +44,6 @@ public class AbstractGroupBoxTest {
     assertEquals(formMock, groupBox.getInnerInnerGroupBox().getForm());
     assertEquals(formMock, groupBox.getTestIntegerField().getForm());
   }
-
 }
 
 class P_TestGroupBox extends AbstractGroupBox {

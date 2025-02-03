@@ -23,7 +23,7 @@ public interface ISequenceBox extends ICompositeField {
 
   /**
    * @return true, if the sequence is validated automatically, whenever a value of the contained fields changes.
-   *         <code>false</code> otherwise.
+   * <code>false</code> otherwise.
    */
   boolean isAutoCheckFromTo();
 

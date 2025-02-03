@@ -45,5 +45,4 @@ public interface ISmartColumn<VALUE> extends IColumn<VALUE> {
   void setLookupCall(ILookupCall<VALUE> c);
 
   ILookupCall<VALUE> prepareLookupCall(ITableRow row);
-
 }

@@ -151,7 +151,6 @@ public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJso
     // from the response, and it will  never be sent to the UI. Only the 'disposeAdapter' event
     // handler on the session can handle that situation (see Session.js).
     getUiSession().sendDisposeAdapterEvent(this);
-
   }
 
   @Override

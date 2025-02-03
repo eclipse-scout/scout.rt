@@ -48,8 +48,8 @@ import io.opentelemetry.sdk.metrics.View;
  *
  * @see AutoConfiguredOpenTelemetrySdk
  * @see <a href=
- *      "https://github.com/open-telemetry/opentelemetry-java/blob/main/sdk-extensions/autoconfigure/README.md">OpenTelemetry
- *      SDK Autoconfigure</a>
+ * "https://github.com/open-telemetry/opentelemetry-java/blob/main/sdk-extensions/autoconfigure/README.md">OpenTelemetry
+ * SDK Autoconfigure</a>
  */
 @Order(4_001)
 public class OpenTelemetryInitializer implements IPlatformListener {

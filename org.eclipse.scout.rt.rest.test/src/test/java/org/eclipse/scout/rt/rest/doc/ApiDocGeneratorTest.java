@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.rest.doc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 import java.lang.annotation.Annotation;
 

@@ -44,7 +44,7 @@ public class DynamicNls {
    * Appends a new {@link ITextPostProcessor} to this instance. This processor will be invoked on each text retrieval.
    *
    * @param postProcessor
-   *          The new processor. Nothing is appended if it is {@code null}.
+   *     The new processor. Nothing is appended if it is {@code null}.
    * @return This {@link DynamicNls} instance.
    */
   public DynamicNls withTextPostProcessor(ITextPostProcessor postProcessor) {
@@ -59,7 +59,7 @@ public class DynamicNls {
    * invoked on each text retrieval.
    *
    * @param processors
-   *          The new processors. {@code null} elements are skipped.
+   *     The new processors. {@code null} elements are skipped.
    * @return This {@link DynamicNls} instance.
    */
   public DynamicNls withTextPostProcessors(Collection<? extends ITextPostProcessor> processors) {
@@ -74,7 +74,7 @@ public class DynamicNls {
    * Removes all {@link ITextPostProcessor} elements for which the {@link Predicate} given returns {@code true}.
    *
    * @param predicate
-   *          The predicate to execute. This method does nothing if the predicate is {@code null}.
+   *     The predicate to execute. This method does nothing if the predicate is {@code null}.
    * @return {@code true} if any elements were removed.
    */
   public boolean removeTextPostProcessor(Predicate<? super ITextPostProcessor> predicate) {
@@ -88,7 +88,7 @@ public class DynamicNls {
    * Removes the {@link ITextPostProcessor} given.
    *
    * @param postProcessor
-   *          The processor to remove.
+   *     The processor to remove.
    * @return {@code true} if any elements were removed.
    */
   public boolean removeTextPostProcessor(ITextPostProcessor postProcessor) {
@@ -111,7 +111,7 @@ public class DynamicNls {
 
   /**
    * @return An unmodifiable {@link Set} of all {@link ITextPostProcessor} instances registered. Never returns
-   *         {@code null}. {@link Collections#unmodifiableSet(Set)} preservers the given order.
+   * {@code null}. {@link Collections#unmodifiableSet(Set)} preservers the given order.
    */
   public Collection<ITextPostProcessor> getTextPostProcessors() {
     return unmodifiableSet(m_textPostProcessors);
@@ -119,13 +119,13 @@ public class DynamicNls {
 
   /**
    * @param key
-   *          nls text key
+   *     nls text key
    * @param messageArguments
-   *          the translation of the text might contain variables {0},{1},{2},... Examples: getText("MissingFile1");
-   *          with translation: MissingFile1=Das File konnte nicht gefunden werden getText("MissingFile2",fileName);
-   *          with translation: MissingFile2=Das File {0} konnte nicht gefunden werden.
-   *          getText("MissingFile3",fileName,dir); with translation: MissingFile3=Das File {0} im Ordner {1} konnte
-   *          nicht gefunden werden
+   *     the translation of the text might contain variables {0},{1},{2},... Examples: getText("MissingFile1");
+   *     with translation: MissingFile1=Das File konnte nicht gefunden werden getText("MissingFile2",fileName);
+   *     with translation: MissingFile2=Das File {0} konnte nicht gefunden werden.
+   *     getText("MissingFile3",fileName,dir); with translation: MissingFile3=Das File {0} im Ordner {1} konnte
+   *     nicht gefunden werden
    */
   public String getText(String key, String... messageArguments) {
     return getText(null, key, messageArguments);
@@ -136,15 +136,15 @@ public class DynamicNls {
    * {@link ITextPostProcessor text post processors}.
    *
    * @param locale
-   *          the locale of the text
+   *     the locale of the text
    * @param key
-   *          nls text key
+   *     nls text key
    * @param messageArguments
-   *          the translation of the text might contain variables {0},{1},{2},... Examples: getText("MissingFile1");
-   *          with translation: MissingFile1=Das File konnte nicht gefunden werden getText("MissingFile2",fileName);
-   *          with translation: MissingFile2=Das File {0} konnte nicht gefunden werden.
-   *          getText("MissingFile3",fileName,dir); with translation: MissingFile3=Das File {0} im Ordner {1} konnte
-   *          nicht gefunden werden
+   *     the translation of the text might contain variables {0},{1},{2},... Examples: getText("MissingFile1");
+   *     with translation: MissingFile1=Das File konnte nicht gefunden werden getText("MissingFile2",fileName);
+   *     with translation: MissingFile2=Das File {0} konnte nicht gefunden werden.
+   *     getText("MissingFile3",fileName,dir); with translation: MissingFile3=Das File {0} im Ordner {1} konnte
+   *     nicht gefunden werden
    */
   public String getText(Locale locale, String key, String... messageArguments) {
     if (key == null) {
@@ -195,5 +195,4 @@ public class DynamicNls {
   protected Locale getDefaultLocale() {
     return NlsLocale.get();
   }
-
 }

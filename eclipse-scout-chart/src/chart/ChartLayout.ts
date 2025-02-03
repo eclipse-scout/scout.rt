@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {AbstractLayout} from '@eclipse-scout/core';
-import {UpdateChartOptions, Chart} from '../index';
+import {Chart, UpdateChartOptions} from '../index';
 
 export class ChartLayout extends AbstractLayout {
   chart: Chart;

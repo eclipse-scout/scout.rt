@@ -31,5 +31,4 @@ public abstract class AbstractDataModelAttributeExtension<OWNER extends Abstract
   public void execPrepareLookup(DataModelAttributePrepareLookupChain chain, ILookupCall<?> call) {
     chain.execPrepareLookup(call);
   }
-
 }

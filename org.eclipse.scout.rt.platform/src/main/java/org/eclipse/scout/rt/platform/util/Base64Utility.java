@@ -38,12 +38,12 @@ public final class Base64Utility {
    * Base-64 encodes the supplied block of data. Line wrapping is not applied on output.
    *
    * @param bytes
-   *          The block of data that is to be Base-64 encoded.
+   *     The block of data that is to be Base-64 encoded.
    * @param urlSafe
-   *          The alphabet used for the regular base 64 encoding contains '/' and '+' which are not allowed in URLs.
-   *          With this property set to true, these chars are replaced with '-' and '_' so that the generated string may
-   *          be used for URLs. See also
-   *          <a href="https://tools.ietf.org/html/rfc4648#page-7">https://tools.ietf.org/html/rfc4648</a>.
+   *     The alphabet used for the regular base 64 encoding contains '/' and '+' which are not allowed in URLs.
+   *     With this property set to true, these chars are replaced with '-' and '_' so that the generated string may
+   *     be used for URLs. See also
+   *     <a href="https://tools.ietf.org/html/rfc4648#page-7">https://tools.ietf.org/html/rfc4648</a>.
    * @return A <code>String</code> containing the encoded data.
    */
   public static String encode(byte[] bytes, boolean urlSafe) {
@@ -71,12 +71,12 @@ public final class Base64Utility {
    * Decodes the supplied Base-64 encoded string.
    *
    * @param string
-   *          The Base-64 encoded string that is to be decoded.
+   *     The Base-64 encoded string that is to be decoded.
    * @param urlSafe
-   *          The alphabet used for the regular base 64 encoding contains '/' and '+' which are not allowed in URLs.
-   *          With this property set to true, these chars are replaced with '-' and '_' so that the generated string may
-   *          be used for URLs. See also
-   *          <a href="https://tools.ietf.org/html/rfc4648#page-7">https://tools.ietf.org/html/rfc4648</a>.
+   *     The alphabet used for the regular base 64 encoding contains '/' and '+' which are not allowed in URLs.
+   *     With this property set to true, these chars are replaced with '-' and '_' so that the generated string may
+   *     be used for URLs. See also
+   *     <a href="https://tools.ietf.org/html/rfc4648#page-7">https://tools.ietf.org/html/rfc4648</a>.
    * @return A <code>byte[]</code> containing the decoded data block.
    */
   public static byte[] decode(String string, boolean urlSafe) {

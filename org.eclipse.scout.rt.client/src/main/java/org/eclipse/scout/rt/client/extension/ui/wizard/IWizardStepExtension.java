@@ -35,5 +35,4 @@ public interface IWizardStepExtension<FORM extends IForm, OWNER extends Abstract
   void execFormStored(WizardStepFormStoredChain<? extends IForm> chain, boolean activation);
 
   void execAction(WizardStepActionChain<? extends IForm> chain);
-
 }

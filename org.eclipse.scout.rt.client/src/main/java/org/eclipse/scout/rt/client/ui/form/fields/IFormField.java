@@ -862,8 +862,8 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   /**
    * @return the mappings between menu and status. The mappings may be set explicitly using
-   *         {@link #setStatusMenuMappings(List)} or by defining an inner class at the form field extending from
-   *         {@link AbstractStatusMenuMapping}.
+   * {@link #setStatusMenuMappings(List)} or by defining an inner class at the form field extending from
+   * {@link AbstractStatusMenuMapping}.
    */
   List<IStatusMenuMapping> getStatusMenuMappings();
 

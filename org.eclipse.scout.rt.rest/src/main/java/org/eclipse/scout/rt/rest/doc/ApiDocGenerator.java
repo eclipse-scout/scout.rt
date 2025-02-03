@@ -128,8 +128,8 @@ public class ApiDocGenerator {
    * Same as {@link #getResourceDescriptors()}, but flitered by scope.
    *
    * @param scope
-   *          Optional scope filter. Defaults to {@link RestApplicationScopes#API}. To disable the filter and return all
-   *          resources, pass {@code ""} or {@code "*"}.
+   *     Optional scope filter. Defaults to {@link RestApplicationScopes#API}. To disable the filter and return all
+   *     resources, pass {@code ""} or {@code "*"}.
    */
   public List<ResourceDescriptor> getResourceDescriptors(String scope) {
     List<ResourceDescriptor> descriptors = getResourceDescriptors();
@@ -166,9 +166,9 @@ public class ApiDocGenerator {
     DescriptionDescriptor description = generateResourceDescription(resource);
 
     List<String> collect = Arrays.stream(
-        Optional.ofNullable(resource.getClass().getAnnotation(RestApplicationScope.class))
-            .map(RestApplicationScope::value)
-            .orElseGet(() -> new String[]{RestApplicationScopes.API})) // default scope
+            Optional.ofNullable(resource.getClass().getAnnotation(RestApplicationScope.class))
+                .map(RestApplicationScope::value)
+                .orElseGet(() -> new String[]{RestApplicationScopes.API})) // default scope
         .filter(StringUtility::hasText)
         .collect(Collectors.toList());
 
@@ -411,11 +411,11 @@ public class ApiDocGenerator {
    * &#64;{@link QueryParam} annotation with the aforementioned param name constant and pass it to this method.
    *
    * @param resourceFilename
-   *          If <code>null</code>, the main HTML page is returned. All other values are treated as relative filenames
-   *          of static resources.
+   *     If <code>null</code>, the main HTML page is returned. All other values are treated as relative filenames
+   *     of static resources.
    * @param scope
-   *          Optional scope filter. Defaults to {@link RestApplicationScopes#API}. To disable the filter and return all
-   *          resources, pass {@code ""} or {@code "*"}.
+   *     Optional scope filter. Defaults to {@link RestApplicationScopes#API}. To disable the filter and return all
+   *     resources, pass {@code ""} or {@code "*"}.
    */
   public Response getWebContent(String resourceFilename, String scope) {
     // Static resources
@@ -475,13 +475,13 @@ public class ApiDocGenerator {
 
       elements.add(HTML.tag("a").addAttribute("name", r.getAnchor()));
       elements.add(HTML.h2(
-          r.getName(),
+              r.getName(),
               HTML.link("#" + r.getAnchor(), "⚓︎") // U+2693 U+FE0E = anchor + "VS15 variant selector = text style"
-              .cssClass("title-link first")
-              .addAttribute("title", "Link to this section"),
+                  .cssClass("title-link first")
+                  .addAttribute("title", "Link to this section"),
               HTML.link("#", "⭡") // U+2B61 UPWARDS ARROW
-              .cssClass("title-link")
-              .addAttribute("title", "Go to top"))
+                  .cssClass("title-link")
+                  .addAttribute("title", "Go to top"))
           .cssClass("title"));
 
       if (!r.getDescription().isEmpty()) {
@@ -489,21 +489,21 @@ public class ApiDocGenerator {
       }
 
       r.getMethods().forEach(m -> elements.add(HTML.div(
-          HTML.div(
-              HTML.div(m.getHttpMethod()).cssClass("http " + m.getHttpMethod().toLowerCase()),
               HTML.div(
-                  HTML.span("(" + CollectionUtility.format(r.getScopes()) + ")").cssClass("scope"),
-                  HTML.span(r.getPath()).cssClass("resource"),
-                  HTML.span(StringUtility.box("/", m.getPath(), "")).cssClass("method")).cssClass("path"))
-              .cssClass("header"),
-          HTML.div(
-              HTML.div(HTML.raw(m.getDescription().toHtml())).cssClass("description"),
-              HTML.div(m.getSignature().toString()).cssClass("signature"),
+                      HTML.div(m.getHttpMethod()).cssClass("http " + m.getHttpMethod().toLowerCase()),
+                      HTML.div(
+                          HTML.span("(" + CollectionUtility.format(r.getScopes()) + ")").cssClass("scope"),
+                          HTML.span(r.getPath()).cssClass("resource"),
+                          HTML.span(StringUtility.box("/", m.getPath(), "")).cssClass("method")).cssClass("path"))
+                  .cssClass("header"),
               HTML.div(
-                  StringUtility.hasText(m.getConsumes()) ? HTML.div(HTML.span("Consumes ").cssClass("k"), HTML.span(m.getConsumes()).cssClass("v")).cssClass("line") : null,
-                  StringUtility.hasText(m.getProduces()) ? HTML.div(HTML.span("Produces ").cssClass("k"), HTML.span(m.getProduces()).cssClass("v")).cssClass("line") : null)
-                  .cssClass("consumes-produces"))
-              .cssClass("body"))
+                      HTML.div(HTML.raw(m.getDescription().toHtml())).cssClass("description"),
+                      HTML.div(m.getSignature().toString()).cssClass("signature"),
+                      HTML.div(
+                              StringUtility.hasText(m.getConsumes()) ? HTML.div(HTML.span("Consumes ").cssClass("k"), HTML.span(m.getConsumes()).cssClass("v")).cssClass("line") : null,
+                              StringUtility.hasText(m.getProduces()) ? HTML.div(HTML.span("Produces ").cssClass("k"), HTML.span(m.getProduces()).cssClass("v")).cssClass("line") : null)
+                          .cssClass("consumes-produces"))
+                  .cssClass("body"))
           .cssClass("operation")));
     });
 
@@ -512,8 +512,8 @@ public class ApiDocGenerator {
     final IHtmlElement toc = tocElements.isEmpty()
         ? null
         : HTML.div(
-            HTML.div("Table of Contents").cssClass("toc-title"),
-            HTML.fragment(tocElements)).cssClass("toc");
+        HTML.div("Table of Contents").cssClass("toc-title"),
+        HTML.fragment(tocElements)).cssClass("toc");
 
     final IHtmlContent mainContent = elements.isEmpty()
         ? HTML.div("No resources available.")
@@ -616,8 +616,8 @@ public class ApiDocGenerator {
    * Lines are separated by {@link #TEXT_LINE_SEPARATOR}, fields are separated by {@link #TEXT_ELEMENT_SEPARATOR}.
    *
    * @param scope
-   *          Optional scope filter. Defaults to {@link RestApplicationScopes#API}. To disable the filter and return all
-   *          resources, pass {@code ""} or {@code "*"}.
+   *     Optional scope filter. Defaults to {@link RestApplicationScopes#API}. To disable the filter and return all
+   *     resources, pass {@code ""} or {@code "*"}.
    */
   public Response getTextContent(String scope) {
     final String content = toText(getResourceDescriptors(scope));
@@ -692,8 +692,8 @@ public class ApiDocGenerator {
    * </ul>
    *
    * @param scope
-   *          Optional scope filter. Defaults to {@link RestApplicationScopes#API}. To disable the filter and return all
-   *          resources, pass {@code ""} or {@code "*"}.
+   *     Optional scope filter. Defaults to {@link RestApplicationScopes#API}. To disable the filter and return all
+   *     resources, pass {@code ""} or {@code "*"}.
    */
   public Response getJsonContent(String scope) {
     final String content = toJsonString(getResourceDescriptors(scope));

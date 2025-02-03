@@ -29,7 +29,7 @@ public final class MenuUtility {
 
   /**
    * @return true if the menu is a visible leaf in the menu tree or the menu is a menu group (has child menus) and at
-   *         least one of the recursive child menus is a visible leaf.
+   * least one of the recursive child menus is a visible leaf.
    */
   public static <T extends IActionNode<?>> boolean isVisible(T menu) {
     if (!menu.isVisible()) {
@@ -53,10 +53,10 @@ public final class MenuUtility {
 
   /**
    * @return the sub-menu of the given context menu owner that implements the given type. If no implementation is found,
-   *         <code>null</code> is returned. Note: This method uses instance-of checks, hence the menu replacement
-   *         mapping is not required.
+   * <code>null</code> is returned. Note: This method uses instance-of checks, hence the menu replacement
+   * mapping is not required.
    * @throws IllegalArgumentException
-   *           when no context menu owner is provided.
+   *     when no context menu owner is provided.
    */
   public static <T extends IMenu> T getMenuByClass(IContextMenuOwner contextMenuOwner, final Class<T> menuType) {
     if (contextMenuOwner == null) {
@@ -74,5 +74,4 @@ public final class MenuUtility {
     }
     return new ActionFinder().findAction(rootMenus, menuType);
   }
-
 }

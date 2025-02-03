@@ -80,7 +80,8 @@ public class ReplyMessageConsumerJob<REQUEST, REPLY> extends AbstractMessageCons
           catch (Exception e) {
             throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
                 .withContextInfo("correlationId", correlationId);
-          } finally {
+          }
+          finally {
             onMessageConsumptionComplete();
           }
         });

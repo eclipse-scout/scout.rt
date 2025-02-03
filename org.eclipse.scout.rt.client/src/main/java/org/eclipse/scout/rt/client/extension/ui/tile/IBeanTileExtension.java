@@ -15,5 +15,4 @@ import org.eclipse.scout.rt.client.ui.tile.AbstractBeanTile;
 public interface IBeanTileExtension<BEAN, OWNER extends AbstractBeanTile<BEAN>> extends ITileExtension<OWNER> {
 
   void execAppLinkAction(BeanTileAppLinkActionChain<BEAN> chain, String ref);
-
 }

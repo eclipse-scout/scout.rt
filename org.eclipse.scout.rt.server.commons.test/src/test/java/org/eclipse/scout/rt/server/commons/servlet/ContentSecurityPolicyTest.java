@@ -173,5 +173,4 @@ public class ContentSecurityPolicyTest {
     appendFunc.apply("foo");
     assertEquals("expect 'bar' and 'foo' as directive source", StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, directive, "bar", "foo"), m_csp.toToken());
   }
-
 }

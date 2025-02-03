@@ -26,5 +26,4 @@ public class HorizontalGroupBoxBodyGrid extends AbstractGroupBoxBodyGrid {
     matrix.computeGridData(fields);
     setGridRows(matrix.getRowCount());
   }
-
 }

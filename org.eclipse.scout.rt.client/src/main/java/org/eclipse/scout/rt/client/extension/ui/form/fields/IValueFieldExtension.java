@@ -24,5 +24,4 @@ public interface IValueFieldExtension<VALUE, OWNER extends AbstractValueField<VA
   void execChangedValue(ValueFieldChangedValueChain<VALUE> chain);
 
   VALUE execParseValue(ValueFieldParseValueChain<VALUE> chain, String text);
-
 }

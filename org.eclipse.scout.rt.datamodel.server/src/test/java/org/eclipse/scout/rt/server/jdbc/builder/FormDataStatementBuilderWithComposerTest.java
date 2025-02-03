@@ -54,20 +54,19 @@ public class FormDataStatementBuilderWithComposerTest {
     m_builder.setDataModel(m_dataModel);
     // add data model mappings
     m_builder.setDataModelEntityDefinition(TestDataModel.Entity.SubEntity.class, "EXISTS ( SELECT 1 "
-        + "FROM TABLE @Table@ "
-        + "WHERE @Table@.PRIMARY_KEY=@parent.Table@.PRIMARY_KEY "
-        + "<whereParts/> "
-        + "<groupBy> "
-        + "  GROUP BY @parent.Table@.PRIMARY_KEY "
-        + "  HAVING 1=1 "
-        + "  <havingParts/> "
-        + "</groupBy> "
-        + ")",
+            + "FROM TABLE @Table@ "
+            + "WHERE @Table@.PRIMARY_KEY=@parent.Table@.PRIMARY_KEY "
+            + "<whereParts/> "
+            + "<groupBy> "
+            + "  GROUP BY @parent.Table@.PRIMARY_KEY "
+            + "  HAVING 1=1 "
+            + "  <havingParts/> "
+            + "</groupBy> "
+            + ")",
         "SELECT <selectParts/> "
             + "FROM <fromParts>TABLE @Table@</fromParts> "
             + "WHERE <whereParts>@Table@.PRIMARY_KEY=@parent.Table@.PRIMARY_KEY</whereParts>");
     m_builder.setDataModelAttributeDefinition(TestDataModel.Entity.SubEntity.SubAttribute.class, "@Table@.SUB_ATTRIBUTE");
-
   }
 
   @Test
