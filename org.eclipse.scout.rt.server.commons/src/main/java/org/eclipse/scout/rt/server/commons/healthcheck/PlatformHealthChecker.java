@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.server.commons.healthcheck;
 
+import java.util.Objects;
+
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.Platform;
 
@@ -17,5 +19,10 @@ public class PlatformHealthChecker extends AbstractHealthChecker {
   @Override
   protected boolean execCheckHealth(HealthCheckCategoryId category) throws Exception {
     return Platform.get().getState() == State.PlatformStarted;
+  }
+
+  @Override
+  public boolean acceptCategory(HealthCheckCategoryId category) {
+    return Objects.equals(category, Startup.ID);
   }
 }

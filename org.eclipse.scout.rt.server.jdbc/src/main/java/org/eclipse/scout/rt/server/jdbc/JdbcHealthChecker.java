@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.server.jdbc;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.commons.healthcheck.AbstractHealthChecker;
 import org.eclipse.scout.rt.server.commons.healthcheck.HealthCheckCategoryId;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
@@ -20,7 +21,7 @@ import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
  *
  * @since 6.1
  */
-public class JdbcHealthCecker extends AbstractHealthChecker {
+public class JdbcHealthChecker extends AbstractHealthChecker {
 
   @Override
   protected long getConfiguredTimeoutMillis() {
@@ -35,5 +36,10 @@ public class JdbcHealthCecker extends AbstractHealthChecker {
       return true;
     }
     return false;
+  }
+
+  @Override
+  public boolean acceptCategory(HealthCheckCategoryId category) {
+    return ObjectUtility.equals(category, Readiness.ID);
   }
 }
