@@ -58,5 +58,4 @@ public class JsonNumberColumnUserFilter extends JsonColumnUserFilter<NumberColum
     json.put("numberTo", bigDecimalToJson(getFilterState().getNumberTo()));
     return json;
   }
-
 }

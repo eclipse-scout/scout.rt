@@ -19,5 +19,4 @@ public interface IClientSessionExtension<OWNER extends AbstractClientSession> ex
   void execStoreSession(ClientSessionStoreSessionChain chain);
 
   void execLoadSession(ClientSessionLoadSessionChain chain);
-
 }

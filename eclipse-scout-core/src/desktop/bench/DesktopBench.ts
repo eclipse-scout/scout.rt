@@ -836,4 +836,5 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     return displayViewId;
   }
 }
+
 export type OutlineContent = Form | Table | OutlineOverview;

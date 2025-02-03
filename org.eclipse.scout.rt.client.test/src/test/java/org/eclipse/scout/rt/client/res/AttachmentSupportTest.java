@@ -72,5 +72,4 @@ public class AttachmentSupportTest {
   protected BinaryResource newBinaryResource(String filename) {
     return new BinaryResource(filename, new byte[]{});
   }
-
 }

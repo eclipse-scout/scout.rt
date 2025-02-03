@@ -66,12 +66,12 @@ public final class BlockingTestUtility {
    * JUnit test fail.
    *
    * @param runnableGettingBlocked
-   *          {@code IRunnable} that will enter a blocking condition.
+   *     {@code IRunnable} that will enter a blocking condition.
    * @param runnableOnceBlocked
-   *          {@code IRunnable} to be executed once the 'runnableGettingBlocked' enters a blocking condition.
+   *     {@code IRunnable} to be executed once the 'runnableGettingBlocked' enters a blocking condition.
    * @param awaitBackgroundJobs
-   *          true waits for background jobs running in the same session to complete before runnableOnceBlocked is
-   *          called
+   *     true waits for background jobs running in the same session to complete before runnableOnceBlocked is
+   *     called
    */
   public static void runBlockingAction(final IRunnable runnableGettingBlocked, final IRunnable runnableOnceBlocked, final boolean awaitBackgroundJobs) {
     final ClientRunContext runContext = ClientRunContexts.copyCurrent();
@@ -90,42 +90,39 @@ public final class BlockingTestUtility {
         .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .andMatchExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
         .toFilter(), event -> {
-          //waitFor was entered
+      //waitFor was entered
 
-          final IRunnable callRunnableOnceBlocked = () -> {
-            try {
-              runnableOnceBlocked.run();
-            }
-            finally {
-              event.getData().getBlockingCondition().setBlocking(false);
-              onceBlockedDoneCondition.setBlocking(false);
-            }
-          };
-          final JobInput jobInputForRunnableOnceBlocked = ModelJobs.newInput(runContext)
-              .withExceptionHandling(BEANS.get(JUnitExceptionHandler.class), true)
-              .withName("JUnit: Handling blocked thread because waiting for a blocking condition");
+      final IRunnable callRunnableOnceBlocked = () -> {
+        try {
+          runnableOnceBlocked.run();
+        }
+        finally {
+          event.getData().getBlockingCondition().setBlocking(false);
+          onceBlockedDoneCondition.setBlocking(false);
+        }
+      };
+      final JobInput jobInputForRunnableOnceBlocked = ModelJobs.newInput(runContext)
+          .withExceptionHandling(BEANS.get(JUnitExceptionHandler.class), true)
+          .withName("JUnit: Handling blocked thread because waiting for a blocking condition");
 
-          if (awaitBackgroundJobs) {
-            //wait until all background jobs finished
-            Jobs.schedule(() -> {
-              jobsBefore.add(IFuture.CURRENT.get());
-              BEANS.get(IJobManager.class).awaitFinished(f -> {
-                RunContext candContext = f.getJobInput().getRunContext();
-                return candContext instanceof ClientRunContext && ((ClientRunContext) candContext).getSession() == runContext.getSession() && !jobsBefore.contains(f);
-              }, 5, TimeUnit.MINUTES);
+      if (awaitBackgroundJobs) {
+        //wait until all background jobs finished
+        Jobs.schedule(() -> {
+          jobsBefore.add(IFuture.CURRENT.get());
+          BEANS.get(IJobManager.class).awaitFinished(f -> {
+            RunContext candContext = f.getJobInput().getRunContext();
+            return candContext instanceof ClientRunContext && ((ClientRunContext) candContext).getSession() == runContext.getSession() && !jobsBefore.contains(f);
+          }, 5, TimeUnit.MINUTES);
 
-              //call runnableOnceBlocked
-              ModelJobs.schedule(callRunnableOnceBlocked, jobInputForRunnableOnceBlocked);
-
-            }, Jobs.newInput().withName("wait until background jobs finished"));
-
-          }
-          else {
-            //call runnableOnceBlocked directly
-            ModelJobs.schedule(callRunnableOnceBlocked, jobInputForRunnableOnceBlocked);
-          }
-
-        });
+          //call runnableOnceBlocked
+          ModelJobs.schedule(callRunnableOnceBlocked, jobInputForRunnableOnceBlocked);
+        }, Jobs.newInput().withName("wait until background jobs finished"));
+      }
+      else {
+        //call runnableOnceBlocked directly
+        ModelJobs.schedule(callRunnableOnceBlocked, jobInputForRunnableOnceBlocked);
+      }
+    });
 
     try {
       runnableGettingBlocked.run(); // this action will enter a blocking condition which causes the 'runnableOnceBlocked' to be executed.
@@ -150,7 +147,7 @@ public final class BlockingTestUtility {
    * Adds a blocking condition timeout listener on {@link IJobManager} for the current {@link IClientSession}
    *
    * @return the handle for the listener containing the first exception caught. Call
-   *         {@link IRegistrationHandle#dispose()} to remove the listener.
+   * {@link IRegistrationHandle#dispose()} to remove the listener.
    */
   public static IBlockingConditionTimeoutHandle addBlockingConditionTimeoutListener(long timeout, TimeUnit unit) {
     final BlockingConditionTimeoutListener listener = new BlockingConditionTimeoutListener(IClientSession.CURRENT.get(), timeout, unit);
@@ -180,9 +177,9 @@ public final class BlockingTestUtility {
    * </p>
    *
    * @param runnable
-   *          The action to be executed that will cause the message box to appear
+   *     The action to be executed that will cause the message box to appear
    * @param messageBoxResult
-   *          The return value for the message box. See {@link IMessageBox} for possible values.
+   *     The return value for the message box. See {@link IMessageBox} for possible values.
    */
   public static void runBlockingActionWithMessageBoxDefaultResult(IRunnable runnable, int messageBoxResult) {
     ClientRunContexts.copyCurrent()
@@ -200,9 +197,9 @@ public final class BlockingTestUtility {
    * </p>
    *
    * @param runnable
-   *          The action to be executed that will cause the message box to appear
+   *     The action to be executed that will cause the message box to appear
    * @param messageBoxHandler
-   *          The handling function that will be used to determine the return value in the message box.
+   *     The handling function that will be used to determine the return value in the message box.
    */
   public static void runBlockingActionWithMessageBoxHandler(IRunnable runnable, ToIntFunction<IMessageBox> messageBoxHandler) {
     ClientRunContexts.copyCurrent()
@@ -263,5 +260,4 @@ public final class BlockingTestUtility {
       }, Jobs.newInput());
     }
   }
-
 }

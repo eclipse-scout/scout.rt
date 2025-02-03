@@ -33,7 +33,7 @@ public interface IJmsMessageHandler {
    * Initializes this handler, e.g. to setup a message content formatter as specified by the given properties.
    *
    * @param properties
-   *          the MOM environment properties provided to the JMS implementor
+   *     the MOM environment properties provided to the JMS implementor
    * @see org.eclipse.scout.rt.mom.api.IMomImplementor.init(Map<Object, Object>)
    */
   void init(Map<Object, Object> properties);
@@ -57,9 +57,9 @@ public interface IJmsMessageHandler {
    * The message has already been processed (marshalled) by the MOM framework.
    *
    * @param destination
-   *          the MOM destination this message is being sent to. <b>Attention:</b> This might be <code>null</code> in
-   *          case of a 'request-reply' communication, where the reply message is only sent back through the JMS
-   *          destination defined by {@link Message#getJMSReplyTo()} (and not through a MOM destination)
+   *     the MOM destination this message is being sent to. <b>Attention:</b> This might be <code>null</code> in
+   *     case of a 'request-reply' communication, where the reply message is only sent back through the JMS
+   *     destination defined by {@link Message#getJMSReplyTo()} (and not through a MOM destination)
    */
   void handleOutgoing(IDestination<?> destination, Message message, IMarshaller marshaller);
 }

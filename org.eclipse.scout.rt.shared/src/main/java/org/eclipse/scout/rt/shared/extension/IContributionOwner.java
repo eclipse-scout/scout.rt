@@ -15,8 +15,8 @@ import java.util.List;
  * This interface describes objects that are capable to hold contributions.<br>
  * Contributions may be added using the {@link IExtensionRegistry} service.
  *
- * @since 4.2
  * @see IExtensionRegistry
+ * @since 4.2
  */
 public interface IContributionOwner {
   /**
@@ -30,11 +30,11 @@ public interface IContributionOwner {
    * Returns all contributions that are <code>instanceof</code> the given filter class.
    *
    * @param type
-   *          The filter class to use. Must not be <code>null</code>.
+   *     The filter class to use. Must not be <code>null</code>.
    * @return A {@link List} containing all contribution instances which are <code>instanceof</code> the given type
-   *         class.
+   * class.
    * @throws IllegalArgumentException
-   *           when the type parameter is null.
+   *     when the type parameter is null.
    */
   <T> List<T> getContributionsByClass(Class<T> type);
 
@@ -42,12 +42,12 @@ public interface IContributionOwner {
    * Returns the contribution that exactly matches the given contribution class.
    *
    * @param contribution
-   *          The class of the contribution to return. Must not be {@code null}.
+   *     The class of the contribution to return. Must not be {@code null}.
    * @return The contribution instance that is exactly of the given class type. Never returns {@code null}.
    * @throws IllegalExtensionException
-   *           if no extension with the given class can be found.
+   *     if no extension with the given class can be found.
    * @throws IllegalArgumentException
-   *           if the contribution parameter is {@code null}.
+   *     if the contribution parameter is {@code null}.
    */
   <T> T getContribution(Class<T> contribution);
 
@@ -55,10 +55,10 @@ public interface IContributionOwner {
    * Returns the contribution that exactly matches the given contribution class.
    *
    * @param contribution
-   *          The class of the contribution to return. Must not be {@code null}.
+   *     The class of the contribution to return. Must not be {@code null}.
    * @return The contribution instance that is exactly of the given class type or {@code null} if it cannot be found.
    * @throws IllegalArgumentException
-   *           if the contribution parameter is {@code null}.
+   *     if the contribution parameter is {@code null}.
    */
   <T> T optContribution(Class<T> contribution);
 }

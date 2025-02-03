@@ -66,5 +66,4 @@ class BeanArrayHolderInput implements IBindInput {
   public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) {
     return m_delegate.produceSqlBindAndSetReplaceToken(sqlStyle);
   }
-
 }

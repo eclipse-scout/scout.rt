@@ -21,5 +21,4 @@ public interface IServerSessionLifecycleHandler {
   IServerSession create();
 
   void destroy(IServerSession session);
-
 }

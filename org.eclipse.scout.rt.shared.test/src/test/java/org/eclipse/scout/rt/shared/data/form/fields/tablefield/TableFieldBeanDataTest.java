@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.data.form.fields.tablefield;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

@@ -175,13 +175,13 @@ public class UiSessionTest {
 
     // create and start test form in a model job
     final SessionStoreTestForm form = ModelJobs.schedule(() -> {
-      SessionStoreTestForm f = new SessionStoreTestForm(openFormCloseAction);
-      f.start();
-      return f;
-    }, ModelJobs
-        .newInput(ClientRunContexts
-            .empty()
-            .withSession(clientSession, true)))
+          SessionStoreTestForm f = new SessionStoreTestForm(openFormCloseAction);
+          f.start();
+          return f;
+        }, ModelJobs
+            .newInput(ClientRunContexts
+                .empty()
+                .withSession(clientSession, true)))
         .awaitDoneAndGet(5, TimeUnit.SECONDS);
 
     // schedule a job that emulates servlet container that performs session invalidation on session timeout
@@ -256,13 +256,13 @@ public class UiSessionTest {
 
     // create and start test form in a model job
     SessionStoreTestForm form = ModelJobs.schedule(() -> {
-      SessionStoreTestForm f = new SessionStoreTestForm(openFormCloseAction);
-      f.start();
-      return f;
-    }, ModelJobs
-        .newInput(ClientRunContexts
-            .empty()
-            .withSession(clientSession, true)))
+          SessionStoreTestForm f = new SessionStoreTestForm(openFormCloseAction);
+          f.start();
+          return f;
+        }, ModelJobs
+            .newInput(ClientRunContexts
+                .empty()
+                .withSession(clientSession, true)))
         .awaitDoneAndGet(1, TimeUnit.SECONDS);
 
     // invalidate HTTP session

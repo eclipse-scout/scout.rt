@@ -65,9 +65,10 @@ public class DynamicResourceInfo {
   }
 
   /**
-   * @param jsonAdapter adapter matching the path
+   * @param jsonAdapter
+   *     adapter matching the path
    * @param path
-   *          decoded path (non url-encoded)
+   *     decoded path (non url-encoded)
    */
   public static DynamicResourceInfo fromPath(IJsonAdapter<?> jsonAdapter, String path) {
     DynamicResourcePathComponents parts = DynamicResourcePathComponents.fromPath(path);
@@ -86,9 +87,10 @@ public class DynamicResourceInfo {
   }
 
   /**
-   * @param uiSession session matching the path
+   * @param uiSession
+   *     session matching the path
    * @param path
-   *          decoded path (non url-encoded)
+   *     decoded path (non url-encoded)
    */
   public static DynamicResourceInfo fromPath(IUiSession uiSession, String path) {
     DynamicResourcePathComponents parts = DynamicResourcePathComponents.fromPath(path);
@@ -109,7 +111,7 @@ public class DynamicResourceInfo {
   /**
    * @param req
    * @param path
-   *          decoded path (non url-encoded)
+   *     decoded path (non url-encoded)
    */
   public static DynamicResourceInfo fromPath(HttpServletRequest req, String path) {
     DynamicResourcePathComponents components = DynamicResourcePathComponents.fromPath(path);
@@ -151,7 +153,7 @@ public class DynamicResourceInfo {
 
     /**
      * @param path
-     *          decoded path (non url-encoded)
+     *     decoded path (non url-encoded)
      * @see #fromPath(HttpServletRequest, String)
      * @see #fromPath(IJsonAdapter, String)
      */

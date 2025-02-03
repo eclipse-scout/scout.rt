@@ -145,7 +145,6 @@ describe('CheckBoxField', () => {
     });
   });
 
-
   describe('saveNeeded', () => {
     it('is false initially', () => {
       let field = scout.create(CheckBoxField, {

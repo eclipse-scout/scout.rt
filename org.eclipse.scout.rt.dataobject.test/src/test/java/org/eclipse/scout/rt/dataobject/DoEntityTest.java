@@ -909,7 +909,6 @@ public class DoEntityTest {
     assertThrows(AssertionException.class, () -> entity.getListNode("attribute"));
     assertThrows(AssertionException.class, () -> entity.getValueNode("attribute"));
     assertThrows(AssertionException.class, () -> entity.getCollectionNode("attribute"));
-
   }
 
   @Test

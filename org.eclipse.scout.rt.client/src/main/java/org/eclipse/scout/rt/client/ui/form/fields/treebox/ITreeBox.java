@@ -129,10 +129,10 @@ public interface ITreeBox<T> extends IValueField<Set<T>>, ICompositeField {
 
   /**
    * @return the first selected/checked value if any
-   *         <p>
-   *         By default a treebox is checkable, so its value is the array of all checked keys
-   *         <p>
-   *         When it is made non-checkable, its value is the array of all selected keys
+   * <p>
+   * By default a treebox is checkable, so its value is the array of all checked keys
+   * <p>
+   * When it is made non-checkable, its value is the array of all selected keys
    */
   T getSingleValue();
 
@@ -156,5 +156,4 @@ public interface ITreeBox<T> extends IValueField<Set<T>>, ICompositeField {
   Set<T> getUncheckedKeys();
 
   void checkAllKeys();
-
 }

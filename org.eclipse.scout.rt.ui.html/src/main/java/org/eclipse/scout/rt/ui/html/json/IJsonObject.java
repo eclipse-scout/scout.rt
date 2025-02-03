@@ -16,5 +16,4 @@ package org.eclipse.scout.rt.ui.html.json;
 public interface IJsonObject {
 
   Object toJson();
-
 }

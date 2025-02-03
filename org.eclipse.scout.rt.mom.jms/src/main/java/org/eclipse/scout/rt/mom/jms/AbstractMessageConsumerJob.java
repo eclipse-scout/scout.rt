@@ -64,7 +64,7 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
    * @param destination
    * @param input
    * @param receiveTimeoutMillis
-   *          in milliseconds, 0 for no timeout
+   *     in milliseconds, 0 for no timeout
    */
   public AbstractMessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IDestination<DTO> destination, SubscribeInput input, long receiveTimeoutMillis) {
     m_mom = mom;

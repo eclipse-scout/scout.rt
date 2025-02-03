@@ -172,7 +172,6 @@ public class ServerSessionCacheTest {
         bc.setBlocking(false);
         return super.create();
       }
-
     };
     IFuture<IServerSession> f1 = Jobs.schedule(() -> cache.getOrCreate(handler1, httpSession1), Jobs.newInput());
     IFuture<IServerSession> f2 = Jobs.schedule(() -> cache.getOrCreate(handler2, httpSession2), Jobs.newInput());
@@ -343,14 +342,12 @@ public class ServerSessionCacheTest {
     public IServerSession create() {
       return new AbstractServerSession(true) {
         private static final long serialVersionUID = 1L;
-
       };
     }
 
     @Override
     public void destroy(IServerSession session) {
     }
-
   }
 
   class FixedServerSessionLifecycleHandler extends TestServerSessionLifecycleHandler {
@@ -359,5 +356,4 @@ public class ServerSessionCacheTest {
       return m_testScoutSession;
     }
   }
-
 }

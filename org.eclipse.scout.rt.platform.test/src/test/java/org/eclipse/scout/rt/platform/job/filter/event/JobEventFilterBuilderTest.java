@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.job.filter.event;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.UUID;

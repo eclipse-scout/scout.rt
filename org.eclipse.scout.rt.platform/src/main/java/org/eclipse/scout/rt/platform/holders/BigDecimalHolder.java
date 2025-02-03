@@ -25,5 +25,4 @@ public class BigDecimalHolder extends Holder<BigDecimal> {
   public BigDecimalHolder(BigDecimal value) {
     super(BigDecimal.class, value);
   }
-
 }

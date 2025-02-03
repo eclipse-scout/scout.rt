@@ -38,5 +38,4 @@ class ActiveOrCheckedRowsFilter extends CheckedRowsFilter {
     }
     return true;
   }
-
 }

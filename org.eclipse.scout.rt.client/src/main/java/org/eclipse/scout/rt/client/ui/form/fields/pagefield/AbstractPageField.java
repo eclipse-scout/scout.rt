@@ -168,9 +168,9 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
    * Method invoked once the Page is changed.
    *
    * @param oldPage
-   *          the old {@link IPage}; might be <code>null</code>.
+   *     the old {@link IPage}; might be <code>null</code>.
    * @param newPage
-   *          the new {@link IPage}; might be <code>null</code>.
+   *     the new {@link IPage}; might be <code>null</code>.
    */
   @ConfigOperation
   protected void execPageChanged(PAGE oldPage, PAGE newPage) {

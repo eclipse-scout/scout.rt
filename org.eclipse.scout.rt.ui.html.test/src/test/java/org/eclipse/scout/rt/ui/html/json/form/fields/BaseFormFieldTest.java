@@ -15,5 +15,4 @@ import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 public class BaseFormFieldTest {
 
   protected IUiSession m_session = new UiSessionMock();
-
 }

@@ -63,7 +63,7 @@ public final class StringUtility {
    * "" (internally this method checks whether the string length is 0).
    *
    * @param s
-   *          the string to be checked
+   *     the string to be checked
    * @return {@code true} if {@code s} is {@code null} or equals the empty string, {@code false} otherwise
    */
   public static boolean isNullOrEmpty(CharSequence s) {
@@ -75,9 +75,9 @@ public final class StringUtility {
    * A character is considered to be whitespace if {@link Character#isWhitespace(char)} returns {@code true}.
    *
    * @param cs
-   *          The {@link CharSequence} to check. May be {@code null}.
+   *     The {@link CharSequence} to check. May be {@code null}.
    * @return {@code true} if the provided {@link CharSequence} contains non-whitespace characters. {@code false}
-   *         otherwise.
+   * otherwise.
    * @see Character#isWhitespace(char)
    */
   public static boolean hasText(CharSequence cs) {
@@ -159,11 +159,11 @@ public final class StringUtility {
 
   /**
    * @param humanReadableFilterText
-   *          is not a regex and may contain *,%,? as wildcards for searching
+   *     is not a regex and may contain *,%,? as wildcards for searching
    * @param patternFlags
-   *          see {@link Pattern}
+   *     see {@link Pattern}
    * @return a {@link Pattern} based on the input pattern. If the input pattern contains no '*' an '*' is automatically
-   *         appended. If the input pattern is null or empty then '*' is used instead
+   * appended. If the input pattern is null or empty then '*' is used instead
    * @since 3.8
    */
   public static Pattern toRegEx(String humanReadableFilterText, int patternFlags) {
@@ -181,9 +181,9 @@ public final class StringUtility {
    * {@link java.util.StringTokenizer} does not care about empty string between separating chars.
    *
    * @param s
-   *          String to tokenize.
+   *     String to tokenize.
    * @param c
-   *          Separating character.
+   *     Separating character.
    * @return given String s tokenized by c.
    */
   public static String[] tokenize(String s, char c) {
@@ -360,7 +360,7 @@ public final class StringUtility {
    * </p>
    *
    * @param text
-   *          the {@link String} thats new line characters should be removed
+   *     the {@link String} thats new line characters should be removed
    * @return a string derived from this string by replacing every occurrence of new line character with a blank.
    */
   public static String removeNewLines(String text) {
@@ -374,11 +374,11 @@ public final class StringUtility {
    * replacement string.
    *
    * @param text
-   *          the {@link String} thats new line characters should be removed
+   *     the {@link String} thats new line characters should be removed
    * @param replacement
-   *          the {@link String} to be used as replacement for the new line characters
+   *     the {@link String} to be used as replacement for the new line characters
    * @return a string derived from this string by replacing every occurrence of new line character with the replacement
-   *         string.
+   * string.
    */
   public static String replaceNewLines(String text, String replacement) {
     if (isNullOrEmpty(text)) {
@@ -450,7 +450,7 @@ public final class StringUtility {
 
   /**
    * @return the contents between a start and a end tag, resp "" when there is a single tag. Returns <code>null</code>
-   *         when the tag is not found in the text.
+   * when the tag is not found in the text.
    */
   public static String getTag(String text, String tagName) {
     return getTag(text, tagName, false);
@@ -463,11 +463,11 @@ public final class StringUtility {
    * tag names with letters within the ASCII range.
    *
    * @param text
-   *          The text to search for the tag name
+   *     The text to search for the tag name
    * @param tagName
-   *          The tag name to search for
+   *     The tag name to search for
    * @param ignoreCase
-   *          Should the tag name be found regardless of case?
+   *     Should the tag name be found regardless of case?
    * @return The tag's contents if it can be found, null if it can not found, or "" if there is a single tag.
    */
   @SuppressWarnings("squid:AssignmentInSubExpressionCheck")
@@ -825,7 +825,7 @@ public final class StringUtility {
     int len = s.length();
     StringBuilder buf = new StringBuilder(len);
 
-    for (int k = 0; k < len;) {
+    for (int k = 0; k < len; ) {
       ch = s.charAt(k++);
       if (ch == '\\') {
         ch = s.charAt(k++);
@@ -1015,15 +1015,15 @@ public final class StringUtility {
    * Format phone numbers (to international phone number format - eg +41 41 882 32 21)
    *
    * @param phoneNumber
-   *          Unformatted/Formatted phone number with optional country code. Brackets for area code and special
-   *          characters (like -) for local number is supported.
+   *     Unformatted/Formatted phone number with optional country code. Brackets for area code and special
+   *     characters (like -) for local number is supported.
    * @param formattingPattern
-   *          Defines the format of the phone number (eg. ## ### ## ## for 41 841 44 44). The formattingPattern must not
-   *          include the country code.
+   *     Defines the format of the phone number (eg. ## ### ## ## for 41 841 44 44). The formattingPattern must not
+   *     include the country code.
    * @param countryCode
-   *          Country code (+41, 0041, 41)
+   *     Country code (+41, 0041, 41)
    * @return If the phone number does not match the formatting pattern the original phone number will be returned.
-   *         Otherwise the formatted phone number will be returned.
+   * Otherwise the formatted phone number will be returned.
    */
   @SuppressWarnings("squid:S1643")
   public static String formatPhone(String phoneNumber, String formattingPattern, String countryCode) {
@@ -1096,7 +1096,6 @@ public final class StringUtility {
       formattedPhoneNumber = PHONE_6_PATTERN.matcher(formattedPhoneNumber).replaceAll("");
       // add country code
       formattedPhoneNumber = "+" + countryCode + " " + formattedPhoneNumber;
-
     }
     else {
       // do nothing
@@ -1341,11 +1340,11 @@ public final class StringUtility {
    * example, replacing "aa" with "b" in the string "aaa" will result in "ba" rather than "ab".
    *
    * @param source
-   *          The original string
+   *     The original string
    * @param search
-   *          The string to be searched within the source string
+   *     The string to be searched within the source string
    * @param replacement
-   *          The new string that should be used instead of the search string
+   *     The new string that should be used instead of the search string
    * @return A new string with all occurences of search replaced to replacement.
    */
   public static String replace(final String source, final String search, String replacement) {
@@ -1522,7 +1521,7 @@ public final class StringUtility {
    *
    * @param prefix
    * @param s
-   *          the string to box.
+   *     the string to box.
    * @param suffix
    * @return Returns the boxed value.
    */
@@ -1977,7 +1976,7 @@ public final class StringUtility {
    * {@link #containsString(String, String)} instead.
    *
    * @throws PatternSyntaxException
-   *           if <code>regex</code> is not a valid regular expression
+   *     if <code>regex</code> is not a valid regular expression
    */
   public static boolean containsRegEx(String s, String regex) {
     return containsRegEx(s, regex, Pattern.MULTILINE | Pattern.DOTALL);
@@ -1991,7 +1990,7 @@ public final class StringUtility {
    * {@link #containsString(String, String)} instead.
    *
    * @throws PatternSyntaxException
-   *           if <code>regex</code> is not a valid regular expression
+   *     if <code>regex</code> is not a valid regular expression
    */
   public static boolean containsRegEx(String s, String regex, int flags) {
     if (s == null || regex == null) {
@@ -2119,7 +2118,7 @@ public final class StringUtility {
    * particularly fast.
    *
    * @param length
-   *          should be &gt; 0 (lower values will return an empty string)
+   *     should be &gt; 0 (lower values will return an empty string)
    */
   @SuppressWarnings("squid:S2245") // Math.random is ok here
   public static String randomId(int length) {

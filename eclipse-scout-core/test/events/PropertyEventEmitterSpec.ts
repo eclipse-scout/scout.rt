@@ -35,6 +35,7 @@ describe('PropertyEventEmitter', () => {
 
   class SubDimensionalPropertyEventEmitter extends DimensionalPropertyEventEmitter {
     multiProp: boolean;
+
     constructor() {
       super();
       this.multiProp = false;
@@ -596,7 +597,7 @@ describe('PropertyEventEmitter', () => {
         emitter.on('propertyChange:alias', event => {
           multiPropAliasEvent = event;
         });
-        emitter.setProperty( 'alias', false);
+        emitter.setProperty('alias', false);
         expect(emitter.getProperty('multiProp')).toBe(false);
         expect(emitter.getProperty('alias')).toBe(false);
         expect(emitter.getPropertyDimension('multiProp', 'alias')).toBe(false);

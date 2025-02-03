@@ -68,5 +68,4 @@ public class AbstractBigIntegerColumnTest extends AbstractBigIntegerColumn {
     updateDisplayText(row, cell);
     assertEquals("cell text not formatted as expected", df.format(testValue), cell.getText());
   }
-
 }

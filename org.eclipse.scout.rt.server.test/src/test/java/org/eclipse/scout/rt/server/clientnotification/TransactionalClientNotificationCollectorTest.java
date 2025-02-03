@@ -65,5 +65,4 @@ public class TransactionalClientNotificationCollectorTest {
     assertEquals(1, res.size());
     assertEquals(mockMessage, res.get(0));
   }
-
 }

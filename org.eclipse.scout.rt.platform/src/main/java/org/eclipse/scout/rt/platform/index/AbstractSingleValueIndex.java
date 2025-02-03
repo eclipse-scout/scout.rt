@@ -90,7 +90,7 @@ public abstract class AbstractSingleValueIndex<INDEX, ELEMENT> implements ISingl
    * Method invoked to calculate the index value for the given element.
    *
    * @param element
-   *          the element to calculate its index value.
+   *     the element to calculate its index value.
    * @return the index value, or <code>null</code> to not add to the index.
    */
   protected abstract INDEX calculateIndexFor(ELEMENT element);

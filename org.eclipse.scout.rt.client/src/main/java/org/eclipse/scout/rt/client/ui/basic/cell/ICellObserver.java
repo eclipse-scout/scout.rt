@@ -22,5 +22,4 @@ public interface ICellObserver {
    * after the fact report after a value was stored in the cell
    */
   void cellChanged(ICell cell, int changedBit);
-
 }

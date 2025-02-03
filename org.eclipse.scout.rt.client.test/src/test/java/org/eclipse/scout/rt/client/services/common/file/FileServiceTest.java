@@ -9,9 +9,7 @@
  */
 package org.eclipse.scout.rt.client.services.common.file;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -122,7 +120,6 @@ public class FileServiceTest {
       assertTrue("Synchronized file does not exist " + synchronizedFile2, synchronizedFile2.exists());
       assertTrue("Synchronized folder does not exist " + synchronizedFolder, synchronizedFolder.exists());
       assertTrue("Incorrect number of synchronized files", synchronizedFolder.listFiles().length == 2);
-
     }
     finally {
       BeanTestingHelper.get().unregisterBeans(reg);
@@ -170,6 +167,5 @@ public class FileServiceTest {
     public void streamRemoteFile(RemoteFile spec, OutputStream out) {
       throw new ProcessingException("not implemented");
     }
-
   }
 }

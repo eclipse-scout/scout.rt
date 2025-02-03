@@ -87,7 +87,6 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
   @ClassId("ecebb06f-1493-46d5-aa6b-281db2955a4c")
   private class GroupBoxWithNonDisplayableField extends AbstractGroupBox {
 
-
     @Order(10)
     @ClassId("7d453fe5-dff0-4066-8afe-e3be0c9dac31")
     public class DisplayableField extends AbstractStringField {

@@ -188,5 +188,4 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
   protected ICalendarFieldExtension<T, ? extends AbstractCalendarField<T>> createLocalExtension() {
     return new LocalCalendarFieldExtension<>(this);
   }
-
 }

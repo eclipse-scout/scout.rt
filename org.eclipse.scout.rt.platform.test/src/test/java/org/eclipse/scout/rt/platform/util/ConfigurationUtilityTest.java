@@ -394,5 +394,4 @@ public class ConfigurationUtilityTest {
     public abstract class AbstractClass2 {
     }
   }
-
 }

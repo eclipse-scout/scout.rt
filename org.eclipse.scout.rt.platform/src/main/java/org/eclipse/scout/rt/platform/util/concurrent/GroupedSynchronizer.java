@@ -60,8 +60,8 @@ public final class GroupedSynchronizer<K, V> {
 
   /**
    * @param numRootLocks
-   *          Number of root lock objects. A higher value uses more memory but has better throughput as exclusive remove
-   *          operations block less concurrent read operations. It is recommended to use a power of 2.
+   *     Number of root lock objects. A higher value uses more memory but has better throughput as exclusive remove
+   *     operations block less concurrent read operations. It is recommended to use a power of 2.
    * @see #GroupedSynchronizer(int, boolean)
    */
   public GroupedSynchronizer(int numRootLocks) {
@@ -70,8 +70,8 @@ public final class GroupedSynchronizer<K, V> {
 
   /**
    * @param fair
-   *          {@code true} if a root lock should use a fair ordering policy. For more details on fair mode versus
-   *          non-fair mode see {@link ReentrantReadWriteLock}.
+   *     {@code true} if a root lock should use a fair ordering policy. For more details on fair mode versus
+   *     non-fair mode see {@link ReentrantReadWriteLock}.
    */
   public GroupedSynchronizer(boolean fair) {
     this(DEFAULT_ROOT_LOCKS, fair);
@@ -79,11 +79,11 @@ public final class GroupedSynchronizer<K, V> {
 
   /**
    * @param numRootLocks
-   *          Number of root lock objects. A higher value uses more memory but has better throughput as exclusive remove
-   *          operations block less concurrent read operations. It is recommended to use a power of 2.
+   *     Number of root lock objects. A higher value uses more memory but has better throughput as exclusive remove
+   *     operations block less concurrent read operations. It is recommended to use a power of 2.
    * @param fair
-   *          {@code true} if a root lock should use a fair ordering policy. For more details on fair mode versus
-   *          non-fair mode see {@link ReentrantReadWriteLock}.
+   *     {@code true} if a root lock should use a fair ordering policy. For more details on fair mode versus
+   *     non-fair mode see {@link ReentrantReadWriteLock}.
    */
   public GroupedSynchronizer(int numRootLocks, boolean fair) {
     m_locks = new ConcurrentHashMap<>();
@@ -103,16 +103,16 @@ public final class GroupedSynchronizer<K, V> {
    * removed while a task using the same entry is running.
    *
    * @param groupKey
-   *          The key object that identifies the group. Must not be {@code null}. The given class must implement
-   *          {@link #equals(Object)} and {@link #hashCode()}.
+   *     The key object that identifies the group. Must not be {@code null}. The given class must implement
+   *     {@link #equals(Object)} and {@link #hashCode()}.
    * @param task
-   *          The task to execute under the group lock. Must not be {@code null}.
+   *     The task to execute under the group lock. Must not be {@code null}.
    * @param lockFactory
-   *          A {@link Function} invoked if a new lock group should be created for a key. The input of the function is
-   *          the key for which a new lock object should be created. The return value will be used as locking object and
-   *          must not be {@code null}! This function may not be {@code null}.
+   *     A {@link Function} invoked if a new lock group should be created for a key. The input of the function is
+   *     the key for which a new lock object should be created. The return value will be used as locking object and
+   *     must not be {@code null}! This function may not be {@code null}.
    * @throws RuntimeException
-   *           occurred while executing the given task or acquiring the group lock.
+   *     occurred while executing the given task or acquiring the group lock.
    */
   public void runInGroupLock(K groupKey, Runnable task, Function<? super K, ? extends V> lockFactory) {
     acceptInGroupLock(groupKey, lockObj -> task.run(), lockFactory);
@@ -128,17 +128,17 @@ public final class GroupedSynchronizer<K, V> {
    * removed while a task using the same entry is running.
    *
    * @param groupKey
-   *          The key object that identifies the group. Must not be {@code null}. The given class must implement
-   *          {@link #equals(Object)} and {@link #hashCode()}.
+   *     The key object that identifies the group. Must not be {@code null}. The given class must implement
+   *     {@link #equals(Object)} and {@link #hashCode()}.
    * @param task
-   *          The task to execute under the group lock. Must not be {@code null}. The instance given to the task is the
-   *          group lock instance under which the task is executed. This group lock instance is never {@code null}.
+   *     The task to execute under the group lock. Must not be {@code null}. The instance given to the task is the
+   *     group lock instance under which the task is executed. This group lock instance is never {@code null}.
    * @param lockFactory
-   *          A {@link Function} invoked if a new lock group should be created for a key. The input of the function is
-   *          the key for which a new lock object should be created. The return value will be used as locking object and
-   *          must not be {@code null}! This function may not be {@code null}.
+   *     A {@link Function} invoked if a new lock group should be created for a key. The input of the function is
+   *     the key for which a new lock object should be created. The return value will be used as locking object and
+   *     must not be {@code null}! This function may not be {@code null}.
    * @throws RuntimeException
-   *           occurred while executing the given task or acquiring the group lock.
+   *     occurred while executing the given task or acquiring the group lock.
    */
   public void acceptInGroupLock(K groupKey, Consumer<? super V> task, Function<? super K, ? extends V> lockFactory) {
     applyInGroupLock(groupKey, lockObj -> {
@@ -157,18 +157,18 @@ public final class GroupedSynchronizer<K, V> {
    * removed while a task using the same entry is running.
    *
    * @param groupKey
-   *          The key object that identifies the group. Must not be {@code null}. The given class must implement
-   *          {@link #equals(Object)} and {@link #hashCode()}.
+   *     The key object that identifies the group. Must not be {@code null}. The given class must implement
+   *     {@link #equals(Object)} and {@link #hashCode()}.
    * @param task
-   *          The task to execute under the group lock. Must not be {@code null}. The instance given to the task is the
-   *          group lock instance under which the task is executed. This group lock instance is never {@code null}.
+   *     The task to execute under the group lock. Must not be {@code null}. The instance given to the task is the
+   *     group lock instance under which the task is executed. This group lock instance is never {@code null}.
    * @param lockFactory
-   *          A {@link Function} invoked if a new lock group should be created for a key. The input of the function is
-   *          the key for which a new lock object should be created. The return value will be used as locking object and
-   *          must not be {@code null}! This function may not be {@code null}.
+   *     A {@link Function} invoked if a new lock group should be created for a key. The input of the function is
+   *     the key for which a new lock object should be created. The return value will be used as locking object and
+   *     must not be {@code null}! This function may not be {@code null}.
    * @return The result of the executed task function.
    * @throws RuntimeException
-   *           occurred while executing the given task or acquiring the group lock.
+   *     occurred while executing the given task or acquiring the group lock.
    */
   public <R> R applyInGroupLock(K groupKey, Function<? super V, ? extends R> task, Function<? super K, ? extends V> lockFactory) {
     assertNotNull(groupKey, "key may not be null");
@@ -217,7 +217,7 @@ public final class GroupedSynchronizer<K, V> {
    * deadlock)!
    *
    * @param groupKey
-   *          The key object that identifies the group. Must not be {@code null}.
+   *     The key object that identifies the group. Must not be {@code null}.
    * @return The removed lock object or {@code null} if no group could be found having the given group key.
    */
   public V remove(K groupKey) {
@@ -233,14 +233,14 @@ public final class GroupedSynchronizer<K, V> {
    * deadlock)!
    *
    * @param groupKey
-   *          The key object that identifies the group. Must not be {@code null}.
+   *     The key object that identifies the group. Must not be {@code null}.
    * @param shouldRemove
-   *          An optional {@link Predicate} that is executed while holding the group lock but before the group is being
-   *          removed. This callback may be used to perform an atomic check if the remove should really be executed. If
-   *          the {@link Predicate} returns {@code false}, nothing will be removed and this method call is a noop. If no
-   *          {@link Predicate} is present or the {@link Predicate} returns {@code true}, the group will be removed.
+   *     An optional {@link Predicate} that is executed while holding the group lock but before the group is being
+   *     removed. This callback may be used to perform an atomic check if the remove should really be executed. If
+   *     the {@link Predicate} returns {@code false}, nothing will be removed and this method call is a noop. If no
+   *     {@link Predicate} is present or the {@link Predicate} returns {@code true}, the group will be removed.
    * @return The removed lock object or {@code null} if nothing was removed (because the key was not found or the
-   *         callback returned {@code false}).
+   * callback returned {@code false}).
    */
   public V remove(K groupKey, Predicate<? super V> shouldRemove) {
     assertNotNull(groupKey, "key may not be null");
@@ -285,7 +285,7 @@ public final class GroupedSynchronizer<K, V> {
 
   /**
    * @return A read only live {@link Map} view on this {@link GroupedSynchronizer}. The map key is the group key and the
-   *         map value the corresponding group lock object.
+   * map value the corresponding group lock object.
    */
   public Map<K, V> toMap() {
     return Collections.unmodifiableMap(m_locks);
@@ -293,7 +293,7 @@ public final class GroupedSynchronizer<K, V> {
 
   /**
    * @return The number of currently locked root locks. This means this number of root locks cannot be used to acquire a
-   *         group lock and task execution for those root locks is delayed.
+   * group lock and task execution for those root locks is delayed.
    */
   public int numLockedRootLocks() {
     return (int) Stream.of(m_rootLocks)

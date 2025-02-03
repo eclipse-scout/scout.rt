@@ -94,7 +94,7 @@ public class LegacyGzipServletResponseWrapper extends HttpServletResponseWrapper
 
   /**
    * @param minimumLengthToCompress
-   *          is the minimum uncompressed size that is compressed, -1 disables compression
+   *     is the minimum uncompressed size that is compressed, -1 disables compression
    * @return true if the content was compressed
    */
   public boolean finish(int minimumLengthToCompress) throws IOException {

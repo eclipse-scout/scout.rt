@@ -154,8 +154,8 @@ public class DefaultSearchFilterServiceTest {
     m_searchFilterService.applySearchDelegate(booleanField, m_searchFilter, false);
     m_searchFilterService.applySearchDelegate(stringField2, m_searchFilter, false);
     Assert.assertEquals(LABEL + " " + TEXTS.get("LogicLike") + " " + stringField.getDisplayText() + "\n" +
-        LABEL + "\n" + // <--
-        LABEL + " " + TEXTS.get("LogicLike") + " " + stringField2.getDisplayText(),
+            LABEL + "\n" + // <--
+            LABEL + " " + TEXTS.get("LogicLike") + " " + stringField2.getDisplayText(),
         m_searchFilter.getDisplayTextsPlain());
 
     // Unchecked --> not contained in output
@@ -165,7 +165,7 @@ public class DefaultSearchFilterServiceTest {
     m_searchFilterService.applySearchDelegate(booleanField, m_searchFilter, false);
     m_searchFilterService.applySearchDelegate(stringField2, m_searchFilter, false);
     Assert.assertEquals(LABEL + " " + TEXTS.get("LogicLike") + " " + stringField.getDisplayText() + "\n" +
-        LABEL + " " + TEXTS.get("LogicLike") + " " + stringField2.getDisplayText(),
+            LABEL + " " + TEXTS.get("LogicLike") + " " + stringField2.getDisplayText(),
         m_searchFilter.getDisplayTextsPlain());
   }
 

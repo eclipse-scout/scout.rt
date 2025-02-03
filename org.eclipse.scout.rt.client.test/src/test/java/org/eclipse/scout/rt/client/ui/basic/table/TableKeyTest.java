@@ -57,7 +57,6 @@ public class TableKeyTest {
     assertEquals(rows.get(0), table.findParentRow(rows.get(2)));
     assertNull(table.findParentRow(rows.get(0)));
     assertNull(table.findParentRow(rows.get(1)));
-
   }
 
   @Test
@@ -275,7 +274,6 @@ public class TableKeyTest {
       protected boolean getConfiguredPrimaryKey() {
         return true;
       }
-
     }
 
     @Order(2000)
@@ -309,7 +307,5 @@ public class TableKeyTest {
     @ClassId("a743972f-d0ab-472c-ad6f-e742c638f359")
     public class FirstColumn extends AbstractStringColumn {
     }
-
   }
-
 }

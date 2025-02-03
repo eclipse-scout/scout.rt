@@ -43,5 +43,4 @@ public final class BeanTileChains {
       callChain(methodInvocation);
     }
   }
-
 }

@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * which is referenced in case of a validation error.
  *
  * @see AbstractFromToSequenceBox for a from/to field pair which should be grouped into a sequence box (using a common
- *      label for both fields)
+ * label for both fields)
  */
 @ApplicationScoped
 public class SequenceValidationHelper {

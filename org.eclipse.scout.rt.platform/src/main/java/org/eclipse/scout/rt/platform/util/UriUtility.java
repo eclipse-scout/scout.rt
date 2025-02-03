@@ -41,7 +41,8 @@ public final class UriUtility {
   /**
    * Parses the given URL's query string using encoding UTF_8 and extracts the query parameter.
    *
-   * @param url url
+   * @param url
+   *     url
    * @return map with parsed query parameters. Never <code>null</code>.
    */
   public static Map<String, String> getQueryParameters(URL url) {
@@ -51,9 +52,10 @@ public final class UriUtility {
   /**
    * Parses the given URL's query string using the given encoding and extracts the query parameter.
    *
-   * @param url url
+   * @param url
+   *     url
    * @param encoding
-   *          encoding of the query parameter. If <code>null</code> UTF_8 is used.
+   *     encoding of the query parameter. If <code>null</code> UTF_8 is used.
    * @return map with parsed query parameters. Never <code>null</code>.
    */
   public static Map<String, String> getQueryParameters(URL url, String encoding) {
@@ -66,7 +68,8 @@ public final class UriUtility {
   /**
    * Parses the given URI's query string using encoding UTF_8 and extracts the query parameter.
    *
-   * @param uri uri
+   * @param uri
+   *     uri
    * @return map with parsed query parameters. Never <code>null</code>.
    */
   public static Map<String, String> getQueryParameters(URI uri) {
@@ -76,9 +79,10 @@ public final class UriUtility {
   /**
    * Parses the given URI's query string using the given encoding and extracts the query parameter.
    *
-   * @param uri uri
+   * @param uri
+   *     uri
    * @param encoding
-   *          encoding of the query parameter. If <code>null</code> UTF-8 is used.
+   *     encoding of the query parameter. If <code>null</code> UTF-8 is used.
    * @return map with parsed query parameters. Never <code>null</code>.
    */
   public static Map<String, String> getQueryParameters(URI uri, String encoding) {
@@ -126,7 +130,8 @@ public final class UriUtility {
   /**
    * Splits the path of the given {@link URI} in its elements.
    *
-   * @param uri uri
+   * @param uri
+   *     uri
    * @return the path elements or an empty string array if the uri or its path is <code>null</code>.
    */
   public static String[] getPath(URI uri) {
@@ -143,7 +148,8 @@ public final class UriUtility {
   /**
    * Converts the given URL into an URI.
    *
-   * @param url url
+   * @param url
+   *     url
    * @return <code>null</code> if the given url is <code>null</code>.
    */
   public static URI urlToUri(URL url) {
@@ -161,7 +167,8 @@ public final class UriUtility {
   /**
    * Converts the given URI into an URL.
    *
-   * @param uri uri
+   * @param uri
+   *     uri
    * @return <code>null</code> if the given uri is <code>null</code>.
    */
   public static URL uriToUrl(URI uri) {
@@ -179,7 +186,8 @@ public final class UriUtility {
   /**
    * Parses the given string into an {@link URI}.
    *
-   * @param uri uri
+   * @param uri
+   *     uri
    * @return <code>null</code> if the given string is null or has no text or a parsed {@link URI} instance.
    */
   public static URI toUri(String uri) {
@@ -197,7 +205,8 @@ public final class UriUtility {
   /**
    * Parses the given string into an {@link URL}.
    *
-   * @param url url
+   * @param url
+   *     url
    * @return <code>null</code> if the given string is null or has no text or a parsed {@link URL} instance.
    */
   public static URL toUrl(String url) {

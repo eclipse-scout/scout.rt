@@ -193,6 +193,5 @@ public class BasicPropertySupportTest {
     else {
       assertTrue(propertySupport.getSpecificPropertyChangeListeners().isEmpty());
     }
-
   }
 }

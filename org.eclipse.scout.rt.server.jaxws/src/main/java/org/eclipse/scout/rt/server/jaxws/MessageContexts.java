@@ -48,7 +48,7 @@ public final class MessageContexts {
 
   /**
    * @return <code>true</code> if the current message is an outbound-message, meaning that the request was already
-   *         processed.
+   * processed.
    */
   public static boolean isOutboundMessage(final MessageContext context) {
     return TypeCastUtility.castValue(context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY), boolean.class);
@@ -56,7 +56,7 @@ public final class MessageContexts {
 
   /**
    * @return <code>true</code> if the current message is an inbound-message, meaning that the request is not processed
-   *         yet.
+   * yet.
    */
   public static boolean isInboundMessage(final MessageContext context) {
     return !isOutboundMessage(context);

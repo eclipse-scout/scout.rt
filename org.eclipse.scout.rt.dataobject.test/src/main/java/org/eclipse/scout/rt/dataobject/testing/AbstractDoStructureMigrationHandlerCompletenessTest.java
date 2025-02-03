@@ -39,7 +39,7 @@ public abstract class AbstractDoStructureMigrationHandlerCompletenessTest {
 
   /**
    * @return a list of classes/test classes that will be excluded from completeness checking. This may be used if there
-   *         is a very special case where a successful standard test cannot be implemented.
+   * is a very special case where a successful standard test cannot be implemented.
    */
   protected Set<Class<?>> getExclusionList() {
     return Collections.emptySet();

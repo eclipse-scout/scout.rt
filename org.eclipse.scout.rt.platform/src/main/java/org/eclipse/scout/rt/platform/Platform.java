@@ -33,13 +33,13 @@ public final class Platform {
 
   /**
    * @return the active platform, fully initialized and in state {@link IPlatform.State#BeanManagerValid}. However there
-   *         may be some {@link IPlatformListener} still running.
-   *         <p>
-   *         Callers of this method should make sure if their code requires the platform to have finished running all
-   *         {@link IPlatformListener}s by calling {@link IPlatform#awaitPlatformStarted()}
-   *         <p>
-   *         If {@link #platform} is null, then it is automatically located and started prior to returning from this
-   *         method.
+   * may be some {@link IPlatformListener} still running.
+   * <p>
+   * Callers of this method should make sure if their code requires the platform to have finished running all
+   * {@link IPlatformListener}s by calling {@link IPlatform#awaitPlatformStarted()}
+   * <p>
+   * If {@link #platform} is null, then it is automatically located and started prior to returning from this
+   * method.
    */
   public static IPlatform get() {
     IPlatform platformAccessor = platform;
@@ -52,12 +52,12 @@ public final class Platform {
 
   /**
    * @return the active platform, may be null and may be not yet initialized
-   *         <p>
-   *         If {@link #platform} is null when calling this method, then the platform is <em>not</em> automatically
-   *         located and started.
-   *         <p>
-   *         Be careful when using this method. In most cases, replacing the platform should not be necessary. This
-   *         method is sometimes used in unit testing frameworks.
+   * <p>
+   * If {@link #platform} is null when calling this method, then the platform is <em>not</em> automatically
+   * located and started.
+   * <p>
+   * Be careful when using this method. In most cases, replacing the platform should not be necessary. This
+   * method is sometimes used in unit testing frameworks.
    */
   public static IPlatform peek() {
     return platform;
@@ -94,5 +94,4 @@ public final class Platform {
     tmpPlatform.awaitPlatformStarting();
     platform = tmpPlatform;
   }
-
 }

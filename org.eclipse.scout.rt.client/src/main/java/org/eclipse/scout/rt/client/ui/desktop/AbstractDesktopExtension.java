@@ -134,7 +134,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    * Subclasses can override this method. The default simply returns {@link ContributionCommand.Continue}.
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
-   *         {@code ContributionCommand.Stop} otherwise
+   * {@code ContributionCommand.Stop} otherwise
    */
   @ConfigOperation
   @Order(10)
@@ -152,7 +152,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    * Subclasses can override this method. The default simply returns {@link ContributionCommand.Continue}.
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
-   *         {@code ContributionCommand.Stop} otherwise
+   * {@code ContributionCommand.Stop} otherwise
    */
   @ConfigOperation
   @Order(12)
@@ -166,7 +166,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    * the closing process will be stopped.
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
-   *         {@code ContributionCommand.Stop} otherwise
+   * {@code ContributionCommand.Stop} otherwise
    */
   @ConfigOperation
   @Order(14)
@@ -180,7 +180,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    * Subclasses can override this method. The default simply returns {@link ContributionCommand.Continue}.
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
-   *         {@code ContributionCommand.Stop} otherwise
+   * {@code ContributionCommand.Stop} otherwise
    */
   @ConfigOperation
   @Order(15)
@@ -194,7 +194,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    * Subclasses can override this method. The default simply returns {@link ContributionCommand.Continue}.
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
-   *         {@code ContributionCommand.Stop} otherwise
+   * {@code ContributionCommand.Stop} otherwise
    */
   @ConfigOperation
   @Order(20)
@@ -208,7 +208,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    * Subclasses can override this method. The default simply returns {@link ContributionCommand.Continue}.
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
-   *         {@code ContributionCommand.Stop} otherwise
+   * {@code ContributionCommand.Stop} otherwise
    */
   @ConfigOperation
   @Order(25)
@@ -222,11 +222,11 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    * Subclasses can override this method. The default simply returns {@link ContributionCommand.Continue}.
    *
    * @param oldOutline
-   *          old outline that was active before
+   *     old outline that was active before
    * @param newOutline
-   *          new outline that is active after the change
+   *     new outline that is active after the change
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
-   *         {@code ContributionCommand.Stop} otherwise
+   * {@code ContributionCommand.Stop} otherwise
    */
   @ConfigOperation
   @Order(30)
@@ -243,9 +243,9 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    * Subclasses can override this method. The default simply returns {@link ContributionCommand.Continue}.
    *
    * @param formHolder
-   *          contains the form that will be added to the core desktop
+   *     contains the form that will be added to the core desktop
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
-   *         {@code ContributionCommand.Stop} otherwise
+   * {@code ContributionCommand.Stop} otherwise
    */
   protected ContributionCommand execFormAboutToShow(IHolder<IForm> formHolder) {
     return ContributionCommand.Continue;
@@ -257,11 +257,11 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    * Subclasses can override this method. The default simply returns {@link ContributionCommand.Continue}.
    *
    * @param oldForm
-   *          is the search form of the old (not selected anymore) page or {@code null}
+   *     is the search form of the old (not selected anymore) page or {@code null}
    * @param newForm
-   *          is the search form of the new (selected) page or {@code null}
+   *     is the search form of the new (selected) page or {@code null}
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
-   *         {@code ContributionCommand.Stop} otherwise
+   * {@code ContributionCommand.Stop} otherwise
    */
   @Order(40)
   @ConfigOperation
@@ -275,11 +275,11 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    * Subclasses can override this method. The default simply returns {@link ContributionCommand.Continue}.
    *
    * @param oldForm
-   *          is the detail form of the old (not selected anymore) page or {@code null}
+   *     is the detail form of the old (not selected anymore) page or {@code null}
    * @param newForm
-   *          is the detail form of the new (selected) page or {@code null}
+   *     is the detail form of the new (selected) page or {@code null}
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
-   *         {@code ContributionCommand.Stop} otherwise
+   * {@code ContributionCommand.Stop} otherwise
    */
   @Order(50)
   @ConfigOperation
@@ -293,11 +293,11 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    * Subclasses can override this method. The default simply returns {@link ContributionCommand.Continue}.
    *
    * @param oldTable
-   *          is the table of the old (not selected anymore) table page or {@code null}
+   *     is the table of the old (not selected anymore) table page or {@code null}
    * @param newTable
-   *          is the table of the new (selected) table page or {@code null}
+   *     is the table of the new (selected) table page or {@code null}
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
-   *         {@code ContributionCommand.Stop} otherwise
+   * {@code ContributionCommand.Stop} otherwise
    */
   @Order(60)
   @ConfigOperation
@@ -311,9 +311,9 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    * Subclasses can override this method. The default simply returns {@link ContributionCommand.Continue}.
    *
    * @param tablePage
-   *          the table page that has been (re)loaded
+   *     the table page that has been (re)loaded
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
-   *         {@code ContributionCommand.Stop} otherwise
+   * {@code ContributionCommand.Stop} otherwise
    */
   @Order(62)
   @ConfigOperation
@@ -341,5 +341,4 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
     List<Class<IAction>> fca = ConfigurationUtility.filterClasses(dca, IAction.class);
     return ConfigurationUtility.removeReplacedClasses(fca);
   }
-
 }

@@ -26,7 +26,7 @@ public class ArrayComparator implements Comparator<Object[]> {
    *
    * @param locale
    * @param sortCols
-   *          0-based column indices
+   *     0-based column indices
    */
   public ArrayComparator(Locale locale, int... sortCols) {
     m_comparators = new ColumnComparator[sortCols.length];
@@ -130,6 +130,5 @@ public class ArrayComparator implements Comparator<Object[]> {
       }
       return c;
     }
-
   }
 }

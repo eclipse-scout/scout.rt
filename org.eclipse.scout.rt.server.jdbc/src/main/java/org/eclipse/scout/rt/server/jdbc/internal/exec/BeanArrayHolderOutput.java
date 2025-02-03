@@ -88,5 +88,4 @@ class BeanArrayHolderOutput implements IBindOutput {
   public String toString() {
     return getClass().getSimpleName() + "[delegate=" + m_delegate + "]";
   }
-
 }

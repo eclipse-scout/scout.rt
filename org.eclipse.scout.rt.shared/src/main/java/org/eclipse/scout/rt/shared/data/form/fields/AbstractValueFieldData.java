@@ -58,5 +58,4 @@ public abstract class AbstractValueFieldData<T> extends AbstractFormFieldData im
       throw new SecurityException("value is of inconsistent type; potential value corruption attack");
     }
   }
-
 }

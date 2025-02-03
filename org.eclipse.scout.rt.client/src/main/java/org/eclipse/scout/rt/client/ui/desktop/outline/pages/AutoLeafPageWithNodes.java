@@ -65,5 +65,4 @@ public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
   protected boolean getConfiguredLeaf() {
     return true;
   }
-
 }

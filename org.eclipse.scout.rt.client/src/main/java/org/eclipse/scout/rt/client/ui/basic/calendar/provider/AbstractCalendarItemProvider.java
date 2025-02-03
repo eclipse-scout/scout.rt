@@ -105,6 +105,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   /*
    * Configuration
    */
+
   /**
    * @return true, if this calendar item should be draggable in the UI, false otherwise.
    */
@@ -222,7 +223,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
    * @param menus
-   *          live and mutable collection of configured menus
+   *     live and mutable collection of configured menus
    */
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
@@ -295,8 +296,8 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     else {
       try {
         ModelJobs.schedule(() -> {
-          propertySupport.setPropertyBool(PROP_LOAD_IN_PROGRESS, loadInProgress);
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
+              propertySupport.setPropertyBool(PROP_LOAD_IN_PROGRESS, loadInProgress);
+            }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
             .awaitDone();
       }
       catch (ThreadInterruptedError e) { // NOSONAR
@@ -447,7 +448,6 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     public void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date fromDate, Date toDate) {
       getOwner().execItemMoved(item, fromDate, toDate);
     }
-
   }
 
   protected final void interceptLoadItems(Date minDate, Date maxDate, Set<ICalendarItem> result) {
@@ -473,5 +473,4 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     CalendarItemProviderItemMovedChain chain = new CalendarItemProviderItemMovedChain(extensions);
     chain.execItemMoved(item, fromDate, toDate);
   }
-
 }

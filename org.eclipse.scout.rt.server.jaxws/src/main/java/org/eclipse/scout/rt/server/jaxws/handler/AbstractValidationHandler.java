@@ -111,7 +111,7 @@ public abstract class AbstractValidationHandler implements LogicalHandler<Logica
 
   /**
    * @return Gets the location on the classpath where the XSD root file can be found. (e.g.
-   *         <code>WEB-INF/wsdl/MyWebService/schema.xsd</code>).
+   * <code>WEB-INF/wsdl/MyWebService/schema.xsd</code>).
    */
   protected abstract String getSchemaPath();
 }

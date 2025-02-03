@@ -53,7 +53,7 @@ public abstract class AbstractPasswordManagementService implements IPasswordMana
 
   /**
    * @throws ProcessingException
-   *           when the userId/password is invalid
+   *     when the userId/password is invalid
    */
   protected abstract void checkAccess(String userId, char[] password);
 
@@ -66,5 +66,4 @@ public abstract class AbstractPasswordManagementService implements IPasswordMana
    * Reset the password, all checks and verifications have already been passed.
    */
   protected abstract void resetPasswordInternal(String userId, char[] newPassword);
-
 }

@@ -60,5 +60,4 @@ public class CollatorProviderTest {
   private void sort(final Collator collator, String[] array) {
     Arrays.sort(array, 0, array.length, (a, b) -> collator.compare(a, b));
   }
-
 }

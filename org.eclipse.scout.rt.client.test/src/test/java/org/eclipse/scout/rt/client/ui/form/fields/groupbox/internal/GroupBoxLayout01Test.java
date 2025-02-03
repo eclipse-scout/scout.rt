@@ -134,7 +134,6 @@ public class GroupBoxLayout01Test extends AbstractGroupBoxLayoutTest {
       protected int getConfiguredGridH() {
         return 2;
       }
-
     }
 
     @Order(40)
@@ -144,8 +143,6 @@ public class GroupBoxLayout01Test extends AbstractGroupBoxLayoutTest {
       protected String getConfiguredLabel() {
         return "Field 04";
       }
-
     }
-
   }
 }

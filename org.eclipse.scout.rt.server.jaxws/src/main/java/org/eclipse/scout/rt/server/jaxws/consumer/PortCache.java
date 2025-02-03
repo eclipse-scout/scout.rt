@@ -42,11 +42,11 @@ public class PortCache<PORT> implements IPortProvider<PORT> {
 
   /**
    * @param corePoolSize
-   *          number of Ports to have preemptively in the cache.
+   *     number of Ports to have preemptively in the cache.
    * @param timeToLive
-   *          time-to-live [ms] for a Port in the cache if the 'corePoolSize' is exceeded.
+   *     time-to-live [ms] for a Port in the cache if the 'corePoolSize' is exceeded.
    * @param portProvider
-   *          factory to create new Ports.
+   *     factory to create new Ports.
    */
   public PortCache(final int corePoolSize, final long timeToLive, final IPortProvider<PORT> portProvider) {
     this(corePoolSize, timeToLive, portProvider, new ConcurrentLinkedDeque<>());

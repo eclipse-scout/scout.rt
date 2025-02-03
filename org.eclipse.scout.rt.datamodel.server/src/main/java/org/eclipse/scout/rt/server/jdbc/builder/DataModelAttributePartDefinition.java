@@ -41,22 +41,22 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
 
   /**
    * @param whereClause
-   *          is normally something like @Person@.LAST_NAME
-   *          <p>
-   *          Maximum extent is using tags like
+   *     is normally something like @Person@.LAST_NAME
+   *     <p>
+   *     Maximum extent is using tags like
    *
-   *          <pre>
-   *          &lt;attribute&gt;@Person@.LAST_NAME&lt;/attribute&gt;
-   *          &lt;fromPart&gt;MY_PERSON @Person@&lt;/fromPart&gt;
-   *          &lt;wherePart&gt;@Person@.PERSON_ID=...&lt;/wherePart&gt;
-   *          &lt;havingPart&gt;...&lt;/havingPart&gt;
-   *          </pre>
-   *
-   *          That way the wherePart is added to the entities whereParts section and never to the havingParts section,
-   *          which would be wrong.
+   *     <pre>
+   *              &lt;attribute&gt;@Person@.LAST_NAME&lt;/attribute&gt;
+   *              &lt;fromPart&gt;MY_PERSON @Person@&lt;/fromPart&gt;
+   *              &lt;wherePart&gt;@Person@.PERSON_ID=...&lt;/wherePart&gt;
+   *              &lt;havingPart&gt;...&lt;/havingPart&gt;
+   *              </pre>
+   *     <p>
+   *     That way the wherePart is added to the entities whereParts section and never to the havingParts section,
+   *     which would be wrong.
    * @param selectClause
-   *          is by default the same as the where clause, but sometimes it is necessary to have a different select
-   *          clause than the where clause.
+   *     is by default the same as the where clause, but sometimes it is necessary to have a different select
+   *     clause than the where clause.
    */
   public DataModelAttributePartDefinition(Class<? extends IDataModelAttribute> attributeType, String whereClause, String selectClause, boolean plainBind) {
     m_attributeType = attributeType;
@@ -125,34 +125,33 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
    * attribute itself as the complete statement part.
    *
    * @param builder
-   *          containging all binds and sql parts
+   *     containging all binds and sql parts
    * @param attributeNodeData
-   *          the form data object containing the runtime value {@link ComposerAttributeNodeData}
+   *     the form data object containing the runtime value {@link ComposerAttributeNodeData}
    * @param stm
-   *          is either {@link #getSelectClause()} or {@link #getWhereClause()} depending on the strategy
+   *     is either {@link #getSelectClause()} or {@link #getWhereClause()} depending on the strategy
    * @param bindNames
-   *          by default the names "a", "b", "c", ... representing then field bindValues in the same order as the fields
+   *     by default the names "a", "b", "c", ... representing then field bindValues in the same order as the fields
    * @param bindValues
-   *          the values of the {@link AbstractValueFieldData}s
+   *     the values of the {@link AbstractValueFieldData}s
    * @param parentAliasMap
-   *          the map of meta-alias to alias for this entity, for example @Person@ -> p1
+   *     the map of meta-alias to alias for this entity, for example @Person@ -> p1
    * @param strategy
-   *          is one of the {@link AttributeStrategy} enums and decides whether {@link #getSelectClause()} or
-   *          {@link #getWhereClause()} is used
+   *     is one of the {@link AttributeStrategy} enums and decides whether {@link #getSelectClause()} or
+   *     {@link #getWhereClause()} is used
    * @return the result; empty {@link EntityContribution} if that part is to be ignored
-   *         <p>
-   *         default calls
-   *         {@link FormDataStatementBuilder#createAttributePart(AttributeStrategy, Integer, String, int, List, List, boolean, Map)}
-   *         <p>
-   *         Can make use of alias markers such as @Person@.LAST_NAME, these are resolved in the
-   *         {@link FormDataStatementBuilder}
-   *         <p>
-   *         Additional bind values - other than the parameter bindNames/bindValues - must be added using
-   *         {@link FormDataStatementBuilder#addBind(String, Object)}
+   * <p>
+   * default calls
+   * {@link FormDataStatementBuilder#createAttributePart(AttributeStrategy, Integer, String, int, List, List, boolean, Map)}
+   * <p>
+   * Can make use of alias markers such as @Person@.LAST_NAME, these are resolved in the
+   * {@link FormDataStatementBuilder}
+   * <p>
+   * Additional bind values - other than the parameter bindNames/bindValues - must be added using
+   * {@link FormDataStatementBuilder#addBind(String, Object)}
    */
   public EntityContribution createInstance(FormDataStatementBuilder builder, ComposerAttributeNodeData attributeNodeData, AttributeStrategy strategy, String stm, List<String> bindNames, List<Object> bindValues,
       Map<String, String> parentAliasMap) {
     return builder.createAttributePart(strategy, attributeNodeData.getAggregationType(), stm, attributeNodeData.getOperator(), bindNames, bindValues, this.isPlainBind(), parentAliasMap);
   }
-
 }

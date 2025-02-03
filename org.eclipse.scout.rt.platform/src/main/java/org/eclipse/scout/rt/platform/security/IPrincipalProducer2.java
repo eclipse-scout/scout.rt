@@ -25,9 +25,9 @@ public interface IPrincipalProducer2 {
 
   /**
    * @param username
-   *          or userId
+   *     or userId
    * @param params
-   *          additional parameters
+   *     additional parameters
    * @return a principal based on the arguments
    */
   Principal produce(String username, List<String> params);

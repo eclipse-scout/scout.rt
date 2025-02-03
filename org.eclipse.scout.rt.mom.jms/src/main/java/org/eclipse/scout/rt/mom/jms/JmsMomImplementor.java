@@ -655,10 +655,10 @@ public class JmsMomImplementor implements IMomImplementor {
 
   /**
    * @return a shared {@link Connection} to JMS broker. This method may block until a connection is available.
-   *         <p>
-   *         Do not keep references to this value, it may change after reconnect attempts.
-   *         <p>
-   *         see {@link #isConnected()} which is not blocking
+   * <p>
+   * Do not keep references to this value, it may change after reconnect attempts.
+   * <p>
+   * see {@link #isConnected()} which is not blocking
    */
   public Connection getConnection() {
     try {

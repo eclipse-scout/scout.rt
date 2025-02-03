@@ -72,7 +72,7 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
    * desktop to null at the end of your test.
    *
    * @param desktop
-   *          the test desktop
+   *     the test desktop
    */
   public void replaceDesktop(IDesktop desktop) {
     m_testDesktop = desktop;

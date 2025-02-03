@@ -23,5 +23,4 @@ public class BooleanHolder extends Holder<Boolean> {
   public BooleanHolder(Boolean value) {
     super(Boolean.class, value);
   }
-
 }

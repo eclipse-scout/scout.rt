@@ -53,5 +53,4 @@ public abstract class AbstractPageWithTableExtension<T extends ITable, OWNER ext
   public List<IMenu> execComputeTableEmptySpaceMenus(PageWithTableComputeTableEmptySpaceMenusChain<? extends ITable> chain) {
     return chain.execComputeTableEmptySpaceMenus();
   }
-
 }

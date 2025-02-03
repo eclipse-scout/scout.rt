@@ -145,11 +145,11 @@ public class MutualExclusionTest {
   public void testAwaitDoneWithSameMutex() {
     final IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
     Jobs.schedule(() -> Jobs.schedule(() -> {
-      // NOOP
-    }, Jobs.newInput()
-        .withExecutionSemaphore(mutex))
-        .awaitDone(), Jobs.newInput()
-        .withExecutionSemaphore(mutex))
+              // NOOP
+            }, Jobs.newInput()
+                .withExecutionSemaphore(mutex))
+            .awaitDone(), Jobs.newInput()
+            .withExecutionSemaphore(mutex))
         .awaitDoneAndGet();
   }
 
@@ -175,7 +175,7 @@ public class MutualExclusionTest {
         try {
           final AtomicBoolean run = new AtomicBoolean(false);
           Jobs.schedule(() -> run.set(true), Jobs.newInput()
-              .withExecutionSemaphore(mutex))
+                  .withExecutionSemaphore(mutex))
               .awaitDone(1, TimeUnit.SECONDS);
           fail("AssertionException expected, because the current job is the mutex owner");
         }
@@ -747,7 +747,6 @@ public class MutualExclusionTest {
         // Wait until job-1 tried to re-acquire the mutex.
         JobTestUtil.waitForPermitCompetitors(m_clientSession.getModelJobSemaphore(), 4); // 4 = job1(re-acquiring), job3(owner), job4, job5
         protocol.add("running-job-3 (b)");
-
       }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
           .withName("job-3")
           .withExecutionHint(JOB_IDENTIFIER)
@@ -1110,10 +1109,10 @@ public class MutualExclusionTest {
     awaitDoneElseFail(JOB_IDENTIFIER);
 
     ModelJobs.schedule(() -> {
-      protocol.add("4: beforeWaitFor");
-      condition.waitFor();
-      protocol.add("5: afterWaitFor");
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
+          protocol.add("4: beforeWaitFor");
+          condition.waitFor();
+          protocol.add("5: afterWaitFor");
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
         .awaitDoneAndGet();
 
     List<String> expected = new ArrayList<>();

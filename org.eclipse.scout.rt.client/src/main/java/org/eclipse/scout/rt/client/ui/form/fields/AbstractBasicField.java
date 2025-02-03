@@ -157,5 +157,4 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
       getOwner().execChangedDisplayText();
     }
   }
-
 }

@@ -167,14 +167,14 @@ public class SunSecurityProvider implements ISecurityProvider {
       SecretKey secretKey = new SecretKeySpec(key, cipherAlgorithm);
       GCMParameterSpec parameters = new GCMParameterSpec(gcmAuthTagBitLen, iv);
       byte[] compatibilityHeader = ("[1:"
-          + keyLen
-          + "-" + secretKeyAlgorithm
-          + "-" + cipherAlgorithm
-          + "-" + cipherAlgorithmProvider
-          + "-" + gcmInitVecLen
-          + "-" + gcmAuthTagBitLen
-          + "-" + keyDerivationIterationCount
-          + "]").getBytes(StandardCharsets.US_ASCII);
+                                        + keyLen
+                                        + "-" + secretKeyAlgorithm
+                                        + "-" + cipherAlgorithm
+                                        + "-" + cipherAlgorithmProvider
+                                        + "-" + gcmInitVecLen
+                                        + "-" + gcmAuthTagBitLen
+                                        + "-" + keyDerivationIterationCount
+                                        + "]").getBytes(StandardCharsets.US_ASCII);
       return new EncryptionKey(secretKey, parameters, compatibilityHeader);
     }
     catch (NoSuchAlgorithmException e) {
@@ -192,29 +192,29 @@ public class SunSecurityProvider implements ISecurityProvider {
 
   /**
    * @param password
-   *          The password to create the hash for. Must not be {@code null} or empty.
+   *     The password to create the hash for. Must not be {@code null} or empty.
    * @param salt
-   *          The salt to use. Use {@link #createSecureRandomBytes(int)} to generate a new random salt for each
-   *          credential. Do not use the same salt for multiple credentials. The salt should be at least 32 bytes long.
-   *          Remember to save the salt with the hashed password! Must not be {@code null} or an empty array.
+   *     The salt to use. Use {@link #createSecureRandomBytes(int)} to generate a new random salt for each
+   *     credential. Do not use the same salt for multiple credentials. The salt should be at least 32 bytes long.
+   *     Remember to save the salt with the hashed password! Must not be {@code null} or an empty array.
    * @param iterations
-   *          Specifies how many times the method executes its underlying algorithm. A higher value is safer.<br>
-   *          While there is a minimum number of iterations recommended to ensure data safety, this value changes every
-   *          year as technology improves. As by Aug 2021 at least 120000 iterations are recommended, see
-   *          https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html.<br>
-   *          Experimentation is important. To provide a good security use an iteration count so that the call to this
-   *          method requires one half second to execute (on the production system). Also consider the number of users
-   *          and the number of logins executed to find a value that scales in your environment.
+   *     Specifies how many times the method executes its underlying algorithm. A higher value is safer.<br>
+   *     While there is a minimum number of iterations recommended to ensure data safety, this value changes every
+   *     year as technology improves. As by Aug 2021 at least 120000 iterations are recommended, see
+   *     https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html.<br>
+   *     Experimentation is important. To provide a good security use an iteration count so that the call to this
+   *     method requires one half second to execute (on the production system). Also consider the number of users
+   *     and the number of logins executed to find a value that scales in your environment.
    * @return the password hash
    * @throws AssertionException
-   *           If one of the following conditions is {@code true}:<br>
-   *           <ul>
-   *           <li>The password is {@code null} or an empty array</li>
-   *           <li>The salt is {@code null} or an empty array</li>
-   *           <li>The number of iterations is too small.</li>
-   *           </ul>
+   *     If one of the following conditions is {@code true}:<br>
+   *     <ul>
+   *     <li>The password is {@code null} or an empty array</li>
+   *     <li>The salt is {@code null} or an empty array</li>
+   *     <li>The number of iterations is too small.</li>
+   *     </ul>
    * @throws ProcessingException
-   *           If there is an error creating the hash. <br>
+   *     If there is an error creating the hash. <br>
    */
   public byte[] createPasswordHash(char[] password, byte[] salt, int iterations) {
     assertGreater(assertNotNull(password, "password must not be null.").length, 0, "empty password is not allowed.");
@@ -464,13 +464,13 @@ public class SunSecurityProvider implements ISecurityProvider {
 
   /**
    * @return Iteration count for key derivation. <a href="https://www.baeldung.com/java-secure-aes-key">AES Keys</a>
-   *         <p>
-   *         2023/05: at least 1000
-   *         <p>
-   *         Do not confuse this parameter with {@link #MIN_PASSWORD_HASH_ITERATIONS}. This parameter is used to derive
-   *         a PBEKey for {@link #encrypt(InputStream, OutputStream, EncryptionKey)} whereas
-   *         {@link #MIN_PASSWORD_HASH_ITERATIONS} is used to hash single passwords in a table that is potentially
-   *         exposed to a rainbow attack.
+   * <p>
+   * 2023/05: at least 1000
+   * <p>
+   * Do not confuse this parameter with {@link #MIN_PASSWORD_HASH_ITERATIONS}. This parameter is used to derive
+   * a PBEKey for {@link #encrypt(InputStream, OutputStream, EncryptionKey)} whereas
+   * {@link #MIN_PASSWORD_HASH_ITERATIONS} is used to hash single passwords in a table that is potentially
+   * exposed to a rainbow attack.
    */
   protected int getKeyDerivationIterationCount() {
     return 3557;
@@ -534,7 +534,7 @@ public class SunSecurityProvider implements ISecurityProvider {
 
   /**
    * @return The key-derivation algorithm (algorithm to create a key based on a password) to use for the
-   *         encryption/decryption.
+   * encryption/decryption.
    */
   protected String getSecretKeyAlgorithm() {
     // Password-based key-derivation algorithm (<a href="http://tools.ietf.org/search/rfc2898">PKCS #5 2.0</a>)

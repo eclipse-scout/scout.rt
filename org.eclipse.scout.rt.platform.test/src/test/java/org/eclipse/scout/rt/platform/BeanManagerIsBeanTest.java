@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.platform;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

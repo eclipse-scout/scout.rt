@@ -28,7 +28,7 @@ public final class DoPredicates {
    * Predicate testing if a particular {@link DoValue} is present.
    *
    * @param accessor
-   *          method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
+   *     method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
    */
   public static <VALUE, DO_ENTITY> Predicate<DO_ENTITY> exists(Function<DO_ENTITY, DoValue<VALUE>> accessor) {
     assertNotNull(accessor, "accessor is required");
@@ -39,7 +39,7 @@ public final class DoPredicates {
    * Predicate testing if a particular {@link DoValue} is not present.
    *
    * @param accessor
-   *          method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
+   *     method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
    */
   public static <VALUE, DO_ENTITY> Predicate<DO_ENTITY> notExists(Function<DO_ENTITY, DoValue<VALUE>> accessor) {
     return exists(accessor).negate();
@@ -49,7 +49,7 @@ public final class DoPredicates {
    * Predicate testing if the value of a particular {@link DoValue} is null.
    *
    * @param accessor
-   *          method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
+   *     method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
    */
   public static <VALUE, DO_ENTITY> Predicate<DO_ENTITY> isNull(Function<DO_ENTITY, DoValue<VALUE>> accessor) {
     assertNotNull(accessor, "accessor is required");
@@ -60,7 +60,7 @@ public final class DoPredicates {
    * Predicate testing if the value of a particular {@link DoValue} is not null.
    *
    * @param accessor
-   *          method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
+   *     method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
    */
   public static <VALUE, DO_ENTITY> Predicate<DO_ENTITY> isNotNull(Function<DO_ENTITY, DoValue<VALUE>> accessor) {
     return isNull(accessor).negate();
@@ -70,7 +70,7 @@ public final class DoPredicates {
    * Predicate testing if the value of a particular {@link DoValue} is equal to the given value.
    *
    * @param accessor
-   *          method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
+   *     method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
    */
   public static <VALUE, DO_ENTITY> Predicate<DO_ENTITY> eq(Function<DO_ENTITY, DoValue<VALUE>> accessor, VALUE value) {
     assertNotNull(accessor, "accessor must not be null");
@@ -81,7 +81,7 @@ public final class DoPredicates {
    * Predicate testing if the value of a particular {@link DoValue} is not equal to the given value.
    *
    * @param accessor
-   *          method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
+   *     method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
    */
   public static <VALUE, DO_ENTITY> Predicate<DO_ENTITY> ne(Function<DO_ENTITY, DoValue<VALUE>> accessor, VALUE value) {
     return eq(accessor, value).negate();
@@ -92,9 +92,9 @@ public final class DoPredicates {
    * given value. The predicate returns {@code null} if, the {@link DoValue} contains {@code null}.
    *
    * @param accessor
-   *          method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
+   *     method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
    * @param value
-   *          a non-null value that the resolved {@link DoValue} will be compared to
+   *     a non-null value that the resolved {@link DoValue} will be compared to
    */
   public static <VALUE extends Comparable<VALUE>, DO_ENTITY> Predicate<DO_ENTITY> le(Function<DO_ENTITY, DoValue<VALUE>> accessor, VALUE value) {
     assertNotNull(accessor, "accessor is required");
@@ -110,9 +110,9 @@ public final class DoPredicates {
    * predicate returns {@code null} if, the {@link DoValue} contains {@code null}.
    *
    * @param accessor
-   *          method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
+   *     method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
    * @param value
-   *          a non-null value that the resolved {@link DoValue} will be compared to
+   *     a non-null value that the resolved {@link DoValue} will be compared to
    */
   public static <VALUE extends Comparable<VALUE>, DO_ENTITY> Predicate<DO_ENTITY> lt(Function<DO_ENTITY, DoValue<VALUE>> accessor, VALUE value) {
     assertNotNull(accessor, "accessor is required");
@@ -128,9 +128,9 @@ public final class DoPredicates {
    * given value. The predicate returns {@code null} if, the {@link DoValue} contains {@code null}.
    *
    * @param accessor
-   *          method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
+   *     method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
    * @param value
-   *          a non-null value that the resolved {@link DoValue} will be compared to
+   *     a non-null value that the resolved {@link DoValue} will be compared to
    */
   public static <VALUE extends Comparable<VALUE>, DO_ENTITY> Predicate<DO_ENTITY> ge(Function<DO_ENTITY, DoValue<VALUE>> accessor, VALUE value) {
     assertNotNull(accessor, "accessor is required");
@@ -146,9 +146,9 @@ public final class DoPredicates {
    * The predicate returns {@code null} if, the {@link DoValue} contains {@code null}.
    *
    * @param accessor
-   *          method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
+   *     method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
    * @param value
-   *          a non-null value that the resolved {@link DoValue} will be compared to
+   *     a non-null value that the resolved {@link DoValue} will be compared to
    */
   public static <VALUE extends Comparable<VALUE>, DO_ENTITY> Predicate<DO_ENTITY> gt(Function<DO_ENTITY, DoValue<VALUE>> accessor, VALUE value) {
     assertNotNull(accessor, "accessor is required");
@@ -163,7 +163,7 @@ public final class DoPredicates {
    * Predicate testing if the value of a particular {@link DoValue} is contained in the given collection of values.
    *
    * @param accessor
-   *          method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
+   *     method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
    */
   public static <VALUE, DO_ENTITY> Predicate<DO_ENTITY> in(Function<DO_ENTITY, DoValue<VALUE>> accessor, Collection<VALUE> values) {
     assertNotNull(accessor, "accessor must not be null");
@@ -175,7 +175,7 @@ public final class DoPredicates {
    * Predicate testing if the value of a particular {@link DoValue} is not contained in the given collection of values.
    *
    * @param accessor
-   *          method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
+   *     method reference that resolves the {@link DoValue} of a {@link DoEntity} (e.g. <code>MyEntity::id</code>).
    */
   public static <VALUE, DO_ENTITY> Predicate<DO_ENTITY> notIn(Function<DO_ENTITY, DoValue<VALUE>> accessor, Collection<VALUE> values) {
     return in(accessor, values).negate();
@@ -186,8 +186,8 @@ public final class DoPredicates {
    * {@link DoCollection}) which satisfies the given predicate.
    *
    * @param collectionAccessor
-   *          method reference that resolves the DO collection ({@link DoList}, {@link DoSet}, {@link DoCollection}) of
-   *          a {@link DoEntity} (e.g. <code>MyEntity::items</code>).
+   *     method reference that resolves the DO collection ({@link DoList}, {@link DoSet}, {@link DoCollection}) of
+   *     a {@link DoEntity} (e.g. <code>MyEntity::items</code>).
    */
   public static <DO_ENTITY, COLLECTION_ITEM> Predicate<DO_ENTITY> exists(Function<DO_ENTITY, IDoCollection<COLLECTION_ITEM, ?>> collectionAccessor, Predicate<COLLECTION_ITEM> predicate) {
     assertNotNull(collectionAccessor, "collection accessor must not be null");
@@ -200,8 +200,8 @@ public final class DoPredicates {
    * {@link DoCollection}) which satisfies the given predicate.
    *
    * @param collectionAccessor
-   *          method reference that resolves the DO collection ({@link DoList}, {@link DoSet}, {@link DoCollection}) of
-   *          a {@link DoEntity} (e.g. <code>MyEntity::items</code>).
+   *     method reference that resolves the DO collection ({@link DoList}, {@link DoSet}, {@link DoCollection}) of
+   *     a {@link DoEntity} (e.g. <code>MyEntity::items</code>).
    */
   public static <DO_ENTITY, COLLECTION_ITEM> Predicate<DO_ENTITY> notExists(Function<DO_ENTITY, IDoCollection<COLLECTION_ITEM, ?>> collectionAccessor, Predicate<COLLECTION_ITEM> predicate) {
     return exists(collectionAccessor, predicate).negate();
@@ -212,8 +212,8 @@ public final class DoPredicates {
    * is empty.
    *
    * @param collectionAccessor
-   *          method reference that resolves the DO collection ({@link DoList}, {@link DoSet}, {@link DoCollection}) of
-   *          a {@link DoEntity} (e.g. <code>MyEntity::items</code>).
+   *     method reference that resolves the DO collection ({@link DoList}, {@link DoSet}, {@link DoCollection}) of
+   *     a {@link DoEntity} (e.g. <code>MyEntity::items</code>).
    */
   public static <DO_ENTITY, COLLECTION_ITEM> Predicate<DO_ENTITY> empty(Function<DO_ENTITY, IDoCollection<COLLECTION_ITEM, ?>> collectionAccessor) {
     assertNotNull(collectionAccessor, "collection accessor must not be null");
@@ -225,8 +225,8 @@ public final class DoPredicates {
    * is not empty.
    *
    * @param collectionAccessor
-   *          method reference that resolves the DO collection ({@link DoList}, {@link DoSet}, {@link DoCollection}) of
-   *          a {@link DoEntity} (e.g. <code>MyEntity::items</code>).
+   *     method reference that resolves the DO collection ({@link DoList}, {@link DoSet}, {@link DoCollection}) of
+   *     a {@link DoEntity} (e.g. <code>MyEntity::items</code>).
    */
   public static <DO_ENTITY, COLLECTION_ITEM> Predicate<DO_ENTITY> notEmpty(Function<DO_ENTITY, IDoCollection<COLLECTION_ITEM, ?>> collectionAccessor) {
     return empty(collectionAccessor).negate();

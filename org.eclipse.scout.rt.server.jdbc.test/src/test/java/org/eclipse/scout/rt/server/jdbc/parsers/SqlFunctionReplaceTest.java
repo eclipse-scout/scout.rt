@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.server.jdbc.parsers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.server.jdbc.parsers.token.DatabaseSpecificToken;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.IToken;

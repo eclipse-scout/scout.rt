@@ -102,7 +102,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final Object m_runnerLock = new Object();
 
   public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final CallableChain<RESULT> callableChain, final Callable<RESULT> callable) {
-    super(() -> callableChain.call(callable) /* run all processors as contained in the chain before invoking the callable */ );
+    super(() -> callableChain.call(callable) /* run all processors as contained in the chain before invoking the callable */);
 
     m_jobManager = jobManager;
     m_runMonitor = runMonitor;

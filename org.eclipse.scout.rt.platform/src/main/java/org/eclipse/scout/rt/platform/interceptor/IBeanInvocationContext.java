@@ -40,7 +40,7 @@ public interface IBeanInvocationContext<T> {
 
   /**
    * @return the modifiable arguments that will be passed to the method (see {@link #getTargetMethod()}). May be
-   *         <code>null</code>.
+   * <code>null</code>.
    */
   Object[] getTargetArgs();
 

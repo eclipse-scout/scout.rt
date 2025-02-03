@@ -20,7 +20,7 @@ public interface ITileFilter<T extends ITile> {
 
   /**
    * @return <code>true</code> if the given tile is accepted by the filter and should therefore be displayed, false if
-   *         not.
+   * not.
    */
   boolean accept(T tile);
 }

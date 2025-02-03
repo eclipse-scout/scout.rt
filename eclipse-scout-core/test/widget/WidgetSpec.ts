@@ -746,6 +746,7 @@ describe('Widget', () => {
           this.enabled = false;
         }
       }
+
       let widget = scout.create(SubWidget, {
         parent: parent
       });

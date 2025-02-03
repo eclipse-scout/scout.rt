@@ -25,7 +25,7 @@ public interface ILookupRowFetchedCallback<T> {
    * Method invoked upon successful {@link ILookupRow} data fetching.
    *
    * @param rows
-   *          the rows fetched.
+   *     the rows fetched.
    */
   void onSuccess(List<? extends ILookupRow<T>> rows);
 
@@ -33,7 +33,7 @@ public interface ILookupRowFetchedCallback<T> {
    * Method invoked if {@link ILookupRow} data fetching failed.
    *
    * @param exception
-   *          the exception occurred.
+   *     the exception occurred.
    */
   void onFailure(RuntimeException exception);
 }

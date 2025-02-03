@@ -185,7 +185,6 @@ public class UtcDateTimeAdapterTest {
       assertEquals(expectedDateTimeString, DATE_TIME_ADAPTER.marshal(d));
       assertEquals(expectedDateString, DATE_ADAPTER.marshal(d));
       assertEquals(expectedTimeString, TIME_ADAPTER.marshal(d));
-
     }
     finally {
       TimeZone.setDefault(DEFAULT_TIME_ZONE);
@@ -234,11 +233,11 @@ public class UtcDateTimeAdapterTest {
 
         // assert format
         assertEquals(StringUtility.lpad(expectedYear + "", "0", 4) + "-"
-            + StringUtility.lpad(expectedMonth + "", "0", 2) + "-"
-            + StringUtility.lpad(expectedDay + "", "0", 2) + " "
-            + StringUtility.lpad(expectedHour + "", "0", 2) + ":"
-            + StringUtility.lpad(expectedMinute + "", "0", 2) + ":"
-            + StringUtility.lpad(expectedSecond + "", "0", 2),
+                + StringUtility.lpad(expectedMonth + "", "0", 2) + "-"
+                + StringUtility.lpad(expectedDay + "", "0", 2) + " "
+                + StringUtility.lpad(expectedHour + "", "0", 2) + ":"
+                + StringUtility.lpad(expectedMinute + "", "0", 2) + ":"
+                + StringUtility.lpad(expectedSecond + "", "0", 2),
             format.format(date));
       }
     }

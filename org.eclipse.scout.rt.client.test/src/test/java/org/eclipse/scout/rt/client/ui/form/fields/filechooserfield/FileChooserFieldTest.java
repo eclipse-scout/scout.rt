@@ -79,7 +79,6 @@ public class FileChooserFieldTest {
           protected String getConfiguredText() {
             return "Menu1";
           }
-
         }
 
         @Order(20)
@@ -148,7 +147,6 @@ public class FileChooserFieldTest {
 
     Assert.assertEquals("Menu2", fileChooserFieldMenus.get(1).getText());
     Assert.assertEquals("alternate-2", fileChooserFieldMenus.get(1).getKeyStroke());
-
   }
 
   @After

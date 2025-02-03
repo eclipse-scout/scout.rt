@@ -71,5 +71,4 @@ public class JsonTile<T extends ITile> extends AbstractJsonWidget<T> {
       }
     });
   }
-
 }

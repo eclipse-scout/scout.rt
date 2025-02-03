@@ -117,5 +117,4 @@ class FunctionInput implements IBindInput {
       return sqlStyle.buildBindFor(value, nullType);
     }
   }
-
 }

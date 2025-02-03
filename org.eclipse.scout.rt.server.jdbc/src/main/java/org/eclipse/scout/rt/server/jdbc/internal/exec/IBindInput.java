@@ -33,5 +33,4 @@ interface IBindInput {
   void setNextBatchIndex(int i);
 
   SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle);
-
 }

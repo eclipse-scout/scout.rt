@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumUtil;
  * effort).
  *
  * @see <a href="https://bugs.chromium.org/p/chromedriver/issues/detail?id=30">
- *      https://bugs.chromium.org/p/chromedriver/issues/detail?id=30</a>
+ * https://bugs.chromium.org/p/chromedriver/issues/detail?id=30</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

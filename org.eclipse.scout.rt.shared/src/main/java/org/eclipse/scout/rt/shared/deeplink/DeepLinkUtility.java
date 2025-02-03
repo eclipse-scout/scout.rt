@@ -33,5 +33,4 @@ public final class DeepLinkUtility {
     String slug = NONLATIN.matcher(normalized).replaceAll("");
     return slug.toLowerCase(Locale.ENGLISH);
   }
-
 }

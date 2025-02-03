@@ -41,7 +41,7 @@ public interface IHttpTransportManager {
 
   /**
    * @param builder
-   *          builder if available
+   *     builder if available
    */
   void interceptNewHttpTransport(IHttpTransportBuilder builder);
 }

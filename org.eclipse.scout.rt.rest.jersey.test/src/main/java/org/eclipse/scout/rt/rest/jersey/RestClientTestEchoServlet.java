@@ -57,7 +57,7 @@ public class RestClientTestEchoServlet extends HttpServlet {
 
       if (LOG.isDebugEnabled()) {
         StringBuilder sb = new StringBuilder("HTTP Headers:");
-        for (Enumeration<String> headers = req.getHeaderNames(); headers.hasMoreElements();) {
+        for (Enumeration<String> headers = req.getHeaderNames(); headers.hasMoreElements(); ) {
           String header = headers.nextElement();
           sb.append(String.format("%n  %s: '%s'", header, req.getHeader(header)));
         }
@@ -112,7 +112,7 @@ public class RestClientTestEchoServlet extends HttpServlet {
     String body = IOUtility.readStringUTF8(req.getInputStream());
 
     Map<String, String> receivedHeaders = new HashMap<>();
-    for (Enumeration<String> headerNames = req.getHeaderNames(); headerNames.hasMoreElements();) {
+    for (Enumeration<String> headerNames = req.getHeaderNames(); headerNames.hasMoreElements(); ) {
       String headerName = headerNames.nextElement();
       receivedHeaders.put(headerName, req.getHeader(headerName));
     }
@@ -157,12 +157,12 @@ public class RestClientTestEchoServlet extends HttpServlet {
     }
     else {
       String content = HTML.html5(
-          HTML.head(
-              HTML.tag("meta").addAttribute("charset", "utf-8"),
-              HTML.tag("title", "REST Client Test")),
-          HTML.body(
-              HTML.h1("REST Client Test"),
-              HTML.div(status == null ? "unknown" : status.getReasonPhrase())))
+              HTML.head(
+                  HTML.tag("meta").addAttribute("charset", "utf-8"),
+                  HTML.tag("title", "REST Client Test")),
+              HTML.body(
+                  HTML.h1("REST Client Test"),
+                  HTML.div(status == null ? "unknown" : status.getReasonPhrase())))
           .toHtml();
       resp.getOutputStream().print(content);
       resp.setContentType(MediaType.TEXT_HTML);

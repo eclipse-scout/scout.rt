@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.services.common.bookmark;
 
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;

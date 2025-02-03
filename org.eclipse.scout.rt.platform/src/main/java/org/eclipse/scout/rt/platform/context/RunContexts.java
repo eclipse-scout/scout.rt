@@ -41,8 +41,8 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
  * });
  * </pre>
  *
- * @since 5.1
  * @see RunContext
+ * @since 5.1
  */
 public final class RunContexts {
 
@@ -89,7 +89,7 @@ public final class RunContexts {
    * copied as well.
    *
    * @throws AssertionException
-   *           if not running in a {@link RunContext}
+   *     if not running in a {@link RunContext}
    */
   public static RunContext copyCurrent() {
     return copyCurrent(false);
@@ -99,9 +99,9 @@ public final class RunContexts {
    * Same as {@link RunContexts#copyCurrent()}, but less strict if not running in a {@link RunContext}.
    *
    * @param orElseEmpty
-   *          indicates whether to return an empty {@link RunContext} if not running in a context yet.
+   *     indicates whether to return an empty {@link RunContext} if not running in a context yet.
    * @throws AssertionException
-   *           if not running in a {@link RunContext}, and <i>orElseEmpty</i> is set to <code>false</code>.
+   *     if not running in a {@link RunContext}, and <i>orElseEmpty</i> is set to <code>false</code>.
    */
   public static RunContext copyCurrent(final boolean orElseEmpty) {
     if (RunContext.CURRENT.get() != null) {

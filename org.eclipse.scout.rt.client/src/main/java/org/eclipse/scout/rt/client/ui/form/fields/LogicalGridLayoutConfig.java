@@ -29,7 +29,7 @@ public class LogicalGridLayoutConfig {
 
   /**
    * @return the width in pixels to use for elements with the logical unit "width = 1". Larger logical widths are
-   *         multiplied with this value (and gaps are added).
+   * multiplied with this value (and gaps are added).
    */
   public int getColumnWidth() {
     return m_columnWidth;
@@ -37,8 +37,8 @@ public class LogicalGridLayoutConfig {
 
   /**
    * @param columnWidth
-   *          the width in pixels to use for elements with the logical unit "width = 1". Larger logical widths are
-   *          multiplied with this value (and gaps are added).
+   *     the width in pixels to use for elements with the logical unit "width = 1". Larger logical widths are
+   *     multiplied with this value (and gaps are added).
    */
   public void setColumnWidth(int columnWidth) {
     m_columnWidth = columnWidth;
@@ -54,7 +54,7 @@ public class LogicalGridLayoutConfig {
 
   /**
    * @return the height in pixels to use for elements with the logical unit "height = 1". Larger logical heights are
-   *         multiplied with this value (and gaps are added).
+   * multiplied with this value (and gaps are added).
    */
   public int getRowHeight() {
     return m_rowHeight;
@@ -62,8 +62,8 @@ public class LogicalGridLayoutConfig {
 
   /**
    * @param rowHeight
-   *          the height in pixels to use for elements with the logical unit "height = 1". Larger logical heights are
-   *          multiplied with this value (and gaps are added).
+   *     the height in pixels to use for elements with the logical unit "height = 1". Larger logical heights are
+   *     multiplied with this value (and gaps are added).
    */
   public void setRowHeight(int rowHeight) {
     m_rowHeight = rowHeight;
@@ -86,7 +86,7 @@ public class LogicalGridLayoutConfig {
 
   /**
    * @param hgap
-   *          the horizontal gap in pixels to use between two logical grid columns.
+   *     the horizontal gap in pixels to use between two logical grid columns.
    */
   public void setHGap(int hgap) {
     m_hgap = hgap;
@@ -117,7 +117,7 @@ public class LogicalGridLayoutConfig {
 
   /**
    * @param vgap
-   *          the vertical gap in pixels to use between two logical grid rows.
+   *     the vertical gap in pixels to use between two logical grid rows.
    */
   public void setVGap(int vgap) {
     m_vgap = vgap;
@@ -133,7 +133,7 @@ public class LogicalGridLayoutConfig {
 
   /**
    * @return the minimum width of the widget. If this width is > 0 a horizontal scrollbar is shown when the widgets gets
-   *         smaller than this value.
+   * smaller than this value.
    */
   public int getMinWidth() {
     return m_minWidth;
@@ -141,8 +141,8 @@ public class LogicalGridLayoutConfig {
 
   /**
    * @param minWidth
-   *          the minimum width of the widget. If this width is > 0 a horizontal scrollbar is shown when the widget gets
-   *          smaller than this value.
+   *     the minimum width of the widget. If this width is > 0 a horizontal scrollbar is shown when the widget gets
+   *     smaller than this value.
    */
   public void setMinWidth(int minWidth) {
     m_minWidth = minWidth;

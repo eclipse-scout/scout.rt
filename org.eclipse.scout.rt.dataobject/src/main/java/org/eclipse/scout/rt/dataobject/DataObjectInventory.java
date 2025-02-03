@@ -67,7 +67,9 @@ public class DataObjectInventory {
    */
   private final Map<Class<? extends IDoEntity>, NamespaceVersion> m_classToTypeVersion = new HashMap<>();
 
-  /** Map of {@link IDoEntity} class to its attributes map */
+  /**
+   * Map of {@link IDoEntity} class to its attributes map
+   */
   private final Map<Class<? extends IDoEntity>, Map<String, DataObjectAttributeDescriptor>> m_classAttributeMap = new ConcurrentHashMap<>();
 
   /**
@@ -120,7 +122,7 @@ public class DataObjectInventory {
 
   /**
    * @return type name for specified class {@code clazz}. If the class does not have a type name, the super class
-   *         hierarchy is searched for the first available type name. Returns {@code null} if no type name can be found.
+   * hierarchy is searched for the first available type name. Returns {@code null} if no type name can be found.
    */
   public String toTypeName(Class<?> queryClazz) {
     Class<?> clazz = queryClazz;
@@ -201,7 +203,7 @@ public class DataObjectInventory {
    * and interfaces.
    *
    * @return {@link IDoEntityContribution} classes for a given {@link IDoEntity} container class and it's parent
-   *         classes/interfaces.
+   * classes/interfaces.
    * @see ContributesTo
    */
   public Set<Class<? extends IDoEntityContribution>> getAllContributionClasses(Class<? extends IDoEntity> containerClass) {
@@ -243,7 +245,7 @@ public class DataObjectInventory {
 
   /**
    * @return Optional of {@link DataObjectAttributeDescriptor} for specified {@code entityClass} and
-   *         {@code attributeName}
+   * {@code attributeName}
    */
   public Optional<DataObjectAttributeDescriptor> getAttributeDescription(Class<? extends IDoEntity> entityClass, String attributeName) {
     ensureEntityDefinitionLoaded(entityClass);

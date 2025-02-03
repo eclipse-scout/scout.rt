@@ -32,5 +32,4 @@ public class AggregateTableControl extends AbstractTableControl implements IAggr
     setTooltipText(TEXTS.get("ui.Total"));
     setIconId(AbstractIcons.Sum);
   }
-
 }

@@ -39,5 +39,4 @@ public abstract class AbstractStringFieldExtension<OWNER extends AbstractStringF
   public TransferObject execDragRequest(StringFieldDragRequestChain chain) {
     return chain.execDragRequest();
   }
-
 }

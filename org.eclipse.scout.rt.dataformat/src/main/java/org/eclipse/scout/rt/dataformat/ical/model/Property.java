@@ -28,7 +28,7 @@ public class Property implements Serializable {
 
   /**
    * @param name
-   *          Property name, not case sensitive
+   *     Property name, not case sensitive
    */
   public Property(String name) {
     this(name, null, null);
@@ -36,9 +36,9 @@ public class Property implements Serializable {
 
   /**
    * @param name
-   *          Property name, not case sensitive
+   *     Property name, not case sensitive
    * @param value
-   *          case sensitive
+   *     case sensitive
    */
   public Property(String name, String value) {
     this(name, null, value);
@@ -46,12 +46,12 @@ public class Property implements Serializable {
 
   /**
    * @param name
-   *          Property name, not case sensitive (stored upper case)
+   *     Property name, not case sensitive (stored upper case)
    * @param parameters
-   *          the order in which this parameters are added is important, as a new parameter with the same name as the
-   *          existing one will overwrite the existing one
+   *     the order in which this parameters are added is important, as a new parameter with the same name as the
+   *     existing one will overwrite the existing one
    * @param value
-   *          case sensitive
+   *     case sensitive
    */
   public Property(String name, List<PropertyParameter> parameters, String value) {
     super();
@@ -77,8 +77,8 @@ public class Property implements Serializable {
 
   /**
    * @param propertyParameters
-   *          if a parameter already exists, all parameter values that are not already added will be added. E.g. adding
-   *          "TYPE=dom" and then adding "TYPE=postal" is equivalent to adding "TYPE=dom,postal"
+   *     if a parameter already exists, all parameter values that are not already added will be added. E.g. adding
+   *     "TYPE=dom" and then adding "TYPE=postal" is equivalent to adding "TYPE=dom,postal"
    */
   public void addParameters(List<PropertyParameter> propertyParameters) {
     if (propertyParameters != null) {
@@ -193,5 +193,4 @@ public class Property implements Serializable {
   public String toString() {
     return "Property [m_name=" + m_name + ", m_parameters=" + m_parameters + ", m_value=" + m_value + "]";
   }
-
 }

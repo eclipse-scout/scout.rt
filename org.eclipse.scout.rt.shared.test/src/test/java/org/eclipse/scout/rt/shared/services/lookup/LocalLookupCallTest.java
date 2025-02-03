@@ -155,7 +155,6 @@ public class LocalLookupCallTest {
     runGetDataByRec(1, ROW30_KEY);
     runGetDataByRec(0, ROW11_KEY);
     runGetDataByRec(0, 799999);
-
   }
 
   @Test

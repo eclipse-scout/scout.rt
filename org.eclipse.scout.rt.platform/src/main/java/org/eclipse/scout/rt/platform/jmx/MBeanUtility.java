@@ -45,11 +45,11 @@ public final class MBeanUtility {
 
   /**
    * @param domain
-   *          Scout convention is to use the package base name
+   *     Scout convention is to use the package base name
    * @param type
-   *          Scout convention is to use {@link PlatformIdentifier}
+   *     Scout convention is to use {@link PlatformIdentifier}
    * @param name
-   *          Scout convention is to use the MBean main type simple name
+   *     Scout convention is to use the MBean main type simple name
    */
   public static ObjectName toJmxName(String domain, String type, String name) {
     try {

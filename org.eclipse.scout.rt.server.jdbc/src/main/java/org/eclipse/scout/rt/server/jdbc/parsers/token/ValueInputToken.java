@@ -155,5 +155,4 @@ public class ValueInputToken implements IToken {
     b.append("]");
     return b.toString();
   }
-
 }

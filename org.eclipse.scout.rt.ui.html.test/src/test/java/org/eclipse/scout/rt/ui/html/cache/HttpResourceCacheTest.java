@@ -90,5 +90,4 @@ public class HttpResourceCacheTest {
     HttpCacheObject obj2 = rc.get(new HttpCacheKey("/"));
     Assert.assertNull(obj2);
   }
-
 }

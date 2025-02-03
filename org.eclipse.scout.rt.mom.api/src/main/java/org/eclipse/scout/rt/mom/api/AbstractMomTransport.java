@@ -57,7 +57,7 @@ public abstract class AbstractMomTransport implements IMomTransport {
 
   /**
    * @return the {@link IMomImplementor} class to use in this MOM. If <code>null</code> is returned, the
-   *         {@link NullMomImplementor} is used.
+   * {@link NullMomImplementor} is used.
    */
   protected abstract Class<? extends IMomImplementor> getConfiguredImplementor();
 
@@ -68,8 +68,8 @@ public abstract class AbstractMomTransport implements IMomTransport {
 
   /**
    * @return the default {@link IMarshaller} to be used if no specific marshaller is configured for this MOM or is
-   *         registered for a {@link IDestination}. The default value is <code>null</code>, which means that the default
-   *         marshaller is chosen by the implementor.
+   * registered for a {@link IDestination}. The default value is <code>null</code>, which means that the default
+   * marshaller is chosen by the implementor.
    */
   protected IMarshaller getConfiguredDefaultMarshaller() {
     return null;
@@ -128,7 +128,7 @@ public abstract class AbstractMomTransport implements IMomTransport {
 
   /**
    * @return the MOM delegate. The delegate is initialized <i>synchronously</i> when this method is first called (i.e.
-   *         this call may block until the delegate is initialized).
+   * this call may block until the delegate is initialized).
    */
   protected IMomImplementor getDelegate() {
     if (m_delegate == null) {
@@ -149,8 +149,8 @@ public abstract class AbstractMomTransport implements IMomTransport {
 
   /**
    * @return {@link IMomImplementor} which may not have been initialized yet. The implementor does not get initialized
-   *         when this method is called. Use {@link #getDelegate()} to safely access the initialized
-   *         {@link IMomImplementor} instance.
+   * when this method is called. Use {@link #getDelegate()} to safely access the initialized
+   * {@link IMomImplementor} instance.
    * @see #getDelegate()
    */
   public IMomImplementor getImplementor() {

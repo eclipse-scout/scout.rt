@@ -96,7 +96,7 @@ public class RequestHistory {
 
   /**
    * @return <code>true</code> if the given <i>request sequence number</i> was already marked as "processed",
-   *         <code>false</code> otherwise.
+   * <code>false</code> otherwise.
    */
   public boolean isRequestProcessed(Long requestSequenceNo) {
     Assertions.assertNotNull(requestSequenceNo);
@@ -110,7 +110,7 @@ public class RequestHistory {
 
   /**
    * @return the "last processed sequence number", i.e. the highest <i>request sequence number</i> that was marked as
-   *         "processed".
+   * "processed".
    */
   public Long getLastProcessedSequenceNo() {
     return m_lastProcessedRequestSequenceNo;
@@ -118,7 +118,7 @@ public class RequestHistory {
 
   /**
    * @return a copy of the set of missing <i>request sequence numbers</i>, i.e. sequence numbers that are lower than
-   *         {@link #getLastProcessedSequenceNo()} but have not been marked as "processed".
+   * {@link #getLastProcessedSequenceNo()} but have not been marked as "processed".
    */
   public SortedSet<Long> getMissingRequestSequenceNos() {
     return new TreeSet<>(m_missingRequestSequenceNos);

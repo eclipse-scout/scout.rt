@@ -32,7 +32,9 @@ import org.eclipse.scout.rt.platform.util.EnumerationUtility;
 public class DefaultPermissionCollection extends AbstractPermissionCollection {
   private static final long serialVersionUID = 1L;
 
-  /** content is effective immutable and protected by {@link #isReadOnly()} */
+  /**
+   * content is effective immutable and protected by {@link #isReadOnly()}
+   */
   private final Map<String, List<IPermission>> m_permissions;
   private final List<Permission> m_javaPermissions;
 

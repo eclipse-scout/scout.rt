@@ -20,7 +20,7 @@ public interface IClassInventory {
    * {@link IClassInfo#isInstanciable()} to check if it is an instantiable bean.
    *
    * @param queryClassInfo
-   *          is a {@link IClassInfo} that is part of this {@link IClassInventory}
+   *     is a {@link IClassInfo} that is part of this {@link IClassInventory}
    * @return all known subclasses, including interfaces and private types.
    */
   Set<IClassInfo> getAllKnownSubClasses(IClassInfo queryClassInfo);
@@ -38,7 +38,7 @@ public interface IClassInventory {
    * {@link Target} {@link ElementType#TYPE} {@link ElementType#ANNOTATION_TYPE}
    *
    * @param annotationInfo
-   *          is a {@link IClassInfo} that is part of this {@link IClassInventory}
+   *     is a {@link IClassInfo} that is part of this {@link IClassInventory}
    * @return all registered types annotated with the annotation
    */
   Set<IClassInfo> getKnownAnnotatedTypes(IClassInfo annotationInfo);

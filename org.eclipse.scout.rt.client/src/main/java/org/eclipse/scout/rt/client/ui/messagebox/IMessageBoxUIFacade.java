@@ -13,5 +13,4 @@ package org.eclipse.scout.rt.client.ui.messagebox;
 public interface IMessageBoxUIFacade {
 
   void setResultFromUI(int option);
-
 }

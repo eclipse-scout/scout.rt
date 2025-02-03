@@ -23,9 +23,8 @@ public interface ICoalescer<T> {
 
   /**
    * @param data
-   *          all objects to coalesce. Ordered, such that new data is inserted at the end of the list
+   *     all objects to coalesce. Ordered, such that new data is inserted at the end of the list
    * @return a coalesced result. Never <code>null</code>.
    */
   List<T> coalesce(List<T> data);
-
 }

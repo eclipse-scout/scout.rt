@@ -62,9 +62,9 @@ import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
  * {@link ConcurrentMap}.
  *
  * @param <K>
- *          the type of keys maintained by this map
+ *     the type of keys maintained by this map
  * @param <V>
- *          the type of mapped values
+ *     the type of mapped values
  * @since 5.2
  */
 public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {

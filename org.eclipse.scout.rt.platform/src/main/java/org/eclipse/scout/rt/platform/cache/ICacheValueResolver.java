@@ -24,7 +24,7 @@ public interface ICacheValueResolver<K, V> {
 
   /**
    * @param key
-   *          never null
+   *     never null
    */
   V resolve(K key);
 
@@ -33,7 +33,7 @@ public interface ICacheValueResolver<K, V> {
    * will be cached and all the entries will be returned by {@link ICache#getAll(Collection)}.
    *
    * @param keys
-   *          never null, empty or contains null elements
+   *     never null, empty or contains null elements
    * @return non null modifiable map
    */
   default Map<K, V> resolveAll(Set<K> keys) {

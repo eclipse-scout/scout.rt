@@ -14,11 +14,11 @@ import java.util.function.Function;
 /**
  * Controls how the tree visiting should continue.
  *
- * @since 8.0
  * @see IBreadthFirstTreeVisitor
  * @see IDepthFirstTreeVisitor
  * @see ITreeTraversal
  * @see TreeTraversals
+ * @since 8.0
  */
 public enum TreeVisitResult {
   /**
@@ -43,7 +43,7 @@ public enum TreeVisitResult {
 
   /**
    * @return Converts this {@link TreeVisitResult} value to a function that takes any input and always returns the
-   *         current {@link TreeVisitResult}.
+   * current {@link TreeVisitResult}.
    */
   public <S> Function<S, TreeVisitResult> asFunction() {
     return o -> this;

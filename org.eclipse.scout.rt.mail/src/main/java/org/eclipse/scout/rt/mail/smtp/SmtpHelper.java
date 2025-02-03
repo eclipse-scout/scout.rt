@@ -57,12 +57,12 @@ public class SmtpHelper {
    * Sends the message over the provided SMTP server.
    *
    * @param config
-   *          SMTP server configuration. If the {@link SmtpServerConfig#getPoolSize()} returns a value > 0, the
-   *          connection pool will be used to send the message. This also means, that the calling thread is potentially
-   *          blocked if no idle connection is available or the pool is at the maximum of its capacity, until a
-   *          connection becomes available.
+   *     SMTP server configuration. If the {@link SmtpServerConfig#getPoolSize()} returns a value > 0, the
+   *     connection pool will be used to send the message. This also means, that the calling thread is potentially
+   *     blocked if no idle connection is available or the pool is at the maximum of its capacity, until a
+   *     connection becomes available.
    * @param message
-   *          Message to send.
+   *     Message to send.
    * @see {@link MailHelper} to create a message
    */
   public void sendMessage(SmtpServerConfig config, MimeMessage message) {
@@ -89,11 +89,11 @@ public class SmtpHelper {
    * Sends the message over the provided session.
    *
    * @param session
-   *          Session to use for sending the message.
+   *     Session to use for sending the message.
    * @param password
-   *          Optional password if authentication is required.
+   *     Optional password if authentication is required.
    * @param message
-   *          Message to send.
+   *     Message to send.
    * @see {@link MailHelper} to create a message
    */
   public void sendMessage(Session session, String password, MimeMessage message) {

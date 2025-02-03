@@ -66,13 +66,13 @@ public class ResponseHistory {
    * If the history is already full, the oldest entry is discarded.
    *
    * @param responseSequenceNo
-   *          The sequence number of the <u>response</u> to remember <i>(mandatory)</i>
+   *     The sequence number of the <u>response</u> to remember <i>(mandatory)</i>
    * @param response
-   *          The <u>response</u> to remember <i>(mandatory)</i>
+   *     The <u>response</u> to remember <i>(mandatory)</i>
    * @param requestSequenceNo
-   *          The sequence number of the <u>request</u> that caused the response <i>(optional)</i>
+   *     The sequence number of the <u>request</u> that caused the response <i>(optional)</i>
    * @throws AssertionException
-   *           if mandatory arguments are <code>null</code>
+   *     if mandatory arguments are <code>null</code>
    */
   public void registerResponse(Long responseSequenceNo, JSONObject response, Long requestSequenceNo) {
     Assertions.assertNotNull(responseSequenceNo);
@@ -107,14 +107,14 @@ public class ResponseHistory {
    * number) and the "response - request" mappings are automatically removed as well.
    *
    * @throws AssertionException
-   *           if the argument is <code>null</code>
+   *     if the argument is <code>null</code>
    */
   public void confirmResponseProcessed(Long confirmedResponseSequenceNo) {
     Assertions.assertNotNull(confirmedResponseSequenceNo);
 
     synchronized (m_mutex) {
       int removeCount = 0;
-      for (Iterator<Long> it = m_responses.keySet().iterator(); it.hasNext();) {
+      for (Iterator<Long> it = m_responses.keySet().iterator(); it.hasNext(); ) {
         Long responseSequenceNo = it.next();
         if (responseSequenceNo <= confirmedResponseSequenceNo) {
           Long requestSequenceNo = m_responseToRequestMap.get(responseSequenceNo);
@@ -170,7 +170,7 @@ public class ResponseHistory {
 
   /**
    * @return the <i>response sequence number</i> that corresponds to the given <i>request sequence number</i> (or
-   *         <code>null</code> if no such mapping exists in the history)
+   * <code>null</code> if no such mapping exists in the history)
    */
   public Long getResponseSequenceNo(Long requestSequenceNo) {
     if (requestSequenceNo == null) {
@@ -183,7 +183,7 @@ public class ResponseHistory {
 
   /**
    * @return the <i>request sequence number</i> that corresponds to the given <i>response sequence number</i> (or
-   *         <code>null</code> if no such mapping exists in the history)
+   * <code>null</code> if no such mapping exists in the history)
    */
   public Long getRequestSequenceNo(Long responseSequenceNo) {
     if (responseSequenceNo == null) {
@@ -196,7 +196,7 @@ public class ResponseHistory {
 
   /**
    * @return the response with the given <i>response sequence number</i> (or <code>null</code> if no response with this
-   *         sequence number exists in the history)
+   * sequence number exists in the history)
    */
   public JSONObject getResponse(Long responseSequenceNo) {
     if (responseSequenceNo == null) {
@@ -209,7 +209,7 @@ public class ResponseHistory {
 
   /**
    * @return the response that was sent as answer for the request with the given <i>request sequence number</i> (or
-   *         <code>null</code> if no response for this request exists in the history)
+   * <code>null</code> if no response for this request exists in the history)
    */
   public JSONObject getResponseForRequest(Long requestSequenceNo) {
     synchronized (m_mutex) {

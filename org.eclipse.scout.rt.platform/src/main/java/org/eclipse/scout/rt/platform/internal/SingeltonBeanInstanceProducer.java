@@ -83,7 +83,9 @@ public class SingeltonBeanInstanceProducer<T> implements IBeanInstanceProducer<T
    */
   private static final int DEADLOCK_DETECTION_MAX_WAIT_TIME_SECONDS = 90;
 
-  /** Time in seconds another thread will wait before a log entry is created with level DEBUG. */
+  /**
+   * Time in seconds another thread will wait before a log entry is created with level DEBUG.
+   */
   private static final int DEADLOCK_DETECTION_DEBUG_WAIT_TIME_SECONDS = 5;
 
   private final FinalValue<T> m_instance = new FinalValue<>();
@@ -172,9 +174,9 @@ public class SingeltonBeanInstanceProducer<T> implements IBeanInstanceProducer<T
       logWarnPotentialDeadlock(creatorThread);
       throw new BeanCreationException("Potential deadlock detected: bean is being created by another thread. Either the creation takes longer than {}s "
           + "or the current and the creator threads are blocking each other (check the log).", maxWaitTimeSeconds)
-              .withContextInfo("beanClass", bean == null || bean.getBeanClazz() == null ? "n/a" : bean.getBeanClazz().getName())
-              .withContextInfo("creatorThreadID", creatorThread == null ? "n/a" : creatorThread.getId())
-              .withContextInfo("creatorThreadName", creatorThread == null ? "n/a" : creatorThread.getName());
+          .withContextInfo("beanClass", bean == null || bean.getBeanClazz() == null ? "n/a" : bean.getBeanClazz().getName())
+          .withContextInfo("creatorThreadID", creatorThread == null ? "n/a" : creatorThread.getId())
+          .withContextInfo("creatorThreadName", creatorThread == null ? "n/a" : creatorThread.getName());
     }
   }
 

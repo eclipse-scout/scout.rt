@@ -28,9 +28,9 @@ public class TimesStatement extends Statement {
    * Creates a statement to execute a test multiple times.
    *
    * @param next
-   *          next {@link Statement} to be executed.
+   *     next {@link Statement} to be executed.
    * @param annotation
-   *          {@link Times}-annotation to read the number of executions.
+   *     {@link Times}-annotation to read the number of executions.
    */
   public TimesStatement(final Statement next, final Times annotation) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");

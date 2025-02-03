@@ -26,7 +26,7 @@ public interface IProposalColumn<LOOKUP_TYPE> extends ISmartColumn<LOOKUP_TYPE> 
 
   /**
    * @param maxLength
-   *          of the text in this field. Negative values are automatically converted to 0.
+   *     of the text in this field. Negative values are automatically converted to 0.
    * @since 6.1
    */
   void setMaxLength(int maxLength);
@@ -39,7 +39,7 @@ public interface IProposalColumn<LOOKUP_TYPE> extends ISmartColumn<LOOKUP_TYPE> 
 
   /**
    * @param b
-   *          true if the entered text should pass through {@link String#trim()}
+   *     true if the entered text should pass through {@link String#trim()}
    * @since 6.1
    */
   void setTrimText(boolean b);

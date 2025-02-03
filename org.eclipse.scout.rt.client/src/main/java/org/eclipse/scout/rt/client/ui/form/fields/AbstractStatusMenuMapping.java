@@ -106,5 +106,4 @@ public abstract class AbstractStatusMenuMapping extends AbstractPropertyObserver
   protected List<Integer> getConfiguredSeverities() {
     return new ArrayList<>();
   }
-
 }

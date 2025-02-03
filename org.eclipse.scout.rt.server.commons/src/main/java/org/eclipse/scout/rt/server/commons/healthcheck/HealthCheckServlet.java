@@ -39,9 +39,9 @@ import org.slf4j.LoggerFactory;
  * {@link IHealthChecker} classes. See {@link IHealthChecker#acceptCategory(HealthCheckCategoryId)} for further
  * explanation of filtering.
  *
- * @since 6.1
  * @see HealthCheckService
  * @see AbstractHealthChecker
+ * @since 6.1
  */
 public class HealthCheckServlet extends AbstractHttpServlet {
   private static final long serialVersionUID = 1L;

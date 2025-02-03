@@ -16,8 +16,8 @@ package org.eclipse.scout.rt.platform;
  * <b>Note</b>: The {@link Order} annotation is only used to initialize this order property. At runtime always
  * {@link #getOrder()} is used.
  *
- * @since 3.8.1
  * @see Order
+ * @since 3.8.1
  */
 public interface IOrdered {
 
@@ -50,7 +50,7 @@ public interface IOrdered {
    * sets the object's order
    *
    * @param order
-   *          the new order value.
+   *     the new order value.
    */
   void setOrder(double order);
 }

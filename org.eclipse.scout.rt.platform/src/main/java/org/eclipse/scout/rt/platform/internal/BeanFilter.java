@@ -30,8 +30,8 @@ public class BeanFilter {
 
   /**
    * @return all {@link Bean} annotated classes
-   *         <p>
-   *         Includes all classes that implement an interface that has a {@link Bean} annotation
+   * <p>
+   * Includes all classes that implement an interface that has a {@link Bean} annotation
    */
   public Set<Class> collect(IClassInventory classInventory) {
     m_classInventory = classInventory;

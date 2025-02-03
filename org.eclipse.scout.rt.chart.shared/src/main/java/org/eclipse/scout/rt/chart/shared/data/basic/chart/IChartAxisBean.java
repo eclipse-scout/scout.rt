@@ -20,5 +20,4 @@ public interface IChartAxisBean extends Serializable {
   String getLabel();
 
   void setLabel(String label);
-
 }

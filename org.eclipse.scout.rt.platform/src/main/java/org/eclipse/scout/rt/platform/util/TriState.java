@@ -24,13 +24,13 @@ public enum TriState {
       return TriState.TRUE;
     }
   },
-  TRUE(Boolean.TRUE){
+  TRUE(Boolean.TRUE) {
     @Override
     public TriState negate() {
       return TriState.FALSE;
     }
   },
-  UNDEFINED(null){
+  UNDEFINED(null) {
     @Override
     public TriState negate() {
       return this;

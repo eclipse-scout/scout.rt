@@ -49,7 +49,6 @@ public class ServiceWithSessionInterceptorTest {
   public static interface ITestService extends IService {
 
     void doit();
-
   }
 
   @ApplicationScoped

@@ -110,5 +110,4 @@ class CollectionHolderOutput implements IBindOutput {
   public String toString() {
     return getClass().getSimpleName() + "[bindType=" + getBindType() + ", source=" + m_source + "]";
   }
-
 }

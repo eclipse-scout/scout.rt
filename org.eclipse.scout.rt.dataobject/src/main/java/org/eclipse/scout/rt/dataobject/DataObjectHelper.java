@@ -196,7 +196,7 @@ public class DataObjectHelper {
    *
    * @return the unwrapped value (never <code>null</code>)
    * @throws AssertionException
-   *           if the given {@link DoValue} is null, does not exist, or has no value
+   *     if the given {@link DoValue} is null, does not exist, or has no value
    */
   public <T> T assertValue(DoValue<T> doValue) {
     Assertions.assertNotNull(doValue);
@@ -210,7 +210,7 @@ public class DataObjectHelper {
    *
    * @return the unwrapped value (never <code>null</code> or empty)
    * @throws AssertionException
-   *           if the given {@link DoValue} is null, does not exist, or has no text
+   *     if the given {@link DoValue} is null, does not exist, or has no text
    */
   public String assertValueHasText(DoValue<String> doValue) {
     String value = assertValue(doValue);
@@ -223,7 +223,7 @@ public class DataObjectHelper {
    * {@link DoCollection}. This is useful to have a comparable output if the same data object is serialized twice.
    *
    * @param dataObject
-   *          Data object to normalize.
+   *     Data object to normalize.
    */
   public void normalize(IDataObject dataObject) {
     new P_NormalizationDataObjectVisitor().normalize(dataObject);
@@ -289,7 +289,7 @@ public class DataObjectHelper {
    * {@link IDoCollection} nodes containing an empty collection. This is useful to have a minimal data object.
    *
    * @param dataObject
-   *          Data object to clean.
+   *     Data object to clean.
    */
   public void clean(IDataObject dataObject) {
     new P_CleanDataObjectVisitor().clean(dataObject);
@@ -377,9 +377,9 @@ public class DataObjectHelper {
    * available. The operation is not recursive.
    *
    * @param target
-   *          target entity that is extended with attributes from the {@code template}. Must not be {@code null}.
+   *     target entity that is extended with attributes from the {@code template}. Must not be {@code null}.
    * @param template
-   *          entity missing attributes are taken from. It is not modified and can be {@code null}.
+   *     entity missing attributes are taken from. It is not modified and can be {@code null}.
    * @return the {@code target} object that was potentially modified
    */
   public <E extends IDoEntity> E extend(E target, IDoEntity template) {
@@ -391,9 +391,9 @@ public class DataObjectHelper {
    * values in @code target} entity. The operation is not recursive.
    *
    * @param target
-   *          target entity where attributes from the {@code template} are applied. Must not be {@code null}.
+   *     target entity where attributes from the {@code template} are applied. Must not be {@code null}.
    * @param template
-   *          entity all attributes are taken from. It is not modified and can be {@code null}.
+   *     entity all attributes are taken from. It is not modified and can be {@code null}.
    * @return the {@code target} object that was potentially modified
    */
   public <E extends IDoEntity> E applyValues(E target, IDoEntity template) {

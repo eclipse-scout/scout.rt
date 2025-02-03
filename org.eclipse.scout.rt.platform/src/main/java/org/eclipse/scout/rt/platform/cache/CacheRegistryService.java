@@ -53,5 +53,4 @@ public class CacheRegistryService implements ICacheRegistryService {
   protected Map<String, ICache> getMap() {
     return m_map;
   }
-
 }

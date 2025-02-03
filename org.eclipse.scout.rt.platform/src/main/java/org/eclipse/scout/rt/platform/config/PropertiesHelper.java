@@ -134,7 +134,7 @@ public class PropertiesHelper {
    * Creates a new instance using the given property provider.<br>
    *
    * @param properties
-   *          the property provider.
+   *     the property provider.
    * @see ConfigPropertyProvider
    */
   public PropertiesHelper(IPropertyProvider properties) {
@@ -145,9 +145,9 @@ public class PropertiesHelper {
    * Creates a new instance using the given config.properties and optional variable file.<br>
    *
    * @param properties
-   *          the property provider.
+   *     the property provider.
    * @param env
-   *          the environment variables. Optional
+   *     the environment variables. Optional
    * @see ConfigPropertyProvider
    */
   public PropertiesHelper(IPropertyProvider properties, IPropertyProvider env) {
@@ -257,7 +257,7 @@ public class PropertiesHelper {
    * </ol>
    *
    * @param key
-   *          The key of the property.
+   *     The key of the property.
    * @return The value of the given property or <code>null</code>.
    */
   public String getProperty(String key) {
@@ -274,11 +274,11 @@ public class PropertiesHelper {
    * </ol>
    *
    * @param key
-   *          The key of the property.
+   *     The key of the property.
    * @param defaultValue
-   *          The default value to use
+   *     The default value to use
    * @return The value of the given property, the given default value if the property could not be found or
-   *         <code>null</code> if the key is <code>null</code> or empty.
+   * <code>null</code> if the key is <code>null</code> or empty.
    */
   public String getProperty(String key, String defaultValue) {
     return getProperty(key, defaultValue, null);
@@ -295,13 +295,13 @@ public class PropertiesHelper {
    * </ol>
    *
    * @param key
-   *          The key of the property.
+   *     The key of the property.
    * @param defaultValue
-   *          defaultValue The default value to use
+   *     defaultValue The default value to use
    * @param namespace
-   *          The namespace of the property to retrieve.
+   *     The namespace of the property to retrieve.
    * @return The value of the given property, the given default value if the property could not be found or
-   *         <code>null</code> if the key is <code>null</code> or empty.
+   * <code>null</code> if the key is <code>null</code> or empty.
    */
   public String getProperty(String key, String defaultValue, String namespace) {
     if (!StringUtility.hasText(key)) {
@@ -433,10 +433,10 @@ public class PropertiesHelper {
    * {@link #getProperty(String, String)}.
    *
    * @param key
-   *          The key of the property without any numbered suffix.
+   *     The key of the property without any numbered suffix.
    * @return If there are listed properties using numbered suffixes, the values of all these are returned. Otherwise a
-   *         {@link List} containing the single value with this key is returned. If there is no entry with this key, an
-   *         empty list is returned. Never returns <code>null</code>. The resulting {@link List} cannot be modified.
+   * {@link List} containing the single value with this key is returned. If there is no entry with this key, an
+   * empty list is returned. Never returns <code>null</code>. The resulting {@link List} cannot be modified.
    */
   public List<String> getPropertyList(String key) {
     return getPropertyList(key, (String) null);
@@ -457,12 +457,12 @@ public class PropertiesHelper {
    * {@link #getProperty(String, String)}.
    *
    * @param key
-   *          The key of the property without any numbered suffix.
+   *     The key of the property without any numbered suffix.
    * @param namespace
-   *          The namespace or <code>null</code>.
+   *     The namespace or <code>null</code>.
    * @return If there are listed properties using numbered suffixes, the values of all these are returned. Otherwise a
-   *         {@link List} containing the single value with this key is returned. If there is no entry with this key, an
-   *         empty list is returned. Never returns <code>null</code>. The resulting {@link List} cannot be modified.
+   * {@link List} containing the single value with this key is returned. If there is no entry with this key, an
+   * empty list is returned. Never returns <code>null</code>. The resulting {@link List} cannot be modified.
    */
   public List<String> getPropertyList(String key, String namespace) {
     return getPropertyList(key, Collections.emptyList(), namespace);
@@ -483,12 +483,12 @@ public class PropertiesHelper {
    * {@link #getProperty(String, String)}.
    *
    * @param key
-   *          The key of the property without any numbered suffix.
+   *     The key of the property without any numbered suffix.
    * @param defaultValue
-   *          The default value to return if no entry exists. May be <code>null</code>.
+   *     The default value to return if no entry exists. May be <code>null</code>.
    * @return If there are listed properties using numbered suffixes, the values of all these are returned. Otherwise a
-   *         {@link List} containing the single value with this key is returned. If there is no entry with this key, the
-   *         given default value is returned. The resulting list cannot be modified unless it is the default value.
+   * {@link List} containing the single value with this key is returned. If there is no entry with this key, the
+   * given default value is returned. The resulting list cannot be modified unless it is the default value.
    */
   public List<String> getPropertyList(String key, List<String> defaultValue) {
     return getPropertyList(key, defaultValue, null);
@@ -509,14 +509,14 @@ public class PropertiesHelper {
    * {@link #getProperty(String, String)}.
    *
    * @param key
-   *          The key of the property without any numbered suffix.
+   *     The key of the property without any numbered suffix.
    * @param defaultValue
-   *          The default value to return if no entry exists. May be <code>null</code>.
+   *     The default value to return if no entry exists. May be <code>null</code>.
    * @param namespace
-   *          The namespace or <code>null</code>.
+   *     The namespace or <code>null</code>.
    * @return If there are listed properties using numbered suffixes, the values of all these are returned. Otherwise a
-   *         {@link List} containing the single value with this key is returned. If there is no entry with this key, the
-   *         given default value is returned. The resulting list cannot be modified unless it is the default value.
+   * {@link List} containing the single value with this key is returned. If there is no entry with this key, the
+   * given default value is returned. The resulting list cannot be modified unless it is the default value.
    */
   public List<String> getPropertyList(String key, List<String> defaultValue, String namespace) {
     if (!StringUtility.hasText(key)) {
@@ -558,9 +558,9 @@ public class PropertiesHelper {
    * {@link #getProperty(String, String)}.
    *
    * @param key
-   *          The key of the property without any numbered suffix.
+   *     The key of the property without any numbered suffix.
    * @return An unmodifiable {@link Map} holding the values with given key. If there are no values with that key the
-   *         resulting map is empty. Never returns <code>null</code>.
+   * resulting map is empty. Never returns <code>null</code>.
    */
   public Map<String, String> getPropertyMap(String key) {
     return getPropertyMap(key, (String) null);
@@ -578,11 +578,11 @@ public class PropertiesHelper {
    * {@link #getProperty(String, String)}.
    *
    * @param key
-   *          The key of the property without any numbered suffix.
+   *     The key of the property without any numbered suffix.
    * @param defaultValue
-   *          The default value to return if no entry exists. May be <code>null</code>.
+   *     The default value to return if no entry exists. May be <code>null</code>.
    * @return An unmodifiable {@link Map} if there are map values with given key and namespace. The given default value
-   *         otherwise.
+   * otherwise.
    */
   public Map<String, String> getPropertyMap(String key, Map<String, String> defaultValue) {
     return getPropertyMap(key, defaultValue, null);
@@ -600,11 +600,11 @@ public class PropertiesHelper {
    * {@link #getProperty(String, String)}.
    *
    * @param key
-   *          The key of the property without any numbered suffix.
+   *     The key of the property without any numbered suffix.
    * @param namespace
-   *          The namespace or <code>null</code>.
+   *     The namespace or <code>null</code>.
    * @return An unmodifiable {@link Map} holding the values with given key and namespace. If there are no values with
-   *         that key and namespace the resulting map is empty. Never returns <code>null</code>.
+   * that key and namespace the resulting map is empty. Never returns <code>null</code>.
    */
   public Map<String, String> getPropertyMap(String key, String namespace) {
     return getPropertyMap(key, Collections.emptyMap(), namespace);
@@ -622,13 +622,13 @@ public class PropertiesHelper {
    * {@link #getProperty(String, String)}.
    *
    * @param key
-   *          The key of the property without any numbered suffix.
+   *     The key of the property without any numbered suffix.
    * @param defaultValue
-   *          The default value to return if no entry exists. May be <code>null</code>.
+   *     The default value to return if no entry exists. May be <code>null</code>.
    * @param namespace
-   *          The namespace or <code>null</code>.
+   *     The namespace or <code>null</code>.
    * @return An unmodifiable {@link Map} if there are map values with given key and namespace. The given default value
-   *         otherwise.
+   * otherwise.
    */
   public Map<String, String> getPropertyMap(String key, Map<String, String> defaultValue, String namespace) {
     return getPropertyMap(key, defaultValue, namespace, false);
@@ -636,8 +636,8 @@ public class PropertiesHelper {
 
   /**
    * @param lenientJsonDeserialization
-   *          <code>true</code> to skip if the given property doesn't correspond to a readable JSON format,
-   *          <code>false</code> otherwise.
+   *     <code>true</code> to skip if the given property doesn't correspond to a readable JSON format,
+   *     <code>false</code> otherwise.
    * @see #getProperty(String, String, String)
    */
   protected Map<String, String> getPropertyMap(String key, Map<String, String> defaultValue, String namespace, boolean lenientJsonDeserialization) {
@@ -678,14 +678,14 @@ public class PropertiesHelper {
    * values are '{@code true}' and '{@code false}' (not case-sensitive).
    *
    * @param key
-   *          The key of the property.
+   *     The key of the property.
    * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid boolean associated with it.
+   *     The default value to use if the given key does not exist or as no valid boolean associated with it.
    * @return The boolean value of the given key or the given default value otherwise.
-   * @since 5.1
    * @throws IllegalArgumentException
-   *           if the value of the property is neither {@code true} nor {@code false} (not case-sensitive).
+   *     if the value of the property is neither {@code true} nor {@code false} (not case-sensitive).
    * @see #getProperty(String)
+   * @since 5.1
    */
   public boolean getPropertyBoolean(String key, boolean defaultValue) {
     return getPropertyBoolean(key, defaultValue, null);
@@ -698,16 +698,16 @@ public class PropertiesHelper {
    * case-sensitive).
    *
    * @param key
-   *          The key of the property.
+   *     The key of the property.
    * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid boolean associated with it.
+   *     The default value to use if the given key does not exist or as no valid boolean associated with it.
    * @param namespace
-   *          The namespace of the property or <code>null</code>.
+   *     The namespace of the property or <code>null</code>.
    * @return The boolean value of the given key or the given default value otherwise.
-   * @since 5.1
    * @throws IllegalArgumentException
-   *           if the value of the property is neither {@code true} nor {@code false} (not case-sensitive).
+   *     if the value of the property is neither {@code true} nor {@code false} (not case-sensitive).
    * @see #getProperty(String)
+   * @since 5.1
    */
   public boolean getPropertyBoolean(String key, boolean defaultValue, String namespace) {
     String rawValue = getProperty(key, namespace);
@@ -728,14 +728,14 @@ public class PropertiesHelper {
    * returned. If the value is no valid int an {@link IllegalArgumentException} is thrown.
    *
    * @param key
-   *          The key of the property.
+   *     The key of the property.
    * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid int associated with it.
+   *     The default value to use if the given key does not exist or as no valid int associated with it.
    * @return The int value of the given key or the given default value otherwise.
-   * @since 5.1
    * @throws IllegalArgumentException
-   *           if the value of the given property is no valid int according to {@link Integer#parseInt(String)}.
+   *     if the value of the given property is no valid int according to {@link Integer#parseInt(String)}.
    * @see #getProperty(String)
+   * @since 5.1
    */
   public int getPropertyInt(String key, int defaultValue) {
     return getPropertyInt(key, defaultValue, null);
@@ -746,16 +746,16 @@ public class PropertiesHelper {
    * the given default value is returned. If the value is no valid int an {@link IllegalArgumentException} is thrown.
    *
    * @param key
-   *          The key of the property.
+   *     The key of the property.
    * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid int associated with it.
+   *     The default value to use if the given key does not exist or as no valid int associated with it.
    * @param namespace
-   *          The namespace of the property or <code>null</code>.
+   *     The namespace of the property or <code>null</code>.
    * @return The int value of the given key or the given default value otherwise.
-   * @since 5.1
    * @throws IllegalArgumentException
-   *           if the value of the given property is no valid int according to {@link Integer#parseInt(String)}.
+   *     if the value of the given property is no valid int according to {@link Integer#parseInt(String)}.
    * @see #getProperty(String)
+   * @since 5.1
    */
   public int getPropertyInt(String key, int defaultValue, String namespace) {
     String valueRaw = getProperty(key, namespace);
@@ -776,14 +776,14 @@ public class PropertiesHelper {
    * returned. If the value is no valid long an {@link IllegalArgumentException} is thrown.
    *
    * @param key
-   *          The key of the property.
+   *     The key of the property.
    * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid long associated with it.
+   *     The default value to use if the given key does not exist or as no valid long associated with it.
    * @return The long value of the given key or the given default value otherwise.
-   * @since 5.1
    * @throws IllegalArgumentException
-   *           if the value of the given property is no valid long according to {@link Long#parseLong(String)}.
+   *     if the value of the given property is no valid long according to {@link Long#parseLong(String)}.
    * @see #getProperty(String)
+   * @since 5.1
    */
   public long getPropertyLong(String key, long defaultValue) {
     return getPropertyLong(key, defaultValue, null);
@@ -794,16 +794,16 @@ public class PropertiesHelper {
    * the given default value is returned. If the value is no valid long an {@link IllegalArgumentException} is thrown.
    *
    * @param key
-   *          The key of the property.
+   *     The key of the property.
    * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid long associated with it.
+   *     The default value to use if the given key does not exist or as no valid long associated with it.
    * @param namespace
-   *          The namespace of the property or <code>null</code>.
+   *     The namespace of the property or <code>null</code>.
    * @return The long value of the given key or the given default value otherwise.
-   * @since 5.1
    * @throws IllegalArgumentException
-   *           if the value of the given property is no valid long according to {@link Long#parseLong(String)}.
+   *     if the value of the given property is no valid long according to {@link Long#parseLong(String)}.
    * @see #getProperty(String)
+   * @since 5.1
    */
   public long getPropertyLong(String key, long defaultValue, String namespace) {
     String valueRaw = getProperty(key, namespace);
@@ -824,14 +824,14 @@ public class PropertiesHelper {
    * returned. If the value is no valid float an {@link IllegalArgumentException} is thrown.
    *
    * @param key
-   *          The key of the property.
+   *     The key of the property.
    * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid float associated with it.
+   *     The default value to use if the given key does not exist or as no valid float associated with it.
    * @return The float value of the given key or the given default value otherwise.
-   * @since 5.1
    * @throws IllegalArgumentException
-   *           if the value of the given property is no valid float according to {@link Float#parseFloat(String)}.
+   *     if the value of the given property is no valid float according to {@link Float#parseFloat(String)}.
    * @see #getProperty(String)
+   * @since 5.1
    */
   public float getPropertyFloat(String key, float defaultValue) {
     return getPropertyFloat(key, defaultValue, null);
@@ -842,16 +842,16 @@ public class PropertiesHelper {
    * the given default value is returned. If the value is no valid float an {@link IllegalArgumentException} is thrown.
    *
    * @param key
-   *          The key of the property.
+   *     The key of the property.
    * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid float associated with it.
+   *     The default value to use if the given key does not exist or as no valid float associated with it.
    * @param namespace
-   *          The namespace of the property or <code>null</code>.
+   *     The namespace of the property or <code>null</code>.
    * @return The float value of the given key or the given default value otherwise.
-   * @since 5.1
    * @throws IllegalArgumentException
-   *           if the value of the given property is no valid float according to {@link Float#parseFloat(String)}.
+   *     if the value of the given property is no valid float according to {@link Float#parseFloat(String)}.
    * @see #getProperty(String)
+   * @since 5.1
    */
   public float getPropertyFloat(String key, float defaultValue, String namespace) {
     String valueRaw = getProperty(key, namespace);
@@ -872,14 +872,14 @@ public class PropertiesHelper {
    * returned. If the value is no valid double an {@link IllegalArgumentException} is thrown.
    *
    * @param key
-   *          The key of the property.
+   *     The key of the property.
    * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid double associated with it.
+   *     The default value to use if the given key does not exist or as no valid double associated with it.
    * @return The double value of the given key or the given default value otherwise.
-   * @since 5.1
    * @throws IllegalArgumentException
-   *           if the value of the given property is no valid double according to {@link Double#parseDouble(String)}.
+   *     if the value of the given property is no valid double according to {@link Double#parseDouble(String)}.
    * @see #getProperty(String)
+   * @since 5.1
    */
   public double getPropertyDouble(String key, double defaultValue) {
     return getPropertyDouble(key, defaultValue, null);
@@ -891,16 +891,16 @@ public class PropertiesHelper {
    * thrown.
    *
    * @param key
-   *          The key of the property.
+   *     The key of the property.
    * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid double associated with it.
+   *     The default value to use if the given key does not exist or as no valid double associated with it.
    * @param namespace
-   *          The namespace of the property or <code>null</code>.
+   *     The namespace of the property or <code>null</code>.
    * @return The double value of the given key or the given default value otherwise.
-   * @since 5.1
    * @throws IllegalArgumentException
-   *           if the value of the given property is no valid double according to {@link Double#parseDouble(String)}.
+   *     if the value of the given property is no valid double according to {@link Double#parseDouble(String)}.
    * @see #getProperty(String)
+   * @since 5.1
    */
   public double getPropertyDouble(String key, double defaultValue, String namespace) {
     String valueRaw = getProperty(key, namespace);
@@ -962,8 +962,8 @@ public class PropertiesHelper {
 
   /**
    * @param lenientJsonDeserialization
-   *          <code>true</code> to skip if the given property doesn't correspond to a readable JSON format,
-   *          <code>false</code> otherwise.
+   *     <code>true</code> to skip if the given property doesn't correspond to a readable JSON format,
+   *     <code>false</code> otherwise.
    */
   protected void collectMapEntriesFromJson(String key, String namespace, Function<String, String> propertyValueRetriever, Map<String, String> collector, boolean lenientJsonDeserialization) {
     String propertyKey = toPropertyKey(key, namespace).toString();
@@ -1122,10 +1122,10 @@ public class PropertiesHelper {
    * application context.
    *
    * @param value
-   *          The expression to resolve.
+   *     The expression to resolve.
    * @return A {@link String} where all variables have been replaced with their values.
    * @throws IllegalArgumentException
-   *           if a variable could not be resolved in the current context.
+   *     if a variable could not be resolved in the current context.
    */
   @SuppressWarnings("squid:S1149")
   protected String resolve(String value, Pattern variablePattern) {
@@ -1152,7 +1152,6 @@ public class PropertiesHelper {
         parse(props);
       }
     });
-
   }
 
   protected Map<String, String> getConfigPropertyMap() {
@@ -1211,5 +1210,4 @@ public class PropertiesHelper {
   protected IPropertyProvider getPropertyProvider(String configUrl) {
     return new ConfigPropertyProvider(configUrl);
   }
-
 }

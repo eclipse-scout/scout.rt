@@ -54,7 +54,7 @@ public interface IAccessController {
    * <code>true</code>, this authenticator continues chain, or sets according headers otherwise.
    *
    * @return <code>true</code> if the request was handled (caller should exit chain), or <code>false</code> if nothing
-   *         was done (caller should continue by invoking subsequent authenticators).
+   * was done (caller should continue by invoking subsequent authenticators).
    */
   boolean handle(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException;
 

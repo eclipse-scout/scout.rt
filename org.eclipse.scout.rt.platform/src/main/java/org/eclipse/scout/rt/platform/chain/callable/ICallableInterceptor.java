@@ -32,11 +32,11 @@ public interface ICallableInterceptor<RESULT> extends IChainable {
    * {@link Callable} is never invoked and this interceptor's result returned to the invoker.
    *
    * @param chain
-   *          The chain to invoke the next handler in the chain, or if this interceptor is the last handler in the
-   *          chain, to invoke the Callable at the end of the chain.
+   *     The chain to invoke the next handler in the chain, or if this interceptor is the last handler in the
+   *     chain, to invoke the Callable at the end of the chain.
    * @return the result to pass along to the invoker.
    * @throws Exception
-   *           the exception to pass along to the invoker.
+   *     the exception to pass along to the invoker.
    */
   @SuppressWarnings("squid:S00112")
   RESULT intercept(Chain<RESULT> chain) throws Exception;

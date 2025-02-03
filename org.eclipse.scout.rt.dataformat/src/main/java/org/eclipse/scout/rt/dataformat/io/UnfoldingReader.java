@@ -210,7 +210,7 @@ public class UnfoldingReader extends BufferedReader {
 
   /**
    * @param parameters
-   *          with parameters[0] being the name of the property
+   *     with parameters[0] being the name of the property
    * @return property object containing the property name, property parameters and their values
    */
   private Property parseParameters(String[] parameters) {

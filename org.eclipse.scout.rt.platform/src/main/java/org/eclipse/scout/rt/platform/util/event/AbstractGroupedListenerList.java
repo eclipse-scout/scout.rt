@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.eclipse.scout.rt.platform.events.ListenerListRegistry;
 import org.eclipse.scout.rt.platform.events.IListenerListWithManagement;
 import org.eclipse.scout.rt.platform.events.ISnapshotCollector;
+import org.eclipse.scout.rt.platform.events.ListenerListRegistry;
 
 /**
  * Thread safe event listener list with a single listener type, grouped by event types
@@ -109,7 +109,7 @@ public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> i
    * @param listener
    * @param weak
    * @param eventTypes
-   *          is either a single event type or an array of types, may also be a primitive array such as int[]
+   *     is either a single event type or an array of types, may also be a primitive array such as int[]
    */
   public void add(LISTENER listener, boolean weak, @SuppressWarnings("unchecked") EVENT_TYPE... eventTypes) {
     if (listener == null) {
@@ -136,7 +136,7 @@ public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> i
    * @param listener
    * @param weak
    * @param eventTypes
-   *          is either a single event type or an array of types, may also be a primitive array such as int[]
+   *     is either a single event type or an array of types, may also be a primitive array such as int[]
    */
   public void addLastCalled(LISTENER listener, boolean weak, @SuppressWarnings("unchecked") EVENT_TYPE... eventTypes) {
     if (listener == null) {
@@ -209,7 +209,7 @@ public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> i
     if (listener == null) {
       return;
     }
-    for (Iterator<Map.Entry<EVENT_TYPE, UnsafeFastListenerList<LISTENER>>> it = listenerMap.entrySet().iterator(); it.hasNext();) {
+    for (Iterator<Map.Entry<EVENT_TYPE, UnsafeFastListenerList<LISTENER>>> it = listenerMap.entrySet().iterator(); it.hasNext(); ) {
       Map.Entry<EVENT_TYPE, UnsafeFastListenerList<LISTENER>> e = it.next();
       EVENT_TYPE eventType = e.getKey();
       if (queryType != null && !Objects.equals(queryType, eventType)) {
@@ -303,5 +303,4 @@ public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> i
     }
     return sb.toString();
   }
-
 }

@@ -59,7 +59,7 @@ public class NotificationHandlerRegistry {
    * Notify all {@link INotificationHandler}s with the message, if the message type matches the handler type.
    *
    * @param notification
-   *          notification message
+   *     notification message
    */
   @SuppressWarnings("unchecked")
   public void notifyNotificationHandlers(Serializable notification) {
@@ -73,5 +73,4 @@ public class NotificationHandlerRegistry {
       }
     }
   }
-
 }

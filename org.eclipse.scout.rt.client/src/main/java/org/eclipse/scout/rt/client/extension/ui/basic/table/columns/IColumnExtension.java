@@ -41,5 +41,4 @@ public interface IColumnExtension<VALUE, OWNER extends AbstractColumn<VALUE>> ex
   void execDecorateCell(ColumnDecorateCellChain<VALUE> chain, Cell cell, ITableRow row);
 
   void execDisposeColumn(ColumnDisposeColumnChain<VALUE> chain);
-
 }

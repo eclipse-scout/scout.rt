@@ -246,7 +246,7 @@ public class TableEvent extends EventObject implements IModelEvent {
       return false;
     }
     boolean removed = false;
-    for (Iterator<? extends ITableRow> it = m_rows.iterator(); it.hasNext();) {
+    for (Iterator<? extends ITableRow> it = m_rows.iterator(); it.hasNext(); ) {
       final ITableRow row = it.next();
       if (rowsToRemove.contains(row)) {
         it.remove();

@@ -43,7 +43,7 @@ public class SmtpServerConfig {
 
   /**
    * @param host
-   *          SMTP server host name.
+   *     SMTP server host name.
    */
   public SmtpServerConfig withHost(String host) {
     m_host = host;
@@ -56,7 +56,7 @@ public class SmtpServerConfig {
 
   /**
    * @param port
-   *          The port to connect to the server.
+   *     The port to connect to the server.
    */
   public SmtpServerConfig withPort(Integer port) {
     m_port = port;
@@ -69,7 +69,7 @@ public class SmtpServerConfig {
 
   /**
    * @param username
-   *          SMTP server username.
+   *     SMTP server username.
    */
   public SmtpServerConfig withUsername(String username) {
     m_username = username;
@@ -82,7 +82,7 @@ public class SmtpServerConfig {
 
   /**
    * @param password
-   *          SMTP server password.
+   *     SMTP server password.
    */
   public SmtpServerConfig withPassword(String password) {
     m_password = password;
@@ -97,7 +97,7 @@ public class SmtpServerConfig {
    * A {@link #getUsername()} must be set, otherwise this setting has no effect.
    *
    * @param useAuthentication
-   *          If <code>true</code>, attempt to authenticate the user using the AUTH command.
+   *     If <code>true</code>, attempt to authenticate the user using the AUTH command.
    */
   public SmtpServerConfig withUseAuthentication(boolean useAuthentication) {
     m_useAuthentication = useAuthentication;
@@ -110,7 +110,7 @@ public class SmtpServerConfig {
 
   /**
    * @param useSmtps
-   *          Specifies if a secure connection should be used.
+   *     Specifies if a secure connection should be used.
    */
   public SmtpServerConfig withUseSmtps(boolean useSmtps) {
     m_useSmtps = useSmtps;
@@ -123,7 +123,7 @@ public class SmtpServerConfig {
 
   /**
    * @param useStartTls
-   *          Enables STARTTLS support.
+   *     Enables STARTTLS support.
    */
   public SmtpServerConfig withUseStartTls(boolean useStartTls) {
     m_useStartTls = useStartTls;
@@ -136,9 +136,9 @@ public class SmtpServerConfig {
 
   /**
    * @param sslProtocols
-   *          Specifies the SSL protocols that will be enabled for SSL connections. The property value is a whitespace
-   *          separated list of tokens acceptable to the {@link javax.net.ssl.SSLSocket#setEnabledProtocols(String[])}
-   *          method.
+   *     Specifies the SSL protocols that will be enabled for SSL connections. The property value is a whitespace
+   *     separated list of tokens acceptable to the {@link javax.net.ssl.SSLSocket#setEnabledProtocols(String[])}
+   *     method.
    */
   public SmtpServerConfig withSslProtocols(String sslProtocols) {
     m_sslProtocols = sslProtocols;
@@ -154,7 +154,7 @@ public class SmtpServerConfig {
    * or user.
    *
    * @param additionalSessionProperties
-   *          Additional properties used to create {@link Session} for SMTP server connection.
+   *     Additional properties used to create {@link Session} for SMTP server connection.
    */
   public SmtpServerConfig withAdditionalSessionProperties(Map<String, String> additionalSessionProperties) {
     m_additionalSessionProperties = additionalSessionProperties;
@@ -163,7 +163,7 @@ public class SmtpServerConfig {
 
   /**
    * @return Returns the size of the connection pool to use with this {@link SmtpServerConfig}. If 0, smtp connection
-   *         pooling is disabled.
+   * pooling is disabled.
    */
   public int getPoolSize() {
     return m_poolSize;
@@ -171,8 +171,8 @@ public class SmtpServerConfig {
 
   /**
    * @param poolSize
-   *          Specifies the size of the connection pool to use with this {@link SmtpServerConfig#}. If 0, smtp
-   *          connection pooling is disabled.
+   *     Specifies the size of the connection pool to use with this {@link SmtpServerConfig#}. If 0, smtp
+   *     connection pooling is disabled.
    */
   public SmtpServerConfig withPoolSize(int poolSize) {
     m_poolSize = poolSize;
@@ -181,8 +181,8 @@ public class SmtpServerConfig {
 
   /**
    * @return Returns the maximum number of messages to send per connection with this {@link SmtpServerConfig}. If the
-   *         limit is reached the connection will not be returned to the pool to be used again. If 0, no limit will be
-   *         applied on the number of messages sent per connection. Only applies when {@link #withPoolSize(int)} > 0.
+   * limit is reached the connection will not be returned to the pool to be used again. If 0, no limit will be
+   * applied on the number of messages sent per connection. Only applies when {@link #withPoolSize(int)} > 0.
    */
   public int getMaxMessagesPerConnection() {
     return m_maxMessagesPerConnection;
@@ -190,9 +190,9 @@ public class SmtpServerConfig {
 
   /**
    * @param maxMessagesPerConnection
-   *          The maximum number of messages sent per connection. If the limit is reached, the connection will not be
-   *          returned to the pool to be used again. If the value of this property is 0, no limit will be applied on the
-   *          number of messages sent per connection. Only applies {@link #withPoolSize(int)} > 0.
+   *     The maximum number of messages sent per connection. If the limit is reached, the connection will not be
+   *     returned to the pool to be used again. If the value of this property is 0, no limit will be applied on the
+   *     number of messages sent per connection. Only applies {@link #withPoolSize(int)} > 0.
    */
   public SmtpServerConfig withMaxMessagesPerConnection(int maxMessagesPerConnection) {
     m_maxMessagesPerConnection = maxMessagesPerConnection;

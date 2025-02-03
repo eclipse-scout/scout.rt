@@ -143,9 +143,9 @@ public class ClientNotificationDispatcher {
    * Dispatching is always done asynchronously to ensure that it is not handled within a model thread.
    *
    * @param session
-   *          the session describes the {@link RunContext} in which the notification should be processed.
+   *     the session describes the {@link RunContext} in which the notification should be processed.
    * @param notification
-   *          the notification to process.
+   *     the notification to process.
    */
   public void dispatchForSession(IClientSession session, Serializable notification, IClientNotificationAddress address) {
     ISession currentSession = ISession.CURRENT.get();

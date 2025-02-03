@@ -24,5 +24,4 @@ public interface IPropertyProvider {
    * @return all the properties of this provider.
    */
   List<Entry<String, String>> readProperties();
-
 }

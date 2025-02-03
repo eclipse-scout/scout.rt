@@ -28,5 +28,4 @@ public interface IRunContextChainInterceptor<RESULT> extends ICallableIntercepto
    * {@link RunContext}. This method is called in the caller environment most likely a outer {@link RunContext}.
    */
   void fillCurrent();
-
 }

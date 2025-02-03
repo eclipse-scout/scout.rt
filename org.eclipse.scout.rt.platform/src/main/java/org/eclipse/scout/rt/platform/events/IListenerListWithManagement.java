@@ -16,5 +16,4 @@ package org.eclipse.scout.rt.platform.events;
 public interface IListenerListWithManagement {
 
   void createSnapshot(ISnapshotCollector collector);
-
 }

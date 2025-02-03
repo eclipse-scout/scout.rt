@@ -29,9 +29,9 @@ public class BytesMarshaller implements IMarshaller {
 
   /**
    * @param transferObject
-   *          object to marshal, must be of type {@code byte[]} (or {@code null})
+   *     object to marshal, must be of type {@code byte[]} (or {@code null})
    * @throws AssertionException
-   *           if the given object is not of the expected type
+   *     if the given object is not of the expected type
    */
   @Override
   public Object marshall(final Object transferObject, final Map<String, String> context) {

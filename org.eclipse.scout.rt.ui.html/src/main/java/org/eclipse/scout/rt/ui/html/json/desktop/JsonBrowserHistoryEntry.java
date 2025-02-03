@@ -37,5 +37,4 @@ public class JsonBrowserHistoryEntry implements IJsonObject {
     }
     return new JsonBrowserHistoryEntry(browserHistoryEntry).toJson();
   }
-
 }

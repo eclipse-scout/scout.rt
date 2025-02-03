@@ -62,7 +62,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    * Subclasses can override this method. Default is {@code false}.
    *
    * @return {@code true} if the input in the string field in case of an editable cell is masked, {@code false}
-   *         otherwise.
+   * otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(140)

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Cell, Column, InitModelOf, ListBoxLayout, ListBoxModel, LookupBox, lookupField, LookupResult, LookupRow, scout, Table, TableRowModel, TableRowsCheckedEvent, Widget} from '../../../index';
+import {arrays, Column, InitModelOf, ListBoxLayout, ListBoxModel, LookupBox, lookupField, LookupResult, LookupRow, scout, Table, TableRowModel, TableRowsCheckedEvent, Widget} from '../../../index';
 
 export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<TValue> {
   declare model: ListBoxModel<TValue>;

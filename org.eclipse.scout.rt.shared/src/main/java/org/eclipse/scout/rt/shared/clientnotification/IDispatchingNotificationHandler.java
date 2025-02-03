@@ -21,5 +21,4 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 public interface IDispatchingNotificationHandler<T extends Serializable> {
 
   void handleNotification(T notification, IClientNotificationAddress address);
-
 }

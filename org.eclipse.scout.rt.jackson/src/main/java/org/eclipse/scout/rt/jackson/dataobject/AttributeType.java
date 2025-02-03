@@ -46,7 +46,7 @@ public class AttributeType {
 
   /**
    * @return {@code true} if the declared attribute type could have been resolved (e.g. if an actual type can be derived
-   *         from the {@link DoNode}'s type parameter). Otherwise {@code false}.
+   * from the {@link DoNode}'s type parameter). Otherwise {@code false}.
    */
   public boolean isKnown() {
     return m_javaType.getRawClass() != Object.class;

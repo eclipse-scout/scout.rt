@@ -341,7 +341,6 @@ public class AbstractRadioButtonGroupTest {
         return Long.valueOf(3L);
       }
     }
-
   }
 
   private class P_RadioButtonGroupWithLookupCall extends AbstractRadioButtonGroup<Long> {

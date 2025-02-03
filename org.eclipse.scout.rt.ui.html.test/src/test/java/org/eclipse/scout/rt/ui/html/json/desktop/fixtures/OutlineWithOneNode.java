@@ -23,5 +23,4 @@ public class OutlineWithOneNode extends AbstractOutline {
     NodePage nodePage = new NodePage();
     pageList.add(nodePage);
   }
-
 }

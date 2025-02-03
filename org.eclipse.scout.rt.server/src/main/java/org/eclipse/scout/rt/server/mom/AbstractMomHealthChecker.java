@@ -26,7 +26,7 @@ public abstract class AbstractMomHealthChecker extends AbstractHealthChecker {
 
   /**
    * @param implementor
-   *          {@link IMomImplementor} from {@link AbstractMomTransport#getImplementor()}
+   *     {@link IMomImplementor} from {@link AbstractMomTransport#getImplementor()}
    */
   protected abstract boolean execCheckHealth(IMomImplementor implementor) throws Exception;
 
@@ -59,5 +59,4 @@ public abstract class AbstractMomHealthChecker extends AbstractHealthChecker {
     }
     return execCheckHealth(implementor);
   }
-
 }

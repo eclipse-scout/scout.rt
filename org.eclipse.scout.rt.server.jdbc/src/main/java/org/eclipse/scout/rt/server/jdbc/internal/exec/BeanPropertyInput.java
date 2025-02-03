@@ -192,5 +192,4 @@ class BeanPropertyInput implements IBindInput {
     }
     return null;
   }
-
 }

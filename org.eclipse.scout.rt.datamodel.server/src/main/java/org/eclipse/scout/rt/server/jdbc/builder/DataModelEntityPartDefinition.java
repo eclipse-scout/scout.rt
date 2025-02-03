@@ -33,41 +33,41 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
 
   /**
    * @param whereClause
-   *          is the clause used to find data by constraining the where clause. This is normally something like
+   *     is the clause used to find data by constraining the where clause. This is normally something like
    *
-   *          <pre>
-   *        EXISTS (
-   *          SELECT 1
-   *          FROM ... &lt;fromParts/&gt;
-   *          WHERE 1=1 &lt;whereParts/&gt;
-   *          &lt;groupBy&gt;
-   *            GROUP BY &lt;groupByParts/&gt;
-   *            HAVING 1=1 &lt;havingParts/&gt;
-   *          &lt;/groupBy&gt;
-   *        )
-   *          </pre>
-   *          <p>
-   *          whereParts and havingParts is replaced in the build process by the corresponding attributes with/without
-   *          aggregation.
+   *     <pre>
+   *            EXISTS (
+   *              SELECT 1
+   *              FROM ... &lt;fromParts/&gt;
+   *              WHERE 1=1 &lt;whereParts/&gt;
+   *              &lt;groupBy&gt;
+   *                GROUP BY &lt;groupByParts/&gt;
+   *                HAVING 1=1 &lt;havingParts/&gt;
+   *              &lt;/groupBy&gt;
+   *            )
+   *              </pre>
+   *     <p>
+   *     whereParts and havingParts is replaced in the build process by the corresponding attributes with/without
+   *     aggregation.
    * @param selectClause
-   *          is the clause to add n attributes of an entity to the base entity. This parameter is the join clause used
-   *          to join the additional entity to the base entity in the select part. It must have the form (SELECT
-   *          <selectParts/> FROM ... ) or a similar form containing a <column/> tag and
-   *          a @parent.TableAlias@.PRIMARY_KEY_ID
-   *          <p>
-   *          Example for a Person-Contact-Entity-join select-clause:
+   *     is the clause to add n attributes of an entity to the base entity. This parameter is the join clause used
+   *     to join the additional entity to the base entity in the select part. It must have the form (SELECT
+   *     <selectParts/> FROM ... ) or a similar form containing a <column/> tag and
+   *     a @parent.TableAlias@.PRIMARY_KEY_ID
+   *     <p>
+   *     Example for a Person-Contact-Entity-join select-clause:
    *
-   *          <pre>
-   * SELECT &lt;selectParts/&gt;
-   * FROM MY_CONTACT @Contact@ &lt;fromParts/&gt;
-   * WHERE @Contact@.PERSON_FK=@parent.Person@.PERSON_ID
-   * &lt;whereParts/&gt;
-   * &lt;groupBy&gt;
-   *  GROUP BY &lt;groupByParts/&gt;
-   *   HAVING 1=1 &lt;havingParts/&gt;
-   *  &lt;/groupBy&gt;
-   *          </pre>
-   *          <p>
+   *     <pre>
+   *     SELECT &lt;selectParts/&gt;
+   *     FROM MY_CONTACT @Contact@ &lt;fromParts/&gt;
+   *     WHERE @Contact@.PERSON_FK=@parent.Person@.PERSON_ID
+   *     &lt;whereParts/&gt;
+   *     &lt;groupBy&gt;
+   *      GROUP BY &lt;groupByParts/&gt;
+   *       HAVING 1=1 &lt;havingParts/&gt;
+   *      &lt;/groupBy&gt;
+   *              </pre>
+   *     <p>
    */
   public DataModelEntityPartDefinition(Class<? extends IDataModelEntity> entityType, String whereClause, String selectClause) {
     m_entityType = entityType;
@@ -107,19 +107,19 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
    * {@link ComposerEntityNodeData#getContainingAttributeNodes()}.
    *
    * @param builder
-   *          containging all binds and sql parts
+   *     containging all binds and sql parts
    * @param entityNodeData
-   *          the form data object containing the runtime value {@link ComposerEntityNodeData}
+   *     the form data object containing the runtime value {@link ComposerEntityNodeData}
    * @param strategy
-   *          is one of the {@link EntityStrategy} enums and decides whether {@link #getSelectClause()} or
-   *          {@link #getWhereClause()} is used
+   *     is one of the {@link EntityStrategy} enums and decides whether {@link #getSelectClause()} or
+   *     {@link #getWhereClause()} is used
    * @param stm
-   *          is either {@link #getSelectClause()} or {@link #getWhereClause()} depending on the strategy
+   *     is either {@link #getSelectClause()} or {@link #getWhereClause()} depending on the strategy
    * @param parentAliasMap
-   *          the map of meta-alias to alias for this entity, for example @Person@ -> p1
+   *     the map of meta-alias to alias for this entity, for example @Person@ -> p1
    * @return the result sql text; null if that part is to be ignored
-   *         <p>
-   *         default just returns the incoming stm (either {@link #getSelectClause()} or {@link #getWhereClause()})
+   * <p>
+   * default just returns the incoming stm (either {@link #getSelectClause()} or {@link #getWhereClause()})
    */
   public String createInstance(FormDataStatementBuilder builder, ComposerEntityNodeData entityNodeData, EntityStrategy strategy, String stm, Map<String, String> parentAliasMap) {
     return stm;

@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.BEANS;
  * certain session.
  *
  * @param T
- *          the type of the notification
+ *     the type of the notification
  * @see NotificationHandlerRegistry
  */
 @FunctionalInterface

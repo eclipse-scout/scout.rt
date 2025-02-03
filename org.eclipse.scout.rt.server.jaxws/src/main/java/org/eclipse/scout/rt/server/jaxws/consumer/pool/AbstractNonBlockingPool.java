@@ -26,9 +26,9 @@ import org.slf4j.LoggerFactory;
  * Non-blocking, unlimited pool. Elements are removed after a given timeout.
  *
  * @param <T>
- *          type of pooled elements.
+ *     type of pooled elements.
  * @param <P>
- *          type of additional parameters used for creating a new pool element.
+ *     type of additional parameters used for creating a new pool element.
  * @since 6.0.300
  */
 public abstract class AbstractNonBlockingPool<T> {
@@ -143,7 +143,7 @@ public abstract class AbstractNonBlockingPool<T> {
    * Discards pool entries.
    *
    * @param all
-   *          discards all entries if parameter value is <code>true</code>. Otherwise only expired ones.
+   *     discards all entries if parameter value is <code>true</code>. Otherwise only expired ones.
    */
   protected void discardPoolEntries(boolean all) {
     try {

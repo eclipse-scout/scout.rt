@@ -35,5 +35,4 @@ public interface IMomTransport extends IMom {
    * the delegate.
    */
   boolean isNullTransport();
-
 }

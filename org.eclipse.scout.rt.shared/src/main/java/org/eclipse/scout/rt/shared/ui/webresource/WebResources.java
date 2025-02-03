@@ -34,16 +34,16 @@ public class WebResources {
    * is in the "prod" or "dev" folder.
    *
    * @param path
-   *          The relative file path
+   *     The relative file path
    * @param minified
-   *          If the resource should be loaded in a minified or normal version
+   *     If the resource should be loaded in a minified or normal version
    * @param theme
-   *          The theme to use. If the resource is a css file the file that matches the theme is returned instead of the
-   *          normal file. For this the file must end with the theme name.
+   *     The theme to use. If the resource is a css file the file that matches the theme is returned instead of the
+   *     normal file. For this the file must end with the theme name.
    * @param cacheEnabled
-   *          Specifies if the cache is enabled
+   *     Specifies if the cache is enabled
    * @return An {@link Optional} holding the first {@link WebResourceDescriptor} found for the given path or an empty
-   *         {@link Optional} if the resource could not be found.
+   * {@link Optional} if the resource could not be found.
    * @see IWebResourceResolver#resolveScriptResource(String, boolean, boolean, String)
    */
   public static Optional<WebResourceDescriptor> resolveScriptResource(String path, boolean minified, boolean cacheEnabled, String theme) {
@@ -61,13 +61,13 @@ public class WebResources {
    * Tries to load the specified relative path in the web resources folder ("res" folder).
    *
    * @param path
-   *          The relative file path
+   *     The relative file path
    * @param minified
-   *          If the resource should be loaded in a minified (if existing) or normal version
+   *     If the resource should be loaded in a minified (if existing) or normal version
    * @param cacheEnabled
-   *          Specifies if the cache is enabled
+   *     Specifies if the cache is enabled
    * @return An {@link Optional} holding the first {@link WebResourceDescriptor} found or an empty {@link Optional} if
-   *         the resource could not be found.
+   * the resource could not be found.
    * @see IWebResourceResolver#resolveWebResource(String, boolean, boolean)
    */
   public static Optional<WebResourceDescriptor> resolveWebResource(String path, boolean minified, boolean cacheEnabled) {

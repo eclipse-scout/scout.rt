@@ -9,10 +9,8 @@
  */
 package org.eclipse.scout.rt.client.job.filter.future;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.function.Predicate;
 

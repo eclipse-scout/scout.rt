@@ -68,19 +68,19 @@ public final class MOM {
    * Two destinations with the same <i>name</i> are considered 'equals'.
    *
    * @param <DTO>
-   *          the type of the transfer object which is sent or received over this destination.
+   *     the type of the transfer object which is sent or received over this destination.
    * @param name
-   *          the symbolic name for the destination
+   *     the symbolic name for the destination
    * @param destinationType
-   *          the type of the resource that this destination represents, e.g. {@link DestinationType#QUEUE}
+   *     the type of the resource that this destination represents, e.g. {@link DestinationType#QUEUE}
    * @param resolveMethod
-   *          the method how to resolve the actual destination, e.g. {@link ResolveMethod#JNDI}
+   *     the method how to resolve the actual destination, e.g. {@link ResolveMethod#JNDI}
    * @param properties
-   *          optional map of additional properties used to resolve the destination (may be set to <code>null</code> if
-   *          no properties are required)
+   *     optional map of additional properties used to resolve the destination (may be set to <code>null</code> if
+   *     no properties are required)
    * @throws AssertionException
-   *           if one of <code>name</code>, <code>type</code> or <code>resolveMethod</code> is <code>null</code> or
-   *           empty
+   *     if one of <code>name</code>, <code>type</code> or <code>resolveMethod</code> is <code>null</code> or
+   *     empty
    */
   public static <DTO> IDestination<DTO> newDestination(final String name, final IDestinationType destinationType, final IResolveMethod resolveMethod, final Map<String, String> properties) {
     return new Destination<DTO, Void>(name, destinationType, resolveMethod, properties);
@@ -96,21 +96,21 @@ public final class MOM {
    * Two destinations with the same <i>name</i> are considered 'equals'.
    *
    * @param <REQUEST>
-   *          the type of the request object which is sent or received over this destination.
+   *     the type of the request object which is sent or received over this destination.
    * @param <REPLY>
-   *          the type of the reply object which is sent or received over this destination.
+   *     the type of the reply object which is sent or received over this destination.
    * @param name
-   *          the symbolic name for the destination
+   *     the symbolic name for the destination
    * @param destinationType
-   *          the type of the resource that this destination represents, e.g. {@link DestinationType#QUEUE}
+   *     the type of the resource that this destination represents, e.g. {@link DestinationType#QUEUE}
    * @param resolveMethod
-   *          the method how to resolve the actual destination, e.g. {@link ResolveMethod#JNDI}
+   *     the method how to resolve the actual destination, e.g. {@link ResolveMethod#JNDI}
    * @param properties
-   *          optional map of additional properties used to resolve the destination (may be set to <code>null</code> if
-   *          no properties are required)
+   *     optional map of additional properties used to resolve the destination (may be set to <code>null</code> if
+   *     no properties are required)
    * @throws AssertionException
-   *           if one of <code>name</code>, <code>type</code> or <code>resolveMethod</code> is <code>null</code> or
-   *           empty
+   *     if one of <code>name</code>, <code>type</code> or <code>resolveMethod</code> is <code>null</code> or
+   *     empty
    */
   public static <REQUEST, REPLY> IBiDestination<REQUEST, REPLY> newBiDestination(final String name, final IDestinationType destinationType, final IResolveMethod resolveMethod, final Map<String, String> properties) {
     return new Destination<>(name, destinationType, resolveMethod, properties);
@@ -139,16 +139,16 @@ public final class MOM {
    * mode and without expiration.
    *
    * @param transport
-   *          specifies the MOM used as transport to publish the message, e.g. {@link ClusterMom}.
+   *     specifies the MOM used as transport to publish the message, e.g. {@link ClusterMom}.
    * @param destination
-   *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
-   *          documentation for more information about the difference between topic and queue based messaging.
+   *     specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
+   *     documentation for more information about the difference between topic and queue based messaging.
    * @param transferObject
-   *          specifies the transfer object to be sent to the destination.<br>
-   *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
-   *          that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
+   *     specifies the transfer object to be sent to the destination.<br>
+   *     The object is marshalled into its transport representation using the {@link IMarshaller} registered for
+   *     that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
    * @param <DTO>
-   *          the type of the transfer object to be published.
+   *     the type of the transfer object to be published.
    * @see #subscribe(Class, IDestination, IMessageListener)
    * @see #newDestination(String, IDestinationType, IResolveMethod, Map)
    */
@@ -160,18 +160,18 @@ public final class MOM {
    * Publishes the given message to the given destination.
    *
    * @param transport
-   *          specifies the MOM used as transport to publish the message, e.g. {@link ClusterMom}.
+   *     specifies the MOM used as transport to publish the message, e.g. {@link ClusterMom}.
    * @param destination
-   *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
-   *          documentation for more information about the difference between topic and queue based messaging.
+   *     specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
+   *     documentation for more information about the difference between topic and queue based messaging.
    * @param transferObject
-   *          specifies the transfer object to be sent to the destination.<br>
-   *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
-   *          that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
+   *     specifies the transfer object to be sent to the destination.<br>
+   *     The object is marshalled into its transport representation using the {@link IMarshaller} registered for
+   *     that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
    * @param input
-   *          specifies how to publish the message.
+   *     specifies how to publish the message.
    * @param <DTO>
-   *          the type of the transfer object to be published.
+   *     the type of the transfer object to be published.
    * @see #subscribe(Class, IDestination, IMessageListener)
    * @see #newDestination(String, IDestinationType, IResolveMethod, Map)
    */
@@ -186,16 +186,16 @@ public final class MOM {
    * acknowledged automatically.
    *
    * @param transport
-   *          specifies the 'transport or network' to subscribe for messages, e.g. {@link ClusterMom}.
+   *     specifies the 'transport or network' to subscribe for messages, e.g. {@link ClusterMom}.
    * @param destination
-   *          specifies the target to consume messages from, and is either a topic (pub/sub) or queue (P2P). See
-   *          {@link IMom} documentation for more information about the difference between topic and queue based
-   *          messaging.
+   *     specifies the target to consume messages from, and is either a topic (pub/sub) or queue (P2P). See
+   *     {@link IMom} documentation for more information about the difference between topic and queue based
+   *     messaging.
    * @param listener
-   *          specifies the listener to receive messages.
-   * @return subscription handle to unsubscribe from the destination.
+   *     specifies the listener to receive messages.
    * @param <DTO>
-   *          the type of the transfer object a subscription is created for.
+   *     the type of the transfer object a subscription is created for.
+   * @return subscription handle to unsubscribe from the destination.
    * @see #publish(Class, IDestination, Object)
    * @see #newDestination(String, IDestinationType, IResolveMethod, Map)
    */
@@ -207,18 +207,18 @@ public final class MOM {
    * Subscribes the given listener to receive messages sent to the given destination.
    *
    * @param transport
-   *          specifies the 'transport or network' to subscribe for messages, e.g. {@link ClusterMom}.
+   *     specifies the 'transport or network' to subscribe for messages, e.g. {@link ClusterMom}.
    * @param destination
-   *          specifies the target to consume messages from, and is either a topic (pub/sub) or queue (P2P). See
-   *          {@link IMom} documentation for more information about the difference between topic and queue based
-   *          messaging.
+   *     specifies the target to consume messages from, and is either a topic (pub/sub) or queue (P2P). See
+   *     {@link IMom} documentation for more information about the difference between topic and queue based
+   *     messaging.
    * @param listener
-   *          specifies the listener to receive messages.
+   *     specifies the listener to receive messages.
    * @param input
-   *          specifies how to subscribe for messages.
-   * @return subscription handle to unsubscribe from the destination.
+   *     specifies how to subscribe for messages.
    * @param <DTO>
-   *          the type of the transfer object a subscription is created for.
+   *     the type of the transfer object a subscription is created for.
+   * @return subscription handle to unsubscribe from the destination.
    * @see #publish(Class, IDestination, Object)
    * @see #newDestination(String, IDestinationType, IResolveMethod, Map)
    */
@@ -236,11 +236,11 @@ public final class MOM {
    * MOM instance.
    *
    * @param transport
-   *          specifies the 'transport' or 'network' for which the durable subscription has been made, e.g.
-   *          {@link ClusterMom}.
+   *     specifies the 'transport' or 'network' for which the durable subscription has been made, e.g.
+   *     {@link ClusterMom}.
    * @param durableSubscriptionName
-   *          The same name that was used to create the durable subscription (see
-   *          {@link SubscribeInput#withDurableSubscription(String)}).
+   *     The same name that was used to create the durable subscription (see
+   *     {@link SubscribeInput#withDurableSubscription(String)}).
    */
   public static void cancelDurableSubscription(final Class<? extends IMomTransport> transport, final String durableSubscriptionName) {
     BEANS.get(transport).cancelDurableSubscription(durableSubscriptionName);
@@ -265,25 +265,25 @@ public final class MOM {
    * mode and without expiration.
    *
    * @param transport
-   *          specifies the 'transport or network' where to initiate a 'request-reply' communication, e.g.
-   *          {@link ClusterMom}.
+   *     specifies the 'transport or network' where to initiate a 'request-reply' communication, e.g.
+   *     {@link ClusterMom}.
    * @param destination
-   *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
-   *          documentation for more information about the difference between topic and queue based messaging.
+   *     specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
+   *     documentation for more information about the difference between topic and queue based messaging.
    * @param requestObject
-   *          specifies the transfer object to be sent to the destination.<br>
-   *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
-   *          that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
+   *     specifies the transfer object to be sent to the destination.<br>
+   *     The object is marshalled into its transport representation using the {@link IMarshaller} registered for
+   *     that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
+   * @param <REQUEST>
+   *     the type of the request object
+   * @param <REPLY>
+   *     the type of the reply object
    * @return the reply of the consumer.
    * @throws ThreadInterruptedError
-   *           if interrupted while waiting for the reply to receive.
+   *     if interrupted while waiting for the reply to receive.
    * @throws RuntimeException
-   *           if the request failed because the replier threw an exception. If threw a {@link RuntimeException}, it is
-   *           that exception which is thrown.
-   * @param <REQUEST>
-   *          the type of the request object
-   * @param <REPLY>
-   *          the type of the reply object
+   *     if the request failed because the replier threw an exception. If threw a {@link RuntimeException}, it is
+   *     that exception which is thrown.
    * @see #reply(Class, IBiDestination, IRequestListener)
    * @see #newBiDestination(String, IDestinationType, IResolveMethod, Map)
    */
@@ -308,31 +308,31 @@ public final class MOM {
    * waiting for the reply.
    *
    * @param transport
-   *          specifies the 'transport or network' where to initiate a 'request-reply' communication, e.g.
-   *          {@link ClusterMom}.
+   *     specifies the 'transport or network' where to initiate a 'request-reply' communication, e.g.
+   *     {@link ClusterMom}.
    * @param destination
-   *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
-   *          documentation for more information about the difference between topic and queue based messaging.
+   *     specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
+   *     documentation for more information about the difference between topic and queue based messaging.
    * @param requestObject
-   *          specifies the transfer object to be sent to the destination.<br>
-   *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
-   *          that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
+   *     specifies the transfer object to be sent to the destination.<br>
+   *     The object is marshalled into its transport representation using the {@link IMarshaller} registered for
+   *     that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
    * @param input
-   *          specifies how to publish the message. Transacted publish of the request is not supported.
+   *     specifies how to publish the message. Transacted publish of the request is not supported.
+   * @param <REQUEST>
+   *     the type of the request object
+   * @param <REPLY>
+   *     the type of the reply object
    * @return the reply of the consumer.
    * @throws ThreadInterruptedError
-   *           if interrupted while waiting for the reply to receive. If interrupted, an interruption request is sent to
-   *           the consumer(s).
+   *     if interrupted while waiting for the reply to receive. If interrupted, an interruption request is sent to
+   *     the consumer(s).
    * @throws TimedOutError
-   *           if the timeout specified via {@link PublishInput#withRequestReplyTimeout(long, TimeUnit)} elapsed. If
-   *           elapsed, an interruption request is sent to the consumer(s).
+   *     if the timeout specified via {@link PublishInput#withRequestReplyTimeout(long, TimeUnit)} elapsed. If
+   *     elapsed, an interruption request is sent to the consumer(s).
    * @throws RuntimeException
-   *           if the request failed because the replier threw an exception. If threw a {@link RuntimeException}, it is
-   *           that exception which is thrown.
-   * @param <REQUEST>
-   *          the type of the request object
-   * @param <REPLY>
-   *          the type of the reply object
+   *     if the request failed because the replier threw an exception. If threw a {@link RuntimeException}, it is
+   *     that exception which is thrown.
    * @see #reply(Class, IBiDestination, IRequestListener)
    * @see #newBiDestination(String, IDestinationType, IResolveMethod, Map)
    */
@@ -347,19 +347,19 @@ public final class MOM {
    * acknowledged automatically.
    *
    * @param transport
-   *          specifies the 'transport or network' where to reply to requests of 'request-reply' communication, e.g.
-   *          {@link ClusterMom}.
+   *     specifies the 'transport or network' where to reply to requests of 'request-reply' communication, e.g.
+   *     {@link ClusterMom}.
    * @param destination
-   *          specifies the target to consume messages from, and is either a topic (pub/sub) or queue (P2P). See
-   *          {@link IMom} documentation for more information about the difference between topic and queue based
-   *          messaging.
+   *     specifies the target to consume messages from, and is either a topic (pub/sub) or queue (P2P). See
+   *     {@link IMom} documentation for more information about the difference between topic and queue based
+   *     messaging.
    * @param listener
-   *          specifies the listener to receive messages.
-   * @return subscription handle to unsubscribe from the destination.
+   *     specifies the listener to receive messages.
    * @param <REQUEST>
-   *          the type of the request object
+   *     the type of the request object
    * @param <REPLY>
-   *          the type of the reply object
+   *     the type of the reply object
+   * @return subscription handle to unsubscribe from the destination.
    * @see #request(Class, IBiDestination, Object)
    * @see #newBiDestination(String, IDestinationType, IResolveMethod, Map)
    */
@@ -371,21 +371,21 @@ public final class MOM {
    * Subscribes the given listener to receive messages from 'request-reply' communication sent to the given destination.
    *
    * @param transport
-   *          specifies the 'transport or network' where to reply to requests of 'request-reply' communication, e.g.
-   *          {@link ClusterMom}.
+   *     specifies the 'transport or network' where to reply to requests of 'request-reply' communication, e.g.
+   *     {@link ClusterMom}.
    * @param destination
-   *          specifies the target to consume messages from, and is either a topic (pub/sub) or queue (P2P). See
-   *          {@link IMom} documentation for more information about the difference between topic and queue based
-   *          messaging.
+   *     specifies the target to consume messages from, and is either a topic (pub/sub) or queue (P2P). See
+   *     {@link IMom} documentation for more information about the difference between topic and queue based
+   *     messaging.
    * @param listener
-   *          specifies the listener to receive messages.
+   *     specifies the listener to receive messages.
    * @param input
-   *          specifies how to subscribe for messages.
-   * @return subscription handle to unsubscribe from the destination.
+   *     specifies how to subscribe for messages.
    * @param <REQUEST>
-   *          the type of the request object
+   *     the type of the request object
    * @param <REPLY>
-   *          the type of the reply object
+   *     the type of the reply object
+   * @return subscription handle to unsubscribe from the destination.
    * @see #request(Class, IBiDestination, Object)
    * @see #newBiDestination(String, IDestinationType, IResolveMethod, Map)
    */

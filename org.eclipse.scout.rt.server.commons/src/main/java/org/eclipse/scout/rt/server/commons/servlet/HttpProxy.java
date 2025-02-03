@@ -110,7 +110,7 @@ public class HttpProxy {
 
   /**
    * @return <code>true</code> if the request payload should be included in the proxy call, <code>false</code>
-   *         otherwise. The default implementation returns <code>true</code> for POST, PUT and PATCH requests.
+   * otherwise. The default implementation returns <code>true</code> for POST, PUT and PATCH requests.
    */
   protected boolean shouldIncludeRequestPayload(HttpServletRequest req) {
     return ObjectUtility.isOneOf(req.getMethod(), "POST", "PUT", "PATCH");
@@ -118,11 +118,11 @@ public class HttpProxy {
 
   /**
    * @return Whether the {@linkplain HttpServletRequest#getParameterMap() request parameters} should be written as
-   *         payload instead of the {@linkplain HttpServletRequest#getInputStream() original payload}.
-   *         <p>
-   *         This is mostly relevant for form submissions (content type <code>application/x-www-form-urlencoded</code>).
-   *         Because the servlet container parses the parameters from the payload, they cannot be read again from the
-   *         request body. Instead, they have to be read from the parameter map and be converted back to a valid body.
+   * payload instead of the {@linkplain HttpServletRequest#getInputStream() original payload}.
+   * <p>
+   * This is mostly relevant for form submissions (content type <code>application/x-www-form-urlencoded</code>).
+   * Because the servlet container parses the parameters from the payload, they cannot be read again from the
+   * request body. Instead, they have to be read from the parameter map and be converted back to a valid body.
    * @see #writeRequestParameters(HttpServletRequest, HttpRequest)
    */
   protected boolean shouldWriteParametersAsPayload(HttpServletRequest req) {
@@ -153,11 +153,11 @@ public class HttpProxy {
    * </ul>
    *
    * @param req
-   *          original request
+   *     original request
    * @param resp
-   *          response where the response from the remote server is written to
+   *     response where the response from the remote server is written to
    * @param options
-   *          optional options for this request
+   *     optional options for this request
    */
   public void proxy(HttpServletRequest req, HttpServletResponse resp, HttpProxyRequestOptions options) throws IOException {
     if (options == null) {
@@ -352,8 +352,8 @@ public class HttpProxy {
 
   /**
    * @param manager
-   *          the {@link IHttpTransportManager} used to execute the http requests. By default the
-   *          {@link DefaultHttpTransportManager} is used.
+   *     the {@link IHttpTransportManager} used to execute the http requests. By default the
+   *     {@link DefaultHttpTransportManager} is used.
    */
   public HttpProxy withHttpTransportManager(IHttpTransportManager manager) {
     m_httpTransportManager = manager;
@@ -362,7 +362,7 @@ public class HttpProxy {
 
   /**
    * @return the base URL on the remote server (without trailing slash). All requests are forwarded to this destination
-   *         by concatenating this URL and the requests "path info".
+   * by concatenating this URL and the requests "path info".
    * @see #rewriteUrl(HttpServletRequest, HttpProxyRequestOptions)
    */
   public String getRemoteBaseUrl() {
@@ -371,8 +371,8 @@ public class HttpProxy {
 
   /**
    * @param remoteBaseUrl
-   *          the base URL on the remote server (without trailing slash). All requests are forwarded to this destination
-   *          by concatenating this URL and the requests "path info".
+   *     the base URL on the remote server (without trailing slash). All requests are forwarded to this destination
+   *     by concatenating this URL and the requests "path info".
    * @see #rewriteUrl(HttpServletRequest, HttpProxyRequestOptions)
    */
   public HttpProxy withRemoteBaseUrl(String remoteBaseUrl) {
@@ -382,7 +382,7 @@ public class HttpProxy {
 
   /**
    * @return live list of request header filters (use {@link #withRequestHeaderFilter(IHttpHeaderFilter)} to add
-   *         filters)
+   * filters)
    */
   public List<IHttpHeaderFilter> getRequestHeaderFilters() {
     return m_requestHeaderFilters;
@@ -395,7 +395,7 @@ public class HttpProxy {
 
   /**
    * @return live list of response header filters (use {@link #withResponseHeaderFilter(IHttpHeaderFilter)} to add
-   *         filters)
+   * filters)
    */
   public List<IHttpHeaderFilter> getResponseHeaderFilters() {
     return m_responseHeaderFilters;

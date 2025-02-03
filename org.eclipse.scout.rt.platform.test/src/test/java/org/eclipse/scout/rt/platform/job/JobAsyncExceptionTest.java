@@ -56,7 +56,6 @@ public class JobAsyncExceptionTest {
     Assert.assertTrue(jobManager.e1 instanceof PlatformException);
     Assert.assertTrue(jobManager.e2 instanceof PlatformException);
     Assert.assertNull(jobManager.e3);
-
   }
 
   @Test(expected = PlatformException.class)
@@ -72,7 +71,6 @@ public class JobAsyncExceptionTest {
     Assert.assertTrue(jobManager.e1 instanceof PlatformException);
     Assert.assertTrue(jobManager.e2 instanceof CallableChainHandledException);
     Assert.assertTrue(jobManager.e3 instanceof PlatformException);
-
   }
 
   private void registerTestBeans(Object... beans) {
@@ -176,6 +174,5 @@ public class JobAsyncExceptionTest {
         }
       });
     }
-
   }
 }

@@ -43,8 +43,6 @@ public final class FormTableControlChains {
         }
       };
       callChain(methodInvocation);
-
     }
   }
-
 }

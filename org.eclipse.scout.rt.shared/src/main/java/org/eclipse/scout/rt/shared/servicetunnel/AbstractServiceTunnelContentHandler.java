@@ -40,5 +40,4 @@ abstract class AbstractServiceTunnelContentHandler implements IServiceTunnelCont
   protected IObjectSerializer getObjectSerializer() {
     return m_objectSerializer;
   }
-
 }

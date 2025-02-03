@@ -41,5 +41,4 @@ public interface IEventHistory<T> {
    * @return a list with the most recent events within the timeout range
    */
   Collection<T> getRecentEvents();
-
 }

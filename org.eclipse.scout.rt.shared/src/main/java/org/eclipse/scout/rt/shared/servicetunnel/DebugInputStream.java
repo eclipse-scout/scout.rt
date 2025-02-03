@@ -84,5 +84,4 @@ public class DebugInputStream extends InputStream {
   public Throwable getLastThrownException() {
     return m_lastThrownException;
   }
-
 }

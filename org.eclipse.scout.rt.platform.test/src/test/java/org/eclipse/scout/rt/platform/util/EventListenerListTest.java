@@ -59,5 +59,4 @@ public class EventListenerListTest {
     listenerList.add(EventListener.class, listener);
     Assert.assertEquals(2, listenerList.getListenerCount(EventListener.class));
   }
-
 }

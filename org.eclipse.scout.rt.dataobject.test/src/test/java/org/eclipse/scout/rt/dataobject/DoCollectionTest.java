@@ -60,7 +60,8 @@ public class DoCollectionTest {
   }
 
   protected Consumer<DoNode<Collection<String>>> m_lazyCreate = attribute -> {
-    /* nop */ };
+    /* nop */
+  };
 
   @Test
   public void testCreateExists() {

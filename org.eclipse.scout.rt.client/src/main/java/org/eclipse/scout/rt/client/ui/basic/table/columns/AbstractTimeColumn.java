@@ -39,5 +39,4 @@ public abstract class AbstractTimeColumn extends AbstractDateColumn {
   protected String getConfiguredGroupFormat() {
     return "HH";
   }
-
 }

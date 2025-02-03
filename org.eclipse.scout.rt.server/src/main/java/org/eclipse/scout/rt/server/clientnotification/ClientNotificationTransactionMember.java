@@ -77,7 +77,6 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
       // to ensure the notifications are sent after all transaction-members are committed.
       m_notificationsToPublish = notifications;
     }
-
   }
 
   /**

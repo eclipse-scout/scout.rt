@@ -27,5 +27,4 @@ public class TextColumnUserFilterState extends ColumnUserFilterState {
   public void setFreeText(String freeText) {
     m_freeText = freeText;
   }
-
 }

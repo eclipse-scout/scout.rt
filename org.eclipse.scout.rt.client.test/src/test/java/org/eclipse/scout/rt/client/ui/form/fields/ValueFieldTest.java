@@ -304,7 +304,6 @@ public class ValueFieldTest {
         final Integer b = getBField().getValue();
         return a == null || b == null || a < b;
       }
-
     }
 
     public void setInvalidABCombination() {
@@ -325,5 +324,4 @@ public class ValueFieldTest {
       return rawValue + 1;
     }
   }
-
 }

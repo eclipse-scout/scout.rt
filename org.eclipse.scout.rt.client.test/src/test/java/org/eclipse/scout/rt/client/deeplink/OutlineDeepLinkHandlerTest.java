@@ -9,9 +9,8 @@
  */
 package org.eclipse.scout.rt.client.deeplink;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -94,5 +93,4 @@ public class OutlineDeepLinkHandlerTest {
     List<IOutline> outlines = (List<IOutline>) field.get(ad);
     outlines.add(outline);
   }
-
 }

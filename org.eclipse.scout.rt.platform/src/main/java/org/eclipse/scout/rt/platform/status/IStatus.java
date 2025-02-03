@@ -65,8 +65,8 @@ public interface IStatus extends Comparable<IStatus> {
    * Returns whether the severity of this status matches the given severity mask.
    *
    * @param severityMask
-   *          a mask formed by bitwise or'ing severity mask constants (<code>ERROR</code>, <code>WARNING</code>,
-   *          <code>INFO</code>, <code>CANCEL</code>)
+   *     a mask formed by bitwise or'ing severity mask constants (<code>ERROR</code>, <code>WARNING</code>,
+   *     <code>INFO</code>, <code>CANCEL</code>)
    * @return <code>true</code> if there is at least one match, <code>false</code> if there are no matches
    * @see #getSeverity()
    * @see #ERROR
@@ -115,5 +115,4 @@ public interface IStatus extends Comparable<IStatus> {
    * @return The icon id of the status.
    */
   String getIconId();
-
 }

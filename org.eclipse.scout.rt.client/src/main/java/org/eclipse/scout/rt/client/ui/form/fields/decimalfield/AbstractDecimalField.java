@@ -236,7 +236,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
    * fraction digits used for parsing is adapted to {@link #getMultiplier()} if needed.)
    *
    * @throws ArithmeticException
-   *           if roundingMode is {@link RoundingMode#UNNECESSARY} but rounding would be needed
+   *     if roundingMode is {@link RoundingMode#UNNECESSARY} but rounding would be needed
    */
   @Override
   protected BigDecimal roundParsedValue(BigDecimal valBeforeRounding) {

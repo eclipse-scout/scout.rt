@@ -59,7 +59,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  *        .withExecutionTrigger(Jobs.newExecutionTrigger()
  *            .withStartIn(5, TimeUnit.SECONDS));
  * </pre>
- *
+ * <p>
  * The following code snippet illustrates how the job is finally run:
  *
  * <pre>
@@ -80,8 +80,8 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  *        .<strong>withExecutionSemaphore(clientRunContext.getSession().getModelJobSemaphore())</strong>);
  * </pre>
  *
- * @since 5.1
  * @see IClientSession#getModelJobSemaphore()
+ * @since 5.1
  */
 public final class ModelJobs {
 
@@ -162,9 +162,9 @@ public final class ModelJobs {
    * </pre>
    *
    * @param runnable
-   *          <code>IRunnable</code> to be executed.
+   *     <code>IRunnable</code> to be executed.
    * @param input
-   *          information about the job with execution instructions for the job manager to run the job.
+   *     information about the job with execution instructions for the job manager to run the job.
    * @return Future to interact with the job like waiting for its completion or to cancel its execution.
    * @see IJobManager#schedule(IRunnable, JobInput)
    */
@@ -206,11 +206,11 @@ public final class ModelJobs {
    * </pre>
    *
    * @param callable
-   *          <code>Callable</code> to be executed.
+   *     <code>Callable</code> to be executed.
    * @param input
-   *          information about the job with execution instructions for the job manager to run the job.
+   *     information about the job with execution instructions for the job manager to run the job.
    * @return Future to interact with the job like waiting for its completion, or to cancel its execution, or to get its
-   *         computation result.
+   * computation result.
    * @see IJobManager#schedule(Callable, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable, final JobInput input) {
@@ -236,8 +236,8 @@ public final class ModelJobs {
    * </pre>
    *
    * @param clientRunContext
-   *          The {@link ClientRunContext} to be associated with the {@link JobInput} returned; must not be
-   *          <code>null</code>.
+   *     The {@link ClientRunContext} to be associated with the {@link JobInput} returned; must not be
+   *     <code>null</code>.
    */
   public static JobInput newInput(final ClientRunContext clientRunContext) {
     BEANS.get(ModelJobValidator.class).validateRunContext(clientRunContext);
@@ -347,7 +347,7 @@ public final class ModelJobs {
     final IBlockingCondition idleCondition = Jobs.newBlockingCondition(true);
     schedule(NULL_RUNNABLE, newInput(ClientRunContexts.copyCurrent())
         .withName("Technical job to yield model thread"))
-            .whenDone(event -> idleCondition.setBlocking(false), ClientRunContexts.copyCurrent());
+        .whenDone(event -> idleCondition.setBlocking(false), ClientRunContexts.copyCurrent());
 
     // Release the current model job permit and wait until all competing model jobs of this session completed their work.
     idleCondition.waitFor();

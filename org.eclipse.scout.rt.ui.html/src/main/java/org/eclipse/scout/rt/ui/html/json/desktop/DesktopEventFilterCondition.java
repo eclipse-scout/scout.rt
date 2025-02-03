@@ -40,5 +40,4 @@ public class DesktopEventFilterCondition {
   public void setCheckDisplayParents(boolean checkDisplayParents) {
     m_checkDisplayParents = checkDisplayParents;
   }
-
 }

@@ -234,7 +234,6 @@ public class ClientNotificationRegistryTest {
             //notifications for other nodes
             assertSingleTestNotification(consumeNoWait(reg, otherNode));
           });
-
     }
     finally {
       IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.set(null);
@@ -282,5 +281,4 @@ public class ClientNotificationRegistryTest {
     assertFalse(notifications.isEmpty());
     assertEquals(TEST_NOTIFICATION, notifications.get(0).getNotification());
   }
-
 }

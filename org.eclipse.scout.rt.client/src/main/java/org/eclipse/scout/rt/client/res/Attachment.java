@@ -51,5 +51,4 @@ public class Attachment implements IAttachment {
   public void setReferenced(boolean referenced) {
     m_referenced = referenced;
   }
-
 }

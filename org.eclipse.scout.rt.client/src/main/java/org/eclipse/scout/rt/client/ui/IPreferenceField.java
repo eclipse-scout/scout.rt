@@ -15,5 +15,4 @@ package org.eclipse.scout.rt.client.ui;
 public interface IPreferenceField {
 
   String getPreferenceBaseKey();
-
 }

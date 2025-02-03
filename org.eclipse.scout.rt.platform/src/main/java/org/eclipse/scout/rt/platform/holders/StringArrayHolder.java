@@ -23,5 +23,4 @@ public class StringArrayHolder extends Holder<String[]> {
   public StringArrayHolder(String[] value) {
     super(String[].class, value);
   }
-
 }

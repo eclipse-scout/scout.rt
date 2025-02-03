@@ -77,8 +77,8 @@ public interface IDesktopNotification extends INotification {
 
   /**
    * @return True, to only show the native desktop notification. False, to show both, the regular and the native
-   *         notification. If and when a native desktop notification is shown is controlled by
-   *         {@link #getNativeNotificationVisibility()}.
+   * notification. If and when a native desktop notification is shown is controlled by
+   * {@link #getNativeNotificationVisibility()}.
    */
   boolean isNativeOnly();
 

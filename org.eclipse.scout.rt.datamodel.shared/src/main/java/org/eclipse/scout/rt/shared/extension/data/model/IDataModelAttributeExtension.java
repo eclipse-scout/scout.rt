@@ -20,5 +20,4 @@ public interface IDataModelAttributeExtension<OWNER extends AbstractDataModelAtt
   void execInitAttribute(DataModelAttributeInitAttributeChain chain);
 
   void execPrepareLookup(DataModelAttributePrepareLookupChain chain, ILookupCall<?> call);
-
 }

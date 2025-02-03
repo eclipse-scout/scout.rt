@@ -101,5 +101,4 @@ public class IncrementalTreeBuilderTest {
     node.getCellForUpdate().setValue(new LookupRow<>(1L, ""));
     return node;
   }
-
 }

@@ -41,8 +41,8 @@ public final class AttributePath implements IDataModelPath {
 
   /**
    * @return the entity path of the attribute or {@link EntityPath#EMPTY}
-   *         <p>
-   *         Never returns null.
+   * <p>
+   * Never returns null.
    */
   public EntityPath getEntityPath() {
     return m_entityPath;

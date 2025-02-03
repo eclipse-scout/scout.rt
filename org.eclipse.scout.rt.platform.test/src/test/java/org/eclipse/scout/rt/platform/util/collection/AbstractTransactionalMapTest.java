@@ -57,11 +57,11 @@ public abstract class AbstractTransactionalMapTest {
     // test size method
     assertEquals(expectedMap.size(), actualMap.size());
     // test map iterator
-    for (Iterator<Entry<K, V>> iterator = actualMap.entrySet().iterator(); iterator.hasNext();) {
+    for (Iterator<Entry<K, V>> iterator = actualMap.entrySet().iterator(); iterator.hasNext(); ) {
       Entry<K, V> entry = iterator.next();
       assertEquals(expectedMap.get(entry.getKey()), entry.getValue());
     }
-    for (Iterator<Entry<K, V>> iterator = expectedMap.entrySet().iterator(); iterator.hasNext();) {
+    for (Iterator<Entry<K, V>> iterator = expectedMap.entrySet().iterator(); iterator.hasNext(); ) {
       Entry<K, V> entry = iterator.next();
       // test map containsKey
       assertTrue(actualMap.containsKey(entry.getKey()));
@@ -327,7 +327,7 @@ public abstract class AbstractTransactionalMapTest {
     map.put(4, "4");
 
     // remove entries while iterating (no concurrent modification exception is thrown)
-    for (Iterator<Entry<Integer, String>> iterator = map.entrySet().iterator(); iterator.hasNext();) {
+    for (Iterator<Entry<Integer, String>> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
       iterator.next();
       iterator.remove();
     }

@@ -22,19 +22,33 @@ import org.eclipse.scout.rt.platform.InjectBean;
  */
 public interface IClassInfo {
 
-  /** Declared public; may be accessed from outside its package. */
+  /**
+   * Declared public; may be accessed from outside its package.
+   */
   int ACC_PUBLIC = Modifier.PUBLIC;
-  /** Declared final; no subclasses allowed. */
+  /**
+   * Declared final; no subclasses allowed.
+   */
   int ACC_FINAL = Modifier.FINAL;
-  /** Is an interface, not a class. */
+  /**
+   * Is an interface, not a class.
+   */
   int ACC_INTERFACE = Modifier.INTERFACE;
-  /** Declared abstract; must not be instantiated. */
+  /**
+   * Declared abstract; must not be instantiated.
+   */
   int ACC_ABSTRACT = Modifier.ABSTRACT;
-  /** Declared synthetic; not present in the source code. */
+  /**
+   * Declared synthetic; not present in the source code.
+   */
   int ACC_SYNTHETIC = 0x1000;
-  /** Declared as an annotation type. */
+  /**
+   * Declared as an annotation type.
+   */
   int ACC_ANNOTATION = 0x2000;
-  /** Declared as an enum type. */
+  /**
+   * Declared as an enum type.
+   */
   int ACC_ENUM = 0x4000;
 
   /**
@@ -44,7 +58,7 @@ public interface IClassInfo {
 
   /**
    * @return class flags composed of {@link #ACC_PUBLIC},{@link #ACC_FINAL},{@link #ACC_INTERFACE},
-   *         {@link #ACC_ABSTRACT},{@link #ACC_SYNTHETIC},{@link #ACC_ANNOTATION},{@link #ACC_ENUM}
+   * {@link #ACC_ABSTRACT},{@link #ACC_SYNTHETIC},{@link #ACC_ANNOTATION},{@link #ACC_ENUM}
    */
   int flags();
 
@@ -122,5 +136,4 @@ public interface IClassInfo {
    * @return <code>true</code>, if declared as an enum type, <code>false</code> otherwise
    */
   boolean isEnum();
-
 }

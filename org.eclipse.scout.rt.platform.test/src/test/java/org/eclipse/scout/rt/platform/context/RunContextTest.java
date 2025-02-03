@@ -180,10 +180,10 @@ public class RunContextTest {
         // Test copy via direct 'RunContext.copy'
         assertEquals(john, RunContext.CURRENT.get().copy().getSubject());
         Jobs.schedule(() -> {
-          assertSame(john, RunContexts.copyCurrent().getSubject());
-          assertSame(john, Subject.getSubject(AccessController.getContext()));
-        }, Jobs.newInput()
-            .withRunContext(RunContext.CURRENT.get().copy()))
+              assertSame(john, RunContexts.copyCurrent().getSubject());
+              assertSame(john, Subject.getSubject(AccessController.getContext()));
+            }, Jobs.newInput()
+                .withRunContext(RunContext.CURRENT.get().copy()))
             .awaitDoneAndGet();
         return null;
       });
@@ -226,18 +226,17 @@ public class RunContextTest {
 
       // Test copy via 'RunContexts.copyCurrent'
       Jobs.schedule(() -> assertEquals(Locale.ITALY, NlsLocale.get()), Jobs.newInput()
-          .withRunContext(RunContexts.copyCurrent()))
+              .withRunContext(RunContexts.copyCurrent()))
           .awaitDoneAndGet();
 
       // Test copy via direct 'RunContext.copy'
       assertEquals(Locale.CANADA_FRENCH, RunContext.CURRENT.get().copy().getLocale());
       Jobs.schedule(() -> {
-        assertEquals(Locale.CANADA_FRENCH, NlsLocale.get());
-        assertEquals(Locale.CANADA_FRENCH, RunContexts.copyCurrent().getLocale());
-      }, Jobs.newInput()
-          .withRunContext(RunContext.CURRENT.get().copy()))
+            assertEquals(Locale.CANADA_FRENCH, NlsLocale.get());
+            assertEquals(Locale.CANADA_FRENCH, RunContexts.copyCurrent().getLocale());
+          }, Jobs.newInput()
+              .withRunContext(RunContext.CURRENT.get().copy()))
           .awaitDoneAndGet();
-
     });
   }
 
@@ -272,20 +271,19 @@ public class RunContextTest {
       assertNotSame(currentMonitor, RunContexts.copyCurrent().getRunMonitor());
       assertFalse(newMonitor.getCancellables().contains(RunContexts.copyCurrent().getRunMonitor()));
       Jobs.schedule(() -> {
-        assertNotNull(RunMonitor.CURRENT.get());
-        assertNotSame(newMonitor, RunMonitor.CURRENT.get());
-        assertNotSame(currentMonitor, RunMonitor.CURRENT.get());
-        assertTrue(newMonitor.getCancellables().contains(RunMonitor.CURRENT.get()));
-      }, Jobs.newInput()
-          .withRunContext(RunContexts.copyCurrent()))
+            assertNotNull(RunMonitor.CURRENT.get());
+            assertNotSame(newMonitor, RunMonitor.CURRENT.get());
+            assertNotSame(currentMonitor, RunMonitor.CURRENT.get());
+            assertTrue(newMonitor.getCancellables().contains(RunMonitor.CURRENT.get()));
+          }, Jobs.newInput()
+              .withRunContext(RunContexts.copyCurrent()))
           .awaitDoneAndGet();
 
       // Test copy via direct 'RunContext.copy'
       assertSame(currentMonitor, RunContext.CURRENT.get().copy().getRunMonitor());
       Jobs.schedule(() -> assertSame(currentMonitor, RunMonitor.CURRENT.get()), Jobs.newInput()
-          .withRunContext(RunContext.CURRENT.get().copy()))
+              .withRunContext(RunContext.CURRENT.get().copy()))
           .awaitDoneAndGet();
-
     });
   }
 
@@ -465,16 +463,16 @@ public class RunContextTest {
 
           // Test copy via copyCurrent
           Jobs.schedule(() -> assertEquals("updated_value", THREAD_LOCAL.get()), Jobs.newInput()
-              .withRunContext(RunContexts.copyCurrent()))
+                  .withRunContext(RunContexts.copyCurrent()))
               .awaitDoneAndGet();
 
           // Test copy directly
           assertEquals("initial_value", RunContext.CURRENT.get().copy().getThreadLocal(THREAD_LOCAL));
           Jobs.schedule(() -> {
-            assertEquals("initial_value", THREAD_LOCAL.get());
-            assertEquals("initial_value", RunContext.CURRENT.get().copy().getThreadLocal(THREAD_LOCAL));
-          }, Jobs.newInput()
-              .withRunContext(RunContext.CURRENT.get().copy()))
+                assertEquals("initial_value", THREAD_LOCAL.get());
+                assertEquals("initial_value", RunContext.CURRENT.get().copy().getThreadLocal(THREAD_LOCAL));
+              }, Jobs.newInput()
+                  .withRunContext(RunContext.CURRENT.get().copy()))
               .awaitDoneAndGet();
         });
   }
@@ -516,25 +514,25 @@ public class RunContextTest {
   @Test
   public void testCopyCurrentOrElseEmpty() {
     Jobs.schedule(() -> {
-      try {
-        RunContexts.copyCurrent();
-        fail("AssertionException expected because not running in a RunContext");
-      }
-      catch (AssertionException e) {
-        // expected
-      }
+          try {
+            RunContexts.copyCurrent();
+            fail("AssertionException expected because not running in a RunContext");
+          }
+          catch (AssertionException e) {
+            // expected
+          }
 
-      try {
-        RunContexts.copyCurrent(false);
-        fail("AssertionException expected because not running in a RunContext");
-      }
-      catch (AssertionException e) {
-        // expected
-      }
+          try {
+            RunContexts.copyCurrent(false);
+            fail("AssertionException expected because not running in a RunContext");
+          }
+          catch (AssertionException e) {
+            // expected
+          }
 
-      assertNotNull(RunContexts.copyCurrent(true));
-    }, Jobs.newInput()
-        .withRunContext(null))
+          assertNotNull(RunContexts.copyCurrent(true));
+        }, Jobs.newInput()
+            .withRunContext(null))
         .awaitDoneAndGet();
   }
 
@@ -568,10 +566,10 @@ public class RunContextTest {
               });
 
           Jobs.schedule(() -> {
-            assertEquals("value-1", MDC.get("test-key-1"));
-            assertEquals("value-2", MDC.get("test-key-2"));
-          }, Jobs.newInput()
-              .withRunContext(RunContext.CURRENT.get()))
+                assertEquals("value-1", MDC.get("test-key-1"));
+                assertEquals("value-2", MDC.get("test-key-2"));
+              }, Jobs.newInput()
+                  .withRunContext(RunContext.CURRENT.get()))
               .awaitDoneAndGet();
         });
   }

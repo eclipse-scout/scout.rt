@@ -75,9 +75,13 @@ import org.junit.runners.model.Statement;
  */
 public class ParameterizedPlatformTestRunner extends PlatformTestRunner {
 
-  /** Parameters returned by the <code>@</code>{@link Parameters} annotated method in the test class. */
+  /**
+   * Parameters returned by the <code>@</code>{@link Parameters} annotated method in the test class.
+   */
   private List<IScoutTestParameter> m_parameterList;
-  /** Parameter for the current test method being executed. */
+  /**
+   * Parameter for the current test method being executed.
+   */
   private IScoutTestParameter m_currentTestParameter = null;
 
   public ParameterizedPlatformTestRunner(Class<?> klass) throws InitializationError {
@@ -123,7 +127,9 @@ public class ParameterizedPlatformTestRunner extends PlatformTestRunner {
     validateOnlyOneConstructor(errors);
   }
 
-  /** Validate the method which specifies the test parameters. */
+  /**
+   * Validate the method which specifies the test parameters.
+   */
   protected void validateParametersMethod(List<Throwable> errors) {
     ParameterizedTestRunnerExtension.validateOneParametersMethod(getTestClass(), errors);
   }

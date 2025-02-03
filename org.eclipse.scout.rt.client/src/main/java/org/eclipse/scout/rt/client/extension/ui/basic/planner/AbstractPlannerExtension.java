@@ -71,5 +71,4 @@ public abstract class AbstractPlannerExtension<RI, AI, OWNER extends AbstractPla
   public void execDisplayModeChanged(PlannerDisplayModeChangedChain<RI, AI> chain, int displayMode) {
     chain.execDisplayModeChanged(displayMode);
   }
-
 }

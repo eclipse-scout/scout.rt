@@ -375,5 +375,4 @@ public class ComposerAttributeForm extends AbstractForm {
   public void startModify() {
     startInternal(new ModifyHandler());
   }
-
 }

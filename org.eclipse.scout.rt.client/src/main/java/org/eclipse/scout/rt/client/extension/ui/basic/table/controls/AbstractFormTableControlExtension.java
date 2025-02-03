@@ -23,5 +23,4 @@ public abstract class AbstractFormTableControlExtension<OWNER extends AbstractTa
   public void execInitForm(TableControlInitFormChain chain) {
     chain.execInitForm();
   }
-
 }

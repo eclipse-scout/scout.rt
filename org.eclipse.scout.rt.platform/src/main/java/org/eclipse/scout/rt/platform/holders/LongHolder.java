@@ -27,5 +27,4 @@ public class LongHolder extends Holder<Long> {
   public LongHolder(Integer value) {
     super(Long.class, (value != null ? value.longValue() : null));
   }
-
 }

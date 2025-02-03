@@ -24,7 +24,7 @@ public class OAuth2Config {
 
   /**
    * @param clientId
-   *          Identification value for the resource registered with OAuth2. The clientId is sometimes also called AppId.
+   *     Identification value for the resource registered with OAuth2. The clientId is sometimes also called AppId.
    */
   public OAuth2Config withClientId(String clientId) {
     m_clientId = clientId;
@@ -37,7 +37,7 @@ public class OAuth2Config {
 
   /**
    * @param clientSecret
-   *          Used by the client to authenticate with the token endpoint ({@link #withTokenEndpoint(String)}).
+   *     Used by the client to authenticate with the token endpoint ({@link #withTokenEndpoint(String)}).
    */
   public OAuth2Config withClientSecret(String clientSecret) {
     m_clientSecret = clientSecret;
@@ -50,9 +50,9 @@ public class OAuth2Config {
 
   /**
    * @param tokenEndpoint
-   *          Server against which the client authenticates and which responds with an access token. For Exchange Online
-   *          365 the token endpoint currently looks like
-   *          https://login.microsoftonline.com/_my_tenant_id_/oauth2/v2.0/token
+   *     Server against which the client authenticates and which responds with an access token. For Exchange Online
+   *     365 the token endpoint currently looks like
+   *     https://login.microsoftonline.com/_my_tenant_id_/oauth2/v2.0/token
    */
   public OAuth2Config withTokenEndpoint(String tokenEndpoint) {
     m_tokenEndpoint = tokenEndpoint;
@@ -65,9 +65,9 @@ public class OAuth2Config {
 
   /**
    * @param authorizationEndpoint
-   *          Not used for the client credentials flow, but some implementations require it. For Exchange Online 365 the
-   *          authorization endpoint currently looks like
-   *          https://login.microsoftonline.com/_my_tenant_id_/oauth2/v2.0/authorize
+   *     Not used for the client credentials flow, but some implementations require it. For Exchange Online 365 the
+   *     authorization endpoint currently looks like
+   *     https://login.microsoftonline.com/_my_tenant_id_/oauth2/v2.0/authorize
    */
   public OAuth2Config withAuthorizationEndpoint(String authorizationEndpoint) {
     m_authorizationEndpoint = authorizationEndpoint;
@@ -80,8 +80,8 @@ public class OAuth2Config {
 
   /**
    * @param scope
-   *          The scope defines which attributes a client requests from the server. When using multiple scopes, separate
-   *          them by a space. For Exchange Online 365 currently use: https://ps.outlook.com/.default
+   *     The scope defines which attributes a client requests from the server. When using multiple scopes, separate
+   *     them by a space. For Exchange Online 365 currently use: https://ps.outlook.com/.default
    */
   public OAuth2Config withScope(String scope) {
     m_scope = scope;

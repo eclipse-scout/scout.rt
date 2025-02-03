@@ -44,8 +44,8 @@ public class BinaryResourceHolder {
 
   /**
    * @return live set of associated {@link IHttpResponseInterceptor} (although it is recommended to use the
-   *         {@link #addHttpResponseInterceptor(IHttpResponseInterceptor)} and
-   *         {@link #removeHttpResponseInterceptor(IHttpResponseInterceptor)} methods). Never <code>null</code>.
+   * {@link #addHttpResponseInterceptor(IHttpResponseInterceptor)} and
+   * {@link #removeHttpResponseInterceptor(IHttpResponseInterceptor)} methods). Never <code>null</code>.
    */
   public Set<IHttpResponseInterceptor> getHttpResponseInterceptors() {
     return m_httpResponseInterceptors;

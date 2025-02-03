@@ -43,7 +43,7 @@ public class GroupBoxProcessButtonGrid {
       buttonList.addAll(m_groupBox.getSystemProcessButtons());
     }
     // filter
-    for (Iterator it = buttonList.iterator(); it.hasNext();) {
+    for (Iterator it = buttonList.iterator(); it.hasNext(); ) {
       IButton b = (IButton) it.next();
       if (!b.isVisible()) {
         GridData data = GridDataBuilder.createFromHints(b, 1);

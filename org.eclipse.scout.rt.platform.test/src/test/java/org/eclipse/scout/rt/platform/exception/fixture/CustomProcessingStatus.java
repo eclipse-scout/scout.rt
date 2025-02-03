@@ -81,5 +81,4 @@ public class CustomProcessingStatus implements IProcessingStatus {
   public double getOrder() {
     return 0;
   }
-
 }

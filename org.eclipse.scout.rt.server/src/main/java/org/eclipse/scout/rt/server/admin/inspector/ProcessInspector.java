@@ -119,7 +119,7 @@ public class ProcessInspector {
   }
 
   public void clearSessionInspectors(String user) {
-    for (Iterator<Entry<IServerSession, SessionInspector>> iterator = m_sessionToInspectorMap.entrySet().iterator(); iterator.hasNext();) {
+    for (Iterator<Entry<IServerSession, SessionInspector>> iterator = m_sessionToInspectorMap.entrySet().iterator(); iterator.hasNext(); ) {
       Entry<IServerSession, SessionInspector> entry = iterator.next();
       SessionInspector session = entry.getValue();
       if (("" + user).equalsIgnoreCase("" + session.getInfo().getUserId())) {

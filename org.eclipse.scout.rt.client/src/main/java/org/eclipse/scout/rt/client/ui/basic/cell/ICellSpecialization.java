@@ -29,7 +29,7 @@ public interface ICellSpecialization extends IStyleable {
    * object is not the same as the one the method is called on.
    *
    * @param cellStyle
-   *          the cell style to reconcile.
+   *     the cell style to reconcile.
    * @return the potentially new object with the reconciled cell style.
    */
   ICellSpecialization reconcile(CellStyle cellStyle);

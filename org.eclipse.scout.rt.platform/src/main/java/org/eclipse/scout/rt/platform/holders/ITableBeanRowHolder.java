@@ -47,5 +47,4 @@ public interface ITableBeanRowHolder {
    * @see #STATUS_DELETED
    */
   int getRowState();
-
 }

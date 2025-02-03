@@ -440,7 +440,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * To change the order or specify the insert position use {@link IWizardStep#setOrder(double)}.
    *
    * @param steps
-   *          live and mutable collection of configured steps, yet not initialized
+   *     live and mutable collection of configured steps, yet not initialized
    */
   protected void injectStepsInternal(OrderedCollection<IWizardStep<? extends IForm>> steps) {
   }
@@ -1158,7 +1158,6 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     public void execFinish(WizardFinishChain chain) {
       getOwner().execFinish();
     }
-
   }
 
   protected final void interceptActiveStepChanged() {

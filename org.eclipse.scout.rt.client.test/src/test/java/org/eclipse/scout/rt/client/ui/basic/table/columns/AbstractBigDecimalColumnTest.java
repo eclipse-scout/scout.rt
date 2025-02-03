@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -49,5 +48,4 @@ public class AbstractBigDecimalColumnTest extends AbstractBigDecimalColumn {
       assertTrue("cell text[" + cell.getText() + "] not rounded as expected", cell.getText().endsWith(decimalSeparator + df1235.format(1235)));
     }
   }
-
 }

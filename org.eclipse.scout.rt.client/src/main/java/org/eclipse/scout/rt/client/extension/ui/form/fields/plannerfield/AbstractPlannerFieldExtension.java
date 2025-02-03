@@ -33,5 +33,4 @@ public abstract class AbstractPlannerFieldExtension<P extends IPlanner<RI, AI>, 
   public void execPopulateResources(PlannerFieldPopulateResourcesChain<? extends IPlanner<RI, AI>, RI, AI> chain) {
     chain.execPopulateResources();
   }
-
 }

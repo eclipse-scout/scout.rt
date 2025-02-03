@@ -84,7 +84,6 @@ public class GroupBoxLayout08Test extends AbstractGroupBoxLayoutTest {
     assertGridData(2, 1, 1, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox06.class).getGridData());
     // group07
     assertGridData(2, 2, 2, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox07.class).getGridData());
-
   }
 
   @Test
@@ -115,7 +114,6 @@ public class GroupBoxLayout08Test extends AbstractGroupBoxLayoutTest {
     assertGridData(2, 2, 1, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox06.class).getGridData());
     // group07
     assertGridData(0, 3, 2, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox07.class).getGridData());
-
   }
 
   public class MainBox extends AbstractGroupBox {

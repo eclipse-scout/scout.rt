@@ -15,5 +15,4 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 public interface IFormFieldMenu extends IMenu {
 
   IFormField getField();
-
 }

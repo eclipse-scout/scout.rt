@@ -23,5 +23,4 @@ public class JsonAggregateTableControl<TABLE_CONTROL extends IAggregateTableCont
   public String getObjectType() {
     return "AggregateTableControl";
   }
-
 }

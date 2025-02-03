@@ -96,5 +96,4 @@ class MapOutput implements IBindOutput {
   public String toString() {
     return getClass().getSimpleName() + "[bindType=" + getBindType() + ", key=" + m_mapKey + ", token=" + m_source + "]";
   }
-
 }

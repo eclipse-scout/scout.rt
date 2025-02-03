@@ -39,7 +39,7 @@ public class FixedDateProvider extends DateProvider {
    * Constructor to provide a date.
    *
    * @param date
-   *          Date to return in subsequent invocations of the provider methods
+   *     Date to return in subsequent invocations of the provider methods
    */
   public FixedDateProvider(Date date) {
     m_date = date;
@@ -49,7 +49,7 @@ public class FixedDateProvider extends DateProvider {
    * Change the date and time returned by the provider
    *
    * @param newTimeMillis
-   *          new date and time to return as provider value
+   *     new date and time to return as provider value
    */
   public void setTimeMillis(long newTimeMillis) {
     setDate(new Date(newTimeMillis));
@@ -70,7 +70,7 @@ public class FixedDateProvider extends DateProvider {
    * Change the date and time returned by the provider
    *
    * @param newDate
-   *          new date and time to return as provider value
+   *     new date and time to return as provider value
    */
   public void setDate(Date newDate) {
     m_date = newDate;

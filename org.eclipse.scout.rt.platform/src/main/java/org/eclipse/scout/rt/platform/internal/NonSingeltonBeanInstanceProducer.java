@@ -43,7 +43,9 @@ import org.eclipse.scout.rt.platform.exception.BeanCreationException;
  */
 public class NonSingeltonBeanInstanceProducer<T> implements IBeanInstanceProducer<T> {
 
-  /** Lazy initialized; No thread safety required */
+  /**
+   * Lazy initialized; No thread safety required
+   */
   private Supplier<? extends T> m_beanInstanceCreator;
 
   @Override

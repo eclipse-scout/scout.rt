@@ -118,5 +118,4 @@ public abstract class AbstractFormExtension<FORM extends AbstractForm> extends A
   public void execDataChanged(FormDataChangedChain chain, Object... dataTypes) {
     chain.execDataChanged(dataTypes);
   }
-
 }

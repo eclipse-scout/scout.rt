@@ -21,5 +21,4 @@ public class JsonParsingFailedStatus extends JsonStatus {
   public String getObjectType() {
     return "ParsingFailedStatus";
   }
-
 }

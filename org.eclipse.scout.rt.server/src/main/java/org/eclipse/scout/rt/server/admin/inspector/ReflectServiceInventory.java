@@ -129,5 +129,4 @@ public class ReflectServiceInventory {
   public void addState(String text) {
     m_states.add(text);
   }
-
 }

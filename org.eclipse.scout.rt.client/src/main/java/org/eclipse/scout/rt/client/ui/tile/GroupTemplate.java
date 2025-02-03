@@ -74,5 +74,4 @@ public class GroupTemplate {
     m_headerVisible = headerVisible;
     return this;
   }
-
 }

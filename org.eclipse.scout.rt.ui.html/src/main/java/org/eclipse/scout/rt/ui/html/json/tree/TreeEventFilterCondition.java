@@ -27,7 +27,7 @@ public class TreeEventFilterCondition {
 
   /**
    * @param type
-   *          event type (see {@link TreeEvent})
+   *     event type (see {@link TreeEvent})
    */
   public TreeEventFilterCondition(int type) {
     m_type = type;

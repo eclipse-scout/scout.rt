@@ -186,7 +186,6 @@ public class FileUtilityTest {
     assertEquals("_.txt", FileUtility.toValidFilename(" .txt"));
     assertEquals("_.txt", FileUtility.toValidFilename("  .txt"));
     assertEquals("_.txt", FileUtility.toValidFilename(" _.txt"));
-
   }
 
   @Test

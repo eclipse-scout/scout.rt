@@ -24,5 +24,4 @@ public interface IFormUIFacade {
    * This request is a forced close of the form from the ui and closes the form model regardless of its state.
    */
   void fireFormKilledFromUI();
-
 }

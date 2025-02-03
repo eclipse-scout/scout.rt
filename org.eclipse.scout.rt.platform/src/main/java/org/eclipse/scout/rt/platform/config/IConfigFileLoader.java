@@ -36,5 +36,4 @@ public interface IConfigFileLoader {
    * @param destination
    */
   void load(URL source, Properties destination);
-
 }

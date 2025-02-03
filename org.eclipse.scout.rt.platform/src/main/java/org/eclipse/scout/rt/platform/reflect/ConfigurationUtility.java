@@ -166,9 +166,9 @@ public final class ConfigurationUtility {
 
   /**
    * @return Returns <code>true</code> if the given class is annotated by {@link InjectFieldTo} or {@link Replace}.
-   *         Otherwise <code>false</code>.
+   * Otherwise <code>false</code>.
    * @throws NullPointerException
-   *           if the given class is null.
+   *     if the given class is null.
    */
   public static boolean isInjectFieldAnnotationPresent(Class<?> c) {
     return c.isAnnotationPresent(InjectFieldTo.class) || c.isAnnotationPresent(Replace.class);
@@ -296,7 +296,7 @@ public final class ConfigurationUtility {
    * public class B extends A {
    * }
    * </pre>
-   *
+   * <p>
    * The invocation of <code>getReplacementMapping(new Class[] {B.class, String.class})</code> returns a map containing
    * <code>&lt;A.class, B.class&gt;</code>.
    *
@@ -338,7 +338,7 @@ public final class ConfigurationUtility {
    * public class B extends A {
    * }
    * </pre>
-   *
+   * <p>
    * The invocation of <code>getReplacingLeafClasses(new Class[] {A.class, B.class, String.class})</code> returns a set
    * that contains <code>B.class</code> only. <code>String.class</code> is not annotated with {@link Replace} and
    * <code>A.class</code> is not a leaf replacement, but further replaced by <code>B.class</code>.
@@ -415,7 +415,7 @@ public final class ConfigurationUtility {
    *
    * @param clazz
    * @param simpleName
-   *          use the simple class name instead of the fully qualified class name.
+   *     use the simple class name instead of the fully qualified class name.
    * @return annotated id or class name fallback
    * @since 3.10.0
    */

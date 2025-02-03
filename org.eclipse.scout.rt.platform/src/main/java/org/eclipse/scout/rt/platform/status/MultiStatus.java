@@ -113,7 +113,7 @@ public class MultiStatus extends Status implements IMultiStatus {
    * message to the message of the max Severity.
    *
    * @param status
-   *          the new child status, not <code>null</code>
+   *     the new child status, not <code>null</code>
    */
   public void add(IStatus status) {
     m_children.add(Assertions.assertNotNull(status));

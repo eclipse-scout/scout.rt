@@ -264,7 +264,7 @@ public abstract class AbstractWebServiceClient<SERVICE extends Service, PORT> {
    * Overwrite to resolve the {@link URL} to the WSDL file.
    *
    * @param location
-   *          location as specified by {@link WebServiceClient#wsdlLocation()}; is not <code>null</code>.
+   *     location as specified by {@link WebServiceClient#wsdlLocation()}; is not <code>null</code>.
    * @return {@link URL}; must not be <code>null</code>.
    */
   protected URL resolveWsdlUrl(final String location) {
@@ -286,8 +286,7 @@ public abstract class AbstractWebServiceClient<SERVICE extends Service, PORT> {
 
     Assertions.assertTrue(candidate instanceof ParameterizedType, "Unexpected: no parameterized type found in super hierarchy of {}", getClass().getName());
 
-    @SuppressWarnings("unchecked")
-    final Class<T>[] types = TypeCastUtility.castValue(((ParameterizedType) candidate).getActualTypeArguments(), Class[].class);
+    @SuppressWarnings("unchecked") final Class<T>[] types = TypeCastUtility.castValue(((ParameterizedType) candidate).getActualTypeArguments(), Class[].class);
     return types;
   }
 

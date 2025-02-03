@@ -292,7 +292,7 @@ public class HttpClientInfo {
   /**
    * @return never <code>null</code>
    * @throws AssertionException
-   *           if object was not initialized using {@link #init(String)}
+   *     if object was not initialized using {@link #init(String)}
    */
   public String getUserAgent() {
     Assertions.assertTrue(m_userAgent.isSet());
@@ -317,7 +317,7 @@ public class HttpClientInfo {
 
   /**
    * @return {@code true} if the HTTP client is Microsoft Internet Explorer. Returns {@code false} for other browsers
-   *         including Microsoft Edge.
+   * including Microsoft Edge.
    */
   public boolean isMshtml() {
     return m_isMshtml;

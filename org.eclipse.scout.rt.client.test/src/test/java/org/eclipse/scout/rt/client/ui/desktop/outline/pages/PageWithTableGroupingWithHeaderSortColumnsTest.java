@@ -68,7 +68,6 @@ public class PageWithTableGroupingWithHeaderSortColumnsTest {
     //now group by b2 is also possible.
     table.getUIFacade().fireHeaderGroupFromUI(b2, true, true);
     assertGroupingState(table, CollectionUtility.arrayList(b3, b2), CollectionUtility.arrayList(b1));
-
   }
 
   @Test
@@ -168,7 +167,6 @@ public class PageWithTableGroupingWithHeaderSortColumnsTest {
         protected boolean getConfiguredAlwaysIncludeSortAtBegin() {
           return true;
         }
-
       }
 
       @Order(20)
@@ -206,7 +204,6 @@ public class PageWithTableGroupingWithHeaderSortColumnsTest {
           //by choice! this is an invalid config.
           return true;
         }
-
       }
 
       @Order(40)
@@ -216,9 +213,6 @@ public class PageWithTableGroupingWithHeaderSortColumnsTest {
           return "Value";
         }
       }
-
     }
-
   }
-
 }

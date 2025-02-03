@@ -46,9 +46,9 @@ public class PreAuthenticationMethod implements IAuthenticationMethod {
    * invoked.
    *
    * @param servletRequest
-   *          current servlet request.
+   *     current servlet request.
    * @param principalProducer
-   *          used to produce {@link Principal} objects for authenticated users.
+   *     used to produce {@link Principal} objects for authenticated users.
    * @return authenticated {@link Subject}, or <code>null</code> if not authenticated yet.
    */
   public Subject getRequestSubject(final HttpServletRequest servletRequest, final IPrincipalProducer principalProducer) {

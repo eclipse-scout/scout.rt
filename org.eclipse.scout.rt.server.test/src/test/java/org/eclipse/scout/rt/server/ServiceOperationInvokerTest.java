@@ -114,5 +114,4 @@ public class ServiceOperationInvokerTest {
     assertNotNull(res.getProcessingDuration());
     assertEquals(data, res.getData());
   }
-
 }

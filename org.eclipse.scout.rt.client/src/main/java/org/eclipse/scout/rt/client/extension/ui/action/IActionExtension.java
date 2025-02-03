@@ -25,5 +25,4 @@ public interface IActionExtension<OWNER extends AbstractAction> extends IExtensi
   void execInitAction(ActionInitActionChain chain);
 
   void execDispose(ActionDisposeChain chain);
-
 }

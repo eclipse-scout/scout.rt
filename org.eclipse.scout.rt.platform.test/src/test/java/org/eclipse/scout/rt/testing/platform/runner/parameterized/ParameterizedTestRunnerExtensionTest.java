@@ -109,7 +109,9 @@ public class ParameterizedTestRunnerExtensionTest {
   public static class ParameterizedTestClassWithMissingParametersMethod {
   }
 
-  /** Parameters method with wrong access modifier. */
+  /**
+   * Parameters method with wrong access modifier.
+   */
   public static class ParameterizedTestClassWithIncorrectParametersMethod1 {
     @Parameters
     private static List<IScoutTestParameter> getParameters() {
@@ -117,7 +119,9 @@ public class ParameterizedTestRunnerExtensionTest {
     }
   }
 
-  /** Parameters method with wrong return type. */
+  /**
+   * Parameters method with wrong return type.
+   */
   public static class ParameterizedTestClassWithIncorrectParametersMethod2 {
     @Parameters
     private static Set<IScoutTestParameter> getParameters() {

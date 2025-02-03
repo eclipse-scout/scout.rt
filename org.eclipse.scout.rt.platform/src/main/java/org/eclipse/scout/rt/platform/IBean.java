@@ -35,9 +35,9 @@ public interface IBean<T> {
    * Gets the {@link Annotation} instance for the given {@link Annotation} {@link Class}.
    *
    * @param annotation
-   *          The {@link Annotation} {@link Class} to search.
+   *     The {@link Annotation} {@link Class} to search.
    * @return The {@link Annotation} instance if this annotation exists for this {@link IBean} or <code>null</code>
-   *         otherwise.
+   * otherwise.
    */
   <ANNOTATION extends Annotation> ANNOTATION getBeanAnnotation(Class<ANNOTATION> annotation);
 
@@ -53,8 +53,8 @@ public interface IBean<T> {
    * <p>
    *
    * @return the initial instance of the bean, undecorated, not intercepted, may be null
-   *         <p>
-   *         used in {@link IBeanDecorationFactory}
+   * <p>
+   * used in {@link IBeanDecorationFactory}
    */
   T getInitialInstance();
 
@@ -78,5 +78,4 @@ public interface IBean<T> {
    * @return {@code true} if there is at least one instance available for this {@link IBean}.
    */
   boolean isInstanceAvailable();
-
 }

@@ -57,7 +57,7 @@ public class TableRow implements ITableRow {
 
   /**
    * @param columnSet
-   *          may be null
+   *     may be null
    */
   public TableRow(ColumnSet columnSet) {
     m_childRowListLock = new Object();

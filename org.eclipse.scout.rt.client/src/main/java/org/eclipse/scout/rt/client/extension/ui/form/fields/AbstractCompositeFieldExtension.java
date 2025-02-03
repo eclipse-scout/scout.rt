@@ -19,5 +19,4 @@ public abstract class AbstractCompositeFieldExtension<OWNER extends AbstractComp
   public AbstractCompositeFieldExtension(OWNER owner) {
     super(owner);
   }
-
 }

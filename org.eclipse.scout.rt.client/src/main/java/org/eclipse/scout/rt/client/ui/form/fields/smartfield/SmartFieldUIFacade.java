@@ -53,5 +53,4 @@ public class SmartFieldUIFacade<VALUE> implements ISmartFieldUIFacade<VALUE> {
   public AbstractSmartField<VALUE> getSmartField() {
     return m_smartField;
   }
-
 }

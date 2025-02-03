@@ -85,5 +85,4 @@ public class RootNode extends AbstractComposerNode {
   @ClassId("b954aef1-32df-47b4-b0fa-924fe51729e8")
   public class AddEntityPlaceholderOnRootMenu extends AbstractMenuSeparator {
   }
-
 }

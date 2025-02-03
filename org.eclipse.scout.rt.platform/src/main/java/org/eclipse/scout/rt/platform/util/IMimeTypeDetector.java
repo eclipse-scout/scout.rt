@@ -56,8 +56,7 @@ public interface IMimeTypeDetector {
   /**
    * @param path
    * @return the mime type for the specified path (including content if necessary) or null if none is defined in this
-   *         bean
+   * bean
    */
   String getMimeType(Path path);
-
 }

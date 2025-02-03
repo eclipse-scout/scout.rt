@@ -18,5 +18,4 @@ public interface IOutlineTileField extends IFormField {
   void setOutline(IOutline outline);
 
   IOutline getOutline();
-
 }

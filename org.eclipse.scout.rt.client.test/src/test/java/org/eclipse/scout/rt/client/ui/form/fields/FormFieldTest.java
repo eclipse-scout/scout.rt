@@ -224,9 +224,7 @@ public class FormFieldTest {
       @Order(20)
       public class GroupBox2 extends AbstractTemplateUsingOtherTemplateGroupBox {
       }
-
     }
-
   }
 
   class TestForm2 extends AbstractForm {
@@ -241,7 +239,6 @@ public class FormFieldTest {
       public class SimpleGroupBox2 extends AbstractTestGroupBox {
       }
     }
-
   }
 
   @Test

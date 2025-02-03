@@ -44,10 +44,10 @@ public class PlatformException extends RuntimeException implements IThrowableWit
    * same as if using {@link Logger SLF4j Logger}.
    *
    * @param message
-   *          the message with support for <em>formatting anchors</em> in the form of {} pairs.
+   *     the message with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param args
-   *          optional arguments to substitute <em>formatting anchors</em> in the message, with the last argument used
-   *          as the exception's cause if of type {@link Throwable} and not referenced in the message.
+   *     optional arguments to substitute <em>formatting anchors</em> in the message, with the last argument used
+   *     as the exception's cause if of type {@link Throwable} and not referenced in the message.
    */
   public PlatformException(final String message, final Object... args) {
     this(MessageFormatter.arrayFormat(message, args));
@@ -116,7 +116,7 @@ public class PlatformException extends RuntimeException implements IThrowableWit
 
   /**
    * @return Extracts the message used to compose the message returned by {@link #getMessage()} and
-   *         {@link #getDisplayMessage()}.
+   * {@link #getDisplayMessage()}.
    */
   protected String extractMessageText() {
     return super.getMessage();

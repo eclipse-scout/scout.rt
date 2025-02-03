@@ -65,9 +65,9 @@ public class DoNode<T> {
 
   /**
    * @return An {@code Optional} describing the wrapped {@link DoNode} value, if the wrapped value within this
-   *         {@link DoNode} is non-null, and this {@link DoNode} is part of a {@link DoEntity}. Otherwise returns an
-   *         empty {@code Optional}.<br>
-   *         Note: Being part of a {@link DoEntity} means, that {@link DoNode#exists()} returns {@code true}.
+   * {@link DoNode} is non-null, and this {@link DoNode} is part of a {@link DoEntity}. Otherwise returns an
+   * empty {@code Optional}.<br>
+   * Note: Being part of a {@link DoEntity} means, that {@link DoNode#exists()} returns {@code true}.
    */
   public final Optional<T> toOptional() {
     if (exists()) {

@@ -79,5 +79,4 @@ public class OutlineFormMenuWrapper extends OutlineMenuWrapper implements IFormM
   public void setPopupResizable(boolean popupResizable) {
     getWrappedMenu().setPopupResizable(popupResizable);
   }
-
 }

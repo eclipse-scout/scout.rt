@@ -25,5 +25,4 @@ public abstract class AbstractComboMenu extends AbstractMenu implements IComboMe
   public AbstractComboMenu(boolean callInitializer) {
     super(callInitializer);
   }
-
 }

@@ -19,9 +19,9 @@ public class ParameterizedFrameworkMethod extends FrameworkMethod {
 
   /**
    * @param frameworkMethod
-   *          test method
+   *     test method
    * @param paramsIndex
-   *          index of the test parameter used to execute the test
+   *     index of the test parameter used to execute the test
    */
   public ParameterizedFrameworkMethod(FrameworkMethod frameworkMethod, int paramsIndex) {
     super(frameworkMethod.getMethod());

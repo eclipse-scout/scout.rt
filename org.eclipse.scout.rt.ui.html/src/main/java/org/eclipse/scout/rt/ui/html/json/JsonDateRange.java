@@ -33,5 +33,4 @@ public class JsonDateRange implements IJsonObject {
     json.put("to", new JsonDate(m_range.getTo()).asJsonString());
     return json;
   }
-
 }

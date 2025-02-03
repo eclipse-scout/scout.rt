@@ -58,8 +58,8 @@ public interface IBeanArrayHolder<T> {
    * gets all beans with belonging to the set of supplied states
    *
    * @param states
-   *          that should be returned. If <code>null</code> or an empty array is passed, then all beans regardless of
-   *          state are returned.
+   *     that should be returned. If <code>null</code> or an empty array is passed, then all beans regardless of
+   *     state are returned.
    * @return an array of beans, does never return <code>null</code>
    */
   T[] getBeans(State... states);
@@ -91,5 +91,4 @@ public interface IBeanArrayHolder<T> {
    * @return the bean class contained in the holder
    */
   Class<T> getHolderType();
-
 }

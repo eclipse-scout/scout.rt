@@ -20,5 +20,4 @@ public interface IReadOnlyMenu extends IMenu {
    * @return The wrapped original menu.
    */
   IMenu getWrappedMenu();
-
 }

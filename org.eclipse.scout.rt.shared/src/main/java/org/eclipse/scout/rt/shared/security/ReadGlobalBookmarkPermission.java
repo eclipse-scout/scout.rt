@@ -17,5 +17,4 @@ public class ReadGlobalBookmarkPermission extends AbstractPermission {
   public ReadGlobalBookmarkPermission() {
     super("scout.bookmark.global.read");
   }
-
 }

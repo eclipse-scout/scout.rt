@@ -17,5 +17,4 @@ public class CreateGlobalBookmarkPermission extends AbstractPermission {
   public CreateGlobalBookmarkPermission() {
     super("scout.bookmark.global.create");
   }
-
 }

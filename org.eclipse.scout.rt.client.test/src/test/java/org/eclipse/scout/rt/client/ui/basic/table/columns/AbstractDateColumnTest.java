@@ -166,7 +166,5 @@ public class AbstractDateColumnTest {
         return TEST_FORMAT1;
       }
     }
-
   }
-
 }

@@ -174,7 +174,7 @@ public class UrlHints implements Serializable {
 
   /**
    * @return {@link Boolean#TRUE} if the given URL parameter is <code>"true"</code>, {@link Boolean#FALSE} for all other
-   *         values, and <code>null</code> if the parameter is not set at all.
+   * values, and <code>null</code> if the parameter is not set at all.
    */
   @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL") // see JavaDoc
   protected Boolean getRequestParameterBoolean(HttpServletRequest req, String parameterName) {

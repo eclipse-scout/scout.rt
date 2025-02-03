@@ -29,9 +29,9 @@ public final class CookieUtility {
 
   /**
    * @return the {@link Cookie} associated with the given <code>cookieName</code> in the given <code>req</code>, or
-   *         <code>null</code> if no such cookie exists.
+   * <code>null</code> if no such cookie exists.
    * @throws AssertionException
-   *           if <code>req</code> is <code>null</code>
+   *     if <code>req</code> is <code>null</code>
    */
   public static Cookie getCookieByName(HttpServletRequest req, String cookieName) {
     Assertions.assertNotNull(req, "Missing HTTP servlet request");

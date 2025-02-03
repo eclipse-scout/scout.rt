@@ -36,5 +36,4 @@ public class TableTextUserFilterState extends AbstractUserFilterState {
   public String getDisplayText() {
     return m_text;
   }
-
 }

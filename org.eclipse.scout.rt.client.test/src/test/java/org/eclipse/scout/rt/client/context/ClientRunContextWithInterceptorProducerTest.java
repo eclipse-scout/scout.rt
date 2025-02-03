@@ -74,7 +74,6 @@ public class ClientRunContextWithInterceptorProducerTest {
         Assert.assertNull(TL_CLIENT_RUN_CONTEXT.get());
         Assert.assertEquals("runcontext", TL_RUN_CONTEXT.get());
       }, Jobs.newInput().withRunContext(new RunContextFactory().copyCurrent())).awaitDone();
-
     }
     finally {
       TL_CLIENT_RUN_CONTEXT.set(null);
@@ -92,7 +91,6 @@ public class ClientRunContextWithInterceptorProducerTest {
         Assert.assertEquals("client.runcontext", TL_CLIENT_RUN_CONTEXT.get());
         Assert.assertEquals("runcontext", TL_RUN_CONTEXT.get());
       }, Jobs.newInput().withRunContext(BEANS.get(ClientRunContextFactory.class).copyCurrent())).awaitDone();
-
     }
     finally {
       TL_CLIENT_RUN_CONTEXT.set(null);
@@ -121,7 +119,6 @@ public class ClientRunContextWithInterceptorProducerTest {
           finally {
             TL_RUN_CONTEXT.set(backup);
           }
-
         }
 
         @Override
@@ -153,7 +150,6 @@ public class ClientRunContextWithInterceptorProducerTest {
           finally {
             TL_CLIENT_RUN_CONTEXT.set(backup);
           }
-
         }
 
         @Override

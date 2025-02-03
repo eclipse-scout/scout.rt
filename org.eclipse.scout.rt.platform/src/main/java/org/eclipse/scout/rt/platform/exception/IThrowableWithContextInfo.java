@@ -38,11 +38,11 @@ public interface IThrowableWithContextInfo {
    * same as if using {@link Logger SLF4j Logger}.
    *
    * @param name
-   *          the name of the context info.
+   *     the name of the context info.
    * @param value
-   *          the value with support for <em>formatting anchors</em> in the form of {} pairs.
+   *     the value with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param valueArgs
-   *          optional arguments to substitute <em>formatting anchors</em> in the value.
+   *     optional arguments to substitute <em>formatting anchors</em> in the value.
    */
   IThrowableWithContextInfo withContextInfo(String name, Object value, Object... valueArgs);
 
@@ -62,5 +62,4 @@ public interface IThrowableWithContextInfo {
   String getDisplayMessage();
 
   String getMessage();
-
 }

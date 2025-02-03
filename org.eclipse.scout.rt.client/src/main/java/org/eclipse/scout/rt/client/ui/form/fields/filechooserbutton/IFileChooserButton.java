@@ -41,7 +41,7 @@ public interface IFileChooserButton extends IValueField<BinaryResource> {
 
   /**
    * @param maximumUploadSize
-   *          maximum size for upload in bytes.
+   *     maximum size for upload in bytes.
    */
   void setMaximumUploadSize(long maximumUploadSize);
 

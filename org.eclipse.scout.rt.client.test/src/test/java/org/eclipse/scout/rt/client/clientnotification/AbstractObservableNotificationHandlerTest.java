@@ -75,12 +75,12 @@ public class AbstractObservableNotificationHandlerTest {
     final AbstractObservableNotificationHandler<Serializable> testHandler = createGlobalHandler();
 
     ModelJobs.schedule(() -> {
-      final CountCondition cc = new CountCondition(1);
-      testHandler.addListener(createVerifyingListener(cc, m_testSession1));
-      testHandler.notifyListenersOfAllSessions(m_testNotification);
-      cc.waitFor();
-    }, ModelJobs
-        .newInput(ClientRunContexts.empty().withSession(m_testSession1, true)))
+          final CountCondition cc = new CountCondition(1);
+          testHandler.addListener(createVerifyingListener(cc, m_testSession1));
+          testHandler.notifyListenersOfAllSessions(m_testNotification);
+          cc.waitFor();
+        }, ModelJobs
+            .newInput(ClientRunContexts.empty().withSession(m_testSession1, true)))
         .awaitDone();
   }
 
@@ -89,14 +89,14 @@ public class AbstractObservableNotificationHandlerTest {
     final AbstractObservableNotificationHandler<Serializable> testHandler = createGlobalHandler();
 
     ModelJobs.schedule(() -> {
-      final CountCondition cc = new CountCondition(2);
-      testHandler.addListener(m_testSession1, createVerifyingListener(cc, m_testSession1));
-      testHandler.addListener(m_testSession2, createVerifyingListener(cc, m_testSession2));
-      testHandler.notifyListenersOfAllSessions(m_testNotification);
-      assertEquals(m_testSession1, IClientSession.CURRENT.get());
-      cc.waitFor();
-    }, ModelJobs
-        .newInput(ClientRunContexts.empty().withSession(m_testSession1, true)))
+          final CountCondition cc = new CountCondition(2);
+          testHandler.addListener(m_testSession1, createVerifyingListener(cc, m_testSession1));
+          testHandler.addListener(m_testSession2, createVerifyingListener(cc, m_testSession2));
+          testHandler.notifyListenersOfAllSessions(m_testNotification);
+          assertEquals(m_testSession1, IClientSession.CURRENT.get());
+          cc.waitFor();
+        }, ModelJobs
+            .newInput(ClientRunContexts.empty().withSession(m_testSession1, true)))
         .awaitDone();
   }
 
@@ -181,12 +181,10 @@ public class AbstractObservableNotificationHandlerTest {
     void waitFor() {
       bc.waitFor(1, TimeUnit.SECONDS);
     }
-
   }
 
   private AbstractObservableNotificationHandler<Serializable> createGlobalHandler() {
     return new AbstractObservableNotificationHandler<Serializable>() {
     };
   }
-
 }

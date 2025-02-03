@@ -62,5 +62,4 @@ public class QueryParam<T> implements IQueryParam {
   public static <T> IQueryParam<T> createByRec(T recKey) {
     return new QueryParam<T>(QueryBy.REC, recKey, null);
   }
-
 }

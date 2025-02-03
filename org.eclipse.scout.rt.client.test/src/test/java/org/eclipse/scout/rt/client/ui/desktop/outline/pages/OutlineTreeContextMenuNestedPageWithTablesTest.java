@@ -158,7 +158,6 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
         protected Set<? extends IMenuType> getConfiguredMenuTypes() {
           return CollectionUtility.hashSet(TableMenuType.EmptySpace);
         }
-
       }
 
       @Order(20)
@@ -206,7 +205,6 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
         protected Set<? extends IMenuType> getConfiguredMenuTypes() {
           return CollectionUtility.hashSet(TableMenuType.EmptySpace);
         }
-
       }
 
       @Order(20)
@@ -221,7 +219,6 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
         protected Set<? extends IMenuType> getConfiguredMenuTypes() {
           return CollectionUtility.hashSet(TableMenuType.SingleSelection);
         }
-
       }
 
       @Order(10)

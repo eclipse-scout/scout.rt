@@ -28,5 +28,4 @@ public class TreeWith3Levels extends AbstractTree {
     addChildNode(child1, new TreeNode());
     addChildNode(child1, new TreeNode());
   }
-
 }

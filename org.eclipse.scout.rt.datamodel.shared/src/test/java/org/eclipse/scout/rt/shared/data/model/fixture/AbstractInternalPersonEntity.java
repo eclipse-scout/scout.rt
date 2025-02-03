@@ -49,6 +49,5 @@ public abstract class AbstractInternalPersonEntity extends AbstractPersonEntity 
     protected int getConfiguredType() {
       return TYPE_INTEGER;
     }
-
   }
 }

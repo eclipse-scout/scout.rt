@@ -43,5 +43,4 @@ public abstract class AbstractEventFilter<EVENT extends EventObject, CONDITION> 
   public void removeAllConditions() {
     m_conditions.clear();
   }
-
 }

@@ -267,7 +267,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
    * @param menus
-   *          live and mutable collection of configured menus
+   *     live and mutable collection of configured menus
    */
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }

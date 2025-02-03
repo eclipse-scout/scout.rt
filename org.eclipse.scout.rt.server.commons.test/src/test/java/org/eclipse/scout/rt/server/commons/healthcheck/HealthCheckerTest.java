@@ -222,5 +222,4 @@ public class HealthCheckerTest {
     awaitDone(checker.getFuture());
     assertTrue("resultZ", checker.checkHealth(RunContexts.empty(), null));
   }
-
 }

@@ -287,5 +287,4 @@ public class FileService implements IFileService {
   private void setDirectPath(String rootPath) {
     m_rootPath = rootPath;
   }
-
 }

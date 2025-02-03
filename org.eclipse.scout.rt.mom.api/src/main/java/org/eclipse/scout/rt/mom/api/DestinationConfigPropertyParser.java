@@ -79,10 +79,10 @@ public class DestinationConfigPropertyParser {
 
   /**
    * @param value
-   *          raw value to parse
+   *     raw value to parse
    * @return this instance (useful for method chaining)
    * @throws AssertionException
-   *           if parsing failed or method was called more than once
+   *     if parsing failed or method was called more than once
    */
   public DestinationConfigPropertyParser parse(final String value) {
     Assertions.assertFalse(m_parsed, "Already parsed");
@@ -163,7 +163,7 @@ public class DestinationConfigPropertyParser {
 
   /**
    * @throws AssertionError
-   *           if {@link #parse(String)} was not called before
+   *     if {@link #parse(String)} was not called before
    */
   public String getDestinationName() {
     Assertions.assertTrue(m_parsed, "Not parsed yet");
@@ -172,7 +172,7 @@ public class DestinationConfigPropertyParser {
 
   /**
    * @throws AssertionError
-   *           if {@link #parse(String)} was not called before
+   *     if {@link #parse(String)} was not called before
    */
   public IResolveMethod getResolveMethod() {
     Assertions.assertTrue(m_parsed, "Not parsed yet");
@@ -182,7 +182,7 @@ public class DestinationConfigPropertyParser {
   /**
    * @return modifiable map of parameters (never <code>null</code>)
    * @throws AssertionError
-   *           if {@link #parse(String)} was not called before
+   *     if {@link #parse(String)} was not called before
    */
   public Map<String, String> getParameters() {
     Assertions.assertTrue(m_parsed, "Not parsed yet");

@@ -41,7 +41,7 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
 
   /**
    * @return The {@link ITable} of this {@link IPage} or {@code null} if it does not have a table. If this page has a
-   *         table but it is not yet created it will be created and initialized.
+   * table but it is not yet created it will be created and initialized.
    */
   T getTable();
 
@@ -49,9 +49,9 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
    * Gets the {@link ITable} of this {@link IPage}.
    *
    * @param create
-   *          if {@code true} and there is no table yet: the table will be created and initialized.
+   *     if {@code true} and there is no table yet: the table will be created and initialized.
    * @return The {@link ITable} or {@code null} if this page has no table (this method call can also return {@code null}
-   *         if {@code true} is passed. This can be the case if this page does not declare a table).
+   * if {@code true} is passed. This can be the case if this page does not declare a table).
    */
   T getTable(boolean create);
 
@@ -82,14 +82,14 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
    * This will first remove all child nodes, add new nodes/table rows and trigger execPageDataLoaded
    *
    * @param reloadReason
-   *          {@link IReloadReason} that caused this reload
+   *     {@link IReloadReason} that caused this reload
    * @since 16.1
    */
   void reloadPage(String reloadReason);
 
   /**
    * @return the detail form, the detail form is not automatically started<br>
-   *         This returns the detail form for THIS node (page), NOT for child nodes of this page
+   * This returns the detail form for THIS node (page), NOT for child nodes of this page
    */
   IForm getDetailForm();
 
@@ -106,9 +106,9 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
 
   /**
    * @return all child pages Note that this is <b>not</b> exactly the same as (IPage)getChildNodes().
-   *         <p>
-   *         Note: Calling this method effectively creates all child page objects and may be expensive on pages with
-   *         many child pages.
+   * <p>
+   * Note: Calling this method effectively creates all child page objects and may be expensive on pages with
+   * many child pages.
    */
   List<IPage<?>> getChildPages();
 
@@ -150,8 +150,8 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
    * These might include pages, forms, fields etc.<br>
    *
    * @see {@link AbstractForm#execDataChanged(Object...)} {@link AbstractForm#execDataChanged(Object...)}
-   *      {@link AbstractFormField#execDataChanged(Object...)} {@link AbstractFormField#execDataChanged(Object...)}
-   *      {@link AbstractPage#execDataChanged(Object...)} {@link AbstractPage#execDataChanged(Object...)}
+   * {@link AbstractFormField#execDataChanged(Object...)} {@link AbstractFormField#execDataChanged(Object...)}
+   * {@link AbstractPage#execDataChanged(Object...)} {@link AbstractPage#execDataChanged(Object...)}
    */
   void dataChanged(Object... dataTypes);
 
@@ -164,7 +164,7 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
    * be added to {@link IPage} without changing its lean interface
    *
    * @param clazz
-   *          the adapter interface class, usually something like IXxxAdapter
+   *     the adapter interface class, usually something like IXxxAdapter
    * @return the contributed adapter instance or <code>null</code>
    */
   <A> A getAdapter(Class<A> clazz);
@@ -187,7 +187,7 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
    * Only possible before detail form is created.
    *
    * @throws AssertionException
-   *           if the detail form is already created.
+   *     if the detail form is already created.
    */
   void setShowTileOverview(boolean showTileOverview);
 
@@ -231,11 +231,10 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
 
   /**
    * @return {@code true} if this page has been activated (at least once clicked by the user). This method also returns
-   *         {@code true} if the page is no longer active (see {@link #isPageActive()}) but was active once before.
-   *         Returns {@code false} if this {@link IPage} has never been activated so far.
+   * {@code true} if the page is no longer active (see {@link #isPageActive()}) but was active once before.
+   * Returns {@code false} if this {@link IPage} has never been activated so far.
    * @see #isPageActive()
    * @see #pageActivatedNotify()
    */
   boolean hasBeenActivated();
-
 }

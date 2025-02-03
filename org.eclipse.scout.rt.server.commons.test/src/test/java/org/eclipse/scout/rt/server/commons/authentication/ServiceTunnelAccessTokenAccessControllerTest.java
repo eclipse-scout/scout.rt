@@ -20,7 +20,7 @@ import org.junit.Test;
 public class ServiceTunnelAccessTokenAccessControllerTest {
 
   @IgnoreBean
-  protected static class MockAuthTokenVerifier extends DefaultAuthTokenVerifier  {
+  protected static class MockAuthTokenVerifier extends DefaultAuthTokenVerifier {
     protected boolean m_enabled;
 
     protected MockAuthTokenVerifier(boolean enabled) {

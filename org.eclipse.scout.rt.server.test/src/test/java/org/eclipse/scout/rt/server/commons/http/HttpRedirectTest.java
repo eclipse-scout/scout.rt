@@ -91,7 +91,6 @@ public class HttpRedirectTest {
     }
     resp.setContentType("text/plain;charset=UTF-8");
     resp.getOutputStream().println("HTTP-GET:Hello " + req.getParameter("foo"));
-
   }
 
   private void fixtureServletPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {

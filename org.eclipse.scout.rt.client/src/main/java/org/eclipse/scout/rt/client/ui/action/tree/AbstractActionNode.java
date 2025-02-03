@@ -95,7 +95,7 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
    * @param actionNodes
-   *          live and mutable collection of configured menus, not yet initialized
+   *     live and mutable collection of configured menus, not yet initialized
    */
   protected void injectActionNodesInternal(OrderedCollection<T> actionNodes) {
   }
@@ -238,5 +238,4 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
   protected IActionNodeExtension<T, ? extends AbstractActionNode<T>> createLocalExtension() {
     return new LocalActionNodeExtension<>(this);
   }
-
 }

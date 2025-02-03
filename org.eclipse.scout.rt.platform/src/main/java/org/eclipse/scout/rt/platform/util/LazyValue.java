@@ -22,17 +22,17 @@ import org.eclipse.scout.rt.platform.BEANS;
  * Example usage:
  *
  * <pre>
-* &#64;Bean
-* public class MyBean {
-*
-*   private static final LazyValue<MyHelper> STATIC_HELPER = new LazyValue<>(MyHelper.class);
-*
-*   public void myMethod() {
-*     ...
-*     STATIC_HELPER.get().doSomething();
-*     ...
-*   }
-* }
+ * &#64;Bean
+ * public class MyBean {
+ *
+ *   private static final LazyValue<MyHelper> STATIC_HELPER = new LazyValue<>(MyHelper.class);
+ *
+ *   public void myMethod() {
+ *     ...
+ *     STATIC_HELPER.get().doSomething();
+ *     ...
+ *   }
+ * }
  * </pre>
  *
  * @since 6.1

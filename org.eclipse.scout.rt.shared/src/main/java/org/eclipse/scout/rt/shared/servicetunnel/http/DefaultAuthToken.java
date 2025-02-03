@@ -148,7 +148,7 @@ public class DefaultAuthToken {
 
   /**
    * @param token
-   *          possible null token to be parsed
+   *     possible null token to be parsed
    * @return this
    */
   public DefaultAuthToken read(String token) {
@@ -202,7 +202,7 @@ public class DefaultAuthToken {
 
   /**
    * @return a text representation. The token text is first UTF-8 byte encoded, then all bytes are written with
-   *         {@link #writeByte(ByteArrayOutputStream, byte)}
+   * {@link #writeByte(ByteArrayOutputStream, byte)}
    */
   public String write(boolean withSignature) {
     byte partsDelimiter = (byte) partsDelimiter();

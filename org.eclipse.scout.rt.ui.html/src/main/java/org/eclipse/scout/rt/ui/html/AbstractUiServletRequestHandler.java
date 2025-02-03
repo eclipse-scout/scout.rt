@@ -38,7 +38,7 @@ public abstract class AbstractUiServletRequestHandler implements IUiServletReque
    * Convenience method for HTTP method GET.
    *
    * @return <code>true</code> if the request was consumed by the handler, no further action is then necessary. If
-   *         <code>false</code> is returned, other handlers may handle the request afterwards.
+   * <code>false</code> is returned, other handlers may handle the request afterwards.
    */
   protected boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
@@ -48,7 +48,7 @@ public abstract class AbstractUiServletRequestHandler implements IUiServletReque
    * Convenience method for HTTP method POST.
    *
    * @return <code>true</code> if the request was consumed by the handler, no further action is then necessary. If
-   *         <code>false</code> is returned, other handlers may handle the request afterwards.
+   * <code>false</code> is returned, other handlers may handle the request afterwards.
    */
   protected boolean handlePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
@@ -58,7 +58,7 @@ public abstract class AbstractUiServletRequestHandler implements IUiServletReque
    * Convenience method for HTTP method PUT.
    *
    * @return <code>true</code> if the request was consumed by the handler, no further action is then necessary. If
-   *         <code>false</code> is returned, other handlers may handle the request afterwards.
+   * <code>false</code> is returned, other handlers may handle the request afterwards.
    */
   protected boolean handlePut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
@@ -68,7 +68,7 @@ public abstract class AbstractUiServletRequestHandler implements IUiServletReque
    * Convenience method for HTTP method DELETE.
    *
    * @return <code>true</code> if the request was consumed by the handler, no further action is then necessary. If
-   *         <code>false</code> is returned, other handlers may handle the request afterwards.
+   * <code>false</code> is returned, other handlers may handle the request afterwards.
    */
   protected boolean handleDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;

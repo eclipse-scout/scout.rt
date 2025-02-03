@@ -212,5 +212,4 @@ public abstract class AbstractFormFieldData extends AbstractContributionComposit
   public String toString() {
     return FormDataUtility.toString(this, false);
   }
-
 }

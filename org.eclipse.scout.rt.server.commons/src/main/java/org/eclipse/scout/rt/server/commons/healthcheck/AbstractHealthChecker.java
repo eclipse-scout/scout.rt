@@ -56,7 +56,7 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
 
   /**
    * @return The status lifetime duration in milliseconds. If greater than zero, status expire after the given duration.
-   *         This prevents denial-of-service due to health check flooding.
+   * This prevents denial-of-service due to health check flooding.
    */
   protected long getConfiguredTimeToLiveMillis() {
     return TimeUnit.SECONDS.toMillis(1);
@@ -64,7 +64,7 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
 
   /**
    * @return The health check timeout duration in milliseconds. If greater than zero,
-   *         {@link #execCheckHealth(HealthCheckCategoryId)} will time out after given duration.
+   * {@link #execCheckHealth(HealthCheckCategoryId)} will time out after given duration.
    */
   protected long getConfiguredTimeoutMillis() {
     return 0;
@@ -167,7 +167,7 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
    * Called after a health check was executed.
    *
    * @param result
-   *          status of last executed health check
+   *     status of last executed health check
    */
   protected void notifyHealthCheckResult(boolean result) {
     if (result) {

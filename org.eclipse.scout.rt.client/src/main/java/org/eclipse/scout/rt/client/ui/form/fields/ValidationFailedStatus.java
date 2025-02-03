@@ -79,5 +79,4 @@ public final class ValidationFailedStatus<VALUE> extends Status {
     }
     return true;
   }
-
 }

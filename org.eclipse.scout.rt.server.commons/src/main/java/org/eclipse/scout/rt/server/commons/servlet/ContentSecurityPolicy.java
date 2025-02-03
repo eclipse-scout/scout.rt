@@ -209,7 +209,7 @@ public class ContentSecurityPolicy {
 
   /**
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-connect-src">https://www.w3.org/TR/CSP2/#directive-connect-src</a>
+   * "https://www.w3.org/TR/CSP2/#directive-connect-src">https://www.w3.org/TR/CSP2/#directive-connect-src</a>
    */
   public ContentSecurityPolicy withConnectSrc(String connectSrc) {
     putOrRemove(DIRECTIVE_CONNECT_SRC, connectSrc);
@@ -220,7 +220,7 @@ public class ContentSecurityPolicy {
    * Appends {@code connectSrc} to existing connect source directive or creates new directive if it not already exists.
    *
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-connect-src">https://www.w3.org/TR/CSP2/#directive-connect-src</a>
+   * "https://www.w3.org/TR/CSP2/#directive-connect-src">https://www.w3.org/TR/CSP2/#directive-connect-src</a>
    */
   public ContentSecurityPolicy appendConnectSrc(String connectSrc) {
     return addOrAppend(DIRECTIVE_CONNECT_SRC, connectSrc);
@@ -228,7 +228,7 @@ public class ContentSecurityPolicy {
 
   /**
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-default-src">https://www.w3.org/TR/CSP2/#directive-default-src</a>
+   * "https://www.w3.org/TR/CSP2/#directive-default-src">https://www.w3.org/TR/CSP2/#directive-default-src</a>
    */
   public ContentSecurityPolicy withDefaultSrc(String defaultSrc) {
     putOrRemove(DIRECTIVE_DEFAULT_SRC, defaultSrc);
@@ -239,7 +239,7 @@ public class ContentSecurityPolicy {
    * Appends {@code defaultSrc} to existing default source directive or creates new directive if it not already exists.
    *
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-default-src">https://www.w3.org/TR/CSP2/#directive-default-src</a>
+   * "https://www.w3.org/TR/CSP2/#directive-default-src">https://www.w3.org/TR/CSP2/#directive-default-src</a>
    */
   public ContentSecurityPolicy appendDefaultSrc(String defaultSrc) {
     return addOrAppend(DIRECTIVE_DEFAULT_SRC, defaultSrc);
@@ -264,7 +264,7 @@ public class ContentSecurityPolicy {
 
   /**
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-form-action">https://www.w3.org/TR/CSP2/#directive-form-action</a>
+   * "https://www.w3.org/TR/CSP2/#directive-form-action">https://www.w3.org/TR/CSP2/#directive-form-action</a>
    */
   public ContentSecurityPolicy withFormAction(String formAction) {
     putOrRemove(DIRECTIVE_FORM_ACTION, formAction);
@@ -275,7 +275,7 @@ public class ContentSecurityPolicy {
    * Appends {@code formAction} to existing form action directive or creates new directive if it not already exists.
    *
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-form-action">https://www.w3.org/TR/CSP2/#directive-form-action</a>
+   * "https://www.w3.org/TR/CSP2/#directive-form-action">https://www.w3.org/TR/CSP2/#directive-form-action</a>
    */
   public ContentSecurityPolicy appendFormAction(String formAction) {
     return addOrAppend(DIRECTIVE_FORM_ACTION, formAction);
@@ -283,7 +283,7 @@ public class ContentSecurityPolicy {
 
   /**
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-frame-ancestors">https://www.w3.org/TR/CSP2/#directive-frame-ancestors</a>
+   * "https://www.w3.org/TR/CSP2/#directive-frame-ancestors">https://www.w3.org/TR/CSP2/#directive-frame-ancestors</a>
    */
   public ContentSecurityPolicy withFrameAncestors(String frameAncestors) {
     putOrRemove(DIRECTIVE_FRAME_ANCESTORS, frameAncestors);
@@ -295,7 +295,7 @@ public class ContentSecurityPolicy {
    * exists.
    *
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-frame-ancestors">https://www.w3.org/TR/CSP2/#directive-frame-ancestors</a>
+   * "https://www.w3.org/TR/CSP2/#directive-frame-ancestors">https://www.w3.org/TR/CSP2/#directive-frame-ancestors</a>
    */
   public ContentSecurityPolicy appendFrameAncestors(String frameAncestors) {
     return addOrAppend(DIRECTIVE_FRAME_ANCESTORS, frameAncestors);
@@ -337,7 +337,7 @@ public class ContentSecurityPolicy {
 
   /**
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-object-src">https://www.w3.org/TR/CSP2/#directive-object-src</a>
+   * "https://www.w3.org/TR/CSP2/#directive-object-src">https://www.w3.org/TR/CSP2/#directive-object-src</a>
    */
   public ContentSecurityPolicy withObjectSrc(String objectSrc) {
     putOrRemove(DIRECTIVE_OBJECT_SRC, objectSrc);
@@ -348,7 +348,7 @@ public class ContentSecurityPolicy {
    * Appends {@code objectSrc} to existing object source directive or creates new directive if it not already exists.
    *
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-object-src">https://www.w3.org/TR/CSP2/#directive-object-src</a>
+   * "https://www.w3.org/TR/CSP2/#directive-object-src">https://www.w3.org/TR/CSP2/#directive-object-src</a>
    */
   public ContentSecurityPolicy appendObjectSrc(String objectSrc) {
     return addOrAppend(DIRECTIVE_OBJECT_SRC, objectSrc);
@@ -356,7 +356,7 @@ public class ContentSecurityPolicy {
 
   /**
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-plugin-types">https://www.w3.org/TR/CSP2/#directive-plugin-types</a>
+   * "https://www.w3.org/TR/CSP2/#directive-plugin-types">https://www.w3.org/TR/CSP2/#directive-plugin-types</a>
    */
   public ContentSecurityPolicy withPluginTypes(String pluginTypes) {
     putOrRemove(DIRECTIVE_PLUGIN_TYPES, pluginTypes);
@@ -367,7 +367,7 @@ public class ContentSecurityPolicy {
    * Appends {@code pluginTypes} to existing pluginTypes directive or creates new directive if it not already exists.
    *
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-plugin-types">https://www.w3.org/TR/CSP2/#directive-plugin-types</a>
+   * "https://www.w3.org/TR/CSP2/#directive-plugin-types">https://www.w3.org/TR/CSP2/#directive-plugin-types</a>
    */
   public ContentSecurityPolicy appendPluginTypes(String pluginTypes) {
     return addOrAppend(DIRECTIVE_PLUGIN_TYPES, pluginTypes);
@@ -375,7 +375,7 @@ public class ContentSecurityPolicy {
 
   /**
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-report-uri">https://www.w3.org/TR/CSP2/#directive-report-uri</a>
+   * "https://www.w3.org/TR/CSP2/#directive-report-uri">https://www.w3.org/TR/CSP2/#directive-report-uri</a>
    */
   public ContentSecurityPolicy withReportUri(String reportUri) {
     putOrRemove(DIRECTIVE_REPORT_URI, reportUri);
@@ -386,7 +386,7 @@ public class ContentSecurityPolicy {
    * Appends {@code reportUri} to existing report URI directive or creates new directive if it not already exists.
    *
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-report-uri">https://www.w3.org/TR/CSP2/#directive-report-uri</a>
+   * "https://www.w3.org/TR/CSP2/#directive-report-uri">https://www.w3.org/TR/CSP2/#directive-report-uri</a>
    */
   public ContentSecurityPolicy appendReportUri(String reportUri) {
     return addOrAppend(DIRECTIVE_REPORT_URI, reportUri);
@@ -411,7 +411,7 @@ public class ContentSecurityPolicy {
 
   /**
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-script-src">https://www.w3.org/TR/CSP2/#directive-script-src</a>
+   * "https://www.w3.org/TR/CSP2/#directive-script-src">https://www.w3.org/TR/CSP2/#directive-script-src</a>
    */
   public ContentSecurityPolicy withScriptSrc(String scriptSrc) {
     putOrRemove(DIRECTIVE_SCRIPT_SRC, scriptSrc);
@@ -422,7 +422,7 @@ public class ContentSecurityPolicy {
    * Appends {@code scriptSrc} to existing script source directive or creates new directive if it not already exists.
    *
    * @see <a href=
-   *      "https://www.w3.org/TR/CSP2/#directive-script-src">https://www.w3.org/TR/CSP2/#directive-script-src</a>
+   * "https://www.w3.org/TR/CSP2/#directive-script-src">https://www.w3.org/TR/CSP2/#directive-script-src</a>
    */
   public ContentSecurityPolicy appendScriptSrc(String scriptSrc) {
     return addOrAppend(DIRECTIVE_SCRIPT_SRC, scriptSrc);
@@ -467,7 +467,7 @@ public class ContentSecurityPolicy {
 
   /**
    * @return a string describing all directives in this rule set, suitable as value for the
-   *         <code>"Content-Security-Policy"</code> HTTP header
+   * <code>"Content-Security-Policy"</code> HTTP header
    * @see <a href="https://www.w3.org/TR/CSP2/#policy_token">https://www.w3.org/TR/CSP2/#policy_token</a>
    */
   public String toToken() {

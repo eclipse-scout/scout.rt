@@ -9,8 +9,8 @@
  */
 package org.eclipse.scout.rt.rest.container;
 
-import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
+import static javax.ws.rs.core.Response.status;
 
 import java.io.IOException;
 import java.net.URI;

@@ -253,7 +253,7 @@ public class JandexInventoryBuilder {
 
   /**
    * @param indexUri
-   *          path to jandex.idx, typically ending in /META-INF/jandex.idx
+   *     path to jandex.idx, typically ending in /META-INF/jandex.idx
    * @return index or null
    */
   protected Index readIndex(URI indexUri) {
@@ -274,7 +274,7 @@ public class JandexInventoryBuilder {
 
   /**
    * @param indexUri
-   *          path to jandex.idx, typically ending in /META-INF/jandex.idx
+   *     path to jandex.idx, typically ending in /META-INF/jandex.idx
    * @return index or null
    */
   protected Index readIndex(URI indexUri, InputStream in) {

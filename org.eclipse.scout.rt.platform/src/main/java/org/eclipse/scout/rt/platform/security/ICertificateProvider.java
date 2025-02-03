@@ -28,30 +28,29 @@ public interface ICertificateProvider {
    * Similar to: openssl req -nodes -newkey rsa:4096 -days 3650 -x509 -keyout cert_private.key -out cert_public.pem
    *
    * @param certificateAlias
-   *          is the alias used in the keystore for accessing the certificate, this is not the certificate name (DN)
+   *     is the alias used in the keystore for accessing the certificate, this is not the certificate name (DN)
    * @param x500Name
-   *          or Subject DN or Issuer DN for example "CN=host.domain.com,C=CH,ST=ZH,L=Zurich,O=My Company",
+   *     or Subject DN or Issuer DN for example "CN=host.domain.com,C=CH,ST=ZH,L=Zurich,O=My Company",
    *
-   *          <pre>
-  X.500 name format is
-  CN: CommonName: host.domain.com
-  C: CountryName: CH
-  S: StateOrProvinceName: ZH
-  L: Locality: Zurich
-  O: Organization: My Company
-  OU: OrganizationalUnit:
-   *          </pre>
-   *
+   *     <pre>
+   *     X.500 name format is
+   *     CN: CommonName: host.domain.com
+   *     C: CountryName: CH
+   *     S: StateOrProvinceName: ZH
+   *     L: Locality: Zurich
+   *     O: Organization: My Company
+   *     OU: OrganizationalUnit:
+   *              </pre>
    * @param storePass
-   *          keystore password
+   *     keystore password
    * @param keyPass
-   *          private key password
+   *     private key password
    * @param keyBits
-   *          typically 4096
+   *     typically 4096
    * @param validDays
-   *          typically 365 days
+   *     typically 365 days
    * @param out
-   *          where to write the generated keystore to. The result is written in java key store file format.
+   *     where to write the generated keystore to. The result is written in java key store file format.
    * @since 22.0
    */
   void createSelfSignedCertificate(String certificateAlias, String x500Name, char[] storePass, char[] keyPass, int keyBits, int validDays, OutputStream out);
@@ -61,7 +60,7 @@ public interface ICertificateProvider {
    * file already exists, then it is re-used and not created.
    *
    * @param keyStorePath
-   *          must be a valid and writable file path (see {@link Paths#get(String, String...)})
+   *     must be a valid and writable file path (see {@link Paths#get(String, String...)})
    * @see #createSelfSignedCertificate(String, String, char[], char[], int, int, OutputStream)
    * @since 22.0
    */

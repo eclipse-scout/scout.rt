@@ -62,5 +62,4 @@ public class FilteredClassInventory<T> {
   protected Class<?> getInventoryType() {
     return m_inventoryType;
   }
-
 }

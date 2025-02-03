@@ -39,5 +39,4 @@ public class EmptyHtmlNodeBuilder extends HtmlNodeBuilder {
       appendText();
     }
   }
-
 }

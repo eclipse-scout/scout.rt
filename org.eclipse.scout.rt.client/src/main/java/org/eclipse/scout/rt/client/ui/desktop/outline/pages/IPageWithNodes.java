@@ -25,5 +25,4 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 public interface IPageWithNodes extends IPage<ITable> {
 
   void rebuildTableInternal();
-
 }

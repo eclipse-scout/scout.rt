@@ -55,8 +55,8 @@ public interface IListBox<KEY> extends IValueField<Set<KEY>>, ICompositeField {
 
   /**
    * @return true: a filter is added to the listbox table that only accepts checked rows<br>
-   *         Affects {@link ITable#getFilteredRows()}<br>
-   *         see also {@link #getFilterCheckedRowsValue()} and {@link #setFilterCheckedRows(boolean)}
+   * Affects {@link ITable#getFilteredRows()}<br>
+   * see also {@link #getFilterCheckedRowsValue()} and {@link #setFilterCheckedRows(boolean)}
    */
   boolean isFilterCheckedRows();
 
@@ -71,8 +71,8 @@ public interface IListBox<KEY> extends IValueField<Set<KEY>>, ICompositeField {
 
   /**
    * @return true: a filter is added to the listbox table that only accepts rows that are active or checked.<br>
-   *         Affects {@link ITable#getFilteredRows()}<br>
-   *         see also {@link #getActiveFilter()} and {@link #setActiveFilter(TriState)}
+   * Affects {@link ITable#getFilteredRows()}<br>
+   * see also {@link #getActiveFilter()} and {@link #setActiveFilter(TriState)}
    */
   boolean isFilterActiveRows();
 
@@ -111,10 +111,10 @@ public interface IListBox<KEY> extends IValueField<Set<KEY>>, ICompositeField {
    * Convenience for getting the first value of {@link #getValue()}
    *
    * @return the first selected/checked value if any
-   *         <p>
-   *         By default a listbox is checkable, so its value is the array of all checked keys
-   *         <p>
-   *         When it is made non-checkable, its value is the array of all selected keys
+   * <p>
+   * By default a listbox is checkable, so its value is the array of all checked keys
+   * <p>
+   * When it is made non-checkable, its value is the array of all selected keys
    */
   KEY getSingleValue();
 
@@ -139,7 +139,7 @@ public interface IListBox<KEY> extends IValueField<Set<KEY>>, ICompositeField {
 
   /**
    * @return the keys that have been checked with regard to the initial keys of the listbox. Initial keys are those
-   *         after the last save or init
+   * after the last save or init
    */
   Set<KEY> getUncheckedKeys();
 
@@ -162,5 +162,4 @@ public interface IListBox<KEY> extends IValueField<Set<KEY>>, ICompositeField {
    * decheck all available keys, regardless of active/inactive flag
    */
   void uncheckAllKeys();
-
 }

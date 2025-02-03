@@ -130,5 +130,4 @@ public interface IImageField extends IFormField, IDNDSupport {
   List<String> getFileExtensions();
 
   void setFileExtensions(List<String> fileExtensions);
-
 }

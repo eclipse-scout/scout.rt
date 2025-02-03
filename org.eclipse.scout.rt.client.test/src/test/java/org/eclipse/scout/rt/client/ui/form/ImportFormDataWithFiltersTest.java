@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.ImportFormDataWithFiltersTest.FilterImportTestForm.MainBox.SubBox.TestSubStringField;
@@ -33,7 +32,7 @@ import org.junit.runner.RunWith;
 
 /**
  * Test for
- * {@link org.eclipse.scout.rt.client.ui.form.AbstractForm#importFormData(AbstractFormData, boolean,IPropertyFilter, IFormFieldFilter) }
+ * {@link org.eclipse.scout.rt.client.ui.form.AbstractForm#importFormData(AbstractFormData, boolean, IPropertyFilter, IFormFieldFilter) }
  */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("anna")
@@ -44,7 +43,7 @@ public class ImportFormDataWithFiltersTest {
    * Tests that field data is imported, if no filter is set.
    *
    * @throws ProcessingException
-   *           if form instantiation fails
+   *     if form instantiation fails
    */
   @Test
   public void testFormDataImportNoFilters() {
@@ -61,7 +60,7 @@ public class ImportFormDataWithFiltersTest {
    * Tests that field data not imported, if ExcludeFormFieldFilter is used with this field.
    *
    * @throws ProcessingException
-   *           if form instantiation fails
+   *     if form instantiation fails
    */
   @Test
   public void testFormDataImportWithFieldFilter() {
@@ -80,7 +79,7 @@ public class ImportFormDataWithFiltersTest {
    * explicitly.
    *
    * @throws ProcessingException
-   *           if form instantiation fails
+   *     if form instantiation fails
    */
   @Test
   public void testFormDataImportWithFieldFilterAndInitValue() {
@@ -97,7 +96,7 @@ public class ImportFormDataWithFiltersTest {
    * Tests that field data imported, if an empty ExcludeFormFieldFilter is used.
    *
    * @throws ProcessingException
-   *           if form instantiation fails
+   *     if form instantiation fails
    */
   @Test
   public void testFormDataImportWithEmptyFieldFilter() {
@@ -136,7 +135,6 @@ public class ImportFormDataWithFiltersTest {
           protected Class<? extends IValueField> getConfiguredMasterField() {
             return TestStringField.class;
           }
-
         }
       }
 
@@ -174,5 +172,4 @@ public class ImportFormDataWithFiltersTest {
       }
     }
   }
-
 }

@@ -43,7 +43,7 @@ public class PropertiesUtilityTest {
 
   private static Properties load(String path) throws Exception {
     try (InputStream inputStream = PropertiesUtility.class.getResourceAsStream("/" + path);
-        InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+         InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
       Properties props = new Properties();
       props.load(reader);
       PropertiesUtility.resolveVariables(props, true);

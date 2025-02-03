@@ -45,5 +45,4 @@ public class JsonViewButton<VIEW_BUTTON extends IViewButton> extends JsonAction<
     getModel().getUIFacade().setSelectedFromUI(true);
     super.handleUiAction(event);
   }
-
 }

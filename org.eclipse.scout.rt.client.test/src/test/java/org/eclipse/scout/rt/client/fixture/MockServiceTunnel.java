@@ -48,7 +48,7 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
 
   /**
    * @return the service response You may call callTargetService() to simply call a service for test purpose (without a
-   *         transaction!)
+   * transaction!)
    */
   protected ServiceTunnelResponse mockServiceCall(ServiceTunnelRequest req) {
     try {

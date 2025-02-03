@@ -21,7 +21,7 @@ public interface IBeanDecorator<T> {
    * Callback executed when a method is called on a bean.
    *
    * @param context
-   *          The context of the method call. Contains information about the method and the arguments being invoked.
+   *     The context of the method call. Contains information about the method and the arguments being invoked.
    * @return the result of the call
    */
   Object invoke(IBeanInvocationContext<T> context);

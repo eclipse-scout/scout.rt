@@ -231,9 +231,9 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
 
   /**
    * @return the internal {@link DecimalFormat} instance.
-   *         <p>
-   *         <b> use with care:</b> Only use for read-access. Never change a property directly on the returned instance
-   *         and never pass a reference outside subclasses!
+   * <p>
+   * <b> use with care:</b> Only use for read-access. Never change a property directly on the returned instance
+   * and never pass a reference outside subclasses!
    */
   protected DecimalFormat getFormatInternal() {
     return ((DecimalFormat) propertySupport.getProperty(INumberValueContainer.PROP_DECIMAL_FORMAT));

@@ -19,5 +19,4 @@ public interface ISelectStreamHandler {
   void handleRow(Connection con, PreparedStatement stm, ResultSet rs, int rowIndex, List<SqlBind> values);
 
   void finished(Connection con, PreparedStatement stm, ResultSet rs, int rowCount);
-
 }

@@ -194,24 +194,24 @@ public class ClientRunContextTest {
   @Test
   public void testCopyCurrentOrElseEmpty() {
     Jobs.schedule(() -> {
-      try {
-        ClientRunContexts.copyCurrent();
-        fail("AssertionException expected because not running in a RunContext");
-      }
-      catch (AssertionException e) {
-        // expected
-      }
+          try {
+            ClientRunContexts.copyCurrent();
+            fail("AssertionException expected because not running in a RunContext");
+          }
+          catch (AssertionException e) {
+            // expected
+          }
 
-      try {
-        ClientRunContexts.copyCurrent(false);
-        fail("AssertionException expected because not running in a RunContext");
-      }
-      catch (AssertionException e) {
-        // expected
-      }
+          try {
+            ClientRunContexts.copyCurrent(false);
+            fail("AssertionException expected because not running in a RunContext");
+          }
+          catch (AssertionException e) {
+            // expected
+          }
 
-      assertNotNull(ClientRunContexts.copyCurrent(true));
-    }, Jobs.newInput())
+          assertNotNull(ClientRunContexts.copyCurrent(true));
+        }, Jobs.newInput())
         .awaitDoneAndGet();
   }
 

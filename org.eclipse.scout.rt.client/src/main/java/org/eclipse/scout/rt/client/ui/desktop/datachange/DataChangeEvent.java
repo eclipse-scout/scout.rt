@@ -39,13 +39,13 @@ public class DataChangeEvent extends EventObject {
    * A {@link DataChangeEvent} is fired by calling {@link IDesktop#fireDataChangeEvent(DataChangeEvent)}
    *
    * @param source
-   *          the source of the event, may not be <code>null</code>
+   *     the source of the event, may not be <code>null</code>
    * @param dataType
-   *          used so a listener can distinct between various data change event. Typically you'd use the
-   *          <code>.class</code> property of that entity as eventType
+   *     used so a listener can distinct between various data change event. Typically you'd use the
+   *     <code>.class</code> property of that entity as eventType
    * @param changeStatus
-   *          a constant value from {@link ChangeStatus}. Specifies the change status of the entity (e.g. inserted,
-   *          updated, deleted or not changed)
+   *     a constant value from {@link ChangeStatus}. Specifies the change status of the entity (e.g. inserted,
+   *     updated, deleted or not changed)
    */
   public DataChangeEvent(Object source, Object dataType, int changeStatus) {
     super(source);

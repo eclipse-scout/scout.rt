@@ -48,8 +48,8 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * By default, {@link ServerRunContext} is configured with {@link TransactionScope#REQUIRES_NEW}, so that code is always
  * executed in a new transaction.
  *
- * @since 5.1
  * @see RunContext
+ * @since 5.1
  */
 public class ServerRunContext extends RunContext {
 

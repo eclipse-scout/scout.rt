@@ -20,5 +20,4 @@ public abstract class AbstractGroupBoxExtension<OWNER extends AbstractGroupBox> 
   public AbstractGroupBoxExtension(OWNER owner) {
     super(owner);
   }
-
 }

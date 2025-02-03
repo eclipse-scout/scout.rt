@@ -26,7 +26,7 @@ public interface ITableField<T extends ITable> extends IFormField {
    * Install a (new) table into the table field.
    *
    * @param externallyManaged
-   *          true means init, dispose, load and store are not handled by the table field
+   *     true means init, dispose, load and store are not handled by the table field
    */
   void setTable(T newTable, boolean externallyManaged);
 

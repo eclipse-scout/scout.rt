@@ -230,9 +230,9 @@ public final class HTML {
    * </p>
    *
    * @param preserveOpener
-   *          Specifies if the opener and referrer should be available to the target browser window. Because of security
-   *          reasons this should be disabled ({@code false}) in most cases. If disabled, the attribute
-   *          {@code rel="noreferrer noopener"} is added to the link element.
+   *     Specifies if the opener and referrer should be available to the target browser window. Because of security
+   *     reasons this should be disabled ({@code false}) in most cases. If disabled, the attribute
+   *     {@code rel="noreferrer noopener"} is added to the link element.
    * @see "https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types"
    * @see "https://mathiasbynens.github.io/rel-noopener/"
    */
@@ -247,7 +247,7 @@ public final class HTML {
    * <code>String encodedHtml = HTML.img("image.png").toHtml();</code>
    *
    * @param src
-   *          image source path
+   *     image source path
    */
   public static IHtmlElement img(CharSequence src) {
     return new HtmlImageBuilder(src);
@@ -260,7 +260,7 @@ public final class HTML {
    * <code>String encodedHtml = HTML.imgByBinaryResource("resourceName").toHtml();</code>
    *
    * @param binaryResource
-   *          image source path
+   *     image source path
    */
   public static IHtmlElement imgByBinaryResource(CharSequence binaryResource) {
     return new HtmlImageBuilder(BinaryResourceUtility.createUrl(binaryResource.toString()));
@@ -273,7 +273,7 @@ public final class HTML {
    * <code>String encodedHtml = HTML.imgByBinaryRef("/crm/customer/image/1234").toHtml();</code>
    *
    * @param binaryRef
-   *          base path plus id
+   *     base path plus id
    */
   public static IHtmlElement imgByBinaryRef(CharSequence binaryRef) {
     if (binaryRef != null && StringUtility.startsWith(binaryRef.toString(), BinaryRefs.URI_SCHEME + ":")) {
@@ -300,7 +300,7 @@ public final class HTML {
    * </ul>
    *
    * @param icon
-   *          icon like AbstractIcons#Info
+   *     icon like AbstractIcons#Info
    */
   public static IHtmlElement icon(final CharSequence icon) {
     final Matcher matcher = FONT_ICON_PATTERN.matcher(icon);
@@ -497,9 +497,9 @@ public final class HTML {
    * <code>String encodedHtml = HTML.appLink("path","text").toHtml();</code>
    *
    * @param ref
-   *          what the link is referring to
+   *     what the link is referring to
    * @param text
-   *          the link text
+   *     the link text
    */
   public static IHtmlElement appLink(CharSequence ref, CharSequence text) {
     return span(text).appLink(ref);

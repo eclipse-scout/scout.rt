@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  *
  * @see CollatorProvider
  * @see <a href=
- *      "https://bugs.eclipse.org/bugs/show_bug.cgi?id=390097">https://bugs.eclipse.org/bugs/show_bug.cgi?id=390097</a>
+ * "https://bugs.eclipse.org/bugs/show_bug.cgi?id=390097">https://bugs.eclipse.org/bugs/show_bug.cgi?id=390097</a>
  */
 @ApplicationScoped
 public class NaturalCollatorProvider {
@@ -80,7 +80,7 @@ public class NaturalCollatorProvider {
    * (<code>-</code>, U+002D) before underscores (<code>_</code>, U+005F).
    *
    * @param origRules
-   *          original rules
+   *     original rules
    * @return replaced rules
    */
   protected String replaceRules(String origRules) {

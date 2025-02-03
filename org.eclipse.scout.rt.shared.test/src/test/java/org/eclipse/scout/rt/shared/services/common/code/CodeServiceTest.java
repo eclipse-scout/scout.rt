@@ -135,7 +135,6 @@ public class CodeServiceTest {
 
   /**
    * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#reloadCodeType(Class)}.
-   *
    */
   @Test
   public void testReloadCodeType() {
@@ -157,7 +156,6 @@ public class CodeServiceTest {
 
   /**
    * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#reloadCodeTypes(List)}.
-   *
    */
   @Test
   public void testReloadCodeTypes() {
@@ -186,7 +184,6 @@ public class CodeServiceTest {
 
   /**
    * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#findCodeTypeById(Object)} .
-   *
    */
   @Test
   public void testFindCodeTypeById() {
@@ -272,7 +269,6 @@ public class CodeServiceTest {
     public Long getId() {
       return ABC_ID;
     }
-
   }
 
   public static class ZyxCodeType extends AbstractCodeType<Long, String> {
@@ -283,7 +279,5 @@ public class CodeServiceTest {
     public Long getId() {
       return ZYX_ID;
     }
-
   }
-
 }

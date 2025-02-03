@@ -42,7 +42,9 @@ public class HttpServletControl implements Serializable {
 
   public static final String HTTP_HEADER_CSP = "Content-Security-Policy";
 
-  /** Legacy header for content security policy used by Internet Explorer */
+  /**
+   * Legacy header for content security policy used by Internet Explorer
+   */
   public static final String HTTP_HEADER_CSP_LEGACY = "X-Content-Security-Policy";
 
   public static final String CSP_REPORT_URL = "csp-report";
@@ -78,11 +80,11 @@ public class HttpServletControl implements Serializable {
    * This includes setting default security response headers, parsing default request attributes etc.
    *
    * @param servlet
-   *          might be {@code null}
+   *     might be {@code null}
    * @param req
-   *          must not be {@code null}
+   *     must not be {@code null}
    * @param resp
-   *          must not be {@code null}
+   *     must not be {@code null}
    */
   public void doDefaults(HttpServlet servlet, HttpServletRequest req, HttpServletResponse resp) {
     parseRequest(servlet, req, resp);

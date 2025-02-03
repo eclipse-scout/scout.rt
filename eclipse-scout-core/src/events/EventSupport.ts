@@ -98,7 +98,7 @@ export class EventSupport {
    * Adds an event handler using {@link one} and returns a promise.
    * The promise is resolved as soon as the event is triggered.
    */
-  when(type: string):JQuery.Promise<Event> {
+  when(type: string): JQuery.Promise<Event> {
     let deferred = $.Deferred();
     this.one(type, deferred.resolve.bind(deferred));
     return deferred.promise();

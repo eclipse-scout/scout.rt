@@ -24,14 +24,14 @@ public interface IResourceLoader {
 
   /**
    * @param resourcePath
-   *          may be null
+   *     may be null
    * @return the {@link HttpCacheKey} for the resourcePath or null if the resourcePath is not handled
    */
   HttpCacheKey createCacheKey(String resourcePath);
 
   /**
    * @param cacheKey
-   *          not null
+   *     not null
    * @return the {@link HttpCacheObject} for the cacheKey or null if the cacheKey is not handled
    */
   HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException;
@@ -47,11 +47,11 @@ public interface IResourceLoader {
    * Checks if the specified {@link HttpCacheObject} is a valid response for the requested resource path.
    *
    * @param requestedExternalPath
-   *          The requested path.
+   *     The requested path.
    * @param cachedObject
-   *          The response candidate to validate. May be {@code null}.
+   *     The response candidate to validate. May be {@code null}.
    * @return {@code true} if the {@link HttpCacheObject} is valid and can be processed further. {@code false} if the
-   *         candidate is not valid (e.g. because it is {@code null} or contains not the expected content).
+   * candidate is not valid (e.g. because it is {@code null} or contains not the expected content).
    */
   boolean validateResource(String requestedExternalPath, HttpCacheObject cachedObject);
 
@@ -60,7 +60,7 @@ public interface IResourceLoader {
    *
    * @param cacheKey
    * @return The {@link IHttpResourceCache} to store the {@link HttpCacheObject}s or <code>null</code> if no caching
-   *         should be supported for this {@link IResourceLoader}.
+   * should be supported for this {@link IResourceLoader}.
    */
   IHttpResourceCache getCache(HttpCacheKey cacheKey);
 }
