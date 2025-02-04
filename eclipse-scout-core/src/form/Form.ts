@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -385,16 +385,19 @@ export class Form extends Widget implements FormModel, DisplayParent {
       return $.resolvedPromise();
     }
     try {
-      return this._withBusyHandling(() => this.lifecycle.load())
-        .catch(error => {
-          return this._handleLoadErrorInternal(error);
-        });
+      return this.withBusyHandling(() => this.lifecycle.load())
+        .catch(error => this._handleLoadErrorInternal(error));
     } catch (error) {
       return this._handleLoadErrorInternal(error);
     }
   }
 
-  protected _withBusyHandling<T>(action: () => JQuery.Promise<T>): JQuery.Promise<T> {
+  /**
+   * Enables the {@link BusyIndicator} while the given action runs.
+   *
+   * @see setBusy
+   */
+  withBusyHandling<T>(action: () => JQuery.Promise<T>): JQuery.Promise<T> {
     this.setBusy(true);
     try {
       return action()
@@ -403,6 +406,13 @@ export class Form extends Widget implements FormModel, DisplayParent {
       this.setBusy(false);
       throw error;
     }
+  }
+
+  /**
+   * @deprecated use {@link withBusyHandling}.
+   */
+  protected _withBusyHandling<T>(action: () => JQuery.Promise<T>): JQuery.Promise<T> {
+    return this.withBusyHandling(action);
   }
 
   /**
@@ -555,7 +565,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   protected _onLifecycleSave(): JQuery.Promise<void> {
     try {
-      return this._withBusyHandling(() => {
+      return this.withBusyHandling(() => {
         let data = this.exportData();
         return this._save(data)
           .then(() => {
@@ -563,9 +573,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
             this.setData(data);
             this.trigger('save');
           });
-      }).catch(error => {
-        return this._handleSaveErrorInternal(error);
-      });
+      }).catch(error => this._handleSaveErrorInternal(error));
     } catch (error) {
       return this._handleSaveErrorInternal(error);
     }
