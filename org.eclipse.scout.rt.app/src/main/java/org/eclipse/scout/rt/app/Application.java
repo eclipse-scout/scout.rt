@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,8 +26,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
 import org.eclipse.jetty.http.HttpCookie.SameSite;
+import org.eclipse.jetty.http2.api.Session;
+import org.eclipse.jetty.http2.api.Stream;
+import org.eclipse.jetty.http2.api.server.ServerSessionListener;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
+import org.eclipse.jetty.io.EndPoint;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -41,6 +46,7 @@ import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationAutoCreateSelfSignedCertificateProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationCertificateAliasProperty;
@@ -180,7 +186,29 @@ public class Application {
 
   protected ServerConnector createHttpServerConnector(Server server) {
     HttpConfiguration httpConfig = createHttpConfiguration();
-    ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(httpConfig), new HTTP2CServerConnectionFactory(httpConfig));
+    ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(httpConfig), new HTTP2CServerConnectionFactory(httpConfig) {
+
+      @Override
+      protected ServerSessionListener newSessionListener(Connector connector, EndPoint endPoint) {
+        return new HTTPServerSessionListener(connector, endPoint) {
+          @Override
+          public void onFailure(Session session, Throwable failure, Callback callback) {
+            LOG.error("HTTP failure, failure", failure);
+            super.onFailure(session, failure, callback);
+          }
+
+          @Override
+          public void onFailure(Session session, Throwable failure) {
+            super.onFailure(session, failure);
+          }
+
+          @Override
+          public void onFailure(Stream stream, int error, String reason, Throwable failure, Callback callback) {
+            super.onFailure(stream, error, reason, failure, callback);
+          }
+        };
+      }
+    });
     return http;
   }
 
@@ -190,7 +218,27 @@ public class Application {
     httpsConfig.addCustomizer(new SecureRequestCustomizer());
 
     HttpConnectionFactory http11 = new HttpConnectionFactory(httpsConfig);
-    HTTP2ServerConnectionFactory http2 = new HTTP2ServerConnectionFactory(httpsConfig);
+    HTTP2ServerConnectionFactory http2 = new HTTP2ServerConnectionFactory(httpsConfig) {
+      @Override
+      protected ServerSessionListener newSessionListener(Connector connector, EndPoint endPoint) {
+        return new HTTPServerSessionListener(connector, endPoint) {
+          @Override
+          public void onFailure(Session session, Throwable failure, Callback callback) {
+            super.onFailure(session, failure, callback);
+          }
+
+          @Override
+          public void onFailure(Session session, Throwable failure) {
+            super.onFailure(session, failure);
+          }
+
+          @Override
+          public void onFailure(Stream stream, int error, String reason, Throwable failure, Callback callback) {
+            super.onFailure(stream, error, reason, failure, callback);
+          }
+        };
+      }
+    };
 
     ALPNServerConnectionFactory alpn = new ALPNServerConnectionFactory();
     alpn.setDefaultProtocol(http11.getProtocol());
