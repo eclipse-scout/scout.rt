@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -129,7 +129,7 @@ public class TrivialAccessController implements IAccessController {
     }
 
     // Is request path excluded from authentication?
-    if (m_config.getPathInfoFilter().accepts(StringUtility.emptyIfNull(request.getServletPath()) + StringUtility.emptyIfNull(request.getPathInfo()))) {
+    if (m_config.getExclusionFilter().accepts(StringUtility.emptyIfNull(request.getServletPath()) + StringUtility.emptyIfNull(request.getPathInfo()))) {
       chain.doFilter(request, response);
       return true;
     }
@@ -209,7 +209,15 @@ public class TrivialAccessController implements IAccessController {
       return this;
     }
 
+    /**
+     * @deprecated use {@link #getExclusionFilter()}
+     */
+    @Deprecated
     public PathInfoFilter getPathInfoFilter() {
+      return getExclusionFilter();
+    }
+
+    public PathInfoFilter getExclusionFilter() {
       return m_exclusionFilter;
     }
 
