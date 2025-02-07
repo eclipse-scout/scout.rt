@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -273,8 +273,9 @@ export class Planner extends Widget implements PlannerModel {
   }
 
   protected _navigateDate(direction: PlannerDirection) {
-    let viewRange = new DateRange(this.viewRange.from, this.viewRange.to),
-      displayMode = Planner.DisplayMode;
+    let viewRange = new DateRange(this.viewRange.from, this.viewRange.to);
+    let displayMode = Planner.DisplayMode;
+    let daysDiff = dates.compareDays(this.viewRange.to, this.viewRange.from);
 
     if (this.displayMode === displayMode.DAY) {
       viewRange.from = dates.shift(this.viewRange.from, 0, 0, direction);
@@ -282,11 +283,11 @@ export class Planner extends Widget implements PlannerModel {
     } else if (scout.isOneOf(this.displayMode, displayMode.WEEK, displayMode.WORK_WEEK)) {
       viewRange.from = dates.shift(this.viewRange.from, 0, 0, direction * 7);
       viewRange.from = dates.ensureMonday(viewRange.from, -1 * direction);
-      viewRange.to = dates.shift(this.viewRange.to, 0, 0, direction * 7);
+      viewRange.to = dates.shift(viewRange.from, 0, 0, daysDiff);
     } else if (scout.isOneOf(this.displayMode, displayMode.MONTH, displayMode.CALENDAR_WEEK)) {
       viewRange.from = dates.shift(this.viewRange.from, 0, direction, 0);
       viewRange.from = dates.ensureMonday(viewRange.from, -1 * direction);
-      viewRange.to = dates.shift(this.viewRange.to, 0, direction, 0);
+      viewRange.to = dates.shift(viewRange.from, 0, 0, daysDiff);
     } else if (this.displayMode === displayMode.YEAR) {
       viewRange.from = dates.shift(this.viewRange.from, 0, 3 * direction, 0);
       viewRange.to = dates.shift(this.viewRange.to, 0, 3 * direction, 0);
@@ -415,7 +416,10 @@ export class Planner extends Widget implements PlannerModel {
     this._reconcileScrollPos();
   }
 
-  protected _reconcileScrollPos() {
+  /**
+   * @internal
+   */
+  _reconcileScrollPos() {
     // When scrolling horizontally scroll scale as well
     let scrollLeft = this.$grid.scrollLeft();
     this.$scale.scrollLeft(scrollLeft);
@@ -1410,11 +1414,11 @@ export class Planner extends Widget implements PlannerModel {
   }
 
   protected _renderAvailableDisplayModes() {
-    // done by PlannerHeader.js
+    // done by PlannerHeader.ts
   }
 
   protected _renderDisplayMode() {
-    // done by PlannerHeader.js
+    // done by PlannerHeader.ts
   }
 
   protected _setViewRange(viewRange: DateRange | JsonDateRange) {

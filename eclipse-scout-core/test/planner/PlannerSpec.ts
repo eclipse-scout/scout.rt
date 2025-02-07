@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,9 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DateRange, dates, ObjectFactory, Planner, PlannerActivity, PlannerModel, PlannerResourceModel, Widget} from '../../src/index';
-import {ObjectType} from '../../src/ObjectFactory';
-import {PlannerResource} from '../../src/planner/Planner';
+import {DateRange, dates, ObjectFactory, Planner, PlannerActivity, PlannerDirection, PlannerResource, PlannerResourceModel} from '../../src/index';
 import {InitModelOf} from '../../src/scout';
 
 describe('Planner', () => {
@@ -36,10 +34,14 @@ describe('Planner', () => {
     override _dateFormat(date: Date, pattern: string): string {
       return super._dateFormat(date, pattern);
     }
+
+    override _navigateDate(direction: PlannerDirection) {
+      super._navigateDate(direction);
+    }
   }
 
-  function createPlannerModel(numResources): PlannerModel & { id: string; objectType: ObjectType<Planner>; parent: Widget; session: SandboxSession } {
-    let model = createSimpleModel('Planner', session) as PlannerModel & { id: string; objectType: ObjectType<Planner>; parent: Widget; session: SandboxSession };
+  function createPlannerModel(numResources = 0): InitModelOf<Planner> {
+    let model = createSimpleModel('Planner', session) as InitModelOf<Planner>;
     model.resources = [];
     for (let i = 0; i < numResources; i++) {
       model.resources[i] = createResource('resource' + i);
@@ -80,7 +82,7 @@ describe('Planner', () => {
   }
 
   describe('deleteResources', () => {
-    let model: PlannerModel & { id: string; objectType: ObjectType<Planner>; parent: Widget; session: SandboxSession };
+    let model: InitModelOf<Planner>;
     let planner: SpecPlanner;
     let resource0: PlannerResource;
     let resource1: PlannerResource;
@@ -139,7 +141,7 @@ describe('Planner', () => {
   });
 
   describe('updateResources', () => {
-    let model: PlannerModel & { id: string; objectType: ObjectType<Planner>; parent: Widget; session: SandboxSession };
+    let model: InitModelOf<Planner>;
     let planner: SpecPlanner;
     let resource0: PlannerResource;
     let resource1: PlannerResource;
@@ -204,7 +206,7 @@ describe('Planner', () => {
   });
 
   describe('renderScale', () => {
-    let model: PlannerModel & { id: string; objectType: ObjectType<Planner>; parent: Widget; session: SandboxSession };
+    let model: InitModelOf<Planner>;
     let planner: SpecPlanner;
 
     beforeEach(() => {
@@ -817,6 +819,56 @@ describe('Planner', () => {
         expect(planner.viewRange.from.toISOString()).toBe(dates.create('2021-03-22').toISOString()); // Monday (today will use first day of week)
         expect(planner.viewRange.to.toISOString()).toBe(dates.create('2021-04-03').toISOString());
       });
+    });
+  });
+
+  describe('_navigateDate', () => {
+    it('does not produce invalid view ranges for week and work_week', () => {
+      let planner = createPlanner(createPlannerModel());
+      planner.setDisplayMode(Planner.DisplayMode.WEEK);
+      assert();
+
+      planner.setDisplayMode(Planner.DisplayMode.WORK_WEEK);
+      assert();
+
+      function assert() {
+        planner.setViewRange(new DateRange(new Date('2017-08-12'), new Date('2017-08-13')));
+        expect(planner.viewRange.from.toISOString()).toBe(new Date('2017-08-12').toISOString()); // Saturday
+        expect(planner.viewRange.to.toISOString()).toBe(new Date('2017-08-13').toISOString());
+
+        planner._navigateDate(Planner.Direction.BACKWARD);
+        expect(planner.viewRange.from.toISOString()).toBe(new Date('2017-08-07').toISOString()); // Monday (only 5 days back, not 7)
+        expect(planner.viewRange.to.toISOString()).toBe(new Date('2017-08-08').toISOString()); // Needs to be 5 days back as well -> keep distance to from date
+
+        planner.setViewRange(new DateRange(new Date('2017-08-12'), new Date('2017-08-13'))); // Back to Saturday
+        planner._navigateDate(Planner.Direction.FORWARD);
+        expect(planner.viewRange.from.toISOString()).toBe(new Date('2017-08-14').toISOString()); // Monday
+        expect(planner.viewRange.to.toISOString()).toBe(new Date('2017-08-15').toISOString());
+      }
+    });
+
+    it('does not produce invalid view ranges for month and calendar_week', () => {
+      let planner = createPlanner(createPlannerModel());
+      planner.setDisplayMode(Planner.DisplayMode.MONTH);
+      assert();
+
+      planner.setDisplayMode(Planner.DisplayMode.CALENDAR_WEEK);
+      assert();
+
+      function assert() {
+        planner.setViewRange(new DateRange(new Date('2017-08-12'), new Date('2017-08-13')));
+        expect(planner.viewRange.from.toISOString()).toBe(new Date('2017-08-12').toISOString()); // Saturday
+        expect(planner.viewRange.to.toISOString()).toBe(new Date('2017-08-13').toISOString());
+
+        planner._navigateDate(Planner.Direction.BACKWARD);
+        expect(planner.viewRange.from.toISOString()).toBe(new Date('2017-07-17').toISOString()); // Monday
+        expect(planner.viewRange.to.toISOString()).toBe(new Date('2017-07-18').toISOString());
+
+        planner.setViewRange(new DateRange(new Date('2017-08-12'), new Date('2017-08-13'))); // Back to Saturday
+        planner._navigateDate(Planner.Direction.FORWARD);
+        expect(planner.viewRange.from.toISOString()).toBe(new Date('2017-09-11').toISOString()); // Monday
+        expect(planner.viewRange.to.toISOString()).toBe(new Date('2017-09-12').toISOString());
+      }
     });
   });
 });

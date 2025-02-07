@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -66,6 +66,8 @@ export class PlannerLayout extends AbstractLayout {
     this._layoutScaleLines();
     // immediate update to prevent flickering, due to reset in layoutScaleLines
     scrollbars.update(this.planner.$grid, true);
+    // If scroll position did not change planner._onGridScroll is not called -> ensure scrollLeft of $scale is correct
+    this.planner._reconcileScrollPos();
     this.planner.layoutYearPanel();
   }
 
@@ -91,17 +93,15 @@ export class PlannerLayout extends AbstractLayout {
    * Positions the scale lines and set to correct height
    */
   protected _layoutScaleLines() {
-    let height, $smallScaleItems, $largeScaleItems, scrollLeft,
-      $timelineSmall = this.planner.$timelineSmall,
-      $timelineLarge = this.planner.$timelineLarge;
-
+    let $timelineSmall = this.planner.$timelineSmall;
     if (!$timelineSmall) {
       // May be null if no view range is rendered
       return;
     }
 
-    $smallScaleItems = $timelineSmall.children('.scale-item');
-    $largeScaleItems = $timelineLarge.children('.scale-item');
+    let $timelineLarge = this.planner.$timelineLarge;
+    let $smallScaleItems = $timelineSmall.children('.scale-item');
+    let $largeScaleItems = $timelineLarge.children('.scale-item');
 
     // First loop through every item and set height to 0 in order to get the correct scrollHeight
     $largeScaleItems.each(function() {
@@ -118,8 +118,8 @@ export class PlannerLayout extends AbstractLayout {
     scrollbars.reset(this.planner.$grid);
 
     // Loop again and update height and left
-    height = this.planner.$grid[0].scrollHeight;
-    scrollLeft = this.planner.$scale[0].scrollLeft;
+    let height = this.planner.$grid[0].scrollHeight;
+    let scrollLeft = this.planner.$scale[0].scrollLeft;
     $largeScaleItems.each(function() {
       let $scaleItem = $(this),
         $scaleItemLine = $scaleItem.data('scale-item-line');
