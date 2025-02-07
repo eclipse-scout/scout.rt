@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -44,6 +44,9 @@
     position: relative;
     white-space: nowrap;
     padding: 0 0 0 5px;
+    // Ensure texts of scale items next to each other don't overlap
+    // overflow-y needs to be visible for scale-item-lines
+    overflow-x: clip;
 
     &.label-invisible {
       color: transparent;
