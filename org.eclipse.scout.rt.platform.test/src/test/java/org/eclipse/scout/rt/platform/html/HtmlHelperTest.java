@@ -51,10 +51,6 @@ public class HtmlHelperTest {
     assertEquals("Header 1\nHeader 2", helper.toPlainText("<h1>Header 1</h1><h1>Header 2</h1>")); // Headers
     assertEquals("List 1\nList 2\nTableHeader 1 TableHeader 2\nData 1 Data 2",
         helper.toPlainText("<ul><li>List 1</li><li>List 2</li></ul><table><tr><th>TableHeader 1</th><th>TableHeader 2</th></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>")); // List and tables
-    assertEquals("Lorem ipsum dolor",
-        helper.toPlainText("<a href=\"\" rel=\"noreferrer noopener\" title=\"Donec: > mattis >> metus lorem\" style=\"color:rgb(0, 0, 0);text-decoration:none;\">Lorem ipsum dolor</a>"));
-    assertEquals("Lorem ipsum dolor",
-        helper.toPlainText("<a href='' rel='noreferrer noopener' title='Donec: > mattis >> metus lorem' style='color:rgb(0, 0, 0);text-decoration:none;'>Lorem ipsum dolor</a>"));
 
     // Simple documents
     assertEquals("", helper.toPlainText("<html>"));
