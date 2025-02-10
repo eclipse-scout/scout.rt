@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -282,9 +282,11 @@ export class TileGridLayout extends LogicalGridLayout {
       width: bounds.width,
       height: bounds.height
     };
+    tile.$container.addClass('animating-bounds');
     let promise = tile.$container.cssAnimated(fromValues, toValues).promise();
     // Note: the always() callback is executed synchronously after the animation is done, regardless of whether it has been completed or aborted
     promise.always(restoreOverflowStyle);
+    promise.always(() => elem.classList.remove('animating-bounds'));
 
     return promise;
   }
