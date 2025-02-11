@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Form, FormAdapter, HybridActionContextElements, HybridManager, HybridManagerAdapter, LabelField, scout, StringField, Tree, TreeAdapter, TreeNode, UuidPool, Widget} from '../../../src';
+import {Form, FormAdapter, HybridActionContextElements, HybridManager, HybridManagerAdapter, LabelField, NumberField, scout, StringField, Tree, TreeAdapter, TreeNode, UuidPool, Widget} from '../../../src';
 import {FormSpecHelper, TreeSpecHelper} from '../../../src/testing';
 
 describe('HybridManager', () => {
@@ -33,9 +33,8 @@ describe('HybridManager', () => {
   });
 
   describe('widgets', () => {
+
     it('destroys removed widgets if hybrid manager is the owner', () => {
-      UuidPool.get(session).uuids.push('123');
-      UuidPool.get(session).uuids.push('234');
       let hybridManager = HybridManager.get(session);
       expect(Object.entries(hybridManager.widgets).length).toBe(0);
 
@@ -85,6 +84,119 @@ describe('HybridManager', () => {
       expect(Object.entries(hybridManager.widgets).length).toBe(1);
       expect(labelField.destroyed).toBe(true);
       expect(stringField.destroyed).toBe(false);
+    });
+
+    it('handles added, removed and changed widgets correctly', async () => {
+      const hybridManager = HybridManager.get(session);
+      expect(Object.entries(hybridManager.widgets).length).toBe(0);
+
+      // add LabelField
+      const labelFieldPromise = hybridManager.when('widgetAdd:1').then(event => event.widget);
+      session._processSuccessResponse({
+        adapterData: mapAdapterData([{
+          id: 'labelField',
+          objectType: 'LabelField'
+        }]),
+        events: [
+          {
+            target: hybridManager.id,
+            type: 'property',
+            properties: {
+              widgets: {
+                1: 'labelField'
+              }
+            }
+          }
+        ]
+      });
+
+      // LabelField is the only widget of the HybridManager
+      const labelField = await labelFieldPromise;
+      expect(Object.entries(hybridManager.widgets).length).toBe(1);
+      expect(labelField).toBeInstanceOf(LabelField);
+      expect(labelField.destroyed).toBeFalse();
+
+      // add StringField
+      const stringFieldPromise = hybridManager.when('widgetAdd:2').then(event => event.widget);
+      session._processSuccessResponse({
+        adapterData: mapAdapterData([{
+          id: 'stringField',
+          objectType: 'StringField'
+        }]),
+        events: [
+          {
+            target: hybridManager.id,
+            type: 'property',
+            properties: {
+              widgets: {
+                1: 'labelField',
+                2: 'stringField'
+              }
+            }
+          }
+        ]
+      });
+
+      // HybridManager contains StringField and LabelField that was created earlier
+      const stringField = await stringFieldPromise;
+      expect(Object.entries(hybridManager.widgets).length).toBe(2);
+      expect(labelField.destroyed).toBeFalse();
+      expect(stringField).toBeInstanceOf(StringField);
+      expect(stringField.destroyed).toBeFalse();
+
+      // replace LabelField by NumberField
+      const numberFieldPromise = hybridManager.when('widgetAdd:1').then(event => event.widget);
+      const labelFieldRemovePromise = hybridManager.when('widgetRemove:1').then(event => event.widget);
+      session._processSuccessResponse({
+        adapterData: mapAdapterData([{
+          id: 'numberField',
+          objectType: 'NumberField'
+        }]),
+        events: [
+          {
+            target: hybridManager.id,
+            type: 'property',
+            properties: {
+              widgets: {
+                1: 'numberField',
+                2: 'stringField'
+              }
+            }
+          }
+        ]
+      });
+
+      // HybridManager contains StringField and NumberField, LabelField that was created earlier is destroyed
+      const numberField = await numberFieldPromise;
+      expect(await labelFieldRemovePromise).toBe(labelField);
+      expect(Object.entries(hybridManager.widgets).length).toBe(2);
+      expect(labelField.destroyed).toBeTrue();
+      expect(stringField.destroyed).toBeFalse();
+      expect(numberField).toBeInstanceOf(NumberField);
+      expect(numberField.destroyed).toBeFalse();
+
+      // remove StringField
+      const stringFieldRemovePromise = hybridManager.when('widgetRemove:2').then(event => event.widget);
+      session._processSuccessResponse({
+        events: [
+          {
+            target: hybridManager.id,
+            type: 'property',
+            properties: {
+              widgets: {
+                1: 'numberField'
+              }
+            }
+          }
+        ]
+      });
+
+      // NumberField is the only widget of the HybridManager, all other fields that where created earlier are destroyed
+      expect(await stringFieldRemovePromise).toBe(stringField);
+      expect(Object.entries(hybridManager.widgets).length).toBe(1);
+      expect(labelField.destroyed).toBeTrue();
+      expect(stringField.destroyed).toBeTrue();
+      expect(numberField.destroyed).toBeFalse();
     });
   });
 

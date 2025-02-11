@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -62,13 +62,13 @@ export class HybridManager extends Widget {
 
     const removedWidgets: Record<string, Widget> = {};
     for (const [id, widget] of Object.entries(this.widgets)) {
-      if (!widgets[id]) {
+      if (!widgets[id] || widgets[id] !== widget) {
         removedWidgets[id] = widget;
       }
     }
     const addedWidgets: Record<string, Widget> = {};
     for (const [id, widget] of Object.entries(widgets as Record<string, Widget>)) {
-      if (!this.widgets[id]) {
+      if (!this.widgets[id] || this.widgets[id] !== widget) {
         addedWidgets[id] = widget;
       }
     }
