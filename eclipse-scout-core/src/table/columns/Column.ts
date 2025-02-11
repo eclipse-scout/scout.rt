@@ -108,7 +108,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     this.primaryKey = false;
     this.mandatory = false;
     this.optimalWidthMeasurer = new ColumnOptimalWidthMeasurer(this);
-    this.sortActive = false;
+    this.sortActive = null;
     this.sortAscending = true;
     this.sortIndex = -1;
     this.summary = false;
@@ -161,6 +161,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     icons.resolveIconProperty(this, 'headerIconId');
     this._setTable(this.table);
     this._setAutoOptimizeWidth(this.autoOptimizeWidth);
+    this.sortActive = scout.nvl(this.sortActive, this.sortIndex >= 0);
     // no need to call setEditable here. cell propagation is done in _initCell
   }
 

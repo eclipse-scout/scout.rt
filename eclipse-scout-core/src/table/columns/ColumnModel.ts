@@ -202,7 +202,7 @@ export interface ColumnModel<TValue = string> extends ObjectModel<Column<TValue>
   /**
    * Configures whether the table should consider this column for sorting.
    *
-   * Default is false.
+   * Default is true if {@link sortIndex} is >= 0, otherwise it is false.
    */
   sortActive?: boolean;
 
