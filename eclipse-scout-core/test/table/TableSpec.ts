@@ -1351,6 +1351,29 @@ describe('Table', () => {
       $header2 = $colHeaders.eq(2);
     }
 
+    it('applies initial sort spec from model', () => {
+      model = helper.createModelFixture(3, 3);
+      model.columns[0].sortIndex = 0;
+      model.columns[0].sortAscending = false;
+      model.columns[1].sortActive = false;
+      model.columns[1].sortIndex = 1;
+      table = helper.createTable(model);
+      column0 = table.columns[0];
+      column1 = table.columns[1];
+
+      render(table);
+
+      expect(column0.sortActive).toBe(true);
+      expect(column0.sortAscending).toBe(false);
+      expect(column0.sortIndex).toBe(0);
+
+      expect(column1.sortActive).toBe(false);
+      expect(column1.sortAscending).toBe(true);
+      expect(column1.sortIndex).toBe(1);
+
+      expect(table.rows.map(r => column0.cell(r).value)).toEqual(['cell2_0', 'cell1_0', 'cell0_0']);
+    });
+
     it('updates column model', () => {
       prepareTable();
       render(table);
