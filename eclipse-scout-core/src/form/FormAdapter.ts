@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,6 +43,10 @@ export class FormAdapter extends ModelAdapter {
   }
 
   protected _onWidgetClose(event: Event<Form>) {
+    // Don't let the form be destroyed, only the server is allowed to do it.
+    event.preventDefault();
+    // Close the form on the UI server.
+    // It will send a disposeAdapter and formHide event back to eventually destroy and remove the form.
     this._send('close');
   }
 
