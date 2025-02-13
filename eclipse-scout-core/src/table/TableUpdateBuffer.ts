@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, ObjectOrModel, objects, Table, TableRow} from '../index';
+import {App, arrays, ObjectOrModel, objects, Table, TableRow} from '../index';
 
 export class TableUpdateBuffer {
   promises: JQuery.Promise<any>[];
@@ -31,14 +31,14 @@ export class TableUpdateBuffer {
     this.table._renderViewportBlocked = true;
     this.table.setLoading(true);
 
-    let handler = function() {
+    let handler = () => {
       arrays.remove(this.promises, promise);
 
       // process immediately when all promises have resolved
       if (this.promises.length === 0) {
         this.process();
       }
-    }.bind(this);
+    };
     // Use then instead of always to ensure it is always executed asynchronous, even for null values
     promise.then(handler, handler);
   }
@@ -64,13 +64,20 @@ export class TableUpdateBuffer {
       return;
     }
 
-    let rows = objects.values(this._rowMap);
-    this.table.updateRows(rows);
-    this._rowMap = {};
+    try {
+      let rows = objects.values(this._rowMap)
+        .filter(row => this.table.hasRow(row)); // ignore old buffered rows that have been removed in the meantime
+      this.table.updateRows(rows);
+    } catch (err: any) {
+      App.get().errorHandler.handle(err); // otherwise error is ignored
+      throw err; // let the promise fail
+    } finally {
+      this._rowMap = {};
+      this.table.setLoading(false);
+      this.table._renderViewportBlocked = false;
+    }
 
     // Update the viewport as well if rendering was blocked
-    this.table.setLoading(false);
-    this.table._renderViewportBlocked = false;
     if (this.table._isDataRendered()) {
       this.table._renderViewport();
     }
