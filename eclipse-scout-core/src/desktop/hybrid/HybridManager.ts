@@ -120,7 +120,7 @@ export class HybridManager extends Widget {
     widget.trigger(eventType, {data});
   }
 
-  protected _onHybridFormEvent(form: Form, eventType: string, data: object) {
+  protected _onHybridFormEvent(form: HybridForm, eventType: string, data: object) {
     if (eventType === 'reset') {
       form.setData(data);
       form.trigger('reset');
@@ -128,7 +128,9 @@ export class HybridManager extends Widget {
       form.setData(data);
       form.trigger('save');
     } else if (eventType === 'close') {
-      form.trigger('close');
+      if (!form.__closeTriggered) { // form.close() may be called by JS code, don't trigger close again
+        form.trigger('close');
+      }
     } else {
       this._onHybridWidgetEvent(form, eventType, data);
     }
@@ -187,7 +189,7 @@ export class HybridManager extends Widget {
    */
   openForm(modelVariant: string, data?: object): JQuery.Promise<Form> {
     const id = this.callAction(`openForm:${modelVariant}`, data);
-    return this.when(`widgetAdd:${id}`).then(event => event.widget as Form);
+    return this.when(`widgetAdd:${id}`).then(event => this._onFormAdd(event.widget as Form));
   }
 
   /**
@@ -199,7 +201,14 @@ export class HybridManager extends Widget {
    */
   createForm(modelVariant: string, data?: object): JQuery.Promise<Form> {
     const id = this.callAction(`createForm:${modelVariant}`, data);
-    return this.when(`widgetAdd:${id}`).then(event => event.widget as Form);
+    return this.when(`widgetAdd:${id}`).then(event => this._onFormAdd(event.widget as Form));
+  }
+
+  protected _onFormAdd(form: HybridForm) {
+    form.one('close', () => {
+      form.__closeTriggered = true;
+    });
+    return form;
   }
 
   // event support
@@ -219,4 +228,11 @@ export class HybridManager extends Widget {
   override when<K extends string & keyof EventMapOf<this['self']>>(type: K | `${K}:${string}`): JQuery.Promise<EventMapOf<this>[K] & Event<this>> {
     return super.when(type as K);
   }
+}
+
+interface HybridForm extends Form {
+  /**
+   * @returns true if {@link FormEventMap.close} event was triggered at least once for this form.
+   */
+  __closeTriggered?: boolean;
 }
