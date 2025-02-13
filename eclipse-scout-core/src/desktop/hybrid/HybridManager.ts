@@ -129,7 +129,9 @@ export class HybridManager extends Widget {
       form.setData(data);
       form.trigger('save');
     } else if (eventType === 'close') {
-      form.trigger('close');
+      if (!form['__closeTriggered']) { // form.close() may be called by JS code, don't trigger close again
+        form.trigger('close');
+      }
     } else {
       this._onHybridWidgetEvent(form, eventType, data);
     }
@@ -192,7 +194,7 @@ export class HybridManager extends Widget {
    */
   openForm(modelVariant: string, data?: object): JQuery.Promise<Form> {
     const id = this.callAction(`openForm:${modelVariant}`, data);
-    return this.when(`widgetAdd:${id}`).then(event => event.widget as Form);
+    return this.when(`widgetAdd:${id}`).then(event => this._onFormAdd(event.widget as Form));
   }
 
   /**
@@ -204,7 +206,14 @@ export class HybridManager extends Widget {
    */
   createForm(modelVariant: string, data?: object): JQuery.Promise<Form> {
     const id = this.callAction(`createForm:${modelVariant}`, data);
-    return this.when(`widgetAdd:${id}`).then(event => event.widget as Form);
+    return this.when(`widgetAdd:${id}`).then(event => this._onFormAdd(event.widget as Form));
+  }
+
+  protected _onFormAdd(form: Form) {
+    form.one('close', () => {
+      form['__closeTriggered'] = true;
+    });
+    return form;
   }
 
   // event support
