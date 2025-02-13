@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -96,14 +96,6 @@ export class JsFormAdapter extends FormAdapter {
     this._send(type, {
       outputData: data
     });
-  }
-
-  protected override _onWidgetClose(event: Event<Form>) {
-    // marks the end of the js lifecycle
-    // prevent remove/destroy of the widget as it will be done by the UI server
-    event.preventDefault();
-    // fromClosing will trigger a 'formHide' event on the desktop which then removes the widget
-    this._send('formClosing');
   }
 
   protected override _onWidgetAbort(event: Event<Form>) {
