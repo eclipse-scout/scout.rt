@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -3045,11 +3045,11 @@ export class Table extends Widget implements TableModel {
     let updatedRows = rows.map(rowOrModel => {
       let parentRowId: any = rowOrModel.parentRow;
       let oldRow = this.rowsMap[rowOrModel.id];
-      // collect old rows
-      oldRowsMap[rowOrModel.id] = oldRow;
       if (!oldRow) {
         throw new Error('Update event received for non existing row. RowId: ' + rowOrModel.id);
       }
+      // collect old rows
+      oldRowsMap[rowOrModel.id] = oldRow;
       // check structure changes
       if (rowOrModel.parentRow) {
         if (typeof rowOrModel.parentRow === 'string') {
@@ -3418,8 +3418,8 @@ export class Table extends Widget implements TableModel {
   /**
    * Checks whether the given row is contained in the table. Uses the id of the row for the lookup.
    */
-  hasRow(row: TableRow): boolean {
-    return Boolean(this.rowsMap[row.id]);
+  hasRow(row: ObjectOrModel<TableRow>): boolean {
+    return Boolean(this.rowsMap[row?.id]);
   }
 
   /**
