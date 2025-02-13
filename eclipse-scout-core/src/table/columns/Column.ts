@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -668,9 +668,10 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     cell.setText(text);
 
     // Don't update row while initializing (it is either added to the table later, or being added / updated right now)
-    // The check for "this.table" is necessary, because the column could already have been destroyed (method is called
-    // asynchronously by setCellTextDeferred).
-    if (row.initialized && this.table) {
+    // The null check for "this.table" is necessary, because the column could already have been destroyed (method is called asynchronously by setCellTextDeferred).
+    // The check for "hasRow" is necessary, because the row could already have been removed (in case this method is called asynchronously e.g. by setCellTextDeferred).
+    // In this case the table will be buffering but there is no need to buffer row updates for already removed rows.
+    if (row.initialized && this.table?.hasRow(row)) {
       this.table.updateRow(row);
     }
   }
