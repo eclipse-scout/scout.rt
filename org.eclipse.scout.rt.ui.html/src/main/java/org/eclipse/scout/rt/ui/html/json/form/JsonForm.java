@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -349,12 +349,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
   }
 
   public void handleUiClose(JsonEvent event) {
-    // Dispose the form adapter. This prevents "formHide" and "disposeAdapter" events
-    // to be sent back to the UI. Because the "close" event is only sent when the form
-    // is already destroyed in the UI, those events would cause errors in the UI.
-    dispose();
-    // Close the form in the model, without possibility of a veto. This will not
-    // generate any UI events, because the JsonForm adapter is already disposed.
+    // Close the form in the model, without possibility of a veto
     getModel().getUIFacade().fireFormKilledFromUI();
   }
 

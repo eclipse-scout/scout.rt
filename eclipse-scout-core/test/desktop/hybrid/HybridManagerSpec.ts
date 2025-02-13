@@ -46,18 +46,12 @@ describe('HybridManager', () => {
           id: '222',
           objectType: 'StringField'
         }]),
-        events: [
-          {
-            target: hybridManager.id,
-            type: 'property',
-            properties: {
-              widgets: {
-                123: '111',
-                234: '222'
-              }
-            }
+        events: [createPropertyChangeEvent(hybridManager, {
+          widgets: {
+            123: '111',
+            234: '222'
           }
-        ]
+        })]
       });
       let labelField = hybridManager.widgets['123'] as Widget;
       let stringField = hybridManager.widgets['234'] as Widget;
@@ -69,17 +63,11 @@ describe('HybridManager', () => {
 
       // Widget '111' is not in the list anymore -> it needs to be destroyed
       session._processSuccessResponse({
-        events: [
-          {
-            target: hybridManager.id,
-            type: 'property',
-            properties: {
-              widgets: {
-                234: '222'
-              }
-            }
+        events: [createPropertyChangeEvent(hybridManager, {
+          widgets: {
+            234: '222'
           }
-        ]
+        })]
       });
       expect(Object.entries(hybridManager.widgets).length).toBe(1);
       expect(labelField.destroyed).toBe(true);
@@ -97,17 +85,11 @@ describe('HybridManager', () => {
           id: 'labelField',
           objectType: 'LabelField'
         }]),
-        events: [
-          {
-            target: hybridManager.id,
-            type: 'property',
-            properties: {
-              widgets: {
-                1: 'labelField'
-              }
-            }
+        events: [createPropertyChangeEvent(hybridManager, {
+          widgets: {
+            1: 'labelField'
           }
-        ]
+        })]
       });
 
       // LabelField is the only widget of the HybridManager
@@ -123,18 +105,12 @@ describe('HybridManager', () => {
           id: 'stringField',
           objectType: 'StringField'
         }]),
-        events: [
-          {
-            target: hybridManager.id,
-            type: 'property',
-            properties: {
-              widgets: {
-                1: 'labelField',
-                2: 'stringField'
-              }
-            }
+        events: [createPropertyChangeEvent(hybridManager, {
+          widgets: {
+            1: 'labelField',
+            2: 'stringField'
           }
-        ]
+        })]
       });
 
       // HybridManager contains StringField and LabelField that was created earlier
@@ -152,18 +128,12 @@ describe('HybridManager', () => {
           id: 'numberField',
           objectType: 'NumberField'
         }]),
-        events: [
-          {
-            target: hybridManager.id,
-            type: 'property',
-            properties: {
-              widgets: {
-                1: 'numberField',
-                2: 'stringField'
-              }
-            }
+        events: [createPropertyChangeEvent(hybridManager, {
+          widgets: {
+            1: 'numberField',
+            2: 'stringField'
           }
-        ]
+        })]
       });
 
       // HybridManager contains StringField and NumberField, LabelField that was created earlier is destroyed
@@ -178,17 +148,11 @@ describe('HybridManager', () => {
       // remove StringField
       const stringFieldRemovePromise = hybridManager.when('widgetRemove:2').then(event => event.widget);
       session._processSuccessResponse({
-        events: [
-          {
-            target: hybridManager.id,
-            type: 'property',
-            properties: {
-              widgets: {
-                1: 'numberField'
-              }
-            }
+        events: [createPropertyChangeEvent(hybridManager, {
+          widgets: {
+            1: 'numberField'
           }
-        ]
+        })]
       });
 
       // NumberField is the only widget of the HybridManager, all other fields that where created earlier are destroyed
@@ -237,17 +201,43 @@ describe('HybridManager', () => {
       });
       const form = formHelper.createFormWithOneField();
       session._processSuccessResponse({
-        events: [
-          {
-            target: HybridManager.get(session).id,
-            type: 'property',
-            properties: {
-              widgets: {
-                42: form
-              }
-            }
+        events: [createPropertyChangeEvent(HybridManager.get(session), {
+          widgets: {
+            42: form
           }
-        ]
+        })]
+      });
+    });
+  });
+
+  describe('form close event', () => {
+    it('is not triggered when close() was initiated by JS', done => {
+      const id = '42';
+      UuidPool.get(session).uuids.push(id);
+      HybridManager.get(session).openForm('Dummy').then(form => {
+        let closeCount = 0;
+        form.on('close', () => closeCount++);
+        form.close();
+        session._processSuccessResponse({
+          events: [
+            {
+              target: HybridManager.get(session).id,
+              type: 'hybridWidgetEvent',
+              id,
+              eventType: 'close'
+            }
+          ]
+        });
+        expect(closeCount).toBe(1);
+        done();
+      });
+      const form = formHelper.createFormWithOneField();
+      session._processSuccessResponse({
+        events: [createPropertyChangeEvent(HybridManager.get(session), {
+          widgets: {
+            42: form
+          }
+        })]
       });
     });
   });
