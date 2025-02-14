@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,12 +15,13 @@ export class FormTableControl extends TableControl implements FormTableControlMo
   declare self: FormTableControl;
 
   form: Form;
-  protected _formDestroyedHandler: EventHandler<Event<Form>>;
+  protected _formDestroyHandler: EventHandler<Event<Form>>;
 
   constructor() {
     super();
     this._addWidgetProperties('form');
-    this._formDestroyedHandler = this._onFormDestroyed.bind(this);
+    this._formDestroyHandler = this._onFormDestroy.bind(this);
+    this.childDestroyer = Form.destroyChildForm.bind(this);
   }
 
   protected override _init(model: InitModelOf<this>) {
@@ -75,10 +76,10 @@ export class FormTableControl extends TableControl implements FormTableControlMo
 
   protected _setForm(form: Form) {
     if (this.form) {
-      this.form.off('destroy', this._formDestroyedHandler);
+      this.form.off('destroy', this._formDestroyHandler);
     }
     if (form) {
-      form.on('destroy', this._formDestroyedHandler);
+      form.one('destroy', this._formDestroyHandler);
       this._adaptForm(form);
     }
     this._setProperty('form', form);
@@ -91,6 +92,7 @@ export class FormTableControl extends TableControl implements FormTableControlMo
     form.setClosable(false);
     form.setAskIfNeedSave(false);
     form.rootGroupBox?.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
+    form.setOwner(this); // TODO CGU See comment in Page.ts
   }
 
   override onControlContainerOpened() {
@@ -100,7 +102,7 @@ export class FormTableControl extends TableControl implements FormTableControlMo
     this.form.renderInitialFocus();
   }
 
-  protected _onFormDestroyed(event: Event<Form>) {
+  protected _onFormDestroy(event: Event<Form>) {
     // Called when the inner form is destroyed --> unlink it from this table control
     this._removeForm();
     this._setForm(null);

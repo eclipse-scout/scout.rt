@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,6 +25,7 @@ export class WrappedFormField extends FormField implements WrappedFormFieldModel
     this.innerForm = null;
     this.initialFocusEnabled = false;
     this._formDestroyHandler = this._onInnerFormDestroy.bind(this);
+    this.childDestroyer = Form.destroyChildForm.bind(this);
   }
 
   protected override _init(model: InitModelOf<this>) {
@@ -52,7 +53,7 @@ export class WrappedFormField extends FormField implements WrappedFormFieldModel
       this.innerForm.off('destroy', this._formDestroyHandler);
     }
     if (innerForm) {
-      innerForm.on('destroy', this._formDestroyHandler);
+      innerForm.one('destroy', this._formDestroyHandler);
       this._adaptForm(innerForm);
     }
     this._setProperty('innerForm', innerForm);
@@ -65,6 +66,7 @@ export class WrappedFormField extends FormField implements WrappedFormFieldModel
     form.setClosable(false); // Disable close key stroke
     form.rootGroupBox?.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
     form.renderInitialFocusEnabled = this.initialFocusEnabled;
+    form.setOwner(this); // TODO CGU see Page.ts
   }
 
   protected _renderInnerForm() {

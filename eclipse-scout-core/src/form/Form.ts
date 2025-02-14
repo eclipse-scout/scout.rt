@@ -59,6 +59,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   messageBoxController: MessageBoxController;
   fileChooserController: FileChooserController;
   closeKeyStroke: KeyStroke;
+//  closing: boolean;
   showOnOpen: boolean;
   initialFocus: Widget;
   renderInitialFocusEnabled: boolean;
@@ -264,6 +265,22 @@ export class Form extends Widget implements FormModel, DisplayParent {
       this._glassPaneRenderer.renderGlassPanes();
     }
   }
+
+  // override destroy() {
+  //   if (this.closing) {
+  //     super.destroy();
+  //     return;
+  //   }
+  //   this.closing = true;
+  //   try {
+  //     // TODO CGU disposeAdapter würde jetzt auch close aufrufen und dann hide() und close event feuern.
+  //     // hybrid manager müsste kein close schicken. im js könnte man auch auf close hören. komisch, weil dann keine klare Unterscheidung mehr zwischen destroy und close?
+  //     // zu grosse änderung?
+  //     this.close();
+  //   } finally {
+  //     this.closing = false;
+  //   }
+  // }
 
   protected override _destroy() {
     super._destroy();
@@ -781,6 +798,9 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * Closes the form and discards any unsaved changes.
    */
   close(): JQuery.Promise<void> {
+    if (this.destroyed) {
+      return;
+    }
     return this.lifecycle.close();
   }
 
@@ -1743,6 +1763,14 @@ export class Form extends Widget implements FormModel, DisplayParent {
       }
     });
     return form;
+  }
+
+  static destroyChildForm(child: Widget) {
+    if (child instanceof Form) {
+      child.close();
+    } else {
+      child.destroy();
+    }
   }
 }
 

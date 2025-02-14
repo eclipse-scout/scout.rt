@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -136,12 +136,10 @@ export class Page extends TreeNode implements PageModel {
     this.trigger('destroying');
     super._destroy();
     if (this.detailTable) {
-      this.detailTable.destroy();
-      this.detailTable = null;
+      this._destroyDetailTable(this.detailTable);
     }
     if (this.detailForm) {
-      this.detailForm.destroy();
-      this.detailForm = null;
+      this._destroyDetailForm(this.detailForm);
     }
     this.trigger('destroy');
   }
@@ -229,6 +227,23 @@ export class Page extends TreeNode implements PageModel {
       form.setDisplayHint(Form.DisplayHint.VIEW);
       form.setDisplayViewId('C');
       form.setShowOnOpen(false);
+      if (form.owner === this.session.root) {
+        // TODO CGU
+        // setOwner to ensure form is destroyed when changed or page is destroyed
+        // Because FormAdapter now sends close event it should be ok if close is called for java forms
+        // Normally, they are closed by Java logic anyway
+        // For Scout JS pages, owner is normally outline unless setDetailForm is called with a created form
+        // In that case caller has to correctly pass outline as parent to ensure destroy is called
+        // This is true for other widgets as well (e.g. dynamic fields on group boxes)
+        // Caller can decide whether he wants to do it or keep the form opem
+        // However, when form is created using hybrid manager, parent cannot be set to outline
+        // and form needs to be closed explicitly
+        // This is why we may change owner only if it is attached to session.root (remote form)
+        // Or we could change it always which makes it a bit different to other widgets
+        // But it guarantees destroy is called and if not desired setOwner can be changed afterwards. Maybe more safe also for other widgets
+        // TODO Create specs
+        form.setOwner(this.getOutline());
+      }
       this._updateParentTablePageMenusForDetailForm();
     }
     if (form instanceof TileOverviewForm) {
@@ -335,7 +350,7 @@ export class Page extends TreeNode implements PageModel {
     if (form.owner === this.getOutline()) {
       // in Scout classic the owner is not an outline but the NullWidget.
       // Then destroy is controlled by the backend
-      form.destroy();
+      form.close();
     }
   }
 
@@ -352,6 +367,7 @@ export class Page extends TreeNode implements PageModel {
       table.setMultiSelect(false);
     }
     table.setTableStatusVisible(this.tableStatusVisible);
+    table.setOwner(this.getOutline());
     this._updateParentTablePageMenusForDetailTable();
   }
 
@@ -422,7 +438,7 @@ export class Page extends TreeNode implements PageModel {
 
   protected _setDetailForm(form: Form) {
     let oldDetailForm = this.detailForm;
-    if (oldDetailForm !== form && oldDetailForm instanceof Widget) {
+    if (oldDetailForm !== form && oldDetailForm instanceof Form) {
       // must be a widget to be destroyed. At startup in Scout Classic it might be a string (the widget id)
       this._destroyDetailForm(oldDetailForm);
     }

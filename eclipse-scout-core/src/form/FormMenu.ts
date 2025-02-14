@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -35,6 +35,7 @@ export class FormMenu extends Menu implements FormMenuModel {
     this.popupResizable = false;
     this._addWidgetProperties('form');
     this._formDestroyHandler = this._onFormDestroy.bind(this);
+    this.childDestroyer = Form.destroyChildForm.bind(this);
   }
 
   static PopupStyle = {
@@ -93,6 +94,7 @@ export class FormMenu extends Menu implements FormMenuModel {
     form.setDisplayHint(Form.DisplayHint.VIEW);
     form.setModal(false);
     form.setClosable(false);
+    form.setOwner(this); // TODO CGU See comment in Page.ts
   }
 
   /**

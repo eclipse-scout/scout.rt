@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -110,6 +110,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.nodePaddingLevelNotCheckable = 20;
     this.nodePaddingLevelHierarchyRow = this.nodePaddingLevelNotCheckable;
     this._scrollDirections = 'y';
+    this.childDestroyer = Form.destroyChildForm.bind(this);
     this._addWidgetProperties(['defaultDetailForm', 'views', 'selectedViewTabs', 'dialogs', 'messageBoxes', 'fileChoosers']);
     this._addPreserveOnPropertyChangeProperties(['selectedViewTabs']);
   }
@@ -546,6 +547,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     form.setDisplayViewId('C');
     form.setShowOnOpen(false);
     form.detailForm = true;
+    form.setOwner(this); // TODO CGU See comment in Page.ts
   }
 
   protected _onDefaultDetailFormDestroy(event: Event<Form>) {

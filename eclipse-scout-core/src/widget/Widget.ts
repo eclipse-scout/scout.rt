@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,6 +33,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   cssClass: string;
   destroyed: boolean;
   destroying: boolean;
+  childDestroyer: (child: Widget) => void;
   disabledStyle: DisabledStyle;
   /**
    * The result of every enabled dimension.
@@ -365,7 +366,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     if (child.owner !== this) {
       return;
     }
-    child.destroy();
+    this.childDestroyer ? this.childDestroyer(child) : child.destroy();
   }
 
   protected _destroyOrUnlinkChildren(widgets: ObjectOrChildModel<Widget>[] | ObjectOrChildModel<Widget>) {
