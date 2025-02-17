@@ -104,7 +104,7 @@ export class PageResolver {
       if (page.pageParamType !== PageIdDummyPageParamDo && page.pageParamType !== null) {
         return null;
       }
-      page.loadFromModel({parent});
+      page._loadFromModel({parent});
       if (page.matchesPageParam(param)) {
         return ObjectFactory.get().getObjectType(page.constructor as Constructor);
       }

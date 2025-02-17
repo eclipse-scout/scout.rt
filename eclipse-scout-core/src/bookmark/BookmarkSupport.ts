@@ -257,14 +257,14 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     if (hybridManager) {
       // Scout Classic: send the bookmark to the UI server first, let the client model resolve as much of the bookmark
       // as it can, then resolve the remaining path in the UI
-      let jsonBookmarkDefinition = dataObjects.serialize(bookmarkDefinition);
       let hybridActionData = {
-        bookmarkDefinition: jsonBookmarkDefinition
+        bookmarkDefinition: bookmarkDefinition
       };
       return hybridManager.callActionAndWaitWithContext('ActivateBookmark', hybridActionData)
         .then((result: HybridManagerActionEndEventResult) => {
-          let targetPage = result.contextElements.getSingle('targetPage').optElement(Page);
-          let data = dataObjects.deserialize(result.data, ActivateBookmarkResultDo);
+          // FIXME bsh [js-bookmark] Handle error
+          let targetPage = result.contextElements.optSingle('targetPage')?.optElement(Page);
+          let data = scout.assertInstance(result.data, ActivateBookmarkResultDo);
           return {
             targetPage: targetPage,
             targetBookmarkPage: data.targetBookmarkPage,

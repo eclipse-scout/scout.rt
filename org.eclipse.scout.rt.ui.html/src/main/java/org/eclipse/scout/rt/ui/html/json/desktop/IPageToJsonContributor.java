@@ -13,6 +13,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.json.JSONObject;
 
+/**
+ * Called when {@link JsonOutline} is converting a {@linkplain IPage page} to JSON.
+ */
 @ApplicationScoped
 public interface IPageToJsonContributor {
 

@@ -92,19 +92,39 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
   }
 
   init(model: InitModelOf<this>) {
-    this.loadFromModel(model);
+    model = this._loadFromModel(model);
     this._init(model);
     if (model.initialExpanded === undefined) {
       this.initialExpanded = this.expanded;
     }
   }
 
-  loadFromModel(model: InitModelOf<this>) {
+  /**
+   * Writes all properties from the {@link _prepareModel prepared model} to the current instance.
+   * To not use this internal method! It is intended to be called by the {@link init} method.
+   *
+   * @internal
+   */
+  _loadFromModel(model: InitModelOf<this>): InitModelOf<this> {
+    model = model || {} as InitModelOf<this>;
+    model = this._prepareModel(model);
+    $.extend(this, model);
+    return model;
+  }
+
+  /**
+   * Returns a new model object with the merged information from the static model ({@link _jsonModel})
+   * and the given `model`. An error is thrown if the `parent` is not a {@link Tree}. If no `session`
+   * is provided, the parent tree's session is automatically inherited.
+   */
+  protected _prepareModel(model: InitModelOf<this>): InitModelOf<this> {
     let staticModel = this._jsonModel();
     if (staticModel) {
       model = $.extend({}, staticModel, model);
     }
-    $.extend(this, model);
+    scout.assertParameter('parent', model.parent, Tree);
+    model.session = model.session || model.parent.session;
+    return model;
   }
 
   destroy() {
@@ -128,9 +148,6 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
   }
 
   protected _init(model: InitModelOf<this>) {
-    scout.assertParameter('parent', model.parent, Tree);
-    this.session = model.session || model.parent.session;
-
     texts.resolveTextProperty(this, 'text');
     icons.resolveIconProperty(this, 'iconId');
 
@@ -140,7 +157,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
     }
   }
 
-  protected _jsonModel(): Record<string, any> {
+  protected _jsonModel(): TreeNodeModel {
     return null;
   }
 
