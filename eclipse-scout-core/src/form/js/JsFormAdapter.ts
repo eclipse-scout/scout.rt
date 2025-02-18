@@ -14,7 +14,7 @@ export class JsFormAdapter extends FormAdapter {
   protected override _initModel(m: ChildModelOf<Widget>, parent: Widget): FullModelOf<Widget> {
     let model = super._initModel(m, parent) as JsFormModel;
 
-    if (!model.jsFormObjectType || !model.jsFormObjectType.length) {
+    if (!model.jsFormObjectType) {
       throw new Error('jsFormObjectType not set');
     }
 
@@ -28,7 +28,8 @@ export class JsFormAdapter extends FormAdapter {
     };
 
     if (model.jsFormModel) {
-      delete model.jsFormModel.objectType; // objectType from Form model should not be used as model.jsFormObjectType specifies the object already
+      // If the jsFormModel contains properties containing data objects deserialize them if possible
+      // createPojoIfDoIsUnknown is true to create POJOs if the _type attributes cannot be resolved to classes to maintain backwards compatibility
       let deserializedJsFormModel = dataObjects.deserialize(model.jsFormModel, null, {createPojoIfDoIsUnknown: true});
       delete deserializedJsFormModel._type; // _type should not be written to Form if present
       jsFormModel = $.extend({}, deserializedJsFormModel, jsFormModel);

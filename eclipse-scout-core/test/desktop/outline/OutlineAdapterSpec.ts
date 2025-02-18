@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {OutlineSpecHelper, TableSpecHelper, TreeSpecHelper} from '../../../src/testing';
-import {defaultValues, Outline, Page} from '../../../src';
+import {BaseDoEntity, DataObjectInventory, defaultValues, ObjectFactory, objects, Outline, Page, PageWithNodes, typeName} from '../../../src';
 
 describe('OutlineAdapter', () => {
   let session: SandboxSession;
@@ -318,6 +318,79 @@ describe('OutlineAdapter', () => {
     expect(node012.id).toBe('0_1_2');
     expect(node012['b']).toBe(234);
     expect(node012.remote).toBeTrue();
+  });
+
+  describe('JsPage', () => {
+
+    @typeName('scout.JsPageInner')
+    class JsPageInnerDo extends BaseDoEntity {
+      prop: number;
+    }
+
+    class MyJsPage extends PageWithNodes {
+    }
+
+    beforeEach(() => {
+      DataObjectInventory.get().add(JsPageInnerDo);
+    });
+
+    afterEach(() => {
+      DataObjectInventory.get().remove(JsPageInnerDo);
+    });
+
+    ObjectFactory.get().registerNamespace('outlineadapterspec', {MyJsPage});
+
+    it('creates the JS page specified by jsPageObjectType and applies values provided by jsPageModel', () => {
+      const treeHelper = new TreeSpecHelper(session);
+      let model = helper.createModelFixture();
+      let adapter = helper.createOutlineAdapter(model);
+      let outline = adapter.createWidget(model, session.desktop) as Outline;
+
+      let nodes = [helper.createModelNode('0_0', 'newChildNode', {
+        nodeType: 'jsPage',
+        jsPageObjectType: 'outlineadapterspec.MyJsPage',
+        jsPageModel: {
+          custom: 'value',
+          objectType: 'dummy' // will be overridden by jsPageObjectType
+        }
+      })];
+      adapter.onModelEvent(treeHelper.createNodesInsertedEvent(outline, nodes));
+      let node = outline.nodes[0];
+      expect(node).toBeInstanceOf(MyJsPage);
+      expect(node.objectType).toBe('outlineadapterspec.MyJsPage');
+      expect(node['custom']).toBe('value');
+    });
+
+    it('deserializes data objects in jsPageModel', () => {
+      const treeHelper = new TreeSpecHelper(session);
+      let model = helper.createModelFixture();
+      let adapter = helper.createOutlineAdapter(model);
+      let outline = adapter.createWidget(model, session.desktop) as Outline;
+
+      let nodes = [helper.createModelNode('0_0', 'newChildNode', {
+        nodeType: 'jsPage',
+        jsPageObjectType: 'outlineadapterspec.MyJsPage',
+        jsPageModel: {
+          dataObject: {
+            _type: 'scout.JsPageInner',
+            prop: 3
+          },
+          legacyDataObject: {
+            _type: 'scout.Unknown',
+            prop: 5
+          }
+        }
+      })];
+      adapter.onModelEvent(treeHelper.createNodesInsertedEvent(outline, nodes));
+      let node = outline.nodes[0];
+      let dataObject: JsPageInnerDo = node['dataObject'];
+      expect(dataObject).toBeInstanceOf(JsPageInnerDo);
+      expect(dataObject.prop).toBe(3);
+
+      let legacyDataObject = node['legacyDataObject'];
+      expect(objects.isPojo(legacyDataObject)).toBe(true);
+      expect(legacyDataObject.prop).toBe(5);
+    });
   });
 });
 

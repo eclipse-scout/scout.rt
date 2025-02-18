@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper} from '../../../src/testing';
-import {AdapterData, Desktop, DesktopAdapter, DisplayHint, Form, FormModel, ObjectFactory, RemoteEvent} from '../../../src';
+import {AdapterData, BaseDoEntity, DataObjectInventory, Desktop, DesktopAdapter, DisplayHint, Form, FormModel, ObjectFactory, objects, RemoteEvent, typeName} from '../../../src';
 import Deferred = JQuery.Deferred;
 
 describe('JsFormAdapter', () => {
@@ -21,7 +21,17 @@ describe('JsFormAdapter', () => {
     desktop = session.desktop;
     linkWidgetAndAdapter(desktop, 'DesktopAdapter');
     desktopAdapter = desktop.modelAdapter as DesktopAdapter;
+    DataObjectInventory.get().add(JsFormInnerDo);
   });
+
+  afterEach(() => {
+    DataObjectInventory.get().remove(JsFormInnerDo);
+  });
+
+  @typeName('scout.JsFormInner')
+  class JsFormInnerDo extends BaseDoEntity {
+    prop: number;
+  }
 
   class JsForm extends Form {
 
@@ -73,6 +83,46 @@ describe('JsFormAdapter', () => {
       inputData: inputData
     };
   }
+
+  it('creates the JS form specified by jsFormObjectType and applies values provided by jsFormModel', () => {
+    let message = {
+      adapterData: mapAdapterData([createAdapterData('js3', 'jsformspec.JsForm', {
+        custom: 'value',
+        objectType: 'dummy' // will be overridden by jsFormObjectType
+      })]),
+      events: [createFormShowEvent('js3')]
+    };
+    session._processSuccessResponse(message);
+    let form = desktop.session.getModelAdapter('js3').widget;
+    expect(form).toBeInstanceOf(JsForm);
+    expect(form.objectType).toBe('jsformspec.JsForm');
+    expect(form['custom']).toBe('value');
+  });
+
+  it('deserializes data objects in jsFormModel', () => {
+    let message = {
+      adapterData: mapAdapterData([createAdapterData('js3', 'jsformspec.JsForm', {
+        dataObject: {
+          _type: 'scout.JsFormInner',
+          prop: 3
+        },
+        legacyDataObject: {
+          _type: 'scout.Unknown',
+          prop: 5
+        }
+      })]),
+      events: [createFormShowEvent('js3')]
+    };
+    session._processSuccessResponse(message);
+    let form = desktop.session.getModelAdapter('js3').widget;
+    let dataObject: JsFormInnerDo = form['dataObject'];
+    expect(dataObject).toBeInstanceOf(JsFormInnerDo);
+    expect(dataObject.prop).toBe(3);
+
+    let legacyDataObject = form['legacyDataObject'];
+    expect(objects.isPojo(legacyDataObject)).toBe(true);
+    expect(legacyDataObject.prop).toBe(5);
+  });
 
   it('blocks rendering until loading is complete', async () => {
     createAndRegisterFormModel('10', 'jsformspec.LoadingJsForm');
