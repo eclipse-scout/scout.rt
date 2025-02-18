@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, BookmarkAdapter, DefaultBookmarkAdapter, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector,
-  KeyStroke, KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectType, ObjectUuidProvider, ObjectWithBookmarkAdapter, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration,
-  PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session, SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
+  Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke, KeyStrokeContext, LayoutData,
+  LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectType, ObjectUuidBuilder, ObjectUuidProvider, ObjectWithObjectUuidBuilder, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter,
+  scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session, SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
 } from '../index';
 import $ from 'jquery';
 
-export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType, ObjectWithUuid, ObjectWithBookmarkAdapter {
+export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType, ObjectWithUuid, ObjectWithObjectUuidBuilder {
   declare model: WidgetModel;
   declare initModel: SomeRequired<this['model'], 'parent'>;
   declare eventMap: WidgetEventMap;
@@ -100,7 +100,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   protected _postRenderActions: (() => void)[];
   protected _scrollHandler: (event: JQuery.ScrollEvent) => void;
   protected _storedFocusedWidget: Widget;
-  protected _bookmarkAdapter: BookmarkAdapter;
+  protected _objectUuidBuilder: ObjectUuidBuilder;
 
   constructor() {
     super();
@@ -149,7 +149,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this._parentDestroyHandler = this._onParentDestroy.bind(this);
     this._parentRemovingWhileAnimatingHandler = this._onParentRemovingWhileAnimating.bind(this);
     this._scrollHandler = this._onScroll.bind(this);
-    this._bookmarkAdapter = null;
+    this._objectUuidBuilder = null;
     this.loadingSupport = this._createLoadingSupport();
     this.keyStrokeContext = this._createKeyStrokeContext();
     this.logicalGrid = null;
@@ -232,11 +232,13 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     return ObjectUuidProvider.get().uuidPath(this, {useFallback});
   }
 
-  getBookmarkAdapter(): BookmarkAdapter {
-    if (!this._bookmarkAdapter) {
-      this._bookmarkAdapter = new DefaultBookmarkAdapter(this);
+  getObjectUuidBuilder(): ObjectUuidBuilder {
+    if (!this._objectUuidBuilder) {
+      this._objectUuidBuilder = scout.create(ObjectUuidBuilder, {
+        owner: this
+      });
     }
-    return this._bookmarkAdapter;
+    return this._objectUuidBuilder;
   }
 
   /**
