@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -814,16 +814,16 @@ describe('Column', () => {
       expect(localTable.uuidPath()).toBe('table-uuid|parent-widget-uuid'); // uuidPath of the table should include its parent
     });
 
-    it('BookmarkAdapter.buildId returns id without parent for local and remote case', () => {
+    it('ObjectUuidBuilder.buildId returns id without parent for local and remote case', () => {
       const localTable = getLocalTable();
       const localCol = localTable.columns[0];
       const remoteTable = getRemoteTable();
       const remoteCol = remoteTable.columns[0];
 
-      expect(remoteCol.getBookmarkAdapter().buildId()).toBe('column-class-id'); // must be the column classId only without its parents
-      expect(remoteTable.getBookmarkAdapter().buildId()).toBe('table-class-id_parent-widget-class-id'); // must be with parent classIds
-      expect(localCol.getBookmarkAdapter().buildId()).toBe('column-uuid'); // must be the column uuid only without its parents
-      expect(localTable.getBookmarkAdapter().buildId()).toBe('table-uuid|parent-widget-uuid'); // must be with parent classIds
+      expect(remoteCol.getObjectUuidBuilder().buildId()).toBe('column-class-id'); // must be the column classId only without its parents
+      expect(remoteTable.getObjectUuidBuilder().buildId()).toBe('table-class-id_parent-widget-class-id'); // must be with parent classIds
+      expect(localCol.getObjectUuidBuilder().buildId()).toBe('column-uuid'); // must be the column uuid only without its parents
+      expect(localTable.getObjectUuidBuilder().buildId()).toBe('table-uuid|parent-widget-uuid'); // must be with parent classIds
     });
 
     function getLocalTable(): SpecTable {

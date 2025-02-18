@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Desktop, NullWidget, ObjectFactory, ObjectModel, ObjectWithType, ObjectWithUuid, scout, SomeRequired, strings, Widget} from '../index';
+import {Constructor, Desktop, NullWidget, ObjectFactory, ObjectModel, ObjectWithType, ObjectWithUuid, scout, SomeRequired, strings, Widget} from '../index';
 
 /**
  * Helper class to extract IDs of objects and to compute uuidPaths.
@@ -121,7 +121,12 @@ export class ObjectUuidProvider implements ObjectUuidProviderModel, ObjectWithTy
     if (!scout.nvl(includeFallback, true) || ObjectUuidProvider.isUiId(object.id)) {
       return null; // no fallback
     }
-    const objectType = object.objectType || ObjectFactory.get().getObjectType(object.constructor as new() => object);
+    let objectType;
+    if (object.objectType && typeof object.objectType === 'string') {
+      objectType = object.objectType;
+    } else {
+      objectType = ObjectFactory.get().getObjectType(object.constructor as Constructor);
+    }
     let fallbackId = strings.join(ObjectUuidProvider.UUID_FALLBACK_DELIMITER, object.id, objectType);
     if (!fallbackId) {
       return null; // don't return empty strings
