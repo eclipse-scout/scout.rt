@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -2301,12 +2301,12 @@ describe('Widget', () => {
 
     it('BookmarkAdapter.buildId returns id with parents for local and remote case', () => {
       const remote = createRemoteWidgetTree();
-      expect(remote.parent.getBookmarkAdapter().buildId()).toBe('w3-class-id_w2-class-id_w1-class-id_root-class-id');
-      expect(remote.getBookmarkAdapter().buildId()).toBe('w4-class-id_w3-class-id_w2-class-id_w1-class-id_root-class-id');
+      expect(remote.parent.getObjectUuidBuilder().buildId()).toBe('w3-class-id_w2-class-id_w1-class-id_root-class-id');
+      expect(remote.getObjectUuidBuilder().buildId()).toBe('w4-class-id_w3-class-id_w2-class-id_w1-class-id_root-class-id');
 
       const local = createLocalWidgetTree();
-      expect(local.parent.getBookmarkAdapter().buildId()).toBe('w3-uuid|w2-uuid|w1-class-id_root-class-id');
-      expect(local.getBookmarkAdapter().buildId()).toBe('w4-uuid|w3-uuid|w2-uuid|w1-class-id_root-class-id');
+      expect(local.parent.getObjectUuidBuilder().buildId()).toBe('w3-uuid|w2-uuid|w1-class-id_root-class-id');
+      expect(local.getObjectUuidBuilder().buildId()).toBe('w4-uuid|w3-uuid|w2-uuid|w1-class-id_root-class-id');
     });
   });
 });

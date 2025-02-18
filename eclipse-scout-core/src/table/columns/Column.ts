@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AggregateTableRow, Alignment, BookmarkAdapter, Cell, CellEditorPopup, ColumnComparator, ColumnEventMap, ColumnModel, ColumnOptimalWidthMeasurer, ColumnUserFilter, comparators, DefaultBookmarkAdapter, Event, EventHandler, FormField,
-  GridData, icons, InitModelOf, objects, ObjectUuidProvider, ObjectWithBookmarkAdapter, ObjectWithType, ObjectWithUuid, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent,
-  TableHeader, TableHeaderMenu, TableRow, texts, ValueField
+  AggregateTableRow, Alignment, Cell, CellEditorPopup, ColumnComparator, ColumnEventMap, ColumnModel, ColumnOptimalWidthMeasurer, ColumnUserFilter, comparators, Event, EventHandler, FormField, GridData, icons, InitModelOf, objects,
+  ObjectUuidBuilder, ObjectUuidProvider, ObjectWithObjectUuidBuilder, ObjectWithType, ObjectWithUuid, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent, TableHeader,
+  TableHeaderMenu, TableRow, texts, ValueField
 } from '../../index';
 import $ from 'jquery';
 
-export class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue>, ObjectWithType, ObjectWithUuid, ObjectWithBookmarkAdapter {
+export class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue>, ObjectWithType, ObjectWithUuid, ObjectWithObjectUuidBuilder {
   declare model: ColumnModel<TValue>;
   declare initModel: SomeRequired<this['model'], 'session'>;
   declare eventMap: ColumnEventMap;
@@ -90,7 +90,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
    */
   _realWidth: number;
 
-  protected _bookmarkAdapter: BookmarkAdapter;
+  protected _objectUuidBuilder: ObjectUuidBuilder;
   protected _tableColumnsChangedHandler: EventHandler<TableColumnMovedEvent | Event<Table>>;
 
   constructor() {
@@ -145,7 +145,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 
     this._tableColumnsChangedHandler = this._onTableColumnsChanged.bind(this);
     this._realWidth = null;
-    this._bookmarkAdapter = null;
+    this._objectUuidBuilder = null;
 
     this.$header = null;
     this.$separator = null;
@@ -198,11 +198,11 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     });
   }
 
-  getBookmarkAdapter(): BookmarkAdapter {
-    if (!this._bookmarkAdapter) {
-      this._bookmarkAdapter = new DefaultBookmarkAdapter(this, false);
+  getObjectUuidBuilder(): ObjectUuidBuilder {
+    if (!this._objectUuidBuilder) {
+      this._objectUuidBuilder = scout.create(ObjectUuidBuilder, {owner: this, useUuidPath: false});
     }
-    return this._bookmarkAdapter;
+    return this._objectUuidBuilder;
   }
 
   /** @internal */
