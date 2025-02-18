@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BaseDoEntity, BookmarkAdapter, bookmarks, ButtonTile, ChildModelOf, Constructor, dataObjects, DefaultBookmarkAdapter, DoEntity, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent,
-  icons, InitModelOf, inspector, Menu, MenuBar, menus, ObjectOrChildModel, ObjectUuidProvider, ObjectWithBookmarkAdapter, ObjectWithUuid, Outline, PageEventMap, PageIdDummyPageParamDo, PageModel, PropertyChangeEvent, scout, strings, Table,
-  TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
+  BaseDoEntity, ButtonTile, ChildModelOf, Constructor, dataObjects, DoEntity, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, menus,
+  ObjectOrChildModel, ObjectUuidBuilder, ObjectUuidProvider, ObjectWithObjectUuidBuilder, ObjectWithUuid, Outline, PageEventMap, PageIdDummyPageParamDo, PageModel, PropertyChangeEvent, scout, strings, Table, TableRow, TableRowClickEvent,
+  TileOutlineOverview, TileOverviewForm, TreeNode, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -21,7 +21,7 @@ import $ from 'jquery';
  * class and is never instantiated directly, instead we always use subclasses of PageWithTable or PageWithNodes.
  * Implementations of these classes contain code which loads table data or child nodes.
  */
-export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectWithBookmarkAdapter {
+export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectWithObjectUuidBuilder {
   declare model: PageModel;
   declare eventMap: PageEventMap;
   declare self: Page;
@@ -66,7 +66,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   protected _tableFilterHandler: EventHandler<Event<Table>>;
   protected _tableRowClickHandler: EventHandler<TableRowClickEvent>;
   protected _detailTableModel: ChildModelOf<Table>;
-  protected _bookmarkAdapter: BookmarkAdapter;
+  protected _objectUuidBuilder: ObjectUuidBuilder;
   protected _pageParamInternal: PageParamDo;
   /** @internal */
   _detailFormModel: ChildModelOf<Form>;
@@ -100,7 +100,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     this._tableRowClickHandler = this._onTableRowClick.bind(this);
     this._detailTableModel = null;
     this._detailFormModel = null;
-    this._bookmarkAdapter = null;
+    this._objectUuidBuilder = null;
     this._menuOwnerMenusChangeHandler = this._onMenuOwnerMenusChange.bind(this);
   }
 
@@ -137,12 +137,15 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     });
   }
 
-  getBookmarkAdapter(): BookmarkAdapter {
-    if (!this._bookmarkAdapter) {
-      // no path, just the id of this Page. See AbstractPage#classId().
-      this._bookmarkAdapter = new DefaultBookmarkAdapter(this, false);
+  getObjectUuidBuilder(): ObjectUuidBuilder {
+    if (!this._objectUuidBuilder) {
+      // no path, just the id of this page. See AbstractPage#classId().
+      this._objectUuidBuilder = scout.create(ObjectUuidBuilder, {
+        owner: this,
+        useUuidPath: false
+      });
     }
-    return this._bookmarkAdapter;
+    return this._objectUuidBuilder;
   }
 
   protected static _removePropertyIfLazyLoading(object: PageModel, name: string): any {

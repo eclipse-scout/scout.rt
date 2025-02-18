@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -253,15 +253,15 @@ describe('Page', () => {
       expect(outline.uuidPath()).toBe('outline-uuid');
     });
 
-    it('BookmarkAdapter.buildId returns id without parent for local and remote case', () => {
+    it('ObjectUuidBuilder.buildId returns id without parent for local and remote case', () => {
       outline.classId = 'outline-class-id';
       const remotePage = scout.create(Page, {
         parent: outline,
         classId: 'page-class-id'
       });
 
-      expect(remotePage.getBookmarkAdapter().buildId()).toBe('page-class-id');
-      expect(outline.getBookmarkAdapter().buildId()).toBe('outline-class-id');
+      expect(remotePage.getObjectUuidBuilder().buildId()).toBe('page-class-id');
+      expect(outline.getObjectUuidBuilder().buildId()).toBe('outline-class-id');
 
       outline.classId = null;
       outline.uuid = 'outline-uuid';
@@ -270,8 +270,8 @@ describe('Page', () => {
         uuid: 'page-uuid'
       });
 
-      expect(localPage.getBookmarkAdapter().buildId()).toBe('page-uuid');
-      expect(outline.getBookmarkAdapter().buildId()).toBe('outline-uuid');
+      expect(localPage.getObjectUuidBuilder().buildId()).toBe('page-uuid');
+      expect(outline.getObjectUuidBuilder().buildId()).toBe('outline-uuid');
     });
   });
 
