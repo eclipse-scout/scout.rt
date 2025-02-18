@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, ChildModelOf, EventHandler, Form, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, Tree, TreeAdapter, TreeNode, TreeNodeModel
+  App, ChildModelOf, dataObjects, EventHandler, Form, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, Tree, TreeAdapter, TreeNode, TreeNodeModel
 } from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
@@ -260,7 +260,7 @@ export class OutlineAdapter extends TreeAdapter {
     nodeModel = (this.modelAdapter as OutlineAdapter)._initNodeModel(nodeModel);
 
     if (nodeModel.nodeType === 'jsPage') {
-      if (!nodeModel.jsPageObjectType?.length) {
+      if (!nodeModel.jsPageObjectType) {
         throw new Error('jsPageObjectType not set');
       }
 
@@ -272,7 +272,11 @@ export class OutlineAdapter extends TreeAdapter {
       };
 
       if (nodeModel.jsPageModel) {
-        jsPageModel = $.extend(true, {}, nodeModel.jsPageModel, jsPageModel);
+        // If the jsPageModel contains data objects, deserialize them if possible.
+        // Create POJOs for objects whose _type attribute cannot be resolved to a class to maintain backward compatibility.
+        let deserializedJsPageModel = dataObjects.deserialize(nodeModel.jsPageModel, null, {createPojoIfDoIsUnknown: true});
+        delete deserializedJsPageModel._type; // _type should not be written to page if present
+        jsPageModel = $.extend({}, deserializedJsPageModel, jsPageModel);
       }
 
       nodeModel = jsPageModel;
