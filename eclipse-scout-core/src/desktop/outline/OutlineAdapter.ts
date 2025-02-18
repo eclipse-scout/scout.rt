@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, ChildModelOf, EventHandler, Form, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, Tree, TreeAdapter, TreeNode, TreeNodeModel, UuidPool
+  App, ChildModelOf, dataObjects, EventHandler, Form, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, Tree, TreeAdapter, TreeNode, TreeNodeModel,
+  UuidPool
 } from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
@@ -282,7 +283,10 @@ export class OutlineAdapter extends TreeAdapter {
       };
 
       if (nodeModel.jsPageModel) {
-        jsPageModel = $.extend(true, {}, nodeModel.jsPageModel, jsPageModel);
+        delete nodeModel.jsPageModel.objectType; // objectType from Page model should not be used as nodeModel.jsPageObjectType specifies the object already
+        let deserializedJsPageModel = dataObjects.deserialize(nodeModel.jsPageModel, null, {createPojoIfDoIsUnknown: true});
+        delete deserializedJsPageModel._type; // _type should not be written to Page if present
+        jsPageModel = $.extend({}, deserializedJsPageModel, jsPageModel);
       }
 
       nodeModel = jsPageModel;
