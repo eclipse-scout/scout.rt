@@ -84,8 +84,7 @@ public abstract class AbstractDoStructureMigrationHandlerTest {
       actual = (IDoEntity) dataObjectMapper.readValueRaw(in);
     }
 
-    DataObjectMigrationContext ctx = BEANS.get(DataObjectMigrationContext.class)
-        .withInitialLocalContext(initialLocalContextData == null ? Collections.emptyList() : Arrays.asList(initialLocalContextData));
+    DataObjectMigrationContext ctx = getDataObjectMigrationContext(initialLocalContextData);
     boolean changed = BEANS.get(DataObjectMigrator.class).applyStructureMigration(ctx, actual, toVersion);
 
     assertTrue("Data object was not changed by migration", changed);
@@ -109,6 +108,12 @@ public abstract class AbstractDoStructureMigrationHandlerTest {
       assertEqualsWithComparisonFailure("Expected DO entity structure differs from actual content. Verify the changes in the result JSON file and commit the changed file.", expected, actual);
       fail("Expected DO entity structure differs from actual content. Verify the changes in the result JSON file and commit the changed file.");
     }
+  }
+
+  protected DataObjectMigrationContext getDataObjectMigrationContext(IDataObjectMigrationLocalContextData[] initialLocalContextData) {
+    DataObjectMigrationContext ctx = BEANS.get(DataObjectMigrationContext.class)
+        .withInitialLocalContext(initialLocalContextData == null ? Collections.emptyList() : Arrays.asList(initialLocalContextData));
+    return ctx;
   }
 
   protected String getFilename(String filenamePrefix, String typeVersion) {
