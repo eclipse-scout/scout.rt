@@ -20,7 +20,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   static ERROR_MISSING_OUTLINE = 'missing-outline';
   static ERROR_MISSING_PAGE_PARAM = 'missing-page-param';
   static ERROR_PAGE_NOT_BOOKMARKABLE = 'page-not-bookmarkable';
-  static ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER = 'page-not-bookmarkable';
+  static ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER = 'page-missing-row-bookmark-identifier';
   static ERROR_OUTLINE_NOT_FOUND = 'outline-not-found';
   static ERROR_PAGE_NOT_FOUND = 'page-not-found';
 
@@ -154,6 +154,8 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     });
   }
 
+  // This methode is called from bottom to top. On the first invocation, the childPage is not
+  // set, but later calls pass the childPage for resolve the corresponding row of a table page.
   protected _pageToBookmark(page: Page, childPage?: Page): JQuery.Promise<IBookmarkPageDo> {
     if (!page) { // } || !page['bookmarkable']) { // FIXME bsh [js-bookmark] Add 'bookmarkable' flag
       return $.rejectedPromise(BookmarkSupport.ERROR_PAGE_NOT_BOOKMARKABLE);
@@ -171,14 +173,24 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
 
     if (page.nodeType === Page.NodeType.TABLE) {
-      // FIXME bsh [js-bookmark] Handle case where bookmarkIdentifier is not present -> throw new VetoException(TEXTS.get("CannotCreateBookmarkAtThisLocation"))
-      if (childPage && !childPage.row?.bookmarkIdentifier) { // child row not identifiable
-        return $.rejectedPromise(BookmarkSupport.ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER);
+      let expandedChildRowIdentifier;
+      if (childPage) {
+        if (childPage.row) {
+          // Linked to table row -> get row identifier
+          expandedChildRowIdentifier = page.getTableRowIdentifier(childPage.row);
+        } else {
+          // Not linked to table row -> assume the page param is enough to identify the child page
+          // FIXME bsh [js-bookmark] Is this assumption correct? Or do we want to throw an error?
+        }
+        if (!expandedChildRowIdentifier) { // child row not identifiable
+          return $.rejectedPromise(BookmarkSupport.ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER);
+        }
       }
 
-      let expandedChildRowIdentifier = childPage?.row?.bookmarkIdentifier;
       // FIXME bsh [js-bookmark] Only export when requested, see BookmarkDoBuilder#createTableRowSelections
-      let selectedChildRowIdentifiers = page.detailTable.selectedRows.map(row => row.bookmarkIdentifier).filter(Boolean);
+      let selectedChildRowIdentifiers = page.detailTable.selectedRows
+        .map(row => page.getTableRowIdentifier(row));
+
       return $.resolvedPromise()
         .then(() => {
           // let outline = page.getOutline();
@@ -297,13 +309,9 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
     this.desktop.setOutline(outline);
 
-    // // FIXME bsh [js-bookmark] Find a better solution to transfer the parent from the UI server to here!
     let pagePath = result.remainingPagePath.slice(); // create copy because arrays is altered
     let parent = result.targetPage || outline;
     let parentRowBookmarkIdentifier = result.targetBookmarkPage instanceof TableBookmarkPageDo ? result.targetBookmarkPage.expandedChildRow : null;
-    // let pagePath = [...bookmarkDefinition.pagePath, bookmarkDefinition.bookmarkedPage];
-    // let parent = outline;
-    // let parentRowBookmarkIdentifier = null;
     return this._resolveNextPageInPath(pagePath, parent, parentRowBookmarkIdentifier)
       .then(page => {
         if (!page) {
@@ -335,12 +343,13 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
         let expandedChildRow = pageDefinition instanceof TableBookmarkPageDo ? pageDefinition.expandedChildRow : null;
         let selectedChildRows = pageDefinition instanceof TableBookmarkPageDo ? pageDefinition.selectedChildRows : null;
 
-        // Restore selection of last table page
-        // FIXME bsh [js-bookmark] Handle hierarchical table, see Table#restoreSelection
+        // FIXME bsh [js-bookmark] Try to reduce duplicate code, maybe change argument type?
+        // // Restore selection of last table page
         if (arrays.empty(pagePath) && page.nodeType === Page.NodeType.TABLE && page.detailTable && arrays.hasElements(selectedChildRows)) {
+          // FIXME bsh [js-bookmark] Handle hierarchical table, see Table#restoreSelection
           let normalizedRowIdentifiers = selectedChildRows.map(bookmarkIdentifier => bookmarks.stringifyNormalized(bookmarkIdentifier));
           let selectedRows = page.detailTable.rows.filter(row => {
-            let normalizedRowIdentifier = bookmarks.stringifyNormalized(row.bookmarkIdentifier);
+            let normalizedRowIdentifier = bookmarks.stringifyNormalized(page.getTableRowIdentifier(row));
             return normalizedRowIdentifiers.includes(normalizedRowIdentifier);
           });
           page.detailTable.selectRows(selectedRows);
@@ -374,7 +383,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
             // Lookup child page by parent PK (ignore PageParam)
             let normalizedParentRowIdentifier = bookmarks.stringifyNormalized(parentRowBookmarkIdentifier);
             let row = parent.detailTable.rows.find(row => {
-              let normalizedRowIdentifier = bookmarks.stringifyNormalized(row.bookmarkIdentifier);
+              let normalizedRowIdentifier = bookmarks.stringifyNormalized(parent.getTableRowIdentifier(row));
               return normalizedRowIdentifier === normalizedParentRowIdentifier;
             });
             if (row) {
