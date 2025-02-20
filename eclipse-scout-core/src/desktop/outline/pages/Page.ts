@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BaseDoEntity, bookmarks, ButtonTile, ChildModelOf, Constructor, dataObjects, DoEntity, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector, Menu,
-  MenuBar, menus,
+  BaseDoEntity, BookmarkAdapter, ButtonTile, ChildModelOf, Constructor, dataObjects, DoTypeResolver, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector,
+  Menu, MenuBar, menus,
   ObjectOrChildModel, ObjectUuidBuilder, ObjectUuidProvider, ObjectWithObjectUuidBuilder, ObjectWithUuid, Outline, PageEventMap, PageIdDummyPageParamDo, PageModel, PropertyChangeEvent, scout, strings, Table, TableRow, TableRowClickEvent,
   TileOutlineOverview, TileOverviewForm, TreeNode, Widget
 } from '../../../index';
@@ -68,6 +68,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   protected _tableRowClickHandler: EventHandler<TableRowClickEvent>;
   protected _detailTableModel: ChildModelOf<Table>;
   protected _objectUuidBuilder: ObjectUuidBuilder;
+  protected _bookmarkAdapter: BookmarkAdapter;
   protected _pageParamInternal: PageParamDo;
   /** @internal */
   _detailFormModel: ChildModelOf<Form>;
@@ -102,6 +103,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     this._detailTableModel = null;
     this._detailFormModel = null;
     this._objectUuidBuilder = null;
+    this._bookmarkAdapter = null;
     this._menuOwnerMenusChangeHandler = this._onMenuOwnerMenusChange.bind(this);
   }
 
@@ -147,6 +149,13 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
       });
     }
     return this._objectUuidBuilder;
+  }
+
+  getBookmarkAdapter(): BookmarkAdapter {
+    if (!this._bookmarkAdapter) {
+      this._bookmarkAdapter = scout.create(BookmarkAdapter);
+    }
+    return this._bookmarkAdapter;
   }
 
   protected static _removePropertyIfLazyLoading(object: PageModel, name: string): any {
@@ -598,7 +607,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   }
 
   matchesPageParam(pageParam: PageParamDo): boolean {
-    return bookmarks.pageParamsMatch(this.pageParam, pageParam);
+    return this.getBookmarkAdapter().pageParamsMatch(this.pageParam, pageParam);
   }
 
   get pageParam(): PageParamDo {
@@ -614,9 +623,10 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   }
 
   set pageParam(pageParam: PageParamDo | object) {
-    if (pageParam instanceof BaseDoEntity || !pageParam) {
-      this._pageParamInternal = pageParam;
+    if (pageParam instanceof PageParamDo || !pageParam) {
+      this._pageParamInternal = pageParam as PageParamDo;
     } else {
+      // FIXME CGU [js-bookmark] Should we add _setPageParam with this code and move get pageParam to BookmarkAdapter?
       this._pageParamInternal = dataObjects.deserialize(pageParam, this.pageParamType);
     }
   }
@@ -682,14 +692,11 @@ export type MenuOwner = Widget & { menus: Menu[]; setMenus: (menus: ObjectOrChil
 
 /**
  * Base interface for all page param types.
- * FIXME bsh [js-bookmark]: PageParamDo should be a class?
  */
-export interface PageParamDo extends DoEntity {
-  [x: string]: any; // FIXME bsh [js-bookmark] Why is this necessary??? WidgetsOutlineModel has errors otherwise
+export class PageParamDo extends BaseDoEntity {
 }
 
-// FIXME bsh [js-bookmark]: 'DO' should extend PageParamDo as soon as it is a class
-export function pageParam<DO extends BaseDoEntity>(pareParamDo: Constructor<DO>) {
+export function pageParam<DO extends PageParamDo>(pareParamDo: Constructor<DO>) {
   return <T extends Constructor>(BaseClass: T) => class extends BaseClass {
     constructor(...args: any[]) {
       super(...args);
@@ -697,3 +704,21 @@ export function pageParam<DO extends BaseDoEntity>(pareParamDo: Constructor<DO>)
     }
   };
 }
+
+/**
+ * If a specific {@link PageParamDo} exists on server side but there is no equivalent on JS side, a {@link BaseDoEntity} would be created.
+ * This resolver ensures a real {@link PageParamDo} instance will be created instead of a {@link BaseDoEntity}
+ * whenever a data object is deserialized whose type ends with 'PageParam', if there is no explicit page param found.
+ *
+ * This guarantees all page params are actual instances of {@link PageParamDo}.
+ */
+export class PageParamDoTypeResolver implements DoTypeResolver {
+  resolve(rawObj: Record<string, any>): Constructor<BaseDoEntity> {
+    if (rawObj?._type?.endsWith('PageParam')) {
+      return PageParamDo;
+    }
+    return null;
+  }
+}
+
+dataObjects.doTypeResolvers.push(new PageParamDoTypeResolver());
