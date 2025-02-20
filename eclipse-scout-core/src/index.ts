@@ -124,6 +124,7 @@ export * from './dataobject/serialize/NumberDoNodeSerializer';
 export * from './dataobject/serialize/SetDoNodeSerializer';
 export * from './dataobject/serialize/DataObjectDeserializer';
 export * from './dataobject/serialize/DataObjectSerializer';
+export * from './dataobject/serialize/FallbackDoProvider';
 export * from './dataobject/dataObjects';
 export * from './dataobject/BaseDoEntity';
 export * from './dataobject/ValueDo';
