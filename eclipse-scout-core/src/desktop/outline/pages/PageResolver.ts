@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, BaseDoEntity, Constructor, DataObjectInventory, ObjectFactory, Outline, Page, PageIdDummyPageParamDo, PageParamDo, scout, strings} from '../../../index';
+import {App, Constructor, ObjectFactory, Outline, Page, PageIdDummyPageParamDo, PageParamDo, scout, strings} from '../../../index';
 import $ from 'jquery';
 
 export class PageResolver {
@@ -27,14 +27,14 @@ export class PageResolver {
     }
 
     // By explicit decorator
-    const pageParamConstructor = this._assertPageParamConstructor(pageParam);
+    const pageParamConstructor = pageParam.constructor as Constructor<PageParamDo>;
     const pageObjectType = this._findObjectTypeForPageParamConstructor(pageParamConstructor);
     if (pageObjectType) {
       return pageObjectType;
     }
 
     // By naming convention
-    const pageParamObjectType = pageParam.objectType || ObjectFactory.get().getObjectType(pageParamConstructor);
+    const pageParamObjectType = ObjectFactory.get().getObjectType(pageParamConstructor);
     if (pageParamObjectType?.endsWith('PageParamDo')) {
       const pageName = strings.removeSuffix(pageParamObjectType, 'ParamDo');
       const pageExists = !!ObjectFactory.get().resolveTypedObjectType(pageName);
@@ -43,13 +43,6 @@ export class PageResolver {
       }
     }
     return null;
-  }
-
-  protected _assertPageParamConstructor(pageParamOrModel: PageParamDo): Constructor<PageParamDo> {
-    if (pageParamOrModel instanceof BaseDoEntity) {
-      return pageParamOrModel.constructor as Constructor<PageParamDo>;
-    }
-    return DataObjectInventory.get().toConstructor(pageParamOrModel._type);
   }
 
   protected _findObjectTypeForPageParamConstructor(paramConstructor: Constructor<PageParamDo>): string {
@@ -112,6 +105,7 @@ export class PageResolver {
       }
       return null;
     } catch (e) {
+      // FIXME CGU [js-bookmark] why is this catched? error gets lost
       const objectType = ObjectFactory.get().getObjectType(PageConstructor);
       $.log.info(`Unable to create and initialize ${objectType}. Cannot check for PageParam`);
     } finally {
