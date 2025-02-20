@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AnyDoEntity, ArrayDoNodeSerializer, arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectDeserializerModel, DataObjectSerializer, DateDoNodeSerializer, DoEntity, DoNodeSerializer, doValueMetaData, MapDoNodeSerializer,
-  NumberDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer
+  AnyDoEntity, ArrayDoNodeSerializer, arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectDeserializerModel, DataObjectSerializer, DateDoNodeSerializer, DefaultDoTypeResolver, DoEntity, DoNodeSerializer, DoTypeResolver,
+  doValueMetaData, MapDoNodeSerializer, NumberDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer
 } from '../index';
 
 /**
@@ -28,6 +28,20 @@ export const dataObjects = {
     new NumberDoNodeSerializer(),
     new ArrayDoNodeSerializer() // must be after Set
   ] as DoNodeSerializer<any>[],
+
+  /**
+   * Editable array of {@link DoTypeResolver} instances.
+   *
+   * The resolvers are called when an object is being deserialized by {@link DataObjectDeserializer} according to the order of this list.
+   * If a resolver returns a value, the next resolvers won't be called.
+   *
+   * By default, the list only contains an instance of {@link DefaultDoTypeResolver}.
+   *
+   * The list may be modified to add a custom resolver. This may be useful for example in the following scenario:
+   * Normally, a {@link BaseDoEntity} is created if the data object class cannot be resolved, unless {@link DataObjectDeserializerModel.createPojoIfDoIsUnknown} is set to true.
+   * To use a specific {@link BaseDoEntity} class for unknown {@link DoEntity._type} values, a custom resolver can be added.
+   */
+  doTypeResolvers: [new DefaultDoTypeResolver()] as DoTypeResolver[],
 
   /**
    * Serializes the given value and converts it to a JSON string using {@link JSON.stringify}.

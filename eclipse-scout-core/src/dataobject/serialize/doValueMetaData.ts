@@ -66,7 +66,7 @@ export const doValueMetaData = {
     return metaData?.args?.[0];
   },
 
-  chooseDataObjectType(obj: any, metaData: DoValueMetaData): Constructor {
+  chooseDataObjectType(obj: any, metaData?: DoValueMetaData): Constructor {
     const detectedClass = doValueMetaData.detectDataObjectClass(obj);
     const metaType = metaData?.type;
 
