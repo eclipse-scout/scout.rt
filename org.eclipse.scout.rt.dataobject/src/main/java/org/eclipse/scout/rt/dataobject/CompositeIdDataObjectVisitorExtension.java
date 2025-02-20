@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.dataobject.id.IIds;
 import org.eclipse.scout.rt.dataobject.id.IRootId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
 import org.eclipse.scout.rt.dataobject.id.IdCodec.IIdCodecFlag;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  * Visitor extension for {@link ICompositeId}.
@@ -53,19 +52,20 @@ public class CompositeIdDataObjectVisitorExtension extends AbstractDataObjectVis
   /**
    * Similar as in {@link IdCodec#toUnqualified(IId, IIdCodecFlag...)}.
    */
-  protected void unwrap(IId component, List<Object> unwrappedComponents) {
+  protected void unwrap(Object component, List<Object> unwrappedComponents) {
     if (component instanceof IRootId) {
-      unwrappedComponents.add(component.unwrap());
+      unwrappedComponents.add(((IRootId) component).unwrap());
     }
     else if (component instanceof ICompositeId) {
       ((ICompositeId) component).unwrap().forEach(id -> unwrap(id, unwrappedComponents));
     }
     else {
-      handleUnknownIdTypeUnwrap(component, unwrappedComponents);
+      unwrappedComponents.add(component);   // FIXME PBZ check this
+      //handleUnknownIdTypeUnwrap(component, unwrappedComponents);
     }
   }
 
-  protected void handleUnknownIdTypeUnwrap(IId id, List<Object> unwrappedComponents) {
-    throw new PlatformException("Unsupported id type {}, cannot unwrap id {}", id.getClass(), id);
-  }
+  //  protected void handleUnknownIdTypeUnwrap(IId id, List<Object> unwrappedComponents) {
+  //    throw new PlatformException("Unsupported id type {}, cannot unwrap id {}", id.getClass(), id);
+  //  }
 }

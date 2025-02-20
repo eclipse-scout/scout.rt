@@ -99,18 +99,18 @@ public class IdFactoryTest {
   @Test
   public void testCompositeIdByComponents() {
     FixtureCompositeId id = BEANS.get(IdFactory.class).createInternal(FixtureCompositeId.class, "abc", UUID.fromString("f0583afe-01d2-45a8-9c4e-c8342d721d9e"));
-    List<? extends IId> idComponents = id.unwrap();
+    List<?> idComponents = id.unwrap();
     assertEquals(2, idComponents.size());
-    assertEquals("abc", idComponents.get(0).unwrap());
-    assertEquals(UUID.fromString("f0583afe-01d2-45a8-9c4e-c8342d721d9e"), idComponents.get(1).unwrap());
+    assertEquals("abc", ((IRootId) idComponents.get(0)).unwrap());
+    assertEquals(UUID.fromString("f0583afe-01d2-45a8-9c4e-c8342d721d9e"), ((IRootId) idComponents.get(1)).unwrap());
   }
 
   @Test
   public void testCompositeIdByComponent() {
     FixtureCompositeId_CardinalityOne id = BEANS.get(IdFactory.class).createInternal(FixtureCompositeId_CardinalityOne.class, "abc");
-    List<? extends IId> idComponents = id.unwrap();
+    List<?> idComponents = id.unwrap();
     assertEquals(1, idComponents.size());
-    assertEquals("abc", idComponents.get(0).unwrap());
+    assertEquals("abc", ((IRootId) idComponents.get(0)).unwrap());
   }
 
   @Test
@@ -121,14 +121,14 @@ public class IdFactoryTest {
 
     // FixtureCompositeWithNullValuesId supports partial null values
     FixtureCompositeWithNullValuesId id2 = BEANS.get(IdFactory.class).createInternal(FixtureCompositeWithNullValuesId.class, "abc", null);
-    List<? extends IId> id2Components = id2.unwrap();
-    assertEquals("abc", id2Components.get(0).unwrap());
+    List<?> id2Components = id2.unwrap();
+    assertEquals("abc", ((IRootId) id2Components.get(0)).unwrap());
     assertNull(id2Components.get(1));
 
     FixtureCompositeWithNullValuesId id3 = BEANS.get(IdFactory.class).createInternal(FixtureCompositeWithNullValuesId.class, null, UUID.fromString("144a0317-8cb5-40b2-981f-1fae0781715f"));
-    List<? extends IId> id3Components = id3.unwrap();
+    List<?> id3Components = id3.unwrap();
     assertNull(id3Components.get(0));
-    assertEquals(UUID.fromString("144a0317-8cb5-40b2-981f-1fae0781715f"), id3Components.get(1).unwrap());
+    assertEquals(UUID.fromString("144a0317-8cb5-40b2-981f-1fae0781715f"), ((IRootId) id3Components.get(1)).unwrap());
   }
 
   @Test
@@ -168,7 +168,7 @@ public class IdFactoryTest {
     FixtureStringId expectedPart2 = FixtureStringId.of(c3);
 
     FixtureWrapperCompositeId id = BEANS.get(IdFactory.class).createInternal(FixtureWrapperCompositeId.class, c1, c2, c3);
-    List<? extends IId> idComponents = id.unwrap();
+    List<?> idComponents = id.unwrap();
     assertEquals(expectedPart1, idComponents.get(0));
     assertEquals(expectedPart2, idComponents.get(1));
   }

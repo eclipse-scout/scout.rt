@@ -150,12 +150,16 @@ public abstract class AbstractIdStructureTest {
     return rawComponents;
   }
 
-  protected void unwrapId(IId id, List<Object> rawComponents) {
+  // FIXME PBZ add to helper or move to IId...
+  protected void unwrapId(Object id, List<Object> rawComponents) {
     if (id instanceof ICompositeId) {
       (((ICompositeId) id).unwrap()).forEach(idComponent -> unwrapId(idComponent, rawComponents));
     }
+    else if (id instanceof IRootId) {
+      rawComponents.add(((IRootId) id).unwrap());
+    }
     else {
-      rawComponents.add(id.unwrap());
+      rawComponents.add(id);
     }
   }
 

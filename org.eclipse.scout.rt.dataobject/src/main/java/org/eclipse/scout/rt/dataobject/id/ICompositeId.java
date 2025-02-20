@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * An interface to represent an arbitrary id based on the composition of multiple {@link IId}'s as components. The
- * type(s) of the raw (wrapped) ids is required to be an instance of {@link IId}.
+ * type(s) of the raw (wrapped) ids is required to be an instance of {@link IId}.  FIXME PBZ ADJUST THIS COMMENT!
  * <p>
  * Subclasses must provide the following static factory methods:
  * <ul>
@@ -27,5 +27,5 @@ import java.util.List;
 public interface ICompositeId extends IId {
 
   @Override
-  List<? extends IId> unwrap();
+  List<?> unwrap();
 }

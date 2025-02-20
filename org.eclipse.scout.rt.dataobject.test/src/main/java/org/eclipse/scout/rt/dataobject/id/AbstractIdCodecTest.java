@@ -24,6 +24,8 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureDateId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureIntegerId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureMixedCompositeId;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureMixedWrapperCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureWrapperCompositeId;
@@ -134,10 +136,24 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testToQualifiedMixedCompositeId() {
+    FixtureMixedCompositeId id = IIds.create(FixtureMixedCompositeId.class, TEST_STRING, TEST_UUID);
+    String ext = getCodec().toQualified(id);
+    assertEquals("scout.FixtureMixedCompositeId:foobar;5833aae1-c813-4d7c-a342-56a53772a3ea", ext);
+  }
+
+  @Test
   public void testToQualifiedWrapperCompositeId() {
     FixtureWrapperCompositeId id = IIds.create(FixtureWrapperCompositeId.class, TEST_STRING, TEST_UUID, TEST_STRING_2);
     String ext = getCodec().toQualified(id);
     assertEquals("scout.FixtureWrapperCompositeId:foobar;5833aae1-c813-4d7c-a342-56a53772a3ea;bazäöl", ext);
+  }
+
+  @Test
+  public void testToQualifiedMixedWrapperCompositeId() {
+    FixtureMixedWrapperCompositeId id = IIds.create(FixtureMixedWrapperCompositeId.class, TEST_STRING, TEST_UUID, TEST_STRING_2);
+    String ext = getCodec().toQualified(id);
+    assertEquals("scout.FixtureMixedWrapperCompositeId:foobar;5833aae1-c813-4d7c-a342-56a53772a3ea;bazäöl", ext);
   }
 
   @Test
@@ -267,8 +283,22 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testToUnqualifiedMixedCompositeId() {
+    FixtureMixedCompositeId id = IIds.create(FixtureMixedCompositeId.class, TEST_STRING, TEST_UUID);
+    String ext = getCodec().toUnqualified(id);
+    assertEquals("foobar;5833aae1-c813-4d7c-a342-56a53772a3ea", ext);
+  }
+
+  @Test
   public void testToUnqualifiedWrapperCompositeId() {
     FixtureWrapperCompositeId id = IIds.create(FixtureWrapperCompositeId.class, TEST_STRING, TEST_UUID, TEST_STRING_2);
+    String ext = getCodec().toUnqualified(id);
+    assertEquals("foobar;5833aae1-c813-4d7c-a342-56a53772a3ea;bazäöl", ext);
+  }
+
+  @Test
+  public void testToUnqualifiedMixedWrapperCompositeId() {
+    FixtureMixedWrapperCompositeId id = IIds.create(FixtureMixedWrapperCompositeId.class, TEST_STRING, TEST_UUID, TEST_STRING_2);
     String ext = getCodec().toUnqualified(id);
     assertEquals("foobar;5833aae1-c813-4d7c-a342-56a53772a3ea;bazäöl", ext);
   }
@@ -398,9 +428,23 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testFromQualifiedMixedCompositeId() {
+    FixtureMixedCompositeId id1 = IIds.create(FixtureMixedCompositeId.class, TEST_STRING, TEST_UUID);
+    IId id2 = getCodec().fromQualified("scout.FixtureMixedCompositeId:foobar;5833aae1-c813-4d7c-a342-56a53772a3ea");
+    assertEquals(id1, id2);
+  }
+
+  @Test
   public void testFromQualifiedWrapperCompositeId() {
     FixtureWrapperCompositeId id1 = IIds.create(FixtureWrapperCompositeId.class, TEST_STRING, TEST_UUID, TEST_STRING_2);
     IId id2 = getCodec().fromQualified("scout.FixtureWrapperCompositeId:foobar;5833aae1-c813-4d7c-a342-56a53772a3ea;bazäöl");
+    assertEquals(id1, id2);
+  }
+
+  @Test
+  public void testFromQualifiedMixedWrapperCompositeId() {
+    FixtureMixedWrapperCompositeId id1 = IIds.create(FixtureMixedWrapperCompositeId.class, TEST_STRING, TEST_UUID, TEST_STRING_2);
+    IId id2 = getCodec().fromQualified("scout.FixtureMixedWrapperCompositeId:foobar;5833aae1-c813-4d7c-a342-56a53772a3ea;bazäöl");
     assertEquals(id1, id2);
   }
 
@@ -530,9 +574,23 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testFromUnqualifiedMixedCompositeId() {
+    FixtureMixedCompositeId id1 = IIds.create(FixtureMixedCompositeId.class, TEST_STRING, TEST_UUID);
+    FixtureMixedCompositeId id2 = getCodec().fromUnqualified(FixtureMixedCompositeId.class, "foobar;5833aae1-c813-4d7c-a342-56a53772a3ea");
+    assertEquals(id1, id2);
+  }
+
+  @Test
   public void testFromUnqualifiedWrapperCompositeId() {
     FixtureWrapperCompositeId id1 = IIds.create(FixtureWrapperCompositeId.class, TEST_STRING, TEST_UUID, TEST_STRING_2);
     IId id2 = getCodec().fromUnqualified(FixtureWrapperCompositeId.class, "foobar;5833aae1-c813-4d7c-a342-56a53772a3ea;bazäöl");
+    assertEquals(id1, id2);
+  }
+
+  @Test
+  public void testFromUnqualifiedMixedWrapperCompositeId() {
+    FixtureMixedWrapperCompositeId id1 = IIds.create(FixtureMixedWrapperCompositeId.class, TEST_STRING, TEST_UUID, TEST_STRING_2);
+    IId id2 = getCodec().fromUnqualified(FixtureMixedWrapperCompositeId.class, "foobar;5833aae1-c813-4d7c-a342-56a53772a3ea;bazäöl");
     assertEquals(id1, id2);
   }
 

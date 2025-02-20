@@ -160,13 +160,13 @@ public class IdCodec {
       return addSignature(id.getClass(), mapper.apply(value), flags);
     }
     else if (id instanceof ICompositeId) {
-      List<? extends IId> components = ((ICompositeId) id).unwrap();
+      List<?> components = ((ICompositeId) id).unwrap();
       // remove signature flag as composites are signed as one and not part by part
       Set<IIdCodecFlag> flagsWithoutSignature = flags.stream()
           .filter(Predicate.not(IdCodecFlag.SIGNATURE::equals))
           .collect(Collectors.toSet());
       return addSignature(id.getClass(), components.stream()
-          .map(comp -> toUnqualified(comp, flagsWithoutSignature))
+          .map(comp -> toUnqualifiedInternal(comp, flagsWithoutSignature))
           .map(s -> s == null ? "" : s) // empty string if component is null just in case of composite id
           .collect(Collectors.joining(";")), flags);
     }
@@ -174,6 +174,23 @@ public class IdCodec {
       return addSignature(UnknownId.class, ((UnknownId) id).getId(), flags);
     }
     return addSignature(id.getClass(), handleToUnqualifiedUnknownIdType(id, flags), flags);
+  }
+
+  // FIXME PBZ beautify this code
+  protected String toUnqualifiedInternal(Object id, Set<IIdCodecFlag> flags) {
+    if (id instanceof IId) {
+      return toUnqualified((IId) id, flags);
+    }
+
+    if (id == null) {
+      return null;
+    }
+
+    Function<Object, String> mapper = m_rawTypeToStringMapper.get(id.getClass());
+    if (mapper == null) {
+      throw new IdCodecException("Missing raw type mapper for wrapped type {}", id.getClass());
+    }
+    return mapper.apply(id);
   }
 
   /**

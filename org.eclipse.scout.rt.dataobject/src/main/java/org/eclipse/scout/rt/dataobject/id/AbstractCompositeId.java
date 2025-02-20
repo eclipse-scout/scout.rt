@@ -22,9 +22,9 @@ import java.util.List;
 public abstract class AbstractCompositeId implements ICompositeId {
   private static final long serialVersionUID = 1L;
 
-  private final List<? extends IId> m_idComponents;
+  private final List<?> m_idComponents;
 
-  protected AbstractCompositeId(IId... idComponents) {
+  protected AbstractCompositeId(Object... idComponents) {
     if (idComponents == null || idComponents.length == 0) {
       throw new IllegalArgumentException("idComponents is null");
     }
@@ -32,7 +32,7 @@ public abstract class AbstractCompositeId implements ICompositeId {
   }
 
   @Override
-  public List<? extends IId> unwrap() {
+  public List<?> unwrap() {
     return Collections.unmodifiableList(m_idComponents);
   }
 
@@ -40,7 +40,7 @@ public abstract class AbstractCompositeId implements ICompositeId {
    * @return component with given {@code index} converted to its type {@code ID}
    */
   @SuppressWarnings("unchecked")
-  protected final <ID extends IId> ID idComponent(int index) {
+  protected final <ID> ID idComponent(int index) {
     return (ID) m_idComponents.get(index);
   }
 
