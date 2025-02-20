@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AnyDoEntity, ArrayDoNodeSerializer, arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectDeserializerModel, DataObjectSerializer, DateDoNodeSerializer, DoEntity, DoNodeSerializer, doValueMetaData, MapDoNodeSerializer,
-  NumberDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer
+  AnyDoEntity, ArrayDoNodeSerializer, arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectDeserializerModel, DataObjectSerializer, DateDoNodeSerializer, DoEntity, DoNodeSerializer, doValueMetaData, FallbackDoProvider,
+  MapDoNodeSerializer, NumberDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer
 } from '../index';
 
 /**
@@ -28,6 +28,13 @@ export const dataObjects = {
     new NumberDoNodeSerializer(),
     new ArrayDoNodeSerializer() // must be after Set
   ] as DoNodeSerializer<any>[],
+
+  /**
+   * Editable array of {@link FallbackDoProvider} instances.
+   * By default, a {@link BaseDoEntity} is created if the data object class cannot be resolved, unless {@link DataObjectDeserializerModel.createPojoIfDoIsUnknown} is set to true.
+   * To use a specific {@link BaseDoEntity} class for unknown {@link DoEntity._type} values, add a custom fallback provider to this array.
+   */
+  fallbackDoProviders: [] as FallbackDoProvider[],
 
   /**
    * Serializes the given value and converts it to a JSON string using {@link JSON.stringify}.
