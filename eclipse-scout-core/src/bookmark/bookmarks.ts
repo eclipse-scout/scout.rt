@@ -49,11 +49,6 @@ export class NodeBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo 
   displayText: string;
 }
 
-@typeName('crm.BookmarkTableRowIdentifier')
-export class BookmarkTableRowIdentifierDo extends BaseDoEntity {
-  keyComponents: IBookmarkTableRowIdentifierComponentDo[];
-}
-
 @typeName('crm.TableBookmarkPage')
 export class TableBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo {
   pageParam: PageParamDo;
@@ -64,6 +59,11 @@ export class TableBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo
   searchFilterComplete: boolean; // FIXME bsh [js-bookmark] always true?
   searchData: DoEntity; // FIXME bsh [js-bookmark] ISearchDo;
   chartTableControlConfig: DoEntity; // FIXME bsh [js-bookmark] ChartTableControlConfigDo;
+}
+
+@typeName('crm.BookmarkTableRowIdentifier')
+export class BookmarkTableRowIdentifierDo extends BaseDoEntity {
+  keyComponents: IBookmarkTableRowIdentifierComponentDo[];
 }
 
 export interface IBookmarkTableRowIdentifierComponentDo {
@@ -84,7 +84,7 @@ export class BookmarkTableRowIdentifierEntityKeyComponentDo extends BaseDoEntity
 
 @typeName('crm.BookmarkTableRowIdentifierDateComponent')
 export class BookmarkTableRowIdentifierDateComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
-  key: string;
+  key: Date;
 }
 
 @typeName('crm.BookmarkTableRowIdentifierBooleanComponent')

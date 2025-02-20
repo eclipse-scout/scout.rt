@@ -1166,6 +1166,7 @@ export * from './bookmark/JsPageUiHandler';
 export * from './bookmark/BookmarkAdapter';
 export * from './bookmark/BookmarkSupport';
 export * from './bookmark/BookmarkSupportModel';
+export * from './bookmark/BookmarkTableRowIdentifierDoFactory';
 export * from './bookmark/BookmarkForm';
 export * from './bookmark/BookmarkFormModel';
 export * from './bookmark/ManageBookmarksForm';
