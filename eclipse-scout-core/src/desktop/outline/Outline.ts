@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -60,6 +60,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
   $title: JQuery;
   $titleText: JQuery;
 
+  protected _bookmarkAdapter: BookmarkAdapter;
   protected _detailContentDestroyHandler: EventHandler<Event<Widget>>;
   protected _detailMenusNodesSelectedHandler: EventListener & {
     outline: Outline;
@@ -103,6 +104,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.messageBoxController = null;
     this.fileChooserController = null;
     this.textFilterEnabled = false;
+    this._bookmarkAdapter = null;
     this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
     this._detailMenusNodesSelectedHandler = null;
     this._defaultDetailFormDestroyHandler = this._onDefaultDetailFormDestroy.bind(this);
