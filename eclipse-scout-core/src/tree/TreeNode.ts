@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -105,6 +105,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
    *
    * @internal
    */
+  // FIXME CGU [js-bookmark] why was this necessary? Normally, init writes model onto widget
   _loadFromModel(model: InitModelOf<this>): InitModelOf<this> {
     model = model || {} as InitModelOf<this>;
     model = this._prepareModel(model);
@@ -117,6 +118,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
    * and the given `model`. An error is thrown if the `parent` is not a {@link Tree}. If no `session`
    * is provided, the parent tree's session is automatically inherited.
    */
+  // FIXME CGU [js-bookmark] this is different than Widget.ts, Widget should be aligned. I think asserting the parent should be in _init as done in Widget.ts
   protected _prepareModel(model: InitModelOf<this>): InitModelOf<this> {
     let staticModel = this._jsonModel();
     if (staticModel) {

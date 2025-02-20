@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -108,7 +108,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   // --------------------------------------
 
   createBookmark(): JQuery.Promise<BookmarkDo> {
-    let outlineId = this.desktop.outline?.getBookmarkAdapter().buildId();
+    let outlineId = this.desktop.outline?.getObjectUuidBuilder().buildId();
     if (!outlineId) {
       // throw new VetoException(TEXTS.get("CannotCreateBookmarkAtThisLocation"));
       return $.rejectedPromise(BookmarkSupport.ERROR_MISSING_OUTLINE);
@@ -286,9 +286,9 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   protected _openBookmarkLocal(bookmarkDefinition: OutlineBookmarkDefinitionDo, result: ActivateBookmarkResult): JQuery.Promise<void> {
     // Check if we are already on the correct outline
     let outline = this.desktop.outline;
-    if (!outline || outline.getBookmarkAdapter().buildId() !== bookmarkDefinition.outlineId) {
+    if (!outline || outline.getObjectUuidBuilder().buildId() !== bookmarkDefinition.outlineId) {
       outline = this.desktop.getOutlines().find(outline => {
-        let outlineId = outline.getBookmarkAdapter().buildId();
+        let outlineId = outline.getObjectUuidBuilder().buildId();
         return outlineId === bookmarkDefinition.outlineId;
       });
     }

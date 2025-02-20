@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BaseDoEntity, ButtonTile, ChildModelOf, Constructor, dataObjects, DoEntity, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, menus,
-  ObjectOrChildModel, ObjectUuidBuilder, ObjectUuidProvider, ObjectWithObjectUuidBuilder, ObjectWithUuid, Outline, PageEventMap, PageIdDummyPageParamDo, PageModel, PropertyChangeEvent, scout, strings, Table, TableRow, TableRowClickEvent,
-  TileOutlineOverview, TileOverviewForm, TreeNode, Widget
+  BaseDoEntity, BookmarkAdapter, ButtonTile, ChildModelOf, Constructor, dataObjects, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, FallbackDoProvider, Form, HtmlComponent, icons, InitModelOf,
+  inspector, Menu, MenuBar, menus, ObjectOrChildModel, ObjectUuidBuilder, ObjectUuidProvider, ObjectWithObjectUuidBuilder, ObjectWithUuid, Outline, PageEventMap, PageIdDummyPageParamDo, PageModel, PropertyChangeEvent, scout, strings, Table,
+  TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -67,6 +67,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   protected _tableRowClickHandler: EventHandler<TableRowClickEvent>;
   protected _detailTableModel: ChildModelOf<Table>;
   protected _objectUuidBuilder: ObjectUuidBuilder;
+  protected _bookmarkAdapter: BookmarkAdapter;
   protected _pageParamInternal: PageParamDo;
   /** @internal */
   _detailFormModel: ChildModelOf<Form>;
@@ -101,6 +102,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     this._detailTableModel = null;
     this._detailFormModel = null;
     this._objectUuidBuilder = null;
+    this._bookmarkAdapter = null;
     this._menuOwnerMenusChangeHandler = this._onMenuOwnerMenusChange.bind(this);
   }
 
@@ -146,6 +148,13 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
       });
     }
     return this._objectUuidBuilder;
+  }
+
+  getBookmarkAdapter(): BookmarkAdapter {
+    if (!this._bookmarkAdapter) {
+      this._bookmarkAdapter = scout.create(BookmarkAdapter);
+    }
+    return this._bookmarkAdapter;
   }
 
   protected static _removePropertyIfLazyLoading(object: PageModel, name: string): any {
@@ -593,7 +602,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   }
 
   matchesPageParam(pageParam: PageParamDo): boolean {
-    return bookmarks.pageParamsMatch(this.pageParam, pageParam);
+    return this.getBookmarkAdapter().pageParamsMatch(this.pageParam, pageParam);
   }
 
   get pageParam(): PageParamDo {
@@ -609,15 +618,16 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   }
 
   set pageParam(pageParam: PageParamDo | object) {
-    if (pageParam instanceof BaseDoEntity || !pageParam) {
-      this._pageParamInternal = pageParam;
+    if (pageParam instanceof PageParamDo || !pageParam) {
+      this._pageParamInternal = pageParam as PageParamDo;
     } else {
+      // FIXME CGU [js-bookmark] Should we add _setPageParam with this code and move get pageParam to BookmarkAdapter?
       this._pageParamInternal = dataObjects.deserialize(pageParam, this.pageParamType);
     }
   }
 
   protected _computeDummyPageParam(): PageParamDo {
-    let pageId = this.getBookmarkAdapter().buildId();
+    let pageId = this.getObjectUuidBuilder().buildId();
     if (pageId) {
       return scout.create(PageIdDummyPageParamDo, {pageId});
     }
@@ -676,14 +686,11 @@ export type MenuOwner = Widget & { menus: Menu[]; setMenus: (menus: ObjectOrChil
 
 /**
  * Base interface for all page param types.
- * FIXME bsh [js-bookmark]: PageParamDo should be a class?
  */
-export interface PageParamDo extends DoEntity {
-  [x: string]: any; // FIXME bsh [js-bookmark] Why is this necessary??? WidgetsOutlineModel has errors otherwise
+export class PageParamDo extends BaseDoEntity {
 }
 
-// FIXME bsh [js-bookmark]: 'DO' should extend PageParamDo as soon as it is a class
-export function pageParam<DO extends BaseDoEntity>(pareParamDo: Constructor<DO>) {
+export function pageParam<DO extends PageParamDo>(pareParamDo: Constructor<DO>) {
   return <T extends Constructor>(BaseClass: T) => class extends BaseClass {
     constructor(...args: any[]) {
       super(...args);
@@ -691,3 +698,20 @@ export function pageParam<DO extends BaseDoEntity>(pareParamDo: Constructor<DO>)
     }
   };
 }
+
+/**
+ * {@link PageParamDo}s for Scout JS pages don't exist on server side but bookmarks may contain them using the generic DoEntity type.
+ * This fallback creator ensures a real {@link PageParamDo} instance will be created whenever a data object is deserialized whose type ends with 'PageParam'.
+ * This guarantees all page params are actual instances of {@link PageParamDo}.
+ */
+export class PageParamFallbackDoCreator implements FallbackDoProvider {
+  accept(rawObj: Record<string, any>): boolean {
+    return rawObj?._type?.endsWith('PageParam');
+  }
+
+  provide(): Constructor<BaseDoEntity> {
+    return PageParamDo;
+  }
+}
+
+dataObjects.fallbackDoProviders.push(new PageParamFallbackDoCreator());

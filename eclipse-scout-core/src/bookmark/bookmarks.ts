@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -115,7 +115,7 @@ export class BookmarkTableRowIdentifierLongComponentDo extends BaseDoEntity impl
 // --------------------------------------------------
 
 @typeName(PageIdDummyPageParamDo.TYPE_NAME)
-export class PageIdDummyPageParamDo extends BaseDoEntity implements PageParamDo {
+export class PageIdDummyPageParamDo extends PageParamDo {
   static TYPE_NAME = 'crm.PageIdDummyPageParam';
 
   pageId: string;
@@ -132,24 +132,6 @@ export class ActivateBookmarkResultDo extends BaseDoEntity {
 // --------------------------------------------------
 
 export const bookmarks = {
-
-  // FIXME bsh [js-bookmark] Find a better solution! Fix confusion between _type and objectType
-  pageParamsMatch(pageParam1: PageParamDo, pageParam2: PageParamDo) {
-    if (!pageParam1 && !pageParam2) {
-      return true;
-    }
-    if (!pageParam1 || !pageParam2) {
-      return false;
-    }
-
-    if (objects.equalsRecursive(pageParam1, pageParam2)) {
-      return true;
-    }
-
-    let normalizedJson1 = bookmarks.stringifyNormalized(pageParam1);
-    let normalizedJson2 = bookmarks.stringifyNormalized(pageParam2);
-    return normalizedJson1 === normalizedJson2;
-  },
 
   // FIXME bsh [js-bookmark] move compare logic to dataObjects.ts
   stringifyNormalized(object: any): string {

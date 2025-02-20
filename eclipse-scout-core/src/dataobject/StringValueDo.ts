@@ -7,11 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DoEntity} from './../index';
+import {BaseDoEntity, typeName, ValueDo} from '..';
 
-/**
- * Wrapper data object for a generic value.
- */
-export interface ValueDo<T> extends DoEntity {
-  value: T;
+@typeName('scout.StringValue')
+export class StringValueDo extends BaseDoEntity implements ValueDo<string> {
+  value: string;
 }
