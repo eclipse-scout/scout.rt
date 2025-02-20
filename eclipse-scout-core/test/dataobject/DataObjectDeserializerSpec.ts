@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, DataObjectDeserializer, DataObjectInventory, dataObjects, dates, ObjectFactory, objects, scout, typeName} from '../../src/index';
+import {arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectInventory, dataObjects, dates, DefaultDoTypeResolver, DoValueMetaData, ObjectFactory, objects, scout, typeName} from '../../src/index';
 
 describe('DataObjectDeserializer', () => {
 
@@ -215,7 +215,7 @@ describe('DataObjectDeserializer', () => {
     expect(fixture03Sub.nestedNestedDateSub).toEqual(dates.parseJsonDate('2024-12-12 08:03:39.708Z'));
   });
 
-  it('Uses pojo for unknown DOs if requested', () => {
+  it('uses pojo for unknown DOs if requested', () => {
     const json = `{
       "_type": "scout.Fixture02",
       "nestedObjUnknown": {
@@ -236,6 +236,31 @@ describe('DataObjectDeserializer', () => {
     const topLevelPojo = dataObjects.parse('{"_type": "not_known"}', null, {createPojoIfDoIsUnknown: true}) as any;
     expect(objects.isPojo(topLevelPojo)).toBeTrue();
     expect(topLevelPojo._type).toBe('not_known');
+  });
+
+  it('considers custom type resolvers when resolving the data object type', () => {
+    class DoTypeResolver implements DefaultDoTypeResolver {
+      resolve(rawObj: Record<string, any>, metaData: DoValueMetaData): Constructor {
+        if (rawObj?._type === 'SpecialOne') {
+          return Fixture01Do;
+        }
+        return null;
+      }
+    }
+
+    let dataObject = dataObjects.parse('{"_type": "SpecialOne"}');
+    expect(dataObject).toBeInstanceOf(BaseDoEntity);
+
+    // Custom resolver always resolves to Fixture01Do
+    const resolver = new DoTypeResolver();
+    dataObjects.doTypeResolvers.push(resolver);
+    dataObject = dataObjects.parse('{"_type": "SpecialOne"}');
+    expect(dataObject).toBeInstanceOf(Fixture01Do);
+
+    // Default behavior applies if resolver is removed again
+    arrays.remove(dataObjects.doTypeResolvers, resolver);
+    dataObject = dataObjects.parse('{"_type": "SpecialOne"}');
+    expect(dataObject).toBeInstanceOf(BaseDoEntity);
   });
 });
 
