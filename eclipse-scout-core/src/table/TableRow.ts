@@ -44,6 +44,9 @@ export class TableRow implements TableRowModel, ObjectWithType, FilterElement {
    */
   page: Page;
   expandable: boolean;
+  /**
+   * Precomputed row identifier for bookmarks (e.g. used for Scout Classic)
+   */
   bookmarkIdentifier: BookmarkTableRowIdentifierDo;
 
   constructor() {
