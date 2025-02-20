@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ActivateBookmarkResultDo, App, arrays, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, dataObjects, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager,
-  HybridManagerActionEndEventResult, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session,
-  SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
+  ActivateBookmarkResultDo, App, arrays, BookmarkDo, bookmarks, BookmarkSupportModel, dataObjects, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, HybridManagerActionEndEventResult, IBookmarkPageDo,
+  InitModelOf, MessageBoxes, NodeBookmarkPageDo, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool,
+  webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -311,8 +311,8 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
     let pagePath = result.remainingPagePath.slice(); // create copy because arrays is altered
     let parent = result.targetPage || outline;
-    let parentRowBookmarkIdentifier = result.targetBookmarkPage instanceof TableBookmarkPageDo ? result.targetBookmarkPage.expandedChildRow : null;
-    return this._resolveNextPageInPath(pagePath, parent, parentRowBookmarkIdentifier)
+    let parentPageDefinition = result.targetBookmarkPage;
+    return this._resolveNextPageInPath(pagePath, parent, parentPageDefinition)
       .then(page => {
         if (!page) {
           return $.rejectedPromise(BookmarkSupport.ERROR_PAGE_NOT_FOUND);
@@ -321,7 +321,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       });
   }
 
-  protected _resolveNextPageInPath(pagePath: IBookmarkPageDo[], parent: Outline | Page, parentRowBookmarkIdentifier: BookmarkTableRowIdentifierDo): JQuery.Promise<Page> {
+  protected _resolveNextPageInPath(pagePath: IBookmarkPageDo[], parent: Outline | Page, parentPageDefinition: IBookmarkPageDo): JQuery.Promise<Page> {
     let parentPage = parent instanceof Page ? parent : null;
 
     if (arrays.empty(pagePath)) {
@@ -329,7 +329,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
 
     let pageDefinition = pagePath.shift();
-    return this._resolvePage(pageDefinition, parent, parentRowBookmarkIdentifier)
+    return this._resolvePage(pageDefinition, parent, parentPageDefinition)
       .then((page: Page) => {
         if (!page) {
           // Unable to find a page that matches the requested page definition. Put it back to the page path (so later
@@ -340,21 +340,22 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
         page.activate();
 
-        let expandedChildRow = pageDefinition instanceof TableBookmarkPageDo ? pageDefinition.expandedChildRow : null;
-        let selectedChildRows = pageDefinition instanceof TableBookmarkPageDo ? pageDefinition.selectedChildRows : null;
-
-        // FIXME bsh [js-bookmark] Try to reduce duplicate code, maybe change argument type?
-        // // Restore selection of last table page
-        if (arrays.empty(pagePath) && page.nodeType === Page.NodeType.TABLE && page.detailTable && arrays.hasElements(selectedChildRows)) {
-          // FIXME bsh [js-bookmark] Handle hierarchical table, see Table#restoreSelection
-          let normalizedRowIdentifiers = selectedChildRows.map(bookmarkIdentifier => bookmarks.stringifyNormalized(bookmarkIdentifier));
-          let selectedRows = page.detailTable.rows.filter(row => {
-            let normalizedRowIdentifier = bookmarks.stringifyNormalized(page.getTableRowIdentifier(row));
-            return normalizedRowIdentifiers.includes(normalizedRowIdentifier);
-          });
-          page.detailTable.selectRows(selectedRows);
+        // Restore selection
+        if (page.nodeType === Page.NodeType.TABLE && page.detailTable) {
+          let selectedChildRows = pageDefinition instanceof TableBookmarkPageDo ? pageDefinition.selectedChildRows : null;
+          if (arrays.hasElements(selectedChildRows)) {
+            // FIXME bsh [js-bookmark] Handle hierarchical table, see Table#restoreSelection
+            let normalizedRowIdentifiers = selectedChildRows
+              .map(bookmarkIdentifier => bookmarks.stringifyNormalized(bookmarkIdentifier));
+            let selectedRows = page.detailTable.rows.filter(row => {
+              let normalizedRowIdentifier = bookmarks.stringifyNormalized(page.getTableRowIdentifier(row));
+              return normalizedRowIdentifiers.includes(normalizedRowIdentifier);
+            });
+            page.detailTable.selectRows(selectedRows);
+          }
         }
 
+        // Apply search filter
         if (page instanceof PageWithTable) {
           if (pageDefinition instanceof TableBookmarkPageDo) {
             page.setSearchFilter(pageDefinition.searchData);
@@ -364,11 +365,11 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
         }
 
         return page.loadChildren()
-          .then(() => this._resolveNextPageInPath(pagePath, page, expandedChildRow));
+          .then(() => this._resolveNextPageInPath(pagePath, page, pageDefinition));
       });
   }
 
-  protected _resolvePage(pageDefinition: IBookmarkPageDo, parent: Page | Outline, parentRowBookmarkIdentifier: BookmarkTableRowIdentifierDo): JQuery.Promise<Page> {
+  protected _resolvePage(pageDefinition: IBookmarkPageDo, parent: Page | Outline, parentPageDefinition: IBookmarkPageDo): JQuery.Promise<Page> {
     if (parent instanceof Outline) {
       // Lookup child page by pageParam
       let result = parent.nodes.find(node => node.matchesPageParam(pageDefinition.pageParam));
@@ -376,18 +377,21 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
 
     if (parent instanceof Page) {
+      parent.ensureDetailTable(); // ensure detail table is present, so loadChildren() will load the table data
       return parent.ensureLoadChildren()
         .then(() => {
           if (parent.nodeType === Page.NodeType.TABLE) {
-            parent.ensureDetailTable(); // FIXME bsh [js-bookmark] This does not work for classic pages!!!
-            // Lookup child page by parent PK (ignore PageParam)
-            let normalizedParentRowIdentifier = bookmarks.stringifyNormalized(parentRowBookmarkIdentifier);
-            let row = parent.detailTable.rows.find(row => {
-              let normalizedRowIdentifier = bookmarks.stringifyNormalized(parent.getTableRowIdentifier(row));
-              return normalizedRowIdentifier === normalizedParentRowIdentifier;
-            });
-            if (row) {
-              return row.page;
+            if (parentPageDefinition instanceof TableBookmarkPageDo) {
+              // Lookup child page by parent PK (ignore PageParam)
+              let parentRowBookmarkIdentifier = parentPageDefinition.expandedChildRow;
+              let normalizedParentRowIdentifier = bookmarks.stringifyNormalized(parentRowBookmarkIdentifier);
+              let row = parent.detailTable.rows.find(row => {
+                let normalizedRowIdentifier = bookmarks.stringifyNormalized(parent.getTableRowIdentifier(row));
+                return normalizedRowIdentifier === normalizedParentRowIdentifier;
+              });
+              if (row) {
+                return row.page;
+              }
             }
             return null; // not found
           }
