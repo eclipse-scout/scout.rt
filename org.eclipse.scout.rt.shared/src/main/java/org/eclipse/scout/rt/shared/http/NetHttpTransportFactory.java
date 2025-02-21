@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.shared.http;
-
-import org.eclipse.scout.rt.shared.servicetunnel.http.MultiSessionCookieStoreInstaller;
 
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -21,7 +19,7 @@ import com.google.api.client.http.javanet.NetHttpTransport.Builder;
  * </p>
  * <p>
  * Unfortunately these transports do not support cookie handling per instance. Several settings must be set VM wide. If
- * cookies per session should be used it might be helpful to activate {@link MultiSessionCookieStoreInstaller}.
+ * cookies per session should be used it might be helpful to install the client-side multi session cookie store.
  * </p>
  */
 public class NetHttpTransportFactory implements IHttpTransportFactory {

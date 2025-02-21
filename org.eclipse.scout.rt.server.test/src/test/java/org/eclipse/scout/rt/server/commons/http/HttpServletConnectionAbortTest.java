@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,12 +9,12 @@
  */
 package org.eclipse.scout.rt.server.commons.http;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.ISocketWriteInterceptor;
-import org.eclipse.scout.rt.shared.servicetunnel.http.ByteArrayContentEx;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.junit.After;
@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.InputStreamContent;
 
 /**
  * Test what happens if the servlet is not reading the input stream content of a post request.
@@ -85,7 +86,7 @@ public class HttpServletConnectionAbortTest {
       System.out.println("ROUND " + i);
       HttpRequest req = m_client
           .getHttpRequestFactory()
-          .buildPostRequest(new GenericUrl(m_server.getServletUrl()), new ByteArrayContentEx(null, reqBytes, false));
+          .buildPostRequest(new GenericUrl(m_server.getServletUrl()), new InputStreamContent("application/octet-stream", new ByteArrayInputStream(reqBytes)));
       req.getHeaders().setCacheControl("no-cache");
       req.getHeaders().setContentType("application/octet-stream");
       req.getHeaders().put("Pragma", "no-cache");
@@ -142,7 +143,7 @@ public class HttpServletConnectionAbortTest {
       System.out.println("ROUND " + i);
       HttpRequest req = m_client
           .getHttpRequestFactory()
-          .buildPostRequest(new GenericUrl(m_server.getServletUrl()), new ByteArrayContentEx(null, reqBytes, false));
+          .buildPostRequest(new GenericUrl(m_server.getServletUrl()), new InputStreamContent("application/octet-stream", new ByteArrayInputStream(reqBytes)));
       req.getHeaders().setCacheControl("no-cache");
       req.getHeaders().setContentType("application/octet-stream");
       req.getHeaders().put("Pragma", "no-cache");

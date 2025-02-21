@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.server.servicetunnel;
 
+import org.eclipse.scout.rt.testing.shared.services.lookup.IEchoService;
+
 public class EchoService implements IEchoService {
 
   @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,10 +40,10 @@ public class DefaultAuthTokenPrincipalProducer implements IPrincipalProducer2 {
    */
   @Override
   public Principal produce(String username, List<String> params) {
-    if (params != null && params.size() > 0 && DefaultAuthTokenSigner.JWT_IDENTIFIER.equals(params.get(0))) {
+    if (params != null && !params.isEmpty() && DefaultAuthTokenSigner.JWT_IDENTIFIER.equals(params.get(0))) {
       return BEANS.get(JwtPrincipalProducer.class).produce(username, params.subList(1, params.size()));
     }
-    if (params != null && params.size() > 0 && DefaultAuthTokenSigner.SAML_IDENTIFIER.equals(params.get(0))) {
+    if (params != null && !params.isEmpty() && DefaultAuthTokenSigner.SAML_IDENTIFIER.equals(params.get(0))) {
       return BEANS.get(SamlPrincipalProducer.class).produce(username, params.subList(1, params.size()));
     }
     return BEANS.get(SimplePrincipalProducer.class).produce(username, params);

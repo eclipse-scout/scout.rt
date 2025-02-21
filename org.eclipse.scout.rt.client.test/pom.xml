@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2025 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -46,9 +46,9 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.jackson.test</artifactId>
-      <scope>test</scope>
+      <artifactId>org.eclipse.scout.rt.rest.jersey.test</artifactId>
     </dependency>
+
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>

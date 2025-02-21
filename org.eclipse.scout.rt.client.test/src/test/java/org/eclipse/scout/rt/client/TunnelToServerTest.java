@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,12 +11,12 @@ package org.eclipse.scout.rt.client;
 
 import java.lang.reflect.Method;
 
+import org.eclipse.scout.rt.client.servicetunnel.ServiceTunnelProxyProducer;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelProxyProducer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

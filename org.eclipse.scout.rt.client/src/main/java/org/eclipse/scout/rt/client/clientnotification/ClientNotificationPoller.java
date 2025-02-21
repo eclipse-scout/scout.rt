@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import jakarta.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.servicetunnel.HttpServiceTunnel;
 import org.eclipse.scout.rt.dataobject.id.IIds;
 import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -44,7 +45,6 @@ import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectProperty;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +66,7 @@ public class ClientNotificationPoller {
     synchronized (m_lock) {
       // ensure the poller starts only once.
       Assertions.assertNull(m_pollerFuture);
-      if (BEANS.get(IServiceTunnel.class).isActive()) {
+      if (BEANS.get(HttpServiceTunnel.class).isActive()) {
         startPoller();
         startLivenessChecker();
       }

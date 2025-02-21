@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2025 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -27,10 +27,14 @@
       <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
     </dependency>
 
-    <!-- Jackson -->
+    <!-- JAX-RS Jersey Client -->
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.jackson</artifactId>
+      <artifactId>org.eclipse.scout.rt.rest.jersey.client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.inject</groupId>
+      <artifactId>jersey-hk2</artifactId>
     </dependency>
 
     <!-- Scout app (Jetty) -->

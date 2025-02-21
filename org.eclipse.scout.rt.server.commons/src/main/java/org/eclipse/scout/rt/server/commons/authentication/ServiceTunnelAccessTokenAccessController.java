@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,10 +21,10 @@ import jakarta.servlet.http.HttpSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.security.IPrincipalProducer2;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelConstants;
 import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
 import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthTokenPrincipalProducer;
 import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthTokenVerifier;
-import org.eclipse.scout.rt.shared.servicetunnel.http.HttpServiceTunnel;
 
 /**
  * Access controller to continue filter-chain if a valid AbstractHttpServiceTunnel#TOKEN_AUTH_HTTP_HEADER Service Tunnel
@@ -57,7 +57,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
       return false;
     }
 
-    String tokenString = request.getHeader(HttpServiceTunnel.TOKEN_AUTH_HTTP_HEADER);
+    String tokenString = request.getHeader(ServiceTunnelConstants.TOKEN_AUTH_HTTP_HEADER);
     if (StringUtility.isNullOrEmpty(tokenString)) {
       return false;
     }

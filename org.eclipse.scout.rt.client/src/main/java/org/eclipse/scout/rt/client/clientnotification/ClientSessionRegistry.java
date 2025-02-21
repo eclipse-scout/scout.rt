@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,13 +18,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.servicetunnel.HttpServiceTunnel;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
       m_sessionIdToSession.put(sessionId, new WeakReference<>(session));
     }
     // if the client session is already started, otherwise the listener will invoke the clientSessionStated method.
-    if (BEANS.get(IServiceTunnel.class).isActive() && session.isActive()) {
+    if (BEANS.get(HttpServiceTunnel.class).isActive() && session.isActive()) {
       sessionStarted(session);
     }
   }
@@ -199,7 +199,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
 
   @Override
   public void sessionChanged(SessionEvent event) {
-    if (!BEANS.get(IServiceTunnel.class).isActive()) {
+    if (!BEANS.get(HttpServiceTunnel.class).isActive()) {
       return;
     }
     ISession source = event.getSource();

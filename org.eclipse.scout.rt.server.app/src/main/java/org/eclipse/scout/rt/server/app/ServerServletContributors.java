@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,13 +12,20 @@ package org.eclipse.scout.rt.server.app;
 import java.util.List;
 
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.scout.rt.app.filter.ExceptionFilter;
 import org.eclipse.scout.rt.jetty.IServletContributor;
 import org.eclipse.scout.rt.jetty.IServletFilterContributor;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.server.ServiceTunnelServlet;
+import org.eclipse.scout.rt.rest.ApiRestApplication;
+import org.eclipse.scout.rt.rest.ServletConstants;
+import org.eclipse.scout.rt.rest.cancellation.RestRequestCancellationServletFilter;
 import org.eclipse.scout.rt.server.commons.healthcheck.HealthCheckServlet;
+import org.eclipse.scout.rt.server.context.ServerRunContextFilter;
+import org.glassfish.jersey.server.ServerProperties;
+import org.glassfish.jersey.servlet.ServletContainer;
+import org.glassfish.jersey.servlet.ServletProperties;
 
 /**
  * {@link IServletContributor} and {@link IServletFilterContributor} for backend server.
@@ -39,8 +46,7 @@ public final class ServerServletContributors {
 
   /**
    * Subclasses must register a filter on `"/*"` that takes care of authentication. If no such filter is registered, all
-   * resources provided by registered servlets (e.g. {@link ServiceTunnelServletContributor}) are accessible without
-   * authentication.
+   * resources provided by registered servlets are accessible without authentication.
    * <p>
    * The paths provided by {@link #getFilterExcludes()} should be excluded from authentication.
    */
@@ -67,6 +73,27 @@ public final class ServerServletContributors {
     }
   }
 
+  /**
+   * After {@link AuthFilterContributor}.
+   */
+  @Order(2000)
+  public static class ApiServerRunContextFilterContributor implements IServletFilterContributor {
+
+    @Override
+    public void contribute(ServletContextHandler handler) {
+      handler.addFilter(ServerRunContextFilter.class, ServletConstants.API_PATH_WITH_WILDCARD, null);
+    }
+  }
+
+  @Order(8000)
+  public static class ApiCancellationFilterContributor implements IServletFilterContributor {
+
+    @Override
+    public void contribute(ServletContextHandler handler) {
+      handler.addFilter(RestRequestCancellationServletFilter.class, ServletConstants.API_PATH_WITH_WILDCARD, null);
+    }
+  }
+
   @Order(1000)
   public static class StatusServletContributor implements IServletContributor {
 
@@ -76,12 +103,18 @@ public final class ServerServletContributors {
     }
   }
 
-  @Order(2000)
-  public static class ServiceTunnelServletContributor implements IServletContributor {
+  /**
+   * JAX-RS Jersey Servlet.
+   */
+  @Order(3000)
+  public static class ApiServletContributor implements IServletContributor {
 
     @Override
     public void contribute(ServletContextHandler handler) {
-      handler.addServlet(ServiceTunnelServlet.class, "/process");
+      ServletHolder servlet = handler.addServlet(ServletContainer.class, ServletConstants.API_PATH_WITH_WILDCARD);
+      servlet.setInitParameter(ServerProperties.WADL_FEATURE_DISABLE, Boolean.TRUE.toString());
+      servlet.setInitParameter(ServletProperties.JAXRS_APPLICATION_CLASS, ApiRestApplication.class.getName());
+      servlet.setInitOrder(1); // load-on-startup
     }
   }
 }

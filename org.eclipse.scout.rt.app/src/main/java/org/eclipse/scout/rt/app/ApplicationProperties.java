@@ -550,6 +550,27 @@ public final class ApplicationProperties {
   }
 
   /**
+   * @see GzipHandler#setInflateBufferSize(int)
+   */
+  public static class ScoutApplicationGzipInflateBufferSize extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.gzip.inflateBufferSize";
+    }
+
+    @Override
+    public String description() {
+      return "Inflater buffer size for " + GzipHandler.class.getName() + " to enable compressed requests. Default value: " + getDefaultValue();
+    }
+
+    @Override
+    public Integer getDefaultValue() {
+      return 2048;
+    }
+  }
+
+  /**
    * @see GzipHandler#setSyncFlush(boolean)
    */
   public static class ScoutApplicationGzipSyncFlush extends AbstractBooleanConfigProperty {

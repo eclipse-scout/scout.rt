@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,9 +17,9 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.servicetunnel.http.MultiSessionCookieStore;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.servicetunnel.http.MultiSessionCookieStore;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;

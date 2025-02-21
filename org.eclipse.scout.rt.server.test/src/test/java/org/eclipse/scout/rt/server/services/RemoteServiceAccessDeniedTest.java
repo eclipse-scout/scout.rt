@@ -16,7 +16,7 @@ import java.security.Permissions;
 
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.server.ServiceOperationInvoker;
+import org.eclipse.scout.rt.server.servicetunnel.ServiceOperationInvoker;
 import org.eclipse.scout.rt.server.services.common.ping.PingService;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
