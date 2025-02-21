@@ -44,4 +44,21 @@ public class ScoutTypeVersions {
    */
   public static final class Scout_25_1_001 extends AbstractTypeVersion {
   }
+
+  //  ___  _____  ___
+  // |__ \| ____||__ \
+  //    ) | |__     ) |
+  //   / /|___ \   / /
+  //  / /_ ___) | / /_
+  // |____|____(_)____|
+
+  /**
+   * Baseline version for all new data objects created in 25.2.
+   * <p>
+   * As soon as the initial build of this major release was published, a new type version must always be created for
+   * data objects requiring a migration handler. A new type version is created by incrementing the counter by 1 and
+   * providing a suffix.
+   */
+  public static final class Scout_25_2_001 extends AbstractTypeVersion {
+  }
 }
