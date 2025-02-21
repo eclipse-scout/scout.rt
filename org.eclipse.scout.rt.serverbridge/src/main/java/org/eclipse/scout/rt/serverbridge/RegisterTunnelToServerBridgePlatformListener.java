@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,12 +11,12 @@ package org.eclipse.scout.rt.serverbridge;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.client.servicetunnel.RegisterTunnelToServerPlatformListener;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.shared.AnnotationFactory;
-import org.eclipse.scout.rt.shared.servicetunnel.RegisterTunnelToServerPlatformListener;
 
 /**
  * Instead of registering @TunnelToServer beans using interfaces we append the @TunnelToServer annotation to all beans

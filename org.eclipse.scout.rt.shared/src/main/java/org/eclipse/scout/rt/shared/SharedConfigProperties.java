@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractSubjectConfigProperty;
-import org.eclipse.scout.rt.platform.config.ConfigUtility;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -101,37 +100,6 @@ public final class SharedConfigProperties {
     }
   }
 
-  public static class BackendUrlProperty extends AbstractStringConfigProperty {
-
-    @Override
-    public String getDefaultValue() {
-      return ConfigUtility.getProperty("server.url");//legacy
-    }
-
-    @Override
-    public String getKey() {
-      return "scout.backendUrl";
-    }
-
-    @Override
-    public String description() {
-      return String.format("The URL of the scout backend server (without any servlets).\n"
-          + "Example: %s=http://localhost:8080\n"
-          + "By default this property is null.", getKey());
-    }
-
-    @Override
-    protected String parse(String value) {
-      if (value == null) {
-        return null;
-      }
-      int i = value.lastIndexOf(ServiceTunnelTargetUrlProperty.PROCESS_SERVLET_MAPPING);
-      if (i >= 0) {
-        value = value.substring(0, i);
-      }
-      return super.parse(value);
-    }
-  }
 
   public static class ExternalBaseUrlProperty extends AbstractStringConfigProperty {
 
@@ -156,73 +124,6 @@ public final class SharedConfigProperties {
         return value;
       }
       return null;
-    }
-  }
-
-  public static class ServiceTunnelTargetUrlProperty extends AbstractStringConfigProperty {
-
-    public static final String PROCESS_SERVLET_MAPPING = "/process";
-
-    @Override
-    public String getDefaultValue() {
-      String backendUrl = BEANS.get(BackendUrlProperty.class).getValue();
-      if (StringUtility.hasText(backendUrl)) {
-        return backendUrl + PROCESS_SERVLET_MAPPING;
-      }
-      return null;
-    }
-
-    @Override
-    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
-    public String description() {
-      return String.format("Specifies the URL to the ServiceTunnelServlet on the backend server.\n"
-          + "By default this property points to the value of property '%s' with '%s' appended.", BEANS.get(BackendUrlProperty.class).getKey(), PROCESS_SERVLET_MAPPING);
-    }
-
-    @Override
-    public String getKey() {
-      return "scout.servicetunnel.targetUrl";
-    }
-  }
-
-  public static class CompressServiceTunnelRequestProperty extends AbstractBooleanConfigProperty {
-
-    @Override
-    @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL")
-    public Boolean getDefaultValue() {
-      // no default value. means the response decides
-      return null;
-    }
-
-    @Override
-    public String description() {
-      return "Specifies if the service tunnel should compress the data. If null, the response decides which is default to true.";
-    }
-
-    @Override
-    public String getKey() {
-      return "scout.servicetunnel.compress";
-    }
-  }
-
-  public static class CreateTunnelToServerBeansProperty extends AbstractBooleanConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.createTunnelToServerBeans";
-    }
-
-    @Override
-    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
-    public String description() {
-      return String.format("Specifies if the Scout platform should create proxy beans for interfaces annotated with '%s'. Calls to beans of such types are then tunneled to the Scout backend.\n"
-          + "By default this property is enabled if the property '%s' is set.", TunnelToServer.class.getSimpleName(), BEANS.get(ServiceTunnelTargetUrlProperty.class).getKey());
-    }
-
-    @Override
-    public Boolean getDefaultValue() {
-      // if no backend url is set proxy instances will not be created by default
-      return StringUtility.hasText(BEANS.get(ServiceTunnelTargetUrlProperty.class).getValue());
     }
   }
 

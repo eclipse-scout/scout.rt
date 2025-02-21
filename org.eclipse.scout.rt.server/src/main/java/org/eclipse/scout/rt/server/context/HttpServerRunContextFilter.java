@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.server.commons.context.HttpRunContextProducer;
  *
  *   &#064;Override
  *   public void contribute(ServletContextHandler handler) {
- *     FilterHolder filter = handler.addFilter(HttpServerRunContextFilter.class, "/api/*", null);
+ *     FilterHolder filter = handler.addFilter(HttpServerRunContextFilter.class, ServletConstants.API_PATH_WITH_WILDCARD, null);
  *     filter.setInitParameter("session", "false");
  *   }
  * }

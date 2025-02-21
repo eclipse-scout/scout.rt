@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,10 +15,13 @@ import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.core.Configuration;
 
 import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.rest.jersey.client.JerseyClientConfigFactory;
 import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector;
 import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.spi.ConnectorProvider;
 
 /**
  * Testing implementation of {@link JerseyClientConfigFactory} enabling to setup a custom (shared) http connection
@@ -29,35 +32,69 @@ public class TestingRestClientConfigFactory extends JerseyClientConfigFactory {
 
   public static final String PROP_CONNECTION_MANAGER = "scout.testing.httpClientConnectionManager";
 
+  private ConnectorProvider m_connectorProvider;
+
+  public TestingRestClientConfigFactory() {
+    resetConnectorProvider();
+  }
+
+  public ConnectorProvider getConnectorProvider() {
+    return m_connectorProvider;
+  }
+
+  public void setConnectorProvider(ConnectorProvider connectorProvider) {
+    m_connectorProvider = connectorProvider;
+  }
+
+  /**
+   * Convenience method: Set {@link TestJerseyMockConnector} using {@link #setConnectorProvider(ConnectorProvider)}
+   */
+  public void setupMockConnectorProvider() {
+    setConnectorProvider((client, runtimeConfig) -> BEANS.get(TestJerseyMockConnector.class));
+  }
+
+  public void resetConnectorProvider() {
+    m_connectorProvider = (client, runtimeConfig) -> new TestScoutApacheConnector(client, runtimeConfig);
+  }
+
   @Override
   protected void initConnectionProvider(ClientConfig clientConfig) {
-    clientConfig.connectorProvider((client, runtimeConfig) -> new ScoutApacheConnector(client, runtimeConfig) {
-      @Override
-      protected boolean isConnectionManagerShared() {
-        return true;
-      }
+    // install a ConnectorProvider redirecting to the current m_connectorProvider (which may change for different calls)
+    clientConfig.connectorProvider((client, runtimeConfig) -> m_connectorProvider.getConnector(client, runtimeConfig));
+  }
 
-      /**
-       * Creates a {@link HttpClientConnectionManager} that manages exactly one connection. This limitation helps
-       * finding resource leaks (i.e. leased connections that are never put back to the pool).
-       */
-      @Override
-      protected HttpClientConnectionManager createConnectionManager(Client client, Configuration config, SSLContext sslContext) {
-        HttpClientConnectionManager httpClientConnectionManager = super.createConnectionManager(client, config, sslContext);
-        // preserve connection manager as property of JAX-RS client instance for later use in tests
-        client.property(PROP_CONNECTION_MANAGER, httpClientConnectionManager);
-        return httpClientConnectionManager;
-      }
+  @IgnoreBean
+  public class TestScoutApacheConnector extends ScoutApacheConnector {
 
-      @Override
-      protected int getMaxConnectionsTotal(Configuration config) {
-        return 1;
-      }
+    public TestScoutApacheConnector(Client client, Configuration config) {
+      super(client, config);
+    }
 
-      @Override
-      protected int getMaxConnectionsPerRoute(Configuration config) {
-        return 1;
-      }
-    });
+    @Override
+    protected boolean isConnectionManagerShared() {
+      return true;
+    }
+
+    /**
+     * Creates a {@link HttpClientConnectionManager} that manages exactly one connection. This limitation helps
+     * finding resource leaks (i.e. leased connections that are never put back to the pool).
+     */
+    @Override
+    protected HttpClientConnectionManager createConnectionManager(Client client, Configuration config, SSLContext sslContext) {
+      HttpClientConnectionManager httpClientConnectionManager = super.createConnectionManager(client, config, sslContext);
+      // preserve connection manager as property of JAX-RS client instance for later use in tests
+      client.property(PROP_CONNECTION_MANAGER, httpClientConnectionManager);
+      return httpClientConnectionManager;
+    }
+
+    @Override
+    protected int getMaxConnectionsTotal(Configuration config) {
+      return 1;
+    }
+
+    @Override
+    protected int getMaxConnectionsPerRoute(Configuration config) {
+      return 1;
+    }
   }
 }

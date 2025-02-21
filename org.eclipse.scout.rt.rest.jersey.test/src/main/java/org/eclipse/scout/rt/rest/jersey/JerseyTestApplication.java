@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.LocalHostAddressHelper;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.rest.RestApplication;
+import org.eclipse.scout.rt.rest.ServletConstants;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.glassfish.jersey.servlet.ServletProperties;
@@ -156,7 +157,7 @@ public class JerseyTestApplication {
       handler.addServlet(RestClientTestEchoServlet.class, "/echo");
 
       // register RestApplication
-      ServletHolder servlet = handler.addServlet(ServletContainer.class, "/api/*");
+      ServletHolder servlet = handler.addServlet(ServletContainer.class, ServletConstants.API_PATH_WITH_WILDCARD);
       servlet.setInitParameter(ServerProperties.WADL_FEATURE_DISABLE, Boolean.TRUE.toString());
       servlet.setInitParameter(ServletProperties.JAXRS_APPLICATION_CLASS, RestApplication.class.getName());
       servlet.setInitOrder(1); // load-on-startup

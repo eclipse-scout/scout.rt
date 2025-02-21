@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,10 +23,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.rest.ServletConstants;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ServerSessionCacheExpirationProperty;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelConstants;
 
 /**
  * Filter which creates a {@link ServerRunContext} using the current {@link Subject} and calls the next filter inside
@@ -77,7 +79,14 @@ public class ServerRunContextFilter implements Filter {
   }
 
   protected ServerRunContext lookupRunContext(HttpServletRequest req, HttpServletResponse resp) {
-    final ServerRunContext sessionContext = getSessionContextProducer().produce(Subject.current());
+    // session-less RunContext is only allowed for /api/process (/api = servlet path; /process = path info)
+    // ServiceOperationInvoker.mustAuthorize(Class<?>, Class<?>, Method, Object[]) does ensure authorization (and session) exists for operations which are not allowed session-less
+    boolean isWithoutSession = req.getHeader(ServiceTunnelConstants.WITHOUT_SESSION_HEADER) != null
+        && ServletConstants.API_PATH.equals(req.getServletPath())
+        && ("/" + ServiceTunnelConstants.PROCESS_PATH).equals(req.getPathInfo());
+    final ServerRunContext sessionContext = isWithoutSession
+        ? null
+        : getSessionContextProducer().produce(Subject.current());
     return getHttpServerRunContextProducer().produce(req, resp, null, sessionContext);
   }
 

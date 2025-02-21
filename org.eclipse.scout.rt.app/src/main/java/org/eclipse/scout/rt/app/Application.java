@@ -60,6 +60,7 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipInclud
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipIncludedMethods;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipIncludedMimeTypes;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipIncludedPaths;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipInflateBufferSize;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipMinSize;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipSyncFlush;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationHttpRequestMaxHeaderSizeProperty;
@@ -435,6 +436,8 @@ public class Application {
 
     Optional.ofNullable(CONFIG.getPropertyValue(ScoutApplicationGzipMinSize.class)).ifPresent(gzipHandler::setMinGzipSize);
     gzipHandler.setSyncFlush(CONFIG.getPropertyValue(ScoutApplicationGzipSyncFlush.class));
+
+    gzipHandler.setInflateBufferSize(CONFIG.getPropertyValue(ScoutApplicationGzipInflateBufferSize.class)); // positive buffer size to enable compressed requests
 
     // wrap the original handler
     gzipHandler.setHandler(handler);

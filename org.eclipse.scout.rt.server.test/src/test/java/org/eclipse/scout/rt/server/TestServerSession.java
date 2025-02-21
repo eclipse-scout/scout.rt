@@ -25,4 +25,10 @@ public class TestServerSession extends AbstractServerSession {
   protected void execLoadSession() {
     setSharedContextVariable("test", String.class, "testval");
   }
+
+  @Override
+  public <T> void setSharedContextVariable(String name, Class<T> type, T value) {
+    // make method accessible for tests
+    super.setSharedContextVariable(name, type, value);
+  }
 }

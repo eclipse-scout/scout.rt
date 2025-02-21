@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.servicetunnel.HttpServiceTunnel;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.session.ClientSessionStopHelper;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
@@ -27,7 +28,6 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 import org.eclipse.scout.rt.security.IAccessControlService;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.testing.client.TestingClientConfigProperties.ClientSessionCacheExpirationProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,7 +168,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
 
   @Override
   protected void registerSessionForNotifications(final IClientSession session, final String sessionId) {
-    if (BEANS.get(IServiceTunnel.class).isActive()) {
+    if (BEANS.get(HttpServiceTunnel.class).isActive()) {
       super.registerSessionForNotifications(session, sessionId);
     }
     else {

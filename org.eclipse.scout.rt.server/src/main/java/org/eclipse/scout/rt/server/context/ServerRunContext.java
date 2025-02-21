@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,9 +29,9 @@ import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
+import org.eclipse.scout.rt.server.servicetunnel.ServiceTunnelService;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.logging.UserIdContextValueProvider;
@@ -219,7 +219,7 @@ public class ServerRunContext extends RunContext {
    * <p>
    * However, transactional notifications are only sent to clients upon successful commit of the transaction.
    * <p>
-   * Typically, this node ID is set by {@link ServiceTunnelServlet} for the processing of a service request.
+   * Typically, this node ID is set by {@link ServiceTunnelService} for the processing of a service request.
    */
   public ServerRunContext withClientNodeId(final NodeId clientNodeId) {
     m_clientNodeId = clientNodeId;
@@ -242,7 +242,7 @@ public class ServerRunContext extends RunContext {
    * {@link #withClientNodeId(NodeId)}). That way, transactional client notifications are not published immediately upon
    * successful commit, but included in the client's response instead (piggyback).
    * <p>
-   * Typically, that collector is set by {@link ServiceTunnelServlet} for the processing of a service request.
+   * Typically, that collector is set by {@link ServiceTunnelService} for the processing of a service request.
    */
   public ServerRunContext withClientNotificationCollector(final ClientNotificationCollector collector) {
     m_clientNotificationCollector = collector;

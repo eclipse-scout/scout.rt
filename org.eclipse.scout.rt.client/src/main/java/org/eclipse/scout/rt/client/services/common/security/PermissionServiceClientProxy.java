@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 
 /**
  * Cache of available permission types (not instances)
