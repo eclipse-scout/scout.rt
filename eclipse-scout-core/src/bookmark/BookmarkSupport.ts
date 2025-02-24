@@ -377,10 +377,10 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
 
     if (parent instanceof Page) {
+      parent.ensureDetailTable(); // ensure detail table is present, so loadChildren() will load the table data
       return parent.ensureLoadChildren()
         .then(() => {
           if (parent.nodeType === Page.NodeType.TABLE) {
-            parent.ensureDetailTable(); // FIXME bsh [js-bookmark] This does not work for classic pages!!!
             if (parentPageDefinition instanceof TableBookmarkPageDo) {
               // Lookup child page by parent PK (ignore PageParam)
               let parentRowBookmarkIdentifier = parentPageDefinition.expandedChildRow;
