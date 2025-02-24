@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
@@ -160,11 +161,11 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     // Use _UI_TreeListener to make sure the event buffer in JsonTree contains the event with no selection when we select the root node,
     // otherwise changing the selection during a selection event would not be possible
     outline.addUITreeListener(event -> {
-      if (event.getNewSelectedNodes().size() == 0) {
+      if (event.getNewSelectedNodes().isEmpty()) {
         outline.selectNode(outline.getRootNode());
       }
     }, TreeEvent.TYPE_NODES_SELECTED);
-    if (outline.getSelectedNodes().size() == 0) {
+    if (outline.getSelectedNodes().isEmpty()) {
       outline.selectNode(outline.getRootNode());
     }
   }
@@ -326,6 +327,11 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
 
     // Do not modify the labels inside a sequencebox
     if (field.getParentField() instanceof ISequenceBox) {
+      return;
+    }
+
+    // Do not modify the labels of buttons (mainly relevant for TileButtons)
+    if (field instanceof IButton) {
       return;
     }
 
