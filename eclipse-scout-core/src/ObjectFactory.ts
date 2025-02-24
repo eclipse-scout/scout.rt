@@ -191,7 +191,7 @@ export class ObjectFactory {
   }
 
   protected _ensureUniqueId(scoutObject: any, options?: ObjectFactoryOptions): boolean {
-    // FIXME bsh [js-bookmark] How can we determine whether an ID should be generated? Is this even needed for widgets' (TreeNodes and TableRows seem to need it because of Maps in Tree/Table, but this could probably changed to ES6-Maps)
+    // FIXME bsh [js-bookmark] How can we determine whether an ID should be generated? Is this even needed for widgets? (TreeNodes and TableRows seem to need it because of Maps in Tree/Table, but this could probably changed to ES6-Maps)
     return scout.nvl(options.ensureUniqueId, scoutObject instanceof Widget || scoutObject instanceof TreeNode || scoutObject instanceof TableRow || scoutObject instanceof ModelAdapter);
   }
 
