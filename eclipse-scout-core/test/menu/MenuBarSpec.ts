@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,9 +27,9 @@ describe('MenuBar', () => {
       '</style>').appendTo($('#sandbox'));
   });
 
-  function createModel(text?: string, iconId?: string, menuTypes?: string[]): MenuModel {
+  function createModel(text?: string, menuTypes?: string[]): MenuModel {
     text = scout.nvl(text, 'Foo');
-    return helper.createModel(text, iconId, menuTypes);
+    return helper.createModel(text, menuTypes);
   }
 
   function createMenuBar(menuOrder?: MenuOrder): SpecMenuBar {
@@ -68,19 +68,18 @@ describe('MenuBar', () => {
     });
 
     it('must add/destroy dynamically created separators', () => {
-      let separator,
-        menu1 = helper.createMenu(createModel('empty')),
-        menu2 = helper.createMenu(createModel('selection-1', null, [Table.MenuType.SingleSelection])),
-        menu3 = helper.createMenu(createModel('selection-2', null, [Table.MenuType.SingleSelection])),
-        menuBar = createMenuBar(),
-        menus = [menu1, menu2];
+      let menu1 = helper.createMenu(createModel('empty'));
+      let menu2 = helper.createMenu(createModel('selection-1', [Table.MenuType.SingleSelection]));
+      let menu3 = helper.createMenu(createModel('selection-2', [Table.MenuType.SingleSelection]));
+      let menuBar = createMenuBar();
+      let menus = [menu1, menu2];
 
       menuBar.render();
       menuBar.setMenuItems(menus);
 
       // a separator must be added between EmptySpace and Selection Menus and ellipsis at the end
       expect(menuBar.orderedMenuItems.all.length).toBe(4);
-      separator = menuBar.orderedMenuItems.all[1];
+      let separator = menuBar.orderedMenuItems.all[1];
       expect(separator.separator).toBe(true);
       expect(separator.createdBy).toBe(menuBar.menuSorter);
 

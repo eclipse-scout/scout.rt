@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -252,7 +252,7 @@ describe('Outline', () => {
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
 
       // Menus change on table -> detail menu bar needs to be updated as well
-      let menu = menuHelper.createModel('menu', '');
+      let menu = menuHelper.createModel('menu');
       node0.detailTable.setMenus([menu]);
       expect(outline.detailMenuBarVisible).toBe(true);
       expect(outline.detailMenuBar.menuItems.length).toBe(1);
@@ -394,7 +394,7 @@ describe('Outline', () => {
       expect(outline.detailMenuBar.menuItems[1].parent).toBe(outline.detailMenuBar.menuboxLeft);
 
       // Set same menus again. Table is temporarily used as parent which means that menu will be removed because table is not rendered
-      // Setting the same menus again would normally not trigger a rerendering, but in this case it has to
+      // Setting the same menus again would normally not trigger a re-rendering, but in this case it has to
       node0.detailTable.setMenus([emptySpaceMenu, emptySpaceMenu2]);
       expect(outline.detailMenuBar.menuItems.length).toBe(2);
       expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);

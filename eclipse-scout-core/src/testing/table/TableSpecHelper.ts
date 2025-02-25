@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -101,12 +101,12 @@ export class TableSpecHelper {
     return scout.create(Cell, cell);
   }
 
-  createMenuModel(text?: string, icon?: string): MenuModel {
-    return this.menuHelper.createModel(text, icon, [Table.MenuType.SingleSelection]);
+  createMenuModel(text?: string): MenuModel {
+    return this.menuHelper.createModel(text, [Table.MenuType.SingleSelection]);
   }
 
-  createMenuModelWithSingleAndHeader(text: string, icon?: string): MenuModel {
-    return this.menuHelper.createModel(text, icon, [Table.MenuType.SingleSelection, Table.MenuType.Header]);
+  createMenuModelWithSingleAndHeader(text: string): MenuModel {
+    return this.menuHelper.createModel(text, [Table.MenuType.SingleSelection, Table.MenuType.Header]);
   }
 
   createModelColumns(count: number, columnType?: ObjectType): ChildModelOf<Column<any>>[] {

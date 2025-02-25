@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -824,8 +824,8 @@ describe('ValueField', () => {
     });
 
     it('context menu only shows menus of specific type', () => {
-      let menu1 = menuHelper.createMenu(menuHelper.createModel('menu', null, [ValueField.MenuType.Null, ValueField.MenuType.NotNull])),
-        menu2 = menuHelper.createMenu(menuHelper.createModel('menu', null, [ValueField.MenuType.Null]));
+      let menu1 = menuHelper.createMenu(menuHelper.createModel('menu', [ValueField.MenuType.Null, ValueField.MenuType.NotNull]));
+      let menu2 = menuHelper.createMenu(menuHelper.createModel('menu', [ValueField.MenuType.Null]));
       formField.setMenus([menu1, menu2]);
       formField.render();
 

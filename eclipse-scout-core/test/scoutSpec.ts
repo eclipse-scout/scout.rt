@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,10 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Menu, NullWidget, NumberField, objects, ObjectUuidProvider, scout, Session, Status, StringField, Tooltip, ValueField, Widget} from '../src/index';
+import {HorizontalGrid, Menu, NullWidget, NumberField, objects, ObjectUuidProvider, scout, Session, Status, StringField, Tooltip, ValueField, Widget} from '../src/index';
 import {FormSpecHelper, SpecObjectUuidProvider} from '../src/testing';
 
-describe('main', () => {
+describe('scout', () => {
   let session: SandboxSession;
 
   abstract class Animal {
@@ -406,6 +406,32 @@ describe('main', () => {
         expect(menu.session === session).toBe(true);
         expect(objects.countOwnProperties(session.modelAdapterRegistry)).toBe(oldNumProperties);
       });
+    });
+  });
+
+  describe('ensure', () => {
+    it('uses scout.create to create a new object unless it is already an object', () => {
+      expect(scout.ensure(HorizontalGrid)).toBeInstanceOf(HorizontalGrid);
+
+      let widget = scout.create(Widget, {
+        parent: session.desktop,
+        visible: false
+      });
+      expect(widget).toBeInstanceOf(Widget);
+      expect(widget.visible).toBe(false);
+    });
+
+    it('does nothing if the parameter is already an object', () => {
+      let widget = scout.create(Widget, {
+        parent: session.desktop,
+        visible: false
+      });
+      expect(scout.ensure(widget)).toBe(widget);
+
+      // Ignores model if widget is already an object
+      expect(scout.ensure(widget, {
+        parent: session.desktop, visible: true
+      }).visible).toBe(false);
     });
   });
 });

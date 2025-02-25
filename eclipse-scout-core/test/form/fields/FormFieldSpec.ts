@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -341,10 +341,10 @@ describe('FormField', () => {
     });
 
     it('is filtered by currentMenuTypes and defaultMenuTypes', () => {
-      let menu1 = menuHelper.createMenu(menuHelper.createModel('menu1', null, ['test.MenuType1', 'test.MenuType2'])),
-        menu2 = menuHelper.createMenu(menuHelper.createModel('menu2', null, ['test.MenuType1'])),
-        menu3 = menuHelper.createMenu(menuHelper.createModel('menu3')),
-        currentMenuTypes = [];
+      let menu1 = menuHelper.createMenu(menuHelper.createModel('menu1', ['test.MenuType1', 'test.MenuType2']));
+      let menu2 = menuHelper.createMenu(menuHelper.createModel('menu2', ['test.MenuType1']));
+      let menu3 = menuHelper.createMenu(menuHelper.createModel('menu3'));
+      let currentMenuTypes = [];
 
       formField._getCurrentMenuTypes = () => currentMenuTypes;
 
