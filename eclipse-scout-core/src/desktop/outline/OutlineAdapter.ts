@@ -183,8 +183,8 @@ export class OutlineAdapter extends TreeAdapter {
     objects.replacePrototypeFunction(Outline, '_initTreeNodeInternal', OutlineAdapter._initTreeNodeInternalRemote, true);
     objects.replacePrototypeFunction(Outline, '_createTreeNode', OutlineAdapter._createTreeNodeRemote, true);
     objects.replacePrototypeFunction(Outline, Outline.prototype.getSearchFilterForPage, OutlineAdapter.getSearchFilterForPageRemote, true);
-    objects.replacePrototypeFunction(Page, '_updateParentTablePageMenusForDetailForm', OutlineAdapter._updateParentTablePageMenusForDetailForm, true);
-    objects.replacePrototypeFunction(Page, '_updateParentTablePageMenusForDetailTable', OutlineAdapter._updateParentTablePageMenusForDetailTable, true);
+    objects.replacePrototypeFunction(Page, '_updateDetailFormMenus', OutlineAdapter._updateDetailFormMenus, true);
+    objects.replacePrototypeFunction(Page, '_updateDetailTableMenus', OutlineAdapter._updateDetailTableMenus, true);
     objects.replacePrototypeFunction(Page, 'linkWithRow', OutlineAdapter.linkWithRow, true);
     objects.replacePrototypeFunction(Page, 'unlinkWithRow', OutlineAdapter.unlinkWithRow, true);
   }
@@ -261,10 +261,10 @@ export class OutlineAdapter extends TreeAdapter {
     this.modelAdapter._linkNodeWithRowLater(page);
   }
 
-  protected static override _createTreeNodeRemote(this: Tree & { modelAdapter: TreeAdapter; _createTreeNodeOrig }, nodeModel: TreeNodeModel) {
+  protected static override _createTreeNodeRemote(this: Tree & { modelAdapter: TreeAdapter; _createTreeNodeOrig }, nodeModel: TreeNodeModel, parentNode: TreeNode) {
     // nodeType is only used for Scout Classic pages
     if (!this.modelAdapter || !nodeModel?.nodeType) {
-      return this._createTreeNodeOrig(nodeModel);
+      return this._createTreeNodeOrig(nodeModel, parentNode);
     }
 
     nodeModel = (this.modelAdapter as OutlineAdapter)._initNodeModel(nodeModel);
@@ -298,7 +298,7 @@ export class OutlineAdapter extends TreeAdapter {
       nodeModel = jsPageModel;
     }
 
-    return this._createTreeNodeOrig(nodeModel);
+    return this._createTreeNodeOrig(nodeModel, parentNode);
   }
 
   protected static getSearchFilterForPageRemote(this: Outline & { modelAdapter: OutlineAdapter; getSearchFilterForPageOrig: typeof Outline.prototype.getSearchFilterForPage }, page: Page & { remote?: true }) {
@@ -322,30 +322,30 @@ export class OutlineAdapter extends TreeAdapter {
     return model;
   }
 
-  protected static _updateParentTablePageMenusForDetailForm(this: Page & { _updateParentTablePageMenusForDetailFormOrig; remote?: true }) {
+  protected static _updateDetailFormMenus(this: Page & { _updateDetailFormMenusOrig; remote?: true }) {
     const detailForm = this.detailForm;
     if (detailForm && (!detailForm.modelAdapter || !this.remote)) {
-      this._updateParentTablePageMenusForDetailFormOrig();
+      this._updateDetailFormMenusOrig();
     }
   }
 
-  protected static _updateParentTablePageMenusForDetailTable(this: Page & { _updateParentTablePageMenusForDetailTableOrig; remote?: true }) {
+  protected static _updateDetailTableMenus(this: Page & { _updateDetailTableMenusOrig; remote?: true }) {
     const detailTable = this.detailTable;
     if (detailTable && (!detailTable.modelAdapter || !this.remote)) {
-      this._updateParentTablePageMenusForDetailTableOrig();
+      this._updateDetailTableMenusOrig();
     }
   }
 
   static linkWithRow(this: Page & { linkWithRowOrig: typeof Page.prototype.linkWithRow }, row: TableRow) {
     this.linkWithRowOrig(row);
     // @ts-expect-error
-    this._updateParentTablePageMenusForDetailFormAndDetailTable();
+    this._updateDetailMenus();
   }
 
   static unlinkWithRow(this: Page & { unlinkWithRowOrig: typeof Page.prototype.unlinkWithRow }, row: TableRow) {
     this.unlinkWithRowOrig(row);
     // @ts-expect-error
-    this._updateParentTablePageMenusForDetailFormAndDetailTable();
+    this._updateDetailMenus();
   }
 }
 

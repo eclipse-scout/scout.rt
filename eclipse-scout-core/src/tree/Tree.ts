@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -266,14 +266,15 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       if (node instanceof TreeNode) {
         continue;
       }
-      nodes[i] = this._createTreeNode(node);
+      nodes[i] = this._createTreeNode(node, parentNode);
     }
   }
 
-  protected _createTreeNode(nodeModel?: TreeNodeModel): TreeNode {
+  protected _createTreeNode(nodeModel?: TreeNodeModel, parentNode?: TreeNode): TreeNode {
     nodeModel = nodeModel || {};
     nodeModel.objectType = scout.nvl(nodeModel.objectType, TreeNode);
     nodeModel.parent = this;
+    nodeModel.parentNode = parentNode;
     return scout.create(nodeModel as FullModelOf<TreeNode>);
   }
 

@@ -213,10 +213,11 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     super.insertNode(node, parentNode);
   }
 
-  protected override _createTreeNode(nodeModel?: PageModel): Page {
+  protected override _createTreeNode(nodeModel?: PageModel, parentNode?: Page): Page {
     nodeModel = nodeModel || {};
     nodeModel.objectType = scout.nvl(nodeModel.objectType, Page);
     nodeModel.parent = this;
+    nodeModel.parentNode = parentNode;
     return scout.create(nodeModel as FullModelOf<Page>);
   }
 
