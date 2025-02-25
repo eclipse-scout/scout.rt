@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Form, GroupBox, Outline, Page, PageWithNodes, PageWithTable, scout, Table, Widget} from '../../../../src';
+import {arrays, Form, GroupBox, Menu, MenuOwner, Outline, Page, PageDetailMenuContributor, PageWithNodes, PageWithTable, ParentTablePageMenuContributor, scout, Table, Widget} from '../../../../src';
 import {MenuSpecHelper, OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing';
 import {ChildModelOf} from '../../../../src/scout';
 
@@ -121,14 +121,14 @@ describe('Page', () => {
       objectType: Table,
       menus: [
         menuHelper.createModel('EmptySpaceMenu'),
-        menuHelper.createModel('SingleSelectionMenu', null, [Table.MenuType.SingleSelection]),
-        menuHelper.createModel('MultiSelectionMenu', null, [Table.MenuType.MultiSelection]),
-        menuHelper.createModel('SingleMultiSelectionMenu', null, [Table.MenuType.SingleSelection, Table.MenuType.MultiSelection]),
+        menuHelper.createModel('SingleSelectionMenu', [Table.MenuType.SingleSelection]),
+        menuHelper.createModel('MultiSelectionMenu', [Table.MenuType.MultiSelection]),
+        menuHelper.createModel('SingleMultiSelectionMenu', [Table.MenuType.SingleSelection, Table.MenuType.MultiSelection]),
         {
-          ...menuHelper.createModel('SingleSelectionMenuWithChildMenus', null, [Table.MenuType.SingleSelection]),
+          ...menuHelper.createModel('SingleSelectionMenuWithChildMenus', [Table.MenuType.SingleSelection]),
           childActions: [
-            menuHelper.createModel('ChildSingleSelectionMenu', null, [Table.MenuType.SingleSelection]),
-            menuHelper.createModel('ChildMultiSelectionMenu', null, [Table.MenuType.MultiSelection])
+            menuHelper.createModel('ChildSingleSelectionMenu', [Table.MenuType.SingleSelection]),
+            menuHelper.createModel('ChildMultiSelectionMenu', [Table.MenuType.MultiSelection])
           ]
         }
       ]
@@ -137,7 +137,7 @@ describe('Page', () => {
       parent: outline,
       detailTable: {
         objectType: Table,
-        menus: [menuHelper.createModel('DetailTableSingleSelectionMenu', null, [Table.MenuType.SingleSelection])]
+        menus: [menuHelper.createModel('DetailTableSingleSelectionMenu', [Table.MenuType.SingleSelection])]
       },
       detailForm: {
         objectType: Form,
@@ -194,7 +194,7 @@ describe('Page', () => {
       childActions: []
     }]);
 
-    detailTable.setMenus([menuHelper.createModel('DetailTableMultiSelectionMenu', null, [Table.MenuType.MultiSelection])]);
+    detailTable.setMenus([menuHelper.createModel('DetailTableMultiSelectionMenu', [Table.MenuType.MultiSelection])]);
     expect(detailTable.menus.map(extractTextAndMenuTypes)).toEqual([...expectedParentTablePageMenus, {
       text: 'DetailTableMultiSelectionMenu',
       menuTypes: [Table.MenuType.MultiSelection],
@@ -272,6 +272,114 @@ describe('Page', () => {
 
       expect(localPage.getObjectUuidBuilder().buildId()).toBe('page-uuid');
       expect(outline.getObjectUuidBuilder().buildId()).toBe('outline-uuid');
+    });
+  });
+
+  describe('pageDetailMenuContributors', () => {
+    let pageWithDetailFormAndTableModel;
+
+    class MenuContributor extends PageDetailMenuContributor {
+      override contribute(originalMenus: Menu[], detailContent: MenuOwner) {
+        return [...originalMenus, scout.create(Menu, {
+          parent: detailContent,
+          text: 'contributed-menu'
+        })];
+      }
+    }
+
+    beforeEach(() => {
+      pageWithDetailFormAndTableModel = {
+        parent: outline,
+        detailTable: {
+          objectType: Table,
+          menus: [{objectType: Menu, text: 'table-menu'}]
+        },
+        detailForm: {
+          objectType: Form,
+          rootGroupBox: {
+            objectType: GroupBox,
+            menus: [{objectType: Menu, text: 'form-menu'}]
+          }
+        }
+      };
+    });
+
+    it('can be extended by the model', () => {
+      let page = scout.create(Page, {
+        parent: outline
+      });
+      expect(page.detailMenuContributors.length).toBe(1);
+      expect(page.detailMenuContributors[0]).toBeInstanceOf(ParentTablePageMenuContributor);
+
+      let page2 = scout.create(Page, {
+        parent: outline,
+        detailMenuContributors: [MenuContributor]
+      });
+      expect(page2.detailMenuContributors.length).toBe(2);
+      expect(page2.detailMenuContributors[0]).toBeInstanceOf(ParentTablePageMenuContributor);
+      expect(page2.detailMenuContributors[1]).toBeInstanceOf(MenuContributor);
+    });
+
+    it('can contribute new menus for detail table and detail form', () => {
+      let page = scout.create(Page, {
+        ...pageWithDetailFormAndTableModel,
+        detailMenuContributors: [MenuContributor]
+      });
+      outline.insertNode(page);
+      outline.selectNode(page);
+      expect(page.detailForm.rootGroupBox.menus.map(menu => menu.text)).toEqual(['form-menu', 'contributed-menu']);
+    });
+
+    it('don\'t contribute new menus multiple times', () => {
+      let page = scout.create(Page, {
+        ...pageWithDetailFormAndTableModel,
+        detailMenuContributors: [MenuContributor]
+      });
+      outline.insertNode(page);
+      outline.selectNode(page);
+      expect(page.detailForm.rootGroupBox.menus.map(menu => menu.text)).toEqual(['form-menu', 'contributed-menu']);
+      expect(page.detailTable.menus.map(menu => menu.text)).toEqual(['table-menu', 'contributed-menu']);
+
+      // Contributors are called again when menus of the detail content change, or when the detail content itself chagnes
+      page.detailTable.setMenus([{objectType: Menu, text: 'new-table-menu'}]);
+      expect(page.detailTable.menus.map(menu => menu.text)).toEqual(['new-table-menu', 'contributed-menu']);
+      expect(page.detailForm.rootGroupBox.menus.map(menu => menu.text)).toEqual(['form-menu', 'contributed-menu']);
+
+      page.detailForm.rootGroupBox.setMenus([{objectType: Menu, text: 'new-form-menu'}]);
+      expect(page.detailTable.menus.map(menu => menu.text)).toEqual(['new-table-menu', 'contributed-menu']);
+      expect(page.detailForm.rootGroupBox.menus.map(menu => menu.text)).toEqual(['new-form-menu', 'contributed-menu']);
+
+      let newTable = scout.create(Table, {parent: outline});
+      page.setDetailTable(newTable);
+      expect(page.detailTable.menus.map(menu => menu.text)).toEqual(['contributed-menu']);
+      expect(page.detailForm.rootGroupBox.menus.map(menu => menu.text)).toEqual(['new-form-menu', 'contributed-menu']);
+
+      let newForm = scout.create(Form, {parent: outline, rootGroupBox: {objectType: GroupBox}});
+      page.setDetailForm(newForm);
+      expect(page.detailTable.menus.map(menu => menu.text)).toEqual(['contributed-menu']);
+      expect(page.detailForm.rootGroupBox.menus.map(menu => menu.text)).toEqual(['contributed-menu']);
+    });
+
+    it('can contribute new menus by cloning existing menus including their child menus', () => {
+      class OutlineMenuContributor extends PageDetailMenuContributor {
+        override contribute(originalMenus: Menu[], detailContent: MenuOwner) {
+          return [...this._cloneMenus(detailContent.findParent(Outline).menus, detailContent), ...originalMenus];
+        }
+      }
+
+      let page = scout.create(Page, {
+        ...pageWithDetailFormAndTableModel,
+        detailMenuContributors: [OutlineMenuContributor]
+      });
+      outline.setMenus([{objectType: Menu, text: 'outline-menu', childActions: [{objectType: Menu, text: 'child'}]}]);
+      outline.insertNode(page);
+      outline.selectNode(page);
+      expect(page.detailForm.rootGroupBox.menus.map(menu => menu.text)).toEqual(['outline-menu', 'form-menu']);
+      expect(page.detailForm.rootGroupBox.menus[0].cloneOf).toBe(outline.menus[0]);
+      expect(page.detailForm.rootGroupBox.menus[0].childActions[0].cloneOf).toBe(outline.menus[0].childActions[0]);
+      expect(page.detailTable.menus.map(menu => menu.text)).toEqual(['outline-menu', 'table-menu']);
+      expect(page.detailTable.menus[0].cloneOf).toBe(outline.menus[0]);
+      expect(page.detailTable.menus[0].childActions[0].cloneOf).toBe(outline.menus[0].childActions[0]);
     });
   });
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,9 +9,9 @@
  */
 import {
   Action, aria, arrays, ContextMenuPopup, DesktopPopupOpenEvent, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, Filterable, FilterOrFunction, FilterResult, FilterSupport,
-  FullModelOf, graphics, HtmlComponent, InitModelOf, keys, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuFilter, MenuItemsOrder, menus as menuUtil, ObjectOrModel, objects, Range, Rectangle, scout,
-  scrollbars, ScrollDirection, ScrollToOptions, strings, tooltips, TreeBreadcrumbFilter, TreeCheckNodesResult, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeEventMap, TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeModel,
-  TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
+  FullModelOf, graphics, HtmlComponent, InitModelOf, keys, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuFilter, MenuItemsOrder, menus as menuUtil, ObjectOrChildModel, ObjectOrModel, objects,
+  Range, Rectangle, scout, scrollbars, ScrollDirection, ScrollToOptions, strings, tooltips, TreeBreadcrumbFilter, TreeCheckNodesResult, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeEventMap, TreeExpandOrDrillDownKeyStroke,
+  TreeLayout, TreeModel, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -307,6 +307,11 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
 
   protected _setAutoCheckChildren(autoCheckChildren: boolean) {
     this._setProperty('autoCheckChildren', autoCheckChildren);
+  }
+
+  /** @see TreeModel.menus */
+  setMenus(menus: ObjectOrChildModel<Menu>[]) {
+    this.setProperty('menus', menus);
   }
 
   protected _setMenus(argMenus: Menu[]) {
