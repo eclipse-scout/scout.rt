@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,11 +16,10 @@ export class MenuSpecHelper {
     this.session = session;
   }
 
-  createModel(text?: string, iconId?: string, menuTypes?: string[]): FullModelOf<Menu> {
+  createModel(text?: string, menuTypes?: string[]): FullModelOf<Menu> {
     let model = createSimpleModel('Menu', this.session) as FullModelOf<Menu>;
     $.extend(model, {
       text: text,
-      iconId: iconId,
       menuTypes: menuTypes
     });
     return model;

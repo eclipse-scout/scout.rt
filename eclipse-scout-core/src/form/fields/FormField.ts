@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,7 @@
 import {
   AbstractLayout, Action, aria, arrays, clipboard, CloneOptions, Column, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, DragAndDropOptions, DropType, EnumObject, EventHandler, fields, FieldStatus, FormFieldClipboardExportEvent,
   FormFieldEventMap, FormFieldLayout, FormFieldModel, FormFieldValidationResultProvider, GridData, GroupBox, HierarchyChangeEvent, HtmlComponent, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, ObjectOrChildModel,
-  ObjectOrModel, objects, ObjectType, Predicate, PropertyChangeEvent, scout, Status, StatusMenuMapping, StatusOrModel, strings, styles, TableRow, Tooltip, tooltips, TooltipSupport, TreeVisitor, TreeVisitResult, Widget
+  ObjectOrModel, ObjectOrType, objects, Predicate, PropertyChangeEvent, scout, Status, StatusMenuMapping, StatusOrModel, strings, styles, TableRow, Tooltip, tooltips, TooltipSupport, TreeVisitor, TreeVisitResult, Widget
 } from '../../index';
 import $ from 'jquery';
 
@@ -1552,15 +1552,13 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   /** @see FormFieldModel.validationResultProvider */
-  setValidationResultProvider(provider: FormFieldValidationResultProvider | ObjectType<FormFieldValidationResultProvider>) {
+  setValidationResultProvider(provider: ObjectOrType<FormFieldValidationResultProvider>) {
     this.setProperty('validationResultProvider', provider);
   }
 
-  protected _setValidationResultProvider(provider: FormFieldValidationResultProvider | ObjectType<FormFieldValidationResultProvider>) {
+  protected _setValidationResultProvider(provider: ObjectOrType<FormFieldValidationResultProvider>) {
     scout.assertParameter('provider', provider);
-    if (typeof provider === 'string' || typeof provider === 'function') {
-      provider = scout.create(provider, {field: this});
-    }
+    provider = scout.ensure(provider, {field: this});
     this._setProperty('validationResultProvider', provider);
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DisabledStyle, LogicalGrid, ObjectType, ObjectWithUuidModel, Session, Widget} from '../index';
+import {DisabledStyle, LogicalGrid, ObjectOrType, ObjectWithUuidModel, Session, Widget} from '../index';
 
 export interface WidgetModel extends ObjectWithUuidModel<Widget> {
   /**
@@ -143,7 +143,7 @@ export interface WidgetModel extends ObjectWithUuidModel<Widget> {
    * In that case, the {@link LogicalGridLayout} will validate the {@link LogicalGrid} using {@link LogicalGrid.validate} before the layout
    * to ensure all widgets in the grid have an up to date {@link GridData} object.
    */
-  logicalGrid?: LogicalGrid | ObjectType<LogicalGrid>;
+  logicalGrid?: ObjectOrType<LogicalGrid>;
   /**
    * Configures whether the {@link Widget.remove} operation should be animated.
    *

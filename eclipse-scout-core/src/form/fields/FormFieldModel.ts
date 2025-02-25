@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 import {
   Action, DropType, FormField, FormFieldLabelPosition, FormFieldStatusPosition, FormFieldStyle, FormFieldSuppressStatus, FormFieldTooltipAnchor, FormFieldValidationResultProvider, GridData, Menu, ObjectOrChildModel, ObjectOrModel,
-  ObjectType, StatusMenuMapping, StatusOrModel, TooltipSupportOptions, WidgetModel
+  ObjectOrType, StatusMenuMapping, StatusOrModel, TooltipSupportOptions, WidgetModel
 } from '../../index';
 
 export interface FormFieldModel extends WidgetModel {
@@ -229,5 +229,5 @@ export interface FormFieldModel extends WidgetModel {
    *
    * @see FormField.getValidationResult
    */
-  validationResultProvider?: FormFieldValidationResultProvider | ObjectType<FormFieldValidationResultProvider>;
+  validationResultProvider?: ObjectOrType<FormFieldValidationResultProvider>;
 }

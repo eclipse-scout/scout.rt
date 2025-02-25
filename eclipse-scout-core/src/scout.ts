@@ -43,6 +43,11 @@ export type ObjectOrModel<T> = T | ModelOf<T>;
  */
 export type ObjectOrChildModel<T> = T | ChildModelOf<T>;
 
+/**
+ * Represents an instance of an object or its type ({@link ObjectType}).
+ */
+export type ObjectOrType<T> = T | ObjectType<T>;
+
 export type Constructor<T = object> = new(...args: any[]) => T;
 export type AbstractConstructor<T = object> = abstract new(...args: any[]) => T;
 
@@ -245,6 +250,21 @@ export const scout = {
   },
 
   create,
+
+  /**
+   * Ensures the given parameter is an object.
+   *
+   * If it is an object, it will be returned as it is.
+   * If it is an {@link ObjectType}, {@link scout.create} is used to create the object.
+   *
+   * @param model will be passed to {@link scout.create} if an object needs to be created and ignored otherwise.
+   */
+  ensure<T extends object>(objectOrType: ObjectOrType<T>, model?: InitModelOf<T>): T {
+    if (typeof objectOrType === 'string' || typeof objectOrType === 'function') {
+      return scout.create(objectOrType, model);
+    }
+    return objectOrType;
+  },
 
   /**
    * Prepares the DOM for scout in the given document. This should be called once while initializing scout.
