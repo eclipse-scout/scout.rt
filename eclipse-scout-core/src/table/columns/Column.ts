@@ -1055,7 +1055,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     }
   }
 
-  isContentValid(row: TableRow): { valid: boolean; validByMandatory: boolean; errorStatus: Status } {
+  isContentValid(row: TableRow): ColumnValidationResult {
     const cell = this.cell(row),
       validByErrorStatus = !cell.errorStatus || cell.errorStatus.isValid(),
       validByMandatory = !cell.mandatory || this._hasCellValue(cell);
@@ -1084,3 +1084,5 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     return this._realWidth || this.width;
   }
 }
+
+export type ColumnValidationResult = { valid: boolean; validByMandatory: boolean; errorStatus: Status };

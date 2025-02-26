@@ -9,8 +9,11 @@
  */
 import {LookupCallColumnModel} from '../../index';
 
-export interface SmartColumnModel<TValue> extends LookupCallColumnModel<TValue> {
-  browseAutoExpandAll?: boolean;
-  browseLoadIncremental?: boolean;
-  activeFilterEnabled?: boolean;
+export interface LookupColumnModel<TValue> extends LookupCallColumnModel<TValue[], TValue> {
+  /**
+   * Whether the same value can be selected in multiple rows or not.
+   *
+   * Default is `false`.
+   */
+  distinct?: boolean;
 }
