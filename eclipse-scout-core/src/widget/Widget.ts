@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -2370,7 +2370,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    *          an optional options object. Shorthand version: If a string is passed instead
    *          of an object, the value is automatically converted to the option {@link ScrollToOptions.align}.
    */
-  reveal(options: ScrollToOptions | string) {
+  reveal(options?: ScrollToOptions | string) {
     if (!this.rendered) {
       return;
     }
