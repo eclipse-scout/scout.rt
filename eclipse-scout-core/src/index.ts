@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -520,9 +520,15 @@ export * from './table/columns/IconColumn';
 export * from './table/columns/NumberColumn';
 export * from './table/columns/NumberColumnModel';
 export * from './table/columns/NumberColumnEventMap';
+export * from './table/columns/LookupCallColumn';
+export * from './table/columns/LookupCallColumnEventMap';
+export * from './table/columns/LookupCallColumnModel';
 export * from './table/columns/SmartColumn';
 export * from './table/columns/SmartColumnModel';
 export * from './table/columns/SmartColumnEventMap';
+export * from './table/columns/LookupColumn';
+export * from './table/columns/LookupColumnEventMap';
+export * from './table/columns/LookupColumnModel';
 export * from './table/controls/TableControlActionKeyStroke';
 export * from './table/controls/TableControl';
 export * from './table/controls/TableControlModel';
@@ -864,6 +870,10 @@ export * from './form/fields/wrappedform/WrappedFormField';
 export * from './form/fields/wrappedform/WrappedFormFieldModel';
 export * from './form/fields/wrappedform/WrappedFormFieldEventMap';
 export * from './form/fields/wrappedform/WrappedFormFieldAdapter';
+export * from './table/columns/LookupEditor';
+export * from './table/columns/LookupEditorEventMap';
+export * from './table/columns/LookupEditorModel';
+export * from './table/columns/LookupEditorTreeLayout';
 export * from './switch/Switch';
 export * from './switch/SwitchModel';
 export * from './switch/SwitchEventMap';

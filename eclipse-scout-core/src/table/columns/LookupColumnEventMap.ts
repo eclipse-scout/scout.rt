@@ -7,10 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LookupCallColumnModel} from '../../index';
+import {LookupCallColumnEventMap, PropertyChangeEvent} from '../../index';
 
-export interface SmartColumnModel<TValue> extends LookupCallColumnModel<TValue> {
-  browseAutoExpandAll?: boolean;
-  browseLoadIncremental?: boolean;
-  activeFilterEnabled?: boolean;
+export interface LookupColumnEventMap<TValue> extends LookupCallColumnEventMap<TValue[], TValue> {
+  'propertyChange:distinct': PropertyChangeEvent<boolean>;
 }
