@@ -221,8 +221,8 @@ export class App extends EventEmitter {
     ].filter(bootstrapper => !!bootstrapper);
 
     return $.promiseAll(this._doBootstrap())
-      .then(this._bootstrapDone.bind(this, options))
-      .catch(this._bootstrapFail.bind(this, options));
+      .catch(this._bootstrapFail.bind(this, options))
+      .then(this._bootstrapDone.bind(this, options)); // BootstrapDone must only be executed if there are no boostrap errors
   }
 
   protected _defaultBootstrappers(options: AppBootstrapOptions): (() => JQuery.Promise<void>)[] {
