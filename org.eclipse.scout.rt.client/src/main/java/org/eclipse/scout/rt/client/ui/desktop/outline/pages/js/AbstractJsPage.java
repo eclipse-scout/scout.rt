@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 
 @ClassId("3ad642d8-4858-43af-bf4c-f5aa7fab4ba1")
 public class AbstractJsPage extends AbstractPage<ITable> implements IJsPage {
@@ -78,5 +79,12 @@ public class AbstractJsPage extends AbstractPage<ITable> implements IJsPage {
   @Override
   protected final ITable createTable() {
     return null;
+  }
+
+  @Override
+  public String classId() {
+    // If there is no classId annotation, null is returned
+    // If there is a classId annotation, it must match the uuid of the JavaScript page
+    return ConfigurationUtility.getAnnotatedClass(getClass());
   }
 }
