@@ -26,6 +26,7 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
   String PROP_COLOR_SCHEME = "colorScheme";
   String PROP_GRID_DATA_HINTS = "gridDataHints";
   String PROP_DISPLAY_STYLE = "displayStyle";
+  String PROP_ANIMATE_BOUNDS_CHANGE = "animateBoundsChange";
 
   /**
    * This is the default display style. If it is active, default styling is applied like visualizing the selection.
@@ -77,4 +78,8 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
 
   @Override
   boolean isLoading();
+
+  boolean isAnimateBoundsChange();
+
+  void setAnimateBoundsChange(boolean animateBoundsChange);
 }

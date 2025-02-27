@@ -86,6 +86,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     setCssClass(getConfiguredCssClass());
     setDisplayStyle(getConfiguredDisplayStyle());
     setGridDataHints(getConfiguredGridDataHints());
+    setAnimateBoundsChange(getConfiguredAnimateBoundsChange());
   }
 
   @Override
@@ -191,6 +192,15 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   /**
+   * Configures whether to animate changes of the tile bounds. The default is <code>true</code>.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(150)
+  protected boolean getConfiguredAnimateBoundsChange() {
+    return true;
+  }
+
+  /**
    * Configures the grid data for this tile.
    * <p>
    * The typical approach to configure it is to get the default object by calling
@@ -293,6 +303,16 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
    */
   protected void setDisplayStyle(String style) {
     propertySupport.setPropertyString(PROP_DISPLAY_STYLE, style);
+  }
+
+  @Override
+  public boolean isAnimateBoundsChange() {
+    return propertySupport.getPropertyBool(PROP_ANIMATE_BOUNDS_CHANGE);
+  }
+
+  @Override
+  public void setAnimateBoundsChange(boolean animateBoundsChange) {
+    propertySupport.setPropertyBool(PROP_ANIMATE_BOUNDS_CHANGE, animateBoundsChange);
   }
 
   protected IDataChangeListener getInternalDataChangeListener() {

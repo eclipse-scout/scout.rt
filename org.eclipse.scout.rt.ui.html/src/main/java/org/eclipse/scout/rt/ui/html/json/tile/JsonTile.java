@@ -50,19 +50,19 @@ public class JsonTile<T extends ITile> extends AbstractJsonWidget<T> {
         return ((IColorScheme) value).getIdentifier();
       }
     });
-    putJsonProperty(new JsonProperty<T>(IFormFieldTile.PROP_DISPLAY_STYLE, model) {
+    putJsonProperty(new JsonProperty<>(IFormFieldTile.PROP_DISPLAY_STYLE, model) {
       @Override
       protected String modelValue() {
         return getModel().getDisplayStyle();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITile.PROP_LOADING, model) {
+    putJsonProperty(new JsonProperty<>(ITile.PROP_LOADING, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isLoading();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITile.PROP_GRID_DATA_HINTS, model) {
+    putJsonProperty(new JsonProperty<>(ITile.PROP_GRID_DATA_HINTS, model) {
       @Override
       protected GridData modelValue() {
         return getModel().getGridDataHints();
@@ -71,6 +71,12 @@ public class JsonTile<T extends ITile> extends AbstractJsonWidget<T> {
       @Override
       public Object prepareValueForToJson(Object value) {
         return JsonGridData.toJson((GridData) value);
+      }
+    });
+    putJsonProperty(new JsonProperty<>(ITile.PROP_ANIMATE_BOUNDS_CHANGE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isAnimateBoundsChange();
       }
     });
   }
