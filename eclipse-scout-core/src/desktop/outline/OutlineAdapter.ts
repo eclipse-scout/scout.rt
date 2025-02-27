@@ -299,7 +299,11 @@ export class OutlineAdapter extends TreeAdapter {
       nodeModel = jsPageModel;
     }
 
-    return this._createTreeNodeOrig(nodeModel);
+    let page = this._createTreeNodeOrig(nodeModel);
+    if (page.classId && page.uuid && page.classId !== page.uuid) {
+      throw new Error(`ClassId and uuid don't match for page ${page.objectType}. ClassId: ${page.classId}, Uuid: ${page.uuid}`);
+    }
+    return page;
   }
 
   protected static getSearchFilterForPageRemote(this: Outline & { modelAdapter: OutlineAdapter; getSearchFilterForPageOrig: typeof Outline.prototype.getSearchFilterForPage }, page: Page & { remote?: true }) {
