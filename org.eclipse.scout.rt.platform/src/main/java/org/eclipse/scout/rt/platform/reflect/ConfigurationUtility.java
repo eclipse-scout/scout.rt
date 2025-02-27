@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -408,15 +408,14 @@ public final class ConfigurationUtility {
   }
 
   /**
-   * Returns the value of the {@link ClassId} annotation or the class name as fallback, the annotation is undefined.
+   * Returns the value of the {@link ClassId} annotation or the class name as fallback if the annotation is undefined.
    * <p>
    * If the class is replaced, the id of the replaced field is used ({@link ClassId}).
    * </p>
    *
-   * @param clazz
    * @param simpleName
    *     use the simple class name instead of the fully qualified class name.
-   * @return annotated id or class name fallback
+   * @return the annotated id or class name fallback
    * @since 3.10.0
    */
   public static String getAnnotatedClassIdWithFallback(Class<?> clazz, boolean simpleName) {
@@ -430,6 +429,24 @@ public final class ConfigurationUtility {
       return replaced.getSimpleName();
     }
     return replaced.getName();
+  }
+
+  /**
+   * Returns the value of the {@link ClassId} annotation.
+   * <p>
+   * If the class is replaced, the id of the replaced field is used ({@link ClassId}).
+   * </p>
+   *
+   * @return the annotated class id
+   */
+  public static String getAnnotatedClass(Class<?> clazz) {
+    Class<?> replaced = getOriginalClass(clazz);
+    ClassId id = replaced.getAnnotation(ClassId.class);
+    String annotatedClassId = (id == null) ? null : id.value();
+    if (annotatedClassId != null) {
+      return annotatedClassId;
+    }
+    return null;
   }
 
   /**
