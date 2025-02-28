@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -32,9 +32,9 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * This class is used to create a read-only menu-instance when an existing menu instance which belongs to a component is
- * used somewhere else. For instance: menus of a page-node are automatically copied to the the page-table, because its
+ * used somewhere else. For instance: menus of a page-node are automatically copied to the page-table, because it's
  * the logical place to have them there. The menu-wrapper delegates most read- or get-methods to the wrapped menu
- * instance, all write- or set-methods are implemented as NOP or throw an {@link UnsupportedOperationException}. Thus
+ * instance, all write- or set-methods are implemented as NOP or throw an {@link UnsupportedOperationException}. Thus,
  * the state of the wrapper should only change, when the original wrapped menu changes.
  * <p>
  * <b>IMPORTANT</b>: do not use this class in cases where you must change the state of the wrapper-instance directly,
