@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -42,6 +43,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.Outline;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.OutlineWithOneNode;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.TablePage;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
+import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
@@ -49,7 +51,6 @@ import org.eclipse.scout.rt.ui.html.json.tree.JsonTreeTest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -87,8 +88,8 @@ public class JsonOutlineTest {
 
     JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline);
 
-    Assert.assertNotNull(jsonOutline.getAdapter(nodePage.getDetailForm()));
-    Assert.assertNotNull(jsonOutline.getAdapter(rowPage.getDetailForm()));
+    assertNotNull(jsonOutline.getAdapter(nodePage.getDetailForm()));
+    assertNotNull(jsonOutline.getAdapter(rowPage.getDetailForm()));
   }
 
   @Test
@@ -233,12 +234,12 @@ public class JsonOutlineTest {
     JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline);
 
     JSONObject jsonNode = jsonOutline.toJson().getJSONArray("nodes").getJSONObject(0);
-    Assert.assertNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
+    assertNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
 
     nodePage.setTableVisible(true);
     JsonTestUtility.processBufferedEvents(m_uiSession);
     jsonNode = jsonOutline.toJson().getJSONArray("nodes").getJSONObject(0);
-    Assert.assertNotNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
+    assertNotNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
   }
 
   @Test
@@ -288,7 +289,7 @@ public class JsonOutlineTest {
     JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline, m_uiSession.getRootJsonAdapter());
     jsonOutline.toJson(); // simulate "send to client"
 
-    Assert.assertEquals(0, initPageCounter.getValue().intValue());
+    assertEquals(0, initPageCounter.getValue().intValue());
 
     // Simulate "select page2" event
     JsonEvent event = createNodeSelectionEvent(jsonOutline, page2);
@@ -302,6 +303,34 @@ public class JsonOutlineTest {
     assertEquals(2, responseEvents.size());
     assertEquals("pageChanged", responseEvents.get(0).getType());
     assertEquals(JsonTree.EVENT_NODES_INSERTED, responseEvents.get(1).getType());
+  }
+
+  @Test
+  public void testNoDetailTableSentForInvisibleRootNode() {
+    TablePage tablePage = new TablePage(1, new TablePage.NodePageWithFormFactory());
+    tablePage.setDetailForm(new FormWithOneField());
+    tablePage.getDetailForm().start();
+
+    IOutline outline = new AbstractOutline() {
+    };
+    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline);
+
+    // setRootNode triggers a page changed event that is handled by the already created JsonOutline
+    outline.setRootNodeVisible(false);
+    outline.setRootNode(tablePage);
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+
+    // Detail table and form must not be sent if root node is invisible and won't be sent either
+    assertNull(jsonOutline.getAdapter(tablePage.getTable()));
+    assertNull(jsonOutline.getGlobalAdapter(tablePage.getDetailForm()));
+    assertNull(jsonOutline.optNodeId(tablePage));
+
+    List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
+
+    // Only the insert event for the child node of the invisible root page is sent
+    assertEquals(1, events.size());
+    assertEquals(JsonTree.EVENT_NODES_INSERTED, events.get(0).getType());
   }
 
   /**
