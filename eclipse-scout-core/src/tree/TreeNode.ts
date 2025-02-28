@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -92,41 +92,14 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
   }
 
   init(model: InitModelOf<this>) {
-    model = this._loadFromModel(model);
-    this._init(model);
-    if (model.initialExpanded === undefined) {
-      this.initialExpanded = this.expanded;
-    }
-  }
-
-  /**
-   * Writes all properties from the {@link _prepareModel prepared model} to the current instance.
-   * To not use this internal method! It is intended to be called by the {@link init} method.
-   *
-   * @internal
-   */
-  // FIXME CGU [js-bookmark] why was this necessary? Normally, init writes model onto widget
-  _loadFromModel(model: InitModelOf<this>): InitModelOf<this> {
-    model = model || {} as InitModelOf<this>;
-    model = this._prepareModel(model);
-    $.extend(this, model);
-    return model;
-  }
-
-  /**
-   * Returns a new model object with the merged information from the static model ({@link _jsonModel})
-   * and the given `model`. An error is thrown if the `parent` is not a {@link Tree}. If no `session`
-   * is provided, the parent tree's session is automatically inherited.
-   */
-  // FIXME CGU [js-bookmark] this is different than Widget.ts, Widget should be aligned. I think asserting the parent should be in _init as done in Widget.ts
-  protected _prepareModel(model: InitModelOf<this>): InitModelOf<this> {
     let staticModel = this._jsonModel();
     if (staticModel) {
       model = $.extend({}, staticModel, model);
     }
-    scout.assertParameter('parent', model.parent, Tree);
-    model.session = model.session || model.parent.session;
-    return model;
+    this._init(model);
+    if (model.initialExpanded === undefined) {
+      this.initialExpanded = this.expanded;
+    }
   }
 
   destroy() {
@@ -150,6 +123,11 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
   }
 
   protected _init(model: InitModelOf<this>) {
+    scout.assertParameter('parent', model.parent, Tree);
+    this.session = model.session || model.parent.session;
+
+    $.extend(this, model);
+
     texts.resolveTextProperty(this, 'text');
     icons.resolveIconProperty(this, 'iconId');
 

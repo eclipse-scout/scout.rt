@@ -97,7 +97,9 @@ export class PageResolver {
       if (page.pageParamType !== PageIdDummyPageParamDo && page.pageParamType !== null) {
         return null;
       }
-      page._loadFromModel({parent});
+      // Write the static model to the page instance, so we can correctly match the pageParam without actually initializing the page
+      let staticModel = page['_jsonModel']();
+      Object.assign(page, staticModel, {parent});
       if (page.matchesPageParam(param)) {
         return ObjectFactory.get().getObjectType(page.constructor as Constructor);
       }
