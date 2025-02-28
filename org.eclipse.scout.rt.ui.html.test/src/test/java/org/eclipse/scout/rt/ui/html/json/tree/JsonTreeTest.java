@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -51,7 +51,6 @@ import org.eclipse.scout.rt.ui.html.json.tree.fixtures.TreeWithOneNode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -280,7 +279,7 @@ public class JsonTreeTest {
   }
 
   @Test
-  public void testMultipleMenuDisposallOnPropertyChange() throws JSONException {
+  public void testMultipleMenuDisposalOnPropertyChange() throws JSONException {
     ITree tree = createTreeWithOneNode();
     ITreeNode node = tree.getRootNode().getChildNode(0);
     assertFalse(node.isSelectedNode());
@@ -589,7 +588,7 @@ public class JsonTreeTest {
   public void testGetOrCreateNodeIdWithNull() throws JSONException {
     ITree tree = createTreeWithOneNode();
     JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, new JsonAdapterMock());
-    Assert.assertNull(jsonTree.getOrCreateNodeId(null));
+    assertNull(jsonTree.getOrCreateNodeId(null));
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1099,9 +1099,12 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   }
 
   /**
-   * Ignore deleted or filtered nodes, because for the UI, they don't exist
+   * Ignores invisible root node and deleted and filtered nodes because for the UI, they don't exist.
    */
   public boolean isNodeAccepted(ITreeNode node) {
+    if (isInvisibleRootNode(node)) {
+      return false;
+    }
     if (node.isStatusDeleted()) {
       return false;
     }
