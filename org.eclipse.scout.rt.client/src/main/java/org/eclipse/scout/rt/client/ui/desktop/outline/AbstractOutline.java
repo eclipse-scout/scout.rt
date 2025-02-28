@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -166,7 +166,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   /**
    * Configures if the outline overview is visible or not. The outline overview is rendered if no default detail form is
-   * set (see {@link AbstractOutline#getConfiguredDefaultDetailForm()}. An overview of the outline is rendered in the JS
+   * set (see {@link AbstractOutline#getConfiguredDefaultDetailForm()}). An overview of the outline is rendered in the JS
    * part.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
@@ -256,7 +256,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
-   * By default the outline tree tries to delegate the drop to the affected page.
+   * By default, the outline tree tries to delegate the drop to the affected page.
    */
   @Override
   protected void execDrop(ITreeNode node, TransferObject t) {
@@ -335,7 +335,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
-   * Calculates the actions's view order, e.g. if the @Order annotation is set to 30.0, the method will return 30.0. If
+   * Calculates the outline's view order, e.g. if the @Order annotation is set to 30.0, the method will return 30.0. If
    * no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
    *
    * @since 4.0.1
