@@ -94,7 +94,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     this.overviewIconId = null;
     this.showTileOverview = false;
     this.inheritMenusFromParentTablePage = true;
-    this.detailMenuContributors = [scout.create(ParentTablePageMenuContributor, {page: this})];
+    this.detailMenuContributors = [];
     this.events = new EventSupport();
     this.events.registerSubTypePredicate('propertyChange', (event: PropertyChangeEvent, propertyName) => event.propertyName === propertyName);
     this.pageChanging = 0;
@@ -125,6 +125,8 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
 
       super._init(model);
       icons.resolveIconProperty(this, 'overviewIconId');
+
+      this.detailMenuContributors = this._createDetailMenuContributors();
 
       // init necessary if the properties are still available (e.g. Scout classic)
       this._internalInitTable();
@@ -187,6 +189,10 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
       this.detailForm = null;
     }
     this.trigger('destroy');
+  }
+
+  protected _createDetailMenuContributors(): PageDetailMenuContributor[] {
+    return [scout.create(ParentTablePageMenuContributor, {page: this})];
   }
 
   protected _internalInitTable() {

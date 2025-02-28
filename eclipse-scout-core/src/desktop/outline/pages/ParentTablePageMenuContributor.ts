@@ -21,7 +21,6 @@ export class ParentTablePageMenuContributor extends PageDetailMenuContributor {
       return [];
     }
 
-    // FIXME CGU [js-bookmark] parentNode is null for invisible root page -> add outline menus on . why does only OutlineAdapter.linkWithRow call updateMenus? BookmarkMenu is not inherited because inheritMenusFromParentTablePage is false for PageWithTable
     const table = this.page.parentNode.detailTable;
     const row = this.page.row;
 
@@ -29,40 +28,17 @@ export class ParentTablePageMenuContributor extends PageDetailMenuContributor {
       return [];
     }
 
-    return this._filterAndCloneParentTablePageMenus(table.menus, newParent);
+    return this._cloneMenus(table.menus, newParent);
   }
 
-  protected _filterAndCloneParentTablePageMenus(tablePageMenus: Menu[], newParent: Widget): Menu[] {
+  protected override _cloneMenus(tablePageMenus: Menu[], newParent: Widget): Menu[] {
     return this._filterParentTablePageMenus(tablePageMenus)
       .filter(menu => this.page.isMenuInheritedFromParentTablePage(menu))
-      .map(menu => this._cloneParentTablePageMenu(menu, newParent));
+      .map(menu => this._cloneMenu(menu, newParent));
   }
 
   protected _filterParentTablePageMenus(tablePageMenus: Menu[]): Menu[] {
     return menus.filter(tablePageMenus, Table.MenuType.SingleSelection);
-  }
-
-  protected _cloneParentTablePageMenu(menu: Menu, newParent: Widget): Menu {
-    if (!menu) {
-      return null;
-    }
-
-    const clone = menu.clone(
-      {
-        parent: newParent,
-        menuTypes: []
-      },
-      {
-        delegateEventsToOriginal: ['action'],
-        delegateAllPropertiesToClone: true,
-        excludePropertiesToClone: ['menuTypes', 'childActions']
-      });
-
-    if (menu.childActions && menu.childActions.length) {
-      clone.setChildActions(this._filterAndCloneParentTablePageMenus(menu.childActions, clone));
-    }
-
-    return clone;
   }
 }
 
