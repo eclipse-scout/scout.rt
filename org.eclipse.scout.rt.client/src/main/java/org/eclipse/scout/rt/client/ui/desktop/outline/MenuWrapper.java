@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,7 @@ public class MenuWrapper {
    *
    * @param menu
    *     Menu to wrap
-   * @return Newly wrapped menu if the the menu is not already wrapped, same menu otherwise.
+   * @return Newly wrapped menu if the menu is not already wrapped, same menu otherwise.
    */
   public static IMenu wrapMenuIfNotWrapped(IMenu menu) {
     return BEANS.get(MenuWrapper.class).doWrapMenuIfNotWrapped(menu, OutlineMenuWrapper.AUTO_MENU_TYPE_MAPPER, OutlineMenuWrapper.ACCEPT_ALL_FILTER);
