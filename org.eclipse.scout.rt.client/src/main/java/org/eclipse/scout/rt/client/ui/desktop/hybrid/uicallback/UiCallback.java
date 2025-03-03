@@ -100,7 +100,7 @@ public class UiCallback<T> implements Future<T> {
     return true;
   }
 
-  private T report() throws InterruptedException, ExecutionException, CancellationException {
+  protected T report() throws InterruptedException, ExecutionException, CancellationException {
     if (m_cancelled) {
       throw new CancellationException();
     }

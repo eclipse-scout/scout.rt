@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -357,8 +357,8 @@ public class AbstractDesktopTest {
       f.start();
 
       // the openForms listBox should only have one (checked) entry for the top form (form_1)
-      assertEquals(f.getOpenFormsField().getValue().size(), 1);
-      assertEquals(f.getOpenFormsField().getCheckedKeyCount(), 1);
+      assertEquals(1, f.getOpenFormsField().getValue().size());
+      assertEquals(1, f.getOpenFormsField().getCheckedKeyCount());
       // the value of that single entry should be all the forms in the displayParent hierarchy with unsaved changes
       assertTrue(CollectionUtility.firstElement(f.getOpenFormsField().getValue()).containsAll(CollectionUtility.hashSet(form_1, form_1_1, form_1_1_1)));
     }
@@ -536,8 +536,8 @@ public class AbstractDesktopTest {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
     desktop.getUIFacade().readyFromUI();
     Future<Coordinates> coordinatesFuture = desktop.requestGeolocation();
-    GeoLocationResponse browserResponse = BEANS.get(GeoLocationResponse.class).withLatitude("1.0").withLongitude("2.0");
-    UiCallbacks.get().getUIFacade().fireCallbackDone("requestGeolocation", browserResponse);
+    GeoLocationDo browserResponse = BEANS.get(GeoLocationDo.class).withLatitude("1.0").withLongitude("2.0");
+    UiCallbacks.get().getUIFacade().fireCallbackDoneFromUI("request-geolocation", browserResponse, null);
     Coordinates coordinates = coordinatesFuture.get();
     assertEquals("1.0", coordinates.getLatitude());
     assertEquals("2.0", coordinates.getLongitude());
@@ -548,7 +548,7 @@ public class AbstractDesktopTest {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
     desktop.getUIFacade().readyFromUI();
     Future<Coordinates> coordinatesFuture = desktop.requestGeolocation();
-    UiCallbacks.get().getUIFacade().fireCallbackFailed("requestGeolocation", "test failure", "-1");
+    UiCallbacks.get().getUIFacade().fireCallbackFailedFromUI("request-geolocation", "test failure", "-1");
     try {
       coordinatesFuture.get();
     }
