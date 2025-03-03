@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
 @TypeName("scout.GeoLocationResponse")
-public class GeoLocationResponse extends DoEntity {
+public class GeoLocationResponseDo extends DoEntity {
 
   public DoValue<String> latitude() {
     return doValue("latitude");
@@ -31,7 +31,7 @@ public class GeoLocationResponse extends DoEntity {
    * *************************************************************************/
 
   @Generated("DoConvenienceMethodsGenerator")
-  public GeoLocationResponse withLatitude(String latitude) {
+  public GeoLocationResponseDo withLatitude(String latitude) {
     latitude().set(latitude);
     return this;
   }
@@ -42,7 +42,7 @@ public class GeoLocationResponse extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public GeoLocationResponse withLongitude(String longitude) {
+  public GeoLocationResponseDo withLongitude(String longitude) {
     longitude().set(longitude);
     return this;
   }

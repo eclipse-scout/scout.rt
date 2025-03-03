@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,8 +22,9 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
 import org.eclipse.scout.rt.client.ui.Coordinates;
 import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.client.ui.desktop.GeoLocationResponse;
+import org.eclipse.scout.rt.client.ui.desktop.GeoLocationResponseDo;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridActionContextElements;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.uicallback.UiCallbacks.P_UiCallback;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -59,13 +60,13 @@ public class UiCallbacksTest {
     UiCallbacks uiCallbacks = UiCallbacks.get();
     int numListeners = getNumDisposeListeners(desktop);
     int numCallbacks = getNumCallbacks(callbackId);
-    Future<GeoLocationResponse> future1 = uiCallbacks.send(desktop, "whatever", null, callbackId);
-    Future<GeoLocationResponse> future2 = uiCallbacks.send(desktop, "whatever", null, callbackId);
+    Future<GeoLocationResponseDo> future1 = uiCallbacks.send(desktop, "whatever", UiCallbacks.newInput().withCallbackId(callbackId));
+    Future<GeoLocationResponseDo> future2 = uiCallbacks.send(desktop, "whatever", UiCallbacks.newInput().withCallbackId(callbackId));
     assertEquals(numListeners + 2, getNumDisposeListeners(desktop));
     assertEquals(numCallbacks + 2, getNumCallbacks(callbackId));
 
-    GeoLocationResponse result = BEANS.get(GeoLocationResponse.class).withLatitude("100").withLongitude("100");
-    uiCallbacks.getUIFacade().fireCallbackDone(callbackId, result);
+    GeoLocationResponseDo result = BEANS.get(GeoLocationResponseDo.class).withLatitude("100").withLongitude("100");
+    uiCallbacks.getUIFacade().fireCallbackDoneFromUI(callbackId, result, null);
 
     assertEquals(numListeners, getNumDisposeListeners(desktop));
     assertEquals(numCallbacks, getNumCallbacks(callbackId));
@@ -77,8 +78,8 @@ public class UiCallbacksTest {
   public void testHandlerCanModifyResultToError() throws Throwable {
     UiCallbacks uiCallbacks = UiCallbacks.get();
     String callbackId = "callbackId2";
-    Future<IDoEntity> future1 = uiCallbacks.send(IDesktop.CURRENT.get(), new P_TestingUiCallbackHandlerThrowingException(), null, callbackId);
-    uiCallbacks.getUIFacade().fireCallbackDone(callbackId, null);
+    Future<IDoEntity> future1 = uiCallbacks.send(IDesktop.CURRENT.get(), new P_TestingUiCallbackHandlerThrowingException(), UiCallbacks.newInput().withCallbackId(callbackId));
+    uiCallbacks.getUIFacade().fireCallbackDoneFromUI(callbackId, null, null);
     try {
       future1.get(); // actual exception is wrapped into an ExecutionException
     }
@@ -91,7 +92,7 @@ public class UiCallbacksTest {
   public void testHandlerCanModifyResult() throws ExecutionException, InterruptedException {
     UiCallbacks uiCallbacks = UiCallbacks.get();
     String callbackId = "callbackId3";
-    GeoLocationResponse result = BEANS.get(GeoLocationResponse.class).withLatitude("100").withLongitude("100");
+    GeoLocationResponseDo result = BEANS.get(GeoLocationResponseDo.class).withLatitude("100").withLongitude("100");
     Future<String> future1 = uiCallbacks.send(IDesktop.CURRENT.get(), new IUiCallbackHandler<>() {
       @Override
       public String uiCallbackHandlerObjectType() {
@@ -99,12 +100,12 @@ public class UiCallbacksTest {
       }
 
       @Override
-      public Pair<String, ? extends Throwable> onCallbackDone(IDoEntity doEntity) {
-        assertSame(result, doEntity);
+      public Pair<String, ? extends Throwable> onCallbackDone(Object data, HybridActionContextElements contextElements) {
+        assertSame(result, data);
         return ImmutablePair.of("300", null);
       }
-    }, null, callbackId);
-    uiCallbacks.getUIFacade().fireCallbackDone(callbackId, result);
+    }, UiCallbacks.newInput().withCallbackId(callbackId));
+    uiCallbacks.getUIFacade().fireCallbackDoneFromUI(callbackId, result, null);
     assertEquals("300", future1.get());
   }
 
@@ -112,9 +113,9 @@ public class UiCallbacksTest {
   public void testHandlerCanModifyErrorToResult() throws ExecutionException, InterruptedException {
     UiCallbacks uiCallbacks = UiCallbacks.get();
     String callbackId = "callbackId4";
-    Future<GeoLocationResponse> future1 = uiCallbacks.send(IDesktop.CURRENT.get(), new IUiCallbackHandler<>() {
+    Future<GeoLocationResponseDo> future1 = uiCallbacks.send(IDesktop.CURRENT.get(), new IUiCallbackHandler<>() {
       @Override
-      public Pair<GeoLocationResponse, ? extends Throwable> onCallbackDone(IDoEntity doEntity) {
+      public Pair<GeoLocationResponseDo, ? extends Throwable> onCallbackDone(Object data, HybridActionContextElements contextElements) {
         throw new AssertionError(); // should not be called as fireCallbackFailed is invoked
       }
 
@@ -124,13 +125,13 @@ public class UiCallbacksTest {
       }
 
       @Override
-      public Pair<GeoLocationResponse, ? extends Throwable> onCallbackFailed(ProcessingException exception, String message, String code) {
+      public Pair<GeoLocationResponseDo, ? extends Throwable> onCallbackFailed(ProcessingException exception, String message, String code) {
         assertEquals("err", message);
         assertEquals("1234", code);
         return ImmutablePair.of(null, null); // change error to null result
       }
-    }, null, callbackId);
-    uiCallbacks.getUIFacade().fireCallbackFailed(callbackId, "err", "1234");
+    }, UiCallbacks.newInput().withCallbackId(callbackId));
+    uiCallbacks.getUIFacade().fireCallbackFailedFromUI(callbackId, "err", "1234");
     assertNull(future1.get());
   }
 
@@ -161,7 +162,7 @@ public class UiCallbacksTest {
     int numCallbacks = getNumCallbacks();
     Future<IDoEntity> future1 = uiCallbacks.send(desktop, new P_TestingUiCallbackHandlerThrowingException());
     Future<IDoEntity> future2 = uiCallbacks.send(desktop, new P_TestingUiCallbackHandlerThrowingException());
-    Future<IDoEntity> future3 = uiCallbacks.send(desktop, new P_TestingUiCallbackHandlerThrowingException(), null, callbackId);
+    Future<IDoEntity> future3 = uiCallbacks.send(desktop, new P_TestingUiCallbackHandlerThrowingException(), UiCallbacks.newInput().withCallbackId(callbackId));
     assertSame(future3, uiCallbacks.getCallbacksInternal(callbackId).get(0));
     assertTrue(uiCallbacks.getCallbacksInternal("does-not-exist").isEmpty());
     assertEquals(numCallbacks + 3, getNumCallbacks());
@@ -179,7 +180,7 @@ public class UiCallbacksTest {
   public void testEventBuffer() {
     IDesktop desktop = IDesktop.CURRENT.get();
     desktop.setProperty(IDesktop.PROP_READY, false);
-    String geoLocationCallbackId = "requestGeolocation";
+    String geoLocationCallbackId = "request-geolocation";
     int numCallbacks = getNumCallbacks(geoLocationCallbackId);
     int numListeners = getNumDisposeListeners(desktop);
     int bufferSize = UiCallbacks.get().m_eventBuffer.size();
@@ -195,8 +196,8 @@ public class UiCallbacksTest {
     assertEquals(numListeners + 3, getNumDisposeListeners(desktop));
     assertEquals(bufferSize, UiCallbacks.get().m_eventBuffer.size()); // buffer has been sent and cleared
 
-    GeoLocationResponse result = BEANS.get(GeoLocationResponse.class).withLatitude("100").withLongitude("100");
-    UiCallbacks.get().getUIFacade().fireCallbackDone(geoLocationCallbackId, result);
+    GeoLocationResponseDo result = BEANS.get(GeoLocationResponseDo.class).withLatitude("100").withLongitude("100");
+    UiCallbacks.get().getUIFacade().fireCallbackDoneFromUI(geoLocationCallbackId, result, null);
     assertEquals(numCallbacks, getNumCallbacks(geoLocationCallbackId));
     assertEquals(numListeners, getNumDisposeListeners(desktop));
     assertEquals(bufferSize, UiCallbacks.get().m_eventBuffer.size());
@@ -215,9 +216,9 @@ public class UiCallbacksTest {
     int numCallbacks = getNumCallbacks();
     int numListeners = getNumDisposeListeners(owner);
     int bufferSize = UiCallbacks.get().m_eventBuffer.size();
-    Future<IDoEntity> future1 = UiCallbacks.get().send(owner, "whatever", null, "id_0");
-    Future<IDoEntity> future2 = UiCallbacks.get().send(owner, "whatever", null, "id_1");
-    Future<IDoEntity> future3 = UiCallbacks.get().send(owner, "whatever", null, "id_2");
+    Future<IDoEntity> future1 = UiCallbacks.get().send(owner, "whatever", UiCallbacks.newInput().withCallbackId("id_0"));
+    Future<IDoEntity> future2 = UiCallbacks.get().send(owner, "whatever", UiCallbacks.newInput().withCallbackId("id_1"));
+    Future<IDoEntity> future3 = UiCallbacks.get().send(owner, "whatever", UiCallbacks.newInput().withCallbackId("id_2"));
     assertEquals(numCallbacks + 3, getNumCallbacks());
     assertEquals(numListeners + 3, getNumDisposeListeners(owner));
     assertEquals(bufferSize + 3, UiCallbacks.get().m_eventBuffer.size());
@@ -230,9 +231,9 @@ public class UiCallbacksTest {
     assertTrue(future2.isCancelled());
     assertTrue(future3.isCancelled());
 
-    UiCallbacks.get().getUIFacade().fireCallbackDone("id_0", null);
-    UiCallbacks.get().getUIFacade().fireCallbackDone("id_1", null);
-    UiCallbacks.get().getUIFacade().fireCallbackDone("id_2", null);
+    UiCallbacks.get().getUIFacade().fireCallbackDoneFromUI("id_0", null, null);
+    UiCallbacks.get().getUIFacade().fireCallbackDoneFromUI("id_1", null, null);
+    UiCallbacks.get().getUIFacade().fireCallbackDoneFromUI("id_2", null, null);
     assertEquals(numCallbacks, getNumCallbacks());
     assertEquals(numListeners, getNumDisposeListeners(owner));
     assertEquals(bufferSize, UiCallbacks.get().m_eventBuffer.size());
@@ -249,7 +250,7 @@ public class UiCallbacksTest {
     int numListeners = getNumDisposeListeners(desktop);
     int numCallbacks = getNumCallbacks(callbackId);
 
-    Future<GeoLocationResponse> future = uiCallbacks.send(desktop, "whatever", null, callbackId);
+    Future<GeoLocationResponseDo> future = uiCallbacks.send(desktop, "whatever", UiCallbacks.newInput().withCallbackId(callbackId));
     assertEquals(numListeners + 1, getNumDisposeListeners(desktop));
     assertEquals(numCallbacks + 1, getNumCallbacks(callbackId));
 
@@ -281,8 +282,8 @@ public class UiCallbacksTest {
   @ObjectType("whatever")
   private static class P_TestingUiCallbackHandlerThrowingException implements IUiCallbackHandler<IDoEntity, IDoEntity> {
     @Override
-    public Pair<IDoEntity, ? extends Throwable> onCallbackDone(IDoEntity doEntity) {
-      return ImmutablePair.of(doEntity /* this value must be ignored as an exception is present */, new ProcessingException("test-error"));
+    public Pair<IDoEntity, ? extends Throwable> onCallbackDone(IDoEntity data, HybridActionContextElements contextElements) {
+      return ImmutablePair.of(data /* this value must be ignored as an exception is present */, new ProcessingException("test-error"));
     }
   }
 }
