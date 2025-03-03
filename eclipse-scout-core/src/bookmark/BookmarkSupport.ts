@@ -8,9 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ActivateBookmarkResultDo, App, arrays, BookmarkDo, bookmarks, BookmarkSupportModel, dataObjects, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, HybridManagerActionEndEventResult, IBookmarkPageDo,
-  InitModelOf, MessageBoxes, NodeBookmarkPageDo, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool,
-  webstorage
+  App, arrays, BookmarkDo, bookmarks, BookmarkSupportModel, dataObjects, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, ObjectWithType,
+  Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -20,9 +19,10 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   static ERROR_MISSING_OUTLINE = 'missing-outline';
   static ERROR_MISSING_PAGE_PARAM = 'missing-page-param';
   static ERROR_PAGE_NOT_BOOKMARKABLE = 'page-not-bookmarkable';
-  static ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER = 'page-missing-row-bookmark-identifier';
+  static ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER = 'missing-row-bookmark-identifier';
   static ERROR_OUTLINE_NOT_FOUND = 'outline-not-found';
   static ERROR_PAGE_NOT_FOUND = 'page-not-found';
+  static ERROR_PAGE_WRONG_OUTLINE = 'page-wrong-outline';
 
   objectType: string;
   desktop: Desktop;
@@ -240,13 +240,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
     this.setLoading(true);
     return $.resolvedPromise()
-      .then(() => this._openBookmarkRemote(bookmarkDefinition))
-      .then(result => {
-        if (arrays.empty(result?.remainingPagePath)) {
-          return; // done, we are already on the correct page
-        }
-        return this._openBookmarkLocal(bookmarkDefinition, result);
-      })
+      .then(() => this._openBookmarkHybrid(bookmarkDefinition))
       .catch(err => {
         // FIXME bsh [js-bookmark] Error handling
         if (err === BookmarkSupport.ERROR_OUTLINE_NOT_FOUND) {
@@ -263,55 +257,40 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       });
   }
 
-  protected _openBookmarkRemote(bookmarkDefinition: OutlineBookmarkDefinitionDo): JQuery.Promise<ActivateBookmarkResult> {
+  protected _openBookmarkHybrid(bookmarkDefinition: OutlineBookmarkDefinitionDo): JQuery.Promise<void> {
     let hybridManager = HybridManager.get(this.session);
 
+    // Scout Classic: send the bookmark to the UI server. The client model will first try to resolve
+    // as much of the bookmark as it can. The remaining path will then be sent back to the UI using
+    // a callback. After that, the hybrid action will end.
     if (hybridManager) {
-      // Scout Classic: send the bookmark to the UI server first, let the client model resolve as much of the bookmark
-      // as it can, then resolve the remaining path in the UI
-      let hybridActionData = {
-        bookmarkDefinition: bookmarkDefinition
-      };
-      return hybridManager.callActionAndWaitWithContext('ActivateBookmark', hybridActionData)
-        .then((result: HybridManagerActionEndEventResult) => {
-          // FIXME bsh [js-bookmark] Handle error
-          let targetPage = result.contextElements.optSingle('targetPage')?.optElement(Page);
-          let data = scout.assertInstance(result.data, ActivateBookmarkResultDo);
-          return {
-            targetPage: targetPage,
-            targetBookmarkPage: data.targetBookmarkPage,
-            remainingPagePath: data.remainingPagePath
-          } as ActivateBookmarkResult;
-        });
+      // FIXME bsh [js-bookmark] Handle error
+      return hybridManager.callActionAndWaitWithContext('ActivateBookmark', {bookmarkDefinition}).then(result => null);
     }
 
     // Scout JS: resolve everything in the UI, i.e. the entire path is remaining
-    return $.resolvedPromise().then(() => {
-      return {
-        targetPage: null,
-        targetBookmarkPage: null,
-        remainingPagePath: [...bookmarkDefinition.pagePath, bookmarkDefinition.bookmarkedPage]
-      };
+    return this.openBookmarkLocal({
+      parentOutline: null,
+      parentPage: null,
+      parentBookmarkPage: null,
+      pagePath: [...bookmarkDefinition.pagePath, bookmarkDefinition.bookmarkedPage]
     });
   }
 
-  protected _openBookmarkLocal(bookmarkDefinition: OutlineBookmarkDefinitionDo, result: ActivateBookmarkResult): JQuery.Promise<void> {
+  openBookmarkLocal(request: ActivateBookmarkRequest): JQuery.Promise<void> {
     // Check if we are already on the correct outline
-    let outline = this.desktop.outline;
-    if (!outline || outline.getObjectUuidBuilder().buildId() !== bookmarkDefinition.outlineId) {
-      outline = this.desktop.getOutlines().find(outline => {
-        let outlineId = outline.getObjectUuidBuilder().buildId();
-        return outlineId === bookmarkDefinition.outlineId;
-      });
-    }
-    if (!outline || !outline.visible) {
+    let outline = request.parentOutline || request.parentPage?.getOutline();
+    if (!outline || !outline.visible || !outline.enabled) {
       return $.rejectedPromise(BookmarkSupport.ERROR_OUTLINE_NOT_FOUND);
     }
     this.desktop.setOutline(outline);
+    if (request.parentPage && request.parentPage.getOutline() !== outline) {
+      return $.rejectedPromise(BookmarkSupport.ERROR_PAGE_WRONG_OUTLINE);
+    }
 
-    let pagePath = result.remainingPagePath.slice(); // create copy because arrays is altered
-    let parent = result.targetPage || outline;
-    let parentPageDefinition = result.targetBookmarkPage;
+    let pagePath = request.pagePath?.slice(); // create copy because array is altered
+    let parent = request.parentPage || outline;
+    let parentPageDefinition = request.parentBookmarkPage;
     return this._resolveNextPageInPath(pagePath, parent, parentPageDefinition)
       .then(page => {
         if (!page) {
@@ -465,8 +444,9 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 }
 
-export interface ActivateBookmarkResult {
-  targetPage: Page;
-  targetBookmarkPage: IBookmarkPageDo;
-  remainingPagePath: IBookmarkPageDo[];
+export interface ActivateBookmarkRequest {
+  parentOutline: Outline;
+  parentPage: Page;
+  parentBookmarkPage: IBookmarkPageDo;
+  pagePath: IBookmarkPageDo[];
 }
