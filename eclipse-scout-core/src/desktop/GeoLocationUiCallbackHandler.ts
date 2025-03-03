@@ -7,23 +7,23 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, Desktop, scout, typeName, UiCallbackErrorDo, UiCallbackHandler} from '../index';
+import {BaseDoEntity, scout, typeName, UiCallbackErrorDo, UiCallbackHandler, UiCallbackParam} from '../index';
 
-export class GeoLocationUiHandler implements UiCallbackHandler {
-  handle(callbackId: string, owner: Desktop, request: BaseDoEntity): JQuery.Promise<GeoLocationResponse> {
+export class GeoLocationUiCallbackHandler implements UiCallbackHandler {
+
+  handle(param: UiCallbackParam): JQuery.Promise<GeoLocationDo> {
     if (!navigator.geolocation) {
-      return $.resolvedPromise(); // no result will let the callback fail.
+      return $.rejectedPromise('Geolocation API not supported');
     }
-
-    const deferred = $.Deferred();
+    let deferred: JQuery.Deferred<GeoLocationDo> = $.Deferred();
     navigator.geolocation.getCurrentPosition(
       position => deferred.resolve(this._positionSuccess(position)),
       positionError => deferred.reject(this._positionError(positionError)));
     return deferred.promise();
   }
 
-  protected _positionSuccess(position: GeolocationPosition): GeoLocationResponse {
-    return scout.create(GeoLocationResponse, {
+  protected _positionSuccess(position: GeolocationPosition): GeoLocationDo {
+    return scout.create(GeoLocationDo, {
       latitude: '' + position.coords.latitude,
       longitude: '' + position.coords.longitude
     });
@@ -37,8 +37,8 @@ export class GeoLocationUiHandler implements UiCallbackHandler {
   }
 }
 
-@typeName('scout.GeoLocationResponse')
-export class GeoLocationResponse extends BaseDoEntity {
+@typeName('scout.GeoLocation')
+export class GeoLocationDo extends BaseDoEntity {
   latitude?: string;
   longitude?: string;
 }

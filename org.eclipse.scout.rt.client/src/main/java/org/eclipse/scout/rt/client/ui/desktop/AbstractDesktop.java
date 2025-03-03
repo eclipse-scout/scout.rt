@@ -1768,7 +1768,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   public Future<Coordinates> requestGeolocation() {
-    return UiCallbacks.get().send(this, BEANS.get(GeoLocationUiCallbackHandler.class), null, "requestGeolocation");
+    return UiCallbacks.get().send(this, BEANS.get(GeoLocationUiCallbackHandler.class), UiCallbacks.newInput().withCallbackId("request-geolocation"));
   }
 
   @Override
