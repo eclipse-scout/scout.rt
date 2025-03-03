@@ -177,7 +177,7 @@ module.exports = (env, args) => {
           }
         }]
       }, {
-        test: /\.tsx?$/,
+        test: /\.[c|m]?tsx?$/,
         exclude: /node_modules/,
         use: [{
           loader: require.resolve('babel-loader'),
@@ -187,13 +187,13 @@ module.exports = (env, args) => {
           options: tsOptions
         }]
       }, {
-        test: /\.jsx?$/,
+        test: /\.[c|m]?jsx?$/,
         use: [{
           loader: require.resolve('babel-loader'),
           options: babelOptions
         }]
       }, {
-        test: /\.jsx?$/,
+        test: /\.[c|m]?jsx?$/,
         enforce: 'pre',
         use: [{
           loader: require.resolve('source-map-loader')
