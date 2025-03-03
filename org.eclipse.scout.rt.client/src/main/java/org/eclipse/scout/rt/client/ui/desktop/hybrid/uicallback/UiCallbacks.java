@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,22 +24,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.rt.client.ClientConfigProperties.DefaultUiCallbackTimeoutMillisProperty;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridActionContextElements;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.event.EventSupport;
@@ -47,8 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Desktop addon (lazy created) to send {@link IDoEntity} instances to custom UI handlers on the browser and
- * asynchronously retrieve their results.
+ * Desktop addon (lazy created) to send data to custom UI handlers on the browser and asynchronously retrieve their results.
  * <p>
  * Use {@link UiCallbacks#get()} to request a UI callback.
  */
@@ -72,6 +78,8 @@ public class UiCallbacks extends AbstractPropertyObserver {
     desktop.addDesktopListener(e -> this.onDesktopClosed(), DesktopEvent.TYPE_DESKTOP_CLOSED);
   }
 
+  // -----------------------------------------------------
+
   /**
    * @return The {@link UiCallbacks} instance for the current {@link IDesktop} or {@code null} if there is no current
    * {@link IDesktop}.
@@ -86,7 +94,41 @@ public class UiCallbacks extends AbstractPropertyObserver {
   }
 
   /**
-   * Calls the UI handler with given ObjectType.
+   * Convenience method to wait for the completion of a callback future. The default timeout can be overwritten by
+   * {@link UiCallbackAwaitInput#getTimeoutInMillis()}. Exceptions are logged automatically and are re-thrown as
+   * runtime exceptions, optionally translated by {@link UiCallbackAwaitInput#getExceptionTranslator()} .
+   *
+   * @param future
+   *     The future to wait for
+   * @param input
+   *     Optional arguments to customize the behavior of this method (can be {@code null})
+   * @return The callback result
+   * @throws RuntimeException
+   *     if the callback failed or was not completed within the specified timeout
+   */
+  public static <RESULT> RESULT await(Future<RESULT> future, UiCallbackAwaitInput input) {
+    // Delegate to instance method to allow overwriting
+    return UiCallbacks.get().waitFor(future, input);
+  }
+
+  /**
+   * Creates a new {@link UiCallbackInput}.
+   */
+  public static UiCallbackInput newInput() {
+    return BEANS.get(UiCallbackInput.class);
+  }
+
+  /**
+   * Creates a new {@link UiCallbackAwaitInput}.
+   */
+  public static UiCallbackAwaitInput newAwaitInput() {
+    return BEANS.get(UiCallbackAwaitInput.class);
+  }
+
+  // -----------------------------------------------------
+
+  /**
+   * Calls the UI handler with given {@code objectType}.
    *
    * @param owner
    *     The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
@@ -94,15 +136,15 @@ public class UiCallbacks extends AbstractPropertyObserver {
    *     {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
    *     {@link IWidget} is disposed.
    * @param jsHandlerObjectType
-   *     The ObjectType of the handler in the browser to answer the callback.
-   * @return The {@link IDoEntity} as returned by the UI handler on the browser.
+   *     The {@code objectType} of the handler in the browser to answer the callback.
+   * @return The data as returned by the UI handler on the browser.
    */
-  public <R extends IDoEntity> Future<R> send(IWidget owner, String jsHandlerObjectType) {
+  public <RESULT> Future<RESULT> send(IWidget owner, String jsHandlerObjectType) {
     return send(owner, jsHandlerObjectType, null);
   }
 
   /**
-   * Calls the UI handler with given ObjectType and input data.
+   * Calls the UI handler with given {@code objectType} and input data.
    *
    * @param owner
    *     The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
@@ -110,38 +152,17 @@ public class UiCallbacks extends AbstractPropertyObserver {
    *     {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
    *     {@link IWidget} is disposed.
    * @param jsHandlerObjectType
-   *     The ObjectType of the handler in the browser to answer the callback.
-   * @param dataToSendToUi
-   *     An optional {@link IDoEntity} to send to the UI handler on the browser.
+   *     The {@code objectType} of the handler in the browser to answer the callback.
+   * @param input
+   *     Optional input for this callback. Use {@link UiCallbacks#newInput()} to create a new input.
    * @return The {@link IDoEntity} as returned by the UI handler on the browser.
    */
-  public <R extends IDoEntity> Future<R> send(IWidget owner, String jsHandlerObjectType, IDoEntity dataToSendToUi) {
-    return send(owner, jsHandlerObjectType, dataToSendToUi, null);
+  public <RESULT> Future<RESULT> send(IWidget owner, String jsHandlerObjectType, UiCallbackInput input) {
+    return send(owner, new DefaultUiCallbackHandler<>(jsHandlerObjectType), input);
   }
 
   /**
-   * Calls the UI handler with given ObjectType and input data.
-   *
-   * @param owner
-   *     The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
-   *     UI callback. E.g. if the callback should be performed as long as the user is logged in, use
-   *     {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
-   *     {@link IWidget} is disposed.
-   * @param jsHandlerObjectType
-   *     The ObjectType of the handler in the browser to answer the callback.
-   * @param dataToSendToUi
-   *     An optional {@link IDoEntity} to send to the UI handler on the browser.
-   * @param callbackId
-   *     An optional callbackId. All callbacks with the same ID are only sent once to the UI and on a response all
-   *     pending callbacks with this ID are resolved at once. By default, each callback has its own unique ID.
-   * @return The {@link IDoEntity} as returned by the UI handler on the browser.
-   */
-  public <R extends IDoEntity> Future<R> send(IWidget owner, String jsHandlerObjectType, IDoEntity dataToSendToUi, String callbackId) {
-    return send(owner, new NoopUiCallbackHandler<>(jsHandlerObjectType), dataToSendToUi, callbackId);
-  }
-
-  /**
-   * Calls the UI handler with ObjectType as returned by {@link IUiCallbackHandler#uiCallbackHandlerObjectType()} and
+   * Calls the UI handler with {@code objectType} as returned by {@link IUiCallbackHandler#uiCallbackHandlerObjectType()} and
    * returns its result as processed by the given {@link IUiCallbackHandler}.
    *
    * @param owner
@@ -150,16 +171,16 @@ public class UiCallbacks extends AbstractPropertyObserver {
    *     {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
    *     {@link IWidget} is disposed.
    * @param handler
-   *     An {@link IUiCallbackHandler} implementation that specifies the UI handler ObjectType and the processing
+   *     An {@link IUiCallbackHandler} implementation that specifies the UI handler {@code objectType} and the processing
    *     of the response.
    * @return The result as processed by the {@link IUiCallbackHandler}.
    */
-  public <R> Future<R> send(IWidget owner, IUiCallbackHandler<?, R> handler) {
+  public <RESULT> Future<RESULT> send(IWidget owner, IUiCallbackHandler<?, RESULT> handler) {
     return send(owner, handler, null);
   }
 
   /**
-   * Calls the UI handler with ObjectType as returned by {@link IUiCallbackHandler#uiCallbackHandlerObjectType()} and
+   * Calls the UI handler with {@code objectType} as returned by {@link IUiCallbackHandler#uiCallbackHandlerObjectType()} and
    * returns its result as processed by the given {@link IUiCallbackHandler}.
    *
    * @param owner
@@ -168,46 +189,25 @@ public class UiCallbacks extends AbstractPropertyObserver {
    *     {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
    *     {@link IWidget} is disposed.
    * @param handler
-   *     An {@link IUiCallbackHandler} implementation that specifies the UI handler ObjectType and the processing
+   *     An {@link IUiCallbackHandler} implementation that specifies the UI handler {@code objectType} and the processing
    *     of the response.
-   * @param dataToSendToUi
-   *     An optional {@link IDoEntity} to send to the UI handler on the browser.
+   * @param input
+   *     Optional input for this callback. Use {@link UiCallbacks#newInput()} to create a new input.
    * @return The result as processed by the {@link IUiCallbackHandler}.
    */
-  public <R> Future<R> send(IWidget owner, IUiCallbackHandler<?, R> handler, IDoEntity dataToSendToUi) {
-    return send(owner, handler, null, null);
-  }
-
-  /**
-   * Calls the UI handler with ObjectType as returned by {@link IUiCallbackHandler#uiCallbackHandlerObjectType()} and
-   * returns its result as processed by the given {@link IUiCallbackHandler}.
-   *
-   * @param owner
-   *     The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
-   *     UI callback. E.g. if the callback should be performed as long as the user is logged in, use
-   *     {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
-   *     {@link IWidget} is disposed.
-   * @param handler
-   *     An {@link IUiCallbackHandler} implementation that specifies the UI handler ObjectType and the processing
-   *     of the response.
-   * @param dataToSendToUi
-   *     An optional {@link IDoEntity} to send to the UI handler on the browser.
-   * @param callbackId
-   *     An optional callbackId. All callbacks with the same ID are only sent once to the UI and on a response all
-   *     pending callbacks with this ID are resolved at once. By default, each callback has its own unique ID.
-   * @return The result as processed by the {@link IUiCallbackHandler}.
-   */
-  public <R> Future<R> send(IWidget owner, IUiCallbackHandler<?, R> handler, IDoEntity dataToSendToUi, String callbackId) {
-    assertNotNull(handler);
-    assertNotNull(owner);
+  public <RESULT> Future<RESULT> send(IWidget owner, IUiCallbackHandler<?, RESULT> handler, UiCallbackInput input) {
     assertModelThread();
+    assertNotNull(owner);
+    assertNotNull(handler);
+    input = ObjectUtility.nvlOpt(input, UiCallbacks::newInput);
 
+    String callbackId = input.getCallbackId();
     if (StringUtility.isNullOrEmpty(callbackId)) {
       callbackId = UUID.randomUUID().toString();
     }
 
     boolean isNewId;
-    P_UiCallback<R> callback;
+    P_UiCallback<RESULT> callback;
     synchronized (m_pendingUiCallbacks) {
       isNewId = !m_pendingUiCallbacks.containsKey(callbackId);
       callback = registerCallback(owner, handler, callbackId);
@@ -215,10 +215,12 @@ public class UiCallbacks extends AbstractPropertyObserver {
 
     if (isNewId) {
       // send only one event to the UI for each ID as one response will resolve all with the same ID.
-      fireUiCallbackEvent(callback, dataToSendToUi, owner);
+      fireUiCallbackEvent(callback, owner, input.getData(), input.getContextElements());
     }
     return callback;
   }
+
+  // -----------------------------------------------------
 
   protected <T> P_UiCallback<T> registerCallback(IWidget owner, IUiCallbackHandler<?, T> handler, String callbackId) {
     P_UiCallback<T> uiCallback = new P_UiCallback<>(owner, handler, callbackId);
@@ -247,7 +249,7 @@ public class UiCallbacks extends AbstractPropertyObserver {
   }
 
   /**
-   * @return An unmodifiable List with all pending callbacks having given ID.
+   * @return An unmodifiable list with all pending callbacks having given ID.
    */
   public List<Future<?>> getCallbacks(String callbackId) {
     return unmodifiableList(getCallbacksInternal(callbackId));
@@ -276,8 +278,8 @@ public class UiCallbacks extends AbstractPropertyObserver {
     return m_eventSupport;
   }
 
-  protected <R> void fireUiCallbackEvent(P_UiCallback<R> callback, IDoEntity dataToSendToUi, IWidget owner) {
-    UiCallbackEvent event = new UiCallbackEvent(this, callback.m_id, callback.m_handler.uiCallbackHandlerObjectType(), dataToSendToUi, owner);
+  protected <R> void fireUiCallbackEvent(P_UiCallback<R> callback, IWidget owner, IDoEntity data, HybridActionContextElements contextElements) {
+    UiCallbackEvent event = new UiCallbackEvent(this, callback.m_id, callback.m_handler.uiCallbackHandlerObjectType(), owner, data, contextElements);
     if (IDesktop.CURRENT.get().isReady()) {
       sendUiCallbackEvent(event);
     }
@@ -290,10 +292,6 @@ public class UiCallbacks extends AbstractPropertyObserver {
 
   protected void sendUiCallbackEvent(UiCallbackEvent event) {
     getEventSupport().fireEvent(event);
-  }
-
-  protected void fireCallbackDone(String callbackId, IDoEntity response) {
-    getCallbacksInternal(callbackId).forEach(c -> fireCallbackDone(c, response));
   }
 
   protected void onDesktopClosed() {
@@ -319,28 +317,44 @@ public class UiCallbacks extends AbstractPropertyObserver {
     }
   }
 
+  protected void fireCallbackDone(String callbackId, Object data, HybridActionContextElements contextElements) {
+    getCallbacksInternal(callbackId).forEach(callback -> fireCallbackDone(callback, data, contextElements));
+  }
+
+  protected <DATA, RESULT> void fireCallbackDone(P_UiCallback<RESULT> callback, DATA data, HybridActionContextElements contextElements) {
+    Pair<RESULT, ? extends Throwable> result;
+    try {
+      @SuppressWarnings("unchecked")
+      IUiCallbackHandler<DATA, RESULT> handler = (IUiCallbackHandler<DATA, RESULT>) callback.m_handler;
+      result = handler.onCallbackDone(data, contextElements);
+    }
+    catch (Exception e) {
+      result = ImmutablePair.of(null, e);
+    }
+    finishCallback(callback, result.getLeft(), result.getRight());
+  }
+
   protected void fireCallbackFailed(String callbackId, String message, String code) {
     ProcessingException t = new ProcessingException(StringUtility.hasText(message) ? message : "Error in UiCallback handler.");
     if (StringUtility.hasText(code)) {
       t.withContextInfo("code", code);
     }
-    getCallbacksInternal(callbackId).forEach(c -> fireCallbackFailed(c, t, message, code));
+    getCallbacksInternal(callbackId).forEach(callback -> fireCallbackFailed(callback, t, message, code));
   }
 
-  protected <RES> void fireCallbackFailed(P_UiCallback<RES> callback, ProcessingException exception, String message, String code) {
-    IUiCallbackHandler<?, RES> handler = callback.m_handler;
-    Pair<RES, ? extends Throwable> result = handler.onCallbackFailed(exception, message, code);
+  protected <RESULT> void fireCallbackFailed(P_UiCallback<RESULT> callback, ProcessingException exception, String message, String code) {
+    Pair<RESULT, ? extends Throwable> result;
+    try {
+      IUiCallbackHandler<?, RESULT> handler = callback.m_handler;
+      result = handler.onCallbackFailed(exception, message, code);
+    }
+    catch (Exception e) {
+      result = ImmutablePair.of(null, e);
+    }
     finishCallback(callback, result.getLeft(), result.getRight());
   }
 
-  protected <IN extends IDoEntity, RES> void fireCallbackDone(P_UiCallback<RES> callback, IN response) {
-    //noinspection unchecked
-    IUiCallbackHandler<IN, RES> handler = (IUiCallbackHandler<IN, RES>) callback.m_handler;
-    Pair<RES, ? extends Throwable> result = handler.onCallbackDone(response);
-    finishCallback(callback, result.getLeft(), result.getRight());
-  }
-
-  protected <IN extends IDoEntity, RES> void finishCallback(UiCallback<RES> callback, RES result, Throwable exception) {
+  protected <RESULT> void finishCallback(UiCallback<RESULT> callback, RESULT result, Throwable exception) {
     if (exception != null) {
       callback.failed(exception);
     }
@@ -349,15 +363,52 @@ public class UiCallbacks extends AbstractPropertyObserver {
     }
   }
 
+  // -----------------------------------------------------
+
   /**
-   * Cancels all callbacks with given ID.
+   * @see #await(Future, UiCallbackAwaitInput)
+   */
+  protected <RESULT> RESULT waitFor(Future<RESULT> future, UiCallbackAwaitInput input) {
+    assertModelThread();
+    assertNotNull(future);
+    input = ObjectUtility.nvlOpt(input, UiCallbacks::newAwaitInput);
+    DefaultUiCallbackTimeoutMillisProperty timeoutProperty = BEANS.get(DefaultUiCallbackTimeoutMillisProperty.class);
+    long timeoutInMillis = NumberUtility.nvl(ObjectUtility.nvlOpt(input.getTimeoutInMillis(), () -> timeoutProperty.getValue()), 0);
+    try {
+      return timeoutInMillis <= 0
+          ? future.get()
+          : future.get(timeoutInMillis, TimeUnit.MILLISECONDS);
+    }
+    catch (Exception e) {
+      if (e instanceof TimeoutException) {
+        if (input.getTimeoutInMillis() == null) {
+          LOG.warn("UI callback{} timed out after {} ms. The timeout can be increased by adjusting the config property '{}'.",
+              StringUtility.box(" '", input.getName(), "'"), timeoutInMillis, timeoutProperty.getKey(), e);
+        }
+        else {
+          LOG.warn("UI callback{} timed out after {} ms.", StringUtility.box(" '", input.getName(), "'"), timeoutInMillis, e);
+        }
+      }
+      else {
+        LOG.warn("Unexpected error while waiting for UI callback{}.", StringUtility.box(" '", input.getName(), "'"), e);
+      }
+      throw input.getExceptionTranslator() != null
+          ? input.getExceptionTranslator().translate(e)
+          : BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+    }
+  }
+
+  // -----------------------------------------------------
+
+  /**
+   * Cancels all callbacks with the given ID.
    *
    * @param mayInterruptIfRunning
    *     {@code true} if the thread executing this task should be interrupted. Otherwise, in-progress tasks are
    *     allowed to complete.
    */
   public void cancelUiCallbacks(String callbackId, boolean mayInterruptIfRunning) {
-    getCallbacksInternal(callbackId).forEach(c -> c.cancel(mayInterruptIfRunning));
+    getCallbacksInternal(callbackId).forEach(callback -> callback.cancel(mayInterruptIfRunning));
   }
 
   /**
@@ -368,17 +419,19 @@ public class UiCallbacks extends AbstractPropertyObserver {
    *     allowed to complete.
    */
   public void cancelAllUiCallbacks(boolean mayInterruptIfRunning) {
-    getCallbacksInternal((Predicate<P_UiCallback<?>>) null).forEach(c -> cancelCallback(c, mayInterruptIfRunning));
+    getCallbacksInternal((Predicate<P_UiCallback<?>>) null).forEach(callback -> cancelCallback(callback, mayInterruptIfRunning));
   }
 
-  protected void cancelCallback(UiCallback<?> c, boolean mayInterruptIfRunning) {
+  protected void cancelCallback(UiCallback<?> callback, boolean mayInterruptIfRunning) {
     try {
-      c.cancel(mayInterruptIfRunning);
+      callback.cancel(mayInterruptIfRunning);
     }
     catch (RuntimeException | PlatformError e) {
       LOG.error("Exception while closing UI callback.", e);
     }
   }
+
+  // -----------------------------------------------------
 
   protected IUiCallbacksUIFacade createUIFacade() {
     return BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
@@ -389,13 +442,14 @@ public class UiCallbacks extends AbstractPropertyObserver {
   }
 
   protected class P_UIFacade implements IUiCallbacksUIFacade {
+
     @Override
-    public void fireCallbackDone(String callbackId, IDoEntity response) {
-      UiCallbacks.this.fireCallbackDone(callbackId, response);
+    public void fireCallbackDoneFromUI(String callbackId, Object data, HybridActionContextElements contextElements) {
+      UiCallbacks.this.fireCallbackDone(callbackId, data, contextElements);
     }
 
     @Override
-    public void fireCallbackFailed(String callbackId, String message, String code) {
+    public void fireCallbackFailedFromUI(String callbackId, String message, String code) {
       UiCallbacks.this.fireCallbackFailed(callbackId, message, code);
     }
   }
@@ -440,25 +494,25 @@ public class UiCallbacks extends AbstractPropertyObserver {
   }
 
   /**
-   * {@link IUiCallbackHandler} which returns error and results as it is sent from the browser.
+   * A generic {@link IUiCallbackHandler} which returns the result as it is sent from the browser, ignoring any context elements.
    */
   @IgnoreBean
-  public static class NoopUiCallbackHandler<T extends IDoEntity> implements IUiCallbackHandler<T, T> {
+  public static class DefaultUiCallbackHandler<T> implements IUiCallbackHandler<T, T> {
 
     private final String m_uiCallbackHandlerObjectType;
 
-    public NoopUiCallbackHandler(String uiCallbackHandlerObjectType) {
+    public DefaultUiCallbackHandler(String uiCallbackHandlerObjectType) {
       m_uiCallbackHandlerObjectType = uiCallbackHandlerObjectType;
-    }
-
-    @Override
-    public Pair<T, ? extends Throwable> onCallbackDone(T t) {
-      return ImmutablePair.of(t, null);
     }
 
     @Override
     public String uiCallbackHandlerObjectType() {
       return m_uiCallbackHandlerObjectType;
+    }
+
+    @Override
+    public Pair<T, ? extends Throwable> onCallbackDone(T data, HybridActionContextElements contextElements) {
+      return ImmutablePair.of(data, null);
     }
   }
 

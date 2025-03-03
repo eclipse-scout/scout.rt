@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,13 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, UiCallbackResponse, UiCallbacks, WidgetEventMap} from '../../../index';
+import {Event, UiCallbackErrorDo, UiCallbackResult, UiCallbacks, WidgetEventMap} from '../../../index';
 
-export interface UiCallbackResponseEvent<T = UiCallbacks> extends Event<T> {
-  data: UiCallbackResponse;
+export interface UiCallbackEndEvent<T = UiCallbacks> extends Event<T> {
+  callbackId: string;
+  result?: UiCallbackResult;
+  error?: UiCallbackErrorDo;
 }
 
 export interface UiCallbacksEventMap extends WidgetEventMap {
-  'uiResponse': UiCallbackResponseEvent;
+  'callbackEnd': UiCallbackEndEvent;
 }
 

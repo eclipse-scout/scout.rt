@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,6 +14,7 @@ import static org.eclipse.scout.rt.platform.util.Assertions.*;
 import java.util.EventObject;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridActionContextElements;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 
 /**
@@ -27,20 +28,15 @@ public class UiCallbackEvent extends EventObject {
   private final String m_jsHandlerObjectType;
   private final IDoEntity m_data;
   private final IWidget m_owner;
+  private final HybridActionContextElements m_contextElements;
 
-  public UiCallbackEvent(Object source, String callbackId, String jsHandlerObjectType, IDoEntity data, IWidget owner) {
+  public UiCallbackEvent(Object source, String callbackId, String jsHandlerObjectType, IWidget owner, IDoEntity data, HybridActionContextElements contextElements) {
     super(assertNotNull(source));
     m_callbackId = assertNotNullOrEmpty(callbackId);
     m_jsHandlerObjectType = assertNotNullOrEmpty(jsHandlerObjectType, "JavaScript handler objectType is mandatory.");
-    m_data = data;
     m_owner = assertNotNull(owner);
-  }
-
-  /**
-   * @return The {@link IDoEntity} to send to the browser.
-   */
-  public IDoEntity getData() {
-    return m_data;
+    m_data = data;
+    m_contextElements = contextElements;
   }
 
   /**
@@ -62,5 +58,19 @@ public class UiCallbackEvent extends EventObject {
    */
   public IWidget getOwner() {
     return m_owner;
+  }
+
+  /**
+   * @return The {@link IDoEntity} to send to the UI.
+   */
+  public IDoEntity getData() {
+    return m_data;
+  }
+
+  /**
+   * @return The {@link HybridActionContextElements context elements} to send to the UI.
+   */
+  public HybridActionContextElements getContextElements() {
+    return m_contextElements;
   }
 }

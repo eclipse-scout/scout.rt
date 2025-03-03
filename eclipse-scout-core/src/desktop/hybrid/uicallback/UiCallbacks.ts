@@ -7,49 +7,84 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, BaseDoEntity, scout, typeName, UiCallbacksEventMap, Widget} from '../../../index';
+import {App, BaseDoEntity, HybridActionContextElements, InitModelOf, JsonValue, ObjectWithType, scout, typeName, UiCallbacksEventMap, Widget} from '../../../index';
+import $ from 'jquery';
 
 /**
  * Processes UI callback requests from the client backend.
  */
 export class UiCallbacks extends Widget {
-
   declare eventMap: UiCallbacksEventMap;
   declare self: UiCallbacks;
 
-  onUiCallbackRequest(handlerObjectType: string, callbackId: string, owner: Widget, request: BaseDoEntity) {
-    const handler = scout.create(handlerObjectType) as UiCallbackHandler;
-    try {
-      handler.handle(callbackId, owner, request)
-        .then(response => this._triggerUiResponse(callbackId, response, null))
-        .catch(error => this._handleCallbackError(callbackId, error));
-    } catch (err: any) {
-      this._handleCallbackError(callbackId, err);
-    }
+  onCallback(handlerObjectType: string, callbackId: string, owner: Widget, data: BaseDoEntity, contextElements: HybridActionContextElements) {
+    $.resolvedPromise() // always start new promise chain so we only need one catch handler
+      .then(() => {
+        const handler = scout.create(handlerObjectType) as UiCallbackHandler;
+        return handler.handle({callbackId, owner, data, contextElements});
+      })
+      .then(result => this._convertResult(result))
+      .then(result => this._triggerCallbackEnd(callbackId, result, null))
+      .catch(error => this._convertError(error)
+        .then(error => this._triggerCallbackEnd(callbackId, null, error)));
   }
 
-  protected _handleCallbackError(callbackId: string, error: any): JQuery.Promise<void> {
-    if (error?._type === 'scout.UiCallbackError') {
-      // handled by backend
-      this._triggerUiResponse(callbackId, null, error);
-      return $.resolvedPromise();
+  protected _convertResult(result: any): UiCallbackResult {
+    if (result instanceof UiCallbackResult) {
+      return result;
+    }
+    return scout.create(UiCallbackResult, {
+      data: result
+    });
+  }
+
+  protected _convertError(error: any): JQuery.Promise<UiCallbackErrorDo> {
+    if (error instanceof UiCallbackErrorDo) {
+      return $.resolvedPromise(error);
     }
     return App.get().errorHandler.analyzeError(error)
       .then(info => {
-        const errorDo = scout.create(UiCallbackErrorDo, {
+        return scout.create(UiCallbackErrorDo, {
           message: info.message,
           code: info.code
         });
-        this._triggerUiResponse(callbackId, null, errorDo);
       });
   }
 
-  protected _triggerUiResponse(callbackId: string, data: BaseDoEntity, error: UiCallbackErrorDo) {
-    const eventData = scout.create(UiCallbackResponse, {id: callbackId, data, error});
-    this.trigger('uiResponse', {data: eventData});
+  protected _triggerCallbackEnd(callbackId: string, result: UiCallbackResult, error: UiCallbackErrorDo) {
+    this.trigger('callbackEnd', {callbackId, result, error});
   }
 }
 
+/**
+ * Represents the result of a successful UI callback.
+ */
+export class UiCallbackResult implements ObjectWithType, UiCallbackResultModel {
+  declare model: UiCallbackResultModel;
+  objectType: string;
+
+  data: BaseDoEntity | any;
+  contextElements: HybridActionContextElements;
+
+  init(model: InitModelOf<this>) {
+    $.extend(this, model);
+  }
+}
+
+export interface UiCallbackResultModel {
+  /**
+   * Optional data to send back to the server. Can be either a {@link BaseDoEntity} or a {@link JsonValue}.
+   */
+  data?: BaseDoEntity | any;
+  /**
+   * Optional {@link HybridActionContextElements context elements} to send back to the server along with the {@link #data}.
+   */
+  contextElements?: HybridActionContextElements;
+}
+
+/**
+ * Represents the result of an unsuccessful UI callback.
+ */
 @typeName('scout.UiCallbackError')
 export class UiCallbackErrorDo extends BaseDoEntity {
   message: string;
@@ -57,22 +92,37 @@ export class UiCallbackErrorDo extends BaseDoEntity {
 }
 
 /**
- * Browser side UI callback. Called as soon as a corresponding UiCallback is sent from the client backend. A new instance is created for each callback call.
+ * Browser-side UI callback handler. Called when a corresponding `callback` event is received from the server.
+ * A new instance is created for each callback call.
  */
 export interface UiCallbackHandler {
+
   /**
-   * Called when a UiCallback is sent from the client backend.
-   * @param callbackId The ID of the callback (as sent from the client backend).
-   * @param owner The owner {@link Widget} the call belongs to.
-   * @param request The optional callback request {@link BaseDoEntity} as sent from the client backend. May be null.
-   * @returns {JQuery.Promise} holding the resulting {@link BaseDoEntity} in case it is resolved or the {@link UiCallbackErrorDo} in case it is rejected.
+   * Called when a UI callback is requested from the server.
+   *
+   * The callback is answered with a `callbackEnd` event when the returned promise is resolved or rejected.
+   *
+   * The promise can be **resolved** with a {@link UiCallbackResult} or a {@link BaseDoEntity}. The latter will
+   * automatically be converted to a {@link UiCallbackResult} and is provided as a convenience for simple callback
+   * handlers that don't require {@link HybridActionContextElements context elements}.
+   *
+   * The promise can be **rejected** with a {@link UiCallbackErrorDo}. Anything else (including `string` and
+   * {@link Error}) will automatically be converted to a {@link UiCallbackErrorDo} using the application's
+   * {@link ErrorHandler}.
    */
-  handle(callbackId: string, owner: Widget, request: BaseDoEntity): JQuery.Promise<BaseDoEntity, UiCallbackErrorDo>;
+  handle(param: UiCallbackParam): JQuery.Promise<any>;
 }
 
-@typeName('scout.UiCallbackResponse')
-export class UiCallbackResponse<TObject extends BaseDoEntity = BaseDoEntity> extends BaseDoEntity {
-  id: string;
-  error?: UiCallbackErrorDo;
-  data?: TObject;
+/**
+ * Represents the callback arguments sent from the server.
+ */
+export interface UiCallbackParam {
+  /** The ID of the callback (as sent from the server). */
+  callbackId: string;
+  /** The owner {@link Widget} the call belongs to. */
+  owner: Widget;
+  /** The optional {@link BaseDoEntity} sent from the server. May be `null`. */
+  data?: BaseDoEntity;
+  /** The optional context elements sent from the server. May be `null`. */
+  contextElements?: HybridActionContextElements;
 }
