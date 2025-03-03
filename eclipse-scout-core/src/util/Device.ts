@@ -277,9 +277,9 @@ export class Device implements DeviceModel, ObjectWithType {
     browser = scout.nvl(browser, this.browser);
     version = scout.nvl(version, this.browserVersion);
     let browsers = Device.Browser;
-    return (browser === browsers.CHROME && version >= 71)
-      || (browser === browsers.FIREFOX && version >= 69)
-      || (browser === browsers.SAFARI && version >= 13);
+    return (browser === browsers.CHROME && version >= 93)
+      || (browser === browsers.FIREFOX && version >= 92)
+      || (browser === browsers.SAFARI && version >= 15.4);
   }
 
   /**
