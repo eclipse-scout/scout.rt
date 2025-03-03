@@ -184,7 +184,6 @@ describe('PageWithTable', () => {
           {
             id: 'StringColumn',
             objectType: Column,
-            sortActive: true,
             sortIndex: 0
           },
           {

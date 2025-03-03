@@ -858,7 +858,6 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
         objectType: objectType,
         text: 'filter-value',
         width: 120,
-        sortActive: true,
         sortIndex: 1,
         horizontalAlignment: -1
       }, {
@@ -871,7 +870,6 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       }, {
         objectType: NumberColumn,
         displayable: false,
-        sortActive: true,
         sortIndex: 0
       }]
     });
