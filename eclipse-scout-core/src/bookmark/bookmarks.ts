@@ -123,10 +123,10 @@ export class PageIdDummyPageParamDo extends PageParamDo {
 
 // --------------------------------------------------
 
-@typeName('suite.ActivateBookmarkResult')
-export class ActivateBookmarkResultDo extends BaseDoEntity {
-  targetBookmarkPage: IBookmarkPageDo;
-  remainingPagePath: IBookmarkPageDo[];
+@typeName('suite.ActivateBookmarkRequest')
+export class ActivateBookmarkRequestDo extends BaseDoEntity {
+  parentBookmarkPage: IBookmarkPageDo;
+  pagePath: IBookmarkPageDo[];
 }
 
 // --------------------------------------------------
