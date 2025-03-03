@@ -41,7 +41,6 @@
     <dependency>
       <groupId>io.opentelemetry.instrumentation</groupId>
       <artifactId>opentelemetry-runtime-telemetry-java8</artifactId>
-      <version>${opentelemetry.instrumentation.alpha.version}</version>
     </dependency>
 
     <!-- Test Dependencies -->

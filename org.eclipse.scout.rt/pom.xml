@@ -1075,6 +1075,21 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>io.opentelemetry.instrumentation</groupId>
+        <artifactId>opentelemetry-instrumentation-api</artifactId>
+        <version>${opentelemetry.instrumentation.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.opentelemetry.instrumentation</groupId>
+        <artifactId>opentelemetry-instrumentation-api-incubator</artifactId>
+        <version>${opentelemetry.instrumentation.alpha.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.opentelemetry.instrumentation</groupId>
+        <artifactId>opentelemetry-runtime-telemetry-java8</artifactId>
+        <version>${opentelemetry.instrumentation.alpha.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
