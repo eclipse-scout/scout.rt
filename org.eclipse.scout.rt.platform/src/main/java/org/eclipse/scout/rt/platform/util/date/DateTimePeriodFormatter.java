@@ -10,12 +10,12 @@
 package org.eclipse.scout.rt.platform.util.date;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Date;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -34,62 +34,117 @@ public class DateTimePeriodFormatter {
   public static final int SECONDS_PER_DAY = 86400; // 60 * 60 * 24
 
   /**
-   * Format: "d hh:mm:ss" = d [day(s)] hh [hour] : mm [minute] : ss [second] <br>
+   * Formats the given duration to a human-readable text.<br>
+   * The format in general is: {@code d [day(s)] h [hour] 'h' m [minute] 'm' s [second] (. zzz [millisecond]) 's'}<br>
    * <ul>
-   * <li>1 day = 1.0d</li>
-   * <li>If the argument d is negative, the result is '00:00:00'</li>
-   * <li>If the argument d is null, the result is null</li>
-   * <li>Fraction of seconds are rounded with {@link RoundingMode#HALF_UP}</li>
+   * <li>This method ensures that digits of the same time-unit always appear in the same position when right-aligned (except for days)</li>
+   * <li>Zero-valued units are left out if there is no higher unit with non-zero value.</li>
    * </ul>
-   * Example: {@code "3 days 15:42:54"}
+   * Examples:
+   * <ul>
+   *   <li>{@code "3 days 15h 00m 04s"}</li>
+   *   <li>{@code "1h 02m 03s"}</li>
+   *   <li>{@code "0m 13s"}</li>
+   *   <li>{@code "5s"}</li>
+   *   <li>{@code "2m 05.123s"}</li>
+   *   <li>{@code 0s} (if {@code includeMilliseconds=false})</li>
+   *   <li>{@code 0.000s} (if {@code includeMilliseconds=true})</li>
+   * </ul>
+   *
+   * @param duration
+   *     The time duration to format.<br>
+   *     If this argument is negative, the result is the same as if zero was passed.<br>
+   *     If this argument is null, the result is also null.
+   * @param includeMilliseconds
+   *     If {@code true}, the milliseconds part of the duration is included in the output.
+   * @return The period formatted in a human-readable text
    */
-  public String formatTimePeriod(BigDecimal d) {
-    if (d == null) {
+  public String formatDuration(Duration duration, boolean includeMilliseconds) {
+    // KEEP IN SYNC WITH eclipse-scout-core/src/util/dates.ts#formatDuration(number, boolean, locale)
+    if (duration == null) {
       return null;
     }
-    else if (d.compareTo(BigDecimal.ZERO) <= 0) {
-      return "00:00:00";
+    if (duration.isNegative()) {
+      duration = Duration.ZERO;
     }
-    long days = d.longValue();
-    int sec = d.subtract(BigDecimal.valueOf(days)).multiply(BigDecimal.valueOf(SECONDS_PER_DAY)).setScale(0, RoundingMode.HALF_UP).intValue();
-    int s = sec % 60;
-    sec = sec / 60;
-    int m = sec % 60;
-    sec = sec / 60;
-    int h = sec % 24;
-    String t = "";
-    if (days > 0) {
-      if (days > 1) {
-        t = days + " " + TEXTS.get("Days") + " ";
-      }
-      else {
-        t = days + " " + TEXTS.get("Day") + " ";
-      }
+    long days = duration.toDaysPart();
+    long hours = duration.toHoursPart();
+    long minutes = duration.toMinutesPart();
+    long seconds = duration.toSecondsPart();
+
+    // the highest non-zero unit can be displayed without padding-zeros
+    // all lower units are displayed with padding zeroes, even if they are zero
+    // this is done so that two different periods formatted by this algorithm can be easily compared when stacked on top of one another
+    // because the digits of the same time-unit always appear in the same position of the text
+    boolean showDays = days > 0;
+    boolean showHours = showDays || hours > 0;
+    boolean showMinutes = showHours || minutes > 0;
+    StringBuilder sb = new StringBuilder();
+    if (showDays) {
+      sb.append(days).append(" ").append(days > 1 ? TEXTS.get("Days") : TEXTS.get("Day")).append(" ");
     }
-    t = t + StringUtility.lpad("" + h, "0", 2) + ":" + StringUtility.lpad("" + m, "0", 2) + ":" + StringUtility.lpad("" + s, "0", 2);
-    return t;
+    if (showHours) {
+      // because the days-part has different lengths ('2 days' vs '1 day'), there is no need to pad the hours-part with zeros
+      // as the digits of the day cannot possibly align anyway. Make the text more readable by leaving out this leading zero.
+      sb.append(hours).append("h ");
+    }
+    if (showMinutes) {
+      sb.append(showHours ? StringUtility.lpad("" + minutes, "0", 2) : minutes).append("m ");
+    }
+    // seconds are always shown
+    sb.append(showMinutes ? StringUtility.lpad("" + seconds, "0", 2) : seconds);
+    // milliseconds are always shown if the corresponding flag is set
+    if (includeMilliseconds) {
+      char decimalSeparator = BEANS.get(NumberFormatProvider.class).getNumberInstance(NlsLocale.get()).getDecimalFormatSymbols().getDecimalSeparator();
+      sb.append(decimalSeparator).append(StringUtility.lpad("" + duration.toMillisPart(), "0", 3));
+    }
+    sb.append("s");
+    return sb.toString();
   }
 
   /**
-   * Format: "d hh:mm:ss.zzz" = d [day(s)] hh [hour] : mm [minute] : ss [second] . zzz [millisecond]
-   * <ul>
-   * <li>1 day = 86400000L (1000 * 60 * 60 * 24)</li>
-   * <li>If the argument milliSecs is negative, the result is '00:00:00.000'</li>
-   * <li>If the argument milliSecs is null, the result is null</li>
-   * </ul>
-   * Example: {@code "1 day 15:42:54.002"}
+   * Formats the given duration to a human-readable text with seconds as the highest precision.
+   * See {@link #formatDuration(Duration, boolean)}.
+   *
+   * @param duration
+   *     The duration to format
+   * @return The formatted text
+   */
+  public String formatDuration(Duration duration) {
+    return formatDuration(duration, false);
+  }
+
+  /**
+   * Formats the given time period to a human-readable text. Does not include milliseconds.<br>
+   * See {@link #formatDuration(Duration, boolean)}.
+   *
+   * @param periodInDays
+   *     The period given in days, i.e. {@code 1 day = 1.0}, {@code 12 hours = 0.5}<br>
+   *     The fraction of seconds is rounded with {@link RoundingMode#HALF_UP}.
+   * @return The formatted text
+   */
+  public String formatTimePeriod(BigDecimal periodInDays) {
+    if (periodInDays == null) {
+      return null;
+    }
+    int seconds = periodInDays.multiply(BigDecimal.valueOf(SECONDS_PER_DAY)).setScale(0, RoundingMode.HALF_UP).intValue();
+    return formatDuration(Duration.ofSeconds(seconds));
+  }
+
+  /**
+   * Formats the given time period to a human-readable text. Includes milliseconds.<br>
+   * See {@link #formatDuration(Duration, boolean)}.
+   *
+   * @param milliSecs
+   *     The period given in milliseconds
+   * @return The formatted text
    */
   public String formatTimePeriodOfMs(Long milliSecs) {
-    char decimalSeparator = BEANS.get(NumberFormatProvider.class).getNumberInstance(NlsLocale.get()).getDecimalFormatSymbols().getDecimalSeparator();
     if (milliSecs == null) {
       return null;
     }
-    else if (milliSecs.longValue() <= 0) {
-      return "00:00:00" + decimalSeparator + "000";
-    }
-
-    BigDecimal msConvertedToDays = new BigDecimal(milliSecs - (milliSecs % 1000)).divide(new BigDecimal(1000 * SECONDS_PER_DAY), MathContext.DECIMAL128);
-    return formatTimePeriod(msConvertedToDays) + decimalSeparator + StringUtility.lpad("" + milliSecs % 1000, "0", 3);
+    Duration duration = Duration.ofMillis(milliSecs);
+    return formatDuration(duration, true);
   }
 
   /**
