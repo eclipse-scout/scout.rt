@@ -9,10 +9,9 @@
  */
 package org.eclipse.scout.rt.server.commons.healthcheck;
 
-import java.util.Objects;
-
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 public class PlatformHealthChecker extends AbstractHealthChecker {
 
@@ -23,6 +22,6 @@ public class PlatformHealthChecker extends AbstractHealthChecker {
 
   @Override
   public boolean acceptCategory(HealthCheckCategoryId category) {
-    return Objects.equals(category, Startup.ID);
+    return ObjectUtility.isOneOf(category, Startup.ID, Liveness.ID);
   }
 }
