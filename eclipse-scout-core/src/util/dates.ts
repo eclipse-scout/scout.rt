@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DateFormat, DateRange, Locale, objects, scout, strings} from '../index';
+import {DateFormat, DateRange, Locale, objects, scout, strings, texts} from '../index';
 
 export interface JsonDateRange {
   from: string;
@@ -463,6 +463,68 @@ export const dates = {
   formatDateTime(date: Date, locale: Locale): string {
     let dateFormat = new DateFormat(locale, locale.dateFormatPatternDefault + ' ' + locale.timeFormatPatternDefault);
     return dateFormat.format(date);
+  },
+
+  /**
+   * Formats the given time duration as follows:
+   * [Days] day(s) [Hours]h [Minutes]m [Seconds]s
+   * or, if milliseconds are included:
+   * [Days] day(s) [Hours]h [Minutes]m [Seconds].[Milliseconds]s
+   *
+   * @param durationInMilliseconds
+   *          The time duration in milliseconds
+   * @param includeMilliseconds
+   *          If this flag is true, the milliseconds part is included in the text
+   * @param locale
+   *          The locale that should be used to format the text
+   * @returns The time duration as formatted text
+   * @see DateTimePeriodFormatter.java
+   */
+  formatDuration(durationInMilliseconds: number, includeMilliseconds: boolean, locale: Locale): string {
+    // KEEP IN SYNC WITH org.eclipse.scout.rt.platform.util.date.DateTimePeriodFormatter.formatDuration(java.time.Duration, boolean)
+    if (durationInMilliseconds === null || durationInMilliseconds === undefined) {
+      return null;
+    }
+    if (durationInMilliseconds < 0) {
+      durationInMilliseconds = 0;
+    }
+    let time = durationInMilliseconds;
+    let milliseconds = time % 1000;
+    time = Math.floor(time / 1000);
+    let seconds = time % 60;
+    time = Math.floor(time / 60);
+    let minutes = time % 60;
+    time = Math.floor(time / 60);
+    let hours = time % 24;
+    let days = Math.floor(time / 24);
+
+    // the highest non-zero unit can be displayed without padding-zeros
+    // all lower units are displayed with padding zeroes, even if they are zero
+    // this is done so that two different periods formatted by this algorithm can be easily compared when stacked on top of one another
+    // because the digits of the same time-unit always appear in the same position of the text
+    let showDays = days > 0;
+    let showHours = showDays || hours > 0;
+    let showMinutes = showHours || minutes > 0;
+    let result = '';
+    if (showDays) {
+      result = days + ' ' + (days > 1 ? texts.resolveText('${textKey:ui.DaysUnit}', locale.languageTag) : texts.resolveText('${textKey:ui.DayUnit}', locale.languageTag)) + ' ';
+    }
+    if (showHours) {
+      // because the days-part has different lengths ('2 days' vs '1 day'), there is no need to pad the hours-part with zeros
+      // as the digits of the day cannot possibly align anyway. Make the text more readable by leaving out this leading zero.
+      result += hours + 'h ';
+    }
+    if (showMinutes) {
+      result += (showHours ? strings.padZeroLeft(minutes, 2) : minutes) + 'm ';
+    }
+    // seconds are always shown
+    result += (showMinutes ? strings.padZeroLeft(seconds, 2) : seconds);
+    if (includeMilliseconds) {
+      let decimalSeparator = locale.decimalFormatSymbols.decimalSeparator;
+      result += decimalSeparator + strings.padZeroLeft(milliseconds, 3);
+    }
+    result += 's';
+    return result;
   },
 
   compare(a: Date, b: Date): number {
