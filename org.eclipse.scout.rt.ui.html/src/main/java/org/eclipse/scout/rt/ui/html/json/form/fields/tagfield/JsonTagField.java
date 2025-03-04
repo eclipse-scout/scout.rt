@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.form.fields.tagfield;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallResult;
@@ -39,7 +39,7 @@ public class JsonTagField extends JsonValueField<ITagField> {
   @Override
   protected void initJsonProperties(ITagField model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<ITagField>(IValueField.PROP_VALUE, model) {
+    putJsonProperty(new JsonProperty<>(IValueField.PROP_VALUE, model) {
       @Override
       protected Set<String> modelValue() {
         return getModel().getValue();
@@ -54,7 +54,7 @@ public class JsonTagField extends JsonValueField<ITagField> {
         return new JSONArray((Set<String>) value);
       }
     });
-    putJsonProperty(new JsonProperty<ITagField>(ITagField.PROP_RESULT, model) {
+    putJsonProperty(new JsonProperty<>(ITagField.PROP_RESULT, model) {
       @Override
       protected ILookupCallResult<String> modelValue() {
         return getModel().getResult();
@@ -66,7 +66,7 @@ public class JsonTagField extends JsonValueField<ITagField> {
         return JsonLookupCallResult.toJson((ILookupCallResult<String>) value);
       }
     });
-    putJsonProperty(new JsonProperty<ITagField>(ITagField.PROP_MAX_LENGTH, model) {
+    putJsonProperty(new JsonProperty<>(ITagField.PROP_MAX_LENGTH, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getMaxLength();
@@ -110,7 +110,7 @@ public class JsonTagField extends JsonValueField<ITagField> {
   protected Set<String> jsonToValue(Object jsonValue0) {
     JSONArray jsonValue = (JSONArray) jsonValue0;
     int numTags = jsonValue.length();
-    Set<String> tags = new HashSet<>(numTags);
+    Set<String> tags = new LinkedHashSet<>(numTags);
     for (int i = 0; i < numTags; i++) {
       tags.add(jsonValue.getString(i));
     }
