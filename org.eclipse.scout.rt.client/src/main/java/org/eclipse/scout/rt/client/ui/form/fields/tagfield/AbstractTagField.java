@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -198,7 +198,7 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
       }
       Set<String> ensuredValue = value.stream()
           .map(this::ensureMaxLength)
-          .collect(Collectors.toSet());
+          .collect(Collectors.toCollection(LinkedHashSet::new));
       setValue(ensuredValue);
     }
 
