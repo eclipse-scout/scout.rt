@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {dates} from '../../src/index';
+import {dates, texts} from '../../src/index';
 import {LocaleSpecHelper} from '../../src/testing/index';
 
 describe('dates', () => {
@@ -493,6 +493,54 @@ describe('dates', () => {
       let locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
 
       expect(dates.format(dates.create('2014-11-21'), locale, 'yy')).toBe('14');
+    });
+  });
+
+  describe('format duration', () => {
+
+    it('can handle invalid values', () => {
+      let helper = new LocaleSpecHelper();
+      let locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+
+      expect(dates.formatDuration(null, false, locale)).toBe(null);
+      expect(dates.formatDuration(undefined, false, locale)).toBe(null);
+    });
+
+    it('can handle negative values', () => {
+      let helper = new LocaleSpecHelper();
+      let locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+      let separator = locale.decimalFormatSymbols.decimalSeparator;
+
+      expect(dates.formatDuration(-1234, false, locale)).toBe('0s');
+      expect(dates.formatDuration(-1234, true, locale)).toBe('0' + separator + '000s');
+    });
+
+    it('can format valid durations', () => {
+      let helper = new LocaleSpecHelper();
+      let locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+      let separator = locale.decimalFormatSymbols.decimalSeparator;
+
+      // without milliseconds
+      expect(dates.formatDuration(0, false, locale)).toBe('0s');
+      expect(dates.formatDuration(1, false, locale)).toBe('0s');
+      expect(dates.formatDuration(999, false, locale)).toBe('0s');
+      expect(dates.formatDuration(1001, false, locale)).toBe('1s');
+      expect(dates.formatDuration(61_001, false, locale)).toBe('1m 01s');
+      expect(dates.formatDuration(3_661_000, false, locale)).toBe('1h 01m 01s');
+      expect(dates.formatDuration(3_600_000, false, locale)).toBe('1h 00m 00s');
+      expect(dates.formatDuration(86_400_000, false, locale)).toBe('1 ' + texts.resolveText('${textKey:ui.DayUnit}', locale.languageTag) + ' 0h 00m 00s');
+      expect(dates.formatDuration(172_800_000, false, locale)).toBe('2 ' + texts.resolveText('${textKey:ui.DaysUnit}', locale.languageTag) + ' 0h 00m 00s');
+
+      // with milliseconds
+      expect(dates.formatDuration(0, true, locale)).toBe('0' + separator + '000s');
+      expect(dates.formatDuration(1, true, locale)).toBe('0' + separator + '001s');
+      expect(dates.formatDuration(999, true, locale)).toBe('0' + separator + '999s');
+      expect(dates.formatDuration(1001, true, locale)).toBe('1' + separator + '001s');
+      expect(dates.formatDuration(60_001, true, locale)).toBe('1m 00' + separator + '001s');
+      expect(dates.formatDuration(3_660_001, true, locale)).toBe('1h 01m 00' + separator + '001s');
+      expect(dates.formatDuration(3_600_000, true, locale)).toBe('1h 00m 00' + separator + '000s');
+      expect(dates.formatDuration(86_400_000, true, locale)).toBe('1 ' + texts.resolveText('${textKey:ui.DayUnit}', locale.languageTag) + ' 0h 00m 00' + separator + '000s');
+      expect(dates.formatDuration(172_800_001, true, locale)).toBe('2 ' + texts.resolveText('${textKey:ui.DaysUnit}', locale.languageTag) + ' 0h 00m 00' + separator + '001s');
     });
   });
 
