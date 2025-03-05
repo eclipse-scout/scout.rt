@@ -96,6 +96,40 @@ describe('ChartJsRendererSpec', () => {
       });
     });
 
+    it('bar chart, min/max is set to default value on y axis, when all values are zero', () => {
+      let config = $.extend(true, {}, defaultScalesConfig, {type: Chart.Type.BAR});
+      config.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0];
+
+      renderer._adjustGridMaxMin(config, chartArea);
+
+      expect(config.options.scales.y).toEqual({
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 5,
+        suggestedMin: 0,
+        ticks: {
+          maxTicksLimit: 9,
+          stepSize: 1 // default value for "onlyIntegers", not part of this test
+        }
+      });
+    });
+
+    it('bar chart, min/max is set to 1 on y axis, when all values are 1', () => {
+      let config = $.extend(true, {}, defaultScalesConfig, {type: Chart.Type.BAR});
+      config.data.datasets[0].data = [1, 1, 1, 1, 1, 1, 1];
+
+      renderer._adjustGridMaxMin(config, chartArea);
+
+      expect(config.options.scales.y).toEqual({
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 1,
+        suggestedMin: 1,
+        ticks: {
+          maxTicksLimit: 9,
+          stepSize: 1 // default value for "onlyIntegers", not part of this test
+        }
+      });
+    });
+
     it('polar area chart, min/max is set on scale', () => {
       let config = $.extend(true, {}, defaultScaleConfig, {type: Chart.Type.POLAR_AREA});
 
@@ -217,6 +251,75 @@ describe('ChartJsRendererSpec', () => {
         ticks: {
           maxTicksLimit: 9,
           stepSize: undefined // default value, not part of this test
+        }
+      });
+    });
+
+    it('scatter chart, min/max is set on x and y axis to 0 when all values are 0', () => {
+      // The ChartJsRenderer will calculate a suggested max and min of 0 as usual.
+      // Note: Chart.js itself will make the scales look "nice" for this edge case by setting the min to -1 and the max to +1.
+      // This test case is only to ensure, that the special handling of the y boundary of the other charts (bar, line, polar, radar)
+      // does not interfere with the boundaries for bubble and scatter chart.
+      let config = $.extend(true, {}, defaultScalesConfig, {type: Chart.Type.SCATTER});
+
+      config.data.datasets[0].data = [
+        {x: 0, y: 0},
+        {x: 0, y: 0},
+        {x: 0, y: 0}
+      ];
+
+      renderer._adjustGridMaxMin(config, chartArea);
+
+      expect(config.options.scales.x).toEqual({
+        minSpaceBetweenTicks: 150, // default value, not part of this test
+        suggestedMax: 0,
+        suggestedMin: 0,
+        ticks: {
+          maxTicksLimit: 6,
+          stepSize: 1 // default value for "onlyIntegers", not part of this test
+        }
+      });
+      expect(config.options.scales.y).toEqual({
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 0,
+        suggestedMin: 0,
+        ticks: {
+          maxTicksLimit: 9,
+          stepSize: 1 // default value for "onlyIntegers", not part of this test
+        }
+      });
+    });
+
+    it('scatter chart, min/max is set on x and y axis to 1 when all values are 1', () => {
+      // The ChartJsRenderer will calculate a suggested max and min of 1 as usual.
+      // This test case is only to ensure, that the special handling of the y boundary of the other charts (bar, line, polar, radar)
+      // does not interfere with the boundaries for bubble and scatter chart.
+      let config = $.extend(true, {}, defaultScalesConfig, {type: Chart.Type.SCATTER});
+
+      config.data.datasets[0].data = [
+        {x: 1, y: 1},
+        {x: 1, y: 1},
+        {x: 1, y: 1}
+      ];
+
+      renderer._adjustGridMaxMin(config, chartArea);
+
+      expect(config.options.scales.x).toEqual({
+        minSpaceBetweenTicks: 150, // default value, not part of this test
+        suggestedMax: 1,
+        suggestedMin: 1,
+        ticks: {
+          maxTicksLimit: 6,
+          stepSize: 1 // default value for "onlyIntegers", not part of this test
+        }
+      });
+      expect(config.options.scales.y).toEqual({
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 1,
+        suggestedMin: 1,
+        ticks: {
+          maxTicksLimit: 9,
+          stepSize: 1 // default value for "onlyIntegers", not part of this test
         }
       });
     });
