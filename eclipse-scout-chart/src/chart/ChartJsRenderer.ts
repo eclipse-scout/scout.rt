@@ -2831,9 +2831,18 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       }
 
       yBoundary = this._computeMaxMinValue(config, datasets, {...options, space: null});
+      if (yBoundary.maxValue === 0 && yBoundary.minValue === 0) {
+        // Max and min value are both 0 if the values in the dataset are all 0.
+        // The default behaviour would lead to a scale from 0 to 1 without any ticks between.
+        // (The option "onlyIntegers" is true (zeros are integers), which prevents any ticks between 0 and 1).
+        // With setting the max value to 5 we achieve a nice looking scale with some ticks with integer values between.
+        yBoundary.maxValue = 5;
+      }
 
       if (datasets.length && datasetsDiffType.length) {
         yBoundaryDiffType = this._computeMaxMinValue(config, datasetsDiffType, {...options, space: null});
+        // Note: we do not adjust the yBoundary of the different type in the case of max and min value are both 0,
+        // because the secondary scale is never shown alone and therefore does not to have to look nicely.
         let yBoundaryRange = yBoundary.maxValue - yBoundary.minValue,
           yBoundaryRangeDiffType = yBoundaryDiffType.maxValue - yBoundaryDiffType.minValue;
         if (yBoundaryRange && yBoundaryRangeDiffType && (yBoundaryRange / yBoundaryRangeDiffType > 10 || yBoundaryRangeDiffType / yBoundaryRange > 10)) {
