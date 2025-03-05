@@ -28,7 +28,7 @@ public final class ServerServletContributors {
   private ServerServletContributors() {
   }
 
-  @Order(1000)
+  @Order(750)
   public static class ExceptionFilterContributor implements IServletFilterContributor {
 
     @Override
@@ -44,7 +44,7 @@ public final class ServerServletContributors {
    * <p>
    * The paths provided by {@link #getFilterExcludes()} should be excluded from authentication.
    */
-  @Order(2000)
+  @Order(1000)
   public static class AuthFilterContributor implements IServletFilterContributor {
 
     /**
