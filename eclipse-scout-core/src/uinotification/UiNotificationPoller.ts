@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ajax, AjaxCall, AjaxError, arrays, BackgroundJobPollingStatus, config, ConfigProperties, ErrorHandler, InitModelOf, JsonErrorResponse, MainConfigProperties, objects, PropertyEventEmitter, scout, Session, TopicDo, UiNotificationDo,
-  UiNotificationPollerEventMap, UiNotificationRequest, UiNotificationResponse, UiNotificationSystem
+  ajax, AjaxCall, AjaxError, App, arrays, BackgroundJobPollingStatus, config, ConfigProperties, ErrorHandler, InitModelOf, JsonErrorResponse, LogLevel, MainConfigProperties, objects, PropertyEventEmitter, scout, Session, TopicDo,
+  UiNotificationDo, UiNotificationPollerEventMap, UiNotificationRequest, UiNotificationResponse, UiNotificationSystem
 } from '../index';
 import $ from 'jquery';
 
@@ -128,11 +128,12 @@ export class UiNotificationPoller extends PropertyEventEmitter {
 
   protected _poll() {
     this._call?.abort(); // abort in case there is already a call running
-    const request = scout.create(UiNotificationRequest, {topics: this.topicsWithLastNotifications});
-    this._call = ajax.createCallDataObject({
+    const ajaxOptions = {
       url: this.url,
       timeout: this.requestTimeout
-    }, request, {
+    };
+    const request = scout.create(UiNotificationRequest, {topics: this.topicsWithLastNotifications});
+    this._call = ajax.createCallDataObject(ajaxOptions, request, {
       maxRetries: -1, // unlimited retries on connection errors
       retryIntervals: UiNotificationPoller.CONNECTION_ERROR_RETRY_INTERVALS
     });
@@ -230,7 +231,11 @@ export class UiNotificationPoller extends PropertyEventEmitter {
     }
 
     this.trigger('error', {error});
-    scout.create(ErrorHandler, {displayError: false, sendError: true}).handle(error);
+
+    App.get().errorHandler.analyzeError(error).then(errorInfo => {
+      scout.getSession().sendLogRequest(`UI notification poller failed, call will be retried in ${UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL} ms.\nError message:\n${errorInfo.log}\n()`, LogLevel.INFO);
+    });
+
     this._schedulePoll(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL);
   }
 
