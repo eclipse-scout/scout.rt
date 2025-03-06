@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -49,6 +49,9 @@ public class UiNotificationResource implements IRestResource {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public void get(UiNotificationRequest request, @Suspended AsyncResponse asyncResponse, @Context HttpServletRequest httpReq) {
+    if (request == null) {
+      throw new BadRequestException("Request must not be null");
+    }
     String userId = getUserId();
     List<TopicDo> topics = request.getTopics();
     LOG.debug("Received request for topics {} and user {}", topics, userId);
