@@ -9,7 +9,7 @@
  */
 import {
   App, arrays, BookmarkDo, bookmarks, BookmarkSupportModel, dataObjects, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, ObjectWithType,
-  Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
+  Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -425,22 +425,73 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   // --------------------------------------
 
-  createPageForBookmark(outline: Outline, bookmark: BookmarkDo): Page {
-    // FIXME bsh [js-bookmark] Implement (BookmarkTablePage.execCreateChildPage, BookmarkClientDomain.createPageForBookmark)
-
-    const pageParam = bookmark?.definition?.bookmarkedPage?.pageParam;
-    const pageObjectType = PageResolver.get().findObjectTypeForPageParam(pageParam);
-    if (pageObjectType) {
-      return scout.create(pageObjectType, {
-        parent: outline,
-        pageParam
-      });
+  applyBookmarkToPage(page: Page, bookmark: BookmarkDo): JQuery.Promise<void> {
+    if (!bookmark) {
+      return $.resolvedPromise();
     }
-    return null;
+
+    return this._applyBookmarkToPage(page, bookmark)
+      .then(() => {
+        // prevent bookmarks from being defined recursively. has some nasty side-effects and is ill-defined:
+        // FIXME bsh [js-bookmark] Implement
+        // m_bookmarkHelper.get().disableBookmarkMenus(targetPage);
+      });
   }
 
-  openBookmarkInPage(page: Page, bookmark: BookmarkDo) {
-    // FIXME bsh [js-bookmark] Implement (CoreBookmarkClientService.openBookmarkInPage)
+  protected _applyBookmarkToPage(page: Page, bookmark: BookmarkDo): JQuery.Promise<void> {
+    let bookmarkPage = bookmark.definition.bookmarkedPage;
+    if (bookmarkPage instanceof TableBookmarkPageDo) {
+      let tablePage = scout.assertInstance(page, PageWithTable);
+      return this._applyBookmarkToTablePage(tablePage, bookmarkPage);
+    }
+    // FIXME bsh [js-bookmark] Do we need to handle the "node page" case?
+    return $.resolvedPromise();
+  }
+
+  protected _applyBookmarkToTablePage(tablePage: PageWithTable, tableBookmarkPage: TableBookmarkPageDo): JQuery.Promise<void> {
+    return this._prepareTablePage(tablePage, tableBookmarkPage, true)
+      .then(() => this._restoreSelection(tablePage, tableBookmarkPage));
+  }
+
+  protected _prepareTablePage(tablePage: PageWithTable, tableBookmarkPage: TableBookmarkPageDo, saveSearchForm: boolean): JQuery.Promise<void> {
+    // FIXME bsh [js-bookmark] Reset table preferences & search form (see CoreBookmarkClientService#openBookmarkInTablePage)
+    tablePage.setSearchFilter(tableBookmarkPage.searchData);
+    tablePage.resetSearchFilter();
+    let promise = tablePage.detailTable.loading ? tablePage.detailTable.when('propertyChange:loading').then(() => null) : $.resolvedPromise();
+    return promise.then(() => {
+      // FIXME bsh [js-bookmark] Implement
+      // // be careful when changing the order of these, e.g. applying column preferences requires custom columns to be injected first
+      // prepareTableCustomizerData(tablePage, tableBookmarkPage);
+      // prepareTableColumnPreferences(tablePage, tableBookmarkPage);
+      // prepareTileMode(tablePage, tableBookmarkPage);
+      // prepareSearchFilter(tablePage, tableBookmarkPage, saveSearchForm);
+      // prepareUserFilters(tablePage, tableBookmarkPage);
+      // prepareChartTableControlState(tablePage, tableBookmarkPage);
+      // prepareShowRelatedCustomerData(tablePage, tableBookmarkPage);
+    });
+  }
+
+  protected _restoreSelection(tablePage: PageWithTable, tableBookmarkPage: TableBookmarkPageDo) {
+    // FIXME bsh [js-bookmark] Implement
+    // if (bookmarkTablePage.getSelectedChildRows().isEmpty()) {
+    //   return;
+    // }
+    //
+    // ITable table = tablePage.getTable();
+    // tablePage.ensureChildrenLoaded();
+    // Set<BookmarkTableRowIdentifierDo> selectionSet = bookmarkTablePage.getSelectedChildRows();
+    // List<ITableRow> rowList = new ArrayList<>();
+    // for (ITableRow row : table.getRows()) {
+    //   BookmarkTableRowIdentifierDo testSelectedRow = createTestRowTableRowIdentifier(tablePage, row);
+    //   if (row.isFilterAccepted() //row must not be filtered out
+    //     && (selectionSet.contains(testSelectedRow))) {
+    //     rowList.add(row);
+    //   }
+    // }
+    //
+    // if (!rowList.isEmpty()) {
+    //   table.selectRows(rowList);
+    // }
   }
 }
 
