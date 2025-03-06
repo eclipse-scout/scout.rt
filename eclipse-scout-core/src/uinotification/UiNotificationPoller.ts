@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ajax, AjaxCall, AjaxError, arrays, BackgroundJobPollingStatus, config, ConfigProperties, dates, ErrorHandler, InitModelOf, JsonErrorResponse, MainConfigProperties, objects, PropertyEventEmitter, scout, Session, TopicDo, UiNotificationDo,
-  UiNotificationPollerEventMap, UiNotificationResponse, UiNotificationSystem
+  ajax, AjaxCall, AjaxError, App, arrays, BackgroundJobPollingStatus, config, ConfigProperties, dates, ErrorHandler, InitModelOf, JsonErrorResponse, LogLevel, MainConfigProperties, objects, PropertyEventEmitter, scout, Session, TopicDo,
+  UiNotificationDo, UiNotificationPollerEventMap, UiNotificationResponse, UiNotificationSystem
 } from '../index';
 import $ from 'jquery';
 
@@ -235,7 +235,11 @@ export class UiNotificationPoller extends PropertyEventEmitter {
     }
 
     this.trigger('error', {error});
-    scout.create(ErrorHandler, {displayError: false, sendError: true}).handle(error);
+
+    App.get().errorHandler.analyzeError(error).then(errorInfo => {
+      scout.getSession().sendLogRequest(`UI notification poller failed, call will be retried in ${UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL} ms.\nError message:\n${errorInfo.log}\n()`, LogLevel.INFO);
+    });
+
     this._schedulePoll(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL);
   }
 
