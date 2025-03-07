@@ -107,16 +107,18 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   // --------------------------------------
 
-  createBookmark(): JQuery.Promise<BookmarkDo> {
-    let outlineId = this.desktop.outline?.getObjectUuidBuilder().buildId();
+  createBookmark(page?: Page): JQuery.Promise<BookmarkDo> {
+    let pageToBookmark = page || this.desktop.outline?.selectedNode();
+    let outline = pageToBookmark?.getOutline();
+
+    let outlineId = outline?.getObjectUuidBuilder().buildId();
     if (!outlineId) {
       // throw new VetoException(TEXTS.get("CannotCreateBookmarkAtThisLocation"));
       return $.rejectedPromise(BookmarkSupport.ERROR_MISSING_OUTLINE);
     }
 
-    let selectedPage = this.desktop.outline.selectedNode();
-    return this._pageToBookmark(selectedPage)
-      .then(bookmarkedPage => this._createBookmark(outlineId, selectedPage, bookmarkedPage));
+    return this._pageToBookmark(pageToBookmark)
+      .then(bookmarkedPage => this._createBookmark(outlineId, pageToBookmark, bookmarkedPage));
   }
 
   protected _createBookmark(outlineId: string, page: Page, bookmarkedPage: IBookmarkPageDo): JQuery.Promise<BookmarkDo> {
@@ -193,9 +195,6 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
       return $.resolvedPromise()
         .then(() => {
-          // let outline = page.getOutline();
-          // return outline.getSearchFilterForPage(page);
-
           // Local
           if (page instanceof PageWithTable) {
             return page.getSearchFilter();
