@@ -1173,6 +1173,7 @@ export * from './bookmark/BookmarkSupportModel';
 export * from './bookmark/BookmarkTableRowIdentifierDoFactory';
 export * from './bookmark/BookmarkForm';
 export * from './bookmark/BookmarkFormModel';
+export * from './bookmark/CreateBookmarkForJsPageUiCallbackHandler';
 export * from './bookmark/ManageBookmarksForm';
 export * from './bookmark/ManageBookmarksFormModel';
 export * from './bookmark/OpenBookmarkInOutlineUiCallbackHandler';
