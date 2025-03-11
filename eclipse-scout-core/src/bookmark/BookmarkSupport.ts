@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, arrays, BookmarkDo, bookmarks, BookmarkSupportModel, dataObjects, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, ObjectWithType,
-  Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
+  App, arrays, BookmarkDo, BookmarkSupportModel, dataObjects, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline,
+  OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -291,58 +291,35 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     let parent = request.parentPage || outline;
     let parentPageDefinition = request.parentBookmarkPage;
     return this._resolveNextPageInPath(pagePath, parent, parentPageDefinition)
-      .then(page => {
+      .then(([page, bookmarkPage]) => {
         if (!page) {
           return $.rejectedPromise(BookmarkSupport.ERROR_PAGE_NOT_FOUND);
         }
-        this._revealPage(page, pagePath);
+        if (arrays.hasElements(pagePath)) {
+          // Path not fully restored
+          page.detailTable?.setTableStatus(Status.error('Loading the favorite has been canceled because the entry cannot be found in this view.')); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResolutionCanceled')
+        }
+        this._revealPage(page);
       });
   }
 
-  protected _resolveNextPageInPath(pagePath: IBookmarkPageDo[], parent: Outline | Page, parentPageDefinition: IBookmarkPageDo): JQuery.Promise<Page> {
+  protected _resolveNextPageInPath(pagePath: IBookmarkPageDo[], parent: Outline | Page, parentPageDefinition: IBookmarkPageDo): JQuery.Promise<[Page, IBookmarkPageDo]> {
     let parentPage = parent instanceof Page ? parent : null;
 
     if (arrays.empty(pagePath)) {
-      return $.resolvedPromise(parentPage); // done!
+      return $.resolvedPromise([parentPage, parentPageDefinition]); // done!
     }
 
     let pageDefinition = pagePath.shift();
     return this._resolvePage(pageDefinition, parent, parentPageDefinition)
-      .then((page: Page) => {
+      .then(page => {
         if (!page) {
           // Unable to find a page that matches the requested page definition. Put it back to the page path (so later
           // code will know that not the entire path was successfully consumed) and return the last known page.
           pagePath.unshift(pageDefinition); // put it back
-          return parentPage;
+          return [parentPage, parentPageDefinition]; // done!
         }
-
-        page.activate();
-
-        // Restore selection
-        if (page.nodeType === Page.NodeType.TABLE && page.detailTable) {
-          let selectedChildRows = pageDefinition instanceof TableBookmarkPageDo ? pageDefinition.selectedChildRows : null;
-          if (arrays.hasElements(selectedChildRows)) {
-            // FIXME bsh [js-bookmark] Handle hierarchical table, see Table#restoreSelection
-            let normalizedRowIdentifiers = selectedChildRows
-              .map(bookmarkIdentifier => bookmarks.stringifyNormalized(bookmarkIdentifier));
-            let selectedRows = page.detailTable.rows.filter(row => {
-              let normalizedRowIdentifier = bookmarks.stringifyNormalized(page.getTableRowIdentifier(row));
-              return normalizedRowIdentifiers.includes(normalizedRowIdentifier);
-            });
-            page.detailTable.selectRows(selectedRows);
-          }
-        }
-
-        // Apply search filter
-        if (page instanceof PageWithTable) {
-          if (pageDefinition instanceof TableBookmarkPageDo) {
-            page.setSearchFilter(pageDefinition.searchData);
-          } else {
-            page.resetSearchFilter();
-          }
-        }
-
-        return page.loadChildren()
+        return this._applyBookmarkPage(page, pageDefinition)
           .then(() => this._resolveNextPageInPath(pagePath, page, pageDefinition));
       });
   }
@@ -360,12 +337,11 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
         .then(() => {
           if (parent.nodeType === Page.NodeType.TABLE) {
             if (parentPageDefinition instanceof TableBookmarkPageDo) {
-              // Lookup child page by parent PK (ignore PageParam)
-              let parentRowBookmarkIdentifier = parentPageDefinition.expandedChildRow;
-              let normalizedParentRowIdentifier = bookmarks.stringifyNormalized(parentRowBookmarkIdentifier);
+              // Lookup child page by parent PK (ignore pageParam)
+              let parentRowIdentifier = parentPageDefinition.expandedChildRow;
               let row = parent.detailTable.rows.find(row => {
-                let normalizedRowIdentifier = bookmarks.stringifyNormalized(parent.getTableRowIdentifier(row));
-                return normalizedRowIdentifier === normalizedParentRowIdentifier;
+                let rowIdentifier = parent.getTableRowIdentifier(row);
+                return objects.equals(rowIdentifier, parentRowIdentifier);
               });
               if (row) {
                 return row.page;
@@ -380,10 +356,13 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
           return null; // not found
         })
         .then((page: Page) => {
+          // If we found the page, but it is currently filtered by the parent table, remove the filter and try again.
+          // If the row is still not accepted, the filter is apparently a non-user filter which cannot be removed -> assume page not found.
           if (page && !page.filterAccepted && parent.detailTable?.hasUserFilter()) {
             parent.detailTable.resetUserFilter();
+            parent.detailTable.setTableStatus(Status.warning('The column filters have been removed during loading of the favorite.')); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResetColumnFilters')
             if (!page.filterAccepted) {
-              return null; // still filtered
+              return null; // still filtered -> not found
             }
           }
           return page;
@@ -393,8 +372,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     return null;
   }
 
-  protected _revealPage(page: Page, remainingPagePath: IBookmarkPageDo[]) {
-    let pathFullyRestored = arrays.empty(remainingPagePath);
+  protected _revealPage(page: Page) {
     let outline = page.getOutline();
 
     // expand restored path, expand the target page if it is not a table page
@@ -404,10 +382,6 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     outline.deselectAll(); // reselection triggers owner changes of menu in case we come here by execDataChanged --> FIXME bsh [js-bookmark] is this necessary in js?
     outline.selectNode(page);
     outline.revealSelection();
-
-    if (!pathFullyRestored) {
-      page.detailTable?.setTableStatus(Status.error('Loading the favorite has been canceled because the entry cannot be found in this view.')); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResolutionCanceled')
-    }
   }
 
   protected _expandPath(page: Page, expandLeaf: boolean) {
@@ -439,58 +413,59 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   protected _applyBookmarkToPage(page: Page, bookmark: BookmarkDo): JQuery.Promise<void> {
     let bookmarkPage = bookmark.definition.bookmarkedPage;
-    if (bookmarkPage instanceof TableBookmarkPageDo) {
-      let tablePage = scout.assertInstance(page, PageWithTable);
-      return this._applyBookmarkToTablePage(tablePage, bookmarkPage);
+    return this._applyBookmarkPage(page, bookmarkPage);
+  }
+
+  protected _applyBookmarkPage(page: Page, bookmarkPage: IBookmarkPageDo): JQuery.Promise<void> {
+    if (page instanceof PageWithTable && bookmarkPage instanceof TableBookmarkPageDo) {
+      return this._applyBookmarkToTablePage(page, bookmarkPage);
     }
     // FIXME bsh [js-bookmark] Do we need to handle the "node page" case?
     return $.resolvedPromise();
   }
 
-  protected _applyBookmarkToTablePage(tablePage: PageWithTable, tableBookmarkPage: TableBookmarkPageDo): JQuery.Promise<void> {
-    return this._prepareTablePage(tablePage, tableBookmarkPage, true)
-      .then(() => this._restoreSelection(tablePage, tableBookmarkPage));
+  protected _applyBookmarkToTablePage(page: PageWithTable, bookmarkPage: TableBookmarkPageDo): JQuery.Promise<void> {
+    return this._prepareTablePage(page, bookmarkPage, true)
+      .then(() => this._restoreSelection(page, bookmarkPage));
   }
 
-  protected _prepareTablePage(tablePage: PageWithTable, tableBookmarkPage: TableBookmarkPageDo, saveSearchForm: boolean): JQuery.Promise<void> {
-    // FIXME bsh [js-bookmark] Reset table preferences & search form (see CoreBookmarkClientService#openBookmarkInTablePage)
-    tablePage.setSearchFilter(tableBookmarkPage.searchData);
-    tablePage.resetSearchFilter();
-    let promise = tablePage.detailTable.loading ? tablePage.detailTable.when('propertyChange:loading').then(() => null) : $.resolvedPromise();
-    return promise.then(() => {
-      // FIXME bsh [js-bookmark] Implement
-      // // be careful when changing the order of these, e.g. applying column preferences requires custom columns to be injected first
-      // prepareTableCustomizerData(tablePage, tableBookmarkPage);
-      // prepareTableColumnPreferences(tablePage, tableBookmarkPage);
-      // prepareTileMode(tablePage, tableBookmarkPage);
-      // prepareSearchFilter(tablePage, tableBookmarkPage, saveSearchForm);
-      // prepareUserFilters(tablePage, tableBookmarkPage);
-      // prepareChartTableControlState(tablePage, tableBookmarkPage);
-      // prepareShowRelatedCustomerData(tablePage, tableBookmarkPage);
-    });
-  }
+  protected _prepareTablePage(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm: boolean): JQuery.Promise<void> {
+    page.ensureDetailTable(); // FIXME bsh [js-bookmark] Check if this is still necessary if searchFilter is migrated to a property
 
-  protected _restoreSelection(tablePage: PageWithTable, tableBookmarkPage: TableBookmarkPageDo) {
     // FIXME bsh [js-bookmark] Implement
-    // if (bookmarkTablePage.getSelectedChildRows().isEmpty()) {
-    //   return;
-    // }
-    //
-    // ITable table = tablePage.getTable();
-    // tablePage.ensureChildrenLoaded();
-    // Set<BookmarkTableRowIdentifierDo> selectionSet = bookmarkTablePage.getSelectedChildRows();
-    // List<ITableRow> rowList = new ArrayList<>();
-    // for (ITableRow row : table.getRows()) {
-    //   BookmarkTableRowIdentifierDo testSelectedRow = createTestRowTableRowIdentifier(tablePage, row);
-    //   if (row.isFilterAccepted() //row must not be filtered out
-    //     && (selectionSet.contains(testSelectedRow))) {
-    //     rowList.add(row);
-    //   }
-    // }
-    //
-    // if (!rowList.isEmpty()) {
-    //   table.selectRows(rowList);
-    // }
+    // // be careful when changing the order of these, e.g. applying column preferences requires custom columns to be injected first
+    // prepareTableCustomizerData(tablePage, tableBookmarkPage);
+    // prepareTableColumnPreferences(tablePage, tableBookmarkPage);
+    // prepareTileMode(tablePage, tableBookmarkPage);
+    // prepareSearchFilter(tablePage, tableBookmarkPage, saveSearchForm);
+    // prepareUserFilters(tablePage, tableBookmarkPage);
+    // prepareChartTableControlState(tablePage, tableBookmarkPage);
+    // prepareShowRelatedCustomerData(tablePage, tableBookmarkPage);
+
+    page.setSearchFilter(bookmarkPage.searchData);
+    // FIXME bsh [js-bookmark] searchFilterComplete???
+    return page.loadChildren();
+  }
+
+  protected _restoreSelection(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
+    if (arrays.hasElements(bookmarkPage.selectedChildRows)) {
+      let table = page.detailTable;
+      let selectedRowIdentifiers = bookmarkPage.selectedChildRows;
+      let selectedRows = table.rows.filter(row => {
+        if (!row.filterAccepted) {
+          return false; // row must not be filtered out
+        }
+        let rowIdentifier = page.getTableRowIdentifier(row);
+        return selectedRowIdentifiers.some(selectedRowIdentifier => objects.equals(selectedRowIdentifier, rowIdentifier));
+      });
+      let selectedKeys = selectedRows.map(row => row.getKeyValues());
+      table.restoreSelection(selectedKeys);
+      // FIXME bsh [js-bookmark] Required? See Table#restoreSelection
+      // if (table.hierarchical) {
+      //   table.expandParentRows(selectedRows);
+      // }
+      // table.selectRows(selectedRows);
+    }
   }
 }
 
