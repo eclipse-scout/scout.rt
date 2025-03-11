@@ -171,9 +171,9 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Specifies whether any session tracking cookies created by the web application will be marked as secure. "
-          + "If true, the session tracking cookie will be marked as secure even if the request initiated the corresponding session using plain HTTP instead of HTTPS (e.g. Scout application behind reverse proxy terminating SSL). "
-          + "If false, the session tracking cookie will only be marked as secure if the request initiated the corresponding session is secure (using HTTPS). "
+      return "Specifies whether the HTTP session cookie created by the web application will be marked as secure. "
+          + "If true, the HTTP session cookie will be marked as secure even if the request initiated the corresponding session using plain HTTP instead of HTTPS (e.g. Scout application behind reverse proxy terminating SSL). "
+          + "If false, the HTTP session cookie will only be marked as secure if the request initiated the corresponding session is secure (using HTTPS). "
           + "The default value is true for non-development mode.";
     }
   }
@@ -205,6 +205,25 @@ public final class ApplicationProperties {
           .filter(e -> value.equals(e.getAttributeValue()))
           .findFirst()
           .orElseThrow();
+    }
+  }
+
+  public static class ScoutApplicationSessionCookieConfigPartitionedProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.sessionCookieConfigPartitioned";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return false;
+    }
+
+    @Override
+    public String description() {
+      return "Specifies whether the HTTP session cookie created by the web application will be marked as partitioned. "
+          + "The default value is false.";
     }
   }
 
