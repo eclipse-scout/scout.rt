@@ -70,6 +70,7 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationKeyStorePa
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationPortProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationPrivateKeyPasswordProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigHttpOnlyProperty;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigPartitionedProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigSameSiteProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigSecureProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionTimeoutProperty;
@@ -360,14 +361,16 @@ public class Application {
       boolean httpOnly = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigHttpOnlyProperty.class);
       boolean secure = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigSecureProperty.class);
       SameSite sameSite = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigSameSiteProperty.class);
+      boolean partitioned = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigPartitionedProperty.class);
 
-      LOG.info("[Session config] timeout: {} s, HTTP only: {}, secure: {}, same site: {}", sessionTimeoutInSeconds, httpOnly, secure, sameSite.getAttributeValue());
+      LOG.info("[Session config] timeout: {} s, HTTP only: {}, secure: {}, same site: {}, partitioned: {}", sessionTimeoutInSeconds, httpOnly, secure, partitioned, sameSite.getAttributeValue());
 
       SessionHandler sessionHandler = handler.getSessionHandler();
       sessionHandler.setMaxInactiveInterval(sessionTimeoutInSeconds);
       sessionHandler.getSessionCookieConfig().setHttpOnly(httpOnly);
       sessionHandler.getSessionCookieConfig().setSecure(secure);
       sessionHandler.setSameSite(sameSite);
+      sessionHandler.setPartitioned(partitioned);
     }
 
     handler.setDisplayName(CONFIG.getPropertyValue(ApplicationNameProperty.class));
