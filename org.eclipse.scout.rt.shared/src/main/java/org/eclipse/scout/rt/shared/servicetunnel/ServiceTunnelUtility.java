@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,7 +26,11 @@ public final class ServiceTunnelUtility {
   }
 
   public static <T> T createProxy(Class<T> serviceInterfaceClass) {
-    ServiceTunnelProxyProducer<?> tunnelProxyProducer = new ServiceTunnelProxyProducer<>(serviceInterfaceClass);
+    return createProxy(serviceInterfaceClass, null);
+  }
+
+  public static <T> T createProxy(Class<T> serviceInterfaceClass, ServiceTunnelOptions options) {
+    ServiceTunnelProxyProducer<?> tunnelProxyProducer = new ServiceTunnelProxyProducer<>(serviceInterfaceClass, options);
     BeanMetaData metaData = new BeanMetaData(serviceInterfaceClass).withApplicationScoped(true).withProducer(tunnelProxyProducer);
     IBean<T> bean = new BeanImplementor<>(metaData);
 

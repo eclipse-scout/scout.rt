@@ -13,27 +13,28 @@ import static org.eclipse.scout.rt.shared.servicetunnel.DataObjectWrapperUtility
 
 import java.io.Serializable;
 
+import org.eclipse.scout.rt.dataobject.DoEntityHolder;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 
 /**
- * Wrapper for {@link IDoEntity} used by service tunnel.
+ * Wrapper for {@link DoEntityHolder} used by service tunnel.
  * <p>
  * Do not use this internal class.
  *
  * @see ServiceTunnelObjectReplacer
  */
 // Package-private because shouldn't be used except by ServiceTunnelObjectReplacer.
-class DoEntityWrapper implements Serializable {
+class DoEntityHolderWrapper implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  // Not using transient IDoEntity along with writeObject/readObject like DoEntityHolder, because the string is read exactly once after deserialization.
+  // Not using transient DoEntityHolder along with writeObject/readObject like DoEntityHolder, because the string is read exactly once after deserialization.
   private final String m_doEntityJson;
 
-  DoEntityWrapper(IDoEntity obj) {
-    m_doEntityJson = mapper().writeValue(obj);
+  DoEntityHolderWrapper(DoEntityHolder obj) {
+    m_doEntityJson = mapper().writeValue(obj.getValue());
   }
 
-  public IDoEntity getDoEntity() {
-    return mapper().readValue(m_doEntityJson, IDoEntity.class);
+  public DoEntityHolder<? extends IDoEntity> getDoEntityHolder() {
+    return new DoEntityHolder<>(null, mapper().readValue(m_doEntityJson, IDoEntity.class));
   }
 }

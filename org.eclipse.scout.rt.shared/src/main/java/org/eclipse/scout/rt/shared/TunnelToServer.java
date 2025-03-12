@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.BeanInvocationHint;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelOptions;
 
 /**
  * Marks an interface (typically a service) that is capable of being called as client proxy to the back-end server if
@@ -29,4 +31,8 @@ import org.eclipse.scout.rt.platform.BeanInvocationHint;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TunnelToServer {
 
+  /**
+   * Whether the interface uses signature creation for serialization/deserialization of {@link IDataObject}s in the service tunnel (see {@link ServiceTunnelOptions#withIdSignature(Boolean)}).
+   */
+  boolean idSignature() default false;
 }
