@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.servicetunnel;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertInstance;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -53,6 +54,8 @@ public class RegisterTunnelToServerPlatformListenerTest {
     indexClass(indexer, IFixtureTunnelToServerEx2.class);
     indexClass(indexer, IFixtureTunnelToServerEx3.class);
     indexClass(indexer, FixtureTunnelToServerEx3Impl.class);
+    indexClass(indexer, ISignedTunnelToServer.class);
+    indexClass(indexer, IUnsignedTunnelToServer.class);
     s_classInventory = new JandexClassInventory(indexer.complete());
   }
 
@@ -143,6 +146,19 @@ public class RegisterTunnelToServerPlatformListenerTest {
     assertReplaceEx2();
   }
 
+  @Test
+  public void testIdSignatureTunnelToServer() {
+    registerTunnelToServerBeans(ISignedTunnelToServer.class, IUnsignedTunnelToServer.class);
+
+    var beanInstanceProducer = m_beanManager.getRegisteredBean(ISignedTunnelToServer.class).getBeanInstanceProducer();
+    var serviceTunnelProxyProducer = assertInstance(beanInstanceProducer, ServiceTunnelProxyProducer.class);
+    assertTrue(serviceTunnelProxyProducer.getOptions().isIdSignature());
+
+    beanInstanceProducer = m_beanManager.getRegisteredBean(IUnsignedTunnelToServer.class).getBeanInstanceProducer();
+    serviceTunnelProxyProducer = assertInstance(beanInstanceProducer, ServiceTunnelProxyProducer.class);
+    assertFalse(serviceTunnelProxyProducer.getOptions().isIdSignature());
+  }
+
   private void assertReplaceEx2() {
     assertPing("return IFixtureTunnelToServerEx2#ping", IFixtureTunnelToServerEx2.class);
   }
@@ -200,5 +216,13 @@ public class RegisterTunnelToServerPlatformListenerTest {
     public String ping() {
       return "pong";
     }
+  }
+
+  @TunnelToServer(idSignature = true)
+  public interface ISignedTunnelToServer extends IService {
+  }
+
+  @TunnelToServer
+  public interface IUnsignedTunnelToServer extends IService {
   }
 }

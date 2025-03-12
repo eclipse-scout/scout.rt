@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -94,7 +95,14 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
    * Creates a new {@link BeanMetaData} for the given class.
    */
   protected BeanMetaData createBeanMetaData(Class<?> c) {
-    ServiceTunnelProxyProducer<?> tunnelProxyProducer = new ServiceTunnelProxyProducer<>(c);
+    ServiceTunnelProxyProducer<?> tunnelProxyProducer = new ServiceTunnelProxyProducer<>(
+        c,
+        ServiceTunnelOptions.create()
+            .withIdSignature(Optional.ofNullable(c)
+                .map(clazz -> clazz.getAnnotation(TunnelToServer.class))
+                .map(TunnelToServer::idSignature)
+                .orElse(false))
+    );
     return new BeanMetaData(c).withApplicationScoped(true).withProducer(tunnelProxyProducer);
   }
 }

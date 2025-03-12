@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,8 @@ import java.security.Permission;
 import java.security.Permissions;
 import java.util.Date;
 
+import org.eclipse.scout.rt.dataobject.DataObjectHolder;
+import org.eclipse.scout.rt.dataobject.DoEntityHolder;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.serialization.IObjectReplacer;
 import org.eclipse.scout.rt.platform.util.date.UTCDate;
@@ -41,6 +43,12 @@ public class ServiceTunnelObjectReplacer implements IObjectReplacer {
     if (obj instanceof IDoEntity) {
       return new DoEntityWrapper((IDoEntity) obj);
     }
+    if (obj instanceof DoEntityHolder) {
+      return new DoEntityHolderWrapper((DoEntityHolder<?>) obj);
+    }
+    if (obj instanceof DataObjectHolder) {
+      return new DataObjectHolderWrapper((DataObjectHolder<?>) obj);
+    }
     return obj;
   }
 
@@ -54,6 +62,12 @@ public class ServiceTunnelObjectReplacer implements IObjectReplacer {
     }
     if (obj instanceof DoEntityWrapper) {
       return ((DoEntityWrapper) obj).getDoEntity();
+    }
+    if (obj instanceof DoEntityHolderWrapper) {
+      return ((DoEntityHolderWrapper) obj).getDoEntityHolder();
+    }
+    if (obj instanceof DataObjectHolderWrapper) {
+      return ((DataObjectHolderWrapper) obj).getDataObjectHolder();
     }
     return obj;
   }

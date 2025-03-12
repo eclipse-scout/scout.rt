@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.servicetunnel.http;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -30,6 +31,7 @@ import org.eclipse.scout.rt.shared.opentelemetry.HttpServiceTunnelInstrumenterFa
 import org.eclipse.scout.rt.shared.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelOptions;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.slf4j.Logger;
@@ -54,6 +56,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   private static final Logger LOG = LoggerFactory.getLogger(HttpServiceTunnel.class);
 
   public static final String TOKEN_AUTH_HTTP_HEADER = "X-ScoutAccessToken";
+  public static final String ID_SIGNATURE_HTTP_HEADER = "X-ScoutIdSignature";
 
   private IServiceTunnelContentHandler m_contentHandler;
   private final URL m_serverUrl;
@@ -164,13 +167,14 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
    * @param callData
    *     data as byte array
    * @throws IOException
-   *           exception
+   *     exception
    * @since 6.0
    */
   protected void addCustomHeaders(HttpRequest httpRequest, ServiceTunnelRequest call, byte[] callData) throws IOException {
     addSignatureHeader(httpRequest, callData);
     addCorrelationId(httpRequest);
     addOpenTelemetryContextHeader(httpRequest);
+    addIdSignatureHeader(httpRequest);
   }
 
   protected void addSignatureHeader(HttpRequest httpRequest, byte[] callData) throws IOException {
@@ -206,6 +210,17 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   /**
+   * Adds the {@link HttpServiceTunnel#ID_SIGNATURE_HTTP_HEADER} if the current run context has the property {@link ServiceTunnelOptions#ID_SIGNATURE_PROP} set.
+   */
+  protected void addIdSignatureHeader(final HttpRequest httpRequest) {
+    if (Optional.ofNullable(RunContext.CURRENT.get())
+        .map(rc -> rc.getPropertyOrDefault(ServiceTunnelOptions.ID_SIGNATURE_PROP, false))
+        .orElse(false)) {
+      httpRequest.getHeaders().put(ID_SIGNATURE_HTTP_HEADER, Boolean.TRUE.toString());
+    }
+  }
+
+  /**
    * @return msgEncoder used to encode and decode a request / response to and from the binary stream. Default is the
    * {@link BinaryServiceTunnelContentHandler} which handles binary messages
    */
@@ -215,8 +230,8 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
 
   /**
    * @param e
-   *          content handler that can encode and decode a request / response to and from the binary stream. Default is
-   *          the {@link BinaryServiceTunnelContentHandler} which handles binary messages
+   *     content handler that can encode and decode a request / response to and from the binary stream. Default is
+   *     the {@link BinaryServiceTunnelContentHandler} which handles binary messages
    */
   public void setContentHandler(IServiceTunnelContentHandler e) {
     m_contentHandler = e;

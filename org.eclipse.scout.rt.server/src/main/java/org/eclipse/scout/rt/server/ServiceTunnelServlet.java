@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,7 @@ import static org.eclipse.scout.rt.server.commons.opentelemetry.SpanNamePropagat
 
 import java.io.IOException;
 import java.security.AccessController;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongPredicate;
 
@@ -47,8 +48,10 @@ import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry.IRegistratio
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelOptions;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.http.HttpServiceTunnel;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,6 +131,7 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
       m_serverRunContextProducer.get()
           .getInnerRunContextProducer()
           .produce(servletRequest, servletResponse)
+          .withProperties(enableSignature(servletRequest) ? Map.of(ServiceTunnelOptions.ID_SIGNATURE_PROP, true) : Map.of())
           .run(() -> {
             ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
             ServiceTunnelResponse serviceResponse = doPost(serviceRequest);
@@ -177,6 +181,14 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
         servletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       }
     }
+  }
+
+  /**
+   * Check the {@link HttpServletRequest} if signature creation needs to be enabled. Default implementation checks
+   * the {@link HttpServiceTunnel#ID_SIGNATURE_HTTP_HEADER}.
+   */
+  protected boolean enableSignature(HttpServletRequest servletRequest) {
+    return Boolean.TRUE.toString().equalsIgnoreCase(servletRequest.getHeader(HttpServiceTunnel.ID_SIGNATURE_HTTP_HEADER));
   }
 
   protected ServiceTunnelResponse doPost(ServiceTunnelRequest serviceRequest) {
