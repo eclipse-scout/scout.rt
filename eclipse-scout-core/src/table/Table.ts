@@ -3705,23 +3705,32 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    */
   restoreSelection(selectedKeys: any[][]) {
     const rows = this.getRowsByKey(selectedKeys);
-    if (this.hierarchical) {
-      // collect all parentRows of selectedRows and expand them
-      const parentRows = new Set<TableRow>();
-      const remaining = new Set(rows);
-      for (const r of remaining) {
-        const parentRow = r.parentRow;
-        if (!parentRow) {
-          continue;
-        }
-        parentRows.add(parentRow);
-        // the iterator will iterate over newly added elements
-        // therefore new elements added here will be processed
-        remaining.add(parentRow);
-      }
-      this.expandRows([...parentRows]);
-    }
+    this.expandParentRows(rows);
     this.selectRows(rows);
+  }
+
+  /**
+   * If the table is hierarchical, ensures that for the given rows all parent rows up to the root are expanded.
+   * If the table is not hierarchical or no rows are given, nothing happens.
+   */
+  expandParentRows(rows: TableRow[]) {
+    if (!this.hierarchical || arrays.empty(rows)) {
+      return;
+    }
+    // collect all parentRows of selectedRows and expand them
+    const parentRows = new Set<TableRow>();
+    const remaining = new Set(rows);
+    for (const r of remaining) {
+      const parentRow = r.parentRow;
+      if (!parentRow) {
+        continue;
+      }
+      parentRows.add(parentRow);
+      // the iterator will iterate over newly added elements
+      // therefore new elements added here will be processed
+      remaining.add(parentRow);
+    }
+    this.expandRows([...parentRows]);
   }
 
   /**

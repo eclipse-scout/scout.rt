@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -964,6 +964,77 @@ describe('HierarchicalTableSpec', () => {
       table.render();
       expect(table.rootRows[0].$row).toHaveAttr('aria-expanded', 'true');
       expect(table.rootRows[1].$row).toHaveAttr('aria-expanded', 'false');
+    });
+  });
+
+  describe('restoreSelection', () => {
+
+    it('expands all parent rows while restoring selection', () => {
+      let model = helper.createModelFixture(1, 0);
+      model.columns[0].primaryKey = true;
+      let table = helper.createTable({
+        ...model,
+        hierarchical: true
+      });
+      table.insertRows([
+        helper.createModelRow('A', ['A']),
+        helper.createModelRow('A1', ['A1'], 'A'),
+        helper.createModelRow('A11', ['A11'], 'A1'),
+        helper.createModelRow('A12', ['A12'], 'A1'),
+        helper.createModelRow('A2', ['A2'], 'A'),
+        helper.createModelRow('A21', ['A21'], 'A2'),
+        helper.createModelRow('A22', ['A22'], 'A2'),
+        helper.createModelRow('A3', ['A3'], 'A'),
+        helper.createModelRow('B', ['B']),
+        helper.createModelRow('B1', ['B1'], 'B'),
+        helper.createModelRow('B11', ['B11'], 'B1'),
+        helper.createModelRow('B2', ['B2'], 'B'),
+        helper.createModelRow('B21', ['B21'], 'B2'),
+        helper.createModelRow('C', ['C'])
+      ]);
+
+      expect(table.getVisibleRows().map(row => row.id)).toEqual(['A', 'B', 'C']);
+      expect(table.getRowByKey(['A']).expanded).toBe(false);
+      expect(table.getRowByKey(['B']).expanded).toBe(false);
+      expect(table.getRowByKey(['C']).expanded).toBe(false);
+      expect(table.selectedRows.map(row => row.id)).toEqual([]);
+
+      table.restoreSelection([['A11'], ['B1'], ['C']]);
+      expect(table.getVisibleRows().map(row => row.id)).toEqual(['A', 'A1', 'A11', 'A12', 'A2', 'A3', 'B', 'B1', 'B2', 'C']);
+      expect(table.getRowByKey(['A']).expanded).toBe(true);
+      expect(table.getRowByKey(['A1']).expanded).toBe(true);
+      expect(table.getRowByKey(['A2']).expanded).toBe(false);
+      expect(table.getRowByKey(['B']).expanded).toBe(true);
+      expect(table.getRowByKey(['B1']).expanded).toBe(false);
+      expect(table.getRowByKey(['B2']).expanded).toBe(false);
+      expect(table.getRowByKey(['C']).expanded).toBe(false);
+      expect(table.selectedRows.map(row => row.id)).toEqual(['A11', 'B1', 'C']);
+
+      table.collapseAll();
+      expect(table.getRowByKey(['A']).expanded).toBe(false);
+      expect(table.getRowByKey(['B']).expanded).toBe(false);
+      expect(table.getRowByKey(['C']).expanded).toBe(false);
+      expect(table.selectedRows.map(row => row.id)).toEqual(['C']);
+
+      // ----------
+
+      table.expandParentRows(null);
+      expect(table.getRowByKey(['A']).expanded).toBe(false);
+      expect(table.getRowByKey(['B']).expanded).toBe(false);
+      expect(table.getRowByKey(['C']).expanded).toBe(false);
+      expect(table.selectedRows.map(row => row.id)).toEqual(['C']);
+      table.expandParentRows([]);
+      expect(table.getRowByKey(['A']).expanded).toBe(false);
+      expect(table.getRowByKey(['B']).expanded).toBe(false);
+      expect(table.getRowByKey(['C']).expanded).toBe(false);
+      expect(table.selectedRows.map(row => row.id)).toEqual(['C']);
+      table.expandParentRows([table.getRowByKey(['B11']), table.getRowByKey(['B21'])]);
+      expect(table.getRowByKey(['A']).expanded).toBe(false);
+      expect(table.getRowByKey(['B']).expanded).toBe(true);
+      expect(table.getRowByKey(['B1']).expanded).toBe(true);
+      expect(table.getRowByKey(['B2']).expanded).toBe(true);
+      expect(table.getRowByKey(['C']).expanded).toBe(false);
+      expect(table.selectedRows.map(row => row.id)).toEqual(['C']);
     });
   });
 });
