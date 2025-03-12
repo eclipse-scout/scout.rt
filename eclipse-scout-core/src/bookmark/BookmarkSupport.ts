@@ -9,7 +9,7 @@
  */
 import {
   App, arrays, BookmarkDo, BookmarkSupportModel, dataObjects, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline,
-  OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
+  OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithNodes, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -108,70 +108,71 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   // --------------------------------------
 
   createBookmark(page?: Page): JQuery.Promise<BookmarkDo> {
-    let pageToBookmark = page || this.desktop.outline?.selectedNode();
-    let outline = pageToBookmark?.getOutline();
-
-    let outlineId = outline?.getObjectUuidBuilder().buildId();
-    if (!outlineId) {
-      // throw new VetoException(TEXTS.get("CannotCreateBookmarkAtThisLocation"));
-      return $.rejectedPromise(BookmarkSupport.ERROR_MISSING_OUTLINE);
-    }
-
-    return this._pageToBookmark(pageToBookmark)
-      .then(bookmarkedPage => this._createBookmark(outlineId, pageToBookmark, bookmarkedPage));
+    return $.resolvedPromise()
+      .then(() => this._createBookmark(page));
   }
 
-  protected _createBookmark(outlineId: string, page: Page, bookmarkedPage: IBookmarkPageDo): JQuery.Promise<BookmarkDo> {
-    // Recursive function that returns the pagePath from the root to the given page  (as a promise)
-    let buildPagePath = (currentPage: Page, pagePath: IBookmarkPageDo[] = []): JQuery.Promise<IBookmarkPageDo[]> => {
-      let parentPage = currentPage.parentNode;
-      if (!parentPage) {
-        return $.resolvedPromise(pagePath); // done
-      }
-      return this._pageToBookmark(parentPage, currentPage).then(pathEntry => {
+  protected async _createBookmark(page?: Page): Promise<BookmarkDo> {
+    let outline = page?.getOutline() || this.desktop.outline;
+    let outlineId = outline?.getObjectUuidBuilder().buildId();
+    if (!outlineId) {
+      throw BookmarkSupport.ERROR_MISSING_OUTLINE;
+    }
+    page = page || outline.selectedNode();
+
+    let bookmarkedPage: IBookmarkPageDo = null;
+    let pagePath: IBookmarkPageDo[] = [];
+    if (page) {
+      bookmarkedPage = await this._pageToBookmarkPage(page);
+
+      let parentPage = page.parentNode;
+      let childPage = page;
+      while (parentPage) {
+        let pathEntry = await this._pageToBookmarkPage(parentPage, childPage);
         if (!pathEntry) {
           // non-bookmarkable page, discard entire path
-          return $.resolvedPromise(null);
+          pagePath = null;
+          break;
         }
-        return buildPagePath(parentPage, [pathEntry, ...pagePath]);
-      });
-    };
-
-    return buildPagePath(page).then(pagePath => {
-      let bookmarkDefinition = null;
-      if (pagePath) {
-        bookmarkDefinition = scout.create(OutlineBookmarkDefinitionDo, {
-          outlineId: outlineId,
-          bookmarkedPage: bookmarkedPage,
-          pagePath: pagePath
-        });
-      } else {
-        bookmarkDefinition = scout.create(PageBookmarkDefinitionDo, {
-          bookmarkedPage: bookmarkedPage
-        });
+        // Add bookmarkPage to front of path and repeat for parent page
+        pagePath.unshift(pathEntry);
+        childPage = parentPage;
+        parentPage = parentPage.parentNode;
       }
-      return scout.create(BookmarkDo, {
-        definition: bookmarkDefinition
+    }
+
+    let bookmarkDefinition;
+    if (pagePath) {
+      bookmarkDefinition = scout.create(OutlineBookmarkDefinitionDo, {
+        outlineId: outlineId,
+        bookmarkedPage: bookmarkedPage,
+        pagePath: pagePath
       });
+    } else {
+      bookmarkDefinition = scout.create(PageBookmarkDefinitionDo, {
+        bookmarkedPage: bookmarkedPage
+      });
+    }
+    return scout.create(BookmarkDo, {
+      definition: bookmarkDefinition
     });
   }
 
-  // This methode is called from bottom to top. On the first invocation, the childPage is not
-  // set, but later calls pass the childPage for resolve the corresponding row of a table page.
-  protected _pageToBookmark(page: Page, childPage?: Page): JQuery.Promise<IBookmarkPageDo> {
+  // Note: this methode is called multiple times from bottom to top. On the first invocation, the childPage is not set,
+  // but later calls pass the childPage for resolving the corresponding row of a table page.
+  protected async _pageToBookmarkPage(page: Page, childPage?: Page): Promise<IBookmarkPageDo> {
     if (!page) { // } || !page['bookmarkable']) { // FIXME bsh [js-bookmark] Add 'bookmarkable' flag
-      return $.rejectedPromise(BookmarkSupport.ERROR_PAGE_NOT_BOOKMARKABLE);
+      throw BookmarkSupport.ERROR_PAGE_NOT_BOOKMARKABLE;
     }
     if (!page.pageParam) {
-      return $.rejectedPromise(BookmarkSupport.ERROR_MISSING_PAGE_PARAM);
+      throw BookmarkSupport.ERROR_MISSING_PAGE_PARAM;
     }
 
     if (page.nodeType === Page.NodeType.NODES) {
-      let bookmarkedPage = scout.create(NodeBookmarkPageDo, {
+      return scout.create(NodeBookmarkPageDo, {
         pageParam: page.pageParam,
         displayText: page.text // FIXME bsh [js-bookmark] Delegate to bookmark adapter
       });
-      return $.resolvedPromise(bookmarkedPage);
     }
 
     if (page.nodeType === Page.NodeType.TABLE) {
@@ -185,7 +186,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
           // FIXME bsh [js-bookmark] Is this assumption correct? Or do we want to throw an error?
         }
         if (!expandedChildRowIdentifier) { // child row not identifiable
-          return $.rejectedPromise(BookmarkSupport.ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER);
+          throw BookmarkSupport.ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER;
         }
       }
 
@@ -193,32 +194,32 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       let selectedChildRowIdentifiers = page.detailTable.selectedRows
         .map(row => page.getTableRowIdentifier(row));
 
-      return $.resolvedPromise()
-        .then(() => {
-          // Local
-          if (page instanceof PageWithTable) {
-            return page.getSearchFilter();
-          }
-          // Remote
-          return HybridManager.get(this.session).callActionAndWait('ExportSearchData', undefined,
-            scout.create(HybridActionContextElements)
-              .withElement('page', HybridActionContextElement.of(page.getOutline(), page))
-          );
-        })
-        .then(searchFilter => {
-          let bookmarkedPage = scout.create(TableBookmarkPageDo, {
-            pageParam: page.pageParam,
-            displayText: page.text, // FIXME bsh [js-bookmark] Delegate to bookmark adapter
-            expandedChildRow: expandedChildRowIdentifier,
-            selectedChildRows: selectedChildRowIdentifiers,
-            searchFilterComplete: true,
-            searchData: searchFilter
-          });
-          return $.resolvedPromise(bookmarkedPage);
-        });
+      let searchFilter = await this._getSearchFilter(page);
+
+      return scout.create(TableBookmarkPageDo, {
+        pageParam: page.pageParam,
+        displayText: page.text, // FIXME bsh [js-bookmark] Delegate to bookmark adapter
+        expandedChildRow: expandedChildRowIdentifier,
+        selectedChildRows: selectedChildRowIdentifiers,
+        searchFilterComplete: true,
+        searchData: searchFilter
+      });
     }
 
-    return $.rejectedPromise(BookmarkSupport.ERROR_PAGE_NOT_BOOKMARKABLE);
+    throw BookmarkSupport.ERROR_PAGE_NOT_BOOKMARKABLE;
+  }
+
+  protected async _getSearchFilter(page: Page): Promise<any> {
+    // Local
+    if (page instanceof PageWithTable) {
+      return page.getSearchFilter();
+    }
+
+    // Remote
+    return HybridManager.get(this.session).callActionAndWait('ExportSearchData', undefined,
+      scout.create(HybridActionContextElements)
+        .withElement('page', HybridActionContextElement.of(page.getOutline(), page))
+    );
   }
 
   // --------------------------------------
@@ -256,7 +257,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       });
   }
 
-  protected _openBookmarkHybrid(bookmarkDefinition: OutlineBookmarkDefinitionDo): JQuery.Promise<void> {
+  protected async _openBookmarkHybrid(bookmarkDefinition: OutlineBookmarkDefinitionDo): Promise<void> {
     let hybridManager = HybridManager.get(this.session);
 
     // Scout Classic: send the bookmark to the UI server. The client model will first try to resolve
@@ -264,112 +265,109 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     // a callback. After that, the hybrid action will end.
     if (hybridManager) {
       // FIXME bsh [js-bookmark] Handle error
-      return hybridManager.callActionAndWaitWithContext('ActivateBookmark', {bookmarkDefinition}).then(result => null);
+      await hybridManager.callActionAndWait('ActivateBookmark', {bookmarkDefinition});
+      return;
     }
 
     // Scout JS: resolve everything in the UI, i.e. the entire path is remaining
+    let outline = this.desktop.getOutlines().find(outline => {
+      let outlineId = outline?.getObjectUuidBuilder().buildId();
+      return outlineId === bookmarkDefinition.outlineId;
+    });
+    let pagePath = bookmarkDefinition.bookmarkedPage
+      ? [...bookmarkDefinition.pagePath || [], bookmarkDefinition.bookmarkedPage]
+      : null;
     return this.openBookmarkLocal({
-      parentOutline: null,
+      parentOutline: outline,
       parentPage: null,
       parentBookmarkPage: null,
-      pagePath: [...bookmarkDefinition.pagePath, bookmarkDefinition.bookmarkedPage]
+      pagePath: pagePath
     });
   }
 
   openBookmarkLocal(request: ActivateBookmarkRequest): JQuery.Promise<void> {
+    return $.resolvedPromise()
+      .then(() => this._openBookmarkLocal(request));
+  }
+
+  protected async _openBookmarkLocal(request: ActivateBookmarkRequest): Promise<void> {
     // Check if we are already on the correct outline
     let outline = request.parentOutline || request.parentPage?.getOutline();
     if (!outline || !outline.visible || !outline.enabled) {
-      return $.rejectedPromise(BookmarkSupport.ERROR_OUTLINE_NOT_FOUND);
+      throw BookmarkSupport.ERROR_OUTLINE_NOT_FOUND;
     }
     this.desktop.setOutline(outline);
     if (request.parentPage && request.parentPage.getOutline() !== outline) {
-      return $.rejectedPromise(BookmarkSupport.ERROR_PAGE_WRONG_OUTLINE);
+      throw BookmarkSupport.ERROR_PAGE_WRONG_OUTLINE;
     }
 
     let pagePath = request.pagePath?.slice(); // create copy because array is altered
-    let parent = request.parentPage || outline;
-    let parentPageDefinition = request.parentBookmarkPage;
-    return this._resolveNextPageInPath(pagePath, parent, parentPageDefinition)
-      .then(([page, bookmarkPage]) => {
-        if (!page) {
-          return $.rejectedPromise(BookmarkSupport.ERROR_PAGE_NOT_FOUND);
-        }
-        if (arrays.hasElements(pagePath)) {
-          // Path not fully restored
-          page.detailTable?.setTableStatus(Status.error('Loading the favorite has been canceled because the entry cannot be found in this view.')); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResolutionCanceled')
-        }
-        this._revealPage(page);
-      });
-  }
-
-  protected _resolveNextPageInPath(pagePath: IBookmarkPageDo[], parent: Outline | Page, parentPageDefinition: IBookmarkPageDo): JQuery.Promise<[Page, IBookmarkPageDo]> {
-    let parentPage = parent instanceof Page ? parent : null;
-
     if (arrays.empty(pagePath)) {
-      return $.resolvedPromise([parentPage, parentPageDefinition]); // done!
+      return; // done
     }
 
-    let pageDefinition = pagePath.shift();
-    return this._resolvePage(pageDefinition, parent, parentPageDefinition)
-      .then(page => {
-        if (!page) {
-          // Unable to find a page that matches the requested page definition. Put it back to the page path (so later
-          // code will know that not the entire path was successfully consumed) and return the last known page.
-          pagePath.unshift(pageDefinition); // put it back
-          return [parentPage, parentPageDefinition]; // done!
-        }
-        return this._applyBookmarkPage(page, pageDefinition)
-          .then(() => this._resolveNextPageInPath(pagePath, page, pageDefinition));
-      });
+    let parentPage = request.parentPage;
+    let parentBookmarkPage = request.parentBookmarkPage;
+
+    while (arrays.hasElements(pagePath)) {
+      let bookmarkPage = pagePath[0];
+      let page = await this._resolvePage(outline, parentPage, parentBookmarkPage, bookmarkPage);
+
+      if (!page) {
+        break; // no child page found matching the given bookmarkPage
+      }
+
+      await this._applyBookmarkPage(page, bookmarkPage, false);
+
+      parentPage = page;
+      parentBookmarkPage = bookmarkPage;
+      pagePath.shift();
+    }
+
+    if (!parentPage) {
+      throw BookmarkSupport.ERROR_PAGE_NOT_FOUND;
+    }
+
+    this._revealPage(parentPage);
+    if (arrays.hasElements(pagePath)) {
+      // Path not fully restored
+      parentPage.detailTable.setTableStatus(Status.error('Loading the favorite has been canceled because the entry cannot be found in this view.')); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResolutionCanceled')
+    }
   }
 
-  protected _resolvePage(pageDefinition: IBookmarkPageDo, parent: Page | Outline, parentPageDefinition: IBookmarkPageDo): JQuery.Promise<Page> {
-    if (parent instanceof Outline) {
-      // Lookup child page by pageParam
-      let result = parent.nodes.find(node => node.matchesPageParam(pageDefinition.pageParam));
-      return $.resolvedPromise(result);
-    }
+  protected async _resolvePage(outline: Outline, parentPage: Page, parentBookmarkPage: IBookmarkPageDo, bookmarkPage: IBookmarkPageDo): Promise<Page> {
+    if (parentPage) {
+      parentPage.ensureDetailTable(); // ensure detail table is present, so loadChildren() will load the table data
+      await parentPage.ensureLoadChildren();
 
-    if (parent instanceof Page) {
-      parent.ensureDetailTable(); // ensure detail table is present, so loadChildren() will load the table data
-      return parent.ensureLoadChildren()
-        .then(() => {
-          if (parent.nodeType === Page.NodeType.TABLE) {
-            if (parentPageDefinition instanceof TableBookmarkPageDo) {
-              // Lookup child page by parent PK (ignore pageParam)
-              let parentRowIdentifier = parentPageDefinition.expandedChildRow;
-              let row = parent.detailTable.rows.find(row => {
-                let rowIdentifier = parent.getTableRowIdentifier(row);
-                return objects.equals(rowIdentifier, parentRowIdentifier);
-              });
-              if (row) {
-                return row.page;
-              }
-            }
-            return null; // not found
-          }
-          if (parent.nodeType === Page.NodeType.NODES) {
-            // Lookup child page by pageParam
-            return parent.childNodes.find(node => node.matchesPageParam(pageDefinition.pageParam));
-          }
-          return null; // not found
-        })
-        .then((page: Page) => {
-          // If we found the page, but it is currently filtered by the parent table, remove the filter and try again.
-          // If the row is still not accepted, the filter is apparently a non-user filter which cannot be removed -> assume page not found.
-          if (page && !page.filterAccepted && parent.detailTable?.hasUserFilter()) {
-            parent.detailTable.resetUserFilter();
-            parent.detailTable.setTableStatus(Status.warning('The column filters have been removed during loading of the favorite.')); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResetColumnFilters')
-            if (!page.filterAccepted) {
-              return null; // still filtered -> not found
-            }
-          }
-          return page;
+      if (parentPage instanceof PageWithTable && parentBookmarkPage instanceof TableBookmarkPageDo) {
+        // Lookup child page by PK in parent table (ignore pageParam)
+        let row = parentPage.detailTable.rows.find(row => {
+          let rowIdentifier = parentPage.getTableRowIdentifier(row);
+          return objects.equals(rowIdentifier, parentBookmarkPage.expandedChildRow);
         });
+        if (!row) {
+          return null; // not found
+        }
+        // If we found the page, but it is currently filtered by the parent table, remove the filter and try again.
+        // If the row is still not accepted, the filter is apparently a non-user filter which cannot be removed -> assume page not found.
+        if (!row.page.filterAccepted && parentPage.detailTable.hasUserFilter()) {
+          parentPage.detailTable.resetUserFilter();
+          parentPage.detailTable.setTableStatus(Status.warning('The column filters have been removed during loading of the favorite.')); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResetColumnFilters')
+          if (!row.page.filterAccepted) {
+            return null; // still filtered -> not found
+          }
+        }
+        return row.page;
+      }
+      if (parentPage instanceof PageWithNodes && parentBookmarkPage instanceof NodeBookmarkPageDo) {
+        // Lookup child page by pageParam
+        return parentPage.childNodes.find(node => node.matchesPageParam(bookmarkPage.pageParam));
+      }
     }
 
-    return null;
+    // Lookup child page by pageParam
+    return outline.nodes.find(node => node.matchesPageParam(bookmarkPage.pageParam));
   }
 
   protected _revealPage(page: Page) {
@@ -399,52 +397,78 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   // --------------------------------------
 
   applyBookmarkToPage(page: Page, bookmark: BookmarkDo): JQuery.Promise<void> {
+    return $.resolvedPromise()
+      .then(() => this._applyBookmarkToPage(page, bookmark));
+  }
+
+  protected async _applyBookmarkToPage(page: Page, bookmark: BookmarkDo): Promise<void> {
     if (!bookmark) {
-      return $.resolvedPromise();
+      return;
     }
-
-    return this._applyBookmarkToPage(page, bookmark)
-      .then(() => {
-        // prevent bookmarks from being defined recursively. has some nasty side-effects and is ill-defined:
-        // FIXME bsh [js-bookmark] Implement
-        // m_bookmarkHelper.get().disableBookmarkMenus(targetPage);
-      });
-  }
-
-  protected _applyBookmarkToPage(page: Page, bookmark: BookmarkDo): JQuery.Promise<void> {
     let bookmarkPage = bookmark.definition.bookmarkedPage;
-    return this._applyBookmarkPage(page, bookmarkPage);
+    await this._applyBookmarkPage(page, bookmarkPage);
   }
 
-  protected _applyBookmarkPage(page: Page, bookmarkPage: IBookmarkPageDo): JQuery.Promise<void> {
+  protected async _applyBookmarkPage(page: Page, bookmarkPage: IBookmarkPageDo, saveSearchForm = true): Promise<void> {
     if (page instanceof PageWithTable && bookmarkPage instanceof TableBookmarkPageDo) {
-      return this._applyBookmarkToTablePage(page, bookmarkPage);
+      return this._applyBookmarkToTablePage(page, bookmarkPage, saveSearchForm);
+    }
+    if (page instanceof PageWithNodes && bookmarkPage instanceof NodeBookmarkPageDo) {
+      return this._applyBookmarkToNodePage(page, bookmarkPage);
     }
     // FIXME bsh [js-bookmark] Do we need to handle the "node page" case?
-    return $.resolvedPromise();
   }
 
-  protected _applyBookmarkToTablePage(page: PageWithTable, bookmarkPage: TableBookmarkPageDo): JQuery.Promise<void> {
-    return this._prepareTablePage(page, bookmarkPage, true)
-      .then(() => this._restoreSelection(page, bookmarkPage));
+  protected async _applyBookmarkToTablePage(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm = true): Promise<void> {
+    await this._prepareTablePage(page, bookmarkPage, saveSearchForm);
+    this._restoreSelection(page, bookmarkPage);
   }
 
-  protected _prepareTablePage(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm: boolean): JQuery.Promise<void> {
-    page.ensureDetailTable(); // FIXME bsh [js-bookmark] Check if this is still necessary if searchFilter is migrated to a property
+  protected async _applyBookmarkToNodePage(page: PageWithNodes, bookmarkPage: NodeBookmarkPageDo): Promise<void> {
+    // hook-method provided for subclasses
+  }
 
-    // FIXME bsh [js-bookmark] Implement
-    // // be careful when changing the order of these, e.g. applying column preferences requires custom columns to be injected first
-    // prepareTableCustomizerData(tablePage, tableBookmarkPage);
-    // prepareTableColumnPreferences(tablePage, tableBookmarkPage);
-    // prepareTileMode(tablePage, tableBookmarkPage);
-    // prepareSearchFilter(tablePage, tableBookmarkPage, saveSearchForm);
-    // prepareUserFilters(tablePage, tableBookmarkPage);
-    // prepareChartTableControlState(tablePage, tableBookmarkPage);
-    // prepareShowRelatedCustomerData(tablePage, tableBookmarkPage);
+  protected async _prepareTablePage(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm = true): Promise<void> {
+    page.ensureDetailTable();
+
+    // be careful when changing the order of these, e.g. applying column preferences requires custom columns to be injected first
+    await this._prepareTableCustomizerData(page, bookmarkPage);
+    await this._prepareTableColumnPreferences(page, bookmarkPage);
+    await this._prepareTileMode(page, bookmarkPage);
+    await this._prepareSearchFilter(page, bookmarkPage, saveSearchForm);
+    await this._prepareUserFilters(page, bookmarkPage);
+    await this._prepareChartTableControlState(page, bookmarkPage);
+    await this._prepareShowRelatedCustomerData(page, bookmarkPage);
+  }
+
+  protected async _prepareTableCustomizerData(page: PageWithTable, bookmarkPage: TableBookmarkPageDo): Promise<void> {
+  }
+
+  protected async _prepareTableColumnPreferences(page: PageWithTable, bookmarkPage: TableBookmarkPageDo): Promise<void> {
+  }
+
+  protected async _prepareTileMode(page: PageWithTable, bookmarkPage: TableBookmarkPageDo): Promise<void> {
+  }
+
+  protected async _prepareSearchFilter(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm: boolean): Promise<void> {
+    let oldSearchForm = page.getSearchForm().exportData();
 
     page.setSearchFilter(bookmarkPage.searchData);
     // FIXME bsh [js-bookmark] searchFilterComplete???
-    return page.loadChildren();
+    await page.loadChildren();
+
+    if (!saveSearchForm) {
+      page.getSearchForm().setData(oldSearchForm);
+    }
+  }
+
+  protected async _prepareUserFilters(page: PageWithTable, bookmarkPage: TableBookmarkPageDo): Promise<void> {
+  }
+
+  protected async _prepareChartTableControlState(page: PageWithTable, bookmarkPage: TableBookmarkPageDo): Promise<void> {
+  }
+
+  protected async _prepareShowRelatedCustomerData(page: PageWithTable, bookmarkPage: TableBookmarkPageDo): Promise<void> {
   }
 
   protected _restoreSelection(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
@@ -459,12 +483,8 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
         return selectedRowIdentifiers.some(selectedRowIdentifier => objects.equals(selectedRowIdentifier, rowIdentifier));
       });
       let selectedKeys = selectedRows.map(row => row.getKeyValues());
+      // FIXME bsh [js-bookmark] Is this even required or should we just use selectRows()? It seems a bit awkward to convert the rows to keys and then back to rows.
       table.restoreSelection(selectedKeys);
-      // FIXME bsh [js-bookmark] Required? See Table#restoreSelection
-      // if (table.hierarchical) {
-      //   table.expandParentRows(selectedRows);
-      // }
-      // table.selectRows(selectedRows);
     }
   }
 }
