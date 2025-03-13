@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -288,35 +288,6 @@ describe('TableOrganizer', () => {
   });
 
   describe('getInvisibleColumns', () => {
-
-    it('returns all invisible columns if no insertAfterColumn is provided', () => {
-      let tableModel = helper.createModelFixture(5);
-      let table = helper.createTable(tableModel);
-      let column0 = table.columns[0];
-      let column1 = table.columns[1];
-      let column2 = table.columns[2];
-      let column3 = table.columns[3];
-      let column4 = table.columns[4];
-      let organizer = table.organizer;
-      column2.setDisplayable(false);
-
-      expect(organizer.getInvisibleColumns()).toEqual([]);
-      column1.setVisible(false);
-      expect(organizer.getInvisibleColumns()).toEqual([column1]);
-      column0.setVisible(false);
-      expect(organizer.getInvisibleColumns()).toEqual([column0, column1]);
-      column4.setVisible(false);
-      expect(organizer.getInvisibleColumns()).toEqual([column0, column1, column4]);
-      column2.setVisible(false);
-      column3.setVisible(false);
-      expect(organizer.getInvisibleColumns()).toEqual([column0, column1, column3, column4]);
-      column2.setVisible(true);
-      expect(organizer.getInvisibleColumns()).toEqual([column0, column1, column3, column4]);
-      column3.setVisible(true);
-      expect(organizer.getInvisibleColumns()).toEqual([column0, column1, column4]);
-
-      expect(organizer.getInvisibleColumns(column3)).toEqual([column0, column1, column4]);
-    });
 
     it('returns all invisible columns if no insertAfterColumn is provided', () => {
       let tableModel = helper.createModelFixture(5);

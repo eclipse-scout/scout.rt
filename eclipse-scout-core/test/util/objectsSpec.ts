@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,7 +33,7 @@ describe('objects', () => {
       }
     }
 
-    it('', () => {
+    it('creates a singleton proxy', () => {
       expect(ObjectFactory.get().initialized).toBeTrue();
       let proxy = objects.createSingletonProxy(ProxyTestClass);
       expect(proxy.prop).toBe('test');
@@ -42,7 +42,7 @@ describe('objects', () => {
       expect(proxy['notExisting']).toBeUndefined();
       expect(proxy['prop']).toBe('test');
     });
-    it('', () => {
+    it('throws errors of the object factory is not initialized', () => {
       ObjectFactory.get().initialized = false;
       let proxy = objects.createSingletonProxy(ProxyTestClass);
       expect(proxy['prototype']).toBeUndefined(); // prototype access does not create the lazy instance
@@ -867,6 +867,7 @@ describe('objects', () => {
 
     it('uses a type predicate to narrow the type', () => {
       // compile time test, ifs are always false
+      expect().nothing(); // suppress warning "spec has no expectations"
 
       let menuClass: new() => Menu;
       if (objects.isSameOrExtendsClass(menuClass, Action)) {
