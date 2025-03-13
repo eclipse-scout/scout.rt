@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -287,7 +287,7 @@ describe('TreeAdapter', () => {
       expect(nodeIds).toEqual(jasmine.arrayWithExactContents([node.id, childNode1.id, childNode2.id]));
     });
 
-    it('sends checked event of checked node and its children if triggered by server', () => {
+    it('sends checked event of checked node and some of its children if triggered by server', () => {
       let model = helper.createModelFixture(2, 1);
       let adapter = helper.createTreeAdapter(model);
       let tree = adapter.createWidget(model, session.desktop) as Tree;

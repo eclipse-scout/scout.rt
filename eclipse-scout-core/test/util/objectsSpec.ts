@@ -33,7 +33,7 @@ describe('objects', () => {
       }
     }
 
-    it('', () => {
+    it('creates a singleton proxy', () => {
       expect(ObjectFactory.get().initialized).toBeTrue();
       let proxy = objects.createSingletonProxy(ProxyTestClass);
       expect(proxy.prop).toBe('test');
@@ -42,7 +42,7 @@ describe('objects', () => {
       expect(proxy['notExisting']).toBeUndefined();
       expect(proxy['prop']).toBe('test');
     });
-    it('', () => {
+    it('throws errors of the object factory is not initialized', () => {
       ObjectFactory.get().initialized = false;
       let proxy = objects.createSingletonProxy(ProxyTestClass);
       expect(proxy['prototype']).toBeUndefined(); // prototype access does not create the lazy instance
@@ -1064,6 +1064,7 @@ describe('objects', () => {
 
     it('uses a type predicate to narrow the type', () => {
       // compile time test, ifs are always false
+      expect().nothing(); // suppress warning "spec has no expectations"
 
       let menuClass: new() => Menu;
       if (objects.isSameOrExtendsClass(menuClass, Action)) {

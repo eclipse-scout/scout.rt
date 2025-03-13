@@ -532,6 +532,10 @@ describe('ListBox', () => {
 
     it('has rows with aria role option', () => {
       let listBox = createFieldWithLookupCall();
+      expect(listBox.loading).toBe(true);
+      jasmine.clock().tick(500);
+      expect(listBox.loading).toBe(false);
+      expect(listBox.table.rows.length).toBeGreaterThan(0);
       listBox.table.rows.forEach(row => {
         expect(row.$row).toHaveAttr('role', 'option');
       });

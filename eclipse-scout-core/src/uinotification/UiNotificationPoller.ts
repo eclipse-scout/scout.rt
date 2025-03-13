@@ -233,7 +233,7 @@ export class UiNotificationPoller extends PropertyEventEmitter {
     this.trigger('error', {error});
 
     App.get().errorHandler.analyzeError(error).then(errorInfo => {
-      scout.getSession().sendLogRequest(`UI notification poller failed, call will be retried in ${UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL} ms.\nError message:\n${errorInfo.log}\n()`, LogLevel.INFO);
+      scout.getSession()?.sendLogRequest(`UI notification poller failed, call will be retried in ${UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL} ms.\nError message:\n${errorInfo.log}\n()`, LogLevel.INFO);
     });
 
     this._schedulePoll(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL);
