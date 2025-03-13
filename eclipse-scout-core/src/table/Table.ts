@@ -3911,7 +3911,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
         parentRow.childRows.push(row);
       } else {
         // do not allow unresolvable parent rows.
-        throw new Error('Parent row of ' + row + ' can not be resolved.');
+        throw new Error('Parent row ' + row.parentRow + ' of row ' + row.id + ' cannot be resolved.');
       }
     });
 

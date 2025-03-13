@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -464,6 +464,10 @@ describe('ListBox', () => {
 
     it('has rows with aria role option', () => {
       let listBox = createFieldWithLookupCall();
+      expect(listBox.loading).toBe(true);
+      jasmine.clock().tick(500);
+      expect(listBox.loading).toBe(false);
+      expect(listBox.table.rows.length).toBeGreaterThan(0);
       listBox.table.rows.forEach(row => {
         expect(row.$row).toHaveAttr('role', 'option');
       });

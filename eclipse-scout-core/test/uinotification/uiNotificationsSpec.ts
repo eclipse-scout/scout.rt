@@ -347,6 +347,8 @@ describe('uiNotifications', () => {
     });
 
     it('rejects if server does not allow it', done => {
+      expect().nothing(); // suppress warning "spec has no expectations"
+
       let errors = [];
       uiNotifications.subscribe('aaa', () => undefined).catch(error => {
         errors.push(error);
