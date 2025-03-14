@@ -9,7 +9,7 @@
  */
 import {
   App, arrays, BookmarkDo, BookmarkSupportModel, dataObjects, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline,
-  OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithNodes, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
+  OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithNodes, PageWithTable, scout, Session, Status, TableBookmarkPageDo, UuidPool, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -17,6 +17,8 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   protected static _INSTANCES: Map<Session, BookmarkSupport> = new Map();
 
+  static ERROR_ALREADY_LOADING = 'already-loading';
+  static ERROR_WRONG_DEFINITION_TYPE = 'wrong-definition-type';
   static ERROR_MISSING_OUTLINE = 'missing-outline';
   static ERROR_MISSING_PAGE_PARAM = 'missing-page-param';
   static ERROR_PAGE_NOT_BOOKMARKABLE = 'page-not-bookmarkable';
@@ -251,14 +253,11 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   openBookmarkInOutline(bookmark: BookmarkDo): JQuery.Promise<void> {
     if (this.loading) {
-      MessageBoxes.openOk(this.desktop, 'Another bookmark is currently loading', Status.Severity.ERROR);
-      return;
+      return $.rejectedPromise(BookmarkSupport.ERROR_ALREADY_LOADING);
     }
 
     if (!(bookmark?.definition instanceof OutlineBookmarkDefinitionDo)) {
-      // throw new VetoException(TEXTS.get("CannotOpenBookmarkInOriginalPlace")); FIXME bsh [js-bookmark] NLS
-      MessageBoxes.openOk(this.desktop, 'Bookmark cannot be opened at its original location.', Status.Severity.ERROR);
-      return;
+      return $.rejectedPromise(BookmarkSupport.ERROR_WRONG_DEFINITION_TYPE);
     }
 
     let bookmarkDefinition = bookmark.definition;
@@ -266,18 +265,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     this.setLoading(true);
     return $.resolvedPromise()
       .then(() => this._openBookmarkHybrid(bookmarkDefinition))
-      .catch(err => {
-        // FIXME bsh [js-bookmark] Error handling
-        if (err === BookmarkSupport.ERROR_OUTLINE_NOT_FOUND) {
-          // throw new VetoException(TEXTS.get("BookmarkActivationFailedOutlineNotAvailable", outline == null ? TEXTS.get("Unknown") : outline.getTitle())); FIXME bsh [js-bookmark] NLS
-          return MessageBoxes.openOk(this.desktop, 'Outline not found', Status.Severity.ERROR);
-        }
-        if (err === BookmarkSupport.ERROR_PAGE_NOT_FOUND) {
-          return MessageBoxes.openOk(this.desktop, 'There has been an error while loading the favorite.', Status.Severity.ERROR); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResolvingFailed')
-        }
-        return App.get().errorHandler.handle(err);
-      })
-      .then(() => {
+      .always(() => {
         this.setLoading(false);
       });
   }
@@ -419,19 +407,37 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
   }
 
-  // --------------------------------------
-
-  applyBookmarkToPage(page: Page, bookmark: BookmarkDo): JQuery.Promise<void> {
-    return $.resolvedPromise()
-      .then(() => this._applyBookmarkToPage(page, bookmark));
+  handleOpenBookmarkError(error: any): JQuery.Promise<any> {
+    if (error === BookmarkSupport.ERROR_ALREADY_LOADING) {
+      return MessageBoxes.openOk(this.desktop, 'Another bookmark is currently loading', Status.Severity.ERROR);
+    }
+    if (error === BookmarkSupport.ERROR_WRONG_DEFINITION_TYPE) {
+      // throw new VetoException(TEXTS.get("CannotOpenBookmarkInOriginalPlace")); FIXME bsh [js-bookmark] NLS
+      return MessageBoxes.openOk(this.desktop, 'Bookmark cannot be opened at its original location.', Status.Severity.ERROR);
+    }
+    if (error === BookmarkSupport.ERROR_OUTLINE_NOT_FOUND) {
+      // throw new VetoException(TEXTS.get("BookmarkActivationFailedOutlineNotAvailable", outline == null ? TEXTS.get("Unknown") : outline.getTitle())); FIXME bsh [js-bookmark] NLS
+      return MessageBoxes.openOk(this.desktop, 'Outline not found', Status.Severity.ERROR);
+    }
+    if (error === BookmarkSupport.ERROR_PAGE_NOT_FOUND) {
+      return MessageBoxes.openOk(this.desktop, 'There has been an error while loading the favorite.', Status.Severity.ERROR); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResolvingFailed')
+    }
+    return App.get().errorHandler.handle(error);
   }
 
-  protected async _applyBookmarkToPage(page: Page, bookmark: BookmarkDo): Promise<void> {
+  // --------------------------------------
+
+  applyBookmarkToPage(page: Page, bookmark: BookmarkDo, saveSearchForm = true): JQuery.Promise<void> {
+    return $.resolvedPromise()
+      .then(() => this._applyBookmarkToPage(page, bookmark, saveSearchForm));
+  }
+
+  protected async _applyBookmarkToPage(page: Page, bookmark: BookmarkDo, saveSearchForm = true): Promise<void> {
     if (!bookmark) {
       return;
     }
     let bookmarkPage = bookmark.definition.bookmarkedPage;
-    await this._applyBookmarkPage(page, bookmarkPage);
+    await this._applyBookmarkPage(page, bookmarkPage, saveSearchForm);
   }
 
   protected async _applyBookmarkPage(page: Page, bookmarkPage: IBookmarkPageDo, saveSearchForm = true): Promise<void> {
