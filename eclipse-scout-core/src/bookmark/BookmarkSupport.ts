@@ -451,14 +451,23 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   protected async _prepareSearchFilter(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm: boolean): Promise<void> {
-    let oldSearchForm = page.getSearchForm().exportData();
+    let searchForm = page.getSearchForm();
 
-    page.setSearchFilter(bookmarkPage.searchData);
-    // FIXME bsh [js-bookmark] searchFilterComplete???
+    let oldSearchData;
+    if (searchForm) {
+      if (!saveSearchForm) {
+        // If the new search data should not be the saved state (i.e. the user can press the "Reset" button to clear
+        // the bookmarked search data), remember the original state and reset it after the page has been loaded.
+        oldSearchData = searchForm.exportData();
+      }
+      searchForm.setData(bookmarkPage.searchData);
+      searchForm.importData();
+    }
+
     await page.loadChildren();
 
-    if (!saveSearchForm) {
-      page.getSearchForm().setData(oldSearchForm);
+    if (oldSearchData !== undefined) {
+      searchForm.setData(oldSearchData);
     }
   }
 
