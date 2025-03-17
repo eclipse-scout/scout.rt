@@ -10,7 +10,7 @@
 import {
   arrays, BaseDoEntity, BookmarkAdapter, BookmarkTableRowIdentifierDo, ButtonTile, ChildModelOf, Constructor, dataObjects, DoTypeResolver, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form,
   HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, ObjectOrChildModel, ObjectOrType, ObjectUuidBuilder, ObjectUuidProvider, ObjectWithObjectUuidBuilder, ObjectWithUuid, Outline, PageDetailMenuContributor, PageEventMap,
-  PageIdDummyPageParamDo, PageModel, ParentTablePageMenuContributor, PropertyChangeEvent, scout, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
+  PageIdDummyPageParamDo, PageModel, ParentTablePageMenuContributor, PropertyChangeEvent, RequiredUnlessNotSubclass, scout, SomeRequired, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -22,6 +22,7 @@ import $ from 'jquery';
  * Implementations of these classes contain code which loads table data or child nodes.
  */
 export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectWithObjectUuidBuilder {
+  declare initModel: SomeRequired<this['model'], 'parent'> & PageParamRequiredIfDeclared<this>;
   declare model: PageModel;
   declare eventMap: PageEventMap;
   declare self: Page;
@@ -30,6 +31,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   declare parentNode: Page;
 
   uuid: string;
+  pageParam: PageParamDo;
   pageParamType: Constructor<BaseDoEntity>; // written using @pageParam decorator (see below)
   /**
    * This property is set by the server, see: JsonOutline#putNodeType.
@@ -69,7 +71,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   protected _detailTableModel: ChildModelOf<Table>;
   protected _objectUuidBuilder: ObjectUuidBuilder;
   protected _bookmarkAdapter: BookmarkAdapter;
-  protected _pageParamInternal: PageParamDo;
+
   /** @internal */
   _detailFormModel: ChildModelOf<Form>;
   protected _detailMenusChangeHandler: (event: Event<MenuOwner>) => void;
@@ -78,7 +80,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     super();
 
     this.uuid = null;
-    this._pageParamInternal = undefined;
+    this.pageParam = null;
     this.nodeType = null;
     this.compactRoot = false;
     this.detailTable = null;
@@ -125,6 +127,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
 
       super._init(model);
       icons.resolveIconProperty(this, 'overviewIconId');
+      this._setPageParam(this.pageParam);
 
       let detailMenuContributors = this._createDetailMenuContributors();
       if (model.detailMenuContributors) {
@@ -138,6 +141,16 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     } finally {
       this.setPageChanging(false);
     }
+  }
+
+  /**
+   * Writes the static model to the page instance and initialize the pageParam,
+   * so the {@link PageResolver} can find the correct page without the need to initialize it completely.
+   */
+  minimalInit(parent: Outline) {
+    let staticModel = this._jsonModel();
+    Object.assign(this, staticModel, {parent});
+    this._setPageParam(this.pageParam);
   }
 
   uuidPath(useFallback?: boolean): string {
@@ -215,7 +228,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     let tableModel = this.detailTable;
     if (tableModel) {
       // this case is used for Scout classic
-      let newDetailTable = this.getOutline()._createChild(tableModel);
+      let newDetailTable = this.outline._createChild(tableModel);
       this._setDetailTable(newDetailTable);
     }
   }
@@ -223,7 +236,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   protected _internalInitDetailForm() {
     let formModel = this.detailForm;
     if (formModel) {
-      let newDetailForm = this.getOutline()._createChild(formModel);
+      let newDetailForm = this.outline._createChild(formModel);
       this._setDetailForm(newDetailForm);
     }
   }
@@ -242,7 +255,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   createDetailTable(): Table {
     let detailTable = this._createDetailTable();
     if (!detailTable && this._detailTableModel) {
-      detailTable = this.getOutline()._createChild(this._detailTableModel);
+      detailTable = this.outline._createChild(this._detailTableModel);
       this._detailTableModel = null; // no longer needed
     }
     return detailTable;
@@ -269,7 +282,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   createDetailForm(): Form {
     let detailForm = this._createDetailForm();
     if (!detailForm && this._detailFormModel) {
-      detailForm = this.getOutline()._createChild(this._detailFormModel);
+      detailForm = this.outline._createChild(this._detailFormModel);
       this._detailFormModel = null; // no longer needed
     }
     return detailForm;
@@ -352,7 +365,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     if (form instanceof TileOverviewForm) {
       form.setPage(null);
     }
-    if (form.owner === this.getOutline()) {
+    if (form.owner === this.outline) {
       // in Scout classic the owner is not an outline but the NullWidget.
       // Then destroy is controlled by the backend
       form.destroy();
@@ -382,7 +395,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   protected _destroyDetailTable(table: Table) {
     table.off('filter', this._tableFilterHandler);
     table.off('rowClick', this._tableRowClickHandler);
-    if (table.owner === this.getOutline()) {
+    if (table.owner === this.outline) {
       // in Scout classic the owner is not an outline but the NullWidget.
       // Then destroy is controlled by the backend
       table.destroy();
@@ -398,7 +411,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     inspector.applyInfo(this, this.$node);
     this.$node.toggleClass('compact-root', this.compactRoot);
     this.$node.toggleClass('has-tile-overview', this.showTileOverview ||
-      (this.compactRoot && this.getOutline().detailContent instanceof TileOutlineOverview));
+      (this.compactRoot && this.outline.detailContent instanceof TileOutlineOverview));
   }
 
   // see Java: AbstractPage#pageActivatedNotify
@@ -413,10 +426,17 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   }
 
   /**
+   * @deprecated use {@link outline} instead
+   */
+  getOutline(): Outline {
+    return this.parent;
+  }
+
+  /**
    * @returns the tree / outline / parent instance. it's all the same,
    *     but it's more intuitive to work with the 'outline' when we deal with pages.
    */
-  getOutline(): Outline {
+  get outline(): Outline {
     return this.parent;
   }
 
@@ -454,7 +474,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
       this._initDetailForm(form);
     }
     this.triggerPropertyChange('detailForm', oldDetailForm, form);
-    this.getOutline().pageChanged(this);
+    this.outline.pageChanged(this);
   }
 
   /**
@@ -483,7 +503,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
       this._initDetailTable(table);
     }
     this.triggerPropertyChange('detailTable', oldDetailTable, table);
-    this.getOutline().pageChanged(this);
+    this.outline.pageChanged(this);
   }
 
   /**
@@ -534,18 +554,18 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
    * @returns a page parameter object used to pass to newly created child pages. Sets the parent
    *     to our outline instance and adds optional other properties. Typically, you'll pass an
    *     object (entity-key or arbitrary data) to a child page.
+   * @deprecated either add the parent by yourself or return a page model instead of a page when creating child pages
    */
-  // FIXME bsh [js-bookmark] Rename (or even remove) this method! Conflict with "pageParam" property. Why does this even exist?
   protected _pageParam<T extends object>(paramProperties?: T): T & { parent: Outline } {
     let param = {
-      parent: this.getOutline()
+      parent: this.outline
     };
     $.extend(param, paramProperties);
     return param as T & { parent: Outline };
   }
 
   reloadPage() {
-    let outline = this.getOutline();
+    let outline = this.outline;
     if (outline) {
       this.loadChildren();
     }
@@ -554,7 +574,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   linkWithRow(row: TableRow) {
     this.row = row;
     row.page = this;
-    this.getOutline().trigger('pageRowLink', {
+    this.outline.trigger('pageRowLink', {
       page: this,
       row: row
     });
@@ -566,7 +586,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   }
 
   protected _onTableFilter(event: Event<Table>) {
-    this.getOutline().mediator.onTableFilter(event, this);
+    this.outline.mediator.onTableFilter(event, this);
   }
 
   protected _onTableRowClick(event: TableRowClickEvent) {
@@ -576,7 +596,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     if (this.leaf) {
       return;
     }
-    this.getOutline().drillDown(event.row.page);
+    this.outline.drillDown(event.row.page);
     event.source.deselectRow(event.row);
   }
 
@@ -584,24 +604,15 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     return this.getBookmarkAdapter().pageParamsMatch(this.pageParam, pageParam);
   }
 
-  get pageParam(): PageParamDo {
-    if (this._pageParamInternal === undefined) {
-      if (this.pageParamType === null) {
-        // FIXME mvi [js-bookmark] DummyPageParam is only used in bookmarks. Should not be here in Page, but in BookmarkAdapter instead?
-        this.pageParam = this._computeDummyPageParam();
-      } else {
-        this.pageParam = null; // no param set
-      }
+  protected _setPageParam(pageParam: PageParamDo | object) {
+    if (!pageParam && this.pageParamType === null) {
+      // FIXME mvi [js-bookmark] DummyPageParam is only used in bookmarks. Should not be here in Page, but in BookmarkAdapter instead?
+      pageParam = this._computeDummyPageParam();
     }
-    return this._pageParamInternal;
-  }
-
-  set pageParam(pageParam: PageParamDo | object) {
     if (pageParam instanceof PageParamDo || !pageParam) {
-      this._pageParamInternal = pageParam as PageParamDo;
+      this.pageParam = pageParam as PageParamDo;
     } else {
-      // FIXME CGU [js-bookmark] Should we add _setPageParam with this code and move get pageParam to BookmarkAdapter?
-      this._pageParamInternal = dataObjects.deserialize(pageParam, this.pageParamType);
+      this.pageParam = dataObjects.deserialize(pageParam, this.pageParamType);
     }
   }
 
@@ -708,3 +719,8 @@ export class PageParamDoTypeResolver implements DoTypeResolver {
 }
 
 dataObjects.doTypeResolvers.push(new PageParamDoTypeResolver());
+
+/**
+ * Makes the pageParam of the given page required if the page declares a concrete page param (= a subclass of {@link PageParamDo}).
+ */
+export type PageParamRequiredIfDeclared<TPage extends Page> = RequiredUnlessNotSubclass<TPage, 'pageParam', PageParamDo>;

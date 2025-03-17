@@ -22,7 +22,8 @@ let $activeElements = null;
 export type ModelOf<TObject> = TObject extends { model?: infer TModel } ? TModel : object;
 /**
  * Model used to initialize an object instance. Usually the same as {@link ModelOf} but with some minimal required properties (mandatory properties).
- * Typically, adds an e.g. {@link parent} or {@link session} property which needs to be present when initializing an already created instance.
+ * The definition of the required properties can be done by the object itself by declaring a property called `initModel`.
+ * A typical object with an `initModel` adds an e.g. {@link parent} or {@link session} property which needs to be present when initializing an already created instance.
  */
 export type InitModelOf<TObject> = TObject extends { initModel?: infer TInitModel } ? TInitModel : ModelOf<TObject>;
 /**

@@ -78,7 +78,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
       childPages.push(childPage);
     });
 
-    this.getOutline().mediator.onTableRowsDeleted(rows, childPages, this);
+    this.outline.mediator.onTableRowsDeleted(rows, childPages, this);
   }
 
   protected _onTableRowsInserted(event: TableRowsInsertedEvent) {
@@ -89,22 +89,22 @@ export class PageWithTable extends Page implements PageWithTableModel {
     let rows = arrays.ensure(event.rows);
     let childPages = rows.map(row => this._createChildPageInternal(row)).filter(Boolean);
 
-    this.getOutline().mediator.onTableRowsInserted(rows, childPages, this);
+    this.outline.mediator.onTableRowsInserted(rows, childPages, this);
   }
 
   protected _onTableRowsUpdated(event: TableRowsUpdatedEvent) {
-    this.getOutline().mediator.onTableRowsUpdated(event, this);
+    this.outline.mediator.onTableRowsUpdated(event, this);
   }
 
   protected _onTableRowAction(event: TableRowActionEvent) {
-    this.getOutline().mediator.onTableRowAction(event, this);
+    this.outline.mediator.onTableRowAction(event, this);
   }
 
   protected _onTableRowOrderChanged(event: TableRowOrderChangedEvent) {
     if (event.animating) { // do nothing while row order animation is in progress
       return;
     }
-    this.getOutline().mediator.onTableRowOrderChanged(event, this);
+    this.outline.mediator.onTableRowOrderChanged(event, this);
   }
 
   protected _createChildPageInternal(row: TableRow): Page {
@@ -120,16 +120,25 @@ export class PageWithTable extends Page implements PageWithTableModel {
   }
 
   /**
-   * Override this method to return a specific Page instance for the given table-row.
-   * The default impl. returns null, which means a AutoLeafPageWithNodes instance will be created for the table-row.
+   * @deprecated use {@link _createChildPage} instead
    */
   createChildPage(row: TableRow): Page {
+    return this._createChildPage(row);
+  }
+
+  /**
+   * Override this method to create a {@link Page} for the given {@link TableRow}.
+   *
+   * By default, no page is created unless {@link alwaysCreateChildPage} is set to true.
+   * In that case, an {@link AutoLeafPageWithNodes} is created.
+   */
+  protected _createChildPage(row: TableRow): Page {
     return null;
   }
 
   createDefaultChildPage(row: TableRow): Page {
     return scout.create(AutoLeafPageWithNodes, {
-      parent: this.getOutline(),
+      parent: this.outline,
       row: row
     });
   }
@@ -226,8 +235,8 @@ export class PageWithTable extends Page implements PageWithTableModel {
   protected _getRestoreSelectionInfo(): RestoreSelectionInfo {
     let restoreSelection = false;
     let selectedRowKey = null;
-    if (this.getOutline().selectedNode()) {
-      let node = this.getOutline().selectedNode();
+    if (this.outline.selectedNode()) {
+      let node = this.outline.selectedNode();
       while (node?.parentNode) {
         if (node.parentNode === this) {
           restoreSelection = true;
@@ -252,11 +261,11 @@ export class PageWithTable extends Page implements PageWithTableModel {
     }
     try {
       const {restoreSelection, selectedRowKey} = restoreSelectionInfo;
-      if (restoreSelection && !this.getOutline().selectedNode()) {
+      if (restoreSelection && !this.outline.selectedNode()) {
         let selectedNode = this.detailTable.selectedRow()?.page
           || this.detailTable.getRowByKey(selectedRowKey)?.page
           || this;
-        this.getOutline().selectNode(selectedNode);
+        this.outline.selectNode(selectedNode);
       }
     } catch (e) {
       $.log.warn('Unable to restore selection.', e);

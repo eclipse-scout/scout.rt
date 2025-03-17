@@ -127,7 +127,7 @@ describe('BookmarkSupport', () => {
 
     protected override _createDetailForm(): Form {
       return scout.create(SpecDetailForm, {
-        parent: this.getOutline()
+        parent: this.outline
       });
     }
   }
@@ -143,7 +143,7 @@ describe('BookmarkSupport', () => {
 
     protected override _createDetailForm(): Form {
       return scout.create(SpecDetailForm, {
-        parent: this.getOutline()
+        parent: this.outline
       });
     }
   }
@@ -158,9 +158,9 @@ describe('BookmarkSupport', () => {
 
     protected override _createChildPages(): JQuery.Promise<Page[]> {
       return $.resolvedPromise([
-        scout.create(SpecNodePage1, {parent: this.getOutline()}),
-        scout.create(SpecTablePage2, {parent: this.getOutline()}),
-        scout.create(SpecNodePage2, {parent: this.getOutline()})
+        scout.create(SpecNodePage1, {parent: this.outline}),
+        scout.create(SpecTablePage2, {parent: this.outline}),
+        scout.create(SpecNodePage2, {parent: this.outline})
       ]);
     }
   }
@@ -175,8 +175,8 @@ describe('BookmarkSupport', () => {
 
     protected override _createChildPages(): JQuery.Promise<Page[]> {
       return $.resolvedPromise([
-        scout.create(SpecNodePage2, {parent: this.getOutline()}),
-        scout.create(SpecTablePage2, {parent: this.getOutline()})
+        scout.create(SpecNodePage2, {parent: this.outline}),
+        scout.create(SpecTablePage2, {parent: this.outline})
       ]);
     }
   }
@@ -192,7 +192,7 @@ describe('BookmarkSupport', () => {
 
     protected override _createDetailTable(): Table {
       return scout.create(Table, {
-        parent: this.getOutline(),
+        parent: this.outline,
         columns: [{
           id: 'LetterColumn',
           objectType: Column,
@@ -226,7 +226,7 @@ describe('BookmarkSupport', () => {
 
     protected override _createDetailTable(): Table {
       return scout.create(Table, {
-        parent: this.getOutline(),
+        parent: this.outline,
         columns: [{
           id: 'KeyColumn',
           objectType: Column,
@@ -277,12 +277,12 @@ describe('BookmarkSupport', () => {
       });
     }
 
-    override createChildPage(row: TableRow): Page {
+    protected override _createChildPage(row: TableRow): Page {
       let pageParam = scout.create(SpecPageParamDo, {
         fooId: this.detailTable.columnById('KeyColumn').cellValue(row)
       });
       return scout.create(SpecNodePage4, {
-        parent: this.getOutline(),
+        parent: this.outline,
         pageParam: pageParam
       });
     }
@@ -299,7 +299,7 @@ describe('BookmarkSupport', () => {
 
     protected override _createDetailTable(): Table {
       return scout.create(Table, {
-        parent: this.getOutline(),
+        parent: this.outline,
         columns: [{
           id: 'KeyColumn',
           objectType: Column,
