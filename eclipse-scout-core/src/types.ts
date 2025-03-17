@@ -24,6 +24,12 @@ export type SomePartial<TObject, TKey extends keyof TObject> = Partial<Pick<TObj
  */
 export type SomeRequired<TObject, TKey extends keyof TObject> = Required<Pick<TObject, TKey>> & TObject;
 
+/**
+ * Makes a property required but only if it is not of TType or a super class of TType.
+ */
+// eslint-disable-next-line
+export type RequiredUnlessNotSubclass<TObject, TKey extends keyof TObject, TType> = (TType extends TObject[TKey] ? {} : Pick<TObject, TKey>);
+
 export type EnumObject<T> = T[keyof T];
 
 export type EmptyObject = Record<string, never>;

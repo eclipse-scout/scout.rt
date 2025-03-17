@@ -11,7 +11,6 @@
 import {BaseDoEntity, bookmarks, Constructor, MaxRowCountContributionDo, objects, PageParamDo} from '../index';
 
 export class BookmarkAdapter {
-  // FIXME bsh [js-bookmark] Find a better solution! Fix confusion between _type and objectType
   pageParamsMatch(pageParam1: PageParamDo, pageParam2: PageParamDo) {
     if (!pageParam1 && !pageParam2) {
       return true;

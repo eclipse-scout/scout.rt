@@ -1166,7 +1166,6 @@ export * from './desktop/hybrid/uicallback/UiCallbacksEventMap';
 export * from './desktop/GeoLocationUiCallbackHandler';
 export * from './bookmark/ApplyBookmarkToJsPageUiCallbackHandler';
 export * from './bookmark/bookmarks';
-export * from './bookmark/ResolveJsPageUiCallbackHandler';
 export * from './bookmark/BookmarkAdapter';
 export * from './bookmark/BookmarkSupport';
 export * from './bookmark/BookmarkSupportModel';

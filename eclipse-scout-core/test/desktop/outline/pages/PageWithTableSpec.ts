@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,6 +33,10 @@ describe('PageWithTable', () => {
 
     override _loadTableData(searchFilter: any): JQuery.Promise<any> {
       return super._loadTableData(searchFilter);
+    }
+
+    override _createChildPage(row: TableRow): Page {
+      return super._createChildPage(row);
     }
   }
 
@@ -132,9 +136,9 @@ describe('PageWithTable', () => {
     }
 
     class SamplePageWithTable extends PageWithTable {
-      override createChildPage(row) {
+      protected override _createChildPage(row) {
         return scout.create(Page, {
-          parent: this.getOutline()
+          parent: this.outline
         });
       }
 
@@ -248,7 +252,7 @@ describe('PageWithTable', () => {
           cells: [...cells]
         })));
     };
-    tablePage.createChildPage = row => scout.create(PageWithNodes, {
+    tablePage._createChildPage = row => scout.create(PageWithNodes, {
       parent: outline,
       computeTextForRow: r => r.cells[1].text
     });
@@ -307,7 +311,7 @@ describe('PageWithTable', () => {
       {cells: ['1', '2', '3', '4', '5']}
     ];
     tablePage._loadTableData = () => $.resolvedPromise(data);
-    tablePage.createChildPage = () => scout.create(PageWithNodes, {parent: outline});
+    tablePage._createChildPage = () => scout.create(PageWithNodes, {parent: outline});
 
     const table = tablePage.detailTable;
     table.reload();

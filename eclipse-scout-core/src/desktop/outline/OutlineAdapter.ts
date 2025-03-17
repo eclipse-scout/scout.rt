@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, ChildModelOf, dataObjects, EventHandler, Form, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, Tree, TreeAdapter, TreeNode, TreeNodeModel,
-  UuidPool
+  App, ChildModelOf, dataObjects, ErrorHandler, EventHandler, Form, icons, objects, Outline, Page, PageResolver, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, Tree,
+  TreeAdapter, TreeNode, TreeNodeModel, UuidPool
 } from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
@@ -270,32 +270,16 @@ export class OutlineAdapter extends TreeAdapter {
     nodeModel = (this.modelAdapter as OutlineAdapter)._initNodeModel(nodeModel);
 
     if (nodeModel.nodeType === 'jsPage') {
-      if (!nodeModel.jsPageObjectType?.length) {
-        throw new Error('jsPageObjectType not set');
+      try {
+        nodeModel = OutlineAdapter._createJsPage.call(this, nodeModel);
+      } catch (error) {
+        // Create a broken page instead of showing a fatal error so the application can still be used.
+        nodeModel.jsPageObjectType = Page;
+        nodeModel.text = this.session.text('ui.CouldNotCreateElement');
+        nodeModel.iconId = icons.EXCLAMATION_MARK_CIRCLE;
+        nodeModel.cssClass = 'broken';
+        scout.create(ErrorHandler, {displayError: false, sendError: true}).handle(error);
       }
-
-      let jsPageModel = {
-        id: nodeModel.id,
-        parent: nodeModel.parent,
-        owner: nodeModel.owner,
-        objectType: nodeModel.jsPageObjectType,
-        // FIXME CGU [js-bookmark] I would prefer to deserialize it here instead of Page#set_pageParam so it behaves the same as for JsFormAdapter,
-        //                         but in that case Page.pageParamType would be ignored. Do we really need @pageParam?
-        // FIXME bsh [js-bookmark] Check which properties we want to explicitly inherit form the Java page
-        pageParam: nodeModel.pageParam,
-        classId: nodeModel.classId,
-        modelClass: nodeModel.modelClass,
-        text: nodeModel.text || undefined // because summary column might come from Java parent page
-      };
-
-      if (nodeModel.jsPageModel) {
-        delete nodeModel.jsPageModel.objectType; // objectType from Page model should not be used as nodeModel.jsPageObjectType specifies the object already
-        let deserializedJsPageModel = dataObjects.deserialize(nodeModel.jsPageModel, null, {createPojoIfDoIsUnknown: true});
-        delete deserializedJsPageModel._type; // _type should not be written to Page if present
-        jsPageModel = $.extend({}, deserializedJsPageModel, jsPageModel);
-      }
-
-      nodeModel = jsPageModel;
     }
 
     let page = this._createTreeNodeOrig(nodeModel);
@@ -303,6 +287,40 @@ export class OutlineAdapter extends TreeAdapter {
       throw new Error(`ClassId and uuid don't match for page ${page.objectType}. ClassId: ${page.classId}, Uuid: ${page.uuid}`);
     }
     return page;
+  }
+
+  protected static _createJsPage(this: Tree, nodeModel: TreeNodeModel) {
+    let pageParam = dataObjects.deserialize(nodeModel.pageParam);
+    nodeModel.jsPageObjectType = nodeModel.jsPageObjectType || PageResolver.get(this.session).findObjectTypeForPageParam(pageParam);
+    if (!nodeModel.jsPageObjectType) {
+      if (pageParam) {
+        throw new Error('Could not resolve page objectType for pageParam ' + JSON.stringify(pageParam));
+      }
+      throw new Error('jsPageObjectType not set');
+    }
+
+    let jsPageModel = {
+      id: nodeModel.id,
+      parent: nodeModel.parent,
+      owner: nodeModel.owner,
+      objectType: nodeModel.jsPageObjectType,
+      // FIXME CGU [js-bookmark] I would prefer to deserialize it here instead of Page#set_pageParam so it behaves the same as for JsFormAdapter,
+      //                         but in that case Page.pageParamType would be ignored. Do we really need @pageParam?
+      // FIXME bsh [js-bookmark] Check which properties we want to explicitly inherit form the Java page
+      pageParam,
+      classId: nodeModel.classId,
+      modelClass: nodeModel.modelClass,
+      text: nodeModel.text || undefined // because summary column might come from Java parent page
+    };
+
+    if (nodeModel.jsPageModel) {
+      delete nodeModel.jsPageModel.objectType; // objectType from Page model should not be used as nodeModel.jsPageObjectType specifies the object already
+      let deserializedJsPageModel = dataObjects.deserialize(nodeModel.jsPageModel, null, {createPojoIfDoIsUnknown: true});
+      delete deserializedJsPageModel._type; // _type should not be written to Page if present
+      jsPageModel = $.extend({}, deserializedJsPageModel, jsPageModel);
+    }
+
+    return jsPageModel;
   }
 
   protected static getSearchFilterForPageRemote(this: Outline & { modelAdapter: OutlineAdapter; getSearchFilterForPageOrig: typeof Outline.prototype.getSearchFilterForPage }, page: Page & { remote?: true }) {

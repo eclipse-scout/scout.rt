@@ -7,13 +7,20 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, Constructor, ObjectFactory, Outline, Page, PageIdDummyPageParamDo, PageParamDo, scout, strings} from '../../../index';
+import {App, Constructor, InitModelOf, ObjectFactory, ObjectModel, objects, ObjectWithType, Outline, Page, PageIdDummyPageParamDo, PageParamDo, scout, Session, strings} from '../../../index';
 import $ from 'jquery';
 
-export class PageResolver {
+export class PageResolver implements PageResolverModel, ObjectWithType {
+  declare model: PageResolverModel;
+  session: Session;
+  objectType: string;
 
-  protected static _INSTANCE: PageResolver = null;
+  protected static _INSTANCES: Map<Session, PageResolver> = new Map();
   protected pageByPageParam: Map<Constructor<PageParamDo>, Constructor<Page>> = null;
+
+  init(model: InitModelOf<this>) {
+    this.session = scout.assertProperty(model, 'session', Session);
+  }
 
   findObjectTypeForPageParam(pageParam: PageParamDo): string {
     if (!pageParam) {
@@ -76,7 +83,7 @@ export class PageResolver {
       return null;
     }
     const allPageClasses = ObjectFactory.get().getSubClassesOf(Page);
-    const parent = scout.create(Outline, {parent: App.get().sessions[0].desktop});
+    const parent = scout.create(Outline, {parent: this.session.desktop});
     try {
       for (let candidate of allPageClasses) {
         const objectType = this._getObjectTypeForPageIfParamMatches(parent, pageParam, candidate);
@@ -97,9 +104,7 @@ export class PageResolver {
       if (page.pageParamType !== PageIdDummyPageParamDo && page.pageParamType !== null) {
         return null;
       }
-      // Write the static model to the page instance, so we can correctly match the pageParam without actually initializing the page
-      let staticModel = page['_jsonModel']();
-      Object.assign(page, staticModel, {parent});
+      page.minimalInit(parent);
       if (page.matchesPageParam(param)) {
         return ObjectFactory.get().getObjectType(page.constructor as Constructor);
       }
@@ -115,10 +120,12 @@ export class PageResolver {
     }
   }
 
-  static get(): PageResolver {
-    if (!PageResolver._INSTANCE) {
-      PageResolver._INSTANCE = scout.create(PageResolver);
-    }
-    return PageResolver._INSTANCE;
+  static get(session?: Session): PageResolver {
+    session = scout.nvl(session, App.get().sessions[0]);
+    return objects.getOrSetIfAbsent(PageResolver._INSTANCES, session, () => scout.create(PageResolver, {session}));
   }
+}
+
+export interface PageResolverModel extends ObjectModel<PageResolver> {
+  session: Session;
 }
