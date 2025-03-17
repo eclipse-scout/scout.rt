@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -101,7 +101,7 @@ export class TileOverviewForm extends Form implements TileOverviewFormModel {
   }
 
   setPage(page: Page) {
-    this.outline = page.getOutline();
+    this.outline = page.outline;
     this.nodes = page.childNodes;
     this.tileOverviewTitle = page.text;
     this.setScrollable(!this.outline.compact);

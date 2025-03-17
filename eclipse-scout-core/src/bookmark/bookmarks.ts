@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, dataObjects, DoEntity, objects, PageParamDo, typeName} from '../index';
+import {arrays, BaseDoEntity, BookmarkSupport, DoEntity, PageParamDo, typeName} from '../index';
 
 @typeName('crm.Bookmark')
 export class BookmarkDo extends BaseDoEntity {
@@ -128,27 +128,3 @@ export class ActivateBookmarkRequestDo extends BaseDoEntity {
   parentBookmarkPage: IBookmarkPageDo;
   pagePath: IBookmarkPageDo[];
 }
-
-// --------------------------------------------------
-
-export const bookmarks = {
-
-  // FIXME bsh [js-bookmark] move compare logic to dataObjects.ts
-  stringifyNormalized(object: any): string {
-    // Get rid of _typeVersion and objectType and sort attributes
-    // FIXME bsh [js-bookmark] There must be a better way!?
-    let json = dataObjects.serialize(object);
-    return JSON.stringify(json, (key, value) => {
-      if (objects.isPojo(value)) {
-        return Object.keys(value)
-          .filter(key => key !== '_typeVersion')
-          .sort()
-          .reduce((acc, cur) => {
-            acc[cur] = value[cur];
-            return acc;
-          }, {});
-      }
-      return value;
-    });
-  }
-} as const;

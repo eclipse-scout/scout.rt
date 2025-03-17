@@ -66,7 +66,7 @@ export class PersonTablePage extends PageWithTable {
   }
 
   protected _createPersonForm(): PersonForm {
-    let outline = this.getOutline();
+    let outline = this.outline;
     return scout.create(PersonForm, {
       parent: outline
     });

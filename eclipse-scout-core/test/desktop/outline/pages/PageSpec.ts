@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Form, GroupBox, Menu, MenuOwner, Outline, Page, PageDetailMenuContributor, PageWithNodes, PageWithTable, ParentTablePageMenuContributor, scout, Table, Widget} from '../../../../src';
+import {arrays, Form, GroupBox, Menu, MenuOwner, Outline, Page, PageDetailMenuContributor, PageParamDo, PageWithNodes, PageWithTable, ParentTablePageMenuContributor, scout, Table, TableRow, Widget} from '../../../../src';
 import {MenuSpecHelper, OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing';
 import {ChildModelOf} from '../../../../src/scout';
 
@@ -133,7 +133,7 @@ describe('Page', () => {
         }
       ]
     }, null);
-    parentPage.createChildPage = row => scout.create(Page, {
+    parentPage._createChildPage = row => scout.create(Page, {
       parent: outline,
       detailTable: {
         objectType: Table,
@@ -340,7 +340,7 @@ describe('Page', () => {
       expect(page.detailForm.rootGroupBox.menus.map(menu => menu.text)).toEqual(['form-menu', 'contributed-menu']);
       expect(page.detailTable.menus.map(menu => menu.text)).toEqual(['table-menu', 'contributed-menu']);
 
-      // Contributors are called again when menus of the detail content change, or when the detail content itself chagnes
+      // Contributors are called again when menus of the detail content change, or when the detail content itself changes
       page.detailTable.setMenus([{objectType: Menu, text: 'new-table-menu'}]);
       expect(page.detailTable.menus.map(menu => menu.text)).toEqual(['new-table-menu', 'contributed-menu']);
       expect(page.detailForm.rootGroupBox.menus.map(menu => menu.text)).toEqual(['form-menu', 'contributed-menu']);
@@ -380,6 +380,46 @@ describe('Page', () => {
       expect(page.detailTable.menus.map(menu => menu.text)).toEqual(['outline-menu', 'table-menu']);
       expect(page.detailTable.menus[0].cloneOf).toBe(outline.menus[0]);
       expect(page.detailTable.menus[0].childActions[0].cloneOf).toBe(outline.menus[0].childActions[0]);
+    });
+  });
+
+  describe('pageParam', () => {
+    class SimplePage extends PageWithNodes {
+    }
+
+    class PageWithParam extends PageWithNodes {
+      declare pageParam: MyPageParamDo;
+    }
+
+    class MyPageParamDo extends PageParamDo {
+      prop: string;
+    }
+
+    it('is mandatory when creating a page if declared explicitly', () => {
+      // No param required
+      scout.create(SimplePage, {
+        parent: outline
+      });
+
+      // Page param is missing
+      // @ts-expect-error
+      scout.create(PageWithParam, {
+        parent: outline
+      });
+
+      // Wrong param type is used
+      scout.create(PageWithParam, {
+        parent: outline,
+        // @ts-expect-error
+        pageParam: scout.create(PageParamDo)
+      });
+
+      // Everything ok
+      let page = scout.create(PageWithParam, {
+        parent: outline,
+        pageParam: scout.create(MyPageParamDo, {prop: 'hi'})
+      });
+      expect(page.pageParam).toBeInstanceOf(MyPageParamDo);
     });
   });
 
@@ -432,6 +472,10 @@ describe('Page', () => {
       super._initDetailTable(table);
       expect(table).toBeInstanceOf(Table);
       this.numTableCreated++;
+    }
+
+    override _createChildPage(row: TableRow): Page {
+      return super._createChildPage(row);
     }
   }
 });

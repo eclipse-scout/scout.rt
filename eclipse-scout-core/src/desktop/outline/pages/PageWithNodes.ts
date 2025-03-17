@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,7 +40,7 @@ export class PageWithNodes extends Page {
   }
 
   protected _onDetailTableRowAction(event: TableRowActionEvent) {
-    this.getOutline().mediator.onTableRowAction(event, this);
+    this.outline.mediator.onTableRowAction(event, this);
   }
 
   protected _onDetailTableReload(event: TableReloadEvent) {
@@ -88,8 +88,8 @@ export class PageWithNodes extends Page {
     this.childrenLoaded = false;
     return this._createChildPages().then(childPages => {
       this._rebuildDetailTable(childPages);
-      this.getOutline().deleteNodes(arrays.diff(this.childNodes, childPages), this);
-      this.getOutline().insertNodes(childPages, this);
+      this.outline.deleteNodes(arrays.diff(this.childNodes, childPages), this);
+      this.outline.insertNodes(childPages, this);
       this.childrenLoaded = true;
     });
   }
