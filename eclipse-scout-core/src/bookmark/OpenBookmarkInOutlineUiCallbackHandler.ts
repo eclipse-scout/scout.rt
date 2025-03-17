@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ActivateBookmarkRequestDo, Desktop, Outline, Page, scout, UiCallbackHandler, UiCallbackParam} from '../index';
+import {ActivateBookmarkRequestDo, BookmarkSupport, Desktop, Outline, Page, scout, UiCallbackHandler, UiCallbackParam} from '../index';
 
 export class OpenBookmarkInOutlineUiCallbackHandler implements UiCallbackHandler {
 
@@ -20,7 +20,7 @@ export class OpenBookmarkInOutlineUiCallbackHandler implements UiCallbackHandler
     let parentOutline = parentPageContextElement?.getWidget(Outline);
     let parentPage = parentPageContextElement?.optElement(Page);
 
-    return desktop.bookmarkSupport.openBookmarkLocal({
+    return BookmarkSupport.get(desktop.session).openBookmarkLocal({
       parentOutline: parentOutline,
       parentPage: parentPage,
       parentBookmarkPage: data.parentBookmarkPage,
