@@ -14,7 +14,8 @@ import {
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   declare model: BookmarkSupportModel;
-  declare initModel: SomeRequired<this['model'], 'desktop'>;
+
+  protected static _INSTANCES: Map<Session, BookmarkSupport> = new Map();
 
   static ERROR_MISSING_OUTLINE = 'missing-outline';
   static ERROR_MISSING_PAGE_PARAM = 'missing-page-param';
@@ -27,6 +28,30 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   objectType: string;
   desktop: Desktop;
   loading: boolean;
+
+  // --------------------------------------
+
+  /**
+   * Returns an instance of {@link BookmarkSupport} for a specific {@link Session}. If no instance is registered
+   * for the session yet, a new instance is created.
+   *
+   * @param session Session object providing a desktop. If this is omitted, the first session of the app is used.
+   * If the app does not have any active sessions (e.g. during unit testing), this argument is mandatory.
+   */
+  static get(session?: Session): BookmarkSupport {
+    session = session || App.get().sessions[0];
+    scout.assertParameter('session', session);
+    let instance = BookmarkSupport._INSTANCES.get(session);
+    if (!instance) {
+      instance = scout.create(BookmarkSupport, {
+        desktop: session.desktop
+      });
+      BookmarkSupport._INSTANCES.set(session, instance);
+    }
+    return instance;
+  }
+
+  // --------------------------------------
 
   constructor() {
     this.desktop = null;

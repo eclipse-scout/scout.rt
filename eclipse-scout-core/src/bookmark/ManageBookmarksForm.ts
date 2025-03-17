@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,11 +20,6 @@ export class ManageBookmarksForm extends Form {
     super();
     this.deletedBookmarkKeys = [];
   }
-
-  get bookmarkSupport(): BookmarkSupport {
-    return this.session.desktop.bookmarkSupport;
-  }
-
   protected override _jsonModel(): FormModel {
     return model();
   }
@@ -40,7 +35,7 @@ export class ManageBookmarksForm extends Form {
   }
 
   protected override _load(): JQuery.Promise<any> {
-    return this.bookmarkSupport.loadAllBookmarks()
+    return BookmarkSupport.get(this.session).loadAllBookmarks()
       .then(bookmarks => {
         this.bookmarks = bookmarks;
         return super._load();
@@ -72,7 +67,7 @@ export class ManageBookmarksForm extends Form {
 
   protected override _save(data: any): JQuery.Promise<void> {
     // FIXME bsh [js-bookmark] This does not work well with concurrent changes! Also, is this.deletedBookmarkKeys necessary?
-    return this.bookmarkSupport.storeAllBookmarks(this.bookmarks)
+    return BookmarkSupport.get(this.session).storeAllBookmarks(this.bookmarks)
       .then(() => {
         this.findDesktop().trigger('bookmarksChanged');
         return super._save(data);
