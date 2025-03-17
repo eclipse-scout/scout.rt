@@ -21,12 +21,7 @@ export class UiCallbacks extends Widget {
     $.resolvedPromise() // always start new promise chain so we only need one catch handler
       .then(() => {
         const handler = scout.create(handlerObjectType) as UiCallbackHandler;
-        return handler.handle({
-          callbackId: callbackId,
-          owner: owner,
-          data: data,
-          contextElements: contextElements
-        });
+        return handler.handle({callbackId, owner, data, contextElements});
       })
       .then(result => this._convertResult(result))
       .then(result => this._triggerCallbackEnd(callbackId, result, null))
@@ -116,6 +111,7 @@ export interface UiCallbackHandler {
    * {@link Error}) will automatically be converted to a {@link UiCallbackErrorDo} using the application's
    * {@link ErrorHandler}.
    */
+  // TODO bsh [REVIEW] remove undefined
   handle(param: UiCallbackParam): JQuery.Promise<any> | undefined;
 }
 

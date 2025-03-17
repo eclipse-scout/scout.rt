@@ -11,11 +11,11 @@ import {BaseDoEntity, scout, typeName, UiCallbackErrorDo, UiCallbackHandler, UiC
 
 export class GeoLocationUiCallbackHandler implements UiCallbackHandler {
 
-  handle(param: UiCallbackParam): JQuery.Promise<any> {
+  handle(param: UiCallbackParam): JQuery.Promise<GeoLocationResponseDo> {
     if (!navigator.geolocation) {
       return $.rejectedPromise('Geolocation API not supported');
     }
-    let deferred = $.Deferred();
+    let deferred: JQuery.Deferred<GeoLocationResponseDo> = $.Deferred();
     navigator.geolocation.getCurrentPosition(
       position => deferred.resolve(this._positionSuccess(position)),
       positionError => deferred.reject(this._positionError(positionError)));
@@ -37,6 +37,7 @@ export class GeoLocationUiCallbackHandler implements UiCallbackHandler {
   }
 }
 
+// TODO bsh [REVIEW] GeoLocationDo
 @typeName('scout.GeoLocationResponse')
 export class GeoLocationResponseDo extends BaseDoEntity {
   latitude?: string;
