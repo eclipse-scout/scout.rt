@@ -269,7 +269,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this._computeNodePaddings();
 
     if (this.compact) {
-      if (node.row && node.getOutline().selectedNode() !== node) {
+      if (node.row && node.outline.selectedNode() !== node) {
         return this.nodePaddingLeft + node.row.hierarchyLevel * this.nodePaddingLevelHierarchyRow;
       }
     }

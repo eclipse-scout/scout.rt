@@ -653,7 +653,7 @@ describe('Outline', () => {
       protected override _createChildPages(): JQuery.Promise<Page[]> {
         let childPages = [
           scout.create(SpecPageWithTable, {
-            parent: this.getOutline(),
+            parent: this.outline,
             text: 'Table Page',
             detailTable: {
               objectType: Table,
@@ -666,7 +666,7 @@ describe('Outline', () => {
             }
           }),
           scout.create(SpecPageWithNodes, {
-            parent: this.getOutline(),
+            parent: this.outline,
             text: 'Node Page'
           })
         ];
@@ -676,9 +676,9 @@ describe('Outline', () => {
 
     class SpecPageWithTable extends PageWithTable {
 
-      override createChildPage(row) {
+      protected override _createChildPage(row) {
         return scout.create(SpecPageWithNodes, {
-          parent: this.getOutline()
+          parent: this.outline
         });
       }
 

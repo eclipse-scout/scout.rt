@@ -7,13 +7,19 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, Constructor, ObjectFactory, Outline, Page, PageIdDummyPageParamDo, PageParamDo, scout, strings} from '../../../index';
-import $ from 'jquery';
+import {App, Constructor, InitModelOf, ObjectFactory, ObjectModel, objects, ObjectWithType, Outline, Page, PageIdDummyPageParamDo, PageParamDo, scout, Session, strings} from '../../../index';
 
-export class PageResolver {
+export class PageResolver implements PageResolverModel, ObjectWithType {
+  declare model: PageResolverModel;
+  session: Session;
+  objectType: string;
 
-  protected static _INSTANCE: PageResolver = null;
+  protected static _INSTANCES: Map<Session, PageResolver> = new Map();
   protected pageByPageParam: Map<Constructor<PageParamDo>, Constructor<Page>> = null;
+
+  init(model: InitModelOf<this>) {
+    this.session = scout.assertProperty(model, 'session', Session);
+  }
 
   findObjectTypeForPageParam(pageParam: PageParamDo): string {
     if (!pageParam) {
@@ -76,7 +82,7 @@ export class PageResolver {
       return null;
     }
     const allPageClasses = ObjectFactory.get().getSubClassesOf(Page);
-    const parent = scout.create(Outline, {parent: App.get().sessions[0].desktop});
+    const parent = scout.create(Outline, {parent: this.session.desktop});
     try {
       for (let candidate of allPageClasses) {
         const objectType = this._getObjectTypeForPageIfParamMatches(parent, pageParam, candidate);
@@ -97,17 +103,16 @@ export class PageResolver {
       if (page.pageParamType !== PageIdDummyPageParamDo && page.pageParamType !== null) {
         return null;
       }
-      // Write the static model to the page instance, so we can correctly match the pageParam without actually initializing the page
-      let staticModel = page['_jsonModel']();
-      Object.assign(page, staticModel, {parent});
+      page.minimalInit(parent);
       if (page.matchesPageParam(param)) {
         return ObjectFactory.get().getObjectType(page.constructor as Constructor);
       }
       return null;
     } catch (e) {
-      // FIXME CGU [js-bookmark] why is this catched? error gets lost
       const objectType = ObjectFactory.get().getObjectType(PageConstructor);
-      $.log.info(`Unable to create and initialize ${objectType}. Cannot check for PageParam`);
+      let message = `Unable to create and initialize ${objectType}. Cannot check for PageParam. Error: ${e.message}`;
+      $.log.error(message);
+      this.session.sendLogRequest(message);
     } finally {
       if (page) {
         page.destroy();
@@ -115,10 +120,20 @@ export class PageResolver {
     }
   }
 
-  static get(): PageResolver {
-    if (!PageResolver._INSTANCE) {
-      PageResolver._INSTANCE = scout.create(PageResolver);
-    }
-    return PageResolver._INSTANCE;
+  /**
+   * Returns an instance of {@link PageResolver} for the given {@link Session}. If no instance is associated
+   * with the session yet, a new instance is created.
+   *
+   * @param session Optional session object. If this is omitted, the first session of the app is used.
+   * If the app does not have any active sessions (e.g. during unit testing), this argument is mandatory.
+   */
+  static get(session?: Session): PageResolver {
+    session = session || App.get().sessions[0];
+    scout.assertParameter('session', session);
+    return objects.getOrSetIfAbsent(PageResolver._INSTANCES, session, session => scout.create(PageResolver, {session}));
   }
+}
+
+export interface PageResolverModel extends ObjectModel<PageResolver> {
+  session: Session;
 }

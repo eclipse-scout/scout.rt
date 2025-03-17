@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,11 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AutoLeafPageWithNodesModel, InitModelOf, Page, scout, SomeRequired, TableRow} from '../../../index';
+import {AutoLeafPageWithNodesModel, InitModelOf, Page, scout, TableRow} from '../../../index';
 
 export class AutoLeafPageWithNodes extends Page implements AutoLeafPageWithNodesModel {
   declare model: AutoLeafPageWithNodesModel;
-  declare initModel: SomeRequired<this['model'], 'parent' | 'row'>;
 
   constructor() {
     super();
