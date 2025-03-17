@@ -146,6 +146,10 @@ export class Page extends TreeNode implements PageModel {
     this.trigger('destroy');
   }
 
+  setOverviewIconId(overviewIconId: string) {
+    this.overviewIconId = overviewIconId;
+  }
+
   protected _internalInitTable() {
     let tableModel = this.detailTable;
     if (tableModel) {
