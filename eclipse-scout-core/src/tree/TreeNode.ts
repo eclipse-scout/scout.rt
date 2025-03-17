@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -224,14 +224,6 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
     this._loadChildrenPromise = null;
   }
 
-  setText(text: string) {
-    this.text = text;
-  }
-
-  setHtmlEnabled(htmlEnabled: boolean) {
-    this.htmlEnabled = htmlEnabled;
-  }
-
   /**
    * This functions renders sets the $node and $text properties.
    *
@@ -260,12 +252,20 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
     this._renderIcon();
   }
 
+  setText(text: string) {
+    this.text = text;
+  }
+
   protected _renderText() {
     if (this.htmlEnabled) {
       this.$text.html(this.text);
     } else {
       this.$text.textOrNbsp(this.text);
     }
+  }
+
+  setChecked(checked: boolean) {
+    this.checked = checked;
   }
 
   /** @internal */
@@ -281,6 +281,10 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
       .toggleClass('checked', this.checked);
 
     aria.checked(this.$node, this.checked);
+  }
+
+  setIconId(iconId: string) {
+    this.iconId = iconId;
   }
 
   protected _renderIcon() {
@@ -406,5 +410,61 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
       cssClass += ' parent-of-selected';
     }
     return cssClass;
+  }
+
+  setCssClass(cssClass: string) {
+    this.cssClass = cssClass;
+  }
+
+  setEnabled(enabled: boolean) {
+    this.enabled = enabled;
+  }
+
+  setExpanded(expanded: boolean) {
+    this.expanded = expanded;
+  }
+
+  setExpandedLazy(expandedLazy: boolean) {
+    this.expandedLazy = expandedLazy;
+  }
+
+  setLazyExpandingEnabled(lazyExpandingEnabled: boolean) {
+    this.lazyExpandingEnabled = lazyExpandingEnabled;
+  }
+
+  setInitialExpanded(initialExpanded: boolean) {
+    this.initialExpanded = initialExpanded;
+  }
+
+  setLeaf(leaf: boolean) {
+    this.leaf = leaf;
+  }
+
+  setLevel(level: number) {
+    this.level = level;
+  }
+
+  setHtmlEnabled(htmlEnabled: boolean) {
+    this.htmlEnabled = htmlEnabled;
+  }
+
+  setParentNode(parentNode: TreeNode) {
+    this.parentNode = parentNode;
+  }
+
+  setTooltipText(tooltipText: string) {
+    this.tooltipText = tooltipText;
+  }
+
+  setBackgroundColor(color: string) {
+    this.backgroundColor = color;
+  }
+
+  setForegroundColor(color: string) {
+    this.foregroundColor = color;
+  }
+
+  setFont(font: string) {
+    this.font = font;
   }
 }
