@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -64,12 +64,13 @@ describe('JsFormAdapter', () => {
     };
   }
 
-  function createAdapterData(id: string, jsFormObjectType: string, jsFormModel?: FormModel) {
+  function createAdapterData(id: string, jsFormObjectType: string, jsFormModel?: FormModel, inputData?: any) {
     return {
       objectType: 'JsForm',
       id: id,
       jsFormObjectType: jsFormObjectType,
-      jsFormModel: jsFormModel
+      jsFormModel: jsFormModel,
+      inputData: inputData
     };
   }
 
@@ -183,5 +184,57 @@ describe('JsFormAdapter', () => {
     expect(desktop.getShownForms()[0]).toBe(localJsForm);
     expect(desktop.getShownForms()[1].id).toBe(js2Form.id);
     expect(desktop.getShownForms()[2].id).toBe(js3Form.id);
+  });
+
+  describe('handles input data and form model correctly', () => {
+
+    it('prefers input data over form model', () => {
+      registerAdapterData([createAdapterData('10', 'jsformspec.LoadingJsForm', {
+        data: {
+          attr: 'jsFormModelAttr'
+        }
+      }, {
+        attr: 'jsInputAttr'
+      })], session);
+      let formShowEvent = new RemoteEvent(desktopAdapter.id, 'formShow', {
+        form: '10',
+        displayParent: desktopAdapter.id
+      });
+      desktopAdapter.onModelAction(formShowEvent);
+      let form = session.getModelAdapter('10').widget as LoadingJsForm;
+      expect(form.data?.attr).toBe('jsInputAttr');
+    });
+
+    it('ignores input data if undefined', () => {
+      registerAdapterData([createAdapterData('10', 'jsformspec.LoadingJsForm', {
+        data: {
+          attr: 'jsFormModelAttr'
+        }
+      })], session);
+      let formShowEvent = new RemoteEvent(desktopAdapter.id, 'formShow', {
+        form: '10',
+        displayParent: desktopAdapter.id
+      });
+      desktopAdapter.onModelAction(formShowEvent);
+      let form = session.getModelAdapter('10').widget as LoadingJsForm;
+      expect(form.data?.attr).toBe('jsFormModelAttr');
+    });
+
+    it('accept null values', () => {
+      registerAdapterData([createAdapterData('10', 'jsformspec.LoadingJsForm', {
+        data: {
+          attr: 'jsFormModelAttr'
+        }
+      }, {
+        attr: null
+      })], session);
+      let formShowEvent = new RemoteEvent(desktopAdapter.id, 'formShow', {
+        form: '10',
+        displayParent: desktopAdapter.id
+      });
+      desktopAdapter.onModelAction(formShowEvent);
+      let form = session.getModelAdapter('10').widget as LoadingJsForm;
+      expect(form.data?.attr).toEqual(null);
+    });
   });
 });
