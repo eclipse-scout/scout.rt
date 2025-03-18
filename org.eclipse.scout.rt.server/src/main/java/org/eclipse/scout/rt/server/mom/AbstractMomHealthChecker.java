@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.mom;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.mom.api.AbstractMomTransport;
@@ -58,5 +59,10 @@ public abstract class AbstractMomHealthChecker extends AbstractHealthChecker {
       return false;
     }
     return execCheckHealth(implementor);
+  }
+
+  @Override
+  public boolean acceptCategory(HealthCheckCategoryId category) {
+    return Objects.equals(category, Readiness.ID);
   }
 }
