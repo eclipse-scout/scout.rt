@@ -11,6 +11,7 @@
 import {BaseDoEntity, Constructor, MaxRowCountContributionDo, PageParamDo} from '../index';
 
 export class BookmarkAdapter {
+
   pageParamsMatch(pageParam1: PageParamDo, pageParam2: PageParamDo) {
     if (!pageParam1 && !pageParam2) {
       return true;

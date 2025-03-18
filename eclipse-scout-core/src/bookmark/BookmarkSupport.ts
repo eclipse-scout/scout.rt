@@ -181,7 +181,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   // Note: this methode is called multiple times from bottom to top. On the first invocation, the childPage is not set,
   // but later calls pass the childPage for resolving the corresponding row of a table page.
   protected async _pageToBookmarkPage(page: Page, childPage?: Page): Promise<IBookmarkPageDo> {
-    if (!page) { // } || !page['bookmarkable']) { // FIXME bsh [js-bookmark] Add 'bookmarkable' flag
+    if (!page) {
       throw BookmarkSupport.ERROR_PAGE_NOT_BOOKMARKABLE;
     }
     if (!page.pageParam) {
@@ -191,7 +191,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     if (page.nodeType === Page.NodeType.NODES) {
       return scout.create(NodeBookmarkPageDo, {
         pageParam: page.pageParam,
-        displayText: page.text // FIXME bsh [js-bookmark] Delegate to bookmark adapter
+        displayText: page.getDisplayText()
       });
     }
 
@@ -218,7 +218,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
       return scout.create(TableBookmarkPageDo, {
         pageParam: page.pageParam,
-        displayText: page.text, // FIXME bsh [js-bookmark] Delegate to bookmark adapter
+        displayText: page.getDisplayText(),
         expandedChildRow: expandedChildRowIdentifier,
         selectedChildRows: selectedChildRowIdentifiers,
         searchFilterComplete: true,
