@@ -38,11 +38,7 @@ export const dataObjects = {
    * @returns the JSON string.
    */
   stringify(dataObject: any): string {
-    const serialized = dataObjects.serialize(dataObject);
-    if (!serialized) {
-      return null;
-    }
-    return JSON.stringify(serialized);
+    return JSON.stringify(dataObjects.serialize(dataObject));
   },
 
   /**
@@ -55,11 +51,11 @@ export const dataObjects = {
    * * Properties with value 'undefined' are not part of the result (skipped).
    *
    * @param dataObject The value to serialize. Can be primitives, arrays or objects/classes. Typically, a pojo or data object class extending {@link BaseDoEntity}.
-   * @returns the input serialized. Typically, a pojo.
+   * @returns the input serialized. Typically, a pojo. Returns the unaltered input if the input is falsy.
    */
   serialize(dataObject: any): any {
     if (!dataObject) {
-      return null;
+      return dataObject;
     }
     return scout.create(DataObjectSerializer).serialize(dataObject);
   },
@@ -72,9 +68,13 @@ export const dataObjects = {
    * @param json The JSON string to parse.
    * @param objectType The expected resulting data object.
    * @param deserializerModel Optional configuration object for the DataObjectDeserializer.
-   * @returns The deserialized data object instance.
+   * @returns The deserialized data object instance, if json is defined. Returns undefined if json is undefined. Returns null if json is null or the empty string.
    */
   parse: ((json: string, objectType?: ObjectType<BaseDoEntity | BaseDoEntity[]>, deserializerModel?: DataObjectDeserializerModel) => {
+    if (objects.isNullOrUndefined(json)) {
+      return json;
+    }
+    // check empty string
     if (!json) {
       return null;
     }
@@ -91,9 +91,13 @@ export const dataObjects = {
    * @param obj The pojo to deserialize.
    * @param objectType The expected resulting data object.
    * @param deserializerModel Optional configuration object for the DataObjectDeserializer.
-   * @returns The deserialized data object instance.
+   * @returns The deserialized data object instance. Returns undefined if obj is undefined. Returns null if obj is null or falsy.
    */
   deserialize: ((obj: any, objectType?: ObjectType<BaseDoEntity | BaseDoEntity[]>, deserializerModel?: DataObjectDeserializerModel) => {
+    if (objects.isNullOrUndefined(obj)) {
+      return obj;
+    }
+    // falsy values can't be deserialized
     if (!obj) {
       return null;
     }

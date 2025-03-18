@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {dataObjects, DoEntity} from '../../src/index';
+import {BaseDoEntity, dataObjects, DoEntity} from '../../src/index';
 
 describe('dataObjects', () => {
 
@@ -161,6 +161,81 @@ describe('dataObjects', () => {
 
       dataObjects.removeContribution(contrib2._type, doEntity);
       expect(doEntity._contributions).toBeUndefined();
+    });
+  });
+
+  describe('stringify', () => {
+    it('booleans', () => {
+      expect(dataObjects.stringify(true)).toBe('true');
+      expect(dataObjects.stringify(false)).toBe('false');
+    });
+    it('numbers', () => {
+      expect(dataObjects.stringify(-1)).toBe('-1');
+      expect(dataObjects.stringify(0)).toBe('0');
+      expect(dataObjects.stringify(NaN)).toBe('null');
+      expect(dataObjects.stringify(Infinity)).toBe('null');
+    });
+    it('strings', () => {
+      expect(dataObjects.stringify('truthy')).toBe('"truthy"');
+      expect(dataObjects.stringify('')).toBe('""');
+    });
+    it('null and undefined', () => {
+      expect(dataObjects.stringify(null)).toBe('null');
+      expect(dataObjects.stringify(undefined)).toBe(undefined);
+    });
+  });
+
+  describe('serialize', () => {
+    it('booleans', () => {
+      expect(dataObjects.serialize(true)).toBe(true);
+      expect(dataObjects.serialize(false)).toBe(false);
+    });
+    it('numbers', () => {
+      expect(dataObjects.serialize(-1)).toBe(-1);
+      expect(dataObjects.serialize(0)).toBe(0);
+      let serializedNan = dataObjects.serialize(NaN);
+      // self-comparison to assert NaN as NaN === NaN is always false
+      // eslint-disable-next-line no-self-compare
+      expect(serializedNan !== undefined && serializedNan !== serializedNan && isNaN(serializedNan)).toBeTrue();
+      expect(dataObjects.serialize(Infinity)).toBe(Infinity);
+    });
+    it('strings', () => {
+      expect(dataObjects.serialize('truthy')).toBe('truthy');
+      expect(dataObjects.serialize('')).toBe('');
+    });
+    it('null and undefined', () => {
+      expect(dataObjects.serialize(null)).toBe(null);
+      expect(dataObjects.serialize(undefined)).toBe(undefined);
+    });
+  });
+
+  describe('parse', () => {
+    it('strings', () => {
+      const parsedObject = dataObjects.parse('{' +
+        '  "value": 13' +
+        '}') as any;
+      expect(parsedObject).toBeInstanceOf(BaseDoEntity);
+      expect(parsedObject.value).toBe(13);
+      expect(dataObjects.parse('')).toBe(null);
+    });
+    it('null and undefined', () => {
+      expect(dataObjects.parse(null)).toBe(null);
+      expect(dataObjects.parse(undefined)).toBe(undefined);
+    });
+  });
+
+  describe('deserialize', () => {
+    it('strings', () => {
+      let deserializedObject = dataObjects.deserialize({
+        value: 13
+      }) as any;
+      expect(deserializedObject).toBeInstanceOf(BaseDoEntity);
+      expect(deserializedObject.value).toBe(13);
+      expect(dataObjects.deserialize('')).toEqual(null);
+    });
+    it('null and undefined', () => {
+      expect(dataObjects.deserialize(null)).toBe(null);
+      expect(dataObjects.deserialize(undefined)).toBe(undefined);
     });
   });
 });
