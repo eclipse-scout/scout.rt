@@ -8,9 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BaseDoEntity, bookmarks, Constructor, MaxRowCountContributionDo, objects, PageParamDo} from '../index';
+import {BaseDoEntity, Constructor, MaxRowCountContributionDo, objects, PageParamDo} from '../index';
 
 export class BookmarkAdapter {
+
   pageParamsMatch(pageParam1: PageParamDo, pageParam2: PageParamDo) {
     if (!pageParam1 && !pageParam2) {
       return true;
@@ -21,14 +22,8 @@ export class BookmarkAdapter {
 
     pageParam1 = this.normalizePageParam(pageParam1);
     pageParam2 = this.normalizePageParam(pageParam2);
-    if (objects.equalsRecursive(pageParam1, pageParam2)) {
-      return true;
-    }
 
-    // FIXME CGU [js-bookmark] remove this, maybe clean empty properties first (collections also?)
-    let normalizedJson1 = bookmarks.stringifyNormalized(pageParam1);
-    let normalizedJson2 = bookmarks.stringifyNormalized(pageParam2);
-    return normalizedJson1 === normalizedJson2;
+    return objects.equals(pageParam1, pageParam2);
   }
 
   normalizePageParam(pageParam: PageParamDo): PageParamDo {

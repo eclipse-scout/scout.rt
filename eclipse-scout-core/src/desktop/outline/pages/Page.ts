@@ -550,6 +550,13 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     return '';
   }
 
+  getDisplayText(): string {
+    if (this.htmlEnabled) {
+      return strings.plainText(this.text);
+    }
+    return this.text;
+  }
+
   /**
    * @returns a page parameter object used to pass to newly created child pages. Sets the parent
    *     to our outline instance and adds optional other properties. Typically, you'll pass an
