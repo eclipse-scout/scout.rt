@@ -109,8 +109,7 @@ public class Application {
     }
     catch (Exception e) {
       LOG.error("Fatal: Unable to start application", e);
-      shutdown();
-      throw new PlatformException("Fatal: Unable to start application", e);
+      shutdown(1);
     }
   }
 
@@ -419,16 +418,26 @@ public class Application {
     Runtime.getRuntime().addShutdownHook(shutdownHook);
   }
 
+  /***
+   * Shutdown application without calling {@link java.lang.System#exit(int)}.
+   */
   public void shutdown() {
+    shutdown(null);
+  }
+
+  /***
+   * Shutdown application and terminate the JVM using given {@code exitCode}.
+   */
+  public void shutdown(Integer exitCode) {
     try {
-      shutdownInternal();
+      shutdownInternal(exitCode);
     }
     catch (Exception e) {
       LOG.error("Error while shutting down application", e);
     }
   }
 
-  protected void shutdownInternal() throws Exception {
+  protected void shutdownInternal(Integer exitCode) throws Exception {
     Server server = m_server.getAndSet(null);
     if (server != null) {
       LOG.info("Shutting down application...");
@@ -440,6 +449,9 @@ public class Application {
         platform.stop();
       }
       LOG.info("Shutdown complete");
+      if (exitCode != null) {
+        System.exit(exitCode.intValue());
+      }
     }
     else {
       LOG.debug("Shutdown already in progress");
