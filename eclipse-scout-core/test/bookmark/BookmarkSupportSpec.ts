@@ -446,6 +446,7 @@ describe('BookmarkSupport', () => {
       expect(bookmarkDefinition.pagePath).toEqual([]);
       expect(bookmarkDefinition.bookmarkedPage).toBeInstanceOf(TableBookmarkPageDo);
       let bookmarkedPage = bookmarkDefinition.bookmarkedPage as TableBookmarkPageDo;
+      expect(bookmarkedPage.displayText).toBe('Table Page 1');
       expect(bookmarkedPage.pageParam).toBeInstanceOf(PageIdDummyPageParamDo);
       expect((bookmarkedPage.pageParam as PageIdDummyPageParamDo).pageId).toBe(SPEC_TABLE_PAGE_1_UUID);
       expect(bookmarkedPage.searchData).toBeUndefined();
@@ -550,12 +551,13 @@ describe('BookmarkSupport', () => {
       }).toPojo());
       let pagePathElement3 = bookmarkDefinition.pagePath[2] as NodeBookmarkPageDo;
       expect(pagePathElement3).toBeInstanceOf(NodeBookmarkPageDo);
-      // expect(pagePathElement3.displayText).toBe('Kiwi'); FIXME bsh [js-bookmark] Enable when implemented
+      expect(pagePathElement3.displayText).toBe('Kiwi');
       expect(pagePathElement3.pageParam).toBeInstanceOf(SpecPageParamDo);
       expect((pagePathElement3.pageParam as SpecPageParamDo).fooId).toBe(FRUIT_5_KEY);
 
       let bookmarkedPage = bookmarkDefinition.bookmarkedPage as TableBookmarkPageDo;
       expect(bookmarkedPage).toBeInstanceOf(TableBookmarkPageDo);
+      expect(bookmarkedPage.displayText).toBe('Table Page 2');
       expect(bookmarkedPage.pageParam).toBeInstanceOf(PageIdDummyPageParamDo);
       expect((bookmarkedPage.pageParam as PageIdDummyPageParamDo).pageId).toBe(SPEC_TABLE_PAGE_2_UUID);
       expect(bookmarkedPage.searchData).toBeInstanceOf(BaseDoEntity);
