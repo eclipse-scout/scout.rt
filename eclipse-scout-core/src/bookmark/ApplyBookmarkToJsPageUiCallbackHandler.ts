@@ -11,7 +11,7 @@ import {BookmarkDo, BookmarkSupport, Desktop, Page, scout, UiCallbackHandler, Ui
 
 export class ApplyBookmarkToJsPageUiCallbackHandler implements UiCallbackHandler {
 
-  handle(param: UiCallbackParam): JQuery.Promise<any> {
+  handle(param: UiCallbackParam): JQuery.Promise<void> {
     const desktop = scout.assertInstance(param.owner, Desktop);
     const bookmark = scout.assertInstance(param.data, BookmarkDo);
     const contextElements = scout.assertValue(param.contextElements, 'Missing context elements');

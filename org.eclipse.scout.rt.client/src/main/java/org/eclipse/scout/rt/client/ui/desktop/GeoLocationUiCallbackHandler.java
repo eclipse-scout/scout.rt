@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,10 +20,10 @@ import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 @ObjectType("GeoLocationUiCallbackHandler")
-public class GeoLocationUiCallbackHandler implements IUiCallbackHandler<GeoLocationResponseDo, Coordinates> {
+public class GeoLocationUiCallbackHandler implements IUiCallbackHandler<GeoLocationDo, Coordinates> {
 
   @Override
-  public Pair<Coordinates, ProcessingException> onCallbackDone(GeoLocationResponseDo data, HybridActionContextElements contextElements) {
+  public Pair<Coordinates, ProcessingException> onCallbackDone(GeoLocationDo data, HybridActionContextElements contextElements) {
     String latitude = data.getLatitude();
     String longitude = data.getLongitude();
 

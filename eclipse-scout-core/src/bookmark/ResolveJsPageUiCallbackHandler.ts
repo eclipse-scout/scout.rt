@@ -12,7 +12,7 @@ import $ from 'jquery';
 
 export class ResolveJsPageUiCallbackHandler implements UiCallbackHandler {
 
-  handle(param: UiCallbackParam): JQuery.Promise<any> {
+  handle(param: UiCallbackParam): JQuery.Promise<string> {
     const pageParam = scout.assertInstance(param.data, PageParamDo);
 
     let objectType = PageResolver.get().findObjectTypeForPageParam(pageParam);

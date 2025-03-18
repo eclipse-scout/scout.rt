@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
 import org.eclipse.scout.rt.client.ui.Coordinates;
 import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.client.ui.desktop.GeoLocationResponseDo;
+import org.eclipse.scout.rt.client.ui.desktop.GeoLocationDo;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridActionContextElements;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.uicallback.UiCallbacks.P_UiCallback;
@@ -60,12 +60,12 @@ public class UiCallbacksTest {
     UiCallbacks uiCallbacks = UiCallbacks.get();
     int numListeners = getNumDisposeListeners(desktop);
     int numCallbacks = getNumCallbacks(callbackId);
-    Future<GeoLocationResponseDo> future1 = uiCallbacks.send(desktop, "whatever", UiCallbacks.newInput().withCallbackId(callbackId));
-    Future<GeoLocationResponseDo> future2 = uiCallbacks.send(desktop, "whatever", UiCallbacks.newInput().withCallbackId(callbackId));
+    Future<GeoLocationDo> future1 = uiCallbacks.send(desktop, "whatever", UiCallbacks.newInput().withCallbackId(callbackId));
+    Future<GeoLocationDo> future2 = uiCallbacks.send(desktop, "whatever", UiCallbacks.newInput().withCallbackId(callbackId));
     assertEquals(numListeners + 2, getNumDisposeListeners(desktop));
     assertEquals(numCallbacks + 2, getNumCallbacks(callbackId));
 
-    GeoLocationResponseDo result = BEANS.get(GeoLocationResponseDo.class).withLatitude("100").withLongitude("100");
+    GeoLocationDo result = BEANS.get(GeoLocationDo.class).withLatitude("100").withLongitude("100");
     uiCallbacks.getUIFacade().fireCallbackDoneFromUI(callbackId, result, null);
 
     assertEquals(numListeners, getNumDisposeListeners(desktop));
@@ -92,7 +92,7 @@ public class UiCallbacksTest {
   public void testHandlerCanModifyResult() throws ExecutionException, InterruptedException {
     UiCallbacks uiCallbacks = UiCallbacks.get();
     String callbackId = "callbackId3";
-    GeoLocationResponseDo result = BEANS.get(GeoLocationResponseDo.class).withLatitude("100").withLongitude("100");
+    GeoLocationDo result = BEANS.get(GeoLocationDo.class).withLatitude("100").withLongitude("100");
     Future<String> future1 = uiCallbacks.send(IDesktop.CURRENT.get(), new IUiCallbackHandler<>() {
       @Override
       public String uiCallbackHandlerObjectType() {
@@ -113,9 +113,9 @@ public class UiCallbacksTest {
   public void testHandlerCanModifyErrorToResult() throws ExecutionException, InterruptedException {
     UiCallbacks uiCallbacks = UiCallbacks.get();
     String callbackId = "callbackId4";
-    Future<GeoLocationResponseDo> future1 = uiCallbacks.send(IDesktop.CURRENT.get(), new IUiCallbackHandler<>() {
+    Future<GeoLocationDo> future1 = uiCallbacks.send(IDesktop.CURRENT.get(), new IUiCallbackHandler<>() {
       @Override
-      public Pair<GeoLocationResponseDo, ? extends Throwable> onCallbackDone(Object data, HybridActionContextElements contextElements) {
+      public Pair<GeoLocationDo, ? extends Throwable> onCallbackDone(Object data, HybridActionContextElements contextElements) {
         throw new AssertionError(); // should not be called as fireCallbackFailed is invoked
       }
 
@@ -125,7 +125,7 @@ public class UiCallbacksTest {
       }
 
       @Override
-      public Pair<GeoLocationResponseDo, ? extends Throwable> onCallbackFailed(ProcessingException exception, String message, String code) {
+      public Pair<GeoLocationDo, ? extends Throwable> onCallbackFailed(ProcessingException exception, String message, String code) {
         assertEquals("err", message);
         assertEquals("1234", code);
         return ImmutablePair.of(null, null); // change error to null result
@@ -196,7 +196,7 @@ public class UiCallbacksTest {
     assertEquals(numListeners + 3, getNumDisposeListeners(desktop));
     assertEquals(bufferSize, UiCallbacks.get().m_eventBuffer.size()); // buffer has been sent and cleared
 
-    GeoLocationResponseDo result = BEANS.get(GeoLocationResponseDo.class).withLatitude("100").withLongitude("100");
+    GeoLocationDo result = BEANS.get(GeoLocationDo.class).withLatitude("100").withLongitude("100");
     UiCallbacks.get().getUIFacade().fireCallbackDoneFromUI(geoLocationCallbackId, result, null);
     assertEquals(numCallbacks, getNumCallbacks(geoLocationCallbackId));
     assertEquals(numListeners, getNumDisposeListeners(desktop));
@@ -250,7 +250,7 @@ public class UiCallbacksTest {
     int numListeners = getNumDisposeListeners(desktop);
     int numCallbacks = getNumCallbacks(callbackId);
 
-    Future<GeoLocationResponseDo> future = uiCallbacks.send(desktop, "whatever", UiCallbacks.newInput().withCallbackId(callbackId));
+    Future<GeoLocationDo> future = uiCallbacks.send(desktop, "whatever", UiCallbacks.newInput().withCallbackId(callbackId));
     assertEquals(numListeners + 1, getNumDisposeListeners(desktop));
     assertEquals(numCallbacks + 1, getNumCallbacks(callbackId));
 

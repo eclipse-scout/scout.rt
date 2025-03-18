@@ -11,7 +11,7 @@ import {ActivateBookmarkRequestDo, BookmarkSupport, Desktop, Outline, Page, scou
 
 export class OpenBookmarkInOutlineUiCallbackHandler implements UiCallbackHandler {
 
-  handle(param: UiCallbackParam): JQuery.Promise<any> {
+  handle(param: UiCallbackParam): JQuery.Promise<void> {
     const desktop = scout.assertInstance(param.owner, Desktop);
     const data = scout.assertInstance(param.data, ActivateBookmarkRequestDo);
     const contextElements = scout.assertValue(param.contextElements, 'Missing context elements');
@@ -25,6 +25,6 @@ export class OpenBookmarkInOutlineUiCallbackHandler implements UiCallbackHandler
       parentPage: parentPage,
       parentBookmarkPage: data.parentBookmarkPage,
       pagePath: data.pagePath
-    }).then(() => null);
+    });
   }
 }

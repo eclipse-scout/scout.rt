@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -536,7 +536,7 @@ public class AbstractDesktopTest {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
     desktop.getUIFacade().readyFromUI();
     Future<Coordinates> coordinatesFuture = desktop.requestGeolocation();
-    GeoLocationResponseDo browserResponse = BEANS.get(GeoLocationResponseDo.class).withLatitude("1.0").withLongitude("2.0");
+    GeoLocationDo browserResponse = BEANS.get(GeoLocationDo.class).withLatitude("1.0").withLongitude("2.0");
     UiCallbacks.get().getUIFacade().fireCallbackDoneFromUI("request-geolocation", browserResponse, null);
     Coordinates coordinates = coordinatesFuture.get();
     assertEquals("1.0", coordinates.getLatitude());

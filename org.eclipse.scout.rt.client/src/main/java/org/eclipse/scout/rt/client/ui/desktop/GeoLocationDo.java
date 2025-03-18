@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,8 +15,8 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
-@TypeName("scout.GeoLocationResponse")
-public class GeoLocationResponseDo extends DoEntity {
+@TypeName("scout.GeoLocation")
+public class GeoLocationDo extends DoEntity {
 
   public DoValue<String> latitude() {
     return doValue("latitude");
@@ -31,7 +31,7 @@ public class GeoLocationResponseDo extends DoEntity {
    * *************************************************************************/
 
   @Generated("DoConvenienceMethodsGenerator")
-  public GeoLocationResponseDo withLatitude(String latitude) {
+  public GeoLocationDo withLatitude(String latitude) {
     latitude().set(latitude);
     return this;
   }
@@ -42,7 +42,7 @@ public class GeoLocationResponseDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public GeoLocationResponseDo withLongitude(String longitude) {
+  public GeoLocationDo withLongitude(String longitude) {
     longitude().set(longitude);
     return this;
   }
