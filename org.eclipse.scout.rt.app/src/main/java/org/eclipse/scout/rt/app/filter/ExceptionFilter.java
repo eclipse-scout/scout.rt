@@ -21,8 +21,10 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import org.eclipse.jetty.io.QuietException;
 import org.eclipse.jetty.server.HttpChannel;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.CorrelationIdContextValueProvider;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -66,15 +68,7 @@ public class ExceptionFilter implements Filter {
    * @return {@code true} if the given Throwable is a {@link QuietException} or wraps one. Otherwise {@code false}.
    */
   protected boolean isCausedByQuietException(Throwable t) {
-    Throwable cur = t;
-    while (cur != null) {
-      // QuietException is a marker to use less verbosely logging
-      if (cur instanceof QuietException) {
-        return true;
-      }
-      cur = cur.getCause();
-    }
-    return false;
+    return BEANS.get(DefaultExceptionTranslator.class).throwableCausesAccept(t, e -> e instanceof QuietException);
   }
 
   @Override
