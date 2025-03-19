@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.util.HexUtility;
 /**
  * Typically used in combination with {@link MalwareScanner}
  * <p>
- * see {@link MimeTypes#verifyMagic(BinaryResource)} and https://en.wikipedia.org/wiki/List_of_file_signatures
+ * see {@link MimeTypes#verifyMagic(BinaryResource)} and <a href="https://en.wikipedia.org/wiki/List_of_file_signatures">List of file signatures</a>
  *
  * @since 10.x
  */
@@ -28,7 +28,7 @@ public interface IMimeMagic {
   IMimeMagic GIF = createMagic(0, "474946383761", "474946383961");
   IMimeMagic GZ = createMagic(0, "1f8b");
   IMimeMagic ICO = createMagic(0, "00000100");
-  IMimeMagic JPEG_JPG = createMagic(0, "ffd8ffdb", "ffd8ffe0", "ffd8ffe1", "ffd8ffe2", "ffd8ffee");
+  IMimeMagic JPEG_JPG = createMagic(0, "ffd8ff");
   IMimeMagic MKV = createMagic(0, "1a45dfa3");
   IMimeMagic MP3 = createMagic(0, "494433", "fff2", "fff3", "fffb");
   IMimeMagic MP4 = createMagic(4, "6674797069736f6d", "667479706D703432");
