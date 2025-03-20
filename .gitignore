@@ -29,13 +29,13 @@ classes
 /.idea/**/usage.statistics.xml
 /.idea/**/dataSources.local.xml
 /.idea/**/jarRepositories.xml
+/.idea/**/compiler.xml
 /.idea/**/shelf
 /.idea/sonarlint
 /.idea/**/dataSources/
 /.idea/httpRequests/
 /.idea/libraries/
 /.idea/artifacts/
-*.iml
 
 # Maven #
 target/
