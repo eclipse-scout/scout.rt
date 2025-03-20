@@ -2,4 +2,3 @@ node_modules
 dist
 test-results
 node
-!*.iml
