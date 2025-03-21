@@ -4,7 +4,6 @@
 package ${package}.data.person;
 
 import jakarta.annotation.Generated;
-
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
@@ -20,8 +19,8 @@ public class PersonDo extends DoEntity {
     return doValue("lastName");
   }
 
-  public DoValue<String> personId() {
-    return doValue("personId");
+  public DoValue<String> id() {
+    return doValue("id");
   }
 
   public DoValue<Integer> salary() {
@@ -59,14 +58,14 @@ public class PersonDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public PersonDo withPersonId(String personId) {
-    personId().set(personId);
+  public PersonDo withId(String id) {
+    id().set(id);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public String getPersonId() {
-    return personId().get();
+  public String getId() {
+    return id().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")

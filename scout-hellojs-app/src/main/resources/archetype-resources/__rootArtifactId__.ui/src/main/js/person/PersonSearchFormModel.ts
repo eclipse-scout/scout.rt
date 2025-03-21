@@ -41,6 +41,10 @@ export default (): FormModel => ({
   }
 });
 
+/* **************************************************************************
+* GENERATED WIDGET MAPS
+* **************************************************************************/
+
 export type PersonSearchFormWidgetMap = {
   'MainBox': GroupBox;
   'DetailBox': GroupBox;

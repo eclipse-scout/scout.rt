@@ -1,5 +1,5 @@
 import {scout} from '@eclipse-scout/core';
-import {Person, PersonForm} from '../../../main/js';
+import {PersonDo, PersonForm} from '../../../main/js';
 
 describe('PersonForm', () => {
   let session: SandboxSession;
@@ -16,12 +16,12 @@ describe('PersonForm', () => {
   });
 
   describe('open with person', () => {
-    it('shows firstName and LastName', done => {
+    it('shows firstName and lastName', done => {
       let personForm = scout.create(PersonForm, {
         parent: session.desktop
       });
 
-      let person = scout.create(Person, {
+      let person = scout.create(PersonDo, {
         firstName: 'first',
         lastName: 'last'
       });
@@ -35,7 +35,7 @@ describe('PersonForm', () => {
           personForm.close();
         })
         .catch(fail)
-        .always(() => done());
+        .always(done);
     });
   });
 });

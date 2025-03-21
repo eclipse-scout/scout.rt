@@ -1,22 +1,23 @@
 import PersonFormModel, {PersonFormWidgetMap} from './PersonFormModel';
-import {Form, FormModel} from '@eclipse-scout/core';
-import {Person, PersonRepository} from '../index';
+import {Form, FormModel, scout} from '@eclipse-scout/core';
+import {PersonDo, PersonRestClient} from '../index';
 
 export class PersonForm extends Form {
-  declare data: Person;
+  declare data: PersonDo;
   declare widgetMap: PersonFormWidgetMap;
 
   protected override _jsonModel(): FormModel {
     return PersonFormModel();
   }
 
-  override exportData(): Person {
-    let person = this.data;
-    person.setFirstName(this.widget('FirstNameField').value);
-    person.setLastName(this.widget('LastNameField').value);
-    person.setSalary(this.widget('SalaryField').value);
-    person.setExternal(this.widget('ExternalField').value);
-    return person;
+  override exportData(): PersonDo {
+    return scout.create(PersonDo, {
+      ...this.data,
+      firstName: this.widget('FirstNameField').value,
+      lastName: this.widget('LastNameField').value,
+      salary: this.widget('SalaryField').value,
+      external: this.widget('ExternalField').value
+    });
   }
 
   override importData() {
@@ -27,16 +28,17 @@ export class PersonForm extends Form {
     this.widget('ExternalField').setValue(person.external);
   }
 
-  protected override _save(data: Person): JQuery.Promise<void> {
-    return (data.personId ? PersonRepository.get().store(data) : PersonRepository.get().create(data))
+  protected override _save(data: PersonDo): JQuery.Promise<void> {
+    let rest = scout.create(PersonRestClient);
+    return (data.id ? rest.store(data) : rest.create(data))
       .then(() => undefined);
   }
 
-  protected override _load(): JQuery.Promise<Person> {
-    if (this.data.personId) {
+  protected override _load(): JQuery.Promise<PersonDo> {
+    if (this.data.id) {
       this.setTitle(this.session.text('EditPerson'));
       // refresh data from server
-      return PersonRepository.get().load(this.data.personId)
+      return scout.create(PersonRestClient).load(this.data.id)
         .then(p => {
           this.setSubTitle(`${p.firstName} ${p.lastName}`);
           return p;

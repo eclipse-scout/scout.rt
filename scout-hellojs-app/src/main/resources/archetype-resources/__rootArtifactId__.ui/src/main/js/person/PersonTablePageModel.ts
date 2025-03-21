@@ -1,5 +1,6 @@
 import {AggregateTableControl, BooleanColumn, Column, FormTableControl, icons, Menu, NumberColumn, PageWithTable, PageWithTableModel, Table} from '@eclipse-scout/core';
 import {PersonSearchForm} from '../index';
+import {PersonSearchFormWidgetMap} from './PersonSearchFormModel';
 
 export default (): PageWithTableModel => ({
   objectType: PageWithTable,
@@ -80,6 +81,15 @@ export default (): PageWithTableModel => ({
   }
 });
 
+/* **************************************************************************
+* GENERATED WIDGET MAPS
+* **************************************************************************/
+
+export class PersonTablePageTable extends Table {
+  declare widgetMap: PersonTablePageTableWidgetMap;
+  declare columnMap: PersonTablePageTableColumnMap;
+}
+
 export type PersonTablePageTableWidgetMap = {
   'EditPersonMenu': Menu;
   'CreatePersonMenu': Menu;
@@ -87,17 +97,12 @@ export type PersonTablePageTableWidgetMap = {
   'SearchFormTableControl': FormTableControl;
   'SearchForm': PersonSearchForm;
   'AggregateTableControl': AggregateTableControl;
-};
+} & PersonSearchFormWidgetMap;
 
 export type PersonTablePageTableColumnMap = {
-  'PersonIdColumn': Column;
   'FirstNameColumn': Column;
   'LastNameColumn': Column;
   'SalaryColumn': NumberColumn;
   'ExternalColumn': BooleanColumn;
+  'PersonIdColumn': Column;
 };
-
-export class PersonTablePageTable extends Table {
-  declare columnMap: PersonTablePageTableColumnMap;
-  declare widgetMap: PersonTablePageTableWidgetMap;
-}

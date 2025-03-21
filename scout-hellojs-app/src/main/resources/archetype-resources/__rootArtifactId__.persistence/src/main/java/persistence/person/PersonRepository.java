@@ -70,7 +70,7 @@ public class PersonRepository extends AbstractRepository<Person, PersonRecord, P
     String newPersonId = UUID.randomUUID().toString();
 
     fromDoToRecord(person, newPersonRecord)
-        .setPersonId(newPersonId);
+      .setPersonId(newPersonId);
     newPersonRecord.store();
     return fromRecordToDo(newPersonRecord, person);
   }
@@ -85,10 +85,10 @@ public class PersonRepository extends AbstractRepository<Person, PersonRecord, P
 
   @Override
   protected DoEntityBeanMappings<PersonDo, PersonRecord> mappings() {
-    return new DoEntityBeanMappings<PersonDo, PersonRecord>().with(PersonDo::personId, PersonRecord::getPersonId)
-        .with(PersonDo::lastName, PersonRecord::getLastName, PersonRecord::setLastName)
-        .with(PersonDo::firstName, PersonRecord::getFirstName, PersonRecord::setFirstName)
-        .with(PersonDo::salary, PersonRecord::getSalary, PersonRecord::setSalary)
-        .with(PersonDo::external, PersonRecord::getExternal, PersonRecord::setExternal);
+    return new DoEntityBeanMappings<PersonDo, PersonRecord>().with(PersonDo::id, PersonRecord::getPersonId)
+      .with(PersonDo::lastName, PersonRecord::getLastName, PersonRecord::setLastName)
+      .with(PersonDo::firstName, PersonRecord::getFirstName, PersonRecord::setFirstName)
+      .with(PersonDo::salary, PersonRecord::getSalary, PersonRecord::setSalary)
+      .with(PersonDo::external, PersonRecord::getExternal, PersonRecord::setExternal);
   }
 }

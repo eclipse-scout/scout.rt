@@ -1,5 +1,5 @@
 import {EventHandler, InitModelOf, MessageBox, MessageBoxes, ObjectOrModel, PageWithTable, PageWithTableModel, scout, Table, TableRow} from '@eclipse-scout/core';
-import {DataChangeEvent, Person, PersonForm, PersonRepository, PersonRestriction, PersonSearchFormData} from '../index';
+import {DataChangeEvent, PersonDo, PersonForm, PersonRestClient, PersonRestrictionDo} from '../index';
 import PersonTablePageModel, {PersonTablePageTable} from './PersonTablePageModel';
 
 export class PersonTablePage extends PageWithTable {
@@ -36,40 +36,33 @@ export class PersonTablePage extends PageWithTable {
   }
 
   protected _onDataChange(event: DataChangeEvent) {
-    if (event.dataType === Person.ENTITY_TYPE) {
+    if (event.dataType === PersonRestClient.DATA_TYPE) {
       this.reloadPage();
     }
   }
 
-  protected override _loadTableData(searchFilter: PersonSearchFormData): JQuery.Promise<Person[]> {
-    let restriction = scout.create(PersonRestriction, searchFilter, {
-      ensureUniqueId: false
+  protected override _loadTableData(restriction: PersonRestrictionDo): JQuery.Promise<PersonDo[]> {
+    return scout.create(PersonRestClient).list(this._withMaxRowCountContribution(restriction));
+  }
+
+  protected override _transformTableDataToTableRows(tableData: PersonDo[]): ObjectOrModel<TableRowWithPerson>[] {
+    return tableData.map(person => {
+      return {
+        person: person,
+        cells: [
+          person.firstName,
+          person.lastName,
+          person.salary,
+          person.external,
+          person.id
+        ]
+      };
     });
-    return PersonRepository.get().list(this._withMaxRowCountContribution(restriction));
   }
 
-  protected override _transformTableDataToTableRows(tableData: Person[]): ObjectOrModel<TableRowWithPerson>[] {
-    return tableData
-      .map(person => {
-        return {
-          person: person,
-          cells: [
-            person.firstName,
-            person.lastName,
-            person.salary,
-            person.external,
-            person.personId
-          ]
-        };
-      });
-  }
-
-  protected _getSelectedPerson(): Person {
+  protected _getSelectedPerson(): PersonDo {
     let selection = this.detailTable.selectedRow() as TableRowWithPerson;
-    if (selection) {
-      return selection.person;
-    }
-    return null;
+    return selection?.person;
   }
 
   protected _createPersonForm(): PersonForm {
@@ -89,21 +82,19 @@ export class PersonTablePage extends PageWithTable {
     MessageBoxes.openYesNo(this.session.desktop, this.session.text('DeleteConfirmationTextNoItemList'))
       .then(button => {
         if (button === MessageBox.Buttons.YES) {
-          PersonRepository.get().remove(this._getSelectedPerson().personId);
+          scout.create(PersonRestClient).remove(this._getSelectedPerson().id);
         }
       });
   }
 
   protected _onCreatePersonMenuAction() {
     let personForm = this._createPersonForm();
-    let emptyPerson = scout.create(Person, {}, {
-      ensureUniqueId: false
-    });
+    let emptyPerson = scout.create(PersonDo);
     personForm.setData(emptyPerson);
     personForm.open();
   }
 }
 
 export interface TableRowWithPerson extends TableRow {
-  person: Person;
+  person: PersonDo;
 }
