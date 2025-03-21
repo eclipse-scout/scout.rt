@@ -9,8 +9,8 @@
  */
 
 import {
-  access, AjaxError, AppEventMap, aria, codes, config, Desktop, Device, ErrorHandler, ErrorInfo, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging, numbers,
-  ObjectFactory, objects, scout, Session, SessionModel, texts, webstorage, Widget
+  access, AjaxError, AjaxSettings, AppEventMap, aria, codes, config, Desktop, Device, ErrorHandler, ErrorInfo, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging,
+  numbers, ObjectFactory, objects, scout, Session, SessionModel, texts, webstorage, Widget
 } from './index';
 import $ from 'jquery';
 
@@ -255,8 +255,7 @@ export class App extends EventEmitter {
    *               - a {@link JQuery.jqXHR} for requests executed with {@link $.ajax}. The parameters `textStatus`, `errorThrown` and `requestOptions` are only set in this case.
    *               - a {@link JsonErrorResponseContainer} if a successful response contained a {@link JsonErrorResponse} which was transformed to an error (e.g. using {@link App.handleJsonError}).
    */
-  protected _bootstrapFail(options: AppBootstrapOptions, vararg: AjaxError | JQuery.jqXHR | JsonErrorResponseContainer, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string,
-    requestOptions?: JQuery.AjaxSettings): JQuery.Promise<any> {
+  protected _bootstrapFail(options: AppBootstrapOptions, vararg: AjaxError | JQuery.jqXHR | JsonErrorResponseContainer, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string, requestOptions?: AjaxSettings): JQuery.Promise<any> {
     $.log.isInfoEnabled() && $.log.info('App bootstrap failed');
 
     // If one of the bootstrap ajax call fails due to a session timeout, the index.html is probably loaded from cache without asking the server for its validity.
@@ -285,7 +284,7 @@ export class App extends EventEmitter {
     return $.rejectedPromise(...args);
   }
 
-  protected _analyzeBootstrapError(vararg: AjaxError | JQuery.jqXHR | JsonErrorResponseContainer, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string, requestOptions?: JQuery.AjaxSettings) {
+  protected _analyzeBootstrapError(vararg: AjaxError | JQuery.jqXHR | JsonErrorResponseContainer, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string, requestOptions?: AjaxSettings) {
     let ajaxError: AjaxError;
     let jsonError: JsonErrorResponseContainer;
     if (vararg instanceof AjaxError) {
@@ -488,7 +487,7 @@ export class App extends EventEmitter {
    *
    * Note: This will affect every ajax call, so use it with care! See also the advice on https://api.jquery.com/jquery.ajaxsetup/.
    */
-  protected _ajaxDefaults(): JQuery.AjaxSettings {
+  protected _ajaxDefaults(): AjaxSettings {
     return {
       beforeSend: this._beforeAjaxCall.bind(this)
     };
@@ -499,7 +498,7 @@ export class App extends EventEmitter {
    *
    * Maybe overridden to set custom headers or to execute other code which should run before an ajax call.
    */
-  protected _beforeAjaxCall(request: JQuery.jqXHR, settings: JQuery.AjaxSettings) {
+  protected _beforeAjaxCall(request: JQuery.jqXHR, settings: AjaxSettings) {
     request.setRequestHeader('X-Scout-Correlation-Id', numbers.correlationId());
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // explicitly add here because jQuery only adds it automatically if it is no crossDomain request
     if (this.sessions[0] && this.sessions[0].ready) {

@@ -7,13 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Box, Device, InitModelOf, LoginAppModel, strings, TextMap} from '../index';
+import {AjaxSettings, Box, Device, InitModelOf, LoginAppModel, strings, TextMap} from '../index';
 import $ from 'jquery';
 
 export class LoginBox extends Box {
   declare model: LoginAppModel;
 
-  ajaxOptions: JQuery.AjaxSettings;
+  ajaxOptions: AjaxSettings;
   authUrl: string;
   onPostDoneFunc: (data: Record<string, any>) => void;
   redirectUrl: string;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {RemoteRequest, RemoteResponse, Session} from '../index';
+import {AjaxSettings, RemoteRequest, RemoteResponse, Session} from '../index';
 
 export class ResponseQueue {
   session: Session;
@@ -170,7 +170,7 @@ export class ResponseQueue {
     request['#ACK'] = this.lastProcessedSequenceNo;
   }
 
-  prepareHttpRequest(ajaxOptions: JQuery.AjaxSettings) {
+  prepareHttpRequest(ajaxOptions: AjaxSettings) {
     ajaxOptions.headers = ajaxOptions.headers || {};
     ajaxOptions.headers['X-Scout-#ACK'] = this.lastProcessedSequenceNo + '';
   }

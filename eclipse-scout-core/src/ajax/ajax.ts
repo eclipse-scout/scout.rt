@@ -23,7 +23,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  get(url: string, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  get(url: string, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       method: 'GET'
@@ -40,7 +40,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  post(url: string, data?: any, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  post(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       method: 'POST',
@@ -58,7 +58,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  put(url: string, data?: any, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  put(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       method: 'PUT',
@@ -75,7 +75,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  remove(url: string, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  remove(url: string, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       method: 'DELETE'
@@ -91,7 +91,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  getJson(url: string, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  getJson(url: string, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       method: 'GET'
@@ -108,7 +108,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  postJson(url: string, data?: any, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  postJson(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     if (data && typeof data !== 'string') {
       data = JSON.stringify(data);
     }
@@ -129,7 +129,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  putJson(url: string, data?: any, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  putJson(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     if (data && typeof data !== 'string') {
       data = JSON.stringify(data);
     }
@@ -149,7 +149,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  removeJson(url: string, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  removeJson(url: string, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       method: 'DELETE'
@@ -166,7 +166,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  callJson(options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  callJson(options?: UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     return ajax.createCallJson(options, model).call();
   },
 
@@ -178,7 +178,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  call(options: JQuery.UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  call(options: UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     return ajax.createCall(options, model).call();
   },
 
@@ -190,7 +190,7 @@ export const ajax = {
    * @param model additional properties for the {@link AjaxCall}.
    * @returns the prepared Ajax call object. Execute it with the call() function.
    */
-  createCallJson(options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): AjaxCall {
+  createCallJson(options?: UrlAjaxSettings, model?: AjaxCallModel): AjaxCall {
     let opts = $.extend({}, {
       method: 'POST',
       dataType: 'json',
@@ -206,8 +206,8 @@ export const ajax = {
    * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
    * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or null.
    */
-  getDataObject<TDoOut extends BaseDoEntity>(url: string, options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
-    const opts: JQuery.UrlAjaxSettings = $.extend({}, {
+  getDataObject<TDoOut extends BaseDoEntity>(url: string, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
+    const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'GET'
     }, options);
@@ -222,8 +222,8 @@ export const ajax = {
    * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
    * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or null.
    */
-  postDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(url: string, dataObject?: TDoIn, options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
-    const opts: JQuery.UrlAjaxSettings = $.extend({}, {
+  postDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(url: string, dataObject?: TDoIn, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
+    const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'POST'
     }, options);
@@ -238,8 +238,8 @@ export const ajax = {
    * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
    * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or null.
    */
-  putDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(url: string, dataObject?: TDoIn, options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
-    const opts: JQuery.UrlAjaxSettings = $.extend({}, {
+  putDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(url: string, dataObject?: TDoIn, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
+    const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'PUT'
     }, options);
@@ -254,8 +254,8 @@ export const ajax = {
    * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
    * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or null.
    */
-  removeDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(url: string, dataObject?: TDoIn, options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
-    const opts: JQuery.UrlAjaxSettings = $.extend({}, {
+  removeDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(url: string, dataObject?: TDoIn, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
+    const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'DELETE'
     }, options);
@@ -269,7 +269,7 @@ export const ajax = {
    * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
    * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or null.
    */
-  callDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(options: JQuery.UrlAjaxSettings, dataObject?: TDoIn, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
+  callDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(options: UrlAjaxSettings, dataObject?: TDoIn, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
     return ajax.createCallDataObject(options, dataObject, model).call();
   },
 
@@ -281,9 +281,9 @@ export const ajax = {
    * @param model Properties for the {@link AjaxCall} which is created.
    * @returns an {@link AjaxCall} which sends the given data object, pre-configured using the given options and model. The result of the call be converted to a dataobject automatically.
    */
-  createCallDataObject(options: JQuery.UrlAjaxSettings, dataObject?: DoEntity | void, model?: AjaxCallModel): AjaxCall {
+  createCallDataObject(options: UrlAjaxSettings, dataObject?: DoEntity | void, model?: AjaxCallModel): AjaxCall {
     const json = dataObjects.stringify(dataObject);
-    const opts: JQuery.UrlAjaxSettings = $.extend({}, {
+    const opts: AjaxSettings = $.extend({}, {
       converters: {
         'text json': data => dataObjects.parse(data)
       },
@@ -299,7 +299,7 @@ export const ajax = {
    * @param model additional properties for the {@link AjaxCall}.
    * @returns the prepared Ajax call object. Execute it with the call() function.
    */
-  createCall(options: JQuery.UrlAjaxSettings, model?: AjaxCallModel): AjaxCall {
+  createCall(options: UrlAjaxSettings, model?: AjaxCallModel): AjaxCall {
     const ajaxOptions = $.extend({}, {cache: false}, options);
     const ajaxCallModel = $.extend(true, {}, {ajaxOptions}, model);
 
@@ -308,3 +308,12 @@ export const ajax = {
     });
   }
 };
+
+/**
+ * Like JQuery.AjaxSettings without 'type' property. Use 'method' instead.
+ */
+export type AjaxSettings = Omit<JQuery.AjaxSettings, 'type'>;
+/**
+ * Like JQuery.UrlAjaxSettings without 'type' property. Use 'method' instead.
+ */
+export type UrlAjaxSettings = AjaxSettings & { url: string };

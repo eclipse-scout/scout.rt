@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxError, Call, CallModel, InitModelOf, SomeRequired, URL} from '../index';
+import {AjaxError, Call, CallModel, InitModelOf, SomeRequired, URL, UrlAjaxSettings} from '../index';
 import $ from 'jquery';
 
 export class AjaxCall extends Call implements AjaxCallModel {
@@ -15,7 +15,7 @@ export class AjaxCall extends Call implements AjaxCallModel {
   declare pendingCall: JQuery.jqXHR;
   declare initModel: SomeRequired<this['model'], 'ajaxOptions'>;
 
-  ajaxOptions: JQuery.UrlAjaxSettings;
+  ajaxOptions: UrlAjaxSettings;
 
   constructor() {
     super();
@@ -45,7 +45,7 @@ export class AjaxCall extends Call implements AjaxCallModel {
         alwaysLast: ['retry']
       });
     }
-    $.log.isTraceEnabled() && $.log.trace(this.logPrefix + (this.callCounter === 1 ? '--- ' : '') + this.ajaxOptions.type + ' "' + this.ajaxOptions.url + '"' + (this.callCounter === 1 ? ' ---' : ''));
+    $.log.isTraceEnabled() && $.log.trace(this.logPrefix + (this.callCounter === 1 ? '--- ' : '') + this.ajaxOptions.method + ' "' + this.ajaxOptions.url + '"' + (this.callCounter === 1 ? ' ---' : ''));
 
     return $.ajax(this.ajaxOptions);
   }
@@ -114,5 +114,5 @@ export interface AjaxCallModel extends CallModel {
   /**
    * Options for the jquery ajax call. At least the {@link JQuery.UrlAjaxSettings.url} is required.
    */
-  ajaxOptions?: JQuery.UrlAjaxSettings;
+  ajaxOptions?: UrlAjaxSettings;
 }

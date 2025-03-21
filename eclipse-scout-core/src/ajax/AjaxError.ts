@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import $ from 'jquery';
-import {ErrorDo, InitModelOf, objects} from '../index';
+import {AjaxSettings, ErrorDo, InitModelOf, objects} from '../index';
 
 export interface AjaxErrorModel {
   jqXHR: JQuery.jqXHR;
   textStatus: JQuery.Ajax.ErrorTextStatus;
   errorThrown: string;
-  requestOptions: JQuery.AjaxSettings;
+  requestOptions: AjaxSettings;
 }
 
 export class AjaxError implements AjaxErrorModel {
@@ -24,7 +24,7 @@ export class AjaxError implements AjaxErrorModel {
   textStatus: JQuery.Ajax.ErrorTextStatus;
   errorDo: ErrorDo;
   errorThrown: string;
-  requestOptions: JQuery.AjaxSettings;
+  requestOptions: AjaxSettings;
 
   constructor(model: InitModelOf<AjaxError>) {
     this.jqXHR = null;

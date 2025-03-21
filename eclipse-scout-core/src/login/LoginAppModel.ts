@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AppModel} from '../index';
+import {AjaxSettings, AppModel} from '../index';
 
 export interface LoginAppModel extends AppModel {
   /**
@@ -38,7 +38,7 @@ export interface LoginAppModel extends AppModel {
   /**
    * The ajax options used for the authentication request. By default, only the type is set to POST, but it will be extended with the url and the data.
    */
-  ajaxOptions?: JQuery.AjaxSettings;
+  ajaxOptions?: AjaxSettings;
 
   /**
    * The url to redirect to after a successful login. If not specified the {@link LoginBox.prepareRedirectUrl} function is used to compute the redirectUrl.

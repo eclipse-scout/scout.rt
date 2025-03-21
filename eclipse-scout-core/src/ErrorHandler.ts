@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxError, App, arrays, DoEntity, icons, InitModelOf, LogLevel, MessageBox, MessageBoxActionEvent, ModelOf, NullLogger, NullWidget, numbers, ObjectModel, objects, ObjectWithType, scout, Session, Status, StatusSeverity, strings, texts
+  AjaxError, AjaxSettings, App, arrays, DoEntity, icons, InitModelOf, LogLevel, MessageBox, MessageBoxActionEvent, ModelOf, NullLogger, NullWidget, numbers, ObjectModel, objects, ObjectWithType, scout, Session, Status, StatusSeverity,
+  strings, texts
 } from './index';
 import $ from 'jquery';
 import * as sourcemappedStacktrace from 'sourcemapped-stacktrace';
@@ -290,7 +291,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
 
   protected _analyzeAjaxError(errorInfo: ErrorInfo, ...args: any[]) {
     let error = errorInfo.error;
-    let jqXHR: JQuery.jqXHR, errorThrown: string, requestOptions: JQuery.AjaxSettings, errorDo: ErrorDo = null;
+    let jqXHR: JQuery.jqXHR, errorThrown: string, requestOptions: AjaxSettings, errorDo: ErrorDo = null;
     if (error instanceof AjaxError) {
       // Scout Ajax Error
       jqXHR = error.jqXHR;
@@ -342,8 +343,8 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     return jqXHR.status ? strings.join(' ', jqXHR.status + '', errorThrown) : 'Connection error';
   }
 
-  formatAjaxRequest(requestOptions: JQuery.AjaxSettings): string {
-    return requestOptions ? strings.join(' ', requestOptions.method || requestOptions.type, requestOptions.url) : '';
+  formatAjaxRequest(requestOptions: AjaxSettings): string {
+    return requestOptions ? strings.join(' ', requestOptions.method, requestOptions.url) : '';
   }
 
   protected _severityToLogLevel(severity: string): LogLevel {
