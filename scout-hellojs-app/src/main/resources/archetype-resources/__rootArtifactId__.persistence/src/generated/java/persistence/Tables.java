@@ -13,11 +13,11 @@ import ${package}.persistence.tables.Person;
 /**
  * Convenience access to all tables in Schema.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
 
-    /**
-     * The table <code>Schema.person</code>.
-     */
-    public static final Person PERSON = Person.PERSON;
+  /**
+   * The table <code>Schema.person</code>.
+   */
+  public static final Person PERSON = Person.PERSON;
 }
