@@ -208,6 +208,10 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     this.trigger('destroy');
   }
 
+  setOverviewIconId(overviewIconId: string) {
+    this.overviewIconId = overviewIconId;
+  }
+
   protected _createDetailMenuContributors(): ObjectOrType<PageDetailMenuContributor>[] {
     return [ParentTablePageMenuContributor];
   }
@@ -617,6 +621,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     if (pageId) {
       return scout.create(PageIdDummyPageParamDo, {pageId});
     }
+    // FIXME cgu [js-bookmark] throw error if no uuid was set, here or elsewhere? if here this code needs to be moved to bookmarkadapter, not every scout project needs params
     return null;
   }
 
