@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, arrays, dates, FormField, Menu, ObjectFactory, objects, Point, scout, Widget} from '../../src/index';
+import {Action, arrays, dataObjects, dates, FormField, Menu, ObjectFactory, objects, Point, scout, Widget} from '../../src/index';
 
 describe('objects', () => {
 
@@ -974,14 +974,20 @@ describe('objects', () => {
       expect(objects.isEmpty({})).toBe(true);
       expect(objects.isEmpty(undefined)).toBe(true);
       expect(objects.isEmpty(null)).toBe(true);
+      expect(objects.isEmpty([])).toBe(true);
+      expect(objects.isEmpty(new Map())).toBe(true);
+      expect(objects.isEmpty(new Set())).toBe(true);
 
       expect(objects.isEmpty({test: 'test'})).toBe(false);
       expect(objects.isEmpty({test: 42})).toBe(false);
+      expect(objects.isEmpty([1, 2])).toBe(false);
+      expect(objects.isEmpty(new Map([['a', 1], ['b', 2]]))).toBe(false);
+      expect(objects.isEmpty(new Set([1, 2, 3]))).toBe(false);
+      expect(objects.isEmpty(new Date())).toBe(false);
 
       expect(objects.isEmpty('test')).toBe(undefined);
       expect(objects.isEmpty(42)).toBe(undefined);
-      expect(objects.isEmpty(['test'])).toBe(undefined);
-      expect(objects.isEmpty([42])).toBe(undefined);
+      expect(objects.isEmpty(false)).toBe(undefined);
     });
   });
 
@@ -1037,11 +1043,50 @@ describe('objects', () => {
       expect(objects.removeEmptyProperties({a: undefined})).toEqual({});
       expect(objects.removeEmptyProperties({a: []})).toEqual({});
       expect(objects.removeEmptyProperties({a: {}})).toEqual({});
+      expect(objects.removeEmptyProperties({a: new Map()})).toEqual({});
+      expect(objects.removeEmptyProperties({a: new Set()})).toEqual({});
 
       expect(objects.removeEmptyProperties({a: ''})).toEqual({a: ''});
       expect(objects.removeEmptyProperties({a: ' '})).toEqual({a: ' '});
       expect(objects.removeEmptyProperties({a: 0})).toEqual({a: 0});
       expect(objects.removeEmptyProperties({a: {b: {}}})).toEqual({a: {b: {}}}); // no recursive clean
+
+      // non-empty Map/Set is not removed
+      let map = new Map([['a', 1], ['b', 2]]);
+      expect(objects.removeEmptyProperties({a: map})).toEqual({a: map});
+      let set = new Set([1, 2, 3]);
+      expect(objects.removeEmptyProperties({a: set})).toEqual({a: set});
+
+      // Date is not removed
+      let date = new Date();
+      expect(objects.removeEmptyProperties({a: date})).toEqual({a: date});
+    });
+
+    it('sets empty properties in DataObjects to undefined', () => {
+      let map = new Map([['a', 1]]);
+      let set = new Set([1, 2, 3]);
+      let date = new Date();
+      const dataObject = dataObjects.deserialize({
+        a: null,
+        b: undefined,
+        c: [],
+        d: [1],
+        e: date,
+        f: new Map(),
+        g: map,
+        h: new Set(),
+        i: set
+      }) as any;
+      objects.removeEmptyProperties(dataObject);
+      expect(dataObject.a).toBeUndefined();
+      expect(dataObject.b).toBeUndefined();
+      expect(dataObject.c).toBeUndefined();
+      expect(dataObject.d).toEqual([1]);
+      expect(dataObject.e).toBe(date);
+      expect(dataObject.f).toBeUndefined();
+      expect(dataObject.g).toBe(map);
+      expect(dataObject.h).toBeUndefined();
+      expect(dataObject.i).toBe(set);
     });
   });
 

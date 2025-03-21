@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, dates, ObjectFactory, Primitive, scout, Widget} from '../index';
+import {arrays, BaseDoEntity, dates, ObjectFactory, Primitive, scout, Widget} from '../index';
 import $ from 'jquery';
 
 const CONST_REGEX = /\${const:([^}]*)}/;
@@ -462,9 +462,6 @@ export const objects = {
     if (objects.isNullOrUndefined(obj)) {
       return true;
     }
-    if (objects.isArray(obj)) {
-      return arrays.empty(obj);
-    }
     return objects.isEmpty(obj);
   },
 
@@ -704,26 +701,48 @@ export const objects = {
     if (!objects.isObject(object)) {
       throw new Error('Not an object: ' + object);
     }
+
+    // Attributes in DOs should not be removed but set to undefined so that they look the same as a new instance. Important when comparing DOs.
+    const removeAttribute = object instanceof BaseDoEntity ? (key: string) => {
+      object[key] = undefined;
+    } : (key: string) => delete object[key];
+
     Object.keys(object).forEach(key => {
       if (objects.isNullOrUndefinedOrEmpty(object[key])) {
-        delete object[key];
+        removeAttribute(key);
       }
     });
     return object;
   },
 
   /**
-   * @returns
-   *  - true if the obj is empty, null or undefined
-   *  - false if the obj is not empty
-   *  - undefined if the obj is not an object
+   * Empty if the input is:
+   * * null
+   * * undefined
+   * * an empty array
+   * * an empty Map
+   * * an empty Set
+   * * or an object without keys (except Date which is never empty).
+   * @returns true if obj is empty, false if obj is not empty and undefined if obj is no object (e.g. a primitive).
    */
   isEmpty(obj: any): boolean | undefined {
     if (objects.isNullOrUndefined(obj)) {
       return true;
     }
+    if (objects.isArray(obj)) {
+      return arrays.empty(obj);
+    }
     if (!objects.isObject(obj)) {
       return;
+    }
+    if (obj instanceof Date) {
+      return false;
+    }
+    if (obj instanceof Map) {
+      return obj.size === 0;
+    }
+    if (obj instanceof Set) {
+      return obj.size === 0;
     }
     return Object.keys(obj).length === 0;
   },
