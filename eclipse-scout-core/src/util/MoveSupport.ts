@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -219,13 +219,7 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
     this._moveData.cloneBounds = this._moveData.cloneBounds.moveTo(this._moveData.cloneStartOffset.add(distance));
 
     // Scale down clone if necessary
-    let scale = 1;
-    if (this._moveData.cloneBounds.width > this.maxCloneSize) {
-      scale = this.maxCloneSize / this._moveData.cloneBounds.width;
-    }
-    if (this._moveData.cloneBounds.height > this.maxCloneSize) {
-      scale = Math.min(this.maxCloneSize / this._moveData.cloneBounds.height, scale);
-    }
+    let scale = this._calculateScale();
     this._moveData.$clone.css({
       'top': this._moveData.cloneBounds.y,
       'left': this._moveData.cloneBounds.x,
@@ -239,6 +233,17 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
     }
 
     this._drag(event);
+  }
+
+  protected _calculateScale(): number {
+    let scale = 1;
+    if (this._moveData.cloneBounds.width > this.maxCloneSize) {
+      scale = this.maxCloneSize / this._moveData.cloneBounds.width;
+    }
+    if (this._moveData.cloneBounds.height > this.maxCloneSize) {
+      scale = Math.min(this.maxCloneSize / this._moveData.cloneBounds.height, scale);
+    }
+    return scale;
   }
 
   /**
