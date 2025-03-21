@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, ChildModelOf, dataObjects, ErrorHandler, EventHandler, Form, icons, objects, Outline, Page, PageResolver, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, Tree,
-  TreeAdapter, TreeNode, TreeNodeModel, UuidPool
+  App, ChildModelOf, dataObjects, ErrorHandler, EventHandler, Form, icons, objects, Outline, Page, PageModel, PageParamDo, PageResolver, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent,
+  TableRowsInsertedEvent, TreeAdapter, TreeNodeModel, UuidPool
 } from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
@@ -261,66 +261,69 @@ export class OutlineAdapter extends TreeAdapter {
     this.modelAdapter._linkNodeWithRowLater(page);
   }
 
-  protected static override _createTreeNodeRemote(this: Tree & { modelAdapter: TreeAdapter; _createTreeNodeOrig }, nodeModel: TreeNodeModel) {
+  protected static override _createTreeNodeRemote(this: Outline & { modelAdapter: OutlineAdapter; _createTreeNodeOrig }, pageModel: PageModel) {
     // nodeType is only used for Scout Classic pages
-    if (!this.modelAdapter || !nodeModel?.nodeType) {
-      return this._createTreeNodeOrig(nodeModel);
+    if (!this.modelAdapter || !pageModel?.nodeType) {
+      return this._createTreeNodeOrig(pageModel);
     }
 
-    nodeModel = (this.modelAdapter as OutlineAdapter)._initNodeModel(nodeModel);
-
-    if (nodeModel.nodeType === 'jsPage') {
+    pageModel = this.modelAdapter._initNodeModel(pageModel);
+    if (pageModel.nodeType === 'jsPage') {
       try {
-        nodeModel = OutlineAdapter._createJsPage.call(this, nodeModel);
+        pageModel = this.modelAdapter._initJsPageModel(pageModel);
       } catch (error) {
         // Create a broken page instead of showing a fatal error so the application can still be used.
-        nodeModel.jsPageObjectType = Page;
-        nodeModel.text = this.session.text('ui.CouldNotCreateElement');
-        nodeModel.iconId = icons.EXCLAMATION_MARK_CIRCLE;
-        nodeModel.cssClass = 'broken';
+        pageModel.jsPageObjectType = Page;
+        pageModel.text = this.session.text('ui.CouldNotCreateElement');
+        pageModel.iconId = icons.EXCLAMATION_MARK_CIRCLE;
+        pageModel.overviewIconId = pageModel.iconId;
+        pageModel.cssClass = 'broken';
         scout.create(ErrorHandler, {displayError: false, sendError: true}).handle(error);
       }
     }
 
-    let page = this._createTreeNodeOrig(nodeModel);
+    let page = this._createTreeNodeOrig(pageModel);
     if (page.classId && page.uuid && page.classId !== page.uuid) {
       throw new Error(`ClassId and uuid don't match for page ${page.objectType}. ClassId: ${page.classId}, Uuid: ${page.uuid}`);
     }
     return page;
   }
 
-  protected static _createJsPage(this: Tree, nodeModel: TreeNodeModel) {
-    let pageParam = dataObjects.deserialize(nodeModel.pageParam);
-    nodeModel.jsPageObjectType = nodeModel.jsPageObjectType || PageResolver.get(this.session).findObjectTypeForPageParam(pageParam);
-    if (!nodeModel.jsPageObjectType) {
+  protected _initJsPageModel(pageModel: PageModel): PageModel {
+    let pageParam = dataObjects.deserialize(pageModel.pageParam);
+    pageModel.jsPageObjectType = pageModel.jsPageObjectType || PageResolver.get(this.session).findObjectTypeForPageParam(pageParam);
+    if (!pageModel.jsPageObjectType) {
       if (pageParam) {
         throw new Error('Could not resolve page objectType for pageParam ' + JSON.stringify(pageParam));
       }
       throw new Error('jsPageObjectType not set');
     }
 
-    let jsPageModel = {
-      id: nodeModel.id,
-      parent: nodeModel.parent,
-      owner: nodeModel.owner,
-      objectType: nodeModel.jsPageObjectType,
-      // FIXME CGU [js-bookmark] I would prefer to deserialize it here instead of Page#set_pageParam so it behaves the same as for JsFormAdapter,
-      //                         but in that case Page.pageParamType would be ignored. Do we really need @pageParam?
-      // FIXME bsh [js-bookmark] Check which properties we want to explicitly inherit form the Java page
-      pageParam,
-      classId: nodeModel.classId,
-      modelClass: nodeModel.modelClass,
-      text: nodeModel.text || undefined // because summary column might come from Java parent page
-    };
-
-    if (nodeModel.jsPageModel) {
-      delete nodeModel.jsPageModel.objectType; // objectType from Page model should not be used as nodeModel.jsPageObjectType specifies the object already
-      let deserializedJsPageModel = dataObjects.deserialize(nodeModel.jsPageModel, null, {createPojoIfDoIsUnknown: true});
+    let jsPageModel = this._createJsPageModel(pageModel, pageParam);
+    if (pageModel.jsPageModel) {
+      delete pageModel.jsPageModel.objectType; // objectType from Page model should not be used as pageModel.jsPageObjectType specifies the object already
+      let deserializedJsPageModel = dataObjects.deserialize(pageModel.jsPageModel, null, {createPojoIfDoIsUnknown: true});
       delete deserializedJsPageModel._type; // _type should not be written to Page if present
       jsPageModel = $.extend({}, deserializedJsPageModel, jsPageModel);
     }
 
     return jsPageModel;
+  }
+
+  protected _createJsPageModel(pageModel: PageModel, pageParam: PageParamDo): PageModel {
+    return {
+      id: pageModel.id,
+      parent: pageModel.parent,
+      owner: pageModel.owner,
+      objectType: pageModel.jsPageObjectType,
+      // FIXME CGU [js-bookmark] I would prefer to deserialize it here instead of Page#set_pageParam so it behaves the same as for JsFormAdapter,
+      //                         but in that case Page.pageParamType would be ignored. Do we really need @pageParam?
+      // FIXME bsh [js-bookmark] Check which properties we want to explicitly inherit form the Java page
+      pageParam,
+      classId: pageModel.classId,
+      modelClass: pageModel.modelClass,
+      text: pageModel.text || undefined // because summary column might come from Java parent page
+    };
   }
 
   protected static getSearchFilterForPageRemote(this: Outline & { modelAdapter: OutlineAdapter; getSearchFilterForPageOrig: typeof Outline.prototype.getSearchFilterForPage }, page: Page & { remote?: true }) {
@@ -336,8 +339,8 @@ export class OutlineAdapter extends TreeAdapter {
     return this.getSearchFilterForPageOrig(page);
   }
 
-  protected override _initNodeModel(nodeModel?: TreeNodeModel): ChildModelOf<TreeNode> {
-    const model = super._initNodeModel(nodeModel);
+  protected override _initNodeModel(nodeModel?: TreeNodeModel): ChildModelOf<Page> {
+    const model = super._initNodeModel(nodeModel) as ChildModelOf<Page>;
     // This marker is only set for pages that represent a remote page on the UI server. It prevents menus from being inherited
     // from the parent table page, because in the case of Java pages that is already done on the server.
     model.remote = true;
@@ -347,6 +350,8 @@ export class OutlineAdapter extends TreeAdapter {
   protected static _updateDetailFormMenus(this: Page & { _updateDetailFormMenusOrig; remote?: true }) {
     const detailForm = this.detailForm;
     if (detailForm && (!detailForm.modelAdapter || !this.remote)) {
+      // Update menus if either the detail form or the page is written in JavaScript
+      // -> menus are updated for JS pages with a Java form, Java Pages with a JS form and JS pages with a JS form
       this._updateDetailFormMenusOrig();
     }
   }
@@ -354,6 +359,8 @@ export class OutlineAdapter extends TreeAdapter {
   protected static _updateDetailTableMenus(this: Page & { _updateDetailTableMenusOrig; remote?: true }) {
     const detailTable = this.detailTable;
     if (detailTable && (!detailTable.modelAdapter || !this.remote)) {
+      // Update menus if either the detail table or the page is written in JavaScript
+      // -> menus are updated for JS pages with a Java table, Java Pages with a JS table and JS pages with a JS table
       this._updateDetailTableMenusOrig();
     }
   }

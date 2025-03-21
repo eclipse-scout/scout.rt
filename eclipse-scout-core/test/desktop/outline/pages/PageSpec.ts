@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Form, GroupBox, Menu, MenuOwner, Outline, Page, PageDetailMenuContributor, PageParamDo, PageWithNodes, PageWithTable, ParentTablePageMenuContributor, scout, Table, Widget} from '../../../../src';
+import {arrays, Form, GroupBox, Menu, MenuOwner, Outline, Page, PageDetailMenuContributor, PageParamDo, PageWithNodes, PageWithTable, ParentTablePageMenuContributor, scout, Table, TableRow, Widget} from '../../../../src';
 import {MenuSpecHelper, OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing';
 import {ChildModelOf} from '../../../../src/scout';
 
@@ -133,7 +133,7 @@ describe('Page', () => {
         }
       ]
     }, null);
-    parentPage.createChildPage = row => scout.create(Page, {
+    parentPage._createChildPage = row => scout.create(Page, {
       parent: outline,
       detailTable: {
         objectType: Table,
@@ -472,6 +472,10 @@ describe('Page', () => {
       super._initDetailTable(table);
       expect(table).toBeInstanceOf(Table);
       this.numTableCreated++;
+    }
+
+    override _createChildPage(row: TableRow): Page {
+      return super._createChildPage(row);
     }
   }
 });

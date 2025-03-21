@@ -108,7 +108,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
   }
 
   protected _createChildPageInternal(row: TableRow): Page {
-    let childPage = this._createChildPage(row);
+    let childPage = this.createChildPage(row);
     if (!childPage && this.alwaysCreateChildPage) {
       childPage = this.createDefaultChildPage(row);
     }
@@ -117,6 +117,13 @@ export class PageWithTable extends Page implements PageWithTableModel {
       childPage = childPage.updatePageFromTableRow(row);
     }
     return childPage;
+  }
+
+  /**
+   * @deprecated use {@link _createChildPage} instead
+   */
+  createChildPage(row: TableRow): Page {
+    return this._createChildPage(row);
   }
 
   /**

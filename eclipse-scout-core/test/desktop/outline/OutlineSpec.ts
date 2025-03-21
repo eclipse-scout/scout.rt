@@ -676,7 +676,7 @@ describe('Outline', () => {
 
     class SpecPageWithTable extends PageWithTable {
 
-      override createChildPage(row) {
+      protected override _createChildPage(row) {
         return scout.create(SpecPageWithNodes, {
           parent: this.outline
         });

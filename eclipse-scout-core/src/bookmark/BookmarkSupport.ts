@@ -140,7 +140,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   protected async _createBookmark(page?: Page): Promise<BookmarkDo> {
-    let outline = page?.getOutline() || this.desktop.outline;
+    let outline = page?.outline || this.desktop.outline;
     let outlineId = outline?.getObjectUuidBuilder().buildId();
     if (!outlineId) {
       throw BookmarkSupport.ERROR_MISSING_OUTLINE;
@@ -245,7 +245,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     // Remote
     return HybridManager.get(this.session).callActionAndWait('ExportSearchData', undefined,
       scout.create(HybridActionContextElements)
-        .withElement('page', HybridActionContextElement.of(page.getOutline(), page))
+        .withElement('page', HybridActionContextElement.of(page.outline, page))
     );
   }
 
@@ -305,12 +305,12 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   protected async _openBookmarkLocal(request: ActivateBookmarkRequest): Promise<void> {
     // Check if we are already on the correct outline
-    let outline = request.parentOutline || request.parentPage?.getOutline();
+    let outline = request.parentOutline || request.parentPage?.outline;
     if (!outline || !outline.visible || !outline.enabled) {
       throw BookmarkSupport.ERROR_OUTLINE_NOT_FOUND;
     }
     this.desktop.setOutline(outline);
-    if (request.parentPage && request.parentPage.getOutline() !== outline) {
+    if (request.parentPage && request.parentPage.outline !== outline) {
       throw BookmarkSupport.ERROR_PAGE_WRONG_OUTLINE;
     }
 
@@ -384,7 +384,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   protected _revealPage(page: Page) {
-    let outline = page.getOutline();
+    let outline = page.outline;
 
     // expand restored path, expand the target page if it is not a table page
     let expandLeaf = page.nodeType !== Page.NodeType.TABLE;
@@ -396,7 +396,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   protected _expandPath(page: Page, expandLeaf: boolean) {
-    let outline = page.getOutline();
+    let outline = page.outline;
     if (expandLeaf) {
       outline.expandNode(page, {renderAnimated: false});
     }

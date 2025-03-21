@@ -636,26 +636,6 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   }
 
   /**
-   * Ensures the given parameter is a {@link Page}.
-   *
-   * If it is a page, it will be returned as it is.
-   * Otherwise {@link scout.create} is used to create the page.
-   *
-   */
-  protected _ensurePage(pageOrModel: ObjectOrChildModel<Page>): Page {
-    if (!pageOrModel) {
-      return null;
-    }
-    if (pageOrModel instanceof Page) {
-      return pageOrModel;
-    }
-    return scout.create({
-      ...pageOrModel,
-      parent: this.outline
-    }) as Page;
-  }
-
-  /**
    * Triggers a property change for a single property.
    */
   triggerPropertyChange<T>(propertyName: string, oldValue: T, newValue: T): PropertyChangeEvent<T, this> {
