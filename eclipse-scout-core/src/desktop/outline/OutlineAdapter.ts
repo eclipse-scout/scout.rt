@@ -270,19 +270,27 @@ export class OutlineAdapter extends TreeAdapter {
     pageModel = this.modelAdapter._initNodeModel(pageModel);
     if (pageModel.nodeType === 'jsPage') {
       try {
-        pageModel = this.modelAdapter._initJsPageModel(pageModel);
+        return this.modelAdapter._createJsPage(pageModel, this._createTreeNodeOrig.bind(this));
       } catch (error) {
         // Create a broken page instead of showing a fatal error so the application can still be used.
-        pageModel.jsPageObjectType = Page;
-        pageModel.text = this.session.text('ui.CouldNotCreateElement');
-        pageModel.iconId = icons.EXCLAMATION_MARK_CIRCLE;
-        pageModel.overviewIconId = pageModel.iconId;
-        pageModel.cssClass = 'broken';
+        pageModel = {
+          ...this.modelAdapter._createJsPageModel(pageModel, null),
+          objectType: Page,
+          text: this.session.text('ui.CouldNotCreateElement'),
+          iconId: icons.EXCLAMATION_MARK_CIRCLE,
+          overviewIconId: pageModel.iconId,
+          cssClass: 'broken'
+        };
         scout.create(ErrorHandler, {displayError: false, sendError: true}).handle(error);
       }
     }
 
-    let page = this._createTreeNodeOrig(pageModel);
+    return this._createTreeNodeOrig(pageModel);
+  }
+
+  protected _createJsPage(pageModel: PageModel, createPage: (pageModel: PageModel) => Page): Page {
+    pageModel = this._initJsPageModel(pageModel);
+    let page = createPage(pageModel);
     if (page.classId && page.uuid && page.classId !== page.uuid) {
       throw new Error(`ClassId and uuid don't match for page ${page.objectType}. ClassId: ${page.classId}, Uuid: ${page.uuid}`);
     }
