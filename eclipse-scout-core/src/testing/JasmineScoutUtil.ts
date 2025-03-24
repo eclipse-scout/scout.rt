@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, DoEntity, HybridActionEvent, HybridManager, scout, Session, strings, Widget} from '../index';
+import {AbstractConstructor, arrays, AutoLeafPageWithNodes, Constructor, DoEntity, HybridActionEvent, HybridManager, ObjectFactory, Page, PageWithNodes, PageWithTable, scout, Session, strings, TypeDescriptor, Widget} from '../index';
 import $ from 'jquery';
 import 'jasmine-ajax';
 
@@ -130,5 +130,80 @@ export const JasmineScoutUtil = {
         });
       }
     });
+  },
+
+  /**
+   * Asserts that every page has an uuid and a specific {@link PageParamDo}, if required.
+   */
+  assertPageCompleteness(options?: PageCompletenessOptions) {
+    options = options || {};
+    let pagesNotRequiringUuid: Set<Constructor<Page> | AbstractConstructor<Page>> = new Set([PageWithNodes, PageWithTable, AutoLeafPageWithNodes, ...options.pagesNotRequiringUuid || []]);
+    let pagesNotRequiringPageParam: Set<Constructor<Page> | AbstractConstructor<Page>> = new Set([PageWithNodes, PageWithTable, AutoLeafPageWithNodes, ...options.pagesNotRequiringPageParam || []]);
+    let missingUuids = new Set();
+    let missingPageParams = new Set();
+    let completePages = new Set();
+
+    for (const PageConstructor of ObjectFactory.get().getSubClassesOf(Page)) {
+      let pageType = ObjectFactory.get().getObjectType(PageConstructor);
+      if (options.namespace && !pageType.startsWith(options.namespace)) {
+        continue;
+      }
+
+      let page = new PageConstructor();
+      page.minimalInit();
+
+      // Assert uuid
+      if (!page.uuid && !pagesNotRequiringUuid.has(PageConstructor)) {
+        missingUuids.add(pageType);
+      }
+
+      // Assert pageParam
+      let pageParamType = `${pageType}ParamDo`;
+      let PageParam = TypeDescriptor.resolveType(pageParamType);
+      if (!PageParam && !pagesNotRequiringPageParam.has(PageConstructor)) {
+        missingPageParams.add(pageType);
+      }
+
+      if (!missingUuids.has(pageType) && !missingPageParams.has(pageType)) {
+        completePages.add(pageType);
+      }
+    }
+
+    if (missingUuids.size > 0) {
+      fail(`Found page(s) without a uuid. Please ensure every page has a uuid.
+      ${Array.from(missingUuids).join('\n')}`);
+    }
+    if (missingPageParams.size > 0) {
+      fail(`Found page(s) without a pageParam.
+If a pageParam is required, create one and add \`declare pageParam: NewPageParam\` to your page.
+Otherwise, add the page to the ignore list (\`options.pagesNotRequiringPageParam\`).
+${Array.from(missingPageParams).join('\n')}`);
+    }
+
+    if (completePages.size > 0) {
+      console.log(`PageCompleteness: the following pages are complete: ${Array.from(completePages).join(', ')}`);
+    }
+
+    if (completePages.size === 0 && missingUuids.size === 0 && missingPageParams.size === 0) {
+      console.log('PageCompleteness: no pages found in this module.');
+    }
+
+    // A test without an expectation logs a warning
+    expect(true).toBe(true);
   }
+};
+
+export type PageCompletenessOptions = {
+  /**
+   * Contains the pages that do not require an uuid.
+   */
+  pagesNotRequiringUuid?: (Constructor<Page> | AbstractConstructor<Page>)[];
+  /**
+   * Contains the pages that do not require a pageParam, e.g. because the page does not have any parameters.
+   */
+  pagesNotRequiringPageParam?: (Constructor<Page> | AbstractConstructor<Page>)[];
+  /**
+   * If specified, only the pages in this namespace are considered.
+   */
+  namespace?: string;
 };
