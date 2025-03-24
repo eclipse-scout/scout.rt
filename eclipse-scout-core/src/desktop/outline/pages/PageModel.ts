@@ -10,6 +10,9 @@
 import {Form, ObjectOrChildModel, ObjectOrModel, ObjectOrType, ObjectWithUuidModel, Outline, Page, PageDetailMenuContributor, PageParamDo, Table, TreeNode, TreeNodeModel} from '../../../index';
 
 export interface PageModel extends TreeNodeModel, ObjectWithUuidModel<TreeNode> {
+  /**
+   * The {@link PageParamDo} containing all parameters that are required to create the page.
+   */
   pageParam?: PageParamDo;
   parent?: Outline;
   childNodes?: ObjectOrModel<Page>[];

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, Constructor, InitModelOf, ObjectFactory, ObjectModel, objects, ObjectWithType, Outline, Page, PageIdDummyPageParamDo, PageParamDo, scout, Session, strings} from '../../../index';
+import {App, Constructor, InitModelOf, ObjectFactory, ObjectModel, objects, ObjectWithType, Page, PageIdDummyPageParamDo, PageParamDo, scout, Session, strings, TypeDescriptor} from '../../../index';
 
 export class PageResolver implements PageResolverModel, ObjectWithType {
   declare model: PageResolverModel;
@@ -43,7 +43,7 @@ export class PageResolver implements PageResolverModel, ObjectWithType {
     const pageParamObjectType = ObjectFactory.get().getObjectType(pageParamConstructor);
     if (pageParamObjectType?.endsWith('PageParamDo')) {
       const pageName = strings.removeSuffix(pageParamObjectType, 'ParamDo');
-      const pageExists = !!ObjectFactory.get().resolveTypedObjectType(pageName);
+      const pageExists = !!TypeDescriptor.resolveType(pageName);
       if (pageExists) {
         return pageName;
       }
@@ -82,28 +82,23 @@ export class PageResolver implements PageResolverModel, ObjectWithType {
       return null;
     }
     const allPageClasses = ObjectFactory.get().getSubClassesOf(Page);
-    const parent = scout.create(Outline, {parent: this.session.desktop});
-    try {
-      for (let candidate of allPageClasses) {
-        const objectType = this._getObjectTypeForPageIfParamMatches(parent, pageParam, candidate);
-        if (objectType) {
-          return objectType;
-        }
+    for (let candidate of allPageClasses) {
+      const objectType = this._getObjectTypeForPageIfParamMatches(pageParam, candidate);
+      if (objectType) {
+        return objectType;
       }
-      return null;
-    } finally {
-      parent.destroy();
     }
+    return null;
   }
 
-  protected _getObjectTypeForPageIfParamMatches(parent: Outline, param: PageIdDummyPageParamDo, PageConstructor: Constructor<Page>): string {
+  protected _getObjectTypeForPageIfParamMatches(param: PageIdDummyPageParamDo, PageConstructor: Constructor<Page>): string {
     let page: Page = null;
     try {
       page = new PageConstructor();
       if (page.pageParamType !== PageIdDummyPageParamDo && page.pageParamType !== null) {
         return null;
       }
-      page.minimalInit(parent);
+      page.minimalInit();
       if (page.matchesPageParam(param)) {
         return ObjectFactory.get().getObjectType(page.constructor as Constructor);
       }
