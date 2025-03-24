@@ -24,7 +24,8 @@ export class OpenBookmarkInOutlineUiCallbackHandler implements UiCallbackHandler
       parentOutline: parentOutline,
       parentPage: parentPage,
       parentBookmarkPage: data.parentBookmarkPage,
-      pagePath: data.pagePath
+      pagePath: data.pagePath,
+      applyParentBookmarkPage: true
     });
   }
 }

@@ -254,6 +254,11 @@ describe('BookmarkSupport', () => {
       });
     }
 
+    protected override _initDetailTable(table: Table) {
+      super._initDetailTable(table);
+      this.getSearchForm().on('search reset', event => table.reload(Table.ReloadReason.SEARCH));
+    }
+
     protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
       let data = [
         {key: FRUIT_1_KEY, name: 'Apple', amount: 42},
@@ -325,6 +330,11 @@ describe('BookmarkSupport', () => {
           }
         }]
       });
+    }
+
+    protected override _initDetailTable(table: Table) {
+      super._initDetailTable(table);
+      this.getSearchForm().on('search reset', event => table.reload(Table.ReloadReason.SEARCH));
     }
 
     protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
@@ -449,7 +459,7 @@ describe('BookmarkSupport', () => {
       expect(bookmarkedPage.displayText).toBe('Table Page 1');
       expect(bookmarkedPage.pageParam).toBeInstanceOf(PageIdDummyPageParamDo);
       expect((bookmarkedPage.pageParam as PageIdDummyPageParamDo).pageId).toBe(SPEC_TABLE_PAGE_1_UUID);
-      expect(bookmarkedPage.searchData).toBeUndefined();
+      expect(bookmarkedPage.searchData).toBe(null);
     });
 
     it('can create a bookmark for a nested node page', async () => {
@@ -682,12 +692,11 @@ describe('BookmarkSupport', () => {
       expect(page2).toBeInstanceOf(SpecNodePage4);
       expect(page2.childrenLoaded).toBe(true);
       expect(page2.expanded).toBe(true);
-      expect(page2.childNodes.length).toBe(2);
-      // expect(page2.childNodes.filter(node => node.filterAccepted).length).toBe(1);
+      expect(page2.childNodes.length).toBe(2); // node pages don't store user filter
+      expect(page2.detailTable).toBe(null); // not created yet
+      desktop.outline.selectNode(page2);
+      expect(page2.detailTable).toBeInstanceOf(Table); // created lazily
       expect(page2.detailTable.rows.length).toEqual(2);
-      // expect(page2.detailTable.filteredRows().length).toEqual(1);
-      // expect(page2.detailTable.getFilter(TableTextUserFilter.TYPE)).toBeInstanceOf(TableTextUserFilter);
-      // expect((page2.detailTable.getFilter(TableTextUserFilter.TYPE) as TableTextUserFilter).text).toBe('ble');
 
       let page3 = page2.parentNode as SpecTablePage2;
       expect(page3).toBeInstanceOf(SpecTablePage2);
@@ -705,6 +714,10 @@ describe('BookmarkSupport', () => {
       expect(page4.childrenLoaded).toBe(true);
       expect(page4.expanded).toBe(true);
       expect(page4.childNodes.length).toBe(3);
+      expect(page4.detailTable).toBe(null); // not created yet
+      desktop.outline.selectNode(page4);
+      expect(page4.detailTable).toBeInstanceOf(Table); // created lazily
+      expect(page4.detailTable.rows.length).toEqual(3);
 
       expect(page4.parentNode).toBeUndefined();
     });
@@ -888,6 +901,76 @@ describe('BookmarkSupport', () => {
 
       expect(page6.parentNode).toBeUndefined();
     });
+
+    it('can open and reset an already loaded page', async () => {
+      // Activate bookmark
+      let bookmark = scout.create(BookmarkDo, {
+        definition: scout.create(OutlineBookmarkDefinitionDo, {
+          outlineId: SPEC_OUTLINE_2_UUID,
+          bookmarkedPage: scout.create(TableBookmarkPageDo, {
+            pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_TABLE_PAGE_2_UUID}),
+            displayText: 'Table Page 2',
+            searchFilterComplete: true,
+            searchData: scout.create(SpecSearchDo, {text: 'apple'})
+          }),
+          pagePath: [
+            scout.create(NodeBookmarkPageDo, {
+              pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_NODE_PAGE_3_UUID}),
+              displayText: 'Node Page 3'
+            })
+          ]
+        })
+      });
+      await BookmarkSupport.get(session).openBookmarkInOutline(bookmark);
+
+      // Assert new state of desktop
+      expect(desktop.outline).toBeInstanceOf(Outline);
+      expect(desktop.outline.id).toBe(SPEC_OUTLINE_2_ID);
+      expect(desktop.outline.selectedNode()).toBeInstanceOf(SpecTablePage2);
+
+      let page1 = desktop.outline.selectedNode() as SpecTablePage2;
+      expect(page1.childrenLoaded).toBe(true);
+      expect(page1.expanded).toBe(false);
+      expect(page1.childNodes.length).toBe(2);
+      expect(page1.detailTable.rows.length).toBe(2);
+      expect(page1.detailTable.rows[0].getKeyValues()).toEqual([FRUIT_1_KEY]);
+      expect(page1.detailTable.rows[1].getKeyValues()).toEqual([FRUIT_3_KEY]);
+      let searchForm1 = scout.assertInstance(page1.getSearchForm(), SpecSearchForm);
+      expect(searchForm1.widget('TextField').value).toBe('apple');
+      let childNode1 = page1.childNodes[0];
+      let childNode2 = page1.childNodes[1];
+
+      // Change search filter
+      searchForm1.widget('TextField').setValue('le');
+      searchForm1.widget('SearchMenu').doAction();
+      await page1.detailTable.when('reload');
+      await page1.ensureLoadChildren();
+      expect(page1.detailTable.rows.length).toBe(3);
+      expect(page1.detailTable.rows[0].getKeyValues()).toEqual([FRUIT_1_KEY]);
+      expect(page1.detailTable.rows[1].getKeyValues()).toEqual([FRUIT_3_KEY]);
+      expect(page1.detailTable.rows[2].getKeyValues()).toEqual([FRUIT_4_KEY]);
+      expect(page1.childNodes[0]).not.toBe(childNode1);
+      expect(page1.childNodes[1]).not.toBe(childNode2);
+
+      // Open same bookmark again
+      await BookmarkSupport.get(session).openBookmarkInOutline(bookmark);
+
+      // Assert same page, but search data has been reset and data reloaded
+      expect(desktop.outline.selectedNode()).toBeInstanceOf(SpecTablePage2);
+      let page2 = desktop.outline.selectedNode() as SpecTablePage2;
+      expect(page2.childrenLoaded).toBe(true);
+      expect(page2.expanded).toBe(false);
+      expect(page2.childNodes.length).toBe(2);
+      expect(page2.detailTable.rows.length).toBe(2);
+      expect(page2.detailTable.rows[0].getKeyValues()).toEqual([FRUIT_1_KEY]);
+      expect(page2.detailTable.rows[1].getKeyValues()).toEqual([FRUIT_3_KEY]);
+      let searchForm2 = scout.assertInstance(page2.getSearchForm(), SpecSearchForm);
+      expect(searchForm2.widget('TextField').value).toBe('apple');
+      expect(page2).toBe(page1);
+      expect(searchForm2).toBe(searchForm1);
+      expect(page1.childNodes[0]).not.toBe(childNode1);
+      expect(page1.childNodes[1]).not.toBe(childNode2);
+    });
   });
 
   describe('openBookmarkLocal', () => {
@@ -977,7 +1060,7 @@ describe('BookmarkSupport', () => {
       expect(page5.childrenLoaded).toBe(true);
       expect(page5.expanded).toBe(true);
       expect(page5.childNodes.length).toBe(2);
-      expect(page5.detailTable.rows.length).toEqual(2);
+      expect(page5.detailTable).toBe(null); // not created yet
 
       expect(page5.parentNode).toBe(page2); // page2 was the starting point
     });
@@ -1007,7 +1090,7 @@ describe('BookmarkSupport', () => {
     });
   });
 
-  describe('applyBookmarkToPage', () => {
+  describe('applyBookmarkToPageAndReload', () => {
 
     it('replaces the search data and reloads the table', async () => {
       let outline = desktop.outline;
@@ -1023,7 +1106,7 @@ describe('BookmarkSupport', () => {
       let searchForm = scout.assertInstance(page.getSearchForm(), SpecSearchForm);
       searchForm.widget('TextField').setValue('bl'); // Matches 'Black' and 'Blue'
       searchForm.widget('SearchMenu').doAction();
-      page.detailTable.reload(Table.ReloadReason.SEARCH); // FIXME bsh [js-bookmark] This should not be necessary!
+      await page.detailTable.when('reload');
       await page.ensureLoadChildren();
       expect(page.detailTable.rows.length).toBe(2);
 
@@ -1034,7 +1117,7 @@ describe('BookmarkSupport', () => {
           })
         })
       });
-      await BookmarkSupport.get(session).applyBookmarkToPage(page, bookmark);
+      await BookmarkSupport.get(session).applyBookmarkToPageAndReload(page, bookmark);
 
       expect(page.detailTable.rows.length).toBe(1);
       expect(searchForm.widget('TextField').value).toBe('yell');
@@ -1064,13 +1147,31 @@ describe('BookmarkSupport', () => {
           })
         })
       });
-      await BookmarkSupport.get(session).applyBookmarkToPage(page, bookmark, false); // <--
+      await BookmarkSupport.get(session).applyBookmarkToPageAndReload(page, bookmark, false); // <--
 
       expect(page.detailTable.rows.length).toBe(1);
       expect(searchForm.widget('TextField').value).toBe('cy');
       searchForm.widget('ResetMenu').doAction();
       await searchForm.when('reset');
       expect(searchForm.widget('TextField').value).toBe(null); // <--
+    });
+
+    it('can restore table filters', async () => {
+      // FIXME bsh: Add test case with filters
+      // expect(page2.childNodes.filter(node => node.filterAccepted).length).toBe(1);
+      // expect(page2.detailTable.filteredRows().length).toEqual(1);
+      // expect(page2.detailTable.getFilter(TableTextUserFilter.TYPE)).toBeInstanceOf(TableTextUserFilter);
+      // expect((page2.detailTable.getFilter(TableTextUserFilter.TYPE) as TableTextUserFilter).text).toBe('ble');
+      expect().nothing();
+    });
+
+    it('can restore chart table control config', async () => {
+      // FIXME bsh: Add test case with filters
+      // expect(page2.childNodes.filter(node => node.filterAccepted).length).toBe(1);
+      // expect(page2.detailTable.filteredRows().length).toEqual(1);
+      // expect(page2.detailTable.getFilter(TableTextUserFilter.TYPE)).toBeInstanceOf(TableTextUserFilter);
+      // expect((page2.detailTable.getFilter(TableTextUserFilter.TYPE) as TableTextUserFilter).text).toBe('ble');
+      expect().nothing();
     });
   });
 });
