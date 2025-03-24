@@ -17,7 +17,6 @@ export class ApplyBookmarkToJsPageUiCallbackHandler implements UiCallbackHandler
     const contextElements = scout.assertValue(param.contextElements, 'Missing context elements');
     const page = contextElements.getSingle('page').getElement(Page);
 
-    return BookmarkSupport.get(desktop.session).applyBookmarkToPage(page, bookmark)
-      .then(() => page.reloadPage());
+    return BookmarkSupport.get(desktop.session).applyBookmarkToPageAndReload(page, bookmark);
   }
 }

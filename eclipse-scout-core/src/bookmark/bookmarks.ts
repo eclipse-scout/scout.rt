@@ -39,26 +39,26 @@ export class PageBookmarkDefinitionDo extends BaseDoEntity implements IBookmarkD
 // --------------------------------------------------
 
 export interface IBookmarkPageDo {
-  pageParam: PageParamDo;
-  displayText: string;
+  pageParam?: PageParamDo;
+  displayText?: string;
 }
 
 @typeName('crm.NodeBookmarkPage')
 export class NodeBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo {
-  pageParam: PageParamDo;
-  displayText: string;
+  pageParam?: PageParamDo;
+  displayText?: string;
 }
 
 @typeName('crm.TableBookmarkPage')
 export class TableBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo {
-  pageParam: PageParamDo;
-  displayText: string;
-  expandedChildRow: BookmarkTableRowIdentifierDo;
-  selectedChildRows: BookmarkTableRowIdentifierDo[];
-  tablePreferences: DoEntity; // FIXME bsh [js-bookmark] TableClientUiPreferencesDo;
-  searchFilterComplete: boolean; // FIXME bsh [js-bookmark] always true?
-  searchData: DoEntity; // FIXME bsh [js-bookmark] ISearchDo;
-  chartTableControlConfig: DoEntity; // FIXME bsh [js-bookmark] ChartTableControlConfigDo;
+  pageParam?: PageParamDo;
+  displayText?: string;
+  expandedChildRow?: BookmarkTableRowIdentifierDo;
+  selectedChildRows?: BookmarkTableRowIdentifierDo[];
+  searchFilterComplete?: boolean; // FIXME bsh [js-bookmark] always true?
+  searchData?: DoEntity; // FIXME bsh [js-bookmark] ISearchDo;
+  tablePreferences?: TableClientUiPreferencesDo;
+  chartTableControlConfig?: ChartTableControlConfigDo;
 }
 
 @typeName('crm.BookmarkTableRowIdentifier')
@@ -114,6 +114,134 @@ export class BookmarkTableRowIdentifierLongComponentDo extends BaseDoEntity impl
 
 // --------------------------------------------------
 
+@typeName('suite.PageStateForBookmark')
+export class PageStateForBookmarkDo extends BaseDoEntity {
+  searchFilterComplete?: boolean;
+  searchData?: DoEntity;
+  tablePreferences?: TableClientUiPreferencesDo;
+  chartTableControlConfig?: ChartTableControlConfigDo;
+}
+
+// --------------------------------------------------
+
+@typeName('crm.ChartTableControlConfig')
+export class ChartTableControlConfigDo extends BaseDoEntity {
+  chartTypeId?: string;
+  chartGroup1ColumnId?: string;
+  chartGroup1Modifier?: number;
+  chartGroup2ColumnId?: string;
+  chartGroup2Modifier?: number;
+  chartAggregationColumnId?: string;
+  chartAggregationModifier?: number;
+}
+
+// --------------------------------------------------
+
+@typeName('crm.TableClientUiPreferences')
+export class TableClientUiPreferencesDo extends BaseDoEntity {
+  tableId?: string;
+  userPreferenceContext?: string;
+  tileMode?: boolean;
+  tileGlobalKey?: string;
+  tablePreferenceProfiles?: Map<string, TableClientUiPreferenceProfileDo>;
+}
+
+@typeName('crm.TableClientUiPreferenceProfile')
+export class TableClientUiPreferenceProfileDo extends BaseDoEntity {
+  columns?: TableColumnClientUiPreferenceDo[];
+  userFilters?: IUserFilterStateDo[];
+  tableCustomizerData?: ITableCustomizerDo;
+}
+
+@typeName('crm.TableColumnClientUiPreference')
+export class TableColumnClientUiPreferenceDo extends BaseDoEntity {
+  columnId?: string;
+  width?: number;
+  viewIndex?: number;
+  sortOrder?: number;
+  sortAscending?: boolean;
+  visible?: boolean;
+  groupingActive?: boolean;
+  aggregationFunctionId?: string;
+  backgroundEffectId?: string;
+}
+
+export interface IUserFilterStateDo extends DoEntity {
+}
+
+@typeName('crm.BooleanColumnUserFilterState')
+export class BooleanColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
+  columnId?: string;
+  selectedValues?: Set<boolean>;
+}
+
+@typeName('crm.CategoryColorColumnUserFilterState')
+export class CategoryColorColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
+  columnId?: string;
+  selectedValues?: Set<string>;
+}
+
+@typeName('crm.ChartTableUserFilterState')
+export class ChartTableUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
+  attributeText?: string;
+  columnIdX?: string;
+  columnIdY?: string;
+  stringFilters?: Map<string, string>[];
+  numberFilters?: Map<string, number>[];
+}
+
+@typeName('crm.ColumnUserFilterState')
+export class ColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
+  columnId?: string;
+  selectedValues?: Set<string>;
+}
+
+@typeName('crm.DateColumnUserFilterState')
+export class DateColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
+  columnId?: string;
+  selectedValues?: Set<number>;
+  dateFrom?: Date;
+  dateTo?: Date;
+}
+
+@typeName('crm.MapTableUserFilterState')
+export class MapTableUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
+  columnId?: string;
+  filterIds?: string[];
+}
+
+@typeName('crm.NumberColumnUserFilterState')
+export class NumberColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
+  columnId?: string;
+  selectedValues?: Set<number>;
+  numberFrom?: number;
+  numberTo?: number;
+}
+
+@typeName('crm.TableTextUserFilterState')
+export class TableTextUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
+  text?: string;
+}
+
+@typeName('crm.TextColumnUserFilterState')
+export class TextColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
+  columnId?: string;
+  selectedValues?: Set<string>;
+  textFilter?: string;
+}
+
+export interface ITableCustomizerDo extends DoEntity {
+}
+
+// FIXME bsh [js-bookmark] Move to suite/crm
+@typeName('crm.CoreTableCustomizer')
+export class CoreTableCustomizerDo extends BaseDoEntity implements ITableCustomizerDo {
+  // FIXME bsh [js-bookmark] Add CustomColumnConfigDo
+  // columns?: CustomColumnConfigDo[];
+}
+
+// --------------------------------------------------
+
 @typeName(PageIdDummyPageParamDo.TYPE_NAME)
 export class PageIdDummyPageParamDo extends PageParamDo {
   static TYPE_NAME = 'crm.PageIdDummyPageParam';
@@ -128,3 +256,54 @@ export class ActivateBookmarkRequestDo extends BaseDoEntity {
   parentBookmarkPage: IBookmarkPageDo;
   pagePath: IBookmarkPageDo[];
 }
+
+// --------------------------------------------------
+
+export const bookmarks = {
+
+  // FIXME bsh [js-bookmark] Remove the following debugging/testing methods
+
+  /** @deprecated ONLY FOR TESTING PURPOSES - DO NOT USE */
+  async create(): Promise<BookmarkDo> {
+    const bookmarkSupport = BookmarkSupport.get();
+    let bookmark = await bookmarkSupport.createBookmark();
+    await bookmarkSupport.storeBookmark(bookmark);
+    return bookmark;
+  },
+
+  /** @deprecated ONLY FOR TESTING PURPOSES - DO NOT USE */
+  async open(index?: number): Promise<BookmarkDo> {
+    const bookmarkSupport = BookmarkSupport.get() as BookmarkSupport & { _getBookmarkStore(): BookmarkDo[] };
+    const bookmarkStore = bookmarkSupport._getBookmarkStore();
+    if (arrays.empty(bookmarkStore)) {
+      return null;
+    }
+    let bookmark = bookmarkStore[index < 0 ? bookmarkStore.length + index : index] || arrays.last(bookmarkStore);
+    await bookmarkSupport.openBookmarkInOutline(bookmark);
+    return bookmark;
+  },
+
+  /** @deprecated ONLY FOR TESTING PURPOSES - DO NOT USE */
+  all(): BookmarkDo[] {
+    const bookmarkSupport = BookmarkSupport.get() as BookmarkSupport & { _getBookmarkStore(): BookmarkDo[] };
+    return bookmarkSupport._getBookmarkStore();
+  },
+
+  /** @deprecated ONLY FOR TESTING PURPOSES - DO NOT USE */
+  delete(index: number): BookmarkDo {
+    const bookmarkSupport = BookmarkSupport.get() as BookmarkSupport & {
+      _getBookmarkStore(): BookmarkDo[];
+      _setBookmarkStore(bookmarkStore: BookmarkDo[]);
+    };
+    const bookmarkStore = bookmarkSupport._getBookmarkStore();
+    if (arrays.empty(bookmarkStore)) {
+      return null;
+    }
+    let bookmark = bookmarkStore[index < 0 ? bookmarkStore.length + index : index];
+    if (bookmark) {
+      arrays.remove(bookmarkStore, bookmark);
+      bookmarkSupport._setBookmarkStore(bookmarkStore);
+    }
+    return bookmark;
+  }
+} as const;

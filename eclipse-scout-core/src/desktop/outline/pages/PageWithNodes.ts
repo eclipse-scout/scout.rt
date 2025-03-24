@@ -39,6 +39,14 @@ export class PageWithNodes extends Page {
     return table;
   }
 
+  protected override _initDetailTable(table: Table) {
+    super._initDetailTable(table);
+    // In case the child pages were loaded before while the page was NOT selected, the detail table will still be null.
+    // Normally, it is populated by PageWithNodes#loadChildren. But when it is created later, the rows would be missing.
+    // Therefore, we create them manually here. If the child apges are not yet loaded, this has no effect.
+    this.rebuildDetailTableInternal();
+  }
+
   protected _onDetailTableRowAction(event: TableRowActionEvent) {
     this.outline.mediator.onTableRowAction(event, this);
   }
