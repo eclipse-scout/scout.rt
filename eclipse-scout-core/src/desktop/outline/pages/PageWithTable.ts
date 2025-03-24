@@ -145,6 +145,8 @@ export class PageWithTable extends Page implements PageWithTableModel {
   }
 
   override loadChildren(): JQuery.Promise<any> {
+    this.ensureDetailTable();
+
     // It's allowed to have no table - but we don't have to load data in that case
     if (!this.detailTable) {
       return $.resolvedPromise();

@@ -39,6 +39,16 @@ export class PageWithNodes extends Page {
     return table;
   }
 
+  protected override _initDetailTable(table: Table) {
+    super._initDetailTable(table);
+    // In case the child pages were loaded while the page was NOT selected, the detail table will now still be null.
+    // This is the intended behavior. The detail table should not be needed to load the child pages. But when we
+    // finally create it, it should be populated with rows according to the loaded child pages. This is normally
+    // done in PageWithNodes#loadChildren. But when the detail table is created later, we have to manually create
+    // them here. If the child pages are not yet loaded, this has no effect.
+    this.rebuildDetailTableInternal();
+  }
+
   protected _onDetailTableRowAction(event: TableRowActionEvent) {
     this.outline.mediator.onTableRowAction(event, this);
   }
