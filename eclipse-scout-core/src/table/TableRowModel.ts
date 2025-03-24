@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Cell, LookupRow, ObjectModel, ObjectOrModel, Primitive, Table, TableRow} from '../index';
+import {BookmarkTableRowIdentifierDo, Cell, DoEntity, LookupRow, ObjectModel, ObjectOrModel, Primitive, Table, TableRow} from '../index';
 
 export interface TableRowModel extends ObjectModel<TableRow> {
   parent?: Table;
@@ -22,6 +22,7 @@ export interface TableRowModel extends ObjectModel<TableRow> {
   parentRow?: string | ObjectOrModel<TableRow>;
   expanded?: boolean;
   lookupRow?: LookupRow<any>;
+  bookmarkIdentifier?: BookmarkTableRowIdentifierDo | DoEntity;
 
   [property: string]: any; // allow custom properties
 }
