@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ObjectWithUuid, Session} from '../index';
+import {ObjectType, ObjectWithUuid, Session} from '../index';
 
 export const inspector = {
   /**
@@ -28,13 +28,14 @@ export const inspector = {
       return;
     }
 
+    let modelClass = model.modelClass || (typeof model.objectType === 'string' && model.objectType);
     let uuid: string = null;
     if (model.uuidPath) {
       uuid = model.uuidPath(false);
     } else {
-      uuid = model.classId ? model.classId : model.uuid;
+      uuid = model.classId || model.uuid;
     }
-    $container.toggleAttr('data-modelclass', !!model.modelClass, model.modelClass);
+    $container.toggleAttr('data-modelclass', !!modelClass, modelClass);
     $container.toggleAttr('data-uuid', !!uuid, uuid);
     $container.toggleAttr('data-id', !!model.id, model.id);
   }
@@ -47,4 +48,5 @@ export interface InspectorModel extends Partial<ObjectWithUuid> {
   id?: string;
   modelClass?: string;
   classId?: string;
+  objectType?: ObjectType;
 }

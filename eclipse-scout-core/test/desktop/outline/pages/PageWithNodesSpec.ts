@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -316,6 +316,59 @@ describe('PageWithNodes', () => {
       expect(detailTable.rows.length).toBe(2);
       expect(detailTable.rows[0].cells[0].text).toBe('Page 104');
       expect(detailTable.rows[1].cells[0].text).toBe('Page 105');
+    });
+  });
+
+  describe('detail table', () => {
+    class SpecPageWithNodes extends PageWithNodes {
+      protected override _createChildPages(): JQuery.Promise<Page[]> {
+        return $.resolvedPromise([
+          scout.create(PageWithNodes, {
+            parent: outline,
+            text: 'A'
+          }),
+          scout.create(PageWithNodes, {
+            parent: outline,
+            text: 'B'
+          })
+        ]);
+      }
+    }
+
+    it('creates rows after child pages have been loaded', () => {
+      let page = scout.create(SpecPageWithNodes, {
+        parent: outline
+      });
+      outline.insertNode(page);
+      expect(page.childrenLoaded).toBe(false); // not yet loaded
+      expect(page.detailTable).toBe(null); // not yet initialized
+
+      outline.selectNode(page);
+      jasmine.clock().tick(1);
+      expect(page.childrenLoaded).toBe(true);
+      expect(page.childNodes.length).toBe(2);
+      expect(page.detailTable).toBeTruthy();
+      expect(page.detailTable.rows.length).toBe(2);
+    });
+
+    it('creates rows after initializing the detail table if the child nodes were already loaded', () => {
+      let page = scout.create(SpecPageWithNodes, {
+        parent: outline
+      });
+      outline.insertNode(page);
+      expect(page.childrenLoaded).toBe(false); // not yet loaded
+      expect(page.detailTable).toBe(null); // not yet initialized
+
+      page.ensureLoadChildren();
+      jasmine.clock().tick(1);
+      expect(page.childrenLoaded).toBe(true);
+      expect(page.childNodes.length).toBe(2);
+      expect(page.detailTable).toBe(null); // still not initialized
+
+      outline.selectNode(page);
+      jasmine.clock().tick(1);
+      expect(page.detailTable).toBeTruthy();
+      expect(page.detailTable.rows.length).toBe(2);
     });
   });
 });

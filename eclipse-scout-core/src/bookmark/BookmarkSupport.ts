@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, arrays, BookmarkDo, BookmarkSupportModel, dataObjects, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline,
-  OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithNodes, PageWithTable, scout, Session, Status, TableBookmarkPageDo, UuidPool, webstorage
+  App, arrays, BookmarkDo, BookmarkSupportModel, BookmarkTableRowIdentifierDo, ChartTableControlConfigDo, dataObjects, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkPageDo, InitModelOf,
+  MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageStateForBookmarkDo, PageWithNodes, PageWithTable, scout, Session, Status, TableBookmarkPageDo,
+  TableClientUiPreferencesDo, TableRow, UuidPool, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -189,57 +190,98 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
 
     if (page.nodeType === Page.NodeType.NODES) {
-      return scout.create(NodeBookmarkPageDo, {
-        pageParam: page.pageParam,
-        displayText: page.getDisplayText()
-      });
+      return this._pageToNodeBookmarkPage(page, childPage);
     }
-
     if (page.nodeType === Page.NodeType.TABLE) {
-      let expandedChildRowIdentifier;
-      if (childPage) {
-        if (childPage.row) {
-          // Linked to table row -> get row identifier
-          expandedChildRowIdentifier = page.getTableRowIdentifier(childPage.row);
-        } else {
-          // Not linked to table row -> assume the page param is enough to identify the child page
-          // FIXME bsh [js-bookmark] Is this assumption correct? Or do we want to throw an error?
-        }
-        if (!expandedChildRowIdentifier) { // child row not identifiable
-          throw BookmarkSupport.ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER;
-        }
-      }
-
-      // FIXME bsh [js-bookmark] Only export when requested, see BookmarkDoBuilder#createTableRowSelections
-      let selectedChildRowIdentifiers = page.detailTable.selectedRows
-        .map(row => page.getTableRowIdentifier(row));
-
-      let searchFilter = await this._getSearchFilter(page);
-
-      return scout.create(TableBookmarkPageDo, {
-        pageParam: page.pageParam,
-        displayText: page.getDisplayText(),
-        expandedChildRow: expandedChildRowIdentifier,
-        selectedChildRows: selectedChildRowIdentifiers,
-        searchFilterComplete: true,
-        searchData: searchFilter
-      });
+      return this._pageToTableBookmarkPage(page, childPage);
     }
 
     throw BookmarkSupport.ERROR_PAGE_NOT_BOOKMARKABLE;
   }
 
-  protected async _getSearchFilter(page: Page): Promise<any> {
-    // Local
-    if (page instanceof PageWithTable) {
-      return page.getSearchFilter();
+  protected async _pageToNodeBookmarkPage(page: Page, childPage?: Page): Promise<NodeBookmarkPageDo> {
+    return scout.create(NodeBookmarkPageDo, {
+      pageParam: page.pageParam,
+      displayText: page.getDisplayText()
+    });
+  }
+
+  protected async _pageToTableBookmarkPage(page: Page, childPage?: Page): Promise<TableBookmarkPageDo> {
+    let expandedChildRowIdentifier;
+    if (childPage) {
+      if (childPage.row) {
+        // Linked to table row -> get row identifier
+        expandedChildRowIdentifier = page.getTableRowIdentifier(childPage.row);
+      } else {
+        // Not linked to table row -> assume the page param is enough to identify the child page
+        // FIXME bsh [js-bookmark] Is this assumption correct? Or do we want to throw an error?
+      }
+      if (!expandedChildRowIdentifier) { // child row not identifiable
+        throw BookmarkSupport.ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER;
+      }
     }
 
-    // Remote
-    return HybridManager.get(this.session).callActionAndWait('ExportSearchData', undefined,
-      scout.create(HybridActionContextElements)
-        .withElement('page', HybridActionContextElement.of(page.outline, page))
-    );
+    // FIXME bsh [js-bookmark] Only export when requested, see BookmarkDoBuilder#createTableRowSelections
+    let selectedChildRowIdentifiers = page.detailTable.selectedRows
+      .map(row => page.getTableRowIdentifier(row));
+
+    let searchFilterComplete: boolean;
+    let searchData: any;
+    let tablePreferences: TableClientUiPreferencesDo;
+    let chartTableControlConfig: ChartTableControlConfigDo;
+    if (page instanceof PageWithTable) {
+      // Local
+      searchFilterComplete = true;
+      searchData = await this._createSearchFilterForBookmark(page);
+      tablePreferences = await this._createTablePreferencesForBookmark(page);
+      chartTableControlConfig = await this._createChartTableControlConfigForBookmark(page);
+    } else {
+      // Remote
+      let contextElements = scout.create(HybridActionContextElements)
+        .withElement('page', HybridActionContextElement.of(page.outline, page));
+      let pageStateForBookmark = await HybridManager.get(this.session).callActionAndWait('GetPageStateForBookmark', undefined, contextElements) as PageStateForBookmarkDo;
+      if (pageStateForBookmark) {
+        searchFilterComplete = pageStateForBookmark.searchFilterComplete;
+        searchData = pageStateForBookmark.searchData;
+        tablePreferences = pageStateForBookmark.tablePreferences;
+        chartTableControlConfig = pageStateForBookmark.chartTableControlConfig;
+      }
+    }
+
+    return scout.create(TableBookmarkPageDo, {
+      pageParam: page.pageParam,
+      displayText: page.getDisplayText(),
+      expandedChildRow: expandedChildRowIdentifier,
+      selectedChildRows: selectedChildRowIdentifiers,
+      searchFilterComplete: searchFilterComplete,
+      searchData: searchData,
+      tablePreferences: tablePreferences,
+      chartTableControlConfig: chartTableControlConfig
+    });
+  }
+
+  protected async _createSearchFilterForBookmark(page: PageWithTable): Promise<any> {
+    // FIXME bsh [js-bookmark] Use page.getSearchFilter() instead - but how to deal with hybrid search forms?
+    let searchForm = page.getSearchForm();
+    if (!searchForm) {
+      return null;
+    }
+    if (searchForm.modelAdapter) {
+      return HybridManager.get(this.session).callActionAndWait('ExportSearchData', undefined,
+        scout.create(HybridActionContextElements)
+          .withElement('searchForm', HybridActionContextElement.of(searchForm))
+      );
+    }
+    return searchForm.exportData();
+  }
+
+  protected async _createTablePreferencesForBookmark(page: PageWithTable): Promise<TableClientUiPreferencesDo> {
+    // return page.detailTable.filterSupport. getSearchFilter();
+    return null;
+  }
+
+  protected async _createChartTableControlConfigForBookmark(page: PageWithTable): Promise<ChartTableControlConfigDo> {
+    return null;
   }
 
   // --------------------------------------
@@ -307,14 +349,28 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       throw BookmarkSupport.ERROR_PAGE_WRONG_OUTLINE;
     }
 
-    let pagePath = request.pagePath?.slice(); // create copy because array is altered
-    if (arrays.empty(pagePath)) {
-      return; // done
-    }
-
     let parentPage = request.parentPage;
     let parentBookmarkPage = request.parentBookmarkPage;
 
+    // FIXME bsh [js-bookmark] HACKY-HACKY! Find a better solution.
+    if (parentPage) {
+      let currentPage = outline.selectedNode();
+      while (currentPage) {
+        if (currentPage === parentPage) {
+          // The currently selected page is a child of 'parentPage'.
+          // Remove the current selection to prevent unwanted selection restoration (PageWithTable#restoreSelection), which
+          // would trigger the loading of the data before the bookmark search data has been applied.
+          outline.selectNode(parentPage);
+        }
+        currentPage = currentPage.parentNode;
+      }
+    }
+
+    if (request.applyParentBookmarkPage) {
+      this._applyBookmarkPage(parentPage, parentBookmarkPage, false);
+    }
+
+    let pagePath = request.pagePath?.slice(); // create copy because array is altered
     while (arrays.hasElements(pagePath)) {
       let bookmarkPage = pagePath[0];
       let page = await this._resolvePage(outline, parentPage, parentBookmarkPage, bookmarkPage);
@@ -323,7 +379,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
         break; // no child page found matching the given bookmarkPage
       }
 
-      await this._applyBookmarkPage(page, bookmarkPage, false);
+      await this._applyBookmarkPageAndReload(page, bookmarkPage, false);
 
       parentPage = page;
       parentBookmarkPage = bookmarkPage;
@@ -343,7 +399,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   protected async _resolvePage(outline: Outline, parentPage: Page, parentBookmarkPage: IBookmarkPageDo, bookmarkPage: IBookmarkPageDo): Promise<Page> {
     if (parentPage) {
-      parentPage.ensureDetailTable(); // ensure detail table is present, so loadChildren() will load the table data
+
       await parentPage.ensureLoadChildren();
 
       if (parentPage instanceof PageWithTable && parentBookmarkPage instanceof TableBookmarkPageDo) {
@@ -420,110 +476,157 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   // --------------------------------------
 
-  applyBookmarkToPage(page: Page, bookmark: BookmarkDo, saveSearchForm = true): JQuery.Promise<void> {
-    return $.resolvedPromise()
-      .then(() => this._applyBookmarkToPage(page, bookmark, saveSearchForm));
-  }
-
-  protected async _applyBookmarkToPage(page: Page, bookmark: BookmarkDo, saveSearchForm = true): Promise<void> {
-    if (!bookmark) {
+  applyBookmarkToPage(page: Page, bookmark: BookmarkDo, saveSearchForm = true) {
+    if (!page || !bookmark || !bookmark.definition) {
       return;
     }
     let bookmarkPage = bookmark.definition.bookmarkedPage;
-    await this._applyBookmarkPage(page, bookmarkPage, saveSearchForm);
+    this._applyBookmarkPage(page, bookmarkPage, saveSearchForm);
   }
 
-  protected async _applyBookmarkPage(page: Page, bookmarkPage: IBookmarkPageDo, saveSearchForm = true): Promise<void> {
+  applyBookmarkToPageAndReload(page: Page, bookmark: BookmarkDo, saveSearchForm = true): JQuery.Promise<void> {
+    if (!page || !bookmark || !bookmark.definition) {
+      return;
+    }
+    let bookmarkPage = bookmark.definition.bookmarkedPage;
+    return $.resolvedPromise()
+      .then(() => this._applyBookmarkPageAndReload(page, bookmarkPage, saveSearchForm));
+  }
+
+  protected async _applyBookmarkPageAndReload(page: Page, bookmarkPage: IBookmarkPageDo, saveSearchForm = true): Promise<void> {
+    this._applyBookmarkPage(page, bookmarkPage, saveSearchForm);
+
+    await page.ensureLoadChildren();
     if (page instanceof PageWithTable && bookmarkPage instanceof TableBookmarkPageDo) {
-      return this._applyBookmarkToTablePage(page, bookmarkPage, saveSearchForm);
+      this._restoreSelection(page, bookmarkPage.selectedChildRows);
     }
-    if (page instanceof PageWithNodes && bookmarkPage instanceof NodeBookmarkPageDo) {
-      return this._applyBookmarkToNodePage(page, bookmarkPage);
-    }
-    // FIXME bsh [js-bookmark] Do we need to handle the "node page" case?
   }
 
-  protected async _applyBookmarkToTablePage(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm = true): Promise<void> {
-    await this._prepareTablePage(page, bookmarkPage, saveSearchForm);
-    this._restoreSelection(page, bookmarkPage);
+  protected _applyBookmarkPage(page: Page, bookmarkPage: IBookmarkPageDo, saveSearchForm = true) {
+    if (page instanceof PageWithTable && bookmarkPage instanceof TableBookmarkPageDo) {
+      this._applyBookmarkToTablePage(page, bookmarkPage, saveSearchForm);
+    } else if (page instanceof PageWithNodes && bookmarkPage instanceof NodeBookmarkPageDo) {
+      this._applyBookmarkToNodePage(page, bookmarkPage);
+    }
   }
 
-  protected async _applyBookmarkToNodePage(page: PageWithNodes, bookmarkPage: NodeBookmarkPageDo): Promise<void> {
+  protected _applyBookmarkToTablePage(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm = true) {
+    this._prepareTablePage(page, bookmarkPage, saveSearchForm);
+  }
+
+  protected _applyBookmarkToNodePage(page: PageWithNodes, bookmarkPage: NodeBookmarkPageDo) {
     // hook-method provided for subclasses
   }
 
-  protected async _prepareTablePage(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm = true): Promise<void> {
+  protected _prepareTablePage(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm = true) {
     page.ensureDetailTable();
 
     // be careful when changing the order of these, e.g. applying column preferences requires custom columns to be injected first
-    await this._prepareTableCustomizerData(page, bookmarkPage);
-    await this._prepareTableColumnPreferences(page, bookmarkPage);
-    await this._prepareTileMode(page, bookmarkPage);
-    await this._prepareSearchFilter(page, bookmarkPage, saveSearchForm);
-    await this._prepareUserFilters(page, bookmarkPage);
-    await this._prepareChartTableControlState(page, bookmarkPage);
-    await this._prepareShowRelatedCustomerData(page, bookmarkPage);
+    this._prepareTableCustomizerData(page, bookmarkPage);
+    this._prepareTableColumnPreferences(page, bookmarkPage);
+    this._prepareTileMode(page, bookmarkPage);
+    this._prepareSearchFilter(page, bookmarkPage, saveSearchForm);
+    this._prepareUserFilters(page, bookmarkPage);
+    this._prepareChartTableControlState(page, bookmarkPage);
+    this._prepareShowRelatedCustomerData(page, bookmarkPage);
   }
 
-  protected async _prepareTableCustomizerData(page: PageWithTable, bookmarkPage: TableBookmarkPageDo): Promise<void> {
+  protected _prepareTableCustomizerData(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
+    // FIXME bsh [js-bookmark] Implement
   }
 
-  protected async _prepareTableColumnPreferences(page: PageWithTable, bookmarkPage: TableBookmarkPageDo): Promise<void> {
+  protected _prepareTableColumnPreferences(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
+    // FIXME bsh [js-bookmark] Implement
   }
 
-  protected async _prepareTileMode(page: PageWithTable, bookmarkPage: TableBookmarkPageDo): Promise<void> {
+  protected _prepareTileMode(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
+    // FIXME bsh [js-bookmark] Implement
+    // let prefs = bookmarkPage.tablePreferences;
+    // if (prefs) {
+    //   page.detailTable.setTileMode(prefs.tileMode);
+    // }
   }
 
-  protected async _prepareSearchFilter(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm: boolean): Promise<void> {
+  protected _prepareSearchFilter(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm: boolean) {
     let searchForm = page.getSearchForm();
+    // FIXME bsh [js-bookmark] Find a solution for this
+    // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    // if (!searchForm) {
+    //   await page.detailTable.widget('SearchFormTableControl').when('propertyChange:form');
+    //   searchForm = page.getSearchForm();
+    // }
 
-    let oldSearchData;
-    if (searchForm) {
-      if (!saveSearchForm) {
-        // If the new search data should not be the saved state (i.e. the user can press the "Reset" button to clear
-        // the bookmarked search data), remember the original state and reset it after the page has been loaded.
-        oldSearchData = searchForm.exportData();
-      }
+    if (searchForm && !searchForm.modelAdapter) {
+      // If the new search data should not be the saved state (i.e. the user can press the "Reset" button to clear
+      // the bookmarked search data), remember the original state and reset it after the page has been loaded.
+      let oldSearchData = saveSearchForm ? undefined : searchForm.exportData();
       searchForm.setData(bookmarkPage.searchData);
       searchForm.importData();
-    }
-
-    await page.loadChildren();
-
-    if (oldSearchData !== undefined) {
       searchForm.setData(oldSearchData);
+      if (saveSearchForm) {
+        searchForm.markAsSaved();
+      }
+      // if (!saveSearchForm) {
+      //   searchForm.setData(oldSearchData);
+      // }
+    } else {
+      // FIXME bsh [js-bookmark] HACKY-HACKY! Replace by searchFilter property on page. How to instruct existing hybrid form to import this again?
+      page['__searchData'] = bookmarkPage.searchData;
+      page['__searchDataMarkAsSaved'] = saveSearchForm;
     }
+
+    // FIXME bsh [js-bookmark] "Mark dirty" - how?
+    page.childrenLoaded = false;
+
+    // FIXME bsh [js-bookmark] Find a solution for this
+    // if (oldSearchData !== undefined) {
+    //   searchForm.setData(oldSearchData);
+    // }
   }
 
-  protected async _prepareUserFilters(page: PageWithTable, bookmarkPage: TableBookmarkPageDo): Promise<void> {
+  protected _prepareUserFilters(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
+    // FIXME bsh [js-bookmark] Implement
   }
 
-  protected async _prepareChartTableControlState(page: PageWithTable, bookmarkPage: TableBookmarkPageDo): Promise<void> {
+  protected _prepareChartTableControlState(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
+    // FIXME bsh [js-bookmark] Implement
   }
 
-  protected async _prepareShowRelatedCustomerData(page: PageWithTable, bookmarkPage: TableBookmarkPageDo): Promise<void> {
+  protected _prepareShowRelatedCustomerData(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
+    // FIXME bsh [js-bookmark] Implement
   }
 
-  protected _restoreSelection(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
-    if (arrays.hasElements(bookmarkPage.selectedChildRows)) {
-      let table = page.detailTable;
-      let selectedRowIdentifiers = bookmarkPage.selectedChildRows;
-      let selectedRows = table.rows.filter(row => {
+  protected _restoreSelection(page: PageWithTable, selectedRowIdentifiers: BookmarkTableRowIdentifierDo[]) {
+    page.ensureDetailTable();
+    let table = page.detailTable;
+    if (!table) {
+      return;
+    }
+    let selectedRows: TableRow[] = [];
+    if (arrays.hasElements(selectedRowIdentifiers)) {
+      selectedRows = table.rows.filter(row => {
         if (!row.filterAccepted) {
           return false; // row must not be filtered out
         }
         let rowIdentifier = page.getTableRowIdentifier(row);
         return selectedRowIdentifiers.some(selectedRowIdentifier => objects.equals(selectedRowIdentifier, rowIdentifier));
       });
-      table.expandParentRows(selectedRows);
-      table.selectRows(selectedRows);
     }
+    table.expandParentRows(selectedRows);
+    table.selectRows(selectedRows);
   }
 }
 
 export interface ActivateBookmarkRequest {
-  parentOutline: Outline;
-  parentPage: Page;
-  parentBookmarkPage: IBookmarkPageDo;
-  pagePath: IBookmarkPageDo[];
+  parentOutline?: Outline;
+  parentPage?: Page;
+  parentBookmarkPage?: IBookmarkPageDo;
+  pagePath?: IBookmarkPageDo[];
+  /**
+   * If set to true, the {@link parentBookmarkPage} is applied to the {@link parentPage} before processing the
+   * remaining {@link pagePath}. This is mainly relevant for hybrid pages that only exist in Java as a hull. When
+   * handing over the bookmark activation to the UI to finish, the server could only navigate to the hybrid page,
+   * but not apply the page state (e.g. table configuration). Therefore, this has to be done in the UI.
+   */
+  applyParentBookmarkPage?: boolean; // FIXME bsh [js-bookmark] Document
 }
