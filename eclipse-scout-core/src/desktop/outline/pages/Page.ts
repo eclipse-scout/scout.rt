@@ -144,12 +144,14 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   }
 
   /**
-   * Writes the static model to the page instance and initialize the pageParam,
-   * so the {@link PageResolver} can find the correct page without the need to initialize it completely.
+   * Writes the static model to the page instance and initializes the {@link pageParam}.
+   * This allows the {@link PageResolver} to find the correct page without having to initialize it completely.
+   *
+   * **Important:** Always use {@link scout.create} to create and initialize page instances. This method is *only* intended to be used for page resolving!
    */
-  minimalInit(parent: Outline) {
+  minimalInit() {
     let staticModel = this._jsonModel();
-    Object.assign(this, staticModel, {parent});
+    Object.assign(this, staticModel);
     this._setPageParam(this.pageParam);
   }
 
@@ -618,7 +620,6 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
 
   protected _setPageParam(pageParam: PageParamDo | object) {
     if (!pageParam && this.pageParamType === null) {
-      // FIXME mvi [js-bookmark] DummyPageParam is only used in bookmarks. Should not be here in Page, but in BookmarkAdapter instead?
       pageParam = this._computeDummyPageParam();
     }
     if (pageParam instanceof PageParamDo || !pageParam) {
@@ -633,7 +634,6 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     if (pageId) {
       return scout.create(PageIdDummyPageParamDo, {pageId});
     }
-    // FIXME cgu [js-bookmark] throw error if no uuid was set, here or elsewhere? if here this code needs to be moved to bookmarkadapter, not every scout project needs params
     return null;
   }
 
@@ -700,7 +700,15 @@ interface ContributedMenu extends Menu {
 }
 
 /**
- * Base interface for all page param types.
+ * A page param contains all parameters that are required to create a {@link Page}.
+ * Being able to create a page in a generic way is essential when bookmarks are used.
+ *
+ * If the application uses bookmarks then each page needs to provide its own page param that inherits from this base class.
+ * If the page does not have any parameters, the page param can be omitted.
+ *
+ * If the application does not use bookmarks, page params are not required.
+ *
+ * @see BookmarkSupport
  */
 export class PageParamDo extends BaseDoEntity {
 }
