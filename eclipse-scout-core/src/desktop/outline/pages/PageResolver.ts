@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {App, Constructor, InitModelOf, ObjectFactory, ObjectModel, objects, ObjectWithType, Page, PageIdDummyPageParamDo, PageParamDo, scout, Session, strings, TypeDescriptor} from '../../../index';
-import $ from 'jquery';
 
 export class PageResolver implements PageResolverModel, ObjectWithType {
   declare model: PageResolverModel;
@@ -105,9 +104,10 @@ export class PageResolver implements PageResolverModel, ObjectWithType {
       }
       return null;
     } catch (e) {
-      // FIXME CGU [js-bookmark] why is this catched? error gets lost
       const objectType = ObjectFactory.get().getObjectType(PageConstructor);
-      $.log.info(`Unable to create and initialize ${objectType}. Cannot check for PageParam`);
+      let message = `Unable to create and initialize ${objectType}. Cannot check for PageParam. Error: ${e.message}`;
+      $.log.error(message);
+      this.session.sendLogRequest(message);
     } finally {
       if (page) {
         page.destroy();

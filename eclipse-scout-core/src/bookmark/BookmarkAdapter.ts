@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BaseDoEntity, Constructor, MaxRowCountContributionDo, objects, PageParamDo} from '../index';
+import {BaseDoEntity, Constructor, MaxRowCountContributionDo, PageParamDo} from '../index';
 
 export class BookmarkAdapter {
 
@@ -22,8 +22,7 @@ export class BookmarkAdapter {
 
     pageParam1 = this.normalizePageParam(pageParam1);
     pageParam2 = this.normalizePageParam(pageParam2);
-
-    return objects.equals(pageParam1, pageParam2);
+    return pageParam1.equals(pageParam2);
   }
 
   normalizePageParam(pageParam: PageParamDo): PageParamDo {
@@ -34,7 +33,10 @@ export class BookmarkAdapter {
     return pageParam;
   }
 
+  /**
+   * @returns contributions that may be added to page params but are irrelevant when comparing page params
+   */
   getIgnoredContributionClassesForPageParamComparison(): Constructor<BaseDoEntity>[] {
-    return [MaxRowCountContributionDo]; // FIXME CGU [js-bookmark] verify if this is really necessary
+    return [MaxRowCountContributionDo];
   }
 }
