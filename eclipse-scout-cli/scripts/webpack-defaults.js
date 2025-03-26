@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const scoutBuildConstants = require('./constants');
 const CopyPlugin = require('copy-webpack-plugin');
+const {CycloneDxWebpackPlugin} = require('@cyclonedx/webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const AfterEmitWebpackPlugin = require('./AfterEmitWebpackPlugin');
 const {SourceMapDevToolPlugin, WatchIgnorePlugin, ProgressPlugin} = require('webpack');
@@ -21,6 +22,8 @@ const {SourceMapDevToolPlugin, WatchIgnorePlugin, ProgressPlugin} = require('web
  * @param {boolean} args.progress true, to show build progress in percentage. Default is true.
  * @param {boolean} args.profile true, to show timing information for each build step. Default is false.
  * @param {boolean} args.watch true, if webpack runs in watch mode. Default is false.
+ * @param {boolean} args.cyclonedxSkip true, if no CycloneDX SBOM should be created. Default is false.
+ * @param {string} args.cyclonedxVersion CycloneDX version to use. Default is '1.5'.
  * @param {[]} args.resDirArray an array containing directories which should be copied to dist/res
  * @param {object} args.tsOptions a config object to be passed to the ts-loader
  * @param {boolean|'fork'} args.typeCheck
@@ -300,6 +303,19 @@ module.exports = (env, args) => {
         }
       })
     ];
+
+    const cyclonedxSkip = ('' + nvl(args.cyclonedxSkip, 'false')) === 'true';
+    if (!cyclonedxSkip) {
+      /** @type {import('@cyclonedx/webpack-plugin').CycloneDxWebpackPluginOptions} */
+      const cycloneDxWebpackPluginOptions = {
+        specVersion: nvl(args.cyclonedxVersion, '1.5'),
+        collectEvidence: true,
+        rootComponentType: 'application',
+        validateResults: false,
+        includeWellknown: false
+      };
+      config.plugins.push(new CycloneDxWebpackPlugin(cycloneDxWebpackPluginOptions));
+    }
   }
 
   return config;
@@ -349,6 +365,10 @@ function libraryConfig(config, options = {}) {
   packageJsonExternals.jquery = 'commonjs jquery'; // Make synthetic default import work (import $ from 'jquery') by importing jquery as commonjs module
   const customExternals = options.externals || {};
   const allExternals = {...packageJsonExternals, ...config.externals, ...customExternals};
+
+  // Remove CycloneDxWebpackPlugin for libraries as dependencies are marked as externals anyway and are therefore not part of the build.
+  // The SBOM will be created for application level builds only.
+  config.plugins = config.plugins.filter(p => !(p instanceof CycloneDxWebpackPlugin));
 
   // FileList is not necessary in library mode
   let plugins = config.plugins.map(plugin => {
