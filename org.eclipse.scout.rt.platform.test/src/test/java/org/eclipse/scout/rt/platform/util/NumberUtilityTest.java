@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,7 +24,7 @@ public class NumberUtilityTest {
 
   private static final double EPSILON = 0.01;
 
-  private static Number[] NUMBER_ARRAY = new Number[]{Long.valueOf(100),
+  private static final Number[] NUMBER_ARRAY = new Number[]{Long.valueOf(100),
       new BigInteger("1000000000000000000000000000000000000000000000000000000"),
       BigDecimal.ONE,
       BigDecimal.ZERO,
@@ -109,6 +109,38 @@ public class NumberUtilityTest {
   }
 
   @Test
+  public void testToInteger() {
+    assertNull(NumberUtility.toInteger(null));
+    assertEquals(Integer.valueOf(0), NumberUtility.toInteger(0));
+    assertEquals(Integer.valueOf(1), NumberUtility.toInteger(1));
+    assertEquals(Integer.valueOf(0), NumberUtility.toInteger((long) 0));
+    assertEquals(Integer.valueOf(1), NumberUtility.toInteger((long) 1));
+    assertEquals(Integer.valueOf(0), NumberUtility.toInteger(0.0));
+    assertEquals(Integer.valueOf(1), NumberUtility.toInteger(1.0f));
+    assertEquals(Integer.valueOf(1), NumberUtility.toInteger(1.4));
+    assertEquals(Integer.valueOf(1), NumberUtility.toInteger(1.5f));
+    assertEquals(Integer.valueOf(1), NumberUtility.toInteger(1.9));
+    assertEquals(Integer.valueOf(-12), NumberUtility.toInteger(-12.99999999999996));
+    assertEquals(Integer.valueOf(12), NumberUtility.toInteger(12.99999999999996));
+  }
+
+  @Test
+  public void testToLong() {
+    assertNull(NumberUtility.toLong(null));
+    assertEquals(Long.valueOf(0), NumberUtility.toLong(0));
+    assertEquals(Long.valueOf(1), NumberUtility.toLong(1));
+    assertEquals(Long.valueOf(0), NumberUtility.toLong((long) 0));
+    assertEquals(Long.valueOf(1), NumberUtility.toLong((long) 1));
+    assertEquals(Long.valueOf(0), NumberUtility.toLong(0.0));
+    assertEquals(Long.valueOf(1), NumberUtility.toLong(1.0f));
+    assertEquals(Long.valueOf(1), NumberUtility.toLong(1.4));
+    assertEquals(Long.valueOf(1), NumberUtility.toLong(1.5f));
+    assertEquals(Long.valueOf(1), NumberUtility.toLong(1.9));
+    assertEquals(Long.valueOf(-12), NumberUtility.toLong(-12.99999999999996));
+    assertEquals(Long.valueOf(12), NumberUtility.toLong(12.99999999999996));
+  }
+
+  @Test
   public void testSumNumbersIntAutoBox() {
     assertEquals(new BigDecimal("503"),
         NumberUtility.sum(1, 2, 500));
@@ -141,7 +173,7 @@ public class NumberUtilityTest {
   @Test
   public void testMedian() {
     // test behavior on null argument
-    double d = NumberUtility.median(null);
+    double d = NumberUtility.median((double[]) null);
     assertEquals(0, d, EPSILON);
     // test behavior on zero length argument
     double[] darray = {};
@@ -199,7 +231,7 @@ public class NumberUtilityTest {
   @Test
   public void testParseEmptyString() {
     assertEquals(0d, NumberUtility.parseDouble(""), 0.00001d);
-    assertEquals(0l, NumberUtility.parseLong(""));
+    assertEquals(0L, NumberUtility.parseLong(""));
     assertEquals(0, NumberUtility.parseInt(""));
   }
 
@@ -241,7 +273,7 @@ public class NumberUtilityTest {
     assertEquals(1, ObjectUtility.nvl(n1, null));
     assertEquals(Integer.valueOf(2), ObjectUtility.nvl(i2, null));
     assertEquals(Float.valueOf(3f), ObjectUtility.nvl(f3, null));
-    assertEquals(1, ObjectUtility.nvl((Number) null, n1));
+    assertEquals(1, ObjectUtility.nvl(null, n1));
   }
 
   @Test
@@ -256,10 +288,10 @@ public class NumberUtilityTest {
   @Test
   public void testNvlLong() {
     Long value = null;
-    assertEquals(100l, NumberUtility.nvl(value, 100));
-    assertEquals(Long.valueOf(100l), ObjectUtility.nvl(value, Long.valueOf(100)));
-    value = 100l;
-    assertEquals(100l, NumberUtility.nvl(value, 101));
+    assertEquals(100L, NumberUtility.nvl(value, 100));
+    assertEquals(Long.valueOf(100L), ObjectUtility.nvl(value, Long.valueOf(100)));
+    value = 100L;
+    assertEquals(100L, NumberUtility.nvl(value, 101));
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -69,11 +69,13 @@ public final class NumberUtility {
   }
 
   /**
-   * Converts a Number to an Integer.
+   * Null-safe variant of {@link Number#intValue()}.
+   * <p>
+   * Note: If decimal places are present in the given Number (e.g. for {@link Double} or {@link Float}), they are removed. No rounding is performed.
    *
    * @param n
-   *     Number to be converted.
-   * @return The converted Integer. Returns <code>null</code> when the input parameter is <code>null</code>.
+   *     Number to be converted or {@code null}.
+   * @return The converted {@link Integer}. Returns {@code null} if the input parameter is {@code null}.
    */
   public static Integer toInteger(Number n) {
     if (n == null) {
@@ -83,11 +85,13 @@ public final class NumberUtility {
   }
 
   /**
-   * Converts a Number to a Long.
+   * Null-safe variant of {@link Number#longValue()}.
+   * <p>
+   * Note: If decimal places are present in the given Number (e.g. for {@link Double} or {@link Float}), they are removed. No rounding is performed.
    *
    * @param n
-   *     Number to be converted.
-   * @return The converted Long. Returns <code>null</code> when the input parameter is <code>null</code>.
+   *     Number to be converted or {@code null}.
+   * @return The converted {@link Long}. Returns {@code null} if the input parameter is {@code null}.
    */
   public static Long toLong(Number n) {
     if (n == null) {
