@@ -180,7 +180,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
    */
   getSearchForm(): Form {
     // TODO bsh [js-bookmark] Add dedicated SearchTableControl class to find the correct table control more reliably
-    let tableControl = this.detailTable.findTableControl(FormTableControl, tableControl => !!tableControl.form);
+    let tableControl = this.detailTable?.findTableControl(FormTableControl, tableControl => !!tableControl.form);
     return tableControl ? tableControl.form : null;
   }
 
