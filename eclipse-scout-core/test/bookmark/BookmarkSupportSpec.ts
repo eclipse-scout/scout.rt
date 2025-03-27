@@ -445,7 +445,7 @@ describe('BookmarkSupport', () => {
 
       // -----
 
-      let bookmark = await bookmarkSupport.createBookmark(desktop.outline.activePage());
+      let bookmark = await bookmarkSupport.createBookmark();
       expect(bookmark).toBeInstanceOf(BookmarkDo);
       expect(bookmark.key).toBeUndefined();
       expect(bookmark.titles).toBeUndefined();
@@ -528,7 +528,7 @@ describe('BookmarkSupport', () => {
 
       // -----
 
-      let bookmark = await bookmarkSupport.createBookmark(desktop.outline.activePage());
+      let bookmark = await bookmarkSupport.createBookmark();
       expect(bookmark).toBeInstanceOf(BookmarkDo);
       expect(bookmark.key).toBeUndefined();
       expect(bookmark.titles).toBeUndefined();
