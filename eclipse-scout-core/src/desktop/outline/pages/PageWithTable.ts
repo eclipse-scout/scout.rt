@@ -175,7 +175,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
   }
 
   getSearchForm(): Form {
-    let tableControl = this.detailTable.findTableControl(FormTableControl, tableControl => !!tableControl.form);
+    let tableControl = this.detailTable?.findTableControl(FormTableControl, tableControl => !!tableControl.form);
     return tableControl ? tableControl.form : null;
   }
 

@@ -257,6 +257,17 @@ export class ActivateBookmarkRequestDo extends BaseDoEntity {
   pagePath: IBookmarkPageDo[];
 }
 
+@typeName('suite.BookmarkDoBuilderOptions')
+export class BookmarkDoBuilderOptionsDo extends BaseDoEntity {
+  createOutline?: boolean;
+  persistableRequired?: boolean;
+  fallbackAllowed?: boolean;
+  createTitle?: boolean;
+  createDescription?: boolean;
+  createTablePreferences?: boolean;
+  createTableRowSelections?: boolean;
+}
+
 // --------------------------------------------------
 
 export const bookmarks = {
