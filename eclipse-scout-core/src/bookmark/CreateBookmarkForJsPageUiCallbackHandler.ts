@@ -7,12 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BookmarkDo, BookmarkSupport, Desktop, Page, scout, UiCallbackHandler, UiCallbackParam} from '../index';
+import {BookmarkDo, BookmarkDoBuilderOptionsDo, BookmarkSupport, Desktop, Page, scout, UiCallbackHandler, UiCallbackParam} from '../index';
 
 export class CreateBookmarkForJsPageUiCallbackHandler implements UiCallbackHandler {
 
   handle(param: UiCallbackParam): JQuery.Promise<BookmarkDo> {
-    const desktop = scout.assertInstance(param.owner, Desktop);
+    const desktop = scout.assertInstance(param.owner, Desktop, 'owner is not of type Desktop');
+    const options = scout.assertInstance(param.data, BookmarkDoBuilderOptionsDo, 'data is ');
     const contextElements = scout.assertValue(param.contextElements, 'Missing context elements');
     const page = contextElements.getSingle('page').getElement(Page);
 
@@ -22,8 +23,6 @@ export class CreateBookmarkForJsPageUiCallbackHandler implements UiCallbackHandl
       // the definition would replace the previous configured search with an empty search. See #229618 for details.
       return null;
     }
-    return BookmarkSupport.get(desktop.session).createBookmark(page, {
-      createOutline: false // we only need the bookmarked page, not the entire path
-    });
+    return BookmarkSupport.get(desktop.session).createBookmark({page, ...options});
   }
 }
