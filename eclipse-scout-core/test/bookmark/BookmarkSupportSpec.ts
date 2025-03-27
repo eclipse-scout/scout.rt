@@ -9,421 +9,83 @@
  */
 
 import {
-  ActivateBookmarkRequest, BaseDoEntity, BookmarkDo, BookmarkSupport, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierStringComponentDo, BooleanColumn, Column, Desktop, Form, FormModel, FormTableControl, GroupBox, icons,
-  NodeBookmarkPageDo, NumberColumn, ObjectOrModel, Outline, OutlineBookmarkDefinitionDo, OutlineViewButton, Page, PageBookmarkDefinitionDo, PageIdDummyPageParamDo, PageParamDo, PageWithNodes, PageWithTable, ResetMenu, scout, SearchMenu,
-  StringField, strings, Table, TableBookmarkPageDo, TableRow, TableTextUserFilter, typeName, UuidPool
+  ActivateBookmarkRequest, BaseDoEntity, BookmarkDo, BookmarkSupport, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierStringComponentDo, Desktop, NodeBookmarkPageDo, Outline, OutlineBookmarkDefinitionDo, PageBookmarkDefinitionDo,
+  PageIdDummyPageParamDo, ResetMenu, scout, SearchMenu, Table, TableBookmarkPageDo, TableTextUserFilter, UuidPool
 } from '../../src/index';
+import {
+  FRUIT_1_KEY, FRUIT_2_KEY, FRUIT_3_KEY, FRUIT_4_KEY, FRUIT_5_KEY, goToOutline, SPEC_NODE_PAGE_1_UUID, SPEC_NODE_PAGE_2_UUID, SPEC_NODE_PAGE_3_UUID, SPEC_NODE_PAGE_4_UUID, SPEC_OUTLINE_1_ID, SPEC_OUTLINE_1_UUID, SPEC_OUTLINE_2_ID,
+  SPEC_OUTLINE_2_UUID, SPEC_TABLE_PAGE_1_UUID, SPEC_TABLE_PAGE_2_UUID, SPEC_TABLE_PAGE_3_UUID, specDesktopModel, SpecNodePage1, SpecNodePage2, SpecNodePage3, SpecNodePage4, SpecPageParamDo, SpecSearchDo, SpecSearchForm, SpecTablePage1,
+  SpecTablePage2, SpecTablePage3
+} from './bookmark-fixtures';
 
 describe('BookmarkSupport', () => {
   let session: SandboxSession;
   let desktop: Desktop;
   let bookmarkSupport: BookmarkSupport;
 
-  const SPEC_OUTLINE_1_ID = 'SpecOutline1';
-  const SPEC_OUTLINE_2_ID = 'SpecOutline2';
-  const SPEC_OUTLINE_1_UUID = '8841b967-4801-47bb-87a9-a5f6d54b4014';
-  const SPEC_OUTLINE_2_UUID = 'a6379a66-c844-4ec7-8e7e-1f854dc7e81e';
-  const SPEC_NODE_PAGE_1_UUID = '9e4a69e7-73a5-44fd-8d68-ebb6a50f07ba';
-  const SPEC_NODE_PAGE_2_UUID = 'c7f9ad97-d80a-429b-8701-0378cad9307f';
-  const SPEC_NODE_PAGE_3_UUID = '80e022bf-5b00-491d-818e-3c4054d7fcc3';
-  const SPEC_NODE_PAGE_4_UUID = 'df79375c-047b-47cf-8323-360652ee97ae';
-  const SPEC_TABLE_PAGE_1_UUID = 'e9320869-aead-46a5-a67e-25491f8823de';
-  const SPEC_TABLE_PAGE_2_UUID = '56c699e5-5692-4a21-9595-e7dac5ee568e';
-  const SPEC_TABLE_PAGE_3_UUID = 'daf22921-71eb-4382-b500-854225e71622';
-  const FRUIT_1_KEY = '1'; // Apple
-  const FRUIT_2_KEY = '2'; // Banana
-  const FRUIT_3_KEY = '3'; // Pineapple
-  const FRUIT_4_KEY = '4'; // Lemon
-  const FRUIT_5_KEY = '5'; // Kiwi
-
-  // ---------------------------------------------------------------
-  //
-  //   SpecOutline1
-  //   +- SpecNodePage1 [leaf, SpecDetailForm]
-  //   +- SpecTablePage1 [leaf] (Letters)
-  //   +- SpecTablePage3 [leaf, SpecSearchForm] (Colors)
-  //
-  //   SpecOutline2
-  //   +- SpecNodePage2 [leaf, SpecDetailForm]
-  //   +- SpecNodePage3
-  //      +- SpecNodePage1 [leaf, SpecDetailForm]
-  //      +- SpecTablePage2 [SpecSearchForm] (Fruits)
-  //      |  +- SpecNodePage4
-  //      |     +- SpecNodePage2 [leaf, SpecDetailForm]
-  //      |     +- (rec:SpecTablePage2)
-  //      +- SpecNodePage2 [leaf, SpecDetailForm]
-  //
-  // ---------------------------------------------------------------
-
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession({
-      desktop: {
-        navigationVisible: true,
-        headerVisible: true,
-        benchVisible: true,
-        viewButtons: [
-          {
-            id: 'SpecOutline1ViewButton',
-            objectType: OutlineViewButton,
-            outline: {
-              id: SPEC_OUTLINE_1_ID,
-              uuid: SPEC_OUTLINE_1_UUID,
-              objectType: Outline,
-              title: 'Spec Outline 1',
-              nodes: [
-                {objectType: SpecNodePage1},
-                {objectType: SpecTablePage1},
-                {objectType: SpecTablePage3}
-              ]
-            },
-            selected: true,
-            displayStyle: 'MENU',
-            text: 'Spec Outline 1'
-          },
-          {
-            id: 'SpecOutline2ViewButton',
-            objectType: OutlineViewButton,
-            outline: {
-              id: SPEC_OUTLINE_2_ID,
-              uuid: SPEC_OUTLINE_2_UUID,
-              objectType: Outline,
-              title: 'Spec Outline 2',
-              nodes: [
-                {objectType: SpecNodePage2},
-                {objectType: SpecNodePage3}
-              ]
-            },
-            displayStyle: 'MENU',
-            text: 'Spec Outline 2'
-          }
-        ],
-        outline: SPEC_OUTLINE_1_ID
-      },
+      desktop: specDesktopModel(),
       renderDesktop: false
     });
     desktop = session.desktop;
     bookmarkSupport = BookmarkSupport.get(session);
   });
 
-  @typeName('SpecPageParam')
-  class SpecPageParamDo extends PageParamDo {
-    fooId: string;
-  }
-
-  @typeName('SpecSearch')
-  class SpecSearchDo extends BaseDoEntity {
-    text: string;
-  }
-
-  class SpecNodePage1 extends PageWithNodes {
-
-    constructor() {
-      super();
-      this.uuid = SPEC_NODE_PAGE_1_UUID;
-      this.text = 'Node Page 1';
-      this.leaf = true;
-    }
-
-    protected override _createDetailForm(): Form {
-      return scout.create(SpecDetailForm, {
-        parent: this.outline
-      });
-    }
-  }
-
-  class SpecNodePage2 extends PageWithNodes {
-
-    constructor() {
-      super();
-      this.uuid = SPEC_NODE_PAGE_2_UUID;
-      this.text = 'Node Page 3';
-      this.leaf = true;
-    }
-
-    protected override _createDetailForm(): Form {
-      return scout.create(SpecDetailForm, {
-        parent: this.outline
-      });
-    }
-  }
-
-  class SpecNodePage3 extends PageWithNodes {
-
-    constructor() {
-      super();
-      this.uuid = SPEC_NODE_PAGE_3_UUID;
-      this.text = 'Node Page 3';
-    }
-
-    protected override _createChildPages(): JQuery.Promise<Page[]> {
-      return $.resolvedPromise([
-        scout.create(SpecNodePage1, {parent: this.outline}),
-        scout.create(SpecTablePage2, {parent: this.outline}),
-        scout.create(SpecNodePage2, {parent: this.outline})
-      ]);
-    }
-  }
-
-  class SpecNodePage4 extends PageWithNodes {
-
-    constructor() {
-      super();
-      this.uuid = SPEC_NODE_PAGE_4_UUID;
-      this.text = 'Node Page 4';
-    }
-
-    protected override _createChildPages(): JQuery.Promise<Page[]> {
-      return $.resolvedPromise([
-        scout.create(SpecNodePage2, {parent: this.outline}),
-        scout.create(SpecTablePage2, {parent: this.outline})
-      ]);
-    }
-  }
-
-  class SpecTablePage1 extends PageWithTable {
-
-    constructor() {
-      super();
-      this.uuid = SPEC_TABLE_PAGE_1_UUID;
-      this.text = 'Table Page 1';
-      this.leaf = true;
-    }
-
-    protected override _createDetailTable(): Table {
-      return scout.create(Table, {
-        parent: this.outline,
-        columns: [{
-          id: 'LetterColumn',
-          objectType: Column,
-          text: 'Letter'
-        }]
-      });
-    }
-
-    protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
-      let data = ['A', 'B', 'C'];
-      return $.resolvedPromise(data);
-    }
-
-    protected override _transformTableDataToTableRows(tableData: any): ObjectOrModel<TableRow>[] {
-      return tableData.map(rowData => {
-        return scout.create(TableRow, {
-          parent: this.detailTable,
-          cells: [rowData]
-        });
-      });
-    }
-  }
-
-  class SpecTablePage2 extends PageWithTable {
-
-    constructor() {
-      super();
-      this.uuid = SPEC_TABLE_PAGE_2_UUID;
-      this.text = 'Table Page 2';
-    }
-
-    protected override _createDetailTable(): Table {
-      return scout.create(Table, {
-        parent: this.outline,
-        columns: [{
-          id: 'KeyColumn',
-          objectType: Column,
-          primaryKey: true,
-          displayable: false
-        }, {
-          id: 'NameColumn',
-          objectType: Column,
-          text: 'Name',
-          summary: true
-        }, {
-          id: 'AmountColumn',
-          objectType: NumberColumn,
-          text: 'Amount'
-        }],
-        tableControls: [{
-          id: 'SearchFormTableControl',
-          objectType: FormTableControl,
-          iconId: icons.SEARCH,
-          form: {
-            id: 'SearchForm',
-            objectType: SpecSearchForm
-          }
-        }]
-      });
-    }
-
-    protected override _initDetailTable(table: Table) {
-      super._initDetailTable(table);
-      this.getSearchForm().on('search reset', event => table.reload(Table.ReloadReason.SEARCH));
-    }
-
-    protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
-      let data = [
-        {key: FRUIT_1_KEY, name: 'Apple', amount: 42},
-        {key: FRUIT_2_KEY, name: 'Banana', amount: 37},
-        {key: FRUIT_3_KEY, name: 'Pineapple', amount: 29},
-        {key: FRUIT_4_KEY, name: 'Lemon', amount: 58},
-        {key: FRUIT_5_KEY, name: 'Kiwi', amount: 33}
-      ];
-      if (searchFilter instanceof SpecSearchDo && searchFilter.text) {
-        data = data.filter(d => new RegExp(strings.quote(searchFilter.text), 'i').test(d.name));
-      }
-      return $.resolvedPromise(data);
-    }
-
-    protected override _transformTableDataToTableRows(tableData: any): ObjectOrModel<TableRow>[] {
-      return tableData.map(rowData => {
-        return scout.create(TableRow, {
-          parent: this.detailTable,
-          cells: [rowData.key, rowData.name, rowData.amount]
-        });
-      });
-    }
-
-    protected override _createChildPage(row: TableRow): Page {
-      let pageParam = scout.create(SpecPageParamDo, {
-        fooId: this.detailTable.columnById('KeyColumn').cellValue(row)
-      });
-      return scout.create(SpecNodePage4, {
-        parent: this.outline,
-        pageParam: pageParam
-      });
-    }
-  }
-
-  class SpecTablePage3 extends PageWithTable {
-
-    constructor() {
-      super();
-      this.uuid = SPEC_TABLE_PAGE_3_UUID;
-      this.text = 'Table Page 3';
-      this.leaf = true;
-    }
-
-    protected override _createDetailTable(): Table {
-      return scout.create(Table, {
-        parent: this.outline,
-        columns: [{
-          id: 'KeyColumn',
-          objectType: Column,
-          primaryKey: true,
-          displayable: false
-        }, {
-          id: 'ColorColumn',
-          objectType: Column,
-          text: 'Color',
-          summary: true
-        }, {
-          id: 'PrimaryColumn',
-          objectType: BooleanColumn,
-          text: 'Primary color'
-        }],
-        tableControls: [{
-          id: 'SearchFormTableControl',
-          objectType: FormTableControl,
-          iconId: icons.SEARCH,
-          form: {
-            id: 'SearchForm',
-            objectType: SpecSearchForm
-          }
-        }]
-      });
-    }
-
-    protected override _initDetailTable(table: Table) {
-      super._initDetailTable(table);
-      this.getSearchForm().on('search reset', event => table.reload(Table.ReloadReason.SEARCH));
-    }
-
-    protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
-      let data = [
-        {key: '#000000', label: 'Black', primary: false},
-        {key: '#ff0000', label: 'Red', primary: true},
-        {key: '#00ff00', label: 'Green', primary: true},
-        {key: '#0000ff', label: 'Blue', primary: true},
-        {key: '#ffff00', label: 'Yellow', primary: false},
-        {key: '#ff00ff', label: 'Magenta', primary: false},
-        {key: '#00ffff', label: 'Cyan', primary: false},
-        {key: '#ffffff', label: 'White', primary: false}
-      ];
-      if (searchFilter instanceof SpecSearchDo && searchFilter.text) {
-        data = data.filter(d => new RegExp(strings.quote(searchFilter.text), 'i').test(d.label));
-      }
-      return $.resolvedPromise(data);
-    }
-
-    protected override _transformTableDataToTableRows(tableData: any): ObjectOrModel<TableRow>[] {
-      return tableData.map(rowData => {
-        return scout.create(TableRow, {
-          parent: this.detailTable,
-          cells: [rowData.key, rowData.label, rowData.primary]
-        });
-      });
-    }
-  }
-
-  class SpecSearchForm extends Form {
-    declare data: SpecSearchDo;
-    declare widgetMap: {
-      'TextField': StringField;
-      'SearchMenu': SearchMenu;
-      'ResetMenu': ResetMenu;
-    };
-
-    protected override _jsonModel(): FormModel {
-      return {
-        rootGroupBox: {
-          id: 'MainBox',
-          objectType: GroupBox,
-          fields: [{
-            id: 'TextField',
-            objectType: StringField,
-            label: 'Text'
-          }],
-          menus: [{
-            id: 'SearchMenu',
-            objectType: SearchMenu
-          }, {
-            id: 'ResetMenu',
-            objectType: ResetMenu
-          }]
-        }
-      };
-    }
-
-    override importData() {
-      if (!this.data) {
-        return;
-      }
-      this.widget('TextField').setValue(this.data.text);
-    }
-
-    override exportData(): any {
-      return scout.create(SpecSearchDo, {
-        text: this.widget('TextField').value
-      });
-    }
-  }
-
-  class SpecDetailForm extends Form {
-  }
-
-  function getOutline(outlineId: string): Outline {
-    return scout.assertValue(desktop.getOutlines().find(outline => outline.id === outlineId), `Outline not found: ${outlineId}`);
-  }
-
-  function goToOutline(outlineId: string): Outline {
-    let outline = getOutline(outlineId);
-    desktop.setOutline(outline);
-    desktop.bringOutlineToFront();
-    return outline;
-  }
-
   // ---------------------------------------------------------------
 
   describe('createBookmark', () => {
+
+    it('can create a bookmark for a top-level table page', async () => {
+      let outline = desktop.outline;
+      expect(outline).toBeInstanceOf(Outline);
+      expect(outline.title).toBe('Spec Outline 1');
+      expect(outline.nodes.length).toBe(3);
+      expect(outline.nodes[0]).toBeInstanceOf(SpecNodePage1);
+      expect(outline.nodes[1]).toBeInstanceOf(SpecTablePage1);
+      expect(outline.nodes[2]).toBeInstanceOf(SpecTablePage3);
+      expect(outline.selectedNode()).toBe(null);
+      let page = scout.assertInstance(outline.nodes[2], SpecTablePage3);
+      expect(page.getSearchForm()).toBe(null);
+      expect(page.getSearchFilter()).toBe(undefined);
+      outline.selectNodes(page);
+      expect(page.getSearchForm()).toBeInstanceOf(SpecSearchForm);
+
+      expect(page.detailTable).toBeInstanceOf(Table);
+      expect(page.detailTable.loading).toBe(true);
+      expect(page.detailTable.rows.length).toBe(0);
+      await page.ensureLoadChildren();
+      expect(page.detailTable.loading).toBe(false);
+      expect(page.detailTable.rows.length).toBe(8);
+
+      // Change search filter
+      let searchForm = page.getSearchForm() as SpecSearchForm;
+      searchForm.widget('TextField').setValue('red');
+      searchForm.widget('SearchMenu').doAction();
+      await page.detailTable.when('reload');
+      await page.ensureLoadChildren();
+      expect(page.detailTable.rows.length).toBe(1);
+
+      // -----
+
+      let bookmark = await bookmarkSupport.createBookmark();
+      expect(bookmark).toBeInstanceOf(BookmarkDo);
+      expect(bookmark.key).toBeUndefined();
+      expect(bookmark.titles).toBeUndefined();
+      expect(bookmark.description).toBeUndefined();
+      expect(bookmark.definition).toBeInstanceOf(OutlineBookmarkDefinitionDo);
+      let bookmarkDefinition = bookmark.definition as OutlineBookmarkDefinitionDo;
+      expect(bookmarkDefinition.outlineId).toBe(SPEC_OUTLINE_1_UUID);
+      expect(bookmarkDefinition.pagePath).toEqual([]);
+      expect(bookmarkDefinition.bookmarkedPage).toBeInstanceOf(TableBookmarkPageDo);
+      let bookmarkedPage = bookmarkDefinition.bookmarkedPage as TableBookmarkPageDo;
+      expect(bookmarkedPage.displayText).toBe('Table Page 3');
+      expect(bookmarkedPage.pageParam).toBeInstanceOf(PageIdDummyPageParamDo);
+      expect((bookmarkedPage.pageParam as PageIdDummyPageParamDo).pageId).toBe(SPEC_TABLE_PAGE_3_UUID);
+      expect(bookmarkedPage.searchData).toBeInstanceOf(BaseDoEntity);
+      expect((bookmarkedPage.searchData as BaseDoEntity).toPojo()).toEqual(scout.create(SpecSearchDo, {text: 'red'}).toPojo());
+    });
 
     it('can create a bookmark for a top-level table page without search form', async () => {
       let outline = desktop.outline;
@@ -434,7 +96,7 @@ describe('BookmarkSupport', () => {
       expect(outline.nodes[1]).toBeInstanceOf(SpecTablePage1);
       expect(outline.nodes[2]).toBeInstanceOf(SpecTablePage3);
       expect(outline.selectedNode()).toBe(null);
-      let page = outline.nodes[1];
+      let page = scout.assertInstance(outline.nodes[1], SpecTablePage1);
       outline.selectNodes(page);
       expect(page.detailTable).toBeInstanceOf(Table);
       expect(page.detailTable.loading).toBe(true);
@@ -462,8 +124,83 @@ describe('BookmarkSupport', () => {
       expect(bookmarkedPage.searchData).toBe(null);
     });
 
+    it('can create a page-only bookmark', async () => {
+      let outline = goToOutline(desktop, SPEC_OUTLINE_2_ID);
+      expect(outline).toBeInstanceOf(Outline);
+      expect(outline.title).toBe('Spec Outline 2');
+      expect(outline.nodes.length).toBe(2);
+      expect(outline.nodes[0]).toBeInstanceOf(SpecNodePage2);
+      expect(outline.nodes[1]).toBeInstanceOf(SpecNodePage3);
+      expect(outline.selectedNode()).toBe(null);
+
+      let page1 = outline.nodes[1] as SpecNodePage3;
+      outline.drillDown(page1);
+      await page1.ensureLoadChildren();
+      expect(page1.childNodes.length).toBe(3);
+      expect(page1.childNodes[0]).toBeInstanceOf(SpecNodePage1);
+      expect(page1.childNodes[1]).toBeInstanceOf(SpecTablePage2);
+      expect(page1.childNodes[2]).toBeInstanceOf(SpecNodePage2);
+
+      let page2 = page1.childNodes[0] as SpecNodePage1;
+      outline.drillDown(page2);
+      await page2.ensureLoadChildren();
+
+      // -----
+
+      let bookmark = await bookmarkSupport.createBookmark({
+        createOutline: false
+      });
+      expect(bookmark).toBeInstanceOf(BookmarkDo);
+      expect(bookmark.key).toBeUndefined();
+      expect(bookmark.titles).toBeUndefined();
+      expect(bookmark.description).toBeUndefined();
+      expect(bookmark.definition).toBeInstanceOf(PageBookmarkDefinitionDo); // <--
+      let bookmarkDefinition = bookmark.definition as PageBookmarkDefinitionDo;
+
+      let bookmarkedPage = bookmarkDefinition.bookmarkedPage as NodeBookmarkPageDo;
+      expect(bookmarkedPage).toBeInstanceOf(NodeBookmarkPageDo);
+      expect(bookmarkedPage.displayText).toBe('Node Page 1');
+      expect(bookmarkedPage.pageParam).toBeInstanceOf(PageIdDummyPageParamDo);
+      expect((bookmarkedPage.pageParam as PageIdDummyPageParamDo).pageId).toBe(SPEC_NODE_PAGE_1_UUID);
+    });
+
+    it('can create a outline-only bookmark', async () => {
+      let outline = goToOutline(desktop, SPEC_OUTLINE_2_ID);
+      expect(outline).toBeInstanceOf(Outline);
+      expect(outline.title).toBe('Spec Outline 2');
+      expect(outline.nodes.length).toBe(2);
+      expect(outline.nodes[0]).toBeInstanceOf(SpecNodePage2);
+      expect(outline.nodes[1]).toBeInstanceOf(SpecNodePage3);
+      expect(outline.selectedNode()).toBe(null);
+
+      // -----
+
+      let bookmark1 = await bookmarkSupport.createBookmark();
+      expect(bookmark1).toBeInstanceOf(BookmarkDo);
+      expect(bookmark1.key).toBeUndefined();
+      expect(bookmark1.titles).toBeUndefined();
+      expect(bookmark1.description).toBeUndefined();
+      expect(bookmark1.definition).toBeInstanceOf(OutlineBookmarkDefinitionDo);
+      let bookmarkDefinition1 = bookmark1.definition as OutlineBookmarkDefinitionDo;
+      expect(bookmarkDefinition1.outlineId).toBe(SPEC_OUTLINE_2_UUID);
+      expect(bookmarkDefinition1.pagePath.length).toBe(0);
+      expect(bookmarkDefinition1.bookmarkedPage).toBe(null);
+
+      // This case does not really make sense, but we test it anyway
+      let bookmark2 = await bookmarkSupport.createBookmark({
+        createOutline: false
+      });
+      expect(bookmark2).toBeInstanceOf(BookmarkDo);
+      expect(bookmark2.key).toBeUndefined();
+      expect(bookmark2.titles).toBeUndefined();
+      expect(bookmark2.description).toBeUndefined();
+      expect(bookmark2.definition).toBeInstanceOf(PageBookmarkDefinitionDo); // <--
+      let bookmarkDefinition2 = bookmark2.definition as PageBookmarkDefinitionDo;
+      expect(bookmarkDefinition2.bookmarkedPage).toBe(null);
+    });
+
     it('can create a bookmark for a nested node page', async () => {
-      let outline = goToOutline(SPEC_OUTLINE_2_ID);
+      let outline = goToOutline(desktop, SPEC_OUTLINE_2_ID);
       expect(outline).toBeInstanceOf(Outline);
       expect(outline.title).toBe('Spec Outline 2');
       expect(outline.nodes.length).toBe(2);
@@ -819,7 +556,7 @@ describe('BookmarkSupport', () => {
 
     it('can reset a user filter to find the specified child node', async () => {
       // Prepare a filter
-      let outline = goToOutline(SPEC_OUTLINE_2_ID);
+      let outline = goToOutline(desktop, SPEC_OUTLINE_2_ID);
       let page1 = scout.assertInstance(outline.nodes[1], SpecNodePage3);
       outline.drillDown(page1);
       await page1.ensureLoadChildren();
@@ -977,7 +714,7 @@ describe('BookmarkSupport', () => {
 
     it('can open a partial bookmark from a given start location', async () => {
       // Go to the start page
-      let outline = goToOutline(SPEC_OUTLINE_2_ID);
+      let outline = goToOutline(desktop, SPEC_OUTLINE_2_ID);
       let page1 = scout.assertInstance(outline.nodes[1], SpecNodePage3);
       outline.drillDown(page1);
       await page1.ensureLoadChildren();
@@ -1071,7 +808,7 @@ describe('BookmarkSupport', () => {
       expect(desktop.outline.nodes[0]).toBeInstanceOf(SpecNodePage1);
       let page = scout.assertInstance(desktop.outline.nodes[0], SpecNodePage1);
 
-      let outline = goToOutline(SPEC_OUTLINE_2_ID);
+      let outline = goToOutline(desktop, SPEC_OUTLINE_2_ID);
       expect(desktop.outline.id).toBe(SPEC_OUTLINE_2_ID);
 
       // Activate bookmark
