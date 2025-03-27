@@ -16,6 +16,14 @@ export class CreateBookmarkForJsPageUiCallbackHandler implements UiCallbackHandl
     const contextElements = scout.assertValue(param.contextElements, 'Missing context elements');
     const page = contextElements.getSingle('page').getElement(Page);
 
-    return BookmarkSupport.get(desktop.session).createBookmark(page);
+    if (!page.childrenLoaded) {
+      // If children are not loaded, we assume that the bookmark has not yet been opened by the user. This can happen if they
+      // update the definition of a bookmark at folder level without opening the bookmarked page before. In this case, updating
+      // the definition would replace the previous configured search with an empty search. See #229618 for details.
+      return null;
+    }
+    return BookmarkSupport.get(desktop.session).createBookmark(page, {
+      createOutline: false // we only need the bookmarked page, not the entire path
+    });
   }
 }

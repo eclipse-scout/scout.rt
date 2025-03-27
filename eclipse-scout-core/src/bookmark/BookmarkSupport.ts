@@ -23,6 +23,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   static ERROR_MISSING_OUTLINE = 'missing-outline';
   static ERROR_MISSING_PAGE_PARAM = 'missing-page-param';
   static ERROR_PAGE_NOT_BOOKMARKABLE = 'page-not-bookmarkable';
+  static ERROR_PAGE_PATH_NOT_BOOKMARKABLE = 'page-path-not-bookmarkable';
   static ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER = 'missing-row-bookmark-identifier';
   static ERROR_OUTLINE_NOT_FOUND = 'outline-not-found';
   static ERROR_PAGE_NOT_FOUND = 'page-not-found';
@@ -135,37 +136,47 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   // --------------------------------------
 
-  createBookmark(page?: Page): JQuery.Promise<BookmarkDo> {
+  createBookmark(page?: Page, options?: CreateBookmarkOptions): JQuery.Promise<BookmarkDo> {
     return $.resolvedPromise()
-      .then(() => this._createBookmark(page));
+      .then(() => this._createBookmark(page, options));
   }
 
-  protected async _createBookmark(page?: Page): Promise<BookmarkDo> {
+  protected async _createBookmark(page?: Page, options?: CreateBookmarkOptions): Promise<BookmarkDo> {
+    options = this._initCreateBookmarkOptions(options);
+
     let outline = page?.outline || this.desktop.outline;
     let outlineId = outline?.getObjectUuidBuilder().buildId();
     if (!outlineId) {
       throw BookmarkSupport.ERROR_MISSING_OUTLINE;
     }
-    page = page || outline.selectedNode();
+    if (page === undefined) {
+      page = outline.activePage();
+    }
 
     let bookmarkedPage: IBookmarkPageDo = null;
     let pagePath: IBookmarkPageDo[] = [];
     if (page) {
-      bookmarkedPage = await this._pageToBookmarkPage(page);
+      bookmarkedPage = await this._pageToBookmarkPage(page, null, options);
 
-      let parentPage = page.parentNode;
-      let childPage = page;
-      while (parentPage) {
-        let pathEntry = await this._pageToBookmarkPage(parentPage, childPage);
-        if (!pathEntry) {
-          // non-bookmarkable page, discard entire path
-          pagePath = null;
-          break;
+      if (options.createOutline) {
+        let parentPage = page.parentNode;
+        let childPage = page;
+        while (parentPage) {
+          let pathEntry = await this._pageToBookmarkPage(parentPage, childPage, options);
+          if (!pathEntry) {
+            if (options.fallbackAllowed) {
+              // non-bookmarkable page, discard entire path
+              pagePath = null;
+              break;
+            } else {
+              throw BookmarkSupport.ERROR_PAGE_PATH_NOT_BOOKMARKABLE;
+            }
+          }
+          // Add bookmarkPage to front of path and repeat for parent page
+          pagePath.unshift(pathEntry);
+          childPage = parentPage;
+          parentPage = parentPage.parentNode;
         }
-        // Add bookmarkPage to front of path and repeat for parent page
-        pagePath.unshift(pathEntry);
-        childPage = parentPage;
-        parentPage = parentPage.parentNode;
       }
     }
 
@@ -181,14 +192,27 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
         bookmarkedPage: bookmarkedPage
       });
     }
+    // FIXME bsh [js-bookmark] DisplayText & Description
     return scout.create(BookmarkDo, {
       definition: bookmarkDefinition
     });
   }
 
+  protected _initCreateBookmarkOptions(options?: CreateBookmarkOptions): CreateBookmarkOptions {
+    return $.extend({
+      createOutline: true,
+      persistableRequired: true,
+      fallbackAllowed: true,
+      createTitle: true,
+      createDescription: true,
+      createTablePreferences: true,
+      createTableRowSelections: true
+    }, options);
+  }
+
   // Note: this methode is called multiple times from bottom to top. On the first invocation, the childPage is not set,
   // but later calls pass the childPage for resolving the corresponding row of a table page.
-  protected async _pageToBookmarkPage(page: Page, childPage?: Page): Promise<IBookmarkPageDo> {
+  protected async _pageToBookmarkPage(page: Page, childPage: Page, options: CreateBookmarkOptions): Promise<IBookmarkPageDo> {
     if (!page) {
       throw BookmarkSupport.ERROR_PAGE_NOT_BOOKMARKABLE;
     }
@@ -197,31 +221,36 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
 
     if (page.nodeType === Page.NodeType.NODES) {
-      return this._pageToNodeBookmarkPage(page, childPage);
+      return this._pageToNodeBookmarkPage(page, childPage, options);
     }
     if (page.nodeType === Page.NodeType.TABLE) {
-      return this._pageToTableBookmarkPage(page, childPage);
+      return this._pageToTableBookmarkPage(page, childPage, options);
     }
 
     throw BookmarkSupport.ERROR_PAGE_NOT_BOOKMARKABLE;
   }
 
-  protected async _pageToNodeBookmarkPage(page: Page, childPage?: Page): Promise<NodeBookmarkPageDo> {
+  protected async _pageToNodeBookmarkPage(page: Page, childPage: Page, options: CreateBookmarkOptions): Promise<NodeBookmarkPageDo> {
     return scout.create(NodeBookmarkPageDo, {
       pageParam: page.pageParam,
       displayText: page.getDisplayText()
     });
   }
 
-  protected async _pageToTableBookmarkPage(page: Page, childPage?: Page): Promise<TableBookmarkPageDo> {
-    let expandedChildRowIdentifier;
+  protected async _pageToTableBookmarkPage(page: Page, childPage: Page, options: CreateBookmarkOptions): Promise<TableBookmarkPageDo> {
+    let expandedChildRowIdentifier: BookmarkTableRowIdentifierDo;
+    let selectedChildRowIdentifiers: BookmarkTableRowIdentifierDo[];
+    let searchFilterComplete: boolean;
+    let searchData: any;
+    let tablePreferences: TableClientUiPreferencesDo;
+    let chartTableControlConfig: ChartTableControlConfigDo;
+
     if (childPage) {
       if (childPage.row) {
         // Linked to table row -> get row identifier
-        expandedChildRowIdentifier = page.getTableRowIdentifier(childPage.row);
+        expandedChildRowIdentifier = page.getTableRowIdentifier(childPage.row, !options.persistableRequired);
       } else {
         // Not linked to table row -> assume the page param is enough to identify the child page
-        // FIXME bsh [js-bookmark] Is this assumption correct? Or do we want to throw an error?
       }
       if (!expandedChildRowIdentifier) { // child row not identifiable
         throw BookmarkSupport.ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER;
@@ -229,23 +258,24 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
 
     // FIXME bsh [js-bookmark] Only export when requested, see BookmarkDoBuilder#createTableRowSelections
-    let selectedChildRowIdentifiers = page.detailTable.selectedRows
-      .map(row => page.getTableRowIdentifier(row));
+    if (options.createTableRowSelections && page.childrenLoaded) {
+      selectedChildRowIdentifiers = page.detailTable.selectedRows
+        .map(row => page.getTableRowIdentifier(row, !options.persistableRequired));
+    }
 
-    let searchFilterComplete: boolean;
-    let searchData: any;
-    let tablePreferences: TableClientUiPreferencesDo;
-    let chartTableControlConfig: ChartTableControlConfigDo;
     if (page instanceof PageWithTable) {
       // Local
       searchFilterComplete = true;
       searchData = await this._createSearchFilterForBookmark(page);
-      tablePreferences = await this._createTablePreferencesForBookmark(page);
+      if (options.createTablePreferences) {
+        tablePreferences = await this._createTablePreferencesForBookmark(page);
+      }
       chartTableControlConfig = await this._createChartTableControlConfigForBookmark(page);
     } else {
       // Remote
       let contextElements = scout.create(HybridActionContextElements)
         .withElement('page', HybridActionContextElement.of(page.outline, page));
+      // FIXME bsh [js-bookmark] Pass CreateBookmarkOptions to server
       let pageStateForBookmark = await HybridManager.get(this.session).callActionAndWait('GetPageStateForBookmark', undefined, contextElements) as PageStateForBookmarkDo;
       if (pageStateForBookmark) {
         searchFilterComplete = pageStateForBookmark.searchFilterComplete;
@@ -373,7 +403,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       }
     }
 
-    if (request.applyParentBookmarkPage) {
+    if (parentPage && parentBookmarkPage && request.applyParentBookmarkPage) {
       this._applyBookmarkPage(parentPage, parentBookmarkPage, false);
     }
 
@@ -627,4 +657,14 @@ export interface ActivateBookmarkRequest {
    * but not apply the page state (e.g. table configuration). Therefore, this has to be done in the UI.
    */
   applyParentBookmarkPage?: boolean; // FIXME bsh [js-bookmark] Document
+}
+
+export interface CreateBookmarkOptions {
+  createOutline?: boolean;
+  persistableRequired?: boolean;
+  fallbackAllowed?: boolean;
+  createTitle?: boolean;
+  createDescription?: boolean;
+  createTablePreferences?: boolean;
+  createTableRowSelections?: boolean;
 }
