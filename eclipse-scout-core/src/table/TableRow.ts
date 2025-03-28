@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,10 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import $ from 'jquery';
-import {AggregateTableRow, BookmarkTableRowIdentifierDo, Cell, EnumObject, FilterElement, InitModelOf, LookupRow, ObjectWithType, Page, SomeRequired, Table, TableRowModel} from '../index';
+import {AggregateTableRow, BookmarkTableRowIdentifierDo, Cell, EnumObject, FilterElement, InitModelOf, LookupRow, objectFactoryHints, ObjectWithType, Page, SomeRequired, Table, TableRowModel} from '../index';
 
 export type TableRowStatus = EnumObject<typeof TableRow.Status>;
 
+@objectFactoryHints({ensureId: true})
 export class TableRow implements TableRowModel, ObjectWithType, FilterElement {
   declare model: TableRowModel;
   declare initModel: SomeRequired<this['model'], 'parent'>;

@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Form, ObjectOrChildModel, ObjectOrModel, ObjectOrType, ObjectWithUuidModel, Outline, Page, PageDetailMenuContributor, PageParamDo, Table, TreeNode, TreeNodeModel} from '../../../index';
+import {Form, ObjectModelWithUuid, ObjectOrChildModel, ObjectOrModel, ObjectOrType, Outline, Page, PageDetailMenuContributor, PageParamDo, Table, TreeNode, TreeNodeModel} from '../../../index';
 
-export interface PageModel extends TreeNodeModel, ObjectWithUuidModel<TreeNode> {
+export interface PageModel extends TreeNodeModel, ObjectModelWithUuid<TreeNode> {
   /**
    * The {@link PageParamDo} containing all parameters that are required to load the page.
    */

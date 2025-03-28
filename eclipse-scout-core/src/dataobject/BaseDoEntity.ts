@@ -7,12 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {dataObjects, DeepPartial, DoContributionClassOrType, InitModelOf, objects, ObjectType} from '../index';
+import {dataObjects, DeepPartial, DoContributionClassOrType, InitModelOf, objectFactoryHints, objects, ObjectType} from '../index';
 import $ from 'jquery';
 
 /**
  * Base class for all data objects.
  */
+@objectFactoryHints({ensureObjectType: false})
 export class BaseDoEntity {
   declare model: DeepPartial<Omit<this, 'init' | 'getContribution' | 'addContribution' | 'removeContribution' | 'toPojo' | 'clone' | 'equals' | 'model'>>;
 

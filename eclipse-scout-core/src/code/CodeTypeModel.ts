@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Code, CodeType, ModelOf, ObjectModel} from '../index';
+import {Code, CodeType, ModelOf, ObjectModel, ObjectModelWithId} from '../index';
 
-export interface CodeTypeModel<TCodeId = string, TCode extends Code<TCodeId> = Code<TCodeId>, TCodeTypeId = string> extends ObjectModel<CodeType<TCodeId, TCode, TCodeTypeId>, TCodeTypeId> {
+export interface CodeTypeModel<TCodeId = string, TCode extends Code<TCodeId> = Code<TCodeId>, TCodeTypeId = string> extends ObjectModel<CodeType<TCodeId, TCode, TCodeTypeId>>, ObjectModelWithId<TCodeTypeId> {
   /**
    * If the Code is loaded from the Scout Java server and the application is running in dev mode, this property stores the Java Code class this code comes from.
    */

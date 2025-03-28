@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DisabledStyle, LogicalGrid, ObjectOrType, ObjectWithUuidModel, Session, Widget} from '../index';
+import {DisabledStyle, LogicalGrid, ObjectModelWithId, ObjectModelWithUuid, ObjectOrType, Session, Widget} from '../index';
 
-export interface WidgetModel extends ObjectWithUuidModel<Widget> {
+export interface WidgetModel extends ObjectModelWithUuid<Widget>, ObjectModelWithId {
   /**
    * The creation of a widget requires a parent so that a link between the child and the parent widget (and eventually between all widgets on the desktop) can be established.
    *

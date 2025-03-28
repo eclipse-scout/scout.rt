@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,10 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Code, CodeTypeModel, FullModelOf, InitModelOf, Locale, ObjectOrModel, ObjectWithType, scout, texts, TreeVisitor, TreeVisitResult} from '../index';
+import {Code, CodeTypeModel, FullModelOf, InitModelOf, Locale, ObjectOrModel, ObjectWithId, ObjectWithType, scout, texts, TreeVisitor, TreeVisitResult} from '../index';
 
-export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCodeId>, TCodeTypeId = string> implements ObjectWithType {
-
+export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCodeId>, TCodeTypeId = string> implements ObjectWithType, ObjectWithId<TCodeTypeId> {
   declare model: CodeTypeModel<TCodeId, TCode, TCodeTypeId>;
 
   id: TCodeTypeId;
@@ -191,7 +190,7 @@ export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCode
       codeType.objectType = CodeType;
     }
     let codeTypeModel = codeType as FullModelOf<CodeType<TCodeId, TCode, TCodeTypeId>>;
-    return scout.create(codeTypeModel, {ensureUniqueId: false}) as CodeType<TCodeId, TCode, TCodeTypeId>;
+    return scout.create(codeTypeModel) as CodeType<TCodeId, TCode, TCodeTypeId>;
   }
 }
 

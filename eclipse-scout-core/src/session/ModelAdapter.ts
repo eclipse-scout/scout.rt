@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, ChildModelOf, comparators, defaultValues, Event, EventEmitter, EventListener, FullModelOf, InitModelOf, ModelAdapterEventMap, ModelAdapterModel, ObjectModel, objects, Predicate, PropertyChangeEvent,
-  PropertyChangeEventFilter, RemoteEvent, scout, Session, SomeRequired, strings, Widget, WidgetEventTypeFilter
+  AdapterData, App, arrays, ChildModelOf, comparators, defaultValues, Event, EventEmitter, EventListener, FullModelOf, InitModelOf, ModelAdapterEventMap, ModelAdapterModel, objectFactoryHints, ObjectModel, objects, Predicate,
+  PropertyChangeEvent, PropertyChangeEventFilter, RemoteEvent, scout, Session, SomeRequired, strings, Widget, WidgetEventTypeFilter
 } from '../index';
 import $ from 'jquery';
 
@@ -17,6 +17,7 @@ import $ from 'jquery';
  * A model adapter is the connector with the server, it takes the events sent from the server and calls the corresponding methods on the widget.
  * It also sends events to the server whenever an action happens on the widget.
  */
+@objectFactoryHints({ensureId: true})
 export class ModelAdapter extends EventEmitter implements ModelAdapterModel, ModelAdapterLike {
   declare model: ModelAdapterModel;
   declare initModel: SomeRequired<this['model'], 'session' | 'id'>;

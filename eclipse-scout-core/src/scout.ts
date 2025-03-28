@@ -79,12 +79,19 @@ export interface ObjectWithUuid {
   uuidPath(useFallback?: boolean): string;
 }
 
-export interface ObjectModel<TObject = object, TId = string> {
+export interface ObjectWithId<TId = string> {
+  id: TId;
+}
+
+export interface ObjectModel<TObject = object> {
   objectType?: ObjectType<TObject>;
+}
+
+export interface ObjectModelWithId<TId = string> {
   id?: TId;
 }
 
-export interface ObjectWithUuidModel<TObject = object, TId = string> extends ObjectModel<TObject, TId> {
+export interface ObjectModelWithUuid<TObject = object> extends ObjectModel<TObject> {
   /**
    * A unique identifier for the object. Typically, a new random UUID can be used.
    */

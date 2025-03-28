@@ -732,9 +732,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     let defaultOptions = {
       retryIntervals: [100, 500, 500, 500]
     };
-    let ajaxCall = scout.create(AjaxCall, $.extend(defaultOptions, callOptions, this.ajaxCallOptions), {
-      ensureUniqueId: false
-    });
+    let ajaxCall = scout.create(AjaxCall, $.extend(defaultOptions, callOptions, this.ajaxCallOptions));
     this.registerAjaxCall(ajaxCall);
     return ajaxCall.call()
       .always(this.unregisterAjaxCall.bind(this, ajaxCall));
