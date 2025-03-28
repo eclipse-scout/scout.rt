@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BookmarkDo, BookmarkDoBuilderModel, BookmarkTableRowIdentifierDo, ChartTableControlConfigDo, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkPageDo, InitModelOf, NodeBookmarkPageDo,
-  ObjectWithType, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageStateForBookmarkDo, PageWithTable, scout, Session, TableBookmarkPageDo, TableClientUiPreferencesDo
+  BookmarkDo, BookmarkDoBuilderModel, BookmarkDoBuilderOptionsDo, BookmarkTableRowIdentifierDo, ChartTableControlConfigDo, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkPageDo, InitModelOf,
+  NodeBookmarkPageDo, ObjectWithType, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, TableBookmarkPageDo, TableClientUiPreferencesDo
 } from '../index';
 
 export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel {
@@ -146,13 +146,14 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
   }
 
   protected async _pageToTableBookmarkPage(page: Page, childPage?: Page): Promise<TableBookmarkPageDo> {
-    let expandedChildRowIdentifier: BookmarkTableRowIdentifierDo;
-    let selectedChildRowIdentifiers: BookmarkTableRowIdentifierDo[];
-    let searchFilterComplete: boolean;
-    let searchData: any;
-    let tablePreferences: TableClientUiPreferencesDo;
-    let chartTableControlConfig: ChartTableControlConfigDo;
+    if (page instanceof PageWithTable) {
+      return this._pageToTableBookmarkPageLocal(page, childPage);
+    }
+    return this._pageToTableBookmarkPageRemote(page, childPage);
+  }
 
+  protected async _pageToTableBookmarkPageLocal(page: PageWithTable, childPage?: Page): Promise<TableBookmarkPageDo> {
+    let expandedChildRowIdentifier: BookmarkTableRowIdentifierDo = null;
     if (childPage) {
       if (childPage.row) {
         // Linked to table row -> get row identifier
@@ -165,32 +166,16 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
       }
     }
 
+    let selectedChildRowIdentifiers: BookmarkTableRowIdentifierDo[] = [];
     if (this.createTableRowSelections && page.childrenLoaded) {
       selectedChildRowIdentifiers = page.detailTable.selectedRows
         .map(row => page.getTableRowIdentifier(row, !this.persistableRequired));
     }
 
-    if (page instanceof PageWithTable) {
-      // Local
-      searchFilterComplete = true;
-      searchData = await this._createSearchFilterForBookmark(page);
-      if (this.createTablePreferences) {
-        tablePreferences = await this._createTablePreferencesForBookmark(page);
-      }
-      chartTableControlConfig = await this._createChartTableControlConfigForBookmark(page);
-    } else {
-      // Remote
-      let contextElements = scout.create(HybridActionContextElements)
-        .withElement('page', HybridActionContextElement.of(page.outline, page));
-      // FIXME bsh [js-bookmark] Pass CreateBookmarkOptions to server
-      let pageStateForBookmark = await HybridManager.get(this.session).callActionAndWait('GetPageStateForBookmark', undefined, contextElements) as PageStateForBookmarkDo;
-      if (pageStateForBookmark) {
-        searchFilterComplete = pageStateForBookmark.searchFilterComplete;
-        searchData = pageStateForBookmark.searchData;
-        tablePreferences = pageStateForBookmark.tablePreferences;
-        chartTableControlConfig = pageStateForBookmark.chartTableControlConfig;
-      }
-    }
+    let searchFilterComplete = true;
+    let searchData = await this._createSearchFilterForBookmark(page);
+    let tablePreferences = await this._createTablePreferencesForBookmark(page);
+    let chartTableControlConfig = await this._createChartTableControlConfigForBookmark(page);
 
     return scout.create(TableBookmarkPageDo, {
       pageParam: page.pageParam,
@@ -202,6 +187,26 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
       tablePreferences: tablePreferences,
       chartTableControlConfig: chartTableControlConfig
     });
+  }
+
+  protected async _pageToTableBookmarkPageRemote(page: Page, childPage?: Page): Promise<TableBookmarkPageDo> {
+    let createBookmarkOptions = scout.create(BookmarkDoBuilderOptionsDo, {
+      createOutline: false,
+      persistableRequired: this.persistableRequired,
+      createTitle: false,
+      createDescription: false,
+      createTablePreferences: this.createTablePreferences,
+      createTableRowSelections: this.createTableRowSelections
+    });
+
+    let contextElements = scout.create(HybridActionContextElements)
+      .withElement('page', HybridActionContextElement.of(page.outline, page));
+
+    let bookmark = await HybridManager.get(this.session).callActionAndWait('CreateBookmark', createBookmarkOptions, contextElements) as BookmarkDo;
+    if (!(bookmark?.definition?.bookmarkedPage instanceof TableBookmarkPageDo)) {
+      throw BookmarkDoBuilder.ERROR_PAGE_NOT_BOOKMARKABLE;
+    }
+    return bookmark.definition.bookmarkedPage;
   }
 
   protected async _createSearchFilterForBookmark(page: PageWithTable): Promise<any> {
@@ -220,7 +225,10 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
   }
 
   protected async _createTablePreferencesForBookmark(page: PageWithTable): Promise<TableClientUiPreferencesDo> {
-    // return page.detailTable.filterSupport. getSearchFilter();
+    if (!this.createTablePreferences) {
+      return null;
+    }
+    // FIXME bsh [js-bookmark] Implement
     return null;
   }
 
