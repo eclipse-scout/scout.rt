@@ -324,8 +324,6 @@ export class OutlineAdapter extends TreeAdapter {
       parent: pageModel.parent,
       owner: pageModel.owner,
       objectType: pageModel.jsPageObjectType,
-      // FIXME CGU [js-bookmark] I would prefer to deserialize it here instead of Page#set_pageParam so it behaves the same as for JsFormAdapter,
-      //                         but in that case Page.pageParamType would be ignored. Do we really need @pageParam?
       // FIXME bsh [js-bookmark] Check which properties we want to explicitly inherit form the Java page
       pageParam,
       classId: pageModel.classId,
@@ -339,6 +337,7 @@ export class OutlineAdapter extends TreeAdapter {
     // This marker is only set for pages that represent a remote page on the UI server. It prevents menus from being inherited
     // from the parent table page, because in the case of Java pages that is already done on the server.
     model.remote = true;
+    model.pageParam = dataObjects.deserialize(model.pageParam);
     return model;
   }
 

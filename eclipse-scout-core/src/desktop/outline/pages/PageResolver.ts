@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, Constructor, InitModelOf, ObjectFactory, ObjectModel, objects, ObjectWithType, Page, PageIdDummyPageParamDo, PageParamDo, scout, Session, strings, TypeDescriptor} from '../../../index';
+import {App, Constructor, InitModelOf, ObjectFactory, ObjectModel, objects, ObjectType, ObjectWithType, Page, PageIdDummyPageParamDo, PageParamDo, scout, Session, strings, TypeDescriptor} from '../../../index';
 
 export class PageResolver implements PageResolverModel, ObjectWithType {
   declare model: PageResolverModel;
@@ -15,31 +15,32 @@ export class PageResolver implements PageResolverModel, ObjectWithType {
   objectType: string;
 
   protected static _INSTANCES: Map<Session, PageResolver> = new Map();
-  protected pageByPageParam: Map<Constructor<PageParamDo>, Constructor<Page>> = null;
+
+  /**
+   * A map of uuid to objectType of the pages using a {@link PageIdDummyPageParamDo}.
+   */
+  protected _objectTypeByUuid: Map<string, ObjectType<Page>> = new Map();
 
   init(model: InitModelOf<this>) {
     this.session = scout.assertProperty(model, 'session', Session);
   }
 
-  findObjectTypeForPageParam(pageParam: PageParamDo): string {
+  /**
+   * @returns the object type of the page matching the given page param.
+   */
+  findObjectTypeForPageParam(pageParam: PageParamDo): ObjectType<Page> {
     if (!pageParam) {
       return null;
     }
 
-    // PageIdDummyPageParamDo
-    if (PageIdDummyPageParamDo.TYPE_NAME === pageParam._type) {
+    // By Dummy Page Param
+    if (pageParam instanceof PageIdDummyPageParamDo) {
       const dummyPageParamDo = pageParam as PageIdDummyPageParamDo;
       return this._findObjectTypeForPageParam(dummyPageParamDo);
     }
 
-    // By explicit decorator
-    const pageParamConstructor = pageParam.constructor as Constructor<PageParamDo>;
-    const pageObjectType = this._findObjectTypeForPageParamConstructor(pageParamConstructor);
-    if (pageObjectType) {
-      return pageObjectType;
-    }
-
     // By naming convention
+    const pageParamConstructor = pageParam.constructor as Constructor<PageParamDo>;
     const pageParamObjectType = ObjectFactory.get().getObjectType(pageParamConstructor);
     if (pageParamObjectType?.endsWith('PageParamDo')) {
       const pageName = strings.removeSuffix(pageParamObjectType, 'ParamDo');
@@ -51,58 +52,37 @@ export class PageResolver implements PageResolverModel, ObjectWithType {
     return null;
   }
 
-  protected _findObjectTypeForPageParamConstructor(paramConstructor: Constructor<PageParamDo>): string {
-    let pageConstructor = this.getPageByParam(paramConstructor);
-    if (!pageConstructor) {
-      return null;
-    }
-    return ObjectFactory.get().getObjectType(pageConstructor);
-  }
-
-  protected getPageByParam(paramConstructor: Constructor<PageParamDo>): Constructor<Page> {
-    if (!paramConstructor) {
-      return null;
-    }
-    if (!this.pageByPageParam) {
-      const mapping = new Map<Constructor<PageParamDo>, Constructor<Page>>();
-      const allPageClasses = ObjectFactory.get().getSubClassesOf(Page);
-      for (let PageConstructor of allPageClasses) {
-        let pageParamType = (new PageConstructor()).pageParamType;
-        if (pageParamType !== null && pageParamType !== PageIdDummyPageParamDo) {
-          mapping.set(pageParamType, PageConstructor);
-        }
-      }
-      this.pageByPageParam = mapping;
-    }
-    return this.pageByPageParam.get(paramConstructor);
-  }
-
-  protected _findObjectTypeForPageParam(pageParam: PageIdDummyPageParamDo): string {
+  protected _findObjectTypeForPageParam(pageParam: PageIdDummyPageParamDo): ObjectType<Page> {
     if (!pageParam) {
       return null;
     }
-    const allPageClasses = ObjectFactory.get().getSubClassesOf(Page);
-    for (let candidate of allPageClasses) {
-      const objectType = this._getObjectTypeForPageIfParamMatches(pageParam, candidate);
-      if (objectType) {
-        return objectType;
-      }
+
+    let objectType = this._objectTypeByUuid.get(pageParam.pageId);
+    if (!objectType) {
+      // If the page is not yet in the cache, (re-)init the cache first
+      this._initObjectTypeByUuid();
     }
-    return null;
+    return this._objectTypeByUuid.get(pageParam.pageId) ?? null;
   }
 
-  protected _getObjectTypeForPageIfParamMatches(param: PageIdDummyPageParamDo, PageConstructor: Constructor<Page>): string {
+  protected _initObjectTypeByUuid() {
+    for (const PageConstructor of ObjectFactory.get().getSubClassesOf(Page)) {
+      let pageUuid = this._getPageUuid(PageConstructor);
+      if (pageUuid) {
+        let objectType = ObjectFactory.get().getObjectType(PageConstructor);
+        this._objectTypeByUuid.set(pageUuid, objectType);
+      }
+    }
+  }
+
+  protected _getPageUuid(PageConstructor: Constructor<Page>): string {
     let page: Page = null;
     try {
       page = new PageConstructor();
-      if (page.pageParamType !== PageIdDummyPageParamDo && page.pageParamType !== null) {
-        return null;
-      }
       page.minimalInit();
-      if (page.matchesPageParam(param)) {
-        return ObjectFactory.get().getObjectType(page.constructor as Constructor);
+      if (page.pageParam instanceof PageIdDummyPageParamDo) {
+        return page.pageParam.pageId;
       }
-      return null;
     } catch (e) {
       const objectType = ObjectFactory.get().getObjectType(PageConstructor);
       let message = `Unable to create and initialize ${objectType}. Cannot check for PageParam. Error: ${e.message}`;
