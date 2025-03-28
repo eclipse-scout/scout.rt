@@ -56,7 +56,7 @@ export class TableBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo
   expandedChildRow?: BookmarkTableRowIdentifierDo;
   selectedChildRows?: BookmarkTableRowIdentifierDo[];
   searchFilterComplete?: boolean; // FIXME bsh [js-bookmark] always true?
-  searchData?: DoEntity; // FIXME bsh [js-bookmark] ISearchDo;
+  searchData?: DoEntity;
   tablePreferences?: TableClientUiPreferencesDo;
   chartTableControlConfig?: ChartTableControlConfigDo;
 }
@@ -114,12 +114,10 @@ export class BookmarkTableRowIdentifierLongComponentDo extends BaseDoEntity impl
 
 // --------------------------------------------------
 
-@typeName('suite.PageStateForBookmark')
-export class PageStateForBookmarkDo extends BaseDoEntity {
-  searchFilterComplete?: boolean;
+@typeName('suite.ImportSearchData')
+export class ImportSearchDataDo extends BaseDoEntity {
   searchData?: DoEntity;
-  tablePreferences?: TableClientUiPreferencesDo;
-  chartTableControlConfig?: ChartTableControlConfigDo;
+  markAsSaved?: boolean;
 }
 
 // --------------------------------------------------
@@ -236,8 +234,24 @@ export interface ITableCustomizerDo extends DoEntity {
 // FIXME bsh [js-bookmark] Move to suite/crm
 @typeName('crm.CoreTableCustomizer')
 export class CoreTableCustomizerDo extends BaseDoEntity implements ITableCustomizerDo {
-  // FIXME bsh [js-bookmark] Add CustomColumnConfigDo
-  // columns?: CustomColumnConfigDo[];
+  columns?: CustomColumnConfigDo[];
+}
+
+// FIXME bsh [js-bookmark] Move to suite/crm
+@typeName('crm.CustomColumnConfig')
+export class CustomColumnConfigDo extends BaseDoEntity {
+  id: string;
+  selection: DoEntity; // FIXME bsh [js-bookmark] Change to IDataModelSelectionDo
+  filterVariantId: string;
+  label: string;
+  tooltip: string;
+  visible: boolean;
+  width: number;
+  order: number;
+  sortIndex: number;
+  sortAscending: boolean;
+  grouped: boolean;
+  multiline: boolean;
 }
 
 // --------------------------------------------------
