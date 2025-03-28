@@ -32,7 +32,6 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
 
   uuid: string;
   pageParam: PageParamDo;
-  pageParamType: Constructor<BaseDoEntity>; // written using @pageParam decorator (see below)
   /**
    * This property is set by the server, see: JsonOutline#putNodeType.
    */
@@ -100,7 +99,6 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     this.events = new EventSupport();
     this.events.registerSubTypePredicate('propertyChange', (event: PropertyChangeEvent, propertyName) => event.propertyName === propertyName);
     this.pageChanging = 0;
-    this.pageParamType = null;
     this._tableFilterHandler = this._onTableFilter.bind(this);
     this._tableRowClickHandler = this._onTableRowClick.bind(this);
     this._detailTableModel = null;
@@ -618,15 +616,13 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     return this.getBookmarkAdapter().pageParamsMatch(this.pageParam, pageParam);
   }
 
-  protected _setPageParam(pageParam: PageParamDo | object) {
-    if (!pageParam && this.pageParamType === null) {
+  protected _setPageParam(pageParam: PageParamDo) {
+    if (pageParam) {
+      scout.assertInstance(pageParam, PageParamDo);
+    } else {
       pageParam = this._computeDummyPageParam();
     }
-    if (pageParam instanceof PageParamDo || !pageParam) {
-      this.pageParam = pageParam as PageParamDo;
-    } else {
-      this.pageParam = dataObjects.deserialize(pageParam, this.pageParamType);
-    }
+    this.pageParam = pageParam;
   }
 
   protected _computeDummyPageParam(): PageParamDo {
@@ -718,15 +714,6 @@ interface ContributedMenu extends Menu {
  * @see BookmarkSupport
  */
 export class PageParamDo extends BaseDoEntity {
-}
-
-export function pageParam<DO extends PageParamDo>(pareParamDo: Constructor<DO>) {
-  return <T extends Constructor>(BaseClass: T) => class extends BaseClass {
-    constructor(...args: any[]) {
-      super(...args);
-      Reflect.set(this, 'pageParamType', pareParamDo);
-    }
-  };
 }
 
 /**

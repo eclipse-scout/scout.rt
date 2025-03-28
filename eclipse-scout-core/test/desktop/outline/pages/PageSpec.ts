@@ -421,6 +421,16 @@ describe('Page', () => {
       });
       expect(page.pageParam).toBeInstanceOf(MyPageParamDo);
     });
+
+    it('must be an instance of PageParam', () => {
+      expect(() => scout.create(PageWithParam, {
+        parent: outline,
+        // @ts-expect-error
+        pageParam: {
+          prop: 'hi'
+        }
+      })).toThrowError('Value has wrong type');
+    });
   });
 
   function createAndInsertPage(detailTable: ChildModelOf<Table>, detailForm: ChildModelOf<Form>, parentPage?: Page): PageWithLazyCreationCounter {

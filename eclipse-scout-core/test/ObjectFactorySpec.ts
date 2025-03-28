@@ -371,4 +371,61 @@ describe('ObjectFactory', () => {
       });
     });
   });
+
+  describe('removeFromNamespace', () => {
+    class Obj {
+    }
+
+    class Obj2 {
+    }
+
+    class Obj3 {
+    }
+
+    class Obj4 {
+    }
+
+    it('removes the objects from the namespace and the object type map', () => {
+      let factory = new ObjectFactory();
+      expect(window['osSpecNs1']).toBeUndefined();
+      expect(factory.getObjectType(Obj)).toBeUndefined();
+      expect(factory.getObjectType(Obj2)).toBeUndefined();
+
+      factory.registerNamespace('osSpecNs1', {Obj, Obj2, Obj3});
+      expect(Object.keys(window['osSpecNs1']).length).toBe(3);
+      expect(window['osSpecNs1']['Obj']).toBe(Obj);
+      expect(window['osSpecNs1']['Obj2']).toBe(Obj2);
+      expect(window['osSpecNs1']['Obj3']).toBe(Obj3);
+      expect(factory.getObjectType(Obj)).toBe('osSpecNs1.Obj');
+      expect(factory.getObjectType(Obj2)).toBe('osSpecNs1.Obj2');
+      expect(factory.getObjectType(Obj3)).toBe('osSpecNs1.Obj3');
+
+      factory.registerNamespace('osSpecNs2', {Obj4});
+      expect(Object.keys(window['osSpecNs2']).length).toBe(1);
+      expect(window['osSpecNs2']['Obj4']).toBe(Obj4);
+      expect(factory.getObjectType(Obj4)).toBe('osSpecNs2.Obj4');
+
+      // Remove only Obj2
+      factory.removeFromNamespace([Obj2]);
+      expect(Object.keys(window['osSpecNs1']).length).toBe(2);
+      expect(window['osSpecNs1']['Obj']).toBe(Obj);
+      expect(window['osSpecNs1']['Obj2']).toBeUndefined();
+      expect(window['osSpecNs1']['Obj3']).toBe(Obj3);
+      expect(factory.getObjectType(Obj)).toBe('osSpecNs1.Obj');
+      expect(factory.getObjectType(Obj2)).toBeUndefined();
+      expect(factory.getObjectType(Obj3)).toBe('osSpecNs1.Obj3');
+
+      // Remove all (including Obj2 which must do nothing)
+      factory.removeFromNamespace([Obj, Obj2, Obj3, Obj4]);
+      expect(window['osSpecNs1']).toBeUndefined();
+      expect(window['osSpecNs2']).toBeUndefined();
+      expect(factory.getObjectType(Obj)).toBeUndefined();
+      expect(factory.getObjectType(Obj2)).toBeUndefined();
+      expect(factory.getObjectType(Obj3)).toBeUndefined();
+      expect(factory.getObjectType(Obj4)).toBeUndefined();
+
+      // Remove nothing -> don't fail
+      factory.removeFromNamespace([]);
+    });
+  });
 });
