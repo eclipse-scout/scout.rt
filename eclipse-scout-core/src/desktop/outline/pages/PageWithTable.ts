@@ -161,18 +161,8 @@ export class PageWithTable extends Page implements PageWithTableModel {
     });
   }
 
-  // FIXME bsh [js-bookmark] Cleanup
   protected _createSearchFilter(): any {
     return this.getSearchFilter();
-    // // Cast could be wrong as any table control is in the list.
-    // // But as the FormTableControl does not add new public items except the form and the presence of that is form is ensured in the find() method, it may be fine.
-    // let controls = this.detailTable.tableControls as FormTableControl[];
-    //
-    // let firstFormTableControl = arrays.find(controls, tableControl => tableControl.form instanceof Form);
-    // if (firstFormTableControl) {
-    //   return firstFormTableControl.form.exportData();
-    // }
-    // return null;
   }
 
   /**
