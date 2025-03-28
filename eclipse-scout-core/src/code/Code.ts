@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CodeModel, CodeType, FullModelOf, InitModelOf, Locale, ModelOf, ObjectWithType, scout, texts, TreeVisitor, TreeVisitResult} from '../index';
+import {CodeModel, CodeType, FullModelOf, InitModelOf, Locale, ModelOf, ObjectWithId, ObjectWithType, scout, texts, TreeVisitor, TreeVisitResult} from '../index';
 
-export class Code<TCodeId> implements ObjectWithType {
+export class Code<TCodeId> implements ObjectWithType, ObjectWithId<TCodeId> {
   declare model: CodeModel<TCodeId>;
 
   id: TCodeId;

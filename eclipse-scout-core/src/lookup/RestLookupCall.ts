@@ -162,7 +162,7 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
       }
     }
 
-    return scout.create((LookupRow<TKey>), clonedLookupRowDo, {ensureUniqueId: false});
+    return scout.create((LookupRow<TKey>), clonedLookupRowDo);
   }
 
   protected _call(): JQuery.Promise<LookupResult<TKey>> {
@@ -245,8 +245,6 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
       ajaxOptions: ajaxOptions,
       name: 'RestLookupCall',
       retryIntervals: [100, 500, 500, 500]
-    }, {
-      ensureUniqueId: false
     });
   }
 }

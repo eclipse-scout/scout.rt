@@ -78,9 +78,7 @@ window.sandboxSession = options => {
   model.backgroundJobPollingEnabled = false;
   model.suppressErrors = true;
   model.$entryPoint = $sandbox;
-  let session = scout.create(Session, model, {
-    ensureUniqueId: false
-  }) as SandboxSession;
+  let session = scout.create(Session, model) as SandboxSession;
   $sandbox.data('sandboxSession', session);
 
   // Install non-filtering requestToJson() function. This is required to test

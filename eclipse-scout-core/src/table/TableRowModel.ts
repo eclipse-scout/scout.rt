@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BookmarkTableRowIdentifierDo, Cell, DoEntity, LookupRow, ObjectModel, ObjectOrModel, Primitive, Table, TableRow} from '../index';
+import {BookmarkTableRowIdentifierDo, Cell, DoEntity, LookupRow, ObjectModel, ObjectModelWithId, ObjectOrModel, Primitive, Table, TableRow} from '../index';
 
-export interface TableRowModel extends ObjectModel<TableRow> {
+export interface TableRowModel extends ObjectModel<TableRow>, ObjectModelWithId {
   parent?: Table;
   /**
    * {@link Cell} instances or cell values.

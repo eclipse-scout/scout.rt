@@ -15,7 +15,7 @@ import $ from 'jquery';
  */
 export class ConfigPropertyCache implements ObjectModel<ConfigPropertyCache> {
 
-  id: string;
+  objectType: string;
   configMap: Map<string /* system name */, Map<string /* config property key */, ConfigProperty<any>>>;
 
   constructor() {

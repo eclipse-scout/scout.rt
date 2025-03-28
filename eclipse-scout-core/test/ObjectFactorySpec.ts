@@ -8,9 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Action, Button, NumberField, ObjectFactory, scout, StringField} from '../src/index';
+import {Action, Button, NumberField, ObjectFactory, objectFactoryHints, ObjectModel, ObjectModelWithId, ObjectWithId, ObjectWithType, scout, StringField} from '../src/index';
 import {LocaleSpecHelper} from '../src/testing/index';
-import {InitModelOf} from '../src/scout';
 
 describe('ObjectFactory', () => {
   let session: SandboxSession;
@@ -50,27 +49,6 @@ describe('ObjectFactory', () => {
     expect(Action.prototype.isPrototypeOf(keyStroke)).toBe(true);
   });
 
-  it('puts the object type to the resulting object', () => {
-    let model: InitModelOf<StringField> = {
-      parent: session.desktop
-      // objectType will be set
-    };
-    let object = ObjectFactory.get().create('StringField', model) as StringField;
-    expect(model.objectType).toBe('StringField');
-    expect(object.objectType).toBe('StringField');
-  });
-
-  it('puts the object type to the resulting object, ignoring the existing object type', () => {
-    let model = {
-      parent: session.desktop,
-      objectType: 'NumberField' // this objectType will be ignored
-    };
-    let object = ObjectFactory.get().create('StringField', model) as StringField;
-    expect(object instanceof StringField).toBe(true);
-    expect(model.objectType).toBe('StringField');
-    expect(object.objectType).toBe('StringField');
-  });
-
   it('throws an error if no explicit type is specified', () => {
     expect(() => {
       ObjectFactory.get().create(null, {
@@ -108,6 +86,122 @@ describe('ObjectFactory', () => {
         objectType: StringField
       });
     }).toThrow();
+  });
+
+  describe('objectType', () => {
+    let factory: ObjectFactory;
+
+    class Obj implements ObjectWithType {
+      objectType: string;
+    }
+
+    class ObjWithInit implements ObjectWithType {
+      objectType: string;
+
+      init(model: ObjectModel) {
+      }
+    }
+
+    @objectFactoryHints({ensureObjectType: false})
+    class ObjWithoutObjectType {
+    }
+
+    beforeEach(() => {
+      factory = new ObjectFactory();
+      factory.registerNamespace('objectFactorySpec', {Obj, ObjWithInit, ObjWithoutObjectType});
+    });
+
+    afterEach(() => {
+      factory.removeFromNamespace([Obj, ObjWithInit, ObjWithoutObjectType]);
+    });
+
+    it('is put to the resulting object', () => {
+      let object = factory.create(Obj);
+      expect(object.objectType).toBe('objectFactorySpec.Obj');
+
+      let model2: ObjectModel = {};
+      let object2 = factory.create(ObjWithInit, model2);
+      expect(model2.objectType).toBe('objectFactorySpec.ObjWithInit');
+      expect(object2.objectType).toBe('objectFactorySpec.ObjWithInit');
+    });
+
+    it('is put to the resulting object, ignoring the object type of the model', () => {
+      let model = {
+        objectType: 'NumberField' // this objectType will be ignored
+      };
+      let object = factory.create(ObjWithInit, model);
+      expect(object instanceof ObjWithInit).toBe(true);
+      expect(model.objectType).toBe('objectFactorySpec.ObjWithInit');
+      expect(object.objectType).toBe('objectFactorySpec.ObjWithInit');
+    });
+
+    it('does not put the objectType to the resulting object if ensureObjectType is set to false using objectTypeHints', () => {
+      let object = factory.create(ObjWithoutObjectType, {});
+      expect(object['objectType']).toBe(undefined);
+    });
+  });
+
+  describe('id', () => {
+    @objectFactoryHints({ensureId: true})
+    class ObjWithId implements ObjectWithId {
+      id: string;
+    }
+
+    @objectFactoryHints({ensureId: true})
+    class ObjWithInitAndId implements ObjectWithId {
+      id: string;
+
+      init(model: ObjectModelWithId) {
+        this.id = model.id;
+      }
+    }
+
+    @objectFactoryHints({ensureId: false})
+    class ExtendedObjWithInitAndDisabledId extends ObjWithInitAndId {
+    }
+
+    class ExtendedObjWithInitAndId extends ObjWithInitAndId {
+    }
+
+    class ObjWithoutId {
+    }
+
+    it('is set to the resulting object if ensureId is set to true using objectTypeHints', () => {
+      let object = ObjectFactory.get().create(ObjWithId);
+      expect(object instanceof ObjWithId).toBe(true);
+      expect(object.id).toBeDefined();
+
+      let objectWithInit = ObjectFactory.get().create(ObjWithInitAndId, {});
+      expect(objectWithInit instanceof ObjWithInitAndId).toBe(true);
+      expect(objectWithInit.id).toBeDefined();
+
+      // Decorator is inherited from super class
+      let extendedObjectWithInit = ObjectFactory.get().create(ExtendedObjWithInitAndId, {});
+      expect(extendedObjectWithInit instanceof ExtendedObjWithInitAndId).toBe(true);
+      expect(extendedObjectWithInit.id).toBeDefined();
+    });
+
+    it('does not override id passed by the model', () => {
+      let object = ObjectFactory.get().create(ObjWithInitAndId, {
+        id: '123'
+      });
+      expect(object instanceof ObjWithInitAndId).toBe(true);
+      expect(object.id).toBe('123');
+    });
+
+    it('is not set to the resulting object if objectTypeHints decorator is not present', () => {
+      let object = ObjectFactory.get().create(ObjWithoutId);
+      expect(object instanceof ObjWithoutId).toBe(true);
+      expect(object['id']).toBeUndefined();
+    });
+
+    it('is not set to the resulting object if ensureId is set to false using objectTypeHints', () => {
+      let object = ObjectFactory.get().create(ExtendedObjWithInitAndDisabledId, {
+        parent: session.desktop
+      });
+      expect(object instanceof ExtendedObjWithInitAndDisabledId).toBe(true);
+      expect(object['id']).toBeUndefined();
+    });
   });
 
   describe('uses the registered factory to create the object', () => {

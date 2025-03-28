@@ -20,7 +20,7 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
   declare self: CodeTypeCache;
   declare eventMap: CodeTypeCacheEventMap;
 
-  id: string;
+  objectType: string;
   /**
    * Map of CodeType id to CodeType instance. Do not access directly. Instead, use {@link get}.
    */
