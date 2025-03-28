@@ -256,10 +256,8 @@ export class CustomColumnConfigDo extends BaseDoEntity {
 
 // --------------------------------------------------
 
-@typeName(PageIdDummyPageParamDo.TYPE_NAME)
+@typeName('crm.PageIdDummyPageParam')
 export class PageIdDummyPageParamDo extends PageParamDo {
-  static TYPE_NAME = 'crm.PageIdDummyPageParam';
-
   pageId: string;
 }
 

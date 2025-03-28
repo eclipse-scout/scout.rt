@@ -330,6 +330,29 @@ export class ObjectFactory {
     }
   }
 
+  /**
+   * Removes the given object types from the namespace and the object type map.
+   * If the namespace is empty after the removal, it will be deleted.
+   *
+   * @param objectTypes the object types to be removed from the namespace
+   */
+  removeFromNamespace(objectTypes: Constructor[]) {
+    for (const objectType of objectTypes) {
+      let name = this.getObjectType(objectType);
+      if (name) {
+        let [namespace, objectName] = name.split('.');
+        if (window[namespace]) {
+          delete window[namespace][objectName];
+
+          if (Object.keys(window[namespace]).length === 0) {
+            delete window[namespace];
+          }
+        }
+      }
+      this._objectTypeMap.delete(objectType);
+    }
+  }
+
   static get(): ObjectFactory {
     return objectFactory;
   }
