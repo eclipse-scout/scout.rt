@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractConstructor, BaseDoEntity, Constructor, FullModelOf, InitModelOf, ModelAdapter, ModelOf, ObjectModel, objects, ObjectUuidProvider, scout, TableRow, TreeNode, TypeDescriptor, TypeDescriptorOptions, Widget} from './index';
+import {AbstractConstructor, Constructor, FullModelOf, InitModelOf, ModelOf, ObjectModel, ObjectModelWithId, objects, ObjectUuidProvider, scout, TypeDescriptor, TypeDescriptorOptions} from './index';
 import $ from 'jquery';
 
 export type ObjectCreator = (model?: any) => object;
@@ -23,6 +23,8 @@ export interface ObjectFactoryOptions extends TypeDescriptorOptions {
    * Controls if the resulting object should be assigned the attribute "id" if it is not defined.
    * If the created object has an init() function, we also set the property 'id' on the model object to allow the init() function to copy the attribute from the model to the scoutObject.
    * Default is true.
+   *
+   * @deprecated will be removed in a future release, use {@link objectFactoryHints} instead
    */
   ensureUniqueId?: boolean;
 }
@@ -51,6 +53,7 @@ export class ObjectFactory {
 
   static NAMESPACE_SEPARATOR = '.';
   static MODEL_VARIANT_SEPARATOR = ':';
+  static HINTS_META_DATA_KEY = Symbol('scout.objectFactoryHints');
 
   /**
    * Creates an object from the given objectType. Only the constructor is called.
@@ -127,23 +130,31 @@ export class ObjectFactory {
   }
 
   /**
-   * Creates and initializes a new Scout object. When the created object has an init function, the
-   * model object is passed to that function. Otherwise, the init call is omitted.
+   * Creates and initializes a new Scout object.
    *
-   * @param objectTypeOrModel A class reference to the object to be created. Or a string with the requested objectType.
-   *        This argument is optional, but if it is omitted, the argument "model" becomes mandatory and MUST contain a
-   *        property named "objectType". If both, objectType and model, are set, the
-   *        objectType parameter always wins before the model.objectType property.
-   * @param modelOrOptions The model object passed to the constructor function and to the init() method.
-   *        This argument is mandatory if it is the first argument, otherwise it is
-   *        optional (see above). This function may set/overwrite the properties 'id' and
-   *        'objectType' on the model object.
+   * When the created object has an init function, it will be called.
+   * The model object is passed to the constructor and to the init function, if it is available.
+   *
+   * The class of the object to be created can provide {@link objectFactoryHints} that influence the object creation.
+   * If not defined otherwise by the hints, the objectType is written to the created object.
+   *
+   * @param objectTypeOrModel This argument can be
+   *        <ul>
+   *          <li>objectType: a class reference to the object to be created or the name of the object as registered with {@link registerNamespace}.</li>
+   *          <li>model: an object containing the objectType as property among with other properties that should be passed to the object to be created.</li>
+   *        </ul>
+   * @param modelOrOptions This argument can be
+   *        <ul>
+   *          <li>model: an object containing properties that should be passed to the object to be created. The property objectType will be ignored because it is provided by the first argument.</li>
+   *          <li>options: see options argument
+   *        </ul>
+   * @param options optional options to influence the creation of the object
    * @throws Error if the argument list does not match the definition.
    */
   create<T extends object>(objectTypeOrModel: ObjectType<T> | FullModelOf<T>, modelOrOptions?: InitModelOf<T>, options?: ObjectFactoryOptions): T {
     // Normalize arguments
     let objectType: ObjectType<T>;
-    let model: ObjectModel<T>;
+    let model: ObjectModel<T> & ObjectModelWithId;
     if (typeof objectTypeOrModel === 'string' || typeof objectTypeOrModel === 'function') {
       options = options || {};
       model = modelOrOptions;
@@ -162,11 +173,11 @@ export class ObjectFactory {
 
     // Create object
     const scoutObject = this._createObjectByType(objectType, options);
-    const ensureUniqueId = this._ensureUniqueId(scoutObject, options);
+    const ensureId = this._ensureUniqueId(scoutObject, options);
     const ensureObjectType = this._ensureObjectType(scoutObject);
     if (objects.isFunction(scoutObject.init)) {
       if (model) {
-        if (model.id === undefined && ensureUniqueId) {
+        if (model.id === undefined && ensureId) {
           model.id = ObjectUuidProvider.createUiId();
         }
         if (ensureObjectType) {
@@ -176,7 +187,7 @@ export class ObjectFactory {
       scoutObject.init(model);
     }
 
-    if (scoutObject.id === undefined && ensureUniqueId) {
+    if (scoutObject.id === undefined && ensureId) {
       scoutObject.id = ObjectUuidProvider.createUiId();
     }
     if (scoutObject.objectType === undefined && ensureObjectType) {
@@ -187,12 +198,13 @@ export class ObjectFactory {
   }
 
   protected _ensureObjectType(scoutObject: any): boolean {
-    return !(scoutObject instanceof BaseDoEntity); // don't create objectType attribute for DOs
+    let hints = Reflect.getMetadata(ObjectFactory.HINTS_META_DATA_KEY, scoutObject) as ObjectFactoryHints;
+    return scout.nvl(hints?.ensureObjectType, true);
   }
 
   protected _ensureUniqueId(scoutObject: any, options?: ObjectFactoryOptions): boolean {
-    // FIXME bsh [js-bookmark] How can we determine whether an ID should be generated? Is this even needed for widgets? (TreeNodes and TableRows seem to need it because of Maps in Tree/Table, but this could probably changed to ES6-Maps)
-    return scout.nvl(options.ensureUniqueId, scoutObject instanceof Widget || scoutObject instanceof TreeNode || scoutObject instanceof TableRow || scoutObject instanceof ModelAdapter);
+    let hints = Reflect.getMetadata(ObjectFactory.HINTS_META_DATA_KEY, scoutObject) as ObjectFactoryHints;
+    return scout.nvl(options?.ensureUniqueId, scout.nvl(hints?.ensureId, false));
   }
 
   /**
@@ -363,3 +375,31 @@ export class ObjectFactory {
 }
 
 let objectFactory = new ObjectFactory();
+
+export type ObjectFactoryHints = {
+  /**
+   * Specifies whether the {@link ObjectFactory} needs to assign a unique id to the object if the object does not already have one.
+   *
+   * Default is false.
+   */
+  ensureId?: boolean;
+  /**
+   * Specifies whether the {@link ObjectFactory} needs to resolve the string based objectType using {@link ObjectType.getObjectType} and assign it to the object.
+   *
+   * Default is true.
+   */
+  ensureObjectType?: boolean;
+};
+
+/**
+ * A class decorator to provide hints for the {@link ObjectFactory} that control the object creation.
+ *
+ * It is possible to override existing hints by extending from the class having hints and adding the decorator with the customized hints to the subclass.
+ */
+export function objectFactoryHints(hints: ObjectFactoryHints) {
+  return <T extends Constructor | AbstractConstructor>(BaseClass: T) => class extends BaseClass {
+    static {
+      Reflect.defineMetadata(ObjectFactory.HINTS_META_DATA_KEY, hints, BaseClass.prototype);
+    }
+  };
+}

@@ -560,9 +560,7 @@ export class App extends EventEmitter {
   }
 
   protected _createSession(options: InitModelOf<Session>): Session {
-    return scout.create(Session, options, {
-      ensureUniqueId: false
-    });
+    return scout.create(Session, options);
   }
 
   protected _createDesktop(parent: Widget): Desktop {

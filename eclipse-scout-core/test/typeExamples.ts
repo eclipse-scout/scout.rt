@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,14 +25,6 @@ function createTyped() {
     autoFit: true
   });
 
-  let img1 = scout.create(Image, {
-    parent: this,
-    autoFit: true
-  }, {
-    ensureUniqueId: false
-  });
-  img1.setAutoFit(false);
-
   let img2 = scout.create({
     objectType: Image,
     parent: this,
@@ -45,14 +37,6 @@ function createTyped() {
     parent: this
   });
   img3.setAutoFit(false);
-
-  let img4 = scout.create({
-    objectType: Image,
-    parent: this
-  }, {
-    ensureUniqueId: false
-  });
-  img4.setAutoFit(false);
 }
 
 function createUntyped() {
@@ -62,14 +46,6 @@ function createUntyped() {
   });
   img.setAutoFit(false);
 
-  let img1 = scout.create('Image', {
-    parent: this,
-    autoFit: true
-  }, {
-    ensureUniqueId: false
-  });
-  img1.setAutoFit(false);
-
   let img2 = scout.create({
     objectType: Image,
     parent: this,
@@ -82,14 +58,6 @@ function createUntyped() {
     parent: this
   });
   img3.setAutoFit(false);
-
-  let img4 = scout.create({
-    objectType: Image,
-    parent: this
-  }, {
-    ensureUniqueId: false
-  });
-  img4.setAutoFit(false);
 }
 
 function refTypes() {

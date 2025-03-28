@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Alignment, Column, ColumnComparator, ObjectWithUuidModel, Session, Table} from '../../index';
+import {Alignment, Column, ColumnComparator, ObjectModelWithUuid, Session, Table} from '../../index';
 
-export interface ColumnModel<TValue = string> extends ObjectWithUuidModel<Column<TValue>> {
+export interface ColumnModel<TValue = string> extends ObjectModelWithUuid<Column<TValue>> {
   session?: Session;
   /**
    * Configures whether the column width is auto optimized.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, Device, Form, FormField, FormFieldLayout, GroupBox, icons, InitModelOf, inspector, ObjectWithUuidModel, scout, scrollbars, strings, tooltips, WizardProgressFieldEventMap, WizardProgressFieldLayout, WizardProgressFieldModel
+  aria, Device, Form, FormField, FormFieldLayout, GroupBox, icons, InitModelOf, inspector, ObjectModelWithUuid, scout, scrollbars, strings, tooltips, WizardProgressFieldEventMap, WizardProgressFieldLayout, WizardProgressFieldModel
 } from '../../../index';
 import $ from 'jquery';
 
@@ -300,7 +300,7 @@ export class WizardProgressField extends FormField implements WizardProgressFiel
   }
 }
 
-export interface WizardStep extends ObjectWithUuidModel<WizardStep> {
+export interface WizardStep extends ObjectModelWithUuid<WizardStep> {
   index?: number;
   title?: string;
   subTitle?: string;

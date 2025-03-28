@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ObjectModel, ObjectOrModel, Session, Tree, TreeNode} from '../index';
+import {ObjectModel, ObjectModelWithId, ObjectOrModel, Session, Tree, TreeNode} from '../index';
 
-export interface TreeNodeModel extends ObjectModel<TreeNode> {
+export interface TreeNodeModel extends ObjectModel<TreeNode>, ObjectModelWithId {
   parent?: Tree;
   checked?: boolean;
   childNodes?: ObjectOrModel<TreeNode>[];

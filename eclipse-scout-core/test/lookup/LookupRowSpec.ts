@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,16 +11,13 @@ import {LookupRow, scout} from '../../src/index';
 
 describe('LookupRow', () => {
 
-  /** ensureUniqueId=false is important: we don't want a random ID property
-   * on the created instance otherwise the equals test would fail.
-   */
   function createLookupRow() {
     return scout.create(LookupRow, {
       key: 123,
       text: 'Foo',
       enabled: false,
       active: false
-    }, {ensureUniqueId: false});
+    });
   }
 
   it('constructor', () => {

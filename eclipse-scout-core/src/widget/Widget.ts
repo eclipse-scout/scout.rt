@@ -9,11 +9,12 @@
  */
 import {
   Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke, KeyStrokeContext, LayoutData,
-  LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, ObjectOrType, objects, ObjectUuidBuilder, ObjectUuidProvider, ObjectWithObjectUuidBuilder, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter,
-  scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session, SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
+  LoadingSupport, LogicalGrid, ModelAdapter, objectFactoryHints, ObjectOrChildModel, ObjectOrType, objects, ObjectUuidBuilder, ObjectUuidProvider, ObjectWithObjectUuidBuilder, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration,
+  PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session, SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
 } from '../index';
 import $ from 'jquery';
 
+@objectFactoryHints({ensureId: true})
 export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType, ObjectWithUuid, ObjectWithObjectUuidBuilder {
   declare model: WidgetModel;
   declare initModel: SomeRequired<this['model'], 'parent'>;
@@ -213,7 +214,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       return modelId;
     }
     if (ObjectUuidProvider.isUiId(modelId) && !ObjectUuidProvider.isUiId(staticModelId)) {
-      // prefer stable Id from static model if model Id is generated.
+      // prefer stable id from static model if model Id is generated.
       return staticModelId;
     }
     return modelId;
