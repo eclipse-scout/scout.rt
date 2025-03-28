@@ -32,9 +32,9 @@ public class HttpServiceTunnelInstrumenterFactory {
   public static final String INSTRUMENTATION_NAME = "scout.HttpServiceTunnel";
   private static final String SCOUT_PREFIX = "scout.server.service";
 
-  private static final AttributeKey<String> REQUEST_NAME = AttributeKey.stringKey(SCOUT_PREFIX + ".name");
-  private static final AttributeKey<String> OPERATION = AttributeKey.stringKey(SCOUT_PREFIX + ".operation");
-  private static final AttributeKey<String> PARAMETER_TYPES = AttributeKey.stringKey(SCOUT_PREFIX + ".parameter.types");
+  public static final AttributeKey<String> REQUEST_NAME = AttributeKey.stringKey(SCOUT_PREFIX + ".name");
+  public static final AttributeKey<String> OPERATION = AttributeKey.stringKey(SCOUT_PREFIX + ".operation");
+  public static final AttributeKey<String> PARAMETER_TYPES = AttributeKey.stringKey(SCOUT_PREFIX + ".parameter.types");
 
   public Instrumenter<ServiceTunnelRequest, Void> createInstrumenter() {
     SpanNameExtractor<ServiceTunnelRequest> spanNameExtractor = serviceTunnelRequest -> {
