@@ -929,7 +929,7 @@ describe('BookmarkSupport', () => {
     });
 
     it('can restore table filters', async () => {
-      // FIXME bsh: Add test case with filters
+      // FIXME bsh [js-bookmark] Add test case with filters
       // expect(page2.childNodes.filter(node => node.filterAccepted).length).toBe(1);
       // expect(page2.detailTable.filteredRows().length).toEqual(1);
       // expect(page2.detailTable.getFilter(TableTextUserFilter.TYPE)).toBeInstanceOf(TableTextUserFilter);
@@ -938,7 +938,7 @@ describe('BookmarkSupport', () => {
     });
 
     it('can restore chart table control config', async () => {
-      // FIXME bsh: Add test case with filters
+      // FIXME bsh [js-bookmark] Add test case with filters
       // expect(page2.childNodes.filter(node => node.filterAccepted).length).toBe(1);
       // expect(page2.detailTable.filteredRows().length).toEqual(1);
       // expect(page2.detailTable.getFilter(TableTextUserFilter.TYPE)).toBeInstanceOf(TableTextUserFilter);
