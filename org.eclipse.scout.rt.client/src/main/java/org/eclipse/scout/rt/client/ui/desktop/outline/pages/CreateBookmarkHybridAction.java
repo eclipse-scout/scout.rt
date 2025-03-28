@@ -13,10 +13,10 @@ import org.eclipse.scout.rt.client.ui.desktop.hybrid.AbstractHybridAction;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridActionType;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 
-@HybridActionType(GetPageStateForBookmarkHybridAction.TYPE)
-public class GetPageStateForBookmarkHybridAction extends AbstractHybridAction<IDoEntity> {
+@HybridActionType(CreateBookmarkHybridAction.TYPE)
+public class CreateBookmarkHybridAction extends AbstractHybridAction<IDoEntity> {
 
-  protected static final String TYPE = "GetPageStateForBookmark";
+  protected static final String TYPE = "CreateBookmark";
 
   @Override
   public void execute(IDoEntity data) {
