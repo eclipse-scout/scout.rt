@@ -84,7 +84,7 @@ public class FixedPatternLogbackLayout extends LayoutBase<ILoggingEvent> {
     addMdcRename("http.request.uri", "httpUri");
     addMdcRename("scout.session.id", "scoutSession");
     addMdcRename("scout.ui.session.id", "uiSession");
-
+    addMdcRename("opentelemetry.trace.id", "traceID");
     addMdcOrder("scout.user.name");
     addMdcOrder("subject.principal.name");
     addMdcOrder("scout.session.id");

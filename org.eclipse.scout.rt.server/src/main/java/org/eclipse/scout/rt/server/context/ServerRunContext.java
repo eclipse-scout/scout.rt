@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.logging.UserIdContextValueProvider;
+import org.eclipse.scout.rt.shared.opentelemetry.OpenTelemetrySpanAttributeProcessor;
 import org.eclipse.scout.rt.shared.session.ScoutSessionIdContextValueProvider;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
@@ -66,6 +67,7 @@ public class ServerRunContext extends RunContext {
         .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
         .add(new DiagnosticContextValueProcessor(BEANS.get(UserIdContextValueProvider.class)))
         .add(new DiagnosticContextValueProcessor(BEANS.get(ScoutSessionIdContextValueProvider.class)))
+        .add(new OpenTelemetrySpanAttributeProcessor())
         .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))
         .add(new ThreadLocalProcessor<>(IClientNodeId.CURRENT, m_clientNodeId))
         .add(new ThreadLocalProcessor<>(ClientNotificationCollector.CURRENT, m_clientNotificationCollector));

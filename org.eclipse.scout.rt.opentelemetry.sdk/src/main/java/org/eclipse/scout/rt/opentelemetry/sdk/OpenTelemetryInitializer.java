@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.dataobject.id.NodeId;
+import org.eclipse.scout.rt.opentelemetry.sdk.traces.ISamplerCustomizerProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk;
+import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdkBuilder;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.metrics.Aggregation;
 import io.opentelemetry.sdk.metrics.InstrumentSelector;
@@ -96,17 +98,25 @@ public class OpenTelemetryInitializer implements IPlatformListener {
     LOG.info("Initialize OpenTelemetry");
 
     // configuration provided by environment variables and/or system properties
-    m_openTelemetry = AutoConfiguredOpenTelemetrySdk.builder()
-        .addPropertiesSupplier(this::getDefaultProperties)
-        .addMeterProviderCustomizer(this::customizeMeterProvider)
-        .disableShutdownHook()
-        .setResultAsGlobal()
+    m_openTelemetry = initSamplers(
+        AutoConfiguredOpenTelemetrySdk.builder()
+            .addPropertiesSupplier(this::getDefaultProperties)
+            .addMeterProviderCustomizer(this::customizeMeterProvider)
+            .disableShutdownHook()
+            .setResultAsGlobal())
         .build()
         .getOpenTelemetrySdk();
 
     registerShutdownListener();
 
     initMetrics();
+  }
+
+  protected AutoConfiguredOpenTelemetrySdkBuilder initSamplers(AutoConfiguredOpenTelemetrySdkBuilder sdkBuilder) {
+    for (ISamplerCustomizerProvider provider : BEANS.all(ISamplerCustomizerProvider.class)) {
+      sdkBuilder.addSamplerCustomizer(provider::createSamplerCustomizer);
+    }
+    return sdkBuilder;
   }
 
   protected Map<String, String> getDefaultProperties() {
