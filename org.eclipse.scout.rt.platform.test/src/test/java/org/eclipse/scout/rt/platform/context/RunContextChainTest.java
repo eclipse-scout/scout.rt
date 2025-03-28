@@ -74,19 +74,24 @@ public class RunContextChainTest {
     // 8. DiagnosticContextValueProcessor
     c = chainIterator.next();
     assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
+    assertEquals("opentelemetry.trace.id", ((DiagnosticContextValueProcessor) c).getMdcKey());
+
+    // 9. DiagnosticContextValueProcessor
+    c = chainIterator.next();
+    assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
     assertEquals("scout.correlation.id", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
-    // 9. ThreadLocalProcessor for NlsLocale.CURRENT
+    // 10. ThreadLocalProcessor for NlsLocale.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(NlsLocale.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 10. ThreadLocalProcessor for PropertyMap.CURRENT
+    // 11. ThreadLocalProcessor for PropertyMap.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(PropertyMap.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 11. TransactionProcessor
+    // 12. TransactionProcessor
     c = chainIterator.next();
     assertEquals(TransactionProcessor.class, c.getClass());
     assertFalse(chainIterator.hasNext());

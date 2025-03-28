@@ -27,7 +27,7 @@ import org.slf4j.MDC;
  * @see MDC
  */
 @ApplicationScoped
-public class PrinicpalContextValueProvider implements IDiagnosticContextValueProvider {
+public class PrincipalContextValueProvider implements IDiagnosticContextValueProvider {
 
   public static final String KEY = "subject.principal.name";
 

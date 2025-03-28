@@ -11,10 +11,17 @@ package org.eclipse.scout.rt.platform.opentelemetry;
 
 import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.opentelemetry.OpenTelemetryProperties.OpenTelemetryTracingEnabledProperty;
 
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 
+/**
+ * Processor to propagate the {@link Context} from one thread to the next. Only enabled if tracing is enabled.
+ *
+ * @see OpenTelemetryTracingEnabledProperty
+ * @see ScoutOpenTelemetryContextStorage
+ */
 public class OpenTelemetryContextProcessor implements ICallableDecorator {
 
   public static final IUndecorator NOOP = () -> {};

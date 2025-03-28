@@ -33,4 +33,21 @@ public final class OpenTelemetryProperties {
       return "Property to specify if the application is using the Scout OpenTelemetry Tracing. Default is false.";
     }
   }
+
+  public static class OpenTelemetrySpanAttributeProcessorEnabledProperty extends AbstractBooleanConfigProperty {
+    @Override
+    public String getKey() {
+      return "scout.otel.span.attribute.processor.enabled";
+    }
+
+    @Override
+    public String description() {
+      return "Property to specify if org.eclipse.scout.rt.shared.opentelemetry.OpenTelemetrySpanAttributeProcessor should add span attributes. Default is false.";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return Boolean.FALSE;
+    }
+  }
 }
