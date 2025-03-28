@@ -126,6 +126,20 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   createBookmark(options?: Omit<BookmarkDoBuilderModel, 'desktop'>): JQuery.Promise<BookmarkDo> {
     let builder = scout.create(BookmarkDoBuilder, {
       desktop: this.desktop,
+      createTableRowSelections: false,
+      ...options
+    });
+    return builder.build();
+  }
+
+  createBookmarkForRefresh(options?: Omit<BookmarkDoBuilderModel, 'desktop'>): JQuery.Promise<BookmarkDo> {
+    let builder = scout.create(BookmarkDoBuilder, {
+      desktop: this.desktop,
+      fallbackAllowed: false,
+      persistableRequired: false,
+      createTitle: false,
+      createDescription: false,
+      createTablePreferences: false,
       ...options
     });
     return builder.build();
@@ -217,7 +231,12 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       this._applyBookmarkPage(parentPage, parentBookmarkPage, false);
     }
 
-    let pagePath = request.pagePath?.slice(); // create copy because array is altered
+    if (arrays.empty(request.pagePath)) {
+      this._revealPage(parentPage);
+      return; // done!
+    }
+
+    let pagePath = request.pagePath.slice(); // create copy because array is altered
     while (arrays.hasElements(pagePath)) {
       let bookmarkPage = pagePath[0];
       let page = await this._resolvePage(outline, parentPage, parentBookmarkPage, bookmarkPage);
@@ -238,6 +257,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
 
     this._revealPage(parentPage);
+
     if (arrays.hasElements(pagePath)) {
       // Path not fully restored
       parentPage.detailTable.setTableStatus(Status.error('Loading the favorite has been canceled because the entry cannot be found in this view.')); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResolutionCanceled')
@@ -280,6 +300,9 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   protected _revealPage(page: Page) {
+    if (!page) {
+      return;
+    }
     let outline = page.outline;
 
     // expand restored path, expand the target page if it is not a table page
