@@ -104,7 +104,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       }
       this._setBookmarkStore(bookmarkStore);
 
-      this.desktop.trigger('bookmarksChanged'); // FIXME bsh [js-bookmark] Improve desktop events
+      this.desktop.trigger('bookmarksChanged');
     });
   }
 
@@ -180,7 +180,6 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     // as much of the bookmark as it can. The remaining path will then be sent back to the UI using
     // a callback. After that, the hybrid action will end.
     if (hybridManager) {
-      // FIXME bsh [js-bookmark] Handle error
       await hybridManager.callActionAndWait('ActivateBookmark', {bookmarkDefinition});
       return;
     }
@@ -316,7 +315,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     let expandLeaf = page.nodeType !== Page.NodeType.TABLE;
     this._expandPath(page, expandLeaf);
 
-    outline.deselectAll(); // reselection triggers owner changes of menu in case we come here by execDataChanged --> FIXME bsh [js-bookmark] is this necessary in js?
+    outline.deselectAll(); // reselection triggers owner changes of menu in case we come here by execDataChanged
     outline.selectNode(page);
     outline.revealSelection();
   }
@@ -426,12 +425,6 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   protected _prepareSearchFilter(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm: boolean) {
     let searchForm = page.getSearchForm();
-    // FIXME bsh [js-bookmark] Find a solution for this
-    // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    // if (!searchForm) {
-    //   await page.detailTable.widget('SearchFormTableControl').when('propertyChange:form');
-    //   searchForm = page.getSearchForm();
-    // }
 
     if (searchForm && !searchForm.modelAdapter) {
       // If the new search data should not be the saved state (i.e. the user can press the "Reset" button to clear
@@ -443,22 +436,14 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       if (saveSearchForm) {
         searchForm.markAsSaved();
       }
-      // if (!saveSearchForm) {
-      //   searchForm.setData(oldSearchData);
-      // }
     } else {
       // FIXME bsh [js-bookmark] HACKY-HACKY! Replace by searchFilter property on page. How to instruct existing hybrid form to import this again?
       page['__searchData'] = bookmarkPage.searchData;
       page['__searchDataMarkAsSaved'] = saveSearchForm;
     }
 
-    // FIXME bsh [js-bookmark] "Mark dirty" - how?
+    // Mark page so ensureChildrenLoaded() will reload the data
     page.childrenLoaded = false;
-
-    // FIXME bsh [js-bookmark] Find a solution for this
-    // if (oldSearchData !== undefined) {
-    //   searchForm.setData(oldSearchData);
-    // }
   }
 
   protected _prepareUserFilters(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
@@ -506,5 +491,5 @@ export interface ActivateBookmarkRequest {
    * handing over the bookmark activation to the UI to finish, the server could only navigate to the hybrid page,
    * but not apply the page state (e.g. table configuration). Therefore, this has to be done in the UI.
    */
-  applyParentBookmarkPage?: boolean; // FIXME bsh [js-bookmark] Document
+  applyParentBookmarkPage?: boolean;
 }

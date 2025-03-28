@@ -632,7 +632,14 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     return null;
   }
 
-  // FIXME bsh [js-bookmark] Document
+  /**
+   * Returns an identifier for the given row that can be stored in a bookmark and be used to find the
+   * same row again when the bookmark is activated. Usually, it consists of all primary key values.
+   *
+   * By default, all components of a row identifier have to be persistable. If one of the primary keys
+   * is of an unsupported type, an error is thrown. To return a (non-persistable) {@link BookmarkTableRowIdentifierObjectComponentDo}
+   * instead, set the optional argument `allowObjectFallback`  to `true`.
+   */
   getTableRowIdentifier(row: TableRow, allowObjectFallback = false): BookmarkTableRowIdentifierDo {
     return row.bookmarkIdentifier;
   }

@@ -9,7 +9,7 @@
  */
 import {
   App, ChildModelOf, dataObjects, ErrorHandler, EventHandler, Form, icons, objects, Outline, Page, PageModel, PageParamDo, PageResolver, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent,
-  TableRowsInsertedEvent, TreeAdapter, TreeNodeModel, UuidPool
+  TableRowsInsertedEvent, TreeAdapter, TreeNodeModel
 } from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
@@ -182,7 +182,6 @@ export class OutlineAdapter extends TreeAdapter {
     objects.replacePrototypeFunction(Outline, 'updateDetailMenus', OutlineAdapter.updateDetailMenusRemote, true);
     objects.replacePrototypeFunction(Outline, '_initTreeNodeInternal', OutlineAdapter._initTreeNodeInternalRemote, true);
     objects.replacePrototypeFunction(Outline, '_createTreeNode', OutlineAdapter._createTreeNodeRemote, true);
-    objects.replacePrototypeFunction(Outline, Outline.prototype.getSearchFilterForPage, OutlineAdapter.getSearchFilterForPageRemote, true);
     objects.replacePrototypeFunction(Page, '_updateDetailFormMenus', OutlineAdapter._updateDetailFormMenus, true);
     objects.replacePrototypeFunction(Page, '_updateDetailTableMenus', OutlineAdapter._updateDetailTableMenus, true);
     objects.replacePrototypeFunction(Page, 'linkWithRow', OutlineAdapter.linkWithRow, true);
@@ -333,19 +332,6 @@ export class OutlineAdapter extends TreeAdapter {
       modelClass: pageModel.modelClass,
       text: pageModel.text || undefined // because summary column might come from Java parent page
     };
-  }
-
-  protected static getSearchFilterForPageRemote(this: Outline & { modelAdapter: OutlineAdapter; getSearchFilterForPageOrig: typeof Outline.prototype.getSearchFilterForPage }, page: Page & { remote?: true }) {
-    if (this.modelAdapter && page && page.remote) {
-      let eventId = UuidPool.take(this.session);
-      this.modelAdapter._send('searchFilterForPageRequest', {
-        eventId: eventId,
-        pageId: page.id
-      });
-      return this.modelAdapter.when('searchFilterForPageResponse:' + eventId)
-        .then((event: any) => event.searchData); // FIXME bsh [js-bookmark] Event Map
-    }
-    return this.getSearchFilterForPageOrig(page);
   }
 
   protected override _initNodeModel(nodeModel?: TreeNodeModel): ChildModelOf<Page> {
