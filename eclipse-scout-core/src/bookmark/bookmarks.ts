@@ -304,7 +304,7 @@ export const bookmarks = {
       return null;
     }
     let bookmark = bookmarkStore[index < 0 ? bookmarkStore.length + index : index] || arrays.last(bookmarkStore);
-    await bookmarkSupport.openBookmarkInOutline(bookmark);
+    await bookmarkSupport.activateBookmark(bookmark);
     return bookmark;
   },
 

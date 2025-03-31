@@ -316,9 +316,9 @@ describe('BookmarkSupport', () => {
     });
   });
 
-  describe('openBookmarkInOutline', () => {
+  describe('activateBookmark', () => {
 
-    it('can open an outline-only bookmark', async () => {
+    it('can activate an outline-only bookmark', async () => {
       // Assert old state of desktop
       expect(desktop.outline).toBeInstanceOf(Outline);
       expect(desktop.outline.id).toBe(SPEC_OUTLINE_1_ID);
@@ -332,7 +332,7 @@ describe('BookmarkSupport', () => {
           pagePath: []
         })
       });
-      await BookmarkSupport.get(session).openBookmarkInOutline(bookmark);
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
 
       // Assert new state of desktop
       expect(desktop.outline).toBeInstanceOf(Outline);
@@ -350,14 +350,14 @@ describe('BookmarkSupport', () => {
         })
       });
       try {
-        await BookmarkSupport.get(session).openBookmarkInOutline(bookmark);
+        await BookmarkSupport.get(session).activateBookmark(bookmark);
         fail('Expected to fail');
       } catch (error) {
         expect(error).toBe(BookmarkSupport.ERROR_WRONG_DEFINITION_TYPE);
       }
     });
 
-    it('can open a top-level page', async () => {
+    it('can activate a top-level page', async () => {
       // Assert old state of desktop
       expect(desktop.outline).toBeInstanceOf(Outline);
       expect(desktop.outline.id).toBe(SPEC_OUTLINE_1_ID);
@@ -375,7 +375,7 @@ describe('BookmarkSupport', () => {
           pagePath: []
         })
       });
-      await BookmarkSupport.get(session).openBookmarkInOutline(bookmark);
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
 
       // Assert new state of desktop
       expect(desktop.outline).toBeInstanceOf(Outline);
@@ -390,7 +390,7 @@ describe('BookmarkSupport', () => {
       expect(page.parentNode).toBeUndefined();
     });
 
-    it('can open a nested page', async () => {
+    it('can activate a nested page', async () => {
       // Assert old state of desktop
       expect(desktop.outline).toBeInstanceOf(Outline);
       expect(desktop.outline.id).toBe(SPEC_OUTLINE_1_ID);
@@ -441,7 +441,7 @@ describe('BookmarkSupport', () => {
           ]
         })
       });
-      await BookmarkSupport.get(session).openBookmarkInOutline(bookmark);
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
 
       // Assert new state of desktop
       expect(desktop.outline).toBeInstanceOf(Outline);
@@ -506,7 +506,7 @@ describe('BookmarkSupport', () => {
         })
       });
       try {
-        await BookmarkSupport.get(session).openBookmarkInOutline(bookmark);
+        await BookmarkSupport.get(session).activateBookmark(bookmark);
         fail('Expected to fail');
       } catch (error) {
         expect(error).toBe(BookmarkSupport.ERROR_OUTLINE_NOT_FOUND);
@@ -520,7 +520,7 @@ describe('BookmarkSupport', () => {
         })
       });
       try {
-        await BookmarkSupport.get(session).openBookmarkInOutline(bookmark);
+        await BookmarkSupport.get(session).activateBookmark(bookmark);
         fail('Expected to fail');
       } catch (error) {
         expect(error).toBe(BookmarkSupport.ERROR_WRONG_DEFINITION_TYPE);
@@ -539,7 +539,7 @@ describe('BookmarkSupport', () => {
         })
       });
       try {
-        await BookmarkSupport.get(session).openBookmarkInOutline(bookmark);
+        await BookmarkSupport.get(session).activateBookmark(bookmark);
         fail('Expected to fail');
       } catch (error) {
         expect(error).toBe(BookmarkSupport.ERROR_PAGE_NOT_FOUND);
@@ -573,7 +573,7 @@ describe('BookmarkSupport', () => {
           ]
         })
       });
-      await BookmarkSupport.get(session).openBookmarkInOutline(bookmark);
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
 
       // Assert new state of desktop
       expect(desktop.outline).toBeInstanceOf(Outline);
@@ -639,7 +639,7 @@ describe('BookmarkSupport', () => {
           ]
         })
       });
-      await BookmarkSupport.get(session).openBookmarkInOutline(bookmark);
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
 
       // Assert new state of desktop
       expect(desktop.outline).toBeInstanceOf(Outline);
@@ -674,7 +674,7 @@ describe('BookmarkSupport', () => {
       expect(page6.parentNode).toBeUndefined();
     });
 
-    it('can open and reset an already loaded page', async () => {
+    it('can activate and reset an already loaded page', async () => {
       // Activate bookmark
       let bookmark = scout.create(BookmarkDo, {
         definition: scout.create(OutlineBookmarkDefinitionDo, {
@@ -693,7 +693,7 @@ describe('BookmarkSupport', () => {
           ]
         })
       });
-      await BookmarkSupport.get(session).openBookmarkInOutline(bookmark);
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
 
       // Assert new state of desktop
       expect(desktop.outline).toBeInstanceOf(Outline);
@@ -725,7 +725,7 @@ describe('BookmarkSupport', () => {
       expect(page1.childNodes[1]).not.toBe(childNode2);
 
       // Open same bookmark again
-      await BookmarkSupport.get(session).openBookmarkInOutline(bookmark);
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
 
       // Assert same page, but search data has been reset and data reloaded
       expect(desktop.outline.selectedNode()).toBeInstanceOf(SpecTablePage2);
@@ -745,9 +745,9 @@ describe('BookmarkSupport', () => {
     });
   });
 
-  describe('openBookmarkLocal', () => {
+  describe('activateBookmarkLocal', () => {
 
-    it('can open a partial bookmark from a given start location', async () => {
+    it('can activate a partial bookmark from a given start location', async () => {
       // Go to the start page
       let outline = goToOutline(desktop, SPEC_OUTLINE_2_ID);
       let page1 = scout.assertInstance(outline.nodes[1], SpecNodePage3);
@@ -801,7 +801,7 @@ describe('BookmarkSupport', () => {
           })
         ]
       };
-      await BookmarkSupport.get(session).openBookmarkLocal(activateBookmarkRequest);
+      await BookmarkSupport.get(session).activateBookmarkLocal(activateBookmarkRequest);
 
       // Assert new state of desktop
       expect(desktop.outline).toBeInstanceOf(Outline);
@@ -854,7 +854,7 @@ describe('BookmarkSupport', () => {
         pagePath: [] // irrelevant for this test
       };
       try {
-        await BookmarkSupport.get(session).openBookmarkLocal(activateBookmarkRequest);
+        await BookmarkSupport.get(session).activateBookmarkLocal(activateBookmarkRequest);
         fail('Expected to fail');
       } catch (error) {
         expect(error).toBe(BookmarkSupport.ERROR_PAGE_WRONG_OUTLINE);
