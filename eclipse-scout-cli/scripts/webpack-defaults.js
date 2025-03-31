@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 const CopyPlugin = require('copy-webpack-plugin');
+const {CycloneDxWebpackPlugin} = require('@cyclonedx/webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const AfterEmitWebpackPlugin = require('./AfterEmitWebpackPlugin');
 
@@ -21,6 +22,8 @@ const webpack = require('webpack');
  * @param {boolean} args.clean true, to clean the dist folder before each build. Default is true.
  * @param {boolean} args.progress true, to show build progress in percentage. Default is true.
  * @param {boolean} args.profile true, to show timing information for each build step. Default is false.
+ * @param {boolean} args.cyclonedxSkip true, if no CycloneDX SBOM should be created. Default is false.
+ * @param {string} args.cyclonedxVersion CycloneDX version to use. Default is '1.5'.
  * @param {[]} args.resDirArray an array containing directories which should be copied to dist/res
  */
 module.exports = (env, args) => {
@@ -232,6 +235,19 @@ module.exports = (env, args) => {
         }
       })
     ];
+
+    const cyclonedxSkip = ('' + nvl(args.cyclonedxSkip, 'false')) === 'true';
+    if (!cyclonedxSkip) {
+      /** @type {import('@cyclonedx/webpack-plugin').CycloneDxWebpackPluginOptions} */
+      const cycloneDxWebpackPluginOptions = {
+        specVersion: nvl(args.cyclonedxVersion, '1.5'),
+        collectEvidence: true,
+        rootComponentType: 'application',
+        validateResults: false,
+        includeWellknown: false
+      };
+      config.plugins.push(new CycloneDxWebpackPlugin(cycloneDxWebpackPluginOptions));
+    }
   }
 
   if (devMode) {
