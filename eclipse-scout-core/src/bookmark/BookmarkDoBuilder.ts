@@ -201,6 +201,9 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
 
     let contextElements = scout.create(HybridActionContextElements)
       .withElement('page', HybridActionContextElement.of(page.outline, page));
+    if (childPage) {
+      contextElements.withElement('childPage', HybridActionContextElement.of(childPage.outline, childPage));
+    }
 
     let bookmark = await HybridManager.get(this.session).callActionAndWait('CreateBookmark', createBookmarkOptions, contextElements) as BookmarkDo;
     if (!(bookmark?.definition?.bookmarkedPage instanceof TableBookmarkPageDo)) {
