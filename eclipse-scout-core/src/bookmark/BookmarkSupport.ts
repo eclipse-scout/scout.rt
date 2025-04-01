@@ -71,6 +71,13 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     this.desktop.setBusy(this.loading);
   }
 
+  resolveOutline(outlineId: string) {
+    return this.desktop.getOutlines().find(outline => {
+      let id = outline.getObjectUuidBuilder().buildId();
+      return id === outlineId;
+    });
+  }
+
   // --------------------------------------
 
   protected _getBookmarkStore(): BookmarkDo[] {
@@ -185,10 +192,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
 
     // Scout JS: resolve everything in the UI, i.e. the entire path is remaining
-    let outline = this.desktop.getOutlines().find(outline => {
-      let outlineId = outline?.getObjectUuidBuilder().buildId();
-      return outlineId === bookmarkDefinition.outlineId;
-    });
+    let outline = this.resolveOutline(bookmarkDefinition.outlineId);
     let pagePath = bookmarkDefinition.bookmarkedPage
       ? [...bookmarkDefinition.pagePath || [], bookmarkDefinition.bookmarkedPage]
       : null;
