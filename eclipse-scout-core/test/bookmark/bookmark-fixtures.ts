@@ -55,7 +55,7 @@ export function specDesktopModel(): DesktopModel {
           id: SPEC_OUTLINE_1_ID,
           uuid: SPEC_OUTLINE_1_UUID,
           objectType: Outline,
-          title: 'Spec Outline 1',
+          title: 'Outline 1',
           nodes: [
             {objectType: SpecNodePage1},
             {objectType: SpecTablePage1},
@@ -64,7 +64,7 @@ export function specDesktopModel(): DesktopModel {
         },
         selected: true,
         displayStyle: 'MENU',
-        text: 'Spec Outline 1'
+        text: 'Outline Button 1'
       },
       {
         id: 'SpecOutline2ViewButton',
@@ -73,14 +73,14 @@ export function specDesktopModel(): DesktopModel {
           id: SPEC_OUTLINE_2_ID,
           uuid: SPEC_OUTLINE_2_UUID,
           objectType: Outline,
-          title: 'Spec Outline 2',
+          title: 'Outline 2',
           nodes: [
             {objectType: SpecNodePage2},
             {objectType: SpecNodePage3}
           ]
         },
         displayStyle: 'MENU',
-        text: 'Spec Outline 2'
+        text: 'Outline Button 2'
       }
     ],
     outline: SPEC_OUTLINE_1_ID

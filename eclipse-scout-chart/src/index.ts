@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,8 @@
 import {ObjectFactory} from '@eclipse-scout/core';
 import * as self from './index';
 
+export * from './objectFactories';
+export * from './bookmark/ChartTableControlConfigHelperImpl';
 export * from './chart/Chart';
 export * from './chart/ChartAdapter';
 export * from './chart/ChartEventMap';
@@ -33,12 +35,13 @@ export * from './tile/ChartFieldTile';
 export * from './tile/ChartFieldTileAdapter';
 export * from './tile/ChartFieldTileModel';
 export * from './table/controls/ChartTableControl';
+export * from './table/controls/ChartTableControlAdapter';
+export * from './table/controls/ChartTableControlConfigDo';
 export * from './table/controls/ChartTableControlEventMap';
+export * from './table/controls/ChartTableControlLayout';
 export * from './table/controls/ChartTableControlModel';
 export * from './table/controls/ChartTableUserFilter';
 export * from './table/controls/ChartTableUserFilterModel';
-export * from './table/controls/ChartTableControlAdapter';
-export * from './table/controls/ChartTableControlLayout';
 
 export default self;
 

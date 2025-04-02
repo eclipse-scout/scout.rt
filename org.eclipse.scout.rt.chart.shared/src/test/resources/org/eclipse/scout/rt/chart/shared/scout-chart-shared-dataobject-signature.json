@@ -1,0 +1,38 @@
+{
+  "_type" : "scout.DataObjectSignature",
+  "entities" : [ {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartAggregationColumnId",
+      "valueType" : "ID[scout.TableColumnId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartAggregationModifier",
+      "valueType" : "CLASS[java.lang.Integer]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartGroup1ColumnId",
+      "valueType" : "ID[scout.TableColumnId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartGroup1Modifier",
+      "valueType" : "CLASS[java.lang.Integer]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartGroup2ColumnId",
+      "valueType" : "ID[scout.TableColumnId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartGroup2Modifier",
+      "valueType" : "CLASS[java.lang.Integer]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartTypeId",
+      "valueType" : "ID[scout.ChartTableControlChartTypeId]"
+    } ],
+    "typeName" : "scout.ChartTableControlConfig",
+    "typeVersion" : "scout-25.2.001"
+  } ],
+  "enums" : [ ]
+}
