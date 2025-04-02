@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
-import {Desktop, DesktopAdapter, Form, FormModel, GroupBox, GroupBoxModel, RemoteEvent} from '../../src/index';
+import {Desktop, DesktopAdapter, Form, FormModel, GroupBox, GroupBoxModel, HybridWidget, RemoteEvent, scout} from '../../src/index';
 
 describe('DesktopAdapter', () => {
   let session: SandboxSession, desktop: Desktop, outlineHelper: OutlineSpecHelper, formHelper: FormSpecHelper, desktopAdapter: DesktopAdapter;
@@ -72,6 +72,29 @@ describe('DesktopAdapter', () => {
         formId: form2.modelAdapter.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
+
+      const jsFormModel = {objectType: 'JsForm', id: '42', jsFormObjectType: 'Form'};
+      registerAdapterData(jsFormModel, session);
+      const jsForm = session.getOrCreateWidget('42', desktop) as Form & HybridWidget;
+
+      desktop.activateForm(jsForm);
+      expect(desktop.activeForm).toBe(jsForm);
+
+      sendQueuedAjaxCalls();
+      event = new RemoteEvent(desktopAdapter.id, 'formActivate', {
+        formId: jsForm.__hybridModelAdapter.id
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+
+      const remoteEvents = [...mostRecentJsonRequest().events];
+      const jsOnlyForm = scout.create(Form, {parent: session.desktop});
+
+      desktop.activateForm(jsOnlyForm);
+      expect(desktop.activeForm).toBe(jsOnlyForm);
+
+      // nothing was sent to the server, the most recent request is unchanged and therefore contains the same events
+      sendQueuedAjaxCalls();
+      expect(mostRecentJsonRequest()).toContainEventsExactly(remoteEvents);
     });
 
     it('can close and open new form in the same response', () => {
@@ -128,9 +151,7 @@ describe('DesktopAdapter', () => {
       sendQueuedAjaxCalls();
 
       let expectedEvents = [
-        new RemoteEvent(desktopAdapter.id, 'formActivate', {
-          formId: null
-        }),
+        new RemoteEvent(desktopAdapter.id, 'formActivate', {}),
         new RemoteEvent(desktopAdapter.id, 'formActivate', {
           formId: '400'
         })

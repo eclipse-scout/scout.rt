@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -103,10 +103,12 @@ export class DisplayChildController implements DisplayChildControllerModel, Obje
     // use _unregisterChild in subclass
   }
 
-  protected _registerChild(child: DisplayChild, children: DisplayChild[], propertyName: string, position?: number) {
+  protected _registerChild(child: DisplayChild, propertyName: string, position?: number) {
+    const children: DisplayChild[] = arrays.ensure(this.displayParent[propertyName]);
     if (children.includes(child)) {
       return;
     }
+    child.one('destroy', e => this._unregisterChild(child, propertyName));
     let newChildren;
     if (position !== undefined) {
       newChildren = [...children];
@@ -118,7 +120,11 @@ export class DisplayChildController implements DisplayChildControllerModel, Obje
     this.displayParent._setProperty(propertyName, newChildren);
   }
 
-  protected _unregisterChild(child: DisplayChild, children: DisplayChild[], propertyName: string) {
+  protected _unregisterChild(child: DisplayChild, propertyName: string) {
+    const children: DisplayChild[] = this.displayParent[propertyName];
+    if (!children?.length) {
+      return;
+    }
     let newChildren = children.filter(f => f !== child);
     if (arrays.equals(children, newChildren)) {
       return;

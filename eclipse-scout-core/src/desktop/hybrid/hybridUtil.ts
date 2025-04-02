@@ -87,7 +87,7 @@ export class HybridUtil {
     if (!contextElement) {
       return null;
     }
-    let adapter = scout.assertInstance(contextElement.widget.modelAdapter, ModelAdapter, 'Widget does not have a model adapter');
+    let adapter = scout.assertInstance(ModelAdapter.getModelAdapterForWidget(contextElement.widget, true), ModelAdapter, 'Widget does not have a model adapter');
     let jsonElement = this._modelElementToJson(adapter, contextElement.element);
 
     return {

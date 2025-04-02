@@ -121,7 +121,7 @@ export class HybridManager extends Widget {
     widget.trigger(eventType, {data});
   }
 
-  protected _onHybridFormEvent(form: HybridForm, eventType: string, data: AnyDoEntity) {
+  protected _onHybridFormEvent(form: HybridManagerForm, eventType: string, data: AnyDoEntity) {
     if (eventType === 'reset') {
       form.setData(data);
       form.trigger('reset');
@@ -209,7 +209,7 @@ export class HybridManager extends Widget {
     return this.when(`widgetAdd:${id}`).then(event => this._onFormAdd(event.widget as Form));
   }
 
-  protected _onFormAdd(form: HybridForm) {
+  protected _onFormAdd(form: HybridManagerForm) {
     form.one('close', () => {
       form.__closeTriggered = true;
     });
@@ -240,7 +240,7 @@ export interface HybridManagerActionEndEventResult {
   contextElements?: HybridActionContextElements;
 }
 
-interface HybridForm extends Form {
+interface HybridManagerForm extends Form {
   /**
    * @returns true if {@link FormEventMap.close} event was triggered at least once for this form.
    */

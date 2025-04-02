@@ -24,7 +24,8 @@ export class JsFormAdapter extends FormAdapter {
       objectType: model.jsFormObjectType,
       displayParent: model.displayParent,
       displayHint: model.displayHint,
-      data: dataObjects.deserialize(model.inputData, null, {createPojoIfDoIsUnknown: true})
+      data: dataObjects.deserialize(model.inputData, null, {createPojoIfDoIsUnknown: true}),
+      __hybridModelAdapter: this
     };
 
     if (model.jsFormModel) {
@@ -45,6 +46,7 @@ export class JsFormAdapter extends FormAdapter {
       if (!widget.exclusiveAdapterKey) {
         // Link the form with this adapter. The form may be an existing form created by JS code or created now by Java.
         widget.exclusiveAdapterKey = this.id;
+        widget.__hybridModelAdapter = this;
       } else if (widget.exclusiveAdapterKey !== this.id) {
         // If the found form belongs to this adapter, it can be opened exclusively.
         // Otherwise, it needs to be opened separately because the server may send events for that form (formHide etc.).
