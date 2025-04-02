@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, BookmarkAdapter, CompositeField, Desktop, DetailTableTreeFilter, Device, DisplayParent, DisplayViewId, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FullModelOf, GlassPaneTarget,
-  GroupBox, GroupBoxMenuItemsOrder, HtmlComponent, Icon, InitModelOf, keys, KeyStrokeContext, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton,
+  arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, DisplayParent, DisplayViewId, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FullModelOf, GlassPaneTarget, GroupBox,
+  GroupBoxMenuItemsOrder, HtmlComponent, Icon, InitModelOf, keys, KeyStrokeContext, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton,
   NavigateUpButton, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, Page,
   PageLayout, PageModel, PropertyChangeEvent, scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent,
   TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodesDeletedEvent, TreeNodesInsertedEvent, TreeNodesSelectedEvent,
@@ -60,7 +60,6 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
   $title: JQuery;
   $titleText: JQuery;
 
-  protected _bookmarkAdapter: BookmarkAdapter;
   protected _detailContentDestroyHandler: EventHandler<Event<Widget>>;
   protected _detailMenusNodesSelectedHandler: EventListener & {
     outline: Outline;
@@ -104,7 +103,6 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.messageBoxController = null;
     this.fileChooserController = null;
     this.textFilterEnabled = false;
-    this._bookmarkAdapter = null;
     this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
     this._detailMenusNodesSelectedHandler = null;
     this._defaultDetailFormDestroyHandler = this._onDefaultDetailFormDestroy.bind(this);

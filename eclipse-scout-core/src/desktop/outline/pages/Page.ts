@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, BaseDoEntity, BookmarkAdapter, BookmarkTableRowIdentifierDo, ButtonTile, ChildModelOf, Constructor, dataObjects, DoTypeResolver, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form,
-  HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, ObjectIdProvider, ObjectOrChildModel, ObjectOrType, ObjectWithUuid, Outline, PageDetailMenuContributor, PageEventMap, PageIdDummyPageParamDo, PageModel,
-  ParentTablePageMenuContributor, PropertyChangeEvent, RequiredUnlessNotSubclass, scout, SomeRequired, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, UuidPathOptions, Widget
+  arrays, BaseDoEntity, BookmarkSupport, BookmarkTableRowIdentifierDo, ButtonTile, ChildModelOf, Constructor, dataObjects, DoTypeResolver, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form,
+  HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, ObjectIdProvider, ObjectOrChildModel, ObjectOrType, ObjectWithUuid, Outline, PageDetailMenuContributor, PageEventMap, PageModel, ParentTablePageMenuContributor,
+  PropertyChangeEvent, RequiredUnlessNotSubclass, scout, SomeRequired, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, typeName, UuidPathOptions, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -68,7 +68,6 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
   protected _tableFilterHandler: EventHandler<Event<Table>>;
   protected _tableRowClickHandler: EventHandler<TableRowClickEvent>;
   protected _detailTableModel: ChildModelOf<Table>;
-  protected _bookmarkAdapter: BookmarkAdapter;
 
   /** @internal */
   _detailFormModel: ChildModelOf<Form>;
@@ -102,7 +101,6 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
     this._tableRowClickHandler = this._onTableRowClick.bind(this);
     this._detailTableModel = null;
     this._detailFormModel = null;
-    this._bookmarkAdapter = null;
     this._detailMenusChangeHandler = this._onMenuOwnerMenusChange.bind(this);
   }
 
@@ -161,13 +159,6 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
 
   setUuid(uuid: string) {
     this.uuid = uuid;
-  }
-
-  getBookmarkAdapter(): BookmarkAdapter {
-    if (!this._bookmarkAdapter) {
-      this._bookmarkAdapter = scout.create(BookmarkAdapter);
-    }
-    return this._bookmarkAdapter;
   }
 
   protected static _removePropertyIfLazyLoading(object: PageModel, name: string): any {
@@ -605,7 +596,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
   }
 
   matchesPageParam(pageParam: PageParamDo): boolean {
-    return this.getBookmarkAdapter().pageParamsMatch(this.pageParam, pageParam);
+    return BookmarkSupport.get(this.session).pageParamsMatch(this.pageParam, pageParam);
   }
 
   protected _setPageParam(pageParam: PageParamDo) {
@@ -626,12 +617,14 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
   }
 
   /**
-   * Returns an identifier for the given row that can be stored in a bookmark and be used to find the
-   * same row again when the bookmark is activated. Usually, it consists of all primary key values.
+   * Returns an identifier for the given row that can be stored in a bookmark or used to find the same row again when the
+   * bookmark is activated. Usually, it consists of all primary key values.
    *
-   * By default, all components of a row identifier have to be persistable. If one of the primary keys
-   * is of an unsupported type, an error is thrown. To return a (non-persistable) {@link BookmarkTableRowIdentifierObjectComponentDo}
-   * instead, set the optional argument `allowObjectFallback`  to `true`.
+   * By default, all components of a row identifier have to be persistable. If one of the primary keys is of an unsupported
+   * type, an error is thrown. To return a (non-persistable) {@link BookmarkTableRowIdentifierObjectComponentDo} instead,
+   * set the optional argument `allowObjectFallback` to `true`.
+   *
+   * This method can also return `null`. In that case, the child page is identified by its page param.
    */
   getTableRowIdentifier(row: TableRow, allowObjectFallback = false): BookmarkTableRowIdentifierDo {
     return row.bookmarkIdentifier;
@@ -706,6 +699,15 @@ interface ContributedMenu extends Menu {
  * @see BookmarkSupport
  */
 export class PageParamDo extends BaseDoEntity {
+}
+
+/**
+ * Default page param that is used by bookmarks to identify pages that do not provide a {@link PageParamDo}.
+ * It stores the page's ID so it can be found again when activating the bookmark.
+ */
+@typeName('scout.PageIdDummyPageParam')
+export class PageIdDummyPageParamDo extends PageParamDo {
+  pageId: string;
 }
 
 /**

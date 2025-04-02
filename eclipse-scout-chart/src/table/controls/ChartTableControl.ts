@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -323,6 +323,10 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     }
   }
 
+  setChartAggregation(chartAggregation: TableControlChartAggregation) {
+    this.setProperty('chartAggregation', chartAggregation);
+  }
+
   protected _setChartAggregation(chartAggregation: TableControlChartAggregation) {
     if (chartAggregation === this.chartAggregation) {
       return;
@@ -333,8 +337,16 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     }
   }
 
+  setChartGroup1(chartGroup: TableControlChartGroup) {
+    this.setProperty('chartGroup1', chartGroup);
+  }
+
   protected _setChartGroup1(chartGroup: TableControlChartGroup) {
     this._setChartGroup(1, chartGroup);
+  }
+
+  setChartGroup2(chartGroup: TableControlChartGroup) {
+    this.setProperty('chartGroup2', chartGroup);
   }
 
   protected _setChartGroup2(chartGroup: TableControlChartGroup) {

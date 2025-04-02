@@ -12,11 +12,21 @@ import {
   BookmarkTableRowIdentifierStringComponentDo, IBookmarkTableRowIdentifierComponentDo, objects, PageWithTable, scout, TableRow
 } from '../index';
 
+/**
+ * Basic factory to create data objects that uniquely identify a row in a table page via the primary keys.
+ *
+ * Since data types are much more rudimentary in JavaScript, this factory only creates a subset of all possible row
+ * identifier components. For example, all numeric values are returned as {@link BookmarkTableRowIdentifierLongComponentDo}
+ * because there is only one number data type and this factory cannot decide whether a value should be a `Long` or an
+ * `Integer`. Likewise, IDs are always returned as {@link BookmarkTableRowIdentifierStringComponentDo}, because they
+ * are usually represented by strings without any additional metadata. If such identifiers are persisted, they cannot
+ * be found again automatically (e.g. for automatic value migration).
+ */
 export class BookmarkTableRowIdentifierDoFactory {
 
   createTableRowIdentifier(tablePage: PageWithTable, row: TableRow, allowObjectFallback = false): BookmarkTableRowIdentifierDo {
     let keys = row.getKeyValues();
-    let keyComponents = keys.map(key => tablePage.createTableRowIdentifierComponent(key, allowObjectFallback));
+    let keyComponents = keys.map(key => this.createTableRowIdentifierComponent(tablePage, key, allowObjectFallback));
     return scout.create(BookmarkTableRowIdentifierDo, {keyComponents});
   }
 
@@ -25,13 +35,9 @@ export class BookmarkTableRowIdentifierDoFactory {
       return null;
     }
 
-    // FIXME bsh [js-bookmark] How to check for IEntityKey?
-    // FIXME bsh [js-bookmark] How to check for TypedId?
-    // FIXME bsh [js-bookmark] How to check for IId?
     if (key instanceof Date) {
       return scout.create(BookmarkTableRowIdentifierDateComponentDo, {key});
     }
-    // FIXME bsh [js-bookmark] Integer vs. Long?
     if (typeof key === 'number') {
       return scout.create(BookmarkTableRowIdentifierLongComponentDo, {key});
     }

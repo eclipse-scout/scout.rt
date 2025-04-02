@@ -9,8 +9,8 @@
  */
 
 import {
-  ActivateBookmarkRequest, BaseDoEntity, BookmarkDo, BookmarkSupport, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierStringComponentDo, Desktop, NodeBookmarkPageDo, Outline, OutlineBookmarkDefinitionDo, PageBookmarkDefinitionDo,
-  PageIdDummyPageParamDo, ResetMenu, scout, SearchMenu, Table, TableBookmarkPageDo, TableTextUserFilter, UuidPool
+  ActivateBookmarkPathParam, BaseDoEntity, BookmarkDo, BookmarkDoBuilder, BookmarkSupport, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierStringComponentDo, Desktop, NodeBookmarkPageDo, Outline, OutlineBookmarkDefinitionDo,
+  PageBookmarkDefinitionDo, PageIdDummyPageParamDo, ResetMenu, scout, SearchMenu, Table, TableBookmarkPageDo, TableTextUserFilter, UuidPool
 } from '../../src/index';
 import {
   FRUIT_1_KEY, FRUIT_2_KEY, FRUIT_3_KEY, FRUIT_4_KEY, FRUIT_5_KEY, goToOutline, SPEC_NODE_PAGE_1_UUID, SPEC_NODE_PAGE_2_UUID, SPEC_NODE_PAGE_3_UUID, SPEC_NODE_PAGE_4_UUID, SPEC_OUTLINE_1_ID, SPEC_OUTLINE_1_UUID, SPEC_OUTLINE_2_ID,
@@ -40,7 +40,7 @@ describe('BookmarkSupport', () => {
     it('can create an outline-only bookmark', async () => {
       let outline = goToOutline(desktop, SPEC_OUTLINE_2_ID);
       expect(outline).toBeInstanceOf(Outline);
-      expect(outline.title).toBe('Spec Outline 2');
+      expect(outline.title).toBe('Outline 2');
       expect(outline.nodes.length).toBe(2);
       expect(outline.nodes[0]).toBeInstanceOf(SpecNodePage2);
       expect(outline.nodes[1]).toBeInstanceOf(SpecNodePage3);
@@ -48,10 +48,11 @@ describe('BookmarkSupport', () => {
 
       // -----
 
-      let bookmark1 = await bookmarkSupport.createBookmark();
+      let bookmark1 = await bookmarkSupport.createBookmark() as BookmarkDo;
+
       expect(bookmark1).toBeInstanceOf(BookmarkDo);
-      expect(bookmark1.key).toBeUndefined();
-      expect(bookmark1.titles).toBeUndefined();
+      expect(bookmark1.id).toBeUndefined();
+      expect(bookmark1.title).toBe('Outline 2');
       expect(bookmark1.description).toBeUndefined();
       expect(bookmark1.definition).toBeInstanceOf(OutlineBookmarkDefinitionDo);
       let bookmarkDefinition1 = bookmark1.definition as OutlineBookmarkDefinitionDo;
@@ -62,12 +63,12 @@ describe('BookmarkSupport', () => {
       // This case does not really make sense, but we test it anyway
       let bookmark2 = await bookmarkSupport.createBookmark({
         createOutline: false
-      });
+      }) as BookmarkDo;
 
       expect(bookmark2).toBeInstanceOf(BookmarkDo);
-      expect(bookmark2.key).toBeUndefined();
-      expect(bookmark2.titles).toBeUndefined();
-      expect(bookmark2.description).toBeUndefined();
+      expect(bookmark1.id).toBeUndefined();
+      expect(bookmark1.title).toBe('Outline 2');
+      expect(bookmark1.description).toBeUndefined();
       expect(bookmark2.definition).toBeInstanceOf(PageBookmarkDefinitionDo); // <--
       let bookmarkDefinition2 = bookmark2.definition as PageBookmarkDefinitionDo;
       expect(bookmarkDefinition2.bookmarkedPage).toBe(null);
@@ -76,7 +77,7 @@ describe('BookmarkSupport', () => {
     it('can create a page-only bookmark', async () => {
       let outline = goToOutline(desktop, SPEC_OUTLINE_2_ID);
       expect(outline).toBeInstanceOf(Outline);
-      expect(outline.title).toBe('Spec Outline 2');
+      expect(outline.title).toBe('Outline 2');
       expect(outline.nodes.length).toBe(2);
       expect(outline.nodes[0]).toBeInstanceOf(SpecNodePage2);
       expect(outline.nodes[1]).toBeInstanceOf(SpecNodePage3);
@@ -98,12 +99,12 @@ describe('BookmarkSupport', () => {
 
       let bookmark = await bookmarkSupport.createBookmark({
         createOutline: false
-      });
+      }) as BookmarkDo;
 
       expect(bookmark).toBeInstanceOf(BookmarkDo);
-      expect(bookmark.key).toBeUndefined();
-      expect(bookmark.titles).toBeUndefined();
-      expect(bookmark.description).toBeUndefined();
+      expect(bookmark.id).toBeUndefined();
+      expect(bookmark.title).toBe('Node Page 1');
+      expect(bookmark.description).toBe('Node Page 1');
       expect(bookmark.definition).toBeInstanceOf(PageBookmarkDefinitionDo); // <--
       let bookmarkDefinition = bookmark.definition as PageBookmarkDefinitionDo;
 
@@ -117,7 +118,7 @@ describe('BookmarkSupport', () => {
     it('can create a bookmark for a top-level table page', async () => {
       let outline = desktop.outline;
       expect(outline).toBeInstanceOf(Outline);
-      expect(outline.title).toBe('Spec Outline 1');
+      expect(outline.title).toBe('Outline 1');
       expect(outline.nodes.length).toBe(3);
       expect(outline.nodes[0]).toBeInstanceOf(SpecNodePage1);
       expect(outline.nodes[1]).toBeInstanceOf(SpecTablePage1);
@@ -146,12 +147,12 @@ describe('BookmarkSupport', () => {
 
       // -----
 
-      let bookmark = await bookmarkSupport.createBookmark();
+      let bookmark = await bookmarkSupport.createBookmark() as BookmarkDo;
 
       expect(bookmark).toBeInstanceOf(BookmarkDo);
-      expect(bookmark.key).toBeUndefined();
-      expect(bookmark.titles).toBeUndefined();
-      expect(bookmark.description).toBeUndefined();
+      expect(bookmark.id).toBeUndefined();
+      expect(bookmark.title).toBe('Outline 1 - Table Page 3');
+      expect(bookmark.description).toBe('Table Page 3\n  text: "red"');
       expect(bookmark.definition).toBeInstanceOf(OutlineBookmarkDefinitionDo);
       let bookmarkDefinition = bookmark.definition as OutlineBookmarkDefinitionDo;
       expect(bookmarkDefinition.outlineId).toBe(SPEC_OUTLINE_1_UUID);
@@ -168,7 +169,7 @@ describe('BookmarkSupport', () => {
     it('can create a bookmark for a top-level table page without search form', async () => {
       let outline = desktop.outline;
       expect(outline).toBeInstanceOf(Outline);
-      expect(outline.title).toBe('Spec Outline 1');
+      expect(outline.title).toBe('Outline 1');
       expect(outline.nodes.length).toBe(3);
       expect(outline.nodes[0]).toBeInstanceOf(SpecNodePage1);
       expect(outline.nodes[1]).toBeInstanceOf(SpecTablePage1);
@@ -185,12 +186,12 @@ describe('BookmarkSupport', () => {
 
       // -----
 
-      let bookmark = await bookmarkSupport.createBookmark();
+      let bookmark = await bookmarkSupport.createBookmark() as BookmarkDo;
 
       expect(bookmark).toBeInstanceOf(BookmarkDo);
-      expect(bookmark.key).toBeUndefined();
-      expect(bookmark.titles).toBeUndefined();
-      expect(bookmark.description).toBeUndefined();
+      expect(bookmark.id).toBeUndefined();
+      expect(bookmark.title).toBe('Outline 1 - Table Page 1');
+      expect(bookmark.description).toBe('Table Page 1');
       expect(bookmark.definition).toBeInstanceOf(OutlineBookmarkDefinitionDo);
       let bookmarkDefinition = bookmark.definition as OutlineBookmarkDefinitionDo;
       expect(bookmarkDefinition.outlineId).toBe(SPEC_OUTLINE_1_UUID);
@@ -206,7 +207,7 @@ describe('BookmarkSupport', () => {
     it('can create a bookmark for a nested node page', async () => {
       let outline = goToOutline(desktop, SPEC_OUTLINE_2_ID);
       expect(outline).toBeInstanceOf(Outline);
-      expect(outline.title).toBe('Spec Outline 2');
+      expect(outline.title).toBe('Outline 2');
       expect(outline.nodes.length).toBe(2);
       expect(outline.nodes[0]).toBeInstanceOf(SpecNodePage2);
       expect(outline.nodes[1]).toBeInstanceOf(SpecNodePage3);
@@ -269,12 +270,12 @@ describe('BookmarkSupport', () => {
 
       // -----
 
-      let bookmark = await bookmarkSupport.createBookmark();
+      let bookmark = await bookmarkSupport.createBookmark() as BookmarkDo;
 
       expect(bookmark).toBeInstanceOf(BookmarkDo);
-      expect(bookmark.key).toBeUndefined();
-      expect(bookmark.titles).toBeUndefined();
-      expect(bookmark.description).toBeUndefined();
+      expect(bookmark.id).toBeUndefined();
+      expect(bookmark.title).toBe('Outline 2 - Node Page 3 - Table Page 2 - Kiwi - Table Page 2');
+      expect(bookmark.description).toBe('Node Page 3\n  Table Page 2\n    text: "i"\n    Kiwi\n      Table Page 2\n        text: "n"');
       expect(bookmark.definition).toBeInstanceOf(OutlineBookmarkDefinitionDo);
       let bookmarkDefinition = bookmark.definition as OutlineBookmarkDefinitionDo;
       expect(bookmarkDefinition.outlineId).toBe(SPEC_OUTLINE_2_UUID);
@@ -314,6 +315,29 @@ describe('BookmarkSupport', () => {
       expect(bookmarkedPage.expandedChildRow).toBe(null);
       expect(bookmarkedPage.selectedChildRows.length).toBe(0); // selected rows are not exported by default
     });
+
+    it('can handle errors', async () => {
+      // Provoke 'missing-outline' error
+      desktop.setOutline(null);
+
+      let spy = spyOn(bookmarkSupport, 'handleCreateBookmarkError').and.returnValue($.resolvedPromise());
+
+      // a) handleError=true (default) --> error should be handled internally
+      await bookmarkSupport.createBookmark();
+      expect(bookmarkSupport.handleCreateBookmarkError).toHaveBeenCalledWith(BookmarkDoBuilder.ERROR_MISSING_OUTLINE);
+      spy.calls.reset();
+
+      // b) handleError=false (default) --> error should be thrown
+      try {
+        await bookmarkSupport.createBookmark(undefined, {
+          handleErrors: false
+        });
+        fail('Expected to fail');
+      } catch (error) {
+        expect(error).toBe(BookmarkDoBuilder.ERROR_MISSING_OUTLINE);
+      }
+      expect(bookmarkSupport.handleCreateBookmarkError).not.toHaveBeenCalled();
+    });
   });
 
   describe('activateBookmark', () => {
@@ -350,7 +374,7 @@ describe('BookmarkSupport', () => {
         })
       });
       try {
-        await BookmarkSupport.get(session).activateBookmark(bookmark);
+        await BookmarkSupport.get(session).activateBookmark(bookmark, {handleErrors: false});
         fail('Expected to fail');
       } catch (error) {
         expect(error).toBe(BookmarkSupport.ERROR_WRONG_DEFINITION_TYPE);
@@ -506,7 +530,7 @@ describe('BookmarkSupport', () => {
         })
       });
       try {
-        await BookmarkSupport.get(session).activateBookmark(bookmark);
+        await BookmarkSupport.get(session).activateBookmark(bookmark, {handleErrors: false});
         fail('Expected to fail');
       } catch (error) {
         expect(error).toBe(BookmarkSupport.ERROR_OUTLINE_NOT_FOUND);
@@ -520,7 +544,7 @@ describe('BookmarkSupport', () => {
         })
       });
       try {
-        await BookmarkSupport.get(session).activateBookmark(bookmark);
+        await BookmarkSupport.get(session).activateBookmark(bookmark, {handleErrors: false});
         fail('Expected to fail');
       } catch (error) {
         expect(error).toBe(BookmarkSupport.ERROR_WRONG_DEFINITION_TYPE);
@@ -539,7 +563,7 @@ describe('BookmarkSupport', () => {
         })
       });
       try {
-        await BookmarkSupport.get(session).activateBookmark(bookmark);
+        await BookmarkSupport.get(session).activateBookmark(bookmark, {handleErrors: false});
         fail('Expected to fail');
       } catch (error) {
         expect(error).toBe(BookmarkSupport.ERROR_PAGE_NOT_FOUND);
@@ -743,9 +767,32 @@ describe('BookmarkSupport', () => {
       expect(page1.childNodes[0]).not.toBe(childNode1);
       expect(page1.childNodes[1]).not.toBe(childNode2);
     });
+
+    it('can handle errors', async () => {
+      // Provoke 'wrong-definition-type' error
+      let bookmark = scout.create(BookmarkDo);
+
+      let spy = spyOn(bookmarkSupport, 'handleActivateBookmarkError').and.returnValue($.resolvedPromise());
+
+      // a) handleError=true (default) --> error should be handled internally
+      await bookmarkSupport.activateBookmark(bookmark);
+      expect(bookmarkSupport.handleActivateBookmarkError).toHaveBeenCalledWith(BookmarkSupport.ERROR_WRONG_DEFINITION_TYPE);
+      spy.calls.reset();
+
+      // b) handleError=false (default) --> error should be thrown
+      try {
+        await bookmarkSupport.activateBookmark(bookmark, {
+          handleErrors: false
+        });
+        fail('Expected to fail');
+      } catch (error) {
+        expect(error).toBe(BookmarkSupport.ERROR_WRONG_DEFINITION_TYPE);
+      }
+      expect(bookmarkSupport.handleActivateBookmarkError).not.toHaveBeenCalled();
+    });
   });
 
-  describe('activateBookmarkLocal', () => {
+  describe('activateBookmarkPath', () => {
 
     it('can activate a partial bookmark from a given start location', async () => {
       // Go to the start page
@@ -759,7 +806,7 @@ describe('BookmarkSupport', () => {
       expect(page2.detailTable.rows.length).toBe(5);
 
       // Activate bookmark
-      let activateBookmarkRequest: ActivateBookmarkRequest = {
+      let activateBookmarkPathParam: ActivateBookmarkPathParam = {
         parentOutline: outline,
         parentPage: page2,
         parentBookmarkPage: scout.create(TableBookmarkPageDo, {
@@ -801,7 +848,7 @@ describe('BookmarkSupport', () => {
           })
         ]
       };
-      await BookmarkSupport.get(session).activateBookmarkLocal(activateBookmarkRequest);
+      await BookmarkSupport.get(session).activateBookmarkPath(activateBookmarkPathParam);
 
       // Assert new state of desktop
       expect(desktop.outline).toBeInstanceOf(Outline);
@@ -847,14 +894,14 @@ describe('BookmarkSupport', () => {
       expect(desktop.outline.id).toBe(SPEC_OUTLINE_2_ID);
 
       // Activate bookmark
-      let activateBookmarkRequest: ActivateBookmarkRequest = {
+      let activateBookmarkParam: ActivateBookmarkPathParam = {
         parentOutline: outline,
         parentPage: page,
         parentBookmarkPage: null, // irrelevant for this test
         pagePath: [] // irrelevant for this test
       };
       try {
-        await BookmarkSupport.get(session).activateBookmarkLocal(activateBookmarkRequest);
+        await BookmarkSupport.get(session).activateBookmarkPath(activateBookmarkParam, {handleErrors: false});
         fail('Expected to fail');
       } catch (error) {
         expect(error).toBe(BookmarkSupport.ERROR_PAGE_WRONG_OUTLINE);

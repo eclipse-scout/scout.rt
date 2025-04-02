@@ -8,9 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, AutoLeafPageWithNodes, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierDoFactory, dataObjects, DoEntity, EventHandler, Form, FormTableControl, IBookmarkTableRowIdentifierComponentDo, LimitedResultInfoContributionDo,
-  ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel, scout, Status, Table, TableAllRowsDeletedEvent, TableMaxResultsHelper, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent, TableRowOrderChangedEvent,
-  TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
+  arrays, AutoLeafPageWithNodes, BookmarkSupport, BookmarkTableRowIdentifierDo, dataObjects, DoEntity, EventHandler, Form, FormTableControl, LimitedResultInfoContributionDo, ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel,
+  scout, Status, Table, TableAllRowsDeletedEvent, TableMaxResultsHelper, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
 } from '../../../index';
 import $ from 'jquery';
 
@@ -371,18 +370,10 @@ export class PageWithTable extends Page implements PageWithTableModel {
   }
 
   override getTableRowIdentifier(row: TableRow, allowObjectFallback = false): BookmarkTableRowIdentifierDo {
-    if (!row.bookmarkIdentifier) {
-      row.bookmarkIdentifier = this.createTableRowIdentifier(row, allowObjectFallback);
+    if (row.bookmarkIdentifier === undefined) {
+      row.bookmarkIdentifier = BookmarkSupport.get(this.session).createTableRowIdentifier(this, row, allowObjectFallback);
     }
     return row.bookmarkIdentifier;
-  }
-
-  createTableRowIdentifier(row: TableRow, allowObjectFallback = false): BookmarkTableRowIdentifierDo {
-    return scout.create(BookmarkTableRowIdentifierDoFactory).createTableRowIdentifier(this, row, allowObjectFallback);
-  }
-
-  createTableRowIdentifierComponent(key: any, allowObjectFallback = false): IBookmarkTableRowIdentifierComponentDo {
-    return scout.create(BookmarkTableRowIdentifierDoFactory).createTableRowIdentifierComponent(this, key, allowObjectFallback);
   }
 }
 

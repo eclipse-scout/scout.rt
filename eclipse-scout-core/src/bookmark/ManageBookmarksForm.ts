@@ -7,19 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, arrays, BookmarkDo, BookmarkForm, BookmarkSupport, Event, Form, FormModel, InitModelOf, ManageBookmarksFormWidgetMap, scout, TableRowActionEvent} from '../index';
+import {Action, arrays, BookmarkDo, BookmarkForm, bookmarks, Event, Form, FormModel, InitModelOf, ManageBookmarksFormWidgetMap, scout, TableRowActionEvent} from '../index';
 import model from './ManageBookmarksFormModel';
 
 export class ManageBookmarksForm extends Form {
   declare widgetMap: ManageBookmarksFormWidgetMap;
 
   bookmarks: BookmarkDo[];
-  deletedBookmarkKeys = [];
+  deletedBookmarkIds: string[] = [];
 
-  constructor() {
-    super();
-    this.deletedBookmarkKeys = [];
-  }
   protected override _jsonModel(): FormModel {
     return model();
   }
@@ -37,7 +33,7 @@ export class ManageBookmarksForm extends Form {
   }
 
   protected override _load(): JQuery.Promise<any> {
-    return BookmarkSupport.get(this.session).loadAllBookmarks()
+    return bookmarks.loadAllBookmarks('jswidgets:bookmarks')
       .then(bookmarks => {
         this.bookmarks = bookmarks;
         return super._load();
@@ -45,9 +41,8 @@ export class ManageBookmarksForm extends Form {
   }
 
   override importData() {
-    let language = this.session.locale.language; // FIXME bsh [js-bookmark] Use LanguageCodeType
     let rows = arrays.ensure(this.bookmarks).map(bookmark => {
-      let name = bookmark.titles?.[language];
+      let name = bookmark.title;
       return {
         cells: [
           bookmark,
@@ -68,8 +63,7 @@ export class ManageBookmarksForm extends Form {
   }
 
   protected override _save(data: any): JQuery.Promise<void> {
-    // FIXME bsh [js-bookmark] This does not work well with concurrent changes! Also, is this.deletedBookmarkKeys necessary?
-    return BookmarkSupport.get(this.session).storeAllBookmarks(this.bookmarks)
+    return bookmarks.storeAllBookmarks(this.bookmarks, 'jswidgets:bookmarks')
       .then(() => {
         this.findDesktop().trigger('bookmarksChanged');
         return super._save(data);
@@ -78,13 +72,12 @@ export class ManageBookmarksForm extends Form {
 
   protected _onEditMenuAction(event: Event<Action>) {
     this._editSelectedBookmark();
-
   }
 
   protected _onDeleteMenuAction(event: Event<Action>) {
     let table = this.widget('BookmarksTable');
     let bookmarkColumn = table.columnById('BookmarkColumn');
-    this.deletedBookmarkKeys.push(...table.selectedRows.map(row => bookmarkColumn.cellValue(row).key));
+    this.deletedBookmarkIds.push(...table.selectedRows.map(row => bookmarkColumn.cellValue(row).id));
     table.deleteRows(table.selectedRows);
   }
 
@@ -105,8 +98,7 @@ export class ManageBookmarksForm extends Form {
     form.open();
     form.whenSave().then(() => {
       let bookmark = form.bookmark;
-      let language = this.session.locale.language; // FIXME bsh [js-bookmark] Use LanguageCodeType
-      let name = bookmark.titles?.[language];
+      let name = bookmark.title;
       // FIXME bsh [js-bookmark] merge with importData()
       table.columnById('BookmarkColumn').setCellValue(selectedRow, bookmark);
       table.columnById('NameColumn').setCellValue(selectedRow, name);
