@@ -65,13 +65,9 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
   protected async _build(): Promise<BookmarkDo> {
     let bookmarkDefinition = await this._createBookmarkDefinition();
     // FIXME bsh [js-bookmark] Create titles and description
-    let bookmarkTitles = undefined;
-    let bookmarkDescription = undefined;
 
     return scout.create(BookmarkDo, {
-      definition: bookmarkDefinition,
-      titles: bookmarkTitles,
-      description: bookmarkDescription
+      definition: bookmarkDefinition
     });
   }
 

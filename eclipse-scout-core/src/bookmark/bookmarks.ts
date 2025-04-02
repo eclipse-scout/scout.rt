@@ -9,8 +9,17 @@
  */
 import {arrays, BaseDoEntity, BookmarkSupport, DoEntity, PageParamDo, typeName} from '../index';
 
+export interface IBookmarkDo extends DoEntity {
+  definition: IBookmarkDefinitionDo;
+}
+
+@typeName('scout.Bookmark')
+export class BookmarkDo extends BaseDoEntity implements IBookmarkDo {
+  definition: IBookmarkDefinitionDo;
+}
+
 @typeName('crm.Bookmark')
-export class BookmarkDo extends BaseDoEntity {
+export class CrmBookmarkDo extends BaseDoEntity implements IBookmarkDo {
   key: string;
   titles: Record<string, string>;
   description: string;
@@ -19,11 +28,11 @@ export class BookmarkDo extends BaseDoEntity {
 
 // --------------------------------------------------
 
-export interface IBookmarkDefinitionDo {
+export interface IBookmarkDefinitionDo extends DoEntity {
   bookmarkedPage: IBookmarkPageDo;
 }
 
-@typeName('crm.OutlineBookmarkDefinition')
+@typeName('scout.OutlineBookmarkDefinition')
 export class OutlineBookmarkDefinitionDo extends BaseDoEntity implements IBookmarkDefinitionDo {
   bookmarkedPage: IBookmarkPageDo;
   outlineId: string;
@@ -31,37 +40,40 @@ export class OutlineBookmarkDefinitionDo extends BaseDoEntity implements IBookma
   pagePath: IBookmarkPageDo[];
 }
 
-@typeName('crm.PageBookmarkDefinition')
+@typeName('scout.PageBookmarkDefinition')
 export class PageBookmarkDefinitionDo extends BaseDoEntity implements IBookmarkDefinitionDo {
   bookmarkedPage: IBookmarkPageDo;
 }
 
 // --------------------------------------------------
 
-export interface IBookmarkPageDo {
+export interface IBookmarkPageDo extends DoEntity {
   pageParam?: PageParamDo;
   displayText?: string;
 }
 
-@typeName('crm.NodeBookmarkPage')
+@typeName('scout.NodeBookmarkPage')
 export class NodeBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo {
   pageParam?: PageParamDo;
   displayText?: string;
 }
 
-@typeName('crm.TableBookmarkPage')
+@typeName('scout.TableBookmarkPage')
 export class TableBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo {
   pageParam?: PageParamDo;
   displayText?: string;
   expandedChildRow?: BookmarkTableRowIdentifierDo;
   selectedChildRows?: BookmarkTableRowIdentifierDo[];
   searchFilterComplete?: boolean; // FIXME bsh [js-bookmark] always true?
-  searchData?: DoEntity;
+  searchData?: ISearchDo;
   tablePreferences?: TableClientUiPreferencesDo;
   chartTableControlConfig?: ChartTableControlConfigDo;
 }
 
-@typeName('crm.BookmarkTableRowIdentifier')
+export interface ISearchDo extends DoEntity {
+}
+
+@typeName('scout.BookmarkTableRowIdentifier')
 export class BookmarkTableRowIdentifierDo extends BaseDoEntity {
   keyComponents: IBookmarkTableRowIdentifierComponentDo[];
 }
@@ -72,44 +84,46 @@ export interface IBookmarkTableRowIdentifierComponentDo {
 /**
  * Never serialize this!
  */
-@typeName('crm.BookmarkTableRowIdentifierObjectComponent')
+@typeName('scout.BookmarkTableRowIdentifierObjectComponent')
 export class BookmarkTableRowIdentifierObjectComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
   key: any;
 }
+
+@typeName('scout.BookmarkTableRowIdentifierDateComponent')
+export class BookmarkTableRowIdentifierDateComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
+  key: Date;
+}
+
+@typeName('scout.BookmarkTableRowIdentifierBooleanComponent')
+export class BookmarkTableRowIdentifierBooleanComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
+  key: boolean;
+}
+
+@typeName('scout.BookmarkTableRowIdentifierIntegerComponent')
+export class BookmarkTableRowIdentifierIntegerComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
+  key: number;
+}
+
+@typeName('scout.BookmarkTableRowIdentifierStringComponent')
+export class BookmarkTableRowIdentifierStringComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
+  key: string;
+}
+
+@typeName('scout.BookmarkTableRowIdentifierLongComponent')
+export class BookmarkTableRowIdentifierLongComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
+  key: number;
+}
+
+// FIXME bsh [js-bookmark] Move to crm core:
 
 @typeName('crm.BookmarkTableRowIdentifierEntityKeyComponent')
 export class BookmarkTableRowIdentifierEntityKeyComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
   key: string;
 }
 
-@typeName('crm.BookmarkTableRowIdentifierDateComponent')
-export class BookmarkTableRowIdentifierDateComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
-  key: Date;
-}
-
-@typeName('crm.BookmarkTableRowIdentifierBooleanComponent')
-export class BookmarkTableRowIdentifierBooleanComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
-  key: boolean;
-}
-
-@typeName('crm.BookmarkTableRowIdentifierIntegerComponent')
-export class BookmarkTableRowIdentifierIntegerComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
-  key: number;
-}
-
 @typeName('crm.BookmarkTableRowIdentifierTypedIdComponent')
 export class BookmarkTableRowIdentifierTypedIdComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
   key: string;
-}
-
-@typeName('crm.BookmarkTableRowIdentifierStringComponent')
-export class BookmarkTableRowIdentifierStringComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
-  key: string;
-}
-
-@typeName('crm.BookmarkTableRowIdentifierLongComponent')
-export class BookmarkTableRowIdentifierLongComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
-  key: number;
 }
 
 // --------------------------------------------------
@@ -122,7 +136,7 @@ export class ImportSearchDataDo extends BaseDoEntity {
 
 // --------------------------------------------------
 
-@typeName('crm.ChartTableControlConfig')
+@typeName('scout.ChartTableControlConfig')
 export class ChartTableControlConfigDo extends BaseDoEntity {
   chartTypeId?: string;
   chartGroup1ColumnId?: string;
@@ -135,7 +149,7 @@ export class ChartTableControlConfigDo extends BaseDoEntity {
 
 // --------------------------------------------------
 
-@typeName('crm.TableClientUiPreferences')
+@typeName('scout.TableClientUiPreferences')
 export class TableClientUiPreferencesDo extends BaseDoEntity {
   tableId?: string;
   userPreferenceContext?: string;
@@ -144,14 +158,14 @@ export class TableClientUiPreferencesDo extends BaseDoEntity {
   tablePreferenceProfiles?: Map<string, TableClientUiPreferenceProfileDo>;
 }
 
-@typeName('crm.TableClientUiPreferenceProfile')
+@typeName('scout.TableClientUiPreferenceProfile')
 export class TableClientUiPreferenceProfileDo extends BaseDoEntity {
   columns?: TableColumnClientUiPreferenceDo[];
   userFilters?: IUserFilterStateDo[];
   tableCustomizerData?: ITableCustomizerDo;
 }
 
-@typeName('crm.TableColumnClientUiPreference')
+@typeName('scout.TableColumnClientUiPreference')
 export class TableColumnClientUiPreferenceDo extends BaseDoEntity {
   columnId?: string;
   width?: number;
@@ -166,6 +180,8 @@ export class TableColumnClientUiPreferenceDo extends BaseDoEntity {
 
 export interface IUserFilterStateDo extends DoEntity {
 }
+
+// FIXME bsh [js-bookmark] Analyze which of these we can move to scout
 
 @typeName('crm.BooleanColumnUserFilterState')
 export class BooleanColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
@@ -258,7 +274,7 @@ export class CustomColumnConfigDo extends BaseDoEntity {
 
 @typeName(PageIdDummyPageParamDo.TYPE_NAME)
 export class PageIdDummyPageParamDo extends PageParamDo {
-  static TYPE_NAME = 'crm.PageIdDummyPageParam';
+  static TYPE_NAME = 'scout.PageIdDummyPageParam';
 
   pageId: string;
 }

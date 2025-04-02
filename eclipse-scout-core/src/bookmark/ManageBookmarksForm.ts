@@ -45,7 +45,8 @@ export class ManageBookmarksForm extends Form {
   override importData() {
     let language = this.session.locale.language; // FIXME bsh [js-bookmark] Use LanguageCodeType
     let rows = arrays.ensure(this.bookmarks).map(bookmark => {
-      let name = bookmark.titles?.[language];
+      // let name = bookmark.titles?.[language];
+      let name = 'Bookmark';
       return {
         cells: [
           bookmark,
@@ -82,7 +83,7 @@ export class ManageBookmarksForm extends Form {
   protected _onDeleteMenuAction(event: Event<Action>) {
     let table = this.widget('BookmarksTable');
     let bookmarkColumn = table.columnById('BookmarkColumn');
-    this.deletedBookmarkKeys.push(...table.selectedRows.map(row => bookmarkColumn.cellValue(row).key));
+    // this.deletedBookmarkKeys.push(...table.selectedRows.map(row => bookmarkColumn.cellValue(row).key));
     table.deleteRows(table.selectedRows);
   }
 
@@ -104,7 +105,8 @@ export class ManageBookmarksForm extends Form {
     form.whenSave().then(() => {
       let bookmark = form.bookmark;
       let language = this.session.locale.language; // FIXME bsh [js-bookmark] Use LanguageCodeType
-      let name = bookmark.titles?.[language];
+      // let name = bookmark.titles?.[language];
+      let name = 'Bookmark';
       // FIXME bsh [js-bookmark] merge with importData()
       table.columnById('BookmarkColumn').setCellValue(selectedRow, bookmark);
       table.columnById('NameColumn').setCellValue(selectedRow, name);

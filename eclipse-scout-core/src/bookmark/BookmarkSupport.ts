@@ -9,7 +9,7 @@
  */
 import {
   App, arrays, BookmarkDo, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, dataObjects, Desktop, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects,
-  ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageWithNodes, PageWithTable, scout, Session, Status, TableBookmarkPageDo, TableRow, UuidPool, webstorage
+  ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageWithNodes, PageWithTable, scout, Session, Status, TableBookmarkPageDo, TableRow, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -102,13 +102,13 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       }
 
       let bookmarkStore = this._getBookmarkStore() || [];
-      bookmark.key = bookmark.key || UuidPool.get(this.session).take();
-      let index = bookmarkStore.findIndex(b => b.key === bookmark.key);
-      if (index === -1) {
-        bookmarkStore.push(bookmark);
-      } else {
-        bookmarkStore[index] = bookmark;
-      }
+      // bookmark.key = bookmark.key || UuidPool.get(this.session).take();
+      // let index = bookmarkStore.findIndex(b => b.key === bookmark.key);
+      // if (index === -1) {
+      //   bookmarkStore.push(bookmark);
+      // } else {
+      //   bookmarkStore[index] = bookmark;
+      // }
       this._setBookmarkStore(bookmarkStore);
 
       this.desktop.trigger('bookmarksChanged');
@@ -119,7 +119,8 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   loadBookmark(key: string): JQuery.Promise<BookmarkDo> {
     return $.resolvedPromise().then(() => {
       let bookmarkStore = this._getBookmarkStore() || [];
-      return bookmarkStore.find(b => b.key === key) || null;
+      return null;
+      // return bookmarkStore.find(b => b.key === key) || null;
     });
   }
 
