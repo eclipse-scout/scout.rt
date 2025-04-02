@@ -1,0 +1,274 @@
+{
+  "_type" : "scout.DataObjectSignature",
+  "entities" : [ {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "definition",
+      "valueType" : "DOI[org.eclipse.scout.rt.api.data.bookmark.IBookmarkDefinitionDo]"
+    } ],
+    "typeName" : "scout.Bookmark",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "list" : true,
+      "name" : "keyComponents",
+      "valueType" : "DOI[org.eclipse.scout.rt.api.data.bookmark.IBookmarkTableRowIdentifierComponentDo]"
+    } ],
+    "typeName" : "scout.BookmarkTableRowIdentifier",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "key",
+      "valueType" : "CLASS[java.lang.Boolean]"
+    } ],
+    "typeName" : "scout.BookmarkTableRowIdentifierBooleanComponent",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "key",
+      "valueType" : "CLASS[java.util.Date]"
+    } ],
+    "typeName" : "scout.BookmarkTableRowIdentifierDateComponent",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "key",
+      "valueType" : "CLASS[java.lang.Integer]"
+    } ],
+    "typeName" : "scout.BookmarkTableRowIdentifierIntegerComponent",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "key",
+      "valueType" : "CLASS[java.lang.Long]"
+    } ],
+    "typeName" : "scout.BookmarkTableRowIdentifierLongComponent",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "key",
+      "valueType" : "CLASS[java.lang.String]"
+    } ],
+    "typeName" : "scout.BookmarkTableRowIdentifierStringComponent",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartAggregationColumnId",
+      "valueType" : "ID[scout.TableColumnId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartAggregationModifier",
+      "valueType" : "CLASS[java.lang.Integer]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartGroup1ColumnId",
+      "valueType" : "ID[scout.TableColumnId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartGroup1Modifier",
+      "valueType" : "CLASS[java.lang.Integer]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartGroup2ColumnId",
+      "valueType" : "ID[scout.TableColumnId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartGroup2Modifier",
+      "valueType" : "CLASS[java.lang.Integer]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartTypeId",
+      "valueType" : "ID[scout.ChartTableControlChartTypeId]"
+    } ],
+    "typeName" : "scout.ChartTableControlConfig",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "displayText",
+      "valueType" : "CLASS[java.lang.String]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "pageParam",
+      "valueType" : "DOI[org.eclipse.scout.rt.api.data.page.IPageParamDo]"
+    } ],
+    "typeName" : "scout.NodeBookmarkPage",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "bookmarkedPage",
+      "valueType" : "DOI[org.eclipse.scout.rt.api.data.bookmark.IBookmarkPageDo]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "outlineId",
+      "valueType" : "ID[scout.OutlineId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "list" : true,
+      "name" : "pagePath",
+      "valueType" : "DOI[org.eclipse.scout.rt.api.data.bookmark.IBookmarkPageDo]"
+    } ],
+    "typeName" : "scout.OutlineBookmarkDefinition",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "bookmarkedPage",
+      "valueType" : "DOI[org.eclipse.scout.rt.api.data.bookmark.IBookmarkPageDo]"
+    } ],
+    "typeName" : "scout.PageBookmarkDefinition",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "pageId",
+      "valueType" : "ID[scout.PageId]"
+    } ],
+    "typeName" : "scout.PageIdDummyPageParam",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "chartTableControlConfig",
+      "valueType" : "DO[scout.ChartTableControlConfig]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "displayText",
+      "valueType" : "CLASS[java.lang.String]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "expandedChildRow",
+      "valueType" : "DO[scout.BookmarkTableRowIdentifier]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "pageParam",
+      "valueType" : "DOI[org.eclipse.scout.rt.api.data.page.IPageParamDo]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "searchData",
+      "valueType" : "DOI[org.eclipse.scout.rt.api.data.page.ISearchDo]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "searchFilterComplete",
+      "valueType" : "CLASS[java.lang.Boolean]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "list" : true,
+      "name" : "selectedChildRows",
+      "valueType" : "DO[scout.BookmarkTableRowIdentifier]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "tablePreferences",
+      "valueType" : "DO[scout.TableClientUiPreferences]"
+    } ],
+    "typeName" : "scout.TableBookmarkPage",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "list" : true,
+      "name" : "columns",
+      "valueType" : "DO[scout.TableColumnClientUiPreference]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "tableCustomizerData",
+      "valueType" : "DOI[org.eclipse.scout.rt.api.data.table.ITableCustomizerDo]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "list" : true,
+      "name" : "userFilters",
+      "valueType" : "DOI[org.eclipse.scout.rt.api.data.table.IUserFilterStateDo]"
+    } ],
+    "typeName" : "scout.TableClientUiPreferenceProfile",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "tableId",
+      "valueType" : "ID[scout.TableId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "tablePreferenceProfiles",
+      "valueType" : "CLASS[CLASS[java.util.Map]]<ID[scout.TableClientUiPreferenceProfileId], DO[scout.TableClientUiPreferenceProfile]>"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "tileGlobalKey",
+      "valueType" : "CLASS[java.lang.String]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "tileMode",
+      "valueType" : "CLASS[java.lang.Boolean]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "userPreferenceContext",
+      "valueType" : "CLASS[java.lang.String]"
+    } ],
+    "typeName" : "scout.TableClientUiPreferences",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "aggregationFunctionId",
+      "valueType" : "ID[scout.TableColumnAggregationFunctionId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "backgroundEffectId",
+      "valueType" : "ID[scout.TableColumnBackgroundEffectId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "columnId",
+      "valueType" : "ID[scout.TableColumnId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "groupingActive",
+      "valueType" : "CLASS[java.lang.Boolean]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "sortAscending",
+      "valueType" : "CLASS[java.lang.Boolean]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "sortOrder",
+      "valueType" : "CLASS[java.lang.Integer]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "viewIndex",
+      "valueType" : "CLASS[java.lang.Integer]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "visible",
+      "valueType" : "CLASS[java.lang.Boolean]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "width",
+      "valueType" : "CLASS[java.lang.Integer]"
+    } ],
+    "typeName" : "scout.TableColumnClientUiPreference",
+    "typeVersion" : "scout-25.2.001"
+  } ],
+  "enums" : [ ]
+}
