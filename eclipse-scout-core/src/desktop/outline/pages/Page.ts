@@ -9,8 +9,8 @@
  */
 import {
   arrays, BaseDoEntity, BookmarkAdapter, BookmarkTableRowIdentifierDo, ButtonTile, ChildModelOf, Constructor, dataObjects, DoTypeResolver, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form,
-  HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, ObjectOrChildModel, ObjectOrType, ObjectUuidProvider, ObjectWithUuid, Outline, PageDetailMenuContributor, PageEventMap, PageIdDummyPageParamDo, PageModel,
-  ParentTablePageMenuContributor, PropertyChangeEvent, RequiredUnlessNotSubclass, scout, SomeRequired, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, UuidPathOptions, Widget
+  HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, ObjectOrChildModel, ObjectOrType, ObjectUuidProvider, ObjectWithUuid, Outline, PageDetailMenuContributor, PageEventMap, PageModel, ParentTablePageMenuContributor,
+  PropertyChangeEvent, RequiredUnlessNotSubclass, scout, SomeRequired, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, typeName, UuidPathOptions, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -701,6 +701,15 @@ interface ContributedMenu extends Menu {
  * @see BookmarkSupport
  */
 export class PageParamDo extends BaseDoEntity {
+}
+
+/**
+ * Page param that is used by bookmarks to identify pages that do not provide a {@link PageParamDo}.
+ * It stores the page's ID so it can be found again when activating the bookmark.
+ */
+@typeName('scout.PageIdDummyPageParam')
+export class PageIdDummyPageParamDo extends PageParamDo {
+  pageId: string;
 }
 
 /**

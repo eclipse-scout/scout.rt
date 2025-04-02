@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, arrays, BookmarkDo, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, dataObjects, Desktop, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects,
-  ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageWithNodes, PageWithTable, scout, Session, Status, TableBookmarkPageDo, TableRow, UuidPool, webstorage
+  ActivateBookmarkDataDo, ActivateBookmarkOptionsDo, App, arrays, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, HybridManager, IBookmarkDo, IBookmarkPageDo, InitModelOf,
+  MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageWithNodes, PageWithTable, scout, Session, Status, TableBookmarkPageDo, TableRow
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -67,7 +67,6 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   setLoading(loading: boolean) {
     this.loading = loading;
-    // FIXME bsh [js-bookmark] add a better implementation
     this.desktop.setBusy(this.loading);
   }
 
@@ -80,73 +79,20 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   // --------------------------------------
 
-  protected _getBookmarkStore(): BookmarkDo[] {
-    let raw = webstorage.getItemFromLocalStorage('jswidgets:bookmarks');
-    return dataObjects.parse(raw, Array<BookmarkDo>);
-  }
-
-  protected _setBookmarkStore(bookmarkStore: BookmarkDo[]) {
-    if (!bookmarkStore) {
-      webstorage.removeItemFromLocalStorage('jswidgets:bookmarks');
-      return;
-    }
-
-    webstorage.setItemToLocalStorage('jswidgets:bookmarks', dataObjects.stringify(bookmarkStore));
-  }
-
-  // FIXME bsh [js-bookmark] Remove and replace with actual implementation
-  storeBookmark(bookmark: BookmarkDo): JQuery.Promise<void> {
-    return $.resolvedPromise().then(() => {
-      if (!bookmark) {
-        return;
-      }
-
-      let bookmarkStore = this._getBookmarkStore() || [];
-      bookmark.key = bookmark.key || UuidPool.get(this.session).take();
-      let index = bookmarkStore.findIndex(b => b.key === bookmark.key);
-      if (index === -1) {
-        bookmarkStore.push(bookmark);
-      } else {
-        bookmarkStore[index] = bookmark;
-      }
-      this._setBookmarkStore(bookmarkStore);
-
-      this.desktop.trigger('bookmarksChanged');
-    });
-  }
-
-  // FIXME bsh [js-bookmark] Remove and replace with actual implementation
-  loadBookmark(key: string): JQuery.Promise<BookmarkDo> {
-    return $.resolvedPromise().then(() => {
-      let bookmarkStore = this._getBookmarkStore() || [];
-      return bookmarkStore.find(b => b.key === key) || null;
-    });
-  }
-
-  loadAllBookmarks(): JQuery.Promise<BookmarkDo[]> {
-    return $.resolvedPromise().then(() => {
-      return this._getBookmarkStore() || [];
-    });
-  }
-
-  storeAllBookmarks(bookmarks: BookmarkDo[]): JQuery.Promise<void> {
-    return $.resolvedPromise().then(() => {
-      this._setBookmarkStore(bookmarks);
-    });
-  }
-
-  // --------------------------------------
-
-  createBookmark(options?: Omit<BookmarkDoBuilderModel, 'desktop'>): JQuery.Promise<BookmarkDo> {
+  createBookmark(options?: Omit<BookmarkDoBuilderModel, 'desktop'>): JQuery.Promise<IBookmarkDo> {
     let builder = scout.create(BookmarkDoBuilder, {
       desktop: this.desktop,
       createTableRowSelections: false,
       ...options
     });
-    return builder.build();
+    return builder.build()
+      .catch(error => {
+        this.handleCreateBookmarkError(error); // FIXME bsh [js-bookmark] Make this optional
+        throw error;
+      });
   }
 
-  createBookmarkForRefresh(options?: Omit<BookmarkDoBuilderModel, 'desktop'>): JQuery.Promise<BookmarkDo> {
+  createBookmarkForRefresh(options?: Omit<BookmarkDoBuilderModel, 'desktop'>): JQuery.Promise<IBookmarkDo> {
     let builder = scout.create(BookmarkDoBuilder, {
       desktop: this.desktop,
       fallbackAllowed: false,
@@ -156,42 +102,53 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       createTablePreferences: false,
       ...options
     });
-    return builder.build();
+    return builder.build()
+      .catch(error => {
+        this.handleCreateBookmarkError(error); // FIXME bsh [js-bookmark] Make this optional
+        throw error;
+      });
   }
 
   // --------------------------------------
 
-  activateBookmark(bookmark: BookmarkDo): JQuery.Promise<void> {
-    return $.when(this._activateBookmark(bookmark));
+  activateBookmark(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): JQuery.Promise<void> {
+    return $.when(this._activateBookmark(bookmark, options));
   }
 
-  async _activateBookmark(bookmark: BookmarkDo): Promise<void> {
-    if (this.loading) {
-      return $.rejectedPromise(BookmarkSupport.ERROR_ALREADY_LOADING);
+  async _activateBookmark(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): Promise<void> {
+    try {
+      if (this.loading) {
+        // noinspection ExceptionCaughtLocallyJS
+        throw BookmarkSupport.ERROR_ALREADY_LOADING;
+      }
+      this.setLoading(true);
+      await this._activateBookmarkHybrid(bookmark, options);
+    } catch (error) {
+      if (scout.nvl(options?.handleErrors, true)) {
+        this.handleActivateBookmarkError(error);
+      }
+      throw error;
+    } finally {
+      this.setLoading(false);
     }
+  }
 
+  protected async _activateBookmarkHybrid(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): Promise<void> {
     if (!(bookmark?.definition instanceof OutlineBookmarkDefinitionDo)) {
-      return $.rejectedPromise(BookmarkSupport.ERROR_WRONG_DEFINITION_TYPE);
+      throw BookmarkSupport.ERROR_WRONG_DEFINITION_TYPE;
     }
-
     let bookmarkDefinition = bookmark.definition;
-
-    this.setLoading(true);
-    return $.resolvedPromise()
-      .then(() => this._activateBookmarkHybrid(bookmarkDefinition))
-      .always(() => {
-        this.setLoading(false);
-      });
-  }
-
-  protected async _activateBookmarkHybrid(bookmarkDefinition: OutlineBookmarkDefinitionDo): Promise<void> {
-    let hybridManager = HybridManager.get(this.session);
 
     // Scout Classic: send the bookmark to the UI server. The client model will first try to resolve
     // as much of the bookmark as it can. The remaining path will then be sent back to the UI using
     // a callback. After that, the hybrid action will end.
+    let hybridManager = await HybridManager.get(this.session, true);
     if (hybridManager) {
-      await hybridManager.callActionAndWait('ActivateBookmark', {bookmarkDefinition});
+      let data = scout.create(ActivateBookmarkDataDo, {
+        bookmarkDefinition,
+        options: options ? scout.create(ActivateBookmarkOptionsDo, options) : undefined
+      });
+      await hybridManager.callActionAndWait('ActivateBookmark', data);
       return;
     }
 
@@ -200,32 +157,40 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     let pagePath = bookmarkDefinition.bookmarkedPage
       ? [...bookmarkDefinition.pagePath || [], bookmarkDefinition.bookmarkedPage]
       : null;
-    return this.activateBookmarkLocal({
+    return this._activateBookmarkLocal({
       parentOutline: outline,
       parentPage: null,
       parentBookmarkPage: null,
       pagePath: pagePath
-    });
+    }, options);
   }
 
-  activateBookmarkLocal(request: ActivateBookmarkRequest): JQuery.Promise<void> {
-    return $.when(this._activateBookmarkLocal(request));
+  activateBookmarkLocal(param: ActivateBookmarkParam, options?: ActivateBookmarkOptions): JQuery.Promise<void> {
+    return $.when(this._activateBookmarkLocal(param, options))
+      .catch(error => {
+        if (scout.nvl(options?.handleErrors, true)) {
+          this.handleActivateBookmarkError(error);
+        }
+        throw error;
+      });
   }
 
-  protected async _activateBookmarkLocal(request: ActivateBookmarkRequest): Promise<void> {
+  protected async _activateBookmarkLocal(param: ActivateBookmarkParam, options?: ActivateBookmarkOptions): Promise<void> {
     // Check if we are already on the correct outline
-    let outline = request.parentOutline || request.parentPage?.outline;
+    let outline = param.parentOutline || param.parentPage?.outline;
     if (!outline || !outline.visible || !outline.enabled) {
       throw BookmarkSupport.ERROR_OUTLINE_NOT_FOUND;
     }
-    this.desktop.setOutline(outline);
-    // FIXME bsh [js-bookmark] bringOutlineToFront?
-    if (request.parentPage && request.parentPage.outline !== outline) {
+    if (scout.nvl(options?.activateOutline, true)) {
+      this.desktop.setOutline(outline);
+      this.desktop.bringOutlineToFront();
+    }
+    if (param.parentPage && param.parentPage.outline !== outline) {
       throw BookmarkSupport.ERROR_PAGE_WRONG_OUTLINE;
     }
 
-    let parentPage = request.parentPage;
-    let parentBookmarkPage = request.parentBookmarkPage;
+    let parentPage = param.parentPage;
+    let parentBookmarkPage = param.parentBookmarkPage;
 
     // FIXME bsh [js-bookmark] HACKY-HACKY! Find a better solution.
     if (parentPage) {
@@ -241,19 +206,19 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       }
     }
 
-    if (parentPage && parentBookmarkPage && request.applyParentBookmarkPage) {
+    if (parentPage && parentBookmarkPage && param.applyParentBookmarkPage) {
       this._applyBookmarkPage(parentPage, parentBookmarkPage, false);
     }
 
-    if (arrays.empty(request.pagePath)) {
+    if (arrays.empty(param.pagePath)) {
       this._revealPage(parentPage);
       return; // done!
     }
 
-    let pagePath = request.pagePath.slice(); // create copy because array is altered
+    let pagePath = param.pagePath.slice(); // create copy because array is altered
     while (arrays.hasElements(pagePath)) {
       let bookmarkPage = pagePath[0];
-      let page = await this._resolvePage(outline, parentPage, parentBookmarkPage, bookmarkPage);
+      let page = await this._resolvePage(outline, parentPage, parentBookmarkPage, bookmarkPage, options);
 
       if (!page) {
         break; // no child page found matching the given bookmarkPage
@@ -272,15 +237,14 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
     this._revealPage(parentPage);
 
-    if (arrays.hasElements(pagePath)) {
+    if (arrays.hasElements(pagePath) && scout.nvl(options?.resetViewAndWarnOnFail, true)) {
       // Path not fully restored
       parentPage.detailTable.setTableStatus(Status.error(this.session.text('BookmarkResolutionCanceled')));
     }
   }
 
-  protected async _resolvePage(outline: Outline, parentPage: Page, parentBookmarkPage: IBookmarkPageDo, bookmarkPage: IBookmarkPageDo): Promise<Page> {
+  protected async _resolvePage(outline: Outline, parentPage: Page, parentBookmarkPage: IBookmarkPageDo, bookmarkPage: IBookmarkPageDo, options?: ActivateBookmarkOptions): Promise<Page> {
     if (parentPage) {
-
       await parentPage.ensureLoadChildren();
 
       if (parentPage instanceof PageWithTable && parentBookmarkPage instanceof TableBookmarkPageDo) {
@@ -294,7 +258,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
         }
         // If we found the page, but it is currently filtered by the parent table, remove the filter and try again.
         // If the row is still not accepted, the filter is apparently a non-user filter which cannot be removed -> assume page not found.
-        if (!row.page.filterAccepted && parentPage.detailTable.hasUserFilter()) {
+        if (!row.page.filterAccepted && parentPage.detailTable.hasUserFilter() && scout.nvl(options?.resetViewAndWarnOnFail, true)) {
           parentPage.detailTable.resetUserFilter();
           parentPage.detailTable.setTableStatus(Status.warning(this.session.text('BookmarkResetColumnFilters')));
           if (!row.page.filterAccepted) {
@@ -303,6 +267,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
         }
         return row.page;
       }
+
       if (parentPage instanceof PageWithNodes && parentBookmarkPage instanceof NodeBookmarkPageDo) {
         // Lookup child page by pageParam
         return parentPage.childNodes.find(node => node.matchesPageParam(bookmarkPage.pageParam));
@@ -340,6 +305,19 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
   }
 
+  handleCreateBookmarkError(error: any): JQuery.Promise<any> {
+    if (scout.isOneOf(error,
+      BookmarkDoBuilder.ERROR_MISSING_OUTLINE,
+      BookmarkDoBuilder.ERROR_MISSING_PAGE_PARAM,
+      BookmarkDoBuilder.ERROR_PAGE_NOT_BOOKMARKABLE,
+      BookmarkDoBuilder.ERROR_PAGE_PATH_NOT_BOOKMARKABLE,
+      BookmarkDoBuilder.ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER
+    )) {
+      return MessageBoxes.openOk(this.desktop, this.session.text('CannotCreateBookmarkAtThisLocation'), Status.Severity.ERROR);
+    }
+    return App.get().errorHandler.handle(error);
+  }
+
   handleActivateBookmarkError(error: any): JQuery.Promise<any> {
     if (error === BookmarkSupport.ERROR_ALREADY_LOADING) {
       $.log.error('Another bookmark is currently loading');
@@ -359,7 +337,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   // --------------------------------------
 
-  applyBookmarkToPage(page: Page, bookmark: BookmarkDo, saveSearchForm = true) {
+  applyBookmarkToPage(page: Page, bookmark: IBookmarkDo, saveSearchForm = true) {
     if (!page || !bookmark || !bookmark.definition) {
       return;
     }
@@ -367,7 +345,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     this._applyBookmarkPage(page, bookmarkPage, saveSearchForm);
   }
 
-  applyBookmarkToPageAndReload(page: Page, bookmark: BookmarkDo, saveSearchForm = true): JQuery.Promise<void> {
+  applyBookmarkToPageAndReload(page: Page, bookmark: IBookmarkDo, saveSearchForm = true): JQuery.Promise<void> {
     if (!page || !bookmark || !bookmark.definition) {
       return;
     }
@@ -486,7 +464,24 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 }
 
-export interface ActivateBookmarkRequest {
+export interface ActivateBookmarkOptions {
+  /**
+   * Specifies whether the target outline should be activated. The default value is `true`.
+   */
+  activateOutline?: boolean;
+  /**
+   * If `true`, the user is warned when the bookmark could not be opened. Useful when a persisted bookmark is activated.
+   * The default value is `true`.
+   */
+  resetViewAndWarnOnFail?: boolean;
+  /**
+   * Specifies whether runtime errors should be handled (e.g. by showing a message). The promise will still be rejected.
+   * The default value is `true`.
+   */
+  handleErrors?: boolean;
+}
+
+export interface ActivateBookmarkParam {
   parentOutline?: Outline;
   parentPage?: Page;
   parentBookmarkPage?: IBookmarkPageDo;

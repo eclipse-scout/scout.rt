@@ -33,12 +33,13 @@ export * from './tile/ChartFieldTile';
 export * from './tile/ChartFieldTileAdapter';
 export * from './tile/ChartFieldTileModel';
 export * from './table/controls/ChartTableControl';
+export * from './table/controls/ChartTableControlAdapter';
+export * from './table/controls/ChartTableControlConfigDo';
 export * from './table/controls/ChartTableControlEventMap';
+export * from './table/controls/ChartTableControlLayout';
 export * from './table/controls/ChartTableControlModel';
 export * from './table/controls/ChartTableUserFilter';
 export * from './table/controls/ChartTableUserFilterModel';
-export * from './table/controls/ChartTableControlAdapter';
-export * from './table/controls/ChartTableControlLayout';
 
 export default self;
 

@@ -7,13 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ActivateBookmarkRequestDo, BookmarkSupport, Desktop, Outline, Page, scout, UiCallbackHandler, UiCallbackParam} from '../index';
+import {BookmarkSupport, Desktop, Outline, Page, RemainingPagePathToActivateDo, scout, UiCallbackHandler, UiCallbackParam} from '../index';
 
-export class ActivateBookmarkUiCallbackHandler implements UiCallbackHandler {
+export class ActivateRemainingBookmarkUiCallbackHandler implements UiCallbackHandler {
 
   handle(param: UiCallbackParam): JQuery.Promise<void> {
-    const desktop = scout.assertInstance(param.owner, Desktop);
-    const data = scout.assertInstance(param.data, ActivateBookmarkRequestDo);
+    const desktop = scout.assertInstance(param.owner, Desktop, 'owner is not of type Desktop');
+    const data = scout.assertInstance(param.data, RemainingPagePathToActivateDo, 'data is not of type RemainingPagePathToActivateDo');
     const contextElements = scout.assertValue(param.contextElements, 'Missing context elements');
 
     let parentPageContextElement = contextElements.optSingle('parentPage');
@@ -26,6 +26,6 @@ export class ActivateBookmarkUiCallbackHandler implements UiCallbackHandler {
       parentBookmarkPage: data.parentBookmarkPage,
       pagePath: data.pagePath,
       applyParentBookmarkPage: true
-    });
+    }, data.options);
   }
 }

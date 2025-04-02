@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BookmarkDo, BookmarkDoBuilderModel, BookmarkDoBuilderOptionsDo, BookmarkTableRowIdentifierDo, ChartTableControlConfigDo, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkDefinitionDo,
-  IBookmarkPageDo, InitModelOf, NodeBookmarkPageDo, ObjectWithType, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, TableBookmarkPageDo, TableClientUiPreferencesDo
+  arrays, BaseDoEntity, BookmarkDo, BookmarkDoBuilderModel, BookmarkDoBuilderOptionsDo, BookmarkSupport, BookmarkTableRowIdentifierDo, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkDefinitionDo,
+  IBookmarkDo, IBookmarkPageDo, IChartTableControlConfigDo, InitModelOf, NodeBookmarkPageDo, objects, ObjectWithType, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, strings, TableBookmarkPageDo,
+  TableClientUiPreferencesDo
 } from '../index';
 
 export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel {
@@ -57,20 +58,22 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
 
   // --------------------------------------
 
-  build(): JQuery.Promise<BookmarkDo> {
+  build(): JQuery.Promise<IBookmarkDo> {
     return $.when(this._build());
   }
 
-  protected async _build(): Promise<BookmarkDo> {
+  protected async _build(): Promise<IBookmarkDo> {
     let bookmarkDefinition = await this._createBookmarkDefinition();
-    // FIXME bsh [js-bookmark] Create titles and description
-    let bookmarkTitles = undefined;
-    let bookmarkDescription = undefined;
+    return this._createBookmark(bookmarkDefinition);
+  }
 
+  protected async _createBookmark(bookmarkDefinition: IBookmarkDefinitionDo): Promise<IBookmarkDo> {
+    let bookmarkTitle = await this._createBookmarkTitle(bookmarkDefinition);
+    let bookmarkDescription = await this._createBookmarkDescription(bookmarkDefinition);
     return scout.create(BookmarkDo, {
       definition: bookmarkDefinition,
-      titles: bookmarkTitles,
-      description: bookmarkDescription
+      title: bookmarkTitle || undefined,
+      description: bookmarkDescription || undefined
     });
   }
 
@@ -244,7 +247,61 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
     return null;
   }
 
-  protected async _createChartTableControlConfigForBookmark(page: PageWithTable): Promise<ChartTableControlConfigDo> {
+  protected async _createChartTableControlConfigForBookmark(page: PageWithTable): Promise<IChartTableControlConfigDo> {
     return null;
+  }
+
+  // --------------------------------------
+
+  protected async _createBookmarkTitle(bookmarkDefinition: IBookmarkDefinitionDo): Promise<string> {
+    if (!this.createTitle) {
+      return null;
+    }
+    let titleSegments: string[] = [];
+    if (bookmarkDefinition instanceof OutlineBookmarkDefinitionDo) {
+      let outline = BookmarkSupport.get(this.session).resolveOutline(bookmarkDefinition.outlineId);
+      if (outline) {
+        titleSegments.push(outline.title);
+      }
+
+      bookmarkDefinition.pagePath
+        .map(p => p.displayText)
+        .forEach(s => titleSegments.push(s));
+    }
+    if (bookmarkDefinition.bookmarkedPage) {
+      titleSegments.push(bookmarkDefinition.bookmarkedPage.displayText);
+    }
+
+    titleSegments = titleSegments.filter(s => strings.hasText(s));
+    return arrays.hasElements(titleSegments) ? titleSegments.join(' - ') : this.session.text('Bookmark');
+  }
+
+  protected async _createBookmarkDescription(bookmarkDefinition: IBookmarkDefinitionDo): Promise<string> {
+    if (!this.createDescription) {
+      return null;
+    }
+
+    let pagePath = [
+      ...(bookmarkDefinition instanceof OutlineBookmarkDefinitionDo ? bookmarkDefinition.pagePath : []),
+      bookmarkDefinition.bookmarkedPage
+    ].filter(Boolean);
+
+    let lines = [];
+    pagePath.forEach((bookmarkPage, index) => {
+      let prefix = strings.repeat('  ', index);
+
+      let displayText = bookmarkPage.displayText || this.session.text('Node');
+      lines.push(prefix + displayText);
+
+      if (bookmarkPage instanceof TableBookmarkPageDo && bookmarkPage.searchData) {
+        let searchData = bookmarkPage.searchData instanceof BaseDoEntity ? bookmarkPage.searchData.toPojo() : bookmarkPage.searchData;
+        Object.keys(searchData)
+          .filter(key => !strings.startsWith(key, '_'))
+          .filter(key => !objects.isNullOrUndefinedOrEmpty(searchData[key]))
+          .map(key => key + ': ' + JSON.stringify((searchData)[key]))
+          .forEach(searchLine => lines.push(prefix + '  ' + searchLine));
+      }
+    });
+    return lines.join('\n');
   }
 }

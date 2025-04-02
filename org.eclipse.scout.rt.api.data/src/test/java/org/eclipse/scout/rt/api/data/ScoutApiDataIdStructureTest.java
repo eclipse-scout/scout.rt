@@ -19,7 +19,7 @@ public class ScoutApiDataIdStructureTest extends AbstractIdStructureTest {
 
   @Parameters(name = "{0}")
   public static Iterable<?> parameters() {
-    return AbstractIdStructureTest.streamIdClasses("org.eclipse.scout.rt.api.data")
+    return streamIdClasses("org.eclipse.scout.rt.api.data")
         .collect(Collectors.toList());
   }
 

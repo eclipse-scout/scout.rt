@@ -9,17 +9,17 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import org.eclipse.scout.rt.api.data.bookmark.ActivateBookmarkDataDo;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.AbstractHybridAction;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridActionType;
-import org.eclipse.scout.rt.dataobject.IDoEntity;
 
 @HybridActionType(ActivateBookmarkHybridAction.TYPE)
-public class ActivateBookmarkHybridAction extends AbstractHybridAction<IDoEntity> {
+public class ActivateBookmarkHybridAction extends AbstractHybridAction<ActivateBookmarkDataDo> {
 
   protected static final String TYPE = "ActivateBookmark";
 
   @Override
-  public void execute(IDoEntity data) {
+  public void execute(ActivateBookmarkDataDo data) {
     // NOT IMPLEMENTED YET -> MOVE CORE IMPLEMENTATION HERE
     fireHybridActionEndEvent();
   }
