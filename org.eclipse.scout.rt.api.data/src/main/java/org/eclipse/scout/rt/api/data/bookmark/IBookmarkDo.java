@@ -11,12 +11,10 @@ package org.eclipse.scout.rt.api.data.bookmark;
 
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
-import org.eclipse.scout.rt.dataobject.TypeVersionRequired;
 
 /**
  * Base interface for a bookmark
  */
-@TypeVersionRequired
 public interface IBookmarkDo extends IDoEntity {
 
   DoValue<IBookmarkDefinitionDo> definition();

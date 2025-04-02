@@ -22,20 +22,12 @@ export class BookmarkForm extends Form implements BookmarkFormModel {
 
   override importData() {
     if (this.bookmark) {
-      // let language = this.session.locale.language; // FIXME bsh [js-bookmark] Use LanguageCodeType
-      // let name = this.bookmark.titles?.[language];
-      // this.widget('NameField').setValue(name);
+      this.widget('NameField').setValue(this.bookmark.title);
     }
   }
 
   override exportData(): any {
-    // let language = this.session.locale.language; // FIXME bsh [js-bookmark] Use LanguageCodeType
-    // let titles = {
-    //   [language]: this.widget('NameField').value
-    // };
-    // this.bookmark = scout.create(BookmarkDo, $.extend({}, this.bookmark, {
-    //   titles: titles
-    // }));
+    this.bookmark.title = this.widget('NameField').value;
     return null;
   }
 }

@@ -7,343 +7,107 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, BaseDoEntity, BookmarkSupport, DoEntity, PageParamDo, typeName} from '../index';
-
-export interface IBookmarkDo extends DoEntity {
-  definition: IBookmarkDefinitionDo;
-}
-
-@typeName('scout.Bookmark')
-export class BookmarkDo extends BaseDoEntity implements IBookmarkDo {
-  definition: IBookmarkDefinitionDo;
-}
-
-@typeName('crm.Bookmark')
-export class CrmBookmarkDo extends BaseDoEntity implements IBookmarkDo {
-  key: string;
-  titles: Record<string, string>;
-  description: string;
-  definition: IBookmarkDefinitionDo;
-}
-
-// --------------------------------------------------
-
-export interface IBookmarkDefinitionDo extends DoEntity {
-  bookmarkedPage: IBookmarkPageDo;
-}
-
-@typeName('scout.OutlineBookmarkDefinition')
-export class OutlineBookmarkDefinitionDo extends BaseDoEntity implements IBookmarkDefinitionDo {
-  bookmarkedPage: IBookmarkPageDo;
-  outlineId: string;
-  /** Path from the outline's root to the {@link bookmarkedPage} */
-  pagePath: IBookmarkPageDo[];
-}
-
-@typeName('scout.PageBookmarkDefinition')
-export class PageBookmarkDefinitionDo extends BaseDoEntity implements IBookmarkDefinitionDo {
-  bookmarkedPage: IBookmarkPageDo;
-}
-
-// --------------------------------------------------
-
-export interface IBookmarkPageDo extends DoEntity {
-  pageParam?: PageParamDo;
-  displayText?: string;
-}
-
-@typeName('scout.NodeBookmarkPage')
-export class NodeBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo {
-  pageParam?: PageParamDo;
-  displayText?: string;
-}
-
-@typeName('scout.TableBookmarkPage')
-export class TableBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo {
-  pageParam?: PageParamDo;
-  displayText?: string;
-  expandedChildRow?: BookmarkTableRowIdentifierDo;
-  selectedChildRows?: BookmarkTableRowIdentifierDo[];
-  searchFilterComplete?: boolean; // FIXME bsh [js-bookmark] always true?
-  searchData?: ISearchDo;
-  tablePreferences?: TableClientUiPreferencesDo;
-  chartTableControlConfig?: ChartTableControlConfigDo;
-}
-
-export interface ISearchDo extends DoEntity {
-}
-
-@typeName('scout.BookmarkTableRowIdentifier')
-export class BookmarkTableRowIdentifierDo extends BaseDoEntity {
-  keyComponents: IBookmarkTableRowIdentifierComponentDo[];
-}
-
-export interface IBookmarkTableRowIdentifierComponentDo {
-}
-
-/**
- * Never serialize this!
- */
-@typeName('scout.BookmarkTableRowIdentifierObjectComponent')
-export class BookmarkTableRowIdentifierObjectComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
-  key: any;
-}
-
-@typeName('scout.BookmarkTableRowIdentifierDateComponent')
-export class BookmarkTableRowIdentifierDateComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
-  key: Date;
-}
-
-@typeName('scout.BookmarkTableRowIdentifierBooleanComponent')
-export class BookmarkTableRowIdentifierBooleanComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
-  key: boolean;
-}
-
-@typeName('scout.BookmarkTableRowIdentifierIntegerComponent')
-export class BookmarkTableRowIdentifierIntegerComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
-  key: number;
-}
-
-@typeName('scout.BookmarkTableRowIdentifierStringComponent')
-export class BookmarkTableRowIdentifierStringComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
-  key: string;
-}
-
-@typeName('scout.BookmarkTableRowIdentifierLongComponent')
-export class BookmarkTableRowIdentifierLongComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
-  key: number;
-}
-
-// FIXME bsh [js-bookmark] Move to crm core:
-
-@typeName('crm.BookmarkTableRowIdentifierEntityKeyComponent')
-export class BookmarkTableRowIdentifierEntityKeyComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
-  key: string;
-}
-
-@typeName('crm.BookmarkTableRowIdentifierTypedIdComponent')
-export class BookmarkTableRowIdentifierTypedIdComponentDo extends BaseDoEntity implements IBookmarkTableRowIdentifierComponentDo {
-  key: string;
-}
-
-// --------------------------------------------------
-
-@typeName('suite.ImportSearchData')
-export class ImportSearchDataDo extends BaseDoEntity {
-  searchData?: DoEntity;
-  markAsSaved?: boolean;
-}
-
-// --------------------------------------------------
-
-@typeName('scout.ChartTableControlConfig')
-export class ChartTableControlConfigDo extends BaseDoEntity {
-  chartTypeId?: string;
-  chartGroup1ColumnId?: string;
-  chartGroup1Modifier?: number;
-  chartGroup2ColumnId?: string;
-  chartGroup2Modifier?: number;
-  chartAggregationColumnId?: string;
-  chartAggregationModifier?: number;
-}
-
-// --------------------------------------------------
-
-@typeName('scout.TableClientUiPreferences')
-export class TableClientUiPreferencesDo extends BaseDoEntity {
-  tableId?: string;
-  userPreferenceContext?: string;
-  tileMode?: boolean;
-  tileGlobalKey?: string;
-  tablePreferenceProfiles?: Map<string, TableClientUiPreferenceProfileDo>;
-}
-
-@typeName('scout.TableClientUiPreferenceProfile')
-export class TableClientUiPreferenceProfileDo extends BaseDoEntity {
-  columns?: TableColumnClientUiPreferenceDo[];
-  userFilters?: IUserFilterStateDo[];
-  tableCustomizerData?: ITableCustomizerDo;
-}
-
-@typeName('scout.TableColumnClientUiPreference')
-export class TableColumnClientUiPreferenceDo extends BaseDoEntity {
-  columnId?: string;
-  width?: number;
-  viewIndex?: number;
-  sortOrder?: number;
-  sortAscending?: boolean;
-  visible?: boolean;
-  groupingActive?: boolean;
-  aggregationFunctionId?: string;
-  backgroundEffectId?: string;
-}
-
-export interface IUserFilterStateDo extends DoEntity {
-}
-
-// FIXME bsh [js-bookmark] Analyze which of these we can move to scout
-
-@typeName('crm.BooleanColumnUserFilterState')
-export class BooleanColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  columnId?: string;
-  selectedValues?: Set<boolean>;
-}
-
-@typeName('crm.CategoryColorColumnUserFilterState')
-export class CategoryColorColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  columnId?: string;
-  selectedValues?: Set<string>;
-}
-
-@typeName('crm.ChartTableUserFilterState')
-export class ChartTableUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  attributeText?: string;
-  columnIdX?: string;
-  columnIdY?: string;
-  stringFilters?: Map<string, string>[];
-  numberFilters?: Map<string, number>[];
-}
-
-@typeName('crm.ColumnUserFilterState')
-export class ColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  columnId?: string;
-  selectedValues?: Set<string>;
-}
-
-@typeName('crm.DateColumnUserFilterState')
-export class DateColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  columnId?: string;
-  selectedValues?: Set<number>;
-  dateFrom?: Date;
-  dateTo?: Date;
-}
-
-@typeName('crm.MapTableUserFilterState')
-export class MapTableUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  columnId?: string;
-  filterIds?: string[];
-}
-
-@typeName('crm.NumberColumnUserFilterState')
-export class NumberColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  columnId?: string;
-  selectedValues?: Set<number>;
-  numberFrom?: number;
-  numberTo?: number;
-}
-
-@typeName('crm.TableTextUserFilterState')
-export class TableTextUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  text?: string;
-}
-
-@typeName('crm.TextColumnUserFilterState')
-export class TextColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  columnId?: string;
-  selectedValues?: Set<string>;
-  textFilter?: string;
-}
-
-export interface ITableCustomizerDo extends DoEntity {
-}
-
-// FIXME bsh [js-bookmark] Move to suite/crm
-@typeName('crm.CoreTableCustomizer')
-export class CoreTableCustomizerDo extends BaseDoEntity implements ITableCustomizerDo {
-  columns?: CustomColumnConfigDo[];
-}
-
-// FIXME bsh [js-bookmark] Move to suite/crm
-@typeName('crm.CustomColumnConfig')
-export class CustomColumnConfigDo extends BaseDoEntity {
-  id: string;
-  selection: DoEntity; // FIXME bsh [js-bookmark] Change to IDataModelSelectionDo
-  filterVariantId: string;
-  label: string;
-  tooltip: string;
-  visible: boolean;
-  width: number;
-  order: number;
-  sortIndex: number;
-  sortAscending: boolean;
-  grouped: boolean;
-  multiline: boolean;
-}
-
-// --------------------------------------------------
-
-@typeName(PageIdDummyPageParamDo.TYPE_NAME)
-export class PageIdDummyPageParamDo extends PageParamDo {
-  static TYPE_NAME = 'scout.PageIdDummyPageParam';
-
-  pageId: string;
-}
-
-// --------------------------------------------------
-
-@typeName('suite.ActivateBookmarkRequest')
-export class ActivateBookmarkRequestDo extends BaseDoEntity {
-  parentBookmarkPage: IBookmarkPageDo;
-  pagePath: IBookmarkPageDo[];
-}
-
-@typeName('suite.BookmarkDoBuilderOptions')
-export class BookmarkDoBuilderOptionsDo extends BaseDoEntity {
-  createOutline?: boolean;
-  persistableRequired?: boolean;
-  fallbackAllowed?: boolean;
-  createTitle?: boolean;
-  createDescription?: boolean;
-  createTablePreferences?: boolean;
-  createTableRowSelections?: boolean;
-}
-
-// --------------------------------------------------
+import {arrays, BookmarkDo, BookmarkSupport, dataObjects, IBookmarkDo, UuidPool, webstorage} from '../index';
 
 export const bookmarks = {
 
   // FIXME bsh [js-bookmark] Remove the following debugging/testing methods
 
+  getBookmarkStore(storeId?: string): BookmarkDo[] {
+    storeId = storeId || 'scout:bookmarks';
+    let raw = webstorage.getItemFromLocalStorage(storeId);
+    return dataObjects.parse(raw, Array<BookmarkDo>);
+  },
+
+  setBookmarkStore(bookmarkStore: BookmarkDo[], storeId?: string) {
+    storeId = storeId || 'scout:bookmarks';
+    if (!bookmarkStore) {
+      webstorage.removeItemFromLocalStorage(storeId);
+      return;
+    }
+    webstorage.setItemToLocalStorage(storeId, dataObjects.stringify(bookmarkStore));
+  },
+
+  storeBookmark(bookmark: BookmarkDo, storeId?: string): JQuery.Promise<void> {
+    return $.resolvedPromise().then(() => {
+      if (!bookmark) {
+        return;
+      }
+
+      let bookmarkStore = bookmarks.getBookmarkStore(storeId) || [];
+      bookmark.id = bookmark.id || UuidPool.get().take();
+      let index = bookmarkStore.findIndex(b => b.id === bookmark.id);
+      if (index === -1) {
+        bookmarkStore.push(bookmark);
+      } else {
+        bookmarkStore[index] = bookmark;
+      }
+      bookmarks.setBookmarkStore(bookmarkStore, storeId);
+    });
+  },
+
+  // FIXME bsh [js-bookmark] Remove and replace with actual implementation
+  loadBookmark(id: string, storeId?: string): JQuery.Promise<BookmarkDo> {
+    return $.resolvedPromise().then(() => {
+      let bookmarkStore = bookmarks.getBookmarkStore(storeId) || [];
+      return bookmarkStore.find(b => b.id === id) || null;
+    });
+  },
+
+  loadAllBookmarks(storeId?: string): JQuery.Promise<BookmarkDo[]> {
+    return $.resolvedPromise().then(() => {
+      return bookmarks.getBookmarkStore(storeId) || [];
+    });
+  },
+
+  storeAllBookmarks(allBookmarks: BookmarkDo[], storeId?: string): JQuery.Promise<void> {
+    return $.resolvedPromise().then(() => {
+      allBookmarks = arrays.ensure(allBookmarks).filter(bookmark => {
+        if (!bookmark) {
+          return false;
+        }
+        bookmark.id = bookmark.id || UuidPool.get().take();
+        return true;
+      });
+      bookmarks.setBookmarkStore(allBookmarks, storeId);
+    });
+  },
+
+  // --------------------------------------
+
   /** @deprecated ONLY FOR TESTING PURPOSES - DO NOT USE */
-  async create(): Promise<BookmarkDo> {
-    const bookmarkSupport = BookmarkSupport.get();
-    let bookmark = await bookmarkSupport.createBookmark();
-    await bookmarkSupport.storeBookmark(bookmark);
+  async create(storeId?: string): Promise<BookmarkDo> {
+    let bookmark = await BookmarkSupport.get().createBookmark() as BookmarkDo;
+    await bookmarks.storeBookmark(bookmark, storeId);
     return bookmark;
   },
 
   /** @deprecated ONLY FOR TESTING PURPOSES - DO NOT USE */
-  async open(index?: number): Promise<BookmarkDo> {
-    const bookmarkSupport = BookmarkSupport.get() as BookmarkSupport & { _getBookmarkStore(): BookmarkDo[] };
-    const bookmarkStore = bookmarkSupport._getBookmarkStore();
+  async activate(index?: number, storeId?: string): Promise<BookmarkDo> {
+    const bookmarkStore = bookmarks.getBookmarkStore(storeId);
     if (arrays.empty(bookmarkStore)) {
       return null;
     }
     let bookmark = bookmarkStore[index < 0 ? bookmarkStore.length + index : index] || arrays.last(bookmarkStore);
-    await bookmarkSupport.activateBookmark(bookmark);
+    await BookmarkSupport.get().activateBookmark(bookmark);
     return bookmark;
   },
 
   /** @deprecated ONLY FOR TESTING PURPOSES - DO NOT USE */
-  all(): BookmarkDo[] {
-    const bookmarkSupport = BookmarkSupport.get() as BookmarkSupport & { _getBookmarkStore(): BookmarkDo[] };
-    return bookmarkSupport._getBookmarkStore();
+  async all(storeId?: string): Promise<BookmarkDo[]> {
+    return bookmarks.loadAllBookmarks(storeId);
   },
 
   /** @deprecated ONLY FOR TESTING PURPOSES - DO NOT USE */
-  delete(index: number): BookmarkDo {
-    const bookmarkSupport = BookmarkSupport.get() as BookmarkSupport & {
-      _getBookmarkStore(): BookmarkDo[];
-      _setBookmarkStore(bookmarkStore: BookmarkDo[]);
-    };
-    const bookmarkStore = bookmarkSupport._getBookmarkStore();
+  delete(index?: number, storeId?: string): IBookmarkDo {
+    const bookmarkStore = bookmarks.getBookmarkStore(storeId);
     if (arrays.empty(bookmarkStore)) {
       return null;
     }
-    let bookmark = bookmarkStore[index < 0 ? bookmarkStore.length + index : index];
+    let bookmark = bookmarkStore[index < 0 ? bookmarkStore.length + index : index] || arrays.last(bookmarkStore);
     if (bookmark) {
       arrays.remove(bookmarkStore, bookmark);
-      bookmarkSupport._setBookmarkStore(bookmarkStore);
+      bookmarks.setBookmarkStore(bookmarkStore);
     }
     return bookmark;
   }

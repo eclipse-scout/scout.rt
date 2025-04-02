@@ -12,8 +12,8 @@ import {ActivateBookmarkRequestDo, BookmarkSupport, Desktop, Outline, Page, scou
 export class ActivateBookmarkUiCallbackHandler implements UiCallbackHandler {
 
   handle(param: UiCallbackParam): JQuery.Promise<void> {
-    const desktop = scout.assertInstance(param.owner, Desktop);
-    const data = scout.assertInstance(param.data, ActivateBookmarkRequestDo);
+    const desktop = scout.assertInstance(param.owner, Desktop, 'owner is not of type Desktop');
+    const data = scout.assertInstance(param.data, ActivateBookmarkRequestDo, 'data is not of type ActivateBookmarkRequestDo');
     const contextElements = scout.assertValue(param.contextElements, 'Missing context elements');
 
     let parentPageContextElement = contextElements.optSingle('parentPage');

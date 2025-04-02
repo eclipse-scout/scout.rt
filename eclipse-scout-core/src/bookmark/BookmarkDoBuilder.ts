@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BookmarkDo, BookmarkDoBuilderModel, BookmarkDoBuilderOptionsDo, BookmarkTableRowIdentifierDo, ChartTableControlConfigDo, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkDefinitionDo,
+  BookmarkDo, BookmarkDoBuilderModel, BookmarkDoBuilderOptionsDo, BookmarkTableRowIdentifierDo, ChartTableControlConfigDo, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkDefinitionDo, IBookmarkDo,
   IBookmarkPageDo, InitModelOf, NodeBookmarkPageDo, ObjectWithType, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, TableBookmarkPageDo, TableClientUiPreferencesDo
 } from '../index';
 
@@ -57,12 +57,12 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
 
   // --------------------------------------
 
-  build(): JQuery.Promise<BookmarkDo> {
+  build(): JQuery.Promise<IBookmarkDo> {
     return $.resolvedPromise()
       .then(() => this._build());
   }
 
-  protected async _build(): Promise<BookmarkDo> {
+  protected async _build(): Promise<IBookmarkDo> {
     let bookmarkDefinition = await this._createBookmarkDefinition();
     // FIXME bsh [js-bookmark] Create titles and description
 

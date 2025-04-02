@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.api.data.bookmark;
+package org.eclipse.scout.rt.api.data.page;
 
 import jakarta.annotation.Generated;
 
@@ -15,58 +15,45 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
-@TypeName("scout.Bookmark")
-public class BookmarkDo extends DoEntity implements IBookmarkDo {
+@TypeName("scout.ImportSearchData")
+public class ImportSearchDataDo extends DoEntity {
 
-  @Override
-  public DoValue<IBookmarkDefinitionDo> definition() {
-    return doValue("definition");
+  public DoValue<ISearchDo> searchData() {
+    return doValue("searchData");
   }
 
-  public DoValue<String> id() {
-    return doValue("id");
-  }
-
-  public DoValue<String> title() {
-    return doValue("title");
+  public DoValue<Boolean> markAsSaved() {
+    return doValue("markAsSaved");
   }
 
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
-  @Override
   @Generated("DoConvenienceMethodsGenerator")
-  public BookmarkDo withDefinition(IBookmarkDefinitionDo definition) {
-    definition().set(definition);
-    return this;
-  }
-
-  @Override
-  @Generated("DoConvenienceMethodsGenerator")
-  public IBookmarkDefinitionDo getDefinition() {
-    return definition().get();
-  }
-
-  @Generated("DoConvenienceMethodsGenerator")
-  public BookmarkDo withId(String id) {
-    id().set(id);
+  public ImportSearchDataDo withSearchData(ISearchDo searchData) {
+    searchData().set(searchData);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public String getId() {
-    return id().get();
+  public ISearchDo getSearchData() {
+    return searchData().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public BookmarkDo withTitle(String title) {
-    title().set(title);
+  public ImportSearchDataDo withMarkAsSaved(Boolean markAsSaved) {
+    markAsSaved().set(markAsSaved);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public String getTitle() {
-    return title().get();
+  public Boolean getMarkAsSaved() {
+    return markAsSaved().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public boolean isMarkAsSaved() {
+    return nvl(getMarkAsSaved());
   }
 }

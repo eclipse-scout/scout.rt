@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, arrays, BookmarkDo, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, dataObjects, Desktop, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects,
-  ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageWithNodes, PageWithTable, scout, Session, Status, TableBookmarkPageDo, TableRow, webstorage
+  App, arrays, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, HybridManager, IBookmarkDo, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType,
+  Outline, OutlineBookmarkDefinitionDo, Page, PageWithNodes, PageWithTable, scout, Session, Status, TableBookmarkPageDo, TableRow
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -80,74 +80,20 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   // --------------------------------------
 
-  protected _getBookmarkStore(): BookmarkDo[] {
-    let raw = webstorage.getItemFromLocalStorage('jswidgets:bookmarks');
-    return dataObjects.parse(raw, Array<BookmarkDo>);
-  }
-
-  protected _setBookmarkStore(bookmarkStore: BookmarkDo[]) {
-    if (!bookmarkStore) {
-      webstorage.removeItemFromLocalStorage('jswidgets:bookmarks');
-      return;
-    }
-
-    webstorage.setItemToLocalStorage('jswidgets:bookmarks', dataObjects.stringify(bookmarkStore));
-  }
-
-  // FIXME bsh [js-bookmark] Remove and replace with actual implementation
-  storeBookmark(bookmark: BookmarkDo): JQuery.Promise<void> {
-    return $.resolvedPromise().then(() => {
-      if (!bookmark) {
-        return;
-      }
-
-      let bookmarkStore = this._getBookmarkStore() || [];
-      // bookmark.key = bookmark.key || UuidPool.get(this.session).take();
-      // let index = bookmarkStore.findIndex(b => b.key === bookmark.key);
-      // if (index === -1) {
-      //   bookmarkStore.push(bookmark);
-      // } else {
-      //   bookmarkStore[index] = bookmark;
-      // }
-      this._setBookmarkStore(bookmarkStore);
-
-      this.desktop.trigger('bookmarksChanged');
-    });
-  }
-
-  // FIXME bsh [js-bookmark] Remove and replace with actual implementation
-  loadBookmark(key: string): JQuery.Promise<BookmarkDo> {
-    return $.resolvedPromise().then(() => {
-      let bookmarkStore = this._getBookmarkStore() || [];
-      return null;
-      // return bookmarkStore.find(b => b.key === key) || null;
-    });
-  }
-
-  loadAllBookmarks(): JQuery.Promise<BookmarkDo[]> {
-    return $.resolvedPromise().then(() => {
-      return this._getBookmarkStore() || [];
-    });
-  }
-
-  storeAllBookmarks(bookmarks: BookmarkDo[]): JQuery.Promise<void> {
-    return $.resolvedPromise().then(() => {
-      this._setBookmarkStore(bookmarks);
-    });
-  }
-
-  // --------------------------------------
-
-  createBookmark(options?: Omit<BookmarkDoBuilderModel, 'desktop'>): JQuery.Promise<BookmarkDo> {
+  createBookmark(options?: Omit<BookmarkDoBuilderModel, 'desktop'>): JQuery.Promise<IBookmarkDo> {
     let builder = scout.create(BookmarkDoBuilder, {
       desktop: this.desktop,
       createTableRowSelections: false,
       ...options
     });
-    return builder.build();
+    return builder.build()
+      .catch(error => {
+        this.handleCreateBookmarkError(error); // FIXME bsh [js-bookmark] Make this optional
+        throw error;
+      });
   }
 
-  createBookmarkForRefresh(options?: Omit<BookmarkDoBuilderModel, 'desktop'>): JQuery.Promise<BookmarkDo> {
+  createBookmarkForRefresh(options?: Omit<BookmarkDoBuilderModel, 'desktop'>): JQuery.Promise<IBookmarkDo> {
     let builder = scout.create(BookmarkDoBuilder, {
       desktop: this.desktop,
       fallbackAllowed: false,
@@ -157,28 +103,40 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       createTablePreferences: false,
       ...options
     });
-    return builder.build();
+    return builder.build()
+      .catch(error => {
+        this.handleCreateBookmarkError(error); // FIXME bsh [js-bookmark] Make this optional
+        throw error;
+      });
   }
 
   // --------------------------------------
 
-  activateBookmark(bookmark: BookmarkDo): JQuery.Promise<void> {
+  activateBookmark(bookmark: IBookmarkDo): JQuery.Promise<void> {
+    return $.resolvedPromise()
+      .then(() => this._activateBookmark(bookmark));
+  }
+
+  async _activateBookmark(bookmark: IBookmarkDo): Promise<void> {
     if (this.loading) {
-      return $.rejectedPromise(BookmarkSupport.ERROR_ALREADY_LOADING);
+      throw BookmarkSupport.ERROR_ALREADY_LOADING;
     }
 
     if (!(bookmark?.definition instanceof OutlineBookmarkDefinitionDo)) {
-      return $.rejectedPromise(BookmarkSupport.ERROR_WRONG_DEFINITION_TYPE);
+      throw BookmarkSupport.ERROR_WRONG_DEFINITION_TYPE;
     }
 
     let bookmarkDefinition = bookmark.definition;
 
     this.setLoading(true);
-    return $.resolvedPromise()
-      .then(() => this._activateBookmarkHybrid(bookmarkDefinition))
-      .always(() => {
-        this.setLoading(false);
-      });
+    try {
+      await this._activateBookmarkHybrid(bookmarkDefinition);
+    } catch (error) {
+      this.handleActivateBookmarkError(error); // FIXME bsh [js-bookmark] Make this optional
+      throw error;
+    } finally {
+      this.setLoading(false);
+    }
   }
 
   protected async _activateBookmarkHybrid(bookmarkDefinition: OutlineBookmarkDefinitionDo): Promise<void> {
@@ -338,6 +296,19 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
   }
 
+  handleCreateBookmarkError(error: any): JQuery.Promise<any> {
+    if (scout.isOneOf(error,
+      BookmarkDoBuilder.ERROR_MISSING_OUTLINE,
+      BookmarkDoBuilder.ERROR_MISSING_PAGE_PARAM,
+      BookmarkDoBuilder.ERROR_PAGE_NOT_BOOKMARKABLE,
+      BookmarkDoBuilder.ERROR_PAGE_PATH_NOT_BOOKMARKABLE,
+      BookmarkDoBuilder.ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER
+    )) {
+      return MessageBoxes.openOk(this.desktop, 'This page is not bookmarkable.', Status.Severity.ERROR); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResolvingFailed')
+    }
+    return App.get().errorHandler.handle(error);
+  }
+
   handleActivateBookmarkError(error: any): JQuery.Promise<any> {
     if (error === BookmarkSupport.ERROR_ALREADY_LOADING) {
       return MessageBoxes.openOk(this.desktop, 'Another bookmark is currently loading', Status.Severity.ERROR);
@@ -358,7 +329,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   // --------------------------------------
 
-  applyBookmarkToPage(page: Page, bookmark: BookmarkDo, saveSearchForm = true) {
+  applyBookmarkToPage(page: Page, bookmark: IBookmarkDo, saveSearchForm = true) {
     if (!page || !bookmark || !bookmark.definition) {
       return;
     }
@@ -366,7 +337,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     this._applyBookmarkPage(page, bookmarkPage, saveSearchForm);
   }
 
-  applyBookmarkToPageAndReload(page: Page, bookmark: BookmarkDo, saveSearchForm = true): JQuery.Promise<void> {
+  applyBookmarkToPageAndReload(page: Page, bookmark: IBookmarkDo, saveSearchForm = true): JQuery.Promise<void> {
     if (!page || !bookmark || !bookmark.definition) {
       return;
     }

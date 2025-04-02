@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 /**
  * A {@link ClassId} of a UI column.
  */
-@IdTypeName("crm.ColumnClassId")
+@IdTypeName("scout.ColumnClassId")
 public final class ColumnClassId extends AbstractStringId {
   private static final long serialVersionUID = 1L;
 

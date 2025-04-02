@@ -7,13 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BookmarkDo, BookmarkSupport, Desktop, Page, scout, UiCallbackHandler, UiCallbackParam} from '../index';
+import {BookmarkSupport, Desktop, IBookmarkDo, Page, scout, UiCallbackHandler, UiCallbackParam} from '../index';
 
 export class ApplyBookmarkToJsPageUiCallbackHandler implements UiCallbackHandler {
 
   handle(param: UiCallbackParam): JQuery.Promise<void> {
-    const desktop = scout.assertInstance(param.owner, Desktop);
-    const bookmark = scout.assertInstance(param.data, BookmarkDo);
+    const desktop = scout.assertInstance(param.owner, Desktop, 'owner is not of type Desktop');
+    const bookmark = scout.assertValue(param.data, 'Missing bookmark') as IBookmarkDo;
     const contextElements = scout.assertValue(param.contextElements, 'Missing context elements');
     const page = contextElements.getSingle('page').getElement(Page);
 

@@ -4,15 +4,6 @@
     "_type" : "scout.EntityDataObjectSignature",
     "attributes" : [ {
       "_type" : "scout.AttributeDataObjectSignature",
-      "name" : "definition",
-      "valueType" : "DOI[org.eclipse.scout.rt.api.data.bookmark.IBookmarkDefinitionDo]"
-    } ],
-    "typeName" : "scout.Bookmark",
-    "typeVersion" : "scout-25.2.001"
-  }, {
-    "_type" : "scout.EntityDataObjectSignature",
-    "attributes" : [ {
-      "_type" : "scout.AttributeDataObjectSignature",
       "list" : true,
       "name" : "keyComponents",
       "valueType" : "DOI[org.eclipse.scout.rt.api.data.bookmark.IBookmarkTableRowIdentifierComponentDo]"
