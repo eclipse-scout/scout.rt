@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -53,10 +53,10 @@ export class FileChooserController extends DisplayChildController {
   }
 
   protected override _register(fileChooser: FileChooser) {
-    this._registerChild(fileChooser, this.displayParent.fileChoosers, 'fileChoosers');
+    this._registerChild(fileChooser, 'fileChoosers');
   }
 
   protected override _unregister(fileChooser: FileChooser) {
-    this._unregisterChild(fileChooser, this.displayParent.fileChoosers, 'fileChoosers');
+    this._unregisterChild(fileChooser, 'fileChoosers');
   }
 }

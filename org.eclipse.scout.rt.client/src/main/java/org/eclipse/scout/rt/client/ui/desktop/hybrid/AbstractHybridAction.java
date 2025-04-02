@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,12 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -51,6 +56,37 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
     m_id = id;
     m_contextElements = contextElements;
     m_initialized = true;
+  }
+
+  @Override
+  public ClientRunContext createRunContext() {
+    ClientRunContext runContext = ClientRunContexts.copyCurrent();
+    prepareRunContext(runContext);
+    return runContext;
+  }
+
+  protected void prepareRunContext(ClientRunContext runContext) {
+    // get outline from context elements
+    Optional.ofNullable(optContextElement("runcontext.outline"))
+        .map(HybridActionContextElement::getWidget)
+        .filter(IOutline.class::isInstance)
+        .map(IOutline.class::cast)
+        // use current outline of desktop as fallback
+        .or(() -> Optional.of(runContext)
+            .map(ClientRunContext::getDesktop)
+            .map(IDesktop::getOutline))
+        .ifPresent(outline -> runContext.withOutline(outline, false));
+
+    // get form from context elements
+    Optional.ofNullable(optContextElement("runcontext.form"))
+        .map(HybridActionContextElement::getWidget)
+        .filter(IForm.class::isInstance)
+        .map(IForm.class::cast)
+        // use active form of desktop as fallback
+        .or(() -> Optional.of(runContext)
+            .map(ClientRunContext::getDesktop)
+            .map(IDesktop::getActiveForm))
+        .ifPresent(runContext::withForm);
   }
 
   protected String getId() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.hybrid;
 
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.Bean;
 
@@ -33,6 +34,8 @@ public interface IHybridAction<DO_ENTITY extends IDoEntity> {
       throw new IllegalArgumentException("data must be of type '" + getDoEntityClass() + "' but is '" + data.getClass() + "'.");
     }
     init(id, contextElements);
-    execute(getDoEntityClass().cast(data));
+    createRunContext().run(() -> execute(getDoEntityClass().cast(data)));
   }
+
+  ClientRunContext createRunContext();
 }

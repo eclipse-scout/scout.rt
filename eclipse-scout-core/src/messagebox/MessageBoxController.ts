@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -54,10 +54,10 @@ export class MessageBoxController extends DisplayChildController {
   }
 
   protected override _register(messageBox: MessageBox) {
-    this._registerChild(messageBox, this.displayParent.messageBoxes, 'messageBoxes');
+    this._registerChild(messageBox, 'messageBoxes');
   }
 
   protected override _unregister(messageBox: MessageBox) {
-    this._unregisterChild(messageBox, this.displayParent.messageBoxes, 'messageBoxes');
+    this._unregisterChild(messageBox, 'messageBoxes');
   }
 }

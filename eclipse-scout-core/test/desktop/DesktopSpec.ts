@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -878,40 +878,65 @@ describe('Desktop', () => {
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, parentDialog, modalChildDialogLevel1, modalChildDialogLevel2]));
       expect(desktop.activeForm).toBe(modalChildDialogLevel2);
 
+      const activatedForms = [];
+      const storeActivatedForm = e => activatedForms.push(e.form);
+      desktop.on('formActivate', storeActivatedForm);
+
       desktop.activateForm(dialog0);
       // expect dialog0 to be on top (= last in the DOM)
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, parentDialog, modalChildDialogLevel1, modalChildDialogLevel2, dialog0]));
       expect(desktop.activeForm).toBe(dialog0);
+      expect(activatedForms).toEqual([dialog0]);
+
+      activatedForms.splice(0, activatedForms.length);
 
       desktop.activateForm(dialog1);
       // expect dialog1 to be on top (= last in the DOM)
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([parentDialog, modalChildDialogLevel1, modalChildDialogLevel2, dialog0, dialog1]));
       expect(desktop.activeForm).toBe(dialog1);
+      expect(activatedForms).toEqual([dialog1]);
+
+      activatedForms.splice(0, activatedForms.length);
 
       desktop.activateForm(parentDialog);
       // expect complete hierarchy beginning with parentDialog to be on top (= last in the DOM)
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, parentDialog, modalChildDialogLevel1, modalChildDialogLevel2]));
       expect(desktop.activeForm).toBe(modalChildDialogLevel2);
+      expect(activatedForms).toEqual([parentDialog, modalChildDialogLevel1, modalChildDialogLevel2]);
+
+      activatedForms.splice(0, activatedForms.length);
 
       desktop.activateForm(dialog0);
       // expect dialog0 to be on top (= last in the DOM)
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, parentDialog, modalChildDialogLevel1, modalChildDialogLevel2, dialog0]));
       expect(desktop.activeForm).toBe(dialog0);
+      expect(activatedForms).toEqual([dialog0]);
+
+      activatedForms.splice(0, activatedForms.length);
 
       desktop.activateForm(modalChildDialogLevel1);
       // expect complete hierarchy beginning with parentDialog to be on top (= last in the DOM)
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog0, parentDialog, modalChildDialogLevel1, modalChildDialogLevel2]));
       expect(desktop.activeForm).toBe(modalChildDialogLevel2);
+      expect(activatedForms).toEqual([parentDialog, modalChildDialogLevel1, modalChildDialogLevel2]);
+
+      activatedForms.splice(0, activatedForms.length);
 
       desktop.activateForm(dialog0);
       // expect dialog0 to be on top (= last in the DOM)
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, parentDialog, modalChildDialogLevel1, modalChildDialogLevel2, dialog0]));
       expect(desktop.activeForm).toBe(dialog0);
+      expect(activatedForms).toEqual([dialog0]);
+
+      activatedForms.splice(0, activatedForms.length);
 
       desktop.activateForm(modalChildDialogLevel2);
       // expect complete hierarchy beginning with parentDialog to be on top (= last in the DOM)
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog0, parentDialog, modalChildDialogLevel1, modalChildDialogLevel2]));
       expect(desktop.activeForm).toBe(modalChildDialogLevel2);
+      expect(activatedForms).toEqual([parentDialog, modalChildDialogLevel1, modalChildDialogLevel2]);
+
+      desktop.off('formActivate', storeActivatedForm);
     });
 
     it('keeps position of dialog\'s messagebox relative to it\'s parent dialog while reordering dialogs', () => {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -102,6 +102,25 @@ export class FormController extends DisplayChildController {
    * Activates the given view or dialog.
    */
   activateForm(form: Form) {
+    if (!form) {
+      this.session.desktop._setFormActivated(null);
+      return;
+    }
+
+    // If the form has a modal child dialog, this dialog needs to be activated as well.
+    let activatedModalDialog = false;
+    form.dialogs.forEach(dialog => {
+      if (dialog.modal) {
+        this.activateForm(dialog);
+        activatedModalDialog = true;
+      }
+    });
+
+    // As this._activateForm activates all display parents for a dialog the current form was already activated as it is the display parent of its modal child dialogs.
+    if (activatedModalDialog) {
+      return;
+    }
+
     let displayParent: DisplayParent = this.displayParent;
     while (displayParent) {
       if (displayParent instanceof Outline) {
@@ -111,11 +130,16 @@ export class FormController extends DisplayChildController {
       displayParent = displayParent instanceof Form ? displayParent.displayParent : null;
     }
 
+    this._activateForm(form);
+  }
+
+  protected _activateForm(form: Form) {
     if (form.displayHint === Form.DisplayHint.VIEW) {
       this._activateView(form);
     } else {
       this._activateDialog(form);
     }
+    this.session.desktop._setFormActivated(form);
   }
 
   protected _renderView(view: Form, register: boolean, position?: number, selectView?: boolean) {
@@ -256,7 +280,7 @@ export class FormController extends DisplayChildController {
     if (dialog.displayParent instanceof Form &&
       (dialog.displayParent.displayHint === Form.DisplayHint.VIEW ||
         (dialog.displayParent.displayHint === Form.DisplayHint.DIALOG && dialog.modal))) {
-      this.activateForm(dialog.displayParent);
+      this._activateForm(dialog.displayParent);
     }
 
     if (!dialog.rendered) {
@@ -335,18 +359,18 @@ export class FormController extends DisplayChildController {
   }
 
   protected _registerDialog(dialog: Form) {
-    this._registerChild(dialog, this.displayParent.dialogs, 'dialogs');
+    this._registerChild(dialog, 'dialogs');
   }
 
   protected _unregisterDialog(dialog: Form) {
-    this._unregisterChild(dialog, this.displayParent.dialogs, 'dialogs');
+    this._unregisterChild(dialog, 'dialogs');
   }
 
   protected _registerView(view: Form, position: number) {
-    this._registerChild(view, this.displayParent.views, 'views', position);
+    this._registerChild(view, 'views', position);
   }
 
   protected _unregisterView(view: Form) {
-    this._unregisterChild(view, this.displayParent.views, 'views');
+    this._unregisterChild(view, 'views');
   }
 }
