@@ -31,6 +31,7 @@ public class SmtpServerConfig {
   private boolean m_useSmtps;
   private boolean m_useStartTls;
   private String m_sslProtocols;
+  private boolean m_oAuth2;
 
   private Map<String, String> m_additionalSessionProperties;
 
@@ -82,7 +83,7 @@ public class SmtpServerConfig {
 
   /**
    * @param password
-   *     SMTP server password.
+   *     SMTP server password or auth token.
    */
   public SmtpServerConfig withPassword(String password) {
     m_password = password;
@@ -142,6 +143,15 @@ public class SmtpServerConfig {
    */
   public SmtpServerConfig withSslProtocols(String sslProtocols) {
     m_sslProtocols = sslProtocols;
+    return this;
+  }
+
+  public boolean isOAuth2() {
+    return m_oAuth2;
+  }
+
+  public SmtpServerConfig withOAuth2(boolean oAuth2) {
+    m_oAuth2 = oAuth2;
     return this;
   }
 
@@ -206,6 +216,7 @@ public class SmtpServerConfig {
     result = prime * result + ((m_additionalSessionProperties == null) ? 0 : m_additionalSessionProperties.hashCode());
     result = prime * result + ((m_host == null) ? 0 : m_host.hashCode());
     result = prime * result + m_maxMessagesPerConnection;
+    result = prime * result + (m_oAuth2 ? 1231 : 1237);
     result = prime * result + ((m_password == null) ? 0 : m_password.hashCode());
     result = prime * result + m_poolSize;
     result = prime * result + ((m_port == null) ? 0 : m_port.hashCode());
@@ -246,6 +257,9 @@ public class SmtpServerConfig {
       return false;
     }
     if (m_maxMessagesPerConnection != other.m_maxMessagesPerConnection) {
+      return false;
+    }
+    if (m_oAuth2 != other.m_oAuth2) {
       return false;
     }
     if (m_password == null) {
