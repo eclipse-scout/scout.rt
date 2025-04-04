@@ -168,6 +168,13 @@ public class SmtpHelper {
     if (StringUtility.hasText(config.getUsername())) {
       props.setProperty(propertyBaseName + ".user", config.getUsername());
       props.setProperty(propertyBaseName + ".auth", "" + config.isUseAuthentication());
+
+      if (config.isOAuth2()) {
+        props.put(propertyBaseName + ".sasl.enable", "true");
+        props.put(propertyBaseName + ".sasl.mechanisms", "XOAUTH2");
+        props.put(propertyBaseName + ".auth.login.disable", "true");
+        props.put(propertyBaseName + ".auth.plain.disable", "true");
+      }
     }
     if (StringUtility.hasText(config.getSslProtocols())) {
       props.setProperty(propertyBaseName + ".ssl.protocols", config.getSslProtocols());
