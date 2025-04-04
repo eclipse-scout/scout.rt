@@ -59,6 +59,20 @@
     "_type" : "scout.EntityDataObjectSignature",
     "attributes" : [ {
       "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "columnId",
+      "valueType" : "ID[scout.TableColumnId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "list" : true,
+      "name" : "selectedValues",
+      "valueType" : "CLASS[java.lang.Boolean]"
+    } ],
+    "typeName" : "scout.BooleanColumnUserFilterState",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
       "name" : "chartAggregationColumnId",
       "valueType" : "ID[scout.TableColumnId]"
     }, {
@@ -92,6 +106,42 @@
     "_type" : "scout.EntityDataObjectSignature",
     "attributes" : [ {
       "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "columnId",
+      "valueType" : "ID[scout.TableColumnId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "list" : true,
+      "name" : "selectedValues",
+      "valueType" : "CLASS[java.lang.String]"
+    } ],
+    "typeName" : "scout.ColumnUserFilterState",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "columnId",
+      "valueType" : "ID[scout.TableColumnId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "dateFrom",
+      "valueType" : "CLASS[java.util.Date]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "dateTo",
+      "valueType" : "CLASS[java.util.Date]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "list" : true,
+      "name" : "selectedValues",
+      "valueType" : "CLASS[java.lang.Integer]"
+    } ],
+    "typeName" : "scout.DateColumnUserFilterState",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
       "name" : "displayText",
       "valueType" : "CLASS[java.lang.String]"
     }, {
@@ -100,6 +150,28 @@
       "valueType" : "DOI[org.eclipse.scout.rt.api.data.page.IPageParamDo]"
     } ],
     "typeName" : "scout.NodeBookmarkPage",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "columnId",
+      "valueType" : "ID[scout.TableColumnId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "numberFrom",
+      "valueType" : "CLASS[java.math.BigDecimal]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "numberTo",
+      "valueType" : "CLASS[java.math.BigDecimal]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "list" : true,
+      "name" : "selectedValues",
+      "valueType" : "CLASS[java.lang.Double]"
+    } ],
+    "typeName" : "scout.NumberColumnUserFilterState",
     "typeVersion" : "scout-25.2.001"
   }, {
     "_type" : "scout.EntityDataObjectSignature",
@@ -259,6 +331,33 @@
       "valueType" : "CLASS[java.lang.Integer]"
     } ],
     "typeName" : "scout.TableColumnClientUiPreference",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "text",
+      "valueType" : "CLASS[java.lang.String]"
+    } ],
+    "typeName" : "scout.TableTextUserFilterState",
+    "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "columnId",
+      "valueType" : "ID[scout.TableColumnId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "list" : true,
+      "name" : "selectedValues",
+      "valueType" : "CLASS[java.lang.String]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "textFilter",
+      "valueType" : "CLASS[java.lang.String]"
+    } ],
+    "typeName" : "scout.TextColumnUserFilterState",
     "typeVersion" : "scout-25.2.001"
   } ],
   "enums" : [ ]
