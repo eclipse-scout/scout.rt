@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -250,7 +250,10 @@ export class MenuBoxLayout extends AbstractLayout {
     let menusWidth = this._menusWidth(menus);
     let prefSize = graphics.prefSize(this.menuBox.$container);
     prefSize.width = menusWidth + this.menuBox.htmlComp.insets().horizontal();
-    return prefSize;
+    // If the value is fractional (e.g. 310.00000762939453) and the browser rounds it down when the size is set to the menu box,
+    // the prefSize (menusWidth in layout()) will always be bigger than the containerSize
+    // -> round up pref size to prevent this
+    return prefSize.ceil();
   }
 
   /**
