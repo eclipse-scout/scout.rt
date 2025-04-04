@@ -1178,7 +1178,7 @@ export * from './bookmark/BookmarkFormModel';
 export * from './bookmark/CreateBookmarkForJsPageUiCallbackHandler';
 export * from './bookmark/ManageBookmarksForm';
 export * from './bookmark/ManageBookmarksFormModel';
-export * from './bookmark/ActivateBookmarkUiCallbackHandler';
+export * from './bookmark/ActivateRemainingBookmarkUiCallbackHandler';
 export * from './system/System';
 export * from './system/systems';
 export * from './uuidpool/UuidPool';

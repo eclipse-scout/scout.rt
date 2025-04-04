@@ -31,6 +31,10 @@ public class BookmarkDo extends DoEntity implements IBookmarkDo {
     return doValue("title");
   }
 
+  public DoValue<String> description() {
+    return doValue("description");
+  }
+
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/

@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, arrays, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, HybridManager, IBookmarkDo, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType,
-  Outline, OutlineBookmarkDefinitionDo, Page, PageWithNodes, PageWithTable, scout, Session, Status, TableBookmarkPageDo, TableRow
+  ActivateBookmarkDataDo, App, arrays, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, HybridManager, IBookmarkDo, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo,
+  objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageWithNodes, PageWithTable, scout, Session, Status, TableBookmarkPageDo, TableRow
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -145,7 +145,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     // as much of the bookmark as it can. The remaining path will then be sent back to the UI using
     // a callback. After that, the hybrid action will end.
     if (hybridManager) {
-      await hybridManager.callActionAndWait('ActivateBookmark', {bookmarkDefinition});
+      await hybridManager.callActionAndWait('ActivateBookmark', scout.create(ActivateBookmarkDataDo, {bookmarkDefinition}));
       return;
     }
 
@@ -162,24 +162,24 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     });
   }
 
-  activateBookmarkLocal(request: ActivateBookmarkRequest): JQuery.Promise<void> {
-    return $.when(this._activateBookmarkLocal(request));
+  activateBookmarkLocal(param: ActivateBookmarkParam): JQuery.Promise<void> {
+    return $.when(this._activateBookmarkLocal(param));
   }
 
-  protected async _activateBookmarkLocal(request: ActivateBookmarkRequest): Promise<void> {
+  protected async _activateBookmarkLocal(param: ActivateBookmarkParam): Promise<void> {
     // Check if we are already on the correct outline
-    let outline = request.parentOutline || request.parentPage?.outline;
+    let outline = param.parentOutline || param.parentPage?.outline;
     if (!outline || !outline.visible || !outline.enabled) {
       throw BookmarkSupport.ERROR_OUTLINE_NOT_FOUND;
     }
     this.desktop.setOutline(outline);
     // FIXME bsh [js-bookmark] bringOutlineToFront?
-    if (request.parentPage && request.parentPage.outline !== outline) {
+    if (param.parentPage && param.parentPage.outline !== outline) {
       throw BookmarkSupport.ERROR_PAGE_WRONG_OUTLINE;
     }
 
-    let parentPage = request.parentPage;
-    let parentBookmarkPage = request.parentBookmarkPage;
+    let parentPage = param.parentPage;
+    let parentBookmarkPage = param.parentBookmarkPage;
 
     // FIXME bsh [js-bookmark] HACKY-HACKY! Find a better solution.
     if (parentPage) {
@@ -195,16 +195,16 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       }
     }
 
-    if (parentPage && parentBookmarkPage && request.applyParentBookmarkPage) {
+    if (parentPage && parentBookmarkPage && param.applyParentBookmarkPage) {
       this._applyBookmarkPage(parentPage, parentBookmarkPage, false);
     }
 
-    if (arrays.empty(request.pagePath)) {
+    if (arrays.empty(param.pagePath)) {
       this._revealPage(parentPage);
       return; // done!
     }
 
-    let pagePath = request.pagePath.slice(); // create copy because array is altered
+    let pagePath = param.pagePath.slice(); // create copy because array is altered
     while (arrays.hasElements(pagePath)) {
       let bookmarkPage = pagePath[0];
       let page = await this._resolvePage(outline, parentPage, parentBookmarkPage, bookmarkPage);
@@ -444,7 +444,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 }
 
-export interface ActivateBookmarkRequest {
+export interface ActivateBookmarkParam {
   parentOutline?: Outline;
   parentPage?: Page;
   parentBookmarkPage?: IBookmarkPageDo;

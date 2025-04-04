@@ -19,8 +19,8 @@ import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
-@TypeName("scout.ActivateBookmarkRequest")
-public class ActivateBookmarkRequestDo extends DoEntity {
+@TypeName("scout.RemainingPagePathToActivate")
+public class RemainingPagePathToActivateDo extends DoEntity {
 
   /**
    * Bookmark descriptor of the parent page. Used to identify the correct child page.
@@ -44,7 +44,7 @@ public class ActivateBookmarkRequestDo extends DoEntity {
    * See {@link #parentBookmarkPage()}.
    */
   @Generated("DoConvenienceMethodsGenerator")
-  public ActivateBookmarkRequestDo withParentBookmarkPage(IBookmarkPageDo parentBookmarkPage) {
+  public RemainingPagePathToActivateDo withParentBookmarkPage(IBookmarkPageDo parentBookmarkPage) {
     parentBookmarkPage().set(parentBookmarkPage);
     return this;
   }
@@ -61,7 +61,7 @@ public class ActivateBookmarkRequestDo extends DoEntity {
    * See {@link #pagePath()}.
    */
   @Generated("DoConvenienceMethodsGenerator")
-  public ActivateBookmarkRequestDo withPagePath(Collection<? extends IBookmarkPageDo> pagePath) {
+  public RemainingPagePathToActivateDo withPagePath(Collection<? extends IBookmarkPageDo> pagePath) {
     pagePath().updateAll(pagePath);
     return this;
   }
@@ -70,7 +70,7 @@ public class ActivateBookmarkRequestDo extends DoEntity {
    * See {@link #pagePath()}.
    */
   @Generated("DoConvenienceMethodsGenerator")
-  public ActivateBookmarkRequestDo withPagePath(IBookmarkPageDo... pagePath) {
+  public RemainingPagePathToActivateDo withPagePath(IBookmarkPageDo... pagePath) {
     pagePath().updateAll(pagePath);
     return this;
   }

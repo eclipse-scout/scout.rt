@@ -18,6 +18,7 @@ export class BookmarkDo extends BaseDoEntity implements IBookmarkDo {
   definition: IBookmarkDefinitionDo;
   id: string;
   title: string;
+  description: string;
 }
 
 // --------------------------------------------------
@@ -155,8 +156,6 @@ export class TableColumnClientUiPreferenceDo extends BaseDoEntity {
 export interface IUserFilterStateDo extends BaseDoEntity {
 }
 
-// FIXME bsh [js-bookmark] Analyze which of these we can move to scout
-
 @typeName('crm.BooleanColumnUserFilterState')
 export class BooleanColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
   columnId?: string;
@@ -238,10 +237,15 @@ export class ImportSearchDataDo extends BaseDoEntity {
   markAsSaved?: boolean;
 }
 
-@typeName('scout.ActivateBookmarkRequest')
-export class ActivateBookmarkRequestDo extends BaseDoEntity {
+@typeName('scout.RemainingPagePathToActivate')
+export class RemainingPagePathToActivateDo extends BaseDoEntity {
   parentBookmarkPage: IBookmarkPageDo;
   pagePath: IBookmarkPageDo[];
+}
+
+@typeName('scout.ActivateBookmarkData')
+export class ActivateBookmarkDataDo extends BaseDoEntity {
+  bookmarkDefinition: OutlineBookmarkDefinitionDo;
 }
 
 @typeName('scout.BookmarkDoBuilderOptions')
