@@ -113,8 +113,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   // --------------------------------------
 
   activateBookmark(bookmark: IBookmarkDo): JQuery.Promise<void> {
-    return $.resolvedPromise()
-      .then(() => this._activateBookmark(bookmark));
+    return $.when(this._activateBookmark(bookmark));
   }
 
   async _activateBookmark(bookmark: IBookmarkDo): Promise<void> {
@@ -164,8 +163,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   activateBookmarkLocal(request: ActivateBookmarkRequest): JQuery.Promise<void> {
-    return $.resolvedPromise()
-      .then(() => this._activateBookmarkLocal(request));
+    return $.when(this._activateBookmarkLocal(request));
   }
 
   protected async _activateBookmarkLocal(request: ActivateBookmarkRequest): Promise<void> {
@@ -342,8 +340,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       return;
     }
     let bookmarkPage = bookmark.definition.bookmarkedPage;
-    return $.resolvedPromise()
-      .then(() => this._applyBookmarkPageAndReload(page, bookmarkPage, saveSearchForm));
+    return $.when(this._applyBookmarkPageAndReload(page, bookmarkPage, saveSearchForm));
   }
 
   protected async _applyBookmarkPageAndReload(page: Page, bookmarkPage: IBookmarkPageDo, saveSearchForm = true): Promise<void> {
