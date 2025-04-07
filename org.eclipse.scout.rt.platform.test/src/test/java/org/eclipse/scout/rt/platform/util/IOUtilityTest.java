@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,6 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,6 +28,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class IOUtilityTest {
       ansiFile = createTempFile("ioUtilityTestAnsi.txt");
 
       String testContent = IOUtility.getContentInEncoding(utf8File.getPath(), StandardCharsets.UTF_8.name());
-      assertEquals(testContent, "TestTestöäü");
+      assertEquals("TestTestöäü", testContent);
 
       testContent = IOUtility.getContentInEncoding(ansiFile.getPath(), StandardCharsets.UTF_8.name());
       assertFalse("content is correct", StringUtility.equalsIgnoreCase(testContent, "TestTestöäü"));
@@ -99,6 +99,7 @@ public class IOUtilityTest {
       assertTrue(tempFile.getName().startsWith(FILENAME));
       assertTrue(tempFile.getName().endsWith(EXTENSION));
       assertArrayEquals(CONTENT, readFile(tempFile));
+      //noinspection ResultOfMethodCallIgnored
       tempFile.delete();
     }
     finally {
@@ -107,7 +108,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testCreateNewTempFileInSpecificFolder() throws Throwable {
+  public void testCreateNewTempFileInSpecificFolder() {
     File tempFolder = null;
     try {
       tempFolder = IOUtility.createTempDirectory("subDirectoryForTest");
@@ -171,6 +172,7 @@ public class IOUtilityTest {
   }
 
   @Test
+  @SuppressWarnings("ResultOfMethodCallIgnored")
   public void testDeleteDirectory() throws IOException {
     File tempFile = File.createTempFile("tempFile", "tmp");
     File tempDir = new File(tempFile.getParent(), "FileUtilityTestTempDir");
@@ -218,13 +220,30 @@ public class IOUtilityTest {
   }
 
   @Test
+  public void testUnzip() throws IOException {
+    try (InputStream in = getClass().getClassLoader().getResourceAsStream(PLATFORM_PATH + "zip.zip")) {
+      byte[] zipSlip = IOUtility.readBytes(in);
+      Collection<BinaryResource> content = IOUtility.unzip(zipSlip, null);
+      assertEquals(1, content.size());
+    }
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testUnzipSlip() throws IOException {
+    try (InputStream in = getClass().getClassLoader().getResourceAsStream(PLATFORM_PATH + FileUtilityTest.getZipSlipSampleFileName())) {
+      byte[] zipSlip = IOUtility.readBytes(in);
+      IOUtility.unzip(zipSlip, null);
+    }
+  }
+
+  @Test
   public void testReadLines() throws FileNotFoundException {
     File tempFile = null;
     try {
       tempFile = createTextTempFile();
 
       List<String> readLines = IOUtility.readLines(tempFile, StandardCharsets.UTF_8.name());
-      String[] readLinesArray = readLines.toArray(new String[readLines.size()]);
+      String[] readLinesArray = readLines.toArray(new String[0]);
       assertArrayEquals("arrays with read lines not as expected", LINES, readLinesArray);
     }
     finally {
@@ -239,7 +258,7 @@ public class IOUtilityTest {
       tempFile = IOUtility.createTempFile(inputStream, "temp", "zip");
 
       List<String> readLines = IOUtility.readLines(tempFile, StandardCharsets.UTF_8.name());
-      String[] readLinesArray = readLines.toArray(new String[readLines.size()]);
+      String[] readLinesArray = readLines.toArray(new String[0]);
       assertTrue(StringUtility.equalsIgnoreCase(readLinesArray[0], "TestTestöäü"));
     }
     finally {
@@ -365,8 +384,7 @@ public class IOUtilityTest {
       pw.close();
 
       List<String> readLines = IOUtility.readLines(tempFile, StandardCharsets.UTF_8.name());
-      List<String> expectedLines = new ArrayList<>();
-      expectedLines.addAll(Arrays.asList(LINES));
+      List<String> expectedLines = Arrays.asList(LINES);
       assertListEquals(expectedLines, readLines);
     }
     finally {
@@ -458,6 +476,7 @@ public class IOUtilityTest {
     for (byte[] bom : bomsToTest) {
       file = IOUtility.createTempFile(filename, mergeArrays(bom, lorem));
       assertArrayEquals(lorem, IOUtility.removeByteOrderMark(IOUtility.getContent(file.getPath())));
+      //noinspection ResultOfMethodCallIgnored
       file.delete();
     }
 
@@ -496,17 +515,17 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testReadStringFromStream1() throws Exception {
+  public void testReadStringFromStream1() {
     String expected = "0123äöü";
-    String actual = IOUtility.readString(newInputStream(expected.getBytes("UTF-8")), "UTF-8");
+    String actual = IOUtility.readString(newInputStream(expected.getBytes(StandardCharsets.UTF_8)), "UTF-8");
     assertEquals(expected, actual);
   }
 
   @Test
-  public void testReadStringFromStream2() throws Exception {
+  public void testReadStringFromStream2() {
     String data = "0123äöü";
     String expected = data.substring(0, 6);
-    String actual = IOUtility.readString(newInputStream(data.getBytes("UTF-8")), "UTF-8", 6);
+    String actual = IOUtility.readString(newInputStream(data.getBytes(StandardCharsets.UTF_8)), "UTF-8", 6);
     assertEquals(expected, actual);
   }
 
@@ -518,7 +537,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testReadStringLenthToSmall() {
+  public void testReadStringLengthToSmall() {
     String data = "0123";
     String expected = data.substring(0, 3);
     String actual = IOUtility.readString(newReader(data), 3);
@@ -575,11 +594,11 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testWriteStringToStream() throws Exception {
+  public void testWriteStringToStream() {
     String expected = "0123äöü";
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     IOUtility.writeString(out, "UTF-8", expected);
-    String actual = new String(out.toByteArray(), "UTF-8");
+    String actual = out.toString(StandardCharsets.UTF_8);
     assertEquals(expected, actual);
   }
 
@@ -590,41 +609,5 @@ public class IOUtilityTest {
     IOUtility.writeString(out, expected);
     String actual = out.toString();
     assertEquals(expected, actual);
-  }
-
-  @Test
-  public void testResourceTryNull() throws Exception {
-    try (InputStream res = (System.currentTimeMillis() == 0 ? new ByteArrayInputStream(new byte[15]) : null)) {
-      if (res != null) {
-        System.out.println("null resource: " + res);
-      }
-    }
-  }
-
-  @Test
-  public void testResourceTryError1() {
-    try (InputStream res = new FileInputStream("foo/bar/test")) {
-      if (res != null) {
-        System.out.println("null resource: " + res);
-      }
-    }
-    catch (Exception ex) {
-      assertEquals(ex.getClass(), java.io.FileNotFoundException.class);
-      return;
-    }
-    fail("should not go here");
-  }
-
-  @Test
-  public void testResourceTryError2() {
-    try (InputStream res = null) {
-      @SuppressWarnings({"resource", "unused"})
-      InputStream tmp = new FileInputStream("foo/bar/test");
-    }
-    catch (Exception ex) {
-      assertEquals(ex.getClass(), java.io.FileNotFoundException.class);
-      return;
-    }
-    fail("should not go here");
   }
 }
