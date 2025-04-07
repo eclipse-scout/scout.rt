@@ -48,9 +48,12 @@ public abstract class AbstractRemoveDoEntityContributionValueMigrationHandler<T 
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public T migrate(DataObjectMigrationContext ctx, T value) {
-    T clone = BEANS.get(DataObjectHelper.class).clone(value);
-    //noinspection deprecation
+    if (value.getAllContributions().stream().noneMatch(this::matchesContribution)) {
+      return value; // nothing to migrate
+    }
+    T clone = BEANS.get(DataObjectHelper.class).cloneLenient(value);
     clone.getAllContributions().removeIf(this::matchesContribution);
     return clone;
   }
@@ -59,7 +62,7 @@ public abstract class AbstractRemoveDoEntityContributionValueMigrationHandler<T 
     if (contribution == null) {
       return false;
     }
-    return getContributionTypeName().equals(contribution.get(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, String.class))
-        && getContributionTypeVersion().equals(contribution.get(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, String.class));
+    return getContributionTypeName().equals(contribution.getString(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME))
+        && getContributionTypeVersion().equals(contribution.getString(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME));
   }
 }

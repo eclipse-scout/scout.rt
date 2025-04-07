@@ -1,12 +1,16 @@
 /*
- * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
- * http://www.bsiag.com/
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.dataobject.migration;
 
 import static org.junit.Assert.*;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -44,11 +48,10 @@ public class AbstractRemoveDoEntityContributionValueMigrationHandlerTest {
   public void testMigrationOfDoEntityWithoutContribution() {
     SimpleFixtureDo fixture = createSimpleFixtureDo();
 
-    String fixtureJson = s_dataObjectMapper.writeValue(fixture);
     DataObjectMigrationContext ctx = BEANS.get(DataObjectMigrationContext.class).putGlobal(BEANS.get(DoValueMigrationIdsContextData.class).withAppliedValueMigrationIds(getAppliedValueMigrations()));
-    DataObjectMigratorResult<SimpleFixtureDo> result = BEANS.get(DataObjectMigrator.class).migrateDataObject(ctx, fixtureJson, SimpleFixtureDo.class);
+    DataObjectMigratorResult<SimpleFixtureDo> result = new TestDataObjectMigrator().applyValueMigration(ctx, fixture);
     assertFalse(result.isChanged());
-    assertEquals(fixture, result.getDataObject());
+    assertSame(fixture, result.getDataObject());
   }
 
   /**
@@ -60,25 +63,23 @@ public class AbstractRemoveDoEntityContributionValueMigrationHandlerTest {
     fixture.contribution(SecondSimpleContributionFixtureDo.class)
         .withSecondValue("mySecondValue");
 
-    String fixtureJson = s_dataObjectMapper.writeValue(fixture);
     DataObjectMigrationContext ctx = BEANS.get(DataObjectMigrationContext.class).putGlobal(BEANS.get(DoValueMigrationIdsContextData.class).withAppliedValueMigrationIds(getAppliedValueMigrations()));
-    DataObjectMigratorResult<SimpleFixtureDo> result = BEANS.get(DataObjectMigrator.class).migrateDataObject(ctx, fixtureJson, SimpleFixtureDo.class);
+    DataObjectMigratorResult<SimpleFixtureDo> result = new TestDataObjectMigrator().applyValueMigration(ctx, fixture);
     assertFalse(result.isChanged());
-    assertEquals(fixture, result.getDataObject());
+    assertSame(fixture, result.getDataObject());
   }
 
   /**
-   * Tests that the DO is not changed because the contribution to be removed still exists in the code.
+   * Tests that the data object is not changed because the contribution to be removed still exists in the code.
    */
   @Test
   public void testMigrationOfDoWithMatchingAndStillExistingContribution() {
     SimpleFixtureDo dataObject = createDataObjectWithExistingContribution();
 
-    String json = s_dataObjectMapper.writeValue(dataObject);
     DataObjectMigrationContext ctx = BEANS.get(DataObjectMigrationContext.class).putGlobal(BEANS.get(DoValueMigrationIdsContextData.class).withAppliedValueMigrationIds(getAppliedValueMigrations()));
-    DataObjectMigratorResult<SimpleFixtureDo> result = BEANS.get(DataObjectMigrator.class).migrateDataObject(ctx, json, SimpleFixtureDo.class);
+    DataObjectMigratorResult<SimpleFixtureDo> result = new TestDataObjectMigrator().applyValueMigration(ctx, dataObject);
     assertFalse(result.isChanged());
-    assertEquals(dataObject, result.getDataObject());
+    assertSame(dataObject, result.getDataObject());
   }
 
   /**
@@ -95,16 +96,10 @@ public class AbstractRemoveDoEntityContributionValueMigrationHandlerTest {
   @Test
   public void testMigrationOfDoWithMultipleContributions() {
     // Existing contribution 1 - should not be removed because the contribution still exists in the code
-    IDoEntity expectedExistingContribution1 = BEANS.get(DoEntity.class);
-    expectedExistingContribution1.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.FirstSimpleContributionFixture");
-    expectedExistingContribution1.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_1.VERSION.unwrap());
-    expectedExistingContribution1.put("firstValue", "myFirstValue");
+    FirstSimpleContributionFixtureDo expectedExistingContribution1 = createFirstSimpleContribution();
 
-    // Existing contribution 2 - no migration handler
-    IDoEntity expectedExistingContribution2 = BEANS.get(DoEntity.class);
-    expectedExistingContribution2.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.SecondSimpleContributionFixture");
-    expectedExistingContribution2.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_1.VERSION.unwrap());
-    expectedExistingContribution2.put("secondValue", "mySecondValue");
+    // Existing contribution 2 - should not be removed because the contribution still exists in the code and there is no migration handler to remove the contribution
+    SecondSimpleContributionFixtureDo expectedExistingContribution2 = createSecondSimpleContribution();
 
     // Unknown contribution 1 - should not be removed because of different type version
     IDoEntity expectedUnknownContribution1 = BEANS.get(DoEntity.class);
@@ -112,28 +107,22 @@ public class AbstractRemoveDoEntityContributionValueMigrationHandlerTest {
     expectedUnknownContribution1.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_2.VERSION.unwrap());
     expectedUnknownContribution1.put("testValue", "myTestValue");
 
-    // Unknown contribution 2 - no migration handler
+    // Unknown contribution 2 - should not be removed because there is no migration handler to remove the contribution
     IDoEntity expectedUnknownContribution2 = BEANS.get(DoEntity.class);
     expectedUnknownContribution2.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.MyOtherTestContribution");
     expectedUnknownContribution2.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_1.VERSION.unwrap());
     expectedUnknownContribution2.put("otherTestValue", "myOtherTestValue");
 
-    // build the DO manually, because we want to add unknown/invalid contributions
-    IDoEntity expectedDataObject = BEANS.get(DoEntity.class);
-    expectedDataObject.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.SimpleFixture");
-    expectedDataObject.put("name1", "myName1");
-    expectedDataObject.putList("_contributions", CollectionUtility.arrayList(expectedExistingContribution1, expectedExistingContribution2, expectedUnknownContribution1, expectedUnknownContribution2));
-
-    // serialize and deserialize the DO, so that we get a SimpleFixtureDo instead of a DoEntity
-    IDoEntity expected = s_dataObjectMapper.readValue(s_dataObjectMapper.writeValue(expectedDataObject), IDoEntity.class);
+    SimpleFixtureDo expected = createSimpleFixtureDo();
+    //noinspection deprecation
+    expected.getAllContributions().addAll(CollectionUtility.arrayList(expectedExistingContribution1, expectedExistingContribution2, expectedUnknownContribution1, expectedUnknownContribution2));
 
     testMigration(createDataObjectWithMultipleContributions(), expected);
   }
 
   protected void testMigration(IDoEntity value, IDoEntity expected) {
-    String json = s_dataObjectMapper.writeValue(value);
     DataObjectMigrationContext ctx = BEANS.get(DataObjectMigrationContext.class).putGlobal(BEANS.get(DoValueMigrationIdsContextData.class).withAppliedValueMigrationIds(getAppliedValueMigrations()));
-    DataObjectMigratorResult<IDoEntity> result = BEANS.get(DataObjectMigrator.class).migrateDataObject(ctx, json, IDoEntity.class);
+    DataObjectMigratorResult<IDoEntity> result = new TestDataObjectMigrator().applyValueMigration(ctx, value);
     assertTrue("Data object migration didn't change the data object", result.isChanged());
     assertEquals(expected, result.getDataObject());
   }
@@ -162,33 +151,25 @@ public class AbstractRemoveDoEntityContributionValueMigrationHandlerTest {
     return fixture;
   }
 
-  protected IDoEntity createDataObjectWithUnknownContribution() {
+  protected SimpleFixtureDo createDataObjectWithUnknownContribution() {
     // Unknown contribution
     IDoEntity contribution = BEANS.get(DoEntity.class);
     contribution.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.MyTestContribution");
     contribution.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_1.VERSION.unwrap());
     contribution.put("testValue", "myTestValue");
 
-    // build the DO manually, because we want to add unknown/invalid contributions
-    IDoEntity dataObject = BEANS.get(DoEntity.class);
-    dataObject.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.SimpleFixture");
-    dataObject.put("name1", "myName1");
-    dataObject.putList("_contributions", Collections.singletonList(contribution));
+    SimpleFixtureDo dataObject = createSimpleFixtureDo();
+    //noinspection deprecation
+    dataObject.getAllContributions().add(contribution);
     return dataObject;
   }
 
-  protected IDoEntity createDataObjectWithMultipleContributions() {
+  protected SimpleFixtureDo createDataObjectWithMultipleContributions() {
     // Existing contribution
-    IDoEntity simpleContribution1 = BEANS.get(DoEntity.class);
-    simpleContribution1.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.FirstSimpleContributionFixture");
-    simpleContribution1.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_1.VERSION.unwrap());
-    simpleContribution1.put("firstValue", "myFirstValue");
+    FirstSimpleContributionFixtureDo simpleContribution1 = createFirstSimpleContribution();
 
     // Existing contribution
-    IDoEntity simpleContribution2 = BEANS.get(DoEntity.class);
-    simpleContribution2.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.SecondSimpleContributionFixture");
-    simpleContribution2.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_1.VERSION.unwrap());
-    simpleContribution2.put("secondValue", "mySecondValue");
+    SecondSimpleContributionFixtureDo simpleContribution2 = createSecondSimpleContribution();
 
     // Unknown contribution 1
     IDoEntity nonExistingContribution1 = BEANS.get(DoEntity.class);
@@ -196,6 +177,7 @@ public class AbstractRemoveDoEntityContributionValueMigrationHandlerTest {
     nonExistingContribution1.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_1.VERSION.unwrap());
     nonExistingContribution1.put("testValue", "myTestValue");
 
+    // Unknown contribution 2 with different type version
     IDoEntity nonExistingContribution2 = BEANS.get(DoEntity.class);
     nonExistingContribution2.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.MyTestContribution");
     nonExistingContribution2.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_2.VERSION.unwrap());
@@ -207,15 +189,21 @@ public class AbstractRemoveDoEntityContributionValueMigrationHandlerTest {
     nonExistingContribution3.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_1.VERSION.unwrap());
     nonExistingContribution3.put("otherTestValue", "myOtherTestValue");
 
-    // build the DO manually, because we want to add unknown/invalid contributions
-    SimpleFixtureDo dataObject = BEANS.get(SimpleFixtureDo.class);
-    dataObject.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.SimpleFixture");
-    dataObject.put("name1", "myName1");
-    dataObject.putList("_contributions", CollectionUtility.arrayList(simpleContribution1, simpleContribution2, nonExistingContribution1, nonExistingContribution2, nonExistingContribution3));
-
-    BEANS.get(IDataObjectMapper.class).readValue(BEANS.get(IDataObjectMapper.class).writeValue(dataObject), IDoEntity.class);
+    SimpleFixtureDo dataObject = createSimpleFixtureDo();
+    //noinspection deprecation
+    dataObject.getAllContributions().addAll(CollectionUtility.arrayList(simpleContribution1, simpleContribution2, nonExistingContribution1, nonExistingContribution2, nonExistingContribution3));
 
     return dataObject;
+  }
+
+  protected FirstSimpleContributionFixtureDo createFirstSimpleContribution() {
+    return BEANS.get(FirstSimpleContributionFixtureDo.class)
+        .withFirstValue("myFirstValue");
+  }
+
+  protected SecondSimpleContributionFixtureDo createSecondSimpleContribution() {
+    return BEANS.get(SecondSimpleContributionFixtureDo.class)
+        .withSecondValue("mySecondValue");
   }
 
   /**

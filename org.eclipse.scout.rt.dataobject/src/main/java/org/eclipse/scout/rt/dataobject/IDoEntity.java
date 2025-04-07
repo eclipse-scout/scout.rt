@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -363,7 +363,7 @@ public interface IDoEntity extends IDataObject {
    * method might create an internal representation to store contributions which is usually not necessary if used
    * read-only.
    *
-   * @return A mutable collection of DO all entity contributions (never <code>null</code>).
+   * @return A mutable collection of all DO entity contributions (never <code>null</code>).
    * @deprecated This method returns ALL contributions of the DO, including the unknown ones, that may not implement {@link IDoEntityContribution}.
    * This method should only be used internally or for special DO migrations that need to access ALL contributions. To get the known contributions use {@link #getContributions} instead.
    */
