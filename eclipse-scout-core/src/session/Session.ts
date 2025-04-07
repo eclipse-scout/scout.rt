@@ -200,11 +200,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     $.extend(this.reconnector, options.reconnectorOptions);
     this.ajaxCallOptions = options.ajaxCallOptions;
 
-    // Set inspector flag by looking at URL params. This is required when running in offline mode.
-    // In online mode, the server may override this flag again, see _processStartupResponse().
-    if (this.url.getParameter('debug') === 'true' || this.url.getParameter('inspector') === 'true') {
-      this.inspector = true;
-    }
+    this._initInspector();
 
     if (this.url.getParameter('adapterExportEnabled') === 'true') {
       this.adapterExportEnabled = true;
@@ -218,6 +214,15 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     this.keyStrokeManager = scout.create(KeyStrokeManager, {
       session: this
     });
+  }
+
+  protected _initInspector() {
+    let devMode = config.get('scout.devMode')?.value;
+    let debugParam = strings.parseBoolean(this.url.getParameter('debug') as string);
+    let inspectorParam = strings.parseBoolean(this.url.getParameter('inspector') as string);
+    // Set inspector flag by looking at URL params and config property. This is required when running in offline or Scout JS only mode.
+    // In online mode, the server may override this flag later, see _processStartupResponse().
+    this.inspector = scout.nvl(inspectorParam, debugParam, devMode, false);
   }
 
   protected _throwError(message?: string) {

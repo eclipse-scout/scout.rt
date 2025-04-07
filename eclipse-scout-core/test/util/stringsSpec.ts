@@ -550,4 +550,24 @@ describe('strings', () => {
       expect(strings.truncateText(1234567 as any, 5)).toBe('12...');
     });
   });
+
+  describe('parseBoolean', () => {
+
+    it('returns true or false if the value is true or false ignoring case', () => {
+      expect(strings.parseBoolean('true')).toBe(true);
+      expect(strings.parseBoolean('TRUE')).toBe(true);
+      expect(strings.parseBoolean('tRuE')).toBe(true);
+      expect(strings.parseBoolean('false')).toBe(false);
+      expect(strings.parseBoolean('FALSE')).toBe(false);
+      expect(strings.parseBoolean('fAlSe')).toBe(false);
+    });
+
+    it('returns undefined if the value is not true or false or not a string', () => {
+      expect(strings.parseBoolean('foo')).toBe(undefined);
+      expect(strings.parseBoolean('')).toBe(undefined);
+      expect(strings.parseBoolean(' ')).toBe(undefined);
+      expect(strings.parseBoolean(undefined)).toBe(undefined);
+      expect(strings.parseBoolean(null)).toBe(undefined);
+    });
+  });
 });
