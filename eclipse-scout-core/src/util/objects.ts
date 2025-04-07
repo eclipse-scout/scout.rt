@@ -455,8 +455,7 @@ export const objects = {
   },
 
   /**
-   * Returns true if the given object is {@link isNullOrUndefined null or undefined}, an
-   * {@link arrays#empty empty array} or an {@link isEmpty empty object}.
+   * Returns true if the given object is {@link isNullOrUndefined null or undefined} or {@link isEmpty empty}.
    */
   isNullOrUndefinedOrEmpty(obj: any): boolean {
     if (objects.isNullOrUndefined(obj)) {
@@ -716,14 +715,15 @@ export const objects = {
   },
 
   /**
-   * Empty if the input is:
-   * * null
-   * * undefined
-   * * an empty array
-   * * an empty Map
-   * * an empty Set
-   * * or an object without keys (except Date which is never empty).
-   * @returns true if obj is empty, false if obj is not empty and undefined if obj is no object (e.g. a primitive).
+   * Empty if the argument is:
+   * - `null`
+   * - `undefined`
+   * - an empty {@link Array}
+   * - an empty {@link Map}
+   * - an empty {@link Set}
+   * - or an object without keys (except {@link Date} which is never empty).
+   *
+   * @returns `true` if *obj* is empty, `false` if *obj* is not empty, `undefined` if *obj* is no object (e.g. a primitive).
    */
   isEmpty(obj: any): boolean | undefined {
     if (objects.isNullOrUndefined(obj)) {
@@ -733,7 +733,7 @@ export const objects = {
       return arrays.empty(obj);
     }
     if (!objects.isObject(obj)) {
-      return;
+      return undefined;
     }
     if (obj instanceof Date) {
       return false;

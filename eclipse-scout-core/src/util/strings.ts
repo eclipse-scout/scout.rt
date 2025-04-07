@@ -443,5 +443,19 @@ export const strings = {
       }
     }
     return text.slice(0, lowerBound).trim() + '...';
+  },
+
+  /**
+   * @returns `true` or `false` if the given string is either `'true'` or `'false'` (ignoring case). Otherwise, `undefined` is returned.
+   */
+  parseBoolean(value: string): boolean {
+    value = value?.toLowerCase();
+    if (value === 'true') {
+      return true;
+    }
+    if (value === 'false') {
+      return false;
+    }
+    return undefined;
   }
 };
