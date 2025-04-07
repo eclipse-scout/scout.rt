@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.platform.util;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,25 +19,29 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.jar.JarOutputStream;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -60,6 +65,147 @@ public final class FileUtility {
   private FileUtility() {
   }
 
+  /**
+   * Extracts a zip archive from an {@link InputStream} to a target directory. Existing files will be overwritten. This method does not close the given {@link InputStream}!
+   *
+   * @param zipArchive
+   *     The {@link InputStream} to read the zipped data. Must contain a valid zip archive. The {@link InputStream} is not closed in this method.
+   * @param targetDir
+   *     The target directory in which the zip will be extracted. Must not be {@code null}. The directory will be created if not existing yet.
+   * @see #extractZip(InputStream, File, Charset)
+   */
+  public static void extractZip(InputStream zipArchive, File targetDir) throws IOException {
+    extractZip(zipArchive, targetDir, null);
+  }
+
+  /**
+   * Extracts a zip archive from an {@link InputStream} to a target directory. Existing files will be overwritten. This method does not close the given {@link InputStream}!
+   *
+   * @param zipArchive
+   *     The {@link InputStream} to read the zipped data. Must contain a valid zip archive. The {@link InputStream} is not closed in this method.
+   * @param targetDir
+   *     The target directory in which the zip will be extracted. Must not be {@code null}. The directory will be created if not existing yet.
+   * @param charset
+   *     Optional {@linkplain java.nio.charset.Charset charset} to be used to decode the zip entry name (ignored if the <i>language encoding bit</i> of the zip entry's general purpose bit flag is set). May be {@code null}. Default is
+   *     {@link StandardCharsets#UTF_8}.
+   * @see #extractZip(InputStream, Path, Charset)
+   */
+  public static void extractZip(InputStream zipArchive, File targetDir, Charset charset) throws IOException {
+    extractZip(zipArchive, targetDir.toPath(), charset);
+  }
+
+  /**
+   * Extracts a zip archive from an {@link InputStream} to a target directory. Existing files will be overwritten. This method does not close the given {@link InputStream}!
+   *
+   * @param zipArchive
+   *     The {@link InputStream} to read the zipped data. Must contain a valid zip archive. The {@link InputStream} is not closed in this method.
+   * @param targetDir
+   *     The target directory in which the zip will be extracted. Must not be {@code null}. The directory will be created if not existing yet.
+   * @see #extractZip(InputStream, Path, Charset)
+   */
+  public static void extractZip(InputStream zipArchive, Path targetDir) throws IOException {
+    extractZip(zipArchive, targetDir, null);
+  }
+
+  /**
+   * Extracts a zip archive from an {@link InputStream} to a target directory. Existing files will be overwritten. This method does not close the given {@link InputStream}!
+   *
+   * @param zipArchive
+   *     The {@link InputStream} to read the zipped data. Must contain a valid zip archive. The {@link InputStream} is not closed in this method.
+   * @param targetDir
+   *     The target directory in which the zip will be extracted. Must not be {@code null}. The directory will be created if not existing yet.
+   * @param charset
+   *     Optional {@linkplain java.nio.charset.Charset charset} to be used to decode the zip entry name (ignored if the <i>language encoding bit</i> of the zip entry's general purpose bit flag is set). May be {@code null}. Default is
+   *     {@link StandardCharsets#UTF_8}.
+   */
+  public static void extractZip(InputStream zipArchive, Path targetDir, Charset charset) throws IOException {
+    Path target = targetDir.toAbsolutePath().normalize();
+    Files.createDirectories(target);
+    ZipInputStream zis = new ZipInputStream(zipArchive, charset == null ? StandardCharsets.UTF_8 : charset);
+    ZipEntry entry;
+    while ((entry = zis.getNextEntry()) != null) {
+      extractZipEntry(entry, zis, target);
+      zis.closeEntry();
+    }
+  }
+
+  /**
+   * Extracts a zip archive to a target directory. Existing files will be overwritten.
+   *
+   * @param archiveFile
+   *     The zip file to extract. Must be an existing zip file.
+   * @param targetDir
+   *     The target directory in which the zip will be extracted. Must not be {@code null}. The directory will be created if not existing yet.
+   */
+  public static void extractZip(File archiveFile, File targetDir) throws IOException {
+    extractZip(archiveFile.toPath(), targetDir.toPath());
+  }
+
+  /**
+   * Extracts a zip archive to a target directory. Existing files will be overwritten.
+   *
+   * @param archiveFile
+   *     The zip file to extract. Must be an existing zip file.
+   * @param targetDir
+   *     The target directory in which the zip will be extracted. Must not be {@code null}. The directory will be created if not existing yet.
+   */
+  public static void extractZip(Path archiveFile, Path targetDir) throws IOException {
+    Path target = targetDir.toAbsolutePath().normalize();
+    Files.createDirectories(target);
+    Files.setLastModifiedTime(target, Files.getLastModifiedTime(archiveFile));
+    try (ZipFile zipFile = new ZipFile(archiveFile.toFile())) {
+      Enumeration<? extends ZipEntry> entries = zipFile.entries();
+      while (entries.hasMoreElements()) {
+        ZipEntry entry = entries.nextElement();
+        if (entry.isDirectory()) {
+          extractZipEntry(entry, null, target);
+        }
+        else {
+          try (InputStream is = zipFile.getInputStream(entry)) {
+            extractZipEntry(entry, is, target);
+          }
+        }
+      }
+    }
+  }
+
+  private static void extractZipEntry(ZipEntry entry, InputStream data, Path targetRoot) throws IOException {
+    Path targetFile = targetRoot.resolve(entry.getName()).normalize();
+    if (!targetFile.startsWith(targetRoot)) {
+      // security check (see https://github.com/snyk/zip-slip-vulnerability)
+      throw new IllegalArgumentException("Zip entry is outside of target dir: " + targetFile);
+    }
+    if (entry.isDirectory()) {
+      Files.createDirectories(targetFile);
+    }
+    else {
+      Files.createDirectories(targetFile.getParent());
+      Files.copy(data, targetFile, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    long time = entry.getTime();
+    if (time >= 0) {
+      Files.setLastModifiedTime(targetFile, FileTime.fromMillis(time));
+    }
+  }
+
+  /**
+   * Extracts a zip archive to a target directory.
+   * <p>
+   * If the zip contains a root folder with the same name as the target directory, the content of this root folder is directly extracted to the target.
+   * So there will no subfolder be created having the same name as the target directory!
+   * This is mainly for zips having a single root folder. It may fail if the zip contains various items on top-level including a folder with the target name.
+   * If this behavior is not required {@link #extractZip(Path, Path)} should be preferred.
+   *
+   * @param archiveFile
+   *     The zip file to extract. Must be an existing zip file.
+   * @param targetDir
+   *     The target directory in which the zip will be extracted. Must not be {@code null}. The directory will be created if not existing yet.
+   * @deprecated This method uses a dangerous special handling for zip directories with the same name as the target directory and will be removed in Scout 26.2. Use {@link #extractZip(File, File)} instead. If top-level directories exist,
+   * they should be removed manually afterward.
+   */
+  @Deprecated
+  @SuppressWarnings({"ResultOfMethodCallIgnored", "DeprecatedIsStillUsed" /* tests only */})
   public static void extractArchive(File archiveFile, File targetDir) throws IOException {
     File destinationDir = targetDir.getCanonicalFile();
     Path destinationPath = destinationDir.toPath();
@@ -83,37 +229,17 @@ public final class FileUtility {
           throw new IllegalArgumentException("Entry is outside of the target dir: " + name);
         }
 
-        if (file.isDirectory()) { // if its a directory, create it
+        if (file.isDirectory()) { // if it's a directory, create it
           f.mkdirs();
-          if (file.getTime() >= 0) {
-            f.setLastModified(file.getTime());
-          }
         }
         else {
           f.getParentFile().mkdirs();
-          InputStream is = null;
-          FileOutputStream fos = null;
-          try {
-            is = jar.getInputStream(file);
-            fos = new FileOutputStream(f);
-            // Copy the bits from instream to outstream
-            byte[] buf = new byte[102400];
-            int len;
-            while ((len = is.read(buf)) > 0) {
-              fos.write(buf, 0, len);
-            }
+          try (InputStream is = jar.getInputStream(file); FileOutputStream fos = new FileOutputStream(f)) {
+            is.transferTo(fos);
           }
-          finally {
-            if (fos != null) {
-              fos.close();
-            }
-            if (is != null) {
-              is.close();
-            }
-          }
-          if (file.getTime() >= 0) {
-            f.setLastModified(file.getTime());
-          }
+        }
+        if (file.getTime() >= 0) {
+          f.setLastModified(file.getTime());
         }
       }
     }
@@ -130,6 +256,7 @@ public final class FileUtility {
    * @throws IOException
    *     if an error occurs during the copy operation
    */
+  @SuppressWarnings("ResultOfMethodCallIgnored")
   public static void copyFile(File source, File dest) throws IOException {
     if (!source.exists()) {
       throw new FileNotFoundException(source.getAbsolutePath());
@@ -212,16 +339,10 @@ public final class FileUtility {
       // source can not be a directory
       throw new IOException("source is a directory: " + source);
     }
-    try (FileInputStream input = new FileInputStream(source)) {
-      byte[] data = new byte[(int) source.length()];
-      int n = 0;
-      while (n < data.length) {
-        n += input.read(data, n, data.length - n);
-      }
-      return data;
-    }
+    return Files.readAllBytes(source.toPath());
   }
 
+  @SuppressWarnings("ResultOfMethodCallIgnored")
   public static void copyTree(File sourceLocation, File targetLocation) throws IOException {
     if (sourceLocation.isDirectory()) {
       if (!targetLocation.exists()) {
@@ -230,7 +351,7 @@ public final class FileUtility {
       }
 
       String[] children = sourceLocation.list();
-      if (children != null && children.length > 0) {
+      if (children != null) {
         for (String aChildren : children) {
           copyTree(new File(sourceLocation, aChildren), new File(targetLocation, aChildren));
         }
@@ -253,7 +374,7 @@ public final class FileUtility {
         list.add(f);
       }
       String[] children = f.list();
-      if (children != null && children.length > 0) {
+      if (children != null) {
         for (String aChildren : children) {
           listTreeRec(new File(f, aChildren), list, includeFiles, includeFolders);
         }
@@ -266,36 +387,45 @@ public final class FileUtility {
     }
   }
 
+  /**
+   * Creates a zip file with the content of the given directory. Hidden files are skipped (see {@link File#isHidden()}).
+   *
+   * @param srcDir
+   *     The content of this directory will be added to the archive. It must be an existing directory.
+   * @param archiveFile
+   *     The name of the zip file to create. If the file exists, it is overwritten.
+   */
+  @SuppressWarnings("ResultOfMethodCallIgnored")
   public static void compressArchive(File srcDir, File archiveFile) throws IOException {
     archiveFile.delete();
-    try (JarOutputStream zOut = new JarOutputStream(new FileOutputStream(archiveFile))) {
-      addFolderToJar(srcDir, srcDir, zOut);
+    try (ZipOutputStream zOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(archiveFile)))) {
+      addFolderToZip(srcDir, srcDir, zOut);
     }
   }
 
-  private static void addFolderToJar(File baseDir, File srcdir, JarOutputStream zOut) throws IOException {
-    if (!srcdir.exists() || !srcdir.isDirectory()) {
-      throw new IOException("source directory " + srcdir + " does not exist or is not a folder");
+  private static void addFolderToZip(File baseDir, File srcDir, ZipOutputStream zOut) throws IOException {
+    if (!srcDir.exists() || !srcDir.isDirectory()) {
+      throw new IOException("source directory " + srcDir + " does not exist or is not a folder");
     }
 
-    File[] files = srcdir.listFiles();
+    File[] files = srcDir.listFiles();
     if (files == null || files.length < 1) {
       return;
     }
 
     for (File f : files) {
-      if (f.exists() && (!f.isHidden())) {
+      if (f.exists() && !f.isHidden()) {
         if (f.isDirectory()) {
-          addFolderToJar(baseDir, f, zOut);
+          addFolderToZip(baseDir, f, zOut);
         }
         else {
-          addFileToJar(baseDir, f, zOut);
+          addFileToZip(baseDir, f, zOut);
         }
       }
     }
   }
 
-  private static void addFileToJar(File baseDir, File src, JarOutputStream zOut) throws IOException {
+  private static void addFileToZip(File baseDir, File src, ZipOutputStream zOut) throws IOException {
     String name = src.getAbsolutePath();
     String prefix = baseDir.getAbsolutePath();
     if (prefix.endsWith("/") || prefix.endsWith("\\")) {
@@ -303,12 +433,11 @@ public final class FileUtility {
     }
     name = name.substring(prefix.length() + 1);
     name = name.replace('\\', '/');
-    long timestamp = src.lastModified();
-    byte[] data = readFile(src);
-    addFileToJar(name, data, timestamp, zOut);
+
+    addFileToZip(name, readFile(src), src.lastModified(), zOut);
   }
 
-  private static void addFileToJar(String name, byte[] data, long timestamp, JarOutputStream zOut) throws IOException {
+  private static void addFileToZip(String name, byte[] data, long timestamp, ZipOutputStream zOut) throws IOException {
     ZipEntry entry = new ZipEntry(name);
     entry.setTime(timestamp);
     zOut.putNextEntry(entry);
@@ -403,9 +532,7 @@ public final class FileUtility {
   }
 
   /**
-   * @param file
-   * @return the file-extension of the given file or null when file has no file-extension. Example "foo.png" will return
-   * "png".
+   * @return the file-extension of the given file or null when file has no file-extension. Example "foo.png" will return "png".
    */
   public static String getFileExtension(File file) {
     if (file == null) {
@@ -415,7 +542,6 @@ public final class FileUtility {
   }
 
   /**
-   * @param fileName
    * @return the file-extension of the given file or null when file has no file-extension. Example "foo.png" will return
    * "png".
    */
@@ -428,7 +554,6 @@ public final class FileUtility {
   }
 
   /**
-   * @param file
    * @return an array with two elements, [0] contains the file-name without extension [1] contains the file-extension
    */
   public static String[] getFilenameParts(File file) {
@@ -439,7 +564,6 @@ public final class FileUtility {
   }
 
   /**
-   * @param fileName
    * @return an array with two elements, [0] contains the file-name without extension [1] contains the file-extension
    */
   public static String[] getFilenameParts(String fileName) {
@@ -560,9 +684,7 @@ public final class FileUtility {
     if (file == null || file.isDirectory() || !file.canRead() || file.length() < 4) {
       return false;
     }
-    try (
-        @SuppressWarnings("squid:S2095")
-        DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
+    try (DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
       int test = in.readInt();
       return test == 0x504b0304; // magic number of a zip file
     }
@@ -657,21 +779,20 @@ public final class FileUtility {
   /**
    * Unzips the given ZIP archive.
    *
-   * @return array of files contained in ZIP archive
+   * @return array of top-level files contained in ZIP archive. Never returns {@code null}.
    */
   public static File[] unzipArchive(File zipArchive) {
-    List<File> files = new LinkedList<>();
     File tempDir = IOUtility.createTempDirectory("");
     try {
-      FileUtility.extractArchive(zipArchive, tempDir);
+      extractZip(zipArchive, tempDir);
       File[] list = tempDir.listFiles();
-      if (list != null && list.length > 0) {
-        Collections.addAll(files, list);
+      if (list == null) {
+        return new File[0];
       }
-      return files.toArray(new File[0]);
+      return list;
     }
     catch (IOException e) {
-      throw new ProcessingException("Could not unzip archive", e);
+      throw new ProcessingException("Could not unzip archive.", e);
     }
   }
 

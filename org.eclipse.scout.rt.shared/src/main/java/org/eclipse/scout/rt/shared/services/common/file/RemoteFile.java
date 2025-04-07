@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -42,16 +42,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * file path with / as delimiter
+ * content encoded in utf-8 and then compressed!!!
  */
-// content encoded in utf-8 and then compressed!!!
-
 public class RemoteFile implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(RemoteFile.class);
 
   private static final int ONE_HUNDRED_KILO_BYTE = 102400;
   public static final long DEFAULT_MAX_BLOCK_SIZE = 20000000; // 20MB
-  private static final String DEFAULT_CHARSETNAME = StandardCharsets.UTF_8.name();
+  private static final String DEFAULT_CHARSET_NAME = StandardCharsets.UTF_8.name();
   private static final long serialVersionUID = 1L;
+
   private String m_dir;
   private String m_name;
   private String m_contentType;
@@ -62,10 +62,10 @@ public class RemoteFile implements Serializable {
   private boolean m_exists;
   private long m_crc = -1;
   private byte[] m_compressedData;
-  private String m_charsetName = DEFAULT_CHARSETNAME;
+  private String m_charsetName = DEFAULT_CHARSET_NAME;
 
   public RemoteFile(URL url, boolean ignoreFolders) {
-    this(url, ignoreFolders, DEFAULT_CHARSETNAME);
+    this(url, ignoreFolders, DEFAULT_CHARSET_NAME);
   }
 
   public RemoteFile(URL url, boolean ignoreFolders, String charsetName) {
@@ -106,7 +106,7 @@ public class RemoteFile implements Serializable {
   }
 
   public RemoteFile(String dir, String name, Locale locale, long lastModified) {
-    this(dir, name, locale, lastModified, DEFAULT_CHARSETNAME);
+    this(dir, name, locale, lastModified, DEFAULT_CHARSET_NAME);
   }
 
   public RemoteFile(String dir, String name, Locale locale, long lastModified, String charsetName) {
@@ -126,7 +126,7 @@ public class RemoteFile implements Serializable {
   }
 
   public RemoteFile(String dir, String name, long lastModified) {
-    this(dir, name, lastModified, DEFAULT_CHARSETNAME);
+    this(dir, name, lastModified, DEFAULT_CHARSET_NAME);
   }
 
   public RemoteFile(String dir, String name, long lastModified, String charsetName) {
@@ -134,7 +134,7 @@ public class RemoteFile implements Serializable {
   }
 
   public RemoteFile(String path, long lastModified) {
-    this(path, lastModified, DEFAULT_CHARSETNAME);
+    this(path, lastModified, DEFAULT_CHARSET_NAME);
   }
 
   public RemoteFile(String path, long lastModified, String charsetName) {
@@ -241,9 +241,7 @@ public class RemoteFile implements Serializable {
   }
 
   /**
-   * @return true if this is a large file that could not be transfered in one block. Use
-   * {@link IRemoteFileService#getRemoteFilePart(RemoteFile, long)} to get the next block of the large server
-   * file.
+   * @return true if this is a large file that could not be transferred in one block. Use {@link IRemoteFileService#getRemoteFilePart(RemoteFile, long)} to get the next block of the large server file.
    */
   public boolean hasMoreParts() {
     return getContentLength() == DEFAULT_MAX_BLOCK_SIZE;
@@ -307,67 +305,28 @@ public class RemoteFile implements Serializable {
     return writeData(new FileOutputStream(f));
   }
 
+  /**
+   * Write data and close stream
+   */
   public long/* crc */ writeData(Writer w) throws IOException {
-    Reader in = null;
-    BufferedWriter out = null;
-    try {
-      in = getDecompressedReader();
-      out = new BufferedWriter(w);
-      char[] b = new char[ONE_HUNDRED_KILO_BYTE];
-      int len;
-      while ((len = in.read(b)) > 0) {
-        out.write(b, 0, len);
-      }
-      out.flush();
-    }
-    finally {
-      if (out != null) {
-        out.close();
-      }
-      if (in != null) {
-        in.close();
-      }
+    try (Reader in = getDecompressedReader(); BufferedWriter out = new BufferedWriter(w)) {
+      in.transferTo(out);
     }
     return getCRC();
   }
 
   /**
    * Write data and close stream
-   *
-   * @param os
-   * @return
-   * @throws IOException
    */
   public long/* crc */ writeData(OutputStream os) throws IOException {
-    InputStream in = null;
-    BufferedOutputStream out = null;
-    try {
-      in = getDecompressedInputStream();
-      out = new BufferedOutputStream(os);
-      byte[] b = new byte[ONE_HUNDRED_KILO_BYTE];
-      int len;
-      while ((len = in.read(b)) > 0) {
-        out.write(b, 0, len);
-      }
-      out.flush();
-    }
-    finally {
-      if (out != null) {
-        out.close();
-      }
-      if (in != null) {
-        in.close();
-      }
+    try (InputStream in = getDecompressedInputStream(); BufferedOutputStream out = new BufferedOutputStream(os)) {
+      in.transferTo(out);
     }
     return getCRC();
   }
 
   /**
    * Read data from file
-   *
-   * @param f
-   * @return
-   * @throws IOException
    */
   @SuppressWarnings("resource")
   public long/* crc */ readData(File f) throws IOException {
@@ -376,42 +335,17 @@ public class RemoteFile implements Serializable {
 
   /**
    * Read data and close stream
-   *
-   * @param f
-   * @return
-   * @throws IOException
    */
   public long/* crc */ readData(Reader r) throws IOException {
-    Writer out = null;
-    BufferedReader in = null;
-    try {
-      in = new BufferedReader(r);
-      out = getCompressedWriter();
-      char[] b = new char[ONE_HUNDRED_KILO_BYTE];
-      int len;
-      while ((len = in.read(b)) > 0) {
-        out.write(b, 0, len);
-      }
-      out.flush();
+    try (BufferedReader in = new BufferedReader(r); Writer out = getCompressedWriter()) {
+      in.transferTo(out);
       m_exists = true;
-    }
-    finally {
-      if (out != null) {
-        out.close();
-      }
-      if (in != null) {
-        in.close();
-      }
     }
     return getCRC();
   }
 
   /**
    * Read data and close stream
-   *
-   * @param is
-   * @return
-   * @throws IOException
    */
   public long/* crc */ readData(InputStream is) throws IOException {
     return readData(is, 0, -1);
@@ -419,12 +353,6 @@ public class RemoteFile implements Serializable {
 
   /**
    * Read data and close stream
-   *
-   * @param is
-   * @param startPosition
-   * @param maxReadSize
-   * @return
-   * @throws IOException
    */
   public long/* crc */ readData(InputStream is, long startPosition, long maxReadSize) throws IOException {
     OutputStream out = null;
@@ -477,12 +405,10 @@ public class RemoteFile implements Serializable {
    * If the remote file is a zip archive, unpack its content to the directory see
    * {@link #readZipContentFromDirectory(File)}
    */
-  @SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
   public void writeZipContentToDirectory(File directory) throws IOException {
-    directory.mkdirs();
-    File tmp = File.createTempFile("tmp", ".zip");
-    writeData(tmp);
-    FileUtility.extractArchive(tmp, directory);
+    try (InputStream in = getDecompressedInputStream()) {
+      FileUtility.extractZip(in, directory);
+    }
   }
 
   /**
@@ -501,7 +427,7 @@ public class RemoteFile implements Serializable {
   }
 
   /**
-   * @ince 2.7
+   * @since 2.7
    */
   public void setContentTypeByExtension(String ext) {
     setContentType(getContentTypeForExtension(ext));

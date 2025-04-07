@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -41,6 +41,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,8 +65,6 @@ import org.slf4j.LoggerFactory;
 public final class IOUtility {
   private static final Logger LOG = LoggerFactory.getLogger(IOUtility.class);
 
-  public static final int BUFFER_SIZE = 10240;
-
   private IOUtility() {
   }
 
@@ -72,9 +72,12 @@ public final class IOUtility {
     return getContent(assertNotNull(toFile(filename)));
   }
 
+  /**
+   * @see Files#readAllBytes(Path)
+   */
   public static byte[] getContent(File file) {
-    try (FileInputStream in = new FileInputStream(file)) {
-      return readBytes(in);
+    try {
+      return Files.readAllBytes(file.toPath());
     }
     catch (IOException e) {
       throw new ProcessingException("filename: " + file.getAbsolutePath(), e);
@@ -254,11 +257,7 @@ public final class IOUtility {
     }
     else {
       try (StringWriter buffer = new StringWriter()) {
-        char[] b = new char[BUFFER_SIZE];
-        int k;
-        while ((k = in.read(b)) > 0) {
-          buffer.write(b, 0, k);
-        }
+        in.transferTo(buffer);
         return buffer.toString();
       }
       catch (IOException e) {
@@ -276,12 +275,8 @@ public final class IOUtility {
   }
 
   public static byte[] uncompressGzip(byte[] b) throws IOException {
-    try (BufferedInputStream in = new BufferedInputStream(new GZIPInputStream(new ByteArrayInputStream(b)));
-         ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-      int val;
-      while ((val = in.read()) >= 0) {
-        out.write(val);
-      }
+    try (InputStream in = new GZIPInputStream(new ByteArrayInputStream(b)); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+      in.transferTo(out);
       return out.toByteArray();
     }
   }
@@ -290,7 +285,7 @@ public final class IOUtility {
    * Unzips the given ZIP archive as a collection of BinaryResources. Unzipping happens in-memory, no files are written.
    * The optional parameter <code>entryNameFilterPattern</code> allows to filter the ZIP for matching file entries.
    * Unzipping will be performed with the UTF-8 charset. If this fails, unzipping with the legacy charset Cp437 will
-   * performed. If this fails again or Cp437 is not supported by the JVM used, an <code>IllegalArgumentException</code>
+   * be performed. If this fails again or Cp437 is not supported by the JVM used, an <code>IllegalArgumentException</code>
    * is thrown.
    *
    * @param zipArchive
@@ -301,7 +296,7 @@ public final class IOUtility {
    */
   public static Collection<BinaryResource> unzip(byte[] zipArchive, Pattern filterPattern) throws IOException {
     try {
-      return unzip(zipArchive, filterPattern, StandardCharsets.UTF_8);
+      return unzip(zipArchive, filterPattern, null);
     }
     catch (IllegalArgumentException e) {
       Charset charset;
@@ -328,11 +323,17 @@ public final class IOUtility {
    * @return A collection of binary resources contained in the ZIP archive
    */
   public static Collection<BinaryResource> unzip(byte[] zipArchive, Pattern filterPattern, Charset charset) throws IOException {
-    try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipArchive), charset)) {
+    try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipArchive), charset == null ? StandardCharsets.UTF_8 : charset)) {
       List<BinaryResource> list = new ArrayList<>();
       ZipEntry entry;
       while ((entry = zis.getNextEntry()) != null) {
-        if (filterPattern != null && !filterPattern.matcher(entry.getName()).matches()) {
+        String entryName = entry.getName();
+        if (Paths.get(entryName).normalize().startsWith("..")) {
+          // security check (see https://github.com/snyk/zip-slip-vulnerability)
+          throw new IllegalArgumentException("Zip entry is outside of root dir: " + entryName);
+        }
+
+        if (filterPattern != null && !filterPattern.matcher(entryName).matches()) {
           continue;
         }
 
@@ -342,11 +343,11 @@ public final class IOUtility {
         }
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        IOUtility.writeFromToStream(bos, zis);
+        writeFromToStream(bos, zis);
         bos.close();
 
         BinaryResource res = BinaryResources.create()
-            .withFilename(entry.getName())
+            .withFilename(entryName)
             .withContent(bos.toByteArray())
             .withLastModified(entry.getTime())
             .build();
@@ -451,7 +452,7 @@ public final class IOUtility {
   }
 
   /**
-   * Write string.
+   * Write bytes to an output stream without throwing a checked exception. {@link ProcessingException} is thrown instead.
    * <p>
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    */
@@ -471,30 +472,18 @@ public final class IOUtility {
    * @since 6.1
    */
   public static long writeFromToStream(OutputStream out, InputStream in) throws IOException {
-    int numRead = 0;
-    long count = 0;
-    byte[] data = new byte[BUFFER_SIZE];
-
-    while ((numRead = in.read(data)) > 0) {
-      out.write(data, 0, numRead);
-      count += numRead;
-    }
-    return count;
+    return in.transferTo(out);
   }
 
   /**
-   * Write string in UTF8 encoding.
-   * <p>
-   * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
+   * Write string in UTF8 encoding. The given {@link OutputStream} is automatically closed.
    */
   public static void writeStringUTF8(OutputStream out, String s) {
     writeString(out, StandardCharsets.UTF_8.name(), s);
   }
 
   /**
-   * Write string.
-   * <p>
-   * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
+   * Write string. The given {@link OutputStream} is automatically closed.
    */
   public static void writeString(OutputStream out, String charset, String s) {
     try (OutputStreamWriter w = new OutputStreamWriter(out, charset)) {
@@ -737,7 +726,7 @@ public final class IOUtility {
    *
    * @param dir
    *     directory to be deleted
-   * @return true if the directory is successfully deleted or does not exists; false otherwise
+   * @return true if the directory is successfully deleted or does not exist; false otherwise
    * @throws SecurityException
    *     - If a security manager exists and its check methods deny read or delete access
    */
@@ -763,9 +752,7 @@ public final class IOUtility {
     if (f != null && f.exists()) {
       return deleteDirectory(f);
     }
-    else {
-      return false;
-    }
+    return false;
   }
 
   public static boolean createDirectory(String dir) {
@@ -806,39 +793,26 @@ public final class IOUtility {
     if (filepath == null) {
       return 0;
     }
-    else {
-      File f = toFile(filepath);
-      return getFileSize(f);
-    }
+    File f = toFile(filepath);
+    return getFileSize(f);
   }
 
   public static long getFileSize(File filepath) {
-    if (filepath == null) {
+    if (filepath == null || !filepath.exists()) {
       return 0;
     }
-    else {
-      if (filepath.exists()) {
-        return filepath.length();
-      }
-      else {
-        return 0;
-      }
-    }
+    return filepath.length();
   }
 
   public static long getFileLastModified(String filepath) {
     if (filepath == null) {
       return 0;
     }
-    else {
-      File f = toFile(filepath);
-      if (f.exists()) {
-        return f.lastModified();
-      }
-      else {
-        return 0;
-      }
+    File f = toFile(filepath);
+    if (f.exists()) {
+      return f.lastModified();
     }
+    return 0;
   }
 
   /**
@@ -859,9 +833,7 @@ public final class IOUtility {
     if (s == null) {
       return null;
     }
-    else {
-      return new File(s.replace('\\', File.separatorChar).replace('/', File.separatorChar));
-    }
+    return new File(s.replace('\\', File.separatorChar).replace('/', File.separatorChar));
   }
 
   /**
@@ -942,7 +914,7 @@ public final class IOUtility {
   }
 
   /**
-   * The text passed to this method is tried to wellform as an URL. If the text can not be transformed into an URL the
+   * The text passed to this method is tried to wellform as a URL. If the text can not be transformed into a URL the
    * method returns null.
    */
   public static URL urlTextToUrl(String urlText) {
@@ -973,15 +945,14 @@ public final class IOUtility {
   /**
    * Append a file to another. The provided {@link PrintWriter} will neither be flushed nor closed.
    * <p>
-   * ATTENTION: Appending a file to itself using an autoflushing PrintWriter, will lead to an endless loop. (Appending a
-   * file to itself using a Printwriter without autoflushing is safe.)
+   * ATTENTION: Appending a file to itself using an auto flushing PrintWriter, will lead to an endless loop. (Appending a file to itself using a {@link PrintWriter} without auto flushing is safe.)
    *
    * @param writer
    *     a PrintWriter for the destination file
    * @param file
    *     source file
    * @throws ProcessingException
-   *     if an {@link IOException} occurs (e.g. if file does not exists)
+   *     if an {@link IOException} occurs (e.g. if file does not exist)
    */
   public static void appendFile(PrintWriter writer, File file) {
     try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -1002,11 +973,11 @@ public final class IOUtility {
    *     The name of a supported {@link Charset </code>charset<code>}
    * @return List containing all lines of the file as Strings
    * @throws ProcessingException
-   *     if an {@link IOException} occurs (e.g. if file does not exists)
+   *     if an {@link IOException} occurs (e.g. if file does not exist)
    */
   public static List<String> readLines(File file, String charsetName) {
     try {
-      return CollectionUtility.arrayList(Files.readAllLines(file.toPath(), Charset.forName(charsetName)));
+      return Files.readAllLines(file.toPath(), Charset.forName(charsetName));
     }
     catch (IOException e) {
       throw new ProcessingException("Error reading all lines of file '{}'", file, e);
