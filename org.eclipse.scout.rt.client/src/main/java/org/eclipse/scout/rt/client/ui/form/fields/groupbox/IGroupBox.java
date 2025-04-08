@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -177,6 +177,8 @@ public interface IGroupBox extends ICompositeField, IPreferenceField {
    * buttons with processButton=true and systemType<>none
    */
   List<IButton> getSystemProcessButtons();
+
+  void setBodyGrid(IGroupBoxBodyGrid bodyGrid);
 
   @Override
   IFormFieldContextMenu getContextMenu();
