@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -42,7 +42,7 @@ public class DoEntityBuilder {
   /**
    * Adds new value to attribute map of entity if the value satisfies the given {@code predicate}.
    */
-  public DoEntityBuilder putIf(String attributeName, Object value, Predicate<? super Object> predicate) {
+  public <V> DoEntityBuilder putIf(String attributeName, V value, Predicate<V> predicate) {
     m_entity.putIf(attributeName, value, predicate);
     return this;
   }

@@ -62,7 +62,7 @@ public interface IDoEntity extends IDataObject {
   /**
    * Adds new value to attribute map of entity if the value satisfies the given {@code predicate}.
    */
-  default void putIf(String attributeName, Object value, Predicate<? super Object> predicate) {
+  default <V> void putIf(String attributeName, V value, Predicate<V> predicate) {
     if (predicate.test(value)) {
       put(attributeName, value);
     }
