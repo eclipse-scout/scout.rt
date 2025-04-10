@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.dataobject.fixture.SecondSimpleContributionFixtureDo
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.junit.Test;
 
@@ -673,9 +674,9 @@ public class DoEntityTest {
     DoEntity entity2 = BEANS.get(DoEntity.class);
 
     assertNotEquals(null, entity1);
-    assertNotEquals(entity1, new Object());
+    assertNotEquals(new Object(), entity1);
 
-    assertEquals(entity1, entity1);
+    assertNotSame(entity1, entity2);
     assertEquals(entity1, entity2);
     assertEquals(entity2, entity1);
     assertEquals(entity1.hashCode(), entity2.hashCode());
@@ -778,11 +779,16 @@ public class DoEntityTest {
     DoEntity expected = BEANS.get(DoEntity.class);
     expected.put("foo1", "value1");
     expected.put("foo3", "value3");
+    expected.put("foo4", "value4");
 
     DoEntity actual = BEANS.get(DoEntity.class);
     actual.putIf("foo1", "value1", Objects::nonNull);
     actual.putIf("foo2", null, Objects::nonNull);
     actual.putIf("foo3", "value3", Objects::nonNull);
+
+    actual.putIf("foo4", "value4", StringUtility::hasText);
+    actual.putIf("foo5", " ", StringUtility::hasText);
+    actual.putIf("foo6", null, StringUtility::hasText);
 
     assertEqualsWithComparisonFailure(expected, actual);
   }

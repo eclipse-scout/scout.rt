@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,7 @@ import java.util.Objects;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.Test;
 
 public class DoEntityBuilderTest {
@@ -27,6 +28,7 @@ public class DoEntityBuilderTest {
     expected.put("attribute1", "foo");
     expected.put("attribute2", 42);
     expected.put("attribute3", "bar");
+    expected.put("attribute5", "bar");
     expected.putList("listAttribute1", CollectionUtility.arrayList(1, 2, 3));
     expected.putList("listAttribute2", CollectionUtility.arrayList(4, 5, 6));
 
@@ -35,6 +37,9 @@ public class DoEntityBuilderTest {
         .put("attribute2", 42)
         .putIf("attribute3", "bar", Objects::nonNull)
         .putIf("attribute4", null, Objects::nonNull)
+        .putIf("attribute5", "bar", StringUtility::hasText)
+        .putIf("attribute6", " ", StringUtility::hasText)
+        .putIf("attribute7", null, StringUtility::hasText)
         .putList("listAttribute1", 1, 2, 3)
         .putList("listAttribute2", Arrays.asList(4, 5, 6))
         .putListIf("listAttribute3", CollectionUtility.emptyArrayList(), v -> !v.isEmpty())
