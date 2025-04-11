@@ -159,7 +159,7 @@ public abstract class AbstractAsyncHttpClientManager<BUILDER> implements IPlatfo
    * calls on the proxy are wrapped with the specific {@link RunContext} (which contains additional context information
    * e.g. for logging).
    */
-  public <T> T createAsyncInvocationHandler(Class<T> clazz, T actualObject) {
+  protected <T> T createAsyncInvocationHandler(Class<T> clazz, T actualObject) {
     if (actualObject == null) {
       return null;
     }
