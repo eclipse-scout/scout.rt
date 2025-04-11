@@ -23,16 +23,18 @@ export class TableMaxResultsHelper {
   }
 
   /**
-   * Adds a DataObject contribution of type {@link MaxRowCountContributionDo} to the given dataObject.
+   * Adds a DataObject contribution of type {@link MaxRowCountContributionDo} to the given dataObject if necessary, removes an existing contribution otherwise.
    * @param dataObject The DataObject to which the contribution should be added.
    * @param table The table to read the maxRowCount property that should be used in the contribution.
    */
-  addMaxRowCountContribution<T extends { _contributions?: DoEntity[] }>(dataObject: T, table: Table): T {
+  withMaxRowCountContribution<T extends { _contributions?: DoEntity[] }>(dataObject: T, table: Table): T {
     const maxRowCountContribution = this.buildMaxRowCountContribution(table);
     if (maxRowCountContribution) {
       dataObject = dataObject || {} as T;
       // see ScoutDataObjectModule.DEFAULT_CONTRIBUTIONS_ATTRIBUTE_NAME
       dataObjects.addContribution(maxRowCountContribution, dataObject);
+    } else {
+      dataObjects.removeContribution(MaxRowCountContributionDo, dataObject);
     }
     return dataObject;
   }

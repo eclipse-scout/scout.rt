@@ -176,7 +176,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
    * @returns the resulting request with the added contribution.
    */
   protected _withMaxRowCountContribution<T>(dataObject: T): T {
-    return scout.create(TableMaxResultsHelper).addMaxRowCountContribution(dataObject, this.detailTable);
+    return scout.create(TableMaxResultsHelper).withMaxRowCountContribution(dataObject, this.detailTable);
   }
 
   /**
