@@ -15,8 +15,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,8 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -39,13 +36,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.hc.client5.http.cookie.CookieStore;
+import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.ConnectionClosedException;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.EntityDetails;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.Method;
 import org.apache.hc.core5.http.message.BasicHeader;
 import org.apache.hc.core5.http.message.BasicHttpResponse;
+import org.apache.hc.core5.http.nio.AsyncEntityConsumer;
+import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
+import org.apache.hc.core5.http.nio.support.classic.AbstractClassicEntityConsumer;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.http.support.BasicRequestBuilder;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.server.Connector;
@@ -58,10 +62,11 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.platform.util.EnumerationUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
@@ -75,6 +80,7 @@ import org.eclipse.scout.rt.shared.http.async.AbstractAsyncHttpClientManager;
 import org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager;
 import org.eclipse.scout.rt.shared.http.async.ForceHttp2DefaultAsyncHttpClientManager;
 import org.eclipse.scout.rt.shared.http.async.H2AsyncHttpClientManager;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.mock.RegisterBeanTestRule;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
@@ -88,7 +94,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.ArgumentCaptor;
-import org.mockito.invocation.InvocationOnMock;
+import org.slf4j.event.Level;
 
 @RunWith(ParameterizedPlatformTestRunner.class)
 public class HttpProxyTest {
@@ -359,7 +365,7 @@ public class HttpProxyTest {
     receivedHeaders.forEach((k, v) -> httpResponse.addHeader(k, v));
 
     // perform actual operation
-    BEANS.get(HttpProxy.class).writeResponseHeaders(res, httpResponse);
+    BEANS.get(HttpProxy.class).writeResponseHeaders("mockCorrelationId", res, httpResponse);
 
     assertEquals(expectedHeaders, collectedHeaders);
     verify(res, atLeast(0)).setHeader(anyString(), anyString());
@@ -455,48 +461,92 @@ public class HttpProxyTest {
   }
 
   @Test
-  public void testProxyRequestRunContextAndCorrelationId() {
-    AtomicInteger hasBeenCalledCount = new AtomicInteger();
-    RunContexts.copyCurrent().withCorrelationId("foo").run(() -> {
-      doAnswer(invocation -> createProxyForTestRunContextAndCorrelationId(hasBeenCalledCount, invocation)).when(m_proxy).createAsyncResponseConsumer(any());
-      doAnswer(invocation -> createProxyForTestRunContextAndCorrelationId(hasBeenCalledCount, invocation)).when(m_proxy).createEntityConsumer(any());
-      doAnswer(invocation -> createProxyForTestRunContextAndCorrelationId(hasBeenCalledCount, invocation)).when(m_proxy).createEntityProducer(any());
-      doAnswer(invocation -> createProxyForTestRunContextAndCorrelationId(hasBeenCalledCount, invocation)).when(m_proxy).createExecuteCallback(any(), any());
+  public void testCreateEntityConsumerCorrelationId() throws Exception {
+    AsyncEntityConsumer<Boolean> entityConsumer = null;
+    try {
+      CorrelationId.CURRENT.set("mockCorrelationId");
+      entityConsumer = m_proxy.createEntityConsumer(mock(HttpServletResponse.class));
+    }
+    finally {
+      CorrelationId.CURRENT.remove();
+    }
+    assertNull(CorrelationId.CURRENT.get());
 
-      testProxyRequest_postRequest();
-    });
-    assertEquals(4, hasBeenCalledCount.get()); // 4: see above, four classes are instrumented, expect for all at least one method call (which itself verified further assertions)
+    ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+    doNothing().when(m_proxy).log(any(Level.class), captor.capture(), any(String.class), any(Object[].class));
+    ContentType contentType = mock(ContentType.class);
+    InputStream inputStream = mock(InputStream.class);
+
+    // (1) test invoking consumeData
+    java.lang.reflect.Method method = AbstractClassicEntityConsumer.class.getDeclaredMethod("consumeData", ContentType.class, InputStream.class);
+    method.setAccessible(true);
+    method.invoke(entityConsumer, contentType, inputStream);
+
+    assertFalse(captor.getAllValues().isEmpty());
+    captor.getAllValues().forEach(v -> assertEquals("mockCorrelationId", v));
   }
 
-  protected Object createProxyForTestRunContextAndCorrelationId(AtomicInteger hasBeenCalledCount, InvocationOnMock invocation) throws Throwable {
-    AtomicBoolean hasBeenCalled = new AtomicBoolean(false);
-    Object actualObject = invocation.callRealMethod();
-
-    boolean checkCorrelationId = true;
-    if (Proxy.isProxyClass(actualObject.getClass())) {
-      InvocationHandler invocationHandler = Proxy.getInvocationHandler(actualObject);
-      if (invocationHandler instanceof AbstractAsyncHttpClientManager.AsyncHttpInvocationHandler) {
-        AbstractAsyncHttpClientManager.AsyncHttpInvocationHandler asyncHttpInvocationHandler = (AbstractAsyncHttpClientManager.AsyncHttpInvocationHandler) invocationHandler;
-        RunContext runContext = asyncHttpInvocationHandler.getRunContext();
-        assertEquals("foo", runContext.getCorrelationId());
-        checkCorrelationId = false;
-      }
+  @Test
+  public void testCreateAsyncResponseConsumerCorrelationId() throws Exception {
+    AsyncResponseConsumer<Boolean> responseConsumer = null;
+    try {
+      CorrelationId.CURRENT.set("mockCorrelationId");
+      responseConsumer = m_proxy.createAsyncResponseConsumer(mock(HttpServletResponse.class));
+    }
+    finally {
+      CorrelationId.CURRENT.remove();
     }
 
-    boolean f_checkCorrelationId = checkCorrelationId;
-    return Proxy.newProxyInstance(
-        HttpProxy.class.getClassLoader(),
-        new Class[]{invocation.getMethod().getReturnType()},
-        (proxy, method, args) -> {
-          if (hasBeenCalled.compareAndSet(false, true)) {
-            hasBeenCalledCount.incrementAndGet();
-          }
-          if (f_checkCorrelationId) {
-            assertEquals("foo", CorrelationId.CURRENT.get());
-          }
-          return method.invoke(actualObject, args);
-        }
-    );
+    assertNull(CorrelationId.CURRENT.get());
+    HttpResponse response = mock(HttpResponse.class);
+    when(response.getHeaders()).thenReturn(new Header[0]);
+    EntityDetails entityDetails = mock(EntityDetails.class);
+    HttpContext context = mock(HttpContext.class);
+    @SuppressWarnings("unchecked") FutureCallback<Boolean> resultCallback = mock(FutureCallback.class);
+    ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+    doNothing().when(m_proxy).log(any(Level.class), captor.capture(), any(String.class), any(Object[].class));
+
+    // (1) test invoking consumeResponse
+    responseConsumer.consumeResponse(response, entityDetails, context, resultCallback);
+
+    // (2) test invoking failed
+    AsyncResponseConsumer<Boolean> finalResponseConsumer = responseConsumer;
+    BEANS.get(JUnitExceptionHandler.class).ignoreExceptionOnce(Exception.class, () -> finalResponseConsumer.failed(new Exception("foo")));
+
+    assertFalse(captor.getAllValues().isEmpty());
+    captor.getAllValues().forEach(v -> assertEquals("mockCorrelationId", v));
+  }
+
+  @Test
+  public void testFutureCallbackCorrelationId() throws Exception {
+    FutureCallback<Boolean> futureCallback = null;
+    try {
+      CorrelationId.CURRENT.set("mockCorrelationId");
+      futureCallback = m_proxy.createExecuteCallback(mock(HttpServletResponse.class), mock(AsyncContext.class));
+    }
+    finally {
+      CorrelationId.CURRENT.remove();
+    }
+
+    BeanTestingHelper.get().registerBean(new BeanMetaData(ExceptionHandler.class).withInitialInstance(mock(ExceptionHandler.class)));
+
+    assertNull(CorrelationId.CURRENT.get());
+
+    ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+    doNothing().when(m_proxy).log(any(Level.class), captor.capture(), any(String.class), any(Object[].class));
+
+    // (1) test invoking completed
+    futureCallback.completed(true);
+
+    // (2) test invoking failed
+    FutureCallback<Boolean> finalFutureCallback = futureCallback;
+    BEANS.get(JUnitExceptionHandler.class).ignoreExceptionOnce(Exception.class, () -> finalFutureCallback.failed(new Exception("foo")));
+
+    // (3) test invoking cancelled
+    futureCallback.cancelled();
+
+    assertFalse(captor.getAllValues().isEmpty());
+    captor.getAllValues().forEach(v -> assertEquals("mockCorrelationId", v));
   }
 
   protected void testProxyRequestWithStatusCodeAndContent_Internal(int statusCode, byte[] content, boolean specifyContentLength) throws IOException {
