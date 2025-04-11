@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public class DisposeWidgetsHybridAction extends AbstractHybridAction<DisposeWidgetsHybridActionDo> {
   private static final Logger LOG = LoggerFactory.getLogger(DisposeWidgetsHybridAction.class);
 
-  protected static final String TYPE = "DisposeWidgets";
+  protected static final String TYPE = "scout.DisposeWidgets";
 
   @Override
   public void execute(DisposeWidgetsHybridActionDo data) {

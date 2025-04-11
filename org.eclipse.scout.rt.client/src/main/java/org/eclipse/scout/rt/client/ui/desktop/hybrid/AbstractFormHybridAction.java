@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,10 +30,10 @@ import org.eclipse.scout.rt.platform.BEANS;
  */
 public abstract class AbstractFormHybridAction<FORM extends IForm, DO_ENTITY extends IDoEntity> extends AbstractHybridAction<DO_ENTITY> {
 
-  private static final String OPEN_FORM = "openForm";
+  private static final String OPEN_FORM = "scout.openForm";
   protected static final String OPEN_FORM_PREFIX = OPEN_FORM + DELIMITER;
 
-  private static final String CREATE_FORM = "createForm";
+  private static final String CREATE_FORM = "scout.createForm";
   protected static final String CREATE_FORM_PREFIX = CREATE_FORM + DELIMITER;
 
   protected boolean isShowFormOnStart() {

@@ -169,7 +169,7 @@ describe('HybridManager', () => {
       expect().nothing(); // suppress warning "spec has no expectations"
       const id = '42';
       UuidPool.get(session).uuids.push(id);
-      HybridManager.get(session).callActionAndWait('Ping').then(() => done());
+      HybridManager.get(session).callActionAndWait('scout.Ping').then(() => done());
       session._processSuccessResponse({
         events: [
           {
@@ -188,7 +188,7 @@ describe('HybridManager', () => {
       expect().nothing(); // suppress warning "spec has no expectations"
       const id = '42';
       UuidPool.get(session).uuids.push(id);
-      HybridManager.get(session).openForm('Dummy').then(form => {
+      HybridManager.get(session).openForm('scout.Dummy').then(form => {
         form.whenClose().then(() => done());
         session._processSuccessResponse({
           events: [
@@ -216,7 +216,7 @@ describe('HybridManager', () => {
     it('is not triggered when close() was initiated by JS', done => {
       const id = '42';
       UuidPool.get(session).uuids.push(id);
-      HybridManager.get(session).openForm('Dummy').then(form => {
+      HybridManager.get(session).openForm('scout.Dummy').then(form => {
         let closeCount = 0;
         form.on('close', () => closeCount++);
         form.close();
