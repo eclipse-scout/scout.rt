@@ -70,6 +70,8 @@ import org.apache.hc.core5.http.support.AbstractRequestBuilder;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
+import org.eclipse.scout.rt.platform.context.CorrelationIdContextValueProvider;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
@@ -87,6 +89,9 @@ import org.eclipse.scout.rt.shared.http.async.AbstractAsyncHttpClientManager;
 import org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.slf4j.MDC.MDCCloseable;
+import org.slf4j.event.Level;
 
 /**
  * Forwards HTTP requests to the given remote URL.
@@ -408,13 +413,13 @@ public class HttpProxy {
     }
   }
 
-  protected void writeResponseHeaders(HttpServletResponse resp, HttpResponse httpResp) {
+  protected void writeResponseHeaders(String correlationId, HttpServletResponse resp, HttpResponse httpResp) {
     final Set<String> hopByHopHeaderNames = getConnectionHeaderValues(httpResp);
     for (Header header : httpResp.getHeaders()) {
       String name = header.getName();
       String value = header.getValue();
       if (name != null && hopByHopHeaderNames.contains(name.toLowerCase(Locale.US))) {
-        LOG.trace("Removed hop-by-hop response header: {} (original value: {})", name, value);
+        log(Level.TRACE, correlationId, "Removed hop-by-hop response header: {} (original value: {})", name, value);
         continue;
       }
       String originalValue = value;
@@ -423,10 +428,10 @@ public class HttpProxy {
       }
       if (value != null) {
         resp.setHeader(name, value);
-        LOG.trace("Added response header: {}: {}", name, value);
+        log(Level.TRACE, correlationId, "Added response header: {}: {}", name, value);
       }
       else {
-        LOG.trace("Removed response header: {} (original value: {})", name, originalValue);
+        log(Level.TRACE, correlationId, "Removed response header: {} (original value: {})", name, originalValue);
       }
     }
   }
@@ -630,18 +635,17 @@ public class HttpProxy {
    */
   protected AsyncEntityConsumer<Boolean> createEntityConsumer(HttpServletResponse resp) {
     AsyncEntityConsumer<Boolean> entityConsumer = new AbstractClassicEntityConsumer<>(getInitialBufferSize(resp), getBlockingOperationExecutor()) {
+
+      private final String m_correlationId = CorrelationId.CURRENT.get();
+
       @Override
       protected Boolean consumeData(ContentType contentType, InputStream inputStream) throws IOException {
-        LOG.trace("Consuming data with contentType {}", contentType);
+        log(Level.TRACE, m_correlationId, "Consuming data with contentType {}", contentType);
         writeResponsePayload(resp, inputStream);
         return true;
       }
     };
-
-    // consumer is run async: wrap the consumer to retain context information (e.g. for logging purposes)
-    @SuppressWarnings("unchecked")
-    AsyncEntityConsumer<Boolean> wrappedConsumer = (AsyncEntityConsumer<Boolean>) m_httpClientManager.createAsyncInvocationHandler(AsyncEntityConsumer.class, entityConsumer);
-    return wrappedConsumer;
+    return entityConsumer;
   }
 
   /**
@@ -651,7 +655,7 @@ public class HttpProxy {
    * </p>
    * <p>
    * Before the actual response payload is consumed the methods
-   * {@link #writeResponseHeaders(HttpServletResponse, HttpResponse)} and
+   * {@link #writeResponseHeaders(String, HttpServletResponse, HttpResponse)} and
    * {@link #writeResponseStatus(HttpServletResponse, HttpResponse)} are called (in this order) to forward header and
    * status.
    * </p>
@@ -659,20 +663,21 @@ public class HttpProxy {
   protected AsyncResponseConsumer<Boolean> createAsyncResponseConsumer(HttpServletResponse resp) {
     AsyncResponseConsumer<Boolean> consumer = new AsyncResponseConsumer<>() {
 
+      private final String m_correlationId = CorrelationId.CURRENT.get();
       private volatile AsyncEntityConsumer<Boolean> m_dataConsumer = createEntityConsumer(resp);
 
       @Override
       public void consumeResponse(HttpResponse response, EntityDetails entityDetails, HttpContext context, FutureCallback<Boolean> resultCallback) throws HttpException, IOException {
-        LOG.trace("Consuming response (protocol version: {})", context.getProtocolVersion());
-        writeResponseHeaders(resp, response);
+        log(Level.TRACE, m_correlationId, "Consuming response (protocol version: {})", context.getProtocolVersion());
+        writeResponseHeaders(m_correlationId, resp, response);
         writeResponseStatus(resp, response);
 
         if (entityDetails != null) {
-          LOG.trace("Starting stream for entity (content-type: {})", entityDetails.getContentType());
+          log(Level.TRACE, m_correlationId, "Starting stream for entity (content-type: {})", entityDetails.getContentType());
           m_dataConsumer.streamStart(entityDetails, resultCallback);
         }
         else {
-          LOG.trace("No entity data for response");
+          log(Level.TRACE, m_correlationId, "No entity data for response");
           resultCallback.completed(true);
         }
       }
@@ -684,9 +689,11 @@ public class HttpProxy {
 
       @Override
       public void failed(Exception cause) {
-        LOG.trace("Response consumer failed: ", cause);
+        log(Level.TRACE, m_correlationId, "Response consumer failed: ", cause);
         if (!m_connectionErrorDetector.get().isConnectionError(cause)) {
-          BEANS.get(ExceptionHandler.class).handle(cause);
+          try (MDCCloseable ignored = MDC.putCloseable(CorrelationIdContextValueProvider.KEY, m_correlationId)) {
+            BEANS.get(ExceptionHandler.class).handle(cause);
+          }
         }
         releaseResources();
       }
@@ -715,10 +722,7 @@ public class HttpProxy {
       }
     };
 
-    // consumer is run async: wrap the consumer to retain context information (e.g. for logging purposes)
-    @SuppressWarnings("unchecked")
-    AsyncResponseConsumer<Boolean> wrappedConsumer = (AsyncResponseConsumer<Boolean>) m_httpClientManager.createAsyncInvocationHandler(AsyncResponseConsumer.class, consumer);
-    return wrappedConsumer;
+    return consumer;
   }
 
   /**
@@ -727,18 +731,22 @@ public class HttpProxy {
    */
   protected FutureCallback<Boolean> createExecuteCallback(HttpServletResponse resp, AsyncContext asyncContext) {
     FutureCallback<Boolean> callback = new FutureCallback<>() {
+      private final String m_correlationId = CorrelationId.CURRENT.get();
+
       @Override
       public void completed(Boolean result) {
-        LOG.trace("Request execution completed with result: {}", result);
+        log(Level.TRACE, m_correlationId, "Request execution completed with result: {}", result);
         assertTrue(result);
         asyncContext.complete();
       }
 
       @Override
       public void failed(Exception ex) {
-        LOG.trace("Request execution failed", ex);
+        log(Level.TRACE, m_correlationId, "Request execution failed", ex);
         if (!m_connectionErrorDetector.get().isConnectionError(ex)) {
-          BEANS.get(ExceptionHandler.class).handle(ex);
+          try (MDCCloseable ignored = MDC.putCloseable(CorrelationIdContextValueProvider.KEY, m_correlationId)) {
+            BEANS.get(ExceptionHandler.class).handle(ex);
+          }
         }
         try {
           boolean alreadyCommitted = resp.isCommitted();
@@ -747,7 +755,7 @@ public class HttpProxy {
           }
         }
         catch (AlreadyInvalidatedException e) {
-          LOG.trace("Response is invalidated", e);
+          log(Level.TRACE, m_correlationId, "Response is invalidated", e);
         }
         try {
           // this method is already called to handle an exception from within a http-client catch block
@@ -755,21 +763,18 @@ public class HttpProxy {
           asyncContext.complete();
         }
         catch (Exception e) {
-          LOG.warn("Unable to complete async context, assuming already completed", e);
+          log(Level.WARN, m_correlationId, "Unable to complete async context, assuming already completed", e);
         }
       }
 
       @Override
       public void cancelled() {
-        LOG.trace("Request execution cancelled");
+        log(Level.TRACE, m_correlationId, "Request execution cancelled");
         asyncContext.complete();
       }
     };
 
-    // callback is run async: wrap the callback to retain context information (e.g. for logging purposes)
-    @SuppressWarnings("unchecked")
-    FutureCallback<Boolean> wrappedCallback = (FutureCallback<Boolean>) m_httpClientManager.createAsyncInvocationHandler(FutureCallback.class, callback);
-    return wrappedCallback;
+    return callback;
   }
 
   protected int computeStatusCodeForFailure(Exception e) {
@@ -788,6 +793,18 @@ public class HttpProxy {
       return HttpStatus.SC_GATEWAY_TIMEOUT;
     }
     return HttpStatus.SC_INTERNAL_SERVER_ERROR;
+  }
+
+  /**
+   * Logs given message {@code msg} at given {@code level} setting up {@link MDC} context for correlation id.<br>
+   * Note: This is necessary since caller are handling asynchronous responses using separate worker threads without relation to the origin invoking thread.
+   */
+  protected void log(Level level, String correlationId, String msg, Object... args) {
+    if (LOG.isEnabledForLevel(level)) {
+      try (MDCCloseable ignored = MDC.putCloseable(CorrelationIdContextValueProvider.KEY, correlationId)) {
+        LOG.atLevel(level).log(msg, args);
+      }
+    }
   }
 
   /**
