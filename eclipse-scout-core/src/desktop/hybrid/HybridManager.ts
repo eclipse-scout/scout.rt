@@ -193,7 +193,7 @@ export class HybridManager extends Widget {
    * @returns a promise that will be resolved once the form has been created
    */
   openForm(modelVariant: string, data?: AnyDoEntity): JQuery.Promise<Form> {
-    const id = this.callAction(`openForm:${modelVariant}`, data);
+    const id = this.callAction(`scout.openForm:${modelVariant}`, data);
     return this.when(`widgetAdd:${id}`).then(event => this._onFormAdd(event.widget as Form));
   }
 
@@ -205,7 +205,7 @@ export class HybridManager extends Widget {
    * @returns a promise that will be resolved once the form has been created
    */
   createForm(modelVariant: string, data?: AnyDoEntity): JQuery.Promise<Form> {
-    const id = this.callAction(`createForm:${modelVariant}`, data);
+    const id = this.callAction(`scout.createForm:${modelVariant}`, data);
     return this.when(`widgetAdd:${id}`).then(event => this._onFormAdd(event.widget as Form));
   }
 

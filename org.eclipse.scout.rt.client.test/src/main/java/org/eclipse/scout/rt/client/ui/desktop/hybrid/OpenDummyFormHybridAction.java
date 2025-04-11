@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.desktop.hybrid;
 @HybridActionType(OpenDummyFormHybridAction.TYPE)
 public class OpenDummyFormHybridAction extends AbstractFormHybridAction<DummyForm, DummyDo> {
 
-  protected static final String TYPE = OPEN_FORM_PREFIX + "Dummy";
+  protected static final String TYPE = OPEN_FORM_PREFIX + "scout.Dummy";
 
   @Override
   protected DummyForm createForm(DummyDo data) {

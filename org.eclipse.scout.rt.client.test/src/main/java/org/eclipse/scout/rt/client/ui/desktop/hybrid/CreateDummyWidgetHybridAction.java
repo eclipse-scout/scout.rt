@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 @HybridActionType(CreateDummyWidgetHybridAction.TYPE)
 public class CreateDummyWidgetHybridAction extends AbstractHybridAction<DoEntity> {
 
-  protected static final String TYPE = "createWidget:Dummy";
+  protected static final String TYPE = "scout.createWidget:scout.Dummy";
 
   @Override
   public void execute(DoEntity data) {

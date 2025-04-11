@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -122,7 +122,7 @@ public class JsonHybridManagerTest {
   public void testPing() {
     JsonHybridManager<HybridManager> jsonHybridManager = createJsonHybridManagerSpy();
     String id = createId();
-    jsonHybridManager.handleUiEvent(createHybridActionJsonEvent(jsonHybridManager, id, "Ping"));
+    jsonHybridManager.handleUiEvent(createHybridActionJsonEvent(jsonHybridManager, id, "scout.Ping"));
     verify(jsonHybridManager).handleModelHybridEvent(eq(HybridEvent.createHybridActionEndEvent(getHybridManager(), id)));
   }
 
@@ -186,7 +186,7 @@ public class JsonHybridManagerTest {
     JsonHybridManager<HybridManager> jsonHybridManager = createJsonHybridManagerSpy();
 
     String id = createId();
-    jsonHybridManager.handleUiEvent(createHybridActionJsonEvent(jsonHybridManager, id, "openForm:Dummy"));
+    jsonHybridManager.handleUiEvent(createHybridActionJsonEvent(jsonHybridManager, id, "scout.openForm:scout.Dummy"));
 
     assertEquals(1, getHybridManager().getWidgets().size());
     IWidget widget = getHybridManager().getWidgetById(id);
@@ -213,7 +213,7 @@ public class JsonHybridManagerTest {
     JSONObject dummyJson = BEANS.get(JsonDataObjectHelper.class).dataObjectToJson(dummyDo);
 
     String id = createId();
-    jsonHybridManager.handleUiEvent(createHybridActionJsonEvent(jsonHybridManager, id, "openForm:Dummy", dummyJson));
+    jsonHybridManager.handleUiEvent(createHybridActionJsonEvent(jsonHybridManager, id, "scout.openForm:scout.Dummy", dummyJson));
 
     assertEquals(1, getHybridManager().getWidgets().size());
     IWidget widget = getHybridManager().getWidgetById(id);
@@ -238,7 +238,7 @@ public class JsonHybridManagerTest {
     JsonHybridManager<HybridManager> jsonHybridManager = createJsonHybridManager();
 
     String id = createId();
-    jsonHybridManager.handleUiEvent(createHybridActionJsonEvent(jsonHybridManager, id, "createWidget:Dummy"));
+    jsonHybridManager.handleUiEvent(createHybridActionJsonEvent(jsonHybridManager, id, "scout.createWidget:scout.Dummy"));
 
     // Create Widget Action created two widgets
     assertEquals(2, getHybridManager().getWidgets().size());
@@ -257,7 +257,7 @@ public class JsonHybridManagerTest {
     DisposeWidgetsHybridActionDo disposeDo = BEANS.get(DisposeWidgetsHybridActionDo.class)
         .withIds("dummy-widget-1");
     JSONObject disposeJson = BEANS.get(JsonDataObjectHelper.class).dataObjectToJson(disposeDo);
-    jsonHybridManager.handleUiEvent(createHybridActionJsonEvent(jsonHybridManager, createId(), "DisposeWidgets", disposeJson));
+    jsonHybridManager.handleUiEvent(createHybridActionJsonEvent(jsonHybridManager, createId(), "scout.DisposeWidgets", disposeJson));
     assertTrue(widget.isDisposeDone());
     assertFalse(widget2.isDisposeDone());
 
