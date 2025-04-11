@@ -42,6 +42,8 @@ import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTr
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty;
 import org.eclipse.scout.rt.shared.http.proxy.ConfigurableProxySelector;
 import org.eclipse.scout.rt.shared.http.retry.CustomHttpRequestRetryStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.metrics.Meter;
@@ -62,6 +64,8 @@ import io.opentelemetry.api.metrics.Meter;
  * @see ConfigurableProxySelector
  */
 public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManager<HttpAsyncClientBuilder> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultAsyncHttpClientManager.class);
 
   /**
    * @return Technical transport manager name used for metrics.
@@ -87,9 +91,9 @@ public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManage
 
     // adding execution interceptor allowing access to entityProducer and asyncExecCallback to add context information e.g. for logging purposes
     builder.addExecInterceptorFirst(AsyncHttpInvocationHandler.class.getSimpleName(), (request, entityProducer, scope, chain, asyncExecCallback) -> chain.proceed(request,
-        createAsyncInvocationHandler(AsyncEntityProducer.class, entityProducer),
+        LOG.isDebugEnabled() ? createAsyncInvocationHandler(AsyncEntityProducer.class, entityProducer) : entityProducer,
         scope,
-        createAsyncInvocationHandler(AsyncExecCallback.class, asyncExecCallback)));
+        LOG.isDebugEnabled() ? createAsyncInvocationHandler(AsyncExecCallback.class, asyncExecCallback) : asyncExecCallback));
   }
 
   protected void installConfigurableProxySelector(HttpAsyncClientBuilder builder) {

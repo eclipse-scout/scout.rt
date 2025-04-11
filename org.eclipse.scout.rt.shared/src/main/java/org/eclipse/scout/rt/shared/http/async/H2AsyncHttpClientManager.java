@@ -18,6 +18,8 @@ import org.apache.hc.client5.http.impl.async.H2AsyncClientBuilder;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.opentelemetry.api.OpenTelemetry;
 
@@ -39,6 +41,8 @@ import io.opentelemetry.api.OpenTelemetry;
 @ApplicationScoped
 public class H2AsyncHttpClientManager extends AbstractAsyncHttpClientManager<H2AsyncClientBuilder> {
 
+  private static final Logger LOG = LoggerFactory.getLogger(H2AsyncHttpClientManager.class);
+
   @Override
   protected H2AsyncClientBuilder createBuilder() {
     return HttpAsyncClients.customHttp2();
@@ -50,9 +54,9 @@ public class H2AsyncHttpClientManager extends AbstractAsyncHttpClientManager<H2A
 
     // adding execution interceptor allowing access to entityProducer and asyncExecCallback to add context information e.g. for logging purposes
     builder.addExecInterceptorFirst(AsyncHttpInvocationHandler.class.getSimpleName(), (request, entityProducer, scope, chain, asyncExecCallback) -> chain.proceed(request,
-        createAsyncInvocationHandler(AsyncEntityProducer.class, entityProducer),
+        LOG.isDebugEnabled() ? createAsyncInvocationHandler(AsyncEntityProducer.class, entityProducer) : entityProducer,
         scope,
-        createAsyncInvocationHandler(AsyncExecCallback.class, asyncExecCallback)));
+        LOG.isDebugEnabled() ? createAsyncInvocationHandler(AsyncExecCallback.class, asyncExecCallback) : asyncExecCallback));
   }
 
   @Override
