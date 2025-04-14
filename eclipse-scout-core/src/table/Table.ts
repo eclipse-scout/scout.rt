@@ -129,6 +129,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   defaultMenuTypes: string[];
   accessibilityRenderer: AbstractTableAccessibilityRenderer;
   organizer: TableOrganizer;
+  defaultRowAction: Action;
 
   $data: JQuery;
   $emptyData: JQuery;
@@ -254,7 +255,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._postAttachActions = [];
     this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
     this._menuInheritAccessibilityChangeHandler = this._updateMenusEnabled.bind(this);
-    this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus', 'tileTableHeader', 'tableTileGridMediator']);
+    this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus', 'tileTableHeader', 'tableTileGridMediator', 'defaultRowAction']);
+    this._addPreserveOnPropertyChangeProperties(['defaultRowAction']);
 
     this.$data = null;
     this.$emptyData = null;
@@ -387,6 +389,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._setSelectedRows(this.selectedRows);
     this._setKeyStrokes(this.keyStrokes);
     this._setMenus(this.menus);
+    this._setDefaultRowAction(this.defaultRowAction);
     this._setTableControls(this.tableControls);
     this._setTableStatus(this.tableStatus);
     this._calculateValuesForBackgroundEffect();
@@ -991,6 +994,14 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     if (this.organizer) {
       this.organizer.install(this);
     }
+  }
+
+  setDefaultRowAction(defaultRowAction: Action | string) {
+    this.setProperty('defaultRowAction', defaultRowAction);
+  }
+
+  protected _setDefaultRowAction(defaultRowAction: Action) {
+    this._setProperty('defaultRowAction', defaultRowAction);
   }
 
   protected _installCellTooltipSupport() {
@@ -2289,13 +2300,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     });
   }
 
-  protected _triggerRowAction(row: TableRow, column: Column<any>) {
-    this.trigger('rowAction', {
-      row: row,
-      column: column
-    });
-  }
-
   /**
    * Starts cell editing for the cell at the given column and row, but only if editing is allowed.
    * @see prepareCellEdit
@@ -2907,7 +2911,12 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     if (!row || !column) {
       return;
     }
-    this._triggerRowAction(row, column);
+
+    const event = this.trigger('rowAction', {column, row});
+
+    if (!event.defaultPrevented && this.defaultRowAction) {
+      this.defaultRowAction.doAction();
+    }
   }
 
   insertRow(row: ObjectOrModel<TableRow>) {

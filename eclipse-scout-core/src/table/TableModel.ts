@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -277,4 +277,9 @@ export interface TableModel extends WidgetModel {
    * not to be organized, set this to `null`. By default, an instance of {@link TableOrganizer} is created automatically.
    */
   organizer?: TableOrganizer;
+  /**
+   * The default action, that should be executed on row action.
+   * If a string is provided, the action will be resolved automatically.
+   */
+  defaultRowAction?: Action | string;
 }
