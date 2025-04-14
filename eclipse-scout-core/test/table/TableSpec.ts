@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BeanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, Status, Table, TableField, TableRow, TableRowModel, Tooltip
+  Action, BeanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, Status, Table, TableField, TableRow, TableRowModel,
+  Tooltip
 } from '../../src/index';
 import {JQueryTesting, LocaleSpecHelper, SpecTable, TableSpecHelper} from '../../src/testing/index';
 import $ from 'jquery';
@@ -1042,6 +1043,49 @@ describe('Table', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
     });
 
+    it('executes default row action if default is not prevented', () => {
+      const table = helper.createTable(helper.createModelFixture(2, 5));
+      const row = table.rows[0];
+      table.selectRows(row);
+
+      const action = scout.create(Action, {parent: table});
+      let count = 0;
+      action.on('action', () => count++);
+      table.setDefaultRowAction(action);
+
+      expect(count).toBe(0);
+
+      table.doRowAction(row);
+      expect(count).toBe(1);
+
+      table.one('rowAction', e => e.preventDefault());
+      table.doRowAction(row);
+      expect(count).toBe(1);
+    });
+
+    it('executes menu if it is set as defaultRowAction', () => {
+      const table = helper.createTable({
+        ...helper.createModelFixture(2, 5),
+        defaultRowAction: '42',
+        menus: [{
+          id: '42',
+          objectType: Menu
+        }]
+      });
+      const row = table.rows[0];
+      table.selectRows(row);
+
+      const menu = table.menus[0];
+      expect(menu).toBe(table.defaultRowAction as Menu);
+
+      let count = 0;
+      menu.on('action', () => count++);
+
+      expect(count).toBe(0);
+
+      table.doRowAction(row);
+      expect(count).toBe(1);
+    });
   });
 
   describe('resizeColumn', () => {
