@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureDateId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureIntegerId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
+import org.eclipse.scout.rt.dataobject.fixture.FixturePartsCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureWrapperCompositeId;
@@ -49,6 +50,9 @@ public abstract class AbstractIdCodecTest {
   protected static final String TEST_STRING = "foobar";
   protected static final String TEST_STRING_2 = "bazäöl";
   protected static final Date TEST_DATE = new Date(123456789);
+  protected static final Integer TEST_INTEGER = 42;
+  protected static final Long TEST_LONG = 43L;
+  protected static final Boolean TEST_BOOLEAN = Boolean.TRUE;
 
   protected IBean<?> m_codecBean;
 
@@ -131,6 +135,17 @@ public abstract class AbstractIdCodecTest {
     FixtureCompositeId id = IIds.create(FixtureCompositeId.class, TEST_STRING, TEST_UUID);
     String ext = getCodec().toQualified(id);
     assertEquals("scout.FixtureCompositeId:foobar;5833aae1-c813-4d7c-a342-56a53772a3ea", ext);
+  }
+
+  @Test
+  public void testToQualifiedPartsCompositeId() {
+    FixturePartsCompositeId id = IIds.create(FixturePartsCompositeId.class, TEST_INTEGER, TEST_DATE, TEST_LONG, TEST_BOOLEAN);
+    String ext = getCodec().toQualified(id);
+    assertEquals("scout.FixturePartsCompositeId:42;123456789;43;true", ext);
+
+    // assert composite parts are not signed
+    String signedExt = getCodec().toQualified(id, IdCodecFlag.SIGNATURE);
+    assertTrue(signedExt.startsWith("scout.FixturePartsCompositeId:42;123456789;43;true"));
   }
 
   @Test
@@ -264,6 +279,17 @@ public abstract class AbstractIdCodecTest {
     FixtureCompositeId id = IIds.create(FixtureCompositeId.class, TEST_STRING, TEST_UUID);
     String ext = getCodec().toUnqualified(id);
     assertEquals("foobar;5833aae1-c813-4d7c-a342-56a53772a3ea", ext);
+  }
+
+  @Test
+  public void testToUnqualifiedPartsCompositeId() {
+    FixturePartsCompositeId id = IIds.create(FixturePartsCompositeId.class, TEST_INTEGER, TEST_DATE, TEST_LONG, TEST_BOOLEAN);
+    String ext = getCodec().toUnqualified(id);
+    assertEquals("42;123456789;43;true", ext);
+
+    // assert composite parts are not signed
+    String signedExt = getCodec().toUnqualified(id, IdCodecFlag.SIGNATURE);
+    assertTrue(signedExt.startsWith("42;123456789;43;true"));
   }
 
   @Test
@@ -405,6 +431,13 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testFromQualifiedPartsCompositeId() {
+    FixturePartsCompositeId id1 = IIds.create(FixturePartsCompositeId.class, TEST_INTEGER, TEST_DATE, TEST_LONG, TEST_BOOLEAN);
+    IId id2 = getCodec().fromQualified("scout.FixturePartsCompositeId:42;123456789;43;true");
+    assertEquals(id1, id2);
+  }
+
+  @Test
   public void testFromQualifiedNullValue() {
     assertNull(getCodec().fromQualified(null));
   }
@@ -526,6 +559,13 @@ public abstract class AbstractIdCodecTest {
   public void testFromUnqualifiedCompositeId() {
     FixtureCompositeId id1 = IIds.create(FixtureCompositeId.class, TEST_STRING, TEST_UUID);
     FixtureCompositeId id2 = getCodec().fromUnqualified(FixtureCompositeId.class, "foobar;5833aae1-c813-4d7c-a342-56a53772a3ea");
+    assertEquals(id1, id2);
+  }
+
+  @Test
+  public void testFromUnqualifiedPartsCompositeId() {
+    FixturePartsCompositeId id1 = IIds.create(FixturePartsCompositeId.class, TEST_INTEGER, TEST_DATE, TEST_LONG, TEST_BOOLEAN);
+    IId id2 = getCodec().fromUnqualified(FixturePartsCompositeId.class, "42;123456789;43;true");
     assertEquals(id1, id2);
   }
 
