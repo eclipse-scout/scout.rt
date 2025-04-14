@@ -165,29 +165,17 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
   }
 
   protected async _pageToTableBookmarkPageLocal(page: PageWithTable, childPage?: Page): Promise<TableBookmarkPageDo> {
-    let expandedChildRowIdentifier: BookmarkTableRowIdentifierDo = null;
-    if (childPage) {
-      if (childPage.row) {
-        // Linked to table row -> get row identifier
-        expandedChildRowIdentifier = page.getTableRowIdentifier(childPage.row, !this.persistableRequired);
-      } else {
-        // Not linked to table row -> assume the page param is enough to identify the child page
-      }
-      if (!expandedChildRowIdentifier) { // child row not identifiable
-        throw BookmarkDoBuilder.ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER;
-      }
-    }
-
-    let selectedChildRowIdentifiers: BookmarkTableRowIdentifierDo[] = [];
-    if (this.createTableRowSelections && page.childrenLoaded) {
-      selectedChildRowIdentifiers = page.detailTable.selectedRows
-        .map(row => page.getTableRowIdentifier(row, !this.persistableRequired));
-    }
-
+    let expandedChildRowIdentifier = this._createExpandedTableRowIdentifier(page, childPage);
+    let selectedChildRowIdentifiers = this._createSelectedTableRowIdentifiers(page);
     let searchFilterComplete = true;
     let searchData = await this._createSearchFilterForBookmark(page);
     let tablePreferences = await this._createTablePreferencesForBookmark(page);
     let chartTableControlConfig = await this._createChartTableControlConfigForBookmark(page);
+
+    if (childPage && !expandedChildRowIdentifier && !childPage.pageParam) {
+      // child row not identifiable
+      throw BookmarkDoBuilder.ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER;
+    }
 
     return scout.create(TableBookmarkPageDo, {
       pageParam: page.pageParam,
@@ -224,6 +212,26 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
     return bookmark.definition.bookmarkedPage;
   }
 
+  protected _createExpandedTableRowIdentifier(page: PageWithTable, childPage: Page): BookmarkTableRowIdentifierDo {
+    // If child page is linked to a table row, check if a special table row identifier is needed.
+    // Otherwise, we assume that the page param is enough to identify the child page.
+    if (childPage && childPage.row) {
+      return page.getTableRowIdentifier(childPage.row, !this.persistableRequired);
+    }
+    return null;
+  }
+
+  protected _createSelectedTableRowIdentifiers(page: PageWithTable): BookmarkTableRowIdentifierDo[] {
+    if (!this.createTableRowSelections) {
+      return [];
+    }
+    if (page.childrenLoaded) {
+      return page.detailTable.selectedRows
+        .map(row => page.getTableRowIdentifier(row, !this.persistableRequired));
+    }
+    return [];
+  }
+
   protected async _createSearchFilterForBookmark(page: PageWithTable): Promise<any> {
     // FIXME bsh [js-bookmark] Use page.getSearchFilter() instead - but how to deal with hybrid search forms?
     let searchForm = page.getSearchForm();
@@ -248,6 +256,7 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
   }
 
   protected async _createChartTableControlConfigForBookmark(page: PageWithTable): Promise<IChartTableControlConfigDo> {
+    // FIXME bsh [js-bookmark] Implement
     return null;
   }
 

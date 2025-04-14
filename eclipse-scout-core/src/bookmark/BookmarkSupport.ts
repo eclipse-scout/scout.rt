@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ActivateBookmarkDataDo, ActivateBookmarkOptionsDo, App, arrays, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, HybridManager, IBookmarkDo, IBookmarkPageDo, InitModelOf,
-  MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageWithNodes, PageWithTable, scout, Session, Status, TableBookmarkPageDo, TableRow
+  ActivateBookmarkDataDo, ActivateBookmarkOptionsDo, App, arrays, BaseDoEntity, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierDoFactory, Constructor, Desktop,
+  HybridManager, IBookmarkDo, IBookmarkPageDo, InitModelOf, MaxRowCountContributionDo, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageParamDo, PageWithNodes, PageWithTable, scout,
+  Session, Status, TableBookmarkPageDo, TableRow
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -75,6 +76,55 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       let id = outline.buildUuid();
       return id === outlineId;
     });
+  }
+
+  // --------------------------------------
+
+  /**
+   * Returns `true` if the given page params are equivalent. Unlike {@link BaseDoEntity#equals}, this method
+   * ignores certain data object contributions that are considered to be irrelevant when identifying pages
+   * (e.g. {@link MaxRowCountContributionDo}).
+   */
+  pageParamsMatch(pageParam1: PageParamDo, pageParam2: PageParamDo) {
+    if (!pageParam1 && !pageParam2) {
+      return true;
+    }
+    if (!pageParam1 || !pageParam2) {
+      return false;
+    }
+
+    pageParam1 = this._normalizePageParam(pageParam1);
+    pageParam2 = this._normalizePageParam(pageParam2);
+    return pageParam1.equals(pageParam2);
+  }
+
+  protected _normalizePageParam(pageParam: PageParamDo): PageParamDo {
+    pageParam = pageParam.clone();
+    for (const contribution of this._getIgnoredContributionClassesForPageParamComparison()) {
+      pageParam.removeContribution(contribution);
+    }
+    return pageParam;
+  }
+
+  /**
+   * @returns contributions that may be added to page params but are irrelevant when comparing page params
+   */
+  protected _getIgnoredContributionClassesForPageParamComparison(): Constructor<BaseDoEntity>[] {
+    return [MaxRowCountContributionDo];
+  }
+
+  /**
+   * Returns an identifier for the given row that can be stored in a bookmark or used to find the same row again when the
+   * bookmark is activated. Usually, it consists of all primary key values.
+   *
+   * By default, all components of a row identifier have to be persistable. If one of the primary keys is of an unsupported
+   * type, an error is thrown. To return a (non-persistable) {@link BookmarkTableRowIdentifierObjectComponentDo} instead,
+   * set the optional argument `allowObjectFallback` to `true`.
+   *
+   * This method can also return `null`. In that case, the child page is identified by its page param.
+   */
+  createTableRowIdentifier(page: PageWithTable, row: TableRow, allowObjectFallback = false): BookmarkTableRowIdentifierDo {
+    return scout.create(BookmarkTableRowIdentifierDoFactory).createTableRowIdentifier(page, row, allowObjectFallback);
   }
 
   // --------------------------------------
@@ -244,38 +294,35 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   protected async _resolvePage(outline: Outline, parentPage: Page, parentBookmarkPage: IBookmarkPageDo, bookmarkPage: IBookmarkPageDo, options?: ActivateBookmarkOptions): Promise<Page> {
-    if (parentPage) {
-      await parentPage.ensureLoadChildren();
+    if (!parentPage) {
+      // Lookup top-level page by page param
+      return outline.nodes.find(node => node.matchesPageParam(bookmarkPage.pageParam));
+    }
 
-      if (parentPage instanceof PageWithTable && parentBookmarkPage instanceof TableBookmarkPageDo) {
-        // Lookup child page by PK in parent table (ignore pageParam)
-        let row = parentPage.detailTable.rows.find(row => {
-          let rowIdentifier = parentPage.getTableRowIdentifier(row);
-          return objects.equals(rowIdentifier, parentBookmarkPage.expandedChildRow);
-        });
-        if (!row) {
-          return null; // not found
+    await parentPage.ensureLoadChildren();
+
+    // If the bookmark contains a row identifier, try to find the corresponding row
+    if (parentPage instanceof PageWithTable && parentBookmarkPage instanceof TableBookmarkPageDo && parentBookmarkPage.expandedChildRow) {
+      let row = parentPage.detailTable.rows.find(row => {
+        let rowIdentifier = parentPage.getTableRowIdentifier(row);
+        return objects.equals(rowIdentifier, parentBookmarkPage.expandedChildRow);
+      });
+      // If we found the row, but it is currently filtered by the parent table, remove the filter and try again.
+      // If the row is still not accepted, the filter is apparently a non-user filter which cannot be removed -> assume page not found.
+      if (row && !row.filterAccepted && parentPage.detailTable.hasUserFilter() && scout.nvl(options?.resetViewAndWarnOnFail, true)) {
+        parentPage.detailTable.resetUserFilter();
+        parentPage.detailTable.setTableStatus(Status.warning(this.session.text('BookmarkResetColumnFilters')));
+        if (!row.filterAccepted) {
+          return null; // still filtered -> not found
         }
-        // If we found the page, but it is currently filtered by the parent table, remove the filter and try again.
-        // If the row is still not accepted, the filter is apparently a non-user filter which cannot be removed -> assume page not found.
-        if (!row.page.filterAccepted && parentPage.detailTable.hasUserFilter() && scout.nvl(options?.resetViewAndWarnOnFail, true)) {
-          parentPage.detailTable.resetUserFilter();
-          parentPage.detailTable.setTableStatus(Status.warning(this.session.text('BookmarkResetColumnFilters')));
-          if (!row.page.filterAccepted) {
-            return null; // still filtered -> not found
-          }
-        }
-        return row.page;
       }
-
-      if (parentPage instanceof PageWithNodes && parentBookmarkPage instanceof NodeBookmarkPageDo) {
-        // Lookup child page by pageParam
-        return parentPage.childNodes.find(node => node.matchesPageParam(bookmarkPage.pageParam));
+      if (row) {
+        return row.page;
       }
     }
 
-    // Lookup child page by pageParam
-    return outline.nodes.find(node => node.matchesPageParam(bookmarkPage.pageParam));
+    // For all other cases, identify the child page by page param (works for both PageWithNodes and PageWithTable).
+    return parentPage.childNodes.find(node => node.matchesPageParam(bookmarkPage.pageParam));
   }
 
   protected _revealPage(page: Page) {
