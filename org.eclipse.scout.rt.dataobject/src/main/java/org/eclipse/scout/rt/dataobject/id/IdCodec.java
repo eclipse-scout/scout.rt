@@ -160,13 +160,13 @@ public class IdCodec {
       return addSignature(id.getClass(), mapper.apply(value), flags);
     }
     else if (id instanceof ICompositeId) {
-      List<? extends IId> components = ((ICompositeId) id).unwrap();
+      List<? extends IId> compositeParts = ((ICompositeId) id).unwrap();
       // remove signature flag as composites are signed as one and not part by part
       Set<IIdCodecFlag> flagsWithoutSignature = flags.stream()
           .filter(Predicate.not(IdCodecFlag.SIGNATURE::equals))
           .collect(Collectors.toSet());
-      return addSignature(id.getClass(), components.stream()
-          .map(comp -> toUnqualified(comp, flagsWithoutSignature))
+      return addSignature(id.getClass(), compositeParts.stream()
+          .map(compositePart -> toUnqualifiedCompositePart(compositePart, flagsWithoutSignature))
           .map(s -> s == null ? "" : s) // empty string if component is null just in case of composite id
           .collect(Collectors.joining(";")), flags);
     }
@@ -174,6 +174,16 @@ public class IdCodec {
       return addSignature(UnknownId.class, ((UnknownId) id).getId(), flags);
     }
     return addSignature(id.getClass(), handleToUnqualifiedUnknownIdType(id, flags), flags);
+  }
+
+  /**
+   * Returns a string representation for the given wrapped {@code compositePart} component of a {@link ICompositeId}.<br>
+   * The default implementation uses {@code #toUnqualified} implementation to convert each component part to its string representation.
+   *
+   * @see #toUnqualified(IId, IIdCodecFlag...)
+   */
+  protected String toUnqualifiedCompositePart(IId compositePart, Set<IIdCodecFlag> flags) {
+    return toUnqualified(compositePart, flags);
   }
 
   /**
