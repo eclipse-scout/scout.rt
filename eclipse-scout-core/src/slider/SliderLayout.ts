@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractLayout, graphics, Slider} from '../index';
+import {AbstractLayout, Slider} from '../index';
 
 export class SliderLayout extends AbstractLayout {
   slider: Slider;
@@ -18,8 +18,6 @@ export class SliderLayout extends AbstractLayout {
   }
 
   override layout($container: JQuery) {
-    let size = graphics.size($container);
-    this.slider.$sliderInput.css('height', size.height);
-    this.slider.$sliderValue.css('height', size.height);
+    this.slider._update();
   }
 }
