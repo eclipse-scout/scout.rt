@@ -11,4 +11,8 @@ import {PropertyChangeEvent, WidgetEventMap} from '../index';
 
 export interface SliderEventMap extends WidgetEventMap {
   'propertyChange:value': PropertyChangeEvent<number>;
+  'propertyChange:minValue': PropertyChangeEvent<number>;
+  'propertyChange:maxValue': PropertyChangeEvent<number>;
+  'propertyChange:step': PropertyChangeEvent<number>;
+  'propertyChange:tabbable': PropertyChangeEvent<boolean>;
 }

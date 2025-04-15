@@ -1,0 +1,47 @@
+/*
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+.slider-field {
+  --slider-margin: 20px;
+  --slider-flex: 80%;
+  --input-min-width: 75px;
+  --input-flex: 20%;
+  --value-label-min-width: 50px;
+  --value-label-padding: 6px;
+
+  & > .field {
+    display: flex;
+    align-items: center;
+
+    & > .slider {
+      flex: var(--slider-flex);
+      min-width: var(--input-min-width);
+      margin-right: var(--slider-margin);
+    }
+
+    & > input {
+      flex: var(--input-flex);
+      min-width: var(--input-min-width);
+      text-align: right;
+    }
+
+    & > .value-label {
+      flex: none;
+      min-width: var(--value-label-min-width);
+      display: inline-block;
+      color: @control-color;
+      align-content: center;
+      text-align: center;
+      padding-left: var(--value-label-padding);
+      padding-top: var(--borderless-field-padding-y);
+      padding-bottom: var(--borderless-field-padding-y);
+    }
+  }
+}
