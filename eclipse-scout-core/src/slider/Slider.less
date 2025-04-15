@@ -7,137 +7,88 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-@thumb-radius: 8px;
-@thumb-size: 16px;
-@thumb-border-width: 1px;
-@thumb-border-color: @slider-thumb-border-color;
-@thumb-color: @slider-thumb-color;
-@thumb-focus-border-color: @slider-thumb-focus-border-color;
-@thumb-focus-color: @slider-thumb-focus-color;
 
-@track-height: 3px;
-@track-color: @slider-track-color;
+.slider {
+  --thumb-size: 18px;
+  --thumb-hitbox-padding: 4px;
+  --thumb-border-radius: 2px;
+  --track-border-radius: 4px;
+  --track-size: 6px;
+  --thumb-border-color: @slider-thumb-border-color;
+  --thumb-color: @slider-thumb-color;
+  --track-before-thumb-color: @slider-track-before-thumb-color;
+  --track-after-thumb-color: @slider-track-after-thumb-color;
+  --thumb-focus-border-color: @slider-thumb-focus-border-color;
+  --thumb-focus-color: @slider-thumb-focus-color;
+  --track-disabled-color: @slider-track-disabled-color;
+  --thumb-disabled-color: @slider-thumb-disabled-color;
+  --thumb-disabled-border-color: @slider-thumb-disabled-border-color;
 
-.track() {
-  height: @track-height;
-  cursor: pointer;
-  animate: 0.2s;
-}
+  position: relative;
+  background: var(--track-after-thumb-color);
+  border-radius: var(--track-border-radius);
+  user-select: none;
+  height: var(--track-size);
 
-/**
- * @param border-width: because firefox renders the border thinner, for some reason
- */
-.thumb(@border-width) {
-  box-sizing: border-box;
-  border: @border-width solid @thumb-border-color;
-  height: @thumb-size;
-  width: @thumb-size;
-  border-radius: @thumb-size / 2;
-  background-color: @thumb-color;
-  cursor: pointer;
-}
-
-.thumb-focus() {
-  background-color: @thumb-focus-color;
-  border-color: @thumb-focus-border-color;
-}
-
-.slider-input {
-  display: inline-block;
-  vertical-align: middle;
-  border: none;
+  // for a bigger hit box
+  &::before {
+    content: '';
+    position: absolute;
+    top: calc(2 * var(--track-size) + var(--thumb-size) * -1);
+    height: var(--thumb-size);
+    left: 0;
+    right: 0;
+  }
 
   &:focus {
-    border: none;
-    box-shadow: none;
-    outline: none;
+    .slider-thumb {
+      background: var(--thumb-focus-color);
+      border: var(--thumb-border-radius) solid var(--thumb-focus-border-color);
+    }
   }
 
-  /* Get rid of Firefox's focus border. See:
-     https://stackoverflow.com/questions/71074/how-to-remove-firefoxs-dotted-outline-on-buttons-as-well-as-links */
+  &.disabled {
+    background-color: var(--track-disabled-color);
 
-  &::-moz-focus-inner {
-    border: 0;
-  }
-}
+    .slider-track {
+      background-color: var(--track-disabled-color);
+    }
 
-.slider-value {
-  display: inline-block;
-  vertical-align: middle;
-  color: @control-color;
-  padding-left: 6px;
-  padding-top: @borderless-field-padding-y;
-  padding-bottom: @borderless-field-padding-y;
-}
-
-.slider.field {
-  /* Slider input/value have the container's height (see SliderLayout), therefore they shouldn't wrap, otherwise the layout breaks. */
-  white-space: nowrap;
-}
-
-input[type=range] {
-  -webkit-appearance: none;
-  padding: 0;
-
-  &:focus {
-    outline: none;
+    .slider-thumb {
+      background-color: var(--thumb-disabled-color);
+      border: var(--thumb-border-radius) solid var(--thumb-disabled-border-color);
+    }
   }
 
-  /* ---- Webkit, Chrome ---- */
-
-  &:not(.ms-edge)::-webkit-slider-runnable-track {
-    .track();
-    background: @track-color;
+  .slider-track {
+    position: absolute;
+    height: 100%;
+    background: var(--track-before-thumb-color);
+    border-radius: var(--track-border-radius);
   }
 
-  &:not(.ms-edge)::-webkit-slider-thumb {
-    .thumb(@thumb-border-width);
-    -webkit-appearance: none;
-    margin-top: ((@track-height) / 2) - (@thumb-size / 2);
-  }
+  .slider-thumb {
+    position: absolute;
+    width: var(--thumb-size);
+    height: var(--thumb-size);
+    background: var(--thumb-color);
+    border: var(--thumb-border-radius) solid var(--thumb-border-color);
+    border-radius: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 
-  &:not(.ms-edge):focus::-webkit-slider-thumb {
-    .thumb-focus();
-  }
+    // for a bigger hit box
+    &::before {
+      --offset: calc(var(--thumb-hitbox-padding) * -1);
+      --size: calc(var(--thumb-size) + var(--thumb-hitbox-padding));
 
-  /* ---- Firefox ---- */
-
-  &::-moz-range-track {
-    .track();
-    background: @track-color;
-  }
-
-  &::-moz-range-thumb {
-    .thumb(@thumb-border-width + 0.5px);
-  }
-
-  &:focus::-moz-range-thumb {
-    .thumb-focus();
-  }
-
-  /* ---- Internet Explorer, Edge ---- */
-
-  &::-ms-track {
-    .track();
-    background: transparent;
-    border-color: transparent;
-    border-size: 0;
-    color: transparent;
-  }
-
-  &::-ms-fill-lower {
-    background: @track-color;
-  }
-
-  &::-ms-fill-upper {
-    background: @track-color;
-  }
-
-  &::-ms-thumb {
-    .thumb(@thumb-border-width);
-  }
-
-  &:focus::-ms-thumb {
-    .thumb-focus();
+      content: '';
+      position: absolute;
+      top: var(--offset);
+      left: var(--offset);
+      height: var(--size);
+      width: var(--size);
+      border-radius: 50%;
+    }
   }
 }

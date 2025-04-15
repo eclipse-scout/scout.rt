@@ -40,23 +40,82 @@ describe('SliderField', () => {
 
   describe('slider', () => {
 
-    it('accepts the value', () => {
+    it('sets the slider value', () => {
       field.render();
       field.setValue(25);
 
-      expect(field.value).toBe(null);
+      expect(field.value).toBe(25);
       expect(field.slider.value).toBe(25);
-      expect(field.displayText).toBe('');
-      field.acceptInput();
       expect(field.displayText).toBe('25');
 
       field.slider.setValue(30);
-      field.acceptInput();
-      expect(field.value).toBe(null);
+      expect(field.value).toBe(30);
       expect(field.slider.value).toBe(30);
       expect(field.displayText).toBe('30');
     });
 
+    it('moves the thumb', () => {
+      field.render();
+
+      expect(field.value).toBe(0);
+      expect(field.slider.value).toBe(0);
+      expect(field.displayText).toBe('0');
+
+      field.slider.move(10);
+      expect(field.value).toBe(10);
+      expect(field.slider.value).toBe(10);
+      expect(field.displayText).toBe('10');
+    });
+
+    it('limits the min & max value', () => {
+      field.render();
+      field.setMinValue(-2.5);
+      field.setMaxValue(4);
+
+      field.slider.move(-100);
+      expect(field.value).toBe(-2.5);
+
+      field.slider.move(200);
+      expect(field.value).toBe(4);
+    });
+
+    it('steps the value', () => {
+      field.render();
+
+      field.setMinValue(0);
+      field.setMaxValue(10);
+      field.setStep(2);
+
+      field.slider.move(2.5);
+      expect(field.value).toBe(2);
+    });
+
+    it('can be read only', () => {
+      field.render();
+      expect(field.$valueLabel.isVisible()).toBe(false);
+      expect(field.$field.isVisible()).toBe(true);
+
+      field.setValueEditable(false);
+
+      expect(field.$valueLabel.isVisible()).toBe(true);
+      expect(field.$field.isVisible()).toBe(false);
+    });
+
+    it('can be tabbable', () => {
+      field.render();
+      expect(field.slider.$container.isTabbable()).toBe(true);
+      field.setSliderTabbable(false);
+      expect(field.slider.$container.isTabbable()).toBe(false);
+    });
+
+    it('syncs the display text with the slider', () => {
+      field.render();
+      field.setDisplayText('3');
+      expect(field.slider.value).toBe(3);
+
+      field.slider.setValue(4);
+      expect(field.displayText).toBe('4');
+    });
   });
 
 });
