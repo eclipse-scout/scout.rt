@@ -7,13 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {WidgetModel} from '../index';
+import {NumberFieldModel} from '../../../index';
 
-export interface SliderModel extends WidgetModel {
+export interface SliderFieldModel extends NumberFieldModel {
   /**
-   * Default is 0.
+   * Default is true.
    */
-  value?: number;
+  valueEditable?: boolean;
   /**
    * Default is 0.
    */
@@ -29,5 +29,5 @@ export interface SliderModel extends WidgetModel {
   /**
    * Default is true
    */
-  tabbable?: boolean;
+  sliderTabbable?: boolean;
 }
