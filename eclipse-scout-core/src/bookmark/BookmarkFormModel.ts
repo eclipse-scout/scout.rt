@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,7 @@ import {BookmarkDo, CancelMenu, Form, FormModel, GroupBox, OkMenu, StringField} 
 
 export default (): FormModel => ({
   objectType: Form,
-  title: 'Bookmark', // FIXME bsh [js-bookmark] NLS
+  title: '${textKey:Bookmark}',
   saveNeededVisible: false,
   rootGroupBox: {
     id: 'MainBox',
@@ -40,7 +40,7 @@ export default (): FormModel => ({
           {
             id: 'NameField',
             objectType: StringField,
-            label: 'Name', // FIXME bsh [js-bookmark] NLS
+            label: '${textKey:Name}',
             mandatory: true
           }
         ]

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,7 @@ import {BookmarkDo, BooleanColumn, CancelMenu, Column, Form, FormModel, GroupBox
 
 export default (): FormModel => ({
   objectType: Form,
-  title: 'Manage Bookmarks', // FIXME bsh [js-bookmark] NLS
+  title: '${textKey:BookmarksManageMenu}',
   displayHint: Form.DisplayHint.VIEW,
   rootGroupBox: {
     id: 'MainBox',
@@ -58,21 +58,8 @@ export default (): FormModel => ({
                 {
                   id: 'NameColumn',
                   objectType: Column,
-                  text: 'Name', // FIXME bsh [js-bookmark] NLS
+                  text: '${textKey:Name}',
                   width: 200
-                },
-                {
-                  id: 'SharedColumn',
-                  objectType: BooleanColumn,
-                  text: 'Shared', // FIXME bsh [js-bookmark] NLS
-                  width: 100,
-                  fixedWidth: true
-                },
-                {
-                  id: 'OwnerColumn',
-                  objectType: Column,
-                  text: 'Owner', // FIXME bsh [js-bookmark] NLS
-                  width: 150
                 }
               ],
               menus: [
@@ -81,6 +68,7 @@ export default (): FormModel => ({
                   objectType: Menu,
                   text: 'Edit',
                   iconId: icons.PENCIL,
+                  keyStroke: 'shift-enter',
                   menuTypes: [Table.MenuType.SingleSelection]
                 },
                 {
@@ -88,13 +76,14 @@ export default (): FormModel => ({
                   objectType: Menu,
                   text: 'Delete',
                   iconId: icons.REMOVE,
+                  keyStroke: 'shift-enter',
                   menuTypes: [Table.MenuType.SingleSelection, Table.MenuType.MultiSelection]
                 },
                 {
                   id: 'MoveRowUpMenu',
                   objectType: Menu,
                   iconId: icons.ANGLE_UP,
-                  tooltipText: 'Move up', // FIXME bsh [js-bookmark] NLS
+                  tooltipText: '${textKey:ButtonMoveUp}',
                   stackable: false,
                   horizontalAlignment: 1
                 },
@@ -102,7 +91,7 @@ export default (): FormModel => ({
                   id: 'MoveRowDownMenu',
                   objectType: Menu,
                   iconId: icons.ANGLE_DOWN,
-                  tooltipText: 'Move down', // FIXME bsh [js-bookmark] NLS
+                  tooltipText: '${textKey:ButtonMoveDown}',
                   stackable: false,
                   horizontalAlignment: 1
                 }
