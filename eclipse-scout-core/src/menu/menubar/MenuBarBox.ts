@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, arrays, HtmlComponent, Menu, MenuBarBoxEventMap, MenuBarBoxLayout, MenuBarBoxModel, ObjectOrChildModel, TooltipPosition, Widget} from '../../index';
+import {aria, arrays, HtmlComponent, Menu, MenuBarBoxEventMap, MenuBarBoxLayout, MenuBarBoxModel, ObjectIdProvider, ObjectOrChildModel, TooltipPosition, Widget} from '../../index';
 
 export class MenuBarBox extends Widget implements MenuBarBoxModel {
   declare model: MenuBarBoxModel;
@@ -87,3 +87,5 @@ export class MenuBarBox extends Widget implements MenuBarBoxModel {
     this.menuItems.forEach(item => item.setTooltipPosition(this.tooltipPosition));
   }
 }
+
+ObjectIdProvider.uuidPathSkipWidgets.add(MenuBarBox);

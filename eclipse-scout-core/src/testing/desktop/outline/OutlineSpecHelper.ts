@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FullModelOf, InitModelOf, ModelAdapter, ObjectOrModel, ObjectUuidProvider, Outline, OutlineAdapter, OutlineModel, Page, PageModel, Session} from '../../../index';
+import {FullModelOf, InitModelOf, ModelAdapter, ObjectIdProvider, ObjectOrModel, Outline, OutlineAdapter, OutlineModel, Page, PageModel, Session} from '../../../index';
 import {FormSpecHelper, TableSpecHelper} from '../../index';
 import $ from 'jquery';
 
@@ -32,7 +32,7 @@ export class OutlineSpecHelper {
 
   createModelNode(id: string, text: string, model?: PageModel): PageModel {
     return $.extend({
-      id: id || ObjectUuidProvider.createUiId(),
+      id: id || ObjectIdProvider.get().createUiSeqId(),
       text: text
     }, model);
   }

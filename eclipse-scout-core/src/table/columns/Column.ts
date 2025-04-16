@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AggregateTableRow, Alignment, Cell, CellEditorPopup, ColumnComparator, ColumnEventMap, ColumnModel, ColumnOptimalWidthMeasurer, ColumnUserFilter, comparators, Event, EventHandler, FormField, GridData, icons, InitModelOf, objects,
-  ObjectUuidBuilder, ObjectUuidProvider, ObjectWithObjectUuidBuilder, ObjectWithType, ObjectWithUuid, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent, TableHeader,
-  TableHeaderMenu, TableRow, texts, ValueField
+  AggregateTableRow, Alignment, Cell, CellEditorPopup, ColumnComparator, ColumnEventMap, ColumnModel, ColumnOptimalWidthMeasurer, ColumnUserFilter, comparators, Event, EventHandler, FormField, GridData, icons, InitModelOf, ObjectIdProvider,
+  objects, ObjectWithType, ObjectWithUuid, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent, TableHeader, TableHeaderMenu, TableRow, texts, UuidPathOptions, ValueField
 } from '../../index';
 import $ from 'jquery';
 
-export class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue>, ObjectWithType, ObjectWithUuid, ObjectWithObjectUuidBuilder {
+export class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue>, ObjectWithType, ObjectWithUuid {
   declare model: ColumnModel<TValue>;
   declare initModel: SomeRequired<this['model'], 'session'>;
   declare eventMap: ColumnEventMap;
@@ -90,7 +89,6 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
    */
   _realWidth: number;
 
-  protected _objectUuidBuilder: ObjectUuidBuilder;
   protected _tableColumnsChangedHandler: EventHandler<TableColumnMovedEvent | Event<Table>>;
 
   constructor() {
@@ -145,7 +143,6 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 
     this._tableColumnsChangedHandler = this._onTableColumnsChanged.bind(this);
     this._realWidth = null;
-    this._objectUuidBuilder = null;
 
     this.$header = null;
     this.$separator = null;
@@ -190,19 +187,18 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     // NOP
   }
 
-  uuidPath(useFallback?: boolean): string {
-    return ObjectUuidProvider.get().uuidPath(this, {
-      parent: this.table,
-      appendParent: true, // append the uuid of the table even when having a classId as the classId does not include its parent yet (see InspectorObjectIdProvider.getIdForColumn)
-      useFallback
-    });
+  buildUuid(useFallback?: boolean): string {
+    return ObjectIdProvider.get().uuid(this, useFallback);
   }
 
-  getObjectUuidBuilder(): ObjectUuidBuilder {
-    if (!this._objectUuidBuilder) {
-      this._objectUuidBuilder = scout.create(ObjectUuidBuilder, {owner: this, useUuidPath: false});
-    }
-    return this._objectUuidBuilder;
+  buildUuidPath(options?: UuidPathOptions): string {
+    return ObjectIdProvider.get().uuidPath(this, $.extend({
+      parent: this.table
+    }, options));
+  }
+
+  setUuid(uuid: string) {
+    this.setProperty('uuid', uuid);
   }
 
   /** @internal */
@@ -373,7 +369,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     // to reference, we do not need to reference the cell either, because screen readers will announce the cell
     // content naturally if there is no aria-labelledby
     if (this.table.header && strings.hasText(this.table.header.headerLabelId)) {
-      let cellLabelId = ObjectUuidProvider.createUiId();
+      let cellLabelId = ObjectIdProvider.get().createUiSeqId();
       ariaAttributes += ' aria-labelledBy="' + this.table.header.headerLabelId + ' ' + cellLabelId + '" ' + 'id="' + cellLabelId + '"';
     }
     return '<div' + ariaAttributes + ' class="' + cssClass + '" style="' + style + '">' + content + '</div>';

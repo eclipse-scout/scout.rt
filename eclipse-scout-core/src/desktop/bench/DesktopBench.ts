@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,8 @@
 import {
   aria, arrays, BenchColumn, BenchColumnLayoutData, BenchColumnViewActivateEvent, BenchColumnViewAddEvent, BenchColumnViewDeactivateEvent, BenchColumnViewRemoveEvent, BenchRowLayoutData, CollapseHandleActionEvent, Desktop,
   DesktopBenchEventMap, DesktopBenchModel, DesktopNavigationHandle, DesktopTab, DesktopTabArea, DesktopTabSelectKeyStroke, DisplayViewId, Event, EventHandler, FlexboxLayout, FlexboxLayoutData, Form, HeaderTabBoxController, HtmlComponent,
-  InitModelOf, KeyStrokeContext, Outline, OutlineOverview, OutlinePageChangedEvent, Page, PropertyChangeEvent, scout, SimpleTab, SimpleTabBox, Splitter, SplitterMoveEvent, styles, Table, TreeNodesSelectedEvent, Widget, widgets
+  InitModelOf, KeyStrokeContext, ObjectIdProvider, Outline, OutlineOverview, OutlinePageChangedEvent, Page, PropertyChangeEvent, scout, SimpleTab, SimpleTabBox, Splitter, SplitterMoveEvent, styles, Table, TreeNodesSelectedEvent, Widget,
+  widgets
 } from '../../index';
 import $ from 'jquery';
 
@@ -837,3 +838,5 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
 }
 
 export type OutlineContent = Form | Table | OutlineOverview;
+
+ObjectIdProvider.uuidPathSkipWidgets.add(DesktopBench);

@@ -11,37 +11,44 @@ import {ObjectType, ObjectWithUuid, Session} from '../index';
 
 export const inspector = {
   /**
-   * Adds inspector info (e.g. classId) from the given 'model' to the DOM. The target element
-   * is either the given '$container' or model.$container. Nothing happens if model or target
-   * element is undefined or the inspector is disabled in the session.
+   * Adds inspector info (uuid, modelclass, id) from the given `object` to the DOM.
+   *
+   * The target element is either the given `$target` or `object.$container`.
+   * Nothing happens if the object or target element is undefined or the inspector is disabled in the session.
+   *
+   * @param $target needs to be set if the object does not provide a $container
+   * @param session needs to be set if the object does not provide a session
    */
-  applyInfo(model: InspectorModel, $container?: JQuery, session?: Session) {
-    if (!model) {
+  applyInfo(object: InspectedObject, $target?: JQuery, session?: Session) {
+    if (!object) {
       return;
     }
-    $container = $container || model.$container;
-    if (!$container) {
+    $target = $target || object.$container;
+    if (!$target) {
       return;
     }
-    session = session || model.session;
+    session = session || object.session;
     if (!session?.inspector) {
       return;
     }
 
-    let modelClass = model.modelClass || (typeof model.objectType === 'string' && model.objectType);
-    let uuid: string = null;
-    if (model.uuidPath) {
-      uuid = model.uuidPath(false);
-    } else {
-      uuid = model.classId || model.uuid;
+    let modelClass = object.modelClass;
+    if (!modelClass && typeof object.objectType === 'string') {
+      modelClass = object.objectType;
     }
-    $container.toggleAttr('data-modelclass', !!modelClass, modelClass);
-    $container.toggleAttr('data-uuid', !!uuid, uuid);
-    $container.toggleAttr('data-id', !!model.id, model.id);
+    let uuid: string = null;
+    if (object.buildUuidPath) {
+      uuid = object.buildUuidPath();
+    } else {
+      uuid = object.classId || object.uuid;
+    }
+    $target.toggleAttr('data-modelclass', !!modelClass, modelClass);
+    $target.toggleAttr('data-uuid', !!uuid, uuid);
+    $target.toggleAttr('data-id', !!object.id, object.id);
   }
 };
 
-export interface InspectorModel extends Partial<ObjectWithUuid> {
+export interface InspectedObject extends Partial<ObjectWithUuid> {
   session?: Session;
   $container?: JQuery;
 

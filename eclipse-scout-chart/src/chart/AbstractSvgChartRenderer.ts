@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, ObjectUuidProvider, strings, styles} from '@eclipse-scout/core';
+import {aria, ObjectIdProvider, strings, styles} from '@eclipse-scout/core';
 import $ from 'jquery';
 import {AbstractChartRenderer, Chart} from '../index';
 import {ClickObject} from './Chart';
@@ -29,8 +29,8 @@ export class AbstractSvgChartRenderer extends AbstractChartRenderer {
     super(chart);
     this.chartBox = null;
 
-    this.clipId = 'Clip-' + ObjectUuidProvider.createUiId();
-    this.maskId = 'Mask-' + ObjectUuidProvider.createUiId();
+    this.clipId = 'Clip-' + ObjectIdProvider.get().createUiSeqId();
+    this.maskId = 'Mask-' + ObjectIdProvider.get().createUiSeqId();
 
     this.suppressLegendBox = false;
   }
@@ -253,7 +253,7 @@ export class AbstractSvgChartRenderer extends AbstractChartRenderer {
     $mask[0].id = this.maskId;
 
     this.chart.$container.find('.' + cssClass).each(function(i) {
-      this.id = 'ClipMask-' + ObjectUuidProvider.createUiId();
+      this.id = 'ClipMask-' + ObjectIdProvider.get().createUiSeqId();
       $clip.appendSVG('use').attrXLINK('href', '#' + this.id);
       $mask.appendSVG('use').attrXLINK('href', '#' + this.id);
     });

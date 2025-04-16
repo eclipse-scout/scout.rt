@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {OutlineSpecHelper, TableSpecHelper, TreeSpecHelper} from '../../../src/testing';
-import {BaseDoEntity, DataObjectInventory, defaultValues, ObjectFactory, objects, ObjectUuidProvider, Outline, Page, PageParamDo, PageWithNodes, typeName} from '../../../src';
+import {BaseDoEntity, DataObjectInventory, defaultValues, ObjectFactory, ObjectIdProvider, objects, Outline, Page, PageParamDo, PageWithNodes, typeName} from '../../../src';
 
 describe('OutlineAdapter', () => {
   let session: SandboxSession;
@@ -411,7 +411,7 @@ describe('OutlineAdapter', () => {
 
     it('is deserialized', () => {
       let model = {
-        id: ObjectUuidProvider.createUiId(),
+        id: ObjectIdProvider.get().createUiSeqId(),
         session,
         objectType: 'Outline',
         nodes: [{

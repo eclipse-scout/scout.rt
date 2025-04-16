@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Action, aria, arrays, ContextMenuPopupLayout, ContextMenuPopupModel, Event, graphics, HtmlComponent, InitModelOf, Menu, MenuDestinations, MenuFilter, menuNavigationKeyStrokes, Popup, PopupLayout, PropertyChangeEvent,
-  Rectangle, RowLayout, scout, ScrollbarInstallOptions
+  AbstractLayout, Action, aria, arrays, ContextMenuPopupLayout, ContextMenuPopupModel, Event, graphics, HtmlComponent, InitModelOf, Menu, MenuDestinations, MenuFilter, menuNavigationKeyStrokes, ObjectIdProvider, Popup, PopupLayout,
+  PropertyChangeEvent, Rectangle, RowLayout, scout, ScrollbarInstallOptions
 } from '../index';
 import $ from 'jquery';
 
@@ -391,11 +391,13 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
       if (this.cloneMenuItems && !menu.cloneOf || !this.has(menu)) {
         menu = menu.clone({
           parent: this,
-          textPosition: Action.TextPosition.DEFAULT
+          textPosition: Action.TextPosition.DEFAULT,
+          uuid: ObjectIdProvider.get().createDependentUuid('cmi', menu) // cmi: context-menu-item
         }, {
           delegateEventsToOriginal: ['acceptInput', 'action', 'click'],
           delegateAllPropertiesToClone: true,
           delegateAllPropertiesToOriginal: true,
+          excludePropertiesToClone: ['uuid'],
           excludePropertiesToOriginal: ['selected', 'logicalGrid', 'tabbable']
         });
         menu.setTabbable(false);

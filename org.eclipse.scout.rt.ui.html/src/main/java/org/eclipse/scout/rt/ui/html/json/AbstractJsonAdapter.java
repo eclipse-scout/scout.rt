@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,10 +15,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.client.ui.InspectorObjectIdProvider;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
@@ -35,7 +33,6 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   private boolean m_disposed;
   private final AtomicBoolean m_disposing = new AtomicBoolean();
   private final IJsonAdapter<?> m_parent;
-  protected static final LazyValue<InspectorObjectIdProvider> INSPECTOR_ID_PROVIDER = new LazyValue<>(InspectorObjectIdProvider.class);
 
   public AbstractJsonAdapter(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     if (model == null) {
@@ -145,8 +142,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     JSONObject json = new JSONObject();
     putProperty(json, "id", getId());
     putProperty(json, "objectType", getObjectTypeVariant());
-    T model = getModel();
-    BEANS.get(InspectorInfo.class).put(getUiSession().currentHttpRequest(), json, model, m -> INSPECTOR_ID_PROVIDER.get().getId(m));
+    BEANS.get(InspectorInfo.class).put(json, getModel(), getUiSession());
 
     // Mark the global adapters so the UI may use the root adapter as owner
     if (getParent() == getUiSession().getRootJsonAdapter()) {

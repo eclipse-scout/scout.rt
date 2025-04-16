@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CompositeEventMap, CompositeModel, HtmlComponent, ObjectOrChildModel, Widget} from '../index';
+import {CompositeEventMap, CompositeModel, HtmlComponent, ObjectIdProvider, ObjectOrChildModel, Widget} from '../index';
 
 export class Composite extends Widget implements CompositeModel {
   declare model: CompositeModel;
@@ -41,3 +41,5 @@ export class Composite extends Widget implements CompositeModel {
     this.invalidateLayoutTree();
   }
 }
+
+ObjectIdProvider.uuidPathSkipWidgets.add(Composite);

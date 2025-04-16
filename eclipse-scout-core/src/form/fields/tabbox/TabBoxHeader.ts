@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, InitModelOf, MenuBar, PropertyChangeEvent, scout, Tab, TabArea, TabBox, TabBoxHeaderLayout, TabItem, Widget, WidgetEventMap, WidgetModel} from '../../../index';
+import {EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, InitModelOf, MenuBar, ObjectIdProvider, PropertyChangeEvent, scout, Tab, TabArea, TabBox, TabBoxHeaderLayout, TabItem, Widget, WidgetEventMap, WidgetModel} from '../../../index';
 
 export interface TabBoxHeaderModel extends WidgetModel {
   tabBox: TabBox;
@@ -122,3 +122,5 @@ export class TabBoxHeader extends Widget implements TabBoxHeaderModel {
     }
   }
 }
+
+ObjectIdProvider.uuidPathSkipWidgets.add(TabBoxHeader);
