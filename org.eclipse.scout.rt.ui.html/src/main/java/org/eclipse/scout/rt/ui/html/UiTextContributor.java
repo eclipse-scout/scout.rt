@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,6 +23,14 @@ public class UiTextContributor implements IUiTextContributor {
 
     // Additional text keys from org.eclipse.scout.rt.nls
     textKeys.addAll(List.of(
+        "Bookmark",
+        "BookmarksManageMenu",
+        "BookmarkResolutionCanceled",
+        "BookmarkResetColumnFilters",
+        "BookmarkResolvingFailed",
+        "BookmarkOutlineNotFound",
+        "BookmarkWrongDefinitionType",
+        "CannotCreateBookmarkAtThisLocation",
         "Cancel",
         "CancelButton",
         "CloseButton",
@@ -37,6 +45,10 @@ public class UiTextContributor implements IUiTextContributor {
         "FormSaveChangesQuestion",
         "ConfirmApplyChanges",
         "GroupBy",
+        "MoveUp",
+        "MoveDown",
+        "Name",
+        "Node",
         "NoGrouping",
         "InactiveState",
         "InvalidNumberMessageX",
