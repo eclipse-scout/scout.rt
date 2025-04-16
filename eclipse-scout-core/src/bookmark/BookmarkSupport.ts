@@ -71,6 +71,13 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     this.desktop.setBusy(this.loading);
   }
 
+  resolveOutline(outlineId: string) {
+    return this.desktop.getOutlines().find(outline => {
+      let id = outline.getObjectUuidBuilder().buildId();
+      return id === outlineId;
+    });
+  }
+
   // --------------------------------------
 
   protected _getBookmarkStore(): BookmarkDo[] {
@@ -154,7 +161,11 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   // --------------------------------------
 
-  openBookmarkInOutline(bookmark: BookmarkDo): JQuery.Promise<void> {
+  activateBookmark(bookmark: BookmarkDo): JQuery.Promise<void> {
+    return $.when(this._activateBookmark(bookmark));
+  }
+
+  async _activateBookmark(bookmark: BookmarkDo): Promise<void> {
     if (this.loading) {
       return $.rejectedPromise(BookmarkSupport.ERROR_ALREADY_LOADING);
     }
@@ -167,13 +178,13 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
     this.setLoading(true);
     return $.resolvedPromise()
-      .then(() => this._openBookmarkHybrid(bookmarkDefinition))
+      .then(() => this._activateBookmarkHybrid(bookmarkDefinition))
       .always(() => {
         this.setLoading(false);
       });
   }
 
-  protected async _openBookmarkHybrid(bookmarkDefinition: OutlineBookmarkDefinitionDo): Promise<void> {
+  protected async _activateBookmarkHybrid(bookmarkDefinition: OutlineBookmarkDefinitionDo): Promise<void> {
     let hybridManager = HybridManager.get(this.session);
 
     // Scout Classic: send the bookmark to the UI server. The client model will first try to resolve
@@ -185,14 +196,11 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
 
     // Scout JS: resolve everything in the UI, i.e. the entire path is remaining
-    let outline = this.desktop.getOutlines().find(outline => {
-      let outlineId = outline?.getObjectUuidBuilder().buildId();
-      return outlineId === bookmarkDefinition.outlineId;
-    });
+    let outline = this.resolveOutline(bookmarkDefinition.outlineId);
     let pagePath = bookmarkDefinition.bookmarkedPage
       ? [...bookmarkDefinition.pagePath || [], bookmarkDefinition.bookmarkedPage]
       : null;
-    return this.openBookmarkLocal({
+    return this.activateBookmarkLocal({
       parentOutline: outline,
       parentPage: null,
       parentBookmarkPage: null,
@@ -200,18 +208,18 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     });
   }
 
-  openBookmarkLocal(request: ActivateBookmarkRequest): JQuery.Promise<void> {
-    return $.resolvedPromise()
-      .then(() => this._openBookmarkLocal(request));
+  activateBookmarkLocal(request: ActivateBookmarkRequest): JQuery.Promise<void> {
+    return $.when(this._activateBookmarkLocal(request));
   }
 
-  protected async _openBookmarkLocal(request: ActivateBookmarkRequest): Promise<void> {
+  protected async _activateBookmarkLocal(request: ActivateBookmarkRequest): Promise<void> {
     // Check if we are already on the correct outline
     let outline = request.parentOutline || request.parentPage?.outline;
     if (!outline || !outline.visible || !outline.enabled) {
       throw BookmarkSupport.ERROR_OUTLINE_NOT_FOUND;
     }
     this.desktop.setOutline(outline);
+    // FIXME bsh [js-bookmark] bringOutlineToFront?
     if (request.parentPage && request.parentPage.outline !== outline) {
       throw BookmarkSupport.ERROR_PAGE_WRONG_OUTLINE;
     }
@@ -332,7 +340,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
   }
 
-  handleOpenBookmarkError(error: any): JQuery.Promise<any> {
+  handleActivateBookmarkError(error: any): JQuery.Promise<any> {
     if (error === BookmarkSupport.ERROR_ALREADY_LOADING) {
       return MessageBoxes.openOk(this.desktop, 'Another bookmark is currently loading', Status.Severity.ERROR);
     }
@@ -365,8 +373,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       return;
     }
     let bookmarkPage = bookmark.definition.bookmarkedPage;
-    return $.resolvedPromise()
-      .then(() => this._applyBookmarkPageAndReload(page, bookmarkPage, saveSearchForm));
+    return $.when(this._applyBookmarkPageAndReload(page, bookmarkPage, saveSearchForm));
   }
 
   protected async _applyBookmarkPageAndReload(page: Page, bookmarkPage: IBookmarkPageDo, saveSearchForm = true): Promise<void> {
