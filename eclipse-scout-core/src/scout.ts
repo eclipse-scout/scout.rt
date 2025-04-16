@@ -9,7 +9,8 @@
  */
 
 import {
-  AdapterData, App, Device, GroupBox, Locale, locales, LogicalGridLayout, ModelAdapterLike, ObjectCreator, ObjectFactory, ObjectFactoryOptions, objects, ObjectType, ObjectUuidProvider, Session, strings, TileGrid, ValueField, Widget, widgets
+  AdapterData, App, Device, GroupBox, Locale, locales, LogicalGridLayout, ModelAdapterLike, ObjectCreator, ObjectFactory, ObjectFactoryOptions, objects, ObjectType, ObjectUuidProvider, Session, strings, TileGrid, UuidPathOptions,
+  ValueField, Widget, widgets
 } from './index';
 import $ from 'jquery';
 
@@ -65,18 +66,39 @@ export interface ObjectWithType {
  */
 export interface ObjectWithUuid {
   /**
-   * The identifier property of the object. This property alone may not be unique within a widget tree (e.g. if template widgets are used).
-   * To get a more unique id use {@link uuidPath} instead.
+   * The unique identifier property of the object.
+   *
+   * This property alone may not be unique within a widget tree (e.g. if template widgets are used).
+   * To get a more unique id use {@link buildUuidPath} instead.
    */
   uuid: string;
 
   /**
-   * Computes a string consisting of the id of this object and its parent objects (if existing) to get a unique identifier within an object tree.
+   * Computes a unique identifier for the object.
+   *
+   * Compared to {@link uuid} it also considers the {@link classId} property and may use a fallback logic if none of these two properties are available, see {@link ObjectUuidProvider.uuid}.
+   *
+   * This property alone may not be unique within a widget tree (e.g. if template widgets are used).
+   * To get a more unique id use {@link buildUuidPath} instead.
+   *
+   * @param useFallback Optional boolean specifying if a fallback identifier may be created in case an object has no specific identifier set. The fallback may be less stable. Default is true.
+   * @returns the uuid for the object or null.
+   */
+  buildUuid(useFallback?: boolean): string;
+
+  /**
+   * Computes a unique identifier for the object considering parent objects (if existing).
    *
    * Note: The returned id may not be unique within the application! E.g. if the same form is opened twice, its children will share the same ids.
-   * @param useFallback Optional boolean specifying if a fallback identifier may be used or created in case an object has no specific identifier set. The fallback may be less stable. Default is true.
+   * @param options Optional {@link UuidPathOptions} controlling the computation of the path.
+   * @see ObjectUuidProvider.uuidPath.
    */
-  uuidPath(useFallback?: boolean): string;
+  buildUuidPath(options?: UuidPathOptions): string;
+
+  /**
+   * Sets the {@link uuid} property.
+   */
+  setUuid(uuid: string);
 }
 
 export interface ObjectWithId<TId = string> {
@@ -522,7 +544,7 @@ export const scout = {
       }
     }
     if (scout.nvl(createUniqueId, true)) {
-      clone.id = ObjectUuidProvider.createUiId();
+      clone.id = ObjectUuidProvider.get().createUiSeqId();
     }
     if (clone.cloneOf === undefined) {
       clone.cloneOf = template;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {NullWidgetEventMap, NullWidgetModel, ObjectOrChildModel, Widget} from '../index';
+import {NullWidgetEventMap, NullWidgetModel, ObjectOrChildModel, ObjectUuidProvider, Widget} from '../index';
 
 export class NullWidget extends Widget implements NullWidgetModel {
   declare model: NullWidgetModel;
@@ -26,3 +26,5 @@ export class NullWidget extends Widget implements NullWidgetModel {
     this.setProperty('childWidget', childWidget);
   }
 }
+
+ObjectUuidProvider.uuidPathAlwaysSkipRules.push(widget => widget instanceof NullWidget);

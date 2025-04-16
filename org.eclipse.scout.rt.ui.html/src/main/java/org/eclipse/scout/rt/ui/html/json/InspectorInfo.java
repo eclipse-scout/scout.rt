@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -69,19 +68,17 @@ public class InspectorInfo {
    *     does nothing.
    * @param model
    *     The model for which the properties should be added. May be {@code null} then this method does nothing.
-   * @param classIdExtractor
-   *     {@link Function} to extract the value for the {@value #PROP_CLASS_ID} property. May be {@code null}, then
-   *     this property is not added. The input to the function is the model. The function may return {@code null}.
    */
-  public <T> void put(HttpServletRequest req, JSONObject json, T model, Function<T, String> classIdExtractor) {
+  public <T> void put(HttpServletRequest req, JSONObject json, T model) {
     if (json == null || model == null) {
       return;
     }
-    if (classIdExtractor != null) {
-      String id = classIdExtractor.apply(model);
-      if (!StringUtility.isNullOrEmpty(id)) {
-        json.put(PROP_CLASS_ID, prepareClassId(id));
-      }
+    String classId = null;
+    if (model instanceof ITypeWithClassId) {
+      classId = ((ITypeWithClassId) model).classId();
+    }
+    if (!StringUtility.isNullOrEmpty(classId)) {
+      json.put(PROP_CLASS_ID, prepareClassId(classId));
     }
     if (UrlHints.isInspectorHint(req)) {
       json.put(PROP_MODEL_CLASS, model.getClass().getName());
@@ -93,7 +90,7 @@ public class InspectorInfo {
    * internal names.
    *
    * @param classId
-   *          The classId to prepare. Must not be {@code null}.
+   *     The classId to prepare. Must not be {@code null}.
    * @return The id ready to be sent to the browser.
    */
   public String prepareClassId(String classId) {

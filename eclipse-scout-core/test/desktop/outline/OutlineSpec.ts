@@ -469,7 +469,7 @@ describe('Outline', () => {
         // The outline node contains a tree as detail node (real life case would be a form with a tree field, but this is easier to test)
         let treeHelper = new TreeSpecHelper(session);
         let treeModel = treeHelper.createModelFixture(3, 3);
-        treeModel.nodes[0].id = ObjectUuidProvider.createUiId(); // tree helper doesn't use unique ids -> do it here
+        treeModel.nodes[0].id = ObjectUuidProvider.get().createUiSeqId(); // tree helper doesn't use unique ids -> do it here
         let tree = treeHelper.createTree(treeModel);
         let form = scout.create(Form, {
           parent: session.desktop,

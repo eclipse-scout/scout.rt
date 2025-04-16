@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 import {
   aria, CollapseHandle, CollapseHandleActionEvent, Desktop, DesktopNavigationEventMap, DesktopNavigationHandle, DesktopNavigationLayout, DesktopNavigationModel, DesktopToolBox, Event, EventHandler, HtmlComponent, InitModelOf, LayoutData,
-  Outline, PropertyChangeEvent, scout, SingleLayout, strings, styles, Tree, ViewButtonBox, Widget
+  ObjectUuidProvider, Outline, PropertyChangeEvent, scout, SingleLayout, strings, styles, Tree, ViewButtonBox, Widget
 } from '../../index';
 
 export class DesktopNavigation extends Widget implements DesktopNavigationModel {
@@ -341,3 +341,4 @@ export class DesktopNavigation extends Widget implements DesktopNavigationModel 
 }
 
 export type DesktopNavigationLayoutData = LayoutData & { fullWidth?: boolean };
+ObjectUuidProvider.uuidPathSkipWidgets.add(DesktopNavigation);

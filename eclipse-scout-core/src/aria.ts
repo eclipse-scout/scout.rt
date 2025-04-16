@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -147,7 +147,7 @@ export const aria = {
     let targetId = $targetElement.attr('id') as string;
     if (!targetId) {
       // Create an id if the element does not have one yet
-      targetId = ObjectUuidProvider.createUiId();
+      targetId = ObjectUuidProvider.get().createUiSeqId();
       $targetElement.attr('id', targetId);
     }
     if (!replace) {

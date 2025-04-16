@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,8 +29,8 @@ export class AbstractSvgChartRenderer extends AbstractChartRenderer {
     super(chart);
     this.chartBox = null;
 
-    this.clipId = 'Clip-' + ObjectUuidProvider.createUiId();
-    this.maskId = 'Mask-' + ObjectUuidProvider.createUiId();
+    this.clipId = 'Clip-' + ObjectUuidProvider.get().createUiSeqId();
+    this.maskId = 'Mask-' + ObjectUuidProvider.get().createUiSeqId();
 
     this.suppressLegendBox = false;
   }
@@ -253,7 +253,7 @@ export class AbstractSvgChartRenderer extends AbstractChartRenderer {
     $mask[0].id = this.maskId;
 
     this.chart.$container.find('.' + cssClass).each(function(i) {
-      this.id = 'ClipMask-' + ObjectUuidProvider.createUiId();
+      this.id = 'ClipMask-' + ObjectUuidProvider.get().createUiSeqId();
       $clip.appendSVG('use').attrXLINK('href', '#' + this.id);
       $mask.appendSVG('use').attrXLINK('href', '#' + this.id);
     });

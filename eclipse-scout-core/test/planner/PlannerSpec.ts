@@ -51,18 +51,18 @@ describe('Planner', () => {
 
   function createResource(text?: string): PlannerResourceModel {
     return {
-      id: ObjectUuidProvider.createUiId(),
+      id: ObjectUuidProvider.get().createUiSeqId(),
       resourceCell: {
         text: text
       },
       activities: [{
         beginTime: '2015-04-01 01:23:45.678Z',
         endTime: '2015-04-31 01:23:45.678Z',
-        id: ObjectUuidProvider.createUiId()
+        id: ObjectUuidProvider.get().createUiSeqId()
       }, {
         beginTime: '2016-02-29 01:23:45.678Z',
         endTime: '2400-02-29 01:23:45.678Z',
-        id: ObjectUuidProvider.createUiId()
+        id: ObjectUuidProvider.get().createUiSeqId()
       }]
     };
   }

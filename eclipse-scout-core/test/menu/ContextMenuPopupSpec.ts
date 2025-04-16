@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ContextMenuPopup, keys, Menu, Popup, scout, Widget} from '../../src/index';
+import {ContextMenuPopup, keys, Menu, ObjectUuidProvider, Popup, scout, Widget} from '../../src/index';
 import {JQueryTesting, MenuSpecHelper} from '../../src/testing/index';
 
 describe('ContextMenuPopup', () => {
@@ -325,6 +325,24 @@ describe('ContextMenuPopup', () => {
       popup.render();
       JQueryTesting.triggerKeyDown(popup.$body, keys.DOWN);
       expect(popup.$container.attr('aria-activedescendant')).toBeTruthy();
+    });
+  });
+
+  describe('uuid', () => {
+    it('of menu items is set to cloned menu items', () => {
+      let menuItem1 = scout.create(Menu, {
+        parent: session.desktop, uuid: '1'
+      });
+      let menuItem2 = scout.create(Menu, {
+        parent: session.desktop, id: 'MyMenu'
+      });
+      let contextMenu = scout.create(ContextMenuPopup, {
+        parent: session.desktop,
+        menuItems: [menuItem1, menuItem2]
+      });
+      contextMenu.render();
+      expect(findClone(contextMenu, menuItem1).uuid).toBe(`cmi${ObjectUuidProvider.DEPENDENT_UUID_DELIMITER}1`);
+      expect(findClone(contextMenu, menuItem2).uuid).toBe(`cmi${ObjectUuidProvider.DEPENDENT_UUID_DELIMITER}MyMenu`);
     });
   });
 });

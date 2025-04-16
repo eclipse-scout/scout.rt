@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,10 +28,10 @@ export const widgets = {
   },
 
   /**
-   * @deprecated Use {@link ObjectUuidProvider.createUiId} instead.
+   * @deprecated Use {@link ObjectUuidProvider.createUiSeqId} instead.
    */
   createUniqueId(prefix?: string): string {
-    return ObjectUuidProvider.createUiId();
+    return ObjectUuidProvider.get().createUiSeqId();
   },
 
   /**

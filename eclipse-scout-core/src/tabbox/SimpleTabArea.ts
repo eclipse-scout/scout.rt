@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -32,6 +32,7 @@ export class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends 
     this.displayStyle = SimpleTabArea.DisplayStyle.DEFAULT;
     this.tabs = [];
     this._selectedViewTab = null;
+    this._addWidgetProperties(['tabs']);
   }
 
   protected override _init(model: InitModelOf<this>) {

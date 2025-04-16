@@ -30,8 +30,8 @@ export const inspector = {
 
     let modelClass = model.modelClass || (typeof model.objectType === 'string' && model.objectType);
     let uuid: string = null;
-    if (model.uuidPath) {
-      uuid = model.uuidPath(false);
+    if (model.buildUuidPath) {
+      uuid = model.buildUuidPath();
     } else {
       uuid = model.classId || model.uuid;
     }

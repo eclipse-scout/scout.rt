@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,12 +9,10 @@
  */
 package org.eclipse.scout.rt.ui.html.json.table;
 
-import org.eclipse.scout.rt.client.ui.InspectorObjectIdProvider;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
@@ -35,7 +33,6 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   private JsonTable<?> m_jsonTable;
   private int m_indexOffset;
 
-  protected static final LazyValue<InspectorObjectIdProvider> INSPECTOR_ID_PROVIDER = new LazyValue<>(InspectorObjectIdProvider.class);
   private static final String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN = "initialAlwaysIncludeSortAtBegin";
   private static final String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END = "initialAlwaysIncludeSortAtEnd";
 
@@ -107,7 +104,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     json.put("headerTooltipText", column.getHeaderCell().getTooltipText());
     json.put("headerTooltipHtmlEnabled", column.getHeaderCell().isTooltipHtmlEnabled());
     json.put("headerIconId", BinaryResourceUrlUtility.createIconUrl(column.getHeaderCell().getIconId()));
-    BEANS.get(InspectorInfo.class).put(getUiSession().currentHttpRequest(), json, column, c -> INSPECTOR_ID_PROVIDER.get().getIdForColumn(c));
+    BEANS.get(InspectorInfo.class).put(getUiSession().currentHttpRequest(), json, column);
     json.put(IColumn.PROP_UI_SORT_POSSIBLE, column.isUiSortPossible());
     json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN, column.isInitialAlwaysIncludeSortAtBegin());
     json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END, column.isInitialAlwaysIncludeSortAtEnd());

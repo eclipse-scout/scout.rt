@@ -233,45 +233,29 @@ describe('Page', () => {
 
   describe('uuid', () => {
 
-    it('uuidPath for remote page includes parent', () => {
-      outline.classId = 'outline-class-id'; // outline contains only own classId without any parents (see AbstractOutline.classId)
-      const page = scout.create(Page, {
-        parent: outline,
-        classId: 'page-class-id' // page contains only own classId without any parents (see AbstractPage.classId)
-      });
-      expect(page.uuidPath()).toBe('page-class-id|outline-class-id');
-      expect(outline.uuidPath()).toBe('outline-class-id');
-    });
-
-    it('uuidPath for local page includes parent', () => {
-      outline.uuid = 'outline-uuid'; // outline contains only own uuid without any parents
-      const page = scout.create(Page, {
-        parent: outline,
-        uuid: 'page-uuid' // page contains only own uuid without any parents
-      });
-      expect(page.uuidPath()).toBe('page-uuid|outline-uuid');
-      expect(outline.uuidPath()).toBe('outline-uuid');
-    });
-
-    it('ObjectUuidBuilder.buildId returns id without parent for local and remote case', () => {
-      outline.classId = 'outline-class-id';
-      const remotePage = scout.create(Page, {
-        parent: outline,
-        classId: 'page-class-id'
-      });
-
-      expect(remotePage.getObjectUuidBuilder().buildId()).toBe('page-class-id');
-      expect(outline.getObjectUuidBuilder().buildId()).toBe('outline-class-id');
-
-      outline.classId = null;
+    it('uuidPath for page does not include outline', () => {
       outline.uuid = 'outline-uuid';
-      const localPage = scout.create(Page, {
+      const page = scout.create(Page, {
         parent: outline,
         uuid: 'page-uuid'
       });
+      expect(page.buildUuidPath()).toBe('page-uuid');
+      expect(outline.buildUuidPath()).toBe('outline-uuid');
 
-      expect(localPage.getObjectUuidBuilder().buildId()).toBe('page-uuid');
-      expect(outline.getObjectUuidBuilder().buildId()).toBe('outline-uuid');
+      class CustomOutline extends Outline {
+      }
+
+      let customOutline = scout.create(CustomOutline, {
+        parent: session.desktop,
+        uuid: 'outline-uuid'
+      });
+
+      const page2 = scout.create(Page, {
+        parent: customOutline,
+        uuid: 'page-uuid'
+      });
+      expect(page2.buildUuidPath()).toBe('page-uuid');
+      expect(customOutline.buildUuidPath()).toBe('outline-uuid');
     });
   });
 

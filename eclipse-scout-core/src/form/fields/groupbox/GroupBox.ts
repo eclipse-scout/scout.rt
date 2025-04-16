@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -866,4 +866,4 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
 export type GroupBoxBorderDecoration = EnumObject<typeof GroupBox.BorderDecoration>;
 export type GroupBoxMenuBarPosition = EnumObject<typeof GroupBox.MenuBarPosition>;
 
-ObjectUuidProvider.UuidPathSkipWidgets.add(GroupBox);
+ObjectUuidProvider.uuidPathSkipWidgets.add(GroupBox);

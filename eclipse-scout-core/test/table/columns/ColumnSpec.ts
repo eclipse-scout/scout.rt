@@ -199,7 +199,7 @@ describe('Column', () => {
     let firstElement = table.rows[0].cells[0]['_cachedEncodedText'];
     expect(firstElement).not.toBeFalsy();
 
-    // re render -> encode must not be called again
+    // re-render -> encode must not be called again
     table.remove();
     table.render();
     expect(firstElement).toBe(table.rows[0].cells[0]['_cachedEncodedText']);
@@ -777,56 +777,39 @@ describe('Column', () => {
   });
 
   describe('uuid', () => {
+    it('uuidPath for column includes parent', () => {
+      const table = createLocalTable();
+      const column = table.columns[0];
+      expect(column.uuid).toBe('column-uuid'); // must be the own uuid only (without table or its parents)
+      expect(table.uuid).toBe('table-uuid'); // must be the own uuid only
+      expect(column.buildUuidPath()).toBe('column-uuid|table-uuid|parent-widget-uuid'); // uuidPath of the column should include the parents
+      expect(table.buildUuidPath()).toBe('table-uuid|parent-widget-uuid'); // uuidPath of the table should include its parent
+    });
 
     it('uuidPath for remote column includes parent', () => {
-      const remoteTable = getRemoteTable();
+      const remoteTable = createRemoteTable();
       const remoteCol = remoteTable.columns[0];
 
       // remote case (Scout Classic): classId is sent from backend
-      expect(remoteCol.classId).toBe('column-class-id'); // must be the own id only (without table or its parents)
-      expect(remoteTable.classId).toBe('table-class-id_parent-widget-class-id'); // table contains the ids of its parents
-      expect(remoteCol.uuidPath()).toBe('column-class-id|table-class-id_parent-widget-class-id'); // uuidPath of the column should include the parent table
-      expect(remoteTable.uuidPath()).toBe('table-class-id_parent-widget-class-id'); // uuidPath of the table should include its parent
+      expect(remoteCol.classId).toBe('column-class-id_table-class-id_parent-widget-class-id');
+      expect(remoteTable.classId).toBe('table-class-id_parent-widget-class-id');
+      expect(remoteCol.buildUuidPath()).toBe('column-class-id_table-class-id_parent-widget-class-id'); // classId already contains parents -> won't be modified
+      expect(remoteTable.buildUuidPath()).toBe('table-class-id_parent-widget-class-id'); // classId already contains parents -> won't be modified
     });
 
-    function getRemoteTable(): SpecTable {
-      const remoteParent = scout.create(Widget, {
-        parent: session.desktop,
-        classId: 'parent-widget-class-id' // root widget classId
-      });
-      return helper.createTable({
-        parent: remoteParent,
-        classId: 'table-class-id_parent-widget-class-id', // classId of the table includes its parents (see AbstractTable.classId)
-        columns: [{
-          objectType: Column,
-          classId: 'column-class-id' // classId without parent Table is sent from backend (see InspectorObjectIdProvider.getIdForColumn)
-        }]
-      });
-    }
-
-    it('uuidPath for local column includes parent', () => {
-      // Scout JS: uuid is part of the model
-      const localTable = getLocalTable();
+    it('buildUuid returns id without parent for local and remote case', () => {
+      const localTable = createLocalTable();
       const localCol = localTable.columns[0];
-      expect(localCol.uuid).toBe('column-uuid'); // must be the own uuid only (without table or its parents)
-      expect(localTable.uuid).toBe('table-uuid'); // must be the own uuid only (without table or its parents)
-      expect(localCol.uuidPath()).toBe('column-uuid|table-uuid|parent-widget-uuid'); // uuidPath of the column should include the parents
-      expect(localTable.uuidPath()).toBe('table-uuid|parent-widget-uuid'); // uuidPath of the table should include its parent
-    });
-
-    it('ObjectUuidBuilder.buildId returns id without parent for local and remote case', () => {
-      const localTable = getLocalTable();
-      const localCol = localTable.columns[0];
-      const remoteTable = getRemoteTable();
+      const remoteTable = createRemoteTable();
       const remoteCol = remoteTable.columns[0];
 
-      expect(remoteCol.getObjectUuidBuilder().buildId()).toBe('column-class-id'); // must be the column classId only without its parents
-      expect(remoteTable.getObjectUuidBuilder().buildId()).toBe('table-class-id_parent-widget-class-id'); // must be with parent classIds
-      expect(localCol.getObjectUuidBuilder().buildId()).toBe('column-uuid'); // must be the column uuid only without its parents
-      expect(localTable.getObjectUuidBuilder().buildId()).toBe('table-uuid|parent-widget-uuid'); // must be with parent classIds
+      expect(remoteCol.buildUuid()).toBe('column-class-id_table-class-id_parent-widget-class-id');
+      expect(remoteTable.buildUuid()).toBe('table-class-id_parent-widget-class-id');
+      expect(localCol.buildUuid()).toBe('column-uuid');
+      expect(localTable.buildUuid()).toBe('table-uuid');
     });
 
-    function getLocalTable(): SpecTable {
+    function createLocalTable(): SpecTable {
       const localParent = scout.create(Widget, {
         parent: session.desktop,
         uuid: 'parent-widget-uuid' // root widget uuid
@@ -837,6 +820,21 @@ describe('Column', () => {
         columns: [{
           objectType: Column,
           uuid: 'column-uuid' // uuid of the column
+        }]
+      });
+    }
+
+    function createRemoteTable(): SpecTable {
+      const remoteParent = scout.create(Widget, {
+        parent: session.desktop,
+        classId: 'parent-widget-class-id' // root widget classId
+      });
+      return helper.createTable({
+        parent: remoteParent,
+        classId: 'table-class-id_parent-widget-class-id', // classId of the table includes its parents (see AbstractTable.classId)
+        columns: [{
+          objectType: Column,
+          classId: 'column-class-id_table-class-id_parent-widget-class-id' // Includes table's classId
         }]
       });
     }

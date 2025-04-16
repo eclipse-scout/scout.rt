@@ -73,7 +73,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   resolveOutline(outlineId: string) {
     return this.desktop.getOutlines().find(outline => {
-      let id = outline.getObjectUuidBuilder().buildId();
+      let id = outline.buildUuid();
       return id === outlineId;
     });
   }

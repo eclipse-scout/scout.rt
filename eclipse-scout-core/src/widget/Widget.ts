@@ -9,13 +9,13 @@
  */
 import {
   Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke, KeyStrokeContext, LayoutData,
-  LoadingSupport, LogicalGrid, ModelAdapter, objectFactoryHints, ObjectOrChildModel, ObjectOrType, objects, ObjectUuidBuilder, ObjectUuidProvider, ObjectWithObjectUuidBuilder, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration,
-  PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session, SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
+  LoadingSupport, LogicalGrid, ModelAdapter, objectFactoryHints, ObjectOrChildModel, ObjectOrType, objects, ObjectUuidProvider, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter, scout,
+  ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session, SomeRequired, strings, texts, TreeVisitResult, UuidPathOptions, WidgetEventMap, WidgetModel
 } from '../index';
 import $ from 'jquery';
 
 @objectFactoryHints({ensureId: true})
-export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType, ObjectWithUuid, ObjectWithObjectUuidBuilder {
+export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType, ObjectWithUuid {
   declare model: WidgetModel;
   declare initModel: SomeRequired<this['model'], 'parent'>;
   declare eventMap: WidgetEventMap;
@@ -101,7 +101,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   protected _postRenderActions: (() => void)[];
   protected _scrollHandler: (event: JQuery.ScrollEvent) => void;
   protected _storedFocusedWidget: Widget;
-  protected _objectUuidBuilder: ObjectUuidBuilder;
 
   constructor() {
     super();
@@ -150,7 +149,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this._parentDestroyHandler = this._onParentDestroy.bind(this);
     this._parentRemovingWhileAnimatingHandler = this._onParentRemovingWhileAnimating.bind(this);
     this._scrollHandler = this._onScroll.bind(this);
-    this._objectUuidBuilder = null;
     this.loadingSupport = this._createLoadingSupport();
     this.keyStrokeContext = this._createKeyStrokeContext();
     this.logicalGrid = null;
@@ -188,7 +186,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   override init(model: InitModelOf<this>) {
     let staticModel = this._jsonModel();
     if (staticModel) {
-      model.id = this._chooseId(model.id, staticModel.id);
       model = $.extend({}, staticModel, model);
     }
     model = model || {} as InitModelOf<this>;
@@ -201,26 +198,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * Decides which id should be used in case this widget has one from the static and the dynamic model.
-   *
-   * It uses the static model in case it contains a custom id and the dynamic model only has a UI id from the sequence. Typically custom ids are more stable than the ids from the UI sequence which may be different every time.
-   * Otherwise, it uses the id from the dynamic model.
-   */
-  protected _chooseId(modelId: string, staticModelId: string): string {
-    if (!modelId) {
-      return staticModelId;
-    }
-    if (!staticModelId) {
-      return modelId;
-    }
-    if (ObjectUuidProvider.isUiId(modelId) && !ObjectUuidProvider.isUiId(staticModelId)) {
-      // prefer stable id from static model if model Id is generated.
-      return staticModelId;
-    }
-    return modelId;
-  }
-
-  /**
    * Default implementation simply returns the unmodified model. A Subclass
    * may override this method to alter the JSON model before the widgets
    * are created out of the widgetProperties in the model.
@@ -229,17 +206,16 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     return model;
   }
 
-  uuidPath(useFallback?: boolean): string {
-    return ObjectUuidProvider.get().uuidPath(this, {useFallback});
+  buildUuid(useFallback?: boolean): string {
+    return ObjectUuidProvider.get().uuid(this, useFallback);
   }
 
-  getObjectUuidBuilder(): ObjectUuidBuilder {
-    if (!this._objectUuidBuilder) {
-      this._objectUuidBuilder = scout.create(ObjectUuidBuilder, {
-        owner: this
-      });
-    }
-    return this._objectUuidBuilder;
+  buildUuidPath(options?: UuidPathOptions): string {
+    return ObjectUuidProvider.get().uuidPath(this, options);
+  }
+
+  setUuid(uuid: string) {
+    this.setProperty('uuid', uuid);
   }
 
   /**

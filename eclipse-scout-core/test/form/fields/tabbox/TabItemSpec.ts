@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {HtmlComponent, TabBox} from '../../../../src/index';
+import {HtmlComponent, ObjectUuidProvider, scout, TabBox, TabItem} from '../../../../src/index';
 import {TabBoxSpecHelper} from '../../../../src/testing/index';
 
 describe('TabItem', () => {
@@ -130,6 +130,26 @@ describe('TabItem', () => {
       expect(tabBox.selectedTab).toBe(tabItem2);
       tabItem1.select();
       expect(tabBox.selectedTab).toBe(tabItem1);
+    });
+  });
+
+  describe('uuid', () => {
+    it('of tab item is set to the tab', () => {
+      let tabBox = scout.create(TabBox, {
+        parent: session.desktop,
+        tabItems: [{
+          objectType: TabItem,
+          uuid: '1'
+        }, {
+          objectType: TabItem,
+          classId: '2'
+        }]
+      });
+      tabBox.render();
+      expect(tabBox.tabItems[0].buildUuid()).toBe('1');
+      expect(tabBox.tabItems[1].buildUuid()).toBe('2');
+      expect(tabBox.header.tabArea.tabs[0].uuid).toBe(`tab${ObjectUuidProvider.DEPENDENT_UUID_DELIMITER}1`);
+      expect(tabBox.header.tabArea.tabs[1].uuid).toBe(`tab${ObjectUuidProvider.DEPENDENT_UUID_DELIMITER}2`);
     });
   });
 });

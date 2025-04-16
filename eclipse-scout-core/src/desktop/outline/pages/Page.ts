@@ -9,8 +9,8 @@
  */
 import {
   arrays, BaseDoEntity, BookmarkAdapter, BookmarkTableRowIdentifierDo, ButtonTile, ChildModelOf, Constructor, dataObjects, DoTypeResolver, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form,
-  HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, ObjectOrChildModel, ObjectOrType, ObjectUuidBuilder, ObjectUuidProvider, ObjectWithObjectUuidBuilder, ObjectWithUuid, Outline, PageDetailMenuContributor, PageEventMap,
-  PageIdDummyPageParamDo, PageModel, ParentTablePageMenuContributor, PropertyChangeEvent, RequiredUnlessNotSubclass, scout, SomeRequired, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
+  HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, ObjectOrChildModel, ObjectOrType, ObjectUuidProvider, ObjectWithUuid, Outline, PageDetailMenuContributor, PageEventMap, PageIdDummyPageParamDo, PageModel,
+  ParentTablePageMenuContributor, PropertyChangeEvent, RequiredUnlessNotSubclass, scout, SomeRequired, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, UuidPathOptions, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -21,7 +21,7 @@ import $ from 'jquery';
  * class and is never instantiated directly, instead we always use subclasses of PageWithTable or PageWithNodes.
  * Implementations of these classes contain code which loads table data or child nodes.
  */
-export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectWithObjectUuidBuilder {
+export class Page extends TreeNode implements PageModel, ObjectWithUuid {
   declare initModel: SomeRequired<this['model'], 'parent'> & PageParamRequiredIfDeclared<this>;
   declare model: PageModel;
   declare eventMap: PageEventMap;
@@ -68,7 +68,6 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   protected _tableFilterHandler: EventHandler<Event<Table>>;
   protected _tableRowClickHandler: EventHandler<TableRowClickEvent>;
   protected _detailTableModel: ChildModelOf<Table>;
-  protected _objectUuidBuilder: ObjectUuidBuilder;
   protected _bookmarkAdapter: BookmarkAdapter;
 
   /** @internal */
@@ -103,7 +102,6 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     this._tableRowClickHandler = this._onTableRowClick.bind(this);
     this._detailTableModel = null;
     this._detailFormModel = null;
-    this._objectUuidBuilder = null;
     this._bookmarkAdapter = null;
     this._detailMenusChangeHandler = this._onMenuOwnerMenusChange.bind(this);
   }
@@ -153,22 +151,16 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     this._setPageParam(this.pageParam);
   }
 
-  uuidPath(useFallback?: boolean): string {
-    return ObjectUuidProvider.get().uuidPath(this, {
-      appendParent: true, // append the uuid of the parent outline even when having a classId as the classId does not include its parent yet (see AbstractPage.classId)
-      useFallback
-    });
+  buildUuid(useFallback?: boolean): string {
+    return ObjectUuidProvider.get().uuid(this, useFallback);
   }
 
-  getObjectUuidBuilder(): ObjectUuidBuilder {
-    if (!this._objectUuidBuilder) {
-      // no path, just the id of this page. See AbstractPage#classId().
-      this._objectUuidBuilder = scout.create(ObjectUuidBuilder, {
-        owner: this,
-        useUuidPath: false
-      });
-    }
-    return this._objectUuidBuilder;
+  buildUuidPath(options?: UuidPathOptions): string {
+    return ObjectUuidProvider.get().uuidPath(this, options);
+  }
+
+  setUuid(uuid: string) {
+    this.uuid = uuid;
   }
 
   getBookmarkAdapter(): BookmarkAdapter {
@@ -621,7 +613,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   }
 
   protected _computeDummyPageParam(): PageParamDo {
-    let pageId = this.getObjectUuidBuilder().buildId();
+    let pageId = this.buildUuid();
     if (pageId) {
       return scout.create(PageIdDummyPageParamDo, {pageId});
     }

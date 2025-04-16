@@ -39,7 +39,7 @@ export class TableSpecHelper {
 
   createModelRow(id?: string, cells?: (Primitive | object | Cell)[], parentRow?: TableRow | string): TableRowModel {
     return {
-      id: id || ObjectUuidProvider.createUiId(),
+      id: id || ObjectUuidProvider.get().createUiSeqId(),
       cells: cells,
       parentRow: parentRow
     };
@@ -79,7 +79,7 @@ export class TableSpecHelper {
 
   createModelColumn<T>(text: string, type?: ObjectType<Column<T>>): ChildModelOf<Column<T>> & { uiSortPossible: boolean } {
     let model = {
-      id: ObjectUuidProvider.createUiId(),
+      id: ObjectUuidProvider.get().createUiSeqId(),
       text: text,
       objectType: (type === undefined ? 'Column' : type),
       uiSortPossible: true

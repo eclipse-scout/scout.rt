@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 import {
   aria, arrays, EllipsisMenu, EnumObject, Event, EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, InitModelOf, keys, KeyStroke, KeyStrokeContext, Menu, MenuBarBox, MenuBarEventMap, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarModel,
-  MenuBarRightKeyStroke, MenuDestinations, MenuFilter, MenuOrder, menus, ObjectOrChildModel, OrderedMenuItems, PropertyChangeEvent, scout, TooltipPosition, Widget, widgets
+  MenuBarRightKeyStroke, MenuDestinations, MenuFilter, MenuOrder, menus, ObjectOrChildModel, ObjectUuidProvider, OrderedMenuItems, PropertyChangeEvent, scout, TooltipPosition, Widget, widgets
 } from '../../index';
 
 export type MenuBarEllipsisPosition = EnumObject<typeof MenuBar.EllipsisPosition>;
@@ -465,3 +465,5 @@ export class MenuBar extends Widget implements MenuBarModel {
     return menus.flatTopLevelActions(this.orderedMenuItems.all);
   }
 }
+
+ObjectUuidProvider.uuidPathSkipWidgets.add(MenuBar);

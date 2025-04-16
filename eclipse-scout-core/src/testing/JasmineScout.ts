@@ -161,7 +161,7 @@ window.removePopups = (session, cssClass) => {
 
 window.createSimpleModel = <T>(objectType, session, id) => {
   if (id === undefined) {
-    id = ObjectUuidProvider.createUiId();
+    id = ObjectUuidProvider.get().createUiSeqId();
   }
   let parent = session.desktop;
   return {
