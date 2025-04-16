@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BookmarkDo, BookmarkDoBuilderModel, BookmarkDoBuilderOptionsDo, BookmarkTableRowIdentifierDo, ChartTableControlConfigDo, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkPageDo, InitModelOf,
-  NodeBookmarkPageDo, ObjectWithType, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, TableBookmarkPageDo, TableClientUiPreferencesDo
+  BookmarkDo, BookmarkDoBuilderModel, BookmarkDoBuilderOptionsDo, BookmarkTableRowIdentifierDo, ChartTableControlConfigDo, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkDefinitionDo,
+  IBookmarkPageDo, InitModelOf, NodeBookmarkPageDo, ObjectWithType, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, TableBookmarkPageDo, TableClientUiPreferencesDo
 } from '../index';
 
 export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel {
@@ -58,11 +58,23 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
   // --------------------------------------
 
   build(): JQuery.Promise<BookmarkDo> {
-    return $.resolvedPromise()
-      .then(() => this._build());
+    return $.when(this._build());
   }
 
   protected async _build(): Promise<BookmarkDo> {
+    let bookmarkDefinition = await this._createBookmarkDefinition();
+    // FIXME bsh [js-bookmark] Create titles and description
+    let bookmarkTitles = undefined;
+    let bookmarkDescription = undefined;
+
+    return scout.create(BookmarkDo, {
+      definition: bookmarkDefinition,
+      titles: bookmarkTitles,
+      description: bookmarkDescription
+    });
+  }
+
+  protected async _createBookmarkDefinition(): Promise<IBookmarkDefinitionDo> {
     let page = this.page;
     let outline = page?.outline || this.desktop.outline;
     let outlineId = outline?.getObjectUuidBuilder().buildId();
@@ -112,10 +124,7 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
         bookmarkedPage: bookmarkedPage
       });
     }
-    // FIXME bsh [js-bookmark] DisplayText & Description
-    return scout.create(BookmarkDo, {
-      definition: bookmarkDefinition
-    });
+    return bookmarkDefinition;
   }
 
   // Note: this methode is called multiple times from bottom to top. On the first invocation, the childPage is not set,
