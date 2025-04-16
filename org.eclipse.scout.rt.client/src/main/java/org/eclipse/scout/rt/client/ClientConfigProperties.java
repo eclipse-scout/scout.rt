@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,6 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.client;
+
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
@@ -76,4 +78,24 @@ public final class ClientConfigProperties {
       return 10L;
     }
   }
+
+  public static class DefaultUiCallbackTimeoutMillisProperty extends AbstractPositiveLongConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.client.defaultUiCallbackTimeoutMillis";
+    }
+
+    @Override
+    public Long getDefaultValue() {
+      return TimeUnit.SECONDS.toMillis(15);
+    }
+
+    @Override
+    public String description() {
+      return "Default maximum time in milliseconds to wait for the browser to respond to a UI callback request.\n"
+          + "The default value is 15 seconds.";
+    }
+  }
+
 }

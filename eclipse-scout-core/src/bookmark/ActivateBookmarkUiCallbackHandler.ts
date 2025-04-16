@@ -9,7 +9,7 @@
  */
 import {ActivateBookmarkRequestDo, BookmarkSupport, Desktop, Outline, Page, scout, UiCallbackHandler, UiCallbackParam} from '../index';
 
-export class OpenBookmarkInOutlineUiCallbackHandler implements UiCallbackHandler {
+export class ActivateBookmarkUiCallbackHandler implements UiCallbackHandler {
 
   handle(param: UiCallbackParam): JQuery.Promise<void> {
     const desktop = scout.assertInstance(param.owner, Desktop);
@@ -20,7 +20,7 @@ export class OpenBookmarkInOutlineUiCallbackHandler implements UiCallbackHandler
     let parentOutline = parentPageContextElement?.getWidget(Outline);
     let parentPage = parentPageContextElement?.optElement(Page);
 
-    return BookmarkSupport.get(desktop.session).openBookmarkLocal({
+    return BookmarkSupport.get(desktop.session).activateBookmarkLocal({
       parentOutline: parentOutline,
       parentPage: parentPage,
       parentBookmarkPage: data.parentBookmarkPage,

@@ -43,5 +43,4 @@ export class SecondInSameFileDo<T> extends BaseDoEntity {
 }
 
 export interface DoInterface {
-
 }
