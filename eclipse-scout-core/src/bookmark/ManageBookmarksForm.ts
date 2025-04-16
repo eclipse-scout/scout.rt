@@ -30,6 +30,8 @@ export class ManageBookmarksForm extends Form {
     this.widget('EditMenu').on('action', this._onEditMenuAction.bind(this));
     this.widget('DeleteMenu').on('action', this._onDeleteMenuAction.bind(this));
     // FIXME bsh [js-bookmark] Move MoveRowMenu to Scout
+    this.widget('MoveRowUpMenu').setVisibleGranted(false);
+    this.widget('MoveRowDownMenu').setVisibleGranted(false);
 
     this.widget('BookmarksTable').on('rowAction', this._onTableRowAction.bind(this));
   }
