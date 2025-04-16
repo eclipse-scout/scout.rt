@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ActivateBookmarkDataDo, ActivateBookmarkOptionsDo, App, arrays, BaseDoEntity, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierDoFactory, Constructor, Desktop,
-  HybridManager, IBookmarkDo, IBookmarkPageDo, InitModelOf, MaxRowCountContributionDo, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageParamDo, PageWithNodes, PageWithTable, scout,
-  Session, Status, TableBookmarkPageDo, TableRow
+  ActivateBookmarkDataDo, ActivateBookmarkOptionsDo, App, arrays, BaseDoEntity, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierDoFactory,
+  ChartTableControlConfigHelper, Constructor, Desktop, HybridManager, IBookmarkDo, IBookmarkPageDo, InitModelOf, MaxRowCountContributionDo, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo,
+  Page, PageParamDo, PageWithNodes, PageWithTable, scout, Session, Status, TableBookmarkPageDo, TableRow
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -482,7 +482,8 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   protected _prepareChartTableControlState(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
-    // FIXME bsh [js-bookmark] Implement
+    const helper = scout.create(ChartTableControlConfigHelper);
+    helper.importConfig(page, bookmarkPage.chartTableControlConfig);
   }
 
   protected _prepareShowRelatedCustomerData(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {

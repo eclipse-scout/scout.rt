@@ -1154,6 +1154,7 @@ export * from './breadcrumbbar/BreadcrumbBar';
 export * from './breadcrumbbar/BreadcrumbBarModel';
 export * from './breadcrumbbar/BreadcrumbBarEventMap';
 export * from './breadcrumbbar/BreadcrumbBarLayout';
+export * from './bookmark/ChartTableControlConfigHelper';
 export * from './breadcrumbbar/BreadcrumbBarAdapter';
 export * from './form/fields/breadcrumbbarfield/BreadcrumbBarField';
 export * from './form/fields/breadcrumbbarfield/BreadcrumbBarFieldModel';

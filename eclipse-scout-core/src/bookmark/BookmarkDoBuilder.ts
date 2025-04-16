@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, BaseDoEntity, BookmarkDo, BookmarkDoBuilderModel, BookmarkDoBuilderOptionsDo, BookmarkSupport, BookmarkTableRowIdentifierDo, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager, IBookmarkDefinitionDo,
-  IBookmarkDo, IBookmarkPageDo, IChartTableControlConfigDo, InitModelOf, NodeBookmarkPageDo, objects, ObjectWithType, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, strings, TableBookmarkPageDo,
-  TableClientUiPreferencesDo
+  arrays, BaseDoEntity, BookmarkDo, BookmarkDoBuilderModel, BookmarkDoBuilderOptionsDo, BookmarkSupport, BookmarkTableRowIdentifierDo, ChartTableControlConfigHelper, Desktop, HybridActionContextElement, HybridActionContextElements,
+  HybridManager, IBookmarkDefinitionDo, IBookmarkDo, IBookmarkPageDo, IChartTableControlConfigDo, InitModelOf, NodeBookmarkPageDo, objects, ObjectWithType, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout,
+  Session, strings, TableBookmarkPageDo, TableClientUiPreferencesDo
 } from '../index';
 
 export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel {
@@ -256,8 +256,8 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
   }
 
   protected async _createChartTableControlConfigForBookmark(page: PageWithTable): Promise<IChartTableControlConfigDo> {
-    // FIXME bsh [js-bookmark] Implement
-    return null;
+    const helper = scout.create(ChartTableControlConfigHelper);
+    return helper.exportConfig(page);
   }
 
   // --------------------------------------
