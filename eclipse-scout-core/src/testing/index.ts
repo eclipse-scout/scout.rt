@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,7 +37,6 @@ export * from './lookup/ColumnDescriptorDummyLookupCall';
 export * from './lookup/LanguageDummyLookupCall';
 export * from './focus/FocusManagerSpecHelper';
 export * from './form/fields/groupbox/GroupBoxSpecHelper';
-export * from './util/SpecObjectUuidProvider';
 export * from './jquery-testing';
 export * from './form/SpecForm';
 export * from './form/SpecLifecycle';

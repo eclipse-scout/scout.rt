@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 import {
   Button, CheckBoxField, CloneOptions, CompositeField, DateField, dates, EventHandler, FormField, FormFieldSuppressStatus, HorizontalGrid, HtmlComponent, InitModelOf, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig,
-  Menu, ObjectOrChildModel, ObjectOrModel, ObjectUuidProvider, PropertyChangeEvent, scout, SequenceBoxEventMap, SequenceBoxGridConfig, SequenceBoxModel, StatusOrModel, strings, ValueField, Widget
+  Menu, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, PropertyChangeEvent, scout, SequenceBoxEventMap, SequenceBoxGridConfig, SequenceBoxModel, StatusOrModel, strings, ValueField, Widget
 } from '../../../index';
 
 export class SequenceBox extends CompositeField implements SequenceBoxModel {
@@ -424,4 +424,4 @@ export class SequenceBox extends CompositeField implements SequenceBoxModel {
   }
 }
 
-ObjectUuidProvider.UuidPathSkipWidgets.add(SequenceBox);
+ObjectIdProvider.uuidPathSkipWidgets.add(SequenceBox);

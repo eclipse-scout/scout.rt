@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, Event, EventHandler, GlassPaneContribution, InitModelOf, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, tooltips, Widget} from '../index';
+import {aria, Event, EventHandler, GlassPaneContribution, InitModelOf, ObjectIdProvider, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, tooltips, Widget} from '../index';
 
 export type DisplayViewId = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C' | 'OUTLINE' | 'OUTLINE_SELECTOR' | 'PAGE_DETAIL' | 'PAGE_SEARCH' | 'PAGE_TABLE';
 
@@ -85,6 +85,7 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
     this.saveNeeded = (this.view ? this.view.saveNeeded : model.saveNeeded);
     this.saveNeededVisible = (this.view ? this.view.saveNeededVisible : model.saveNeededVisible);
     this.status = (this.view ? this.view.status : model.status);
+    ObjectIdProvider.get().setDependentUuid('tab', this.view, this);
 
     if (this.view) {
       this._installViewListeners();

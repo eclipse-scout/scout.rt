@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -96,7 +96,7 @@ public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgre
     jsonStep.put("actionEnabled", wizardStep.isActionEnabled());
     jsonStep.put("cssClass", wizardStep.getCssClass());
     jsonStep.put("finished", wizardStep.isFinished());
-    BEANS.get(InspectorInfo.class).put(getUiSession().currentHttpRequest(), jsonStep, wizardStep, s -> INSPECTOR_ID_PROVIDER.get().getIdForWizardStep(s));
+    BEANS.get(InspectorInfo.class).put(jsonStep, wizardStep, getUiSession());
     return jsonStep;
   }
 

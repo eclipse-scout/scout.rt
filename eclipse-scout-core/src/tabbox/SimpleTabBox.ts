@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Event, EventHandler, HtmlComponent, InitModelOf, LayoutData, scout, SimpleTabArea, SimpleTabBoxController, SimpleTabBoxEventMap, SimpleTabBoxLayout, SimpleTabBoxModel, SimpleTabView, SimpleTabViewContentLayout, Widget
+  arrays, Event, EventHandler, HtmlComponent, InitModelOf, LayoutData, ObjectIdProvider, scout, SimpleTabArea, SimpleTabBoxController, SimpleTabBoxEventMap, SimpleTabBoxLayout, SimpleTabBoxModel, SimpleTabView, SimpleTabViewContentLayout,
+  Widget
 } from '../index';
 
 export class SimpleTabBox<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabBoxModel<TView> {
@@ -282,3 +283,5 @@ export class SimpleTabBox<TView extends SimpleTabView = SimpleTabView> extends W
     });
   }
 }
+
+ObjectIdProvider.uuidPathSkipWidgets.add(SimpleTabBox);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 import {
   aria, arrays, CloneOptions, FormField, HorizontalGrid, HtmlComponent, InitModelOf, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, LookupCall, LookupCallOrModel, LookupResult, LookupRow,
-  ObjectOrChildModel, ObjectOrModel, objects, ObjectUuidProvider, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap, RadioButtonGroupGridConfig, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel,
+  ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, objects, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap, RadioButtonGroupGridConfig, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel,
   RadioButtonGroupRightOrDownKeyStroke, scout, Status, ValueField
 } from '../../../index';
 import $ from 'jquery';
@@ -535,4 +535,4 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
   }
 }
 
-ObjectUuidProvider.UuidPathSkipWidgets.add(RadioButtonGroup);
+ObjectIdProvider.uuidPathSkipWidgets.add(RadioButtonGroup);

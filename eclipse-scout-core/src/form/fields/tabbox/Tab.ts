@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, Device, Event, EventHandler, FieldStatus, FormField, HtmlComponent, HtmlEnvironment, InitModelOf, PropertyChangeEvent, scout, SomeRequired, Status, strings, TabEventMap, TabItem, TabModel, tooltips, Widget
+  aria, Device, Event, EventHandler, FieldStatus, FormField, HtmlComponent, HtmlEnvironment, InitModelOf, ObjectIdProvider, PropertyChangeEvent, scout, SomeRequired, Status, strings, TabEventMap, TabItem, TabModel, tooltips, Widget
 } from '../../../index';
 
 export class Tab extends Widget implements TabModel {
@@ -67,6 +67,7 @@ export class Tab extends Widget implements TabModel {
     this.setMarked(this.tabItem.marked);
     this.setErrorStatus(this.tabItem.errorStatus);
     this.setTooltipText(this.tabItem.tooltipText);
+    ObjectIdProvider.get().setDependentUuid('tab', this.tabItem, this);
 
     this.fieldStatus = scout.create(FieldStatus, {
       parent: this,

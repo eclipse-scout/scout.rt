@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  CollapseHandle, CollapseHandleHorizontalAlignment, CompositeField, Dimension, EnumObject, FormField, graphics, GroupBox, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStroke, ObjectUuidProvider, PropertyChangeEvent, scout,
+  CollapseHandle, CollapseHandleHorizontalAlignment, CompositeField, Dimension, EnumObject, FormField, graphics, GroupBox, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStroke, ObjectIdProvider, PropertyChangeEvent, scout,
   SplitBoxCollapseKeyStroke, SplitBoxEventMap, SplitBoxFirstCollapseKeyStroke, SplitBoxLayout, SplitBoxModel, SplitBoxSecondCollapseKeyStroke
 } from '../../../index';
 import $ from 'jquery';
@@ -781,4 +781,4 @@ export class SplitBox extends CompositeField {
 
 export type SplitBoxSplitterPositionType = EnumObject<typeof SplitBox.SplitterPositionType>;
 
-ObjectUuidProvider.UuidPathSkipWidgets.add(SplitBox);
+ObjectIdProvider.uuidPathSkipWidgets.add(SplitBox);

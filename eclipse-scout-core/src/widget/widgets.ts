@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, ObjectUuidProvider, Widget} from '../index';
+import {arrays, ObjectIdProvider, Widget} from '../index';
 import $ from 'jquery';
 
 export const widgets = {
@@ -28,10 +28,10 @@ export const widgets = {
   },
 
   /**
-   * @deprecated Use {@link ObjectUuidProvider.createUiId} instead.
+   * @deprecated Use {@link ObjectIdProvider.createUiSeqId} instead.
    */
   createUniqueId(prefix?: string): string {
-    return ObjectUuidProvider.createUiId();
+    return ObjectIdProvider.get().createUiSeqId();
   },
 
   /**

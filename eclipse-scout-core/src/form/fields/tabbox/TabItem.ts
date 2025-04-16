@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {GroupBox, GroupBoxEventMap, GroupBoxModel, Menu, ObjectUuidProvider, PropertyChangeEvent, Tab, TabBox, TabItemLayout} from '../../../index';
+import {GroupBox, GroupBoxEventMap, GroupBoxModel, Menu, ObjectIdProvider, PropertyChangeEvent, Tab, TabBox, TabItemLayout} from '../../../index';
 
 export interface TabItemModel extends GroupBoxModel {
   /**
@@ -96,4 +96,4 @@ export class TabItem extends GroupBox implements TabItemModel {
   }
 }
 
-ObjectUuidProvider.UuidPathSkipWidgets.add(TabItem);
+ObjectIdProvider.uuidPathSkipWidgets.add(TabItem);

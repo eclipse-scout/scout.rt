@@ -77,7 +77,7 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
   protected async _createBookmarkDefinition(): Promise<IBookmarkDefinitionDo> {
     let page = this.page;
     let outline = page?.outline || this.desktop.outline;
-    let outlineId = outline?.getObjectUuidBuilder().buildId();
+    let outlineId = outline?.buildUuid();
     if (!outlineId) {
       throw BookmarkDoBuilder.ERROR_MISSING_OUTLINE;
     }

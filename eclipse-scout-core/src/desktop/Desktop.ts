@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Action, arrays, BenchColumnLayoutData, BookmarkSupport, BusyIndicatorOptions, BusySupport, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopBenchViewActivateEvent, DesktopEventMap, DesktopFormController,
-  DesktopHeader, DesktopLayout, DesktopModel, DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler,
-  FileChooser, FileChooserController, Form, GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectOrChildModel, ObjectOrModel, objects,
-  OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
+  AbstractLayout, Action, arrays, BenchColumnLayoutData, BusyIndicatorOptions, BusySupport, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopBenchViewActivateEvent, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout,
+  DesktopModel, DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser,
+  FileChooserController, Form, GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel,
+  objects, OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
   SplitterPositionChangeEvent, strings, styles, Tooltip, Tree, TreeDisplayStyle, UnsavedFormChangesForm, URL, ViewButton, webstorage, Widget, widgets
 } from '../index';
 import $ from 'jquery';
@@ -68,7 +68,6 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   url: URL;
   responsiveHandler: ResponsiveHandler;
   busySupport: BusySupport;
-  bookmarkSupport: BookmarkSupport;
 
   $notifications: JQuery;
   $overlaySeparator: JQuery;
@@ -129,7 +128,6 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this.dense = false;
     this.url = null;
     this.busySupport = scout.create(BusySupport, {parent: this});
-    this.bookmarkSupport = scout.create(BookmarkSupport, {desktop: this});
 
     this.$notifications = null;
     this.$overlaySeparator = null;
@@ -1897,3 +1895,5 @@ export type BrowserHistoryEntry = {
 };
 export type DesktopHistoryState = { deepLinkPath: string };
 export type GlassPaneTargetFilter = (target: HTMLElement, element: Widget) => boolean;
+
+ObjectIdProvider.uuidPathAlwaysSkipRules.push(widget => widget instanceof Desktop);

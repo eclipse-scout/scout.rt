@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, InitModelOf, inspector, MenuBar, MenuDestinations, objects, ObjectUuidProvider, PropertyChangeEvent, Rectangle, scout,
-  scrollbars, SomeRequired, strings, styles, Table, TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableHeaderEventMap, TableHeaderMenu, TableHeaderModel, tooltips, Widget
+  aria, arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, InitModelOf, inspector, MenuBar, MenuDestinations, ObjectIdProvider, objects, PropertyChangeEvent, Rectangle, scout, scrollbars,
+  SomeRequired, strings, styles, Table, TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableHeaderEventMap, TableHeaderMenu, TableHeaderModel, tooltips, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -135,7 +135,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
     $header.cssMinWidth(columnWidth).cssMaxWidth(columnWidth);
 
     // add label id to header item text, so table cells can reference it for screen readers
-    this.headerLabelId = ObjectUuidProvider.createUiId();
+    this.headerLabelId = ObjectIdProvider.get().createUiSeqId();
     $header.appendSpan('table-header-item-text').attr('id', this.headerLabelId);
 
     if (this.enabled) { // enabledComputed not used on purpose

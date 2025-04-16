@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Cell, CellModel, ChildModelOf, Column, ColumnModel, comparators, DecimalFormat, Filter, InitModelOf, MenuModel, ModelAdapter, NumberColumnModel, ObjectOrChildModel, ObjectOrModel, objects, ObjectType, ObjectUuidProvider,
-  Primitive, RemoteEvent, scout, Session, Table, TableModel, TableRow, TableRowModel, TableTextUserFilter, TextColumnUserFilter, Widget
+  arrays, Cell, CellModel, ChildModelOf, Column, ColumnModel, comparators, DecimalFormat, Filter, InitModelOf, MenuModel, ModelAdapter, NumberColumnModel, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, objects, ObjectType, Primitive,
+  RemoteEvent, scout, Session, Table, TableModel, TableRow, TableRowModel, TableTextUserFilter, TextColumnUserFilter, Widget
 } from '../../index';
 import {MenuSpecHelper, SpecTable, SpecTableAdapter} from '../index';
 import $ from 'jquery';
@@ -39,7 +39,7 @@ export class TableSpecHelper {
 
   createModelRow(id?: string, cells?: (Primitive | object | Cell)[], parentRow?: TableRow | string): TableRowModel {
     return {
-      id: id || ObjectUuidProvider.createUiId(),
+      id: id || ObjectIdProvider.get().createUiSeqId(),
       cells: cells,
       parentRow: parentRow
     };
@@ -79,7 +79,7 @@ export class TableSpecHelper {
 
   createModelColumn<T>(text: string, type?: ObjectType<Column<T>>): ChildModelOf<Column<T>> & { uiSortPossible: boolean } {
     let model = {
-      id: ObjectUuidProvider.createUiId(),
+      id: ObjectIdProvider.get().createUiSeqId(),
       text: text,
       objectType: (type === undefined ? 'Column' : type),
       uiSortPossible: true

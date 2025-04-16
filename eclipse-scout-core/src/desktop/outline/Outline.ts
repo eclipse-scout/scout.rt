@@ -10,7 +10,7 @@
 import {
   arrays, BookmarkAdapter, CompositeField, Desktop, DetailTableTreeFilter, Device, DisplayParent, DisplayViewId, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FullModelOf, GlassPaneTarget,
   GroupBox, GroupBoxMenuItemsOrder, HtmlComponent, Icon, InitModelOf, keys, KeyStrokeContext, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton,
-  NavigateUpButton, ObjectOrChildModel, ObjectOrModel, ObjectUuidBuilder, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, Page,
+  NavigateUpButton, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, Page,
   PageLayout, PageModel, PropertyChangeEvent, scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent,
   TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodesDeletedEvent, TreeNodesInsertedEvent, TreeNodesSelectedEvent,
   TreeNodesUpdatedEvent, Widget
@@ -168,17 +168,6 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this._setMenus(this.menus);
     this.updateDetailContent();
     this._nodesSelectedInternal(this.selectedNodes);
-  }
-
-  override getObjectUuidBuilder(): ObjectUuidBuilder {
-    if (!this._objectUuidBuilder) {
-      // no path, just the id of this outline. See AbstractOutline#classId().
-      this._objectUuidBuilder = scout.create(ObjectUuidBuilder, {
-        owner: this,
-        useUuidPath: false
-      });
-    }
-    return this._objectUuidBuilder;
   }
 
   protected _createMediator(): OutlineMediator {
@@ -1285,3 +1274,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     }
   }
 }
+
+// There is never more than one outline shown at a time -> no need to include any outline in a uuidPath.
+// This is still true if outline fields are used. In that case the field and its parents are considered and make it unique.
+ObjectIdProvider.uuidPathAlwaysSkipRules.push(widget => widget instanceof Outline);

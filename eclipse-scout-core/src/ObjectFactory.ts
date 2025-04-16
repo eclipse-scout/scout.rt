@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractConstructor, Constructor, FullModelOf, InitModelOf, ModelOf, ObjectModel, ObjectModelWithId, objects, ObjectUuidProvider, scout, TypeDescriptor, TypeDescriptorOptions} from './index';
+import {AbstractConstructor, Constructor, FullModelOf, InitModelOf, ModelOf, ObjectIdProvider, ObjectModel, ObjectModelWithId, objects, scout, TypeDescriptor, TypeDescriptorOptions} from './index';
 import $ from 'jquery';
 
 export type ObjectCreator = (model?: any) => object;
@@ -177,7 +177,7 @@ export class ObjectFactory {
     if (objects.isFunction(scoutObject.init)) {
       if (model) {
         if (model.id === undefined && ensureId) {
-          model.id = ObjectUuidProvider.createUiId();
+          model.id = ObjectIdProvider.get().createUiSeqId();
         }
         if (ensureObjectType) {
           model.objectType = this.getObjectType(objectType);
@@ -187,7 +187,7 @@ export class ObjectFactory {
     }
 
     if (scoutObject.id === undefined && ensureId) {
-      scoutObject.id = ObjectUuidProvider.createUiId();
+      scoutObject.id = ObjectIdProvider.get().createUiSeqId();
     }
     if (scoutObject.objectType === undefined && ensureObjectType) {
       scoutObject.objectType = this.getObjectType(objectType);
@@ -207,10 +207,10 @@ export class ObjectFactory {
   }
 
   /**
-   * @deprecated Use {@link ObjectUuidProvider.createUiId} instead.
+   * @deprecated Use {@link ObjectIdProvider.createUiSeqId} instead.
    */
   createUniqueId(): string {
-    return ObjectUuidProvider.createUiId();
+    return ObjectIdProvider.get().createUiSeqId();
   }
 
   resolveTypedObjectType<T>(objectType: ObjectType<T>): ObjectType<T> {
