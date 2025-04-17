@@ -26,6 +26,8 @@ import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.scout.rt.app.Application;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 public class ScoutServletContextHandler extends ServletContextHandler {
@@ -118,5 +120,20 @@ public class ScoutServletContextHandler extends ServletContextHandler {
     catch (IOException e) {
       throw new ProcessingException("Error during getResourcePaths", e);
     }
+  }
+
+  /**
+   * Optional provider for a custom Jetty {@link SessionHandler} implementation.
+   */
+  @Override
+  protected SessionHandler newSessionHandler() {
+    return BEANS.optional(ISessionHandlerProvider.class)
+        .orElse(super::newSessionHandler)
+        .newSessionHandler();
+  }
+
+  @ApplicationScoped
+  public interface ISessionHandlerProvider {
+    SessionHandler newSessionHandler();
   }
 }
