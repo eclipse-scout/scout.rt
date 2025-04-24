@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BookmarkDo, BooleanColumn, CancelMenu, Column, Form, FormModel, GroupBox, icons, Menu, OkMenu, Table, TableField} from '../index';
+import {BookmarkDo, CancelMenu, Column, Form, FormModel, GroupBox, icons, Menu, OkMenu, Table, TableField} from '../index';
 
 export default (): FormModel => ({
   objectType: Form,
@@ -49,6 +49,7 @@ export default (): FormModel => ({
               id: 'BookmarksTable',
               objectType: Table,
               autoResizeColumns: true,
+              defaultRowAction: 'EditMenu',
               columns: [
                 {
                   id: 'BookmarkColumn',
@@ -76,14 +77,23 @@ export default (): FormModel => ({
                   objectType: Menu,
                   text: 'Delete',
                   iconId: icons.REMOVE,
-                  keyStroke: 'shift-enter',
+                  keyStroke: 'delete',
                   menuTypes: [Table.MenuType.SingleSelection, Table.MenuType.MultiSelection]
+                },
+                {
+                  id: 'ActivateMenu',
+                  objectType: Menu,
+                  text: 'Activate',
+                  iconId: icons.TARGET,
+                  keyStroke: 'ctrl-enter',
+                  menuTypes: [Table.MenuType.SingleSelection]
                 },
                 {
                   id: 'MoveRowUpMenu',
                   objectType: Menu,
                   iconId: icons.ANGLE_UP,
-                  tooltipText: '${textKey:ButtonMoveUp}',
+                  tooltipText: '${textKey:MoveUp}',
+                  keyStroke: 'ctrl-up',
                   stackable: false,
                   horizontalAlignment: 1
                 },
@@ -91,7 +101,8 @@ export default (): FormModel => ({
                   id: 'MoveRowDownMenu',
                   objectType: Menu,
                   iconId: icons.ANGLE_DOWN,
-                  tooltipText: '${textKey:ButtonMoveDown}',
+                  tooltipText: '${textKey:MoveDown}',
+                  keyStroke: 'ctrl-down',
                   stackable: false,
                   horizontalAlignment: 1
                 }
@@ -125,6 +136,7 @@ export class BookmarksTable extends Table {
 export type BookmarksTableWidgetMap = {
   'EditMenu': Menu;
   'DeleteMenu': Menu;
+  'ActivateMenu': Menu;
   'MoveRowUpMenu': Menu;
   'MoveRowDownMenu': Menu;
 };
@@ -132,6 +144,4 @@ export type BookmarksTableWidgetMap = {
 export type BookmarksTableColumnMap = {
   'BookmarkColumn': Column<BookmarkDo>;
   'NameColumn': Column;
-  'SharedColumn': BooleanColumn;
-  'OwnerColumn': Column;
 };

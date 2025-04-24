@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, arrays, BookmarkDo, BookmarkForm, bookmarks, Event, Form, FormModel, InitModelOf, ManageBookmarksFormWidgetMap, scout, TableRowActionEvent} from '../index';
+import {Action, arrays, BookmarkDo, BookmarkForm, BookmarkSupport, Event, Form, FormModel, InitModelOf, ManageBookmarksFormWidgetMap, scout} from '../index';
 import model from './ManageBookmarksFormModel';
 
 export class ManageBookmarksForm extends Form {
@@ -25,19 +25,9 @@ export class ManageBookmarksForm extends Form {
 
     this.widget('EditMenu').on('action', this._onEditMenuAction.bind(this));
     this.widget('DeleteMenu').on('action', this._onDeleteMenuAction.bind(this));
-    // FIXME bsh [js-bookmark] Move MoveRowMenu to Scout
-    this.widget('MoveRowUpMenu').setVisibleGranted(false);
-    this.widget('MoveRowDownMenu').setVisibleGranted(false);
+    this.widget('ActivateMenu').on('action', this._onActivateMenuAction.bind(this));
 
-    this.widget('BookmarksTable').on('rowAction', this._onTableRowAction.bind(this));
-  }
-
-  protected override _load(): JQuery.Promise<any> {
-    return bookmarks.loadAllBookmarks('jswidgets:bookmarks')
-      .then(bookmarks => {
-        this.bookmarks = bookmarks;
-        return super._load();
-      });
+    this._installUpDownMenus();
   }
 
   override importData() {
@@ -56,52 +46,102 @@ export class ManageBookmarksForm extends Form {
   }
 
   override exportData(): any {
-    let table = this.widget('BookmarksTable');
-    let bookmarkColumn = table.columnById('BookmarkColumn');
+    const table = this.widget('BookmarksTable');
+    const bookmarkColumn = table.columnById('BookmarkColumn');
+
     this.bookmarks = table.rows.map(row => bookmarkColumn.cellValue(row));
     return null;
   }
 
-  protected override _save(data: any): JQuery.Promise<void> {
-    return bookmarks.storeAllBookmarks(this.bookmarks, 'jswidgets:bookmarks')
-      .then(() => {
-        this.findDesktop().trigger('bookmarksChanged');
-        return super._save(data);
-      });
-  }
-
   protected _onEditMenuAction(event: Event<Action>) {
-    this._editSelectedBookmark();
-  }
+    const table = this.widget('BookmarksTable');
+    const bookmarkColumn = table.columnById('BookmarkColumn');
+    const nameColumn = table.columnById('NameColumn');
+    const selectedRow = table.selectedRow();
 
-  protected _onDeleteMenuAction(event: Event<Action>) {
-    let table = this.widget('BookmarksTable');
-    let bookmarkColumn = table.columnById('BookmarkColumn');
-    this.deletedBookmarkIds.push(...table.selectedRows.map(row => bookmarkColumn.cellValue(row).id));
-    table.deleteRows(table.selectedRows);
-  }
-
-  protected _onTableRowAction(event: TableRowActionEvent) {
-    this._editSelectedBookmark();
-  }
-
-  _editSelectedBookmark() {
-    let table = this.widget('BookmarksTable');
-    let bookmarkColumn = table.columnById('BookmarkColumn');
-    let selectedRow = table.selectedRow();
-
-    let bookmark = bookmarkColumn.cellValue(selectedRow);
     let form = scout.create(BookmarkForm, {
       parent: this,
-      bookmark: bookmark
+      bookmark: bookmarkColumn.cellValue(selectedRow)
     });
     form.open();
     form.whenSave().then(() => {
       let bookmark = form.bookmark;
       let name = bookmark.title;
-      // FIXME bsh [js-bookmark] merge with importData()
-      table.columnById('BookmarkColumn').setCellValue(selectedRow, bookmark);
-      table.columnById('NameColumn').setCellValue(selectedRow, name);
+      bookmarkColumn.setCellValue(selectedRow, bookmark);
+      nameColumn.setCellValue(selectedRow, name);
     });
+  }
+
+  protected _onDeleteMenuAction(event: Event<Action>) {
+    const table = this.widget('BookmarksTable');
+    const bookmarkColumn = table.columnById('BookmarkColumn');
+
+    this.deletedBookmarkIds.push(...table.selectedRows.map(row => bookmarkColumn.cellValue(row).id));
+    table.deleteRows(table.selectedRows);
+  }
+
+  protected _onActivateMenuAction(event: Event<Action>) {
+    const table = this.widget('BookmarksTable');
+    const bookmarkColumn = table.columnById('BookmarkColumn');
+
+    BookmarkSupport.get(this.session).activateBookmark(bookmarkColumn.cellValue(table.selectedRow()));
+  }
+
+  protected _installUpDownMenus() {
+    const tableField = this.widget('BookmarksTableField');
+    const table = this.widget('BookmarksTable');
+    const moveRowUpMenu = table.widget('MoveRowUpMenu');
+    const moveRowDownMenu = table.widget('MoveRowDownMenu');
+
+    const onMoveRowMenuActionHandler = (event: Event<Action>) => {
+      let moveUp = event.source === moveRowUpMenu;
+      let moved = false;
+      table.selectedRows.slice()
+        .sort((r1, r2) => {
+          if (moveUp) {
+            return table.rows.indexOf(r1) - table.rows.indexOf(r2);
+          }
+          return table.rows.indexOf(r2) - table.rows.indexOf(r1); // reverse
+        })
+        .some(row => {
+          let i1 = table.rows.indexOf(row);
+          if (moveUp) {
+            table.moveRowUp(row);
+          } else {
+            table.moveRowDown(row);
+          }
+          let i2 = table.rows.indexOf(row);
+          if (i1 === i2) {
+            return true; // stop if move did not do anything
+          }
+          moved = true;
+          return false; // continue
+        });
+      if (moved) {
+        tableField.touch();
+      }
+    };
+
+    moveRowUpMenu.on('action', onMoveRowMenuActionHandler);
+    moveRowDownMenu.on('action', onMoveRowMenuActionHandler);
+
+    table.on('propertyChange:enabledComputed', event => this._recomputeUpDownMenuVisibility());
+    table.on('rowsSelected rowsInserted rowsUpdated rowsDeleted rowOrderChanged', event => this._recomputeUpDownMenuVisibility());
+
+    this._recomputeUpDownMenuVisibility();
+  }
+
+  protected _recomputeUpDownMenuVisibility() {
+    const table = this.widget('BookmarksTable');
+    const moveRowUpMenu = table.widget('MoveRowUpMenu');
+    const moveRowDownMenu = table.widget('MoveRowDownMenu');
+
+    let moveable = table.enabledComputed && table.selectedRows.length && table.rows.length > 1;
+    let firstRow = arrays.first(table.visibleRows);
+    let lastRow = arrays.last(table.visibleRows);
+    moveRowUpMenu.setVisible(moveable);
+    moveRowUpMenu.setEnabled(table.selectedRows.every(row => row !== firstRow));
+    moveRowDownMenu.setVisible(moveable);
+    moveRowDownMenu.setEnabled(table.selectedRows.every(row => row !== lastRow));
   }
 }
