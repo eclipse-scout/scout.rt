@@ -46,18 +46,16 @@ export abstract class PageDetailMenuContributor implements ObjectWithType {
       return null;
     }
 
-    const clone = menu.clone(
-      {
-        parent: parent,
-        menuTypes: []
-      },
-      {
-        delegateEventsToOriginal: ['action'],
-        delegateAllPropertiesToClone: true,
-        excludePropertiesToClone: ['menuTypes', 'childActions']
-      });
+    const clone = menu.clone({
+      parent: parent,
+      menuTypes: []
+    }, {
+      delegateEventsToOriginal: ['action'],
+      delegateAllPropertiesToClone: true,
+      excludePropertiesToClone: ['menuTypes', 'childActions']
+    });
 
-    if (menu.childActions?.length > 0) {
+    if (menu.childActions?.length) {
       clone.setChildActions(this._cloneMenus(menu.childActions, clone));
     }
 

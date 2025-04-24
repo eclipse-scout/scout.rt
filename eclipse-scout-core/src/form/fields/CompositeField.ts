@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 import {fields, FormField, FormFieldStyle, widgets} from '../../index';
 
 export abstract class CompositeField extends FormField {
+
   /**
    * @returns an array of child-fields.
    */
