@@ -435,7 +435,6 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     this._prepareSearchFilter(page, bookmarkPage, saveSearchForm);
     this._prepareUserFilters(page, bookmarkPage);
     this._prepareChartTableControlState(page, bookmarkPage);
-    this._prepareShowRelatedCustomerData(page, bookmarkPage);
   }
 
   protected _prepareTableCustomizerData(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
@@ -484,10 +483,6 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   protected _prepareChartTableControlState(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
     const helper = scout.create(ChartTableControlConfigHelper);
     helper.importConfig(page, bookmarkPage.chartTableControlConfig);
-  }
-
-  protected _prepareShowRelatedCustomerData(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
-    // FIXME bsh [js-bookmark] Implement
   }
 
   protected _restoreSelection(page: PageWithTable, selectedRowIdentifiers: BookmarkTableRowIdentifierDo[]) {
