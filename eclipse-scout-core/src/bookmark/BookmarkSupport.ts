@@ -129,43 +129,58 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   // --------------------------------------
 
-  createBookmark(options?: Omit<BookmarkDoBuilderModel, 'desktop'>): JQuery.Promise<IBookmarkDo> {
+  /**
+   * Creates a new bookmark for the specified page, or the {@link Outline#activePage active page} of the {@link Desktop#outline current outline}
+   * if no explicit page is specified. By default, {@link CreateBookmarkParam#createTableRowSelections} is set to `false`.
+   *
+   * @param param Optional parameters to {@link BookmarkDoBuilder}, can be used to override the defaults.
+   * @param options Optional settings to change the behavior of this method.
+   */
+  createBookmark(param?: CreateBookmarkParam, options?: CreateBookmarkOptions): JQuery.Promise<IBookmarkDo> {
     let builder = scout.create(BookmarkDoBuilder, {
       desktop: this.desktop,
       createTableRowSelections: false,
-      ...options
+      ...param
     });
     return builder.build()
       .catch(error => {
-        this.handleCreateBookmarkError(error); // FIXME bsh [js-bookmark] Make this optional
+        if (scout.nvl(options?.handleErrors, true)) {
+          this.handleCreateBookmarkError(error);
+        }
         throw error;
       });
   }
 
-  createBookmarkForRefresh(options?: Omit<BookmarkDoBuilderModel, 'desktop'>): JQuery.Promise<IBookmarkDo> {
-    let builder = scout.create(BookmarkDoBuilder, {
-      desktop: this.desktop,
+  /**
+   * Creates a bookmark for the given page to be used to refresh an outline. It differs from {@link createBookmark}
+   * in that the resulting bookmark can contain non-bookmarkable pages and non-serializable data. Additionally,
+   * title and description are not returned.
+   */
+  createBookmarkForRefresh(param?: CreateBookmarkParam, options?: CreateBookmarkOptions): JQuery.Promise<IBookmarkDo> {
+    return this.createBookmark({
       fallbackAllowed: false,
       persistableRequired: false,
       createTitle: false,
       createDescription: false,
       createTablePreferences: false,
-      ...options
-    });
-    return builder.build()
-      .catch(error => {
-        this.handleCreateBookmarkError(error); // FIXME bsh [js-bookmark] Make this optional
-        throw error;
-      });
+      ...param
+    }, options);
   }
 
   // --------------------------------------
 
+  /**
+   * Navigates to the original location of the given bookmark.
+   *
+   * This method supports hybrid bookmarks, that are partly activated on the UI server.
+   *
+   * @param options Optional settings to change the behavior of this method
+   */
   activateBookmark(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): JQuery.Promise<void> {
     return $.when(this._activateBookmark(bookmark, options));
   }
 
-  async _activateBookmark(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): Promise<void> {
+  protected async _activateBookmark(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): Promise<void> {
     try {
       if (this.loading) {
         // noinspection ExceptionCaughtLocallyJS
@@ -215,6 +230,12 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }, options);
   }
 
+  /**
+   * Navigates to the original location of the given bookmark. Unlike {@link activateBookmark}, this process handled
+   * entirely by the UI, i.e. the bookmark may only contain JS pages.
+   *
+   * @param options Optional settings to change the behavior of this method
+   */
   activateBookmarkLocal(param: ActivateBookmarkParam, options?: ActivateBookmarkOptions): JQuery.Promise<void> {
     return $.when(this._activateBookmarkLocal(param, options))
       .catch(error => {
@@ -352,6 +373,9 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
   }
 
+  /**
+   * Handles errors that occurred during bookmark creation.
+   */
   handleCreateBookmarkError(error: any): JQuery.Promise<any> {
     if (scout.isOneOf(error,
       BookmarkDoBuilder.ERROR_MISSING_OUTLINE,
@@ -365,6 +389,9 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     return App.get().errorHandler.handle(error);
   }
 
+  /**
+   * Handles errors that occurred during bookmark activation.
+   */
   handleActivateBookmarkError(error: any): JQuery.Promise<any> {
     if (error === BookmarkSupport.ERROR_ALREADY_LOADING) {
       $.log.error('Another bookmark is currently loading');
@@ -384,6 +411,14 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   // --------------------------------------
 
+  /**
+   * Adapts the given target page with the information from the given bookmark.
+   * Useful when bookmarked page is opened inline, i.e. in bookmark outline.
+   *
+   * @param saveSearchForm Specifies whether the new state of the search form should be the saved state, i.e. pressing the
+   * reset button should revert the form back to the state from the bookmark rather than to the original state. The default
+   * value is `true`.
+   */
   applyBookmarkToPage(page: Page, bookmark: IBookmarkDo, saveSearchForm = true) {
     if (!page || !bookmark || !bookmark.definition) {
       return;
@@ -392,6 +427,10 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     this._applyBookmarkPage(page, bookmarkPage, saveSearchForm);
   }
 
+  /**
+   * Same as {@link applyBookmarkToPage}, but also reloads the page. The returned promise is not resolved until the
+   * reload is done.
+   */
   applyBookmarkToPageAndReload(page: Page, bookmark: IBookmarkDo, saveSearchForm = true): JQuery.Promise<void> {
     if (!page || !bookmark || !bookmark.definition) {
       return;
@@ -507,16 +546,9 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 }
 
-export interface ActivateBookmarkOptions {
-  /**
-   * Specifies whether the target outline should be activated. The default value is `true`.
-   */
-  activateOutline?: boolean;
-  /**
-   * If `true`, the user is warned when the bookmark could not be opened. Useful when a persisted bookmark is activated.
-   * The default value is `true`.
-   */
-  resetViewAndWarnOnFail?: boolean;
+export type CreateBookmarkParam = Omit<BookmarkDoBuilderModel, 'desktop'>;
+
+export interface CreateBookmarkOptions {
   /**
    * Specifies whether runtime errors should be handled (e.g. by showing a message). The promise will still be rejected.
    * The default value is `true`.
@@ -536,4 +568,21 @@ export interface ActivateBookmarkParam {
    * but not apply the page state (e.g. table configuration). Therefore, this has to be done in the UI.
    */
   applyParentBookmarkPage?: boolean;
+}
+
+export interface ActivateBookmarkOptions {
+  /**
+   * Specifies whether the target outline should be activated. The default value is `true`.
+   */
+  activateOutline?: boolean;
+  /**
+   * If `true`, the user is warned when the bookmark could not be opened. Useful when a persisted bookmark is activated.
+   * The default value is `true`.
+   */
+  resetViewAndWarnOnFail?: boolean;
+  /**
+   * Specifies whether runtime errors should be handled (e.g. by showing a message). The promise will still be rejected.
+   * The default value is `true`.
+   */
+  handleErrors?: boolean;
 }
