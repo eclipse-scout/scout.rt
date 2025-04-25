@@ -324,8 +324,7 @@ export class OutlineAdapter extends TreeAdapter {
       parent: pageModel.parent,
       owner: pageModel.owner,
       objectType: pageModel.jsPageObjectType,
-      // FIXME bsh [js-bookmark] Check which properties we want to explicitly inherit form the Java page
-      pageParam,
+      pageParam: pageParam,
       classId: pageModel.classId,
       modelClass: pageModel.modelClass,
       text: pageModel.text || undefined // because summary column might come from Java parent page
