@@ -45,19 +45,19 @@ export class ObjectUuidProvider implements ObjectUuidProviderModel, ObjectWithTy
 
   /**
    * Modifiable set of widgets which will be skipped when building the uuidPath.
-   * A widget is skipped if its class is exactly one of these (NOT instanceof!).
+   * A widget is skipped if its class is exactly one of these (*not* `instanceof`!).
    *
    * A widget may be skipped if it is not relevant for computing the uuidPath, e.g. if it is only a layouting component.
-   * For example: A group box is skipped because the id or uuid of a widget is normally unique inside a form so the group box would unnecessarily enlarge the uuidPath.
-   * Also, if the widget is moved into another group box, the uuidPath won't be affected.
-   * If the group box is extracted into a separate widget and gets its own class (aka. template field)
-   * it must not be skipped anymore because this template can be used multiple times on the same form and must therefore be part of the uuidPath.
-   * This template use case is the reason why the subclasses of the registered widgets are not considered.
+   * For example: A group box is skipped because the id or uuid of a widget is normally unique inside a form so the group
+   * box would unnecessarily enlarge the uuidPath. Also, if the widget is moved into another group box, the uuidPath won't
+   * be affected. If the group box is extracted into a separate widget and gets its own class (aka. template field), it must
+   * not be skipped anymore because this template can be used multiple times on the same form and must therefore be part of
+   * the uuidPath. This template use-case is the reason why the subclasses of the registered widgets are not considered.
    */
   static uuidPathSkipWidgets: Set<Constructor<Widget>> = new Set<Constructor<Widget>>();
 
   /**
-   * Modifiable list of rules which are used to determine if a parent should be skipped when building the uuidPath.
+   * Modifiable list of rules (predicates) which are used to determine if a parent should be skipped when building the uuidPath.
    *
    * These rules are always applied, even if {@link UuidPathOptions.considerSkipWidgets} is set to false.
    */
@@ -71,7 +71,8 @@ export class ObjectUuidProvider implements ObjectUuidProviderModel, ObjectWithTy
   /**
    * Computes a path starting with the {@link uuid} of this object. If a parent is available, its {@link uuidPath} is appended to the right (recursively).
    * {@link UUID_PATH_DELIMITER} is used as delimiter between the segments.
-   * By default, if the object is a remote (Scout Classic) object having a classId, its value is directly returned without appending the parent path because classIds typically already include its parents.
+   * By default, if the object is a remote (Scout Classic) object having a classId, its value is directly returned without appending the parent path,
+   * because classIds typically already include their parents.
    *
    * @param object The object for which the uuidPath should be computed.
    * @param options Optional {@link UuidPathOptions} controlling the computation of the path.
@@ -94,7 +95,7 @@ export class ObjectUuidProvider implements ObjectUuidProviderModel, ObjectWithTy
       return uuid;
     }
 
-    // By default, stop on classIds as they typically include its parents already
+    // By default, stop on classIds as they typically include their parents already
     const appendParent = !object.classId;
     if (!appendParent) {
       return uuid;
@@ -149,7 +150,7 @@ export class ObjectUuidProvider implements ObjectUuidProviderModel, ObjectWithTy
    * Computes an uuid for the given object. The result may be a 'classId' for remote objects (Scout Classic) or an 'uuid' for Scout JS elements (if available).
    * If the fallback is enabled, an id might be created using the 'id' property and 'objectType' property.
    *
-   * @param useFallback Optional boolean specifying if a fallback identifier may be created in case an object has no specific identifier set. The fallback may be less stable. Default is true.
+   * @param useFallback Specifies if a fallback identifier may be created in case the object has no specific identifier set. The fallback may be less stable. Default is true.
    * @returns the uuid for the object or null.
    */
   uuid(object: ObjectUuidSource, useFallback?: boolean): string {
@@ -174,7 +175,7 @@ export class ObjectUuidProvider implements ObjectUuidProviderModel, ObjectWithTy
     if (this._considerId(object)) {
       return object.id;
     }
-    let objectType;
+    let objectType: string;
     if (typeof object.objectType === 'string') {
       objectType = object.objectType;
     } else {

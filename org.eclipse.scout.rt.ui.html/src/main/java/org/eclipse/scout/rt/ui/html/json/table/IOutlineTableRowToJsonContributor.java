@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,6 +14,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.json.JSONObject;
 
+/**
+ * Called when {@link JsonOutlineTable} is converting a {@linkplain ITableRow table row} of a {@linkplain IPage page} to JSON.
+ */
 @ApplicationScoped
 public interface IOutlineTableRowToJsonContributor {
 

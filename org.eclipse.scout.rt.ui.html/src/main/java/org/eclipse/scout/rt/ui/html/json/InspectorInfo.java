@@ -57,7 +57,7 @@ public class InspectorInfo {
   }
 
   /**
-   * Adds inspector properties ({@value #PROP_CLASS_ID} & {@value #PROP_MODEL_CLASS}) to the given {@link JSONObject}.
+   * Adds inspector properties ({@value #PROP_CLASS_ID},  {@value #PROP_MODEL_CLASS}) to the given {@link JSONObject}.
    *
    * @param req
    *     The {@link HttpServletRequest} to detect if the inspector is enabled

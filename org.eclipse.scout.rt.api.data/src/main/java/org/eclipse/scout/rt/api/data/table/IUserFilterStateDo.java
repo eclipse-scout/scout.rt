@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.api.data.table;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeVersionRequired;
 
+/**
+ * Marker interface for data objects representing the user filter state of a column.
+ */
 @TypeVersionRequired
 public interface IUserFilterStateDo extends IDoEntity {
 }

@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.api.data.table;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeVersionRequired;
 
+/**
+ * Marker interface for a data object containing the state of a table customizer.
+ */
 @TypeVersionRequired
 public interface ITableCustomizerDo extends IDoEntity {
 }

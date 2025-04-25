@@ -11,6 +11,7 @@ import {App, Constructor, InitModelOf, ObjectFactory, ObjectModel, objects, Obje
 
 export class PageResolver implements PageResolverModel, ObjectWithType {
   declare model: PageResolverModel;
+
   session: Session;
   objectType: string;
 
@@ -26,17 +27,16 @@ export class PageResolver implements PageResolverModel, ObjectWithType {
   }
 
   /**
-   * @returns the object type of the page matching the given page param.
+   * @returns the object type of the page matching the given page param, or `null` if no such page could be identified.
    */
   findObjectTypeForPageParam(pageParam: PageParamDo): ObjectType<Page> {
     if (!pageParam) {
       return null;
     }
 
-    // By Dummy Page Param
+    // By dummy page param
     if (pageParam instanceof PageIdDummyPageParamDo) {
-      const dummyPageParamDo = pageParam as PageIdDummyPageParamDo;
-      return this._findObjectTypeForPageParam(dummyPageParamDo);
+      return this._findObjectTypeForDummyPageParam(pageParam);
     }
 
     // By naming convention
@@ -52,17 +52,13 @@ export class PageResolver implements PageResolverModel, ObjectWithType {
     return null;
   }
 
-  protected _findObjectTypeForPageParam(pageParam: PageIdDummyPageParamDo): ObjectType<Page> {
-    if (!pageParam) {
-      return null;
-    }
-
+  protected _findObjectTypeForDummyPageParam(pageParam: PageIdDummyPageParamDo): ObjectType<Page> {
     let objectType = this._objectTypeByUuid.get(pageParam.pageId);
     if (!objectType) {
       // If the page is not yet in the cache, (re-)init the cache first
       this._initObjectTypeByUuid();
     }
-    return this._objectTypeByUuid.get(pageParam.pageId) ?? null;
+    return this._objectTypeByUuid.get(pageParam.pageId) || null;
   }
 
   protected _initObjectTypeByUuid() {

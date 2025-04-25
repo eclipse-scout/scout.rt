@@ -138,10 +138,10 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
   }
 
   /**
-   * Writes the static model to the page instance and initialize the {@link pageParam},
-   * so the {@link PageResolver} can find the correct page without the need to initialize it completely.
+   * Writes the static model to the page instance and initializes the {@link pageParam}.
+   * This allows the {@link PageResolver} to find the correct page without having to initialize it completely.
    *
-   * Important: if a page should be used regularly, always use {@link scout.create} to create and initialize it properly. This method IS intended to be used for page resolving only.
+   * **Important:** Always use {@link scout.create} to create and initialize page instances. This method is *only* intended to be used for page resolving!
    */
   minimalInit() {
     let staticModel = this._jsonModel();
@@ -533,6 +533,9 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
     return '';
   }
 
+  /**
+   * Returns the `text` property of this page as plain text.
+   */
   getDisplayText(): string {
     if (this.htmlEnabled) {
       return strings.plainText(this.text);
@@ -697,7 +700,7 @@ export class PageParamDo extends BaseDoEntity {
 }
 
 /**
- * Page param that is used by bookmarks to identify pages that do not provide a {@link PageParamDo}.
+ * Default page param that is used by bookmarks to identify pages that do not provide a {@link PageParamDo}.
  * It stores the page's ID so it can be found again when activating the bookmark.
  */
 @typeName('scout.PageIdDummyPageParam')

@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
- * Profile Id used to identify different profile for {@link TableClientUiPreferenceProfileDo}.
+ * Profile ID used to identify different profile for {@link TableClientUiPreferenceProfileDo}.
  * <p>
  * A profile might be based on some information from the user agent.
  */
