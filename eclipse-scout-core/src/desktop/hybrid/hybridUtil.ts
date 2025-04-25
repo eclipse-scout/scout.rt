@@ -9,7 +9,7 @@
  */
 import {HybridActionContextElement, HybridActionContextElementConverters, HybridActionContextElements, JsonHybridActionContextElement, ModelAdapter, scout, Session, Widget} from '../../index';
 
-export class HybridUtilImpl {
+export class HybridUtil {
 
   jsonToContextElements(session: Session, jsonContextElements: Record<string, JsonHybridActionContextElement[]>): HybridActionContextElements {
     scout.assertParameter('session', session);
@@ -110,4 +110,4 @@ export class HybridUtilImpl {
   }
 }
 
-export const hybridUtil = scout.create(HybridUtilImpl);
+export const hybridUtil = scout.create(HybridUtil);
