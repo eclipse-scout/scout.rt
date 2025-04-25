@@ -12,15 +12,18 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.AbstractHybridAction;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridActionType;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @HybridActionType(ExportSearchDataHybridAction.TYPE)
 public class ExportSearchDataHybridAction extends AbstractHybridAction<IDoEntity> {
+  private static final Logger LOG = LoggerFactory.getLogger(ExportSearchDataHybridAction.class);
 
   protected static final String TYPE = "ExportSearchData";
 
   @Override
   public void execute(IDoEntity data) {
-    // NOT IMPLEMENTED YET -> MOVE CORE IMPLEMENTATION HERE
+    LOG.warn("Not implemented yet");
     fireHybridActionEndEvent();
   }
 }

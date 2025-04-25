@@ -12,15 +12,18 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 import org.eclipse.scout.rt.api.data.bookmark.ActivateBookmarkDataDo;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.AbstractHybridAction;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridActionType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @HybridActionType(ActivateBookmarkHybridAction.TYPE)
 public class ActivateBookmarkHybridAction extends AbstractHybridAction<ActivateBookmarkDataDo> {
+  private static final Logger LOG = LoggerFactory.getLogger(ActivateBookmarkHybridAction.class);
 
   protected static final String TYPE = "ActivateBookmark";
 
   @Override
   public void execute(ActivateBookmarkDataDo data) {
-    // NOT IMPLEMENTED YET -> MOVE CORE IMPLEMENTATION HERE
+    LOG.warn("Not implemented yet");
     fireHybridActionEndEvent();
   }
 }
