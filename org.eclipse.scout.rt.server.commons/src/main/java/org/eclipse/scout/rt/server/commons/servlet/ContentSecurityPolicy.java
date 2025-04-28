@@ -89,6 +89,7 @@ public class ContentSecurityPolicy {
   public static final String DIRECTIVE_FONT_SRC = "font-src";
   public static final String DIRECTIVE_FORM_ACTION = "form-action";
   public static final String DIRECTIVE_FRAME_ANCESTORS = "frame-ancestors";
+  public static final String DIRECTIVE_MANIFEST_SRC = "manifest-src";
   public static final String DIRECTIVE_MEDIA_SRC = "media-src";
   public static final String DIRECTIVE_OBJECT_SRC = "object-src";
   public static final String DIRECTIVE_PLUGIN_TYPES = "plugin-types";
@@ -106,12 +107,13 @@ public class ContentSecurityPolicy {
   /**
    * Default rules for content security policy (CSP):
    * <ul>
-   * <li><b>default-src 'self'</b><br>
-   * Only accept 'self' sources by default.</li>
-   * <li><b>script-src 'self'</b><br>
+   * <li><b>default-src 'none'</b><br>
+   * Disable fallback handling, directives should be set explicitly.</li>
+   * <li><b>script-src 'self'; font-src 'self'; manifest-src 'self'; media-src 'self'; object-src 'self';</b><br>
+   * Only accept resources from the same origin.</li>
    * <li><b>style-src 'self' 'unsafe-inline'</b><br>
    * Without inline styling many widgets would not work as expected.</li>
-   * <li><b>frame-src *; child-src *</b><br>
+   * <li><b>child-src *</b><br>
    * Everything is allowed because the iframes created by the browser field run in the sandbox mode and therefore handle
    * the security policy by their own.</li>
    * <li><b>report-uri {@link HttpServletControl#CSP_REPORT_URL}</b><br>
@@ -123,13 +125,14 @@ public class ContentSecurityPolicy {
     withImgSrc(getConfiguredDefault(DIRECTIVE_IMG_SRC, "'self'"));
     withStyleSrc(getConfiguredDefault(DIRECTIVE_STYLE_SRC, "'self' 'unsafe-inline'"));
     withChildSrc(getConfiguredDefault(DIRECTIVE_CHILD_SRC, "*"));
-    withConnectSrc(getConfiguredDefault(DIRECTIVE_CONNECT_SRC, null));
-    withDefaultSrc(getConfiguredDefault(DIRECTIVE_DEFAULT_SRC, "'self'"));
-    withFontSrc(getConfiguredDefault(DIRECTIVE_FONT_SRC, null));
+    withConnectSrc(getConfiguredDefault(DIRECTIVE_CONNECT_SRC, "'self'"));
+    withDefaultSrc(getConfiguredDefault(DIRECTIVE_DEFAULT_SRC, "'none'"));
+    withFontSrc(getConfiguredDefault(DIRECTIVE_FONT_SRC, "'self'"));
     withFormAction(getConfiguredDefault(DIRECTIVE_FORM_ACTION, null));
     withFrameAncestors(getConfiguredDefault(DIRECTIVE_FRAME_ANCESTORS, null));
-    withMediaSrc(getConfiguredDefault(DIRECTIVE_MEDIA_SRC, null));
-    withObjectSrc(getConfiguredDefault(DIRECTIVE_OBJECT_SRC, null));
+    withManifestSrc(getConfiguredDefault(DIRECTIVE_MANIFEST_SRC, "'self'"));
+    withMediaSrc(getConfiguredDefault(DIRECTIVE_MEDIA_SRC, "'self'"));
+    withObjectSrc(getConfiguredDefault(DIRECTIVE_OBJECT_SRC, "'self'"));
     withPluginTypes(getConfiguredDefault(DIRECTIVE_PLUGIN_TYPES, null));
     withReportUri(getConfiguredDefault(DIRECTIVE_REPORT_URI, HttpServletControl.CSP_REPORT_URL)); // see also ContentSecurityPolicyReportHandler
     withSandbox(getConfiguredDefault(DIRECTIVE_SANDBOX, null));
@@ -318,6 +321,23 @@ public class ContentSecurityPolicy {
    */
   public ContentSecurityPolicy appendImgSrc(String imgSrc) {
     return addOrAppend(DIRECTIVE_IMG_SRC, imgSrc);
+  }
+
+  /**
+   * @see <a href="https://www.w3.org/TR/CSP3/#directive-manifest-src">https://www.w3.org/TR/CSP3/#directive-manifest-src</a>
+   */
+  public ContentSecurityPolicy withManifestSrc(String manifestSrc) {
+    putOrRemove(DIRECTIVE_MANIFEST_SRC, manifestSrc);
+    return this;
+  }
+
+  /**
+   * Appends {@code manifestSrc} to existing manifest source directive or creates new directive if it not already exists.
+   *
+   * @see <a href="https://www.w3.org/TR/CSP3/#directive-manifest-src">https://www.w3.org/TR/CSP3/#directive-manifest-src</a>
+   */
+  public ContentSecurityPolicy appendManifestSrc(String manifestSrc) {
+    return addOrAppend(DIRECTIVE_MANIFEST_SRC, manifestSrc);
   }
 
   /**
