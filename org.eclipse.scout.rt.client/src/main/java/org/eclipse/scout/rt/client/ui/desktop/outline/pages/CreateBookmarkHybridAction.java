@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class CreateBookmarkHybridAction extends AbstractHybridAction<IDoEntity> {
   private static final Logger LOG = LoggerFactory.getLogger(CreateBookmarkHybridAction.class);
 
-  protected static final String TYPE = "CreateBookmark";
+  protected static final String TYPE = "scout.CreateBookmark";
 
   @Override
   public void execute(IDoEntity data) {

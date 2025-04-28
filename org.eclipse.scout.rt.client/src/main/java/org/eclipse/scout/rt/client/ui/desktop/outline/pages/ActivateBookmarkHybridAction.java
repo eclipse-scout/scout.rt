@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class ActivateBookmarkHybridAction extends AbstractHybridAction<ActivateBookmarkDataDo> {
   private static final Logger LOG = LoggerFactory.getLogger(ActivateBookmarkHybridAction.class);
 
-  protected static final String TYPE = "ActivateBookmark";
+  protected static final String TYPE = "scout.ActivateBookmark";
 
   @Override
   public void execute(ActivateBookmarkDataDo data) {

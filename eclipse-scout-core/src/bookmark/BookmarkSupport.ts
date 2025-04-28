@@ -213,7 +213,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
         bookmarkDefinition,
         options: options ? scout.create(ActivateBookmarkOptionsDo, options) : undefined
       });
-      await hybridManager.callActionAndWait('ActivateBookmark', data);
+      await hybridManager.callActionAndWait('scout.ActivateBookmark', data);
       return;
     }
 

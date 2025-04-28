@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class ExportSearchDataHybridAction extends AbstractHybridAction<IDoEntity> {
   private static final Logger LOG = LoggerFactory.getLogger(ExportSearchDataHybridAction.class);
 
-  protected static final String TYPE = "ExportSearchData";
+  protected static final String TYPE = "scout.ExportSearchData";
 
   @Override
   public void execute(IDoEntity data) {

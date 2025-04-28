@@ -205,7 +205,7 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
       contextElements.withElement('childPage', HybridActionContextElement.of(childPage.outline, childPage));
     }
 
-    let bookmark = await HybridManager.get(this.session).callActionAndWait('CreateBookmark', createBookmarkOptions, contextElements) as BookmarkDo;
+    let bookmark = await HybridManager.get(this.session).callActionAndWait('scout.CreateBookmark', createBookmarkOptions, contextElements) as BookmarkDo;
     if (!(bookmark?.definition?.bookmarkedPage instanceof TableBookmarkPageDo)) {
       throw BookmarkDoBuilder.ERROR_PAGE_NOT_BOOKMARKABLE;
     }
@@ -239,7 +239,7 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
       return null;
     }
     if (searchForm.modelAdapter) {
-      return HybridManager.get(this.session).callActionAndWait('ExportSearchData', undefined,
+      return HybridManager.get(this.session).callActionAndWait('scout.ExportSearchData', undefined,
         scout.create(HybridActionContextElements)
           .withElement('searchForm', HybridActionContextElement.of(searchForm))
       );
