@@ -493,25 +493,10 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   protected _prepareSearchFilter(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm: boolean) {
-    let searchForm = page.getSearchForm();
+    // Import search data
+    page.setSearchFilter(bookmarkPage.searchData, saveSearchForm);
 
-    if (searchForm && !searchForm.modelAdapter) {
-      // If the new search data should not be the saved state (i.e. the user can press the "Reset" button to clear
-      // the bookmarked search data), remember the original state and reset it after the page has been loaded.
-      let oldSearchData = saveSearchForm ? undefined : searchForm.exportData();
-      searchForm.setData(bookmarkPage.searchData);
-      searchForm.importData();
-      searchForm.setData(oldSearchData);
-      if (saveSearchForm) {
-        searchForm.markAsSaved();
-      }
-    } else {
-      // FIXME bsh [js-bookmark] HACKY-HACKY! Replace by searchFilter property on page. How to instruct existing hybrid form to import this again?
-      page['__searchData'] = bookmarkPage.searchData;
-      page['__searchDataMarkAsSaved'] = saveSearchForm;
-    }
-
-    // Mark page so ensureChildrenLoaded() will reload the data
+    // Mark page as dirty so ensureChildrenLoaded() will reload the data
     page.childrenLoaded = false;
   }
 

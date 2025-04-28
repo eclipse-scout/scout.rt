@@ -172,11 +172,14 @@ export class PageWithTable extends Page implements PageWithTableModel {
     return this.getSearchForm()?.exportData();
   }
 
-  setSearchFilter(searchFilter: any) {
+  setSearchFilter(searchFilter: any, saveSearchForm?: boolean) {
     let searchForm = this.getSearchForm();
     if (searchForm) {
       searchForm.setData(searchFilter);
       searchForm.importData();
+      if (saveSearchForm) {
+        searchForm.markAsSaved();
+      }
     }
   }
 
