@@ -263,14 +263,15 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     let parentPage = param.parentPage;
     let parentBookmarkPage = param.parentBookmarkPage;
 
-    // FIXME bsh [js-bookmark] HACKY-HACKY! Find a better solution.
+    // Check if the currently selected page is a child of 'parentPage'. If yes, change the current selection to parentPage.
+    // Otherwise, after reloading the parent page, the selection would be restored (see PageWithTable#restoreSelection).
+    // This would cause the child page to be loaded _before_ the search data from the bookmark has been applied, resulting
+    // in the wrong data being shown.
+    // TODO bsh [js-bookmark] This workaround has the negative side-effect that the parent page is visible shortly. Is there a better solution?
     if (parentPage) {
       let currentPage = outline.selectedNode();
       while (currentPage) {
         if (currentPage === parentPage) {
-          // The currently selected page is a child of 'parentPage'.
-          // Remove the current selection to prevent unwanted selection restoration (PageWithTable#restoreSelection), which
-          // would trigger the loading of the data before the bookmark search data has been applied.
           outline.selectNode(parentPage);
         }
         currentPage = currentPage.parentNode;
