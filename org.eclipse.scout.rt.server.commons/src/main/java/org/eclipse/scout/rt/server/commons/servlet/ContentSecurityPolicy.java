@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -89,12 +89,14 @@ public class ContentSecurityPolicy {
   public static final String DIRECTIVE_FONT_SRC = "font-src";
   public static final String DIRECTIVE_FORM_ACTION = "form-action";
   public static final String DIRECTIVE_FRAME_ANCESTORS = "frame-ancestors";
+  public static final String DIRECTIVE_MANIFEST_SRC = "manifest-src";
   public static final String DIRECTIVE_MEDIA_SRC = "media-src";
   public static final String DIRECTIVE_OBJECT_SRC = "object-src";
   public static final String DIRECTIVE_PLUGIN_TYPES = "plugin-types";
   public static final String DIRECTIVE_REPORT_URI = "report-uri";
   public static final String DIRECTIVE_SANDBOX = "sandbox";
   public static final String DIRECTIVE_SCRIPT_SRC = "script-src";
+  public static final String DIRECTIVE_WORKER_SRC = "worker-src";
 
   private final Map<String, String> m_directives = new LinkedHashMap<>();
 
@@ -105,12 +107,13 @@ public class ContentSecurityPolicy {
   /**
    * Default rules for content security policy (CSP):
    * <ul>
-   * <li><b>default-src 'self'</b><br>
-   * Only accept 'self' sources by default.</li>
-   * <li><b>script-src 'self'</b><br>
+   * <li><b>default-src 'none'</b><br>
+   * Disable fallback handling, directives should be set explicitly.</li>
+   * <li><b>script-src 'self'; font-src 'self'; manifest-src 'self'; media-src 'self'; object-src 'self';</b><br>
+   * Only accept resources from the same origin.</li>
    * <li><b>style-src 'self' 'unsafe-inline'</b><br>
    * Without inline styling many widgets would not work as expected.</li>
-   * <li><b>frame-src *; child-src *</b><br>
+   * <li><b>child-src *</b><br>
    * Everything is allowed because the iframes created by the browser field run in the sandbox mode and therefore handle
    * the security policy by their own.</li>
    * <li><b>report-uri {@link HttpServletControl#CSP_REPORT_URL}</b><br>
@@ -122,17 +125,19 @@ public class ContentSecurityPolicy {
     withImgSrc(getConfiguredDefault(DIRECTIVE_IMG_SRC, "'self'"));
     withStyleSrc(getConfiguredDefault(DIRECTIVE_STYLE_SRC, "'self' 'unsafe-inline'"));
     withChildSrc(getConfiguredDefault(DIRECTIVE_CHILD_SRC, "*"));
-    withConnectSrc(getConfiguredDefault(DIRECTIVE_CONNECT_SRC, null));
-    withDefaultSrc(getConfiguredDefault(DIRECTIVE_DEFAULT_SRC, "'self'"));
-    withFontSrc(getConfiguredDefault(DIRECTIVE_FONT_SRC, null));
+    withConnectSrc(getConfiguredDefault(DIRECTIVE_CONNECT_SRC, "'self'"));
+    withDefaultSrc(getConfiguredDefault(DIRECTIVE_DEFAULT_SRC, "'none'"));
+    withFontSrc(getConfiguredDefault(DIRECTIVE_FONT_SRC, "'self'"));
     withFormAction(getConfiguredDefault(DIRECTIVE_FORM_ACTION, null));
     withFrameAncestors(getConfiguredDefault(DIRECTIVE_FRAME_ANCESTORS, null));
-    withMediaSrc(getConfiguredDefault(DIRECTIVE_MEDIA_SRC, null));
-    withObjectSrc(getConfiguredDefault(DIRECTIVE_OBJECT_SRC, null));
+    withManifestSrc(getConfiguredDefault(DIRECTIVE_MANIFEST_SRC, "'self'"));
+    withMediaSrc(getConfiguredDefault(DIRECTIVE_MEDIA_SRC, "'self'"));
+    withObjectSrc(getConfiguredDefault(DIRECTIVE_OBJECT_SRC, "'self'"));
     withPluginTypes(getConfiguredDefault(DIRECTIVE_PLUGIN_TYPES, null));
     withReportUri(getConfiguredDefault(DIRECTIVE_REPORT_URI, HttpServletControl.CSP_REPORT_URL)); // see also ContentSecurityPolicyReportHandler
     withSandbox(getConfiguredDefault(DIRECTIVE_SANDBOX, null));
     withScriptSrc(getConfiguredDefault(DIRECTIVE_SCRIPT_SRC, "'self'"));
+    withWorkerSrc(getConfiguredDefault(DIRECTIVE_WORKER_SRC, null));
   }
 
   protected String getConfiguredDefault(String directiveKey, String fallbackValue) {
@@ -319,6 +324,23 @@ public class ContentSecurityPolicy {
   }
 
   /**
+   * @see <a href="https://www.w3.org/TR/CSP3/#directive-manifest-src">https://www.w3.org/TR/CSP3/#directive-manifest-src</a>
+   */
+  public ContentSecurityPolicy withManifestSrc(String manifestSrc) {
+    putOrRemove(DIRECTIVE_MANIFEST_SRC, manifestSrc);
+    return this;
+  }
+
+  /**
+   * Appends {@code manifestSrc} to existing manifest source directive or creates new directive if it not already exists.
+   *
+   * @see <a href="https://www.w3.org/TR/CSP3/#directive-manifest-src">https://www.w3.org/TR/CSP3/#directive-manifest-src</a>
+   */
+  public ContentSecurityPolicy appendManifestSrc(String manifestSrc) {
+    return addOrAppend(DIRECTIVE_MANIFEST_SRC, manifestSrc);
+  }
+
+  /**
    * @see <a href="https://www.w3.org/TR/CSP2/#directive-media-src">https://www.w3.org/TR/CSP2/#directive-media-src</a>
    */
   public ContentSecurityPolicy withMediaSrc(String mediaSrc) {
@@ -443,6 +465,23 @@ public class ContentSecurityPolicy {
    */
   public ContentSecurityPolicy appendStyleSrc(String styleSrc) {
     return addOrAppend(DIRECTIVE_STYLE_SRC, styleSrc);
+  }
+
+  /**
+   * @see <a href="https://www.w3.org/TR/CSP3/#directive-worker-src">https://www.w3.org/TR/CSP3/#directive-worker-src</a>
+   */
+  public ContentSecurityPolicy withWorkerSrc(String workerSrc) {
+    putOrRemove(DIRECTIVE_WORKER_SRC, workerSrc);
+    return this;
+  }
+
+  /**
+   * Appends {@code workerSrc} to existing worker source directive or creates new directive if it not already exists.
+   *
+   * @see <a href="https://www.w3.org/TR/CSP3/#directive-worker-src">https://www.w3.org/TR/CSP3/#directive-worker-src</a>
+   */
+  public ContentSecurityPolicy appendWorkerSrc(String workerSrc) {
+    return addOrAppend(DIRECTIVE_WORKER_SRC, workerSrc);
   }
 
   /**
