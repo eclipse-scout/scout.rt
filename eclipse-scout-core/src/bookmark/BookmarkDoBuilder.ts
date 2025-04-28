@@ -67,16 +67,6 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
     return this._createBookmark(bookmarkDefinition);
   }
 
-  protected async _createBookmark(bookmarkDefinition: IBookmarkDefinitionDo): Promise<IBookmarkDo> {
-    let bookmarkTitle = await this._createBookmarkTitle(bookmarkDefinition);
-    let bookmarkDescription = await this._createBookmarkDescription(bookmarkDefinition);
-    return scout.create(BookmarkDo, {
-      definition: bookmarkDefinition,
-      title: bookmarkTitle || undefined,
-      description: bookmarkDescription || undefined
-    });
-  }
-
   protected async _createBookmarkDefinition(): Promise<IBookmarkDefinitionDo> {
     let page = this.page;
     let outline = page?.outline || this.desktop.outline;
@@ -261,6 +251,16 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
   }
 
   // --------------------------------------
+
+  protected async _createBookmark(bookmarkDefinition: IBookmarkDefinitionDo): Promise<IBookmarkDo> {
+    let bookmarkTitle = await this._createBookmarkTitle(bookmarkDefinition);
+    let bookmarkDescription = await this._createBookmarkDescription(bookmarkDefinition);
+    return scout.create(BookmarkDo, {
+      definition: bookmarkDefinition,
+      title: bookmarkTitle || undefined,
+      description: bookmarkDescription || undefined
+    });
+  }
 
   protected async _createBookmarkTitle(bookmarkDefinition: IBookmarkDefinitionDo): Promise<string> {
     if (!this.createTitle) {
