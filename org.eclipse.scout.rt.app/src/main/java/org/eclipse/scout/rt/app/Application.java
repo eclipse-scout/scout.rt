@@ -160,8 +160,16 @@ public class Application {
     int port = CONFIG.getPropertyValue(ScoutApplicationPortProperty.class);
     String contextPath = CONFIG.getPropertyValue(ScoutApplicationContextPathProperty.class);
 
+    String pid = null;
+    try {
+      pid = String.valueOf(ProcessHandle.current().pid());
+    }
+    catch (Exception e) {
+      // PID not supported
+    }
+
     StringBuilder sb = new StringBuilder();
-    sb.append("Server ready. The application is available on the following addresses:\n");
+    sb.append("Server ready. The application").append(StringUtility.box(" with PID=", pid, "")).append(" is available at the following addresses:\n");
     sb.append("---------------------------------------------------------------------\n");
     sb.append("  ").append(protocol).append("://localhost:").append(port).append(contextPath).append('\n');
     sb.append("  ").append(protocol).append("://").append(hostname).append(":").append(port).append(contextPath).append('\n');
