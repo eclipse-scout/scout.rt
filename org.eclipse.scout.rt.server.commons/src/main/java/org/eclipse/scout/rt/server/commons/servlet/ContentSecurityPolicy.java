@@ -88,6 +88,7 @@ public class ContentSecurityPolicy {
   public static final String DIRECTIVE_DEFAULT_SRC = "default-src";
   public static final String DIRECTIVE_FONT_SRC = "font-src";
   public static final String DIRECTIVE_FORM_ACTION = "form-action";
+  public static final String DIRECTIVE_FRAME_SRC = "frame-src";
   public static final String DIRECTIVE_FRAME_ANCESTORS = "frame-ancestors";
   public static final String DIRECTIVE_MANIFEST_SRC = "manifest-src";
   public static final String DIRECTIVE_MEDIA_SRC = "media-src";
@@ -109,11 +110,11 @@ public class ContentSecurityPolicy {
    * <ul>
    * <li><b>default-src 'none'</b><br>
    * Disable fallback handling, directives should be set explicitly.</li>
-   * <li><b>script-src 'self'; font-src 'self'; manifest-src 'self'; media-src 'self'; object-src 'self';</b><br>
+   * <li><b>base-uri 'self'; child-src 'self'; font-src 'self'; form-action 'self'; manifest-src 'self'; media-src 'self'; object-src 'self'; script-src 'self'; worker-src 'self';</b><br>
    * Only accept resources from the same origin.</li>
    * <li><b>style-src 'self' 'unsafe-inline'</b><br>
    * Without inline styling many widgets would not work as expected.</li>
-   * <li><b>child-src *</b><br>
+   * <li><b>frame-src *;</b><br>
    * Everything is allowed because the iframes created by the browser field run in the sandbox mode and therefore handle
    * the security policy by their own.</li>
    * <li><b>report-uri {@link HttpServletControl#CSP_REPORT_URL}</b><br>
@@ -121,14 +122,15 @@ public class ContentSecurityPolicy {
    * </ul>
    */
   protected void initDirectives() {
-    withBaseUri(getConfiguredDefault(DIRECTIVE_BASE_URI, null));
+    withBaseUri(getConfiguredDefault(DIRECTIVE_BASE_URI, "'self'"));
     withImgSrc(getConfiguredDefault(DIRECTIVE_IMG_SRC, "'self'"));
     withStyleSrc(getConfiguredDefault(DIRECTIVE_STYLE_SRC, "'self' 'unsafe-inline'"));
-    withChildSrc(getConfiguredDefault(DIRECTIVE_CHILD_SRC, "*"));
+    withChildSrc(getConfiguredDefault(DIRECTIVE_CHILD_SRC, "'self"));
     withConnectSrc(getConfiguredDefault(DIRECTIVE_CONNECT_SRC, "'self'"));
     withDefaultSrc(getConfiguredDefault(DIRECTIVE_DEFAULT_SRC, "'none'"));
     withFontSrc(getConfiguredDefault(DIRECTIVE_FONT_SRC, "'self'"));
-    withFormAction(getConfiguredDefault(DIRECTIVE_FORM_ACTION, null));
+    withFormAction(getConfiguredDefault(DIRECTIVE_FORM_ACTION, "'self'"));
+    withFrameSrc(getConfiguredDefault(DIRECTIVE_FRAME_SRC, "*"));
     withFrameAncestors(getConfiguredDefault(DIRECTIVE_FRAME_ANCESTORS, null));
     withManifestSrc(getConfiguredDefault(DIRECTIVE_MANIFEST_SRC, "'self'"));
     withMediaSrc(getConfiguredDefault(DIRECTIVE_MEDIA_SRC, "'self'"));
@@ -137,7 +139,7 @@ public class ContentSecurityPolicy {
     withReportUri(getConfiguredDefault(DIRECTIVE_REPORT_URI, HttpServletControl.CSP_REPORT_URL)); // see also ContentSecurityPolicyReportHandler
     withSandbox(getConfiguredDefault(DIRECTIVE_SANDBOX, null));
     withScriptSrc(getConfiguredDefault(DIRECTIVE_SCRIPT_SRC, "'self'"));
-    withWorkerSrc(getConfiguredDefault(DIRECTIVE_WORKER_SRC, null));
+    withWorkerSrc(getConfiguredDefault(DIRECTIVE_WORKER_SRC, "'self'"));
   }
 
   protected String getConfiguredDefault(String directiveKey, String fallbackValue) {
@@ -285,6 +287,24 @@ public class ContentSecurityPolicy {
   public ContentSecurityPolicy appendFormAction(String formAction) {
     return addOrAppend(DIRECTIVE_FORM_ACTION, formAction);
   }
+
+  /**
+   * @see <a href="https://www.w3.org/TR/CSP3/#directive-frame-src">https://www.w3.org/TR/CSP3/#directive-frame-src</a>
+   */
+  public ContentSecurityPolicy withFrameSrc(String frameSrc) {
+    putOrRemove(DIRECTIVE_FRAME_SRC, frameSrc);
+    return this;
+  }
+
+  /**
+   * Appends {@code frameSrc} to existing frame source directive or creates new directive if it not already exists.
+   *
+   * @see <a href="https://www.w3.org/TR/CSP3/#directive-frame-src">https://www.w3.org/TR/CSP3/#directive-frame-src</a>
+   */
+  public ContentSecurityPolicy appendFrameSrc(String frameSrc) {
+    return addOrAppend(DIRECTIVE_FRAME_SRC, frameSrc);
+  }
+
 
   /**
    * @see <a href=
