@@ -24,8 +24,10 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.ActiveFormDataChangeManager;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
+import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -323,14 +325,23 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
           interceptDataChanged(event);
         }
       };
+      IForm rootForm = FormUtility.findRootForm(getParentOfType(IForm.class));
+      IDesktop desktop = IDesktop.CURRENT.get();
+      boolean isView = desktop.getViews().contains(rootForm);
+      if (isView) {
+        BEANS.get(ActiveFormDataChangeManager.class).add(rootForm, m_internalDataChangeListener, true, dataTypes);
+      }
+      else {
+        desktop.dataChangeDesktopInForegroundListeners().add(m_internalDataChangeListener, true, dataTypes);
+      }
     }
-    IDesktop.CURRENT.get().dataChangeDesktopInForegroundListeners().add(m_internalDataChangeListener, true, dataTypes);
   }
 
   @Override
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {
       ClientSessionProvider.currentSession().getDesktop().removeDataChangeListener(m_internalDataChangeListener, dataTypes);
+      BEANS.get(ActiveFormDataChangeManager.class).remove(m_internalDataChangeListener);
     }
   }
 
