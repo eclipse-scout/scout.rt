@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Widget} from './index';
+import {BaseDoEntity, scout, Widget} from './index';
 
 export type Predicate<T> = (obj: T) => boolean;
 
@@ -59,3 +59,11 @@ export type JsonValue = string | number | boolean | JsonObject | JsonValue[];
 export interface JsonObject {
   [x: string]: JsonValue;
 }
+
+/**
+ * Marker type to indicate that the value is a {@link JsonValue}.
+ *
+ * Use this in data object classes ({@link BaseDoEntity}) to prevent the following TS compiler error when creating
+ * an instance with {@link scout.create}: `TS2589: Type instantiation is excessively deep and possibly infinite.`
+ */
+export type AnyJsonValue = any;
