@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BookmarkDo, CancelMenu, Form, FormModel, GroupBox, OkMenu, StringField} from '../index';
+import {BookmarkDo, CancelMenu, Form, FormField, FormModel, GroupBox, OkMenu, StringField} from '../index';
 
 export default (): FormModel => ({
   objectType: Form,
@@ -17,7 +17,9 @@ export default (): FormModel => ({
     id: 'MainBox',
     objectType: GroupBox,
     mainBox: true,
-    gridColumnCount: 1,
+    gridDataHints: {
+      widthInPixel: 600
+    },
     menus: [
       {
         id: 'OkMenu',
@@ -34,7 +36,7 @@ export default (): FormModel => ({
         objectType: GroupBox,
         statusVisible: false,
         gridDataHints: {
-          w: 1
+          w: FormField.FULL_WIDTH
         },
         fields: [
           {
@@ -50,7 +52,14 @@ export default (): FormModel => ({
 });
 
 export interface BookmarkFormModel extends FormModel {
-  bookmark: BookmarkDo;
+  /**
+   * The bookmark to edit. If this is set, no data is loaded from or saved to the {@link BookmarkStore bookmark store}.
+   */
+  bookmark?: BookmarkDo;
+  /**
+   * The ID of the bookmark to edit. If this is set, the bookmark is loaded from and saved to the {@link BookmarkStore bookmark store}.
+   */
+  bookmarkId?: string;
 }
 
 /* **************************************************************************
