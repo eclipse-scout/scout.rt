@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -95,6 +95,7 @@ public class ContentSecurityPolicy {
   public static final String DIRECTIVE_REPORT_URI = "report-uri";
   public static final String DIRECTIVE_SANDBOX = "sandbox";
   public static final String DIRECTIVE_SCRIPT_SRC = "script-src";
+  public static final String DIRECTIVE_WORKER_SRC = "worker-src";
 
   private final Map<String, String> m_directives = new LinkedHashMap<>();
 
@@ -133,6 +134,7 @@ public class ContentSecurityPolicy {
     withReportUri(getConfiguredDefault(DIRECTIVE_REPORT_URI, HttpServletControl.CSP_REPORT_URL)); // see also ContentSecurityPolicyReportHandler
     withSandbox(getConfiguredDefault(DIRECTIVE_SANDBOX, null));
     withScriptSrc(getConfiguredDefault(DIRECTIVE_SCRIPT_SRC, "'self'"));
+    withWorkerSrc(getConfiguredDefault(DIRECTIVE_WORKER_SRC, null));
   }
 
   protected String getConfiguredDefault(String directiveKey, String fallbackValue) {
@@ -443,6 +445,23 @@ public class ContentSecurityPolicy {
    */
   public ContentSecurityPolicy appendStyleSrc(String styleSrc) {
     return addOrAppend(DIRECTIVE_STYLE_SRC, styleSrc);
+  }
+
+  /**
+   * @see <a href="https://www.w3.org/TR/CSP3/#directive-worker-src">https://www.w3.org/TR/CSP3/#directive-worker-src</a>
+   */
+  public ContentSecurityPolicy withWorkerSrc(String workerSrc) {
+    putOrRemove(DIRECTIVE_WORKER_SRC, workerSrc);
+    return this;
+  }
+
+  /**
+   * Appends {@code workerSrc} to existing worker source directive or creates new directive if it not already exists.
+   *
+   * @see <a href="https://www.w3.org/TR/CSP3/#directive-worker-src">https://www.w3.org/TR/CSP3/#directive-worker-src</a>
+   */
+  public ContentSecurityPolicy appendWorkerSrc(String workerSrc) {
+    return addOrAppend(DIRECTIVE_WORKER_SRC, workerSrc);
   }
 
   /**
