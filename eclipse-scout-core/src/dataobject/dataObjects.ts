@@ -48,6 +48,8 @@ export const dataObjects = {
    *
    * See {@link serialize} for details.
    *
+   * Note: Like {@link JSON.stringify}, this method will convert `null` to the string `'null'`. If this is not desired, check the input before calling this method.
+   *
    * @param dataObject The value to serialize. Can be primitives, arrays or objects/classes. Typically, a pojo or data object class extending {@link BaseDoEntity}.
    * @returns the JSON string.
    */
