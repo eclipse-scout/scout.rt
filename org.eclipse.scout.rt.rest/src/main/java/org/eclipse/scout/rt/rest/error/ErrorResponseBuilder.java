@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,6 +29,7 @@ public class ErrorResponseBuilder {
   private String m_title;
   private String m_message;
   private String m_severity;
+  private boolean m_correlationId = true;
 
   public ErrorResponseBuilder withHttpStatus(int httpStatus) {
     m_httpStatus = httpStatus;
@@ -79,6 +80,11 @@ public class ErrorResponseBuilder {
     return this;
   }
 
+  public ErrorResponseBuilder withCorrelationId(boolean correlationId) {
+    m_correlationId = correlationId;
+    return this;
+  }
+
   public Response build() {
     return Response.status(m_httpStatus)
         .entity(BEANS.get(ErrorResponse.class).withError(buildError()))
@@ -88,8 +94,7 @@ public class ErrorResponseBuilder {
 
   protected ErrorDo buildError() {
     ErrorDo error = BEANS.get(ErrorDo.class)
-        .withHttpStatus(m_httpStatus)
-        .withCorrelationId(CorrelationId.CURRENT.get());
+        .withHttpStatus(m_httpStatus);
     if (m_errorCode != null) {
       error.withErrorCode(m_errorCode);
     }
@@ -101,6 +106,9 @@ public class ErrorResponseBuilder {
     }
     if (m_severity != null) {
       error.withSeverity(m_severity);
+    }
+    if (m_correlationId) {
+      error.withCorrelationId(CorrelationId.CURRENT.get());
     }
     return error;
   }
