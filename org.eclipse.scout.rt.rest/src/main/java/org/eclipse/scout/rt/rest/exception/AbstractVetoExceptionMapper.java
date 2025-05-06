@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,6 +33,7 @@ public abstract class AbstractVetoExceptionMapper<E extends VetoException> exten
         .withTitle(exception.getStatus().getTitle())
         .withMessage(exception.getStatus().getBody())
         .withErrorCode(exception.getStatus().getCode())
-        .withSeverity(exception.getStatus().getSeverity());
+        .withSeverity(exception.getStatus().getSeverity())
+        .withCorrelationId(false);
   }
 }
