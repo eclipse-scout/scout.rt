@@ -44,7 +44,7 @@ export class SmartColumn<TValue> extends LookupCallColumn<TValue> {
 
   protected _calculateCellSortCode(cell: Cell<TValue>): number {
     if (!this.codeType) {
-      return null;
+      return cell.sortCode;
     }
     let codeType = codes.get(this.codeType);
     if (!codeType) {
