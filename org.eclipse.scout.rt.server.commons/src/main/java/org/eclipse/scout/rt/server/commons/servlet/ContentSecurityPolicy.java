@@ -125,7 +125,7 @@ public class ContentSecurityPolicy {
     withBaseUri(getConfiguredDefault(DIRECTIVE_BASE_URI, "'self'"));
     withImgSrc(getConfiguredDefault(DIRECTIVE_IMG_SRC, "'self'"));
     withStyleSrc(getConfiguredDefault(DIRECTIVE_STYLE_SRC, "'self' 'unsafe-inline'"));
-    withChildSrc(getConfiguredDefault(DIRECTIVE_CHILD_SRC, "'self"));
+    withChildSrc(getConfiguredDefault(DIRECTIVE_CHILD_SRC, "'self'"));
     withConnectSrc(getConfiguredDefault(DIRECTIVE_CONNECT_SRC, "'self'"));
     withDefaultSrc(getConfiguredDefault(DIRECTIVE_DEFAULT_SRC, "'none'"));
     withFontSrc(getConfiguredDefault(DIRECTIVE_FONT_SRC, "'self'"));
