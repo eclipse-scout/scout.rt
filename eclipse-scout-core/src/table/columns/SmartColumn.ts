@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -44,7 +44,7 @@ export class SmartColumn<TValue> extends LookupCallColumn<TValue> {
 
   protected _calculateCellSortCode(cell: Cell<TValue>): number {
     if (!this.codeType) {
-      return null;
+      return cell.sortCode;
     }
     let codeType = codes.get(this.codeType);
     if (!codeType) {
