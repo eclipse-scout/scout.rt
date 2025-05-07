@@ -64,7 +64,7 @@ public class IdFactory {
 
   // ---------------- helper methods ----------------
 
-  protected List<Class<?>> findTypeParameters(Class<? extends IId> idClass) {
+  public List<Class<?>> findTypeParameters(Class<? extends IId> idClass) {
     return List.of(lookupCreateMethod(idClass).getParameterTypes());
   }
 
