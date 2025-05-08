@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -31,9 +31,6 @@ export class FocusFilterFieldKeyStroke extends KeyStroke {
     this.inheritAccessibility = false;
   }
 
-  /**
-   * @override KeyStroke.js
-   */
   protected override _accept(event: ScoutKeyboardEvent & { _$filterInput?: JQuery<HTMLInputElement> }): boolean {
     if (!this._isKeyStrokeInRange(event)) {
       return false;
