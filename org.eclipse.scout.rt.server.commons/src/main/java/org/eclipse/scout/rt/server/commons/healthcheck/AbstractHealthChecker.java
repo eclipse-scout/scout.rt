@@ -9,9 +9,9 @@
  */
 package org.eclipse.scout.rt.server.commons.healthcheck;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -32,8 +32,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractHealthChecker implements IHealthChecker {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractHealthChecker.class);
 
-  private final AtomicBoolean m_lastStatus = new AtomicBoolean(false);
-  private final AtomicLong m_timestamp = new AtomicLong(0);
+  protected final Map<HealthCheckCategoryId, LastStatusEntry> m_lastStatusMap = new ConcurrentHashMap<>();
 
   protected final String m_name;
   protected final long m_timeToLive;
@@ -77,14 +76,6 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
     return m_name;
   }
 
-  public boolean getLastStatus() {
-    return m_lastStatus.get();
-  }
-
-  public boolean isExpired() {
-    return m_timeToLive <= 0 || m_timestamp.get() + m_timeToLive < System.currentTimeMillis();
-  }
-
   protected IFuture getFuture() throws InterruptedException {
     m_lock.lockInterruptibly();
     try {
@@ -102,11 +93,15 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
 
   @Override
   public boolean checkHealth(RunContext context, HealthCheckCategoryId category) {
-    if (!isExpired()) {
-      return m_lastStatus.get();
+    LastStatusEntry lastStatusEntry = m_lastStatusMap.get(category == null ? Empty.ID : category);
+    if (lastStatusEntry == null) {
+      lastStatusEntry = new LastStatusEntry(m_timeToLive);
+    }
+    if (!lastStatusEntry.isExpired()) {
+      return lastStatusEntry.getLastStatus();
     }
     if (!m_lock.tryLock()) {
-      return m_lastStatus.get();
+      return lastStatusEntry.getLastStatus();
     }
 
     // expired & lock acquired
@@ -123,20 +118,20 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
             result = false;
             LOG.warn("HealthCheck[{}] failed, future={}.", getName(), m_future, t);
           }
-          m_lastStatus.set(BooleanUtility.nvl(result));
-          m_timestamp.set(System.currentTimeMillis());
+          lastStatusEntry.setLastStatus(BooleanUtility.nvl(result));
+          lastStatusEntry.resetTimestamp();
           m_future = null;
         }
         else if (m_timeout > 0 && m_futureStart + m_timeout < System.currentTimeMillis()) {
           LOG.warn("HealthCheck[{}] has timed out after {}ms, future={}. Cancelling job now.", getName(), m_timeout, m_future);
           m_future.cancel(true);
           m_future = null;
-          m_lastStatus.set(false);
-          m_timestamp.set(System.currentTimeMillis());
+          lastStatusEntry.setLastStatus(false);
+          lastStatusEntry.resetTimestamp();
         }
       }
 
-      if (m_future == null && isExpired()) {
+      if (m_future == null && lastStatusEntry.isExpired()) {
         // time to refresh
         m_futureStart = System.currentTimeMillis();
         m_future = Jobs.schedule(() -> {
@@ -156,7 +151,7 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
         LOG.debug("HealthCheck[{}] was started with a new scheduled job, future={}", getName(), m_future);
       }
 
-      return m_lastStatus.get();
+      return lastStatusEntry.getLastStatus();
     }
     finally {
       m_lock.unlock();
@@ -175,6 +170,48 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
     }
     else {
       LOG.warn("HealthCheck[{}] failed.", getName());
+    }
+  }
+
+  /**
+   * This is a sentinel value and not a real category available for health checking
+   */
+  private static final class Empty implements IHealthCheckCategory {
+    public static final HealthCheckCategoryId ID = HealthCheckCategoryId.of("empty");
+
+    @Override
+    public HealthCheckCategoryId getId() {
+      return ID;
+    }
+  }
+
+  protected class LastStatusEntry {
+    private boolean m_lastStatus = false;
+    private long m_timestamp = 0L;
+    private final long m_timeToLive;
+
+    LastStatusEntry(long timeToLive) {
+      m_timeToLive = timeToLive;
+    }
+
+    public boolean getLastStatus() {
+      return m_lastStatus;
+    }
+
+    public void setLastStatus(boolean lastStatus) {
+      m_lastStatus = lastStatus;
+    }
+
+    public long getTimestamp() {
+      return m_timestamp;
+    }
+
+    public void resetTimestamp() {
+      m_timestamp = System.currentTimeMillis();
+    }
+
+    public boolean isExpired() {
+      return m_timeToLive <= 0 || m_timestamp + m_timeToLive < System.currentTimeMillis();
     }
   }
 }
