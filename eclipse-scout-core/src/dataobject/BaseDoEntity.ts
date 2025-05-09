@@ -72,13 +72,14 @@ export class BaseDoEntity {
    * See {@link dataObjects.serialize} for details.
    *
    * @param model An optional model to apply to the clone.
-   * Note: this extra model is applied to the pojo representation of this data object before a new instance is created. So to modify properties, the structure and types of the properties in their pojo form must be used.
+   * * The values of the model are copied by reference and nested objects are _not_ merged (shallow-copy).
+   * * The model is applied to the pojo representation of this data object before a new instance is created. So to modify properties, the structure and types of the properties in their pojo form must be used.
    * @returns A deep clone of this data object instance (compare {@link toPojo}).
    */
   clone(model?: InitModelOf<this> | BaseDoEntity): this {
     const addModel = model instanceof BaseDoEntity ? model.toPojo() : model;
     const thisModel = this.toPojo();
-    return dataObjects.deserialize($.extend(true, thisModel, addModel)) as this;
+    return dataObjects.deserialize($.extend(thisModel, addModel)) as this;
   }
 
   /**
