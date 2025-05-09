@@ -368,16 +368,21 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   protected void makeGroupBoxScrollable(IGroupBox groupBox) {
-    if (!groupBox.isScrollable().isTrue()) {
-      groupBox.setScrollable(true);
+    if (groupBox.isScrollable().isTrue()) {
+      return;
+    }
+    if (groupBox.getForm() != null && getDesktop().getPageDetailForm() == groupBox.getForm()) {
+      // Ignore main boxes of detail forms, see notifyPageDetailFormChanged
+      return;
+    }
+    groupBox.setScrollable(true);
 
-      // GridDataHints have been modified by setScrollable. Update the actual gridData with those hints.
-      if (groupBox.isMainBox()) {
-        FormUtility.initRootBoxGridData(groupBox);
-      }
-      else {
-        rebuildParentGrid(groupBox);
-      }
+    // GridDataHints have been modified by setScrollable. Update the actual gridData with those hints.
+    if (groupBox.isMainBox()) {
+      FormUtility.initRootBoxGridData(groupBox);
+    }
+    else {
+      rebuildParentGrid(groupBox);
     }
   }
 
