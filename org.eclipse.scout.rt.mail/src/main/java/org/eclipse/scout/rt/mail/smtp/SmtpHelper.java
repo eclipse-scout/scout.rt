@@ -276,8 +276,8 @@ public class SmtpHelper {
       }
     }
 
-    SmtpHelper.ensureFromAddress(message, defaultFromAddress);
-    SmtpHelper.ensureReplyToAddress(message, defaultReplyToAddress);
+    ensureFromAddress(message, defaultFromAddress);
+    ensureReplyToAddress(message, defaultReplyToAddress);
   }
 
   /**
