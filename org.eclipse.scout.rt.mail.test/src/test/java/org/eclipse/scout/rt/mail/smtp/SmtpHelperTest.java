@@ -25,9 +25,11 @@ import org.eclipse.scout.rt.mail.MailParticipant;
 import org.eclipse.scout.rt.mail.smtp.SmtpHelper.SmtpDebugReceiverEmailProperty;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -113,5 +115,26 @@ public class SmtpHelperTest {
 
     MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(mailMessage);
     BEANS.get(SmtpHelper.class).sendMessage(config, message);
+  }
+
+  @Test
+  public void testToInternetAddress() {
+    assertNull(SmtpHelper.toInternetAddress(null));
+    assertNull(SmtpHelper.toInternetAddress(""));
+
+    assertEquals("john.doe@example.org", SmtpHelper.toInternetAddress("john.doe@example.org").getAddress());
+    assertNull(SmtpHelper.toInternetAddress("john.doe@example.org").getPersonal());
+
+    assertEquals("john.doe@example.org", SmtpHelper.toInternetAddress("<john.doe@example.org>").getAddress());
+    assertNull(SmtpHelper.toInternetAddress("<john.doe@example.org>").getPersonal());
+
+    assertEquals("john.doe@example.org", SmtpHelper.toInternetAddress("John Doe<john.doe@example.org>").getAddress());
+    assertEquals("John Doe", SmtpHelper.toInternetAddress("John Doe<john.doe@example.org>").getPersonal());
+
+    assertEquals("用户@xn--fsqu00a.xn--4rr70v", SmtpHelper.toInternetAddress("用户@例子.广告").getAddress());
+    assertEquals("用户@xn--fsqu00a.xn--4rr70v", SmtpHelper.toInternetAddress("孫德明<用户@例子.广告>").getAddress());
+    assertEquals("孫德明", SmtpHelper.toInternetAddress("孫德明<用户@例子.广告>").getPersonal());
+
+    Assert.assertThrows(PlatformException.class, () -> SmtpHelper.toInternetAddress("John Doe<john.doe@example.org>, Jane Doe<jane.doe@example.org>").getAddress()); // more than one address
   }
 }
