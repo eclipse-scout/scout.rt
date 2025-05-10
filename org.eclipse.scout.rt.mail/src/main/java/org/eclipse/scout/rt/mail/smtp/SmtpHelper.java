@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.mail.smtp;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.function.Consumer;
 
@@ -16,14 +18,18 @@ import jakarta.mail.Address;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
 import org.eclipse.scout.rt.mail.MailHelper;
+import org.eclipse.scout.rt.mail.MailIDNConverter;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -63,7 +69,7 @@ public class SmtpHelper {
    *     connection becomes available.
    * @param message
    *     Message to send.
-   * @see {@link MailHelper} to create a message
+   * @see MailHelper MailHelper to create a message
    */
   public void sendMessage(SmtpServerConfig config, MimeMessage message) {
     Assertions.assertNotNull(config, "SMTP server config must be set");
@@ -94,7 +100,7 @@ public class SmtpHelper {
    *     Optional password if authentication is required.
    * @param message
    *     Message to send.
-   * @see {@link MailHelper} to create a message
+   * @see MailHelper MailHelper to create a message
    */
   public void sendMessage(Session session, String password, MimeMessage message) {
     Assertions.assertNotNull(message, "Message must be set");
@@ -217,6 +223,102 @@ public class SmtpHelper {
 
   protected String getProtocol(SmtpServerConfig config) {
     return config.isUseSmtps() ? "smtps" : "smtp";
+  }
+
+  /**
+   * Return an InternetAddress from a String representation of an email address
+   *
+   * @param value
+   *     String representation of an email address
+   * @return the InternetAddress representation of 'value'
+   */
+  public static InternetAddress toInternetAddress(String value) {
+    if (!StringUtility.hasText(value)) {
+      return null;
+    }
+
+    try {
+      InternetAddress internetAddress = new InternetAddress(value);
+      // Use constructor to split address from personal, use constructor a second time to handle international email addresses properly,
+      // see (partly) https://github.com/eclipse-ee4j/mail/issues/379
+      String personal = internetAddress.getPersonal();
+      internetAddress = new InternetAddress(BEANS.get(MailIDNConverter.class).toASCII(internetAddress.getAddress()));
+      if (personal != null) {
+        internetAddress.setPersonal(personal, StandardCharsets.UTF_8.name());
+      }
+      return internetAddress;
+    }
+    catch (AddressException | UnsupportedEncodingException e) {
+      throw new PlatformException("Failed to parse value '{}' as InternetAddress", value, e);
+    }
+  }
+
+  /**
+   * Ensures from and reply headers. Might modify 'message'.
+   */
+  public static void ensureDefaultAddresses(MimeMessage message, String defaultFromEmail, String defaultReplyToEmail, boolean enforceDefaults) {
+    InternetAddress defaultFromAddress = toInternetAddress(defaultFromEmail);
+    InternetAddress defaultReplyToAddress = toInternetAddress(defaultReplyToEmail);
+
+    if (enforceDefaults) {
+      // If defaults are enforced, remove headers so that default are applied below.
+      try {
+        if (defaultFromAddress != null) {
+          message.removeHeader("From");
+          message.removeHeader("Sender");
+        }
+        if (defaultReplyToAddress != null) {
+          message.removeHeader("Reply-To");
+        }
+      }
+      catch (MessagingException e) {
+        throw new PlatformException("Failed to remove header to enforce defaults", e);
+      }
+    }
+
+    SmtpHelper.ensureFromAddress(message, defaultFromAddress);
+    SmtpHelper.ensureReplyToAddress(message, defaultReplyToAddress);
+  }
+
+  /**
+   * Similar as {@link MailHelper#ensureFromAddress(MimeMessage, String)} but working with {@link InternetAddress}
+   * instead of {@link String}.
+   */
+  public static void ensureFromAddress(MimeMessage message, InternetAddress defaultFromAddress) {
+    try {
+      Address[] fromAddresses = message.getFrom();
+      if (fromAddresses != null && fromAddresses.length != 0) {
+        // From address is already set
+        return;
+      }
+
+      if (defaultFromAddress != null) {
+        message.setFrom(defaultFromAddress);
+      }
+    }
+    catch (MessagingException e) {
+      throw new ProcessingException("Couldn't apply 'default from' to message", e);
+    }
+  }
+
+  /**
+   * If Reply-To header contains no addresses, default reply-to email is used instead. 'message' might be modified.
+   */
+  public static void ensureReplyToAddress(MimeMessage message, InternetAddress defaultReplyToAddress) {
+    try {
+      String[] replyToAddresses = message.getHeader("Reply-To"); // use get header because when getReplyTo is used, getFrom is an internal fallback, thus always resulting in a value.
+      if (replyToAddresses != null && replyToAddresses.length != 0) {
+        // Reply-to address is already set
+        return;
+      }
+
+      if (defaultReplyToAddress != null) {
+        message.setReplyTo(new InternetAddress[]{defaultReplyToAddress});
+      }
+    }
+    catch (MessagingException e) {
+      throw new ProcessingException("Couldn't apply 'default reply-to' to message", e);
+    }
   }
 
   public static class SmtpDebugReceiverEmailProperty extends AbstractStringConfigProperty {
