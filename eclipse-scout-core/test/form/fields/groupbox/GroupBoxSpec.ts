@@ -659,9 +659,16 @@ describe('GroupBox', () => {
   describe('expandable', () => {
 
     beforeEach(() => {
-      $('<style>' +
-        '.group-box.collapsed > .group-box-body { display: none; }' +
-        '</style>').appendTo($('#sandbox'));
+      $(`<style>
+        .label-field {
+          display: flex;
+          width: 20px;
+          height: 20px;
+        }
+        .group-box.collapsed > .group-box-body {
+           display: none;
+        }
+      </style>`).appendTo($('#sandbox'));
     });
 
     it('removes status when collapsed', () => {
@@ -719,7 +726,7 @@ describe('GroupBox', () => {
               expandable: true,
               fields: [
                 {
-                  objectType: StringField
+                  objectType: LabelField
                 }
               ]
             },
@@ -728,7 +735,7 @@ describe('GroupBox', () => {
               expandable: true,
               fields: [
                 {
-                  objectType: StringField,
+                  objectType: LabelField,
                   errorStatus: {
                     message: 'I am an error!!!'
                   }
