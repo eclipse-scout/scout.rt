@@ -88,6 +88,7 @@ public class ContentSecurityPolicy {
   public static final String DIRECTIVE_DEFAULT_SRC = "default-src";
   public static final String DIRECTIVE_FONT_SRC = "font-src";
   public static final String DIRECTIVE_FORM_ACTION = "form-action";
+  public static final String DIRECTIVE_FRAME_SRC = "frame-src";
   public static final String DIRECTIVE_FRAME_ANCESTORS = "frame-ancestors";
   public static final String DIRECTIVE_MANIFEST_SRC = "manifest-src";
   public static final String DIRECTIVE_MEDIA_SRC = "media-src";
@@ -130,6 +131,7 @@ public class ContentSecurityPolicy {
     withFontSrc(getConfiguredDefault(DIRECTIVE_FONT_SRC, "'self'"));
     withFormAction(getConfiguredDefault(DIRECTIVE_FORM_ACTION, null));
     withFrameAncestors(getConfiguredDefault(DIRECTIVE_FRAME_ANCESTORS, null));
+    withFrameSrc(getConfiguredDefault(DIRECTIVE_FRAME_SRC, null));
     withManifestSrc(getConfiguredDefault(DIRECTIVE_MANIFEST_SRC, "'self'"));
     withMediaSrc(getConfiguredDefault(DIRECTIVE_MEDIA_SRC, "'self'"));
     withObjectSrc(getConfiguredDefault(DIRECTIVE_OBJECT_SRC, "'self'"));
@@ -285,6 +287,24 @@ public class ContentSecurityPolicy {
   public ContentSecurityPolicy appendFormAction(String formAction) {
     return addOrAppend(DIRECTIVE_FORM_ACTION, formAction);
   }
+
+  /**
+   * @see <a href="https://www.w3.org/TR/CSP3/#directive-frame-src">https://www.w3.org/TR/CSP3/#directive-frame-src</a>
+   */
+  public ContentSecurityPolicy withFrameSrc(String frameSrc) {
+    putOrRemove(DIRECTIVE_FRAME_SRC, frameSrc);
+    return this;
+  }
+
+  /**
+   * Appends {@code frameSrc} to existing frame source directive or creates new directive if it not already exists.
+   *
+   * @see <a href="https://www.w3.org/TR/CSP3/#directive-frame-src">https://www.w3.org/TR/CSP3/#directive-frame-src</a>
+   */
+  public ContentSecurityPolicy appendFrameSrc(String frameSrc) {
+    return addOrAppend(DIRECTIVE_FRAME_SRC, frameSrc);
+  }
+
 
   /**
    * @see <a href=
