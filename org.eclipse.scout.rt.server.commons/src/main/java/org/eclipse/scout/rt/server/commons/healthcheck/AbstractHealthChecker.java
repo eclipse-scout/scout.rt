@@ -93,10 +93,9 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
 
   @Override
   public boolean checkHealth(RunContext context, HealthCheckCategoryId category) {
+    m_lastStatusMap.putIfAbsent(category == null ? Empty.ID : category, new LastStatusEntry(m_timeToLive));
     LastStatusEntry lastStatusEntry = m_lastStatusMap.get(category == null ? Empty.ID : category);
-    if (lastStatusEntry == null) {
-      lastStatusEntry = new LastStatusEntry(m_timeToLive);
-    }
+
     if (!lastStatusEntry.isExpired()) {
       return lastStatusEntry.getLastStatus();
     }
@@ -151,6 +150,7 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
         LOG.debug("HealthCheck[{}] was started with a new scheduled job, future={}", getName(), m_future);
       }
 
+      m_lastStatusMap.put(category == null ? Empty.ID : category, lastStatusEntry);
       return lastStatusEntry.getLastStatus();
     }
     finally {
