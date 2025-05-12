@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -206,29 +206,17 @@ export class MenuBarLayout extends AbstractLayout {
    */
   shrink(menus: Menu[]) {
     menus.forEach(menu => {
-      if (menu.textVisibleOrig !== undefined) {
-        // already done
-        return;
-      }
-      if (menu.shrinkable && menu.icon) {
-        menu.textVisibleOrig = menu.textVisible;
-        menu.htmlComp.suppressInvalidate = true;
-        menu.setTextVisible(false);
-        menu.htmlComp.suppressInvalidate = false;
-      }
+      menu.htmlComp.suppressInvalidate = true;
+      menu.shrink();
+      menu.htmlComp.suppressInvalidate = false;
     });
   }
 
   undoShrink(menus: Menu[]) {
     menus.forEach(menu => {
-      if (menu.textVisibleOrig === undefined) {
-        return;
-      }
-      // Restore old text visible state
       menu.htmlComp.suppressInvalidate = true;
-      menu.setTextVisible(menu.textVisibleOrig);
+      menu.undoShrink();
       menu.htmlComp.suppressInvalidate = false;
-      menu.textVisibleOrig = undefined;
     });
   }
 

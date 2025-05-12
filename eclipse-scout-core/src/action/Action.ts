@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -278,6 +278,17 @@ export class Action extends Widget implements ActionModel {
   }
 
   /**
+   * Returns the text to show as a tooltip, which might be different from the `tooltipText` property.
+   * If this value is falsy, the tooltip is not installed.
+   *
+   * @see _configureTooltip
+   * @see _shouldInstallTooltip
+   */
+  protected _computeTooltipText(): string {
+    return this.tooltipText;
+  }
+
+  /**
    * Installs or uninstalls tooltip based on tooltipText, selected and enabledComputed.
    */
   protected _updateTooltip() {
@@ -293,7 +304,8 @@ export class Action extends Widget implements ActionModel {
     if (this.selected && !this.showTooltipWhenSelected) {
       return false;
     }
-    return !!this.tooltipText;
+    let tooltipText = this._computeTooltipText();
+    return !!tooltipText;
   }
 
   /** @see ActionModel.tabbable */
@@ -333,7 +345,7 @@ export class Action extends Widget implements ActionModel {
   protected _configureTooltip(): InitModelOf<TooltipSupport> {
     return {
       parent: this,
-      text: this.tooltipText,
+      text: this._computeTooltipText(),
       $anchor: this.$container,
       arrowPosition: 50,
       arrowPositionUnit: '%',
@@ -422,13 +434,11 @@ export class Action extends Widget implements ActionModel {
 
   /** @see ActionModel.textVisible */
   setTextVisible(textVisible: boolean) {
-    if (this.textVisible === textVisible) {
-      return;
-    }
-    this._setProperty('textVisible', textVisible);
-    if (this.rendered) {
-      this._renderText();
-    }
+    this.setProperty('textVisible', textVisible);
+  }
+
+  protected _renderTextVisible() {
+    this._renderText();
   }
 
   /** @see ActionModel.horizontalAlignment */
@@ -482,5 +492,56 @@ export class Action extends Widget implements ActionModel {
     tooltips.cancel(this.$container);
 
     this.doAction();
+  }
+
+  /**
+   * Sets the action into compact mode. Can be reversed by calling {@link #undoMakeCompact}.
+   * @see ActionModel.compact
+   */
+  makeCompact() {
+    if (this.compactOrig !== undefined) {
+      return; // already done
+    }
+    this.compactOrig = this.compact;
+    this.setCompact(true);
+  }
+
+  /**
+   * Undoes the effect of {@link #makeCompact}, i.e. restores the previous compact state.
+   * If {@link #makeCompact} was not called previously, nothing happens.
+   */
+  undoMakeCompact() {
+    if (this.compactOrig === undefined) {
+      return; // nothing to undo
+    }
+    this.setCompact(this.compactOrig);
+    this.compactOrig = undefined;
+  }
+
+  /**
+   * If the action has an icon, the text is made invisible. Otherwise, nothing happens.
+   * Can be reversed by calling {@link #undoShrink}.
+   */
+  shrink() {
+    if (!this.iconId) {
+      return; // not shrinkable
+    }
+    if (this.textVisibleOrig !== undefined) {
+      return; // already done
+    }
+    this.textVisibleOrig = this.textVisible;
+    this.setTextVisible(false);
+  }
+
+  /**
+   * Undoes the effect of {@link #shrink}, i.e. restores the text visibility to the previous state.
+   * If {@link #shrink} was not called previously, nothing happens.
+   */
+  undoShrink() {
+    if (this.textVisibleOrig === undefined) {
+      return; // nothing to undo
+    }
+    this.setTextVisible(this.textVisibleOrig);
+    this.textVisibleOrig = undefined;
   }
 }
