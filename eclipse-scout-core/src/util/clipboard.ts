@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -138,11 +138,12 @@ export const clipboard = {
    */
   showNotification(parent: Widget, status?: Status) {
     scout.assertParameter('parent', parent);
+    status = status || clipboard._successStatus(parent.session);
     let notification = scout.create(DesktopNotification, {
-      parent: parent,
+      parent: parent.findDesktop(), // use desktop as parent in case the given parent widget is destroyed before the notification duration has elapsed
       closable: false,
-      duration: 1234,
-      status: status || clipboard._successStatus(parent.session)
+      duration: status.isValid() ? 1234 : 3456, // use longer duration for errors because error message is longer
+      status: status
     });
     notification.show();
   }
