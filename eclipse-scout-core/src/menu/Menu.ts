@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -358,6 +358,7 @@ export class Menu extends Action implements MenuModel {
     this.$container.toggleClass('has-text', strings.hasText(this.text) && this.textVisible);
     if (!this.rendering) {
       this._renderSubMenuIcon();
+      this._updateTooltip(); // tooltip shows text when menu is shrunk (see _showTextAsTooltip)
     }
     this.invalidateLayoutTree();
   }
@@ -691,6 +692,13 @@ export class Menu extends Action implements MenuModel {
     this.invalidateLayoutTree();
   }
 
+  override shrink() {
+    if (!this.shrinkable) {
+      return;
+    }
+    super.shrink();
+  }
+
   protected override _renderOverflown() {
     super._renderOverflown();
     this._renderActionStyle();
@@ -730,5 +738,24 @@ export class Menu extends Action implements MenuModel {
       return super.focus();
     }
     return false;
+  }
+
+  protected override _computeTooltipText(): string {
+    if (this._showTextAsTooltip()) {
+      return strings.join('\n\n', this.text, this.tooltipText);
+    }
+    return super._computeTooltipText();
+  }
+
+  /**
+   * Specifies whether the value of the `text` property should be included in the tooltip. This is the case if the menu has a text
+   * that is currently invisible because the menus has been shrunken. Note that this does not change the value of the `tooltipText`
+   * property or the aria attributes. Only the _computed_ tooltip text is affected.
+   *
+   * @see shrink
+   * @see _computeTooltipText
+   */
+  protected _showTextAsTooltip(): boolean {
+    return this.text && !this.textVisible && this._textVisibleOrig;
   }
 }

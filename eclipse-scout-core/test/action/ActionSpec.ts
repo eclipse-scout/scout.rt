@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, keys, scout, Tooltip, tooltips} from '../../src/index';
+import {Action, icons, keys, scout, Tooltip, tooltips} from '../../src/index';
 import {JQueryTesting} from '../../src/testing';
 
 describe('Action', () => {
@@ -230,6 +230,108 @@ describe('Action', () => {
       expect(action.$container).toHaveAttr('aria-pressed', 'true');
       action.setToggleAction(false);
       expect(action.$container.attr('aria-pressed')).toBeFalsy();
+    });
+  });
+
+  describe('compact', () => {
+
+    it('makeCompact() makes the action compact', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop
+      }) as Action & {_compactOrig};
+      expect(action.compact).toBe(false);
+      expect(action._compactOrig).toBe(undefined);
+
+      action.makeCompact();
+      expect(action.compact).toBe(true);
+      expect(action._compactOrig).toBe(false);
+      action.makeCompact(); // no effect
+      expect(action.compact).toBe(true);
+      expect(action._compactOrig).toBe(false);
+
+      action.undoMakeCompact();
+      expect(action.compact).toBe(false);
+      expect(action._compactOrig).toBe(undefined);
+      action.undoMakeCompact(); // no effect
+      expect(action.compact).toBe(false);
+      expect(action._compactOrig).toBe(undefined);
+    });
+
+    it('makeCompact() does nothing if action is already compact', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        compact: true
+      }) as Action & {_compactOrig};
+      expect(action.compact).toBe(true);
+      expect(action._compactOrig).toBe(undefined);
+
+      action.makeCompact();
+      expect(action.compact).toBe(true);
+      expect(action._compactOrig).toBe(true);
+
+      action.undoMakeCompact();
+      expect(action.compact).toBe(true);
+      expect(action._compactOrig).toBe(undefined);
+    });
+  });
+
+  describe('shrink', () => {
+
+    it('shrink() hides the text if the action has an icon', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        iconId: icons.WORLD
+      }) as Action & {_textVisibleOrig};
+      expect(action.textVisible).toBe(true);
+      expect(action._textVisibleOrig).toBe(undefined);
+
+      action.shrink();
+      expect(action.textVisible).toBe(false);
+      expect(action._textVisibleOrig).toBe(true);
+      action.shrink(); // no effect
+      expect(action.textVisible).toBe(false);
+      expect(action._textVisibleOrig).toBe(true);
+
+      action.undoShrink();
+      expect(action.textVisible).toBe(true);
+      expect(action._textVisibleOrig).toBe(undefined);
+      action.undoShrink(); // no effect
+      expect(action.textVisible).toBe(true);
+      expect(action._textVisibleOrig).toBe(undefined);
+    });
+
+    it('shrink() does nothing if the action does not have an icon', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop
+      }) as Action & {_textVisibleOrig};
+      expect(action.textVisible).toBe(true);
+      expect(action._textVisibleOrig).toBe(undefined);
+
+      action.shrink();
+      expect(action.textVisible).toBe(true);
+      expect(action._textVisibleOrig).toBe(undefined);
+
+      action.undoShrink();
+      expect(action.textVisible).toBe(true);
+      expect(action._textVisibleOrig).toBe(undefined);
+    });
+
+    it('shrink() has no effect if the action is already shrunk', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        iconId: icons.WORLD,
+        textVisible: false
+      }) as Action & {_textVisibleOrig};
+      expect(action.textVisible).toBe(false);
+      expect(action._textVisibleOrig).toBe(undefined);
+
+      action.shrink();
+      expect(action.textVisible).toBe(false);
+      expect(action._textVisibleOrig).toBe(false);
+
+      action.undoShrink();
+      expect(action.textVisible).toBe(false);
+      expect(action._textVisibleOrig).toBe(undefined);
     });
   });
 });

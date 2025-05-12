@@ -19,6 +19,7 @@ export class DesktopToolBox extends MenuBox {
   protected override _initMenu(menu: Menu) {
     super._initMenu(menu);
     menu.popupHorizontalAlignment = Popup.Alignment.CENTER;
+    menu.setShrinkable(true); // all menus in the DesktopToolBox should always be shrinkable
   }
 
   protected override _render() {

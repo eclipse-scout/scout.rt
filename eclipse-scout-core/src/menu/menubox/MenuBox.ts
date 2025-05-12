@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,9 +15,10 @@ export class MenuBox extends Widget implements MenuBoxModel {
   declare self: MenuBox;
 
   compact: boolean;
-  compactOrig: boolean;
   menus: Menu[];
   uiMenuCssClass: string;
+
+  protected _compactOrig: boolean;
 
   constructor() {
     super();
@@ -75,5 +76,28 @@ export class MenuBox extends Widget implements MenuBoxModel {
   protected _renderCompact() {
     this.$container.toggleClass('compact', this.compact);
     this.invalidateLayoutTree();
+  }
+
+  /**
+   * Sets the menu box into compact mode. Can be reversed by calling {@link #undoMakeCompact}.
+   */
+  makeCompact() {
+    if (this._compactOrig !== undefined) {
+      return; // already done
+    }
+    this._compactOrig = this.compact;
+    this.setCompact(true);
+  }
+
+  /**
+   * Undoes the effect of {@link #makeCompact}, i.e. restores the previous compact state.
+   * If {@link #makeCompact} was not called previously, nothing happens.
+   */
+  undoMakeCompact() {
+    if (this._compactOrig === undefined) {
+      return; // nothing to undo
+    }
+    this.setCompact(this._compactOrig);
+    this._compactOrig = undefined;
   }
 }

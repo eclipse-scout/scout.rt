@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, ContextMenuPopup, EllipsisMenu, Menu, scout, tooltips} from '../../src/index';
+import {Action, ContextMenuPopup, EllipsisMenu, icons, Menu, scout, tooltips} from '../../src/index';
 import {JQueryTesting, MenuSpecHelper} from '../../src/testing/index';
 
 describe('Menu', () => {
@@ -715,6 +715,165 @@ describe('Menu', () => {
       expect(ellipsis.$container).toHaveAttr('aria-expanded', 'false');
       ellipsis.setSelected(true);
       expect(ellipsis.$container).toHaveAttr('aria-expanded', 'true');
+    });
+  });
+
+  describe('shrink', () => {
+
+    function find$Tooltips() {
+      return $('body').find('.tooltip');
+    }
+
+    function expectTooltip($element: JQuery, tooltipText: string) {
+      // No tooltip initially
+      let $tooltips = find$Tooltips();
+      expect($tooltips.length).toBe(0);
+
+      // Enter mouse cursor and check tooltip
+      JQueryTesting.triggerMouseEnter($element);
+      jasmine.clock().tick(1000);
+      $tooltips = find$Tooltips();
+      if (tooltipText) {
+        expect($tooltips.length).toBe(1);
+        expect($tooltips.get(0).innerText).toBe(tooltipText); // text() does not return line breaks
+      } else {
+        expect($tooltips.length).toBe(0);
+      }
+
+      // Exit mouse cursor, tooltip should be gone
+      JQueryTesting.triggerMouseLeave($element);
+      jasmine.clock().tick(1000);
+      $tooltips = find$Tooltips();
+      expect($tooltips.length).toBe(0);
+    }
+
+    it('does not shrink the menu if it is not shrinkable', () => {
+      let menu = helper.createMenu({
+        text: 'Foo',
+        iconId: icons.PENCIL
+        // 'shrinkable' is false by default
+      });
+      menu.render();
+
+      expect(menu.textVisible).toBe(true);
+      expect(menu.$text).toBeTruthy();
+      expect(menu.$text.text()).toBe('Foo');
+      expectTooltip(menu.$container, null);
+      expect(menu.$container.attr('aria-label')).toBe(undefined);
+      expect(menu.$container.attr('aria-description')).toBe(undefined);
+
+      menu.shrink();
+      expect(menu.textVisible).toBe(true);
+      expect(menu.$text).toBeTruthy();
+      expect(menu.$text.text()).toBe('Foo');
+      expectTooltip(menu.$container, null);
+      expect(menu.$container.attr('aria-label')).toBe(undefined);
+      expect(menu.$container.attr('aria-description')).toBe(undefined);
+
+      menu.undoShrink();
+      expect(menu.textVisible).toBe(true);
+      expect(menu.$text).toBeTruthy();
+      expect(menu.$text.text()).toBe('Foo');
+      expectTooltip(menu.$container, null);
+      expect(menu.$container.attr('aria-label')).toBe(undefined);
+      expect(menu.$container.attr('aria-description')).toBe(undefined);
+    });
+
+    it('always shows the text as label if the action has no icon and is shrunk', () => {
+      let menu = helper.createMenu({
+        text: 'Foo',
+        tooltipText: 'Bar',
+        shrinkable: true
+      });
+      menu.render();
+
+      expect(menu.textVisible).toBe(true);
+      expect(menu.$text).toBeTruthy();
+      expect(menu.$text.text()).toBe('Foo');
+      expectTooltip(menu.$container, 'Bar');
+      expect(menu.$container.attr('aria-label')).toBe(undefined);
+      expect(menu.$container.attr('aria-description')).toBe('Bar');
+
+      menu.shrink();
+      expect(menu.textVisible).toBe(true);
+      expect(menu.$text).toBeTruthy();
+      expect(menu.$text.text()).toBe('Foo');
+      expectTooltip(menu.$container, 'Bar');
+      expect(menu.$container.attr('aria-label')).toBe(undefined);
+      expect(menu.$container.attr('aria-description')).toBe('Bar');
+
+      menu.undoShrink();
+      expect(menu.textVisible).toBe(true);
+      expect(menu.$text).toBeTruthy();
+      expect(menu.$text.text()).toBe('Foo');
+      expectTooltip(menu.$container, 'Bar');
+      expect(menu.$container.attr('aria-label')).toBe(undefined);
+      expect(menu.$container.attr('aria-description')).toBe('Bar');
+    });
+
+    it('shows the text as tooltip if the action has an icon and is shrunk', () => {
+      let menu = helper.createMenu({
+        text: 'Foo',
+        iconId: icons.PENCIL,
+        shrinkable: true
+      });
+      menu.render();
+
+      expect(menu.textVisible).toBe(true);
+      expect(menu.$text).toBeTruthy();
+      expect(menu.$text.text()).toBe('Foo');
+      expectTooltip(menu.$container, null);
+      expect(menu.$container.attr('aria-label')).toBe(undefined);
+      expect(menu.$container.attr('aria-description')).toBe(undefined);
+
+      menu.shrink();
+      expect(menu.textVisible).toBe(false);
+      expect(menu.$text).toBeFalsy();
+      expectTooltip(menu.$container, 'Foo');
+      expect(menu.$container.attr('aria-label')).toBe('Foo');
+      expect(menu.$container.attr('aria-description')).toBe(undefined);
+
+      menu.undoShrink();
+      expect(menu.textVisible).toBe(true);
+      expect(menu.$text).toBeTruthy();
+      expect(menu.$text.text()).toBe('Foo');
+      expectTooltip(menu.$container, null);
+      expect(menu.$container.attr('aria-label')).toBe(undefined);
+      expect(menu.$container.attr('aria-description')).toBe(undefined);
+    });
+
+    it('shows both the text and the tooltip as tooltip if the action has an icon and is shrunk', () => {
+      let menu = helper.createMenu({
+        text: 'Foo',
+        tooltipText: 'Bar',
+        iconId: icons.PENCIL,
+        shrinkable: true
+      });
+      menu.render();
+
+      expect(menu.textVisible).toBe(true);
+      expect(menu.$text).toBeTruthy();
+      expect(menu.$text.text()).toBe('Foo');
+      expectTooltip(menu.$container, 'Bar');
+      expect(menu.$container.attr('aria-label')).toBe(undefined);
+      expect(menu.$container.attr('aria-description')).toBe('Bar');
+
+      menu.shrink();
+      expect(menu.textVisible).toBe(false);
+      expect(menu.$text).toBeFalsy();
+      // Visible tooltip texts are combined
+      expectTooltip(menu.$container, 'Foo\n\nBar');
+      // Aria attributes are still separate
+      expect(menu.$container.attr('aria-label')).toBe('Foo');
+      expect(menu.$container.attr('aria-description')).toBe('Bar');
+
+      menu.undoShrink();
+      expect(menu.textVisible).toBe(true);
+      expect(menu.$text).toBeTruthy();
+      expect(menu.$text.text()).toBe('Foo');
+      expectTooltip(menu.$container, 'Bar');
+      expect(menu.$container.attr('aria-label')).toBe(undefined);
+      expect(menu.$container.attr('aria-description')).toBe('Bar');
     });
   });
 });

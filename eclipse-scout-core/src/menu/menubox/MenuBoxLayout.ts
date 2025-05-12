@@ -82,23 +82,17 @@ export class MenuBoxLayout extends AbstractLayout {
   }
 
   compact(menus?: Menu[]) {
-    if (this.menuBox.compactOrig === undefined) {
-      this.menuBox.compactOrig = this.menuBox.compact;
-      this.menuBox.htmlComp.suppressInvalidate = true;
-      this.menuBox.setCompact(true);
-      this.menuBox.htmlComp.suppressInvalidate = false;
-    }
+    this.menuBox.htmlComp.suppressInvalidate = true;
+    this.menuBox.makeCompact();
+    this.menuBox.htmlComp.suppressInvalidate = false;
 
     this.compactMenus(menus);
   }
 
   undoCompact(menus?: Menu[]) {
-    if (this.menuBox.compactOrig !== undefined) {
-      this.menuBox.htmlComp.suppressInvalidate = true;
-      this.menuBox.setCompact(this.menuBox.compactOrig);
-      this.menuBox.htmlComp.suppressInvalidate = false;
-      this.menuBox.compactOrig = undefined;
-    }
+    this.menuBox.htmlComp.suppressInvalidate = true;
+    this.menuBox.undoMakeCompact();
+    this.menuBox.htmlComp.suppressInvalidate = false;
 
     this.undoCompactMenus(menus);
   }
@@ -109,13 +103,8 @@ export class MenuBoxLayout extends AbstractLayout {
   compactMenus(menus?: Menu[]) {
     menus = menus || this.visibleMenus();
     menus.forEach(menu => {
-      if (menu.compactOrig !== undefined) {
-        // already done
-        return;
-      }
-      menu.compactOrig = menu.compact;
       menu.htmlComp.suppressInvalidate = true;
-      menu.setCompact(true);
+      menu.makeCompact();
       menu.htmlComp.suppressInvalidate = false;
     });
 
@@ -130,14 +119,9 @@ export class MenuBoxLayout extends AbstractLayout {
   undoCompactMenus(menus?: Menu[]) {
     menus = menus || this.visibleMenus();
     menus.forEach(menu => {
-      if (menu.compactOrig === undefined) {
-        return;
-      }
-      // Restore old compact state
       menu.htmlComp.suppressInvalidate = true;
-      menu.setCompact(menu.compactOrig);
+      menu.undoMakeCompact();
       menu.htmlComp.suppressInvalidate = false;
-      menu.compactOrig = undefined;
     });
 
     if (this._ellipsis) {
@@ -155,16 +139,9 @@ export class MenuBoxLayout extends AbstractLayout {
   shrinkMenus(menus?: Menu[]) {
     menus = menus || this.visibleMenus();
     menus.forEach(menu => {
-      if (menu.textVisibleOrig !== undefined) {
-        // already done
-        return;
-      }
-      if (menu.iconId) {
-        menu.textVisibleOrig = menu.textVisible;
-        menu.htmlComp.suppressInvalidate = true;
-        menu.setTextVisible(false);
-        menu.htmlComp.suppressInvalidate = false;
-      }
+      menu.htmlComp.suppressInvalidate = true;
+      menu.shrink();
+      menu.htmlComp.suppressInvalidate = false;
     });
   }
 
@@ -175,14 +152,9 @@ export class MenuBoxLayout extends AbstractLayout {
   undoShrinkMenus(menus?: Menu[]) {
     menus = menus || this.visibleMenus();
     menus.forEach(menu => {
-      if (menu.textVisibleOrig === undefined) {
-        return;
-      }
-      // Restore old text visible state
       menu.htmlComp.suppressInvalidate = true;
-      menu.setTextVisible(menu.textVisibleOrig);
+      menu.undoShrink();
       menu.htmlComp.suppressInvalidate = false;
-      menu.textVisibleOrig = undefined;
     });
   }
 
@@ -193,7 +165,7 @@ export class MenuBoxLayout extends AbstractLayout {
   }
 
   /**
-   * Undoes the collapsing by removing ellipsis and rendering non rendered menus.
+   * Undoes the collapsing by removing ellipsis and rendering non-rendered menus.
    */
   undoCollapse(menus?: Menu[]) {
     menus = menus || this.visibleMenus();
