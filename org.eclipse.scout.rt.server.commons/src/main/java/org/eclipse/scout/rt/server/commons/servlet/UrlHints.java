@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter;
 
 /**
  * Holder for URL param hints for servlets.
@@ -32,7 +33,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
  * <li><b><code>?cache=(true|false)</code></b>: Enable/disable HTTP caching of resources. Default value is
  * <code>true</code> (<code>false</code> in development mode).
  * <li><b><code>?compress=(true|false)</code></b>: Enable/disable GZIP compression (if client supports it). Default
- * value is <code>true</code>.
+ * value is <code>true</code>. <b>Note</b>: The hint only has an effect if the deprecated {@link GzipServletFilter} is used.
  * <li><b><code>?minify=(true|false)</code></b>: Enable/disable "minification" of JS/CSS files. Default value is
  * <code>true</code> (<code>false</code> in development mode).
  * <li><b><code>?inspector=(true|false)</code></b>: Enable/disable inspector attributes in DOM ("modelClass",
@@ -46,6 +47,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
  *
  * @see UrlHintsHelper
  */
+@SuppressWarnings("deprecation")
 @Bean
 public class UrlHints implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -88,10 +90,19 @@ public class UrlHints implements Serializable {
     }
   }
 
+  /**
+   * @deprecated The hint only has an effect if the deprecated {@link GzipServletFilter} is used and will be removed together with the filter in the future.
+   */
+  @Deprecated
   public boolean isCompress() {
     return m_compress;
   }
 
+  /**
+   * @deprecated The hint only has an effect if the deprecated {@link GzipServletFilter} is used and will be removed together with the filter in the future.
+   */
+  @SuppressWarnings("DeprecatedIsStillUsed")
+  @Deprecated
   public void setCompress(boolean compress) {
     assertWritable();
     if (m_compress != compress) {
@@ -186,12 +197,10 @@ public class UrlHints implements Serializable {
   }
 
   public String toCookieString() {
-    return new StringBuilder()
-        .append("C").append(m_cache ? "1" : "0")
-        .append("Z").append(m_compress ? "1" : "0")
-        .append("M").append(m_minify ? "1" : "0")
-        .append("I").append(m_inspector ? "1" : "0")
-        .toString();
+    return "C" + (m_cache ? "1" : "0")
+        + "Z" + (m_compress ? "1" : "0")
+        + "M" + (m_minify ? "1" : "0")
+        + "I" + (m_inspector ? "1" : "0");
   }
 
   public void setFromCookieString(String cookieString) {
@@ -283,7 +292,10 @@ public class UrlHints implements Serializable {
 
   /**
    * Static convenience method delegating to {@link UrlHintsHelper#isCompressHint(HttpServletRequest)}.
+   *
+   * @deprecated The hint only has an effect if the deprecated {@link GzipServletFilter} is used and will be removed together with the filter in the future.
    */
+  @Deprecated
   public static boolean isCompressHint(HttpServletRequest req) {
     return URL_HINTS_HELPER.get().isCompressHint(req);
   }
