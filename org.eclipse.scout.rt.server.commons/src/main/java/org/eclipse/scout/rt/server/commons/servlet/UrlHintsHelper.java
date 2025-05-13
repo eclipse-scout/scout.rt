@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.UrlHintsEnabledProperty;
+import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +129,13 @@ public class UrlHintsHelper {
     return getUrlHints(req).isMinify();
   }
 
+  /**
+   * @deprecated The hint only has an effect if the deprecated {@link GzipServletFilter} is used and will be removed together with the filter in the future.
+   */
+  @SuppressWarnings("DeprecatedIsStillUsed")
+  @Deprecated
   public boolean isCompressHint(HttpServletRequest req) {
+    //noinspection deprecation
     return getUrlHints(req).isCompress();
   }
 }
