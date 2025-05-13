@@ -681,6 +681,12 @@ export const objects = {
     }
   },
 
+  resolveConstProperties(object: object, configs: { property: string; constType: any }[]) {
+    arrays.ensure(configs).forEach(config => {
+      objects.resolveConstProperty(object, config);
+    });
+  },
+
   /**
    * Cleans the given object, i.e. removes all top-level properties with values that are null, undefined or
    * consist of an empty array or an empty object. This is useful to have a minimal data object.

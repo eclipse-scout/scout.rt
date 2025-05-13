@@ -9,8 +9,8 @@
  */
 import {
   arrays, BaseDoEntity, BookmarkSupport, BookmarkTableRowIdentifierDo, ButtonTile, ChildModelOf, Constructor, dataObjects, DoTypeResolver, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form,
-  HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, ObjectIdProvider, ObjectOrChildModel, ObjectOrType, ObjectWithUuid, Outline, PageDetailMenuContributor, PageEventMap, PageModel, ParentTablePageMenuContributor,
-  PropertyChangeEvent, RequiredUnlessNotSubclass, scout, SomeRequired, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, typeName, UuidPathOptions, Widget
+  HtmlComponent, InitModelOf, inspector, Menu, MenuBar, ObjectIdProvider, ObjectOrChildModel, ObjectOrType, ObjectWithUuid, Outline, PageDetailMenuContributor, PageEventMap, PageModel, ParentTablePageMenuContributor, PropertyChangeEvent,
+  RequiredUnlessNotSubclass, scout, SomeRequired, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, typeName, UuidPathOptions, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -120,7 +120,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
       this._detailFormModel = Page._removePropertyIfLazyLoading(model, 'detailForm') as ChildModelOf<Form>;
 
       super._init(model);
-      icons.resolveIconProperty(this, 'overviewIconId');
+      this._resolveIconIds(['overviewIconId']);
       this._setPageParam(this.pageParam);
 
       let detailMenuContributors = this._createDetailMenuContributors();

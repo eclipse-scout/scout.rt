@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -136,13 +136,21 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
 
     $.extend(this, model);
 
-    texts.resolveTextProperty(this, 'text');
-    icons.resolveIconProperty(this, 'iconId');
+    this._resolveTextKeys(['text']);
+    this._resolveIconIds(['iconId']);
 
     // make sure all child nodes are TreeNodes too
     if (this.hasChildNodes()) {
       this.tree.ensureTreeNodes(this.childNodes, this);
     }
+  }
+
+  protected _resolveTextKeys(properties: string[]) {
+    texts.resolveTextProperties(this, properties);
+  }
+
+  protected _resolveIconIds(properties: string[]) {
+    icons.resolveIconProperties(this, properties);
   }
 
   protected _jsonModel(): TreeNodeModel {

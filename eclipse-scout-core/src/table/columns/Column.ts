@@ -172,9 +172,8 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
       this.initialWidth = scout.nvl(this.width, 0);
     }
 
-    texts.resolveTextProperty(this, 'text');
-    texts.resolveTextProperty(this, 'headerTooltipText');
-    icons.resolveIconProperty(this, 'headerIconId');
+    this._resolveTextKeys(['text', 'headerTooltipText']);
+    this._resolveIconIds(['headerIconId']);
 
     this._setAutoOptimizeWidth(this.autoOptimizeWidth);
     this.sortActive = scout.nvl(this.sortActive, this.sortIndex >= 0);
@@ -223,6 +222,14 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 
   get table(): Table {
     return this.parent;
+  }
+
+  protected _resolveTextKeys(properties: string[]) {
+    texts.resolveTextProperties(this, properties);
+  }
+
+  protected _resolveIconIds(properties: string[]) {
+    icons.resolveIconProperties(this, properties);
   }
 
   /**
