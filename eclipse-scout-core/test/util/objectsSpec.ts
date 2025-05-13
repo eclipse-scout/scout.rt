@@ -934,6 +934,42 @@ describe('objects', () => {
       expect(model.labelPosition).toBe(FormField.LabelPosition.RIGHT);
     });
 
+    it('resolveConstProperties', () => {
+      let model = {
+        labelPosition: '${const:RIGHT}',
+        labelPosition2: '${const:TOP}',
+        foo: '${const:ON_FIELD}'
+      } as any;
+
+      objects.resolveConstProperties(model, null);
+      expect(model.labelPosition).toBe('${const:RIGHT}');
+      expect(model.labelPosition2).toBe('${const:TOP}');
+      expect(model.foo).toBe('${const:ON_FIELD}');
+      expect(model.bar).toBe(undefined);
+
+      objects.resolveConstProperties(model, [{
+        property: 'labelPosition',
+        constType: FormField.LabelPosition
+      }, {
+        property: 'labelPosition2',
+        constType: FormField.LabelPosition
+      }, {
+        property: 'bar',
+        constType: FormField.LabelPosition
+      }]);
+      expect(model.labelPosition).toBe(FormField.LabelPosition.RIGHT);
+      expect(model.labelPosition2).toBe(FormField.LabelPosition.TOP);
+      expect(model.foo).toBe('${const:ON_FIELD}');
+      expect(model.bar).toBe(undefined);
+      objects.resolveConstProperties(model, [{
+        property: 'foo',
+        constType: FormField.LabelPosition
+      }]);
+      expect(model.labelPosition).toBe(FormField.LabelPosition.RIGHT);
+      expect(model.labelPosition2).toBe(FormField.LabelPosition.TOP);
+      expect(model.foo).toBe(FormField.LabelPosition.ON_FIELD);
+      expect(model.bar).toBe(undefined);
+    });
   });
 
   describe('optProperty', () => {
