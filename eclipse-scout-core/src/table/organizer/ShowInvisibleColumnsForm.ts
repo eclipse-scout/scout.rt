@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Cell, Column, Form, FormModel, scout, ShowInvisibleColumnsFormData, ShowInvisibleColumnsFormModel, ShowInvisibleColumnsFormWidgetMap, strings, TableRow} from '../../index';
+import {arrays, Cell, Column, Form, FormModel, scout, ShowInvisibleColumnsFormData, ShowInvisibleColumnsFormModel, ShowInvisibleColumnsFormWidgetMap, strings, TableRowModel} from '../../index';
 import model from './ShowInvisibleColumnsFormModel';
 
 export class ShowInvisibleColumnsForm extends Form implements ShowInvisibleColumnsFormModel {
@@ -26,9 +26,9 @@ export class ShowInvisibleColumnsForm extends Form implements ShowInvisibleColum
         cells: [
           column,
           false,
-          this._createTitleCell(column)
+          ShowInvisibleColumnsForm.createColumnTitleCell(column)
         ]
-      } as TableRow;
+      } as TableRowModel;
     });
     this.widget('ColumnsTable').insertRows(rows);
   }
@@ -43,7 +43,7 @@ export class ShowInvisibleColumnsForm extends Form implements ShowInvisibleColum
     };
   }
 
-  protected _createTitleCell(column: Column): Cell {
+  static createColumnTitleCell(column: Column): Cell {
     let text = column.text;
     let htmlEnabled = column.headerHtmlEnabled;
     let font = null;

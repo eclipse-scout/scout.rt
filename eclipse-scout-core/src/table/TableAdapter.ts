@@ -9,9 +9,9 @@
  */
 import {
   AdapterData, App, arrays, BooleanColumn, Cell, ChildModelOf, Column, ColumnModel, ColumnUserFilter, defaultValues, Event, Filter, ModelAdapter, NumberColumn, ObjectOrModel, objects, RemoteEvent, RemoteTableOrganizer, scout, Table,
-  TableAggregationFunctionChangedEvent, TableAppLinkActionEvent, TableCancelCellEditEvent, TableColumnBackgroundEffectChangedEvent, TableColumnMovedEvent, TableColumnOrganizeActionEvent, TableColumnResizedEvent, TableCompleteCellEditEvent,
-  TableDropEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableModel, TablePrepareCellEditEvent, TableReloadEvent, TableRow, TableRowActionEvent, TableRowClickEvent, TableRowModel, TableRowsCheckedEvent,
-  TableRowsExpandedEvent, TableRowsSelectedEvent, TableSortEvent, TableUserFilter, ValueField
+  TableAggregationFunctionChangedEvent, TableAppLinkActionEvent, TableCancelCellEditEvent, TableColumnBackgroundEffectChangedEvent, TableColumnMovedEvent, TableColumnResizedEvent, TableCompleteCellEditEvent, TableDropEvent,
+  TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableModel, TablePrepareCellEditEvent, TableReloadEvent, TableRow, TableRowActionEvent, TableRowClickEvent, TableRowModel, TableRowsCheckedEvent, TableRowsExpandedEvent,
+  TableRowsSelectedEvent, TableSortEvent, TableUserFilter, ValueField
 } from '../index';
 import $ from 'jquery';
 
@@ -150,10 +150,10 @@ export class TableAdapter extends ModelAdapter {
     this._send('columnBackgroundEffectChanged', data);
   }
 
-  protected _onWidgetColumnOrganizeAction(event: TableColumnOrganizeActionEvent) {
+  sendColumnOrganizeAction(column: Column<any>, action: 'add' | 'remove' | 'modify') {
     this._send('columnOrganizeAction', {
-      action: event.action,
-      columnId: event.column.id
+      action: action,
+      columnId: column.id
     });
   }
 
@@ -391,8 +391,6 @@ export class TableAdapter extends ModelAdapter {
       this._onWidgetColumnMoved(event as TableColumnMovedEvent);
     } else if (event.type === 'columnBackgroundEffectChanged') {
       this._onWidgetColumnBackgroundEffectChanged(event as TableColumnBackgroundEffectChangedEvent);
-    } else if (event.type === 'columnOrganizeAction') {
-      this._onWidgetColumnOrganizeAction(event as TableColumnOrganizeActionEvent);
     } else if (event.type === 'aggregationFunctionChanged') {
       this._onWidgetAggregationFunctionChanged(event as TableAggregationFunctionChangedEvent);
     } else if (event.type === 'drop' && this.widget.dragAndDropHandler) {

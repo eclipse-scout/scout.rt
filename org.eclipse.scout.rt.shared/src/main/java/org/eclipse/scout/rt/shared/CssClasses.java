@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -75,4 +75,9 @@ public interface CssClasses {
    * This is useful if the splitter itself should be visualized in another way, e.g. by using one of the fields border.
    */
   String INVISIBLE_SPLITTER = "invisible-splitter";
+
+  /**
+   * Class that can be added to menubar containers (e.g. a table) to hide the separators between menus.
+   */
+  String NO_MENUBAR_SEPARATORS = "no-menubar-separators";
 }

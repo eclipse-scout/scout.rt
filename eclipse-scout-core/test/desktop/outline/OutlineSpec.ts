@@ -572,7 +572,8 @@ describe('Outline', () => {
       outline.render();
       const childPage = outline.nodes[0];
       expect(outline.selectedNode()).toBe(childPage);
-      expect(outline.detailMenuBar.menuItems).toEqual(childPage.detailTable.menus);
+      // The empty space menus from the detail table are copied to the page detail menu bar (TableOrganizerMenu won't be copied because it is a header menu)
+      expect(outline.detailMenuBar.menuItems).toEqual(childPage.detailTable.menus.filter(menu => !menu.menuTypes.length));
     });
   });
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,18 +7,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Column, EventHandler, ObjectWithType, scout, ShowInvisibleColumnsForm, Table, TableColumnOrganizeActionEvent} from '../../index';
+import {arrays, Column, ObjectWithType, scout, ShowInvisibleColumnsForm, Table} from '../../index';
 
 /**
  * If present on a table, allows adding, removing or modifying columns. If the table is customizable,
  * those functions are delegated to the table customizer. Otherwise, adding or removing a column
  * changes its `visible` flag, while modifying is currently not supported.
  *
- * Use {@link #install} to attach the table organizer to a table. This happens automatically when
+ * Use {@link install} to attach the table organizer to a table. This happens automatically when
  * the table organizer is defined on the {@link Table}.
  *
- * @see Table#organizer
- * @see TableHeaderMenu#_renderColumnActionsGroup
+ * @see Table.organizer
+ * @see TableHeaderMenu._renderColumnActionsGroup
  * @see ShowInvisibleColumnsForm
  */
 export class TableOrganizer implements ObjectWithType {
@@ -26,36 +26,29 @@ export class TableOrganizer implements ObjectWithType {
   objectType: string;
   table: Table;
 
-  protected _columnOrganizeActionHandler: EventHandler<TableColumnOrganizeActionEvent>;
-
   constructor() {
     this.table = null; // set with install()
-    this._columnOrganizeActionHandler = this._onColumnOrganizeAction.bind(this);
   }
 
   /**
-   * Installs a listener for the `columnOrganizeAction` event on the given table. If the organizer is already
-   * installed, an error is thrown. In most cases, it is not necessary to call this method manually. Consider
-   * using {@link Table#setOrganizer} instead.
+   * Passes the given table to the organizer.
+   * If the organizer is already installed, an error is thrown.
+   * In most cases, it is not necessary to call this method manually. Consider using {@link Table.setOrganizer} instead.
    */
   install(table: Table) {
     if (this.table) {
       throw new Error('Already installed');
     }
     this.table = scout.assertInstance(table, Table);
-    this.table.on('columnOrganizeAction', this._columnOrganizeActionHandler);
   }
 
   /**
-   * Uninstalls the listener for the `columnOrganizeAction` event on the given table. If the organizer is not
-   * installed, nothing happens. In most cases, it is not necessary to call this method manually. Consider
-   * using {@link Table#setOrganizer} instead.
+   * Removes the table from the organizer.
+   * If the organizer is not installed, nothing happens.
+   * In most cases, it is not necessary to call this method manually. Consider using {@link Table.setOrganizer} instead.
    */
   uninstall() {
-    if (this.table) {
-      this.table.off('columnOrganizeAction', this._columnOrganizeActionHandler);
-      this.table = null;
-    }
+    this.table = null;
   }
 
   // --------------------
@@ -67,7 +60,7 @@ export class TableOrganizer implements ObjectWithType {
    * If a column is specified after which the selected columns are to be moved, the result will only include
    * columns that can be moved there without overtaking existing columns with `fixedPosition=true`.
    */
-  getInvisibleColumns(insertAfterColumn?: Column): Column[] {
+  getInvisibleColumns(insertAfterColumn?: Column<any>): Column<any>[] {
     if (!this.table) {
       return []; // not installed
     }
@@ -97,7 +90,7 @@ export class TableOrganizer implements ObjectWithType {
    * Adds the given columns to the list of visible columns. If `insertAfterColumn` is set, the columns are
    * also moved after the specified column. Otherwise, they remain at their current position.
    */
-  showColumns<T>(columns: Column[], insertAfterColumn?: Column) {
+  showColumns<T>(columns: Column<any>[], insertAfterColumn?: Column<any>) {
     if (!this.table) {
       return; // not installed
     }
@@ -121,28 +114,50 @@ export class TableOrganizer implements ObjectWithType {
   }
 
   /**
-   * Hides the given column. If it was grouped, the grouping is removed. If it was part of a filter, the filter is removed.
+   * Hides the given columns. If it was grouped, the grouping is removed. If it was part of a filter, the filter is removed.
    */
-  hideColumn(column: Column) {
+  hideColumns(columns: Column<any>[]) {
     if (!this.table) {
       return; // not installed
     }
-    if (!column) {
+    columns = arrays.ensure(columns).filter(Boolean);
+    if (!columns.length) {
       return; // nothing to do
     }
 
-    column.setVisible(false);
+    for (let column of columns) {
+      column.setVisible(false, false); // parameter 'false' skips call of onColumnVisibilityChanged()
 
-    if (column.grouped) {
-      this.table.groupColumn(column, true, null, true); // multiGroup=true is necessary to not affect potentially other grouped columns
+      if (column.grouped) {
+        this.table.groupColumn(column, true, null, true); // multiGroup=true is necessary to not affect potentially other grouped columns
+      }
+      this.table.removeFilterByKey(column.id);
     }
-    this.table.removeFilterByKey(column.id);
+    this.table.onColumnVisibilityChanged(); // do this only once, will also update the aggregate rows
+  }
+
+  /**
+   * Moves the columns to their new position according to the indices in the given `visibleColumns` array.
+   */
+  moveColumns(visibleColumns: Column<any>[]) {
+    // Add guiOnly columns to visibleColumns array if they are not already included
+    // moveColumn only works with indices based on all visibleColumns including guiOnly columns
+    let guiOnlyColumns = this.table.filterColumns(column => column.guiOnly);
+    for (const column of guiOnlyColumns.reverse()) {
+      if (!visibleColumns.includes(column)) {
+        visibleColumns = [column, ...visibleColumns];
+      }
+    }
+    for (let newPos = 0; newPos < visibleColumns.length; newPos++) {
+      const column = visibleColumns[newPos];
+      this.table.moveColumn(column, newPos);
+    }
   }
 
   /**
    * Returns true if there are addable columns according to {@link getInvisibleColumns}.
    */
-  isColumnAddable(insertAfterColumn?: Column): boolean {
+  isColumnAddable(insertAfterColumn?: Column<any>): boolean {
     if (!this.table) {
       return false; // not installed
     }
@@ -156,10 +171,20 @@ export class TableOrganizer implements ObjectWithType {
     return arrays.hasElements(invisibleColumns);
   }
 
+  addColumn(column?: Column<any>): JQuery.Promise<void> {
+    if (this.table.isCustomizable()) {
+      // TODO bsh [js-table] Delegate to this.table.tableCustomizer
+      return $.resolvedPromise();
+    }
+    return this._showInvisibleColumnsForm(column);
+  }
+
   /**
    * Returns true if the given column can be removed form the table.
+   *
+   * @param allowRemovalOfLastColumn true, to allow the removal of the last visible column. Default is false.
    */
-  isColumnRemovable(column: Column): boolean {
+  isColumnRemovable(column: Column<any>, allowRemovalOfLastColumn = false): boolean {
     if (!this.table) {
       return false; // not installed
     }
@@ -172,14 +197,22 @@ export class TableOrganizer implements ObjectWithType {
     if (this.table.isCustomizable()) {
       return true;
     }
-    // Prevent removal of last column, because there is no separate organize menu in Scout JS
-    return this.table.visibleColumns().length > 1;
+    // Prevent removal of last column, because there may not always be a table organizer menu to add it again
+    return this.table.visibleColumns(false).length > (allowRemovalOfLastColumn ? 0 : 1);
+  }
+
+  removeColumns(columns: Column<any>[]) {
+    if (this.table.isCustomizable()) {
+      // TODO bsh [js-table] Delegate to this.table.tableCustomizer
+    } else {
+      this.hideColumns(columns);
+    }
   }
 
   /**
    * Returns true if the given column can be modified.
    */
-  isColumnModifiable(column: Column): boolean {
+  isColumnModifiable(column: Column<any>): boolean {
     if (!this.table) {
       return false; // not installed
     }
@@ -192,28 +225,44 @@ export class TableOrganizer implements ObjectWithType {
     return false;
   }
 
-  // --------------------
-
-  protected _onColumnOrganizeAction(event: TableColumnOrganizeActionEvent) {
-    switch (event.action) {
-      case 'add':
-        return this._handleColumnAddEvent(event);
-      case 'remove':
-        return this._handleColumnRemoveEvent(event);
-      case 'modify':
-        return this._handleColumnModifyEvent(event);
-    }
-  }
-
-  protected _handleColumnAddEvent(event: TableColumnOrganizeActionEvent) {
+  modifyColumn(column: Column<any>) {
     if (this.table.isCustomizable()) {
       // TODO bsh [js-table] Delegate to this.table.tableCustomizer
     } else {
-      this._showInvisibleColumnsForm(event.column);
+      // NOP (currently not supported)
     }
   }
 
-  protected _showInvisibleColumnsForm(insertAfterColumn?: Column) {
+  /**
+   * @returns true if the column can be moved to the left.
+   *          It cannot be moved if the column is invisible, the column is already at the beginning or if left of the column is a fixed position column.
+   */
+  isColumnMovableToLeft(column: Column<any>): boolean {
+    if (!column.visible) {
+      return false;
+    }
+    let visibleOldPos = this.table.visibleColumns().indexOf(column);
+    let visibleNewPos = visibleOldPos - 1;
+    visibleNewPos = this.table.considerFixedPositionColumns(visibleOldPos, visibleNewPos);
+    return visibleNewPos >= 0 && visibleNewPos < visibleOldPos;
+  }
+
+  /**
+   * @returns true if the column can be moved to the right.
+   *          It cannot be moved if the column is invisible, the column is already at the end or if right of the column is a fixed position column.
+   */
+  isColumnMovableToRight(column: Column<any>): boolean {
+    if (!column.visible) {
+      return false;
+    }
+    let visibleColumns = this.table.visibleColumns();
+    let visibleOldPos = visibleColumns.indexOf(column);
+    let visibleNewPos = visibleOldPos + 1;
+    visibleNewPos = this.table.considerFixedPositionColumns(visibleOldPos, visibleNewPos);
+    return visibleNewPos < visibleColumns.length && visibleNewPos > visibleOldPos;
+  }
+
+  protected _showInvisibleColumnsForm(insertAfterColumn?: Column<any>): JQuery.Promise<void> {
     let form = scout.create(ShowInvisibleColumnsForm, {
       parent: this.table,
       data: {
@@ -221,24 +270,8 @@ export class TableOrganizer implements ObjectWithType {
       }
     });
     form.open();
-    form.whenSave().then(() => {
+    return form.whenSave().then(() => {
       this.showColumns(form.data.columns, insertAfterColumn);
     });
-  }
-
-  protected _handleColumnRemoveEvent(event: TableColumnOrganizeActionEvent) {
-    if (this.table.isCustomizable()) {
-      // TODO bsh [js-table] Delegate to this.table.tableCustomizer
-    } else {
-      this.hideColumn(event.column);
-    }
-  }
-
-  protected _handleColumnModifyEvent(event: TableColumnOrganizeActionEvent) {
-    if (this.table.isCustomizable()) {
-      // TODO bsh [js-table] Delegate to this.table.tableCustomizer
-    } else {
-      // NOP (currently not supported)
-    }
   }
 }

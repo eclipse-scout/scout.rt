@@ -274,8 +274,8 @@ describe('Table Grouping', () => {
     expect(tableControl.aggregateRow[3]).toBeDefined();
 
     // Table control is deselected when all aggregated columns are hidden
-    table.organizer.hideColumn(table.columns[3]);
-    table.organizer.hideColumn(table.columns[4]);
+    table.organizer.hideColumns([table.columns[3]]);
+    table.organizer.hideColumns([table.columns[4]]);
     // 0: col0<String> [G] | (1: col1<String> ) | 2: col2<String> | (3: col4<Number> ) | ( 4: col3<Number> )
     expect(table._aggregateRows.length).toBe(2);
     expect(table._aggregateRows[0].contents.length).toBe(2);

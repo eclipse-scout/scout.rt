@@ -151,11 +151,6 @@ export interface TableStartCellEditEvent<TValue = any, T = Table> extends Event<
   field: ValueField<TValue>;
 }
 
-export interface TableColumnOrganizeActionEvent<TValue = any, T = Table> extends Event<T> {
-  action: 'add' | 'remove' | 'modify';
-  column: Column<TValue>;
-}
-
 export interface TableEventMap extends WidgetEventMap {
   'aggregationFunctionChanged': TableAggregationFunctionChangedEvent;
   'allRowsDeleted': TableAllRowsDeletedEvent;
@@ -197,7 +192,6 @@ export interface TableEventMap extends WidgetEventMap {
   'startCellEdit': TableStartCellEditEvent;
   'statusChanged': Event;
   'columnBackgroundEffectChanged': TableColumnBackgroundEffectChangedEvent;
-  'columnOrganizeAction': TableColumnOrganizeActionEvent;
   'propertyChange:autoResizeColumns': PropertyChangeEvent<boolean>;
   'propertyChange:checkable': PropertyChangeEvent<boolean>;
   'propertyChange:checkableStyle': PropertyChangeEvent<TableCheckableStyle>;

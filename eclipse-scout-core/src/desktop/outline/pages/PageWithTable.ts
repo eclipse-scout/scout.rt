@@ -9,7 +9,8 @@
  */
 import {
   arrays, AutoLeafPageWithNodes, BookmarkSupport, BookmarkTableRowIdentifierDo, dataObjects, DoEntity, EventHandler, Form, FormTableControl, LimitedResultInfoContributionDo, ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel,
-  scout, Status, Table, TableAllRowsDeletedEvent, TableMaxResultsHelper, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
+  scout, Status, Table, TableAllRowsDeletedEvent, TableMaxResultsHelper, TableOrganizerMenu, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent,
+  TableRowsUpdatedEvent
 } from '../../../index';
 import $ from 'jquery';
 
@@ -50,6 +51,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
     table.on('rowOrderChanged', this._tableRowOrderChangeHandler);
     table.on('reload', this._tableDataLoadHandler);
     table.hasReloadHandler = true;
+    table.insertMenus([scout.create(TableOrganizerMenu, {parent: table})]);
   }
 
   protected override _destroyDetailTable(table: Table) {

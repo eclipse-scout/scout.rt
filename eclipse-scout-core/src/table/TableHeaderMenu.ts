@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -374,15 +374,11 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   }
 
   protected _onColumnMoved() {
-    let table = this.table,
-      column = this.column;
+    let column = this.column;
 
     if (this.moveGroup) {
-      let visibleColumns = table.visibleColumns();
-      let columnIndex = table.visibleColumns().indexOf(column);
-      let forwardEnabled = visibleColumns[columnIndex - 1] && !visibleColumns[columnIndex - 1].fixedPosition;
-      let backwardEnabled = visibleColumns[columnIndex + 1] && !visibleColumns[columnIndex + 1].fixedPosition;
-
+      let forwardEnabled = this.table.organizer.isColumnMovableToLeft(column);
+      let backwardEnabled = this.table.organizer.isColumnMovableToRight(column);
       this.toBeginButton.setEnabled(forwardEnabled);
       this.forwardButton.setEnabled(forwardEnabled);
       this.backwardButton.setEnabled(backwardEnabled);
@@ -398,9 +394,6 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   }
 
   protected _renderColumnActionsGroup(): TableHeaderMenuGroup {
-    let column = this.column,
-      menuPopup = this;
-
     this.columnActionsGroup = scout.create(TableHeaderMenuGroup, {
       parent: this,
       textKey: 'ui.Column'
@@ -412,7 +405,10 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       cssClass: 'add-column',
       visible: this.table.isColumnAddable(this.column)
     });
-    this.addColumnButton.on('action', onClick.bind(this, 'add'));
+    this.addColumnButton.on('action', () => {
+      this.close();
+      this.table.organizer.addColumn(this.column);
+    });
 
     this.removeColumnButton = scout.create(TableHeaderMenuButton, {
       parent: this.columnActionsGroup,
@@ -420,7 +416,10 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       cssClass: 'remove-column',
       visible: this.table.isColumnRemovable(this.column)
     });
-    this.removeColumnButton.on('action', onClick.bind(this, 'remove'));
+    this.removeColumnButton.on('action', () => {
+      this.close();
+      this.table.organizer.removeColumns([this.column]);
+    });
 
     this.modifyColumnButton = scout.create(TableHeaderMenuButton, {
       parent: this.columnActionsGroup,
@@ -428,7 +427,10 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       cssClass: 'change-column',
       visible: this.table.isColumnModifiable(this.column)
     });
-    this.modifyColumnButton.on('action', onClick.bind(this, 'modify'));
+    this.modifyColumnButton.on('action', () => {
+      this.close();
+      this.table.organizer.modifyColumn(this.column);
+    });
 
     this.columnActionsGroup.render(this.$columnActions);
     // link buttons with the group header, the header is updated with the text of the action
@@ -436,14 +438,6 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     aria.linkElementWithLabel(this.removeColumnButton.$container, this.columnActionsGroup.$text);
     aria.linkElementWithLabel(this.modifyColumnButton.$container, this.columnActionsGroup.$text);
     return this.columnActionsGroup;
-
-    function onClick(action: string) {
-      menuPopup.close();
-      this.table.trigger('columnOrganizeAction', {
-        action: action,
-        column: column
-      });
-    }
   }
 
   protected _renderSortingGroup(): TableHeaderMenuGroup {
