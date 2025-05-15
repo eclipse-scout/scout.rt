@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, arrays, ComboMenu, EllipsisMenu, InitModelOf, Menu, MenuDestinations, scout} from '../index';
+import {Action, arrays, ComboMenu, EllipsisMenu, InitModelOf, Menu, MenuDestinations, ObjectOrChildModel, scout, Widget} from '../index';
 import $ from 'jquery';
 
 export type MenuFilterOptions = {
@@ -203,5 +203,31 @@ export const menus = {
       }
       return [item];
     });
+  },
+
+  /**
+   * Appends the given menus to the existing menus of the menu owner and calls {@link MenuOwner.setMenus} to set the new list of menus.
+   */
+  insertMenus(menuOwner: MenuOwner, menusToInsert: ObjectOrChildModel<Menu>[]) {
+    menusToInsert = arrays.ensure(menusToInsert);
+    if (menusToInsert.length === 0) {
+      return;
+    }
+    let menus = menuOwner.menus as ObjectOrChildModel<Menu>[];
+    menuOwner.setMenus(menus.concat(menusToInsert));
+  },
+
+  /**
+   * Removes the given menus from the existing menus of the menu owner and calls {@link MenuOwner.setMenus} to set the new list of menus.
+   */
+  deleteMenus(menuOwner: MenuOwner, menusToDelete: Menu[]) {
+    menusToDelete = arrays.ensure(menusToDelete);
+    if (menusToDelete.length === 0) {
+      return;
+    }
+    let menus = arrays.diff(menuOwner.menus, menusToDelete);
+    menuOwner.setMenus(menus);
   }
 };
+
+export type MenuOwner = Widget & { menus: Menu[]; setMenus: (menus: ObjectOrChildModel<Menu>[]) => void };

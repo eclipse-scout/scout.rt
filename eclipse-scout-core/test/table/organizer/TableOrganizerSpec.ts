@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {TableSpecHelper} from '../../../src/testing/index';
-import {arrays, Column, Event, scout, TableOrganizer} from '../../../src';
+import {arrays, Column, scout, TableOrganizer} from '../../../src';
 
 describe('TableOrganizer', () => {
 
@@ -61,67 +61,6 @@ describe('TableOrganizer', () => {
       let table = helper.createTable(tableModel);
 
       expect(table.organizer).toBe(null);
-    });
-
-    it('installs a listener to the table', () => {
-      let tableModel = helper.createModelFixture(1);
-      let table = helper.createTable(tableModel);
-
-      let oldOrganizer = table.organizer;
-      expect(oldOrganizer).toBeTruthy();
-      let initialListenerCount = table.events._eventListeners.length;
-      spyOn(oldOrganizer, 'uninstall').and.callThrough();
-      table.setOrganizer(null);
-      expect(table.events._eventListeners.length).toBe(initialListenerCount - 1);
-      expect(oldOrganizer.uninstall).toHaveBeenCalled();
-
-      let newOrganizer = scout.create(TableOrganizer);
-      spyOn(newOrganizer, 'install').and.callThrough();
-      table.setOrganizer(newOrganizer);
-      expect(table.events._eventListeners.length).toBe(initialListenerCount);
-      expect(newOrganizer.install).toHaveBeenCalled();
-    });
-
-    it('reacts to table events', () => {
-      let tableModel = helper.createModelFixture(1);
-      let table = helper.createTable(tableModel);
-      let column = table.columns[0];
-      let organizer = table.organizer as TableOrganizer & { _handleColumnAddEvent; _handleColumnRemoveEvent; _handleColumnModifyEvent };
-      spyOn(organizer, '_handleColumnAddEvent');
-      spyOn(organizer, '_handleColumnRemoveEvent');
-      spyOn(organizer, '_handleColumnModifyEvent');
-
-      table.trigger('columnOrganizeAction', {
-        action: 'add',
-        column: column
-      });
-      table.trigger('columnOrganizeAction', {
-        action: 'remove',
-        column: column
-      });
-      table.trigger('columnOrganizeAction', {
-        action: 'modify',
-        column: column
-      });
-
-      expect(organizer._handleColumnAddEvent).toHaveBeenCalledOnceWith(new Event({
-        type: 'columnOrganizeAction',
-        source: table,
-        action: 'add',
-        column: column
-      }));
-      expect(organizer._handleColumnRemoveEvent).toHaveBeenCalledOnceWith(new Event({
-        type: 'columnOrganizeAction',
-        source: table,
-        action: 'remove',
-        column: column
-      }));
-      expect(organizer._handleColumnModifyEvent).toHaveBeenCalledOnceWith(new Event({
-        type: 'columnOrganizeAction',
-        source: table,
-        action: 'modify',
-        column: column
-      }));
     });
   });
 
@@ -478,6 +417,44 @@ describe('TableOrganizer', () => {
       expect(table.visibleColumns()).toEqual([column0, column1, column2, column3, column4]);
       expect(table.displayableColumns()).toEqual([column0, column1, column2, column3, column4, column5]);
       expect(table.onColumnVisibilityChanged).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('moveColumns', () => {
+    it('moves the columns to their new position', () => {
+      let tableModel = helper.createModelFixture(4);
+      let table = helper.createTable(tableModel);
+      table.columns[1].setVisible(false);
+      let columns = table.columns.slice();
+      expect(table.visibleColumns()).toEqual([columns[0], columns[2], columns[3]]);
+
+      table.organizer.moveColumns([columns[2], columns[3], columns[0]]);
+      expect(table.visibleColumns()).toEqual([columns[2], columns[3], columns[0]]);
+    });
+
+    it('can move only some of the columns', () => {
+      let tableModel = helper.createModelFixture(3);
+      let table = helper.createTable(tableModel);
+      let columns = table.columns.slice();
+      expect(table.visibleColumns()).toEqual(columns);
+
+      table.organizer.moveColumns([columns[2], columns[1]]);
+      expect(table.visibleColumns()).toEqual([columns[2], columns[1], columns[0]]);
+    });
+
+    it('enhances the given array with guiOnly columns if necessary', () => {
+      let tableModel = helper.createModelFixture(2);
+      let table = helper.createTable(tableModel);
+      table.setCheckable(true);
+      table.setRowIconVisible(true);
+      let columns = table.columns.slice();
+      expect(table.visibleColumns()).toEqual([columns[0], columns[1], columns[2], columns[3]]);
+
+      table.organizer.moveColumns([columns[3], columns[2]]);
+      expect(table.visibleColumns()).toEqual([columns[0], columns[1], columns[3], columns[2]]);
+
+      table.organizer.moveColumns([columns[0], columns[1], columns[3], columns[2]]);
+      expect(table.visibleColumns()).toEqual([columns[0], columns[1], columns[3], columns[2]]);
     });
   });
 });

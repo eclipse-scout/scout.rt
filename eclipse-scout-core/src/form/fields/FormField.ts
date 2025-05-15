@@ -889,12 +889,7 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   insertMenus(menusToInsert: ObjectOrChildModel<Menu>[]) {
-    menusToInsert = arrays.ensure(menusToInsert);
-    if (menusToInsert.length === 0) {
-      return;
-    }
-    let menus = this.menus as ObjectOrChildModel<Menu>[];
-    this.setMenus(menus.concat(menusToInsert));
+    menuUtil.insertMenus(this, menusToInsert);
   }
 
   deleteMenu(menuToDelete: Menu) {
@@ -902,13 +897,7 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   deleteMenus(menusToDelete: Menu[]) {
-    menusToDelete = arrays.ensure(menusToDelete);
-    if (menusToDelete.length === 0) {
-      return;
-    }
-    let menus = this.menus.slice();
-    arrays.removeAll(menus, menusToDelete);
-    this.setMenus(menus);
+    menuUtil.deleteMenus(this, menusToDelete);
   }
 
   protected _onMenuPropertyChange(event: PropertyChangeEvent<any, Menu>) {
