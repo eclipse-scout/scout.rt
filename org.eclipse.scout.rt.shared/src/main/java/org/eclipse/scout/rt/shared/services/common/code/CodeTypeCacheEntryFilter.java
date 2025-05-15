@@ -45,6 +45,10 @@ public class CodeTypeCacheEntryFilter implements ICacheEntryFilter<CodeTypeCache
     return m_codeTypeClasses.contains(key.getCodeTypeClass());
   }
 
+  public boolean accept(Class<? extends ICodeType<?, ?>> codeTypeClass) {
+    return m_codeTypeClasses.stream().anyMatch(codeTypeClass::isAssignableFrom);
+  }
+
   @Override
   public ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>> coalesce(ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>> other) {
     if (other instanceof CodeTypeCacheEntryFilter) {
