@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BeanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, Status, Table, TableField, TableRow, TableRowModel, Tooltip
+  BeanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, SmartColumn, Status, Table, TableField, TableRow,
+  TableRowModel, Tooltip
 } from '../../src/index';
 import {JQueryTesting, LocaleSpecHelper, SpecTable, TableSpecHelper} from '../../src/testing/index';
 import $ from 'jquery';
@@ -1767,6 +1768,58 @@ describe('Table', () => {
         table.rows.forEach((row, index) => {
           column0.cell(row).sortCode = sortCodes[index];
         });
+
+        table.render();
+
+        table.sort(column0, 'desc');
+        helper.assertValuesInCells(table.rows, 0, [2, 0, 3, 1, 4]);
+
+        table.sort(column0, 'asc');
+        helper.assertValuesInCells(table.rows, 0, [4, 1, 3, 0, 2]);
+      });
+
+      it('sorts smart columns with sortcode', () => {
+        let rows = [
+          helper.createModelRow(null, [
+            scout.create(Cell, {
+              sortCode: 13,
+              text: '0',
+              value: 0
+            })
+          ]),
+          helper.createModelRow(null, [
+            scout.create(Cell, {
+              sortCode: 0,
+              text: '1',
+              value: 1
+            })
+          ]),
+          helper.createModelRow(null, [
+            scout.create(Cell, {
+              sortCode: 42,
+              text: '2',
+              value: 2
+            })
+          ]),
+          helper.createModelRow(null, [
+            scout.create(Cell, {
+              sortCode: 7,
+              text: '3',
+              value: 3
+            })
+          ]),
+          helper.createModelRow(null, [
+            scout.create(Cell, {
+              sortCode: null,
+              text: '4',
+              value: 4
+            })
+          ])
+        ];
+
+        let model = helper.createModel(helper.createModelColumns(1, SmartColumn), rows);
+        let table = helper.createTable(model);
+        column0 = table.columns[0];
 
         table.render();
 
