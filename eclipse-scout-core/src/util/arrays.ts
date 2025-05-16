@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -684,5 +684,32 @@ export const arrays = {
       array[index1] = element2;
       array[index2] = element1;
     }
+  },
+
+  /**
+   * Sorts the given array _in place_ according to the order of the template array.
+   * Does nothing, if the array is null or undefined.
+   *
+   * @returns the given array which is now in order.
+   */
+  sortBy<T>(array: T[], template: T[], direction: 'asc' | 'desc' = 'asc'): T[] {
+    if (!array) {
+      return [];
+    }
+    if (!template) {
+      return array;
+    }
+
+    // Save the indices in a map to halve the execution time
+    let map = new Map();
+    array = array.sort((element1, element2) => {
+      let row1Index = objects.getOrSetIfAbsent(map, element1, element => template.indexOf(element));
+      let row2Index = objects.getOrSetIfAbsent(map, element2, row => template.indexOf(row));
+      if (direction === 'asc') {
+        return row1Index - row2Index;
+      }
+      return row2Index - row1Index;
+    });
+    return array;
   }
 };

@@ -1880,114 +1880,157 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
   /**
    * Moves the row to the top.
+   *
+   * @returns true, if the row has been moved, false if not.
    */
-  moveRowToTop(row: TableRow) {
+  moveRowToTop(row: TableRow): boolean {
     let rowIndex = this.rows.indexOf(row);
-    this.moveRow(rowIndex, 0);
+    if (rowIndex < 0) {
+      return false;
+    }
+    return this.moveRow(rowIndex, 0);
   }
 
   /**
    * Moves the row to the bottom.
+   *
+   * @returns true, if the row has been moved, false if not.
    */
-  moveRowToBottom(row: TableRow) {
+  moveRowToBottom(row: TableRow): boolean {
     let rowIndex = this.rows.indexOf(row);
-    this.moveRow(rowIndex, this.rows.length - 1);
+    if (rowIndex < 0) {
+      return false;
+    }
+    return this.moveRow(rowIndex, this.rows.length - 1);
   }
 
   /**
-   * Moves the row one up, disregarding filtered rows.
+   * Moves the row one up.
+   *
+   * @returns true, if the row has been moved, false if not.
    */
-  moveRowUp(row: TableRow) {
-    let rowIndex = this.rows.indexOf(row),
-      targetIndex = rowIndex - 1;
-    if (this.hierarchical) {
-      // find index with same parent
-      let siblings = this.rows.filter(candidate => row.parentRow === candidate.parentRow),
-        rowIndexSiblings = siblings.indexOf(row),
-        sibling = siblings[rowIndexSiblings - 1];
-      if (sibling) {
-        targetIndex = this.rows.indexOf(sibling);
-      } else {
-        targetIndex = 0;
-      }
-    }
-
-    this.moveRow(rowIndex, targetIndex);
+  moveRowUp(row: TableRow): boolean {
+    return this.moveRowUpOrDown(row, 'up');
   }
 
   /**
-   * Moves the row one down, disregarding filtered rows.
+   * Moves the row one down.
+   *
+   * @returns true, if the row has been moved, false if not.
    */
-  moveRowDown(row: TableRow) {
-    let rowIndex = this.rows.indexOf(row),
-      targetIndex = rowIndex + 1;
-    if (this.hierarchical) {
-      // find index with same parent
-      let siblings = this.rows.filter(candidate => row.parentRow === candidate.parentRow),
-        rowIndexSiblings = siblings.indexOf(row),
-        sibling = siblings[rowIndexSiblings + 1];
-      if (sibling) {
-        targetIndex = this.rows.indexOf(sibling);
-      } else {
-        targetIndex = this.rows.length;
-      }
-    }
-    this.moveRow(rowIndex, targetIndex);
+  moveRowDown(row: TableRow): boolean {
+    return this.moveRowUpOrDown(row, 'down');
   }
 
-  moveVisibleRowUp(row: TableRow) {
-    let rowIndex = this.rows.indexOf(row),
-      visibleIndex = this.visibleRows.indexOf(row),
-      sibling: TableRow,
-      targetIndex: number;
+  /**
+   * Moves the row one up, considering only the {@link visibleRows}.
+   *
+   * @returns true, if the row has been moved, false if not.
+   */
+  moveVisibleRowUp(row: TableRow): boolean {
+    return this.moveVisibleRowUpOrDown(row, 'up');
+  }
 
-    if (this.hierarchical) {
-      let siblings = this.visibleRows.filter(candidate => row.parentRow === candidate.parentRow);
-      sibling = siblings[siblings.indexOf(row) - 1];
-      if (sibling) {
-        targetIndex = this.rows.indexOf(sibling);
-      } else {
-        // no previous sibling
-        return;
+  /**
+   * Moves the row one down, considering only the {@link visibleRows}.
+   *
+   * @returns true, if the row has been moved, false if not.
+   */
+  moveVisibleRowDown(row: TableRow): boolean {
+    return this.moveVisibleRowUpOrDown(row, 'down');
+  }
+
+  /**
+   * Moves the given rows one up or one down, depending on the direction.
+   *
+   * @returns the moved table rows or an empty array if no rows have been moved.
+   */
+  moveRowsUpOrDown(rows: TableRow[], direction: TableRowMoveDirection): TableRow[] {
+    if (!rows) {
+      return [];
+    }
+    rows = rows.slice();
+
+    let movedRows = [];
+    arrays.sortBy(rows, this.rows, direction === 'up' ? 'asc' : 'desc');
+    rows.some(row => {
+      let rowMoved = this.moveRowUpOrDown(row, direction);
+      if (!rowMoved) {
+        return true; // stop if move did not do anything
       }
-    } else {
-      sibling = this.visibleRows[visibleIndex - 1];
+      if (direction === 'up') {
+        movedRows.push(row);
+      } else {
+        // Prepend to return the rows in the same order as the rows in the table
+        movedRows.unshift(row);
+      }
+      return false; // continue
+    });
+    return movedRows;
+  }
+
+  /**
+   * Moves the row one up or one down, depending on the direction.
+   *
+   * @returns true, if the row has been moved, false if not.
+   */
+  moveRowUpOrDown(row: TableRow, direction: TableRowMoveDirection): boolean {
+    const rowIndex = this.rows.indexOf(row);
+    if (rowIndex < 0) {
+      return false;
+    }
+    const diff = direction === 'up' ? -1 : 1;
+    let targetIndex = rowIndex + diff;
+    if (this.hierarchical) {
+      const sibling = this._findSiblingWithSameParent(row, direction);
       if (!sibling) {
-        // no previous sibling
-        return;
+        return false;
       }
       targetIndex = this.rows.indexOf(sibling);
     }
-    this.moveRow(rowIndex, targetIndex);
+    return this.moveRow(rowIndex, targetIndex);
   }
 
-  moveVisibleRowDown(row: TableRow) {
-    let rowIndex = this.rows.indexOf(row),
-      visibleIndex = this.visibleRows.indexOf(row),
-      sibling: TableRow,
-      targetIndex: number;
-
-    if (this.hierarchical) {
-      let siblings = this.visibleRows.filter(candidate => row.parentRow === candidate.parentRow);
-      sibling = siblings[siblings.indexOf(row) + 1];
-      if (sibling) {
-        targetIndex = this.rows.indexOf(sibling);
-      } else {
-        // no following sibling
-        return;
-      }
-    } else {
-      sibling = this.visibleRows[visibleIndex + 1];
-      if (!sibling) {
-        // no following sibling
-        return;
-      }
-      targetIndex = this.rows.indexOf(sibling);
+  /**
+   * Moves the row one up or one down, depending on the direction, considering only the {@link visibleRows}.
+   *
+   * @returns true, if the row has been moved, false if not.
+   */
+  moveVisibleRowUpOrDown(row: TableRow, direction: TableRowMoveDirection): boolean {
+    const rowIndex = this.rows.indexOf(row);
+    if (rowIndex < 0) {
+      return false;
     }
-    this.moveRow(rowIndex, targetIndex);
+    let targetIndex: number;
+    let sibling: TableRow;
+    if (this.hierarchical) {
+      sibling = this._findSiblingWithSameParent(row, direction, this.visibleRows);
+    } else {
+      const diff = direction === 'up' ? -1 : 1;
+      const visibleIndex = this.visibleRows.indexOf(row);
+      sibling = this.visibleRows[visibleIndex + diff];
+    }
+    if (!sibling) {
+      return false;
+    }
+    targetIndex = this.rows.indexOf(sibling);
+    return this.moveRow(rowIndex, targetIndex);
   }
 
-  moveRow(sourceIndex: number, targetIndex: number) {
+  protected _findSiblingWithSameParent(row: TableRow, direction: TableRowMoveDirection, rows?: TableRow[]): TableRow {
+    rows = rows || this.rows;
+    const siblings = rows.filter(candidate => row.parentRow === candidate.parentRow);
+    const rowIndexSiblings = siblings.indexOf(row);
+    const diff = direction === 'up' ? -1 : 1;
+    return siblings[rowIndexSiblings + diff];
+  }
+
+  /**
+   * Moves the row from the source index to the target index.
+   *
+   * @returns true, if the row has been moved, false if not.
+   */
+  moveRow(sourceIndex: number, targetIndex: number): boolean {
     let rowCount = this.rows.length;
     sourceIndex = Math.max(sourceIndex, 0);
     sourceIndex = Math.min(sourceIndex, rowCount - 1);
@@ -1995,11 +2038,12 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     targetIndex = Math.min(targetIndex, rowCount - 1);
 
     if (sourceIndex === targetIndex) {
-      return;
+      return false;
     }
 
     arrays.move(this.rows, sourceIndex, targetIndex);
     this.updateRowOrder(this.rows);
+    return true;
   }
 
   protected _removeRowsInRange(range: Range) {
@@ -3887,8 +3931,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   /**
    * @returns all selected rows in the same order as {@link rows}.
    */
-  selectedRowsSorted(): TableRow[] {
-    return this.orderRows(this.selectedRows.slice());
+  selectedRowsSorted(direction: 'asc' | 'desc' = 'asc'): TableRow[] {
+    return arrays.sortBy(this.selectedRows.slice(), this.rows, direction);
   }
 
   $selectedRows(): JQuery {
@@ -4137,26 +4181,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     });
     this._renderScrollTop();
     this._renderEmptyData();
-  }
-
-  /**
-   * Sorts the given rows _in place_ according the order of {@link rows}.
-   * Does nothing, if rows is null or undefined.
-   *
-   * @returns a reference to the given rows which are now in order.
-   */
-  orderRows(rows: TableRow[], direction: 'asc' | 'desc' = 'asc'): TableRow[] {
-    // Save the indices in a map to halve the execution time
-    let rowMap = new Map();
-    rows = rows?.sort((row1, row2) => {
-      let row1Index = objects.getOrSetIfAbsent(rowMap, row1, row => this.rows.indexOf(row));
-      let row2Index = objects.getOrSetIfAbsent(rowMap, row2, row => this.rows.indexOf(row));
-      if (direction === 'asc') {
-        return row1Index - row2Index;
-      }
-      return row2Index - row1Index;
-    });
-    return rows;
   }
 
   /**
@@ -6167,3 +6191,4 @@ export type ColumnMap = {
 };
 
 export type ColumnMapOf<T> = T extends { columnMap: infer TMap } ? TMap : object;
+export type TableRowMoveDirection = 'up' | 'down';

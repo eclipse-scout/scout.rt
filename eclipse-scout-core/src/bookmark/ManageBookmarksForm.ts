@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, arrays, BookmarkDo, BookmarkForm, BookmarkStore, BookmarkSupport, Event, Form, FormModel, InitModelOf, ManageBookmarksFormWidgetMap, scout} from '../index';
+import {Action, arrays, BookmarkDo, BookmarkForm, BookmarkStore, BookmarkSupport, Event, Form, FormModel, InitModelOf, ManageBookmarksFormWidgetMap, MoveTableRowMenuHelper, scout} from '../index';
 import model from './ManageBookmarksFormModel';
 
 export class ManageBookmarksForm extends Form {
@@ -95,56 +95,8 @@ export class ManageBookmarksForm extends Form {
     const table = this.widget('BookmarksTable');
     const moveRowUpMenu = table.widget('MoveRowUpMenu');
     const moveRowDownMenu = table.widget('MoveRowDownMenu');
-
-    const onMoveRowMenuActionHandler = (event: Event<Action>) => {
-      let moveUp = event.source === moveRowUpMenu;
-      let moved = false;
-      table.selectedRows.slice()
-        .sort((r1, r2) => {
-          if (moveUp) {
-            return table.rows.indexOf(r1) - table.rows.indexOf(r2);
-          }
-          return table.rows.indexOf(r2) - table.rows.indexOf(r1); // reverse
-        })
-        .some(row => {
-          let i1 = table.rows.indexOf(row);
-          if (moveUp) {
-            table.moveRowUp(row);
-          } else {
-            table.moveRowDown(row);
-          }
-          let i2 = table.rows.indexOf(row);
-          if (i1 === i2) {
-            return true; // stop if move did not do anything
-          }
-          moved = true;
-          return false; // continue
-        });
-      if (moved) {
-        tableField.touch();
-      }
-    };
-
-    moveRowUpMenu.on('action', onMoveRowMenuActionHandler);
-    moveRowDownMenu.on('action', onMoveRowMenuActionHandler);
-
-    table.on('propertyChange:enabledComputed', event => this._recomputeUpDownMenuVisibility());
-    table.on('rowsSelected rowsInserted rowsUpdated rowsDeleted rowOrderChanged', event => this._recomputeUpDownMenuVisibility());
-
-    this._recomputeUpDownMenuVisibility();
-  }
-
-  protected _recomputeUpDownMenuVisibility() {
-    const table = this.widget('BookmarksTable');
-    const moveRowUpMenu = table.widget('MoveRowUpMenu');
-    const moveRowDownMenu = table.widget('MoveRowDownMenu');
-
-    let moveable = table.enabledComputed && table.selectedRows.length && table.rows.length > 1;
-    let firstRow = arrays.first(table.visibleRows);
-    let lastRow = arrays.last(table.visibleRows);
-    moveRowUpMenu.setVisible(moveable);
-    moveRowUpMenu.setEnabled(table.selectedRows.every(row => row !== firstRow));
-    moveRowDownMenu.setVisible(moveable);
-    moveRowDownMenu.setEnabled(table.selectedRows.every(row => row !== lastRow));
+    const moveRowHelper = scout.create(MoveTableRowMenuHelper);
+    moveRowHelper.install({table, moveRowUpMenu, moveRowDownMenu});
+    table.on('rowOrderChanged', () => tableField.touch());
   }
 }
