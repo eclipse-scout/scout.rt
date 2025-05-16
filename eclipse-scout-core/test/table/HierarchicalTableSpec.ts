@@ -848,17 +848,20 @@ describe('HierarchicalTableSpec', () => {
     it('up - expect the row gets moved above the previous visible row', () => {
       createAndRegisterColumnFilter(table, table.columns[0], ['a']);
       expectRowIds(table.visibleRows, [1, 2, 3, 6]);
-      table.moveVisibleRowUp(rows[6]);
+      let moved = table.moveVisibleRowUp(rows[6]);
+      expect(moved).toBe(true);
       expectRowIds(table.rows, [0, 1, 6, 2, 3, 4, 5, 7]);
       expectRowIds(table.visibleRows, [1, 6, 2, 3]);
 
       // once again expect to be moved before 1
-      table.moveVisibleRowUp(rows[6]);
+      moved = table.moveVisibleRowUp(rows[6]);
+      expect(moved).toBe(true);
       expectRowIds(table.rows, [0, 6, 1, 2, 3, 4, 5, 7]);
       expectRowIds(table.visibleRows, [6, 1, 2, 3]);
 
       // once again expect to move nothing since node 0 is invisible
-      table.moveVisibleRowUp(rows[6]);
+      moved = table.moveVisibleRowUp(rows[6]);
+      expect(moved).toBe(false);
       expectRowIds(table.rows, [0, 6, 1, 2, 3, 4, 5, 7]);
       expectRowIds(table.visibleRows, [6, 1, 2, 3]);
 
@@ -868,17 +871,20 @@ describe('HierarchicalTableSpec', () => {
       createAndRegisterColumnFilter(table, table.columns[0], ['a']);
       expectRowIds(table.visibleRows, [1, 2, 3, 6]);
 
-      table.moveVisibleRowDown(rows[1]);
+      let moved = table.moveVisibleRowDown(rows[1]);
+      expect(moved).toBe(true);
       expectRowIds(table.rows, [0, 2, 3, 4, 1, 5, 6, 7]);
       expectRowIds(table.visibleRows, [2, 3, 1, 6]);
 
       // once again expect to be moved after 6
-      table.moveVisibleRowDown(rows[1]);
+      moved = table.moveVisibleRowDown(rows[1]);
+      expect(moved).toBe(true);
       expectRowIds(table.rows, [0, 2, 3, 4, 5, 6, 1, 7]);
       expectRowIds(table.visibleRows, [2, 3, 6, 1]);
 
       // once again expect to move nothing since node 7 is invisible
-      table.moveVisibleRowDown(rows[1]);
+      moved = table.moveVisibleRowDown(rows[1]);
+      expect(moved).toBe(false);
       expectRowIds(table.rows, [0, 2, 3, 4, 5, 6, 1, 7]);
       expectRowIds(table.visibleRows, [2, 3, 6, 1]);
     });

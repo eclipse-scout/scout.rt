@@ -1916,26 +1916,6 @@ describe('Table', () => {
 
   });
 
-  describe('orderRows', () => {
-    it('orders the given rows according to the order of the rows in the table', () => {
-      let model = helper.createModelFixture(1, 3);
-      let table = helper.createTable(model);
-
-      let rows = [table.rows[1], table.rows[0], table.rows[2]];
-      expect(table.orderRows(rows)).toEqual(table.rows);
-      expect(table.orderRows(rows, 'desc')).toEqual(table.rows.slice().reverse());
-    });
-
-    it('does not require all rows', () => {
-      let model = helper.createModelFixture(1, 5);
-      let table = helper.createTable(model);
-
-      let rows = [table.rows[4], table.rows[1], table.rows[2]];
-      expect(table.orderRows(rows)).toEqual([table.rows[1], table.rows[2], table.rows[4]]);
-      expect(table.orderRows(rows, 'desc')).toEqual([table.rows[4], table.rows[2], table.rows[1]]);
-    });
-  });
-
   describe('row click', () => {
 
     function clickRowAndAssertSelection(table, $row) {
@@ -3212,26 +3192,30 @@ describe('Table', () => {
 
       // Move row B one up
       let rowB = table.rows[1];
-      table.moveRowUp(rowB);
+      let moved = table.moveRowUp(rowB);
+      expect(moved).toBe(true);
       expect(table.rows[0].cells[0].text).toBe('B');
       expect(table.rows[1].cells[0].text).toBe('A');
       expect(table.rows[2].cells[0].text).toBe('C');
 
       // Move row B one up again (no effect)
-      table.moveRowUp(rowB);
+      moved = table.moveRowUp(rowB);
+      expect(moved).toBe(false);
       expect(table.rows[0].cells[0].text).toBe('B');
       expect(table.rows[1].cells[0].text).toBe('A');
       expect(table.rows[2].cells[0].text).toBe('C');
 
-      // Move row D one up
+      // Move row C one up
       let rowD = table.rows[2];
-      table.moveRowUp(rowD);
+      moved = table.moveRowUp(rowD);
+      expect(moved).toBe(true);
       expect(table.rows[0].cells[0].text).toBe('B');
       expect(table.rows[1].cells[0].text).toBe('C');
       expect(table.rows[2].cells[0].text).toBe('A');
 
-      // Move row D one up again
-      table.moveRowUp(rowD);
+      // Move row C one up again
+      moved = table.moveRowUp(rowD);
+      expect(moved).toBe(true);
       expect(table.rows[0].cells[0].text).toBe('C');
       expect(table.rows[1].cells[0].text).toBe('B');
       expect(table.rows[2].cells[0].text).toBe('A');
@@ -3251,29 +3235,176 @@ describe('Table', () => {
 
       // Move row B one down
       let rowB = table.rows[1];
-      table.moveRowDown(rowB);
+      let moved = table.moveRowDown(rowB);
+      expect(moved).toBe(true);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('C');
       expect(table.rows[2].cells[0].text).toBe('B');
 
       // Move row B one down again (no effect)
-      table.moveRowDown(rowB);
+      moved = table.moveRowDown(rowB);
+      expect(moved).toBe(false);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('C');
       expect(table.rows[2].cells[0].text).toBe('B');
 
       // Move row A one down
       let rowA = table.rows[0];
-      table.moveRowDown(rowA);
+      moved = table.moveRowDown(rowA);
+      expect(moved).toBe(true);
       expect(table.rows[0].cells[0].text).toBe('C');
       expect(table.rows[1].cells[0].text).toBe('A');
       expect(table.rows[2].cells[0].text).toBe('B');
 
       // Move row A one down again
-      table.moveRowDown(rowA);
+      moved = table.moveRowDown(rowA);
+      expect(moved).toBe(true);
       expect(table.rows[0].cells[0].text).toBe('C');
       expect(table.rows[1].cells[0].text).toBe('B');
       expect(table.rows[2].cells[0].text).toBe('A');
+    });
+  });
+
+  describe('moveRowsUpOrDown', () => {
+
+    describe('with direction \'up\'', () => {
+      it('moves rows one up', () => {
+        let model = helper.createModelFixture(1, 0);
+        let table = helper.createTable(model);
+        table.insertRows([
+          helper.createModelRow(null, ['A']),
+          helper.createModelRow(null, ['B']),
+          helper.createModelRow(null, ['C']),
+          helper.createModelRow(null, ['D'])
+        ]);
+
+        // Move rows one up
+        let rows = [table.rows[1], table.rows[2]];
+        let movedRows = table.moveRowsUpOrDown(rows, 'up');
+        expect(movedRows).toEqual(rows);
+        expect(table.rows[0].cells[0].text).toBe('B');
+        expect(table.rows[1].cells[0].text).toBe('C');
+        expect(table.rows[2].cells[0].text).toBe('A');
+        expect(table.rows[3].cells[0].text).toBe('D');
+
+        // Move rows one up again (no effect)
+        movedRows = table.moveRowsUpOrDown(rows, 'up');
+        expect(movedRows).toEqual([]);
+        expect(table.rows[0].cells[0].text).toBe('B');
+        expect(table.rows[1].cells[0].text).toBe('C');
+        expect(table.rows[2].cells[0].text).toBe('A');
+        expect(table.rows[3].cells[0].text).toBe('D');
+
+        // Move rows C and D up
+        rows = [table.rows[1], table.rows[3]];
+        movedRows = table.moveRowsUpOrDown(rows, 'up');
+        expect(table.rows[0].cells[0].text).toBe('C');
+        expect(table.rows[1].cells[0].text).toBe('B');
+        expect(table.rows[2].cells[0].text).toBe('D');
+        expect(table.rows[3].cells[0].text).toBe('A');
+
+        // Move rows up again (no effect, relative distance between rows should be preserved)
+        movedRows = table.moveRowsUpOrDown(rows, 'up');
+        expect(table.rows[0].cells[0].text).toBe('C');
+        expect(table.rows[1].cells[0].text).toBe('B');
+        expect(table.rows[2].cells[0].text).toBe('D');
+        expect(table.rows[3].cells[0].text).toBe('A');
+      });
+
+      it('orders the rows first', () => {
+        let model = helper.createModelFixture(1, 0);
+        let table = helper.createTable(model);
+        table.insertRows([
+          helper.createModelRow(null, ['A']),
+          helper.createModelRow(null, ['B']),
+          helper.createModelRow(null, ['C'])
+        ]);
+
+        // Move rows one up even if order of given rows does not match the order of the rows in the table
+        let rows = [table.rows[2], table.rows[1]];
+        let movedRows = table.moveRowsUpOrDown(rows, 'up');
+        expect(movedRows).toEqual(rows.reverse());
+        expect(table.rows[0].cells[0].text).toBe('B');
+        expect(table.rows[1].cells[0].text).toBe('C');
+        expect(table.rows[2].cells[0].text).toBe('A');
+
+        // Move rows one up again (no effect)
+        movedRows = table.moveRowsUpOrDown(rows, 'up');
+        expect(movedRows).toEqual([]);
+        expect(table.rows[0].cells[0].text).toBe('B');
+        expect(table.rows[1].cells[0].text).toBe('C');
+        expect(table.rows[2].cells[0].text).toBe('A');
+      });
+    });
+
+    describe('with direction \'down\'', () => {
+      it('moves rows one down', () => {
+        let model = helper.createModelFixture(1, 0);
+        let table = helper.createTable(model);
+        table.insertRows([
+          helper.createModelRow(null, ['A']),
+          helper.createModelRow(null, ['B']),
+          helper.createModelRow(null, ['C']),
+          helper.createModelRow(null, ['D'])
+        ]);
+
+        // Move rows one down
+        let rows = [table.rows[1], table.rows[2]];
+        let movedRows = table.moveRowsUpOrDown(rows, 'down');
+        expect(movedRows).toEqual(rows);
+        expect(table.rows[0].cells[0].text).toBe('A');
+        expect(table.rows[1].cells[0].text).toBe('D');
+        expect(table.rows[2].cells[0].text).toBe('B');
+        expect(table.rows[3].cells[0].text).toBe('C');
+
+        // Move rows one down again (no effect)
+        movedRows = table.moveRowsUpOrDown(rows, 'down');
+        expect(movedRows).toEqual([]);
+        expect(table.rows[0].cells[0].text).toBe('A');
+        expect(table.rows[1].cells[0].text).toBe('D');
+        expect(table.rows[2].cells[0].text).toBe('B');
+        expect(table.rows[3].cells[0].text).toBe('C');
+
+        // Move rows A and B down
+        rows = [table.rows[0], table.rows[2]];
+        movedRows = table.moveRowsUpOrDown(rows, 'down');
+        expect(table.rows[0].cells[0].text).toBe('D');
+        expect(table.rows[1].cells[0].text).toBe('A');
+        expect(table.rows[2].cells[0].text).toBe('C');
+        expect(table.rows[3].cells[0].text).toBe('B');
+
+        // Move rows down again (no effect, relative distance between rows should be preserved)
+        movedRows = table.moveRowsUpOrDown(rows, 'down');
+        expect(table.rows[0].cells[0].text).toBe('D');
+        expect(table.rows[1].cells[0].text).toBe('A');
+        expect(table.rows[2].cells[0].text).toBe('C');
+        expect(table.rows[3].cells[0].text).toBe('B');
+      });
+
+      it('orders the rows first', () => {
+        let model = helper.createModelFixture(1, 0);
+        let table = helper.createTable(model);
+        table.insertRows([
+          helper.createModelRow(null, ['A']),
+          helper.createModelRow(null, ['B']),
+          helper.createModelRow(null, ['C'])
+        ]);
+
+        // Move rows one down even if order of given rows does not match the order of the rows in the table
+        let rows = [table.rows[1], table.rows[0]];
+        let movedRows = table.moveRowsUpOrDown(rows, 'down');
+        expect(movedRows).toEqual(rows.reverse());
+        expect(table.rows[0].cells[0].text).toBe('C');
+        expect(table.rows[1].cells[0].text).toBe('A');
+        expect(table.rows[2].cells[0].text).toBe('B');
+
+        // Move rows one down again (no effect)
+        movedRows = table.moveRowsUpOrDown(rows, 'down');
+        expect(movedRows).toEqual([]);
+        expect(table.rows[0].cells[0].text).toBe('C');
+        expect(table.rows[1].cells[0].text).toBe('A');
+        expect(table.rows[2].cells[0].text).toBe('B');
+      });
     });
   });
 
@@ -3368,7 +3499,8 @@ describe('Table', () => {
 
       // Move row D one up
       let rowD = table.rows[3];
-      table.moveVisibleRowUp(rowD);
+      let moved = table.moveVisibleRowUp(rowD);
+      expect(moved).toBe(true);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('D-filtered');
       expect(table.rows[2].cells[0].text).toBe('B-filtered');
@@ -3378,7 +3510,8 @@ describe('Table', () => {
       expect(table.rows[6].cells[0].text).toBe('G');
 
       // Move row D one up again (no effect)
-      table.moveVisibleRowUp(rowD);
+      moved = table.moveVisibleRowUp(rowD);
+      expect(moved).toBe(false);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('D-filtered');
       expect(table.rows[2].cells[0].text).toBe('B-filtered');
@@ -3389,7 +3522,8 @@ describe('Table', () => {
 
       // Move row F one up
       let rowF = table.rows[5];
-      table.moveVisibleRowUp(rowF);
+      moved = table.moveVisibleRowUp(rowF);
+      expect(moved).toBe(true);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('D-filtered');
       expect(table.rows[2].cells[0].text).toBe('F-filtered');
@@ -3399,7 +3533,8 @@ describe('Table', () => {
       expect(table.rows[6].cells[0].text).toBe('G');
 
       // Move row F one up again
-      table.moveVisibleRowUp(rowF);
+      moved = table.moveVisibleRowUp(rowF);
+      expect(moved).toBe(true);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('F-filtered');
       expect(table.rows[2].cells[0].text).toBe('D-filtered');
@@ -3435,7 +3570,8 @@ describe('Table', () => {
 
       // Move row D one down
       let rowD = table.rows[3];
-      table.moveVisibleRowDown(rowD);
+      let moved = table.moveVisibleRowDown(rowD);
+      expect(moved).toBe(true);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('B-filtered');
       expect(table.rows[2].cells[0].text).toBe('C');
@@ -3445,7 +3581,8 @@ describe('Table', () => {
       expect(table.rows[6].cells[0].text).toBe('G');
 
       // Move row D one down again (no effect)
-      table.moveVisibleRowDown(rowD);
+      moved = table.moveVisibleRowDown(rowD);
+      expect(moved).toBe(false);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('B-filtered');
       expect(table.rows[2].cells[0].text).toBe('C');
@@ -3456,7 +3593,8 @@ describe('Table', () => {
 
       // Move row B one down
       let rowB = table.rows[1];
-      table.moveVisibleRowDown(rowB);
+      moved = table.moveVisibleRowDown(rowB);
+      expect(moved).toBe(true);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('C');
       expect(table.rows[2].cells[0].text).toBe('E');
@@ -3466,7 +3604,8 @@ describe('Table', () => {
       expect(table.rows[6].cells[0].text).toBe('G');
 
       // Move row B one down again
-      table.moveVisibleRowDown(rowB);
+      moved = table.moveVisibleRowDown(rowB);
+      expect(moved).toBe(true);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('C');
       expect(table.rows[2].cells[0].text).toBe('E');

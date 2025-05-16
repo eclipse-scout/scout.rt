@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1079,4 +1079,36 @@ describe('arrays', () => {
     });
   });
 
+  describe('sortBy', () => {
+    it('sorts the given array according to the order of the template array', () => {
+      let arr = [1, 2, 3, 4];
+      let template = [4, 3, 1, 2];
+      expect(arrays.sortBy(arr, template)).toEqual(template);
+      expect(arrays.sortBy(arr, template, 'desc')).toEqual(template.reverse());
+    });
+
+    it('does not require all elements of the template array', () => {
+      let arr = [1, 2, 4];
+      let template = [4, 3, 1, 2];
+      expect(arrays.sortBy(arr, template)).toEqual([4, 1, 2]);
+      expect(arrays.sortBy(arr, template, 'desc')).toEqual([2, 1, 4]);
+    });
+
+    it('does not modify the given array if the template array is null, undefined or empty', () => {
+      let arr = [1, 2, 4];
+      expect(arrays.sortBy(arr, [])).toBe(arr);
+      expect(arrays.sortBy(arr, [], 'desc')).toBe(arr);
+      expect(arrays.sortBy(arr, null)).toBe(arr);
+      expect(arrays.sortBy(arr, null, 'desc')).toBe(arr);
+      expect(arrays.sortBy(arr, undefined)).toBe(arr);
+      expect(arrays.sortBy(arr, undefined, 'desc')).toBe(arr);
+    });
+
+    it('returns an empty array if the given array is null or undefined', () => {
+      expect(arrays.sortBy(null, [])).toEqual([]);
+      expect(arrays.sortBy(undefined, [])).toEqual([]);
+      expect(arrays.sortBy(null, [1, 2])).toEqual([]);
+      expect(arrays.sortBy([], [])).toEqual([]);
+    });
+  });
 });
