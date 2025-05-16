@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -2456,7 +2456,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
 
   protected _adjustSize(config: ChartConfig, chartArea: ChartArea) {
     this._adjustBubbleSizes(config, chartArea);
-    this._adjustGridMaxMin(config, chartArea);
+    this._adjustGridMaxMin(config, this.chartJs.chartArea);
   }
 
   protected _adjustBubbleSizes(config: ChartConfig, chartArea: ChartArea) {
@@ -2483,7 +2483,12 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     if (sizeOfLargestBubble) {
       let width = Math.abs(chartArea.right - chartArea.left),
         height = Math.abs(chartArea.top - chartArea.bottom);
-      sizeOfLargestBubble = Math.min(sizeOfLargestBubble, Math.floor(Math.min(width, height) / 6));
+
+      // TODO nur bei labelMap. Falsche Werte, weil Chart nachher neu gerechnet wird nachdem Bubbles gescalet wurden...
+      let xAxisOffset = this._getAxisOffsetInPixel(width, 'x');
+      let yAxisOffset = this._getAxisOffsetInPixel(height, 'y');
+
+      sizeOfLargestBubble = Math.min(sizeOfLargestBubble, Math.floor(Math.min(width, height) / 6), Math.min(xAxisOffset, yAxisOffset));
       if (maxR === 0) {
         // If maxR is equal to 0, all radii are equal to 0, therefore set bubbleRadiusOffset to sizeOfLargestBubble.
         bubbleRadiusOffset = sizeOfLargestBubble;
@@ -2513,7 +2518,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       // sizeOfLargestBubble is not set
       if (minR === 0) {
         // If the smallest radius equals 0 scaling will have no effect.
-        bubbleRadiusOffset = minBubbleSize;
+        // bubbleRadiusOffset = minBubbleSize;
       } else {
         // Scaling is sufficient.
         bubbleScalingFactor = minBubbleSize / minR;
@@ -2521,14 +2526,32 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     }
     datasets.forEach(dataset => dataset.data.forEach((data: BubbleDataPoint) => {
       if (!objects.isNullOrUndefined(data.r)) {
-        data.r = data.r * bubbleScalingFactor + bubbleRadiusOffset;
+        if (data.r !== 0) {
+          data.r = data.r * bubbleScalingFactor + bubbleRadiusOffset;
+        }
       }
     }));
+
+    // ChartJs sets the chartArea depending on the Bubble Sizes and subtracts the max radius from the height / width.
+    // This results in a different layout, and we need to refresh before the next calculations.
+    this.refresh();
+  }
+
+  protected _getAxisOffsetInPixel(space: number, identifier: string) {
+    let axis = this.chartJs.scales[identifier];
+    let offsetValue = this._getOffsetValue(axis.ticks[0].value, axis.ticks[axis.ticks.length - 1].value, axis.ticks.length);
+    // TODo special handling without offset
+    return offsetValue / (axis.max + 2 * offsetValue - axis.min) * space;
   }
 
   protected _computeMaxMinValue(config: ChartConfig, datasets: ChartDataset[], identifier?: string, exact?: boolean, boundRange?: boolean, padding?: number, space?: number): Boundary {
     if (!datasets) {
       return;
+    }
+
+    let ignoreEmptyValues = false;
+    if (identifier === 'r') {
+      ignoreEmptyValues = true;
     }
 
     let maxValue, minValue;
@@ -2544,6 +2567,9 @@ export class ChartJsRenderer extends AbstractChartRenderer {
             value = datasets[i].data[j][identifier];
           } else {
             value = datasets[i].data[j];
+          }
+          if (ignoreEmptyValues && value === 0) {
+            continue;
           }
           if (isNaN(maxValue)) {
             maxValue = value;
@@ -2594,7 +2620,9 @@ export class ChartJsRenderer extends AbstractChartRenderer {
 
     return {
       maxValue: maxBoundary,
-      minValue: minBoundary
+      minValue: minBoundary,
+      initialMax: maxValue,
+      initialMin: minValue
     };
   }
 
@@ -2703,16 +2731,32 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       padding = padding + (config.options.elements.point.hoverRadius as number);
     }
 
-    if (offset) {
-      boundary = this._computeMaxMinValue(config, datasets, identifier, labelMap, true);
-    } else {
-      boundary = this._computeMaxMinValue(config, datasets, identifier, labelMap, true, padding, space);
+    // TODO: resize chart after chartArea is correct (solves bubbles outside chartArea) -> done
+    // TODO: maybe add invisible ticks (solves large white space, label rotation)
+    if (offset && axis.minSpaceBetweenTicks) {
+      // TODO: min 0
+      // padding -= axis.minSpaceBetweenTicks / 2;
     }
+
+    boundary = this._computeMaxMinValue(config, datasets, identifier, labelMap, true, padding, space);
     if (labelMap) {
+      if (offset) {
+        let offsetValue = this._getOffsetValue(boundary.initialMin, boundary.initialMax, this.chartJs.scales[identifier].ticks.length);
+        if (offsetValue > boundary.maxValue - boundary.initialMax) {
+          boundary.maxValue = boundary.initialMax;
+        }
+        if (offsetValue > boundary.initialMin - boundary.minValue) {
+          boundary.minValue = boundary.initialMin;
+        }
+      }
       boundary.maxValue = Math.ceil(boundary.maxValue);
       boundary.minValue = Math.floor(boundary.minValue);
     }
     return boundary;
+  }
+
+  protected _getOffsetValue(min: number, max: number, numTicks: number): number {
+    return ((max - min) / Math.max(numTicks - 1, 1)) / 2;
   }
 
   protected _computeXBoundaryPointElement(config: ChartConfig, width: number): Boundary {
@@ -2886,7 +2930,7 @@ export type DatasetColors = {
   datalabelColor?: string;
 };
 
-export type Boundary = { maxValue: number; minValue: number };
+export type Boundary = { maxValue: number; minValue: number; initialMax?: number; initialMin?: number };
 
 export type AxisWithMaxMin = (CartesianChartScale | RadialChartScale) & {
   suggestedMax?: string | number;
