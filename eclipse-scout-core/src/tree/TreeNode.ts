@@ -119,7 +119,14 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
     // NOP
   }
 
+  /**
+   * @deprecated use {@link tree} instead.
+   */
   getTree(): Tree {
+    return this.tree;
+  }
+
+  get tree(): Tree {
     return this.parent;
   }
 
@@ -134,7 +141,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
 
     // make sure all child nodes are TreeNodes too
     if (this.hasChildNodes()) {
-      this.getTree().ensureTreeNodes(this.childNodes, this);
+      this.tree.ensureTreeNodes(this.childNodes, this);
     }
   }
 
@@ -246,7 +253,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
     this.$text = this.$node.appendSpan('text');
 
     this._renderControl();
-    if (this.getTree().checkable) {
+    if (this.tree.checkable) {
       this._renderCheckbox();
     }
     this._renderText();
@@ -304,7 +311,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
 
   /** @internal */
   _updateControl($control: JQuery) {
-    let tree = this.getTree();
+    let tree = this.tree;
     $control.toggleClass('checkable', tree.checkable);
     $control.cssPaddingLeft(tree._computeNodeControlPaddingLeft(this));
     $control.setVisible(!this.leaf);
@@ -344,8 +351,8 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
       return;
     }
 
-    let $node = this.$node,
-      tree = this.getTree();
+    let $node = this.$node;
+    let tree = this.tree;
 
     $node.attr('class', this._preserveCssClasses($node));
     $node.addClass(this.cssClass);

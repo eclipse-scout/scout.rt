@@ -576,7 +576,7 @@ describe('TableKeyStrokes', () => {
       model.checkable = true;
       let table = helper.createTable(model);
       let rows = table.rows;
-      table.checkRow(rows[2], true);
+      table.checkRow(rows[2]);
       table.render();
 
       JQueryTesting.triggerKeyDown(table.$data, keys.SPACE);
@@ -607,7 +607,7 @@ describe('TableKeyStrokes', () => {
       let table = helper.createTable(model);
       let rows = table.rows;
       table.render();
-      table.checkRow(rows[2], true);
+      table.checkRow(rows[2]);
       helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
 
       JQueryTesting.triggerKeyDownCapture(table.$data, keys.SPACE);
@@ -630,10 +630,10 @@ describe('TableKeyStrokes', () => {
       let table = helper.createTable(model);
       let rows = table.rows;
       table.render();
-      table.checkRow(rows[0], true);
-      table.checkRow(rows[1], true);
-      table.checkRow(rows[2], true);
-      table.checkRow(rows[3], true);
+      table.checkRow(rows[0]);
+      table.checkRow(rows[1]);
+      table.checkRow(rows[2]);
+      table.checkRow(rows[3]);
       helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
 
       JQueryTesting.triggerKeyDown(table.$data, keys.SPACE);

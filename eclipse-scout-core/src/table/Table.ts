@@ -2356,9 +2356,14 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   /**
-   * @returns a cell for the given column and row. Row Icon column and cell icon column don't have cells --> generate one.
+   * @returns a cell for the given column and row or null if column or row is null or undefined.
+   *          Because the artificial {@link rowIconColumn} and {@link checkableColumn} don't have cells, a dummy cell will be created for these columns.
    */
   cell<TValue>(column: Column<TValue>, row: TableRow): Cell<TValue> {
+    if (!column || !row) {
+      return null;
+    }
+
     // @ts-expect-error
     if (column === this.rowIconColumn) {
       return scout.create(Cell, {
@@ -2390,6 +2395,9 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     return this.cell(this.columns[cellIndex], row);
   }
 
+  /**
+   * @returns the value of the cell for the given column and row.
+   */
   cellValue<TValue>(column: Column<TValue>, row: TableRow): TValue {
     let cell = this.cell(column, row);
     if (!cell) {
@@ -2770,10 +2778,25 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.setProperty('multiCheck', multiCheck);
   }
 
+  /**
+   * @returns the first row that is checked.
+   */
+  checkedRow(): TableRow {
+    return this.rows.find(row => row.checked);
+  }
+
+  /**
+   * @returns all rows that are checked. The returned rows have the same order as {@link rows}.
+   */
   checkedRows(): TableRow[] {
     return this.rows.filter(row => row.checked);
   }
 
+  /**
+   * Checks the given row if `checked` is set to true (which is the default) or unchecks it otherwise.
+   *
+   * @see checkRows
+   */
   checkRow(row: TableRow, checked?: boolean, options?: TableRowCheckOptions) {
     let opts = $.extend(options, {
       checked: checked
@@ -2781,6 +2804,13 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.checkRows([row], opts);
   }
 
+  /**
+   * Checks the given rows if `options.checked` is set to true (which is the default) or unchecks them otherwise.
+   * Does not modify any other rows unless {@link multiCheck} is set to false. In that case, other rows may get unchecked.
+   *
+   * The checked state will only be modified if the table is {@link checkable} and the row and table are enabled.
+   * If `options.checkOnlyEnabled` is set to false, the rows can be checked even if the row or table is disabled.
+   */
   checkRows(rows: TableRow | TableRow[], options?: TableRowCheckOptions) {
     let opts: TableRowCheckOptions = $.extend({
       checked: true,
@@ -2814,10 +2844,20 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._triggerRowsChecked(checkedRows);
   }
 
+  /**
+   * Unchecks the given row.
+   *
+   * @see checkRows
+   */
   uncheckRow(row: TableRow, options?: TableRowCheckOptions) {
     this.uncheckRows([row], options);
   }
 
+  /**
+   * Unchecks the given rows.
+   *
+   * @see checkRows
+   */
   uncheckRows(rows: TableRow | TableRow[], options?: TableRowCheckOptions) {
     let opts = $.extend({
       checked: false
@@ -2928,10 +2968,43 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     }
   }
 
+  /**
+   * Inserts the given row at the end of the existing {@link rows}.
+   *
+   * @see insertRows
+   */
   insertRow(row: ObjectOrModel<TableRow>) {
     this.insertRows([row]);
   }
 
+  /**
+   * Inserts the given rows at the end of the existing {@link rows}.
+   *
+   * @example Compact approach to insert rows using {@link TableRowModel}
+   * // Create an array of model rows.
+   * // The cells can consist of the values or real cell objects that need to match the order of the columns.
+   * let rows = [{
+   *   cells: ['value row 0 column 0', 'value row 0 column 1']
+   * }, {
+   *   cells: ['value row 1 column 0', scout.create(Cell, {value: 'value row 1 column 1', tooltipText: 'tooltip for this cell'})]
+   * }];
+   * table.insertRows(rows);
+   *
+   * @example Type-safe approach to insert rows using {@link Column}.
+   * // Create an array of actual table rows. The values or cell properties can be set using the appropriate column.
+   * // This approach is more type-safe and does not rely on the order of the columns.
+   * let row0 = scout.create(TableRow, {parent: table});
+   * table.columnById('FirstColumn').setCellValue(row0, 'value row 0 column 0');
+   * table.columnById('SecondColumn').setCellValue(row0, 'value row 0 column 1');
+   *
+   * let row1 = scout.create(TableRow, {parent: table});
+   * table.columnById('FirstColumn').setCellValue(row1, 'value row 1 column 0');
+   * table.columnById('SecondColumn').setCellValue(row1, 'value row 1 column 1');
+   * table.columnById('SecondColumn').cell(row1).setTooltipText('tooltip for this cell');
+   * table.insertRows([row0, row1]);
+   *
+   * @param rows the new rows to be inserted.
+   */
   insertRows(rows: ObjectOrModel<TableRow> | ObjectOrModel<TableRow>[]) {
     let rowsArr = arrays.ensure(rows);
     if (rowsArr.length === 0) {
@@ -3814,6 +3887,13 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     return null;
   }
 
+  /**
+   * @returns all selected rows in the same order as {@link rows}.
+   */
+  selectedRowsSorted(): TableRow[] {
+    return this.orderRows(this.selectedRows.slice());
+  }
+
   $selectedRows(): JQuery {
     if (!this.$data) {
       return $();
@@ -3883,6 +3963,9 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     return columnIds.map(id => this.columnById(id));
   }
 
+  /**
+   * @deprecated use {@link visibleRows} instead.
+   */
   getVisibleRows(): TableRow[] {
     return this.visibleRows;
   }
@@ -4057,6 +4140,26 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     });
     this._renderScrollTop();
     this._renderEmptyData();
+  }
+
+  /**
+   * Sorts the given rows _in place_ according the order of {@link rows}.
+   * Does nothing, if rows is null or undefined.
+   *
+   * @returns a reference to the given rows which are now in order.
+   */
+  orderRows(rows: TableRow[], direction: 'asc' | 'desc' = 'asc'): TableRow[] {
+    // Save the indices in a map to halve the execution time
+    let rowMap = new Map();
+    rows = rows?.sort((row1, row2) => {
+      let row1Index = objects.getOrSetIfAbsent(rowMap, row1, row => this.rows.indexOf(row));
+      let row2Index = objects.getOrSetIfAbsent(rowMap, row2, row => this.rows.indexOf(row));
+      if (direction === 'asc') {
+        return row1Index - row2Index;
+      }
+      return row2Index - row1Index;
+    });
+    return rows;
   }
 
   /**

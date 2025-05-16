@@ -87,7 +87,7 @@ export class ManageBookmarksForm extends Form {
     const table = this.widget('BookmarksTable');
     const bookmarkColumn = table.columnById('BookmarkColumn');
 
-    BookmarkSupport.get(this.session).activateBookmark(bookmarkColumn.cellValue(table.selectedRow()));
+    BookmarkSupport.get(this.session).activateBookmark(bookmarkColumn.selectedCellValue());
   }
 
   protected _installUpDownMenus() {

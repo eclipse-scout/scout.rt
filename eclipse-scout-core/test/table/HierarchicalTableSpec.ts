@@ -737,19 +737,19 @@ describe('HierarchicalTableSpec', () => {
 
       // expects 1 row and its parents are visible
       createAndRegisterColumnFilter(table, column0, ['row2']);
-      expect(table.getVisibleRows().length).toBe(3);
+      expect(table.visibleRows.length).toBe(3);
 
       table.collapseRow(rows[1]);
 
       // expect the collapsed row is visible even when it does not match to the filter
-      expect(table.getVisibleRows().length).toBe(2);
-      expect(table.getVisibleRows()[0]).toBe(rows[0]);
-      expect(table.getVisibleRows()[1]).toBe(rows[1]);
+      expect(table.visibleRows.length).toBe(2);
+      expect(table.visibleRows[0]).toBe(rows[0]);
+      expect(table.visibleRows[1]).toBe(rows[1]);
 
       table.expandRow(rows[1]);
       table.collapseRow(rows[0]);
-      expect(table.getVisibleRows().length).toBe(1);
-      expect(table.getVisibleRows()[0]).toBe(rows[0]);
+      expect(table.visibleRows.length).toBe(1);
+      expect(table.visibleRows[0]).toBe(rows[0]);
     });
 
   });
@@ -993,14 +993,14 @@ describe('HierarchicalTableSpec', () => {
         helper.createModelRow('C', ['C'])
       ]);
 
-      expect(table.getVisibleRows().map(row => row.id)).toEqual(['A', 'B', 'C']);
+      expect(table.visibleRows.map(row => row.id)).toEqual(['A', 'B', 'C']);
       expect(table.getRowByKey(['A']).expanded).toBe(false);
       expect(table.getRowByKey(['B']).expanded).toBe(false);
       expect(table.getRowByKey(['C']).expanded).toBe(false);
       expect(table.selectedRows.map(row => row.id)).toEqual([]);
 
       table.restoreSelection([['A11'], ['B1'], ['C']]);
-      expect(table.getVisibleRows().map(row => row.id)).toEqual(['A', 'A1', 'A11', 'A12', 'A2', 'A3', 'B', 'B1', 'B2', 'C']);
+      expect(table.visibleRows.map(row => row.id)).toEqual(['A', 'A1', 'A11', 'A12', 'A2', 'A3', 'B', 'B1', 'B2', 'C']);
       expect(table.getRowByKey(['A']).expanded).toBe(true);
       expect(table.getRowByKey(['A1']).expanded).toBe(true);
       expect(table.getRowByKey(['A2']).expanded).toBe(false);
