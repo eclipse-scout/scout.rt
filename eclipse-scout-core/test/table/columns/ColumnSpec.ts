@@ -389,16 +389,27 @@ describe('Column', () => {
 
   describe('cell getters', () => {
 
-    it('cell() should return cell of given row', () => {
+    it('cell() returns cell of given row', () => {
       let model = helper.createModelFixture(3, 2);
       let table = helper.createTable(model);
       let row1 = table.rows[1];
       let column1 = table.columns[1];
       let cell1 = row1.cells[1];
       expect(column1.cell(row1)).toBe(cell1);
+      expect(column1.cell(null)).toBe(null);
     });
 
-    it('selectedCell() should return cell from selected row', () => {
+    it('cells() returns all cells of a column', () => {
+      let model = helper.createModelFixture(3, 2);
+      let table = helper.createTable(model);
+      let column1 = table.columns[1];
+      expect(column1.cells()).toEqual([table.rows[0].cells[1], table.rows[1].cells[1]]);
+
+      table.deleteAllRows();
+      expect(column1.cells()).toEqual([]);
+    });
+
+    it('selectedCell() returns cell of the selected row', () => {
       let model = helper.createModelFixture(3, 2);
       let table = helper.createTable(model);
       let row1 = table.rows[1];
@@ -406,6 +417,46 @@ describe('Column', () => {
       let cell1 = row1.cells[1];
       table.selectRows([row1]);
       expect(column1.selectedCell()).toBe(cell1);
+
+      table.deselectAll();
+      expect(column1.selectedCell()).toBe(null);
+    });
+
+    it('selectedCells() returns cells of the selected rows', () => {
+      let model = helper.createModelFixture(3, 3);
+      let table = helper.createTable(model);
+      let row0 = table.rows[0];
+      let row2 = table.rows[2];
+      let column1 = table.columns[1];
+      table.selectRows([row0, row2]);
+      expect(column1.selectedCells()).toEqual([row0.cells[1], row2.cells[1]]);
+
+      table.deselectAll();
+      expect(column1.selectedCells()).toEqual([]);
+    });
+
+    it('selectedCellValue() returns cell value of the selected row', () => {
+      let model = helper.createModelFixture(3, 2);
+      let table = helper.createTable(model);
+      let row1 = table.rows[1];
+      let column1 = table.columns[1];
+      let cell1 = row1.cells[1];
+      table.selectRows([row1]);
+      expect(column1.selectedCellValue()).toBe(cell1.value);
+
+      table.deselectAll();
+      expect(column1.selectedCellValue()).toBe(null);
+    });
+
+    it('selectedCellValues() returns the values of the selected rows in correct order', () => {
+      let model = helper.createModelFixture(2, 3);
+      let table = helper.createTable(model);
+      let column1 = table.columns[1];
+      table.selectRows([table.rows[1], table.rows[0]]);
+      expect(column1.selectedCellValues()).toEqual([table.rows[0].cells[1].value, table.rows[1].cells[1].value]);
+
+      table.deselectAll();
+      expect(column1.selectedCellValues()).toEqual([]);
     });
 
     it('cellValue() and cellText() return the appropriate values', () => {
@@ -438,6 +489,29 @@ describe('Column', () => {
       expect(column1.cellValueOrText(row1)).toBe(1);
     });
 
+    it('checkedCellValue() returns the value of the first checked row', () => {
+      let model = helper.createModelFixture(2, 3);
+      let table = helper.createTable(model);
+      let column1 = table.columns[1];
+      table.setCheckable(true);
+      table.checkRows([table.rows[2], table.rows[1]]);
+      expect(column1.checkedCellValue()).toBe(table.rows[1].cells[1].value);
+
+      table.uncheckAll();
+      expect(column1.checkedCellValue()).toBe(null);
+    });
+
+    it('checkedCellValues() returns the values of the checked rows in correct order', () => {
+      let model = helper.createModelFixture(2, 3);
+      let table = helper.createTable(model);
+      let column1 = table.columns[1];
+      table.setCheckable(true);
+      table.checkRows([table.rows[2], table.rows[1]]);
+      expect(column1.checkedCellValues()).toEqual([table.rows[1].cells[1].value, table.rows[2].cells[1].value]);
+
+      table.uncheckAll();
+      expect(column1.checkedCellValues()).toEqual([]);
+    });
   });
 
   describe('autoOptimizeWidth', () => {

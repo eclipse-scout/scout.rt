@@ -23,7 +23,7 @@ export class ParentTablePageMenuContributor extends PageDetailMenuContributor {
 
     const table = this.page.parentNode.detailTable;
     const row = this.page.row;
-    if (!table || !row || table !== row.getTable()) {
+    if (!table || !row || table !== row.table) {
       return [];
     }
 

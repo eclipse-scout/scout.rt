@@ -113,7 +113,14 @@ export class TableRow implements TableRowModel, ObjectWithType, FilterElement {
     return this.childRows.some(childRow => childRow.filterAccepted || childRow.hasFilterAcceptedChildren());
   }
 
+  /**
+   * @deprecated use {@link table} instead.
+   */
   getTable(): Table {
+    return this.parent;
+  }
+
+  get table(): Table {
     return this.parent;
   }
 
@@ -136,10 +143,10 @@ export class TableRow implements TableRowModel, ObjectWithType, FilterElement {
     if (!this.cells?.length) {
       return [];
     }
-    let columns = this.getTable().primaryKeyColumns();
+    let columns = this.table.primaryKeyColumns();
     if (!columns.length) {
-      columns = this.getTable().columns;
+      columns = this.table.columns;
     }
-    return columns.map(column => this.getTable().cellValue(column, this));
+    return columns.map(column => this.table.cellValue(column, this));
   }
 }

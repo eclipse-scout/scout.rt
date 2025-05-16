@@ -28,7 +28,7 @@ export class OutlineMediator {
       return;
     }
 
-    pageWithTable.getTree().insertNodes(childPages, pageWithTable);
+    pageWithTable.outline.insertNodes(childPages, pageWithTable);
   }
 
   onTableRowsDeleted(rows: TableRow[], childPages: Page[], pageWithTable: PageWithTable) {
@@ -36,7 +36,7 @@ export class OutlineMediator {
       return;
     }
 
-    pageWithTable.getTree().deleteNodes(childPages, pageWithTable);
+    pageWithTable.outline.deleteNodes(childPages, pageWithTable);
   }
 
   onTableRowsUpdated(event: TableRowsUpdatedEvent, pageWithTable: PageWithTable) {
@@ -45,7 +45,7 @@ export class OutlineMediator {
     }
 
     let pages = pageWithTable.updatePagesFromTableRows(event.rows);
-    pageWithTable.getTree().updateNodes(pages);
+    pageWithTable.outline.updateNodes(pages);
   }
 
   onTableRowAction(event: TableRowActionEvent, page: Page) {
@@ -86,7 +86,7 @@ export class OutlineMediator {
 
     const table = selectedPage.parentNode.detailTable;
     const row = selectedPage.row;
-    if (!table || !row || table !== row.getTable()) {
+    if (!table || !row || table !== row.table) {
       return;
     }
     table.selectRow(row);

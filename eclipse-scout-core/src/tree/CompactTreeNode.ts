@@ -14,7 +14,7 @@ export class CompactTreeNode extends TreeNode {
   declare parentNode: CompactTreeNode;
 
   override render($parent: JQuery, paddingLeft: number) {
-    let tree = this.getTree();
+    let tree = this.tree;
 
     if (this.isSection()) {
       let $section = tree.$container

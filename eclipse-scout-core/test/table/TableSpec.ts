@@ -71,7 +71,7 @@ describe('Table', () => {
       expect(table.$container).toHaveClass('checkable');
 
       // row must have 'checked' class
-      table.checkRow(table.rows[0], true);
+      table.checkRow(table.rows[0]);
       expect(table.$container.find('.table-row').first().hasClass('checked')).toBe(true);
     });
 
@@ -652,13 +652,13 @@ describe('Table', () => {
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
-      table.checkRow(rows[0], true);
-      table.checkRow(rows[4], true);
+      table.checkRow(rows[0]);
+      table.checkRow(rows[4]);
 
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(2);
 
-      table.checkRow(rows[4], false);
+      table.uncheckRow(rows[4]);
 
       checkedRows = [];
       for (let z = 0; z < rows.length; z++) {
@@ -680,13 +680,13 @@ describe('Table', () => {
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
-      table.checkRow(rows[0], true);
-      table.checkRow(rows[4], true);
+      table.checkRow(rows[0]);
+      table.checkRow(rows[4]);
 
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(1);
 
-      table.checkRow(rows[4], false);
+      table.uncheckRow(rows[4]);
 
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
@@ -703,7 +703,7 @@ describe('Table', () => {
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
-      table.checkRow(rows[0], true);
+      table.checkRow(rows[0]);
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
     });
@@ -719,7 +719,7 @@ describe('Table', () => {
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
       rows[0].setEnabled(false);
-      table.checkRow(rows[0], true);
+      table.checkRow(rows[0]);
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
     });
@@ -736,7 +736,7 @@ describe('Table', () => {
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
-      table.checkRow(rows[0], true);
+      table.checkRow(rows[0]);
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
     });
@@ -753,8 +753,8 @@ describe('Table', () => {
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
-      table.checkRow(rows[0], true);
-      table.checkRow(rows[2], true);
+      table.checkRow(rows[0]);
+      table.checkRow(rows[2]);
 
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(2);
@@ -774,7 +774,7 @@ describe('Table', () => {
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
-      table.checkRow(rows[0], true);
+      table.checkRow(rows[0]);
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(1);
 
@@ -1914,6 +1914,26 @@ describe('Table', () => {
 
     });
 
+  });
+
+  describe('orderRows', () => {
+    it('orders the given rows according to the order of the rows in the table', () => {
+      let model = helper.createModelFixture(1, 3);
+      let table = helper.createTable(model);
+
+      let rows = [table.rows[1], table.rows[0], table.rows[2]];
+      expect(table.orderRows(rows)).toEqual(table.rows);
+      expect(table.orderRows(rows, 'desc')).toEqual(table.rows.slice().reverse());
+    });
+
+    it('does not require all rows', () => {
+      let model = helper.createModelFixture(1, 5);
+      let table = helper.createTable(model);
+
+      let rows = [table.rows[4], table.rows[1], table.rows[2]];
+      expect(table.orderRows(rows)).toEqual([table.rows[1], table.rows[2], table.rows[4]]);
+      expect(table.orderRows(rows, 'desc')).toEqual([table.rows[4], table.rows[2], table.rows[1]]);
+    });
   });
 
   describe('row click', () => {

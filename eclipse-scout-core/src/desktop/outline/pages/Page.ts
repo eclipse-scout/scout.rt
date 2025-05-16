@@ -525,7 +525,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
    * from the first cell of the given row. It's allowed to ignore the given row entirely, when you override this function.
    */
   computeTextForRow(row: TableRow): string {
-    const summaryColumns = row.getTable().summaryColumns();
+    const summaryColumns = row.table.summaryColumns();
     if (summaryColumns.length) {
       return strings.join(' ', ...summaryColumns.map(summaryColumn => summaryColumn.cellText(row)));
     }

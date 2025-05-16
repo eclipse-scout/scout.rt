@@ -516,10 +516,17 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   }
 
   /**
-   * @returns the cell object for this column from the given row.
+   * @returns the cell object for this column and the given row.
    */
   cell(row: TableRow): Cell<TValue> {
     return this.table.cell(this, row);
+  }
+
+  /**
+   * @returns all cells for this column.
+   */
+  cells(): Cell<TValue>[] {
+    return this.table.rows.map(row => this.cell(row));
   }
 
   /**
@@ -546,6 +553,43 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   }
 
   /**
+   * @returns all selected cells for this column in the same order as the {@link Table.rows}.
+   */
+  selectedCells(): Cell<TValue>[] {
+    return this.table.selectedRowsSorted().map(row => this.cell(row));
+  }
+
+  /**
+   * @returns the cell value for this column from the first selected row in the table.
+   */
+  selectedCellValue(): TValue {
+    let selectedRow = this.table.selectedRow();
+    return this.table.cellValue(this, selectedRow);
+  }
+
+  /**
+   * @returns all selected cell values for this column in the same order as the {@link Table.rows}.
+   */
+  selectedCellValues(): TValue[] {
+    return this.table.selectedRowsSorted().map(row => this.cellValue(row));
+  }
+
+  /**
+   * @returns the value for the first row that is checked.
+   */
+  checkedCellValue(): TValue {
+    let checkedRow = this.table.checkedRow();
+    return this.cellValue(checkedRow);
+  }
+
+  /**
+   * @returns all cell values for this column for each checked row in the same order as the {@link Table.rows}.
+   */
+  checkedCellValues(): TValue[] {
+    return this.table.checkedRows().map(row => this.cellValue(row));
+  }
+
+  /**
    * @returns the value of the cell. If it is text based as string otherwise the raw value.
    */
   cellValueOrText(row: TableRow): TValue | string {
@@ -555,10 +599,23 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     return this.table.cellValue(this, row);
   }
 
+  /**
+   * @returns the cell value of the given row.
+   */
   cellValue(row: TableRow): TValue {
     return this.table.cellValue(this, row);
   }
 
+  /**
+   * @returns all cell values of this column.
+   */
+  cellValues(): TValue[] {
+    return this.table.rows.map(row => this.cellValue(row));
+  }
+
+  /**
+   * @returns the cell text of the given row.
+   */
   cellText(row: TableRow): string {
     return this.table.cellText(this, row);
   }
@@ -651,6 +708,11 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     return text;
   }
 
+  /**
+   * Updates the cell value for the given row.
+   *
+   * The value will be formatted using {@link _formatValue} and the result set as cell text using {@link setCellText}.
+   */
   setCellValue(row: TableRow, value: TValue) {
     let cell = this.cell(row);
     this._setCellValue(row, value, cell);
@@ -684,6 +746,9 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     this.table.updateBuffer.pushPromise(promise);
   }
 
+  /**
+   * Updates the cell text for the given row and calls {@link Table.updateRow} if the row is initialized and the table contains it.
+   */
   setCellText(row: TableRow, text: string, cell?: Cell<TValue>) {
     if (!cell) {
       cell = this.cell(row);
@@ -780,6 +845,26 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
       return;
     }
     this.table.resizeColumn(this, width);
+  }
+
+  setFixedPosition(fixedPosition: boolean) {
+    this.setProperty('fixedPosition', fixedPosition);
+  }
+
+  setFixedWidth(fixedWidth: boolean) {
+    let changed = this.setProperty('fixedWidth', fixedWidth);
+    if (!changed) {
+      return;
+    }
+    this.table.invalidateLayoutTree(fixedWidth);
+  }
+
+  setModifiable(modifiable: boolean) {
+    this.setProperty('modifiable', modifiable);
+  }
+
+  setRemovable(removable: boolean) {
+    this.setProperty('removable', removable);
   }
 
   createAggrGroupCell(row: TableRow): Cell<TValue> {
@@ -1059,6 +1144,10 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     if (changed && this.table.header) {
       this.table.header.updateHeader(this);
     }
+  }
+
+  setHeaderMenuEnabled(headerMenuEnabled: boolean) {
+    this.setProperty('headerMenuEnabled', headerMenuEnabled);
   }
 
   setHeaderTooltipText(headerTooltipText: string) {
