@@ -7,7 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LookupResult, RestLookupCall, scout} from '../../src/index';
+import {AjaxCall, LookupResult, RestLookupCall, scout} from '../../src/index';
+import Deferred = JQuery.Deferred;
 
 describe('RestLookupCall', () => {
 
@@ -15,6 +16,8 @@ describe('RestLookupCall', () => {
 
   class SpecRestLookupCall extends RestLookupCall<number> {
     declare _restriction: Record<string, any>;
+    declare _ajaxCall: AjaxCall;
+    declare _deferred: Deferred<LookupResult<number>, { abort: boolean }>;
 
     override _call(): JQuery.Promise<LookupResult<number>> {
       return super._call();
@@ -260,6 +263,33 @@ describe('RestLookupCall', () => {
       arr2: ['one', 'two', 'three'],
       arr3: ['one', 'two', 'three']
     });
+  });
+
+  it('aborts calls', () => {
+    let lookupCall = scout.create(SpecRestLookupCall, {
+      session: session,
+      resourceUrl: 'test-api/dummy'
+    });
+
+    expect(lookupCall._deferred).toBeNull();
+    expect(lookupCall._ajaxCall).toBeNull();
+
+    // abort does nothing if _deferred and _ajaxCall are null
+    lookupCall.abort();
+
+    // call lookup and abort again
+    lookupCall.getAll();
+    expect(lookupCall._deferred).not.toBeNull();
+    expect(lookupCall._deferred.state()).toBe('pending');
+    expect(lookupCall._ajaxCall).not.toBeNull();
+    expect(lookupCall._ajaxCall.aborted).toBeFalse();
+
+    // abort rejects _deferred and aborts _ajaxCall
+    lookupCall.abort();
+    expect(lookupCall._deferred).not.toBeNull();
+    expect(lookupCall._deferred.state()).toBe('rejected');
+    expect(lookupCall._ajaxCall).not.toBeNull();
+    expect(lookupCall._ajaxCall.aborted).toBeTrue();
   });
 
 });
