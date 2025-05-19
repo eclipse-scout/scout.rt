@@ -184,10 +184,10 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
   }
 
   override abort() {
-    this._deferred.reject({
+    this._deferred?.reject({
       abort: true
     });
-    this._ajaxCall.abort();
+    this._ajaxCall?.abort();
     super.abort();
   }
 
