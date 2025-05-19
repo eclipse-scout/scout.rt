@@ -1346,10 +1346,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
           $row.css('top', oldTop - $row.offset().top).animate({
             top: 0
           }, {
-            progress: function() {
-              this._triggerRowOrderChanged(row, true);
+            progress: () => {
+              this._triggerRowOrderChangeAnimation(row);
               this.updateScrollbars();
-            }.bind(this)
+            }
           });
         }
       });
@@ -3308,10 +3308,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       visibleRows: true
     });
     this.clearAggregateRows(this._animateAggregateRows);
+    this._triggerRowOrderChanged();
     if (this._isDataRendered()) {
       this._renderRowOrderChanges();
     }
-    this._triggerRowOrderChanged();
 
     this._group(this._animateAggregateRows);
     this._animateAggregateRows = false;
@@ -4655,12 +4655,15 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     }
   }
 
-  protected _triggerRowOrderChanged(row?: TableRow, animating?: boolean) {
+  protected _triggerRowOrderChanged() {
+    this.trigger('rowOrderChanged');
+  }
+
+  protected _triggerRowOrderChangeAnimation(row?: TableRow) {
     let event = {
-      row: row,
-      animating: animating
+      row: row
     };
-    this.trigger('rowOrderChanged', event);
+    this.trigger('rowOrderChangeAnimation', event);
   }
 
   protected _triggerColumnResized(column: Column<any>) {

@@ -100,9 +100,6 @@ export class PageWithTable extends Page implements PageWithTableModel {
   }
 
   protected _onTableRowOrderChanged(event: TableRowOrderChangedEvent) {
-    if (event.animating) { // do nothing while row order animation is in progress
-      return;
-    }
     this.outline.mediator.onTableRowOrderChanged(event, this);
   }
 

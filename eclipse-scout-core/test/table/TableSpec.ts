@@ -627,6 +627,18 @@ describe('Table', () => {
       expect(table.$rows().length).toBe(2);
       expect(table.rows.length).toBe(3);
     });
+
+    it('triggers row order changed event', () => {
+      table.render();
+      table.on('rowOrderChanged', event => {
+        // New order has been applied to model
+        expect(table.rows).toEqual([row2, row1, row0]);
+
+        // New order has not been rendered yet
+        expect(table.$rows().toArray().map(elem => $(elem).data('row').id)).toEqual([row0.id, row1.id, row2.id]);
+      });
+      table.updateRowOrder([row2, row1, row0]);
+    });
   });
 
   describe('checkRow', () => {
@@ -1743,6 +1755,22 @@ describe('Table', () => {
       expect([$row0, $row1, $row2, $row4]).not.anyToHaveClass('select-middle');
       expect([$row0, $row1, $row2, $row3]).not.anyToHaveClass('select-bottom');
       expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
+    });
+
+    it('triggers rowOrderChanged event', () => {
+      prepareTable();
+      table.render();
+      let row0 = table.rows[0];
+      let row1 = table.rows[1];
+      let row2 = table.rows[2];
+      table.on('rowOrderChanged', event => {
+        // New order has been applied to model
+        expect(table.rows).toEqual([row2, row1, row0]);
+
+        // New order has not been rendered yet
+        expect(table.$rows().toArray().map(elem => $(elem).data('row').id)).toEqual([row0.id, row1.id, row2.id]);
+      });
+      table.sort(column0, 'desc');
     });
 
     describe('sorting', () => {

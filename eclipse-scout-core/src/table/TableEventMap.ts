@@ -108,8 +108,10 @@ export interface TableRowInitEvent<T = Table> extends Event<T> {
 }
 
 export interface TableRowOrderChangedEvent<T = Table> extends Event<T> {
+}
+
+export interface TableRowOrderChangeAnimationEvent<T = Table> extends Event<T> {
   row: TableRow;
-  animating: boolean;
 }
 
 export interface TableRowsCheckedEvent<T = Table> extends Event<T> {
@@ -178,7 +180,14 @@ export interface TableEventMap extends WidgetEventMap {
   'rowAction': TableRowActionEvent;
   'rowClick': TableRowClickEvent;
   'rowInit': TableRowInitEvent;
+  /**
+   * Will be triggered when the row order has changed but before the new order is rendered.
+   */
   'rowOrderChanged': TableRowOrderChangedEvent;
+  /**
+   * Will be triggered during the row order change animation for each animation step.
+   */
+  'rowOrderChangeAnimation': TableRowOrderChangeAnimationEvent;
   'rowsChecked': TableRowsCheckedEvent;
   'rowsDeleted': TableRowsDeletedEvent;
   'rowsExpanded': TableRowsExpandedEvent;
