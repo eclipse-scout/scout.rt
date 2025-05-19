@@ -9,7 +9,7 @@
  */
 import {
   AbstractLayout, Cell, CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorPopupModel, CellEditorTabKeyStroke, Column, EventHandler, events, graphics, InitModelOf, KeyStroke,
-  KeyStrokeManagerKeyStrokeEvent, Point, Popup, Rectangle, scout, SomeRequired, Table, TableRow, TableRowOrderChangedEvent, ValueField, widgets
+  KeyStrokeManagerKeyStrokeEvent, Point, Popup, Rectangle, scout, SomeRequired, Table, TableRow, TableRowOrderChangeAnimationEvent, TableRowOrderChangedEvent, ValueField, widgets
 } from '../../index';
 import $ from 'jquery';
 
@@ -21,8 +21,8 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
   column: Column<TValue>;
   row: TableRow;
   cell: Cell<TValue>;
-  protected _rowOrderChangedFunc: EventHandler<TableRowOrderChangedEvent>;
   protected _pendingCompleteCellEdit: JQuery.Promise<void>;
+  protected _rowOrderChangedHandler: EventHandler<TableRowOrderChangedEvent>;
   protected _keyStrokeHandler: EventHandler<KeyStrokeManagerKeyStrokeEvent>;
 
   constructor() {
@@ -96,17 +96,17 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
     // Make sure cell content is not visible while the editor is open (especially necessary for transparent editors like checkboxes)
     this.$anchor.css('visibility', 'hidden');
 
-    this._rowOrderChangedFunc = event => {
-      if (event.animating) {
+    this._rowOrderChangedHandler = event => {
+      if (event.type === 'rowOrderChangeAnimation') {
         // row is only set while animating
-        if (event.row === this.row) {
+        if ((event as TableRowOrderChangeAnimationEvent).row === this.row) {
           this.position();
         }
       } else {
         this.position();
       }
     };
-    this.table.on('rowOrderChanged', this._rowOrderChangedFunc);
+    this.table.on('rowOrderChanged rowOrderChangeAnimation', this._rowOrderChangedHandler);
     // Set table style to focused, so that it looks as it still has the focus.
     // This prevents flickering if the cell editor gets opened, especially when tabbing to the next cell editor.
     if (this.table.enabled) {
@@ -157,7 +157,7 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
     super._remove(); // uninstalls the focus context for this popup
 
     this.session.keyStrokeManager.off('keyStroke', this._keyStrokeHandler);
-    this.table.off('rowOrderChanged', this._rowOrderChangedFunc);
+    this.table.off('rowOrderChanged rowOrderChangeAnimation', this._rowOrderChangedHandler);
     // table may have been removed in the meantime
     if (this.table.rendered) {
       this.table.$container.removeClass('focused');

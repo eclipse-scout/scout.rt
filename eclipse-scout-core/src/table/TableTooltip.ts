@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EventHandler, InitModelOf, SomeRequired, Table, TableRow, TableRowOrderChangedEvent, TableTooltipModel, Tooltip} from '../index';
+import {EventHandler, InitModelOf, SomeRequired, Table, TableRow, TableRowOrderChangeAnimationEvent, TableRowOrderChangedEvent, TableTooltipModel, Tooltip} from '../index';
 
 export class TableTooltip extends Tooltip implements TableTooltipModel {
   declare model: TableTooltipModel;
@@ -16,7 +16,7 @@ export class TableTooltip extends Tooltip implements TableTooltipModel {
   table: Table;
   row: TableRow;
 
-  protected _rowOrderChangedFunc: EventHandler<TableRowOrderChangedEvent>;
+  protected _rowOrderChangedHandler: EventHandler<TableRowOrderChangedEvent>;
 
   protected override _init(options: InitModelOf<this>) {
     super._init(options);
@@ -27,21 +27,21 @@ export class TableTooltip extends Tooltip implements TableTooltipModel {
   protected override _render() {
     super._render();
 
-    this._rowOrderChangedFunc = (event: TableRowOrderChangedEvent) => {
-      if (event.animating) {
+    this._rowOrderChangedHandler = (event: TableRowOrderChangedEvent | TableRowOrderChangeAnimationEvent) => {
+      if (event.type === 'rowOrderChangeAnimation') {
         // row is only set while animating
-        if (event.row === this.row) {
+        if ((event as TableRowOrderChangeAnimationEvent).row === this.row) {
           this.position();
         }
       } else {
         this.position();
       }
     };
-    this.table.on('rowOrderChanged', this._rowOrderChangedFunc);
+    this.table.on('rowOrderChanged rowOrderChangeAnimation', this._rowOrderChangedHandler);
   }
 
   protected override _remove() {
     super._remove();
-    this.table.off('rowOrderChanged', this._rowOrderChangedFunc);
+    this.table.off('rowOrderChanged rowOrderChangeAnimation', this._rowOrderChangedHandler);
   }
 }
