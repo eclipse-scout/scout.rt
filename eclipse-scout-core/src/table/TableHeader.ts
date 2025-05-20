@@ -258,24 +258,23 @@ export class TableHeader extends Widget implements TableHeaderModel {
     let that = this;
     $headers.each(function() {
       // move to old position and then animate
-      $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
-        .animate({
-          left: 0
-        }, {
-          progress: function(animation, progress, remainingMs) {
-            let $headerItem = $(this);
-            if (!$headerItem.isSelected()) {
-              return;
-            }
-            // make sure selected header item is visible
-            scrollbars.scrollHorizontalTo(that.table.$data, $headerItem);
-
-            // move menu
-            if (that.tableHeaderMenu && that.tableHeaderMenu.rendered) {
-              that.tableHeaderMenu.position();
-            }
+      const $headerItem = $(this);
+      const oldLeft = $headerItem.data('old-left') - $headerItem.offset().left;
+      $headerItem.cssLeftAnimated(oldLeft, 0, {
+        progress: function(animation, progress, remainingMs) {
+          const $headerItem = $(this);
+          if (!$headerItem.isSelected()) {
+            return;
           }
-        });
+          // make sure selected header item is visible
+          scrollbars.scrollHorizontalTo(that.table.$data, $headerItem);
+
+          // move menu
+          if (that.tableHeaderMenu && that.tableHeaderMenu.rendered) {
+            that.tableHeaderMenu.position();
+          }
+        }
+      });
     });
   }
 
@@ -560,31 +559,26 @@ export class TableHeader extends Widget implements TableHeaderModel {
   }
 
   protected _onTableColumnMoved(event: TableColumnMovedEvent) {
-    let
-      column = event.column,
-      oldPos = event.oldPos,
-      newPos = event.newPos,
-      $header = column.$header,
-      $headers = this.findHeaderItems(),
-      $moveHeader = $headers.eq(oldPos),
-      $moveResize = $moveHeader.next('.table-header-resize'),
-      visibleColumns = this._visibleColumns(),
-      lastColumnPos = visibleColumns.length - 1;
-
     // store old position of header
+    const $headers = this.findHeaderItems();
     $headers.each(function() {
-      $(this).data('old-pos', $(this).offset().left);
+      $(this).data('old-left', $(this).offset().left);
     });
 
     // change order in dom of header
+    const oldPos = event.oldPos;
+    const newPos = event.newPos;
+    const $movedHeader = $headers.eq(oldPos);
+    const $targetHeader = $headers.eq(newPos);
     if (newPos < oldPos) {
-      $headers.eq(newPos).before($moveHeader);
+      $targetHeader.before($movedHeader);
     } else {
-      $headers.eq(newPos).after($moveHeader);
-      $moveHeader.before($moveHeader.next('.table-header-resize'));
+      $targetHeader.after($movedHeader);
+      $movedHeader.before($movedHeader.next('.table-header-resize'));
     }
-    // The resizer belongs to a column which is especially relevant for fixed width columns where resizer is disabled -> ensure it is always positioned after the header
-    $moveHeader.after($moveResize);
+    // The separator belongs to a column which is especially relevant for fixed width columns where resizing is disabled -> ensure it is always positioned after the header
+    const $separator = $movedHeader.next('.table-header-resize');
+    $movedHeader.after($separator);
 
     // Update first/last markers
     if ($headers.length > 0) {
@@ -592,6 +586,8 @@ export class TableHeader extends Widget implements TableHeaderModel {
       $headers.eq($headers.length - 1).removeClass('last');
     }
 
+    const visibleColumns = this._visibleColumns();
+    const lastColumnPos = visibleColumns.length - 1;
     if (visibleColumns.length > 0) {
       visibleColumns[0].$header.addClass('first');
       visibleColumns[lastColumnPos].$header.addClass('last');
@@ -602,13 +598,9 @@ export class TableHeader extends Widget implements TableHeaderModel {
       visibleColumns.forEach(column => this.resizeHeaderItem(column));
     }
 
-    // move to old position and then animate
-    if (event.dragged) {
-      $header.css('left', parseInt($header.css('left'), 0) + $header.data('old-pos') - $header.offset().left)
-        .addClass('releasing')
-        .animateAVCSD('left', 0, () => $header.removeClass('releasing'));
-    } else {
-      this._arrangeHeaderItems($headers);
+    // move to old position and then animate unless it was dragged and being released
+    if (!this.dragging) {
+      this._arrangeHeaderItems($([$movedHeader[0], $targetHeader[0]]));
     }
   }
 
@@ -625,7 +617,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
 
     // store old position of headers
     $headers.each(function() {
-      $(this).data('old-pos', $(this).offset().left);
+      $(this).data('old-left', $(this).offset().left);
     });
 
     // change order in dom of header
@@ -773,8 +765,13 @@ export class TableHeader extends Widget implements TableHeaderModel {
       });
 
       // move column
-      if (newPos > -1 && oldPos !== newPos) {
-        that.table.moveColumn($header.data('column'), oldPos, newPos, true);
+      const oldLeft = $header.offset().left;
+      const moved = that.table.moveColumn($header.data('column'), newPos);
+      if (moved) {
+        const left = $header.cssLeft() + oldLeft - $header.offset().left;
+        $header.css('left', left)
+          .addClass('releasing')
+          .animateAVCSD('left', 0, () => $header.removeClass('releasing'));
         that.dragging = false;
         that.columnMoved = true;
       } else {

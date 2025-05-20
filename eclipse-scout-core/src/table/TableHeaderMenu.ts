@@ -318,9 +318,8 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   }
 
   protected _renderMovingGroup(): TableHeaderMenuGroup {
-    let table = this.table,
-      column = this.column,
-      pos = table.visibleColumns().indexOf(column);
+    let table = this.table;
+    let column = this.column;
 
     this.moveGroup = scout.create(TableHeaderMenuGroup, {
       parent: this,
@@ -333,8 +332,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       cssClass: 'move move-top'
     });
     this.toBeginButton.on('action', () => {
-      table.moveColumn(column, pos, 0);
-      pos = table.visibleColumns().indexOf(column);
+      table.moveColumn(column, 0);
     });
 
     this.forwardButton = scout.create(TableHeaderMenuButton, {
@@ -343,8 +341,8 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       cssClass: 'move move-up'
     });
     this.forwardButton.on('action', () => {
-      table.moveColumn(column, pos, Math.max(pos - 1, 0));
-      pos = table.visibleColumns().indexOf(column);
+      let pos = table.visibleColumns().indexOf(column);
+      table.moveColumn(column, Math.max(pos - 1, 0));
     });
 
     this.backwardButton = scout.create(TableHeaderMenuButton, {
@@ -353,8 +351,8 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       cssClass: 'move move-down'
     });
     this.backwardButton.on('action', () => {
-      table.moveColumn(column, pos, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
-      pos = table.visibleColumns().indexOf(column);
+      let pos = table.visibleColumns().indexOf(column);
+      table.moveColumn(column, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
     });
 
     this.toEndButton = scout.create(TableHeaderMenuButton, {
@@ -363,8 +361,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       cssClass: 'move move-bottom'
     });
     this.toEndButton.on('action', () => {
-      table.moveColumn(column, pos, table.header.findHeaderItems().length - 1);
-      pos = table.visibleColumns().indexOf(column);
+      table.moveColumn(column, table.header.findHeaderItems().length - 1);
     });
 
     this.moveGroup.render(this.$columnActions);

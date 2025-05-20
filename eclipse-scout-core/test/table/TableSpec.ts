@@ -2598,13 +2598,13 @@ describe('Table', () => {
       expect(table.columns.indexOf($header1.data('column'))).toBe(1);
       expect(table.columns.indexOf($header2.data('column'))).toBe(2);
 
-      table.moveColumn($header0.data('column'), 0, 2);
+      table.moveColumn($header0.data('column'), 2);
 
       expect(table.columns.indexOf($header1.data('column'))).toBe(0);
       expect(table.columns.indexOf($header2.data('column'))).toBe(1);
       expect(table.columns.indexOf($header0.data('column'))).toBe(2);
 
-      table.moveColumn($header2.data('column'), 1, 0);
+      table.moveColumn($header2.data('column'), 0);
 
       expect(table.columns.indexOf($header2.data('column'))).toBe(0);
       expect(table.columns.indexOf($header1.data('column'))).toBe(1);
@@ -2624,7 +2624,7 @@ describe('Table', () => {
       expect($cells0.eq(1).text()).toBe('0_1');
       expect($cells0.eq(2).text()).toBe('0_2');
 
-      table.moveColumn(table.columns[0], 0, 2);
+      table.moveColumn(table.columns[0], 2);
       $rows = table.$rows();
       expect(table.viewRangeRendered).toEqual(new Range(0, 1));
       expect($rows.length).toBe(1);
@@ -3168,11 +3168,11 @@ describe('Table', () => {
       colB.setVisible(false); // column in the middle is invisible
       expect(table.visibleColumns().length).toBe(2);
 
-      table.moveColumn(colC, 1, 0); // move C to be the first column
+      table.moveColumn(colC, 0); // move C to be the first column
       expect(table.visibleColumns()).toEqual([colC, colA]);
       expect(table.columns).toEqual([colC, colA, colB]);
 
-      table.moveColumn(colC, 0, 1); // move C to be the last column
+      table.moveColumn(colC, 1); // move C to be the last column
       expect(table.visibleColumns()).toEqual([colA, colC]);
       expect(table.columns).toEqual([colA, colC, colB]);
     });
