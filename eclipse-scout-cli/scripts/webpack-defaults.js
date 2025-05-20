@@ -29,6 +29,7 @@ const ts = require('typescript');
  * @param {string} args.cyclonedxVersion CycloneDX version to use. Default is '1.5'.
  * @param {[]} args.resDirArray an array containing directories which should be copied to dist/res
  * @param {object} args.tsOptions a config object to be passed to the ts-loader
+ * @param {object} args.forkTypeCheckOptions a config object to be passed to the ForkTsCheckerWebpackPlugin
  * @param {boolean|'fork'} args.typeCheck
  *    true: let the TypeScript compiler check the types.
  *    false: let the TypeScript compiler only transpile the TypeScript code without checking types, which makes it faster.
@@ -260,13 +261,16 @@ module.exports = (env, args) => {
 
     let forkTsCheckerConfig = {
       typescript: {
-        memoryLimit: 4096
-      }
+        memoryLimit: 4096,
+        ...args.forkTypeCheckOptions?.typescript
+      },
+      ...args.forkTypeCheckOptions
     };
     if (!fs.existsSync('./tsconfig.json')) {
       // if the module has no tsconfig: use default from Scout.
       // Otherwise, each module would need to provide a tsconfig even if there is no typescript code in the module.
       forkTsCheckerConfig = {
+        ...forkTsCheckerConfig,
         typescript: {
           ...forkTsCheckerConfig.typescript,
           configFile: require.resolve('@eclipse-scout/tsconfig'),
