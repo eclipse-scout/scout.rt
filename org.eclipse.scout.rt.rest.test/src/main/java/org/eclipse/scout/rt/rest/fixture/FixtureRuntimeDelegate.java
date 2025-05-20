@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,7 @@ import jakarta.ws.rs.SeBootstrap.Instance;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.CacheControl;
 import jakarta.ws.rs.core.EntityPart;
-import jakarta.ws.rs.core.Link.Builder;
+import jakarta.ws.rs.core.Link;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.UriBuilder;
@@ -37,17 +37,17 @@ public class FixtureRuntimeDelegate extends RuntimeDelegate {
 
   @Override
   public UriBuilder createUriBuilder() {
-    return mock(UriBuilder.class);
+    return mock(UriBuilder.class, withSettings().defaultAnswer(RETURNS_SELF));
   }
 
   @Override
   public ResponseBuilder createResponseBuilder() {
-    return mock(ResponseBuilder.class);
+    return mock(ResponseBuilder.class, withSettings().defaultAnswer(RETURNS_SELF));
   }
 
   @Override
   public VariantListBuilder createVariantListBuilder() {
-    return mock(VariantListBuilder.class);
+    return mock(VariantListBuilder.class, withSettings().defaultAnswer(RETURNS_SELF));
   }
 
   @Override
@@ -71,13 +71,13 @@ public class FixtureRuntimeDelegate extends RuntimeDelegate {
   }
 
   @Override
-  public Builder createLinkBuilder() {
-    return mock(Builder.class);
+  public Link.Builder createLinkBuilder() {
+    return mock(Link.Builder.class, withSettings().defaultAnswer(RETURNS_SELF));
   }
 
   @Override
   public Configuration.Builder createConfigurationBuilder() {
-    return mock(Configuration.Builder.class);
+    return mock(Configuration.Builder.class, withSettings().defaultAnswer(RETURNS_SELF));
   }
 
   @Override
@@ -94,6 +94,6 @@ public class FixtureRuntimeDelegate extends RuntimeDelegate {
 
   @Override
   public EntityPart.Builder createEntityPartBuilder(String partName) throws IllegalArgumentException {
-    return mock(EntityPart.Builder.class);
+    return mock(EntityPart.Builder.class, withSettings().defaultAnswer(RETURNS_SELF));
   }
 }
