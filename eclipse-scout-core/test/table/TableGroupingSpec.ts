@@ -214,7 +214,7 @@ describe('Table Grouping', () => {
     expect(tableControl.aggregateRow[4]).toBeDefined();
 
     // Move last column between first and second column
-    table.moveColumn(table.columns[4], 4, 1);
+    table.moveColumn(table.columns[4], 1);
     // 0: col0<String> [G] | 1: col4<Number> | 2: col1<String> | 3: col2<String> | 4: col3<Number>
     expect(table._aggregateRows.length).toBe(2);
     expect(table._aggregateRows[0].contents.length).toBe(5);

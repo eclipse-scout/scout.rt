@@ -4631,12 +4631,26 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     return spaceAvailableForText + (newIsIconVisible ? -iconWidth : iconWidth);
   }
 
-  moveColumn(column: Column<any>, visibleOldPos: number, visibleNewPos: number, dragged?: boolean) {
+  /**
+   * Moves the column to the new position. The position must be an index of {@link visibleColumns}.
+   *
+   * @returns true, if the column was moved, false if not.
+   */
+  moveColumn(column: Column<any>, visibleNewPos: number): boolean {
+    let visibleColumns = this.visibleColumns();
+    let visibleOldPos = visibleColumns.indexOf(column);
+    let range = new Range(0, visibleColumns.length);
+    if (!range.contains(visibleOldPos) || !range.contains(visibleNewPos)) {
+      return false;
+    }
+
     // If there are fixed columns, don't allow moving the column onto the other side of the fixed columns
-    visibleNewPos = this._considerFixedPositionColumns(visibleOldPos, visibleNewPos);
+    visibleNewPos = this.considerFixedPositionColumns(visibleOldPos, visibleNewPos);
+    if (visibleNewPos === visibleOldPos) {
+      return false;
+    }
 
     // Translate position of 'visible columns' array to position in 'all columns' array
-    let visibleColumns = this.visibleColumns();
     let newColumn = visibleColumns[visibleNewPos];
     let newPos = this.columns.indexOf(newColumn);
 
@@ -4647,7 +4661,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     visibleNewPos = visibleColumns.indexOf(column); // we must re-evaluate visible columns
 
     this._calculateTableNodeColumn();
-    this._triggerColumnMoved(column, visibleOldPos, visibleNewPos, dragged);
+    this._triggerColumnMoved(column, visibleOldPos, visibleNewPos);
 
     // move aggregated rows
     this._aggregateRows.forEach(aggregateRow => arrays.move(aggregateRow.contents, visibleOldPos, visibleNewPos));
@@ -4656,12 +4670,18 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     if (this._isDataRendered()) {
       this._rerenderViewport();
     }
+    return true;
   }
 
   /**
-   * Ensures the given newPos does not pass a fixed column boundary (necessary when moving columns)
+   * Ensures the given visibleNewPos does not pass a fixed column boundary (necessary when moving columns)
+   *
+   * @returns the adjusted visibleNewPos if the position passes a fixed column boundary, otherwise the unmodified visibleNewPos
    */
-  protected _considerFixedPositionColumns(visibleOldPos: number, visibleNewPos: number): number {
+  considerFixedPositionColumns(visibleOldPos: number, visibleNewPos: number): number {
+    if (visibleNewPos === visibleOldPos) {
+      return visibleNewPos;
+    }
     let fixedColumnIndex = -1;
     if (visibleNewPos > visibleOldPos) {
       // move to right
@@ -4801,12 +4821,11 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.trigger('columnResizedToFit', event);
   }
 
-  protected _triggerColumnMoved(column: Column<any>, oldPos: number, newPos: number, dragged?: boolean) {
+  protected _triggerColumnMoved(column: Column<any>, oldPos: number, newPos: number) {
     let event = {
       column: column,
       oldPos: oldPos,
-      newPos: newPos,
-      dragged: dragged
+      newPos: newPos
     };
     this.trigger('columnMoved', event);
   }

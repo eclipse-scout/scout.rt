@@ -41,7 +41,6 @@ export interface TableColumnMovedEvent<TValue = any, T = Table> extends Event<T>
   column: Column<TValue>;
   oldPos: number;
   newPos: number;
-  dragged: boolean;
 }
 
 export interface TableColumnResizedEvent<TValue = any, T = Table> extends Event<T> {
