@@ -20,6 +20,6 @@ export class AutoLeafPageWithNodes extends Page implements AutoLeafPageWithNodes
   protected override _init(model: InitModelOf<this>) {
     scout.assertParameter('row', model.row, TableRow);
     super._init(model);
-    this.text = this.row.cells[0].text;
+    this.text = this.computeTextForRow(this.row);
   }
 }

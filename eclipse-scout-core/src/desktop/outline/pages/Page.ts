@@ -517,15 +517,23 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
       page.htmlEnabled = row.cells[0].htmlEnabled;
       page.cssClass = row.cells[0].cssClass;
     }
+    if (row.getTable().compact) {
+      page.htmlEnabled = true;
+    }
     return page;
   }
 
   /**
-   * This function creates the text property of this page. The default implementation returns the texts of the summary columns of the table or
-   * from the first cell of the given row. It's allowed to ignore the given row entirely, when you override this function.
+   * This function creates the text property of this page. The default implementation returns the compactValue of the row if the table is compact,
+   * the texts of the summary columns of the table or from the first cell of the given row. It's allowed to ignore the given row entirely, when
+   * you override this function.
    */
   computeTextForRow(row: TableRow): string {
-    const summaryColumns = row.table.summaryColumns();
+    const table = row.table;
+    if (table.compact) {
+      return row.compactValue;
+    }
+    const summaryColumns = table.summaryColumns();
     if (summaryColumns.length) {
       return strings.join(' ', ...summaryColumns.map(summaryColumn => summaryColumn.cellText(row)));
     }
