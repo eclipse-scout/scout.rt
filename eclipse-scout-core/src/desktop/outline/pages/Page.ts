@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, BaseDoEntity, BookmarkSupport, BookmarkTableRowIdentifierDo, ButtonTile, ChildModelOf, Constructor, dataObjects, DoTypeResolver, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form,
-  HtmlComponent, InitModelOf, inspector, Menu, MenuBar, MenuOwner, ObjectIdProvider, ObjectOrType, ObjectWithUuid, Outline, PageDetailMenuContributor, PageEventMap, PageModel, ParentTablePageMenuContributor, PropertyChangeEvent,
-  RequiredUnlessNotSubclass, scout, SomeRequired, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, typeName, UuidPathOptions, Widget
+  arrays, BaseDoEntity, BookmarkSupport, BookmarkTableRowIdentifierDo, ButtonTile, ChildModelOf, Column, comparators, Constructor, dataObjects, DoTypeResolver, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel,
+  EventSupport, Form, HtmlComponent, InitModelOf, inspector, Menu, MenuBar, MenuOwner, ObjectIdProvider, ObjectOrType, ObjectWithUuid, Outline, PageDetailMenuContributor, PageEventMap, PageModel, ParentTablePageMenuContributor,
+  PropertyChangeEvent, RequiredUnlessNotSubclass, scout, SomeRequired, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, typeName, UuidPathOptions, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -512,27 +512,61 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
   updatePageFromTableRow(row: TableRow): Page {
     let page = row.page;
     page.enabled = row.enabled;
-    page.text = page.computeTextForRow(row);
-    if (row.cells.length) {
-      page.htmlEnabled = row.cells[0].htmlEnabled;
-      page.cssClass = row.cells[0].cssClass;
+
+    const summaryColumns = page._computeSummaryColumns(row);
+    page.text = page.computeTextForRow(row, summaryColumns);
+
+    // get properties from cell of first summary column
+    const firstSummaryColumn = summaryColumns[0];
+    if (firstSummaryColumn) {
+      const cell = firstSummaryColumn.cell(row);
+      page.htmlEnabled = cell.htmlEnabled;
+      page.cssClass = cell.cssClass;
+      page.iconId = cell.iconId || row.iconId;
     }
+
     return page;
   }
 
   /**
-   * This function creates the text property of this page. The default implementation returns the texts of the summary columns of the table or
-   * from the first cell of the given row. It's allowed to ignore the given row entirely, when you override this function.
+   * This function creates the text property of this page. The default implementation returns {@link Column#cellText} of all summary columns.
    */
-  computeTextForRow(row: TableRow): string {
-    const summaryColumns = row.table.summaryColumns();
+  computeTextForRow(row: TableRow, summaryColumns?: Column[]): string {
+    if (!summaryColumns) {
+      summaryColumns = this._computeSummaryColumns(row);
+    }
+    return strings.join(' ', ...summaryColumns.map(summaryColumn => summaryColumn.cellText(row)));
+  }
+
+  /**
+   * Computes the summary columns of the given {@link TableRow}. The summary columns are
+   * <ol>
+   *   <li> the {@link Table#compactColumn} if it exists and the {@link Outline} is compact
+   *   <li> the {@link Table#summaryColumns}
+   *   <li> the first visible column
+   * </ol>
+   */
+  protected _computeSummaryColumns(row: TableRow): Column<any>[] {
+    if (!row) {
+      return [];
+    }
+
+    const table = row.table;
+
+    // use compact column if outline is compact
+    if (this.outline.compact && table.compactColumn) {
+      return [table.compactColumn];
+    }
+
+    const summaryColumns = table.summaryColumns();
     if (summaryColumns.length) {
-      return strings.join(' ', ...summaryColumns.map(summaryColumn => summaryColumn.cellText(row)));
+      return summaryColumns;
     }
-    if (row.cells.length >= 1) {
-      return row.cells[0].text;
-    }
-    return '';
+
+    // find the first visible column considering the originally defined column order (ignoring the column order changes the user did)
+    const columns = table.visibleColumns(false, true);
+    columns.sort((c1, c2) => comparators.NUMERIC.compare(c1.index, c2.index));
+    return columns.slice(0, 1);
   }
 
   /**

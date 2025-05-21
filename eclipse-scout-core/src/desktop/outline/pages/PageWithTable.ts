@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, AutoLeafPageWithNodes, BookmarkSupport, BookmarkTableRowIdentifierDo, dataObjects, DoEntity, EventHandler, Form, FormTableControl, LimitedResultInfoContributionDo, ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel,
-  scout, Status, Table, TableAllRowsDeletedEvent, TableMaxResultsHelper, TableOrganizerMenu, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent,
-  TableRowsUpdatedEvent
+  arrays, AutoLeafPageWithNodes, BookmarkSupport, BookmarkTableRowIdentifierDo, dataObjects, DoEntity, Event, EventHandler, Form, InitModelOf, LimitedResultInfoContributionDo, ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel,
+  PropertyChangeEvent, scout, SearchFormTableControl, Status, Table, TableAllRowsDeletedEvent, TableControl, TableMaxResultsHelper, TableOrganizerMenu, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent,
+  TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
 } from '../../../index';
 import $ from 'jquery';
 
@@ -26,6 +26,9 @@ export class PageWithTable extends Page implements PageWithTableModel {
   protected _tableRowActionHandler: EventHandler<TableRowActionEvent>;
   protected _tableRowOrderChangeHandler: EventHandler<TableRowOrderChangedEvent>;
   protected _tableDataLoadHandler: EventHandler<TableReloadEvent>;
+  protected _tableControlsChangeHandler: EventHandler<PropertyChangeEvent<TableControl[]>> = this._onTableControlsChange.bind(this);
+  protected _searchFormTableControlSearchHandler: EventHandler<Event<SearchFormTableControl>> = this._onSearchFormTableControlSearch.bind(this);
+  protected _searchFormTableControlResetHandler: EventHandler<Event<SearchFormTableControl>> = this._onSearchFormTableControlReset.bind(this);
 
   constructor() {
     super();
@@ -42,8 +45,41 @@ export class PageWithTable extends Page implements PageWithTableModel {
     this._tableDataLoadHandler = (e: TableReloadEvent) => this.loadTableData(e?.reloadReason);
   }
 
+  protected override _init(model: InitModelOf<this>) {
+    super._init(model);
+
+    // display rows as AutoLeafPageWithNodes if outline is compact
+    if (this.outline.compact) {
+      this.setAlwaysCreateChildPage(true);
+      this.setLeaf(false);
+    }
+  }
+
+  setAlwaysCreateChildPage(alwaysCreateChildPage: boolean) {
+    this.alwaysCreateChildPage = alwaysCreateChildPage;
+  }
+
   protected override _initDetailTable(table: Table) {
     super._initDetailTable(table);
+
+    if (this.outline.compact) {
+      // set table compact if outline is compact
+      table.setCompact(true);
+
+      // disable more-link and enable html to plain text on compact handler
+      table.compactHandler.setMoreLinkAvailable(false);
+      table.compactHandler.setLineCustomizer(line => line.textBlock.setHtmlToPlainTextEnabled(true));
+
+      // hide all table controls except search form table control
+      const searchFormTableControl = this._findSearchFormTableControl(table);
+      for (const tableControl of table.tableControls) {
+        if (tableControl === searchFormTableControl) {
+          continue;
+        }
+        tableControl.setVisibleGranted(false);
+      }
+    }
+
     table.on('rowsDeleted allRowsDeleted', this._tableRowDeleteHandler);
     table.on('rowsInserted', this._tableRowInsertHandler);
     table.on('rowsUpdated', this._tableRowUpdateHandler);
@@ -52,6 +88,9 @@ export class PageWithTable extends Page implements PageWithTableModel {
     table.on('reload', this._tableDataLoadHandler);
     table.hasReloadHandler = true;
     table.insertMenus([scout.create(TableOrganizerMenu, {parent: table})]);
+
+    table.on('propertyChange:tableControls', this._tableControlsChangeHandler);
+    this._addSearchFormTableControlListeners(this._findSearchFormTableControl(table));
   }
 
   protected override _destroyDetailTable(table: Table) {
@@ -61,6 +100,10 @@ export class PageWithTable extends Page implements PageWithTableModel {
     table.off('rowAction', this._tableRowActionHandler);
     table.off('rowOrderChanged', this._tableRowOrderChangeHandler);
     table.off('reload', this._tableDataLoadHandler);
+
+    table.off('propertyChange:tableControls', this._tableControlsChangeHandler);
+    this._removeSearchFormTableControlListeners(this._findSearchFormTableControl(table));
+
     super._destroyDetailTable(table);
   }
 
@@ -103,6 +146,45 @@ export class PageWithTable extends Page implements PageWithTableModel {
 
   protected _onTableRowOrderChanged(event: TableRowOrderChangedEvent) {
     this.outline.mediator.onTableRowOrderChanged(event, this);
+  }
+
+  protected _onTableControlsChange(e: PropertyChangeEvent<TableControl[]>) {
+    // disable search/reset listeners on old search form controls
+    arrays.ensure(e.oldValue)
+      .filter(tableControl => tableControl instanceof SearchFormTableControl)
+      .forEach((searchFormTableControl: SearchFormTableControl) => this._removeSearchFormTableControlListeners(searchFormTableControl));
+
+    // enable search/reset listeners on search form control
+    this._addSearchFormTableControlListeners(this.getSearchFormTableControl());
+  }
+
+  /**
+   * Adds search and reset listener to the given {@link SearchFormTableControl}.
+   */
+  protected _addSearchFormTableControlListeners(searchFormTableControl: SearchFormTableControl) {
+    searchFormTableControl?.on('search', this._searchFormTableControlSearchHandler);
+    searchFormTableControl?.on('reset', this._searchFormTableControlResetHandler);
+  }
+
+  /**
+   * Removes search and reset listener from the given {@link SearchFormTableControl}.
+   */
+  protected _removeSearchFormTableControlListeners(searchFormTableControl: SearchFormTableControl) {
+    searchFormTableControl?.off('search', this._searchFormTableControlSearchHandler);
+    searchFormTableControl?.off('reset', this._searchFormTableControlResetHandler);
+  }
+
+  protected _onSearchFormTableControlSearch(e: Event<SearchFormTableControl>) {
+    this.detailTable.reload(Table.ReloadReason.SEARCH);
+
+    // close search table control after search if outline is compact, otherwise the search form covers the table
+    if (this.outline.compact) {
+      this.getSearchFormTableControl().setSelected(false);
+    }
+  }
+
+  protected _onSearchFormTableControlReset(e: Event<SearchFormTableControl>) {
+    this.detailTable.reload(Table.ReloadReason.SEARCH);
   }
 
   protected _createChildPageInternal(row: TableRow): Page {
@@ -164,12 +246,24 @@ export class PageWithTable extends Page implements PageWithTableModel {
   }
 
   /**
+   * Returns the {@link SearchFormTableControl} for the given {@link Table}, or `null` if no {@link SearchFormTableControl} is present.
+   */
+  protected _findSearchFormTableControl(table: Table): SearchFormTableControl {
+    return table?.findTableControl(SearchFormTableControl);
+  }
+
+  /**
+   * Returns the {@link SearchFormTableControl} for this page, or `null` if no {@link SearchFormTableControl} is present.
+   */
+  getSearchFormTableControl(): SearchFormTableControl {
+    return this._findSearchFormTableControl(this.detailTable);
+  }
+
+  /**
    * Returns the search form for this page, or `null` if no search form is present.
    */
   getSearchForm(): Form {
-    // TODO bsh [js-bookmark] Add dedicated SearchTableControl class to find the correct table control more reliably
-    let tableControl = this.detailTable?.findTableControl(FormTableControl, tableControl => !!tableControl.form);
-    return tableControl ? tableControl.form : null;
+    return this.getSearchFormTableControl()?.form || null;
   }
 
   /**

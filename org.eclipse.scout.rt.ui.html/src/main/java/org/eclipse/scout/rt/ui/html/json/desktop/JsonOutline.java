@@ -180,12 +180,9 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   @Override
   protected void putCellProperties(JSONObject json, ITreeNode node) {
     if (node instanceof IJsPage) {
-      // Send text because it might come from a summary column from a parent PageWithTable
-      json.put("text", node.getCell().getText());
+      return;
     }
-    else {
-      super.putCellProperties(json, node);
-    }
+    super.putCellProperties(json, node);
   }
 
   @Override
@@ -245,6 +242,18 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   protected void putJsPageObjectTypeAndModel(JSONObject json, IJsPage jsPage) {
     putProperty(json, IJsPage.PROP_JS_PAGE_OBJECT_TYPE, jsPage.getJsPageObjectType());
     putProperty(json, IJsPage.PROP_JS_PAGE_MODEL, jsonDoHelper().dataObjectToJson(jsPage.getJsPageModel()));
+
+    if (jsPage.getParentNode() instanceof IPageWithTable) {
+      JSONObject jsPageModel = ObjectUtility.nvl(json.optJSONObject(IJsPage.PROP_JS_PAGE_MODEL), new JSONObject());
+
+      // Send the properties which might come from a summary column from a parent PageWithTable
+      jsPageModel.put("text", jsPage.getCell().getText());
+      jsPageModel.put("htmlEnabled", jsPage.getCell().isHtmlEnabled());
+      jsPageModel.put("cssClass", jsPage.getCell().getCssClass());
+      jsPageModel.put("iconId", jsPage.getCell().getIconId());
+
+      putProperty(json, IJsPage.PROP_JS_PAGE_MODEL, jsPageModel);
+    }
   }
 
   @Override

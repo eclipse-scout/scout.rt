@@ -587,6 +587,7 @@ export * from './table/controls/FormTableControlModel';
 export * from './table/controls/FormTableControlEventMap';
 export * from './table/controls/FormTableControlAdapter';
 export * from './table/controls/FormTableControlLayout';
+export * from './table/controls/SearchFormTableControl';
 export * from './table/editor/CellEditorPopup';
 export * from './table/editor/CellEditorPopupModel';
 export * from './table/editor/CellEditorPopupLayout';

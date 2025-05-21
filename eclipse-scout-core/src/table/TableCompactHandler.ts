@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,8 @@ export class TableCompactHandler implements TableCompactHandlerModel, ObjectWith
   table: Table;
   useOnlyVisibleColumns: boolean;
   maxContentLines: number;
+  moreLinkAvailable: boolean;
+  lineCustomizer: (line: CompactLine) => void;
   protected _oldStates: Record<string, any>;
   protected _updateHandler: EventHandler<TableRowsInsertedEvent | TableRowsUpdatedEvent | Event<Table>>;
 
@@ -26,6 +28,8 @@ export class TableCompactHandler implements TableCompactHandlerModel, ObjectWith
     this.table = null;
     this.useOnlyVisibleColumns = true;
     this.maxContentLines = 3;
+    this.moreLinkAvailable = true;
+    this.lineCustomizer = null;
     this._oldStates = objects.createMap();
     this._updateHandler = null;
   }
@@ -40,6 +44,14 @@ export class TableCompactHandler implements TableCompactHandlerModel, ObjectWith
 
   setMaxContentLines(maxContentLines: number) {
     this.maxContentLines = maxContentLines;
+  }
+
+  setMoreLinkAvailable(moreLinkAvailable: boolean) {
+    this.moreLinkAvailable = moreLinkAvailable;
+  }
+
+  setLineCustomizer(lineCustomizer: (line: CompactLine) => void) {
+    this.lineCustomizer = lineCustomizer;
   }
 
   handle(compact: boolean) {
@@ -104,7 +116,7 @@ export class TableCompactHandler implements TableCompactHandlerModel, ObjectWith
     if (rows.length === 0) {
       return;
     }
-    let columns = this._getColumns();
+    let columns = this.getColumns();
     rows.forEach(row => this._updateValue(columns, row));
   }
 
@@ -127,7 +139,7 @@ export class TableCompactHandler implements TableCompactHandlerModel, ObjectWith
     columns.forEach((column, i) => this._processColumn(column, i, row, bean));
   }
 
-  protected _getColumns(): Column<any>[] {
+  getColumns(): Column<any>[] {
     return this.table.filterColumns(column => this._acceptColumn(column));
   }
 
@@ -199,10 +211,14 @@ export class TableCompactHandler implements TableCompactHandlerModel, ObjectWith
       }
       line.textBlock.setText(text);
     }
+    this.lineCustomizer?.(line);
   }
 
   protected _postProcessBean(bean: CompactBean) {
-    bean.transform({maxContentLines: this.maxContentLines});
+    bean.transform({
+      maxContentLines: this.maxContentLines,
+      moreLinkAvailable: this.moreLinkAvailable
+    });
 
     // If only title is set move it to content. A title without content does not look good.
     if (bean.title && !bean.subtitle && !bean.titleSuffix && !bean.content) {
@@ -213,7 +229,7 @@ export class TableCompactHandler implements TableCompactHandlerModel, ObjectWith
 
   protected _buildValue(bean: CompactBean): string {
     let hasHeader = (bean.title + bean.titleSuffix + bean.subtitle) ? ' has-header' : '';
-    let moreLink = bean.moreContent ? `<div class="compact-cell-more"><span class="more-link link">${this.table.session.text('More')}</span></div>` : '';
+    let moreLink = (this.moreLinkAvailable && bean.moreContent) ? `<div class="compact-cell-more"><span class="more-link link">${this.table.session.text('More')}</span></div>` : '';
 
     return `
 <div class="compact-cell-header">

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,29 +39,26 @@ public class SummaryCellBuilder implements ISummaryCellBuilder {
     if (summaryColumns.isEmpty()) {
       return new Cell();
     }
-    else if (summaryColumns.size() == 1) {
-      Cell cell = new Cell(getTable().getCell(row, summaryColumns.get(0)));
-      if (cell.getIconId() == null) {
-        // use icon of row
-        cell.setIconId(row.getIconId());
-      }
+
+    Cell cell = new Cell(getTable().getCell(row, summaryColumns.get(0)));
+    if (cell.getIconId() == null) {
+      // use icon of row
+      cell.setIconId(row.getIconId());
+    }
+
+    if (summaryColumns.size() == 1) {
       return cell;
     }
-    else {
-      Cell cell = new Cell(getTable().getCell(row, summaryColumns.get(0)));
-      if (cell.getIconId() == null) {
-        // use icon of row
-        cell.setIconId(row.getIconId());
+
+    StringBuilder b = new StringBuilder();
+    for (IColumn<?> c : summaryColumns) {
+      if (b.length() > 0) {
+        b.append(" ");
       }
-      StringBuilder b = new StringBuilder();
-      for (IColumn<?> c : summaryColumns) {
-        if (b.length() > 0) {
-          b.append(" ");
-        }
-        b.append(getTable().getCell(row, c).toPlainText());
-      }
-      cell.setText(b.toString());
-      return cell;
+      b.append(getTable().getCell(row, c).toPlainText());
     }
+    cell.setText(b.toString());
+
+    return cell;
   }
 }
