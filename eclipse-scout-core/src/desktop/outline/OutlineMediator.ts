@@ -53,6 +53,10 @@ export class OutlineMediator {
       return;
     }
 
+    if (event.source.defaultRowAction) {
+      return;
+    }
+
     let drillNode = event.row.page;
     page.outline.drillDown(drillNode);
   }
