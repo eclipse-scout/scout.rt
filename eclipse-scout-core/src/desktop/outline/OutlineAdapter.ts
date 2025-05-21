@@ -306,8 +306,7 @@ export class OutlineAdapter extends TreeAdapter {
       objectType: pageModel.jsPageObjectType,
       pageParam: pageParam,
       classId: pageModel.classId,
-      modelClass: pageModel.modelClass,
-      text: pageModel.text || undefined // because summary column might come from Java parent page
+      modelClass: pageModel.modelClass
     };
   }
 

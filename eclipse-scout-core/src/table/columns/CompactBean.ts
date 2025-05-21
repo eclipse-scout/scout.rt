@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -74,10 +74,12 @@ export class CompactBean {
    *
    * @param options.removeEmptyContentLines default true
    * @param options.maxContentLines default 1000
+   * @param options.moreLinkAvailable If <code>true</code>, maxContentLines may be increased by 1 if the more link would reveal only one line. Does not have any effect if it is <code>false</code>. Default is <code>false</code>.
    */
-  transform(options?: { removeEmptyContentLines?: boolean; maxContentLines?: number }) {
+  transform(options?: { removeEmptyContentLines?: boolean; maxContentLines?: number; moreLinkAvailable?: boolean }) {
     let removeEmptyContentLines = scout.nvl(options.removeEmptyContentLines, true);
     let maxContentLines = scout.nvl(options.maxContentLines, 1000);
+    const moreLinkAvailable = options.moreLinkAvailable;
     if (this.titleLine) {
       this.setTitle(this.titleLine.build());
     }
@@ -92,7 +94,7 @@ export class CompactBean {
     if (removeEmptyContentLines) {
       contentLines = this.contentLines.filter(line => !!line.build());
     }
-    if (maxContentLines + 1 === contentLines.length) {
+    if (moreLinkAvailable && maxContentLines + 1 === contentLines.length) {
       // Don't show more link if it would only reveal one element
       maxContentLines++;
     }

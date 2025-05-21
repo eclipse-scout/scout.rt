@@ -1,4 +1,4 @@
-import {AggregateTableControl, BooleanColumn, Column, FormTableControl, icons, Menu, NumberColumn, PageWithTable, PageWithTableModel, Table} from '@eclipse-scout/core';
+import {AggregateTableControl, BooleanColumn, Column, icons, Menu, NumberColumn, PageWithTable, PageWithTableModel, SearchFormTableControl, Table} from '@eclipse-scout/core';
 import {PersonSearchForm} from '../index';
 import {PersonSearchFormWidgetMap} from './PersonSearchFormModel';
 
@@ -66,8 +66,7 @@ export default (): PageWithTableModel => ({
     tableControls: [
       {
         id: 'SearchFormTableControl',
-        objectType: FormTableControl,
-        iconId: icons.SEARCH,
+        objectType: SearchFormTableControl,
         form: {
           id: 'SearchForm',
           objectType: PersonSearchForm
@@ -94,7 +93,7 @@ export type PersonTablePageTableWidgetMap = {
   'EditPersonMenu': Menu;
   'CreatePersonMenu': Menu;
   'DeletePersonMenu': Menu;
-  'SearchFormTableControl': FormTableControl;
+  'SearchFormTableControl': SearchFormTableControl;
   'SearchForm': PersonSearchForm;
   'AggregateTableControl': AggregateTableControl;
 } & PersonSearchFormWidgetMap;

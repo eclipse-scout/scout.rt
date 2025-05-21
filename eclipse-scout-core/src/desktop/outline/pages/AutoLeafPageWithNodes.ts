@@ -7,19 +7,27 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AutoLeafPageWithNodesModel, InitModelOf, Page, scout, TableRow} from '../../../index';
+import {AutoLeafPageWithNodesModel, InitModelOf, PageWithNodes, scout, Table, TableRow} from '../../../index';
 
-export class AutoLeafPageWithNodes extends Page implements AutoLeafPageWithNodesModel {
+export class AutoLeafPageWithNodes extends PageWithNodes implements AutoLeafPageWithNodesModel {
   declare model: AutoLeafPageWithNodesModel;
 
   constructor() {
     super();
+    // hide table and form
+    this.detailTableVisible = false;
+    this.detailFormVisible = false;
     this.leaf = true;
+  }
+
+  protected override _createDetailTable(): Table {
+    // do not create a table, AutoLeafPageWithNodes has no own content
+    return null;
   }
 
   protected override _init(model: InitModelOf<this>) {
     scout.assertParameter('row', model.row, TableRow);
     super._init(model);
-    this.text = this.row.cells[0].text;
+    this.text = this.computeTextForRow(this.row);
   }
 }

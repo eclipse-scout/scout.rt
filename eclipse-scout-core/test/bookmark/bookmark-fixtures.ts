@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BaseDoEntity, BooleanColumn, Column, Desktop, DesktopModel, Form, FormModel, FormTableControl, GroupBox, icons, NumberColumn, ObjectOrModel, Outline, OutlineViewButton, Page, PageParamDo, PageWithNodes, PageWithTable, ResetMenu, scout,
+  BaseDoEntity, BooleanColumn, Column, Desktop, DesktopModel, Form, FormModel, GroupBox, NumberColumn, ObjectOrModel, Outline, OutlineViewButton, Page, PageParamDo, PageWithNodes, PageWithTable, ResetMenu, scout, SearchFormTableControl,
   SearchMenu, StringField, strings, Table, TableRow, typeName
 } from '../../src';
 
@@ -244,8 +244,7 @@ export class SpecTablePage2 extends PageWithTable {
       }],
       tableControls: [{
         id: 'SearchFormTableControl',
-        objectType: FormTableControl,
-        iconId: icons.SEARCH,
+        objectType: SearchFormTableControl,
         form: {
           id: 'SearchForm',
           objectType: SpecSearchForm
@@ -322,8 +321,7 @@ export class SpecTablePage3 extends PageWithTable {
       }],
       tableControls: [{
         id: 'SearchFormTableControl',
-        objectType: FormTableControl,
-        iconId: icons.SEARCH,
+        objectType: SearchFormTableControl,
         form: {
           id: 'SearchForm',
           objectType: SpecSearchForm

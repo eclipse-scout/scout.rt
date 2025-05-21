@@ -17,7 +17,7 @@ export class ParentTablePageMenuContributor extends PageDetailMenuContributor {
   }
 
   protected _computeParentTablePageMenus(detailContent: Widget): Menu[] {
-    if (!this.page.parentNode) {
+    if (!this.page.parentNode || (this.page.outline.compact && detailContent instanceof Table)) {
       return [];
     }
 
