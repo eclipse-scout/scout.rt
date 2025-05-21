@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, BeanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, SmartColumn, Status, Table, TableField, TableRow,
-  TableRowModel, Tooltip
+  Action, BeanColumn, BooleanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, SmartColumn, Status, strings, Table,
+  TableField, TableRow, TableRowModel, Tooltip
 } from '../../src/index';
 import {JQueryTesting, LocaleSpecHelper, SpecTable, TableSpecHelper} from '../../src/testing/index';
 import $ from 'jquery';
@@ -4262,6 +4262,585 @@ describe('Table', () => {
       expect(table._columnAtX(119 + offset)).toBe(column1);
       // right of last column -> returns last column
       expect(table._columnAtX(130 + offset)).toBe(column1);
+    });
+  });
+
+  describe('insert columns', () => {
+    let table: SpecTable;
+
+    beforeEach(() => {
+      const model = helper.createModelFixture(3, 5);
+      table = helper.createTable(model);
+      table.render();
+    });
+
+    it('does nothing if no column is given', () => {
+      expect(table.columns.length).toBe(3);
+
+      table.insertColumns([]);
+
+      expect(table.columns.length).toBe(3);
+    });
+
+    it('does nothing if column is already part of table', () => {
+      expect(table.columns.length).toBe(3);
+
+      table.insertColumns([table.columns[0]]);
+
+      expect(table.columns.length).toBe(3);
+    });
+
+    it('inserts a column at the end with no value if position and initValue are not specified', () => {
+      expect(table.columns.length).toBe(3);
+
+      table.insertColumns([helper.createModelColumn('foo')]);
+
+      expect(table.columns.length).toBe(4);
+
+      const column = table.columns[3];
+      expect(column.text).toBe('foo');
+      expect(column.index).toBe(3);
+      table.rows.forEach(row => expect(table.cellValue(column, row)).toBeNull());
+    });
+
+    it('inserts a column at the specified position', () => {
+      expect(table.columns.length).toBe(3);
+
+      table.insertColumns([helper.createModelColumn('foo')], 1);
+
+      expect(table.columns.length).toBe(4);
+
+      const column = table.columns[1];
+      expect(column.text).toBe('foo');
+      expect(column.index).toBe(3);
+    });
+
+    it('inserts the columns at the specified position', () => {
+      expect(table.columns.length).toBe(3);
+
+      table.insertColumns([helper.createModelColumn('foo'), helper.createModelColumn('number', NumberColumn)], 1);
+
+      expect(table.columns.length).toBe(5);
+
+      const column = table.columns[1];
+      expect(column.text).toBe('foo');
+      expect(column.index).toBe(3);
+
+      const numberColumn = table.columns[2];
+      expect(numberColumn.text).toBe('number');
+      expect(numberColumn.index).toBe(4);
+    });
+
+    it('inserts the columns after the specified column', () => {
+      expect(table.columns.length).toBe(3);
+
+      table.insertColumns([helper.createModelColumn('foo'), helper.createModelColumn('number', NumberColumn)], table.columns[1]);
+
+      expect(table.columns.length).toBe(5);
+
+      const column = table.columns[2];
+      expect(column.text).toBe('foo');
+      expect(column.index).toBe(3);
+
+      const numberColumn = table.columns[3];
+      expect(numberColumn.text).toBe('number');
+      expect(numberColumn.index).toBe(4);
+    });
+
+    it('inserts the columns at the end if the specified column is not part of the table', () => {
+      expect(table.columns.length).toBe(3);
+
+      table.insertColumns([helper.createModelColumn('foo'), helper.createModelColumn('number', NumberColumn)], scout.create(Column, {
+        parent: table,
+        ...helper.createModelColumn('anchor')
+      }));
+
+      expect(table.columns.length).toBe(5);
+
+      const column = table.columns[3];
+      expect(column.text).toBe('foo');
+      expect(column.index).toBe(3);
+
+      const numberColumn = table.columns[4];
+      expect(numberColumn.text).toBe('number');
+      expect(numberColumn.index).toBe(4);
+    });
+
+    it('initializes the inserted column with the specified value', () => {
+      expect(table.columns.length).toBe(3);
+
+      table.insertColumns([helper.createModelColumn('foo')], null, 'bar');
+
+      expect(table.columns.length).toBe(4);
+
+      const column = table.columns[3];
+      table.rows.forEach(row => expect(table.cellValue(column, row)).toBe('bar'));
+
+      table.insertColumns([helper.createModelColumn('number', NumberColumn)], null, (column, row) => table.rows.indexOf(row));
+
+      expect(table.columns.length).toBe(5);
+
+      const numberColumn = table.columns[4];
+      table.rows.forEach((row, index) => expect(table.cellValue(numberColumn, row)).toBe(index));
+    });
+
+    it('calculates the correct index', () => {
+      table.setColumns([]);
+      expect(table.columns.length).toBe(0);
+
+      table.insertColumns([{...helper.createModelColumn('foo'), index: 42}]);
+
+      expect(table.columns.length).toBe(1);
+
+      const column = table.columns[0];
+      expect(column.text).toBe('foo');
+      expect(column.index).toBe(42);
+
+      table.insertColumns([helper.createModelColumn('number', NumberColumn)]);
+
+      expect(table.columns.length).toBe(2);
+
+      const numberColumn = table.columns[1];
+      expect(numberColumn.text).toBe('number');
+      expect(numberColumn.index).toBe(43);
+    });
+
+    it('shifts index of existing columns if necessary', () => {
+      expect(table.columns.length).toBe(3);
+      expect(table.columns.map(c => c.index)).toEqual([0, 1, 2]);
+
+      table.insertColumns([
+        {
+          ...helper.createModelColumn('foo'),
+          index: 1
+        },
+        helper.createModelColumn('number', NumberColumn)
+      ]);
+
+      expect(table.columns.length).toBe(5);
+
+      const column = table.columns[3];
+      expect(column.text).toBe('foo');
+      expect(column.index).toBe(1);
+
+      const numberColumn = table.columns[4];
+      expect(numberColumn.text).toBe('number');
+      expect(numberColumn.index).toBe(4);
+
+      expect(table.columns.map(c => c.index)).toEqual([0, 2, 3, 1, 4]);
+    });
+
+    it('triggers columnStructureChanged event', async () => {
+      jasmine.clock().uninstall();
+
+      expect(table.columns.length).toBe(3);
+
+      const columnStructureChangedPromise = table.when('columnStructureChanged');
+
+      const [column0, column1, column2] = table.columns;
+      table.insertColumns([helper.createModelColumn('foo'), helper.createModelColumn('number', NumberColumn)]);
+
+      expect(table.columns.length).toBe(5);
+
+      const columnStructureChangedEvent = await columnStructureChangedPromise;
+      expect(columnStructureChangedEvent.oldColumns).toEqual([column0, column1, column2]);
+      expect(columnStructureChangedEvent.newColumns.map(c => c.text)).toEqual([column0.text, column1.text, column2.text, 'foo', 'number']);
+    });
+  });
+
+  describe('delete columns', () => {
+    let table: SpecTable;
+
+    beforeEach(() => {
+      const model = helper.createModelFixture(3, 5);
+      table = helper.createTable(model);
+      table.render();
+    });
+
+    it('does nothing if no column is given', () => {
+      expect(table.columns.length).toBe(3);
+
+      table.deleteColumns([]);
+
+      expect(table.columns.length).toBe(3);
+    });
+
+    it('does nothing if column is not part of table', () => {
+      expect(table.columns.length).toBe(3);
+
+      table.deleteColumns([scout.create(Column, {
+        parent: table,
+        ...helper.createModelColumn('foo')
+      })]);
+
+      expect(table.columns.length).toBe(3);
+    });
+
+    it('deletes and destroys columns', () => {
+      expect(table.columns.length).toBe(3);
+
+      const [column0, column1, column2] = table.columns;
+
+      table.deleteColumns([column0, column2]);
+
+      expect(table.columns.length).toBe(1);
+      expect(table.columns[0]).toBe(column1);
+
+      expect(column0.table).toBeNull();
+      expect(column2.table).toBeNull();
+    });
+
+    it('shifts index of remaining columns if necessary', () => {
+      expect(table.columns.length).toBe(3);
+
+      const [column0, column1, column2] = table.columns;
+      expect(column0.index).toBe(0);
+      expect(column1.index).toBe(1);
+      expect(column2.index).toBe(2);
+
+      table.deleteColumns([column1]);
+
+      expect(table.columns.length).toBe(2);
+      expect(column0.index).toBe(0);
+      expect(column2.index).toBe(1);
+    });
+
+    it('triggers columnStructureChanged event', async () => {
+      jasmine.clock().uninstall();
+
+      expect(table.columns.length).toBe(3);
+
+      const columnStructureChangedPromise = table.when('columnStructureChanged');
+
+      const [column0, column1, column2] = table.columns;
+      table.deleteColumns([column0, column1]);
+
+      expect(table.columns.length).toBe(1);
+
+      const columnStructureChangedEvent = await columnStructureChangedPromise;
+      expect(columnStructureChangedEvent.oldColumns).toEqual([column0, column1, column2]);
+      expect(columnStructureChangedEvent.newColumns).toEqual([column2]);
+    });
+  });
+
+  describe('setColumns', () => {
+    let table: SpecTable;
+
+    beforeEach(() => {
+      const model = helper.createModelFixture(3, 5);
+      table = helper.createTable(model);
+      table.render();
+    });
+
+    it('does nothing if column arrays are identical', () => {
+      const columns = table.columns;
+      table.setColumns(columns);
+      expect(table.columns).toBe(columns);
+    });
+
+    it('sets columns if columns are identical but arrays are not', () => {
+      const columns = table.columns;
+      table.setColumns([...columns]);
+      expect(table.columns).not.toBe(columns);
+      expect(table.columns).toEqual(columns);
+    });
+
+    it('initializes inserted columns with the specified value', () => {
+      expect(table.columns.length).toBe(3);
+
+      table.setColumns([...table.columns, helper.createModelColumn('foo')], 'bar');
+
+      expect(table.columns.length).toBe(4);
+
+      const column = table.columns[3];
+      table.rows.forEach(row => expect(table.cellValue(column, row)).toBe('bar'));
+
+      table.setColumns([...table.columns, helper.createModelColumn('number', NumberColumn)], (column, row) => table.rows.indexOf(row));
+
+      expect(table.columns.length).toBe(5);
+
+      const numberColumn = table.columns[4];
+      table.rows.forEach((row, index) => expect(table.cellValue(numberColumn, row)).toBe(index));
+    });
+
+    it('inserts and deletes columns', () => {
+      expect(table.columns.length).toBe(3);
+
+      const [column0, column1, column2] = table.columns;
+
+      table.setColumns([column1, helper.createModelColumn('foo')]);
+
+      expect(table.columns.length).toBe(2);
+
+      expect(table.columns[0]).toBe(column1);
+      expect(column1.index).toBe(0);
+
+      const column = table.columns[1];
+      expect(column.text).toBe('foo');
+      expect(column.index).toBe(1);
+
+      expect(column0.table).toBeNull();
+      expect(column2.table).toBeNull();
+    });
+
+    it('ensures guiOnly columns are not deleted', () => {
+      table.setCheckable(true);
+      table.setRowIconVisible(true);
+
+      expect(table.columns.length).toBe(5);
+      expect(table.checkableColumn).toBe(table.columns[0] as BooleanColumn);
+      expect(table.rowIconColumn).toBe(table.columns[1]);
+
+      table.setColumns([helper.createModelColumn('foo')]);
+
+      expect(table.columns.length).toBe(3);
+      expect(table.checkableColumn).toBe(table.columns[0] as BooleanColumn);
+      expect(table.rowIconColumn).toBe(table.columns[1]);
+    });
+
+    it('updates checkable column', () => {
+      table.setCheckable(true);
+
+      expect(table.columns.length).toBe(4);
+
+      table.setColumns([...table.columns, {...helper.createModelColumn('MyCheckableColumn', BooleanColumn), checkable: true}]);
+
+      expect(table.columns.length).toBe(4);
+      expect(table.checkableColumn).toBe(table.columns[3] as BooleanColumn);
+      expect(table.checkableColumn.text).toBe('MyCheckableColumn');
+    });
+
+    it('updates table node column', () => {
+      expect(table.columns.length).toBe(3);
+      expect(table.tableNodeColumn).toBe(table.columns[0]);
+
+      table.setColumns(helper.createModelColumns(3).map(model => ({...model, nodeColumnCandidate: false})));
+      expect(table.tableNodeColumn).toBeUndefined();
+
+      table.setColumns([...table.columns, helper.createModelColumn('MyTableNodeColumn')]);
+
+      expect(table.columns.length).toBe(4);
+      expect(table.tableNodeColumn).toBe(table.columns[3]);
+      expect(table.tableNodeColumn.text).toBe('MyTableNodeColumn');
+    });
+
+    it('updates permanent sort columns', () => {
+      expect(table.columns.length).toBe(3);
+
+      expect(table._permanentHeadSortColumns.length).toBe(0);
+      expect(table._permanentTailSortColumns.length).toBe(0);
+
+      table.setColumns([
+        ...table.columns,
+        {...helper.createModelColumn('sort-begin-1'), sortIndex: 1, initialAlwaysIncludeSortAtBegin: true}
+      ]);
+
+      expect(table._permanentHeadSortColumns.length).toBe(1);
+      expect(table._permanentHeadSortColumns.map(c => c.text)).toEqual(['sort-begin-1']);
+      expect(table._permanentTailSortColumns.length).toBe(0);
+
+      table.setColumns([
+        {...helper.createModelColumn('sort-end-1'), sortIndex: 1, initialAlwaysIncludeSortAtEnd: true},
+        {...helper.createModelColumn('sort-begin-0'), sortIndex: 0, initialAlwaysIncludeSortAtBegin: true},
+        ...table.columns,
+        {...helper.createModelColumn('sort-end-0'), sortIndex: 0, initialAlwaysIncludeSortAtEnd: true}
+      ]);
+
+      expect(table._permanentHeadSortColumns.length).toBe(2);
+      expect(table._permanentHeadSortColumns.map(c => c.text)).toEqual(['sort-begin-0', 'sort-begin-1']);
+      expect(table._permanentTailSortColumns.length).toBe(2);
+      expect(table._permanentTailSortColumns.map(c => c.text)).toEqual(['sort-end-0', 'sort-end-1']);
+    });
+
+    it('sorts the table rows', () => {
+      for (let i = 0; i < table.rows.length; i++) {
+        (table.rows[i] as { __foo?: string }).__foo = `foo-${i}`;
+        (table.rows[i] as { __bar?: string }).__bar = `bar-${i}`;
+      }
+      table.setColumns([helper.createModelColumn('foo'), helper.createModelColumn('bar')], (column, row) => row[`__${column.text}`]);
+
+      expect(table.rows.map(row => row.cells.map(cell => cell.value))).toEqual([
+        ['foo-0', 'bar-0'],
+        ['foo-1', 'bar-1'],
+        ['foo-2', 'bar-2'],
+        ['foo-3', 'bar-3'],
+        ['foo-4', 'bar-4']
+      ]);
+
+      table.columns[1].sortIndex = 0;
+      table.columns[1].sortActive = true;
+      table.columns[1].sortAscending = false;
+
+      expect(table.rows.map(row => row.cells.map(cell => cell.value))).toEqual([
+        ['foo-0', 'bar-0'],
+        ['foo-1', 'bar-1'],
+        ['foo-2', 'bar-2'],
+        ['foo-3', 'bar-3'],
+        ['foo-4', 'bar-4']
+      ]);
+
+      table.setColumns([...table.columns]);
+
+      expect(table.rows.map(row => row.cells.map(cell => cell.value))).toEqual([
+        ['foo-4', 'bar-4'],
+        ['foo-3', 'bar-3'],
+        ['foo-2', 'bar-2'],
+        ['foo-1', 'bar-1'],
+        ['foo-0', 'bar-0']
+      ]);
+    });
+
+    it('groups the table rows', () => {
+      for (let i = 0; i < table.rows.length; i++) {
+        (table.rows[i] as { __foo?: string }).__foo = `foo-${i % 2}`;
+        (table.rows[i] as { __bar?: string }).__bar = `bar-${i}`;
+      }
+      table.setColumns([helper.createModelColumn('foo'), helper.createModelColumn('bar')], (column, row) => row[`__${column.text}`]);
+
+      expect(table.rows.map(row => row.cells.map(cell => cell.value))).toEqual([
+        ['foo-0', 'bar-0'],
+        ['foo-1', 'bar-1'],
+        ['foo-0', 'bar-2'],
+        ['foo-1', 'bar-3'],
+        ['foo-0', 'bar-4']
+      ]);
+
+      table.columns[0].grouped = true;
+      table.columns[0].sortIndex = 0;
+      table.columns[0].sortActive = true;
+
+      expect(table.rows.map(row => row.cells.map(cell => cell.value))).toEqual([
+        ['foo-0', 'bar-0'],
+        ['foo-1', 'bar-1'],
+        ['foo-0', 'bar-2'],
+        ['foo-1', 'bar-3'],
+        ['foo-0', 'bar-4']
+      ]);
+
+      table.setColumns([...table.columns]);
+
+      expect(table.rows.map(row => row.cells.map(cell => cell.value))).toEqual([
+        ['foo-0', 'bar-0'],
+        ['foo-0', 'bar-2'],
+        ['foo-0', 'bar-4'],
+        ['foo-1', 'bar-1'],
+        ['foo-1', 'bar-3']
+      ]);
+    });
+
+    it('calculates values for background effect', () => {
+      table.setColumns([...table.columns, {...helper.createModelColumn('MyColumnWithBackgroundEffect', NumberColumn), backgroundEffect: 'barChart'}], (column, row) => table.rows.indexOf(row));
+
+      expect(table.columns.length).toBe(4);
+      expect(table.columns[3]).toBeInstanceOf(NumberColumn);
+      expect((table.columns[3] as NumberColumn).calcMinValue).toBe(0);
+      expect((table.columns[3] as NumberColumn).calcMaxValue).toBe(4);
+    });
+
+    it('applies filters', () => {
+      for (let i = 0; i < table.rows.length; i++) {
+        (table.rows[i] as { __foo?: string }).__foo = `foo-${i}`;
+        (table.rows[i] as { __bar?: string }).__bar = `bar-${i % 2}`;
+      }
+
+      table.setColumns([helper.createModelColumn('foo')], (column, row) => row[`__${column.text}`]);
+
+      expect(table.rows.length).toBe(5);
+      expect(table.rows.map(row => row.cells.map(cell => cell.value))).toEqual([
+        ['foo-0'],
+        ['foo-1'],
+        ['foo-2'],
+        ['foo-3'],
+        ['foo-4']
+      ]);
+      expect(table.filteredRows().length).toBe(5);
+
+      table.addFilter(row => strings.contains(row.cells.reduce((acc, cell) => acc + cell.text, ''), '0'));
+      expect(table.rows.length).toBe(5);
+      expect(table.filteredRows().length).toBe(1);
+      expect(table.filteredRows().map(row => row.cells.map(cell => cell.value))).toEqual([
+        ['foo-0']
+      ]);
+
+      table.setColumns([...table.columns, helper.createModelColumn('bar')], (column, row) => row[`__${column.text}`]);
+
+      expect(table.rows.length).toBe(5);
+      expect(table.rows.map(row => row.cells.map(cell => cell.value))).toEqual([
+        ['foo-0', 'bar-0'],
+        ['foo-1', 'bar-1'],
+        ['foo-2', 'bar-0'],
+        ['foo-3', 'bar-1'],
+        ['foo-4', 'bar-0']
+      ]);
+      expect(table.filteredRows().length).toBe(3);
+      expect(table.filteredRows().map(row => row.cells.map(cell => cell.value))).toEqual([
+        ['foo-0', 'bar-0'],
+        ['foo-2', 'bar-0'],
+        ['foo-4', 'bar-0']
+      ]);
+    });
+
+    it('removes column filters', () => {
+      for (let i = 0; i < table.rows.length; i++) {
+        (table.rows[i] as { __foo?: string }).__foo = `foo-${i}`;
+        (table.rows[i] as { __bar?: string }).__bar = `bar-${i}`;
+      }
+      table.setColumns([helper.createModelColumn('foo'), helper.createModelColumn('bar')], (column, row) => row[`__${column.text}`]);
+
+      const [fooColumn, barColumn] = table.columns;
+
+      expect(table.rows.map(row => row.cells.map(cell => cell.value))).toEqual([
+        ['foo-0', 'bar-0'],
+        ['foo-1', 'bar-1'],
+        ['foo-2', 'bar-2'],
+        ['foo-3', 'bar-3'],
+        ['foo-4', 'bar-4']
+      ]);
+      expect(table.filteredRows().length).toBe(5);
+
+      helper.createAndRegisterColumnFilter({
+        session: session,
+        table: table,
+        column: barColumn,
+        selectedValues: ['bar-2', 'bar-3']
+      });
+
+      expect(table.rows.length).toBe(5);
+      expect(table.filteredRows().length).toBe(2);
+      expect(table.filteredRows().map(row => row.cells.map(cell => cell.value))).toEqual([
+        ['foo-2', 'bar-2'],
+        ['foo-3', 'bar-3']
+      ]);
+
+      table.setColumns([fooColumn]);
+
+      expect(table.rows.length).toBe(5);
+      expect(table.rows.map(row => row.cells.map(cell => cell.value))).toEqual([
+        ['foo-0'],
+        ['foo-1'],
+        ['foo-2'],
+        ['foo-3'],
+        ['foo-4']
+      ]);
+      expect(table.filteredRows().length).toBe(5);
+    });
+
+    it('triggers columnStructureChanged event', async () => {
+      jasmine.clock().uninstall();
+
+      expect(table.columns.length).toBe(3);
+
+      const [column0, column1, column2] = table.columns;
+
+      const columnStructureChangedPromise = table.when('columnStructureChanged');
+
+      table.setColumns([column2, helper.createModelColumn('foo'), helper.createModelColumn('number', NumberColumn)]);
+
+      expect(table.columns.length).toBe(3);
+
+      const columnStructureChangedEvent = await columnStructureChangedPromise;
+      expect(columnStructureChangedEvent.oldColumns).toEqual([column0, column1, column2]);
+      expect(columnStructureChangedEvent.newColumns.map(c => c.text)).toEqual([column2.text, 'foo', 'number']);
     });
   });
 });

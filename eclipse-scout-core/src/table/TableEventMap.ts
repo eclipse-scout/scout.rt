@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -49,6 +49,14 @@ export interface TableColumnResizedEvent<TValue = any, T = Table> extends Event<
 
 export interface TableColumnResizedToFitEvent<TValue = any, T = Table> extends Event<T> {
   column: Column<TValue>;
+}
+
+/**
+ * Event containing the old and new list of {@link Column}s after {@link Table.columns} changed.
+ */
+export interface TableColumnStructureChangedEvent<T = Table> extends Event<T> {
+  oldColumns: Column<any>[];
+  newColumns: Column<any>[];
 }
 
 export interface TableCompleteCellEditEvent<TValue = any, T = Table> extends Event<T> {
@@ -160,7 +168,7 @@ export interface TableEventMap extends WidgetEventMap {
   'columnMoved': TableColumnMovedEvent;
   'columnResized': TableColumnResizedEvent;
   'columnResizedToFit': TableColumnResizedToFitEvent;
-  'columnStructureChanged': Event;
+  'columnStructureChanged': TableColumnStructureChangedEvent;
   'completeCellEdit': TableCompleteCellEditEvent;
   'drop': TableDropEvent;
   'filter': Event;
@@ -195,6 +203,7 @@ export interface TableEventMap extends WidgetEventMap {
   'propertyChange:autoResizeColumns': PropertyChangeEvent<boolean>;
   'propertyChange:checkable': PropertyChangeEvent<boolean>;
   'propertyChange:checkableStyle': PropertyChangeEvent<TableCheckableStyle>;
+  'propertyChange:columns': PropertyChangeEvent<Column<any>[]>;
   'propertyChange:compact': PropertyChangeEvent<boolean>;
   'propertyChange:contextColumn': PropertyChangeEvent<Column<any>>;
   'propertyChange:dropMaximumSize': PropertyChangeEvent<number>;
