@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,6 +15,8 @@ export class SpecTable extends Table {
   declare events: EventSupport & { _eventListeners: EventListener[] };
   declare footer: TableFooter & { _$infoTableStatus: JQuery; _$infoTableStatusIcon: JQuery };
   declare _doubleClickSupport: DoubleClickSupport & { _lastTimestamp: number };
+  declare _permanentHeadSortColumns: Column<any>[];
+  declare _permanentTailSortColumns: Column<any>[];
 
   override _resizeToFit(column: Column<any>, maxWidth?: number, calculatedSize?: number) {
     super._resizeToFit(column, maxWidth, calculatedSize);

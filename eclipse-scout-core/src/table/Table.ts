@@ -423,28 +423,12 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   protected _initColumns() {
     let cols = this.columns as ObjectOrChildModel<Column<any>>[];
     this.columns = cols.map((colModel, index) => {
-      let column: Column<any>;
-      let columnOrModel = colModel as FullModelOf<Column<any>>;
-      if (columnOrModel instanceof Column) {
-        column = columnOrModel;
-        column._setParent(this);
-      } else {
-        columnOrModel.parent = this;
-        column = scout.create(columnOrModel);
-      }
-
+      const column = this._ensureColumn(colModel);
       if (column.index < 0) {
         column.index = index;
       }
-      if (column.checkable) {
-        // set checkable column if this column is the checkable one
-        this.checkableColumn = column as BooleanColumn;
-      }
       return column;
     });
-
-    // Add gui only checkbox column at the beginning
-    this._setCheckable(this.checkable);
 
     // Add gui only row icon column at the beginning
     if (this.rowIconVisible) {
@@ -452,11 +436,27 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     }
 
     this._setCompact(this.compact);
+
+    // update checkable column, table node column and sort columns
+    this._calculateCheckableTableNodeAndSortColumns();
+
+    this.columnLayoutDirty = true;
+  }
+
+  /**
+   * Calculates the {@link Table.checkableColumn} (see {@link Table._calculateCheckableColumn}), the {@link Table.tableNodeColumn} (see {@link Table._calculateTableNodeColumn})
+   * and the {@link Table._permanentHeadSortColumns} and {@link Table._permanentTailSortColumns} (see {@link Table._setHeadAndTailSortColumns}).
+   */
+  protected _calculateCheckableTableNodeAndSortColumns() {
+    // update checkable column
+    this._calculateCheckableColumn();
+    this._setCheckable(this.checkable);
+
+    // update table node column
     this._calculateTableNodeColumn();
 
-    // Sync head and tail sort columns
+    // update sort columns
     this._setHeadAndTailSortColumns();
-    this.columnLayoutDirty = true;
   }
 
   protected override _destroy() {
@@ -912,7 +912,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   onColumnVisibilityChanged() {
     this.columnLayoutDirty = true;
     this._calculateTableNodeColumn();
-    this.trigger('columnStructureChanged');
+    this._triggerColumnStructureChanged(this.columns, this.columns);
 
     // Rebuild aggregate rows. This computes missing aggregate values for previously hidden columns. It is also a convenient
     // way to fix the column indices. The aggregate table control was already updated via 'columnStructureChanged' event.
@@ -4985,16 +4985,17 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   protected _setRowIconVisible(rowIconVisible: boolean) {
     this._setProperty('rowIconVisible', rowIconVisible);
     let column = this.rowIconColumn;
+    const columns = [...this.columns];
     if (this.rowIconVisible && !column) {
       this._insertRowIconColumn();
       this._calculateTableNodeColumn();
-      this.trigger('columnStructureChanged');
+      this._triggerColumnStructureChanged(columns, this.columns);
     } else if (!this.rowIconVisible && column) {
       column.destroy();
       arrays.remove(this.columns, column);
       this.rowIconColumn = null;
       this._calculateTableNodeColumn();
-      this.trigger('columnStructureChanged');
+      this._triggerColumnStructureChanged(columns, this.columns);
     }
   }
 
@@ -5283,19 +5284,34 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._updateCheckableColumn();
   }
 
+  /**
+   * Calculates the {@link Table.checkableColumn}. It is the last column in {@link Table.columns} that is {@link Column.checkable}.
+   */
+  protected _calculateCheckableColumn() {
+    const oldCheckableColumn = this.checkableColumn;
+    this.checkableColumn = [...this.columns].reverse().find(c => c.checkable) as BooleanColumn;
+
+    // remove old checkable column if it was a guiOnly column
+    if (this.checkableColumn !== oldCheckableColumn && oldCheckableColumn?.guiOnly) {
+      oldCheckableColumn.destroy();
+      arrays.remove(this.columns, oldCheckableColumn);
+    }
+  }
+
   protected _updateCheckableColumn() {
     let column = this.checkableColumn;
     let showCheckBoxes = this.checkable && scout.isOneOf(this.checkableStyle, Table.CheckableStyle.CHECKBOX, Table.CheckableStyle.CHECKBOX_TABLE_ROW);
+    const columns = [...this.columns];
     if (showCheckBoxes && !column) {
       this._insertBooleanColumn();
       this._calculateTableNodeColumn();
-      this.trigger('columnStructureChanged');
+      this._triggerColumnStructureChanged(columns, this.columns);
     } else if (!showCheckBoxes && column && column.guiOnly) {
       column.destroy();
       arrays.remove(this.columns, column);
       this.checkableColumn = null;
       this._calculateTableNodeColumn();
-      this.trigger('columnStructureChanged');
+      this._triggerColumnStructureChanged(columns, this.columns);
     }
   }
 
@@ -5885,14 +5901,241 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   /**
+   * Sets the given {@link Column}s. All columns that are removed will also be removed from {@link TableRow.cells}. All new columns are initialized with the given initValue.
+   * Column properties, e.g. {@link Column.sortIndex}, {@link Column.grouped} and {@link NumberColumn.backgroundEffect}, and {@link Table.filters} are re-applied.
+   */
+  setColumns(columnOrModels: ObjectOrChildModel<Column<any>>[], initValue?: any | ((Column, TableRow) => any)) {
+    // do not check equality of columns, this gives the possibility to only apply new column settings like sorting, grouping, etc.
+    if (this.columns === columnOrModels) {
+      return;
+    }
+    this._setColumns(columnOrModels, initValue);
+    if (this.rendered) {
+      this._renderColumns();
+    }
+  }
+
+  /**
+   * @see setColumns
+   */
+  protected _setColumns(columnOrModels: ObjectOrChildModel<Column<any>>[], initValue?: any | ((Column, TableRow) => any)) {
+    // ensure this.columns are initialized, otherwise models contained in this.columns are considered deleted and therefore corresponding cells are deleted as well
+    for (const column of this.columns) {
+      scout.assertInstance(column, Column, 'Table.columns are not initialized yet.');
+    }
+
+    // ensure initValue function
+    if (initValue === undefined) {
+      initValue = null;
+    }
+    if (!objects.isFunction(initValue)) {
+      const value = initValue;
+      initValue = (column: Column, row: TableRow) => value;
+    }
+
+    // ensure guiOnly columns are part of columnsOrModels and are the first elements
+    const guiOnlyColumns = this.filterColumns(c => c.guiOnly);
+    arrays.removeAll(columnOrModels, guiOnlyColumns);
+    columnOrModels = [...guiOnlyColumns, ...columnOrModels];
+
+    // ensure columns
+    const columns = columnOrModels
+      .map(column => this._ensureColumn(column))
+      .filter(column => !!column);
+
+    const oldColumns = [...this.columns];
+    const deletedColumns = arrays.diff(this.columns, columns);
+    const insertedColumns = arrays.diff(columns, this.columns);
+    const currentColumns = [...this.columns];
+
+    let buffering: JQuery.Deferred<void>;
+
+    // deleted columns
+    for (const column of deletedColumns) {
+      // update index of other columns and handle cells if removed column has an index set
+      if (column.index >= 0) {
+        // update index of all columns whose index is greater than the index of the removed column
+        for (const c of currentColumns) {
+          if (c.index > column.index) {
+            c.index--;
+          }
+        }
+
+        // remove cells for all rows at the correct position (column.index)
+        this.rows.forEach(row => row.cells.splice(column.index, 1));
+      }
+
+      // remove column filters, do not apply filters here as they will be applied in batch later
+      this.removeFilterByKey(column.id, false);
+
+      // destroy column and remove from current columns
+      column.destroy();
+      arrays.remove(currentColumns, column);
+    }
+
+    // inserted columns
+    for (const column of insertedColumns) {
+      // set index to max index + 1 if no index is provided
+      if (column.index < 0) {
+        column.index = Math.max(-1, ...currentColumns.map(column => column.index)) + 1;
+      }
+
+      // update index of all columns whose index is greater or equal to the index of the new column
+      for (const c of currentColumns) {
+        if (c.index >= column.index) {
+          c.index++;
+        }
+      }
+
+      // set updateBuffer buffering until all columns are added, otherwise column.initCell triggers updateRow before the rows cell array is modified
+      if (!buffering) {
+        buffering = $.Deferred();
+        this.updateBuffer.pushPromise(buffering.promise());
+      }
+
+      // insert new cell for all rows at the correct position (column.index)
+      this.rows.forEach(row => {
+        if (column.index > row.cells.length + 1) {
+          // if index is larger than length, arrays.insert will insert it at the end which is not correct if index is larger than length + 1
+          // in this case there is no need to shift other elements -> simply add the cell at the right index
+          row.cells[column.index] = column.initCell(initValue(column, row), row);
+        } else {
+          arrays.insert(row.cells, column.initCell(initValue(column, row), row), column.index);
+        }
+      });
+
+      // add to current columns
+      currentColumns.push(column);
+    }
+
+    this._setProperty('columns', columns);
+
+    // update checkable column, table node column and sort columns
+    this._calculateCheckableTableNodeAndSortColumns();
+
+    // apply sorting and grouping
+    this._sort();
+
+    // only calculate values for background effect, rendering is done in _renderColumns
+    this._calculateValuesForBackgroundEffect();
+
+    // re-apply filters
+    this._updateRowStructure({filteredRows: true});
+
+    // resolve buffering and trigger events
+    buffering?.resolve();
+    this._triggerColumnStructureChanged(oldColumns, this.columns);
+  }
+
+  protected _renderColumns() {
+    this.columnLayoutDirty = true;
+    this._updateRowWidth();
+    this.redraw();
+  }
+
+  /**
+   * Triggers {@link TableColumnStructureChangedEvent}.
+   */
+  protected _triggerColumnStructureChanged(oldColumns: Column<any>[], newColumns: Column<any>[]) {
+    // create new arrays to prevent unexpected behaviour if listeners modify the arrays
+    oldColumns = [...oldColumns];
+    newColumns = [...newColumns];
+    this.trigger('columnStructureChanged', {oldColumns, newColumns});
+  }
+
+  /**
+   * Inserts the given {@link Column}.
+   * The column will be inserted into {@link Table.columns} at the specified position or after the given anchor {@link Column}.
+   * The inserted column is initialized with the given initValue.
+   */
+  insertColumn(columnOrModel: ObjectOrChildModel<Column<any>>, positionOrInsertAfterColumn?: number | Column<any>, initValue?: any | ((Column, TableRow) => any)) {
+    this.insertColumns([columnOrModel], positionOrInsertAfterColumn, initValue);
+  }
+
+  /**
+   * Inserts the given {@link Column}s.
+   * The columns will be inserted into {@link Table.columns} at the specified position or after the given anchor {@link Column}.
+   * The inserted columns are initialized with the given initValue.
+   */
+  insertColumns(columnOrModels: ObjectOrChildModel<Column<any>>[], positionOrInsertAfterColumn?: number | Column<any>, initValue?: any | ((Column, TableRow) => any)) {
+    if (!columnOrModels?.length) {
+      return;
+    }
+
+    // determine position
+    let position: number;
+    if (objects.isNumber(positionOrInsertAfterColumn)) {
+      position = positionOrInsertAfterColumn;
+    } else if (positionOrInsertAfterColumn instanceof Column) {
+      // insert directly after anchor column if it is part of this.columns
+      const positionCandidate = this.columns.indexOf(positionOrInsertAfterColumn);
+      if (positionCandidate > -1) {
+        position = positionCandidate + 1;
+      }
+    }
+
+    // add columns last if no position has been determined
+    if (!objects.isNumber(position)) {
+      position = this.columns.length;
+    }
+
+    // remove columns from columnOrModels that are already part of this.columns
+    arrays.removeAll(columnOrModels, this.columns);
+
+    // create new columns
+    const newColumns = [...this.columns];
+    arrays.insertAll(newColumns, columnOrModels, position);
+
+    this.setColumns(newColumns, initValue);
+  }
+
+  /**
+   * Deletes the given {@link Column} from {@link Table.columns}.
+   */
+  deleteColumn(column: Column) {
+    this.deleteColumns([column]);
+  }
+
+  /**
+   * Deletes the given {@link Column}s from {@link Table.columns}.
+   */
+  deleteColumns(columns: Column[]) {
+    if (!columns?.length) {
+      return;
+    }
+
+    // create new columns
+    const newColumns = [...this.columns];
+    arrays.removeAll(newColumns, columns);
+
+    this.setColumns(newColumns);
+  }
+
+  /**
+   * Ensures the given {@link ObjectOrChildModel} to be a {@link Column} and sets its parent to this {@link Table}.
+   */
+  protected _ensureColumn<T extends Column<any> = Column>(columnOrModel: ObjectOrChildModel<T>): T {
+    if (columnOrModel instanceof Column) {
+      columnOrModel._setParent(this);
+      return columnOrModel;
+    }
+
+    return scout.create({
+      ...columnOrModel,
+      parent: this
+    }) as T;
+  }
+
+  /**
    * Rebuilds the header.<br>
    * Does not modify the rows, it expects a deleteAll and insert operation to follow which will do the job.
    */
   updateColumnStructure(columns: Column<any>[]) {
     this._destroyColumns();
+    const oldColumns = [...this.columns];
     this.columns = columns;
     this._initColumns();
-    this.trigger('columnStructureChanged');
+    this._triggerColumnStructureChanged(oldColumns, this.columns);
     if (this._isDataRendered()) {
       this._updateRowWidth();
       this.$rows(true).css('width', this.rowWidth);
