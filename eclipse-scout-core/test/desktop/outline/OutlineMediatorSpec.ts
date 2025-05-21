@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Device, Outline, PageWithNodes, PageWithTable, scout, Table, TableModel, TableTextUserFilter} from '../../../src/index';
+import {Action, Device, Outline, PageWithNodes, PageWithTable, scout, Table, TableModel, TableTextUserFilter} from '../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../src/testing/index';
 
 describe('OutlineMediator', () => {
@@ -75,6 +75,18 @@ describe('OutlineMediator', () => {
 
     expect(page.expanded).toBe(false);
     expect(outline.selectedNode()).toBe(null);
+
+    // no drill down on row action if defaultRowAction is set
+    detailTable.setDefaultRowAction(scout.create(Action, {parent: detailTable}));
+
+    detailTable.selectRows([firstRow]);
+    detailTable.doRowAction(firstRow, firstColumn);
+
+    expect(page.expanded).toBe(false);
+    expect(outline.selectedNode()).toBe(null);
+
+    // drill down on row action if defaultRowAction is not set
+    detailTable.setDefaultRowAction(null);
 
     detailTable.selectRows([firstRow]);
     detailTable.doRowAction(firstRow, firstColumn);
