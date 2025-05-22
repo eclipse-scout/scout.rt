@@ -10,6 +10,10 @@
 import {Alignment, Column, ColumnComparator, ObjectModelWithId, ObjectModelWithUuid, Session, Table} from '../../index';
 
 export interface ColumnModel<TValue = string> extends ObjectModelWithUuid<Column<TValue>>, ObjectModelWithId {
+  /**
+   * The table this column belongs to.
+   */
+  parent?: Table;
   session?: Session;
   /**
    * Configures whether the column width is auto optimized.
@@ -268,11 +272,6 @@ export interface ColumnModel<TValue = string> extends ObjectModelWithUuid<Column
    * Default is true.
    */
   showSeparator?: boolean;
-
-  /**
-   * The table this column belongs to.
-   */
-  table?: Table;
 
   /**
    * Default is 4000.

@@ -425,12 +425,11 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.columns = cols.map((colModel, index) => {
       let column: Column<any>;
       let columnOrModel = colModel as FullModelOf<Column<any>>;
-      columnOrModel.session = this.session;
       if (columnOrModel instanceof Column) {
         column = columnOrModel;
-        column._setTable(this);
+        column._setParent(this);
       } else {
-        columnOrModel.table = this;
+        columnOrModel.parent = this;
         column = scout.create(columnOrModel);
       }
 
@@ -546,15 +545,14 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       return;
     }
     let column = scout.create(BooleanColumn, {
-      session: this.session,
+      parent: this,
       fixedWidth: true,
       fixedPosition: true,
       guiOnly: true,
       nodeColumnCandidate: false,
       headerMenuEnabled: false,
       showSeparator: false,
-      width: Column.NARROW_MIN_WIDTH,
-      table: this
+      width: Column.NARROW_MIN_WIDTH
     });
 
     arrays.insert(this.columns, column, 0);
@@ -564,15 +562,14 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   protected _insertRowIconColumn() {
     let position = 0,
       column = scout.create(IconColumn, {
-        session: this.session,
+        parent: this,
         fixedWidth: true,
         fixedPosition: true,
         guiOnly: true,
         nodeColumnCandidate: false,
         headerMenuEnabled: false,
         showSeparator: false,
-        width: this.rowIconColumnWidth,
-        table: this
+        width: this.rowIconColumnWidth
       });
     if (this.columns[0] === this.checkableColumn) {
       position = 1;
@@ -5284,8 +5281,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
   protected _insertCompactColumn() {
     let column = scout.create(CompactColumn, {
-      session: this.session,
-      table: this,
+      parent: this,
       guiOnly: true,
       headerMenuEnabled: false
     });

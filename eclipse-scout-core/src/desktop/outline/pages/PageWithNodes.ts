@@ -21,17 +21,16 @@ export class PageWithNodes extends Page {
   }
 
   protected override _createDetailTable(): Table {
-    let nodeColumn = scout.create(Column, {
-      id: 'NodeColumn',
-      session: this.session
-    });
     let table = scout.create(Table, {
       parent: this.parent,
       id: 'PageWithNodesTable',
       autoResizeColumns: true,
       headerVisible: false,
       hasReloadHandler: this.reloadable,
-      columns: [nodeColumn]
+      columns: [{
+        id: 'NodeColumn',
+        objectType: Column
+      }]
     });
     table.menuBar.setPosition(MenuBar.Position.TOP);
     table.on('rowAction', this._onDetailTableRowAction.bind(this));

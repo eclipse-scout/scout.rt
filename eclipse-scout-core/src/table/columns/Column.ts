@@ -17,7 +17,7 @@ import $ from 'jquery';
 @objectFactoryHints({ensureId: true})
 export class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue>, ObjectWithType, ObjectWithUuid {
   declare model: ColumnModel<TValue>;
-  declare initModel: SomeRequired<this['model'], 'session'>;
+  declare initModel: SomeRequired<this['model'], 'parent'>;
   declare eventMap: ColumnEventMap;
   declare self: Column<any>;
 
@@ -63,7 +63,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   initialWidth: number;
   minWidth: number;
   showSeparator: boolean;
-  table: Table;
+  parent: Table;
   tableNodeColumn: boolean;
   maxLength: number;
   text: string;
@@ -126,8 +126,8 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     this.width = 60;
     this.initialWidth = undefined;
     this.minWidth = Column.DEFAULT_MIN_WIDTH;
+    this.parent = null;
     this.showSeparator = true;
-    this.table = null;
     this.tableNodeColumn = false;
     this.maxLength = 4000;
     this.text = null;
@@ -160,8 +160,12 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   static NARROW_MIN_WIDTH = 34;
 
   protected override _init(model: InitModelOf<this>) {
+    model.parent = model.parent || model.table; // Table was renamed to parent -> map table to parent to not break existing code
+    delete model.table;
     super._init(model);
-    this.session = model.session;
+
+    this._setParent(this.parent);
+    this.session = scout.assertInstance(model.session || this.parent?.session, Session);
 
     // Initial width is only sent if it differs from width
     if (this.initialWidth === undefined) {
@@ -171,7 +175,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     texts.resolveTextProperty(this, 'text');
     texts.resolveTextProperty(this, 'headerTooltipText');
     icons.resolveIconProperty(this, 'headerIconId');
-    this._setTable(this.table);
+
     this._setAutoOptimizeWidth(this.autoOptimizeWidth);
     this.sortActive = scout.nvl(this.sortActive, this.sortIndex >= 0);
     // no need to call setEditable here. cell propagation is done in _initCell
@@ -179,7 +183,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 
   destroy() {
     this._destroy();
-    this._setTable(null);
+    this._setParent(null);
   }
 
   /**
@@ -204,14 +208,21 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   }
 
   /** @internal */
-  _setTable(table: Table) {
-    if (this.table) {
-      this.table.off('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
+  _setParent(parent: Table) {
+    if (this.parent === parent) {
+      return;
     }
-    this.table = table;
-    if (this.table) {
-      this.table.on('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
+    if (this.parent) {
+      this.parent.off('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
     }
+    this.parent = parent;
+    if (this.parent) {
+      this.parent.on('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
+    }
+  }
+
+  get table(): Table {
+    return this.parent;
   }
 
   /**

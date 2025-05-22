@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -91,7 +91,7 @@ describe('TableTextUserFilter', () => {
       expect(table.filteredRows().length).toBe(2);
     });
 
-    it('separates cell values with whitepace', () => {
+    it('separates cell values with whitespace', () => {
       let model = helper.createModelFixture(2, 0),
         table = helper.createTable(model),
         filter = createFilter(table);
@@ -121,12 +121,10 @@ describe('TableTextUserFilter', () => {
       let table = scout.create(Table, {
         parent: new NullWidget(),
         session: session,
-        columns: [
-          scout.create(ASpecBeanColumn, {
-            session: session,
-            width: 100
-          })
-        ]
+        columns: [{
+          objectType: ASpecBeanColumn,
+          width: 100
+        }]
       });
       let filter = createFilter(table);
       let bean0 = {

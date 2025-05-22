@@ -30,19 +30,17 @@ export class TagChooserPopup extends Popup implements TagChooserPopupModel {
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
-    let column = scout.create(Column, {
-      session: this.session,
-      text: 'Tag',
-      autoOptimizeWidth: false
-    });
-
     this.table = scout.create(Table, {
       parent: this,
       headerVisible: false,
       autoResizeColumns: true,
       multiSelect: false,
       scrollToSelection: true,
-      columns: [column],
+      columns: [{
+        objectType: Column,
+        text: 'Tag',
+        autoOptimizeWidth: false
+      }],
       headerMenusEnabled: false,
       textFilterEnabled: false
     });
