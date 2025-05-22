@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -143,7 +143,7 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
           LOG.debug("HealthCheck[{}] has started", getName());
           try {
             boolean result = execCheckHealth(category);
-            notifyHealthCheckResult(result);
+            notifyHealthCheckResult(result, category);
             return result;
           }
           catch (InterruptedException e) {
@@ -168,13 +168,15 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
    *
    * @param result
    *     status of last executed health check
+   * @param category
+   *     type of health check that was performed (see {@link org.eclipse.scout.rt.server.commons.healthcheck.IHealthChecker} for types)
    */
-  protected void notifyHealthCheckResult(boolean result) {
+  protected void notifyHealthCheckResult(boolean result, HealthCheckCategoryId category) {
     if (result) {
-      LOG.debug("HealthCheck[{}] was successful", getName());
+      LOG.debug("HealthCheck[{}:{}] was successful", getName(), category);
     }
     else {
-      LOG.warn("HealthCheck[{}] failed.", getName());
+      LOG.warn("HealthCheck[{}:{}] failed.", getName(), category);
     }
   }
 }
