@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,22 +8,22 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, arrays, Cell, Column, ColumnDescriptor, ListBoxTableAccessibilityRenderer, lookupField, LookupRow, objects, ProposalChooser, scout, SmartFieldLookupResult, Table, TableLayoutResetter, TableRow, TableRowClickEvent, TableRowModel,
-  TableRowsSelectedEvent
+  aria, arrays, Cell, Column, ColumnDescriptor, ColumnModel, ListBoxTableAccessibilityRenderer, lookupField, LookupRow, ObjectOrChildModel, objects, ProposalChooser, scout, SmartFieldLookupResult, Table, TableLayoutResetter, TableRow,
+  TableRowClickEvent, TableRowModel, TableRowsSelectedEvent
 } from '../../../index';
 
 export class TableProposalChooser<TValue> extends ProposalChooser<TValue, Table, TableRow> {
 
   protected override _createContent(): Table {
-    let headerVisible = false,
-      columns = [],
-      descriptors = this.smartField.columnDescriptors;
+    let headerVisible = false;
+    let columns = [];
+    let descriptors = this.smartField.columnDescriptors;
 
     if (descriptors) {
-      descriptors.forEach(function(descriptor, index) {
+      descriptors.forEach((descriptor, index) => {
         headerVisible = headerVisible || !!descriptor.text;
         columns.push(this._createColumnForDescriptor(descriptor));
-      }, this);
+      });
     } else {
       columns.push(this._createColumn());
     }
@@ -41,12 +41,12 @@ export class TableProposalChooser<TValue> extends ProposalChooser<TValue, Table,
     return scout.create(TableLayoutResetter, this.content);
   }
 
-  protected _createColumn(): Column<TValue> {
-    return scout.create(Column, {
-      session: this.session,
+  protected _createColumn(): ObjectOrChildModel<ColumnModel<TValue>> {
+    return {
+      objectType: Column,
       width: Column.NARROW_MIN_WIDTH,
       horizontalAlignment: this.smartField.gridData.horizontalAlignment
-    }) as Column<TValue>;
+    };
   }
 
   protected _createColumnForDescriptor(descriptor: ColumnDescriptor): Column {

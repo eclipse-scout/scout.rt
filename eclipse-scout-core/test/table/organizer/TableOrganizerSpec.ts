@@ -134,7 +134,7 @@ describe('TableOrganizer', () => {
 
       organizer.getInvisibleColumns = () => [];
       expect(organizer.isColumnAddable()).toBe(false);
-      organizer.getInvisibleColumns = () => [scout.create(Column, {session: session})];
+      organizer.getInvisibleColumns = () => [scout.create(Column, {parent: table})];
       expect(organizer.isColumnAddable()).toBe(true);
     });
 
@@ -147,7 +147,7 @@ describe('TableOrganizer', () => {
       expect(organizer.isColumnAddable()).toBe(false);
       table.isCustomizable = () => true;
       expect(organizer.isColumnAddable()).toBe(true);
-      organizer.getInvisibleColumns = () => [scout.create(Column, {session: session})];
+      organizer.getInvisibleColumns = () => [scout.create(Column, {parent: table})];
       expect(organizer.isColumnAddable()).toBe(true);
     });
 
@@ -161,7 +161,7 @@ describe('TableOrganizer', () => {
       expect(organizer.isColumnAddable()).toBe(false);
       table.isCustomizable = () => true;
       expect(organizer.isColumnAddable()).toBe(false);
-      organizer.getInvisibleColumns = () => [scout.create(Column, {session: session})];
+      organizer.getInvisibleColumns = () => [scout.create(Column, {parent: table})];
       expect(organizer.isColumnAddable()).toBe(false);
 
       table.columnAddable = true;
