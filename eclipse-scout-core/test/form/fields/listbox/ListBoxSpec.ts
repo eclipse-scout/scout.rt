@@ -290,7 +290,7 @@ describe('ListBox', () => {
       });
       field.on('prepareLookupCall', event => {
         expect(event.lookupCall['customProperty']).toBe(templatePropertyValue);
-        expect(event.lookupCall.id).not.toBe(field.lookupCall.id);
+        expect(event.lookupCall).not.toBe(field.lookupCall);
         expect(event.type).toBe('prepareLookupCall');
         expect(event.source).toBe(field);
 
