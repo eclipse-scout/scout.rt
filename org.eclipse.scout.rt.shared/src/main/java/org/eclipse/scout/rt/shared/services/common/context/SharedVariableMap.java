@@ -63,18 +63,22 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
 
   /**
    * Update values of this variable map with the new one.
+   * <p>
+   * Fires a change event
    */
   public synchronized void updateInternal(Map<String, Object> newMap) {
     if (m_variables.equals(newMap)) {
       return; // nothing changed
     }
 
+    Map<String, Object> oldVariables = CollectionUtility.copyMap(m_variables);
     m_variables.clear();
-    putAll(newMap); // fires a value changed event
+    m_variables.putAll(newMap);
+    fireValuesChanged(oldVariables);
   }
 
-  private void fireValuesChanged() {
-    m_propertySupport.firePropertyChange(PROP_VALUES, null, CollectionUtility.copyMap(m_variables));
+  private void fireValuesChanged(Map<String, Object> oldVariables) {
+    m_propertySupport.firePropertyChange(PROP_VALUES, oldVariables, CollectionUtility.copyMap(m_variables));
   }
 
   /**
@@ -82,8 +86,9 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
    */
   @Override
   public synchronized void clear() {
+    Map<String, Object> oldVariables = CollectionUtility.copyMap(m_variables);
     m_variables.clear();
-    fireValuesChanged();
+    fireValuesChanged(oldVariables);
   }
 
   @Override
@@ -121,8 +126,9 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
    */
   @Override
   public synchronized Object put(String key, Object value) {
+    Map<String, Object> oldVariables = CollectionUtility.copyMap(m_variables);
     Object o = m_variables.put(key, value);
-    fireValuesChanged();
+    fireValuesChanged(oldVariables);
     return o;
   }
 
@@ -131,8 +137,9 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
    */
   @Override
   public synchronized void putAll(Map<? extends String, ?> m) {
+    Map<String, Object> oldVariables = CollectionUtility.copyMap(m_variables);
     m_variables.putAll(m);
-    fireValuesChanged();
+    fireValuesChanged(oldVariables);
   }
 
   /**
@@ -140,8 +147,9 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
    */
   @Override
   public synchronized Object remove(Object key) {
+    Map<String, Object> oldVariables = CollectionUtility.copyMap(m_variables);
     Object o = m_variables.remove(key);
-    fireValuesChanged();
+    fireValuesChanged(oldVariables);
     return o;
   }
 

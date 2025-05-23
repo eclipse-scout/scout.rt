@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,11 +9,11 @@
  */
 package org.eclipse.scout.rt.shared;
 
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 
 /**
@@ -33,15 +33,9 @@ public interface ISession {
   String getId();
 
   /**
-   * Shared context variable containing the authenticated userId in lowercase
+   * Authenticated userId, extracted by {@link IAccessControlService#getUserIdOfCurrentSubject()}
    */
   String getUserId();
-
-  /**
-   * @return the shared variable map. Shared variables are automatically updated on the client by client notifications
-   * when changed on the server.
-   */
-  Map<String, Object> getSharedVariableMap();
 
   /**
    * Returns true if the session has been loaded and is running.

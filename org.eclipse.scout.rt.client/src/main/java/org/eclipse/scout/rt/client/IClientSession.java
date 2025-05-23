@@ -125,8 +125,6 @@ public interface IClientSession extends ISession, IPropertyObserver {
    */
   void setMemoryPolicy(IMemoryPolicy memoryPolicy);
 
-  void replaceSharedVariableMapInternal(Map<String, Object> newMap);
-
   /**
    * Returns the <em>one-permit</em> {@link IExecutionSemaphore} to run model jobs of this session in sequence, meaning
    * that only one model job is active at any given time for this session.
@@ -138,4 +136,17 @@ public interface IClientSession extends ISession, IPropertyObserver {
    * map} that should be accessible in the browser. Never returns {@code null}.
    */
   Set<String> getExposedSharedVariables();
+
+  /**
+   * @return the variable map holding additional information used by the client session
+   */
+  Map<String, Object> getSharedVariableMap();
+
+  /**
+   * Sets multiple shared variables and fires a change event. Existing entries with the same keys will be overwritten.
+   *
+   * @param variables
+   *     map of variables that should be set
+   */
+  void setSharedVariables(Map<String, Object> variables);
 }

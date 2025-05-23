@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.slf4j.Logger;
@@ -80,7 +79,6 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
    * session.
    */
   public void sessionStarted(final IClientSession session) {
-    ensureUserIdAvailable(session);
     checkSession(session);
     LOG.debug("Register client session [sessionId={}, userId={}].", session.getId(), session.getUserId());
     registerUser(session);
@@ -121,14 +119,6 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
         m_userToSessions.put(session.getUserId(), sessionRefs);
       }
     }
-  }
-
-  /**
-   * Make sure, the userid is set on the session. A first server-lookup creates the server session and synchronized the
-   * userid.
-   */
-  protected void ensureUserIdAvailable(IClientSession session) {
-    BEANS.get(IPingService.class).ping("ensure shared context is loaded...");
   }
 
   @Override

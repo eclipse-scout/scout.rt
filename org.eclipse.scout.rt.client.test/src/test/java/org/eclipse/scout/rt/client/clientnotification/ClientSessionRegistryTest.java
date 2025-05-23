@@ -41,7 +41,7 @@ public class ClientSessionRegistryTest {
    */
   @Test
   public void testRegisteredWhenSessionStarted() {
-    ClientSessionRegistry reg = new TestClientSessionRegistry();
+    ClientSessionRegistry reg = new ClientSessionRegistry();
     startSession(reg);
 
     final List<IClientSession> userSessions = reg.getClientSessionsForUser(m_clientSession.getUserId());
@@ -52,7 +52,7 @@ public class ClientSessionRegistryTest {
 
   @Test
   public void testUnRegisteredWhenSessionStopped() {
-    ClientSessionRegistry reg = new TestClientSessionRegistry();
+    ClientSessionRegistry reg = new ClientSessionRegistry();
     startSession(reg);
     reg.sessionStopped(m_clientSession);
     final List<IClientSession> userSessions = reg.getClientSessionsForUser(m_clientSession.getUserId());
@@ -63,12 +63,5 @@ public class ClientSessionRegistryTest {
   private void startSession(ClientSessionRegistry reg) {
     reg.register(m_clientSession, m_clientSession.getId());
     reg.sessionStarted(m_clientSession);
-  }
-
-  class TestClientSessionRegistry extends ClientSessionRegistry {
-    @Override
-    protected void ensureUserIdAvailable(IClientSession session) {
-      //nop
-    }
   }
 }
