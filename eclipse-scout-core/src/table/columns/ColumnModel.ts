@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Alignment, Column, ColumnComparator, ObjectModelWithUuid, Session, Table} from '../../index';
+import {Alignment, Column, ColumnComparator, ObjectModelWithId, ObjectModelWithUuid, Session, Table} from '../../index';
 
-export interface ColumnModel<TValue = string> extends ObjectModelWithUuid<Column<TValue>> {
+export interface ColumnModel<TValue = string> extends ObjectModelWithUuid<Column<TValue>>, ObjectModelWithId {
   session?: Session;
   /**
    * Configures whether the column width is auto optimized.
