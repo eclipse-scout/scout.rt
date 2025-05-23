@@ -11,8 +11,10 @@ package org.eclipse.scout.rt.shared.services.common.context;
 
 import static org.junit.Assert.assertEquals;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -26,15 +28,17 @@ public class SharedVariableMapTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testUpdateInternal() {
-    List<Map<String, Object>> protocol = new ArrayList<>();
+    List<PropertyChangeEvent> protocol = new ArrayList<>();
     SharedVariableMap m = new SharedVariableMap();
     m.put("1", 1L);
     m.put("2", 2L);
     assertEquals(2, m.size());
 
-    PropertyChangeListener propertyChangeListener = e -> protocol.add((Map<String, Object>) e.getNewValue());
+    PropertyChangeListener propertyChangeListener = e -> protocol.add(e);
     m.addPropertyChangeListener(propertyChangeListener);
     m.put("3", 3L);
+    m.clear();
+    m.putAll(Map.of("1", 1L, "2", 2L, "3", 3L));
     m.remove("1");
     m.updateInternal(Map.of("11", 11L, "22", 22L, "33", 33L));
     m.updateInternal(Map.of("33", 33L, "11", 11L, "22", 22L)); // this update is ignored (no changes)
@@ -44,10 +48,22 @@ public class SharedVariableMapTest {
     assertEquals(22L, m.get("22"));
     assertEquals(33L, m.get("33"));
 
-    assertEquals(3, protocol.size());
-    assertEquals(Map.of("1", 1L, "2", 2L, "3", 3L), protocol.get(0));
-    assertEquals(Map.of("2", 2L, "3", 3L), protocol.get(1));
-    assertEquals(Map.of("11", 11L, "22", 22L, "33", 33L), protocol.get(2));
+    assertEquals(5, protocol.size());
+    // put
+    assertEquals(Map.of("1", 1L, "2", 2L), protocol.get(0).getOldValue());
+    assertEquals(Map.of("1", 1L, "2", 2L, "3", 3L), protocol.get(0).getNewValue());
+    // clear
+    assertEquals(Map.of("1", 1L, "2", 2L, "3", 3L), protocol.get(1).getOldValue());
+    assertEquals(Collections.emptyMap(), protocol.get(1).getNewValue());
+    // putAll
+    assertEquals(Collections.emptyMap(), protocol.get(2).getOldValue());
+    assertEquals(Map.of("1", 1L, "2", 2L, "3", 3L), protocol.get(2).getNewValue());
+    // remove
+    assertEquals(Map.of("1", 1L, "2", 2L, "3", 3L), protocol.get(3).getOldValue());
+    assertEquals(Map.of("2", 2L, "3", 3L), protocol.get(3).getNewValue());
+    // updateInternal
+    assertEquals(Map.of("2", 2L, "3", 3L), protocol.get(4).getOldValue());
+    assertEquals(Map.of("11", 11L, "22", 22L, "33", 33L), protocol.get(4).getNewValue());
     m.removePropertyChangeListener(propertyChangeListener);
   }
 

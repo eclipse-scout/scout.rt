@@ -7,16 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.server;
+package org.eclipse.scout.rt.shared;
 
-public class TestServerSession extends AbstractServerSession {
-  private static final long serialVersionUID = 782294551137415747L;
+public interface ISessionVariable {
 
-  public TestServerSession() {
-    super(true);
-  }
-
-  @Override
-  protected void execLoadSession() {
-  }
+  String SHARED_CONTEXT_USER_ID = "userId";
 }

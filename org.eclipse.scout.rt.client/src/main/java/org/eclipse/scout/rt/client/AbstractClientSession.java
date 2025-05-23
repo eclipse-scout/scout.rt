@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.client;
 
 import static java.util.Collections.*;
+import static org.eclipse.scout.rt.shared.ISessionVariable.SHARED_CONTEXT_USER_ID;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,7 +39,6 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -49,15 +49,17 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
+import org.eclipse.scout.rt.shared.ISessionVariable;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
-import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
+import org.eclipse.scout.rt.shared.session.ISessionService;
+import org.eclipse.scout.rt.shared.session.LoadInitialSharedVariablesResponse;
 import org.eclipse.scout.rt.shared.session.SessionData;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.eclipse.scout.rt.shared.session.SessionMetricsHelper;
@@ -165,7 +167,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    */
   @Override
   public String getUserId() {
-    return getSharedContextVariable("userId", String.class);
+    return getSharedContextVariable(SHARED_CONTEXT_USER_ID, String.class);
   }
 
   @Override
@@ -289,25 +291,27 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   /**
-   * replace the shared variable map with a new version.
-   *
-   * @param newMap
-   *     map to replace the current one with
+   * Sets a single shared variable and fires a change event. If the variable already exists, its value will be overwritten.
    */
-  @Override
-  public void replaceSharedVariableMapInternal(Map<String, Object> newMap) {
-    m_sharedVariableMap.updateInternal(newMap);
+  protected void setSharedVariable(String variableName, Object newValue) {
+    m_sharedVariableMap.put(variableName, newValue);
   }
 
   /**
-   * Pings the server to get the initial shared variables. Blocks until the initial version of the shared variables is
-   * available or the timeout is reached.
-   *
-   * @throws ProcessingException
-   *     if interrupted (and the variables are not initialized)
+   * Sets multiple shared variables and fires a change event. Existing entries with the same keys will be overwritten.
    */
-  protected void initializeSharedVariables() {
-    BEANS.get(IPingService.class).ping("");
+  @Override
+  public void setSharedVariables(Map<String, Object> variables) {
+    m_sharedVariableMap.putAll(variables);
+  }
+
+  /**
+   * Loads the initial shared variables from the server. Blocks until the initial version of the variables is
+   * available or the timeout is reached.
+   */
+  protected void loadInitialSharedVariables() {
+    LoadInitialSharedVariablesResponse initialVariablesResponse = BEANS.get(ISessionService.class).loadInitialSharedVariables();
+    setSharedVariables(initialVariablesResponse.getVariables());
   }
 
   @Override
