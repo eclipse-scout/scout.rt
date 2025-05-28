@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.platform.context;
 
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -566,7 +565,7 @@ public class RunContext implements IAdaptable {
     final RunContext currentRunContext = Assertions.assertNotNull(CURRENT.get());
 
     m_runMonitor = RunMonitor.CURRENT.get();
-    m_subject = Subject.getSubject(AccessController.getContext());
+    m_subject = Subject.current();
     m_locale = NlsLocale.CURRENT.get();
     m_correlationId = CorrelationId.CURRENT.get();
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());

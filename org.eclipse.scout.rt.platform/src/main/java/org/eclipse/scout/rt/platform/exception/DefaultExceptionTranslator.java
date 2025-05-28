@@ -11,7 +11,6 @@ package org.eclipse.scout.rt.platform.exception;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.security.AccessController;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -139,7 +138,7 @@ public class DefaultExceptionTranslator implements IExceptionTranslator<Exceptio
   public <EXCEPTION extends Throwable> EXCEPTION decorate(final EXCEPTION exception) {
     if (exception instanceof IThrowableWithContextInfo) {
       // Associate the current user with this exception.
-      ((IThrowableWithContextInfo) exception).withContextInfo("user", SecurityUtility.getPrincipalNames(Subject.getSubject(AccessController.getContext())));
+      ((IThrowableWithContextInfo) exception).withContextInfo("user", SecurityUtility.getPrincipalNames(Subject.current()));
     }
     return exception;
   }

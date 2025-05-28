@@ -10,7 +10,6 @@
 package org.eclipse.scout.rt.ui.html;
 
 import java.io.IOException;
-import java.security.AccessController;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -82,7 +81,7 @@ public class UiServlet extends AbstractHttpServlet {
     final String cid = req.getHeader(CorrelationId.HTTP_HEADER_NAME);
     final UserAgent userAgent = HttpClientInfo.get(req).toUserAgents().build();
     return ClientRunContexts.copyCurrent(true)
-        .withSubject(Subject.getSubject(AccessController.getContext()))
+        .withSubject(Subject.current())
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
         .withDiagnostics(BEANS.get(ServletDiagnosticsProviderFactory.class).getProviders(req, resp))

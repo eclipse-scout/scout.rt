@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.rt.server.commons.context;
 
-import java.security.AccessController;
-
 import javax.security.auth.Subject;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -63,7 +61,7 @@ public class HttpRunContextProducer {
     }
 
     return contextToFill
-        .withSubject(Subject.getSubject(AccessController.getContext()))
+        .withSubject(Subject.current())
         .withCorrelationId(currentCorrelationId(req))
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)

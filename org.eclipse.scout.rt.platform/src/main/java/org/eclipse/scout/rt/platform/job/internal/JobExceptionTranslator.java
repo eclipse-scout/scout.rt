@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.platform.job.internal;
 
-import java.security.AccessController;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +69,7 @@ public class JobExceptionTranslator {
   protected <EXCEPTION extends Throwable> EXCEPTION decorate(final EXCEPTION exception) {
     if (exception instanceof IThrowableWithContextInfo) {
       ((IThrowableWithContextInfo) exception)
-          .withContextInfo("user", SecurityUtility.getPrincipalNames(Subject.getSubject(AccessController.getContext())))
+          .withContextInfo("user", SecurityUtility.getPrincipalNames(Subject.current()))
           .withContextInfo("calling-thread", Thread.currentThread().getName());
     }
     return exception;

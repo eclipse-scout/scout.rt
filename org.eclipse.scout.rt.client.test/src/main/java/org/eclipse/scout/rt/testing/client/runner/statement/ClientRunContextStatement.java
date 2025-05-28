@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.rt.testing.client.runner.statement;
 
-import java.security.AccessController;
-
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.IClientSession;
@@ -52,7 +50,7 @@ public class ClientRunContextStatement extends Statement {
   }
 
   private void evaluateWithClientRunContext() throws Throwable {
-    final Subject currentSubject = Subject.getSubject(AccessController.getContext());
+    final Subject currentSubject = Subject.current();
     if (currentSubject == null) {
       Assertions.fail("Subject must not be null. Use the annotation '{}' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
     }

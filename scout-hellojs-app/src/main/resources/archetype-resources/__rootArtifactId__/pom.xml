@@ -24,7 +24,7 @@
     <docker.app.image.tag>${versionWithoutSnapshot}-latest</docker.app.image.tag>
     <!-- java source image (pull) -->
     <docker.java.image.name>eclipse-temurin</docker.java.image.name>
-    <docker.java.image.tag>21-jdk-jammy</docker.java.image.tag>
+    <docker.java.image.tag>24-jdk-noble</docker.java.image.tag>
     <docker.java.image>${docker.java.image.name}:${docker.java.image.tag}</docker.java.image>
   </properties>
 

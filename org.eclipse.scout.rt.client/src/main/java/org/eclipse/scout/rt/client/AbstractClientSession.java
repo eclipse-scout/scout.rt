@@ -13,7 +13,6 @@ import static java.util.Collections.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.AccessController;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -106,7 +105,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_sessionData = new SessionData();
     m_stateLock = new Object();
     m_userAgent = UserAgent.get();
-    m_subject = Subject.getSubject(AccessController.getContext());
+    m_subject = Subject.current();
     m_objectExtensions = new ObjectExtensions<>(this, true);
     m_sharedVariableMap = new SharedVariableMap();
     m_exposedSharedVariables = null;

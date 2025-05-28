@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -230,7 +229,7 @@ public class ServiceTunnelServletTest {
 
   private static RunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
     return RunContexts.copyCurrent(true)
-        .withSubject(Subject.getSubject(AccessController.getContext()))
+        .withSubject(Subject.current())
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
         .withDiagnostics(BEANS.get(ServletDiagnosticsProviderFactory.class).getProviders(req, resp));

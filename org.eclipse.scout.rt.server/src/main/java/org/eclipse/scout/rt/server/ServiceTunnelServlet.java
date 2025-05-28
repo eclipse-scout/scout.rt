@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server;
 import static org.eclipse.scout.rt.server.commons.opentelemetry.SpanNamePropagationFromDownstream.addNameToContext;
 
 import java.io.IOException;
-import java.security.AccessController;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongPredicate;
@@ -75,7 +74,7 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
 
   @Override
   protected void doPost(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException, IOException {
-    if (Subject.getSubject(AccessController.getContext()) == null) {
+    if (Subject.current() == null) {
       servletResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
       return;
     }

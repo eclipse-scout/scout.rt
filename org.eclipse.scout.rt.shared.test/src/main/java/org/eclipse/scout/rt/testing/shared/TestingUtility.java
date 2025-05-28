@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -83,7 +83,10 @@ public final class TestingUtility {
     DecimalFormatSymbols symbols = df.getDecimalFormatSymbols();
     StringBuilder sb = new StringBuilder();
     if (minus) {
-      sb.append(df.getNegativePrefix().replace("%", ""));
+      sb.append(df.getNegativePrefix()
+          .replace("%", "") // some locales include the percent sign in the prefix instead of the suffix; this method only supports a suffix, remove it
+          .replace("\u00a0", "") // special cases some locales (e.g. blo) seem to include a non-breaking space in the prefix, trim it
+      );
     }
     sb.append(integerPart);
     if (fractionPart != null) {

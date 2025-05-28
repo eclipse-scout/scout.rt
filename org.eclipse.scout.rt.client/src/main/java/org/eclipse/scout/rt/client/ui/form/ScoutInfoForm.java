@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.client.ui.form;
 
-import java.security.AccessController;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -120,7 +119,7 @@ public class ScoutInfoForm extends AbstractForm {
     String userId = ClientSessionProvider.currentSession().getUserId();
     if (!StringUtility.hasText(userId)) {
       try {
-        Subject subject = Subject.getSubject(AccessController.getContext());
+        Subject subject = Subject.current();
         Principal firstPrincipal = CollectionUtility.firstElement(subject.getPrincipals());
         userId = firstPrincipal.getName();
       }

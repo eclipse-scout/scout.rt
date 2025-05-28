@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.security;
 
-import java.security.AccessController;
 import java.security.PermissionCollection;
 import java.security.Principal;
 import java.util.Collection;
@@ -185,7 +184,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
 
   @Override
   public String getUserIdOfCurrentSubject() {
-    return getUserId(Subject.getSubject(AccessController.getContext()));
+    return getUserId(Subject.current());
   }
 
   @Override
