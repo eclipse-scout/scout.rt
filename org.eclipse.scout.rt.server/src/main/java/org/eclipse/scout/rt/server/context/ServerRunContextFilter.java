@@ -10,7 +10,6 @@
 package org.eclipse.scout.rt.server.context;
 
 import java.io.IOException;
-import java.security.AccessController;
 
 import javax.security.auth.Subject;
 
@@ -78,7 +77,7 @@ public class ServerRunContextFilter implements Filter {
   }
 
   protected ServerRunContext lookupRunContext(HttpServletRequest req, HttpServletResponse resp) {
-    final ServerRunContext sessionContext = getSessionContextProducer().produce(Subject.getSubject(AccessController.getContext()));
+    final ServerRunContext sessionContext = getSessionContextProducer().produce(Subject.current());
     return getHttpServerRunContextProducer().produce(req, resp, null, sessionContext);
   }
 

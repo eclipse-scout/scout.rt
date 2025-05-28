@@ -11,7 +11,6 @@ package org.eclipse.scout.rt.ui.html;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
-import java.security.AccessController;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -731,7 +730,7 @@ public class UiSession implements IUiSession {
   }
 
   protected Subject currentSubject() {
-    return Subject.getSubject(AccessController.getContext());
+    return Subject.current();
   }
 
   @Override

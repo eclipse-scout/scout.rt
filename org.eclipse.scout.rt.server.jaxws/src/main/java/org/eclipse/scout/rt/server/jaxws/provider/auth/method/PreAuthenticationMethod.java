@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.server.jaxws.provider.auth.method;
 
-import java.security.AccessController;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.Set;
@@ -55,7 +54,7 @@ public class PreAuthenticationMethod implements IAuthenticationMethod {
   public Subject getRequestSubject(final HttpServletRequest servletRequest, final IPrincipalProducer principalProducer) {
     // Check if already running within a Subject.
     if (BEANS.get(ServletFilterHelper.class).isRunningWithValidSubject(servletRequest)) {
-      return Subject.getSubject(AccessController.getContext());
+      return Subject.current();
     }
 
     // Check if already authenticated.

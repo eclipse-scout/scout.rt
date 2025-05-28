@@ -10,7 +10,6 @@
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import java.nio.charset.StandardCharsets;
-import java.security.AccessController;
 import java.security.Principal;
 import java.util.List;
 
@@ -103,7 +102,7 @@ public class DefaultAuthTokenSigner {
    * @since 10.0
    */
   protected Principal selectUserPrincipal() {
-    Subject subject = Subject.getSubject(AccessController.getContext());
+    Subject subject = Subject.current();
     if (subject == null) {
       return null;
     }

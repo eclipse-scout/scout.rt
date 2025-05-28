@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.testing.client.runner.fixture;
 
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +63,7 @@ public class LoginTestClientSessionProvider extends ClientSessionProviderWithCac
 
     @Override
     public void start(String sessionId) {
-      String runAs = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next().getName();
+      String runAs = Subject.current().getPrincipals().iterator().next().getName();
       s_beforeStartRunAs.add(runAs);
       super.start(sessionId);
       s_afterStartRunAs.add(runAs);

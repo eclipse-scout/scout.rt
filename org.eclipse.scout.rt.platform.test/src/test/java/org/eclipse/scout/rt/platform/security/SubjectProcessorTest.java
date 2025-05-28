@@ -11,8 +11,6 @@ package org.eclipse.scout.rt.platform.security;
 
 import static org.junit.Assert.*;
 
-import java.security.AccessController;
-
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
@@ -30,7 +28,7 @@ public class SubjectProcessorTest {
     CallableChain<String> callableChain = new CallableChain<>();
     callableChain.add(new SubjectProcessor<>(m_subject));
     String result = callableChain.call(() -> {
-      actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
+      actualSubject.setValue(Subject.current());
       return "result";
     });
 
@@ -46,7 +44,7 @@ public class SubjectProcessorTest {
     CallableChain<String> callableChain = new CallableChain<>();
     callableChain.add(new SubjectProcessor<>(null));
     String result = callableChain.call(() -> {
-      actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
+      actualSubject.setValue(Subject.current());
       return "result";
     });
 
@@ -65,7 +63,7 @@ public class SubjectProcessorTest {
     callableChain.add(new SubjectProcessor<>(m_subject));
     try {
       callableChain.call(() -> {
-        actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
+        actualSubject.setValue(Subject.current());
         throw exception;
       });
       fail();
@@ -88,7 +86,7 @@ public class SubjectProcessorTest {
     callableChain.add(new SubjectProcessor<>(m_subject));
     try {
       callableChain.call(() -> {
-        actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
+        actualSubject.setValue(Subject.current());
         throw runtimeException;
       });
       fail();

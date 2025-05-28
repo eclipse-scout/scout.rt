@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.rt.server.context;
 
-import java.security.AccessController;
-
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -50,7 +48,7 @@ public class ServerRunContextProducer extends RunContextProducer {
     // ensure that the session belongs to the specified subject
     // use the current set subject as subject of the session, because if the session is not null it must be the current session
     IServerSession session = serverRunContext.getSession();
-    if (session == null || ObjectUtility.notEquals(Subject.getSubject(AccessController.getContext()), subject)) {
+    if (session == null || ObjectUtility.notEquals(Subject.current(), subject)) {
       serverRunContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
     }
 

@@ -11,7 +11,6 @@ package org.eclipse.scout.rt.testing.client.runner;
 
 import static org.junit.Assert.*;
 
-import java.security.AccessController;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -71,7 +70,7 @@ public class ClientTestRunnerDifferentSubjectTest {
   }
 
   private static String getCurrentUser() {
-    return Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next().toString();
+    return Subject.current().getPrincipals().iterator().next().toString();
   }
 
   public static class JUnitClientSession extends AbstractClientSession {

@@ -13,7 +13,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URL;
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -108,7 +107,7 @@ public class PortProducer<SERVICE extends Service, PORT> implements IPortProvide
     final RunContextProducer runContextProducer = BEANS.get(handleWithRunContext.value());
     return (Handler<?>) Proxy.newProxyInstance(handler.getClass().getClassLoader(), handler.getClass().getInterfaces(), (proxy, method, args) -> {
       if (PROXIED_HANDLER_METHODS.contains(method)) {
-        return runContextProducer.produce(Subject.getSubject(AccessController.getContext())).call(() -> method.invoke(handler, args), DefaultExceptionTranslator.class);
+        return runContextProducer.produce(Subject.current()).call(() -> method.invoke(handler, args), DefaultExceptionTranslator.class);
       }
       else {
         return method.invoke(handler, args);

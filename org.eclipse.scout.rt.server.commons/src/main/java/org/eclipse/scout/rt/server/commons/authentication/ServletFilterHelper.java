@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.commons.authentication;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.AccessController;
 import java.security.Principal;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -138,7 +137,7 @@ public class ServletFilterHelper {
       return false;
     }
 
-    Subject subject = Subject.getSubject(AccessController.getContext());
+    Subject subject = Subject.current();
     if (subject == null || subject.getPrincipals().isEmpty()) {
       return false;
     }
@@ -191,7 +190,7 @@ public class ServletFilterHelper {
    */
   public Subject createSubject(Principal principal) {
     // create subject if necessary
-    Subject subject = Subject.getSubject(AccessController.getContext());
+    Subject subject = Subject.current();
     if (subject == null || subject.isReadOnly()) {
       subject = new Subject();
     }

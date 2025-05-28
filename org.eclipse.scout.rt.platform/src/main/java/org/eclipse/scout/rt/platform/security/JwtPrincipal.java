@@ -10,7 +10,6 @@
 package org.eclipse.scout.rt.platform.security;
 
 import java.io.Serializable;
-import java.security.AccessController;
 import java.security.Principal;
 import java.util.Objects;
 
@@ -65,7 +64,7 @@ public class JwtPrincipal implements Principal, Serializable {
    * @return the JSON web token for the current subject if it contains a {@link JwtPrincipal}
    */
   public static String jwtTokenStringOfCurrentSubject() {
-    return jwtTokenString(Subject.getSubject(AccessController.getContext()));
+    return jwtTokenString(Subject.current());
   }
 
   /**

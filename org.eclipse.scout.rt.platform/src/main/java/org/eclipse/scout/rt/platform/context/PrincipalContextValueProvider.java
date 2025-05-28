@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.platform.context;
 
-import java.security.AccessController;
 import java.security.Principal;
 
 import javax.security.auth.Subject;
@@ -38,7 +37,7 @@ public class PrincipalContextValueProvider implements IDiagnosticContextValuePro
 
   @Override
   public String value() {
-    final Subject currentSubject = Subject.getSubject(AccessController.getContext());
+    final Subject currentSubject = Subject.current();
     if (currentSubject == null || currentSubject.getPrincipals().isEmpty()) {
       return null;
     }

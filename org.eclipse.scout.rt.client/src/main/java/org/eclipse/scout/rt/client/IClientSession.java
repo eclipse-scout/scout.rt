@@ -90,7 +90,7 @@ public interface IClientSession extends ISession, IPropertyObserver {
   /**
    * Consumers can query for the {@link Subject} of a {@link IClientSession}
    * <p>
-   * The subject is set when this object is created from {@link Subject#getSubject(java.security.AccessControlContext)}
+   * The subject is set when this object is created from {@link Subject#current()}
    */
   Subject getSubject();
 

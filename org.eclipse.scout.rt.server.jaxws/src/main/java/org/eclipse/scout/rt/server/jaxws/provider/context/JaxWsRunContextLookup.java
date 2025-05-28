@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.server.jaxws.provider.context;
 
-import java.security.AccessController;
 import java.util.Collections;
 
 import javax.security.auth.Subject;
@@ -102,7 +101,7 @@ public class JaxWsRunContextLookup {
       return new Subject(true, Collections.singleton(webServiceContext.getUserPrincipal()), Collections.emptySet(), Collections.emptySet());
     }
 
-    return Subject.getSubject(AccessController.getContext());
+    return Subject.current();
   }
 
   /**

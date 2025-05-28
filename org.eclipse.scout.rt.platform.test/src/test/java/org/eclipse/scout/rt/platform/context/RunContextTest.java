@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform.context;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
 import java.util.HashSet;
@@ -110,7 +109,7 @@ public class RunContextTest {
         .withTransactionScope(TransactionScope.REQUIRED)
         .run(() -> {
           assertEquals("value", PropertyMap.CURRENT.get().get("key"));
-          assertSame(subject, Subject.getSubject(AccessController.getContext()));
+          assertSame(subject, Subject.current());
           assertEquals(Locale.CANADA_FRENCH, NlsLocale.CURRENT.get());
           assertSame(monitor, RunMonitor.CURRENT.get());
           assertEquals("cid", CorrelationId.CURRENT.get());
@@ -119,7 +118,7 @@ public class RunContextTest {
 
           RunContexts.copyCurrent().run(() -> {
             assertEquals("value", PropertyMap.CURRENT.get().get("key"));
-            assertSame(subject, Subject.getSubject(AccessController.getContext()));
+            assertSame(subject, Subject.current());
             assertEquals(Locale.CANADA_FRENCH, NlsLocale.CURRENT.get());
             assertNotSame(monitor, RunMonitor.CURRENT.get());
             assertEquals("cid", CorrelationId.CURRENT.get());
@@ -129,7 +128,7 @@ public class RunContextTest {
 
           RunContexts.empty().run(() -> {
             assertNull(PropertyMap.CURRENT.get().get("key"));
-            assertNull(Subject.getSubject(AccessController.getContext()));
+            assertNull(Subject.current());
             assertNull(NlsLocale.CURRENT.get());
             assertNotSame(monitor, RunMonitor.CURRENT.get());
             assertNull(CorrelationId.CURRENT.get());
@@ -154,13 +153,13 @@ public class RunContextTest {
   public void testCopySubject() {
     RunContexts.empty().run(() -> {
       assertNull(RunContexts.copyCurrent().getSubject());
-      assertNull(Subject.getSubject(AccessController.getContext()));
+      assertNull(Subject.current());
     });
 
     final Subject john = newSubject("john");
     RunContexts.empty().withSubject(john).run(() -> {
       assertSame(john, RunContexts.copyCurrent().getSubject());
-      assertSame(Subject.getSubject(AccessController.getContext()), RunContexts.copyCurrent().getSubject());
+      assertSame(Subject.current(), RunContexts.copyCurrent().getSubject());
 
       // Change Subject directly
       final Subject anna = newSubject("anna");
@@ -169,19 +168,19 @@ public class RunContextTest {
         assertSame(anna, RunContexts.copyCurrent().getSubject());
         RunContexts.copyCurrent().run(() -> {
           assertSame(anna, RunContexts.copyCurrent().getSubject());
-          assertSame(anna, Subject.getSubject(AccessController.getContext()));
+          assertSame(anna, Subject.current());
         });
 
         RunContext.CURRENT.get().run(() -> {
           assertSame(john, RunContexts.copyCurrent().getSubject());
-          assertSame(john, Subject.getSubject(AccessController.getContext()));
+          assertSame(john, Subject.current());
         });
 
         // Test copy via direct 'RunContext.copy'
         assertEquals(john, RunContext.CURRENT.get().copy().getSubject());
         Jobs.schedule(() -> {
               assertSame(john, RunContexts.copyCurrent().getSubject());
-              assertSame(john, Subject.getSubject(AccessController.getContext()));
+              assertSame(john, Subject.current());
             }, Jobs.newInput()
                 .withRunContext(RunContext.CURRENT.get().copy()))
             .awaitDoneAndGet();
@@ -191,7 +190,7 @@ public class RunContextTest {
 
     RunContexts.empty().withSubject(null).run(() -> {
       assertNull(RunContexts.copyCurrent().getSubject());
-      assertNull(Subject.getSubject(AccessController.getContext()));
+      assertNull(Subject.current());
     });
   }
 
