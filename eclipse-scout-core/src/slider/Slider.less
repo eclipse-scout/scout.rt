@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,23 +9,25 @@
  */
 
 .slider {
+  --track-size: 6px;
+  --track-border-radius: 4px;
+  --track-background-color: @slider-track-background-color;
+  --track-disabled-background-color: @slider-track-disabled-background-color;
+  --track-color: @slider-track-color;
+  --track-disabled-color: @slider-track-disabled-color;
+
   --thumb-size: 18px;
   --thumb-hitbox-padding: 4px;
-  --thumb-border-radius: 2px;
-  --track-border-radius: 4px;
-  --track-size: 6px;
-  --thumb-border-color: @slider-thumb-border-color;
+  --thumb-border-width: 1px;
   --thumb-color: @slider-thumb-color;
-  --track-before-thumb-color: @slider-track-before-thumb-color;
-  --track-after-thumb-color: @slider-track-after-thumb-color;
-  --thumb-focus-border-color: @slider-thumb-focus-border-color;
-  --thumb-focus-color: @slider-thumb-focus-color;
-  --track-disabled-color: @slider-track-disabled-color;
+  --thumb-border-color: @slider-thumb-border-color;
+  --thumb-active-color: @slider-thumb-active-color;
+  --thumb-active-border-color: @slider-thumb-active-border-color;
   --thumb-disabled-color: @slider-thumb-disabled-color;
   --thumb-disabled-border-color: @slider-thumb-disabled-border-color;
 
   position: relative;
-  background: var(--track-after-thumb-color);
+  background-color: var(--track-background-color);
   border-radius: var(--track-border-radius);
   user-select: none;
   height: var(--track-size);
@@ -34,21 +36,14 @@
   &::before {
     content: '';
     position: absolute;
-    top: calc(2 * var(--track-size) + var(--thumb-size) * -1);
+    top: calc(-1 * (var(--thumb-size) - var(--track-size)) / 2);
     height: var(--thumb-size);
     left: 0;
     right: 0;
   }
 
-  &:focus {
-    .slider-thumb {
-      background: var(--thumb-focus-color);
-      border: var(--thumb-border-radius) solid var(--thumb-focus-border-color);
-    }
-  }
-
   &.disabled {
-    background-color: var(--track-disabled-color);
+    background-color: var(--track-disabled-background-color);
 
     .slider-track {
       background-color: var(--track-disabled-color);
@@ -56,14 +51,32 @@
 
     .slider-thumb {
       background-color: var(--thumb-disabled-color);
-      border: var(--thumb-border-radius) solid var(--thumb-disabled-border-color);
+      border-color: var(--thumb-disabled-border-color);
+    }
+  }
+
+  &:not(.disabled) {
+    cursor: pointer;
+
+    & .slider-thumb {
+      #scout.drop-shadow(@y: 1px, @blur: 2px);
+    }
+
+    &:active .slider-thumb {
+      background-color: var(--thumb-active-color);
+      border-color: var(--thumb-active-border-color);
+    }
+
+    &.focused.keyboard-navigation .slider-thumb,
+    &:focus.keyboard-navigation .slider-thumb {
+      #scout.focus-border();
     }
   }
 
   .slider-track {
     position: absolute;
     height: 100%;
-    background: var(--track-before-thumb-color);
+    background-color: var(--track-color);
     border-radius: var(--track-border-radius);
   }
 
@@ -71,16 +84,16 @@
     position: absolute;
     width: var(--thumb-size);
     height: var(--thumb-size);
-    background: var(--thumb-color);
-    border: var(--thumb-border-radius) solid var(--thumb-border-color);
+    background-color: var(--thumb-color);
+    border: var(--thumb-border-width) solid var(--thumb-border-color);
     border-radius: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
 
     // for a bigger hit box
     &::before {
-      --offset: calc(var(--thumb-hitbox-padding) * -1);
-      --size: calc(var(--thumb-size) + var(--thumb-hitbox-padding));
+      --offset: calc(-1 * var(--thumb-hitbox-padding));
+      --size: calc(var(--thumb-size) + 2 * var(--thumb-hitbox-padding));
 
       content: '';
       position: absolute;

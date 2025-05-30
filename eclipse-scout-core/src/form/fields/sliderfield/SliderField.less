@@ -11,10 +11,15 @@
 .slider-field {
   --slider-margin: 20px;
   --slider-flex: 80%;
+  --slider-min-width: 50px;
   --input-min-width: 75px;
   --input-flex: 20%;
   --value-label-min-width: 50px;
   --value-label-padding: 6px;
+
+  &.has-error > .field > .slider {
+    --track-color: @error-color;
+  }
 
   & > .field {
     display: flex;
@@ -22,7 +27,7 @@
 
     & > .slider {
       flex: var(--slider-flex);
-      min-width: var(--input-min-width);
+      min-width: var(--slider-min-width);
       margin-right: var(--slider-margin);
     }
 
@@ -42,6 +47,31 @@
       padding-left: var(--value-label-padding);
       padding-top: var(--borderless-field-padding-y);
       padding-bottom: var(--borderless-field-padding-y);
+    }
+
+    // Added by SliderFieldLayout when field is to narrow to fit all elements
+    &.compact {
+
+      &.value-editable {
+        // Hide slider, use full width for input field
+
+        & > .slider {
+          display: none;
+        }
+
+        & > input {
+          min-width: 0;
+        }
+      }
+
+      &:not(.value-editable) {
+        // Remove min-width constraints but continue to show both elements
+
+        & > .slider,
+        & > .value-label {
+          min-width: 0;
+        }
+      }
     }
   }
 }
