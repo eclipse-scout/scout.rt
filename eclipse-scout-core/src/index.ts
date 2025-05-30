@@ -812,6 +812,7 @@ export * from './form/fields/sequencebox/SequenceBoxAdapter';
 export * from './form/fields/sliderfield/SliderField';
 export * from './form/fields/sliderfield/SliderFieldModel';
 export * from './form/fields/sliderfield/SliderFieldEventMap';
+export * from './form/fields/sliderfield/SliderFieldLayout';
 export * from './form/fields/smartfield/SmartField';
 export * from './form/fields/smartfield/SmartFieldEventMap';
 export * from './form/fields/smartfield/SmartFieldModel';
