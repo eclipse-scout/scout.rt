@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, Device, events, HtmlComponent, InitModelOf, KeyStrokeContext, objects, SliderEventMap, SliderLayout, SliderModel, SliderNavigationKeyStroke, SliderShiftNavigationKeyStroke, Widget} from '../index';
+import {aria, Device, events, graphics, HtmlComponent, InitModelOf, KeyStrokeContext, SliderEventMap, SliderLayout, SliderModel, SliderNavigationKeyStroke, SliderShiftNavigationKeyStroke, Widget} from '../index';
 import $ from 'jquery';
 
 export class Slider extends Widget implements SliderModel {
@@ -28,8 +28,8 @@ export class Slider extends Widget implements SliderModel {
   protected _mouseUpHandler = this._onMouseUp.bind(this);
 
   $window: JQuery<Window>;
-  $sliderTrack: JQuery<HTMLDivElement>;
-  $sliderThumb: JQuery<HTMLDivElement>;
+  $track: JQuery<HTMLDivElement>;
+  $thumb: JQuery<HTMLDivElement>;
 
   constructor() {
     super();
@@ -40,8 +40,8 @@ export class Slider extends Widget implements SliderModel {
     this.step = null;
     this.tabbable = true;
 
-    this.$sliderTrack = null;
-    this.$sliderThumb = null;
+    this.$track = null;
+    this.$thumb = null;
   }
 
   protected override _init(options: InitModelOf<this>) {
@@ -65,11 +65,14 @@ export class Slider extends Widget implements SliderModel {
   }
 
   protected override _render() {
-    this.$container = this.$parent.appendDiv('slider');
+    this.$container = this.$parent.appendDiv('slider')
+      .on('blur', this._onBlur.bind(this))
+      .on('focus', this._onFocus.bind(this));
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new SliderLayout(this));
-    this.$sliderTrack = this.$container.appendDiv('slider-track') as JQuery<HTMLDivElement>;
-    this.$sliderThumb = this.$container.appendDiv('slider-thumb') as JQuery<HTMLDivElement>;
+
+    this.$track = this.$container.appendDiv('slider-track');
+    this.$thumb = this.$container.appendDiv('slider-thumb');
 
     this.$window = this.$container.window();
     this.$container.on('mousedown touchstart', this._onMouseDown.bind(this));
@@ -87,12 +90,26 @@ export class Slider extends Widget implements SliderModel {
   }
 
   protected override _remove() {
-    this.$sliderTrack = null;
-    this.$sliderThumb = null;
+    this.$track = null;
+    this.$thumb = null;
     this.$window
       .off('mousemove touchmove', this._mouseMoveHandler)
       .off('mouseup touchend touchcancel', this._mouseUpHandler);
     super._remove();
+  }
+
+  protected _onFocus(event: JQuery.FocusEvent) {
+    // When the slider is tabbable, it will receive the focus when the user clicks it. However, we only want to set
+    // the 'focused' property when the focus happens during keyboard navigation, because this property is used by
+    // the SliderField. Note that we cannot use the 'unfocusable' class, because then the keystrokes would not work.
+    if (!this.$container?.hasClass('keyboard-navigation')) {
+      return;
+    }
+    this.setFocused(true);
+  }
+
+  protected _onBlur(event: JQuery.BlurEvent) {
+    this.setFocused(false);
   }
 
   setValue(value: number) {
@@ -101,7 +118,7 @@ export class Slider extends Widget implements SliderModel {
 
   protected _renderValue() {
     this._setThumbPosition(this._valueToLocalPosition(this._limitValue(this.value)));
-    this.$container.attr('valuenow', this.value);
+    this.$container.attr('aria-valuenow', this.value);
   }
 
   setMinValue(minValue: number) {
@@ -181,18 +198,19 @@ export class Slider extends Widget implements SliderModel {
   }
 
   protected _setThumbPosition(position: number) {
-    this.$sliderThumb.cssLeft(position);
-    this.$sliderTrack.cssWidth(position);
+    const borderLeft = graphics.borders(this.$container).left;
+    this.$thumb.cssLeft(position - borderLeft);
+    this.$track.cssWidth(position - borderLeft);
   }
 
   move(moveBy: number) {
     this.setValue(this._normalizeValue(this.value + moveBy));
   }
 
-  /** @internal */
+  /** @internal called by SliderLayout */
   _update() {
     if (this.rendered) {
-      this._setThumbPosition(this._valueToLocalPosition(this._normalizeValue(this.value)));
+      this._setThumbPosition(this._valueToLocalPosition(this.value));
     }
   }
 
@@ -201,11 +219,27 @@ export class Slider extends Widget implements SliderModel {
       return this.$container.cssWidth() / 2;
     }
 
-    return (value - this.minValue) / (this.maxValue - this.minValue) * this.$container.cssWidth();
+    // Offset thumb on either side by half its width, so it does not stick out of the slider area
+    const offset = this.$thumb.cssWidth() / 2;
+    const minPosition = offset;
+    const maxPosition = this.$container.cssWidth() - offset;
+
+    let position = (value - this.minValue) / (this.maxValue - this.minValue) * (this.$container.cssWidth() - this.$thumb.cssWidth()) + offset;
+    return Math.round(Math.max(minPosition, Math.min(maxPosition, position)));
   }
 
   protected _localPositionToValue(position: number) {
-    return position / this.$container.cssWidth() * (this.maxValue - this.minValue) + this.minValue;
+    const offset = this.$thumb.cssWidth() / 2;
+    const minPosition = offset;
+    const maxPosition = this.$container.cssWidth() - offset;
+
+    if (position <= minPosition) {
+      return this.minValue;
+    }
+    if (position >= maxPosition) {
+      return this.maxValue;
+    }
+    return (position - offset) / (this.$container.cssWidth() - this.$thumb.cssWidth()) * (this.maxValue - this.minValue) + this.minValue;
   }
 
   protected _normalizeValue(value: number) {
@@ -217,7 +251,7 @@ export class Slider extends Widget implements SliderModel {
   }
 
   protected _calculateSteppedValue(value: number) {
-    if (objects.isNullOrUndefined(this.step) || this.step === 0) {
+    if (!this.step) { // 0 or not set
       return value;
     }
     const stepsFromMin = Math.round((value - this.minValue) / this.step);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {fields, FormField, HtmlComponent, InitModelOf, NumberField, objects, PropertyChangeEvent, scout, Slider, SliderFieldEventMap, SliderFieldModel, ValueField} from '../../../index';
+import {aria, fields, FormField, HtmlComponent, InitModelOf, NumberField, objects, PropertyChangeEvent, scout, Slider, SliderFieldEventMap, SliderFieldLayout, SliderFieldModel, ValueField} from '../../../index';
 
 export class SliderField extends NumberField implements SliderFieldModel {
   declare model: SliderFieldModel;
@@ -53,12 +53,13 @@ export class SliderField extends NumberField implements SliderFieldModel {
       tabbable: this.sliderTabbable,
       valueEditable: this.valueEditable
     });
+    this.slider.on('propertyChange', this._onSliderPropertyChange.bind(this));
 
     this.on('propertyChange:displayText', event => this._syncDisplayTextToSlider(event.newValue));
   }
 
   protected override _render() {
-    this.addContainer(this.$parent, 'slider-field');
+    this.addContainer(this.$parent, 'slider-field', new SliderFieldLayout(this));
     this.addLabel();
     this.addMandatoryIndicator();
 
@@ -66,7 +67,7 @@ export class SliderField extends NumberField implements SliderFieldModel {
     this.fieldHtmlComp = HtmlComponent.install($fieldContainer, this.session);
 
     this.slider.render($fieldContainer);
-    this.slider.on('propertyChange:value', this._onSliderValueChanged.bind(this));
+    aria.linkElementWithLabel(this.slider.$container, this.$label);
 
     let $field = fields.makeTextField($fieldContainer, 'field');
     $fieldContainer.append($field);
@@ -114,6 +115,7 @@ export class SliderField extends NumberField implements SliderFieldModel {
   }
 
   protected _renderValueEditable() {
+    this.$fieldContainer.toggleClass('value-editable', !!this.valueEditable);
     this.$field.setVisible(this.valueEditable);
     this.$valueLabel.setVisible(!this.valueEditable);
 
@@ -149,9 +151,11 @@ export class SliderField extends NumberField implements SliderFieldModel {
     return super._validateValue(scout.nvl(value, this.minValue));
   }
 
-  protected _onSliderValueChanged(event: PropertyChangeEvent) {
-    if (!this._syncingValue) {
+  protected _onSliderPropertyChange(event: PropertyChangeEvent) {
+    if (event.propertyName === 'value' && !this._syncingValue) {
       this.setValue(event.newValue);
+    } else if (event.propertyName === 'focused') {
+      this.setFocused(event.newValue);
     }
   }
 
