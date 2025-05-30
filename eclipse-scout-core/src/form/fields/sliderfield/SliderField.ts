@@ -73,6 +73,7 @@ export class SliderField extends NumberField implements SliderFieldModel {
     $fieldContainer.append($field);
 
     this.$valueLabel = $fieldContainer.appendDiv('slider-value');
+    this._updateValueLabel();
 
     this.addFieldContainer($fieldContainer);
     this.addField($field);
@@ -88,11 +89,6 @@ export class SliderField extends NumberField implements SliderFieldModel {
   protected override _renderProperties() {
     super._renderProperties();
     this._renderValueEditable();
-  }
-
-  protected override _renderDisplayText() {
-    super._renderDisplayText();
-    this.$valueLabel.text(this.displayText);
   }
 
   protected override _renderClearable() {
@@ -155,7 +151,12 @@ export class SliderField extends NumberField implements SliderFieldModel {
     if (event.propertyName === 'value' && !this._syncingValue) {
       this.setValue(event.newValue);
     } else if (event.propertyName === 'focused') {
-      this.setFocused(event.newValue);
+      // When the slider is tabbable, it will receive the focus when the user clicks it. This is needed for the keystrokes.
+      // However, we only want to set the 'focused' property of the slider field accordingly (to change the color of the label)
+      // when the focus happens during keyboard navigation.
+      if (!event.newValue || this.slider.$container?.hasClass('keyboard-navigation')) {
+        this.setFocused(event.newValue);
+      }
     }
   }
 
@@ -163,10 +164,15 @@ export class SliderField extends NumberField implements SliderFieldModel {
     try {
       this._syncingValue = true;
       this.slider.setValue(this.parseValue(displayText));
+      this._updateValueLabel();
     } catch (error) {
       // nop
     } finally {
       this._syncingValue = false;
     }
+  }
+
+  protected _updateValueLabel() {
+    this.$valueLabel?.text(this.displayText);
   }
 }
