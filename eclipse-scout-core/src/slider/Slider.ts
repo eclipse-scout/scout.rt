@@ -15,7 +15,6 @@ export class Slider extends Widget implements SliderModel {
   declare eventMap: SliderEventMap;
   declare self: Slider;
 
-  protected static CLICK_TOLERANCE = 12;
   protected static FLOATING_POINT_ERROR_CORRECTION = 100000000;
 
   value: number;
@@ -99,12 +98,6 @@ export class Slider extends Widget implements SliderModel {
   }
 
   protected _onFocus(event: JQuery.FocusEvent) {
-    // When the slider is tabbable, it will receive the focus when the user clicks it. However, we only want to set
-    // the 'focused' property when the focus happens during keyboard navigation, because this property is used by
-    // the SliderField. Note that we cannot use the 'unfocusable' class, because then the keystrokes would not work.
-    if (!this.$container?.hasClass('keyboard-navigation')) {
-      return;
-    }
     this.setFocused(true);
   }
 
