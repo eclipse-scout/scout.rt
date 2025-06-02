@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -48,22 +48,29 @@ export class PlainTextEncoder {
     // It is not possible to use jquery's text() function or to create a html element and use textContent, because the new lines get omitted.
     // Node.innerText would preserve the new lines but it is not supported by firefox
 
+    // Remove comments
+    text = text.replace(/<!--.*?--!?>/gs, '');
+
+    // Remove font icons (needs to be executed before removing attribute values)
+    if (options.removeFontIcons) {
+      text = text.replace(/<span\s[^>]*class="[^"]*font-icon[^"]*"[^>]*>[^<]*<\/span>/gmi, '');
+    }
+
+    // Remove attribute values since they could contain special characters like >
+    text = this.removeAttributeValues(text);
+
     // Preserve new lines
     text = text.replace(/<br>|<br\/>|<\/p>|<p\/>|<\/div>|<\/li>|<\/tr>/gi, '\n');
 
     // Separate td with ' '
     text = text.replace(/<\/td>/gi, ' ');
 
-    if (options.removeFontIcons) {
-      text = text.replace(/<span\s[^>]*class="[^"]*font-icon[^"]*"[^>]*>[^<]*<\/span>/gmi, '');
-    }
-
     // Remove script and style contents
     text = text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
     text = text.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
 
     // Replace remaining tags
-    text = text.replace(/<[^>]+>/gi, '');
+    text = text.replace(/<[^\s>][^>]*>/gi, '');
 
     // Convert decimal nrc to unicode
     text = text.replace('&zwj;', String.fromCharCode(0x200D)); // zero width joiner for combined chars
@@ -84,5 +91,38 @@ export class PlainTextEncoder {
     let textarea = this.cache.get() as HTMLTextAreaElement;
     textarea.innerHTML = text;
     return textarea.value;
+  }
+
+  removeAttributeValues(text: string): string {
+    // Keep in sync with HtmlHelper.removeAttributeValues
+
+    let lastAttributeQuote: string = null;
+    let insideTag = false;
+    let result = '';
+
+    for (let i = 0; i < text.length; i++) {
+      let c = text[i];
+      if (lastAttributeQuote) {
+        // inside quoted attribute value
+        if (c === lastAttributeQuote) {
+          // end of quoted attribute value
+          lastAttributeQuote = null;
+        } else {
+          // ignore all characters beside closing attribute value quote
+          continue;
+        }
+      } else if (insideTag && (c === '\'' || c === '"')) {
+        // start of quoted attribute value
+        lastAttributeQuote = c;
+      } else if (c === '<' && text.length > i + 1 && !/\s/.test(text[i + 1])) {
+        // start of tag
+        insideTag = true;
+      } else if (c === '>') {
+        // end of tag
+        insideTag = false;
+      }
+      result += c;
+    }
+    return result;
   }
 }
