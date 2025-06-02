@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -155,4 +155,98 @@ describe('PlainTextEncoder', () => {
     expect(encoder.encode(htmlText, {removeFontIcons: true})).toBe('\nText');
   });
 
+  it('ignores ">" in attribute values', () => {
+    let htmlText = '<a href="" rel="noreferrer noopener" title="Donec: > mattis >> metus lorem" style="color:rgb(0, 0, 0);text-decoration:none;">Lorem ipsum dolor</a>';
+    expect(encoder.encode(htmlText)).toBe('Lorem ipsum dolor');
+
+    htmlText = '<a href=\'\' rel=\'noreferrer noopener\' title=\'Donec: > mattis >> metus lorem\' style=\'color:rgb(0, 0, 0);text-decoration:none;\'>Lorem ipsum dolor</a>';
+    expect(encoder.encode(htmlText)).toBe('Lorem ipsum dolor');
+  });
+
+  it('recognizes only valid tag syntax', () => {
+    let htmlText = '< a href=""/>';
+    expect(encoder.encode(htmlText)).toBe('< a href=""/>');
+
+    htmlText = '< a href="">Lorem ipsum< /a>';
+    expect(encoder.encode(htmlText)).toBe('< a href="">Lorem ipsum< /a>');
+
+    htmlText = '<\ta href="">Lorem ipsum<\t/a>';
+    expect(encoder.encode(htmlText)).toBe('<\ta href="">Lorem ipsum<\t/a>');
+
+    htmlText = '<>Lorem ipsum<>';
+    expect(encoder.encode(htmlText)).toBe('<>Lorem ipsum<>');
+
+    htmlText = '<12 href="">Lorem ipsum</12>';
+    expect(encoder.encode(htmlText)).toBe('Lorem ipsum');
+  });
+
+  it('removes comments correctly', () => {
+    let htmlText = 'a<!-- this is a comment -->b';
+    expect(encoder.encode(htmlText)).toBe('ab');
+
+    htmlText = 'a<!-- this is a comment\n -->b';
+    expect(encoder.encode(htmlText)).toBe('ab');
+
+    htmlText = 'a<!--this is a comment-->b';
+    expect(encoder.encode(htmlText)).toBe('ab');
+
+    htmlText = 'a<!-- this is a comment --!>b';
+    expect(encoder.encode(htmlText)).toBe('ab');
+
+    htmlText = 'a<!-- this ->is a --c>omment --!>b';
+    expect(encoder.encode(htmlText)).toBe('ab');
+
+    htmlText = 'a<!-- this is a comment --!>b-->';
+    expect(encoder.encode(htmlText)).toBe('ab-->');
+
+    htmlText = 'a<!-- this is a comment -->b--!>';
+    expect(encoder.encode(htmlText)).toBe('ab--!>');
+
+    htmlText = 'a<!-- this is a comment -->b<!-- and this too-->c';
+    expect(encoder.encode(htmlText)).toBe('abc');
+
+    htmlText = 'a<!-- this is a com<!--ment -->b<!-- and this too-->c';
+    expect(encoder.encode(htmlText)).toBe('abc');
+  });
+
+  it('removes attribute values correctly', () => {
+    let htmlText = '';
+    expect(encoder.removeAttributeValues(htmlText)).toBe('');
+
+    htmlText = '<span title=\'Some text > and <\\span>\'>test<\\span>';
+    expect(encoder.removeAttributeValues(htmlText)).toBe('<span title=\'\'>test<\\span>');
+
+    htmlText = '<span title="Some text > and <\\span>">test<\\span>';
+    expect(encoder.removeAttributeValues(htmlText)).toBe('<span title="">test<\\span>');
+
+    htmlText = '<span>test<\\span title=\'attribute is invalid in end tag, but we delete it as well. > and <\\span>\'>';
+    expect(encoder.removeAttributeValues(htmlText)).toBe('<span>test<\\span title=\'\'>');
+
+    htmlText = '<span>test<\\span title="attribute is invalid in end tag, but we delete it as well. > and <\\span>">';
+    expect(encoder.removeAttributeValues(htmlText)).toBe('<span>test<\\span title="">');
+
+    htmlText = '<abc attr= "someText>123';
+    expect(encoder.removeAttributeValues(htmlText)).toBe('<abc attr= "');
+
+    htmlText = '<abc attr= "someText>123"';
+    expect(encoder.removeAttributeValues(htmlText)).toBe('<abc attr= ""');
+
+    htmlText = '<12 attr="someText>123"';
+    expect(encoder.removeAttributeValues(htmlText)).toBe('<12 attr=""');
+
+    htmlText = '<12 "someText>123"';
+    expect(encoder.removeAttributeValues(htmlText)).toBe('<12 ""');
+
+    htmlText = '<12 "someText\'>123"';
+    expect(encoder.removeAttributeValues(htmlText)).toBe('<12 ""');
+
+    htmlText = '<12 "someText<\'>123"';
+    expect(encoder.removeAttributeValues(htmlText)).toBe('<12 ""');
+
+    htmlText = '< abc attr=\'someText\'>';
+    expect(encoder.removeAttributeValues(htmlText)).toBe('< abc attr=\'someText\'>');
+
+    htmlText = '<\tabc attr=\'someText\'>';
+    expect(encoder.removeAttributeValues(htmlText)).toBe('<\tabc attr=\'someText\'>');
+  });
 });

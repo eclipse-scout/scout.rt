@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,9 +24,10 @@ public class HtmlHelper {
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
   private static final Pattern HTML_PARAGRAPH_END_TAGS = Pattern.compile("<br/?></div>|</div>|<br/?>|</p>|<p/>|</tr>|</h[1-6]>|</dt>|</dd>|</dl>|</table>|</li>|</head>", Pattern.CASE_INSENSITIVE);
   private static final Pattern HTML_SPACE_END_TAGS = Pattern.compile("</td>|</th>", Pattern.CASE_INSENSITIVE);
-  private static final Pattern HTML_TAGS = Pattern.compile("<[^>]+>", Pattern.DOTALL);
+  private static final Pattern HTML_TAGS = Pattern.compile("<[^\\s>][^>]*>", Pattern.DOTALL);
   private static final Pattern HTML_SCRIPTS = Pattern.compile("<script\\b[^<]*(?:(?!</script>)<[^<]*)*</script>", Pattern.CASE_INSENSITIVE);
   private static final Pattern HTML_STYLES = Pattern.compile("<style\\b[^<]*(?:(?!</style>)<[^<]*)*</style>", Pattern.CASE_INSENSITIVE);
+  private static final Pattern HTML_COMMENT = Pattern.compile("<!--.*?--!?>", Pattern.DOTALL);
   private static final Pattern MULTIPLE_SPACES = Pattern.compile("[ ]+");
   private static final Pattern SPACES_ADJACENT_LINEBREAKS = Pattern.compile("[ ]+\n[ ]?|[ ]?\n[ ]+");
   private static final Pattern DECIMAL_NCR = Pattern.compile("&#(\\d+);");
@@ -90,29 +91,24 @@ public class HtmlHelper {
       // <body> not found, use entire input
       s = html;
     }
-    //newlines
+    // remove comments
+    s = HTML_COMMENT.matcher(s).replaceAll("");
+    // remove attribute values since they could contain special characters like >
+    s = removeAttributeValues(s);
+    // newlines
     s = StringUtility.replace(s, "\r", "");
     s = StringUtility.replace(s, "\n", " ");
-    Matcher matcher = HTML_PARAGRAPH_END_TAGS.matcher(s);
-    s = matcher.replaceAll("\n");
-    //tabs
-    s = StringUtility.replace(s, StringUtility.HTML_ENCODED_TAB, "\t");
-    //remove script and style contents
-    matcher = HTML_SCRIPTS.matcher(s);
-    s = matcher.replaceAll("");
-    matcher = HTML_STYLES.matcher(s);
-    s = matcher.replaceAll("");
-    //remove tags
-    matcher = HTML_SPACE_END_TAGS.matcher(s);
-    s = matcher.replaceAll(" ");
-    matcher = HTML_TAGS.matcher(s);
-    s = matcher.replaceAll("");
-    //remove multiple spaces
-    matcher = MULTIPLE_SPACES.matcher(s);
-    s = matcher.replaceAll(" ");
-    //remove spaces at the beginning and end of each line
-    matcher = SPACES_ADJACENT_LINEBREAKS.matcher(s);
-    s = matcher.replaceAll("\n");
+    s = HTML_PARAGRAPH_END_TAGS.matcher(s).replaceAll("\n");
+    // remove script and style contents
+    s = HTML_SCRIPTS.matcher(s).replaceAll("");
+    s = HTML_STYLES.matcher(s).replaceAll("");
+    // remove tags
+    s = HTML_SPACE_END_TAGS.matcher(s).replaceAll(" ");
+    s = HTML_TAGS.matcher(s).replaceAll("");
+    // remove multiple spaces
+    s = MULTIPLE_SPACES.matcher(s).replaceAll(" ");
+    // remove spaces at the beginning and end of each line
+    s = SPACES_ADJACENT_LINEBREAKS.matcher(s).replaceAll("\n");
     s = unescape(s);
 
     // space
@@ -124,9 +120,9 @@ public class HtmlHelper {
     s = StringUtility.replace(s, "&#9;", "\t");
     s = StringUtility.replaceNoCase(s, "&#x9;", "\t");
 
-    //decimal numeric character reference
+    // decimal numeric character reference
     s = StringUtility.replace(s, "&zwj;", Character.toString(0x200D)); //zero width joiner for combined characters
-    matcher = DECIMAL_NCR.matcher(s);
+    Matcher matcher = DECIMAL_NCR.matcher(s);
     StringBuilder sb = new StringBuilder();
     while (matcher.find()) {
       String decimalNcr = matcher.group(1);
@@ -221,5 +217,42 @@ public class HtmlHelper {
    */
   public String escapeAndNewLineToBr(String text) {
     return newLineToBr(escape(text));
+  }
+
+  public String removeAttributeValues(String html) {
+    // Keep in sync with PlainTextEncoder.removeAttributeValues
+
+    Character lastAttributeQuote = null;
+    boolean insideTag = false;
+    StringBuilder result = new StringBuilder();
+
+    for (int i = 0; i < html.length(); i++) {
+      char c = html.charAt(i);
+      if (lastAttributeQuote != null) {
+        // inside quoted attribute value
+        if (c == lastAttributeQuote) {
+          // end of quoted attribute value
+          lastAttributeQuote = null;
+        }
+        else {
+          // ignore all characters beside closing attribute value quote
+          continue;
+        }
+      }
+      else if (insideTag && (c == '\'' || c == '"')) {
+        // start of quoted attribute value
+        lastAttributeQuote = c;
+      }
+      else if (c == '<' && html.length() > i + 1 && !Character.isWhitespace(html.charAt(i + 1))) {
+        // start of tag
+        insideTag = true;
+      }
+      else if (c == '>') {
+        // end of tag
+        insideTag = false;
+      }
+      result.append(c);
+    }
+    return result.toString();
   }
 }
