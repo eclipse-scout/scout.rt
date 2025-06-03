@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+  -
+  - This program and the accompanying materials are made
+  - available under the terms of the Eclipse Public License 2.0
+  - which is available at https://www.eclipse.org/legal/epl-2.0/
+  -
+  - SPDX-License-Identifier: EPL-2.0
+  -->
+<svg id="a" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <path
+    d="M21.54,12.94H2.45c-.8,0-1.45.61-1.45,1.35v7.3c0,.74.65,1.35,1.45,1.35h19.09c.8,0,1.46-.61,1.46-1.35v-7.3c0-.74-.65-1.35-1.46-1.35ZM22,14.29v3.15h-9.5v-3.5h9.04c.25,0,.46.16.46.35ZM2.45,13.94h9.05v3.5H2v-3.15c0-.19.21-.35.45-.35ZM2,21.6v-3.15h9.5v3.5H2.45c-.25,0-.45-.16-.45-.35ZM21.54,21.94h-9.04v-3.5h9.5v3.15c0,.19-.21.35-.46.35Z" />
+  <path d="M4.5,8.15l.71-.71-2.5-2.5h18.59l-2.5,2.5.71.71,3.35-3.35c.2-.2.2-.51,0-.71l-3.35-3.35-.71.71,2.5,2.5H2.71l2.5-2.5-.71-.71-3.35,3.35c-.2.2-.2.51,0,.71l3.35,3.35Z" />
+</svg>

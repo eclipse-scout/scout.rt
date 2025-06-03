@@ -9,8 +9,8 @@
  */
 import {
   AbstractLayout, aria, arrays, Cell, Column, ColumnUserFilter, ColumnUserFilterValues, Device, EnumObject, Event, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, InitModelOf, ListBoxTableAccessibilityRenderer, NumberColumn,
-  NumberColumnAggregationFunction, Point, Popup, RowLayout, scout, scrollbars, SomeRequired, Table, TableHeader, TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuLayout, TableHeaderMenuModel, TableRow,
-  TableRowModel, TableRowsCheckedEvent
+  NumberColumnAggregationFunction, NumberField, Point, Popup, RowLayout, scout, scrollbars, SomeRequired, Table, TableHeader, TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuGroupItem,
+  TableHeaderMenuLayout, TableHeaderMenuModel, TableRow, TableRowModel, TableRowsCheckedEvent, ValueField
 } from '../index';
 
 export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
@@ -207,6 +207,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       scrollShadow: 'none'
     });
     this.$columnActions = this.$body.appendDiv('table-header-menu-actions');
+    HtmlComponent.install(this.$columnActions, this.session);
 
     // only add right column if filter has a filter-table or filter-fields
     if (this.hasFilterTable || this.hasFilterFields) {
@@ -239,6 +240,11 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
 
     // Expand/Collapse
     this.leftGroups.push(this._renderHierarchyGroup());
+
+    // Width
+    if (!this.column.fixedWidth) {
+      this.leftGroups.push(this._renderWidthGroup());
+    }
 
     // Aggregation
     if (this.table.isAggregationPossible(this.column)) {
@@ -365,11 +371,6 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     });
 
     this.moveGroup.render(this.$columnActions);
-    // link buttons with the group header, the header is updated with the text of the action
-    aria.linkElementWithLabel(this.toBeginButton.$container, this.moveGroup.$text);
-    aria.linkElementWithLabel(this.forwardButton.$container, this.moveGroup.$text);
-    aria.linkElementWithLabel(this.backwardButton.$container, this.moveGroup.$text);
-    aria.linkElementWithLabel(this.toEndButton.$container, this.moveGroup.$text);
     return this.moveGroup;
   }
 
@@ -433,10 +434,6 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     });
 
     this.columnActionsGroup.render(this.$columnActions);
-    // link buttons with the group header, the header is updated with the text of the action
-    aria.linkElementWithLabel(this.addColumnButton.$container, this.columnActionsGroup.$text);
-    aria.linkElementWithLabel(this.removeColumnButton.$container, this.columnActionsGroup.$text);
-    aria.linkElementWithLabel(this.modifyColumnButton.$container, this.columnActionsGroup.$text);
     return this.columnActionsGroup;
   }
 
@@ -490,12 +487,6 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
 
     this._updateSortingSelectedState();
     this.sortingGroup.render(this.$columnActions);
-
-    // link buttons with the group header, the header is updated with the text of the action
-    aria.linkElementWithLabel(this.sortAscButton?.$container, this.sortingGroup.$text);
-    aria.linkElementWithLabel(this.sortDescButton?.$container, this.sortingGroup.$text);
-    aria.linkElementWithLabel(this.sortAscAddButton.$container, this.sortingGroup.$text);
-    aria.linkElementWithLabel(this.sortDescAddButton.$container, this.sortingGroup.$text);
     return this.sortingGroup;
 
     function onSortClick() {
@@ -606,13 +597,6 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     }
 
     group.render(this.$columnActions);
-
-    // link buttons with the group header, the header is updated with the text of the action
-    aria.linkElementWithLabel(this.groupButton.$container, group.$text);
-    aria.linkElementWithLabel(this.groupAddButton.$container, group.$text);
-    // Action added the invisible label as aria-label to the button, because header buttons are labelled more sophisticated, remove the label added by action
-    aria.label(this.groupButton.$container, null);
-    aria.label(this.groupAddButton.$container, null);
     return group;
 
     function groupColumn() {
@@ -653,13 +637,51 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     });
 
     this.hierarchyGroup.render(this.$columnActions);
-    // link buttons with the group header, the header is updated with the text of the action
-    aria.linkElementWithLabel(this.collapseAllButton.$container, this.hierarchyGroup.$text);
-    aria.linkElementWithLabel(this.expandAllButton.$container, this.hierarchyGroup.$text);
-    // Action added the invisible label as aria-label to the button, because header buttons are labelled more sophisticated, remove the label added by action
-    aria.label(this.collapseAllButton.$container, null);
-    aria.label(this.expandAllButton.$container, null);
     return this.hierarchyGroup;
+  }
+
+  protected _renderWidthGroup(): TableHeaderMenuGroup {
+    let group = scout.create(TableHeaderMenuGroup, {
+      parent: this,
+      textKey: 'ui.Width'
+    });
+    let optimizeWidthButton = scout.create(TableHeaderMenuButton, {
+      parent: group,
+      text: '${textKey:ui.optimizeWidth}',
+      cssClass: 'optimize-width'
+    });
+    optimizeWidthButton.on('action', () => {
+      this.table.resizeToFit(this.column);
+      this.close();
+    });
+    let optimizeWidthAllButton = scout.create(TableHeaderMenuButton, {
+      parent: group,
+      text: '${textKey:ui.optimizeWidthAll}',
+      cssClass: 'optimize-widths'
+    });
+    optimizeWidthAllButton.on('action', () => {
+      this.table.visibleColumns().forEach(column => this.table.resizeToFit(column));
+      this.close();
+    });
+    let widthField = scout.create(NumberField, {
+      parent: group,
+      cssClass: 'table-header-menu-command width no-mandatory-indicator',
+      label: '${textKey:ui.Width}',
+      labelVisible: false,
+      clearable: ValueField.Clearable.NEVER,
+      value: this.column.width,
+      minValue: this.column.minWidth,
+      gridData: { // Don't use hints because parent has no logical grid but FormField._updateElementInnerAlignment expects that
+        horizontalAlignment: 0
+      }
+    }) as NumberField & TableHeaderMenuGroupItem;
+    widthField.on('propertyChange:value', () => {
+      this.table.resizeColumn(this.column, widthField.value);
+    });
+    widthField.computeGroupSuffix = () => this.session.text('ui.adjust');
+    group.render(this.$columnActions);
+    HtmlComponent.install(group.$container, this.session);
+    return group;
   }
 
   protected _renderAggregationGroup(): TableHeaderMenuGroup {
@@ -681,17 +703,6 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
 
     group.children.forEach((button: TableHeaderMenuButton) => button.setSelected(button.aggregation === aggregation));
     group.render(this.$columnActions);
-
-    // link buttons with the group header, the header is updated with the text of the action
-    aria.linkElementWithLabel(this.sumButton?.$container, group.$text);
-    aria.linkElementWithLabel(this.averageButton?.$container, group.$text);
-    aria.linkElementWithLabel(this.minimumButton?.$container, group.$text);
-    aria.linkElementWithLabel(this.maximumButton?.$container, group.$text);
-    // Action added the invisible label as aria-label to the button, because header buttons are labelled more sophisticated, remove the label added by action
-    aria.label(this.sumButton?.$container, null);
-    aria.label(this.averageButton?.$container, null);
-    aria.label(this.minimumButton?.$container, null);
-    aria.label(this.maximumButton?.$container, null);
     return group;
 
     function createHeaderMenuButtonForAggregationFunction(text: string, aggregation: NumberColumnAggregationFunction): TableHeaderMenuButton {
@@ -756,15 +767,6 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
 
     group.children.forEach((button: TableHeaderMenuButton) => button.setSelected(button.backgroundEffect === backgroundEffect));
     group.render(this.$columnActions);
-    // link buttons with the move group header, the header is updated with the text of the action
-    aria.linkElementWithLabel(this.colorGradient1Button.$container, group.$text);
-    aria.linkElementWithLabel(this.colorGradient2Button.$container, group.$text);
-    aria.linkElementWithLabel(this.barChartButton?.$container, group.$text);
-    // Action added the invisible label as aria-label to the button, because header buttons are labelled more sophisticated, remove the label added by action
-    aria.label(this.colorGradient1Button?.$container, null);
-    aria.label(this.colorGradient2Button?.$container, null);
-    aria.label(this.barChartButton?.$container, null);
-
     return group;
 
     function onClick() {
