@@ -95,6 +95,8 @@ public abstract class AbstractIcons implements Serializable {
   public static final String DiagramPie = "font:\uE078";
   public static final String DiagramRadar = "font:\uE079";
   public static final String DiagramScatter = "font:\uE07A";
+  public static final String OptimizeWidth = "font:\uE07B";
+  public static final String OptimizeWidths = "font:\uE07C";
 
   /* awesome font icons */
   public static final String ChevronLeftBold = "font:\uF053";

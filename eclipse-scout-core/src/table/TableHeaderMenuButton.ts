@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, ActionExecKeyStroke, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, TableHeaderMenuButtonModel, TableHeaderMenuGroup} from '../index';
+import {Action, ActionExecKeyStroke, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, TableHeaderMenuButtonModel, TableHeaderMenuGroup, TableHeaderMenuGroupItem} from '../index';
 
-export class TableHeaderMenuButton extends Action implements TableHeaderMenuButtonModel {
+export class TableHeaderMenuButton extends Action implements TableHeaderMenuButtonModel, TableHeaderMenuGroupItem {
   declare parent: TableHeaderMenuGroup;
   declare model: TableHeaderMenuButtonModel;
 
@@ -35,12 +35,7 @@ export class TableHeaderMenuButton extends Action implements TableHeaderMenuButt
 
   protected override _render() {
     super._render();
-    this.$container = this.$container.addClass('table-header-menu-command button')
-      .unfocusable()
-      .on('focusin', this._onFocusIn.bind(this))
-      .on('focusout', this._onFocusOut.bind(this))
-      .on('mouseenter', this._onMouseOver.bind(this))
-      .on('mouseleave', this._onMouseOut.bind(this));
+    this.$container = this.$container.addClass('table-header-menu-command button').unfocusable();
     this.$icon = this.$container.appendSpan('icon font-icon');
   }
 
@@ -49,36 +44,14 @@ export class TableHeaderMenuButton extends Action implements TableHeaderMenuButt
     this._renderToggleAction();
   }
 
-  protected _onMouseOver() {
-    this._appendActionText();
-  }
-
-  protected _onMouseOut() {
-    this.parent.resetText();
-  }
-
-  protected override _onFocusIn(event: FocusEvent | JQuery.FocusInEvent) {
-    super._onFocusIn(event);
-    this._appendActionText();
-  }
-
-  protected _onFocusOut() {
-    this.parent.resetText();
-  }
-
   override _renderToggleAction() {
     super._renderToggleAction();
     this.$container.toggleClass('togglable', this.toggleAction);
   }
 
-  // Show 'remove' text when button is already selected
-  protected _appendActionText() {
-    let text = this.selected ? this.session.text('ui.remove') : this.text;
-    this.parent.appendText(text);
-  }
-
-  protected _resetText() {
-    this.parent.resetText();
+  computeGroupSuffix() {
+    // Show 'remove' text when button is selected
+    return this.selected ? this.session.text('ui.remove') : this.text;
   }
 
   protected override _renderIconId() {

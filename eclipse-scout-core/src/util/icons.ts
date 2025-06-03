@@ -81,6 +81,8 @@ export const icons = {
   DIAGRAM_PIE: 'font:\uE078',
   DIAGRAM_RADAR: 'font:\uE079',
   DIAGRAM_SCATTER: 'font:\uE07A',
+  OPTIMIZE_WIDTH: 'font:\uE07B',
+  OPTIMIZE_WIDTHS: 'font:\uE07C',
 
   /* font awesome icons */
   CHEVRON_LEFT_BOLD: 'font:\uF053',

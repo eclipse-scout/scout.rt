@@ -87,8 +87,10 @@ export class TableHeaderMenuLayout extends PopupLayout {
     // fix width of actions column, so it doesn't become wider when user
     // hovers over a button and thus the text of the group changes.
     this._setMaxWidth();
-    let actionColumnSize = graphics.size(this.popup.$columnActions);
+    let htmlColumnActions = HtmlComponent.get(this.popup.$columnActions);
+    let actionColumnSize = htmlColumnActions.size();
     this._setMaxWidth(actionColumnSize.width);
+    htmlColumnActions.validateLayout(); // Ensure widgets that require layouting (e.g. NumberField for column width) are layouted.
   }
 
   protected override _adjustSizeWithAnchor(prefSize: Dimension): Dimension {

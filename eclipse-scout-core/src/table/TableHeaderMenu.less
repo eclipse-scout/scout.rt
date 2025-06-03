@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -193,6 +193,18 @@
       font-size: 12px;
       line-height: 12px; /* limit height otherwise arrow would move up in some browsers */
     }
+  }
+
+  &.optimize-width > .icon::before {
+    content: @icon-optimize-width;
+  }
+
+  &.optimize-widths > .icon::before {
+    content: @icon-optimize-widths;
+  }
+
+  &.table-header-menu-command.width {
+    width: @table-header-menu-cmd-width + @field-status-margin-left + @field-status-size;
   }
 
   &.aggregation-function {
