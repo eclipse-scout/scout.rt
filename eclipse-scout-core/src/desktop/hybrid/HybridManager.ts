@@ -122,7 +122,9 @@ export class HybridManager extends Widget {
   }
 
   protected _onHybridFormEvent(form: HybridManagerForm, eventType: string, data: AnyDoEntity) {
-    if (eventType === 'reset') {
+    if (eventType === 'data') {
+      form.setData(data);
+    } else if (eventType === 'reset') {
       form.setData(data);
       form.trigger('reset');
     } else if (eventType === 'save') {
