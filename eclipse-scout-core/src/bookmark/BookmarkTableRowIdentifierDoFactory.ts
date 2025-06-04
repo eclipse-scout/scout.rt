@@ -27,6 +27,9 @@ export class BookmarkTableRowIdentifierDoFactory {
   createTableRowIdentifier(tablePage: PageWithTable, row: TableRow, allowObjectFallback = false): BookmarkTableRowIdentifierDo {
     let keys = row.getKeyValues();
     let keyComponents = keys.map(key => this.createTableRowIdentifierComponent(tablePage, key, allowObjectFallback));
+    if (keyComponents.length === 0) {
+      return null;
+    }
     return scout.create(BookmarkTableRowIdentifierDo, {keyComponents});
   }
 
