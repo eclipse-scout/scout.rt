@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -153,11 +153,11 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
       return;
     }
     // The root content (default detail form / outline overview) will be embedded into the root node
-    // To make this work the root node needs to be visible. We also have to mark is as compact root so that the UI knows where to embed the root content.
-    // We also need to make sure that deselecting all nodes actually select the root node
-    // The root node will only be visible when it is selected which is done by using CSS, see Outline.less
+    // To make this work the root node needs to be visible.
     outline.setRootNodeVisible(true);
-    outline.getRootPage().setCompactRoot(true);
+
+    // Make sure that deselecting all nodes actually select the root node
+    // The root node will only be visible when it is selected which is done by using CSS, see Outline.less
     // Use _UI_TreeListener to make sure the event buffer in JsonTree contains the event with no selection when we select the root node,
     // otherwise changing the selection during a selection event would not be possible
     outline.addUITreeListener(event -> {
@@ -165,6 +165,22 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
         outline.selectNode(outline.getRootNode());
       }
     }, TreeEvent.TYPE_NODES_SELECTED);
+
+    // If root node changes dynamically, apply the root node transformation for the new root node
+    outline.addUITreeListener(event -> {
+      if (event.getNodeCount() == 1 && event.getNode() == outline.getRootNode()) {
+        transformRootPage(outline.getRootPage());
+      }
+    }, TreeEvent.TYPE_NODES_INSERTED);
+
+    transformRootPage(outline.getRootPage());
+  }
+
+  protected void transformRootPage(IPage page) {
+    // Mark is as compact root so that the UI knows where to embed the root content.
+    page.setCompactRoot(true);
+    page.setExpanded(true);
+    IOutline outline = page.getOutline();
     if (outline.getSelectedNodes().isEmpty()) {
       outline.selectNode(outline.getRootNode());
     }

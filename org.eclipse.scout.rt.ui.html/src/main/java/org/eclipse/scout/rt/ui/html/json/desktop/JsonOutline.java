@@ -129,11 +129,11 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   }
 
   @Override
-  protected void attachNode(ITreeNode node, boolean attachChildren) {
+  protected void attachNodeInternal(ITreeNode node) {
     if (!(node instanceof IPage)) {
       throw new IllegalArgumentException("Expected node to be a page. " + node);
     }
-    super.attachNode(node, attachChildren);
+    super.attachNodeInternal(node);
     IPage<?> page = (IPage<?>) node;
     if (hasDetailForm(page)) {
       attachGlobalAdapter(page.getDetailForm());
