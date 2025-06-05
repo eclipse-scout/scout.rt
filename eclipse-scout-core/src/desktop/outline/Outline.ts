@@ -164,8 +164,8 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this._setViews(this.views);
     this._setSelectedViewTabs(this.selectedViewTabs);
     this._setMenus(this.menus);
-    this.updateDetailContent();
     this._nodesSelectedInternal(this.selectedNodes);
+    this.updateDetailContent();
   }
 
   protected _createMediator(): OutlineMediator {
@@ -1237,7 +1237,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
   }
 
   pageChanged(page: Page) {
-    if (page?.pageChanging) {
+    if (!this.initialized || page?.pageChanging) {
       return;
     }
 
