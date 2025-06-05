@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.dataobject.TypeVersion;
  */
 @TypeName("scout.BookmarkTableRowIdentifier")
 @TypeVersion(Scout_25_2_001.class)
-public class BookmarkTableRowIdentifierDo extends DoEntity implements IBookmarkTableRowIdentifierDo {
+public class BookmarkTableRowIdentifierDo extends DoEntity {
 
   public DoList<IBookmarkTableRowIdentifierComponentDo> keyComponents() {
     return doList("keyComponents");
