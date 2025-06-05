@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, BookmarkTableRowIdentifierDo, BooleanColumn, Cell, ChildModelOf, Column, ColumnModel, ColumnUserFilter, dataObjects, defaultValues, Event, Filter, ModelAdapter, NumberColumn, ObjectOrModel, objects, RemoteEvent,
-  RemoteTableOrganizer, scout, Table, TableAggregationFunctionChangedEvent, TableAppLinkActionEvent, TableCancelCellEditEvent, TableColumnBackgroundEffectChangedEvent, TableColumnMovedEvent, TableColumnOrganizeActionEvent,
-  TableColumnResizedEvent, TableCompleteCellEditEvent, TableDropEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableModel, TablePrepareCellEditEvent, TableReloadEvent, TableRow, TableRowActionEvent,
-  TableRowClickEvent, TableRowModel, TableRowsCheckedEvent, TableRowsExpandedEvent, TableRowsSelectedEvent, TableSortEvent, TableUserFilter, ValueField
+  AdapterData, App, arrays, BooleanColumn, Cell, ChildModelOf, Column, ColumnModel, ColumnUserFilter, defaultValues, Event, Filter, ModelAdapter, NumberColumn, ObjectOrModel, objects, RemoteEvent, RemoteTableOrganizer, scout, Table,
+  TableAggregationFunctionChangedEvent, TableAppLinkActionEvent, TableCancelCellEditEvent, TableColumnBackgroundEffectChangedEvent, TableColumnMovedEvent, TableColumnOrganizeActionEvent, TableColumnResizedEvent, TableCompleteCellEditEvent,
+  TableDropEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableModel, TablePrepareCellEditEvent, TableReloadEvent, TableRow, TableRowActionEvent, TableRowClickEvent, TableRowModel, TableRowsCheckedEvent,
+  TableRowsExpandedEvent, TableRowsSelectedEvent, TableSortEvent, TableUserFilter, ValueField
 } from '../index';
 import $ from 'jquery';
 
@@ -632,7 +632,6 @@ export class TableAdapter extends ModelAdapter {
   protected _initRowModel(rowModel?: TableRowModel): ChildModelOf<TableRow> {
     let model = (rowModel || {}) as ChildModelOf<TableRow>;
     model.objectType = scout.nvl(model.objectType, 'TableRow');
-    model.bookmarkIdentifier = dataObjects.deserialize(model.bookmarkIdentifier, BookmarkTableRowIdentifierDo);
     defaultValues.applyTo(model);
     return model;
   }
