@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BookmarkTableRowIdentifierDo, Cell, LookupRow, ObjectModel, ObjectModelWithId, ObjectOrModel, Primitive, Table, TableRow} from '../index';
+import {Cell, LookupRow, ObjectModel, ObjectModelWithId, ObjectOrModel, Primitive, Table, TableRow} from '../index';
 
 export interface TableRowModel extends ObjectModel<TableRow>, ObjectModelWithId {
   parent?: Table;
@@ -22,10 +22,6 @@ export interface TableRowModel extends ObjectModel<TableRow>, ObjectModelWithId 
   parentRow?: string | ObjectOrModel<TableRow>;
   expanded?: boolean;
   lookupRow?: LookupRow<any>;
-  /**
-   * Row identifier for rows in a table page. Used for when creating or activating a bookmark. Initially undefined so it can be computed on demand.
-   */
-  bookmarkIdentifier?: BookmarkTableRowIdentifierDo;
 
   [property: string]: any; // allow custom properties
 }

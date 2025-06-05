@@ -627,7 +627,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
    * This method can also return `null`. In that case, the child page is identified by its page param.
    */
   getTableRowIdentifier(row: TableRow, allowObjectFallback = false): BookmarkTableRowIdentifierDo {
-    return row.bookmarkIdentifier;
+    return null;
   }
 
   setPageChanging(changing: boolean) {

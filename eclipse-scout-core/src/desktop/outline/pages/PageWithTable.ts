@@ -367,10 +367,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
   }
 
   override getTableRowIdentifier(row: TableRow, allowObjectFallback = false): BookmarkTableRowIdentifierDo {
-    if (row.bookmarkIdentifier === undefined) {
-      row.bookmarkIdentifier = BookmarkSupport.get(this.session).createTableRowIdentifier(this, row, allowObjectFallback);
-    }
-    return row.bookmarkIdentifier;
+    return BookmarkSupport.get(this.session).createTableRowIdentifier(this, row, allowObjectFallback);
   }
 }
 

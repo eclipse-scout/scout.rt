@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,7 +14,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
@@ -37,7 +36,6 @@ public class JsonOutlineTable<T extends ITable> extends JsonTable<T> {
     JsonOutline<IOutline> jsonOutline = getGlobalAdapter(m_page.getOutline());
     String nodeId = jsonOutline.getOrCreateNodeId(treeNode);
     putProperty(json, "nodeId", nodeId);
-    BEANS.all(IOutlineTableRowToJsonContributor.class).forEach(c -> c.contribute(json, m_page, row));
     return json;
   }
 }
