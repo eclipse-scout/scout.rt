@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1133,26 +1134,40 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   @Override
   public void setRootNode(ITreeNode root) {
-    if (m_rootNode != null) {
-      m_rootNode.setTreeInternal(null, true);
-      // inform root of remove
-      m_rootNode.nodeRemovedNotify();
-      m_rootNode.dispose();
-    }
-    m_rootNode = root;
-    if (m_rootNode != null) {
-      m_rootNode.setTreeInternal(this, true);
-      // inform root of add
-      m_rootNode.nodeAddedNotify();
-      // expand root if it is not visible
-      if (!isRootNodeVisible()) {
-        try {
-          m_rootNode.ensureChildrenLoaded();
-        }
-        catch (RuntimeException e) {
-          LOG.error("expanding root node of {}", getTitle(), e);
+    this.setTreeChanging(true);
+    try {
+      if (m_rootNode != null) {
+        deselectNode(m_rootNode);
+        setNodeChecked(m_rootNode, false);
+        m_rootNode.setTreeInternal(null, true);
+        // inform root of remove
+        m_rootNode.nodeRemovedNotify();
+        m_rootNode.dispose();
+        if (this.isInitConfigDone()) {
+          fireNodesDeleted(null, Arrays.asList(m_rootNode));
         }
       }
+      m_rootNode = root;
+      if (m_rootNode != null) {
+        if (this.isInitConfigDone()) {
+          fireNodesInserted(null, Arrays.asList(m_rootNode)); // Needs to happen before linking it with the tree, see addChildNodes
+        }
+        m_rootNode.setTreeInternal(this, true);
+        // inform root of add
+        m_rootNode.nodeAddedNotify();
+        // expand root if it is not visible
+        if (!isRootNodeVisible()) {
+          try {
+            m_rootNode.ensureChildrenLoaded();
+          }
+          catch (RuntimeException e) {
+            LOG.error("expanding root node of {}", getTitle(), e);
+          }
+        }
+      }
+    }
+    finally {
+      setTreeChanging(false);
     }
   }
 

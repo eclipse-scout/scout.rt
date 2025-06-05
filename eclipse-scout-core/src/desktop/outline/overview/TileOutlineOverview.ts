@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, Desktop, EventHandler, HtmlComponent, InitModelOf, OutlineOverview, Page, PageTileGrid, PropertyChangeEvent, RowLayout, scout, TileOutlineOverviewEventMap, TileOutlineOverviewModel} from '../../../index';
+import {
+  aria, Desktop, EventHandler, HtmlComponent, InitModelOf, OutlineOverview, Page, PageTileGrid, PropertyChangeEvent, RowLayout, scout, TileOutlineOverviewEventMap, TileOutlineOverviewModel, TreeNodesDeletedEvent, TreeNodesInsertedEvent
+} from '../../../index';
 
 export class TileOutlineOverview extends OutlineOverview implements TileOutlineOverviewModel {
   declare model: TileOutlineOverviewModel;
@@ -20,6 +22,8 @@ export class TileOutlineOverview extends OutlineOverview implements TileOutlineO
   contentHtmlComp: HtmlComponent;
   $title: JQuery;
   protected _desktopNavigationVisibilityChangeHandler: EventHandler<PropertyChangeEvent<boolean, Desktop>>;
+  protected _outlineNodesInsertedHandler: EventHandler<TreeNodesInsertedEvent>;
+  protected _outlineNodesDeletedHandler: EventHandler<TreeNodesDeletedEvent>;
 
   constructor() {
     super();
@@ -28,15 +32,27 @@ export class TileOutlineOverview extends OutlineOverview implements TileOutlineO
     this.titleVisible = true;
     this._addWidgetProperties(['pageTileGrid']);
     this._desktopNavigationVisibilityChangeHandler = this._onDesktopNavigationVisibilityChange.bind(this);
+    this._outlineNodesInsertedHandler = this._onOutlineNodesInserted.bind(this);
+    this._outlineNodesDeletedHandler = this._onOutlineNodesDeleted.bind(this);
   }
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
-    if (!this.pageTileGrid) {
-      this.pageTileGrid = this._createPageTileGrid();
+    this.pageTileGrid = this._createPageTileGrid();
+    if (this.outline.compact) {
+      this.outline.on('nodesDeleted', this._outlineNodesDeletedHandler);
+      this.outline.on('nodesInserted', this._outlineNodesInsertedHandler);
     }
     this.scrollable = !this.outline.compact;
     this.addCssClass('dimmed-background');
+  }
+
+  protected override _destroy() {
+    if (this.outline.compact) {
+      this.outline.off('nodesDeleted', this._outlineNodesDeletedHandler);
+      this.outline.off('nodesInserted', this._outlineNodesInsertedHandler);
+    }
+    super._destroy();
   }
 
   protected override _render() {
@@ -62,6 +78,10 @@ export class TileOutlineOverview extends OutlineOverview implements TileOutlineO
     super._renderProperties();
     this._renderPageTileGrid();
     this._renderScrollable();
+  }
+
+  protected setPageTileGrid(pageTileGrid: PageTileGrid) {
+    this.setProperty('pageTileGrid', pageTileGrid);
   }
 
   protected _renderPageTileGrid() {
@@ -112,5 +132,23 @@ export class TileOutlineOverview extends OutlineOverview implements TileOutlineO
 
   protected _onDesktopNavigationVisibilityChange(event: PropertyChangeEvent<boolean, Desktop>) {
     this._updateTitle();
+  }
+
+  protected _onOutlineNodesInserted(event: TreeNodesInsertedEvent) {
+    if (this.pageTileGrid) {
+      // If there is already a page tile grid, it will handle the insertion itself
+      return;
+    }
+    this.setPageTileGrid(this._createPageTileGrid());
+  }
+
+  protected _onOutlineNodesDeleted(event: TreeNodesDeletedEvent) {
+    // If outline is compact, the root page is passed to the page tile grid.
+    // If the root page is deleted, the grid needs to be recreated
+    // If outline is not compact, the grid itself takes care of page removals / insertions
+    const deletedNodes = event.nodes;
+    if (this.pageTileGrid && deletedNodes.length === 1 && this.pageTileGrid.page === deletedNodes[0]) {
+      this.setPageTileGrid(null);
+    }
   }
 }

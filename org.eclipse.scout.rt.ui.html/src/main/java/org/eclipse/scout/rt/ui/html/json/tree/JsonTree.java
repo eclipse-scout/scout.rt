@@ -318,6 +318,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   }
 
   protected void attachNodes(Collection<ITreeNode> nodes, boolean attachChildren) {
+    nodes = getChildrenIfInvisibleRootNode(nodes);
     for (ITreeNode node : nodes) {
       attachNode(node, attachChildren);
     }
@@ -618,7 +619,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
 
   protected void handleModelNodesInserted(TreeEvent event) {
     Set<ITreeNode> acceptedNodes = new HashSet<>();
-    attachNodes(event.getNodes(), true); // TODO [7.0] cgu: why not inside loop? attaching for rejected nodes?
+    attachNodes(event.getNodes(), true);
     IChildNodeIndexLookup childIndexes = createChildNodeIndexLookup();
     JSONArray jsonNodes = treeNodesToJson(event.getNodes(), childIndexes, acceptedNodes);
     if (jsonNodes.length() == 0) {
@@ -931,6 +932,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   }
 
   protected JSONArray treeNodesToJson(Collection<ITreeNode> nodes, IChildNodeIndexLookup childIndexes, Set<ITreeNode> acceptedNodes) {
+    nodes = getChildrenIfInvisibleRootNode(nodes);
     JSONArray jsonNodes = new JSONArray();
     for (ITreeNode node : nodes) {
       if (isNodeAccepted(node)) {
@@ -939,6 +941,21 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
       }
     }
     return jsonNodes;
+  }
+
+  /**
+   * If the given nodes just consist of the invisible root node, the children of that node are returned instead.
+   * Otherwise, the given nodes are returned as they are.
+   */
+  protected Collection<ITreeNode> getChildrenIfInvisibleRootNode(Collection<ITreeNode> nodes) {
+    if (nodes.size() != 1) {
+      return nodes;
+    }
+    ITreeNode node = nodes.stream().findFirst().get();
+    if (isInvisibleRootNode(node)) {
+      nodes = node.getChildNodes();
+    }
+    return nodes;
   }
 
   protected JSONObject treeNodeToJson(ITreeNode node, IChildNodeIndexLookup childIndexes, Set<ITreeNode> acceptedNodes) {

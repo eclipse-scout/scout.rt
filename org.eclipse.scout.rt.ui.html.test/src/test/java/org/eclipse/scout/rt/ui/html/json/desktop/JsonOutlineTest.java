@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.transformation.MobileDeviceTransformer;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
@@ -28,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -331,6 +333,34 @@ public class JsonOutlineTest {
     // Only the insert event for the child node of the invisible root page is sent
     assertEquals(1, events.size());
     assertEquals(JsonTree.EVENT_NODES_INSERTED, events.get(0).getType());
+  }
+
+  @Test
+  public void testChangingVisibleRootNodeForMobile() {
+    IOutline outline = new OutlineWithOneNode();
+    outline.setRootNodeVisible(true);
+    BEANS.get(MobileDeviceTransformer.class).transformOutline(outline);
+
+    IPage<?> oldRootNode = outline.getRootPage();
+    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline);
+    String oldRootNodeId = jsonOutline.getNodeId(oldRootNode);
+
+    NodePage newRootNode = new NodePage();
+    outline.setRootNode(newRootNode);
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+
+    assertNull(jsonOutline.optNodeId(oldRootNode));
+    assertNotNull(jsonOutline.optNodeId(newRootNode));
+
+    List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
+
+    String newRootNodeId = jsonOutline.getNodeId(newRootNode);
+    assertEquals(4, events.size());
+    JsonTreeTest.assertEventTypeAndNodeIds(events.get(0), JsonTree.EVENT_NODES_DELETED, oldRootNodeId);
+    assertEquals(JsonTree.EVENT_NODES_INSERTED, events.get(1).getType());
+    assertEquals("pageChanged", events.get(2).getType()); // because selecting the new root node creates the detail table
+    JsonTreeTest.assertEventTypeAndNodeIds(events.get(3), JsonTree.EVENT_NODES_SELECTED, newRootNodeId); // Mobile Device transformer selects the new root node
   }
 
   /**
