@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Column, Form, GroupBox, MessageBox, ObjectIdProvider, ObjectOrModel, objects, OutlineOverview, Page, PageWithNodes, PageWithTable, scout, Status, Table, TableRow, TileOutlineOverview, Tree, TreeField} from '../../../src/index';
+import {
+  Column, Form, GroupBox, Menu, MessageBox, ObjectIdProvider, ObjectOrModel, objects, OutlineOverview, Page, PageWithNodes, PageWithTable, scout, Status, Table, TableRow, TileOutlineOverview, Tree, TreeField
+} from '../../../src/index';
 import {FormSpecHelper, JQueryTesting, MenuSpecHelper, OutlineSpecHelper, TreeSpecHelper} from '../../../src/testing/index';
 
 describe('Outline', () => {
@@ -515,6 +517,62 @@ describe('Outline', () => {
       }));
       expect(outline.detailContent).toBe(page.detailForm);
       expect(outline.detailContent).not.toBe(oldDetailForm);
+    });
+
+    it('is set correctly when page is initially selected', () => {
+      const outline = helper.createOutline({
+        parent: session.desktop,
+        selectedNodes: ['child_page'],
+        embedDetailContent: true,
+        compact: true,
+        displayStyle: Tree.DisplayStyle.BREADCRUMB,
+        nodes: [{
+          id: 'child_page',
+          objectType: PageWithTable,
+          detailForm: {
+            objectType: Form,
+            rootGroupBox: {
+              objectType: GroupBox,
+              menus: [{
+                objectType: Menu
+              }]
+            }
+          }
+        }]
+      });
+      outline.render();
+      const childPage = outline.nodes[0];
+      expect(outline.selectedNode()).toBe(childPage);
+      expect(outline.detailContent).toBe(childPage.detailForm);
+      expect(outline.detailMenuBar.menuItems).toEqual(childPage.detailForm.rootGroupBox.menus);
+    });
+
+    it('can be selected initially without errors on mobile', () => {
+      // Table page is selected initially.
+      // Because of displayStyle = BREADCRUMB, the selected node will be expanded before the node menu bar is created.
+      // Expanding the node creates the detail table which updates the detail menus on the outline.
+      // -> Expect that Outline.pageChanged is not called during init to prevent errors
+      const outline = helper.createOutline({
+        parent: session.desktop,
+        selectedNodes: ['child_page'],
+        embedDetailContent: true,
+        compact: true,
+        displayStyle: Tree.DisplayStyle.BREADCRUMB,
+        nodes: [{
+          id: 'child_page',
+          objectType: PageWithTable,
+          detailTable: {
+            objectType: Table,
+            menus: [{
+              objectType: Menu
+            }]
+          }
+        }]
+      });
+      outline.render();
+      const childPage = outline.nodes[0];
+      expect(outline.selectedNode()).toBe(childPage);
+      expect(outline.detailMenuBar.menuItems).toEqual(childPage.detailTable.menus);
     });
   });
 
