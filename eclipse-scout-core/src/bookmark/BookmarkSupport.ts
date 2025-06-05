@@ -168,10 +168,11 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * @param options Optional settings to change the behavior of this method
    */
   activateBookmark(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): JQuery.Promise<void> {
-    return $.when(this._activateBookmark(bookmark, options));
+    return $.when(this._activateBookmarkAsync(bookmark, options));
   }
 
-  protected async _activateBookmark(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): Promise<void> {
+  // Native-promise version of activateBookmark()
+  protected async _activateBookmarkAsync(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): Promise<void> {
     try {
       if (!(bookmark?.definition instanceof OutlineBookmarkDefinitionDo)) {
         // noinspection ExceptionCaughtLocallyJS
@@ -215,13 +216,28 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * @param options Optional settings to change the behavior of this method
    */
   activateBookmarkPath(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): JQuery.Promise<void> {
-    return $.when(this._activateBookmarkPath(param, options))
-      .catch(error => {
-        if (scout.nvl(options?.handleErrors, true)) {
-          return this.handleActivateBookmarkError(error);
-        }
-        throw error;
-      });
+    return $.when(this._activateBookmarkPathAsync(param, options));
+  }
+
+  // Native-promise version of activateBookmarkPath()
+  protected async _activateBookmarkPathAsync(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): Promise<void> {
+    try {
+      if (this.loading) {
+        // noinspection ExceptionCaughtLocallyJS
+        throw BookmarkSupport.ERROR_ALREADY_LOADING;
+      }
+      this.setLoading(true);
+      try {
+        await this._activateBookmarkPath(param, options);
+      } finally {
+        this.setLoading(false);
+      }
+    } catch (error) {
+      if (scout.nvl(options?.handleErrors, true)) {
+        return this.handleActivateBookmarkError(error);
+      }
+      throw error;
+    }
   }
 
   protected async _activateBookmarkPath(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): Promise<void> {
@@ -411,11 +427,16 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * reload is done.
    */
   applyBookmarkToPageAndReload(page: Page, bookmark: IBookmarkDo, saveSearchForm = true): JQuery.Promise<void> {
+    return $.when(this._applyBookmarkToPageAndReloadAsync(page, bookmark, saveSearchForm));
+  }
+
+  // Native-promise version of applyBookmarkToPageAndReload()
+  protected async _applyBookmarkToPageAndReloadAsync(page: Page, bookmark: IBookmarkDo, saveSearchForm = true): Promise<void> {
     if (!page || !bookmark || !bookmark.definition) {
       return;
     }
     let bookmarkPage = bookmark.definition.bookmarkedPage;
-    return $.when(this._applyBookmarkPageAndReload(page, bookmarkPage, saveSearchForm));
+    await this._applyBookmarkPageAndReload(page, bookmarkPage, saveSearchForm);
   }
 
   protected async _applyBookmarkPageAndReload(page: Page, bookmarkPage: IBookmarkPageDo, saveSearchForm = true): Promise<void> {
