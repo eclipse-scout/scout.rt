@@ -20,7 +20,7 @@
 
   <artifactId>org.eclipse.scout.rt.server.commons.test</artifactId>
   <packaging>jar</packaging>
-
+  <name>${project.artifactId}</name>
 
   <dependencies>
     <!-- Build Dependencies -->
