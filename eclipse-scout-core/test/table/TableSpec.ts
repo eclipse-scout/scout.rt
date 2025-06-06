@@ -2621,22 +2621,34 @@ describe('Table', () => {
       let $header0 = $colHeaders.eq(0);
       let $header1 = $colHeaders.eq(1);
       let $header2 = $colHeaders.eq(2);
+      let $resizer0 = $header0.next('.table-header-resize');
+      let $resizer1 = $header1.next('.table-header-resize');
+      let $resizer2 = $header2.next('.table-header-resize');
 
       expect(table.columns.indexOf($header0.data('column'))).toBe(0);
       expect(table.columns.indexOf($header1.data('column'))).toBe(1);
       expect(table.columns.indexOf($header2.data('column'))).toBe(2);
+      expect($resizer0.length).toBe(1);
+      expect($resizer1.length).toBe(1);
+      expect($resizer2.length).toBe(1);
 
       table.moveColumn($header0.data('column'), 2);
 
       expect(table.columns.indexOf($header1.data('column'))).toBe(0);
       expect(table.columns.indexOf($header2.data('column'))).toBe(1);
       expect(table.columns.indexOf($header0.data('column'))).toBe(2);
+      expect($header0.next('.table-header-resize')[0]).toBe($resizer0[0]);
+      expect($header1.next('.table-header-resize')[0]).toBe($resizer1[0]);
+      expect($header2.next('.table-header-resize')[0]).toBe($resizer2[0]);
 
       table.moveColumn($header2.data('column'), 0);
 
       expect(table.columns.indexOf($header2.data('column'))).toBe(0);
       expect(table.columns.indexOf($header1.data('column'))).toBe(1);
       expect(table.columns.indexOf($header0.data('column'))).toBe(2);
+      expect($header0.next('.table-header-resize')[0]).toBe($resizer0[0]);
+      expect($header1.next('.table-header-resize')[0]).toBe($resizer1[0]);
+      expect($header2.next('.table-header-resize')[0]).toBe($resizer2[0]);
     });
 
     it('considers view range (does not fail if not all rows are rendered)', () => {

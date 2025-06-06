@@ -570,14 +570,14 @@ export class TableHeader extends Widget implements TableHeaderModel {
     const newPos = event.newPos;
     const $movedHeader = $headers.eq(oldPos);
     const $targetHeader = $headers.eq(newPos);
+    // The separator always belongs to a column -> remember it before moving the header
+    const $separator = $movedHeader.next('.table-header-resize');
     if (newPos < oldPos) {
       $targetHeader.before($movedHeader);
     } else {
       $targetHeader.after($movedHeader);
       $movedHeader.before($movedHeader.next('.table-header-resize'));
     }
-    // The separator belongs to a column which is especially relevant for fixed width columns where resizing is disabled -> ensure it is always positioned after the header
-    const $separator = $movedHeader.next('.table-header-resize');
     $movedHeader.after($separator);
 
     // Update first/last markers
