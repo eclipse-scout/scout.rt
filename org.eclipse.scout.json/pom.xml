@@ -20,7 +20,7 @@
 
   <artifactId>org.eclipse.scout.json</artifactId>
   <packaging>jar</packaging>
-
+  <name>${project.artifactId}</name>
 
   <!-- primarily for license header generation -->
   <inceptionYear>2015</inceptionYear>

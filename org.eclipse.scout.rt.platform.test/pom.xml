@@ -20,7 +20,7 @@
 
   <artifactId>org.eclipse.scout.rt.platform.test</artifactId>
   <packaging>jar</packaging>
-
+  <name>${project.artifactId}</name>
 
   <properties>
     <surefire.excludedGroups>${scout.excludeTestCategories}</surefire.excludedGroups>

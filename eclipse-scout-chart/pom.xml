@@ -21,6 +21,7 @@
   </parent>
 
   <artifactId>eclipse-scout-chart</artifactId>
+  <name>${project.artifactId}</name>
 
   <properties>
     <master_skip_copy_webpack_build_output>true</master_skip_copy_webpack_build_output>

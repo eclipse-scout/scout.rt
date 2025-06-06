@@ -14,7 +14,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
-    <version>25.1.2</version>
+    <version>25.2.0-SNAPSHOT</version>
     <relativePath />
   </parent>
 
@@ -22,6 +22,7 @@
   <artifactId>org.eclipse.scout.rt.root</artifactId>
   <version>25.2-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <name>${project.artifactId}</name>
 
   <modules>
     <module>org.eclipse.scout.rt</module>

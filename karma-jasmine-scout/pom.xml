@@ -21,6 +21,7 @@
   </parent>
 
   <artifactId>karma-jasmine-scout</artifactId>
+  <name>${project.artifactId}</name>
 
   <properties>
     <master_skip_npm_build_dev>true</master_skip_npm_build_dev>
