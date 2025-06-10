@@ -678,6 +678,7 @@ export * from './form/fields/ValueField';
 export * from './form/fields/ValueFieldModel';
 export * from './form/fields/ValueFieldEventMap';
 export * from './form/fields/ValueFieldAdapter';
+export * from './form/fields/AcceptInputKeyStroke';
 export * from './form/fields/BasicField';
 export * from './form/fields/BasicFieldModel';
 export * from './form/fields/BasicFieldEventMap';
