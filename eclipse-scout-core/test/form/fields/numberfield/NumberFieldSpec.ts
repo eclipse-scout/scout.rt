@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper, JQueryTesting, LocaleSpecHelper} from '../../../../src/testing/index';
-import {DecimalFormat, Locale, NumberField, RoundingMode, scout, Status} from '../../../../src/index';
+import {DecimalFormat, keys, Locale, NumberField, RoundingMode, scout, Status} from '../../../../src/index';
 
 describe('NumberField', () => {
   let session: SandboxSession;
@@ -184,6 +184,16 @@ describe('NumberField', () => {
       expect(field.$field.val()).toBe('6');
       expect(field.value).toBe(6);
       expect(field.errorStatus).toBe(null);
+    });
+
+    it('is called when ENTER is pressed', () => {
+      let field = helper.createField(NumberField);
+      field.render();
+      field.$field.val('6');
+      expect(field.value).toBe(null);
+
+      JQueryTesting.triggerKeyDownCapture(field.$field, keys.ENTER);
+      expect(field.value).toBe(6);
     });
   });
 

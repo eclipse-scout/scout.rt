@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, BasicField, Calculator, DecimalFormat, DecimalFormatOptions, fields, InitModelOf, InputFieldKeyStrokeContext, KeyStrokeContext, Locale, NumberFieldEventMap, NumberFieldModel, numbers, objects} from '../../../index';
+import {
+  AcceptInputKeyStroke, aria, BasicField, Calculator, DecimalFormat, DecimalFormatOptions, fields, InitModelOf, InputFieldKeyStrokeContext, KeyStrokeContext, Locale, NumberFieldEventMap, NumberFieldModel, numbers, objects
+} from '../../../index';
 
 export class NumberField extends BasicField<number, number | string> implements NumberFieldModel {
   declare model: NumberFieldModel;
@@ -49,6 +51,11 @@ export class NumberField extends BasicField<number, number | string> implements 
 
   protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new InputFieldKeyStrokeContext();
+  }
+
+  protected override _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
+    this.keyStrokeContext.registerKeyStroke(new AcceptInputKeyStroke(this));
   }
 
   protected override _render() {
