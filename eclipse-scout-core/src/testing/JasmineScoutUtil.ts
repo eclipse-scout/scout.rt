@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractConstructor, arrays, AutoLeafPageWithNodes, Constructor, DoEntity, HybridActionEvent, HybridManager, ObjectFactory, Page, PageWithNodes, PageWithTable, scout, Session, strings, TypeDescriptor, Widget} from '../index';
+import {
+  AbstractConstructor, arrays, AutoLeafPageWithNodes, BaseDoEntity, Constructor, dataObjects, DoEntity, HybridActionEvent, HybridManager, ObjectFactory, Page, PageWithNodes, PageWithTable, scout, Session, strings, TypeDescriptor, Widget
+} from '../index';
 import $ from 'jquery';
 import 'jasmine-ajax';
 
@@ -91,13 +93,31 @@ export const JasmineScoutUtil = {
   mockRestCall(resourceUrlToMock: string, responseData: any, options: {
     restriction?: any;
     method?: string;
+    /**
+     * Used to serialize the responseData. Default is {@link JSON.stringify}.
+     */
+    stringify?: (any) => string;
   } = {}) {
     let url = new RegExp('.*' + strings.quote(resourceUrlToMock) + '.*');
     let data = options.restriction ? new RegExp('.*' + strings.quote(options.restriction) + '.*') : undefined;
+    const stringify = options.stringify || JSON.stringify;
+    const responseText = stringify(responseData);
     jasmine.Ajax.stubRequest(url, data, options.method).andReturn({
       status: 200,
-      responseText: JSON.stringify(responseData)
+      responseText
     });
+  },
+
+  mockDataObjectRestCall(resourceUrlToMock: string, responseData: BaseDoEntity | void, options: {
+    restriction?: any;
+    method?: string;
+    /**
+     * Used to serialize the responseData. Default is {@link dataObjects.stringify}.
+     */
+    stringify?: (any) => string;
+  } = {}) {
+    options.stringify = options.stringify || dataObjects.stringify;
+    this.mockRestCall(resourceUrlToMock, responseData, options);
   },
 
   /**
