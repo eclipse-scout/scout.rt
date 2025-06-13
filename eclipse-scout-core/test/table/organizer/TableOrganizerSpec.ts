@@ -228,7 +228,7 @@ describe('TableOrganizer', () => {
 
   describe('getInvisibleColumns', () => {
 
-    it('returns all invisible columns if no insertAfterColumn is provided', () => {
+    it('returns all invisible columns', () => {
       let tableModel = helper.createModelFixture(5);
       let table = helper.createTable(tableModel);
       let column0 = table.columns[0];
@@ -253,78 +253,6 @@ describe('TableOrganizer', () => {
       expect(organizer.getInvisibleColumns()).toEqual([column0, column1, column3, column4]);
       column3.setVisible(true);
       expect(organizer.getInvisibleColumns()).toEqual([column0, column1, column4]);
-
-      expect(organizer.getInvisibleColumns(column3)).toEqual([column0, column1, column4]);
-    });
-
-    it('returns only invisible columns that are between fixed columns around the insertAfterColumn', () => {
-      let tableModel = helper.createModelFixture(8);
-      tableModel.columns[1].visible = false;
-      tableModel.columns[2].fixedPosition = true;
-      tableModel.columns[3].visible = false;
-      tableModel.columns[4].visible = false;
-      tableModel.columns[5].fixedPosition = true;
-      tableModel.columns[6].visible = false;
-      tableModel.columns[7].fixedPosition = true;
-      let table = helper.createTable(tableModel);
-      let column0 = table.columns[0];
-      let column1 = table.columns[1];
-      let column2 = table.columns[2]; // fixed
-      let column3 = table.columns[3];
-      let column4 = table.columns[4];
-      let column5 = table.columns[5]; // fixed
-      let column6 = table.columns[6];
-      let column7 = table.columns[7]; // fixed
-      let organizer = table.organizer;
-
-      expect(organizer.getInvisibleColumns()).toEqual([column1, column3, column4, column6]);
-      expect(organizer.getInvisibleColumns(column0)).toEqual([column1]);
-      expect(organizer.getInvisibleColumns(column1)).toEqual([column1, column3, column4, column6]);
-      expect(organizer.getInvisibleColumns(column2)).toEqual([column3, column4]);
-      expect(organizer.getInvisibleColumns(column3)).toEqual([column1, column3, column4, column6]);
-      expect(organizer.getInvisibleColumns(column4)).toEqual([column1, column3, column4, column6]);
-      expect(organizer.getInvisibleColumns(column5)).toEqual([column6]);
-      expect(organizer.getInvisibleColumns(column6)).toEqual([column1, column3, column4, column6]);
-      expect(organizer.getInvisibleColumns(column7)).toEqual([]);
-
-      column5.setVisible(false);
-      expect(organizer.getInvisibleColumns()).toEqual([column1, column3, column4, column5, column6]);
-      expect(organizer.getInvisibleColumns(column0)).toEqual([column1]);
-      expect(organizer.getInvisibleColumns(column1)).toEqual([column1, column3, column4, column5, column6]);
-      expect(organizer.getInvisibleColumns(column2)).toEqual([column3, column4, column5, column6]);
-      expect(organizer.getInvisibleColumns(column3)).toEqual([column1, column3, column4, column5, column6]);
-      expect(organizer.getInvisibleColumns(column4)).toEqual([column1, column3, column4, column5, column6]);
-      expect(organizer.getInvisibleColumns(column5)).toEqual([column1, column3, column4, column5, column6]);
-      expect(organizer.getInvisibleColumns(column6)).toEqual([column1, column3, column4, column5, column6]);
-      expect(organizer.getInvisibleColumns(column7)).toEqual([]);
-    });
-
-    it('ignores insertAfterColumn when it is invisible or belongs to a different table', () => {
-      let tableModel = helper.createModelFixture(5);
-      tableModel.columns[1].visible = false;
-      tableModel.columns[3].fixedPosition = true;
-      tableModel.columns[4].visible = false;
-      let table = helper.createTable(tableModel);
-      let column0 = table.columns[0];
-      let column1 = table.columns[1];
-      let column2 = table.columns[2];
-      let column3 = table.columns[3];
-      let column4 = table.columns[4];
-      let organizer = table.organizer;
-
-      expect(organizer.getInvisibleColumns()).toEqual([column1, column4]);
-      expect(organizer.getInvisibleColumns(column0)).toEqual([column1]);
-      expect(organizer.getInvisibleColumns(column1)).toEqual([column1, column4]); // invisible
-      expect(organizer.getInvisibleColumns(column2)).toEqual([column1]);
-      expect(organizer.getInvisibleColumns(column3)).toEqual([column4]);
-      expect(organizer.getInvisibleColumns(column4)).toEqual([column1, column4]); // invisible
-
-      let tableModel2 = helper.createModelFixture(1);
-      tableModel2.columns[0].fixedPosition = true;
-      let table2 = helper.createTable(tableModel2);
-      let column0_2 = table2.columns[0];
-
-      expect(organizer.getInvisibleColumns(column0_2)).toEqual([column1, column4]); // wrong table
     });
   });
 
@@ -417,6 +345,34 @@ describe('TableOrganizer', () => {
       expect(table.visibleColumns()).toEqual([column0, column1, column2, column3, column4]);
       expect(table.displayableColumns()).toEqual([column0, column1, column2, column3, column4, column5]);
       expect(table.onColumnVisibilityChanged).toHaveBeenCalledTimes(1);
+    });
+
+    it('ensures columns are not moved passed fixed columns', () => {
+      let tableModel = helper.createModelFixture(8);
+      tableModel.columns[0].visible = false;
+      tableModel.columns[2].fixedPosition = true;
+      tableModel.columns[3].visible = false;
+      tableModel.columns[4].visible = false;
+      tableModel.columns[5].fixedPosition = true;
+      tableModel.columns[6].visible = false;
+      tableModel.columns[7].fixedPosition = true;
+      let table = helper.createTable(tableModel);
+      let column0 = table.columns[0];
+      let column1 = table.columns[1];
+      let column2 = table.columns[2]; // fixed
+      let column3 = table.columns[3];
+      let column4 = table.columns[4];
+      let column5 = table.columns[5]; // fixed
+      let column6 = table.columns[6];
+      let column7 = table.columns[7]; // fixed
+      let organizer = table.organizer;
+      expect(table.visibleColumns()).toEqual([column1, column2, column5, column7]);
+
+      organizer.showColumns([column0, column3], column5); // column 0 cannot be moved passed 2, column 3 cannot be moved passed 5
+      expect(table.visibleColumns()).toEqual([column1, column0, column2, column3, column5, column7]);
+
+      organizer.showColumns([column4, column6], column0); // column 4 cannot be moved passed 2, column 6 cannot be moved passed 5
+      expect(table.visibleColumns()).toEqual([column1, column0, column2, column4, column3, column5, column6, column7]);
     });
   });
 

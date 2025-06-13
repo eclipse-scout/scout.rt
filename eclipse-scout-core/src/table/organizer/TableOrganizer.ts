@@ -56,33 +56,14 @@ export class TableOrganizer implements ObjectWithType {
   /**
    * Returns a list of all currently invisible but displayable columns that can be added to the list of
    * visible columns by the table organizer.
-   *
-   * If a column is specified after which the selected columns are to be moved, the result will only include
-   * columns that can be moved there without overtaking existing columns with `fixedPosition=true`.
    */
-  getInvisibleColumns(insertAfterColumn?: Column<any>): Column<any>[] {
+  getInvisibleColumns(): Column<any>[] {
     if (!this.table) {
       return []; // not installed
     }
 
     let displayableColumns = this.table.displayableColumns();
     let visibleColumns = this.table.visibleColumns();
-
-    // Only consider the "insertAfterColumn" if it is visible. ShowInvisibleColumnsForm#exportData will
-    // then keep the current column position and only update the visibility.
-    if (insertAfterColumn && visibleColumns.includes(insertAfterColumn)) {
-      // Only allow adding invisible columns between two visible columns with fixed position (if present).
-      // Otherwise, it would be possible to hide them and add them again on the other side.
-      let insertAfterIndex = visibleColumns.indexOf(insertAfterColumn);
-      let prevFixedColumn = arrays.findFromReverse(visibleColumns, insertAfterIndex, col => col.fixedPosition);
-      let nextFixedColumn = arrays.findFromForward(visibleColumns, insertAfterIndex + 1, col => col.fixedPosition);
-      if (prevFixedColumn || nextFixedColumn) {
-        displayableColumns = displayableColumns.slice(
-          prevFixedColumn ? displayableColumns.indexOf(prevFixedColumn) : 0,
-          nextFixedColumn ? displayableColumns.indexOf(nextFixedColumn) : undefined
-        );
-      }
-    }
     return arrays.diff(displayableColumns, visibleColumns);
   }
 
@@ -100,17 +81,25 @@ export class TableOrganizer implements ObjectWithType {
       return; // nothing to do
     }
 
+    // Make the columns visible
+    columns.forEach(column => column.setVisible(true, false)); // parameter 'false' skips call of onColumnVisibilityChanged()
+
+    // If a "insertAfterColumn" is provided, move the columns to a position right after that column.
+    // Otherwise, the selected columns are only made visible, but not moved.
     if (insertAfterColumn && insertAfterColumn.visible && this.table.columns.includes(insertAfterColumn)) {
-      // If a "insertAfterColumn" is provided, move the (still hidden) columns to a position right after that column.
-      // We do this _before_ making them visible to prevent the animation. If no valid "insertAfterColumn" is provided,
-      // the selected columns are only made visible, but not moved.
-      arrays.removeAll(this.table.columns, columns);
-      arrays.insertAll(this.table.columns, columns, this.table.columns.indexOf(insertAfterColumn) + 1);
+      this._moveColumns(columns, insertAfterColumn);
     }
 
-    // Make the columns visible (at their new location)
-    columns.forEach(column => column.setVisible(true, false)); // parameter 'false' skips call of onColumnVisibilityChanged()
     this.table.onColumnVisibilityChanged(); // do this only once, will also update the aggregate rows
+  }
+
+  protected _moveColumns(columns: Column<any>[], insertAfterColumn: Column<any>) {
+    for (const column of columns.reverse()) {
+      let visibleColumns = this.table.visibleColumns();
+      let visibleOldPos = visibleColumns.indexOf(column);
+      let visibleNewPos = visibleColumns.indexOf(insertAfterColumn);
+      this.table._moveColumn(column, visibleColumns, visibleOldPos, visibleNewPos);
+    }
   }
 
   /**
@@ -157,7 +146,7 @@ export class TableOrganizer implements ObjectWithType {
   /**
    * Returns true if there are addable columns according to {@link getInvisibleColumns}.
    */
-  isColumnAddable(insertAfterColumn?: Column<any>): boolean {
+  isColumnAddable(): boolean {
     if (!this.table) {
       return false; // not installed
     }
@@ -167,7 +156,7 @@ export class TableOrganizer implements ObjectWithType {
     if (this.table.isCustomizable()) {
       return true;
     }
-    let invisibleColumns = this.getInvisibleColumns(insertAfterColumn);
+    let invisibleColumns = this.getInvisibleColumns();
     return arrays.hasElements(invisibleColumns);
   }
 
@@ -266,7 +255,7 @@ export class TableOrganizer implements ObjectWithType {
     let form = scout.create(ShowInvisibleColumnsForm, {
       parent: this.table,
       data: {
-        columns: this.getInvisibleColumns(insertAfterColumn)
+        columns: this.getInvisibleColumns()
       }
     });
     form.open();

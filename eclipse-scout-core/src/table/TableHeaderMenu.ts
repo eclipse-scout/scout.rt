@@ -391,7 +391,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   }
 
   protected _isColumnActionsGroupVisible(): boolean {
-    return this.table.isColumnAddable(this.column) || this.table.isColumnRemovable(this.column) || this.table.isColumnModifiable(this.column);
+    return this.table.isColumnAddable() || this.table.isColumnRemovable(this.column) || this.table.isColumnModifiable(this.column);
   }
 
   protected _renderColumnActionsGroup(): TableHeaderMenuGroup {
@@ -404,7 +404,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       parent: this.columnActionsGroup,
       text: '${textKey:ui.addColumn}',
       cssClass: 'add-column',
-      visible: this.table.isColumnAddable(this.column)
+      visible: this.table.isColumnAddable()
     });
     this.addColumnButton.on('action', () => {
       this.close();
