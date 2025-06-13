@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -736,12 +736,12 @@ describe('TableAdapter', () => {
 
       expect(table.organizer).toBeInstanceOf(RemoteTableOrganizer);
 
-      expect(table.isColumnAddable(table.columns[0])).toBe(true);
+      expect(table.isColumnAddable()).toBe(true);
       expect(table.isColumnRemovable(table.columns[0])).toBe(true);
       expect(table.isColumnModifiable(table.columns[0])).toBe(true);
 
       table.columnAddable = false;
-      expect(table.isColumnAddable(table.columns[0])).toBe(false);
+      expect(table.isColumnAddable()).toBe(false);
       table.columns[0].removable = false;
       table.columns[0].modifiable = false;
       expect(table.isColumnRemovable(table.columns[0])).toBe(false);

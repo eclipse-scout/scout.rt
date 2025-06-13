@@ -4639,24 +4639,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   moveColumn(column: Column<any>, visibleNewPos: number): boolean {
     let visibleColumns = this.visibleColumns();
     let visibleOldPos = visibleColumns.indexOf(column);
-    let range = new Range(0, visibleColumns.length);
-    if (!range.contains(visibleOldPos) || !range.contains(visibleNewPos)) {
+    visibleNewPos = this._moveColumn(column, visibleColumns, visibleOldPos, visibleNewPos);
+    if (visibleNewPos === null) {
       return false;
     }
-
-    // If there are fixed columns, don't allow moving the column onto the other side of the fixed columns
-    visibleNewPos = this.considerFixedPositionColumns(visibleOldPos, visibleNewPos);
-    if (visibleNewPos === visibleOldPos) {
-      return false;
-    }
-
-    // Translate position of 'visible columns' array to position in 'all columns' array
-    let newColumn = visibleColumns[visibleNewPos];
-    let newPos = this.columns.indexOf(newColumn);
-
-    arrays.remove(this.columns, column);
-    arrays.insert(this.columns, column, newPos);
-
     visibleColumns = this.visibleColumns();
     visibleNewPos = visibleColumns.indexOf(column); // we must re-evaluate visible columns
 
@@ -4671,6 +4657,32 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       this._rerenderViewport();
     }
     return true;
+  }
+
+  /**
+   * Moves the given column to the new position without changing rows, triggering events and rendering the new state.
+   *
+   * @returns thew new visible position if it was adjusted by {@link considerFixedPositionColumns}
+   * @internal
+   */
+  _moveColumn(column: Column<any>, visibleColumns: Column<any>[], visibleOldPos: number, visibleNewPos: number): number {
+    let range = new Range(0, visibleColumns.length);
+    if (!range.contains(visibleOldPos) || !range.contains(visibleNewPos)) {
+      return null;
+    }
+    // If there are fixed columns, don't allow moving the column onto the other side of the fixed columns
+    visibleNewPos = this.considerFixedPositionColumns(visibleOldPos, visibleNewPos);
+    if (visibleNewPos === visibleOldPos) {
+      return null;
+    }
+
+    // Translate position of 'visible columns' array to position in 'all columns' array
+    let newColumn = visibleColumns[visibleNewPos];
+    let newPos = this.columns.indexOf(newColumn);
+
+    arrays.remove(this.columns, column);
+    arrays.insert(this.columns, column, newPos);
+    return visibleNewPos;
   }
 
   /**
@@ -6122,9 +6134,9 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     });
   }
 
-  isColumnAddable(insertAfterColumn?: Column): boolean {
+  isColumnAddable(): boolean {
     if (this.organizer) {
-      return this.organizer.isColumnAddable(insertAfterColumn);
+      return this.organizer.isColumnAddable();
     }
     return false;
   }

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {TableSpecHelper} from '../../../src/testing';
-import {scout, Table, TableOrganizerForm, TableOrganizerMenu} from '../../../src';
+import {scout, ShowInvisibleColumnsForm, Table, TableOrganizerForm, TableOrganizerMenu} from '../../../src';
 
 describe('TableOrganizerForm', () => {
   let session: SandboxSession;
@@ -160,6 +160,32 @@ describe('TableOrganizerForm', () => {
       await form.load();
       expect(columnsTable.rows.length).toBe(0);
       expect(addColumnMenu.visible).toBe(true);
+    });
+
+    it('can show all invisible columns even if there are fixed columns', async () => {
+      let table = createTable(3);
+      table.columns[1].setFixedPosition(true);
+      spyOn(table, 'isCustomizable').and.returnValue(false);
+      let form = await openOrganizerForm(table);
+      let addColumnMenu = form.widget('AddColumnMenu');
+      let removeColumnMenu = form.widget('RemoveColumnMenu');
+      let columnsTable = form.columnsTable;
+
+      // Remove all columns, only fixed column stays
+      columnsTable.selectAll();
+      removeColumnMenu.doAction();
+      expect(columnsTable.columnById('KeyColumn').cellValues()).toEqual([table.columns[1]]);
+
+      // Select remaining row
+      columnsTable.selectAll();
+
+      // Add all columns, all columns are shown again
+      addColumnMenu.doAction();
+      let event = await session.desktop.when('propertyChange:dialogs');
+      let showInvisibleColumnsForm = scout.assertInstance(event.newValue[0], ShowInvisibleColumnsForm);
+      showInvisibleColumnsForm.widget('ColumnsTable').checkAll();
+      await showInvisibleColumnsForm.ok();
+      expect(columnsTable.columnById('KeyColumn').cellValues()).toEqual([table.columns[0], table.columns[1], table.columns[2]]);
     });
   });
 

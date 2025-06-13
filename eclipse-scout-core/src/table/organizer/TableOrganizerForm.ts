@@ -126,7 +126,7 @@ export class TableOrganizerForm extends Form {
 
   protected _updateColumnMenus() {
     let selectedColumns = this.keyColumn.selectedCellValues();
-    let columnAddable = this.table.organizer.isColumnAddable(arrays.last(selectedColumns));
+    let columnAddable = this.table.organizer.isColumnAddable();
     let columnRemovable = false;
     let columnModifiable = false;
     let columnMovableToLeft = false;
