@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,12 +12,14 @@ package org.eclipse.scout.rt.testing.platform.runner;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.testing.platform.runner.statement.AssertNoRunningJobsStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsCleanupStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsInitStatement;
@@ -153,11 +155,16 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
     return new BeanAnnotationsCleanupStatement(s1);
   }
 
+  protected Statement withMaximumRuntime(final FrameworkMethod method, final Statement next) {
+    return new MonitorRuntimeStatement(method, next);
+  }
+
   @Override
   protected Statement methodBlock(final FrameworkMethod method) {
     final Statement superStatement = PlatformTestRunner.super.methodBlock(method);
+    final Statement statementWithMaximumRuntime = withMaximumRuntime(method, superStatement);
 
-    return interceptMethodLevelStatement(superStatement, getTestClass().getJavaClass(), method.getMethod());
+    return interceptMethodLevelStatement(statementWithMaximumRuntime, getTestClass().getJavaClass(), method.getMethod());
   }
 
   protected Statement interceptBeforeClassStatement(Statement beforeClassStatement, Class<?> javaClass) {
@@ -364,6 +371,70 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
         }
       }
       MultipleFailureException.assertEmpty(m_errors);
+    }
+  }
+
+  /**
+   * Each test method should not exceed a specific default runtime, however we cannot set timeouts just for all methods as timeouts would also create a different behavior (timeout test methods are executed in a different thread).
+   * <p>
+   * This statement just monitors the runtime for each test method and after everything is finished an error is thrown if the maximum runtime has been exceeded.
+   * It may be useful to identify test methods which suddenly take a much longer time.
+   * </p>
+   * <p>
+   * This statement defines a default maximum runtime of three minutes; if a test is supposed to take longer than three minutes a higher timeout should be defined on the specific test-method to increase this maximum expected runtime.
+   * </p>
+   *
+   * @see Test#timeout()
+   */
+  protected static class MonitorRuntimeStatement extends Statement {
+
+    private static final long DEFAULT_MAXIMUM_RUNTIME = TimeUnit.MINUTES.toMillis(3);
+
+    private final long m_timeout;
+    private final Statement m_next;
+
+    public MonitorRuntimeStatement(FrameworkMethod method, Statement next) {
+      m_timeout = calculateTimeout(method);
+      m_next = next;
+    }
+
+    protected long getConfiguredDefaultMaximumRuntime() {
+      return DEFAULT_MAXIMUM_RUNTIME;
+    }
+
+    protected long calculateTimeout(FrameworkMethod frameworkMethod) {
+      long configuredDefaultMaximumRuntime = getConfiguredDefaultMaximumRuntime();
+      Method method = frameworkMethod.getMethod();
+
+      Test annotation = ReflectionUtility.getAnnotation(Test.class, method);
+      if (annotation == null) {
+        return configuredDefaultMaximumRuntime; // set a default timeout, we usually do not want our tests to run forever
+      }
+
+      long timeout = annotation.timeout();
+      if (timeout < 0L) {
+        return 0L; // forever
+      }
+      else if (timeout >= 0L && timeout <= configuredDefaultMaximumRuntime) {
+        return configuredDefaultMaximumRuntime; // override default timeout, we do not want to run our tests forever
+      }
+      return timeout;
+    }
+
+    protected Statement getNext() {
+      return m_next;
+    }
+
+    @Override
+    public void evaluate() throws Throwable {
+      long startMillis = System.nanoTime() / 1_000_000;
+      m_next.evaluate(); // run the next statement
+      long endMillis = System.nanoTime() / 1_000_000;
+      long elapsed = endMillis - startMillis;
+
+      if (elapsed > m_timeout) {
+        throw new AssertionException("Test including pre-/post-methods took longer than maximum expected runtime (maximum expected: {}, actual runtime: {}); specify a higher timeout on the @Test method to increase maximum time for specific test methods", m_timeout, elapsed);
+      }
     }
   }
 }

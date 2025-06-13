@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,9 +39,9 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(ParameterizedClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
-public class ParameterizedServerTestRunnerTimeoutTransactionTest {
+public class ParameterizedClientTestRunnerTimeoutTransactionTest {
 
-  private Map<String, Set<PropertyMap>> s_protocolByTestMethod;
+  private Map<String, Set<PropertyMap>> m_protocolByTestMethod;
   private static Map<String, Integer> s_expectedPropertyMapsCountByTestMethod;
 
   @Rule
@@ -49,10 +49,10 @@ public class ParameterizedServerTestRunnerTimeoutTransactionTest {
 
   private ParameterizedServerTestRunnerTestParameter m_param;
 
-  public ParameterizedServerTestRunnerTimeoutTransactionTest(ParameterizedServerTestRunnerTestParameter param) {
+  public ParameterizedClientTestRunnerTimeoutTransactionTest(ParameterizedServerTestRunnerTestParameter param) {
     m_param = param;
 
-    s_protocolByTestMethod = new HashMap<>();
+    m_protocolByTestMethod = new HashMap<>();
     s_expectedPropertyMapsCountByTestMethod = new HashMap<>();
     s_expectedPropertyMapsCountByTestMethod.put("testDefault", 1);
     s_expectedPropertyMapsCountByTestMethod.put("testTimeout", 3);
@@ -70,11 +70,7 @@ public class ParameterizedServerTestRunnerTimeoutTransactionTest {
 
   protected void updateProtocol() {
     String testName = getMethodName();
-    Set<PropertyMap> p = s_protocolByTestMethod.get(testName);
-    if (p == null) {
-      p = new HashSet<>(3);
-      s_protocolByTestMethod.put(testName, p);
-    }
+    Set<PropertyMap> p = m_protocolByTestMethod.computeIfAbsent(testName, k -> new HashSet<>(3));
     p.add(PropertyMap.CURRENT.get());
   }
 
@@ -83,7 +79,7 @@ public class ParameterizedServerTestRunnerTimeoutTransactionTest {
     Integer expectedTransactionCount = s_expectedPropertyMapsCountByTestMethod.get(testName);
     assertNotNull(expectedTransactionCount);
 
-    Set<PropertyMap> transactions = s_protocolByTestMethod.get(testName);
+    Set<PropertyMap> transactions = m_protocolByTestMethod.get(testName);
     int actualTransactionCount = transactions == null ? 0 : transactions.size();
 
     assertEquals(expectedTransactionCount.intValue(), actualTransactionCount);
