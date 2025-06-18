@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.rest.jersey.EchoServletParameters;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestApplication;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestRestClientHelper;
 import org.eclipse.scout.rt.rest.jersey.RestClientTestEchoResponse;
+import org.eclipse.scout.rt.rest.multipart.MultipartMessageBodyWriter;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.uuid.FixedUuidProvider;
