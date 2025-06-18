@@ -15,6 +15,7 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import jakarta.ws.rs.core.MediaType;
 
@@ -36,12 +37,14 @@ public final class MultipartPart {
   private final String m_filename;
   private final String m_contentType;
   private final InputStream m_inputStream;
+  private final Map<String, Object> m_customHeaders;
 
-  private MultipartPart(String partName, String filename, String contentType, InputStream inputStream) {
+  private MultipartPart(String partName, String filename, String contentType, InputStream inputStream, Map<String, Object> customHeaders) {
     m_partName = assertNotNull(partName, "name is required");
     m_filename = filename; // filename is optional (only for file field part, not text field part)
     m_contentType = contentType; // content type is optional
     m_inputStream = assertNotNull(inputStream, "inputStream is required");
+    m_customHeaders = customHeaders;
   }
 
   /**
@@ -58,7 +61,26 @@ public final class MultipartPart {
    *     Input stream (mandatory)
    */
   public static MultipartPart of(String partName, String filename, String contentType, InputStream inputStream) {
-    return new MultipartPart(partName, filename, contentType, inputStream);
+    return of(partName, filename, contentType, inputStream, null);
+  }
+
+  /**
+   * Creates a generic part. For most scenarios either {@link #ofFile(String, String, InputStream)} or
+   * {@link #ofField(String, String)} can be used instead.
+   *
+   * @param partName
+   *     Name of part (mandatory)
+   * @param filename
+   *     Filename (optional)
+   * @param contentType
+   *     Content type (optional)
+   * @param inputStream
+   *     Input stream (mandatory)
+   * @param customHeaders
+   *     Custom header attributes (optional)
+   */
+  public static MultipartPart of(String partName, String filename, String contentType, InputStream inputStream, Map<String, Object> customHeaders) {
+    return new MultipartPart(partName, filename, contentType, inputStream, customHeaders);
   }
 
   /**
@@ -73,8 +95,25 @@ public final class MultipartPart {
    *     Input stream (mandatory)
    */
   public static MultipartPart ofFile(String partName, String filename, InputStream inputStream) {
+    return ofFile(partName, filename, inputStream, null);
+  }
+
+  /**
+   * Create a file field part.
+   *
+   * @param partName
+   *     Name of part (mandatory)
+   * @param filename
+   *     Filename (recommended because content type is deduced from filename extension, otherwise
+   *     {@link MediaType#APPLICATION_OCTET_STREAM} is used)
+   * @param inputStream
+   *     Input stream (mandatory)
+   * @param customHeaders
+   *     Custom header attributes (optional)
+   */
+  public static MultipartPart ofFile(String partName, String filename, InputStream inputStream, Map<String, Object> customHeaders) {
     String contentType = FileUtility.getContentTypeForExtension(FileUtility.getFileExtension(filename));
-    return new MultipartPart(partName, filename, contentType, inputStream);
+    return new MultipartPart(partName, filename, contentType, inputStream, customHeaders);
   }
 
   /**
@@ -87,7 +126,7 @@ public final class MultipartPart {
    */
   public static MultipartPart ofField(String partName, String value) {
     assertNotNull(value, "value is required");
-    return new MultipartPart(partName, null, null, new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8)));
+    return new MultipartPart(partName, null, null, new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8)), null);
   }
 
   public String getPartName() {
@@ -106,8 +145,12 @@ public final class MultipartPart {
     return m_inputStream;
   }
 
+  public Map<String, Object> getCustomHeaders() {
+    return m_customHeaders;
+  }
+
   @Override
   public String toString() {
-    return MultipartPart.class.getSimpleName() + "[m_partName=" + m_partName + " m_filename=" + m_filename + " m_contentType=" + m_contentType + "]";
+    return MultipartPart.class.getSimpleName() + "[m_partName=" + m_partName + " m_filename=" + m_filename + " m_contentType=" + m_contentType + " m_customHeaders=" + m_customHeaders + "]";
   }
 }
