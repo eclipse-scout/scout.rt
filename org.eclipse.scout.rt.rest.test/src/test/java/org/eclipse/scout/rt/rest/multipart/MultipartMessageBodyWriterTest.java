@@ -1,14 +1,13 @@
 /*
- * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * https://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.rest.jersey.client.multipart;
+package org.eclipse.scout.rt.rest.multipart;
 
 import static org.junit.Assert.*;
 
@@ -20,7 +19,7 @@ import org.junit.Test;
 
 /**
  * Test for {@link MultipartMessageBodyWriter}, additional tests indirectly using this class are in
- * {@link MultipartRestClientTest}.
+ * {@link org.eclipse.scout.rt.rest.jersey.client.multipart.MultipartRestClientTest}.
  */
 public class MultipartMessageBodyWriterTest {
 
