@@ -1,14 +1,13 @@
 /*
- * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * https://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.rest.jersey.client.multipart;
+package org.eclipse.scout.rt.rest.multipart;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
@@ -28,6 +27,7 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyWriter;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.rest.client.IGlobalRestClientConfigurator;
 import org.eclipse.scout.rt.rest.client.multipart.MultipartMessage;
 import org.eclipse.scout.rt.rest.client.multipart.MultipartPart;
@@ -40,10 +40,6 @@ import org.eclipse.scout.rt.rest.client.multipart.MultipartPart;
  * <p>
  * Expects that the media type contains already a boundary parameter, as added when {@link MultipartMessage#toEntity()}
  * is used.
- * <p>
- * Regarding imports, this class must not be part of the module <code>org.eclipse.scout.rt.rest.jersey.client</code> but
- * could reside in <code>org.eclipse.scout.rt.rest</code> too. Because there is no direct access to this class, this
- * module is used instead to hide implementation details.
  * <p>
  * Idea from <a href="https://guntherrotsch.github.io/blog_2021/jaxrs-multipart-client.html">JAX/RS Multipart Client by
  * Gunther Rotsch</a>. Scout uses a different approach via direct stream processing instead of working with temporary
@@ -131,6 +127,10 @@ public class MultipartMessageBodyWriter implements MessageBodyWriter<MultipartMe
 
     if (part.getContentType() != null) {
       headers.add("Content-Type: " + part.getContentType());
+    }
+
+    if (CollectionUtility.hasElements(part.getCustomHeaders())) {
+      part.getCustomHeaders().forEach((headerName, headerValue) -> headers.add(headerName + ": " + headerValue));
     }
 
     return headers;
