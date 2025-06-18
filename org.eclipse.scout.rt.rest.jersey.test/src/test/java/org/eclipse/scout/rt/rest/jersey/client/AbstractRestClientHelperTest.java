@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.rest.client.proxy.RestClientProxyFactory;
 import org.eclipse.scout.rt.rest.jackson.ObjectMapperResolver;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestRestClientHelper;
 import org.eclipse.scout.rt.rest.jersey.LanguageAndCorrelationIdRestRequestFilter;
-import org.eclipse.scout.rt.rest.jersey.client.multipart.MultipartMessageBodyWriter;
+import org.eclipse.scout.rt.rest.multipart.MultipartMessageBodyWriter;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.Test;
 

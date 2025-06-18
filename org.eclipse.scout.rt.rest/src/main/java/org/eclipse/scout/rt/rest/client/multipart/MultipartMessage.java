@@ -57,9 +57,11 @@ import org.eclipse.scout.rt.rest.client.IRestClientHelper;
 public class MultipartMessage {
 
   public static final String BOUNDARY_PARAMETER = "boundary";
+  public static final MediaType DEFAULT_MIME_TYPE = MediaType.MULTIPART_FORM_DATA_TYPE;
 
   protected List<MultipartPart> m_parts = new ArrayList<>();
   protected String m_boundary; // cached boundary in case #toEntity is called multiple times
+  protected MediaType m_mediaType = DEFAULT_MIME_TYPE;
 
   public MultipartMessage addPart(MultipartPart part) {
     m_parts.add(part);
@@ -68,6 +70,14 @@ public class MultipartMessage {
 
   public List<MultipartPart> getParts() {
     return Collections.unmodifiableList(m_parts);
+  }
+
+  public MediaType getMediaType() {
+    return m_mediaType;
+  }
+
+  public void setMediaType(MediaType mediaType) {
+    m_mediaType = mediaType;
   }
 
   /**
@@ -87,7 +97,7 @@ public class MultipartMessage {
       // create a new unique boundary if it wasn't already cached before for this multipart message
       m_boundary = BEANS.get(IUuidProvider.class).createUuid().toString().replace("-", "");
     }
-    return new MediaType(MediaType.MULTIPART_FORM_DATA_TYPE.getType(), MediaType.MULTIPART_FORM_DATA_TYPE.getSubtype(), CollectionUtility.hashMap(ImmutablePair.of(BOUNDARY_PARAMETER, m_boundary)));
+    return new MediaType(getMediaType().getType(), getMediaType().getSubtype(), CollectionUtility.hashMap(ImmutablePair.of(BOUNDARY_PARAMETER, m_boundary)));
   }
 
   @Override
