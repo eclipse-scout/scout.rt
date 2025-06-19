@@ -8,10 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, arrays, BaseDoEntity, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierDoFactory, ChartTableControlConfigHelper, Constructor, Desktop, IBookmarkDo,
-  IBookmarkPageDo, InitModelOf, MaxRowCountContributionDo, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageParamDo, PageWithNodes, PageWithTable, scout, Session, Status,
-  TableBookmarkPageDo, TableRow
+  App, arrays, BaseDoEntity, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierDoFactory, ChartTableControlConfigHelper, ClientUiPreferences, clientUiPreferences,
+  Constructor, Desktop, IBookmarkDo, IBookmarkPageDo, InitModelOf, MaxRowCountContributionDo, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageParamDo, PageWithNodes, PageWithTable,
+  scout, Session, Status, TableBookmarkPageDo, TableRow
 } from '../index';
+import $ from 'jquery';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   declare model: BookmarkSupportModel;
@@ -130,11 +131,10 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * @param options Optional settings to change the behavior of this method.
    */
   createBookmark(param?: CreateBookmarkParam, options?: CreateBookmarkOptions): JQuery.Promise<IBookmarkDo> {
-    let builder = scout.create(BookmarkDoBuilder, {
+    let builder = scout.create(BookmarkDoBuilder, $.extend({
       desktop: this.desktop,
-      createTableRowSelections: false,
-      ...param
-    });
+      createTableRowSelections: false
+    }, param));
     return builder.build()
       .catch(error => {
         if (scout.nvl(options?.handleErrors, true)) {
@@ -150,14 +150,13 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * title and description are not returned.
    */
   createBookmarkForRefresh(param?: CreateBookmarkParam, options?: CreateBookmarkOptions): JQuery.Promise<IBookmarkDo> {
-    return this.createBookmark({
+    return this.createBookmark($.extend({
       fallbackAllowed: false,
       persistableRequired: false,
       createTitle: false,
       createDescription: false,
-      createTablePreferences: false,
-      ...param
-    }, options);
+      createTablePreferences: false
+    }, param), options);
   }
 
   // --------------------------------------
