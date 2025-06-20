@@ -55,14 +55,20 @@ describe('MoveTableRowMenuHelper', () => {
       expect(moveUpMenu.visible).toBe(false);
     });
 
-    it('is enabled if first row is not selected', () => {
+    it('is disabled if one of the selected rows is the first row', () => {
       expect(moveUpMenu.enabled).toBe(false);
 
       table.selectRows(table.rows[0]);
       expect(moveUpMenu.enabled).toBe(false);
 
-      table.selectRows(table.rows[1]);
+      table.selectRows([table.rows[0], table.rows[1]]);
+      expect(moveUpMenu.enabled).toBe(false);
+
+      table.selectRows([table.rows[1], table.rows[2]]);
       expect(moveUpMenu.enabled).toBe(true);
+
+      table.selectAll();
+      expect(moveUpMenu.enabled).toBe(false);
     });
 
     it('moves row up and updates state', () => {
@@ -113,7 +119,7 @@ describe('MoveTableRowMenuHelper', () => {
       expect(moveDownMenu.visible).toBe(false);
     });
 
-    it('is enabled if last row is not selected', () => {
+    it('is disabled if one of the selected row is the last row', () => {
       expect(moveDownMenu.enabled).toBe(false);
 
       table.selectRows(table.rows[2]);
@@ -121,6 +127,15 @@ describe('MoveTableRowMenuHelper', () => {
 
       table.selectRows(table.rows[1]);
       expect(moveDownMenu.enabled).toBe(true);
+
+      table.selectRows([table.rows[1], table.rows[2]]);
+      expect(moveDownMenu.enabled).toBe(false);
+
+      table.selectRows([table.rows[0], table.rows[1]]);
+      expect(moveDownMenu.enabled).toBe(true);
+
+      table.selectAll();
+      expect(moveDownMenu.enabled).toBe(false);
     });
 
     it('moves row up and updates state', () => {
@@ -158,6 +173,67 @@ describe('MoveTableRowMenuHelper', () => {
       moveDownMenu.doAction();
       expect(table.rows[1]).toBe(row1); // not moved
       expect(moveDownMenu.enabled).toBe(true); // did not change state
+    });
+  });
+
+  describe('rowFilter', () => {
+    it('may be specified if some rows should not be movable', () => {
+      table.insertRow({cells: ['new-row']});
+      moveTableRowMenuHelper.uninstall();
+      scout.create(MoveTableRowMenuHelper).install({
+        table: table,
+        moveRowUpMenu: moveUpMenu,
+        moveRowDownMenu: moveDownMenu,
+        // First row can never be moved, second can only be moved down
+        rowFilter: (selectedRow, direction) => {
+          if (selectedRow === table.rows[0]) {
+            return false;
+          }
+          if (direction === 'up' && selectedRow === table.rows[1]) {
+            return false;
+          }
+          return true;
+        }
+      });
+      expect(moveUpMenu.visible).toBe(false);
+      expect(moveUpMenu.enabled).toBe(false);
+      expect(moveDownMenu.visible).toBe(false);
+      expect(moveDownMenu.enabled).toBe(false);
+
+      table.selectRows(table.rows[0]);
+      expect(moveUpMenu.visible).toBe(true); // Visibility is not affected by the filter
+      expect(moveUpMenu.enabled).toBe(false);
+      expect(moveDownMenu.visible).toBe(true); // Visibility is not affected by the filter
+      expect(moveDownMenu.enabled).toBe(false); // Disabled because of the filter
+
+      table.selectRows([table.rows[0], table.rows[1]]);
+      expect(moveUpMenu.enabled).toBe(false);
+      expect(moveDownMenu.enabled).toBe(false); // Second row can be moved but first row cannot -> disable menu
+
+      table.selectRows(table.rows[1]);
+      expect(moveUpMenu.enabled).toBe(false);
+      expect(moveDownMenu.enabled).toBe(true);
+
+      table.selectRows([table.rows[1], table.rows[2]]);
+      expect(moveUpMenu.enabled).toBe(false);
+      expect(moveDownMenu.enabled).toBe(true);
+
+      let row1 = table.rows[1];
+      let row2 = table.rows[2];
+      let row3 = table.rows[3];
+      moveDownMenu.doAction();
+      expect(table.rows[1]).toBe(row3);
+      expect(table.rows[2]).toBe(row1);
+      expect(table.rows[3]).toBe(row2);
+      expect(moveUpMenu.enabled).toBe(true);
+      expect(moveDownMenu.enabled).toBe(false); // Disabled because it is now the last row
+
+      moveUpMenu.doAction();
+      expect(table.rows[1]).toBe(row1);
+      expect(table.rows[2]).toBe(row2);
+      expect(table.rows[3]).toBe(row3);
+      expect(moveUpMenu.enabled).toBe(false);
+      expect(moveDownMenu.enabled).toBe(true);
     });
   });
 });

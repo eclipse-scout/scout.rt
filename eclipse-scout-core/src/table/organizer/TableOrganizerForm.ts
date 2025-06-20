@@ -129,8 +129,6 @@ export class TableOrganizerForm extends Form {
     let columnAddable = this.table.organizer.isColumnAddable();
     let columnRemovable = false;
     let columnModifiable = false;
-    let columnMovableToLeft = false;
-    let columnMovableToRight = false;
     for (const column of selectedColumns) {
       if (this.table.organizer.isColumnModifiable(column)) {
         columnModifiable = true;
@@ -138,21 +136,11 @@ export class TableOrganizerForm extends Form {
       if (this._isColumnRemovable(column)) {
         columnRemovable = true;
       }
-      if (this.table.organizer.isColumnMovableToLeft(column)) {
-        columnMovableToLeft = true;
-      }
-      if (this.table.organizer.isColumnMovableToRight(column)) {
-        columnMovableToRight = true;
-      }
     }
     // Add and remove menus are either used to show and hide columns or to add and remove custom columns
     this.widget('AddColumnMenu').setVisible(columnAddable);
     this.widget('ModifyColumnMenu').setVisible(columnModifiable);
     this.widget('RemoveColumnMenu').setVisible(columnRemovable);
-
-    // The move-menus should always be visible, otherwise their position changes when row is moved to top or bottom
-    this.widget('MoveColumnUpMenu').setEnabled(columnMovableToLeft);
-    this.widget('MoveColumnDownMenu').setEnabled(columnMovableToRight);
   }
 
   protected _isColumnRemovable(column: Column<any>) {
@@ -195,7 +183,7 @@ export class TableOrganizerForm extends Form {
       table: this.columnsTable,
       moveRowUpMenu,
       moveRowDownMenu,
-      selectedRowsFilter: (row, direction) => {
+      rowFilter: (row, direction) => {
         let column = this.keyColumn.cellValue(row);
         if (direction === 'up') {
           return this.table.organizer.isColumnMovableToLeft(column);
