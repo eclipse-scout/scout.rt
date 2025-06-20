@@ -60,7 +60,14 @@ describe('icons', () => {
 
     window['testIconsSpec'] = {icons: {FOO: 'bar'}}; // dummy namespace
     expect(icons.resolveIconId('${iconId:testIconsSpec.FOO}')).toBe('bar');
+    expect(icons.resolveIconId('${iconId:testIconsSpec._DOES_NOT_EXIST_}')).toBe(undefined);
     delete window['testIconsSpec'];
+
+    window['testIconsSpec'] = {}; // dummy namespace without 'icons' object
+    expect(icons.resolveIconId('${iconId:testIconsSpec.FOO}')).toBe(undefined);
+    delete window['testIconsSpec'];
+
+    expect(icons.resolveIconId('${iconId:nonExistingNamespace.FOO}')).toBe(undefined);
   });
 
   it('resolves iconId property', () => {

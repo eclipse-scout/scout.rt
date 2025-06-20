@@ -149,10 +149,10 @@ export const icons = {
       let parts = iconId.split('.');
       if (parts.length === 1) {
         // look for icon in global object scout.icons.[0]
-        value = window['scout']['icons'][parts[0]];
+        value = icons[parts[0]];
       } else if (parts.length === 2) {
         // look for icon in global object [0].icons.[1]
-        value = window[parts[0]]['icons'][parts[1]];
+        value = window[parts[0]]?.['icons']?.[parts[1]];
       } else {
         $.log.warn('Invalid iconId: ' + value);
       }
