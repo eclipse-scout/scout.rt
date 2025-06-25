@@ -136,7 +136,7 @@ describe('PageWithNodes', () => {
 
   describe('reloadPage', () => {
 
-    it('does not reload child pages if pages are static', () => {
+    it('does not reload child pages if pages are static, even when reloadable=true', () => {
       let page = scout.create(PageWithNodes, {
         parent: outline,
         text: 'Page 1',
@@ -197,7 +197,8 @@ describe('PageWithNodes', () => {
       }
 
       let page = scout.create(SpecPageWithNodes, {
-        parent: outline
+        parent: outline,
+        reloadable: false
       });
       outline.insertNode(page);
       outline.selectNode(page);
@@ -247,6 +248,72 @@ describe('PageWithNodes', () => {
       expect(detailTable.rows[1].cells[0].text).toBe('Page 103');
     });
 
+    it('automatically sets reloadable=true when _createChildPages is overwritten', () => {
+      class SpecReloadablePageWithNodes extends PageWithNodes {
+        protected override _createChildPages(): JQuery.Promise<Page[]> {
+          return $.resolvedPromise([]);
+        }
+      }
+
+      let page1a = scout.create(SpecReloadablePageWithNodes, {
+        parent: outline
+      });
+      let page1b = scout.create(SpecReloadablePageWithNodes, {
+        parent: outline,
+        reloadable: true
+      });
+      let page1c = scout.create(SpecReloadablePageWithNodes, {
+        parent: outline,
+        reloadable: false
+      });
+
+      expect(page1a.reloadable).toBe(true); // <--
+      expect(page1b.reloadable).toBe(true);
+      expect(page1c.reloadable).toBe(false);
+
+      // -----
+
+      class SpecNotReloadablePageWithNodes extends PageWithNodes {
+      }
+
+      let page2a = scout.create(SpecNotReloadablePageWithNodes, {
+        parent: outline
+      });
+      let page2b = scout.create(SpecNotReloadablePageWithNodes, {
+        parent: outline,
+        reloadable: true
+      });
+      let page2c = scout.create(SpecNotReloadablePageWithNodes, {
+        parent: outline,
+        reloadable: false
+      });
+
+      expect(page2a.reloadable).toBe(false); // <--
+      expect(page2b.reloadable).toBe(true);
+      expect(page2c.reloadable).toBe(false);
+
+      // -----
+
+      let page3a = scout.create(PageWithNodes, {
+        parent: outline,
+        childNodes: [{text: 'Child Page'}]
+      });
+      let page3b = scout.create(PageWithNodes, {
+        parent: outline,
+        childNodes: [{text: 'Child Page'}],
+        reloadable: true
+      });
+      let page3c = scout.create(PageWithNodes, {
+        parent: outline,
+        childNodes: [{text: 'Child Page'}],
+        reloadable: false
+      });
+
+      expect(page3a.reloadable).toBe(false); // <--
+      expect(page3b.reloadable).toBe(true);
+      expect(page3c.reloadable).toBe(false);
+    });
+
     it('reloads child pages if reloadable=true', () => {
       let counter = 100;
 
@@ -267,8 +334,7 @@ describe('PageWithNodes', () => {
       }
 
       let page = scout.create(SpecPageWithNodes, {
-        parent: outline,
-        reloadable: true
+        parent: outline
       });
       outline.insertNode(page);
       outline.selectNode(page);
