@@ -17,7 +17,8 @@ export class PageWithNodes extends Page {
   constructor() {
     super();
     this.nodeType = Page.NodeType.NODES;
-    this.reloadable = false;
+    // Assume page is reloadable when _createChildPages() is overwritten (can still be disabled by setting "reloadable: false" in the model)
+    this.reloadable = Object.getPrototypeOf(this)._createChildPages !== PageWithNodes.prototype._createChildPages;
   }
 
   protected override _createDetailTable(): Table {
