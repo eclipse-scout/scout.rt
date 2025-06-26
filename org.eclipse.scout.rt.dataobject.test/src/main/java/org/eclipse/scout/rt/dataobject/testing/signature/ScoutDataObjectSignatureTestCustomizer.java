@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.rt.dataobject.id.TypedId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 public class ScoutDataObjectSignatureTestCustomizer implements IDataObjectSignatureTestCustomizer {
@@ -47,8 +46,7 @@ public class ScoutDataObjectSignatureTestCustomizer implements IDataObjectSignat
       List.class, // required for DoValue<Map<String, List<LoremDo>>>, not desired for DoValue<List<LoremDo>> because DoList should be used instead
 
       // Scout basic types
-      BinaryResource.class,
-      TypedId.class));
+      BinaryResource.class));
 
   @Override
   public Set<Class<?>> supportedTypes() {
