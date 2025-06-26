@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 import org.eclipse.scout.rt.dataobject.id.IId;
-import org.eclipse.scout.rt.dataobject.id.TypedId;
 import org.eclipse.scout.rt.jackson.dataobject.enumeration.EnumDeserializer;
 import org.eclipse.scout.rt.jackson.dataobject.enumeration.EnumMapKeyDeserializer;
 import org.eclipse.scout.rt.jackson.dataobject.enumeration.EnumMapKeySerializer;
@@ -31,8 +30,6 @@ import org.eclipse.scout.rt.jackson.dataobject.id.QualifiedIIdDeserializer;
 import org.eclipse.scout.rt.jackson.dataobject.id.QualifiedIIdMapKeyDeserializer;
 import org.eclipse.scout.rt.jackson.dataobject.id.QualifiedIIdMapKeySerializer;
 import org.eclipse.scout.rt.jackson.dataobject.id.QualifiedIIdSerializer;
-import org.eclipse.scout.rt.jackson.dataobject.id.TypedIdDeserializer;
-import org.eclipse.scout.rt.jackson.dataobject.id.TypedIdSerializer;
 import org.eclipse.scout.rt.jackson.dataobject.id.UnqualifiedIIdDeserializer;
 import org.eclipse.scout.rt.jackson.dataobject.id.UnqualifiedIIdMapKeyDeserializer;
 import org.eclipse.scout.rt.jackson.dataobject.id.UnqualifiedIIdMapKeySerializer;
@@ -81,9 +78,6 @@ public class ScoutDataObjectSerializerProvider implements IDataObjectSerializerP
         return new QualifiedIIdSerializer(moduleContext);
       }
     }
-    else if (TypedId.class.isAssignableFrom(rawClass)) {
-      return new TypedIdSerializer(moduleContext);
-    }
     else if (IEnum.class.isAssignableFrom(rawClass)) {
       return new EnumSerializer(type);
     }
@@ -130,9 +124,6 @@ public class ScoutDataObjectSerializerProvider implements IDataObjectSerializerP
       else {
         return new QualifiedIIdDeserializer(moduleContext, idClass);
       }
-    }
-    else if (TypedId.class.isAssignableFrom(rawClass)) {
-      return new TypedIdDeserializer(moduleContext);
     }
 
     return null;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,10 +10,9 @@
 package org.eclipse.scout.rt.dataobject;
 
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -22,7 +21,6 @@ import org.eclipse.scout.rt.dataobject.fixture.BiCompositeFixtureObject;
 import org.eclipse.scout.rt.dataobject.fixture.BiCompositeFixtureObjectDataObjectVisitorExtension;
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectWithCompositeFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectWithCompositeIdDo;
-import org.eclipse.scout.rt.dataobject.fixture.DataObjectWithTypedIdDo;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
@@ -33,7 +31,6 @@ import org.eclipse.scout.rt.dataobject.fixture.TriCompositeFixtureObject;
 import org.eclipse.scout.rt.dataobject.fixture.TriCompositeFixtureObjectDataObjectVisitorExtension;
 import org.eclipse.scout.rt.dataobject.id.ICompositeId;
 import org.eclipse.scout.rt.dataobject.id.IRootId;
-import org.eclipse.scout.rt.dataobject.id.TypedId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Test;
@@ -170,54 +167,6 @@ public class DataObjectVisitorExtensionTest {
         .withCompositeList(
             BiCompositeFixtureObject.of(FixtureStringId.of("composite-list-1.2"), FixtureStringId.of("composite-list-1.1")),
             BiCompositeFixtureObject.of(FixtureStringId.of("composite-list-2.2"), FixtureStringId.of("composite-list-2.1")));
-
-    assertEqualsWithComparisonFailure(expected, actual);
-  }
-
-  /**
-   * Test for {@link TypedIdDataObjectVisitorExtension}.
-   */
-  @Test
-  public void testForEachTypedId() {
-    DataObjectWithTypedIdDo doEntity = BEANS.get(DataObjectWithTypedIdDo.class)
-        .withId(TypedId.of(FixtureStringId.of("single-id")))
-        .withIds(Arrays.asList(
-            TypedId.of(FixtureStringId.of("list-1")),
-            TypedId.of(FixtureStringId.of("list-2")),
-            TypedId.of(FixtureStringId.of("list-3"))));
-
-    List<FixtureStringId> ids = new ArrayList<>();
-    DataObjectVisitors.forEachRec(doEntity, FixtureStringId.class, ids::add);
-
-    assertEquals(
-        CollectionUtility.arrayList(
-            FixtureStringId.of("single-id"),
-            FixtureStringId.of("list-1"),
-            FixtureStringId.of("list-2"),
-            FixtureStringId.of("list-3")),
-        ids);
-  }
-
-  /**
-   * Test for {@link TypedIdDataObjectVisitorExtension}.
-   */
-  @Test
-  public void testReplaceTypedId() {
-    DataObjectWithTypedIdDo actual = BEANS.get(DataObjectWithTypedIdDo.class)
-        .withId(TypedId.of(FixtureStringId.of("single-id")))
-        .withIds(Arrays.asList(
-            TypedId.of(FixtureStringId.of("list-1")),
-            TypedId.of(FixtureStringId.of("list-3")),
-            TypedId.of(FixtureStringId.of("list-3"))));
-
-    DataObjectVisitors.replaceEach(actual, FixtureStringId.class, id -> FixtureStringId.of(id.unwrapAsString() + "-replaced"));
-
-    DataObjectWithTypedIdDo expected = BEANS.get(DataObjectWithTypedIdDo.class)
-        .withId(TypedId.of(FixtureStringId.of("single-id-replaced")))
-        .withIds(Arrays.asList(
-            TypedId.of(FixtureStringId.of("list-1-replaced")),
-            TypedId.of(FixtureStringId.of("list-3-replaced")),
-            TypedId.of(FixtureStringId.of("list-3-replaced"))));
 
     assertEqualsWithComparisonFailure(expected, actual);
   }
@@ -373,28 +322,6 @@ public class DataObjectVisitorExtensionTest {
         .put("dummy", BEANS.get(IdAsStringFixtureDo.class)
             .withIdAsString("single-id-replaced"))
         .build();
-
-    assertEqualsWithComparisonFailure(expected, actual);
-  }
-
-  /**
-   * Tests that {@link DataObjectVisitors#forEachRec(Object, Class, Consumer)} and
-   * {@link DataObjectVisitors#replaceEach(Object, Class, UnaryOperator)} will work for <code>null</code> node values
-   * too regarding visitor extensions.
-   */
-  @Test
-  public void testReplaceEachNullSafe() {
-    DataObjectWithTypedIdDo actual = BEANS.get(DataObjectWithTypedIdDo.class)
-        .withId(null);
-
-    List<FixtureStringId> ids = new ArrayList<>();
-    DataObjectVisitors.forEachRec(actual, FixtureStringId.class, ids::add);
-    assertTrue(ids.isEmpty());
-
-    DataObjectVisitors.replaceEach(actual, FixtureStringId.class, id -> FixtureStringId.of(id.unwrapAsString() + "-replaced"));
-
-    DataObjectWithTypedIdDo expected = BEANS.get(DataObjectWithTypedIdDo.class)
-        .withId(null);
 
     assertEqualsWithComparisonFailure(expected, actual);
   }
