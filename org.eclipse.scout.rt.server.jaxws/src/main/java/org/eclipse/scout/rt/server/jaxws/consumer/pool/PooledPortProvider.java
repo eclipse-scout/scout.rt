@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,6 @@
 package org.eclipse.scout.rt.server.jaxws.consumer.pool;
 
 import java.net.URL;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import jakarta.xml.ws.Service;
@@ -20,8 +19,6 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.server.admin.diagnostic.DiagnosticFactory;
-import org.eclipse.scout.rt.server.admin.diagnostic.IDiagnostic;
 import org.eclipse.scout.rt.server.jaxws.consumer.IPortProvider;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.quartz.SimpleScheduleBuilder;
@@ -33,7 +30,7 @@ import org.quartz.SimpleScheduleBuilder;
  *
  * @since 6.0.300
  */
-public class PooledPortProvider<SERVICE extends Service, PORT> implements IPortProvider<PORT>, IDiagnostic {
+public class PooledPortProvider<SERVICE extends Service, PORT> implements IPortProvider<PORT> {
 
   protected final Class<PORT> m_portTypeClazz;
   protected final ServicePool<SERVICE> m_servicePool;
@@ -44,7 +41,6 @@ public class PooledPortProvider<SERVICE extends Service, PORT> implements IPortP
     m_servicePool = new ServicePool<>(serviceClazz, serviceName, wsdlLocation, targetNamespace, initializer);
     m_portPool = new PortPool<>(m_servicePool, portTypeClazz, initializer);
     installCleanupWorker();
-    DiagnosticFactory.addDiagnosticStatusProvider(this);
   }
 
   /**
@@ -94,31 +90,6 @@ public class PooledPortProvider<SERVICE extends Service, PORT> implements IPortP
   public void discardAllPoolEntries() {
     m_portPool.discardAllPoolEntries();
     m_servicePool.discardAllPoolEntries();
-  }
-
-  @Override
-  public void addDiagnosticItemToList(List<List<String>> result) {
-    DiagnosticFactory.addDiagnosticItemToList(result, "JAX-WS Pool", "", DiagnosticFactory.STATUS_TITLE);
-    DiagnosticFactory.addDiagnosticItemToList(result, "Service Class", m_servicePool.m_serviceClazz.getName(), DiagnosticFactory.STATUS_INFO);
-    DiagnosticFactory.addDiagnosticItemToList(result, "Port Class", m_portPool.m_portTypeClazz.getName(), DiagnosticFactory.STATUS_INFO);
-    DiagnosticFactory.addDiagnosticItemToList(result, "Service Name", m_servicePool.m_serviceName, DiagnosticFactory.STATUS_INFO);
-    DiagnosticFactory.addDiagnosticItemToList(result, "Service Pool", m_servicePool.createStateSnapshot(), DiagnosticFactory.STATUS_INFO);
-    DiagnosticFactory.addDiagnosticItemToList(result, "Port Pool", m_portPool.createStateSnapshot(), DiagnosticFactory.STATUS_INFO);
-  }
-
-  @Override
-  public String[] getPossibleActions() {
-    return null;
-  }
-
-  @Override
-  public void addSubmitButtonsHTML(List<List<String>> result) {
-    // provides no diagnostics actions
-  }
-
-  @Override
-  public void call(String action, Object[] values) {
-    // provides no diagnostics actions
   }
 
   private class P_PooledPortTransactionMember extends AbstractTransactionMember {
