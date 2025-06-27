@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,9 +16,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
@@ -48,19 +46,6 @@ public class ServiceOperationInvokerTest {
     when(m_pingSvc.ping(any(String.class))).thenReturn(m_testData);
     ServiceTunnelResponse res = invokePingService(createRunContextWithSession());
     assertValidResponse(res, m_testData);
-  }
-
-  @Test
-  public void testInvokeInspectedWithSession() {
-    try {
-      BEANS.get(ProcessInspector.class).setEnabled(true);
-      when(m_pingSvc.ping(any(String.class))).thenReturn(m_testData);
-      ServiceTunnelResponse res = invokePingService(createRunContextWithSession());
-      assertValidResponse(res, m_testData);
-    }
-    finally {
-      BEANS.get(ProcessInspector.class).setEnabled(false);
-    }
   }
 
   @Test(expected = ProcessingException.class) //exception is handled with JUnitExceptionHandler

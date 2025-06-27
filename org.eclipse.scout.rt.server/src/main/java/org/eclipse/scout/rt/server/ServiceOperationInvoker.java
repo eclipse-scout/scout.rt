@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,9 +26,6 @@ import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.security.ACCESS;
-import org.eclipse.scout.rt.server.admin.inspector.CallInspector;
-import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
-import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
@@ -84,45 +81,16 @@ public class ServiceOperationInvoker {
       String userId = serverSession != null ? serverSession.getUserId() : "";
       LOG.debug("started {}.{} by {} at {}", serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), userId, new Date());
     }
-    CallInspector callInspector = getCallInspector(serviceReq, serverSession);
     ServiceTunnelResponse serviceRes = null;
-    try {
-      ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
-      Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceReq.getServiceInterfaceClassName());
-      Method serviceOp = serviceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
-      Object[] args = serviceReq.getArgs();
-      Object service = getValidatedServiceAccess(serviceInterfaceClass, serviceOp, args);
+    ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
+    Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceReq.getServiceInterfaceClassName());
+    Method serviceOp = serviceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
+    Object[] args = serviceReq.getArgs();
+    Object service = getValidatedServiceAccess(serviceInterfaceClass, serviceOp, args);
 
-      Object data = serviceUtility.invoke(service, serviceOp, args);
-      serviceRes = new ServiceTunnelResponse(data);
-      return serviceRes;
-    }
-    finally {
-      updateInspector(callInspector, serviceRes);
-    }
-  }
-
-  private void updateInspector(CallInspector callInspector, ServiceTunnelResponse serviceRes) {
-    if (callInspector != null) {
-      try {
-        callInspector.update();
-      }
-      catch (RuntimeException e) {
-        LOG.warn("Could not update call inspector", e);
-      }
-      try {
-        callInspector.close(serviceRes);
-      }
-      catch (RuntimeException e) {
-        LOG.warn("Could not close service invocation on call inspector", e);
-      }
-      try {
-        callInspector.getSessionInspector().update();
-      }
-      catch (RuntimeException e) {
-        LOG.warn("Could not update session inspector", e);
-      }
-    }
+    Object data = serviceUtility.invoke(service, serviceOp, args);
+    serviceRes = new ServiceTunnelResponse(data);
+    return serviceRes;
   }
 
   /**
@@ -268,16 +236,6 @@ public class ServiceOperationInvoker {
       }
     }
     return true;
-  }
-
-  private CallInspector getCallInspector(ServiceTunnelRequest serviceReq, IServerSession serverSession) {
-    if (serverSession != null) {
-      SessionInspector sessionInspector = BEANS.get(ProcessInspector.class).getSessionInspector(serverSession, true);
-      if (sessionInspector != null) {
-        return sessionInspector.requestCallInspector(serviceReq);
-      }
-    }
-    return null;
   }
 
   /**

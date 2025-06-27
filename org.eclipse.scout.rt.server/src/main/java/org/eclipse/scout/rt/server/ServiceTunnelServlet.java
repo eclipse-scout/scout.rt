@@ -22,7 +22,6 @@ import javax.security.auth.Subject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
@@ -34,13 +33,11 @@ import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
-import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.idempotent.DuplicateRequestException;
 import org.eclipse.scout.rt.server.commons.idempotent.SequenceNumberDuplicateDetector;
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.context.HttpServerRunContextProducer;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
@@ -73,48 +70,6 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
   protected transient LazyValue<HttpCacheControl> m_httpCacheControl = new LazyValue<>(HttpCacheControl.class);
   protected transient LazyValue<ServiceOperationInvoker> m_svcInvoker = new LazyValue<>(ServiceOperationInvoker.class);
   protected transient LazyValue<RunMonitorCancelRegistry> m_runMonCancelRegistry = new LazyValue<>(RunMonitorCancelRegistry.class);
-
-  // === HTTP-GET ===
-
-  @Override
-  protected void doGet(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws IOException, ServletException {
-    if (Subject.getSubject(AccessController.getContext()) == null) {
-      servletResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
-      return;
-    }
-
-    lazyInit(servletRequest, servletResponse);
-
-    BEANS.get(HttpServerRunContextProducer.class)
-        .withSessionSupport(false)
-        .produce(servletRequest, servletResponse)
-        .run(() -> invokeAdminService(ServerRunContexts.copyCurrent()), ServletExceptionTranslator.class);
-  }
-
-  /**
-   * Method invoked to delegate the HTTP request to the 'admin service'.
-   */
-  @SuppressWarnings("squid:S00112")
-  protected void invokeAdminService(final ServerRunContext serverRunContext) throws Exception {
-    serverRunContext.run(() -> {
-      final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-      final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
-
-      m_httpServletControl.get().doDefaults(ServiceTunnelServlet.this, servletRequest, servletResponse);
-
-      getAdminSession(servletRequest).serviceRequest(servletRequest, servletResponse);
-    }, DefaultExceptionTranslator.class);
-  }
-
-  protected AdminSession getAdminSession(HttpServletRequest servletRequest) {
-    HttpSession httpSession = servletRequest.getSession();
-    AdminSession adminSession = (AdminSession) httpSession.getAttribute(ADMIN_SESSION_KEY);
-    if (adminSession == null) {
-      adminSession = new AdminSession();
-      httpSession.setAttribute(ADMIN_SESSION_KEY, adminSession);
-    }
-    return adminSession;
-  }
 
   // === HTTP-POST ===
 

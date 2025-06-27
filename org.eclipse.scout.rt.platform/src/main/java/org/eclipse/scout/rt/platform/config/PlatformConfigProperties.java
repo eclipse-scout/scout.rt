@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -74,7 +74,7 @@ public final class PlatformConfigProperties {
 
     @Override
     public String description() {
-      return "Version of the scout platform. Used e.g. in the info form and the diagnostic views. The default value is bound to the implementation version in the manifest file.";
+      return "Version of the scout platform. Used e.g. in the info form. The default value is bound to the implementation version in the manifest file.";
     }
   }
 
@@ -87,7 +87,7 @@ public final class PlatformConfigProperties {
 
     @Override
     public String description() {
-      return "The application version as displayed to the user. Used e.g. in the info form and the diagnostic views. The default value is '0.0.0'.";
+      return "The application version as displayed to the user. Used e.g. in the info form. The default value is '0.0.0'.";
     }
 
     @Override
@@ -105,7 +105,7 @@ public final class PlatformConfigProperties {
 
     @Override
     public String description() {
-      return "The display name of the application. Used e.g. in the info form and the diagnostic views. The default value is 'unknown'.";
+      return "The display name of the application. Used e.g. in the info form. The default value is 'unknown'.";
     }
 
     @Override
