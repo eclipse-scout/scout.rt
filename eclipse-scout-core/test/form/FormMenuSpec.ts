@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FormSpecHelper} from '../../src/testing/index';
-import {ContextMenuPopup, Desktop, FormMenu, FormMenuModel, MenuBar, menus, scout} from '../../src/index';
+import {FormSpecHelper, JQueryTesting} from '../../src/testing/index';
+import {ContextMenuPopup, Desktop, Form, FormMenu, FormMenuModel, MenuBar, menus, scout} from '../../src/index';
 
 describe('FormMenu', () => {
   let session: SandboxSession, desktop: Desktop, helper: FormSpecHelper;
@@ -353,6 +353,38 @@ describe('FormMenu', () => {
       testMenu.setSelected(true);
       expect(testMenu.$container).toHaveAttr('aria-expanded', 'true');
       expect(testMenu.$container.attr('aria-pressed')).toBeFalsy();
+    });
+  });
+
+  describe('click', () => {
+    it('does not open the form again when it was destroyed on mousedown', () => {
+      let formMenu = scout.create(FormMenu, {
+        parent: session.desktop
+      });
+      formMenu.on('propertyChange:selected', event => {
+        if (!formMenu.selected) {
+          formMenu.form?.destroy();
+          return;
+        }
+        formMenu.setForm(scout.create(Form, {
+          parent: formMenu
+        }));
+      });
+      formMenu.render();
+      expect(formMenu.form).toBe(null);
+
+      JQueryTesting.triggerClick(formMenu.$container);
+      let form = formMenu.form;
+      expect(form.rendered).toBe(true);
+
+      JQueryTesting.triggerMouseDown(formMenu.$container);
+      expect(form.rendered).toBe(false);
+      expect(formMenu.form).toBe(null);
+
+      JQueryTesting.triggerMouseUp(formMenu.$container);
+      JQueryTesting.triggerMouseAction(formMenu.$container, 'click');
+      expect(form.rendered).toBe(false);
+      expect(formMenu.form).toBe(null);
     });
   });
 });

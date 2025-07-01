@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -184,7 +184,7 @@ export class FormMenu extends Menu implements FormMenuModel {
 
   protected override _createPopup(): Popup {
     // Menu bar should always be on the bottom
-    this.form.rootGroupBox.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
+    this.form.rootGroupBox?.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
 
     if (this.popupStyle === FormMenu.PopupStyle.MOBILE) {
       return scout.create(MobilePopup, {

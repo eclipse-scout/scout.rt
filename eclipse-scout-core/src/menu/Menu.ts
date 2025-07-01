@@ -278,12 +278,12 @@ export class Menu extends Action implements MenuModel {
     // If it is already displayed it will stay
     tooltips.cancel(this.$container);
 
-    // If menu has childActions, a popup should be rendered on click. To create
+    // If toggleAction is true, a popup should be rendered on click. To create
     // the impression of a faster UI, open the popup already on 'mousedown', not
     // on 'click'. All other actions are handled on 'click'.
-    if (event.type === 'mousedown' && this._doActionTogglesPopup()) {
+    if (event.type === 'mousedown' && this.isToggleAction()) {
       this.doAction();
-    } else if ((event.type === 'click' || event.type === 'contextmenu') && !this._doActionTogglesPopup()) {
+    } else if ((event.type === 'click' || event.type === 'contextmenu') && !this.isToggleAction()) {
       this.doAction();
     }
   }
