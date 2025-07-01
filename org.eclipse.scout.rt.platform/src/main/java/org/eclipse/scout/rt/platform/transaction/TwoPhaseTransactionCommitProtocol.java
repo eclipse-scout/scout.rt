@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,6 +29,10 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
 
   @Override
   public void commitOrRollback(final ITransaction tx) {
+    commitOrRollback(tx, true);
+  }
+
+  protected void commitOrRollback(final ITransaction tx, boolean releaseAfterCommit) {
     try {
       // Immediately rollback the TX in case of failures.
       if (tx.hasFailures()) {
@@ -85,7 +89,9 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
       }
     }
     finally {
-      release(tx);
+      if (releaseAfterCommit) {
+        release(tx);
+      }
     }
   }
 
