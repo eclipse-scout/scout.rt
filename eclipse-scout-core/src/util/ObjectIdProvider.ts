@@ -81,7 +81,7 @@ export class ObjectIdProvider implements ObjectIdProviderModel, ObjectWithType {
     }
 
     // Abort if there is no parent
-    let parent = options.parent || object.parent;
+    let parent = options.parent || object.uuidParent || object.parent;
     if (!parent) {
       return uuid;
     }
@@ -94,7 +94,9 @@ export class ObjectIdProvider implements ObjectIdProviderModel, ObjectWithType {
 
     // Find the next relevant parent (some parents may be skipped)
     let considerSkipWidgets = this._computeConsiderSkipWidgets(options, object);
-    parent = this._findUuidPathParent(parent, considerSkipWidgets);
+    if (parent instanceof Widget) {
+      parent = this._findUuidPathParent(parent, considerSkipWidgets);
+    }
 
     // Prepare options for the next iteration
     options.considerSkipWidgets = considerSkipWidgets;
@@ -317,6 +319,7 @@ export interface ObjectUuidSource extends Partial<ObjectWithUuid>, Partial<Objec
   id?: string;
   classId?: string;
   parent?: Widget;
+  uuidParent?: ObjectWithUuid;
 }
 
 export interface ObjectIdProviderModel extends ObjectModel<ObjectIdProvider> {

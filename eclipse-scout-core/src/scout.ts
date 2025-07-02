@@ -74,6 +74,13 @@ export interface ObjectWithUuid {
   uuid: string;
 
   /**
+   * Widget to be used instead of the default parent when computing the uuid path for the object.
+   *
+   * @see buildUuidPath
+   */
+  uuidParent?: ObjectWithUuid;
+
+  /**
    * Computes a unique identifier for the object.
    *
    * Compared to {@link uuid} it also considers the {@link classId} property and may use a fallback logic if none of these two properties are available, see {@link ObjectIdProvider.uuid}.
@@ -118,6 +125,12 @@ export interface ObjectModelWithUuid<TObject = object> extends ObjectModel<TObje
    * A unique identifier for the object. Typically, a new random UUID can be used.
    */
   uuid?: string;
+  /**
+   * Widget to be used instead of the default parent when computing the uuid path for the object.
+   *
+   * @see ObjectWithUuid.buildUuidPath
+   */
+  uuidParent?: ObjectWithUuid;
 }
 
 export interface ReloadPageOptions {
