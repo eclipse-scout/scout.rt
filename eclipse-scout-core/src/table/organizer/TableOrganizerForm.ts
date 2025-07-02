@@ -15,6 +15,7 @@ import TableOrganizerFormModel, {ColumnsTable0, ProfilesTable} from './TableOrga
 
 export class TableOrganizerForm extends Form {
   declare widgetMap: TableOrganizerFormWidgetMap;
+
   table: Table;
   profilesTable: ProfilesTable;
   columnsTable: ColumnsTable0;
@@ -68,7 +69,7 @@ export class TableOrganizerForm extends Form {
     (event.field as StringField).selectAll();
   }
 
-  protected _onProfilesTableCompleteCellEdit(event: TableCompleteCellEditEvent<ProfilesTable>) {
+  protected _onProfilesTableCompleteCellEdit(event: TableCompleteCellEditEvent<string>) {
     event.cell.setEditable(false);
     this.profilesTable.updateRow(event.row);
   }
@@ -91,16 +92,17 @@ export class TableOrganizerForm extends Form {
   protected _newConfigName(): string {
     let profileNo = 1;
     const baseName = this.session.text('New');
-    const profiles = this.profilesTable.columnById('ConfigNameColumn').cellValues();
-    while (profiles.includes(`${baseName} ${profileNo}`)) {
-      ++profileNo;
+    const existingNames = this.profilesTable.columnById('ConfigNameColumn').cellValues();
+    while (existingNames.includes(`${baseName} ${profileNo}`)) {
+      profileNo++;
     }
     return `${baseName} ${profileNo}`;
   }
 
   protected _renameConfig(row?: TableRow) {
     row = scout.nvl(row, this.profilesTable.selectedRow());
-    let column = this.profilesTable.columnById('ConfigNameColumn');
+
+    const column = this.profilesTable.columnById('ConfigNameColumn');
     column.cell(row).setEditable(true);
     this.profilesTable.updateRow(row);
     this.profilesTable.focusCell(column, row);
@@ -112,7 +114,7 @@ export class TableOrganizerForm extends Form {
   }
 
   protected _reloadColumnsTable() {
-    let columns = this.table.visibleColumns(false);
+    const columns = this.table.visibleColumns(false);
     const rows = columns.map(column => {
       return {
         cells: [
@@ -148,13 +150,13 @@ export class TableOrganizerForm extends Form {
   }
 
   protected async _onAddColumnMenuAction(event: Event<Action>): Promise<void> {
-    let previousColumns = this.table.visibleColumns();
+    let oldColumns = this.table.visibleColumns();
 
     await this.table.organizer.addColumn(arrays.last(this.keyColumn.selectedCellValues()));
     this._reloadColumnsTable();
 
     // Select inserted columns
-    let insertedColumns = arrays.diff(this.table.visibleColumns(), previousColumns);
+    let insertedColumns = arrays.diff(this.table.visibleColumns(), oldColumns);
     this.columnsTable.selectRows(this.columnsTable.rows.filter(row => insertedColumns.includes(this.keyColumn.cellValue(row))));
     this.columnsTable.focus();
   }
@@ -178,8 +180,7 @@ export class TableOrganizerForm extends Form {
   protected _installColumnUpDownMenus() {
     const moveRowUpMenu = this.widget('MoveColumnUpMenu');
     const moveRowDownMenu = this.widget('MoveColumnDownMenu');
-    let moveRowHelper = scout.create(MoveTableRowMenuHelper);
-    moveRowHelper.install({
+    scout.create(MoveTableRowMenuHelper).install({
       table: this.columnsTable,
       moveRowUpMenu,
       moveRowDownMenu,
