@@ -105,6 +105,7 @@ export default (): FormModel => ({
           headerVisible: false,
           autoResizeColumns: true,
           scrollToSelection: true, // To reveal selection when moving rows
+          defaultRowAction: 'ModifyColumnMenu',
           columns: [{
             id: 'KeyColumn',
             objectType: Column<Column>,
