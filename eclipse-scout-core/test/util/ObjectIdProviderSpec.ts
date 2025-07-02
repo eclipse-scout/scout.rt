@@ -193,6 +193,23 @@ describe('ObjectIdProvider', () => {
       assertUuidPath(object, '4|id3');
     });
 
+    it('includes uuid of uuidParent instead of parent', () => {
+      const object1 = scout.create(Widget, {parent: session.desktop, id: 'o1', uuid: 'U0001'});
+      const object2 = scout.create(Widget, {parent: object1, id: 'o2', uuid: 'U0002'});
+      assertUuidPath(object2, 'U0002|U0001');
+
+      // Change uuidParent of parent2 after the widget has already been created -> uuidPath should change
+      const object3 = scout.create(Widget, {parent: object1, id: 'o3', uuid: 'U0003'});
+      object2.uuidParent = object3;
+      assertUuidPath(object2, 'U0002|U0003|U0001');
+
+      // Chain of uuidParents/parents -> should work recursively
+      // o5 --(uuidParent)--> o4 --(uuidParent)--> o3 --(parent)--> o1
+      const object4 = scout.create(Widget, {parent: object2, uuidParent: object3, id: 'o4', uuid: 'U0004'});
+      const object5 = scout.create(Widget, {parent: object1, uuidParent: object4, id: 'o5', uuid: 'U0005'});
+      assertUuidPath(object5, 'U0005|U0004|U0003|U0001');
+    });
+
     it('prefers given parent', () => {
       const root = scout.create(Widget, {parent: session.desktop, uuid: '2'});
       const parent = scout.create(Widget, {parent: root, uuid: '3'});

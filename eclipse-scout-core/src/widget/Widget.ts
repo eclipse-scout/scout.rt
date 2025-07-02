@@ -78,6 +78,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   session: Session;
   trackFocus: boolean;
   uuid: string;
+  uuidParent: ObjectWithUuid;
   visible: boolean;
   modelAdapter: ModelAdapter;
   $container: JQuery;

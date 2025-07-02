@@ -363,6 +363,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
    * @param table The table to initialize.
    */
   protected _initDetailTable(table: Table) {
+    table.uuidParent = this;
     table.menuBar.setPosition(MenuBar.Position.TOP);
     table.on('filter', this._tableFilterHandler);
     if (this.drillDownOnRowClick) {
