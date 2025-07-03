@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BaseDoEntity, DataObjectInventory, dataObjects, dates, ObjectFactory, scout, typeName} from '../../src/index';
+import {BaseDoEntity, dataObjects, dates, ObjectFactory, scout, typeName} from '../../src/index';
 
 describe('MapDoNodeSerializer', () => {
 
@@ -92,15 +92,6 @@ describe('MapDoNodeSerializer', () => {
 
   beforeAll(() => {
     ObjectFactory.get().registerNamespace('scout', {MapFixture01Do, MapFixture02Do}, {allowedReplacements: ['scout.MapFixture01Do', 'scout.MapFixture02Do']});
-    const doInventory = DataObjectInventory.get();
-    doInventory.add(MapFixture01Do);
-    doInventory.add(MapFixture02Do);
-  });
-
-  afterAll(() => {
-    const doInventory = DataObjectInventory.get();
-    doInventory.remove(MapFixture02Do);
-    doInventory.remove(MapFixture01Do);
   });
 
   it('can serialize maps', () => {

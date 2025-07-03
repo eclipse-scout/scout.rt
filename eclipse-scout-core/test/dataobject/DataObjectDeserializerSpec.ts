@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectInventory, dataObjects, dates, DefaultDoTypeResolver, DoValueMetaData, ObjectFactory, objects, scout, typeName} from '../../src/index';
+import {arrays, BaseDoEntity, Constructor, DataObjectDeserializer, dataObjects, dates, DefaultDoTypeResolver, DoValueMetaData, ObjectFactory, objects, scout, typeName} from '../../src/index';
 
 describe('DataObjectDeserializer', () => {
 
@@ -15,20 +15,6 @@ describe('DataObjectDeserializer', () => {
     ObjectFactory.get().registerNamespace('scout', {
       Fixture01Do, Fixture02Do, Fixture03Do, Fixture03SubDo
     }, {allowedReplacements: ['scout.Fixture01Do', 'scout.Fixture02Do', 'scout.Fixture03Do', 'scout.Fixture03SubDo']});
-
-    const doInventory = DataObjectInventory.get();
-    doInventory.add(Fixture01Do);
-    doInventory.add(Fixture02Do);
-    doInventory.add(Fixture03Do);
-    doInventory.add(Fixture03SubDo);
-  });
-
-  afterAll(() => {
-    const doInventory = DataObjectInventory.get();
-    doInventory.remove(Fixture01Do);
-    doInventory.remove(Fixture02Do);
-    doInventory.remove(Fixture03Do);
-    doInventory.remove(Fixture03SubDo);
   });
 
   it('can deserialize based on _type', () => {

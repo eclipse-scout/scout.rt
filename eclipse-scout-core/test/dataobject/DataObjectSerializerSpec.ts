@@ -18,19 +18,17 @@ describe('DataObjectSerializer', () => {
       Fixture01Do, Fixture02Do, Fixture03Do, Fixture04Do, Fixture05Do, Fixture06Do
     }, {allowedReplacements: ['Fixture01Do', 'Fixture02Do', 'Fixture03Do', 'Fixture04Do', 'Fixture05Do', 'Fixture06Do']});
 
+    // remove Fixture04Do and Fixture05Do
     const doInventory = DataObjectInventory.get();
-    doInventory.add(Fixture01Do);
-    doInventory.add(Fixture02Do);
-    doInventory.add(Fixture03Do);
-    // Fixture04Do and Fixture05Do not added here!
-    doInventory.add(Fixture06Do);
+    doInventory.remove(Fixture04Do);
+    doInventory.remove(Fixture05Do);
   });
 
   afterAll(() => {
+    // add Fixture04Do and Fixture05Do again
     const doInventory = DataObjectInventory.get();
-    doInventory.remove(Fixture01Do);
-    doInventory.remove(Fixture02Do);
-    doInventory.remove(Fixture03Do);
+    doInventory.add(Fixture04Do);
+    doInventory.add(Fixture05Do);
   });
 
   it('can serialize arrays', () => {
@@ -166,10 +164,8 @@ describe('DataObjectSerializer', () => {
         "propObj2": {
           "propDate": "2024-07-01 11:51:39.708",
           "_type": "scout.Fixture06"
-        },
-        "_type": "scout.Fixture05"
-      },
-      "_type": "scout.Fixture04"
+        }
+      }
     }
     `));
     const json = dataObjects.stringify({

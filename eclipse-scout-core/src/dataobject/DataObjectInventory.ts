@@ -47,6 +47,9 @@ export class DataObjectInventory {
       return false;
     }
 
+    if (this._constructorByTypeName.has(typeName)) {
+      throw new Error(`There is already a constructor registered for type name '${typeName}'.`);
+    }
     this._constructorByTypeName.set(typeName, doClass);
     objectType = objectType || ObjectFactory.get().getObjectType(doClass);
     if (!objectType) {

@@ -7,23 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, DataObjectInventory, dates, ObjectFactory, scout, typeName} from '../../src/index';
+import {BaseDoEntity, dates, ObjectFactory, scout, typeName} from '../../src/index';
 
 describe('BaseDoEntity', () => {
   beforeAll(() => {
     ObjectFactory.get().registerNamespace('scout', {
       BaseDoEntityFixture01Do, BaseDoEntityFixture02Do
     }, {allowedReplacements: ['scout.BaseDoEntityFixture01Do', 'scout.BaseDoEntityFixture02Do']});
-
-    const doInventory = DataObjectInventory.get();
-    doInventory.add(BaseDoEntityFixture01Do);
-    doInventory.add(BaseDoEntityFixture02Do);
-  });
-
-  afterAll(() => {
-    const doInventory = DataObjectInventory.get();
-    doInventory.remove(BaseDoEntityFixture01Do);
-    doInventory.remove(BaseDoEntityFixture02Do);
   });
 
   describe('clone', () => {
