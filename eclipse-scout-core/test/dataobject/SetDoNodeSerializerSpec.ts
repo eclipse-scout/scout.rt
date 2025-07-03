@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BaseDoEntity, DataObjectInventory, dataObjects, ObjectFactory, scout, typeName} from '../../src/index';
+import {BaseDoEntity, dataObjects, ObjectFactory, scout, typeName} from '../../src/index';
 
 describe('SetDoNodeSerializer', () => {
 
@@ -23,15 +23,6 @@ describe('SetDoNodeSerializer', () => {
 
   beforeAll(() => {
     ObjectFactory.get().registerNamespace('scout', {SetFixture01Do}, {allowedReplacements: ['scout.SetFixture01Do']});
-    const doInventory = DataObjectInventory.get();
-    doInventory.add(SetFixture01Do);
-    doInventory.add(SetFixture02Do);
-  });
-
-  afterAll(() => {
-    const doInventory = DataObjectInventory.get();
-    doInventory.remove(SetFixture01Do);
-    doInventory.remove(SetFixture02Do);
   });
 
   it('can serialize Sets', () => {

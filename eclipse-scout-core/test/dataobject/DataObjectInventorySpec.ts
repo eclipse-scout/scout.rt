@@ -103,5 +103,14 @@ describe('DataObjectInventory', () => {
     expect(inventory._typeNameByObjectType.size).toBe(0);
     expect(inventory._objectTypeByTypeName.size).toBe(0);
   });
+
+  it('register fails if type name is already present', () => {
+    expectInventorySize(0);
+    expect(inventory.add(SpecDo)).toBeTrue();
+    expectInventorySize(1);
+    expectSpecDoInRegistry();
+
+    expect(() => inventory.add(SpecDo)).toThrowError('There is already a constructor registered for type name \'scout.Spec\'.');
+  });
 });
 
