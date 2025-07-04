@@ -18,6 +18,7 @@ export * from './JasmineScoutUtil';
 export * from './JasmineScout';
 export * from './text/LocaleSpecHelper';
 export * from './menu/MenuSpecHelper';
+export * from './prefs/SpecUiPreferencesStore';
 export * from './security/accessSpecHelper';
 export * from './tree/TreeSpecHelper';
 export * from './table/TableSpecHelper';

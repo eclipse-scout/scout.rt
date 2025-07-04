@@ -60,6 +60,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
   tile: ButtonTile;
   events: EventSupport;
   pageChanging: number;
+  userPreferenceContext: string;
 
   // Inspector infos (are only available for remote pages)
   modelClass: string;
@@ -364,6 +365,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
    */
   protected _initDetailTable(table: Table) {
     table.uuidParent = this;
+    table.userPreferenceContext = this.userPreferenceContext;
     table.menuBar.setPosition(MenuBar.Position.TOP);
     table.on('filter', this._tableFilterHandler);
     if (this.drillDownOnRowClick) {

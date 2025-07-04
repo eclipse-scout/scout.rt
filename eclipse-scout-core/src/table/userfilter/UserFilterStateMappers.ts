@@ -31,7 +31,7 @@ export class UserFilterStateMappers {
   }
 
   /**
-   * @return all registered mappers in the order specified during registration
+   * @returns all registered mappers in the order specified during registration
    */
   all(): UserFilterStateMapper[] {
     return this._registry.map(registration => {

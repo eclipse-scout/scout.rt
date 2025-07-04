@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {TableSpecHelper} from '../../../src/testing/index';
-import {arrays, Column, scout, TableOrganizer} from '../../../src';
+import {arrays, Column, ITableCustomizerDo, scout, TableCustomizer, TableOrganizer} from '../../../src';
 
 describe('TableOrganizer', () => {
 
@@ -84,7 +84,7 @@ describe('TableOrganizer', () => {
 
       organizer.getInvisibleColumns = () => [];
       expect(organizer.isColumnAddable()).toBe(false);
-      table.isCustomizable = () => true;
+      table.customizer = new SpecTableCustomizer();
       expect(organizer.isColumnAddable()).toBe(true);
       organizer.getInvisibleColumns = () => [scout.create(Column, {parent: table})];
       expect(organizer.isColumnAddable()).toBe(true);
@@ -98,7 +98,7 @@ describe('TableOrganizer', () => {
 
       organizer.getInvisibleColumns = () => [];
       expect(organizer.isColumnAddable()).toBe(false);
-      table.isCustomizable = () => true;
+      table.customizer = new SpecTableCustomizer();
       expect(organizer.isColumnAddable()).toBe(false);
       organizer.getInvisibleColumns = () => [scout.create(Column, {parent: table})];
       expect(organizer.isColumnAddable()).toBe(false);
@@ -155,7 +155,7 @@ describe('TableOrganizer', () => {
       let organizer = table.organizer;
 
       expect(organizer.isColumnRemovable(column)).toBe(false);
-      table.isCustomizable = () => true;
+      table.customizer = new SpecTableCustomizer();
       expect(organizer.isColumnRemovable(column)).toBe(true);
     });
 
@@ -193,7 +193,7 @@ describe('TableOrganizer', () => {
       let organizer = table.organizer;
 
       expect(organizer.isColumnModifiable(column)).toBe(false);
-      table.isCustomizable = () => true;
+      table.customizer = new SpecTableCustomizer();
       expect(organizer.isColumnModifiable(column)).toBe(true);
     });
 
@@ -208,7 +208,7 @@ describe('TableOrganizer', () => {
       expect(organizer.isColumnModifiable(column0)).toBe(false);
       expect(organizer.isColumnModifiable(column1)).toBe(false);
 
-      table.isCustomizable = () => true;
+      table.customizer = new SpecTableCustomizer();
       expect(organizer.isColumnModifiable(column0)).toBe(false);
       expect(organizer.isColumnModifiable(column1)).toBe(true);
     });
@@ -413,4 +413,35 @@ describe('TableOrganizer', () => {
       expect(table.visibleColumns()).toEqual([columns[0], columns[1], columns[3], columns[2]]);
     });
   });
+
+  class SpecTableCustomizer extends TableCustomizer {
+
+    override setCustomizerData(customizerData: ITableCustomizerDo) {
+      // nop
+    }
+
+    override getCustomizerData(): ITableCustomizerDo {
+      return null;
+    }
+
+    override addColumn(insertAfterColumn?: Column<any>): JQuery.Promise<void> {
+      return $.resolvedPromise();
+    }
+
+    override modifyColumn(column: Column<any>): JQuery.Promise<void> {
+      return $.resolvedPromise();
+    }
+
+    override removeColumns(columns: Column<any>[]) {
+      // nop
+    }
+
+    override removeAllColumns() {
+      // nop
+    }
+
+    override isCustomizable(column: Column<any>): boolean {
+      return true;
+    }
+  }
 });

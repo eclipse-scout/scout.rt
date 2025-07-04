@@ -12,10 +12,11 @@ import {
   ContextMenuPopup, dataObjects, DefaultTableAccessibilityRenderer, Desktop, DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, ErrorHandler, EventHandler, Filter,
   Filterable, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HierarchicalTableAccessibilityRenderer, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext,
   LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects,
-  Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToOptions, Status, StatusOrModel, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
-  TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke,
-  TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke,
-  TableTooltip, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
+  Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToOptions, Status, StatusOrModel, strings, styles, TableClientUiPreferenceProfileDo, TableColumnClientUiPreferenceDo, TableCompactHandler, TableControl, TableCopyKeyStroke,
+  TableCustomizer, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke,
+  TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke,
+  TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, UiPreferences, uiPreferences,
+  UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -129,7 +130,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   defaultMenuTypes: string[];
   accessibilityRenderer: AbstractTableAccessibilityRenderer;
   organizer: TableOrganizer;
+  customizer: TableCustomizer;
   defaultRowAction: Action;
+  userPreferenceContext: string;
+  uiPreferencesEnabled: boolean;
 
   $data: JQuery;
   $emptyData: JQuery;
@@ -163,6 +167,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   protected _$mouseDownRow: JQuery;
   protected _mouseDownRowId: string;
   protected _mouseDownColumn: Column<any>;
+  protected _initialUiPreferences: TableClientUiPreferenceProfileDo;
 
   constructor() {
     super();
@@ -244,6 +249,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.defaultMenuTypes = [Table.MenuType.EmptySpace];
     this.accessibilityRenderer = new DefaultTableAccessibilityRenderer();
     this.organizer = null;
+    this.customizer = null;
 
     this._doubleClickSupport = new DoubleClickSupport();
     this._permanentHeadSortColumns = [];
@@ -372,6 +378,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     }]);
 
     this._initOrganizer(model.organizer === undefined); // auto-create unless explicitly defined in the model
+    this._initCustomizer();
     this._initColumns();
 
     this.rows.forEach((row, i) => {
@@ -397,6 +404,14 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._setTileTableHeader(this.tileTableHeader);
     this._sortWhileInit(); // required in case the rows are already provided in the initial model
     this._updateMenusEnabled();
+    this._initTablePreferences();
+  }
+
+  protected _initTablePreferences() {
+    // Wait for event so that changes made by subclasses in _init are also saved as initial preferences
+    this.one('init', event => {
+      this._setUiPreferencesEnabled(this.uiPreferencesEnabled);
+    });
   }
 
   protected _initRow(row: ObjectOrModel<TableRow>): TableRow {
@@ -461,6 +476,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
   protected override _destroy() {
     this._destroyOrganizer();
+    this._destroyCustomizer();
     this._destroyColumns();
     super._destroy();
   }
@@ -1000,6 +1016,25 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     if (this.organizer) {
       this.organizer.install(this);
     }
+  }
+
+  protected _initCustomizer() {
+    this._setCustomizer(this.customizer); // validate table
+  }
+
+  protected _destroyCustomizer() {
+    this.setCustomizer(null);
+  }
+
+  setCustomizer(customizer: TableCustomizer) {
+    this.setProperty('customizer', customizer);
+  }
+
+  protected _setCustomizer(customizer: TableCustomizer) {
+    if (customizer && customizer.table !== this) {
+      throw new Error(`Unexpected table in customizer (${customizer.table.id} instead of ${this.id}`);
+    }
+    this._setProperty('customizer', customizer);
   }
 
   setDefaultRowAction(defaultRowAction: Action | string) {
@@ -3995,6 +4030,15 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   /**
+   * Searches for a column with the given {@link Column#buildUuid UUID}.
+   * @param type optional type to cast the result to (without runtime check)
+   * @returns the column for the requested UUID or `null` if no column has been found.
+   */
+  columnByUuid<TColumn extends Column<any>>(columnUuid: string, type?: abstract new() => TColumn): TColumn {
+    return arrays.find(this.columns, column => column.buildUuid() === columnUuid) as TColumn;
+  }
+
+  /**
    * @param $cell the $cell to get the column for
    * @param $row the $row which contains the $cell. If not passed it will be determined automatically
    * @returns the column for the given $cell
@@ -4267,10 +4311,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       }
       scout.create(ErrorHandler, {displayError: false, logError: true}).handle(`No mapper found for user filter state: ${dataObjects.stringify(filterState)}`);
     });
-
-    // Update filters
     this.setFilters(newFilters);
-    this.filter();
   }
 
   resizeToFit(column: Column<any>, maxWidth?: number) {
@@ -6425,8 +6466,103 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   isCustomizable(): boolean {
-    // TODO bsh [js-table] Delegate to this.customizer
-    return false;
+    return !!this.customizer;
+  }
+
+  /**
+   * Allows to enable or disable the support for {@link UiPreferences} on this table.
+   *
+   * This method should only be used if it is not possible to set the value in the {@link TableModel}. It should be
+   * called before the user can interact with the table. It should only be enabled on tables that have a unique and
+   * stable {@link #uuid}. When enabled, any existing stored preferences are applied automatically.
+   */
+  setUiPreferencesEnabled(uiPreferencesEnabled: boolean) {
+    this.setProperty('uiPreferencesEnabled', !!uiPreferencesEnabled);
+  }
+
+  protected _setUiPreferencesEnabled(uiPreferencesEnabled: boolean) {
+    this._setProperty('uiPreferencesEnabled', uiPreferencesEnabled);
+    if (uiPreferencesEnabled) {
+      // Save current state as "factory defaults". User filters are not included.
+      this.setInitialUiPreferences(uiPreferences.createTablePreferenceProfile(this));
+
+      // If there is a stored GLOBAL profile, apply it now
+      let prefs = uiPreferences.getTablePreferences(this);
+      uiPreferences.applyTablePreferences(this, prefs, UiPreferences.TABLE_PREFERENCE_PROFILE_ID_GLOBAL);
+
+      // Install a table listener that stores all changes into the GLOBAL profile.
+      // This is only done _after_ applying the initial state, so that no events were triggered.
+      uiPreferences.installTableListener(this);
+    } else {
+      // Uninstall listener
+      uiPreferences.uninstallTableListener(this);
+    }
+  }
+
+  setInitialUiPreferences(initialUiPreferences: TableClientUiPreferenceProfileDo) {
+    this._initialUiPreferences = initialUiPreferences;
+  }
+
+  get initialUiPreferences(): TableClientUiPreferenceProfileDo {
+    return this._initialUiPreferences;
+  }
+
+  /**
+   * Applies the {@link initialUiPreferences} and clears the stored {@link UiPreferences#TABLE_PREFERENCE_PROFILE_ID_GLOBAL} profile.
+   * If the initial ui preferences were not previously set, this method has no effect.
+   */
+  resetToInitialUiPreferences() {
+    if (!this._initialUiPreferences) {
+      return;
+    }
+    uiPreferences.applyTablePreferenceProfile(this, this._initialUiPreferences, {
+      applyUserFilters: true
+    });
+    if (this.uiPreferencesEnabled) {
+      uiPreferences.clearGlobalTablePreferenceProfile(this);
+    }
+  }
+
+  applyColumnPreferences(columnPreferences: TableColumnClientUiPreferenceDo[]) {
+    let columnPreferencesMap = new Map(arrays.ensure(columnPreferences).map(pref => [pref.columnId, pref]));
+
+    // Sort existing columns according to the order specified in the preferences
+    let newColumns = this.columns
+      .filter(c => !c.guiOnly) // will be recreated by _setColumns
+      .sort((c1, c2) => { // reorder
+        let viewIndex1 = columnPreferencesMap.get(c1.buildUuid())?.viewIndex ?? Infinity;
+        let viewIndex2 = columnPreferencesMap.get(c2.buildUuid())?.viewIndex ?? Infinity;
+        return viewIndex1 - viewIndex2;
+      });
+    // Apply preferences to existing columns. Columns without corresponding entry in the preferences are left
+    // untouched, while preference entries without corresponding column are simply ignored.
+    newColumns.forEach(column => this._applyColumnPreferencesToColumn(column, columnPreferencesMap.get(column.buildUuid())));
+
+    this.setColumns(newColumns);
+  }
+
+  protected _applyColumnPreferencesToColumn(column: Column<any>, columnPreferences: TableColumnClientUiPreferenceDo) {
+    if (!columnPreferences) {
+      return; // can happen if preferences are applied before the customizer is installed or if preferences contains obsolete data
+    }
+
+    // Use setter for 'visible' property because it is a multidimensional property
+    column.setVisible(columnPreferences.visible, false); // parameter 'false' skips call of onColumnVisibilityChanged()
+
+    // Don't use setter for 'width' property to prevent unnecessarily redrawing the table (will be done again later in setColumns anyway)
+    column.width = columnPreferences.width;
+
+    // Properties without setter (changes will be applied later by _setColumns)
+    column.sortIndex = columnPreferences.sortOrder;
+    column.sortAscending = columnPreferences.sortAscending;
+    column.sortActive = column.sortIndex >= 0;
+    column.grouped = columnPreferences.groupingActive;
+
+    if (column instanceof NumberColumn) {
+      // Use setters to correctly update internal structures (e.g. aggrStart function)
+      column.setAggregationFunction(columnPreferences.aggregationFunctionId as NumberColumnAggregationFunction);
+      column.setBackgroundEffect(columnPreferences.backgroundEffectId as NumberColumnBackgroundEffect);
+    }
   }
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */

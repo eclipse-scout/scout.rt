@@ -133,11 +133,11 @@ export class TableClientUiPreferenceProfileDo extends BaseDoEntity {
 @typeName('scout.TableColumnClientUiPreference')
 export class TableColumnClientUiPreferenceDo extends BaseDoEntity {
   columnId?: string;
-  width?: number;
   viewIndex?: number;
+  visible?: boolean;
+  width?: number;
   sortOrder?: number;
   sortAscending?: boolean;
-  visible?: boolean;
   groupingActive?: boolean;
   aggregationFunctionId?: string;
   backgroundEffectId?: string;
@@ -187,4 +187,16 @@ export class TextColumnUserFilterStateDo extends BaseDoEntity implements IUserFi
 }
 
 export interface ITableCustomizerDo extends BaseDoEntity {
+}
+
+// --------------------------------------------------
+
+@typeName('scout.UiPreferences')
+export class UiPreferencesDo extends BaseDoEntity {
+  tablePreferences?: TableClientUiPreferencesDo[];
+}
+
+@typeName('scout.UiPreferencesUpdate')
+export class UiPreferencesUpdateDo extends BaseDoEntity {
+  preferences?: UiPreferencesDo;
 }

@@ -74,7 +74,7 @@ export interface ObjectWithUuid {
   uuid: string;
 
   /**
-   * Widget to be used instead of the default parent when computing the uuid path for the object.
+   * Parent to be used instead of the default parent when computing the uuid path for the object.
    *
    * @see buildUuidPath
    */
@@ -126,7 +126,7 @@ export interface ObjectModelWithUuid<TObject = object> extends ObjectModel<TObje
    */
   uuid?: string;
   /**
-   * Widget to be used instead of the default parent when computing the uuid path for the object.
+   * Parent to be used instead of the default parent when computing the uuid path for the object.
    *
    * @see ObjectWithUuid.buildUuidPath
    */

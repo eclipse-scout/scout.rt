@@ -11,7 +11,7 @@ import {
   AdapterData, App, arrays, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectIdProvider, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session,
   SessionStartupResponse, uiNotifications, Widget, WidgetModel
 } from '../index';
-import {jasmineScoutMatchers, JasmineScoutUtil, LocaleSpecHelper, TestingApp, UiNotificationsMock} from './index';
+import {jasmineScoutMatchers, JasmineScoutUtil, LocaleSpecHelper, SpecUiPreferencesStore, TestingApp, UiNotificationsMock} from './index';
 import 'jasmine-jquery';
 import $ from 'jquery';
 
@@ -244,6 +244,7 @@ export const JasmineScout = {
 
     beforeEach(() => {
       jasmine.addMatchers(jasmineScoutMatchers);
+      SpecUiPreferencesStore.install();
     });
 
     afterEach(() => {
@@ -257,6 +258,7 @@ export const JasmineScout = {
       // Cleanup global objects and remove every handler to avoid a memory leak because widgets are not destroyed properly after tests, so they won't unregister their handlers
       HtmlEnvironment.get().off('propertyChange');
       uiNotifications.tearDown();
+      SpecUiPreferencesStore.uninstall();
     });
 
     context.keys().forEach(context);
