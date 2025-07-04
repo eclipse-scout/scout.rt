@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -34,8 +34,8 @@ export class DateColumnUserFilter extends ColumnUserFilter implements ColumnUser
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
-    this.dateFrom = dates.parseJsonDate(model.dateFrom);
-    this.dateTo = dates.parseJsonDate(model.dateTo);
+    this.dateFrom = typeof model.dateFrom === 'string' ? dates.parseJsonDate(model.dateFrom) : model.dateFrom;
+    this.dateTo = typeof model.dateTo === 'string' ? dates.parseJsonDate(model.dateTo) : model.dateTo;
   }
 
   override axisGroup(): TableMatrixNumberGroup | TableMatrixDateGroup {
