@@ -12,7 +12,6 @@
   <packaging>pom</packaging>
 
   <properties>
-    <jdk.source.version>${javaVersion}</jdk.source.version>
     <org.eclipse.scout.rt.version>25.2-SNAPSHOT</org.eclipse.scout.rt.version>
     <org.jooq.version>3.20.2</org.jooq.version>
     <derby.version>10.17.1.0</derby.version>
