@@ -9,12 +9,14 @@
  */
 
 import {
-  ActivateBookmarkPathParam, BaseDoEntity, BookmarkDo, BookmarkDoBuilder, BookmarkSupport, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierStringComponentDo, Desktop, NodeBookmarkPageDo, Outline, OutlineBookmarkDefinitionDo,
-  PageBookmarkDefinitionDo, PageIdDummyPageParamDo, ResetMenu, scout, SearchMenu, Table, TableBookmarkPageDo, TableTextUserFilter, UuidPool
+  ActivateBookmarkPathParam, BaseDoEntity, BookmarkDo, BookmarkDoBuilder, BookmarkSupport, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierStringComponentDo, BooleanColumn, Column, Desktop, NodeBookmarkPageDo, NumberColumn,
+  NumberColumnUserFilter, NumberColumnUserFilterStateDo, Outline, OutlineBookmarkDefinitionDo, PageBookmarkDefinitionDo, PageIdDummyPageParamDo, ResetMenu, scout, SearchMenu, Table, TableBookmarkPageDo, TableClientUiPreferenceProfileDo,
+  TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableTextUserFilter, TableTextUserFilterStateDo, UiPreferences, UuidPool
 } from '../../src/index';
 import {
   FRUIT_1_KEY, FRUIT_2_KEY, FRUIT_3_KEY, FRUIT_4_KEY, FRUIT_5_KEY, goToOutline, SPEC_NODE_PAGE_1_UUID, SPEC_NODE_PAGE_2_UUID, SPEC_NODE_PAGE_3_UUID, SPEC_NODE_PAGE_4_UUID, SPEC_OUTLINE_1_ID, SPEC_OUTLINE_1_UUID, SPEC_OUTLINE_2_ID,
-  SPEC_OUTLINE_2_UUID, SPEC_TABLE_PAGE_1_UUID, SPEC_TABLE_PAGE_2_UUID, SPEC_TABLE_PAGE_3_UUID, specDesktopModel, SpecNodePage1, SpecNodePage2, SpecNodePage3, SpecNodePage4, SpecPageParamDo, SpecSearchDo, SpecSearchForm, SpecTablePage1,
+  SPEC_OUTLINE_2_UUID, SPEC_TABLE_PAGE_1_UUID, SPEC_TABLE_PAGE_2_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID,
+  SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, SPEC_TABLE_PAGE_3_TABLE_UUID, SPEC_TABLE_PAGE_3_UUID, specDesktopModel, SpecNodePage1, SpecNodePage2, SpecNodePage3, SpecNodePage4, SpecPageParamDo, SpecSearchDo, SpecSearchForm, SpecTablePage1,
   SpecTablePage2, SpecTablePage3
 } from './bookmark-fixtures';
 
@@ -139,11 +141,44 @@ describe('BookmarkSupport', () => {
 
       // Change search filter
       let searchForm = page.getSearchForm() as SpecSearchForm;
-      searchForm.widget('TextField').setValue('red');
+      searchForm.widget('TextField').setValue('n'); // 'Green', 'Magenta', 'Cyan'
       searchForm.widget('SearchMenu').doAction();
       await page.detailTable.when('reload');
       await page.ensureLoadChildren();
-      expect(page.detailTable.rows.length).toBe(1);
+      expect(page.detailTable.rows.length).toBe(3);
+      expect(page.detailTable.visibleRows.length).toBe(3);
+
+      // Add table filter
+      let textFilter = scout.create(TableTextUserFilter, {
+        session: session,
+        table: page.detailTable,
+        text: 'a' // 'Magenta', 'Cyan'
+      });
+      page.detailTable.addFilter(textFilter);
+      expect(page.detailTable.rows.length).toBe(3);
+      expect(page.detailTable.visibleRows.length).toBe(2);
+
+      // Change column settings
+      let colorColumn = scout.assertInstance(page.detailTable.columnById('ColorColumn'), Column);
+      let hexColumn = scout.assertInstance(page.detailTable.columnById('HexColumn'), Column);
+      let primaryColumn = scout.assertInstance(page.detailTable.columnById('PrimaryColumn'), BooleanColumn);
+      let usageColumn = scout.assertInstance(page.detailTable.columnById('UsageColumn'), NumberColumn);
+      page.detailTable.moveColumn(colorColumn, 1);
+      colorColumn.setWidth(333);
+      primaryColumn.setWidth(77);
+      primaryColumn.setVisible(false);
+
+      let columnFilter = scout.create(NumberColumnUserFilter, {
+        session: session,
+        table: page.detailTable,
+        column: usageColumn,
+        numberFrom: 10 // 'Magenta'
+      });
+      page.detailTable.addFilter(columnFilter);
+      expect(page.detailTable.rows.length).toBe(3);
+      expect(page.detailTable.visibleRows.length).toBe(1);
+
+      page.detailTable.sort(hexColumn);
 
       // -----
 
@@ -152,7 +187,7 @@ describe('BookmarkSupport', () => {
       expect(bookmark).toBeInstanceOf(BookmarkDo);
       expect(bookmark.id).toBeUndefined();
       expect(bookmark.title).toBe('Outline 1 - Table Page 3');
-      expect(bookmark.description).toBe('Table Page 3\n  text: "red"');
+      expect(bookmark.description).toBe('Table Page 3\n  text: "n"');
       expect(bookmark.definition).toBeInstanceOf(OutlineBookmarkDefinitionDo);
       let bookmarkDefinition = bookmark.definition as OutlineBookmarkDefinitionDo;
       expect(bookmarkDefinition.outlineId).toBe(SPEC_OUTLINE_1_UUID);
@@ -163,7 +198,78 @@ describe('BookmarkSupport', () => {
       expect(bookmarkedPage.pageParam).toBeInstanceOf(PageIdDummyPageParamDo);
       expect((bookmarkedPage.pageParam as PageIdDummyPageParamDo).pageId).toBe(SPEC_TABLE_PAGE_3_UUID);
       expect(bookmarkedPage.searchData).toBeInstanceOf(BaseDoEntity);
-      expect((bookmarkedPage.searchData as BaseDoEntity).toPojo()).toEqual(scout.create(SpecSearchDo, {text: 'red'}).toPojo());
+      expect((bookmarkedPage.searchData as BaseDoEntity).toPojo()).toEqual(scout.create(SpecSearchDo, {text: 'n'}).toPojo());
+
+      expect(bookmarkedPage.tablePreferences).toBeTruthy();
+      expect(bookmarkedPage.tablePreferences.tableId).toBe(`${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`);
+      expect(bookmarkedPage.tablePreferences.userPreferenceContext).toBe(undefined);
+      expect(bookmarkedPage.tablePreferences.tileMode).toBe(false);
+      expect(bookmarkedPage.tablePreferences.tileGlobalKey).toBe(undefined);
+      expect(bookmarkedPage.tablePreferences.tablePreferenceProfiles).toBeInstanceOf(Map);
+      expect(bookmarkedPage.tablePreferences.tablePreferenceProfiles.size).toBe(1);
+      let bookmarkedTableProfile = bookmarkedPage.tablePreferences.tablePreferenceProfiles.get(UiPreferences.TABLE_PREFERENCE_PROFILE_ID_BOOKMARK);
+      expect(bookmarkedTableProfile).toBeTruthy();
+      expect(bookmarkedTableProfile.tableCustomizerData).toBe(undefined);
+      expect(bookmarkedTableProfile.columns).toEqual([
+        scout.create(TableColumnClientUiPreferenceDo, {
+          columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, // KeyColumn
+          viewIndex: 0,
+          visible: false,
+          width: 60,
+          sortOrder: -1,
+          sortAscending: true,
+          groupingActive: false
+        }),
+        scout.create(TableColumnClientUiPreferenceDo, {
+          columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, // HexColumn
+          viewIndex: 1,
+          visible: true,
+          width: 100,
+          sortOrder: 0,
+          sortAscending: true,
+          groupingActive: false
+        }),
+        scout.create(TableColumnClientUiPreferenceDo, {
+          columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, // ColorColumn
+          viewIndex: 2,
+          visible: true,
+          width: 333,
+          sortOrder: -1,
+          sortAscending: true,
+          groupingActive: false
+        }),
+        scout.create(TableColumnClientUiPreferenceDo, {
+          columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID, // PrimaryColumn
+          viewIndex: 3,
+          visible: false,
+          width: 77,
+          sortOrder: -1,
+          sortAscending: false,
+          groupingActive: false
+        }),
+        scout.create(TableColumnClientUiPreferenceDo, {
+          columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, // UsageColumn
+          viewIndex: 4,
+          visible: true,
+          width: 60,
+          sortOrder: -1,
+          sortAscending: true,
+          groupingActive: false,
+          aggregationFunctionId: 'sum',
+          backgroundEffectId: null
+        })
+      ]);
+      expect(bookmarkedTableProfile.userFilters).toEqual([
+        scout.create(TableTextUserFilterStateDo, {
+          text: 'a'
+        }),
+        scout.create(NumberColumnUserFilterStateDo, {
+          columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID,
+          selectedValues: new Set(),
+          numberFrom: 10,
+          numberTo: null
+        })
+      ]);
     });
 
     it('can create a bookmark for a top-level table page without search form', async () => {
@@ -408,10 +514,151 @@ describe('BookmarkSupport', () => {
 
       let page = desktop.outline.selectedNode() as SpecNodePage1;
       expect(page.childrenLoaded).toBe(true);
-      expect(page.expanded).toBe(true);
+      expect(page.expanded).toBe(true); // Node pages are always expanded, see BookmarkSupport._revealPage
       expect(page.childNodes.length).toBe(0);
 
       expect(page.parentNode).toBeUndefined();
+    });
+
+    it('can restore table ui preferences when activating a table page', async () => {
+      // Assert old state of desktop
+      expect(desktop.outline).toBeInstanceOf(Outline);
+      expect(desktop.outline.id).toBe(SPEC_OUTLINE_1_ID);
+      expect(desktop.outline.selectedNode()).toBe(null);
+      expect(desktop.outline.nodes.length).toBe(3);
+
+      // Activate bookmark
+      let bookmark = scout.create(BookmarkDo, {
+        definition: scout.create(OutlineBookmarkDefinitionDo, {
+          outlineId: SPEC_OUTLINE_1_UUID,
+          bookmarkedPage: scout.create(TableBookmarkPageDo, {
+            pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_TABLE_PAGE_3_UUID}),
+            displayText: 'Table Page 3',
+            expandedChildRow: null,
+            selectedChildRows: [],
+            searchFilterComplete: true,
+            searchData: scout.create(SpecSearchDo, {text: 'n'}),
+            tablePreferences: scout.create(TableClientUiPreferencesDo, {
+              tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
+              tileMode: false,
+              tablePreferenceProfiles: new Map([
+                [UiPreferences.TABLE_PREFERENCE_PROFILE_ID_BOOKMARK, scout.create(TableClientUiPreferenceProfileDo, {
+                  columns: [
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, // KeyColumn
+                      viewIndex: 0,
+                      visible: false,
+                      width: 60,
+                      sortOrder: -1,
+                      groupingActive: false
+                    }),
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, // HexColumn
+                      viewIndex: 1,
+                      visible: true,
+                      width: 100,
+                      sortOrder: 0,
+                      sortAscending: true,
+                      groupingActive: false
+                    }),
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, // ColorColumn
+                      viewIndex: 2,
+                      visible: true,
+                      width: 333,
+                      sortOrder: -1,
+                      groupingActive: false
+                    }),
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID, // PrimaryColumn
+                      viewIndex: 3,
+                      visible: false,
+                      width: 77,
+                      sortOrder: -1,
+                      groupingActive: false
+                    }),
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, // UsageColumn
+                      viewIndex: 4,
+                      visible: true,
+                      width: 60,
+                      sortOrder: -1,
+                      groupingActive: false,
+                      aggregationFunctionId: 'sum',
+                      backgroundEffectId: null
+                    })
+                  ],
+                  userFilters: [
+                    scout.create(TableTextUserFilterStateDo, {
+                      text: 'a'
+                    }),
+                    scout.create(NumberColumnUserFilterStateDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID,
+                      selectedValues: new Set(),
+                      numberFrom: 10,
+                      numberTo: null
+                    })
+                  ]
+                })]
+              ])
+            })
+          }),
+          pagePath: []
+        })
+      });
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
+
+      // Assert new state of desktop
+      expect(desktop.outline).toBeInstanceOf(Outline);
+      expect(desktop.outline.id).toBe(SPEC_OUTLINE_1_ID);
+      expect(desktop.outline.selectedNode()).toBeInstanceOf(SpecTablePage3);
+
+      let page = desktop.outline.selectedNode() as SpecTablePage3;
+      expect(page.childrenLoaded).toBe(true);
+      expect(page.expanded).toBe(false); // Table pages are not expanded, see BookmarkSupport._revealPage
+      expect(page.childNodes.length).toBe(0);
+
+      expect(page.parentNode).toBeUndefined();
+
+      let table = page.detailTable;
+      let colorColumn = scout.assertInstance(page.detailTable.columnById('ColorColumn'), Column);
+      let hexColumn = scout.assertInstance(page.detailTable.columnById('HexColumn'), Column);
+      let primaryColumn = scout.assertInstance(page.detailTable.columnById('PrimaryColumn'), BooleanColumn);
+      let usageColumn = scout.assertInstance(page.detailTable.columnById('UsageColumn'), NumberColumn);
+
+      expect(table.columns.length).toBe(5);
+      expect(table.visibleColumns().length).toBe(3);
+      expect(table.rows.length).toBe(3);
+      expect(table.visibleRows.length).toBe(1);
+      expect(table.visibleColumns()).toEqual([hexColumn, colorColumn, usageColumn]);
+      expect(colorColumn.width).toBe(333);
+      expect(hexColumn.width).toBe(100);
+      expect(primaryColumn.width).toBe(77);
+      expect(usageColumn.width).toBe(60);
+
+      // Change state and reset -> original state from page model is restored (not state from bookmark!)
+      hexColumn.setVisible(false);
+      primaryColumn.setVisible(true);
+      primaryColumn.setWidth(444);
+      table.sort(colorColumn, 'desc');
+      table.moveColumn(usageColumn, 0);
+
+      table.resetToInitialUiPreferences();
+      let searchForm = page.getSearchForm() as SpecSearchForm;
+      searchForm.widget('ResetMenu').doAction();
+      await page.detailTable.when('reload');
+      await page.ensureLoadChildren();
+
+      expect(table.columns.length).toBe(5);
+      expect(table.visibleColumns().length).toBe(4);
+      expect(table.rows.length).toBe(8);
+      expect(table.visibleRows.length).toBe(8);
+      expect(table.visibleColumns()).toEqual([colorColumn, hexColumn, primaryColumn, usageColumn]);
+      expect(table.filterCount()).toBe(0);
+      expect(colorColumn.width).toBe(222);
+      expect(hexColumn.width).toBe(100);
+      expect(primaryColumn.width).toBe(60);
+      expect(usageColumn.width).toBe(60);
     });
 
     it('can activate a nested page', async () => {
@@ -909,6 +1156,87 @@ describe('BookmarkSupport', () => {
     });
   });
 
+  describe('applyBookmarkToPage', () => {
+
+    it('can still restore table ui preferences when bookmark has no table preferences and page has uiPreferencesEnabled=false', async () => {
+      // Special case for pages that explicitly don't install uiPreferences support and apply a bookmark without table preferences
+
+      let outline = desktop.outline;
+      expect(outline).toBeInstanceOf(Outline);
+      expect(outline.id).toBe(SPEC_OUTLINE_1_ID);
+      expect(outline.nodes[2]).toBeInstanceOf(SpecTablePage3);
+
+      let page = outline.nodes[2] as SpecTablePage3;
+      page._initDetailTableUiPreferences = () => {
+        // NOP -> uiPreferencesEnabled will stay false
+      };
+      outline.drillDown(page);
+      await page.ensureLoadChildren();
+      expect(page.detailTable.rows.length).toBe(8);
+
+      let searchForm = scout.assertInstance(page.getSearchForm(), SpecSearchForm);
+      searchForm.widget('TextField').setValue('bl'); // Matches 'Black' and 'Blue'
+      searchForm.widget('SearchMenu').doAction();
+      await page.detailTable.when('reload');
+      await page.ensureLoadChildren();
+      expect(page.detailTable.rows.length).toBe(2);
+
+      let bookmark = scout.create(BookmarkDo, {
+        definition: scout.create(PageBookmarkDefinitionDo, {
+          bookmarkedPage: scout.create(TableBookmarkPageDo, {
+            searchData: scout.create(SpecSearchDo, {text: 'yell'}),
+            tablePreferences: null // <--
+          })
+        })
+      });
+
+      await BookmarkSupport.get(session).applyBookmarkToPage(page, bookmark);
+
+      // -----
+
+      let table = page.detailTable;
+      let colorColumn = scout.assertInstance(page.detailTable.columnById('ColorColumn'), Column);
+      let hexColumn = scout.assertInstance(page.detailTable.columnById('HexColumn'), Column);
+      let primaryColumn = scout.assertInstance(page.detailTable.columnById('PrimaryColumn'), BooleanColumn);
+      let usageColumn = scout.assertInstance(page.detailTable.columnById('UsageColumn'), NumberColumn);
+
+      expect(table.columns.length).toBe(5);
+      expect(table.visibleColumns().length).toBe(4);
+      expect(table.visibleColumns()).toEqual([colorColumn, hexColumn, primaryColumn, usageColumn]);
+      expect(colorColumn.width).toBe(222);
+      expect(hexColumn.width).toBe(100);
+      expect(primaryColumn.width).toBe(60);
+      expect(usageColumn.width).toBe(60);
+      expect(table.initialUiPreferences).toBeInstanceOf(TableClientUiPreferenceProfileDo);
+
+      // -----
+
+      expect(searchForm.widget('TextField').value).toBe('yell');
+
+      searchForm.widget('ResetMenu').doAction();
+      await searchForm.when('reset');
+      expect(searchForm.widget('TextField').value).toBe('yell'); // <--
+
+      // -----
+
+      // Change state and reset -> original state from table is restored (because there was no state in the bookmark)
+      hexColumn.setVisible(false);
+      colorColumn.setWidth(987);
+      primaryColumn.setWidth(444);
+      table.moveColumn(usageColumn, 0);
+
+      page.detailTable.resetToInitialUiPreferences();
+
+      expect(table.columns.length).toBe(5);
+      expect(table.visibleColumns().length).toBe(4);
+      expect(table.visibleColumns()).toEqual([colorColumn, hexColumn, primaryColumn, usageColumn]);
+      expect(colorColumn.width).toBe(222);
+      expect(hexColumn.width).toBe(100);
+      expect(primaryColumn.width).toBe(60);
+      expect(usageColumn.width).toBe(60);
+    });
+  });
+
   describe('applyBookmarkToPageAndReload', () => {
 
     it('replaces the search data and reloads the table', async () => {
@@ -932,20 +1260,84 @@ describe('BookmarkSupport', () => {
       let bookmark = scout.create(BookmarkDo, {
         definition: scout.create(PageBookmarkDefinitionDo, {
           bookmarkedPage: scout.create(TableBookmarkPageDo, {
-            searchData: scout.create(SpecSearchDo, {text: 'yell'})
+            searchData: scout.create(SpecSearchDo, {text: 'yell'}),
+            tablePreferences: scout.create(TableClientUiPreferencesDo, {
+              tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
+              tablePreferenceProfiles: new Map([
+                [UiPreferences.TABLE_PREFERENCE_PROFILE_ID_BOOKMARK, scout.create(TableClientUiPreferenceProfileDo, {
+                  columns: [
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, // KeyColumn
+                      viewIndex: 0,
+                      visible: false,
+                      width: 60,
+                      sortOrder: -1,
+                      groupingActive: false
+                    }),
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, // HexColumn
+                      viewIndex: 1,
+                      visible: true,
+                      width: 100,
+                      sortOrder: 0,
+                      sortAscending: true,
+                      groupingActive: false
+                    }),
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, // ColorColumn
+                      viewIndex: 2,
+                      visible: true,
+                      width: 333,
+                      sortOrder: -1,
+                      groupingActive: false
+                    }),
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID, // PrimaryColumn
+                      viewIndex: 3,
+                      visible: false,
+                      width: 77,
+                      sortOrder: -1,
+                      groupingActive: false
+                    }),
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, // UsageColumn
+                      viewIndex: 4,
+                      visible: true,
+                      width: 60,
+                      sortOrder: -1,
+                      groupingActive: false,
+                      aggregationFunctionId: 'avg',
+                      backgroundEffectId: 'colorGradient2'
+                    })
+                  ],
+                  userFilters: [
+                    scout.create(TableTextUserFilterStateDo, {
+                      text: 'a'
+                    })
+                  ]
+                })]
+              ])
+            })
           })
         })
       });
       await BookmarkSupport.get(session).applyBookmarkToPageAndReload(page, bookmark);
 
       expect(page.detailTable.rows.length).toBe(1);
+      expect(page.detailTable.visibleRows.length).toBe(0);
+      expect(page.detailTable.filterCount()).toBe(1);
       expect(searchForm.widget('TextField').value).toBe('yell');
+
       searchForm.widget('ResetMenu').doAction();
       await searchForm.when('reset');
       expect(searchForm.widget('TextField').value).toBe('yell'); // <--
+
+      page.detailTable.resetToInitialUiPreferences();
+      expect(page.detailTable.visibleRows.length).toBe(0);
+      expect(page.detailTable.filterCount()).toBe(1);
     });
 
-    it('applies the search data while allowing the user to reset the search form if saveSearchForm is false', async () => {
+    it('applies the search data while allowing the user to reset the search form and table preferences if saveState is false', async () => {
       let outline = desktop.outline;
       expect(outline).toBeInstanceOf(Outline);
       expect(outline.id).toBe(SPEC_OUTLINE_1_ID);
@@ -962,35 +1354,83 @@ describe('BookmarkSupport', () => {
       let bookmark = scout.create(BookmarkDo, {
         definition: scout.create(PageBookmarkDefinitionDo, {
           bookmarkedPage: scout.create(TableBookmarkPageDo, {
-            searchData: scout.create(SpecSearchDo, {text: 'cy'})
+            searchData: scout.create(SpecSearchDo, {text: 'cy'}),
+            tablePreferences: scout.create(TableClientUiPreferencesDo, {
+              tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
+              tablePreferenceProfiles: new Map([
+                [UiPreferences.TABLE_PREFERENCE_PROFILE_ID_BOOKMARK, scout.create(TableClientUiPreferenceProfileDo, {
+                  columns: [
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, // KeyColumn
+                      viewIndex: 0,
+                      visible: false,
+                      width: 60,
+                      sortOrder: -1,
+                      groupingActive: false
+                    }),
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, // HexColumn
+                      viewIndex: 1,
+                      visible: true,
+                      width: 100,
+                      sortOrder: 0,
+                      sortAscending: true,
+                      groupingActive: false
+                    }),
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, // ColorColumn
+                      viewIndex: 2,
+                      visible: true,
+                      width: 333,
+                      sortOrder: -1,
+                      groupingActive: false
+                    }),
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID, // PrimaryColumn
+                      viewIndex: 3,
+                      visible: false,
+                      width: 77,
+                      sortOrder: -1,
+                      groupingActive: false
+                    }),
+                    scout.create(TableColumnClientUiPreferenceDo, {
+                      columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, // UsageColumn
+                      viewIndex: 4,
+                      visible: true,
+                      width: 60,
+                      sortOrder: -1,
+                      groupingActive: false,
+                      aggregationFunctionId: 'avg',
+                      backgroundEffectId: 'colorGradient2'
+                    })
+                  ],
+                  userFilters: [
+                    scout.create(TableTextUserFilterStateDo, {
+                      text: 'e'
+                    })
+                  ]
+                })]
+              ])
+            })
           })
         })
       });
       await BookmarkSupport.get(session).applyBookmarkToPageAndReload(page, bookmark, false); // <--
 
       expect(page.detailTable.rows.length).toBe(1);
+      expect(page.detailTable.visibleRows.length).toBe(0);
+      expect(page.detailTable.filterCount()).toBe(1);
       expect(searchForm.widget('TextField').value).toBe('cy');
+
       searchForm.widget('ResetMenu').doAction();
       await searchForm.when('reset');
       expect(searchForm.widget('TextField').value).toBe(null); // <--
-    });
 
-    it('can restore table filters', async () => {
-      // FIXME bsh [js-bookmark] Add test case with filters
-      // expect(page2.childNodes.filter(node => node.filterAccepted).length).toBe(1);
-      // expect(page2.detailTable.filteredRows().length).toEqual(1);
-      // expect(page2.detailTable.getFilter(TableTextUserFilter.TYPE)).toBeInstanceOf(TableTextUserFilter);
-      // expect((page2.detailTable.getFilter(TableTextUserFilter.TYPE) as TableTextUserFilter).text).toBe('ble');
-      expect().nothing();
-    });
-
-    it('can restore chart table control config', async () => {
-      // FIXME bsh [js-bookmark] Add test case with filters
-      // expect(page2.childNodes.filter(node => node.filterAccepted).length).toBe(1);
-      // expect(page2.detailTable.filteredRows().length).toEqual(1);
-      // expect(page2.detailTable.getFilter(TableTextUserFilter.TYPE)).toBeInstanceOf(TableTextUserFilter);
-      // expect((page2.detailTable.getFilter(TableTextUserFilter.TYPE) as TableTextUserFilter).text).toBe('ble');
-      expect().nothing();
+      page.detailTable.resetToInitialUiPreferences();
+      page.detailTable.filter(); // FIXME bsh Remove this when #426270 is fixed
+      expect(page.detailTable.rows.length).toBe(8);
+      expect(page.detailTable.visibleRows.length).toBe(8);
+      expect(page.detailTable.filterCount()).toBe(0);
     });
   });
 });

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Action, ActionAdapter, LocalBookmarkStore, scout, TreeField, TreeFieldAdapter} from './index';
+import {Action, ActionAdapter, LocalBookmarkStore, LocalUiPreferencesStore, scout, TreeField, TreeFieldAdapter} from './index';
 
 scout.addObjectFactories({
   'KeyStroke': () => {
@@ -21,5 +21,6 @@ scout.addObjectFactories({
     return new TreeField();
   },
   'ComposerFieldAdapter': () => new TreeFieldAdapter(),
-  'BookmarkStore': () => new LocalBookmarkStore()
+  'BookmarkStore': () => new LocalBookmarkStore(),
+  'UiPreferencesStore': () => new LocalUiPreferencesStore()
 });

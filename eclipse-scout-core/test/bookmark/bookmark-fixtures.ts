@@ -100,6 +100,12 @@ export const SPEC_NODE_PAGE_4_UUID = 'df79375c-047b-47cf-8323-360652ee97ae';
 export const SPEC_TABLE_PAGE_1_UUID = 'e9320869-aead-46a5-a67e-25491f8823de';
 export const SPEC_TABLE_PAGE_2_UUID = '56c699e5-5692-4a21-9595-e7dac5ee568e';
 export const SPEC_TABLE_PAGE_3_UUID = 'daf22921-71eb-4382-b500-854225e71622';
+export const SPEC_TABLE_PAGE_3_TABLE_UUID = '32c1657d-cad4-4050-b943-b920332de3c3';
+export const SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID = 'ef9bd80d-09c3-46fa-b69e-427b5ca1d68a';
+export const SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID = 'e9014bf0-e71b-4cf5-ba02-5873b683f71f';
+export const SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID = '426f8d85-d259-45f1-b472-867f74615612';
+export const SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID = '67961f65-dded-463d-88a8-51f62c534b2b';
+export const SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID = 'c716f67c-72bb-4c8b-a04b-41b26e11b1de';
 export const FRUIT_1_KEY = '1'; // Apple
 export const FRUIT_2_KEY = '2'; // Banana
 export const FRUIT_3_KEY = '3'; // Pineapple
@@ -304,20 +310,39 @@ export class SpecTablePage3 extends PageWithTable {
   protected override _createDetailTable(): Table {
     return scout.create(Table, {
       parent: this.outline,
+      uuid: SPEC_TABLE_PAGE_3_TABLE_UUID,
       columns: [{
         id: 'KeyColumn',
+        uuid: SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID,
         objectType: Column,
         primaryKey: true,
         displayable: false
       }, {
         id: 'ColorColumn',
+        uuid: SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID,
         objectType: Column,
         text: 'Color',
-        summary: true
+        summary: true,
+        width: 222,
+        sortIndex: 1
+      }, {
+        id: 'HexColumn',
+        uuid: SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID,
+        objectType: Column,
+        text: 'HEX Color',
+        width: 100
       }, {
         id: 'PrimaryColumn',
+        uuid: SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID,
         objectType: BooleanColumn,
-        text: 'Primary color'
+        text: 'Primary color',
+        sortIndex: 0,
+        sortAscending: false
+      }, {
+        id: 'UsageColumn',
+        uuid: SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID,
+        objectType: NumberColumn,
+        text: 'Usage'
       }],
       tableControls: [{
         id: 'SearchFormTableControl',
@@ -335,16 +360,21 @@ export class SpecTablePage3 extends PageWithTable {
     this.getSearchForm().on('search reset', event => table.reload(Table.ReloadReason.SEARCH));
   }
 
+  // Make public to be able to overwrite it in spec
+  override _initDetailTableUiPreferences(table: Table) {
+    super._initDetailTableUiPreferences(table);
+  }
+
   protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
     let data = [
-      {key: '#000000', label: 'Black', primary: false},
-      {key: '#ff0000', label: 'Red', primary: true},
-      {key: '#00ff00', label: 'Green', primary: true},
-      {key: '#0000ff', label: 'Blue', primary: true},
-      {key: '#ffff00', label: 'Yellow', primary: false},
-      {key: '#ff00ff', label: 'Magenta', primary: false},
-      {key: '#00ffff', label: 'Cyan', primary: false},
-      {key: '#ffffff', label: 'White', primary: false}
+      {key: '#000000', label: 'Black', primary: false, usage: 329},
+      {key: '#ff0000', label: 'Red', primary: true, usage: 287},
+      {key: '#00ff00', label: 'Green', primary: true, usage: 254},
+      {key: '#0000ff', label: 'Blue', primary: true, usage: 301},
+      {key: '#ffff00', label: 'Yellow', primary: false, usage: 110},
+      {key: '#ff00ff', label: 'Magenta', primary: false, usage: 45},
+      {key: '#00ffff', label: 'Cyan', primary: false, usage: 0},
+      {key: '#ffffff', label: 'White', primary: false, usage: 92}
     ];
     if (searchFilter instanceof SpecSearchDo && searchFilter.text) {
       data = data.filter(d => new RegExp(strings.quote(searchFilter.text), 'i').test(d.label));
@@ -356,7 +386,7 @@ export class SpecTablePage3 extends PageWithTable {
     return tableData.map(rowData => {
       return scout.create(TableRow, {
         parent: this.detailTable,
-        cells: [rowData.key, rowData.label, rowData.primary]
+        cells: [rowData.key, rowData.label, strings.toUpperCase(rowData.key), rowData.primary, rowData.usage]
       });
     });
   }

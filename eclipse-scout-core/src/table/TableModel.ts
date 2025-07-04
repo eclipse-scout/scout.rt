@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, Column, DropType, FilterOrFunction, Menu, ObjectOrChildModel, ObjectOrModel, StatusOrModel, TableCheckableStyle, TableCompactHandler, TableControl, TableGroupingStyle, TableHierarchicalStyle, TableOrganizer, TableRow,
-  TableSelectionHandler, TableTileGridMediator, TableUserFilterModel, Tile, TileTableHeaderBox, WidgetModel
+  Action, Column, DropType, FilterOrFunction, Menu, ObjectOrChildModel, ObjectOrModel, StatusOrModel, TableCheckableStyle, TableCompactHandler, TableControl, TableCustomizer, TableGroupingStyle, TableHierarchicalStyle, TableOrganizer,
+  TableRow, TableSelectionHandler, TableTileGridMediator, TableUserFilterModel, Tile, TileTableHeaderBox, WidgetModel
 } from '../index';
 
 export interface TableModel extends WidgetModel {
@@ -278,8 +278,28 @@ export interface TableModel extends WidgetModel {
    */
   organizer?: TableOrganizer;
   /**
+   * Allows the user to create and manage custom columns at runtime. The description of those columns is stored as
+   * {@link ITableCustomizerDo} in the {@link UiPreferences}. Since the data source must also provide additional data,
+   * the customizer is `null` by default and a custom implementation has to be provided.
+   */
+  customizer?: TableCustomizer;
+  /**
    * The default action, that should be executed on row action.
    * If a string is provided, the action will be resolved automatically.
    */
   defaultRowAction?: Action | string;
+  /**
+   * Additional qualifier that is added to the key for {@link UiPreferences} for this table.
+   * Useful when the same class is used in multiple locations but preferences should be stored separately.
+   */
+  userPreferenceContext?: string;
+  /**
+   * Specifies whether some UI changes made by the user (e.g. order or width of columns) are stored and re-applied later.
+   * The default is `false`.
+   *
+   * **Important:** To ensure that the saved preferences are assigned to the correct table again, it is important that
+   * it has a unique and stable identifier. If this property is set to true, it is therefore highly recommended to also
+   * set the `uuid` property explicitly.
+   */
+  uiPreferencesEnabled?: boolean;
 }

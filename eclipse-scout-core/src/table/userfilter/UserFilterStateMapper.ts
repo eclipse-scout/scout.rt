@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {IUserFilterStateDo, scout, Table, TableUserFilter} from '../../index';
+import {IUserFilterStateDo, Table, TableUserFilter} from '../../index';
 
 export abstract class UserFilterStateMapper<TFilter extends TableUserFilter = TableUserFilter, TFilterState extends IUserFilterStateDo = IUserFilterStateDo> {
 
@@ -23,17 +23,6 @@ export abstract class UserFilterStateMapper<TFilter extends TableUserFilter = Ta
       return this._fromDo(table, filterState);
     }
     return null;
-  }
-
-  protected _createColumnFilter(table: Table, columnId: string, model: any): TFilter {
-    const session = table.session;
-    const column = table.columnById(columnId);
-    return scout.create(column.filterType, {
-      session: session,
-      table: table,
-      column: column,
-      ...model
-    });
   }
 
   protected abstract _acceptFilter(filter: TableUserFilter): filter is TFilter;

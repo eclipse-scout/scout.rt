@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, arrays, BaseDoEntity, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierDoFactory, ChartTableControlConfigHelper, Constructor, Desktop, IBookmarkDo,
+  App, arrays, BaseDoEntity, BookmarkDo, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierDoFactory, ChartTableControlConfigHelper, Constructor, Desktop, IBookmarkDo,
   IBookmarkPageDo, InitModelOf, MaxRowCountContributionDo, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageParamDo, PageWithNodes, PageWithTable, scout, Session, Status,
-  TableBookmarkPageDo, TableRow
+  TableBookmarkPageDo, TableRow, UiPreferences, uiPreferences
 } from '../index';
 import $ from 'jquery';
 
@@ -157,6 +157,17 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       createDescription: false,
       createTablePreferences: false
     }, param), options);
+  }
+
+  /**
+   * Returns the implementation-specific identifier for the given bookmark, or `undefined` if the bookmark does not
+   * have a recognizable identifier.
+   */
+  getBookmarkId(bookmark: IBookmarkDo): string {
+    if (bookmark instanceof BookmarkDo) {
+      return bookmark.id;
+    }
+    return undefined;
   }
 
   // --------------------------------------
@@ -409,37 +420,37 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * Adapts the given target page with the information from the given bookmark.
    * Useful when bookmarked page is opened inline, i.e. in bookmark outline.
    *
-   * @param saveSearchForm Specifies whether the new state of the search form should be the saved state, i.e. pressing the
-   * reset button should revert the form back to the state from the bookmark rather than to the original state. The default
-   * value is `true`.
+   * @param saveState Specifies whether the new state of the page (table configuration, search form) should be the
+   * saved state, i.e. resetting to factory settings should revert the page to the state from the bookmark rather
+   * than to the original state. The default value is `true`.
    */
-  applyBookmarkToPage(page: Page, bookmark: IBookmarkDo, saveSearchForm = true) {
+  applyBookmarkToPage(page: Page, bookmark: IBookmarkDo, saveState = true) {
     if (!page || !bookmark || !bookmark.definition) {
       return;
     }
     let bookmarkPage = bookmark.definition.bookmarkedPage;
-    this._applyBookmarkPage(page, bookmarkPage, saveSearchForm);
+    this._applyBookmarkPage(page, bookmarkPage, saveState);
   }
 
   /**
    * Same as {@link applyBookmarkToPage}, but also reloads the page. The returned promise is not resolved until the
    * reload is done.
    */
-  applyBookmarkToPageAndReload(page: Page, bookmark: IBookmarkDo, saveSearchForm = true): JQuery.Promise<void> {
-    return $.when(this._applyBookmarkToPageAndReloadAsync(page, bookmark, saveSearchForm));
+  applyBookmarkToPageAndReload(page: Page, bookmark: IBookmarkDo, saveState = true): JQuery.Promise<void> {
+    return $.when(this._applyBookmarkToPageAndReloadAsync(page, bookmark, saveState));
   }
 
   // Native-promise version of applyBookmarkToPageAndReload()
-  protected async _applyBookmarkToPageAndReloadAsync(page: Page, bookmark: IBookmarkDo, saveSearchForm = true): Promise<void> {
+  protected async _applyBookmarkToPageAndReloadAsync(page: Page, bookmark: IBookmarkDo, saveState = true): Promise<void> {
     if (!page || !bookmark || !bookmark.definition) {
       return;
     }
     let bookmarkPage = bookmark.definition.bookmarkedPage;
-    await this._applyBookmarkPageAndReload(page, bookmarkPage, saveSearchForm);
+    await this._applyBookmarkPageAndReload(page, bookmarkPage, saveState);
   }
 
-  protected async _applyBookmarkPageAndReload(page: Page, bookmarkPage: IBookmarkPageDo, saveSearchForm = true): Promise<void> {
-    this._applyBookmarkPage(page, bookmarkPage, saveSearchForm);
+  protected async _applyBookmarkPageAndReload(page: Page, bookmarkPage: IBookmarkPageDo, saveState = true): Promise<void> {
+    this._applyBookmarkPage(page, bookmarkPage, saveState);
 
     await page.ensureLoadChildren();
     if (page instanceof PageWithTable && bookmarkPage instanceof TableBookmarkPageDo) {
@@ -447,60 +458,55 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
   }
 
-  protected _applyBookmarkPage(page: Page, bookmarkPage: IBookmarkPageDo, saveSearchForm = true) {
+  protected _applyBookmarkPage(page: Page, bookmarkPage: IBookmarkPageDo, saveState = true) {
     if (page instanceof PageWithTable && bookmarkPage instanceof TableBookmarkPageDo) {
-      this._applyBookmarkToTablePage(page, bookmarkPage, saveSearchForm);
+      this._applyBookmarkToTablePage(page, bookmarkPage, saveState);
     } else if (page instanceof PageWithNodes && bookmarkPage instanceof NodeBookmarkPageDo) {
       this._applyBookmarkToNodePage(page, bookmarkPage);
     }
   }
 
-  protected _applyBookmarkToTablePage(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm = true) {
-    this._prepareTablePage(page, bookmarkPage, saveSearchForm);
+  protected _applyBookmarkToTablePage(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveState = true) {
+    this._prepareTablePage(page, bookmarkPage, saveState);
   }
 
   protected _applyBookmarkToNodePage(page: PageWithNodes, bookmarkPage: NodeBookmarkPageDo) {
     // hook-method provided for subclasses
   }
 
-  protected _prepareTablePage(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm = true) {
+  protected _prepareTablePage(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveState = true) {
     page.ensureDetailTable();
 
-    // be careful when changing the order of these, e.g. applying column preferences requires custom columns to be injected first
-    this._prepareTableCustomizerData(page, bookmarkPage);
-    this._prepareTableColumnPreferences(page, bookmarkPage);
-    this._prepareTileMode(page, bookmarkPage);
-    this._prepareSearchFilter(page, bookmarkPage, saveSearchForm);
-    this._prepareUserFilters(page, bookmarkPage);
+    this._prepareTablePreferences(page, bookmarkPage, saveState);
+    this._prepareSearchFilter(page, bookmarkPage, saveState);
     this._prepareChartTableControlState(page, bookmarkPage);
   }
 
-  protected _prepareTableCustomizerData(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
-    // FIXME bsh [js-bookmark] Implement
+  protected _prepareTablePreferences(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveState: boolean) {
+    const table = page.detailTable;
+    const prefs = bookmarkPage.tablePreferences;
+    const profile = uiPreferences.getTablePreferenceProfile(prefs, UiPreferences.TABLE_PREFERENCE_PROFILE_ID_BOOKMARK);
+
+    uiPreferences.applyTablePreferences(table, prefs);
+    uiPreferences.applyTablePreferenceProfile(table, profile, {
+      applyUserFilters: true
+    });
+
+    if (saveState) {
+      // Set bookmarked profile as default preferences (no need to store the GLOBAL setting, but "reset to factory settings" should still be possible)
+      table.setInitialUiPreferences(profile || uiPreferences.createTablePreferenceProfile(table));
+    } else {
+      // Store applied settings as GLOBAL setting
+      uiPreferences.storeGlobalTablePreferenceProfile(table);
+    }
   }
 
-  protected _prepareTableColumnPreferences(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
-    // FIXME bsh [js-bookmark] Implement
-  }
-
-  protected _prepareTileMode(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
-    // FIXME bsh [js-bookmark] Implement
-    // let prefs = bookmarkPage.tablePreferences;
-    // if (prefs) {
-    //   page.detailTable.setTileMode(prefs.tileMode);
-    // }
-  }
-
-  protected _prepareSearchFilter(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveSearchForm: boolean) {
+  protected _prepareSearchFilter(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveState: boolean) {
     // Import search data
-    page.setSearchFilter(bookmarkPage.searchData, saveSearchForm);
+    page.setSearchFilter(bookmarkPage.searchData, saveState);
 
     // Mark page as dirty so ensureChildrenLoaded() will reload the data
     page.childrenLoaded = false;
-  }
-
-  protected _prepareUserFilters(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
-    // FIXME bsh [js-bookmark] Implement
   }
 
   protected _prepareChartTableControlState(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {

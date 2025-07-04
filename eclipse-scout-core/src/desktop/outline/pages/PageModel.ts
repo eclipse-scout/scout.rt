@@ -42,4 +42,9 @@ export interface PageModel extends TreeNodeModel, ObjectModelWithUuid<TreeNode> 
    * Default is true
    */
   inheritMenusFromParentTablePage?: boolean;
+  /**
+   * Additional qualifier that is added to the key for {@link UiPreferences} for the detail table of this page.
+   * Useful when the same class is used in multiple locations but preferences should be stored separately.
+   */
+  userPreferenceContext?: string;
 }

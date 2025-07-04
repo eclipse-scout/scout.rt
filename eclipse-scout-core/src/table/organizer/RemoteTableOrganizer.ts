@@ -15,8 +15,8 @@ import {Column, Table, TableAdapter, TableOrganizer} from '../../index';
  * Unlike the default {@link TableOrganizer}, it does not handle {@link addColumn}, {@link removeColumns} and {@link modifyColumn}.
  * Instead, it just delegates the calls to the UI server using the {@link TableAdapter}.
  *
- * The availability of the column organize actions depends on the flags
- * {@link Table.columnAddable}, {@link Column.removable} and {@link Column.modifiable} reported by the server.
+ * The availability of the column organize actions depends on the flags {@link Table.columnAddable}, {@link Column.removable}
+ * and {@link Column.modifiable} reported by the server.
  */
 export class RemoteTableOrganizer extends TableOrganizer {
 
@@ -52,7 +52,8 @@ export class RemoteTableOrganizer extends TableOrganizer {
     return column.modifiable;
   }
 
-  override modifyColumn(column: Column<any>) {
+  override modifyColumn(column: Column<any>): JQuery.Promise<void> {
     (this.table.modelAdapter as TableAdapter).sendColumnOrganizeAction(column, 'modify');
+    return $.resolvedPromise();
   }
 }

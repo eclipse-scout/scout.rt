@@ -162,8 +162,7 @@ export class TableOrganizer implements ObjectWithType {
 
   addColumn(column?: Column<any>): JQuery.Promise<void> {
     if (this.table.isCustomizable()) {
-      // TODO bsh [js-table] Delegate to this.table.tableCustomizer
-      return $.resolvedPromise();
+      return this.table.customizer.addColumn(column);
     }
     return this._showInvisibleColumnsForm(column);
   }
@@ -183,7 +182,7 @@ export class TableOrganizer implements ObjectWithType {
     if (column.fixedPosition) {
       return false;
     }
-    if (this.table.isCustomizable()) {
+    if (this.table.isCustomizable() && this.table.customizer.isCustomizable(column)) {
       return true;
     }
     // Prevent removal of last column, because there may not always be a table organizer menu to add it again
@@ -192,7 +191,10 @@ export class TableOrganizer implements ObjectWithType {
 
   removeColumns(columns: Column<any>[]) {
     if (this.table.isCustomizable()) {
-      // TODO bsh [js-table] Delegate to this.table.tableCustomizer
+      let customizableColumns = columns.filter(column => this.table.customizer.isCustomizable(column));
+      let nonCustomizableColumns = columns.filter(column => !this.table.customizer.isCustomizable(column));
+      this.table.customizer.removeColumns(customizableColumns);
+      this.hideColumns(nonCustomizableColumns);
     } else {
       this.hideColumns(columns);
     }
@@ -208,18 +210,17 @@ export class TableOrganizer implements ObjectWithType {
     if (!column.modifiable) {
       return false; // explicitly disabled
     }
-    if (this.table.isCustomizable()) {
+    if (this.table.isCustomizable() && this.table.customizer.isCustomizable(column)) {
       return true;
     }
     return false;
   }
 
-  modifyColumn(column: Column<any>) {
-    if (this.table.isCustomizable()) {
-      // TODO bsh [js-table] Delegate to this.table.tableCustomizer
-    } else {
-      // NOP (currently not supported)
+  modifyColumn(column: Column<any>): JQuery.Promise<void> {
+    if (this.table.isCustomizable() && this.table.customizer.isCustomizable(column)) {
+      return this.table.customizer.modifyColumn(column);
     }
+    return $.resolvedPromise(); // non-customized columns cannot be modified
   }
 
   /**

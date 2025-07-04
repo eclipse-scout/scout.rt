@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, Column, Event, Form, InitModelOf, MoveTableRowMenuHelper, scout, ShowInvisibleColumnsForm, StringField, Table, TableCompleteCellEditEvent, TableOrganizerFormWidgetMap, TableRow, TableRowModel, TableRowsSelectedEvent,
-  TableStartCellEditEvent, WidgetModel
+  Action, arrays, Column, Event, Form, InitModelOf, MoveTableRowMenuHelper, scout, ShowInvisibleColumnsForm, StringField, strings, Table, TableCompleteCellEditEvent, TableOrganizerFormWidgetMap, TableRow, TableRowModel,
+  TableRowsSelectedEvent, TableStartCellEditEvent, UiPreferences, uiPreferences, WidgetModel
 } from '../../index';
 import TableOrganizerFormModel, {ColumnsTable0, ProfilesTable} from './TableOrganizerFormModel';
 
@@ -33,6 +33,8 @@ export class TableOrganizerForm extends Form {
     this.keyColumn = this.columnsTable.columnById('KeyColumn');
 
     this.widget('NewConfigMenu').on('action', event => this._addNewConfig());
+    this.widget('LoadConfigMenu').on('action', event => this._loadConfig());
+    this.widget('UpdateConfigMenu').on('action', event => this._updateConfig());
     this.widget('DeleteConfigMenu').on('action', event => this._deleteConfigs());
     this.widget('RenameConfigMenu').on('action', event => this._renameConfig());
     this.profilesTable.on('rowsSelected', event => this._onProfilesTableRowsSelected(event));
@@ -44,6 +46,11 @@ export class TableOrganizerForm extends Form {
     this.widget('RemoveColumnMenu').on('action', event => this._onRemoveColumnMenuAction(event));
     this.columnsTable.on('rowsSelected', event => this._onColumnsTableRowsSelected(event));
     this._installColumnUpDownMenus();
+
+    // Pages in a bookmark outline should only have one profile (the one stored in the bookmark) -> disable menu to create new profiles
+    if (strings.startsWith(this.table.userPreferenceContext, `${UiPreferences.TABLE_PREFERENCE_PROFILE_ID_BOOKMARK}:`)) {
+      this.widget('NewConfigMenu').setEnabled(false);
+    }
   }
 
   protected override _load(): JQuery.Promise<any> {
@@ -55,6 +62,15 @@ export class TableOrganizerForm extends Form {
 
   protected _reloadProfilesTable() {
     const rows: TableRowModel[] = [{cells: [this.session.text('DefaultSettings'), true]}];
+
+    // Create a row for each preference profile, except the GLOBAL profile (this represents the current state and cannot be activated explicitly)
+    let prefs = uiPreferences.getTablePreferences(this.table);
+    if (prefs && prefs.tablePreferenceProfiles) {
+      [...prefs.tablePreferenceProfiles.keys()]
+        .filter(key => key !== UiPreferences.TABLE_PREFERENCE_PROFILE_ID_GLOBAL)
+        .forEach(key => rows.push({cells: [key]}));
+    }
+
     this.profilesTable.replaceRows(rows);
   }
 
@@ -72,6 +88,10 @@ export class TableOrganizerForm extends Form {
   protected _onProfilesTableCompleteCellEdit(event: TableCompleteCellEditEvent<string>) {
     event.cell.setEditable(false);
     this.profilesTable.updateRow(event.row);
+
+    let oldConfigName = this.profilesTable.columnById('ConfigNameColumn').cellValue(event.row);
+    let newConfigName = event.field.value;
+    uiPreferences.renameTablePreferenceProfile(this.table, oldConfigName, newConfigName);
   }
 
   protected _updateProfileMenus() {
@@ -82,8 +102,13 @@ export class TableOrganizerForm extends Form {
   }
 
   protected _addNewConfig() {
+    let configName = this._newConfigName();
+
+    let profile = uiPreferences.createTablePreferenceProfile(this.table, {includeUserFilters: true});
+    uiPreferences.storeTablePreferenceProfile(this.table, configName, profile);
+
     let row = scout.create(TableRow, {parent: this.profilesTable});
-    this.profilesTable.columnById('ConfigNameColumn').setCellValue(row, this._newConfigName());
+    this.profilesTable.columnById('ConfigNameColumn').setCellValue(row, configName);
     this.profilesTable.columnById('DefaultConfigColumn').setCellValue(row, false);
     this.profilesTable.insertRow(row);
     this._renameConfig(row);
@@ -99,6 +124,35 @@ export class TableOrganizerForm extends Form {
     return `${baseName} ${profileNo}`;
   }
 
+  protected _loadConfig(row?: TableRow) {
+    row = scout.nvl(row, this.profilesTable.selectedRow());
+
+    let configName = this.profilesTable.columnById('ConfigNameColumn').cellValue(row);
+    let defaultConfig = this.profilesTable.columnById('DefaultConfigColumn').cellValue(row);
+    if (defaultConfig) {
+      this.table.resetToInitialUiPreferences();
+    } else {
+      let prefs = uiPreferences.getTablePreferences(this.table);
+      let profile = uiPreferences.getTablePreferenceProfile(prefs, configName);
+      uiPreferences.applyTablePreferenceProfile(this.table, profile);
+      // Store activated profile as current state
+      uiPreferences.storeGlobalTablePreferenceProfile(this.table);
+    }
+
+    this._reloadColumnsTable();
+  }
+
+  protected _updateConfig(row?: TableRow) {
+    row = scout.nvl(row, this.profilesTable.selectedRow());
+
+    if (this.profilesTable.columnById('DefaultConfigColumn').cellValue(row)) {
+      return;
+    }
+    let configName = this.profilesTable.columnById('ConfigNameColumn').cellValue(row);
+    let profile = uiPreferences.createTablePreferenceProfile(this.table);
+    uiPreferences.storeTablePreferenceProfile(this.table, configName, profile);
+  }
+
   protected _renameConfig(row?: TableRow) {
     row = scout.nvl(row, this.profilesTable.selectedRow());
 
@@ -110,6 +164,14 @@ export class TableOrganizerForm extends Form {
 
   protected _deleteConfigs(rows?: TableRow[]) {
     rows = scout.nvl(rows, this.profilesTable.selectedRows);
+
+    const configNameColumn = this.profilesTable.columnById('ConfigNameColumn');
+    const defaultConfigColumn = this.profilesTable.columnById('DefaultConfigColumn');
+    rows = rows.filter(row => !defaultConfigColumn.cellValue(row));
+    rows.forEach(row => {
+      let configName = configNameColumn.cellValue(row);
+      uiPreferences.removeTablePreferenceProfile(this.table, configName);
+    });
     this.profilesTable.deleteRows(rows);
   }
 
@@ -161,8 +223,9 @@ export class TableOrganizerForm extends Form {
     this.columnsTable.focus();
   }
 
-  protected _onModifyColumnMenuAction(event: Event<Action>) {
-    this.table.organizer.modifyColumn(this.keyColumn.selectedCellValue());
+  protected async _onModifyColumnMenuAction(event: Event<Action>) {
+    await this.table.organizer.modifyColumn(this.keyColumn.selectedCellValue());
+    this._reloadColumnsTable();
   }
 
   protected _onRemoveColumnMenuAction(event: Event<Action>) {
