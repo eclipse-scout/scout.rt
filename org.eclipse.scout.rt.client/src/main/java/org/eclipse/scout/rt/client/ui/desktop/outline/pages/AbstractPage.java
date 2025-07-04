@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1169,6 +1169,16 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   @Override
   public <A> A getAdapter(Class<A> clazz) {
     return null;
+  }
+
+  @Override
+  public void unload() {
+    super.unload();
+
+    ITable table = getTable(false);
+    if (table != null) {
+      table.deleteAllRows();
+    }
   }
 
   private void interceptReloadPage(String reloadReason) {

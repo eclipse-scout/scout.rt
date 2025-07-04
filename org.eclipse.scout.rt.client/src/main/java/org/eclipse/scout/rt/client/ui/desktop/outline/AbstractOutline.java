@@ -618,23 +618,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   @Override
-  public void unloadNode(ITreeNode node) {
-    setTreeChanging(true);
-    try {
-      super.unloadNode(node);
-      if (node instanceof IPage<?>) {
-        ITable table = ((IPage<?>) node).getTable(false);
-        if (table != null) {
-          table.deleteAllRows();
-        }
-      }
-    }
-    finally {
-      setTreeChanging(false);
-    }
-  }
-
-  @Override
   public void resetOutline() {
     resetOutline(true);
   }
