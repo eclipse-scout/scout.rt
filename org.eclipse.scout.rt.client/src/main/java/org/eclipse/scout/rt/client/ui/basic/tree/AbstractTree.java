@@ -2636,10 +2636,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   public void unloadNode(ITreeNode node) {
     try {
       setTreeChanging(true);
-      //
-      setNodeExpanded(node, false);
-      removeAllChildNodes(node);
-      node.setChildrenLoaded(false);
+      node.unload();
     }
     finally {
       setTreeChanging(false);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -52,8 +52,6 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   /**
    * The strategy how rows can be checked.
-   *
-   * @since 9.0
    */
   String PROP_CHECKABLE_STYLE = "checkableStyle";
 
@@ -72,9 +70,6 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    */
   String CLS_NO_CHILDREN_CHECKED_STYLE = "no-children-checked-style";
 
-  /**
-   * @since 5.1.0
-   */
   AbstractEventBuffer<TreeEvent> createEventBuffer();
 
   void requestFocus();
@@ -107,7 +102,9 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   boolean hasNodeFilters();
 
   /**
-   * adding a filter multiple times is supported. This only adds it the first time. The other times it just calls
+   * Adds a node filter.
+   * <p>
+   * Adding a filter multiple times is supported. This only adds it the first time. The other times it just calls
    * {@link #applyNodeFilters()}
    */
   void addNodeFilter(ITreeNodeFilter filter);
@@ -170,7 +167,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   void ensureVisible(ITreeNode node);
 
   /**
-   * to expand all nodes under the given parent node, parent node inclusive.
+   * Expands all nodes under the given parent node, parent node inclusive.
    *
    * @param parent
    *     the start node for the expansion.
@@ -178,7 +175,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   void expandAll(ITreeNode parent);
 
   /**
-   * to collapse all nodes under the given parent node, parent node inclusive.
+   * Collapses all nodes under the given parent node, parent node inclusive.
    *
    * @param parent
    *     the start node for collapsing.
@@ -216,24 +213,24 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   void deselectNodes(Collection<? extends ITreeNode> nodes);
 
   /**
-   * Select the previous selectable node in this tree. Does not expand any nodes.
+   * Selects the previous selectable node in this tree. Does not expand any nodes.
    */
   void selectPreviousNode();
 
   /**
-   * Select the next visible and selectable node in this tree. Does not expand any nodes.
+   * Selects the next visible and selectable node in this tree. Does not expand any nodes.
    */
   void selectNextNode();
 
   /**
-   * Select the first visible and selectable node in this tree. Does not expand any nodes.
+   * Selects the first visible and selectable node in this tree. Does not expand any nodes.
    *
    * @return The selected node or {@code null} if no visible and selectable node could be found.
    */
   ITreeNode selectFirstNode();
 
   /**
-   * Select the last visible and selectable node in this tree. Does not expand any nodes.
+   * Selects the last visible and selectable node in this tree. Does not expand any nodes.
    */
   void selectLastNode();
 
@@ -243,7 +240,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   void selectNextChildNode();
 
   /**
-   * Select parent of current selected node.
+   * Selects the parent of current selected node.
    */
   void selectPreviousParentNode();
 
@@ -256,7 +253,6 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   /**
    * @return true if parent is equal to child or parent is an ancestor of child
-   * @since 03.07.2009
    */
   boolean isAncestorNodeOf(ITreeNode parent, ITreeNode child);
 
@@ -278,7 +274,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   }
 
   /**
-   * Add the listener so it is called as <em>last</em> listener
+   * Adds the listener so it is called as <em>last</em> listener.
    * <p>
    * Use {@link AbstractTree#addTreeListener(TreeListener, Integer...)} in all other cases
    *
@@ -296,7 +292,6 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    * {@link AbstractTree#createEventHistory()}
    * <p>
    * This method is thread safe.
-   * @since 3.8
    */
   IEventHistory<TreeEvent> getEventHistory();
 
@@ -318,7 +313,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   void setMultiSelect(boolean multiSelect);
 
   /**
-   * true if multiple nodes can be checked (default true)
+   * @return true if multiple nodes can be checked (default is true).
    */
   boolean isMultiCheck();
 
@@ -371,7 +366,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   void setNodeExpanded(ITreeNode node, boolean expanded, boolean lazy);
 
   /**
-   * set expanded without check if node is already expanded
+   * Sets node expanded without checking if node is already expanded.
    */
   void setNodeExpandedInternal(ITreeNode node, boolean expanded, boolean lazy);
 
@@ -432,12 +427,12 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    */
 
   /**
-   * append a child node to the end of the children of parent
+   * Appends a child node to the end of the parent's children.
    */
   void addChildNode(ITreeNode parent, ITreeNode child);
 
   /**
-   * append a list of child nodes or a complete subtree to the end of the children of parent
+   * Appends a list of child nodes or a complete subtree to the end of the parent's children.
    */
   void addChildNodes(ITreeNode parent, List<? extends ITreeNode> children);
 
@@ -475,12 +470,12 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   void disposeDeletedNodes(Collection<ITreeNode> nodes);
 
   /**
-   * Removes a node from deleted nodes (does not discard it, it might be re-used afterwards).
+   * Removes a node from deleted nodes (does not discard it, it might be re-used afterward).
    */
   void discardDeletedNode(ITreeNode node);
 
   /**
-   * Removes nodes from deleted nodes (does not discard them, they might be re-used afterwards).
+   * Removes nodes from deleted nodes (does not discard them, they might be re-used afterward).
    */
   void discardDeletedNodes(Collection<ITreeNode> node);
 
@@ -503,21 +498,21 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   TreeVisitResult visitNode(ITreeNode node, IDepthFirstTreeVisitor<ITreeNode> visitor);
 
   /**
-   * unload all children and mark node as not loaded
+   * Calls {@link ITreeNode#unload()}
    */
   void unloadNode(ITreeNode node);
 
   /**
-   * extract transfer data to be sent to the backend
+   * Extracts transfer data to be sent to the backend.
    * <p>
-   * The single root node is not exported, the export starts with the first level after the root node
+   * The single root node is not exported, the export starts with the first level after the root node.
    */
   void exportTreeData(AbstractTreeFieldData target);
 
   /**
-   * apply transfer data to this tree
+   * Applies transfer data to this tree.
    * <p>
-   * All nodes are imported starting under the (existing) root node
+   * All nodes are imported starting under the (existing) root node.
    */
   void importTreeData(AbstractTreeFieldData source);
 
@@ -551,10 +546,8 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   void setToggleBreadcrumbStyleEnabled(boolean toggleBreadcrumbStyleEnabled);
 
   /**
-   * informs the attached UI that a node has changed in a way that may affect its presentation (e.g. text, font,
-   * color...) but no structural changes occurred
-   *
-   * @since 3.10.0-M5
+   * Informs the attached UI that a node has changed in a way that may affect its presentation (e.g. text, font,
+   * color...) but no structural changes occurred.
    */
   void fireNodeChanged(ITreeNode treeNode);
 }

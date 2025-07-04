@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -342,4 +342,9 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
    * @return {@code true} if this {@link ITreeNode} is disposing.
    */
   boolean isDisposing();
+
+  /**
+   * Unloads all children and marks the node as not loaded.
+   */
+  void unload();
 }

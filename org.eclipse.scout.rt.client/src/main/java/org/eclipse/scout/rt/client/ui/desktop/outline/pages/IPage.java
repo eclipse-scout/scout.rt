@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -41,7 +41,7 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
 
   /**
    * @return The {@link ITable} of this {@link IPage} or {@code null} if it does not have a table. If this page has a
-   * table but it is not yet created it will be created and initialized.
+   * table, but it is not yet created, it will be created and initialized.
    */
   T getTable();
 
