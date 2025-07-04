@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,5 +14,7 @@ export interface ChartTableUserFilterModel extends TableUserFilterModel {
   text?: string;
   xAxis?: TableMatrixKeyAxis;
   yAxis?: TableMatrixKeyAxis;
+  columnIdX?: string;
+  columnIdY?: string;
   filters?: { deterministicKey: TableControlDeterministicKey }[];
 }
