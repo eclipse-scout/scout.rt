@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DummyLookupCall, FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
+import {DummyLookupCall, FormSpecHelper, JQueryTesting, OutlineSpecHelper} from '../../src/testing/index';
 import {
   arrays, BusyIndicator, Button, DateField, DatePickerPopup, Desktop, DesktopNotification, DesktopTab, Event, FileChooser, Form, FormMenu, GroupBox, ListBox, MessageBox, MessageBoxes, ObjectOrChildModel, Outline, OutlineViewButton, Popup,
   scout, SmartField, SmartFieldPopup, Status, StringField, strings, Tooltip, UnsavedFormChangesForm, Widget, WidgetPopup, WrappedFormField
@@ -1395,6 +1395,38 @@ describe('Desktop', () => {
 
       outline.selectNode(page);
       expect(desktop.activeForm).toBe(form);
+    });
+
+    it('will be set to open dialog if view gets activated that owns the dialog', async () => {
+      const outline = outlineHelper.createOutlineWithOneDetailForm();
+      const page = outline.nodes[0];
+      desktop.setOutline(outline);
+      outline.selectNode(page);
+      expect(desktop.activeForm).toBe(null);
+
+      let view = scout.create(Form, {
+        parent: session.desktop,
+        displayHint: 'view',
+        title: 'a'
+      });
+      await view.open();
+      expect(desktop.activeForm).toBe(view);
+
+      let dialog = scout.create(Form, {
+        parent: view,
+        displayParent: view
+      });
+      await dialog.open();
+      expect(desktop.activeForm).toBe(dialog);
+
+      desktop.bringOutlineToFront();
+      expect(desktop.activeForm).toBe(null);
+
+      let desktopTab = desktop.bench.getViewTab(view) as DesktopTab;
+      JQueryTesting.triggerClick(desktopTab.$container);
+      expect(view.rendered).toBe(true);
+      expect(dialog.rendered).toBe(true);
+      expect(desktop.activeForm).toBe(dialog);
     });
   });
 
