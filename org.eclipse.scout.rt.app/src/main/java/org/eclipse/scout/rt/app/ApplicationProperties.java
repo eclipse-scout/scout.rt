@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jetty.http.HttpCookie.SameSite;
-import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
@@ -218,7 +217,12 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Specifies the maximum allowed size in bytes for a HTTP request header. The default value is 8 KB (see " + HttpConfiguration.class.getName() + ").";
+      return "Specifies the maximum allowed size in bytes for a HTTP request header. The default value is 72 KB.";
+    }
+
+    @Override
+    public Integer getDefaultValue() {
+      return 72 * 1024;
     }
   }
 
