@@ -727,7 +727,7 @@ export class TableAdapter extends ModelAdapter {
 
     // init
     objects.replacePrototypeFunction(Column, 'init', function(this: Column & { initOrig }, model: ColumnModel<any>) {
-      if (model.table && model.table.modelAdapter && !model.guiOnly) {
+      if (model.parent && model.parent.modelAdapter && !model.guiOnly) {
         // Fill in the missing default values only in remote case, don't do it JS case to not accidentally set undefined properties (e.g. uiSortEnabled)
         model = $.extend({}, model);
         defaultValues.applyTo(model);
