@@ -194,8 +194,8 @@ export class ColumnsTable0 extends Table {
 
 export type ColumnsTable0WidgetMap = {
   'AddColumnMenu': Menu;
-  'ModifyColumnMenu': Menu;
   'RemoveColumnMenu': Menu;
+  'ModifyColumnMenu': Menu;
   'MoveColumnUpMenu': Menu;
   'MoveColumnDownMenu': Menu;
 };
