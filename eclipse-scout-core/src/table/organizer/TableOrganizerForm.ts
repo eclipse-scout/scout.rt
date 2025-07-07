@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, Column, Event, Form, InitModelOf, MoveTableRowMenuHelper, scout, ShowInvisibleColumnsForm, StringField, Table, TableCompleteCellEditEvent, TableRow, TableRowModel, TableRowsSelectedEvent, TableStartCellEditEvent,
-  WidgetModel
+  Action, arrays, Column, Event, Form, InitModelOf, MoveTableRowMenuHelper, scout, ShowInvisibleColumnsForm, StringField, Table, TableCompleteCellEditEvent, TableOrganizerFormWidgetMap, TableRow, TableRowModel, TableRowsSelectedEvent,
+  TableStartCellEditEvent, WidgetModel
 } from '../../index';
-import TableOrganizerFormModel, {ColumnsTable0, ProfilesTable, TableOrganizerFormWidgetMap} from './TableOrganizerFormModel';
+import TableOrganizerFormModel, {ColumnsTable0, ProfilesTable} from './TableOrganizerFormModel';
 
 export class TableOrganizerForm extends Form {
   declare widgetMap: TableOrganizerFormWidgetMap;
