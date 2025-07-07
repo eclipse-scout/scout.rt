@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Action, arrays, BenchColumnLayoutData, BusyIndicatorOptions, BusySupport, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopBenchViewActivateEvent, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout,
-  DesktopModel, DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser,
-  FileChooserController, Form, GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel,
-  objects, OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
+  AbstractLayout, Action, arrays, BenchColumnLayoutData, BusyIndicatorOptions, BusySupport, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel,
+  DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form,
+  GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, objects,
+  OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
   SplitterPositionChangeEvent, strings, styles, Tooltip, Tree, TreeDisplayStyle, UnsavedFormChangesForm, URL, ViewButton, webstorage, Widget, widgets
 } from '../index';
 import $ from 'jquery';
@@ -78,7 +78,6 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   protected _glassPaneTargetFilters: GlassPaneTargetFilter[];
   protected _offlineNotification: OfflineDesktopNotification;
   /** event listeners */
-  protected _benchActiveViewChangedHandler: EventHandler<DesktopBenchViewActivateEvent>;
   protected _selectedViewDestroyHandler: EventHandler<Event<Form>>;
   protected _popstateHandler: (event: JQuery.TriggeredEvent) => void;
   protected _repositionTooltipsHandler: () => void;
@@ -136,7 +135,6 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this._addPreserveOnPropertyChangeProperties(['focusedElement', 'selectedViewTabs']);
 
     this._glassPaneTargetFilters = [];
-    this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);
     this._selectedViewDestroyHandler = this._onSelectedViewDestroy.bind(this);
     this._repositionTooltipsHandler = null;
   }
@@ -285,17 +283,6 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   /** @see DesktopModel.nativeNotificationDefaults */
   setNativeNotificationDefaults(defaults: NativeNotificationDefaults) {
     this.setProperty('nativeNotificationDefaults', defaults);
-  }
-
-  protected _onBenchActivateViewChanged(event: DesktopBenchViewActivateEvent) {
-    if (this.initialFormRendering) {
-      return;
-    }
-    let view = event.view;
-    if (view instanceof Form && this.bench.outlineContent !== view && !view.detailForm) {
-      // Notify model that this form is active (only for regular views, not detail forms)
-      this._setFormActivated(view);
-    }
   }
 
   protected override _render() {
@@ -474,7 +461,6 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
       return;
     }
     this.bench = this._createBench();
-    this.bench.on('viewActivate', this._benchActiveViewChangedHandler);
     this.bench.render();
     this.bench.$container.insertBefore(this.$overlaySeparator);
     this.invalidateLayoutTree();
@@ -493,7 +479,6 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     if (!this.bench) {
       return;
     }
-    this.bench.off('viewActivate', this._benchActiveViewChangedHandler);
     this.bench.on('destroy', () => {
       this.bench = null;
       this.invalidateLayoutTree();
