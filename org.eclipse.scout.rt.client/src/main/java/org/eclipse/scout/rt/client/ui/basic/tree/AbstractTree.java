@@ -1077,7 +1077,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
         if (pathStr.length() != 0) {
           pathStr.insert(0, delimiter);
         }
-        pathStr.insert(0, node.getCell().toPlainText());
+        pathStr.insert(0, node.toPlainTextTitle());
       }
       // next
       node = node.getParentNode();
@@ -2582,7 +2582,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
               interceptDecorateCell(node, node.getCellForUpdate());
             }
             catch (Exception t) {
-              LOG.warn("node {} ({})", node.getClass(), node.getCell().getText(), t);
+              LOG.warn("node {} ({})", node.getClass(), node.toPlainTextTitle(), t);
             }
           }
         }
@@ -2813,7 +2813,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
         StringBuilder msg = new StringBuilder();
         for (ITreeNode node : nodes) {
           msg.append("[");
-          msg.append(node.getCell().toPlainText());
+          msg.append(node.toPlainTextTitle());
           msg.append("]");
         }
         throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
@@ -2845,7 +2845,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       catch (RuntimeException e) {
         if (node != null) {
           throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
-              .withContextInfo("node", node.getCell().toPlainText());
+              .withContextInfo("node", node.toPlainTextTitle());
         }
         throw e;
       }
@@ -2879,7 +2879,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       catch (RuntimeException e) {
         if (node != null) {
           throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
-              .withContextInfo("cell", node.getCell().toPlainText());
+              .withContextInfo("cell", node.toPlainTextTitle());
         }
         throw e;
       }
