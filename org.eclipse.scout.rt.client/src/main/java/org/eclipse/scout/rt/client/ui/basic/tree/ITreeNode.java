@@ -137,6 +137,17 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
 
   Cell getCellForUpdate();
 
+  /**
+   * Makes it possible to differentiate between the cell text (which could be html) and what the cell represents (e.g. a label)
+   */
+  String getPlainTextTitle();
+
+  void setPlainTextTitle(String title);
+
+  default String toPlainTextTitle() {
+    return getPlainTextTitle() == null ? getCell().toPlainText() : getPlainTextTitle();
+  }
+
   Object getPrimaryKey();
 
   void setPrimaryKey(Object key);
