@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -63,7 +63,7 @@ public class ComposerDisplayTextBuilder {
   private void visitOrNodes(List<? extends EitherOrNode> nodes, StringBuilder buf, String prefix) {
     for (EitherOrNode node : nodes) {
       buf.append(prefix);
-      buf.append(node.getCell().toPlainText());
+      buf.append(node.toPlainTextTitle());
       buf.append("\n");
       // add children
       visitAndNodes(node.getChildNodes(), buf, prefix + " ");
@@ -72,7 +72,7 @@ public class ComposerDisplayTextBuilder {
 
   private void visitEntityNode(EntityNode node, StringBuilder buf, String prefix) {
     buf.append(prefix);
-    buf.append(node.getCell().toPlainText());
+    buf.append(node.toPlainTextTitle());
     buf.append("\n");
     // add children
     visitAndNodes(node.getChildNodes(), buf, prefix + " ");
@@ -80,7 +80,7 @@ public class ComposerDisplayTextBuilder {
 
   private void visitAttributeNode(AttributeNode node, StringBuilder buf, String prefix) {
     buf.append(prefix);
-    buf.append(node.getCell().toPlainText());
+    buf.append(node.toPlainTextTitle());
     buf.append("\n");
     // add children
     visitAndNodes(node.getChildNodes(), buf, prefix + " ");

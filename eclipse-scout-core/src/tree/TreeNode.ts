@@ -33,6 +33,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
   parentNode: TreeNode;
   session: Session;
   text: string;
+  plainTextTitle: string;
   tooltipText: string;
   foregroundColor: string;
   backgroundColor: string;
@@ -88,6 +89,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
     this.rendered = false;
     this.session = null;
     this.text = null;
+    this.plainTextTitle = null;
 
     this._loadChildrenPromise = null;
   }
@@ -462,6 +464,10 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
 
   setHtmlEnabled(htmlEnabled: boolean) {
     this.htmlEnabled = htmlEnabled;
+  }
+
+  setPlainTextTitle(plainTextTitle: string) {
+    this.plainTextTitle = plainTextTitle;
   }
 
   setParentNode(parentNode: TreeNode) {

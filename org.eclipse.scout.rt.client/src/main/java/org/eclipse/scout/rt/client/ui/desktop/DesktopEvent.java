@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -209,7 +209,7 @@ public class DesktopEvent extends EventObject implements IModelEvent {
       buf.append(" ").append(m_messageBox.getHeader());
     }
     if (m_outline != null) {
-      buf.append(" ").append(m_outline.getRootNode().getCell().toPlainText());
+      buf.append(" ").append(m_outline.getRootNode().toPlainTextTitle());
     }
     buf.append("]");
     return buf.toString();

@@ -649,6 +649,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
       putProperty(jsonNode, "leaf", node.isLeaf());
       putProperty(jsonNode, "enabled", node.isEnabled());
       putProperty(jsonNode, "lazyExpandingEnabled", node.isLazyExpandingEnabled());
+      putProperty(jsonNode, "plainTextTitle", node.getPlainTextTitle());
 
       jsonNodes.put(jsonNode);
     }
@@ -756,6 +757,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, nodeId);
     putCellProperties(jsonEvent, modelNode);
+    putProperty(jsonEvent, "plainTextTitle", modelNode.getPlainTextTitle());
     addActionEvent(EVENT_NODE_CHANGED, jsonEvent);
   }
 
@@ -969,6 +971,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     putProperty(json, "enabled", node.isEnabled());
     putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(node.getCell().getIconId()));
     putProperty(json, "initialExpanded", node.isInitialExpanded());
+    putProperty(json, "plainTextTitle", node.getPlainTextTitle());
     putChildNodeIndex(json, node, childIndexes);
     putCellProperties(json, node);
     JSONArray jsonChildNodes = new JSONArray();

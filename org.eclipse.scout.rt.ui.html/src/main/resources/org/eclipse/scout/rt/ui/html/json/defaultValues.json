@@ -460,7 +460,8 @@
       "htmlEnabled": false,
       "initialExpanded": false,
       "childNodes": [],
-      "filterAccepted": true
+      "filterAccepted": true,
+      "plainTextTitle": null
     },
     "Page": {
       "detailTableVisible": true,
