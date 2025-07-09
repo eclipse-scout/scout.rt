@@ -77,6 +77,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private final OptimisticLock m_childrenLoadedLock;
   private final Cell m_cell;
 
+  private String m_plainTextTitle;
   private List<ITreeNode> m_childNodeList;
   private volatile List<ITreeNode> m_filteredChildNodes;
   private int m_status;
@@ -414,12 +415,22 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   @Override
+  public String getPlainTextTitle() {
+    return m_plainTextTitle;
+  }
+
+  @Override
+  public void setPlainTextTitle(String cellTitle) {
+    m_plainTextTitle = cellTitle;
+  }
+
+  @Override
   public final void decorateCell() {
     try {
       interceptDecorateCell(m_cell);
     }
     catch (Exception t) {
-      LOG.error("node {} {}", getClass(), getCell().getText(), t);
+      LOG.error("node {} {}", getClass(), toPlainTextTitle(), t);
     }
   }
 

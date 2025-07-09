@@ -172,7 +172,7 @@ public class BookmarkViewForm extends AbstractForm {
            */
           @Override
           public boolean accept(ITreeNode node, int level) {
-            String text = node.getCell().toPlainText();
+            String text = node.toPlainTextTitle();
             return text == null || m_lowercaseFilterPattern == null || m_lowercaseFilterPattern.matcher(text.toLowerCase()).matches();
           }
         }
@@ -180,10 +180,6 @@ public class BookmarkViewForm extends AbstractForm {
         @Order(20)
         @ClassId("abaae7ed-f148-4368-94ac-e53710b25b24")
         public class UserBookmarkTreeField extends AbstractBookmarkTreeField {
-          @Override
-          protected int getConfiguredGridW() {
-            return 1;
-          }
 
           @Override
           protected int getConfiguredGridH() {

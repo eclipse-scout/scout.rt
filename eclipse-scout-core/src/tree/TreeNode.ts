@@ -32,6 +32,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
   parentNode: TreeNode;
   session: Session;
   text: string;
+  plainTextTitle: string;
   tooltipText: string;
   foregroundColor: string;
   backgroundColor: string;
@@ -87,6 +88,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
     this.rendered = false;
     this.session = null;
     this.text = null;
+    this.plainTextTitle = null;
 
     this._loadChildrenPromise = null;
   }
@@ -225,6 +227,10 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
 
   setText(text: string) {
     this.text = text;
+  }
+
+  setPlainTextTitle(plainTextTitle: string) {
+    this.plainTextTitle = plainTextTitle;
   }
 
   /**

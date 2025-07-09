@@ -637,10 +637,11 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
       JSONObject jsonNode = new JSONObject();
       putProperty(jsonNode, "id", nodeId);
       // Only send _some_ of the properties. Everything else (e.g. "checked", "expanded") will be handled with separate events.
-      // --> See also: Tree.js/_onNodesUpdated()
+      // --> See also: Tree.ts/_applyUpdatedNodeProperties()
       putProperty(jsonNode, "leaf", node.isLeaf());
       putProperty(jsonNode, "enabled", node.isEnabled());
       putProperty(jsonNode, "lazyExpandingEnabled", node.isLazyExpandingEnabled());
+      putProperty(jsonNode, "plainTextTitle", node.getPlainTextTitle());
 
       jsonNodes.put(jsonNode);
     }
@@ -753,6 +754,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     }
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, nodeId);
+    putProperty(jsonEvent, "plainTextTitle", modelNode.getPlainTextTitle());
     putCellProperties(jsonEvent, modelNode.getCell());
     addActionEvent(EVENT_NODE_CHANGED, jsonEvent);
   }
@@ -950,6 +952,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     putProperty(json, "enabled", node.isEnabled());
     putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(node.getCell().getIconId()));
     putProperty(json, "initialExpanded", node.isInitialExpanded());
+    putProperty(json, "plainTextTitle", node.getPlainTextTitle());
     putChildNodeIndex(json, node, childIndexes);
     putCellProperties(json, node.getCell());
     JSONArray jsonChildNodes = new JSONArray();
