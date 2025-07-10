@@ -15,9 +15,9 @@ import {
 } from '../../src/index';
 import {
   FRUIT_1_KEY, FRUIT_2_KEY, FRUIT_3_KEY, FRUIT_4_KEY, FRUIT_5_KEY, goToOutline, SPEC_NODE_PAGE_1_UUID, SPEC_NODE_PAGE_2_UUID, SPEC_NODE_PAGE_3_UUID, SPEC_NODE_PAGE_4_UUID, SPEC_OUTLINE_1_ID, SPEC_OUTLINE_1_UUID, SPEC_OUTLINE_2_ID,
-  SPEC_OUTLINE_2_UUID, SPEC_TABLE_PAGE_1_UUID, SPEC_TABLE_PAGE_2_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID,
-  SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, SPEC_TABLE_PAGE_3_TABLE_UUID, SPEC_TABLE_PAGE_3_UUID, specDesktopModel, SpecNodePage1, SpecNodePage2, SpecNodePage3, SpecNodePage4, SpecPageParamDo, SpecSearchDo, SpecSearchForm, SpecTablePage1,
-  SpecTablePage2, SpecTablePage3
+  SPEC_OUTLINE_2_UUID, SPEC_OUTLINE_3_ID, SPEC_OUTLINE_3_UUID, SPEC_TABLE_PAGE_1_UUID, SPEC_TABLE_PAGE_2_UUID,  SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID,
+  SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, SPEC_TABLE_PAGE_3_TABLE_UUID,SPEC_TABLE_PAGE_3_UUID, specDesktopModel, SpecNodePage1, SpecNodePage2, SpecNodePage3, SpecNodePage4, SpecPageParamDo,
+  SpecSearchDo, SpecSearchForm, SpecTablePage1, SpecTablePage2, SpecTablePage3
 } from './bookmark-fixtures';
 
 describe('BookmarkSupport', () => {
@@ -443,6 +443,79 @@ describe('BookmarkSupport', () => {
         expect(error).toBe(BookmarkDoBuilder.ERROR_MISSING_OUTLINE);
       }
       expect(bookmarkSupport.handleCreateBookmarkError).not.toHaveBeenCalled();
+    });
+
+    it('does not include invisible root node in page path', async () => {
+      let outline = goToOutline(desktop, SPEC_OUTLINE_3_ID);
+      expect(outline).toBeInstanceOf(Outline);
+      expect(outline.title).toBe('Outline 3');
+      expect(outline.nodes.length).toBe(1);
+      expect(outline.nodes[0]).toBeInstanceOf(SpecNodePage4);
+      expect(outline.nodes[0].compactRoot).toBe(true); // <--
+      expect(outline.selectedNode()).toBe(null);
+
+      let page1 = outline.nodes[0] as SpecNodePage4;
+      outline.drillDown(page1);
+      await page1.ensureLoadChildren();
+      expect(page1.childNodes.length).toBe(2);
+      expect(page1.childNodes[0]).toBeInstanceOf(SpecNodePage2);
+      expect(page1.childNodes[0].compactRoot).toBe(false);
+      expect(page1.childNodes[1]).toBeInstanceOf(SpecTablePage2);
+      expect(page1.childNodes[1].compactRoot).toBe(false);
+
+      let page2 = page1.childNodes[1] as SpecTablePage2;
+      outline.drillDown(page2);
+      await page2.ensureLoadChildren();
+      expect(page2.detailTable.rows.length).toBe(5);
+      page2.setSearchFilter(scout.create(SpecSearchDo, {text: 'i'})); // Matches 'Pineapple' and 'Kiwi'
+      page2.reloadPage();
+      await page2.ensureLoadChildren();
+      expect(page2.detailTable.rows.length).toBe(2);
+      expect(page2.childNodes.length).toBe(2);
+      expect(page2.childNodes[0]).toBeInstanceOf(SpecNodePage4);
+      expect(page2.childNodes[0].compactRoot).toBe(false);
+      expect(page2.childNodes[0].pageParam).toBeInstanceOf(SpecPageParamDo);
+      expect((page2.childNodes[0].pageParam as SpecPageParamDo).fooId).toBe(FRUIT_3_KEY);
+      expect(page2.childNodes[1]).toBeInstanceOf(SpecNodePage4);
+      expect(page2.childNodes[1].pageParam).toBeInstanceOf(SpecPageParamDo);
+      expect((page2.childNodes[1].pageParam as SpecPageParamDo).fooId).toBe(FRUIT_5_KEY);
+
+      let page3 = page2.childNodes[1] as SpecNodePage4;
+      outline.drillDown(page3);
+      await page3.ensureLoadChildren();
+
+      // -----
+
+      let bookmark = await bookmarkSupport.createBookmark() as BookmarkDo;
+
+      expect(bookmark).toBeInstanceOf(BookmarkDo);
+      expect(bookmark.id).toBeUndefined();
+      expect(bookmark.title).toBe('Outline 3 - Table Page 2 - Kiwi');
+      expect(bookmark.description).toBe('Table Page 2\n  text: "i"\n  Kiwi');
+      expect(bookmark.definition).toBeInstanceOf(OutlineBookmarkDefinitionDo);
+      let bookmarkDefinition = bookmark.definition as OutlineBookmarkDefinitionDo;
+      expect(bookmarkDefinition.outlineId).toBe(SPEC_OUTLINE_3_UUID);
+      expect(bookmarkDefinition.pagePath.length).toBe(1); // <--
+
+      let pagePathElement1 = bookmarkDefinition.pagePath[0] as TableBookmarkPageDo;
+      expect(pagePathElement1).toBeInstanceOf(TableBookmarkPageDo);
+      expect(pagePathElement1.displayText).toBe('Table Page 2');
+      expect(pagePathElement1.pageParam).toBeInstanceOf(PageIdDummyPageParamDo);
+      expect((pagePathElement1.pageParam as PageIdDummyPageParamDo).pageId).toBe(SPEC_TABLE_PAGE_2_UUID);
+      expect(pagePathElement1.searchFilterComplete).toBe(true);
+      expect(pagePathElement1.searchData).toBeInstanceOf(BaseDoEntity);
+      expect((pagePathElement1.searchData as BaseDoEntity).toPojo()).toEqual(scout.create(SpecSearchDo, {text: 'i'}).toPojo());
+      expect(pagePathElement1.expandedChildRow).toBeInstanceOf(BookmarkTableRowIdentifierDo);
+      expect(pagePathElement1.expandedChildRow.toPojo()).toEqual(scout.create(BookmarkTableRowIdentifierDo, {
+        keyComponents: [scout.create(BookmarkTableRowIdentifierStringComponentDo, {key: FRUIT_5_KEY})]
+      }).toPojo());
+      expect(pagePathElement1.selectedChildRows.length).toBe(0); // selected rows are not exported by default
+
+      let bookmarkedPage = bookmarkDefinition.bookmarkedPage as NodeBookmarkPageDo;
+      expect(bookmarkedPage).toBeInstanceOf(NodeBookmarkPageDo);
+      expect(bookmarkedPage.displayText).toBe('Kiwi');
+      expect(bookmarkedPage.pageParam).toBeInstanceOf(SpecPageParamDo);
+      expect((bookmarkedPage.pageParam as SpecPageParamDo).fooId).toBe(FRUIT_5_KEY);
     });
   });
 
