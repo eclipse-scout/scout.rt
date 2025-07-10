@@ -1399,6 +1399,13 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   /**
+   * The number of visible columns that are sorted.
+   */
+  visibleSortColumnsCount(): number {
+    return this.visibleColumns().filter(column => column.sortActive).length;
+  }
+
+  /**
    * @param column the column to sort by.
    * @param direction the sorting direction. Either 'asc' or 'desc'. If not specified the direction specified by the column is used {@link Column.sortAscending}.
    * @param multiSort true to add the column to the list of sorted columns. False to use this column exclusively as sort column (reset other columns). Default is false.
@@ -2746,6 +2753,13 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     $aggregateRow.toggleClass('grouping-style-top', onTop);
     $aggregateRow.toggleClass('grouping-style-bottom', !onTop);
     return $aggregateRow;
+  }
+
+  /**
+   * The number of visible columns that are grouped.
+   */
+  visibleGroupColumnsCount(): number {
+    return this.visibleColumns().filter(column => column.grouped).length;
   }
 
   groupColumn(column: Column<any>, multiGroup?: boolean, direction?: 'asc' | 'desc', remove?: boolean) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -252,6 +252,39 @@ public class HTMLTest {
 
     html = HTML.span("text").cssClass("first").addCssClass("second").addCssClass("third").addCssClass("third");
     assertEquals("<span class=\"first second third\">text</span>", html.toHtml());
+  }
+
+  @Test
+  public void testRemoveCssClass() {
+    IHtmlContent html = HTML.span("text").cssClass("first second").removeCssClass("first");
+    assertEquals("<span class=\"second\">text</span>", html.toHtml());
+
+    html = HTML.span("text").cssClass("first").removeCssClass("first");
+    assertEquals("<span>text</span>", html.toHtml());
+
+    html = HTML.span("text").cssClass("first").removeCssClass("second");
+    assertEquals("<span class=\"first\">text</span>", html.toHtml());
+
+    html = HTML.span("text").removeCssClass("first");
+    assertEquals("<span>text</span>", html.toHtml());
+  }
+
+  @Test
+  public void testToggleCssClass() {
+    IHtmlContent html = HTML.span("text").addCssClass("first");
+    assertEquals("<span class=\"first\">text</span>", html.toHtml());
+
+    html = HTML.span("text").cssClass("first").toggleCssClass("second", true);
+    assertEquals("<span class=\"first second\">text</span>", html.toHtml());
+
+    html = HTML.span("text").cssClass("first second").toggleCssClass("second", false);
+    assertEquals("<span class=\"first\">text</span>", html.toHtml());
+
+    html = HTML.span("text").cssClass("first").toggleCssClass("first", true);
+    assertEquals("<span class=\"first\">text</span>", html.toHtml());
+
+    html = HTML.span("text").cssClass("first").toggleCssClass("first", false);
+    assertEquals("<span>text</span>", html.toHtml());
   }
 
   @Test

@@ -17,6 +17,7 @@ export class MoveTableRowMenuHelper extends EventEmitter {
   table: Table;
   moveRowUpMenu: Menu;
   moveRowDownMenu: Menu;
+  alwaysShowMenus = false;
   rowFilter: (selectedRow: TableRow, direction: TableRowMoveDirection) => boolean;
   protected _actionHandler: EventHandler;
   protected _tableHandler: EventHandler;
@@ -30,6 +31,7 @@ export class MoveTableRowMenuHelper extends EventEmitter {
     this.table = scout.assertInstance(options.table, Table);
     this.moveRowUpMenu = scout.assertInstance(options.moveRowUpMenu, Menu);
     this.moveRowDownMenu = scout.assertInstance(options.moveRowDownMenu, Menu);
+    this.alwaysShowMenus = scout.nvl(options.alwaysShowMenus, this.alwaysShowMenus);
     this.rowFilter = options.rowFilter;
 
     this._actionHandler = this._onMoveRowMenuAction.bind(this);
@@ -63,9 +65,9 @@ export class MoveTableRowMenuHelper extends EventEmitter {
     let movableUp = movable && this.table.selectedRows.every(row => row !== firstRow && rowFilter(row, 'up'));
     let movableDown = movable && this.table.selectedRows.every(row => row !== lastRow && rowFilter(row, 'down'));
     // Using a new dimension makes it possible to still hide and disable the menus by the consumer of this helper, even if this helper would show or enable the menus
-    this.moveRowUpMenu.setPropertyDimension('visible', 'helper', movable);
+    this.moveRowUpMenu.setPropertyDimension('visible', 'helper', movable || this.alwaysShowMenus);
     this.moveRowUpMenu.setPropertyDimension('enabled', 'helper', movableUp);
-    this.moveRowDownMenu.setPropertyDimension('visible', 'helper', movable);
+    this.moveRowDownMenu.setPropertyDimension('visible', 'helper', movable || this.alwaysShowMenus);
     this.moveRowDownMenu.setPropertyDimension('enabled', 'helper', movableDown);
   }
 
@@ -102,6 +104,10 @@ export interface MoveRowMenuInstallOptions {
   table: Table;
   moveRowUpMenu: Menu;
   moveRowDownMenu: Menu;
+  /**
+   * Specifies whether the menus should be visible even if there are no rows or no selected rows. Default is false.
+   */
+  alwaysShowMenus?: boolean;
   /**
    * May be specified if some rows should not be movable.
    */

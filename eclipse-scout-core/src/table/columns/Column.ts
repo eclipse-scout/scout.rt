@@ -930,6 +930,13 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   }
 
   /**
+   * @returns true if the column has an active filter, false if not.
+   */
+  get filtered(): boolean {
+    return !!this.table.getFilter(this.id);
+  }
+
+  /**
    * Returns a table header menu. Subclasses can override this method to create a column specific table header menu.
    */
   createTableHeaderMenu(tableHeader: TableHeader): TableHeaderMenu {

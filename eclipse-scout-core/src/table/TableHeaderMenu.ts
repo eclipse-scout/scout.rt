@@ -643,7 +643,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   protected _renderWidthGroup(): TableHeaderMenuGroup {
     let group = scout.create(TableHeaderMenuGroup, {
       parent: this,
-      textKey: 'ui.Width'
+      textKey: 'Width'
     });
     let optimizeWidthButton = scout.create(TableHeaderMenuButton, {
       parent: group,
@@ -666,7 +666,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     let widthField = scout.create(NumberField, {
       parent: group,
       cssClass: 'table-header-menu-command width no-mandatory-indicator',
-      label: '${textKey:ui.Width}',
+      label: '${textKey:Width}',
       labelVisible: false,
       clearable: ValueField.Clearable.NEVER,
       value: this.column.width,
@@ -952,16 +952,12 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     return this.rendered && this.belongsTo($headerItem);
   }
 
-  protected _countColumns(propertyName: string): number {
-    return this.table.visibleColumns().reduce((sum, column) => sum + (column[propertyName] ? 1 : 0), 0);
-  }
-
   protected _sortColumnCount(): number {
-    return this._countColumns('sortActive');
+    return this.table.visibleSortColumnsCount();
   }
 
   protected _groupColumnCount(): number {
-    return this._countColumns('grouped');
+    return this.table.visibleGroupColumnsCount();
   }
 
   protected _renderCompact() {

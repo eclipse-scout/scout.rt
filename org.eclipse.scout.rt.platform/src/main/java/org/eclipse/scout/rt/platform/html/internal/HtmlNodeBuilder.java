@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -149,6 +149,32 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
     String value = removeAttribute("class");
     value = BEANS.get(StyleHelper.class).addCssClasses(value, cssClass.toString());
     addAttribute("class", value);
+    return this;
+  }
+
+  @Override
+  public IHtmlElement removeCssClass(CharSequence cssClass) {
+    if (cssClass == null) {
+      return this;
+    }
+    String value = removeAttribute("class");
+    value = BEANS.get(StyleHelper.class).removeCssClass(value, cssClass.toString());
+    if (!value.isEmpty()) {
+      addAttribute("class", value);
+    }
+    return this;
+  }
+
+  @Override
+  public IHtmlElement toggleCssClass(CharSequence cssClass, boolean condition) {
+    if (cssClass == null) {
+      return this;
+    }
+    String value = removeAttribute("class");
+    value = BEANS.get(StyleHelper.class).toggleCssClass(value, cssClass.toString(), condition);
+    if (!value.isEmpty()) {
+      addAttribute("class", value);
+    }
     return this;
   }
 
