@@ -88,7 +88,7 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
     if (createOutlineBookmarkDefinition && page) {
       let parentPage = page.parentNode;
       let childPage = page;
-      while (parentPage) {
+      while (parentPage && !parentPage.compactRoot) {
         let pathEntry = await this._pageToBookmarkPage(parentPage, childPage);
         if (!pathEntry) {
           // non-bookmarkable page

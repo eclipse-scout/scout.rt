@@ -9,7 +9,7 @@
  */
 import {
   BaseDoEntity, BooleanColumn, Column, Desktop, DesktopModel, Form, FormModel, GroupBox, NumberColumn, ObjectOrModel, Outline, OutlineViewButton, Page, PageParamDo, PageWithNodes, PageWithTable, ResetMenu, scout, SearchFormTableControl,
-  SearchMenu, StringField, strings, Table, TableRow, typeName
+  SearchMenu, StringField, strings, Table, TableRow, Tree, typeName
 } from '../../src';
 
 // ---------------------------------------------------------------
@@ -28,6 +28,11 @@ import {
 //      |     +- SpecNodePage2 [leaf, SpecDetailForm]
 //      |     +- (rec:SpecTablePage2)
 //      +- SpecNodePage2 [leaf, SpecDetailForm]
+//
+//   SpecOutline3 [breadcrumb]
+//   +- SpecNodePage4 [compactRoot]
+//      +- SpecNodePage2 [leaf, SpecDetailForm]
+//      +- (rec:SpecTablePage2)
 //
 // ---------------------------------------------------------------
 
@@ -81,6 +86,25 @@ export function specDesktopModel(): DesktopModel {
         },
         displayStyle: 'MENU',
         text: 'Outline Button 2'
+      },
+      {
+        id: 'SpecOutline3ViewButton',
+        objectType: OutlineViewButton,
+        outline: {
+          id: SPEC_OUTLINE_3_ID,
+          uuid: SPEC_OUTLINE_3_UUID,
+          objectType: Outline,
+          title: 'Outline 3',
+          displayStyle: Tree.DisplayStyle.BREADCRUMB,
+          nodes: [
+            {
+              objectType: SpecNodePage4,
+              compactRoot: true
+            }
+          ]
+        },
+        displayStyle: 'MENU',
+        text: 'Outline Button 3'
       }
     ],
     outline: SPEC_OUTLINE_1_ID
@@ -91,8 +115,10 @@ export function specDesktopModel(): DesktopModel {
 
 export const SPEC_OUTLINE_1_ID = 'SpecOutline1';
 export const SPEC_OUTLINE_2_ID = 'SpecOutline2';
+export const SPEC_OUTLINE_3_ID = 'SpecOutline3';
 export const SPEC_OUTLINE_1_UUID = '8841b967-4801-47bb-87a9-a5f6d54b4014';
 export const SPEC_OUTLINE_2_UUID = 'a6379a66-c844-4ec7-8e7e-1f854dc7e81e';
+export const SPEC_OUTLINE_3_UUID = 'cbe9986e-cbb8-415c-94fc-680a961280a7';
 export const SPEC_NODE_PAGE_1_UUID = '9e4a69e7-73a5-44fd-8d68-ebb6a50f07ba';
 export const SPEC_NODE_PAGE_2_UUID = 'c7f9ad97-d80a-429b-8701-0378cad9307f';
 export const SPEC_NODE_PAGE_3_UUID = '80e022bf-5b00-491d-818e-3c4054d7fcc3';
