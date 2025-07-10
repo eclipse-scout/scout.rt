@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, Column, Event, Form, InitModelOf, MoveTableRowMenuHelper, scout, ShowInvisibleColumnsForm, StringField, strings, Table, TableCompleteCellEditEvent, TableOrganizerFormWidgetMap, TableRow, TableRowModel,
+  Action, arrays, Cell, Column, Event, Form, InitModelOf, MoveTableRowMenuHelper, scout, ShowInvisibleColumnsForm, StringField, strings, Table, TableCompleteCellEditEvent, TableOrganizerFormWidgetMap, TableRow, TableRowModel,
   TableRowsSelectedEvent, TableStartCellEditEvent, UiPreferences, uiPreferences, WidgetModel
 } from '../../index';
 import TableOrganizerFormModel, {ColumnsTable0, ProfilesTable} from './TableOrganizerFormModel';
@@ -45,6 +45,7 @@ export class TableOrganizerForm extends Form {
     this.widget('ModifyColumnMenu').on('action', event => this._onModifyColumnMenuAction(event));
     this.widget('RemoveColumnMenu').on('action', event => this._onRemoveColumnMenuAction(event));
     this.columnsTable.on('rowsSelected', event => this._onColumnsTableRowsSelected(event));
+    this.columnsTable.columnById('WidthColumn').setVisible(!this.table.autoResizeColumns);
     this._installColumnUpDownMenus();
 
     // Pages in a bookmark outline should only have one profile (the one stored in the bookmark) -> disable menu to create new profiles
@@ -181,11 +182,48 @@ export class TableOrganizerForm extends Form {
       return {
         cells: [
           column,
-          ShowInvisibleColumnsForm.createColumnTitleCell(column)
+          ShowInvisibleColumnsForm.createColumnTitleCell(column),
+          scout.create(Cell, {value: this._computeColumnStatus(column), tooltipText: this._computeColumnStatusTooltip(column)}),
+          column.width
         ]
       } as TableRowModel;
     });
     this.columnsTable.replaceRows(rows);
+  }
+
+  protected _computeColumnStatus(column: Column<any>): string {
+    let filtered = column.filtered;
+    let groupSymbol = 'G';
+    let filterSymbol = 'F';
+    let sortSymbol = column.sortAscending ? '↑' : '↓';
+    let sortIndex = column.sortIndex + 1;
+    let sortCount = this.table.visibleSortColumnsCount();
+    let $container = $('<div>');
+    let $status = $container.appendDiv('status');
+    let $left = $status.appendSpan('group-filter');
+    $left.appendDiv().text(groupSymbol).toggleClass('hidden', !column.grouped);
+    $left.appendDiv().text(filterSymbol).toggleClass('hidden', !filtered);
+    if (!column.grouped && !filtered) {
+      // Reserve space if neither grouped nor filtered to align with the status on the other rows
+      $left.children().removeClass('hidden').addClass('invisible');
+    }
+    $status.appendSpan('sort-direction').text(sortSymbol).toggleClass('invisible', !column.sortActive);
+    $status.appendSpan('sort-index').text(sortIndex).toggleClass('invisible', !column.sortActive || sortCount <= 1);
+    return $container.html();
+  }
+
+  protected _computeColumnStatusTooltip(column: Column<any>): string {
+    let result = [];
+    if (column.grouped) {
+      result.push(this.session.text('Grouped'));
+    }
+    if (column.filtered) {
+      result.push(this.session.text('Filtered'));
+    }
+    if (column.sortActive) {
+      result.push(this.session.text('Sorted'));
+    }
+    return result.join('\n');
   }
 
   protected _updateColumnMenus() {
@@ -247,6 +285,7 @@ export class TableOrganizerForm extends Form {
       table: this.columnsTable,
       moveRowUpMenu,
       moveRowDownMenu,
+      alwaysShowMenus: true,
       rowFilter: (row, direction) => {
         let column = this.keyColumn.cellValue(row);
         if (direction === 'up') {

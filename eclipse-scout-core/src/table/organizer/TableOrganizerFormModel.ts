@@ -12,16 +12,19 @@ import {Column, comparators, Device, Form, FormModel, GroupBox, icons, Menu, Tab
 export default (): FormModel => ({
   objectType: Form,
   title: '${textKey:TableOrganize}',
+  headerVisible: true,
+  saveNeededVisible: false,
   rootGroupBox: {
     objectType: GroupBox,
     gridDataHints: {
-      widthInPixel: 600,
+      widthInPixel: 750,
       heightInPixel: 350
     },
     fields: [{
       id: 'ProfilesBox',
       objectType: GroupBox,
       label: '${textKey:SavedSettings}',
+      labelVisible: false,
       statusVisible: false,
       gridColumnCount: 1,
       gridDataHints: {
@@ -38,12 +41,14 @@ export default (): FormModel => ({
         table: {
           id: 'ProfilesTable',
           objectType: Table,
-          headerVisible: false,
+          headerEnabled: false,
           autoResizeColumns: true,
           defaultRowAction: 'LoadConfigMenu',
+          cssClass: 'table-organizer-profiles-table',
           columns: [{
             id: 'ConfigNameColumn',
             objectType: Column,
+            text: '${textKey:SavedSettings}',
             sortIndex: 1,
             comparator: comparators.ALPHANUMERIC
           }, {
@@ -87,6 +92,7 @@ export default (): FormModel => ({
       id: 'ColumnsBox',
       objectType: GroupBox,
       label: '${textKey:Columns}',
+      labelVisible: false,
       statusVisible: false,
       menuBarPosition: GroupBox.MenuBarPosition.TITLE,
       gridColumnCount: 1,
@@ -102,10 +108,11 @@ export default (): FormModel => ({
           id: 'ColumnsTable',
           objectType: Table,
           cssClass: 'no-menubar-separators',
-          headerVisible: false,
+          headerEnabled: false,
           autoResizeColumns: true,
           scrollToSelection: true, // To reveal selection when moving rows
           defaultRowAction: 'ModifyColumnMenu',
+          textFilterEnabled: false,
           columns: [{
             id: 'KeyColumn',
             objectType: Column<Column>,
@@ -113,33 +120,47 @@ export default (): FormModel => ({
           }, {
             id: 'TitleColumn',
             objectType: Column,
-            text: '${textKey:Title}'
+            text: '${textKey:Column}',
+            width: 120
+          }, {
+            id: 'StatusColumn',
+            objectType: Column,
+            text: '${textKey:Status}',
+            htmlEnabled: true,
+            width: 70,
+            fixedWidth: true,
+            cssClass: 'table-organizer-column-status-cell'
+          }, {
+            id: 'WidthColumn',
+            objectType: Column,
+            text: '${textKey:Width}',
+            autoOptimizeWidth: true,
+            // Size of width in Italian.
+            // This column should not take too much space, so if another language has a larger word it will show ellipsis.
+            autoOptimizeMaxWidth: 85,
+            horizontalAlignment: 1
           }],
           menus: [{
             id: 'AddColumnMenu',
             objectType: Menu,
             iconId: icons.PLUS,
-            menuTypes: [Table.MenuType.EmptySpace, Table.MenuType.SingleSelection, Table.MenuType.MultiSelection],
             tooltipText: '${textKey:AddColumn}'
           }, {
             id: 'RemoveColumnMenu',
             objectType: Menu,
             iconId: icons.MINUS,
             keyStroke: 'delete',
-            menuTypes: [Table.MenuType.SingleSelection, Table.MenuType.MultiSelection],
             tooltipText: '${textKey:RemoveColumn}'
           }, {
             id: 'ModifyColumnMenu',
             objectType: Menu,
             iconId: icons.PENCIL,
-            menuTypes: [Table.MenuType.SingleSelection],
             tooltipText: '${textKey:ModifyColumn}'
           }, {
             id: 'MoveColumnUpMenu',
             objectType: Menu,
             iconId: icons.ANGLE_UP,
             keyStroke: 'alt-up',
-            menuTypes: [Table.MenuType.SingleSelection, Table.MenuType.MultiSelection],
             horizontalAlignment: 1,
             tooltipText: '${textKey:MoveColumnForward}'
           }, {
@@ -147,7 +168,6 @@ export default (): FormModel => ({
             objectType: Menu,
             iconId: icons.ANGLE_DOWN,
             keyStroke: 'alt-down',
-            menuTypes: [Table.MenuType.SingleSelection, Table.MenuType.MultiSelection],
             horizontalAlignment: 1,
             tooltipText: '${textKey:MoveColumnBackward}'
           }]
@@ -204,4 +224,6 @@ export type ColumnsTable0WidgetMap = {
 export type ColumnsTable0ColumnMap = {
   'KeyColumn': Column<Column>;
   'TitleColumn': Column;
+  'StatusColumn': Column;
+  'WidthColumn': Column;
 };

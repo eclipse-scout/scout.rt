@@ -464,8 +464,8 @@ export class TableHeader extends Widget implements TableHeaderModel {
   }
 
   protected _renderColumnState(column: Column<any>) {
-    let $header = column.$header,
-      filtered = this.table.getFilter(column.id);
+    let $header = column.$header;
+    let filtered = column.filtered;
 
     $header.children('.table-header-item-state').remove();
     let $state = $header.appendSpan('table-header-item-state');
@@ -515,8 +515,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
    * Makes sure state is fully visible by adjusting width (happens if column.minWidth is < DEFAULT_MIN_WIDTH)
    */
   protected _adjustColumnMinWidth(column: Column<any> & { __minWidthWithoutState?: number; __widthWithoutState?: number }) {
-    let filtered = this.table.getFilter(column.id);
-    if (column.sortActive || column.grouped || filtered) {
+    if (column.sortActive || column.grouped || column.filtered) {
       if (column.minWidth < Column.DEFAULT_MIN_WIDTH) {
         column.__minWidthWithoutState = column.minWidth;
         column.__widthWithoutState = column.width;

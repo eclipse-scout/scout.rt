@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -30,6 +31,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractAlphanumericSortingStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
@@ -57,7 +59,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.html.HtmlHelper;
+import org.eclipse.scout.rt.platform.html.IHtmlContent;
+import org.eclipse.scout.rt.platform.html.IHtmlElement;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -68,6 +73,9 @@ import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 @ClassId("5bd26d3c-604d-4991-a246-7fff74e32faa")
 public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumnsForm {
+
+  private static final String UNICODE_ARROW_UP = "↑"; // U+2191
+  private static final String UNICODE_ARROW_DOWN = "↓"; // U+2193
 
   public enum ConfigType {
     DEFAULT, CUSTOM
@@ -92,6 +100,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("TableOrganize");
+  }
+
+  @Override
+  protected Boolean getConfiguredHeaderVisible() {
+    return true;
   }
 
   public ColumnsTableField getColumnsTableField() {
@@ -120,7 +133,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
     @Override
     protected int getConfiguredWidthInPixel() {
-      return 600;
+      return 750;
     }
 
     @Override
@@ -152,6 +165,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
       @Order(5)
       @ClassId("698da86a-d878-439e-9a1c-da7b63d4f2e3")
       public class ProfilesBox extends AbstractGroupBox {
+
+        @Override
+        protected boolean getConfiguredLabelVisible() {
+          return false;
+        }
 
         @Override
         protected int getConfiguredGridColumnCount() {
@@ -251,8 +269,13 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             }
 
             @Override
-            protected boolean getConfiguredHeaderVisible() {
+            protected boolean getConfiguredHeaderEnabled() {
               return false;
+            }
+
+            @Override
+            protected String getConfiguredCssClass() {
+              return "table-organizer-profiles-table";
             }
 
             @Override
@@ -286,6 +309,12 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             @Order(10)
             @ClassId("f607ab39-e616-4b27-b7c4-f6e437b6b1a3")
             public class ConfigNameColumn extends AbstractAlphanumericSortingStringColumn {
+
+              @Override
+              protected String getConfiguredHeaderText() {
+                return TEXTS.get("SavedSettings");
+              }
+
               @Override
               protected boolean getConfiguredEditable() {
                 return true;
@@ -332,6 +361,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             @Order(20)
             @ClassId("d84a8d65-59c2-449d-b375-7a2f2da1844b")
             public class ConfigTypeColumn extends AbstractColumn<ConfigType> {
+
               @Override
               protected boolean getConfiguredDisplayable() {
                 return false;
@@ -538,6 +568,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         }
 
         @Override
+        protected boolean getConfiguredLabelVisible() {
+          return false;
+        }
+
+        @Override
         protected int getConfiguredGridW() {
           return 1;
         }
@@ -610,6 +645,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             }
 
             @Override
+            protected boolean getConfiguredTextFilterEnabled() {
+              return false;
+            }
+
+            @Override
             protected void execDrop(ITableRow row, TransferObject transfer) {
               if (row != null && transfer instanceof JavaTransferObject) {
                 List<ITableRow> draggedRows = ((JavaTransferObject) transfer).getLocalObjectAsList(ITableRow.class);
@@ -641,12 +681,20 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             }
 
             @Override
-            protected boolean getConfiguredHeaderVisible() {
+            protected boolean getConfiguredHeaderEnabled() {
               return false;
             }
 
             public KeyColumn getKeyColumn() {
               return getColumnSet().getColumnByClass(KeyColumn.class);
+            }
+
+            public StatusColumn getStatusColumn() {
+              return getColumnSet().getColumnByClass(StatusColumn.class);
+            }
+
+            public WidthColumn getWidthColumn() {
+              return getColumnSet().getColumnByClass(WidthColumn.class);
             }
 
             public TitleColumn getTitleColumn() {
@@ -659,6 +707,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               if (rows.size() > 0) {
                 getProfilesTableField().getTable().deselectAllRows();
               }
+            }
+
+            @Override
+            protected void execInitTable() {
+              getWidthColumn().setVisible(!m_organizedTable.isAutoResizeColumns());
             }
 
             @Order(10)
@@ -682,12 +735,69 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected String getConfiguredHeaderText() {
-                return TEXTS.get("Title");
+                return TEXTS.get("Column");
               }
 
               @Override
               protected int getConfiguredWidth() {
                 return 120;
+              }
+            }
+
+            @Order(40)
+            @ClassId("23b153bc-1d74-46a2-b08b-87aecba6c1b0")
+            public class StatusColumn extends AbstractStringColumn {
+
+              @Override
+              protected String getConfiguredHeaderText() {
+                return TEXTS.get("Status");
+              }
+
+              @Override
+              protected int getConfiguredWidth() {
+                return 70;
+              }
+
+              @Override
+              protected boolean getConfiguredFixedWidth() {
+                return true;
+              }
+
+              @Override
+              protected boolean getConfiguredHtmlEnabled() {
+                return true;
+              }
+
+              @Override
+              protected String getConfiguredCssClass() {
+                return "table-organizer-column-status-cell";
+              }
+
+              @Override
+              protected void execDecorateCell(Cell cell, ITableRow row) {
+                cell.setTooltipText(computeColumnStatusTooltip(getKeyColumn().getValue(row)));
+              }
+            }
+
+            @Order(70)
+            @ClassId("c0bfe89c-2402-419a-bda1-68fc61b23ec7")
+            public class WidthColumn extends AbstractIntegerColumn {
+
+              @Override
+              protected String getConfiguredHeaderText() {
+                return TEXTS.get("Width");
+              }
+
+              @Override
+              protected boolean getConfiguredAutoOptimizeWidth() {
+                return true;
+              }
+
+              @Override
+              protected int getConfiguredAutoOptimizeMaxWidth() {
+                // Size of width in Italian.
+                // This column should not take too much space, so if another language has a larger word it will show ellipsis.
+                return 85;
               }
             }
 
@@ -697,7 +807,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.EmptySpace, TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.EmptySpace);
               }
 
               @Override
@@ -722,7 +832,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.EmptySpace);
               }
 
               @Override
@@ -752,7 +862,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.EmptySpace);
               }
 
               @Override
@@ -784,7 +894,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.EmptySpace);
               }
 
               @Override
@@ -832,7 +942,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.EmptySpace);
               }
 
               @Override
@@ -1140,10 +1250,51 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         }
         columnsTable.getTitleColumn().setValue(row, columnTitle);
 
+        // Status
+        columnsTable.getStatusColumn().setValue(row, computeColumnStatus(col));
+
+        // Width
+        columnsTable.getWidthColumn().setValue(row, col.getWidth());
+
         rowList.add(row);
       }
     }
     return rowList;
+  }
+
+  protected String computeColumnStatus(IColumn<?> column) {
+    String groupSymbol = "G";
+    String filterSymbol = "F";
+    String sortSymbol = column.isSortAscending() ? UNICODE_ARROW_UP : UNICODE_ARROW_DOWN;
+    String sortIndex = String.valueOf(column.getSortIndex() + 1);
+    int sortCount = getOrganizedTable().getColumnSet().getSortColumnCount();
+    IHtmlElement htmlGrouped = HTML.div(groupSymbol).toggleCssClass("hidden", !column.isGroupingActive());
+    IHtmlElement htmlFiltered = HTML.div(filterSymbol).toggleCssClass("hidden", !column.isColumnFilterActive());
+    if (!column.isGroupingActive() && !column.isColumnFilterActive()) {
+      htmlGrouped.removeCssClass("hidden").addCssClass("invisible");
+    }
+    IHtmlContent container = HTML.fragment(
+        HTML.div(
+            HTML.span(htmlGrouped, htmlFiltered).addCssClass("group-filter"),
+            HTML.span(sortSymbol).addCssClass("sort-direction").toggleCssClass("invisible", !column.isSortActive()),
+            HTML.span(sortIndex).addCssClass("sort-index").toggleCssClass("invisible", !column.isSortActive() || sortCount <= 1)
+        ).addCssClass("status")
+    );
+    return container.toHtml();
+  }
+
+  protected String computeColumnStatusTooltip(IColumn<?> column) {
+    List<String> result = new ArrayList<>();
+    if (column.isGroupingActive()) {
+      result.add(TEXTS.get("Grouped"));
+    }
+    if (column.isColumnFilterActive()) {
+      result.add(TEXTS.get("Filtered"));
+    }
+    if (column.isSortActive()) {
+      result.add(TEXTS.get("Sorted"));
+    }
+    return StringUtility.join("\n", result);
   }
 
   protected List<String> getVisibleColumnIds() {

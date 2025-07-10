@@ -11,3 +11,31 @@
   min-height: 220px;
   min-width: 220px;
 }
+
+.table-organizer-profiles-table > .table-header > .table-header-item > .sorted {
+  display: none;
+}
+
+.table-organizer-column-status-cell {
+  padding-top: 4px;
+  padding-bottom: 0;
+
+  & > .status {
+    white-space: preserve;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    height: 24px;
+    gap: 3px;
+
+    & > .group-filter {
+      text-align: center;
+    }
+
+    & > .sort-direction {
+      font-size: @font-size-large;
+      margin-top: -4px;
+    }
+  }
+}

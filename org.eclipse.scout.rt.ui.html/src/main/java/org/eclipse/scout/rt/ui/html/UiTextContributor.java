@@ -47,11 +47,13 @@ public class UiTextContributor implements IUiTextContributor {
         "DefaultSettings",
         "DeleteMenu",
         "ErrorWhileLoadingData",
+        "Filtered",
         "FormEmptyMandatoryFieldsMessage",
         "FormInvalidFieldsMessage",
         "FormInvalidFieldsWarningMessage",
         "FormSaveChangesQuestion",
         "ConfirmApplyChanges",
+        "Grouped",
         "GroupBy",
         "Load",
         "MoveUp",
@@ -85,7 +87,9 @@ public class UiTextContributor implements IUiTextContributor {
         "SmartFieldMoreThanXRows",
         "SmartFieldNoDataFound",
         "SmartFieldNotUnique",
+        "Sorted",
         "SortBy",
+        "Status",
         "TableOrganize",
         "Title",
         "TooManyRows",
@@ -108,6 +112,7 @@ public class UiTextContributor implements IUiTextContributor {
         "FormsCannotBeSaved",
         "NotAllCheckedFormsCanBeSaved",
         "FormValidationFailedTitle",
+        "Width",
         "YouAreNotAuthorizedToPerformThisAction"));
   }
 }

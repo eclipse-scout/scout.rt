@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -48,9 +48,12 @@ public class OrganizeColumnsMenu extends AbstractFormMenu<IOrganizeColumnsForm> 
 
   @Override
   protected void execSelectionChanged(boolean selected) {
-    super.execSelectionChanged(selected);
     if (selected) {
+      super.execSelectionChanged(selected);
       getForm().reload();
+    }
+    else {
+      getForm().doClose();
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,6 +24,16 @@ public interface IHtmlElement extends IHtmlContent {
    * classes in the 'class' attribute.
    */
   IHtmlElement addCssClass(CharSequence cssClass);
+
+  /**
+   * Removes the CSS class from the 'class' attribute. If there are no more classes left, the 'class' attribute will be removed as well.
+   */
+  IHtmlElement removeCssClass(CharSequence cssClass);
+
+  /**
+   * Adds or removes the css class from the 'class'  attribute depending on the given condition.
+   */
+  IHtmlElement toggleCssClass(CharSequence cssClass, boolean condition);
 
   /**
    * Sets the 'style' attribute (CSS).
