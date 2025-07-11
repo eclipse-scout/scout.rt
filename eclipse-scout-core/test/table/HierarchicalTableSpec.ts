@@ -19,7 +19,6 @@ describe('HierarchicalTableSpec', () => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
-    $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -28,7 +27,6 @@ describe('HierarchicalTableSpec', () => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
-    $.fx.off = false;
   });
 
   function createAndRegisterColumnFilter(table: Table, column: Column<any>, selectedValues: (string | number)[]): ColumnUserFilter {
@@ -66,6 +64,12 @@ describe('HierarchicalTableSpec', () => {
       }
     });
     return expandedRows;
+  }
+
+  function finishRowAnimation(table: Table) {
+    // Stop the current animation and jump to the end state
+    // $.fx.off = true does not seem to work consistently in this specific spec
+    table.$rows().stop(false, true);
   }
 
   describe('add', () => {
@@ -216,6 +220,7 @@ describe('HierarchicalTableSpec', () => {
         parentRow = table.rows[0];
       newRow.parentRow = parentRow.id;
       table.collapseRow(parentRow);
+      finishRowAnimation(table);
       table.insertRow(newRow);
 
       expect(table.rowsMap[parentRow.id].childRows.length).toBe(2);
@@ -275,6 +280,7 @@ describe('HierarchicalTableSpec', () => {
 
     it('leaf row with collapsed parent and expect the structure to be valid', () => {
       table.collapseRow(rows[3]);
+      finishRowAnimation(table);
       expect(table.visibleRows.length).toBe(5);
       table.deleteRow(rows[5]);
       expect(rows[3].expanded).toBeFalsy();
@@ -409,6 +415,7 @@ describe('HierarchicalTableSpec', () => {
       expectRowIds(getUiRows(table), expectedRowIds);
 
       table.collapseRow(rows[1]);
+      finishRowAnimation(table);
 
       expectRowIds(table.rows, expectedRowIds);
       expectRowIds(getTreeRows(table), expectedRowIds);
@@ -418,6 +425,7 @@ describe('HierarchicalTableSpec', () => {
       expectRowIds(getUiRows(table), [0, 1, 3]);
 
       table.collapseRow(rows[0]);
+      finishRowAnimation(table);
 
       expectRowIds(table.rows, expectedRowIds);
       expectRowIds(getTreeRows(table), expectedRowIds);
@@ -437,8 +445,7 @@ describe('HierarchicalTableSpec', () => {
 
     });
 
-    it('are valid after expand all and collapse all.', () => {
-
+    it('are valid after expand all and collapse all', () => {
       let expectedRowIds = [0, 1, 2, 3];
       expectRowIds(table.rows, expectedRowIds);
       expectRowIds(getTreeRows(table), expectedRowIds);
@@ -448,6 +455,7 @@ describe('HierarchicalTableSpec', () => {
       expectRowIds(getUiRows(table), expectedRowIds);
 
       table.collapseAll();
+      finishRowAnimation(table);
 
       expectRowIds(table.rows, expectedRowIds);
       expectRowIds(getTreeRows(table), expectedRowIds);
@@ -463,9 +471,7 @@ describe('HierarchicalTableSpec', () => {
       expectRowIds(table.visibleRows, expectedRowIds);
       expectRowIds(getExpandedRows(table), [0, 1]);
       expectRowIds(getUiRows(table), expectedRowIds);
-
     });
-
   });
 
   describe('selection', () => {
@@ -697,6 +703,7 @@ describe('HierarchicalTableSpec', () => {
         cells: ['newRow0Cell0']
       };
       table.updateRow(row0);
+      finishRowAnimation(table);
 
       expectRowIds(table.rows, rowIds);
       expectRowIds(table.visibleRows, [0, 3]);
@@ -897,7 +904,6 @@ describe('HierarchicalTableSpec', () => {
       table.render();
       expect(table.$rows().length).toBe(4);
 
-      $.fx.off = false;
       table.collapseRow(table.rootRows[1]);
       table.expandRow(table.rootRows[1]);
       table.deleteRow(table.rootRows[1]);
