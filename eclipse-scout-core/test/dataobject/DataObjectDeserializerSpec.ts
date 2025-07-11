@@ -248,10 +248,28 @@ describe('DataObjectDeserializer', () => {
     dataObject = dataObjects.parse('{"_type": "SpecialOne"}');
     expect(dataObject).toBeInstanceOf(BaseDoEntity);
   });
+
+  it('can deserialize properties from abstract DOs', () => {
+    const json = `{
+      "_type": "scout.Fixture01",
+      "abstractPropDate": "2013-05-25 22:30:00.000Z",
+      "propDate": "2013-05-25 22:30:00.000Z"
+    }
+    `;
+    const foo = dataObjects.parse(json) as Fixture01Do;
+    expect(foo).toBeInstanceOf(Fixture01Do);
+    expect(foo.abstractPropDate).toEqual(dates.parseJsonDate('2013-05-25 22:30:00.000Z'));
+    expect(foo.propDate).toEqual(dates.parseJsonDate('2013-05-25 22:30:00.000Z'));
+  });
 });
 
+@typeName()
+export abstract class AbstractFixture01Do extends BaseDoEntity {
+  abstractPropDate?: Date;
+}
+
 @typeName('scout.Fixture01')
-export class Fixture01Do extends BaseDoEntity {
+export class Fixture01Do extends AbstractFixture01Do {
   propBool: boolean;
   propNum: number;
   propStr: string;
