@@ -221,9 +221,6 @@ describe('Table', () => {
     it('rowsInserted event must be triggered before rowOrderChanged event', () => {
       let events = '',
         rowsOnInsert;
-      if (!Device.get().supportsInternationalization()) {
-        return;
-      }
       // we sort 1st column desc which means Z is before A
       model = helper.createModelFixture(1, 0);
       table = helper.createTable(model);
@@ -1650,9 +1647,6 @@ describe('Table', () => {
     it('sends sort without sortingRequested event when client side sorting is possible', () => {
       prepareTableWithAdapter();
       render(table);
-      // Make sure sorting is not executed because it does not work with
-      // phantomJS
-      spyOn(Device.get(), 'supportsInternationalization').and.returnValue(true);
       spyOn(table, '_sort').and.returnValue(true);
 
       table.sort(column0, 'desc');
@@ -1692,10 +1686,6 @@ describe('Table', () => {
     });
 
     it('regroups the data if group by column is active', () => {
-      if (!Device.get().supportsInternationalization()) {
-        return;
-      }
-
       prepareTable();
       render(table);
 
@@ -1790,10 +1780,6 @@ describe('Table', () => {
     describe('sorting', () => {
 
       it('sorts text columns considering locale (if browser supports it)', () => {
-        if (!Device.get().supportsInternationalization()) {
-          return;
-        }
-
         let model = helper.createModelSingleColumnByTexts(['Österreich', 'Italien', 'Zypern']);
         let table = helper.createTable(model);
         column0 = table.columns[0];
@@ -1916,10 +1902,6 @@ describe('Table', () => {
       });
 
       it('uses non sort columns as fallback', () => {
-        if (!Device.get().supportsInternationalization()) {
-          return;
-        }
-
         let model = helper.createModelFixture(2, 4);
         let table = helper.createTable(model);
 

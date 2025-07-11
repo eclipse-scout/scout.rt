@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AggregateTableControl, arrays, Column, Device, NumberColumn, Range, scout, Table} from '../../src/index';
+import {AggregateTableControl, arrays, Column, NumberColumn, Range, scout, Table} from '../../src/index';
 import {SpecTable, SpecTableAdapter, TableModelWithCells, TableRowModelWithCells, TableSpecHelper} from '../../src/testing/index';
 
 describe('Table Grouping', () => {
@@ -158,9 +158,6 @@ describe('Table Grouping', () => {
   }
 
   it('renders an aggregate row for each group', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     render(table);
@@ -173,9 +170,6 @@ describe('Table Grouping', () => {
   });
 
   it('updates aggregate rows when column structure changes', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     let tableControl = scout.create(AggregateTableControl, {
       parent: table,
@@ -284,9 +278,6 @@ describe('Table Grouping', () => {
   });
 
   it('considers groupingStyle -> aggregate rows must be rendered previous to the grouped rows', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     table.groupingStyle = Table.GroupingStyle.TOP;
     prepareContent();
@@ -307,9 +298,6 @@ describe('Table Grouping', () => {
   });
 
   it('considers view range -> only renders an aggregate row for rendered rows', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     table.viewRangeSize = 4;
@@ -329,9 +317,6 @@ describe('Table Grouping', () => {
   });
 
   it('considers view range -> doesn\'t render an aggregate row if the last row of the group is not rendered', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     table.viewRangeSize = 3;
@@ -364,9 +349,6 @@ describe('Table Grouping', () => {
   });
 
   it('regroups if rows get inserted', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     render(table);
@@ -391,9 +373,6 @@ describe('Table Grouping', () => {
   });
 
   it('regroups if rows get inserted, event is from server and table was empty', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable(true);
     render(table);
     table.deleteAllRows();
@@ -415,9 +394,6 @@ describe('Table Grouping', () => {
   });
 
   it('does not regroup if rows get inserted, event is from server and table was not empty', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable(true);
     prepareContent();
     render(table);
@@ -443,9 +419,6 @@ describe('Table Grouping', () => {
   });
 
   it('regroups when a filter is applied', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     render(table);
@@ -462,9 +435,6 @@ describe('Table Grouping', () => {
   });
 
   it('regroups if rows get deleted', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     render(table);
@@ -492,9 +462,6 @@ describe('Table Grouping', () => {
   });
 
   it('removes aggregate rows if all rows get deleted', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     render(table);
@@ -514,9 +481,6 @@ describe('Table Grouping', () => {
   });
 
   it('regroups if rows get updated', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     render(table);
@@ -541,9 +505,6 @@ describe('Table Grouping', () => {
   });
 
   it('may group column 0 only', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     render(table);
@@ -560,9 +521,6 @@ describe('Table Grouping', () => {
   });
 
   it('may group column 1 only', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     render(table);
@@ -579,9 +537,6 @@ describe('Table Grouping', () => {
   });
 
   it('may group columns 0 (avg) and 1 (sum)', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     render(table);
@@ -601,9 +556,6 @@ describe('Table Grouping', () => {
   });
 
   it('may group columns 0, 1 and 2', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     render(table);
@@ -626,9 +578,6 @@ describe('Table Grouping', () => {
 
   // vary order
   it('may group columns 2 and 1', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     render(table);
@@ -648,9 +597,6 @@ describe('Table Grouping', () => {
   });
 
   it('may group column 1 only after grouping column 0 first', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     render(table);
@@ -669,9 +615,6 @@ describe('Table Grouping', () => {
   });
 
   it('may group column 1 and 2 after grouping column 0 first', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     prepareTable();
     prepareContent();
     render(table);

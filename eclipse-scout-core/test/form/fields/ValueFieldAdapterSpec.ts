@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Device, ValueFieldAdapter} from '../../../src/index';
+import {ValueFieldAdapter} from '../../../src/index';
 import {FormSpecHelper} from '../../../src/testing/index';
 
 describe('ValueFieldAdapter', () => {
@@ -28,9 +28,6 @@ describe('ValueFieldAdapter', () => {
   describe('_createPropertySortFunc', () => {
 
     it('should order properties', () => {
-      if (!Device.get().supportsInternationalization()) {
-        return;
-      }
       let order = ['foo', 'baz', 'bar'];
       let properties = ['x', 'bar', 'foo', 'a', 'y', 'baz'];
       let adapter = new SpecValueFieldAdapter();

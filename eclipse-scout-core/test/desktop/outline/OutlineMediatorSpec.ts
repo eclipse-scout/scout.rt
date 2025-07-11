@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, Device, Outline, PageWithNodes, PageWithTable, scout, Table, TableModel, TableTextUserFilter} from '../../../src/index';
+import {Action, Outline, PageWithNodes, PageWithTable, scout, Table, TableModel, TableTextUserFilter} from '../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../src/testing/index';
 
 describe('OutlineMediator', () => {
@@ -96,9 +96,6 @@ describe('OutlineMediator', () => {
   });
 
   it('tableRowOrderChanged', () => {
-    if (!Device.get().supportsInternationalization()) {
-      return;
-    }
     let modelRows = [
       tableHelper.createModelRow('0', ['Foo']),
       tableHelper.createModelRow('1', ['Bar'])
