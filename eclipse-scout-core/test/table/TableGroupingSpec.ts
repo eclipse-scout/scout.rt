@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,6 @@ describe('Table Grouping', () => {
     $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
-
   });
 
   afterEach(() => {
@@ -103,22 +102,22 @@ describe('Table Grouping', () => {
 
   }
 
-  function render(table) {
+  function render(table: Table) {
     table.render();
     $colHeaders = table.header.$container.find('.table-header-item');
     $header0 = $colHeaders.eq(0);
     $header1 = $colHeaders.eq(1);
   }
 
-  function addGrouping(table, column, multi) {
-    table.groupColumn(column, multi, 'asc', false);
+  function addGrouping(table: Table, column: Column<any>, multi: boolean) {
+    table.group(column, 'asc', multi);
   }
 
-  function removeGrouping(table, column) {
-    table.groupColumn(column, '', 'asc', true);
+  function removeGrouping(table: Table, column: Column<any>) {
+    table.removeGroupColumn(column);
   }
 
-  function assertGroupingProperty(table, ...args) {
+  function assertGroupingProperty(table: Table, ...args) {
     let i, expectGrouped = arrays.init(5, false);
     for (i = 0; i < args.length; i++) {
       expectGrouped[args[i]] = true;
@@ -692,4 +691,26 @@ describe('Table Grouping', () => {
     assertGroupingProperty(table);
   });
 
+  describe('removeAllGroupColumns', () => {
+    it('clears the sort columns', () => {
+      prepareTable();
+
+      table.addGroupColumn(table.columns[1]);
+      table.addGroupColumn(table.columns[2]);
+      expect(table.columns[1].sortActive).toBe(true);
+      expect(table.columns[1].sortIndex).toBe(0);
+      expect(table.columns[1].grouped).toBe(true);
+      expect(table.columns[2].sortActive).toBe(true);
+      expect(table.columns[2].sortIndex).toBe(1);
+      expect(table.columns[2].grouped).toBe(true);
+
+      table.removeAllGroupColumns();
+      expect(table.columns[1].sortActive).toBe(false);
+      expect(table.columns[1].sortIndex).toBe(-1);
+      expect(table.columns[1].grouped).toBe(false);
+      expect(table.columns[2].sortActive).toBe(false);
+      expect(table.columns[2].sortIndex).toBe(-1);
+      expect(table.columns[2].grouped).toBe(false);
+    });
+  });
 });

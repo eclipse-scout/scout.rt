@@ -118,7 +118,10 @@ export class TableOrganizer implements ObjectWithType {
       column.setVisible(false, false); // parameter 'false' skips call of onColumnVisibilityChanged()
 
       if (column.grouped) {
-        this.table.groupColumn(column, true, null, true); // multiGroup=true is necessary to not affect potentially other grouped columns
+        this.table.removeGroupColumn(column);
+      }
+      if (column.sortActive) {
+        this.table.removeSortColumn(column);
       }
       this.table.removeFilterByKey(column.id);
     }

@@ -9,9 +9,9 @@
  */
 import {
   Action, BeanColumn, BooleanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, SmartColumn, Status, strings, Table,
-  TableField, TableRow, TableRowModel, Tooltip
+  TableAdapter, TableField, TableRow, TableRowModel, Tooltip
 } from '../../src/index';
-import {JQueryTesting, LocaleSpecHelper, SpecTable, TableSpecHelper} from '../../src/testing/index';
+import {JQueryTesting, LocaleSpecHelper, SpecTable, TableModelWithCells, TableSpecHelper} from '../../src/testing/index';
 import $ from 'jquery';
 
 describe('Table', () => {
@@ -1384,7 +1384,7 @@ describe('Table', () => {
   });
 
   describe('sort', () => {
-    let model, table, adapter, column0, column1, column2;
+    let model: TableModelWithCells, table: SpecTable, adapter: TableAdapter, column0: Column<any>, column1: Column<any>, column2: Column<any>;
     let $colHeaders, $header0, $header1, $header2;
 
     function prepareTable() {
@@ -1699,12 +1699,7 @@ describe('Table', () => {
       prepareTable();
       render(table);
 
-      // Make sure sorting is not executed because it does not work with
-      // phantomJS
-      spyOn(Device.get(), 'supportsInternationalization').and.returnValue(true);
-      spyOn(table, '_sortImpl').and.returnValue(true);
       spyOn(table, '_group');
-
       column0.grouped = true;
       table.sort(column0, 'desc');
 
@@ -1771,6 +1766,25 @@ describe('Table', () => {
         expect(table.$rows().toArray().map(elem => $(elem).data('row').id)).toEqual([row0.id, row1.id, row2.id]);
       });
       table.sort(column0, 'desc');
+    });
+
+    describe('removeAllSortColumns', () => {
+      it('clears the sort columns', () => {
+        prepareTable();
+
+        table.addSortColumn(table.columns[1]);
+        table.addSortColumn(table.columns[2]);
+        expect(table.columns[1].sortActive).toBe(true);
+        expect(table.columns[1].sortIndex).toBe(0);
+        expect(table.columns[2].sortActive).toBe(true);
+        expect(table.columns[2].sortIndex).toBe(1);
+
+        table.removeAllSortColumns();
+        expect(table.columns[1].sortActive).toBe(false);
+        expect(table.columns[1].sortIndex).toBe(-1);
+        expect(table.columns[2].sortActive).toBe(false);
+        expect(table.columns[2].sortIndex).toBe(-1);
+      });
     });
 
     describe('sorting', () => {
@@ -1912,14 +1926,14 @@ describe('Table', () => {
         column0 = table.columns[0];
         column1 = table.columns[1];
 
-        column0.setCellValue(model.rows[0], 'zzz');
-        column1.setCellValue(model.rows[0], 'same');
-        column0.setCellValue(model.rows[1], 'aaa');
-        column1.setCellValue(model.rows[1], 'other');
-        column0.setCellValue(model.rows[2], 'ccc');
-        column1.setCellValue(model.rows[2], 'other');
-        column0.setCellValue(model.rows[3], 'qqq');
-        column1.setCellValue(model.rows[3], 'same');
+        column0.setCellValue(table.rows[0], 'zzz');
+        column1.setCellValue(table.rows[0], 'same');
+        column0.setCellValue(table.rows[1], 'aaa');
+        column1.setCellValue(table.rows[1], 'other');
+        column0.setCellValue(table.rows[2], 'ccc');
+        column1.setCellValue(table.rows[2], 'other');
+        column0.setCellValue(table.rows[3], 'qqq');
+        column1.setCellValue(table.rows[3], 'same');
 
         table.render();
 
@@ -4200,7 +4214,7 @@ describe('Table', () => {
       let table = helper.createTable(model);
       table.render();
 
-      table.groupColumn(table.columns[0]);
+      table.group(table.columns[0]);
       let $aggregateRows = table.$aggregateRows();
       expect($aggregateRows.length).toBeGreaterThan(0);
       $aggregateRows.each((index, aggregateRow) => {
