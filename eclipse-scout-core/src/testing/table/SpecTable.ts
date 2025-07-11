@@ -45,4 +45,12 @@ export class SpecTable extends Table {
   override _columnAtX(x: number): Column<any> {
     return super._columnAtX(x);
   }
+
+  override _sort(animateAggregateRows?: boolean): boolean {
+    return super._sort(animateAggregateRows);
+  }
+
+  override _sortImpl(sortColumns: Column<any>[]) {
+    super._sortImpl(sortColumns);
+  }
 }

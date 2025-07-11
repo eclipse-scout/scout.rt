@@ -602,7 +602,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     function groupColumn() {
       let direction: 'asc' | 'desc' = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
       menuPopup.close();
-      table.groupColumn(column, this.additional, direction, !this.selected);
+      table.group(column, direction, this.additional, !this.selected);
     }
   }
 

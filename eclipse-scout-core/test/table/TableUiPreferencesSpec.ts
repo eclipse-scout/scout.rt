@@ -123,10 +123,10 @@ describe('TableUiPreferences', () => {
       let c6 = table.columnById('c6');
 
       c2.setWidth(202);
-      table.groupColumn(c3);
-      table.sort(c4, 'desc', true);
+      table.group(c3);
+      table.addSortColumn(c4, 'desc');
       c5.setVisible(false);
-      table.sort(c5, undefined, true, true);
+      table.removeSortColumn(c5);
       table.moveColumn(c6, 1);
 
       expect(c2.width).toBe(202);
@@ -326,10 +326,10 @@ describe('TableUiPreferences', () => {
       // -----
 
       c2.setWidth(202);
-      table.groupColumn(c3);
-      table.sort(c4, 'desc', true);
+      table.group(c3);
+      table.addSortColumn(c4, 'desc');
       c5.setVisible(false);
-      table.sort(c5, undefined, true, true); // remove=true
+      table.removeSortColumn(c5);
       table.moveColumn(c6, 1);
       table.addFilter(scout.create(TextColumnUserFilter, {
         session: session,
@@ -343,8 +343,8 @@ describe('TableUiPreferences', () => {
       // -----
 
       c3.setWidth(203);
-      table.groupColumn(c3, undefined, undefined, true); // remove=true
-      table.sort(c4, 'asc', true);
+      table.removeGroupColumn(c3);
+      table.addSortColumn(c4, 'asc');
       table.moveColumn(c6, 2);
       table.addFilter(scout.create(TableTextUserFilter, {
         session: session,

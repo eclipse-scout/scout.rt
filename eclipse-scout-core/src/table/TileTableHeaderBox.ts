@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -135,10 +135,10 @@ export class TileTableHeaderBox extends GroupBox implements TileTableHeaderBoxMo
       if (event.newValue !== null) {
         let column = event.newValue as Column<any>;
         let direction: 'asc' | 'desc' = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
-        this.table.groupColumn(column, false, direction, false);
+        this.table.group(column, direction);
       } else {
         let column = event.oldValue as Column<any>;
-        this.table.groupColumn(column, false, null, true);
+        this.table.removeGroupColumn(column);
       }
       this.isGrouping = false;
     }
@@ -152,10 +152,10 @@ export class TileTableHeaderBox extends GroupBox implements TileTableHeaderBoxMo
       this.isSorting = true;
       if (event.newValue !== null) {
         let newValue = event.newValue as TileTableHeaderSortKey;
-        this.table.sort(newValue.column, newValue.asc ? 'asc' : 'desc', false, false);
+        this.table.sort(newValue.column, newValue.asc ? 'asc' : 'desc');
       } else {
         let oldValue = event.oldValue as TileTableHeaderSortKey;
-        this.table.sort(oldValue.column, null, false, true);
+        this.table.removeSortColumn(oldValue.column);
       }
       this.isSorting = false;
     }

@@ -1399,6 +1399,31 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   /**
+   * Adds the column to the list of sorted columns and re-sorts the table rows.
+   *
+   * @param direction the sorting direction. Either 'asc' or 'desc'. If not specified, the direction specified by the column is used ({@link Column.sortAscending}).
+   */
+  addSortColumn(column: Column<any>, direction?: 'asc' | 'desc') {
+    this.sort(column, direction, true);
+  }
+
+  /**
+   * Removes the column from the list of sorted columns and re-sorts the table rows.
+   */
+  removeSortColumn(column: Column<any>) {
+    this.sort(column, null, true, true);
+  }
+
+  /**
+   * Clears the list of sorted columns and re-sort the table rows.
+   */
+  removeAllSortColumns() {
+    this.columns
+      .filter(column => column.sortActive)
+      .forEach(this.removeSortColumn.bind(this));
+  }
+
+  /**
    * The number of visible columns that are sorted.
    */
   visibleSortColumnsCount(): number {
@@ -1406,10 +1431,19 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   /**
-   * @param column the column to sort by.
-   * @param direction the sorting direction. Either 'asc' or 'desc'. If not specified the direction specified by the column is used {@link Column.sortAscending}.
-   * @param multiSort true to add the column to the list of sorted columns. False to use this column exclusively as sort column (reset other columns). Default is false.
-   * @param remove true to remove the column from the sort columns. Default is false.
+   * @param column
+   *          the column to sort by.
+   * @param direction
+   *          the sorting direction. Either 'asc' or 'desc'.
+   *          If not specified, the direction specified by the column is used ({@link Column.sortAscending}).
+   * @param multiGroup
+   *          true to add the column to the list of sorted columns.
+   *          False to use this column exclusively as sort column (reset other columns).
+   *          Does not have an effect is `remove` is set to true.
+   *          Default is false.
+   * @param remove
+   *          true to remove the column from the list of sorted columns.
+   *          Default is false.
    */
   sort(column: Column<any>, direction?: 'asc' | 'desc', multiSort?: boolean, remove?: boolean) {
     multiSort = scout.nvl(multiSort, false);
@@ -2756,13 +2790,62 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   /**
+   * Adds the column to the list of grouped columns and re-sorts the table rows.
+   *
+   * @param direction
+   *          the sorting direction. Either 'asc' or 'desc'.
+   *          If not specified, the direction specified by the column is used ({@link Column.sortAscending}).
+   */
+  addGroupColumn(column: Column<any>, direction?: 'asc' | 'desc') {
+    this.group(column, direction, true);
+  }
+
+  /**
+   * Removes the column from the list of grouped columns and re-sorts the table rows.
+   */
+  removeGroupColumn(column: Column<any>) {
+    this.group(column, null, true, true);
+  }
+
+  /**
+   * Clears the list of grouped columns and re-sort the table rows.
+   */
+  removeAllGroupColumns() {
+    this.columns
+      .filter(column => column.grouped)
+      .forEach(this.removeGroupColumn.bind(this));
+  }
+
+  /**
    * The number of visible columns that are grouped.
    */
   visibleGroupColumnsCount(): number {
     return this.visibleColumns().filter(column => column.grouped).length;
   }
 
+  /**
+   * @deprecated use {@link group} instead.
+   */
   groupColumn(column: Column<any>, multiGroup?: boolean, direction?: 'asc' | 'desc', remove?: boolean) {
+    this.group(column, direction, multiGroup);
+  }
+
+  /**
+   * @param column
+   *          the column to group by.
+   * @param direction
+   *          the sorting direction. Either 'asc' or 'desc'.
+   *          If not specified, the direction specified by the column is used ({@link Column.sortAscending}).
+   * @param multiGroup
+   *          true to add the column to the list of grouped columns.
+   *          False to use this column exclusively as group column (reset other columns).
+   *          Does not have an effect is `remove` is set to true.
+   *          Default is false.
+   * @param remove
+   *          true to remove the column from the list of grouped columns.
+   *          Default is false.
+   */
+  group(column: Column<any>, direction?: 'asc' | 'desc', multiGroup?: boolean, remove?: boolean) {
     multiGroup = scout.nvl(multiGroup, false);
     remove = scout.nvl(remove, false);
     if (remove) {
@@ -2800,20 +2883,22 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.trigger('group', data);
   }
 
+  /**
+   * @deprecated use removeGroupColumn
+   */
   removeColumnGrouping(column: Column<any>) {
-    if (column) {
-      this.groupColumn(column, false, 'asc', true);
-    }
-  }
-
-  removeAllColumnGroupings() {
-    this.columns
-      .filter(column => column.grouped)
-      .forEach(this.removeColumnGrouping.bind(this));
+    this.removeGroupColumn(column);
   }
 
   /**
-   * @returns true if at least one column has grouped=true
+   * @deprecated use removeGroupColumn
+   */
+  removeAllColumnGroupings() {
+    this.removeAllGroupColumns();
+  }
+
+  /**
+   * @returns true if at least one column is {@link Column.grouped}.
    */
   isGrouped(): boolean {
     return this.columns.some(column => column.grouped);
@@ -3450,7 +3535,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
     // Has to be called before the property is set! Otherwise, the grouping will not completely be removed, since isGroupingPossible() will return false.
     if (hierarchical) {
-      this.removeAllColumnGroupings();
+      this.removeAllGroupColumns();
     }
     if (hierarchical && !(this.accessibilityRenderer instanceof HierarchicalTableAccessibilityRenderer)) {
       this.accessibilityRenderer = new HierarchicalTableAccessibilityRenderer();
