@@ -179,6 +179,20 @@ describe('DataObjectSerializer', () => {
     expect(json).toBe(expected);
   });
 
+  it('can serialize properties from abstract DOs', () => {
+    const expected = JSON.stringify(JSON.parse(`{
+      "_type": "scout.Fixture06",
+      "abstractPropDate": "2013-05-25 22:30:00.000",
+      "propDate": "2013-05-25 22:30:00.000"
+    }
+    `));
+    const json = dataObjects.stringify(scout.create(Fixture06Do, {
+      propDate: dates.parseJsonDate('2013-05-25 22:30:00.000'),
+      abstractPropDate: dates.parseJsonDate('2013-05-25 22:30:00.000')
+    }));
+    expect(json).toBe(expected);
+  });
+
   function _createFixture01Do(arr: Fixture02Do[], obj: Fixture03Do): Fixture01Do {
     const model = {
       propBool: true,
@@ -217,7 +231,12 @@ export class Fixture05Do extends BaseDoEntity {
   propObj2: Fixture06Do;
 }
 
+@typeName()
+export abstract class AbstractFixture06Do extends BaseDoEntity {
+  abstractPropDate?: Date;
+}
+
 @typeName('scout.Fixture06')
-export class Fixture06Do extends BaseDoEntity {
+export class Fixture06Do extends AbstractFixture06Do {
   propDate: Date;
 }

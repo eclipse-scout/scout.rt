@@ -29,7 +29,7 @@ export interface AnyDoEntity extends DoEntity {
  * Class decorator function for data objects. It writes the given typeName value to the _type attribute of the data object instance. Is executed before the class constructor.
  * @param typeName The typeName (_type) of the data object.
  */
-export function typeName(typeName: string) {
+export function typeName(typeName?: string) {
   return <T extends Constructor | AbstractConstructor>(BaseClass: T) => class extends BaseClass {
     constructor(...args: any[]) {
       super(...args);
