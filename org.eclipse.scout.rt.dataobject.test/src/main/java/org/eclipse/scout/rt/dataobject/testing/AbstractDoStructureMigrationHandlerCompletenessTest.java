@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.rt.dataobject.migration.AbstractDoDeletionMigrationHandler;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoStructureMigrationHandlerTest;
 import org.eclipse.scout.rt.dataobject.migration.IDoStructureMigrationHandler;
 import org.eclipse.scout.rt.platform.IgnoreBean;
@@ -52,6 +53,7 @@ public abstract class AbstractDoStructureMigrationHandlerCompletenessTest {
     Set<Class<?>> excludedMigrationHandlers = getExclusionList();
     Set<String> expectedTestClassNames = findClasses(IDoStructureMigrationHandler.class)
         .filter(clazz -> !excludedMigrationHandlers.contains(clazz))
+        .filter(clazz -> !AbstractDoDeletionMigrationHandler.class.isAssignableFrom(clazz))
         .map(Class::getName)
         .map(className -> className + "_Test")
         .collect(Collectors.toSet());
