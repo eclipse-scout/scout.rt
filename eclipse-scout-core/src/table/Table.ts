@@ -1190,6 +1190,11 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   protected _sort(animateAggregateRows?: boolean): boolean {
+    if (!this.rows.length) {
+      // nothing to sort
+      return true;
+    }
+
     let sortColumns = this._sortColumns();
 
     // Initialize comparators
