@@ -77,10 +77,6 @@ export interface TableFilterRemovedEvent<T = Table> extends Event<T> {
   filter: Filter<TableRow>;
 }
 
-export interface TableFiltersRemovedEvent<T = Table> extends Event<T> {
-  filter: Filter<TableRow>;
-}
-
 export interface TableGroupEvent<TValue = any, T = Table> extends Event<T> {
   column: Column<TValue>;
   groupAscending: boolean;
@@ -174,8 +170,6 @@ export interface TableEventMap extends WidgetEventMap {
   'filter': Event;
   'filterAdded': TableFilterAddedEvent;
   'filterRemoved': TableFilterRemovedEvent;
-  'filterReset': Event;
-  'filtersRemoved': TableFiltersRemovedEvent;
   'group': TableGroupEvent;
   'prepareCellEdit': TablePrepareCellEditEvent;
   'reload': TableReloadEvent;

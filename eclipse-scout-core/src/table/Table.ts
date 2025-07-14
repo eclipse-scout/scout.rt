@@ -4383,10 +4383,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   resetUserFilter(applyFilter = true) {
-    this.filters.filter(filter => filter instanceof TableUserFilter)
-      .forEach(filter => this.removeFilter(filter, applyFilter));
-
-    this._triggerFilterReset();
+    let newFilters = this.filters.filter(filter => !(filter instanceof TableUserFilter));
+    this.setFilters(newFilters, applyFilter);
   }
 
   hasUserFilter(): boolean {
@@ -4491,17 +4489,11 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    * @see TableModel.filters
    */
   setFilters(filters: (FilterOrFunction<TableRow> | ObjectOrModel<TableUserFilter>)[], applyFilter = true) {
-    this.resetUserFilter(false);
     let tableFilters = filters.map(filter => this._ensureFilter(filter));
     let result = this.filterSupport.setFilters(tableFilters, applyFilter);
-    let filtersAdded = result.filtersAdded;
-    let filtersRemoved = result.filtersRemoved;
-    filtersAdded.forEach(filter => this.trigger('filterAdded', {
-      filter: filter
-    }));
-    filtersRemoved.forEach(filter => this.trigger('filtersRemoved', {
-      filter: filter
-    }));
+
+    result.filtersAdded.forEach(filter => this.trigger('filterAdded', {filter}));
+    result.filtersRemoved.forEach(filter => this.trigger('filterRemoved', {filter}));
   }
 
   protected _ensureFilter<T extends Filter<TableRow>>(filter: TableUserFilterModel | FilterOrFunction<TableRow>): Filter<TableRow> {
@@ -4949,10 +4941,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
   protected _triggerFilter() {
     this.trigger('filter');
-  }
-
-  protected _triggerFilterReset() {
-    this.trigger('filterReset');
   }
 
   protected _triggerAppLinkAction(column: Column<any>, row: TableRow, ref: string, $appLink: JQuery) {

@@ -9,7 +9,7 @@
  */
 import {
   Action, BeanColumn, BooleanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, SmartColumn, Status, strings, Table,
-  TableAdapter, TableField, TableRow, TableRowModel, Tooltip
+  TableAdapter, TableField, TableRow, TableRowModel, TableUserFilter, Tooltip
 } from '../../src/index';
 import {JQueryTesting, LocaleSpecHelper, SpecTable, TableModelWithCells, TableSpecHelper} from '../../src/testing/index';
 import $ from 'jquery';
@@ -3967,6 +3967,122 @@ describe('Table', () => {
       table.setFilters([]);
       expect(table.filters.length).toBe(0);
       expect(table.filteredRows().length).toBe(4);
+    });
+  });
+
+  describe('setFilters', () => {
+
+    it('replaces existing filters', () => {
+      class SpecTableUserFilter extends TableUserFilter {
+        key: string;
+        acceptedRows: TableRow[];
+
+        constructor(key: string, acceptedRows: TableRow[]) {
+          super();
+          this.key = key;
+          this.acceptedRows = acceptedRows;
+        }
+
+        override createKey(): string {
+          return this.key;
+        }
+
+        override createLabel(): string {
+          return 'Spec Table User Filter';
+        }
+
+        override accept(row: TableRow): boolean {
+          return scout.isOneOf(row, this.acceptedRows);
+        }
+      }
+
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      let row0 = table.rows[0];
+      let row1 = table.rows[1];
+      let row2 = table.rows[2];
+      let row3 = table.rows[3];
+
+      let eventCollector = [];
+      table.on('filterAdded filterRemoved', event => eventCollector.push(event));
+
+      let filter1 = new SpecTableUserFilter('F1', [row1]);
+      let filter2 = new SpecTableUserFilter('F2', [row3, row0]);
+      let filter3 = new SpecTableUserFilter('F3', [row2]);
+
+      // -----
+
+      table.addFilter(filter1);
+      expect(table.filters.length).toBe(1);
+      expect(table.filteredRows()).toEqual([row1]);
+      expect(eventCollector.length).toBe(1);
+      expect(eventCollector[0].type).toBe('filterAdded');
+      expect(eventCollector[0].filter).toBe(filter1);
+      eventCollector = [];
+
+      table.setFilters([filter2]);
+      expect(table.filters.length).toBe(1);
+      expect(table.filteredRows()).toEqual([row0, row3]);
+      expect(eventCollector.length).toBe(2);
+      expect(eventCollector[0].type).toBe('filterAdded');
+      expect(eventCollector[0].filter).toBe(filter2);
+      expect(eventCollector[1].type).toBe('filterRemoved');
+      expect(eventCollector[1].filter).toBe(filter1);
+      eventCollector = [];
+
+      table.setFilters([filter2, filter1]);
+      expect(table.filters.length).toBe(2);
+      expect(table.filteredRows()).toEqual([]);
+      expect(eventCollector.length).toBe(1);
+      expect(eventCollector[0].type).toBe('filterAdded');
+      expect(eventCollector[0].filter).toBe(filter1);
+      eventCollector = [];
+
+      table.setFilters([]);
+      expect(table.filters.length).toBe(0);
+      expect(table.filteredRows()).toEqual([row0, row1, row2, row3]);
+      expect(eventCollector.length).toBe(2);
+      expect(eventCollector[0].type).toBe('filterRemoved');
+      expect(eventCollector[0].filter).toBe(filter2);
+      expect(eventCollector[1].type).toBe('filterRemoved');
+      expect(eventCollector[1].filter).toBe(filter1);
+      eventCollector = [];
+
+      table.setFilters([filter1, filter2]);
+      expect(table.filters.length).toBe(2);
+      expect(table.filteredRows()).toEqual([]);
+      expect(eventCollector.length).toBe(2);
+      expect(eventCollector[0].type).toBe('filterAdded');
+      expect(eventCollector[0].filter).toBe(filter1);
+      expect(eventCollector[1].type).toBe('filterAdded');
+      expect(eventCollector[1].filter).toBe(filter2);
+      eventCollector = [];
+
+      table.resetUserFilter();
+      expect(table.filters.length).toBe(0);
+      expect(table.filteredRows()).toEqual([row0, row1, row2, row3]);
+      expect(eventCollector.length).toBe(2);
+      expect(eventCollector[0].type).toBe('filterRemoved');
+      expect(eventCollector[0].filter).toBe(filter1);
+      expect(eventCollector[1].type).toBe('filterRemoved');
+      expect(eventCollector[1].filter).toBe(filter2);
+      eventCollector = [];
+
+      table.setFilters([filter1, filter2]);
+      table.removeFilter(filter3);
+      expect(table.filters.length).toBe(2);
+      expect(table.filteredRows()).toEqual([]);
+      table.removeFilter(filter2);
+      expect(table.filters.length).toBe(1);
+      expect(table.filteredRows()).toEqual([row1]);
+      expect(eventCollector.length).toBe(3);
+      expect(eventCollector[0].type).toBe('filterAdded');
+      expect(eventCollector[0].filter).toBe(filter1);
+      expect(eventCollector[1].type).toBe('filterAdded');
+      expect(eventCollector[1].filter).toBe(filter2);
+      expect(eventCollector[2].type).toBe('filterRemoved');
+      expect(eventCollector[2].filter).toBe(filter2);
+      eventCollector = [];
     });
   });
 
