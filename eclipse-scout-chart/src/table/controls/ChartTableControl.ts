@@ -44,7 +44,7 @@ export class ChartTableControl extends TableControl implements ChartTableControl
   protected _tableUpdatedHandler: (e: Event<Table>) => void;
   protected _tableColumnStructureChangedHandler: () => void;
   protected _chartValueClickedHandler: () => void;
-  protected _filterResetListener: EventListener;
+  protected _filterRemovedListener: EventListener;
   protected _tableUpdatedTimeOutId: number;
 
   constructor() {
@@ -417,10 +417,11 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     ];
 
     // listeners
-    this._filterResetListener = this.table.on('filterReset', event => {
-      if (this.chart) {
-        this.chart.setCheckedItems([]);
+    this._filterRemovedListener = this.table.on('filterRemoved', event => {
+      if (!(event.filter instanceof ChartTableUserFilter)) {
+        return;
       }
+      this.chart.setCheckedItems([]);
     });
 
     this._addListeners();
@@ -1233,7 +1234,7 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     this._removeScrollbars();
     this.$contentContainer.remove();
     this.chart.remove();
-    this.table.events.removeListener(this._filterResetListener);
+    this.table.events.removeListener(this._filterRemovedListener);
     this._removeListeners();
     this.oldChartType = null;
     this.recomputeEnabled();
