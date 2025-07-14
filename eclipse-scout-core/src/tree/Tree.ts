@@ -2130,20 +2130,25 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     this._nodesSelectedInternal(nodes);
     this._triggerNodesSelected(debounceSend);
 
-    if (this.selectedNodes.length > 0 && !this.visibleNodesMap[this.selectedNodes[0].id]) {
-      this._expandAllParentNodes(this.selectedNodes[0]);
-    }
-
-    if (this.selectedNodes.length === 1) {
-      aria.linkElementWithActiveDescendant(this.$container, this.selectedNodes[0].$node);
+    let selectedNode = this.selectedNode();
+    if (selectedNode) {
+      aria.linkElementWithActiveDescendant(this.$container, selectedNode.$node);
+      if (!this.visibleNodesMap[selectedNode.id]) {
+        this._expandAllParentNodes(selectedNode);
+        if (!this.visibleNodesMap[selectedNode.id] && !this.isBreadcrumbStyleActive()) {
+          // If node is still not visible, the parent was likely already lazily expanded -> trigger LazyNodeFilter to show selected node.
+          // It is not necessary in breadcrumb mode because it will be re-filtered anyway, see below.
+          this.applyFiltersForNode(selectedNode);
+        }
+      }
     }
 
     this._updateItemPath(true);
     if (this.isBreadcrumbStyleActive()) {
       // In breadcrumb mode selected node has to be expanded
-      if (this.selectedNodes.length > 0 && !this.selectedNodes[0].expanded) {
-        this.expandNode(this.selectedNodes[0]);
-        this.selectedNodes[0].filterDirty = true;
+      if (selectedNode && !selectedNode.expanded) {
+        this.expandNode(selectedNode);
+        selectedNode.filterDirty = true;
       }
       this.filter();
     }
@@ -2239,8 +2244,8 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   }
 
   protected _expandAllParentNodes(node: TreeNode) {
-    let i, currNode = node,
-      parentNodes = [];
+    let currNode = node;
+    let parentNodes = [];
 
     currNode = node;
     let nodesToInsert: TreeNode[] = [];
@@ -2252,7 +2257,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       currNode = currNode.parentNode;
     }
 
-    for (i = parentNodes.length - 1; i >= 0; i--) {
+    for (let i = parentNodes.length - 1; i >= 0; i--) {
       if (nodesToInsert.indexOf(parentNodes[i]) !== -1) {
         this._addToVisibleFlatList(parentNodes[i], false);
       }

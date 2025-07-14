@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1885,6 +1885,45 @@ describe('Tree', () => {
       expect(node0.expanded).toBe(true);
       expect(child0.expanded).toBe(true);
       expect(tree.$selectedNodes().length).toBe(1);
+      expect(grandchild0.$node.isSelected()).toBe(true);
+    });
+
+    it('ensures the selected node is shown even if the parent is lazily expanded', () => {
+      let model = helper.createModelFixture(1, 2, false);
+      model.nodes[0].childNodes[0].lazyExpandingEnabled = true;
+      let tree = helper.createTree(model);
+      let node0 = tree.nodes[0];
+      let child0 = node0.childNodes[0];
+      let grandchild0 = child0.childNodes[0];
+      tree.render();
+
+      tree.expandNode(node0);
+      tree.expandNode(child0);
+      expect(child0.expandedLazy).toBe(true);
+      expect(grandchild0.filterAccepted).toBe(false);
+      expect(grandchild0.rendered).toBe(false);
+
+      tree.selectNode(grandchild0);
+      expect(grandchild0.filterAccepted).toBe(true);
+      expect(grandchild0.rendered).toBe(true);
+      expect(grandchild0.$node.isSelected()).toBe(true);
+    });
+
+    it('ensures the selected node is shown even if the grand-parent is lazily expanded', () => {
+      let model = helper.createModelFixture(1, 2, false);
+      model.nodes[0].lazyExpandingEnabled = true;
+      let tree = helper.createTree(model);
+      let node0 = tree.nodes[0];
+      let child0 = node0.childNodes[0];
+      let grandchild0 = child0.childNodes[0];
+      tree.render();
+
+      tree.expandNode(node0);
+      expect(node0.expandedLazy).toBe(true);
+      expect(grandchild0.rendered).toBe(false);
+
+      tree.selectNode(grandchild0);
+      expect(grandchild0.rendered).toBe(true);
       expect(grandchild0.$node.isSelected()).toBe(true);
     });
 
