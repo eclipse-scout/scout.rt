@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Column, scout, Table, TableClientUiPreferencesDo, uiPreferences, UiPreferences, UiPreferencesDo, UiPreferencesUpdateDo} from '../../src/index';
+import {Column, scout, Table, TableClientUiPreferencesDo, tableUiPreferences, uiPreferences, UiPreferences, UiPreferencesDo, UiPreferencesUpdateDo} from '../../src/index';
 import {SpecUiPreferencesStore} from '../../src/testing';
 
 describe('UiPreferences', () => {
@@ -36,8 +36,8 @@ describe('UiPreferences', () => {
       let store = SpecUiPreferencesStore.get();
       expect(store.loadCount).toBe(0);
       expect(store.subscribers.length).toBe(0);
-      expect(uiPreferences.getTablePreferences(table1)).toBe(undefined);
-      expect(uiPreferences.getTablePreferences(table2)).toBe(undefined);
+      expect(tableUiPreferences.get(table1)).toBe(undefined);
+      expect(tableUiPreferences.get(table2)).toBe(undefined);
       store.preferences = scout.create(UiPreferencesDo, {
         tablePreferences: [
           scout.create(TableClientUiPreferencesDo, {
@@ -55,11 +55,11 @@ describe('UiPreferences', () => {
 
       expect(store.loadCount).toBe(1);
       expect(store.subscribers.length).toBe(1);
-      expect(uiPreferences.getTablePreferences(table1)).toBeInstanceOf(TableClientUiPreferencesDo);
-      expect(uiPreferences.getTablePreferences(table1).tileMode).toBe(false);
+      expect(tableUiPreferences.get(table1)).toBeInstanceOf(TableClientUiPreferencesDo);
+      expect(tableUiPreferences.get(table1).tileMode).toBe(false);
       expect(table1.tileMode).toBe(false);
-      expect(uiPreferences.getTablePreferences(table2)).toBeInstanceOf(TableClientUiPreferencesDo);
-      expect(uiPreferences.getTablePreferences(table2).tileMode).toBe(false);
+      expect(tableUiPreferences.get(table2)).toBeInstanceOf(TableClientUiPreferencesDo);
+      expect(tableUiPreferences.get(table2).tileMode).toBe(false);
       expect(table2.tileMode).toBe(false);
 
       store.subscribers[0](scout.create(UiPreferencesUpdateDo, {
@@ -74,10 +74,10 @@ describe('UiPreferences', () => {
       }));
 
       expect(store.loadCount).toBe(1); // still 1
-      expect(uiPreferences.getTablePreferences(table1)).toBeInstanceOf(TableClientUiPreferencesDo);
-      expect(uiPreferences.getTablePreferences(table1).tileMode).toBe(true);
+      expect(tableUiPreferences.get(table1)).toBeInstanceOf(TableClientUiPreferencesDo);
+      expect(tableUiPreferences.get(table1).tileMode).toBe(true);
       expect(table1.tileMode).toBe(false); // not updated automatically
-      expect(uiPreferences.getTablePreferences(table2)).toBe(undefined);
+      expect(tableUiPreferences.get(table2)).toBe(undefined);
       expect(table2.tileMode).toBe(false);
     });
   });
@@ -96,10 +96,15 @@ describe('UiPreferences', () => {
       let table = scout.create(Table, {
         parent: session.desktop,
         id: 't1',
+        uiPreferencesEnabled: true,
         columns: [
           {
             objectType: Column,
             id: 'c1'
+          },
+          {
+            objectType: Column,
+            id: 'c2'
           }
         ]
       });
@@ -107,20 +112,38 @@ describe('UiPreferences', () => {
       let store = SpecUiPreferencesStore.get();
       expect(store.storeCount).toBe(0);
 
-      uiPreferences.installTableListener(table);
       table.setTileMode(true);
-      table.columns[0].setWidth(123);
+      table.setTileMode(false);
+      jasmine.clock().tick(0);
+      expect(store.storeCount).toBe(1);
+      jasmine.clock().tick(1000);
+      expect(store.storeCount).toBe(1);
 
-      jasmine.clock().tick(1000);
+      table.columns[0].setVisible(false);
+      table.columns[1].setVisible(false);
       expect(store.storeCount).toBe(1);
+      jasmine.clock().tick(0);
+      expect(store.storeCount).toBe(2);
       jasmine.clock().tick(1000);
-      expect(store.storeCount).toBe(1);
+      expect(store.storeCount).toBe(2);
 
       table.columns[0].setWidth(456);
       table.columns[0].setWidth(789);
-      expect(store.storeCount).toBe(1);
-      jasmine.clock().tick(1000);
       expect(store.storeCount).toBe(2);
+      jasmine.clock().tick(333); // less than 750
+      expect(store.storeCount).toBe(2);
+      jasmine.clock().tick(1000);
+      expect(store.storeCount).toBe(3);
+      jasmine.clock().tick(1000);
+      expect(store.storeCount).toBe(3);
+
+      table.setTileMode(true);
+      table.columns[1].setVisible(true);
+      expect(store.storeCount).toBe(3);
+      jasmine.clock().tick(0);
+      expect(store.storeCount).toBe(4);
+      jasmine.clock().tick(1000);
+      expect(store.storeCount).toBe(4);
     });
   });
 });

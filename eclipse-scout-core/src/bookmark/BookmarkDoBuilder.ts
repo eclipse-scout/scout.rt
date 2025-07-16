@@ -9,7 +9,8 @@
  */
 import {
   arrays, BaseDoEntity, BookmarkDo, BookmarkDoBuilderModel, BookmarkSupport, BookmarkTableRowIdentifierDo, ChartTableControlConfigHelper, Desktop, Form, IBookmarkDefinitionDo, IBookmarkDo, IBookmarkPageDo, IChartTableControlConfigDo,
-  InitModelOf, NodeBookmarkPageDo, objects, ObjectWithType, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, strings, TableBookmarkPageDo, TableClientUiPreferencesDo, UiPreferences, uiPreferences
+  InitModelOf, NodeBookmarkPageDo, objects, ObjectWithType, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, strings, TableBookmarkPageDo, TableClientUiPreferencesDo, TableUiPreferences,
+  tableUiPreferences
 } from '../index';
 
 export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel {
@@ -214,12 +215,10 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
       return null;
     }
     let table = page.detailTable;
-    let prefs = uiPreferences.createTablePreferences(table);
-    let profile = uiPreferences.createTablePreferenceProfile(table, {
-      includeUserFilters: true
-    });
+    let prefs = tableUiPreferences.create(table);
+    let profile = tableUiPreferences.createProfile(table, {includeUserFilters: true});
     prefs.tablePreferenceProfiles = new Map([
-      [UiPreferences.TABLE_PREFERENCE_PROFILE_ID_BOOKMARK, profile]
+      [TableUiPreferences.PROFILE_ID_BOOKMARK, profile]
     ]);
     return prefs;
   }

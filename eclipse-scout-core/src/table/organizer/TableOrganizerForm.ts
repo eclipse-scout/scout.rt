@@ -9,7 +9,7 @@
  */
 import {
   Action, arrays, Cell, Column, Event, Form, InitModelOf, MoveTableRowMenuHelper, scout, ShowInvisibleColumnsForm, StringField, strings, Table, TableCompleteCellEditEvent, TableOrganizerFormWidgetMap, TableRow, TableRowModel,
-  TableRowsSelectedEvent, TableStartCellEditEvent, UiPreferences, uiPreferences, WidgetModel
+  TableRowsSelectedEvent, TableStartCellEditEvent, tableUiPreferences, TableUiPreferences, WidgetModel
 } from '../../index';
 import TableOrganizerFormModel, {ColumnsTable0, ProfilesTable} from './TableOrganizerFormModel';
 
@@ -49,7 +49,7 @@ export class TableOrganizerForm extends Form {
     this._installColumnUpDownMenus();
 
     // Pages in a bookmark outline should only have one profile (the one stored in the bookmark) -> disable menu to create new profiles
-    if (strings.startsWith(this.table.userPreferenceContext, `${UiPreferences.TABLE_PREFERENCE_PROFILE_ID_BOOKMARK}:`)) {
+    if (strings.startsWith(this.table.userPreferenceContext, `${TableUiPreferences.PROFILE_ID_BOOKMARK}:`)) {
       this.widget('NewConfigMenu').setEnabled(false);
     }
   }
@@ -65,10 +65,10 @@ export class TableOrganizerForm extends Form {
     const rows: TableRowModel[] = [{cells: [this.session.text('DefaultSettings'), true]}];
 
     // Create a row for each preference profile, except the GLOBAL profile (this represents the current state and cannot be activated explicitly)
-    let prefs = uiPreferences.getTablePreferences(this.table);
-    if (prefs && prefs.tablePreferenceProfiles) {
+    let prefs = tableUiPreferences.get(this.table);
+    if (prefs?.tablePreferenceProfiles) {
       [...prefs.tablePreferenceProfiles.keys()]
-        .filter(key => key !== UiPreferences.TABLE_PREFERENCE_PROFILE_ID_GLOBAL)
+        .filter(key => key !== TableUiPreferences.PROFILE_ID_GLOBAL)
         .forEach(key => rows.push({cells: [key]}));
     }
 
@@ -92,7 +92,7 @@ export class TableOrganizerForm extends Form {
 
     let oldConfigName = this.profilesTable.columnById('ConfigNameColumn').cellValue(event.row);
     let newConfigName = event.field.value;
-    uiPreferences.renameTablePreferenceProfile(this.table, oldConfigName, newConfigName);
+    tableUiPreferences.renameProfile(this.table, oldConfigName, newConfigName);
   }
 
   protected _updateProfileMenus() {
@@ -105,8 +105,8 @@ export class TableOrganizerForm extends Form {
   protected _addNewConfig() {
     let configName = this._newConfigName();
 
-    let profile = uiPreferences.createTablePreferenceProfile(this.table, {includeUserFilters: true});
-    uiPreferences.storeTablePreferenceProfile(this.table, configName, profile);
+    let profile = tableUiPreferences.createProfile(this.table, {includeUserFilters: true});
+    tableUiPreferences.storeProfile(this.table, configName, profile);
 
     let row = scout.create(TableRow, {parent: this.profilesTable});
     this.profilesTable.columnById('ConfigNameColumn').setCellValue(row, configName);
@@ -133,11 +133,11 @@ export class TableOrganizerForm extends Form {
     if (defaultConfig) {
       this.table.resetToInitialUiPreferences();
     } else {
-      let prefs = uiPreferences.getTablePreferences(this.table);
-      let profile = uiPreferences.getTablePreferenceProfile(prefs, configName);
-      uiPreferences.applyTablePreferenceProfile(this.table, profile);
+      let prefs = tableUiPreferences.get(this.table);
+      let profile = tableUiPreferences.getProfile(prefs, configName);
+      tableUiPreferences.applyProfile(this.table, profile);
       // Store activated profile as current state
-      uiPreferences.storeGlobalTablePreferenceProfile(this.table);
+      tableUiPreferences.storeGlobalProfile(this.table);
     }
 
     this._reloadColumnsTable();
@@ -150,8 +150,8 @@ export class TableOrganizerForm extends Form {
       return;
     }
     let configName = this.profilesTable.columnById('ConfigNameColumn').cellValue(row);
-    let profile = uiPreferences.createTablePreferenceProfile(this.table);
-    uiPreferences.storeTablePreferenceProfile(this.table, configName, profile);
+    let profile = tableUiPreferences.createProfile(this.table);
+    tableUiPreferences.storeProfile(this.table, configName, profile);
   }
 
   protected _renameConfig(row?: TableRow) {
@@ -171,7 +171,7 @@ export class TableOrganizerForm extends Form {
     rows = rows.filter(row => !defaultConfigColumn.cellValue(row));
     rows.forEach(row => {
       let configName = configNameColumn.cellValue(row);
-      uiPreferences.removeTablePreferenceProfile(this.table, configName);
+      tableUiPreferences.removeProfile(this.table, configName);
     });
     this.profilesTable.deleteRows(rows);
   }

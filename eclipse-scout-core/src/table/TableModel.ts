@@ -294,7 +294,7 @@ export interface TableModel extends WidgetModel {
    */
   userPreferenceContext?: string;
   /**
-   * Specifies whether some UI changes made by the user (e.g. order or width of columns) are stored and re-applied later.
+   * Specifies whether certain UI changes made by the user (e.g. order or width of columns) are stored and re-applied later.
    * The default is `false`.
    *
    * **Important:** To ensure that the saved preferences are assigned to the correct table again, it is important that
