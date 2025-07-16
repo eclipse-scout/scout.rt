@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BooleanColumn, Column, DateColumn, NumberColumn, ObjectIdProvider, scout, Table, TableClientUiPreferenceProfileDo, TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableRow, TableTextUserFilter, TextColumnUserFilter, Tile,
-  uiPreferences, UiPreferences, UiPreferencesDo, WidgetModel
+  BooleanColumn, Column, DateColumn, NumberColumn, ObjectIdProvider, scout, Table, TableClientUiPreferenceProfileDo, TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableRow, TableTextUserFilter, tableUiPreferences,
+  TableUiPreferences, TextColumnUserFilter, Tile, uiPreferences, UiPreferencesDo, WidgetModel
 } from '../../src/index';
 import {SpecUiPreferencesStore} from '../../src/testing';
 
@@ -46,7 +46,7 @@ describe('TableUiPreferences', () => {
       expect(prefStore.preferences.tablePreferences[0].tableId).toBe('t1');
       expect(prefStore.preferences.tablePreferences[0].tileMode).toBe(false);
       expect(prefStore.preferences.tablePreferences[0].tablePreferenceProfiles.size).toBe(1);
-      let profile = prefStore.preferences.tablePreferences[0].tablePreferenceProfiles.get(UiPreferences.TABLE_PREFERENCE_PROFILE_ID_GLOBAL);
+      let profile = prefStore.preferences.tablePreferences[0].tablePreferenceProfiles.get(TableUiPreferences.PROFILE_ID_GLOBAL);
       expect(profile).toBeTruthy();
       expect(profile.columns.length).toBe(6);
       expect(profile.columns[0].columnId).toBe('c1');
@@ -66,7 +66,7 @@ describe('TableUiPreferences', () => {
       expect(prefStore.preferences.tablePreferences[0].tableId).toBe('t1');
       expect(prefStore.preferences.tablePreferences[0].tileMode).toBe(false);
       expect(prefStore.preferences.tablePreferences[0].tablePreferenceProfiles.size).toBe(1);
-      profile = prefStore.preferences.tablePreferences[0].tablePreferenceProfiles.get(UiPreferences.TABLE_PREFERENCE_PROFILE_ID_GLOBAL);
+      profile = prefStore.preferences.tablePreferences[0].tablePreferenceProfiles.get(TableUiPreferences.PROFILE_ID_GLOBAL);
       expect(profile).toBeTruthy();
       expect(profile.columns.length).toBe(6);
       expect(profile.columns.map(c => c.columnId)).toEqual(['c1', 'c2', 'c6', 'c3', 'c4', 'c5']);
@@ -231,7 +231,7 @@ describe('TableUiPreferences', () => {
             tableId: 't1',
             tileMode: true,
             tablePreferenceProfiles: new Map([
-              [UiPreferences.TABLE_PREFERENCE_PROFILE_ID_GLOBAL, scout.create(TableClientUiPreferenceProfileDo, {
+              [TableUiPreferences.PROFILE_ID_GLOBAL, scout.create(TableClientUiPreferenceProfileDo, {
                 columns: [
                   scout.create(TableColumnClientUiPreferenceDo, {
                     columnId: 'c2',
@@ -315,7 +315,7 @@ describe('TableUiPreferences', () => {
         parent: session.desktop,
         id: 't1'
       });
-      table.setInitialUiPreferences(uiPreferences.createTablePreferenceProfile(table));
+      table.setInitialUiPreferences(tableUiPreferences.createProfile(table));
 
       let c2 = table.columnById('c2');
       let c3 = table.columnById('c3');
@@ -338,7 +338,7 @@ describe('TableUiPreferences', () => {
         freeText: 'foo'
       }));
 
-      let profile1 = uiPreferences.createTablePreferenceProfile(table);
+      let profile1 = tableUiPreferences.createProfile(table);
 
       // -----
 
@@ -352,11 +352,11 @@ describe('TableUiPreferences', () => {
         text: 'bar'
       }));
 
-      let profile2 = uiPreferences.createTablePreferenceProfile(table);
+      let profile2 = tableUiPreferences.createProfile(table);
 
       // -----
 
-      uiPreferences.applyTablePreferenceProfile(table, profile1);
+      tableUiPreferences.applyProfile(table, profile1);
 
       expect(table.columns.map(c => c.id)).toEqual(['c1', 'c2', 'c6', 'c3', 'c4', 'c5']);
       expect(table.visibleColumns().map(c => c.id)).toEqual(['c2', 'c6', 'c3', 'c4']);
@@ -367,7 +367,7 @@ describe('TableUiPreferences', () => {
       expect(table.columns.map(c => c.sortActive)).toEqual([false, false, false, true, true, false]);
       expect(table.filterCount()).toBe(2);
 
-      uiPreferences.applyTablePreferenceProfile(table, profile2);
+      tableUiPreferences.applyProfile(table, profile2);
 
       expect(table.columns.map(c => c.id)).toEqual(['c1', 'c2', 'c3', 'c6', 'c4', 'c5']);
       expect(table.visibleColumns().map(c => c.id)).toEqual(['c2', 'c3', 'c6', 'c4']);
@@ -389,7 +389,7 @@ describe('TableUiPreferences', () => {
       expect(table.columns.map(c => c.sortActive)).toEqual([false, false, false, false, true, false]);
       expect(table.filterCount()).toBe(0);
 
-      uiPreferences.applyTablePreferenceProfile(table, profile1);
+      tableUiPreferences.applyProfile(table, profile1);
       expect(table.filterCount()).toBe(0);
     });
 
@@ -401,14 +401,14 @@ describe('TableUiPreferences', () => {
         rowIconVisible: true,
         rowIconColumnWidth: 96
       });
-      table.setInitialUiPreferences(uiPreferences.createTablePreferenceProfile(table));
+      table.setInitialUiPreferences(tableUiPreferences.createProfile(table));
       expect(table.columns.length).toBe(6 + 2);
       expect(table.columns.map(c => c.guiOnly ? null : c.id)).toEqual([null, null, 'c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
 
       let c2 = table.columnById('c2');
       c2.setWidth(202);
 
-      let profile = uiPreferences.createTablePreferenceProfile(table);
+      let profile = tableUiPreferences.createProfile(table);
       expect(profile.columns.length).toBe(6);
       expect(profile.columns.map(c => c.columnId)).toEqual(['c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
 
@@ -416,7 +416,7 @@ describe('TableUiPreferences', () => {
       expect(table.columns.length).toBe(6 + 2);
       expect(table.columns.map(c => c.guiOnly ? null : c.id)).toEqual([null, null, 'c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
       expect(c2.width).toBe(102);
-      uiPreferences.applyTablePreferenceProfile(table, profile);
+      tableUiPreferences.applyProfile(table, profile);
       expect(table.columns.length).toBe(6 + 2);
       expect(table.columns.map(c => c.guiOnly ? null : c.id)).toEqual([null, null, 'c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
       expect(c2.width).toBe(202);
@@ -442,7 +442,7 @@ describe('TableUiPreferences', () => {
       expect(table.columns.map(c => c.visible)).toEqual([false, true, false, true, true, true]);
       expect(table.columns.map(c => c.visibleIgnoreCompacted)).toEqual([false, true, false, true, true, true]);
       expect(table.columns.map(c => c.compacted)).toEqual([false, false, false, false, false, false]);
-      let profile1 = uiPreferences.createTablePreferenceProfile(table);
+      let profile1 = tableUiPreferences.createProfile(table);
       expect(profile1.columns.length).toBe(6);
       expect(profile1.columns.map(c => c.columnId)).toEqual(['c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
       expect(profile1.columns.map(c => c.visible)).toEqual([false, true, false, true, true, true]);
@@ -455,7 +455,7 @@ describe('TableUiPreferences', () => {
       expect(table.columns.map(c => c.visible)).toEqual([false, false, false, false, false, false, true]);
       expect(table.columns.map(c => c.visibleIgnoreCompacted)).toEqual([false, true, false, true, true, true, true]);
       expect(table.columns.map(c => c.compacted)).toEqual([false, true, true, true, true, true, false]);
-      let profile2 = uiPreferences.createTablePreferenceProfile(table);
+      let profile2 = tableUiPreferences.createProfile(table);
       expect(profile2.columns.length).toBe(6); // <--
       expect(profile2.columns.map(c => c.columnId)).toEqual(['c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
       expect(profile2.columns.map(c => c.visible)).toEqual([false, true, false, true, true, true]);

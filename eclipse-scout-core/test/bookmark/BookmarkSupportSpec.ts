@@ -11,12 +11,12 @@
 import {
   ActivateBookmarkPathParam, BaseDoEntity, BookmarkDo, BookmarkDoBuilder, BookmarkSupport, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierStringComponentDo, BooleanColumn, Column, Desktop, NodeBookmarkPageDo, NumberColumn,
   NumberColumnUserFilter, NumberColumnUserFilterStateDo, Outline, OutlineBookmarkDefinitionDo, PageBookmarkDefinitionDo, PageIdDummyPageParamDo, ResetMenu, scout, SearchMenu, Table, TableBookmarkPageDo, TableClientUiPreferenceProfileDo,
-  TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableTextUserFilter, TableTextUserFilterStateDo, UiPreferences, UuidPool
+  TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableTextUserFilter, TableTextUserFilterStateDo, TableUiPreferences, UuidPool
 } from '../../src/index';
 import {
   FRUIT_1_KEY, FRUIT_2_KEY, FRUIT_3_KEY, FRUIT_4_KEY, FRUIT_5_KEY, goToOutline, SPEC_NODE_PAGE_1_UUID, SPEC_NODE_PAGE_2_UUID, SPEC_NODE_PAGE_3_UUID, SPEC_NODE_PAGE_4_UUID, SPEC_OUTLINE_1_ID, SPEC_OUTLINE_1_UUID, SPEC_OUTLINE_2_ID,
-  SPEC_OUTLINE_2_UUID, SPEC_OUTLINE_3_ID, SPEC_OUTLINE_3_UUID, SPEC_TABLE_PAGE_1_UUID, SPEC_TABLE_PAGE_2_UUID,  SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID,
-  SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, SPEC_TABLE_PAGE_3_TABLE_UUID,SPEC_TABLE_PAGE_3_UUID, specDesktopModel, SpecNodePage1, SpecNodePage2, SpecNodePage3, SpecNodePage4, SpecPageParamDo,
+  SPEC_OUTLINE_2_UUID, SPEC_OUTLINE_3_ID, SPEC_OUTLINE_3_UUID, SPEC_TABLE_PAGE_1_UUID, SPEC_TABLE_PAGE_2_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID,
+  SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, SPEC_TABLE_PAGE_3_TABLE_UUID, SPEC_TABLE_PAGE_3_UUID, specDesktopModel, SpecNodePage1, SpecNodePage2, SpecNodePage3, SpecNodePage4, SpecPageParamDo,
   SpecSearchDo, SpecSearchForm, SpecTablePage1, SpecTablePage2, SpecTablePage3
 } from './bookmark-fixtures';
 
@@ -207,7 +207,7 @@ describe('BookmarkSupport', () => {
       expect(bookmarkedPage.tablePreferences.tileGlobalKey).toBe(undefined);
       expect(bookmarkedPage.tablePreferences.tablePreferenceProfiles).toBeInstanceOf(Map);
       expect(bookmarkedPage.tablePreferences.tablePreferenceProfiles.size).toBe(1);
-      let bookmarkedTableProfile = bookmarkedPage.tablePreferences.tablePreferenceProfiles.get(UiPreferences.TABLE_PREFERENCE_PROFILE_ID_BOOKMARK);
+      let bookmarkedTableProfile = bookmarkedPage.tablePreferences.tablePreferenceProfiles.get(TableUiPreferences.PROFILE_ID_BOOKMARK);
       expect(bookmarkedTableProfile).toBeTruthy();
       expect(bookmarkedTableProfile.tableCustomizerData).toBe(undefined);
       expect(bookmarkedTableProfile.columns).toEqual([
@@ -615,7 +615,7 @@ describe('BookmarkSupport', () => {
               tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
               tileMode: false,
               tablePreferenceProfiles: new Map([
-                [UiPreferences.TABLE_PREFERENCE_PROFILE_ID_BOOKMARK, scout.create(TableClientUiPreferenceProfileDo, {
+                [TableUiPreferences.PROFILE_ID_BOOKMARK, scout.create(TableClientUiPreferenceProfileDo, {
                   columns: [
                     scout.create(TableColumnClientUiPreferenceDo, {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, // KeyColumn
@@ -1337,7 +1337,7 @@ describe('BookmarkSupport', () => {
             tablePreferences: scout.create(TableClientUiPreferencesDo, {
               tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
               tablePreferenceProfiles: new Map([
-                [UiPreferences.TABLE_PREFERENCE_PROFILE_ID_BOOKMARK, scout.create(TableClientUiPreferenceProfileDo, {
+                [TableUiPreferences.PROFILE_ID_BOOKMARK, scout.create(TableClientUiPreferenceProfileDo, {
                   columns: [
                     scout.create(TableColumnClientUiPreferenceDo, {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, // KeyColumn
@@ -1431,7 +1431,7 @@ describe('BookmarkSupport', () => {
             tablePreferences: scout.create(TableClientUiPreferencesDo, {
               tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
               tablePreferenceProfiles: new Map([
-                [UiPreferences.TABLE_PREFERENCE_PROFILE_ID_BOOKMARK, scout.create(TableClientUiPreferenceProfileDo, {
+                [TableUiPreferences.PROFILE_ID_BOOKMARK, scout.create(TableClientUiPreferenceProfileDo, {
                   columns: [
                     scout.create(TableColumnClientUiPreferenceDo, {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, // KeyColumn

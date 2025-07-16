@@ -10,7 +10,7 @@
 import {
   App, arrays, BaseDoEntity, BookmarkDo, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierDoFactory, ChartTableControlConfigHelper, Constructor, Desktop, IBookmarkDo,
   IBookmarkPageDo, InitModelOf, MaxRowCountContributionDo, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageParamDo, PageWithNodes, PageWithTable, scout, Session, Status,
-  TableBookmarkPageDo, TableRow, UiPreferences, uiPreferences
+  TableBookmarkPageDo, TableRow, TableUiPreferences, tableUiPreferences
 } from '../index';
 import $ from 'jquery';
 
@@ -485,19 +485,17 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   protected _prepareTablePreferences(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveState: boolean) {
     const table = page.detailTable;
     const prefs = bookmarkPage.tablePreferences;
-    const profile = uiPreferences.getTablePreferenceProfile(prefs, UiPreferences.TABLE_PREFERENCE_PROFILE_ID_BOOKMARK);
+    const profile = tableUiPreferences.getProfile(prefs, TableUiPreferences.PROFILE_ID_BOOKMARK);
 
-    uiPreferences.applyTablePreferences(table, prefs);
-    uiPreferences.applyTablePreferenceProfile(table, profile, {
-      applyUserFilters: true
-    });
+    tableUiPreferences.apply(table, prefs);
+    tableUiPreferences.applyProfile(table, profile, {applyUserFilters: true});
 
     if (saveState) {
       // Set bookmarked profile as default preferences (no need to store the GLOBAL setting, but "reset to factory settings" should still be possible)
-      table.setInitialUiPreferences(profile || uiPreferences.createTablePreferenceProfile(table));
+      table.setInitialUiPreferences(profile || tableUiPreferences.createProfile(table));
     } else {
       // Store applied settings as GLOBAL setting
-      uiPreferences.storeGlobalTablePreferenceProfile(table);
+      tableUiPreferences.storeGlobalProfile(table);
     }
   }
 
