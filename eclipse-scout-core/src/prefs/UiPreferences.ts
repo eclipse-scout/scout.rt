@@ -234,7 +234,7 @@ export class UiPreferences implements ObjectWithType {
         return scout.create(TableColumnClientUiPreferenceDo, {
           columnId: column.buildUuid(),
           viewIndex: index,
-          visible: column.visible,
+          visible: column.visibleIgnoreCompacted, // in compact mode, all columns would be invisible otherwise
           width: column.width,
           sortOrder: column.sortIndex,
           sortAscending: column.sortAscending,
