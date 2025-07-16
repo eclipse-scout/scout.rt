@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BooleanColumn, Column, DateColumn, NumberColumn, scout, Table, TableClientUiPreferenceProfileDo, TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableRow, TableTextUserFilter, TextColumnUserFilter, Tile, uiPreferences,
-  UiPreferences, UiPreferencesDo, WidgetModel
+  BooleanColumn, Column, DateColumn, NumberColumn, ObjectIdProvider, scout, Table, TableClientUiPreferenceProfileDo, TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableRow, TableTextUserFilter, TextColumnUserFilter, Tile,
+  uiPreferences, UiPreferences, UiPreferencesDo, WidgetModel
 } from '../../src/index';
 import {SpecUiPreferencesStore} from '../../src/testing';
 
@@ -420,6 +420,46 @@ describe('TableUiPreferences', () => {
       expect(table.columns.length).toBe(6 + 2);
       expect(table.columns.map(c => c.guiOnly ? null : c.id)).toEqual([null, null, 'c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
       expect(c2.width).toBe(202);
+    });
+
+    it('ignores compact mode', () => {
+      let table = scout.create(SpecTable, {
+        parent: session.desktop,
+        id: 't1'
+      });
+      table.columnById('c3').setVisible(false);
+
+      const getColumnId = (column: Column) => {
+        if (ObjectIdProvider.get().isUiSeqId(column.id)) {
+          return null;
+        }
+        return column.id;
+      };
+
+      expect(table.columns.length).toBe(6);
+      expect(table.columns.map(c => getColumnId(c))).toEqual(['c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
+      expect(table.columns.map(c => c.guiOnly)).toEqual([undefined, undefined, undefined, undefined, undefined, undefined]);
+      expect(table.columns.map(c => c.visible)).toEqual([false, true, false, true, true, true]);
+      expect(table.columns.map(c => c.visibleIgnoreCompacted)).toEqual([false, true, false, true, true, true]);
+      expect(table.columns.map(c => c.compacted)).toEqual([false, false, false, false, false, false]);
+      let profile1 = uiPreferences.createTablePreferenceProfile(table);
+      expect(profile1.columns.length).toBe(6);
+      expect(profile1.columns.map(c => c.columnId)).toEqual(['c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
+      expect(profile1.columns.map(c => c.visible)).toEqual([false, true, false, true, true, true]);
+      expect(profile1.columns.map(c => c.width)).toEqual([60, 102, 103, 104, 105, 106]);
+
+      table.setCompact(true);
+      expect(table.columns.length).toBe(7);
+      expect(table.columns.map(c => getColumnId(c))).toEqual(['c1', 'c2', 'c3', 'c4', 'c5', 'c6', null]);
+      expect(table.columns.map(c => c.guiOnly)).toEqual([undefined, undefined, undefined, undefined, undefined, undefined, true]);
+      expect(table.columns.map(c => c.visible)).toEqual([false, false, false, false, false, false, true]);
+      expect(table.columns.map(c => c.visibleIgnoreCompacted)).toEqual([false, true, false, true, true, true, true]);
+      expect(table.columns.map(c => c.compacted)).toEqual([false, true, true, true, true, true, false]);
+      let profile2 = uiPreferences.createTablePreferenceProfile(table);
+      expect(profile2.columns.length).toBe(6); // <--
+      expect(profile2.columns.map(c => c.columnId)).toEqual(['c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
+      expect(profile2.columns.map(c => c.visible)).toEqual([false, true, false, true, true, true]);
+      expect(profile2.columns.map(c => c.width)).toEqual([60, 102, 103, 104, 105, 106]);
     });
   });
 
