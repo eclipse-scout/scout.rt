@@ -92,16 +92,16 @@ export class PageWithTable extends Page implements PageWithTableModel {
     table.on('propertyChange:tableControls', this._tableControlsChangeHandler);
     this._addSearchFormTableControlListeners(this._findSearchFormTableControl(table));
 
-    this._initDetailTableUiPreferences(table);
+    // Ensure _initDetailTableUiPreferences is only called after _initDetailTable has been completed (including subclasses).
+    this.one('propertyChange:detailTable', event => {
+      if (event.newValue === table) {
+        this._initDetailTableUiPreferences(table);
+      }
+    });
   }
 
   protected _initDetailTableUiPreferences(table: Table) {
-    // Wait for event so that changes made by a subclass in _initDetailTable are also saved as initial preferences
-    this.one('propertyChange:detailTable', event => {
-      if (event.newValue === table) {
-        table.setUiPreferencesEnabled(true);
-      }
-    });
+    table.setUiPreferencesEnabled(true);
   }
 
   protected override _destroyDetailTable(table: Table) {
