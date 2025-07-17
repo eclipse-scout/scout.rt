@@ -371,4 +371,52 @@ describe('PageWithTable', () => {
     expect(page.childrenLoaded).toBe(true);
     expect(detailTable.loading).toBe(false);
   });
+
+  it('calls _initDetailTableUiPreferences after _initDetailTable', () => {
+    let observedTestValue = 0;
+
+    class SpecPageWithTable1 extends PageWithTable {
+      testValue = 0;
+
+      protected override _initDetailTable(table: Table) {
+        super._initDetailTable(table);
+        this.testValue = 1;
+      }
+
+      protected override _initDetailTableUiPreferences(table: Table) {
+        observedTestValue = this.testValue;
+      }
+    }
+
+    class SpecPageWithTable2 extends SpecPageWithTable1 {
+      protected override _initDetailTable(table: Table) {
+        super._initDetailTable(table);
+        this.testValue = 2;
+      }
+    }
+
+    let page1 = scout.create(SpecPageWithTable1, {
+      parent: outline,
+      detailTable: {
+        objectType: Table
+      }
+    });
+    expect(page1.testValue).toBe(0);
+    expect(observedTestValue).toBe(0);
+    page1.ensureDetailTable();
+    expect(page1.testValue).toBe(1);
+    expect(observedTestValue).toBe(1);
+
+    let page2 = scout.create(SpecPageWithTable2, {
+      parent: outline,
+      detailTable: {
+        objectType: Table
+      }
+    });
+    expect(page2.testValue).toBe(0);
+    expect(observedTestValue).toBe(1);
+    page2.ensureDetailTable();
+    expect(page2.testValue).toBe(2);
+    expect(observedTestValue).toBe(2);
+  });
 });
