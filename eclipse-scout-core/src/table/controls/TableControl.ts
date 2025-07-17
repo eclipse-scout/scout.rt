@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -150,7 +150,7 @@ export class TableControl extends Action implements TableControlModel {
     selected = scout.nvl(selected, this.selected);
     options = $.extend({}, {closeWhenUnselected: true}, options);
 
-    this.$container.select(selected);
+    this.$container.setSelected(selected);
 
     if (selected) {
       this.tableFooter.onControlSelected(this);

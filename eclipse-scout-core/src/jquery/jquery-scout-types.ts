@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -536,14 +536,9 @@ declare global {
     addDeviceClass(): this;
 
     /**
-     * Adds the class 'selected' to the current element and removes class selected from siblings.
+     * Adds or removes the class 'selected'.
      */
-    selectOne(): this;
-
-    /**
-     * Toggles the class 'selected'.
-     */
-    select(selected?: boolean): this;
+    setSelected(selected: boolean): this;
 
     /**
      * @returns true if the current element has the class 'selected', false if not.
@@ -556,7 +551,7 @@ declare global {
     focus(): this;
 
     /**
-     * Toggles the class 'disabled'. Also toggles 'disabled' attribute for elements that support it (see http://www.w3.org/TR/html5/disabled-elements.html)
+     * Adds or removes the class 'disabled'. Also adds or removes 'disabled' attribute for elements that support it (see http://www.w3.org/TR/html5/disabled-elements.html)
      */
     setEnabled(enabled: boolean): this;
 
@@ -566,7 +561,7 @@ declare global {
     isEnabled(): boolean;
 
     /**
-     * Toggles the class 'hidden'. Also triggers the events 'hide' and 'show', if the state changed.
+     * Adds or removes the class 'hidden'. Also triggers the events 'hide' and 'show', if the state changed.
      */
     setVisible(visible: boolean): this;
 

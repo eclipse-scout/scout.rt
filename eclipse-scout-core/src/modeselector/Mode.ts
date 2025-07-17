@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -38,7 +38,7 @@ export class Mode<TRef = any> extends Action implements ModeModel<TRef> {
   }
 
   protected override _renderSelected() {
-    this.$container.select(this.selected);
+    this.$container.setSelected(this.selected);
     aria.checked(this.$container, this.selected);
   }
 

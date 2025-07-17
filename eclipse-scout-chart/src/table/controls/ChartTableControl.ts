@@ -131,9 +131,9 @@ export class ChartTableControl extends TableControl implements ChartTableControl
 
   protected _selectChartType() {
     objects.values(this._chartTypeMap).forEach($element => {
-      $element.removeClass('selected');
+      $element.setSelected(false);
     });
-    this._chartTypeMap[this.chartType].addClass('selected');
+    this._chartTypeMap[this.chartType].setSelected(true);
   }
 
   protected _renderChartGroup1() {
@@ -153,8 +153,10 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     let chartGroup = this[groupName];
     if (chartGroup) {
       let $element = this[map][chartGroup.id];
-      $element.siblings('.select-axis').animateAVCSD('height', 30);
-      $element.selectOne('selected');
+      $element.siblings('.select-axis')
+        .setSelected(false)
+        .animateAVCSD('height', 30);
+      $element.setSelected(true);
 
       if (chartGroup.modifier > 0) {
         let dateGroupIndex = chartGroup.modifier ^ ChartTableControl.DATE_GROUP_FLAG;
@@ -170,8 +172,9 @@ export class ChartTableControl extends TableControl implements ChartTableControl
   protected _renderChartAggregation() {
     let $element = this._aggregationMap[this.chartAggregation.id || 'all'];
     if ($element) {
-      $element.selectOne();
+      $element.siblings('.select-data').setSelected(false);
       $element
+        .setSelected(true)
         .removeClass('data-sum')
         .removeClass('data-avg');
       $element.addClass(this._getAggregationCssClass());

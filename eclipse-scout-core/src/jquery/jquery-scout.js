@@ -676,14 +676,7 @@ $.fn.addDeviceClass = function() {
   return this;
 };
 
-// select one and deselect siblings
-$.fn.selectOne = function() {
-  this.siblings().removeClass('selected');
-  this.addClass('selected');
-  return this;
-};
-
-$.fn.select = function(selected) {
+$.fn.setSelected = function(selected) {
   return this.toggleClass('selected', !!selected);
 };
 

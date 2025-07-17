@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -909,9 +909,9 @@ export class Calendar extends Widget implements CalendarModel {
           let $day = $(element),
             date = $day.data('date');
           if (!date || dates.compareDays(date, this.selectedDate) === 0) {
-            $day.select(false); // de-select old date
+            $day.setSelected(false); // de-select old date
           } else if (dates.compareDays(date, selectedDate) === 0) {
-            $day.select(true); // select new date
+            $day.setSelected(true); // select new date
           }
         });
       }
@@ -968,11 +968,11 @@ export class Calendar extends Widget implements CalendarModel {
     $.log.isInfoEnabled() && $.log.info('(Calendar#_updateScreen)');
 
     // select mode
-    $('.calendar-mode', this.$commands).select(false);
-    $('[data-mode="' + this.displayMode + '"]', this.$commands).select(true);
+    $('.calendar-mode', this.$commands).setSelected(false);
+    $('[data-mode="' + this.displayMode + '"]', this.$commands).setSelected(true);
 
     // remove selected day
-    $('.selected', this.$grid).select(false);
+    $('.selected', this.$grid).setSelected(false);
 
     // layout grid
     this.layoutLabel();
@@ -1018,7 +1018,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.calendarSidebar.setResourcePanelExpanded(this.showResourcePanel);
 
     // show or hide work list
-    $('.calendar-toggle-list', this.$commands).select(this.showListPanel);
+    $('.calendar-toggle-list', this.$commands).setSelected(this.showListPanel);
     if (this.showListPanel) {
       this.$list.parent().data('new-width', this.calendarToggleListWidth);
       gridW -= this.calendarToggleListWidth;

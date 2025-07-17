@@ -3870,7 +3870,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       if (!row.$row) {
         return;
       }
-      row.$row.select(false);
+      row.$row.setSelected(false);
       row.$row.toggleClass(Table.SELECTION_CLASSES, false);
       aria.selected(row.$row, null);
     });
@@ -3888,7 +3888,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.selectedRows.push(row);
 
     if (row.$row && this._isDataRendered()) {
-      row.$row.select(true);
+      row.$row.setSelected(true);
       this._renderSelection(row);
       if (this.scrollToSelection) {
         this.revealSelection();

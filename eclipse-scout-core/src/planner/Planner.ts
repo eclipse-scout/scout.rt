@@ -1307,7 +1307,7 @@ export class Planner extends Widget implements PlannerModel {
     }
 
     // show or hide year panel
-    $('.calendar-toggle-year', this.$modes).select(this.yearPanelVisible);
+    $('.calendar-toggle-year', this.$modes).setSelected(this.yearPanelVisible);
     if (this.yearPanelVisible) {
       yearPanelWidth = 210;
     } else {
@@ -1460,11 +1460,11 @@ export class Planner extends Widget implements PlannerModel {
   }
 
   protected _removeSelectedResources() {
-    this.selectedResources.forEach(resource => resource.$resource.select(false));
+    this.selectedResources.forEach(resource => resource.$resource.setSelected(false));
   }
 
   protected _renderSelectedResources() {
-    this.selectedResources.forEach(resource => resource.$resource.select(true));
+    this.selectedResources.forEach(resource => resource.$resource.setSelected(true));
   }
 
   protected _renderActivitySelectable() {

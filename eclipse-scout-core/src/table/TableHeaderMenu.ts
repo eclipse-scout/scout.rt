@@ -194,7 +194,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     this.leftGroups = [];
     this.$rightGroups = [];
 
-    this.$headerItem.select(true);
+    this.$headerItem.setSelected(true);
 
     this.$container = this.$parent.appendDiv('popup table-header-menu');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
@@ -310,7 +310,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     if (this.tableHeader.rendered) {
       this.tableHeader.$container.off('scroll', this._tableHeaderScrollHandler);
     }
-    this.$headerItem.select(false);
+    this.$headerItem.setSelected(false);
     this.table.off('columnMoved', this._onColumnMovedHandler);
     this.table.off('filterAdded', this._tableFilterHandler);
     this.table.off('filterRemoved', this._tableFilterHandler);

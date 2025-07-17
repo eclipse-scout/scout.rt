@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -93,8 +93,8 @@ export class PlannerHeader extends Widget {
   }
 
   protected _renderDisplayMode() {
-    $('.planner-mode', this.$commands).select(false);
-    $('[data-mode="' + this.displayMode + '"]', this.$commands).select(true);
+    $('.planner-mode', this.$commands).setSelected(false);
+    $('[data-mode="' + this.displayMode + '"]', this.$commands).setSelected(true);
   }
 
   protected _onTodayClick(event: JQuery.ClickEvent) {
