@@ -1143,7 +1143,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       }
 
       if (node.rendered) {
-        node.$node.select(true);
+        node.$node.setSelected(true);
         aria.selected(node.$node, true);
       }
     });
@@ -1207,7 +1207,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
 
   protected _removeNodeSelection(node: TreeNode) {
     if (node.rendered) {
-      node.$node.select(false);
+      node.$node.setSelected(false);
       aria.selected(node.$node, null);
     }
 

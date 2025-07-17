@@ -562,7 +562,7 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
   protected _deselectSiblings(menuItem: Menu) {
     menuItem.$container.siblings('.menu-item').each((i, elem) => {
       let $menuItem = $(elem);
-      $menuItem.select(false);
+      $menuItem.setSelected(false);
     });
   }
 

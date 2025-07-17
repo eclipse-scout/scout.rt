@@ -219,7 +219,7 @@ export class Tab extends Widget implements TabModel {
   }
 
   protected _renderSelected() {
-    this.$container.select(this.selected);
+    this.$container.setSelected(this.selected);
     this.$container.setTabbable(this.selected && !Device.get().supportsOnlyTouch());
     aria.selected(this.$container, this.selected || null);
   }
