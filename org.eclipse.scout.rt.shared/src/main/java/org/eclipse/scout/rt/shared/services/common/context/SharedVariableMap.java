@@ -28,6 +28,18 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   private static final long serialVersionUID = 1L;
   public static final String PROP_VALUES = "values";
 
+  /**
+   * Internal variable map.
+   * <p>
+   * Access to this map is synchronized on the instance of {@link SharedVariableMap}
+   * to ensure thread safety for all operations that modify or read the map.
+   * Since {@link HashMap} is not thread-safe, this synchronization protects
+   * against concurrent modifications and ensures visibility of changes across threads.
+   * <p>
+   * <b>Important:</b> Any new method that accesses or modifies {@code m_variables}
+   * <b>must</b> be properly synchronized on the {@link SharedVariableMap} instance.
+   * Omitting synchronization may cause race conditions or data inconsistency.
+   */
   private final Map<String, Object> m_variables;
   private transient BasicPropertySupport m_propertySupport;
 
@@ -52,7 +64,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   /**
    * Update values of this variable map with the new one.
    */
-  public void updateInternal(Map<String, Object> newMap) {
+  public synchronized void updateInternal(Map<String, Object> newMap) {
     if (m_variables.equals(newMap)) {
       return; // nothing changed
     }
@@ -69,38 +81,38 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
    * Fires a change event
    */
   @Override
-  public void clear() {
+  public synchronized void clear() {
     m_variables.clear();
     fireValuesChanged();
   }
 
   @Override
-  public boolean containsKey(Object key) {
+  public synchronized boolean containsKey(Object key) {
     return m_variables.containsKey(key);
   }
 
   @Override
-  public boolean containsValue(Object value) {
+  public synchronized boolean containsValue(Object value) {
     return m_variables.containsValue(value);
   }
 
   @Override
-  public Set<Entry<String, Object>> entrySet() {
+  public synchronized Set<Entry<String, Object>> entrySet() {
     return CollectionUtility.hashSet(m_variables.entrySet());
   }
 
   @Override
-  public Object get(Object key) {
+  public synchronized Object get(Object key) {
     return m_variables.get(key);
   }
 
   @Override
-  public boolean isEmpty() {
+  public synchronized boolean isEmpty() {
     return m_variables.isEmpty();
   }
 
   @Override
-  public Set<String> keySet() {
+  public synchronized Set<String> keySet() {
     return CollectionUtility.hashSet(m_variables.keySet());
   }
 
@@ -108,7 +120,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
    * Fires a change event
    */
   @Override
-  public Object put(String key, Object value) {
+  public synchronized Object put(String key, Object value) {
     Object o = m_variables.put(key, value);
     fireValuesChanged();
     return o;
@@ -118,7 +130,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
    * Fires a change event
    */
   @Override
-  public void putAll(Map<? extends String, ?> m) {
+  public synchronized void putAll(Map<? extends String, ?> m) {
     m_variables.putAll(m);
     fireValuesChanged();
   }
@@ -127,24 +139,24 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
    * Fires a change event
    */
   @Override
-  public Object remove(Object key) {
+  public synchronized Object remove(Object key) {
     Object o = m_variables.remove(key);
     fireValuesChanged();
     return o;
   }
 
   @Override
-  public int size() {
+  public synchronized int size() {
     return m_variables.size();
   }
 
   @Override
-  public Collection<Object> values() {
+  public synchronized Collection<Object> values() {
     return CollectionUtility.arrayList(m_variables.values());
   }
 
   @Override
-  public String toString() {
+  public synchronized String toString() {
     return m_variables.toString();
   }
 }
