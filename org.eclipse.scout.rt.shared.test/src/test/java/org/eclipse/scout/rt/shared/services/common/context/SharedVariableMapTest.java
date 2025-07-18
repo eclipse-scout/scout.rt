@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.junit.Test;
 
 public class SharedVariableMapTest {
@@ -46,5 +49,50 @@ public class SharedVariableMapTest {
     assertEquals(Map.of("2", 2L, "3", 3L), protocol.get(1));
     assertEquals(Map.of("11", 11L, "22", 22L, "33", 33L), protocol.get(2));
     m.removePropertyChangeListener(propertyChangeListener);
+  }
+
+  @Test
+  public void testConcurrentAccess() {
+    final SharedVariableMap m = new SharedVariableMap();
+    final List<IFuture<Void>> jobs = new ArrayList<>();
+    final int numberOfValues = 1000;
+    final int numberOfJobs = 10;
+
+    // Phase 1: Concurrent put and get
+    for (int i = 0; i < numberOfJobs; i++) {
+      jobs.add(schedulePutAndGetJob(m, i, numberOfValues));
+    }
+    jobs.forEach(IFuture::awaitDoneAndGet);
+    assertEquals(numberOfJobs * numberOfValues, m.size());
+
+    // Phase 2: Concurrent remove and get
+    jobs.clear();
+    for (int i = 0; i < numberOfJobs; i++) {
+      jobs.add(scheduleRemoveAndGetJob(m, i, numberOfValues));
+    }
+    jobs.forEach(IFuture::awaitDoneAndGet);
+    assertEquals(0, m.size());
+  }
+
+  protected IFuture<Void> schedulePutAndGetJob(SharedVariableMap m, int jobNumber, int numberOfValues) {
+    return Jobs.schedule(() -> {
+      for (int i = jobNumber * numberOfValues; i < (jobNumber + 1) * numberOfValues; i++) {
+        m.put(String.valueOf(i), i);
+        if (i % 5 == 0) {
+          m.get(String.valueOf(i)); // Occasionally read a key to test concurrent gets
+        }
+      }
+    }, Jobs.newInput().withName("put-get-job-" + jobNumber).withRunContext(RunContexts.empty()));
+  }
+
+  protected IFuture<Void> scheduleRemoveAndGetJob(SharedVariableMap m, int jobNumber, int numberOfValues) {
+    return Jobs.schedule(() -> {
+      for (int i = jobNumber * numberOfValues; i < (jobNumber + 1) * numberOfValues; i++) {
+        if (i % 5 == 0) {
+          m.get(String.valueOf(i)); // Occasionally read a key to test concurrent gets
+        }
+        m.remove(String.valueOf(i));
+      }
+    }, Jobs.newInput().withName("remove-get-job-" + jobNumber).withRunContext(RunContexts.empty()));
   }
 }
