@@ -25,12 +25,16 @@ public class TableColumnClientUiPreferenceDo extends DoEntity {
     return doValue("columnId");
   }
 
-  public DoValue<Integer> width() {
-    return doValue("width");
-  }
-
   public DoValue<Integer> viewIndex() {
     return doValue("viewIndex");
+  }
+
+  public DoValue<Boolean> visible() {
+    return doValue("visible");
+  }
+
+  public DoValue<Integer> width() {
+    return doValue("width");
   }
 
   public DoValue<Integer> sortOrder() {
@@ -39,10 +43,6 @@ public class TableColumnClientUiPreferenceDo extends DoEntity {
 
   public DoValue<Boolean> sortAscending() {
     return doValue("sortAscending");
-  }
-
-  public DoValue<Boolean> visible() {
-    return doValue("visible");
   }
 
   public DoValue<Boolean> groupingActive() {
@@ -73,17 +73,6 @@ public class TableColumnClientUiPreferenceDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TableColumnClientUiPreferenceDo withWidth(Integer width) {
-    width().set(width);
-    return this;
-  }
-
-  @Generated("DoConvenienceMethodsGenerator")
-  public Integer getWidth() {
-    return width().get();
-  }
-
-  @Generated("DoConvenienceMethodsGenerator")
   public TableColumnClientUiPreferenceDo withViewIndex(Integer viewIndex) {
     viewIndex().set(viewIndex);
     return this;
@@ -92,6 +81,33 @@ public class TableColumnClientUiPreferenceDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Integer getViewIndex() {
     return viewIndex().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TableColumnClientUiPreferenceDo withVisible(Boolean visible) {
+    visible().set(visible);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Boolean getVisible() {
+    return visible().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public boolean isVisible() {
+    return nvl(getVisible());
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TableColumnClientUiPreferenceDo withWidth(Integer width) {
+    width().set(width);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Integer getWidth() {
+    return width().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
@@ -119,22 +135,6 @@ public class TableColumnClientUiPreferenceDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public boolean isSortAscending() {
     return nvl(getSortAscending());
-  }
-
-  @Generated("DoConvenienceMethodsGenerator")
-  public TableColumnClientUiPreferenceDo withVisible(Boolean visible) {
-    visible().set(visible);
-    return this;
-  }
-
-  @Generated("DoConvenienceMethodsGenerator")
-  public Boolean getVisible() {
-    return visible().get();
-  }
-
-  @Generated("DoConvenienceMethodsGenerator")
-  public boolean isVisible() {
-    return nvl(getVisible());
   }
 
   @Generated("DoConvenienceMethodsGenerator")
