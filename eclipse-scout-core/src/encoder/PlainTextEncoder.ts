@@ -8,33 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {CachedElement, strings} from '../index';
-
-export interface PlainTextEncoderOptions {
-  /**
-   * Multiple consecutive empty lines are reduced to a single empty line. Default is false.
-   */
-  compact?: boolean;
-
-  /**
-   * Calls string.trim(). White space at the beginning and the end of the text gets removed. Default is false.
-   */
-  trim?: boolean;
-
-  /**
-   * Removes font icons. Default is false.
-   */
-  removeFontIcons?: boolean;
-}
+import {CachedElement, scout, strings} from '../index';
 
 /**
  * Replaces character HTML entities (e.g. &amp;nbsp;, &amp;gt;, etc.).
  */
 export class PlainTextEncoder {
-  cache: CachedElement;
+  protected _cachedElement: CachedElement<HTMLTextAreaElement>;
 
   constructor() {
-    this.cache = new CachedElement('textarea');
+    this._cachedElement = new CachedElement<HTMLTextAreaElement>('textarea');
   }
 
   encode(text: string, options?: PlainTextEncoderOptions): string {
@@ -45,8 +28,7 @@ export class PlainTextEncoder {
     text = strings.asString(text);
 
     // Regexp is used to replace the tags.
-    // It is not possible to use jquery's text() function or to create a html element and use textContent, because the new lines get omitted.
-    // Node.innerText would preserve the new lines but it is not supported by firefox
+    // It is not possible to use jquery's text() function or to create a html element and use textContent/innerText, because it does not handle line breaks as desired.
 
     // Remove comments
     text = text.replace(/<!--.*?--!?>/gs, '');
@@ -59,11 +41,15 @@ export class PlainTextEncoder {
     // Remove attribute values since they could contain special characters like >
     text = this.removeAttributeValues(text);
 
-    // Preserve new lines
-    text = text.replace(/<br>|<br\/>|<\/p>|<p\/>|<\/div>|<\/li>|<\/tr>/gi, '\n');
+    // Convert native newlines to whitespace
+    text = text.replace(/\r/g, '');
+    text = text.replace(/\n/g, ' ');
 
     // Separate td with ' '
-    text = text.replace(/<\/td>/gi, ' ');
+    text = text.replace(/<\/td>|<\/th>/gi, ' ');
+
+    // Create newlines for certain end tags
+    text = text.replace(/<br\/?><\/div>|<\/div>|<br\/?>|<\/p>|<p\/>|<\/tr>|<\/h[1-6]>|<\/dt>|<\/dd>|<\/dl>|<\/li>|<\/head>/gi, '\n');
 
     // Remove script and style contents
     text = text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
@@ -72,9 +58,8 @@ export class PlainTextEncoder {
     // Replace remaining tags
     text = text.replace(/<[^\s>][^>]*>/gi, '');
 
-    // Convert decimal nrc to unicode
-    text = text.replace('&zwj;', String.fromCharCode(0x200D)); // zero width joiner for combined chars
-    text = text.replace(/&#(\\d+);/gi, (match, group1) => String.fromCharCode(group1));
+    // Remove multiple spaces
+    text = text.replace(/[ ]+/g, ' ');
 
     // Remove spaces at the beginning and end of each line
     text = text.replace(/^[ ]+/gm, '');
@@ -84,11 +69,11 @@ export class PlainTextEncoder {
       // Compact consecutive empty lines. One is enough
       text = text.replace(/\n{3,}/gm, '\n\n');
     }
-    if (options.trim) {
+    if (scout.nvl(options.trim, true)) {
       text = text.trim();
     }
 
-    let textarea = this.cache.get() as HTMLTextAreaElement;
+    let textarea = this._cachedElement.get();
     textarea.innerHTML = text;
     return textarea.value;
   }
@@ -125,4 +110,21 @@ export class PlainTextEncoder {
     }
     return result;
   }
+}
+
+export interface PlainTextEncoderOptions {
+  /**
+   * If true, multiple consecutive empty lines are reduced to a single empty line. Default is false.
+   */
+  compact?: boolean;
+  /**
+   * If true, empty lines at the beginning and the end of the text are removed. Default is true.
+   *
+   * Spaces at the beginning and at the end of *every* line are *always* removed.
+   */
+  trim?: boolean;
+  /**
+   * Removes font icons. Default is false.
+   */
+  removeFontIcons?: boolean;
 }

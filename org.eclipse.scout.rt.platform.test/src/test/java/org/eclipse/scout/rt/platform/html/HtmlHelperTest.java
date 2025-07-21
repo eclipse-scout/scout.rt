@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 /**
  * @since 5.2
  */
+@SuppressWarnings({"SpellCheckingInspection", "ConcatenationWithEmptyString", "TextBlockMigration", "UnnecessaryUnicodeEscape"})
 @RunWith(PlatformTestRunner.class)
 public class HtmlHelperTest {
 
@@ -40,12 +41,13 @@ public class HtmlHelperTest {
     assertEquals("one two", helper.toPlainText("one\r\ntwo"));
     assertEquals("onetwo", helper.toPlainText("one\rtwo"));
     assertEquals("hell<", helper.toPlainText("hell&lt;"));
-    assertEquals("one   two", helper.toPlainText("one&nbsp;&nbsp; two"));
-    assertEquals("hell&ouml;", helper.toPlainText("hell&ouml;")); // [?] not all entities are replaced
+    assertEquals("hellö", helper.toPlainText("hell&ouml;"));
     assertEquals("one\ttwo", helper.toPlainText("one&#9;two"));
     assertEquals("one \t two", helper.toPlainText("one &#9; two"));
     assertEquals("one\ttwo", helper.toPlainText("one" + StringUtility.HTML_ENCODED_TAB + "two"));
-    assertEquals("one    two", helper.toPlainText("one&#160;&#xa0;&#Xa0;&#xA0;two")); // HTML5 spec allows for mixed case hex values.
+    assertEquals("one two", helper.toPlainText("one   two"));
+    assertEquals("one\u00A0\u00A0 two", helper.toPlainText("one&nbsp;&nbsp; two"));
+    assertEquals("one\u00A0\u00A0\u00A0\u00A0two", helper.toPlainText("one&#160;&#xa0;&#Xa0;&#xA0;two")); // HTML5 spec allows for mixed case hex values.
     assertEquals("one\t\ttwo", helper.toPlainText("one&#x9;&#X9;two")); // HTML5 spec allows for mixed case hex values.
     assertEquals("Unterraschungsfeier", helper.toPlainText("<div class=\"rte-line\">Unter<u>rasch</u>u<span class=\"rte-highlight\" style=\"background-color: rgb(255, 219, 157)\">ngs</span>feier<br></div>")); // Formating tags within a single word.
     assertEquals("Header 1\nHeader 2", helper.toPlainText("<h1>Header 1</h1><h1>Header 2</h1>")); // Headers
@@ -71,26 +73,44 @@ public class HtmlHelperTest {
     assertEquals("one & two", helper.toPlainText("<html><head>one & two</html>"));
     assertEquals("one & two", helper.toPlainText("<html><head>one &amp; two</html>"));
     assertEquals("one & two\nthree", helper.toPlainText("<html><head>one &amp; two</head><body>three</html>")); // [?] invalid <body>, has no end tag
+    assertEquals("&amp;", helper.toPlainText("&amp;amp;"));
+    assertEquals("&auml;", helper.toPlainText("&amp;auml;"));
+    assertEquals("&", helper.toPlainText("&<span>amp;</span>")); // [?] tags are removed before entities are decoded (cannot be handled correctly without a proper parser)
+    assertEquals("&#x42;", helper.toPlainText("&amp;#x42;"));
     assertEquals("three", helper.toPlainText("<html><head>one &amp; two</head><body>three</body></html>"));
     assertEquals("Unterraschungsfeier",
         helper.toPlainText("<html><body><div class=\"rte-line\">Unter<u>rasch</u>u<span class=\"rte-highlight\" style=\"background-color: rgb(255, 219, 157)\">ngs</span>feier<br></div></body></html>"));
+    assertEquals("Z1\nZ2", helper.toPlainText("<p>Z1</p><span></span><p>Z2</p>"));
+    assertEquals("Guten Tag\n\n\u00A0\n\nZeile 2", helper.toPlainText("<html><body><div><div><p>Guten Tag<o:p></o:p></p></div><div><p><o:p>&nbsp;</o:p></span></p></div><div><p><span>Zeile 2<o:p></o:p></span></p></div></div></body></html>"));
+    assertEquals("’", helper.toPlainText("&#8217;"));
+    assertEquals("+", helper.toPlainText("&#43;"));
+    assertEquals("+", helper.toPlainText("&#x2B;"));
+    assertEquals("+", helper.toPlainText("&#X2B;"));
+    assertEquals("&#X2Bs;", helper.toPlainText("&#X2Bs;"));
 
     // Line breaks
     assertEquals("a\nb", helper.toPlainText("a<br>b"));
     assertEquals("a\nb", helper.toPlainText("a <br/> b"));
     assertEquals("a\nb", helper.toPlainText("a    <br/> b"));
-    assertEquals("a \nb", helper.toPlainText("a&nbsp;<br/> b"));
-    assertEquals("line", helper.toPlainText("<br/>line")); // [?]
+    assertEquals("a\u00A0\nb", helper.toPlainText("a&nbsp;<br/> b"));
+    assertEquals("a \u00A0\nb", helper.toPlainText("a  &nbsp;  <br/>  b  "));
+    assertEquals("a\n\u00A0\u00A0b\n\u00A0\u00A0\u00A0\u00A0c", helper.toPlainText("a<br>&nbsp;&nbsp;b<br>&nbsp;&nbsp;&nbsp;&nbsp;c"));
+    assertEquals("line", helper.toPlainText("<br/>line"));
+    assertEquals("\nline", helper.toPlainTextNoTrim("<br/>line"));
     assertEquals("line1\nx\nline2", helper.toPlainText("<p>line1<br>\nx</p><p>line2</p>"));
-    assertEquals("line1 x\nline2", helper.toPlainText("<div>line1\nx</div><div>line2</div>")); // [?]
+    assertEquals("line1 x\nline2", helper.toPlainText("<div>line1\nx</div><div>line2</div>"));
     assertEquals("line1\nline2", helper.toPlainText("<div>line1<br/></div><div>line2<br/></div>"));
+    assertEquals("a b\nc", helper.toPlainText("<div>a\nb<br>c</div>"));
+    assertEquals("a b\nc\n", helper.toPlainTextNoTrim("<div>a\nb<br>c</div>"));
 
     // Tables
     assertEquals("one two\nthree four", helper.toPlainText("<table><tr><td>one</td><td>two</td></tr><tr><td>three</td><td>four</td></tr></table>"));
+    assertEquals("1. line\n2. line", helper.toPlainText("<table><tr><td><b>1. line</b></td></tr><tr><td><i>2. line</i></td></tr></table>"));
+    assertEquals("1. line\n2. line\n", helper.toPlainTextNoTrim("<table><tr><td><b>1. line</b></td></tr><tr><td><i>2. line</i></td></tr></table>"));
 
     // Styles and Scripts
-    assertEquals(
-        "Lorem ipsum dolor\n"
+    assertEquals(""
+            + "Lorem ipsum dolor\n"
             + "Donec mattis metus lorem. Aenean posuere tincidunt enim.\n"
             + "Pellentesque eu euismod eros, in ullamcorper erat.",
         helper.toPlainText(
