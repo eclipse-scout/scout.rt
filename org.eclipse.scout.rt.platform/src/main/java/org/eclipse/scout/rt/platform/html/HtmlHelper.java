@@ -9,10 +9,10 @@
  */
 package org.eclipse.scout.rt.platform.html;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 public class HtmlHelper {
 
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
-  private static final Pattern HTML_PARAGRAPH_END_TAGS = Pattern.compile("<br/?></div>|</div>|<br/?>|</p>|<p/>|</tr>|</h[1-6]>|</dt>|</dd>|</dl>|</table>|</li>|</head>", Pattern.CASE_INSENSITIVE);
+  private static final Pattern HTML_PARAGRAPH_END_TAGS = Pattern.compile("<br/?></div>|</div>|<br/?>|</p>|<p/>|</tr>|</h[1-6]>|</dt>|</dd>|</dl>|</li>|</head>", Pattern.CASE_INSENSITIVE);
   private static final Pattern HTML_SPACE_END_TAGS = Pattern.compile("</td>|</th>", Pattern.CASE_INSENSITIVE);
   private static final Pattern HTML_TAGS = Pattern.compile("<[^\\s>][^>]*>", Pattern.DOTALL);
   private static final Pattern HTML_SCRIPTS = Pattern.compile("<script\\b[^<]*(?:(?!</script>)<[^<]*)*</script>", Pattern.CASE_INSENSITIVE);
@@ -30,8 +30,6 @@ public class HtmlHelper {
   private static final Pattern HTML_COMMENT = Pattern.compile("<!--.*?--!?>", Pattern.DOTALL);
   private static final Pattern MULTIPLE_SPACES = Pattern.compile("[ ]+");
   private static final Pattern SPACES_ADJACENT_LINEBREAKS = Pattern.compile("[ ]+\n[ ]?|[ ]?\n[ ]+");
-  private static final Pattern DECIMAL_NCR = Pattern.compile("&#(\\d+);");
-  private static final Pattern HEX_NCR = Pattern.compile("&#x([0-9a-fA-F]+);");
 
   /**
    * Very basic HTML to plain text conversion, without parsing and building a model.
@@ -96,63 +94,26 @@ public class HtmlHelper {
     s = HTML_COMMENT.matcher(s).replaceAll("");
     // remove attribute values since they could contain special characters like >
     s = removeAttributeValues(s);
-    // newlines
+    // whitespace
     s = StringUtility.replace(s, "\r", "");
     s = StringUtility.replace(s, "\n", " ");
+    s = HTML_SPACE_END_TAGS.matcher(s).replaceAll(" ");
+    // newlines
     s = HTML_PARAGRAPH_END_TAGS.matcher(s).replaceAll("\n");
     // remove script and style contents
     s = HTML_SCRIPTS.matcher(s).replaceAll("");
     s = HTML_STYLES.matcher(s).replaceAll("");
     // remove tags
-    s = HTML_SPACE_END_TAGS.matcher(s).replaceAll(" ");
     s = HTML_TAGS.matcher(s).replaceAll("");
     // remove multiple spaces
     s = MULTIPLE_SPACES.matcher(s).replaceAll(" ");
     // remove spaces at the beginning and end of each line
     s = SPACES_ADJACENT_LINEBREAKS.matcher(s).replaceAll("\n");
-    s = unescape(s);
 
-    // space
-    s = StringUtility.replace(s, "&nbsp;", " ");
-    s = StringUtility.replace(s, "&#160;", " ");
-    s = StringUtility.replaceNoCase(s, "&#xa0;", " ");
+    // character references
+    s = BEANS.get(HtmlEntities.class).unescapeAll(s);
 
-    // tab
-    s = StringUtility.replace(s, "&#9;", "\t");
-    s = StringUtility.replaceNoCase(s, "&#x9;", "\t");
-
-    // decimal numeric character reference
-    StringBuilder sb = new StringBuilder();
-    s = StringUtility.replace(s, "&zwj;", Character.toString(0x200D)); //zero width joiner for combined characters
-    Matcher matcher = DECIMAL_NCR.matcher(s);
-    while (matcher.find()) {
-      String decimalNcr = matcher.group(1);
-      try {
-        String character = Character.toString(Integer.parseInt(decimalNcr));
-        matcher.appendReplacement(sb, character);
-      }
-      catch (IllegalArgumentException e) {
-        matcher.appendReplacement(sb, decimalNcr);
-      }
-    }
-    matcher.appendTail(sb);
-    s = sb.toString();
-
-    // hexadecimal numeric characters
-    sb = new StringBuilder();
-    matcher = HEX_NCR.matcher(s);
-    while (matcher.find()) {
-      String decimalNcr = matcher.group(1);
-      try {
-        String character = Character.toString(Integer.parseInt(decimalNcr, 16));
-        matcher.appendReplacement(sb, character);
-      }
-      catch (IllegalArgumentException e) {
-        matcher.appendReplacement(sb, decimalNcr);
-      }
-    }
-    matcher.appendTail(sb);
-    return sb.toString();
+    return s;
   }
 
   /**

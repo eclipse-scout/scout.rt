@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,18 +7,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-export class CachedElement {
+export class CachedElement<TElementType = HTMLElement> {
   tagName: string;
-  cachedElement: HTMLElement;
+  cachedElement: TElementType;
 
   constructor(tagName: string) {
     this.tagName = tagName;
     this.cachedElement = null;
   }
 
-  get(): HTMLElement {
+  get(): TElementType {
     if (!this.cachedElement) {
-      this.cachedElement = document.createElement(this.tagName);
+      this.cachedElement = document.createElement(this.tagName) as TElementType;
     }
     return this.cachedElement;
   }
