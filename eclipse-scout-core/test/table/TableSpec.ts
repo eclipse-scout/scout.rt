@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, BeanColumn, BooleanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, SmartColumn, Status, strings, Table,
-  TableAdapter, TableField, TableRow, TableRowModel, TableUserFilter, Tooltip
+  Action, arrays, BeanColumn, BooleanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, SmartColumn, StaticLookupCall,
+  Status, strings, Table, TableAdapter, TableField, TableRow, TableRowModel, TableUserFilter, Tooltip
 } from '../../src/index';
 import {JQueryTesting, LocaleSpecHelper, SpecTable, TableModelWithCells, TableSpecHelper} from '../../src/testing/index';
 import $ from 'jquery';
@@ -4178,6 +4178,78 @@ describe('Table', () => {
       expect(table.selectedRows.length).toBe(1);
       expect(table.rows.filter(row => row.expanded).length).toBe(1);
       expect(findRow(rowC).expanded).toBeTrue();
+    });
+
+    it('preserves the scroll position', () => {
+      $('<style>' +
+        '.table-row {height: 30px;}' +
+        '.table-data {height: 100px;}' +
+        '</style>').appendTo($('#sandbox'));
+
+      let table = scout.create(Table, {
+        parent: session.desktop,
+        viewRangeSize: 2,
+        columns: [{
+          objectType: Column
+        }]
+      });
+      table.render();
+      let rows = arrays.init(10, {cells: ['a']});
+      table.insertRows(rows);
+      expect(table.$rows().length).toBe(2);
+
+      table.scrollTo(table.rows[5]);
+      table.$data.trigger('scroll'); // Ensure table.scrollTop is up to date
+
+      let scrollTop = table.$data[0].scrollTop;
+      rows = arrays.init(10, {cells: ['b']});
+      table.replaceRows(rows);
+      expect(table.$rows().length).toBe(2);
+      expect(table.$data[0].scrollTop).toBe(scrollTop);
+    });
+
+    it('preserves the scroll position even with smart columns', async () => {
+      jasmine.clock().uninstall();
+      $('<style>' +
+        '.table-row {height: 30px;}' +
+        '.table-data {height: 100px;}' +
+        '</style>').appendTo($('#sandbox'));
+
+      let table = scout.create(Table, {
+        parent: session.desktop,
+        viewRangeSize: 2,
+        columns: [{
+          objectType: SmartColumn,
+          lookupCall: {
+            objectType: StaticLookupCall,
+            data: [
+              [1, 'A'],
+              [2, 'B']
+            ]
+          }
+        }]
+      });
+      table.render();
+      let rows = arrays.init(10, {cells: [1]});
+      table.insertRows(rows);
+      expect(table.updateBuffer.isBuffering()).toBe(true);
+      expect(table.$rows().length).toBe(0);
+
+      await table.updateBuffer.when('complete');
+      expect(table.$rows().length).toBe(2);
+
+      table.scrollTo(table.rows[5]);
+      table.$data.trigger('scroll'); // Ensure table.scrollTop is up to date
+
+      let scrollTop = table.$data[0].scrollTop;
+      rows = arrays.init(10, {cells: [2]});
+      table.replaceRows(rows);
+      expect(table.updateBuffer.isBuffering()).toBe(true);
+      expect(table.$rows().length).toBe(0);
+
+      await table.updateBuffer.when('complete');
+      expect(table.$rows().length).toBe(2);
+      expect(table.$data[0].scrollTop).toBe(scrollTop);
     });
   });
 

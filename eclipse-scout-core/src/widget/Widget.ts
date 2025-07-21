@@ -2264,8 +2264,8 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
 
   protected _onScroll(event: JQuery.ScrollEvent) {
     let $scrollable = this.get$Scrollable();
-    this._setProperty('scrollTop', $scrollable[0].scrollTop);
-    this._setProperty('scrollLeft', $scrollable[0].scrollLeft);
+    this._setScrollTop($scrollable[0].scrollTop);
+    this._setScrollLeft($scrollable[0].scrollLeft);
   }
 
   /** @see WidgetModel.scrollTop */
@@ -2275,6 +2275,10 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       return;
     }
     this.setProperty('scrollTop', scrollTop);
+  }
+
+  protected _setScrollTop(scrollTop: number) {
+    this._setProperty('scrollTop', scrollTop);
   }
 
   /** @internal */
@@ -2300,6 +2304,10 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       return;
     }
     this.setProperty('scrollLeft', scrollLeft);
+  }
+
+  protected _setScrollLeft(scrollLeft: number) {
+    this._setProperty('scrollLeft', scrollLeft);
   }
 
   protected _renderScrollLeft() {

@@ -7,14 +7,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, arrays, ObjectOrModel, objects, Table, TableRow} from '../index';
+import {App, arrays, Event, EventEmitter, EventMap, ObjectOrModel, objects, Table, TableRow} from '../index';
 
-export class TableUpdateBuffer {
+export class TableUpdateBuffer extends EventEmitter {
+  declare self: TableUpdateBuffer;
+  declare eventMap: UpdateBufferEventMap;
+
   promises: JQuery.Promise<any>[];
   table: Table;
   protected _rowMap: Record<string, ObjectOrModel<TableRow>>;
 
   constructor(table: Table) {
+    super();
     this._rowMap = {};
     this.promises = [];
     this.table = table;
@@ -81,5 +85,10 @@ export class TableUpdateBuffer {
     if (this.table._isDataRendered()) {
       this.table._renderViewport();
     }
+    this.trigger('complete');
   }
+}
+
+export interface UpdateBufferEventMap extends EventMap {
+  'complete': Event;
 }
