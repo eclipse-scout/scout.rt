@@ -17,7 +17,8 @@ export interface PlainTextEncoderOptions {
   compact?: boolean;
 
   /**
-   * Calls string.trim(). White space at the beginning and the end of the text gets removed. Default is false.
+   * Calls string.trim(). Empty lines at the beginning and the end of the text get removed. Default is false.
+   * Spaces are always removed.
    */
   trim?: boolean;
 

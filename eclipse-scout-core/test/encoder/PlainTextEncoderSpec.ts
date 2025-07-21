@@ -15,6 +15,7 @@ describe('PlainTextEncoder', () => {
   let encoder = new PlainTextEncoder();
 
   it('converts HTML to plain text', () => {
+    expect(encoder.encode(null)).toBe(null);
     expect(encoder.encode('')).toBe('');
 
     let htmlText = '<b>hello</b>';
@@ -113,6 +114,15 @@ describe('PlainTextEncoder', () => {
 
   it('removes leading and trailing newlines if configured', () => {
     let htmlText = '\n\nHello!\n\n';
+    expect(encoder.encode(htmlText, {trim: false})).toBe('\n\nHello!\n\n');
+    expect(encoder.encode(htmlText, {trim: true})).toBe('Hello!');
+
+    htmlText = '\n\n Hello! \n\n';
+    expect(encoder.encode(htmlText, {trim: false})).toBe('\n\nHello!\n\n');
+    expect(encoder.encode(htmlText, {trim: true})).toBe('Hello!');
+
+    htmlText = '  \n  \n  Hello!  \n  \n  ';
+    expect(encoder.encode(htmlText, {trim: false})).toBe('\n\nHello!\n\n');
     expect(encoder.encode(htmlText, {trim: true})).toBe('Hello!');
   });
 
@@ -258,5 +268,24 @@ describe('PlainTextEncoder', () => {
 
     htmlText = '<\tabc attr=\'someText\'>';
     expect(encoder.removeAttributeValues(htmlText)).toBe('<\tabc attr=\'someText\'>');
+  });
+
+  it('trims lines, but preserves other white-space', () => {
+    expect(encoder.encode('hello')).toBe('hello');
+    expect(encoder.encode('one\ntwo')).toBe('one\ntwo');
+    expect(encoder.encode('one\r\ntwo')).toBe('one\ntwo');
+    expect(encoder.encode('one\rtwo')).toBe('one\ntwo');
+    expect(encoder.encode('one   two')).toBe('one   two');
+    expect(encoder.encode('one&nbsp;&nbsp; two')).toBe('one\u00a0\u00a0 two');
+    expect(encoder.encode('one &#9; two')).toBe('one \t two');
+    expect(encoder.encode(' one \n two  \n   three ')).toBe('one\ntwo\nthree');
+    expect(encoder.encode('a\n&nbsp;&nbsp;b\n&nbsp;&nbsp;&nbsp;&nbsp;c')).toBe('a\n\u00A0\u00A0b\n\u00A0\u00A0\u00A0\u00A0c');
+  });
+
+  it('decodes special characters', () => {
+    expect(encoder.encode('&amp;amp;')).toBe('&amp;');
+    expect(encoder.encode('&amp;&amp;amp;amp;')).toBe('&&amp;amp;');
+    expect(encoder.encode('Hell&ouml;!')).toBe('Hellö!');
+    expect(encoder.encode('a&lt;br&gt;b')).toBe('a<br>b');
   });
 });
