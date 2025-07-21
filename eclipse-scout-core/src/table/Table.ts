@@ -3256,9 +3256,24 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    */
   replaceRows(rows: ObjectOrModel<TableRow> | ObjectOrModel<TableRow>[]) {
     const selectedKeys = this.getSelectedKeys();
+    const scrollTop = this.scrollTop;
     this.deleteAllRows();
     this.insertRows(rows);
     this.restoreSelection(selectedKeys);
+    this._restoreScrollTop(scrollTop);
+  }
+
+  protected _restoreScrollTop(scrollTop: number) {
+    if (this.updateBuffer.isBuffering()) {
+      this.updateBuffer.one('complete', () => this._restoreScrollTop(scrollTop));
+      return;
+    }
+    // Cannot use setScrollTop because this.scrollTop may still have the old value so that _renderScrollTop would not been called
+    // This is because _onScroll is called asynchronously
+    this._setScrollTop(scrollTop);
+    if (this.rendered) {
+      this._renderScrollTop();
+    }
   }
 
   deleteRow(row: TableRow) {
