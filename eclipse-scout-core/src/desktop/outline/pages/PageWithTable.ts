@@ -42,7 +42,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
     this._tableRowUpdateHandler = this._onTableRowsUpdated.bind(this);
     this._tableRowActionHandler = this._onTableRowAction.bind(this);
     this._tableRowOrderChangeHandler = this._onTableRowOrderChanged.bind(this);
-    this._tableDataLoadHandler = (e: TableReloadEvent) => this.loadTableData(e?.reloadReason);
+    this._tableDataLoadHandler = this._onTableReload.bind(this);
   }
 
   protected override _init(model: InitModelOf<this>) {
@@ -157,6 +157,14 @@ export class PageWithTable extends Page implements PageWithTableModel {
 
   protected _onTableRowOrderChanged(event: TableRowOrderChangedEvent) {
     this.outline.mediator.onTableRowOrderChanged(event, this);
+  }
+
+  protected _onTableReload(event: TableReloadEvent) {
+    if (this.expandedLazy) {
+      // If the page is expanded lazily, all child nodes will be gone -> collapse it to prevent showing the "+" icon without any child nodes
+      this.outline.setNodeExpanded(this, false);
+    }
+    this.loadTableData(event.reloadReason);
   }
 
   protected _onTableControlsChange(e: PropertyChangeEvent<TableControl[]>) {

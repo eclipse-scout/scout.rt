@@ -419,4 +419,91 @@ describe('PageWithTable', () => {
     expect(page2.testValue).toBe(2);
     expect(observedTestValue).toBe(2);
   });
+
+  it('collapses lazy expanded nodes on reload', () => {
+    class LazyPageWithTable extends PageWithTable {
+      constructor() {
+        super();
+        this.lazyExpandingEnabled = true;
+      }
+
+      protected override _createDetailTable(): Table {
+        return scout.create(Table, {
+          parent: this.outline,
+          columns: [{
+            id: 'ColorColumn',
+            objectType: Column,
+            primaryKey: true
+          }]
+        });
+      }
+
+      protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+        return $.resolvedPromise(['Red', 'Green', 'Blue']);
+      }
+
+      protected override _transformTableDataToTableRows(tableData: any): ObjectOrModel<TableRow>[] {
+        return tableData.map(color => {
+          return {
+            cells: [color]
+          };
+        });
+      }
+
+      protected override _createChildPage(row): Page {
+        return scout.create(Page, {
+          parent: this.outline,
+          text: this.detailTable.columnById('ColorColumn').cellValue(row)
+        });
+      }
+    }
+
+    let page = scout.create(LazyPageWithTable, {
+      parent: outline
+    });
+    outline.insertNode(page);
+    outline.selectNode(page);
+    jasmine.clock().tick(1);
+
+    expect(page.childNodes.length).toBe(3);
+    expect(page.expanded).toBe(false);
+    expect(page.expandedLazy).toBe(false);
+    expect(page.detailTable).toBeInstanceOf(Table);
+    expect(page.detailTable.rows.length).toBe(3);
+    expect(page.detailTable.hasReloadHandler).toBe(true);
+
+    // -----
+
+    // Drill down to child node -> page should be expanded lazily
+
+    outline.drillDown(page.childNodes[0]);
+    expect(page.expanded).toBe(true);
+    expect(page.expandedLazy).toBe(true);
+
+    // -----
+
+    // Reload page -> should be collapsed automatically
+
+    outline.selectNode(page);
+    page.detailTable.reload();
+    jasmine.clock().tick(1);
+
+    expect(page.childNodes.length).toBe(3);
+    expect(page.expanded).toBe(false);
+    expect(page.expandedLazy).toBe(false);
+
+    // -----
+
+    // Expand page non-lazily and reload -> page should stay expanded
+
+    page.setExpanded(true);
+    expect(page.expanded).toBe(true);
+    expect(page.expandedLazy).toBe(false);
+
+    page.detailTable.reload();
+    jasmine.clock().tick(1);
+    expect(page.childNodes.length).toBe(3);
+    expect(page.expanded).toBe(true);
+    expect(page.expandedLazy).toBe(false);
+  });
 });
