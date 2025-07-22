@@ -515,11 +515,9 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   protected override _createLoadingSupport(): LoadingSupport {
     return new LoadingSupport({
       widget: this,
+      withGlassPane: true,
       $container: () => {
-        if (this.$container.hasClass('knight-rider-loading')) {
-          return this.$container;
-        }
-        return this.$data;
+        return this.tileMode ? this.tableTileGridMediator.tileAccordion.$container : this.$data;
       }
     });
   }
