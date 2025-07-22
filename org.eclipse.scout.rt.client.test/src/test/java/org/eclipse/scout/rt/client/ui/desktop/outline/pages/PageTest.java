@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,11 +11,21 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import static org.junit.Assert.*;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -120,6 +130,54 @@ public class PageTest {
     Mockito.verify(outline).firePageChanged(Mockito.eq(p));
   }
 
+  @Test
+  public void testCollapseLazyNodeOnReload() {
+    IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
+    desktop.setAvailableOutlines(Collections.singletonList(new LazyPageWithTableOutline()));
+    desktop.setOutline(LazyPageWithTableOutline.class);
+    desktop.activateFirstPage();
+    IOutline outline = desktop.getOutline();
+    LazyPageWithTable page = (LazyPageWithTable) outline.getActivePage();
+
+    assertEquals(3, page.getChildNodeCount());
+    assertFalse(page.isExpanded());
+    assertTrue(page.isExpandedLazy());
+
+    // -----
+
+    // Drill down to child node -> page should be expanded lazily
+
+    outline.getUIFacade().setNodeSelectedAndExpandedFromUI(page.getChildNode(0));
+    assertTrue(page.isExpanded());
+    assertTrue(page.isExpandedLazy());
+
+    // -----
+
+    // Reload page -> should be collapsed automatically
+
+    outline.selectNode(page);
+    page.reloadPage();
+
+    assertEquals(3, page.getChildNodeCount());
+    assertFalse(page.isExpanded());
+    assertFalse(page.isExpandedLazy());
+
+    // -----
+
+    // Expand page non-lazily and reload -> page should stay expanded
+
+    page.setExpanded(true, false);
+    assertTrue(page.isExpanded());
+    assertFalse(page.isExpandedLazy());
+
+    page.reloadPage();
+    assertEquals(3, page.getChildNodeCount());
+    assertTrue(page.isExpanded());
+    assertFalse(page.isExpandedLazy());
+  }
+
+  // ------------------------------------------------------------------
+
   class P_Page extends AbstractPage<ITable> {
     @Override
     protected ITable createTable() {
@@ -176,6 +234,38 @@ public class PageTest {
       P_Outline mock = Mockito.spy(new P_Outline(false));
       mock.callInitializer();
       return mock;
+    }
+  }
+
+  class LazyPageWithTableOutline extends AbstractOutline {
+
+    @Override
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
+      pageList.add(new LazyPageWithTable());
+    }
+  }
+
+  class LazyPageWithTable extends AbstractPageWithTable<LazyPageWithTable.Table> {
+
+    @Override
+    protected void execLoadData(SearchFilter filter) {
+      final Object[][] data = new Object[][]{
+          new Object[]{"red"},
+          new Object[]{"green"},
+          new Object[]{"blue"}
+      };
+      importTableData(data);
+    }
+
+    @Override
+    protected IPage<?> execCreateChildPage(ITableRow row) {
+      return new P_Page();
+    }
+
+    public class Table extends AbstractTable {
+      @Order(10)
+      public class FirstColumn extends AbstractStringColumn {
+      }
     }
   }
 }

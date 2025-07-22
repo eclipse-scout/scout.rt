@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Outline, Page, PageWithNodes, scout} from '../../../../src/index';
+import {Outline, Page, PageWithNodes, scout, Table} from '../../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
 
 describe('PageWithNodes', () => {
@@ -382,6 +382,81 @@ describe('PageWithNodes', () => {
       expect(detailTable.rows.length).toBe(2);
       expect(detailTable.rows[0].cells[0].text).toBe('Page 104');
       expect(detailTable.rows[1].cells[0].text).toBe('Page 105');
+    });
+
+    it('collapses lazy expanded nodes on reload', () => {
+      class LazyPageWithNodes extends PageWithNodes {
+        constructor() {
+          super();
+          this.lazyExpandingEnabled = true;
+        }
+
+        protected override _createChildPages(): JQuery.Promise<Page[]> {
+          return $.resolvedPromise([
+            scout.create(PageWithNodes, {
+              parent: outline,
+              text: 'Red'
+            }),
+            scout.create(PageWithNodes, {
+              parent: outline,
+              text: 'Green'
+            }),
+            scout.create(PageWithNodes, {
+              parent: outline,
+              text: 'Blue'
+            })
+          ]);
+        }
+      }
+
+      let page = scout.create(LazyPageWithNodes, {
+        parent: outline
+      });
+      outline.insertNode(page);
+      outline.selectNode(page);
+      jasmine.clock().tick(1);
+
+      expect(page.childNodes.length).toBe(3);
+      expect(page.expanded).toBe(false);
+      expect(page.expandedLazy).toBe(false);
+      expect(page.reloadable).toBe(true);
+      expect(page.detailTable).toBeInstanceOf(Table);
+      expect(page.detailTable.rows.length).toBe(3);
+      expect(page.detailTable.hasReloadHandler).toBe(true);
+
+      // -----
+
+      // Drill down to child node -> page should be expanded lazily
+
+      outline.drillDown(page.childNodes[0]);
+      expect(page.expanded).toBe(true);
+      expect(page.expandedLazy).toBe(true);
+
+      // -----
+
+      // Reload page -> should be collapsed automatically
+
+      outline.selectNode(page);
+      page.detailTable.reload();
+      jasmine.clock().tick(1);
+
+      expect(page.childNodes.length).toBe(3);
+      expect(page.expanded).toBe(false);
+      expect(page.expandedLazy).toBe(false);
+
+      // -----
+
+      // Expand page non-lazily and reload -> page should stay expanded
+
+      page.setExpanded(true);
+      expect(page.expanded).toBe(true);
+      expect(page.expandedLazy).toBe(false);
+
+      page.detailTable.reload();
+      jasmine.clock().tick(1);
+      expect(page.childNodes.length).toBe(3);
+      expect(page.expanded).toBe(true);
+      expect(page.expandedLazy).toBe(false);
     });
   });
 

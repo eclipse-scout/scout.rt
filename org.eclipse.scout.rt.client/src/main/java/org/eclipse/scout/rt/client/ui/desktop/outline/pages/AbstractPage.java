@@ -525,6 +525,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
     try {
       tree.setTreeChanging(true);
+      if (this.isExpandedLazy()) {
+        // If the page is expanded lazily, all child nodes will be gone -> collapse it to prevent showing the "+" icon without any child nodes
+        tree.setNodeExpanded(this, false);
+      }
       loadChildren();
     }
     finally {
