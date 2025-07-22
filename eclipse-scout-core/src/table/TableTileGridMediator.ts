@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -356,11 +356,6 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
       }
     });
 
-    this.tableState.loadingSupportContainer = this.table.loadingSupport.options$Container;
-    this.table.loadingSupport.options$Container = function() {
-      return this.tileAccordion.$container;
-    }.bind(this);
-
     // check if there exists a hierarchy within the tableRows
     let hasHierarchy = arrays.find(this.table.rows, row => !!row.parentRow) !== null;
     if (hasHierarchy) {
@@ -389,10 +384,6 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
     this.table._setProperty('headerVisible', this.tableState.headerVisible);
     if (this.table.tileTableHeader) {
       this.table.tileTableHeader.setVisible(false);
-    }
-
-    if (this.tableState.loadingSupportContainer) {
-      this.table.loadingSupport.options$Container = this.tableState.loadingSupportContainer;
     }
 
     if (this._tableHierarchyFilter) {
@@ -436,6 +427,8 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
       }
     }
     this.table._refreshMenuBarPosition();
+    this.table.loadingSupport.remove();
+    this.table.loadingSupport.renderLoading(true);
   }
 
   override destroy() {

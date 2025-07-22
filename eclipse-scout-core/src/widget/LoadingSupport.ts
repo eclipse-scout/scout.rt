@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,12 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LoadingSupportOptions, scout, WidgetSupport} from '../index';
+import {GlassPane, LoadingSupportOptions, scout, WidgetSupport} from '../index';
 
 export class LoadingSupport extends WidgetSupport {
   loadingIndicatorDelay: number;
+  withGlassPane: boolean;
   protected _$loadingIndicator: JQuery;
   protected _loadingIndicatorTimeoutId: number;
+  protected _glassPane: GlassPane;
+  protected _containerScrollHandler: (event: JQuery.ScrollEvent) => void;
 
   /**
    * @param options a mandatory options object
@@ -20,9 +23,11 @@ export class LoadingSupport extends WidgetSupport {
   constructor(options: LoadingSupportOptions) {
     super(options);
     this.loadingIndicatorDelay = scout.nvl(options.loadingIndicatorDelay, 250); // ms
+    this.withGlassPane = scout.nvl(options.withGlassPane, false);
 
     this._$loadingIndicator = null;
     this._loadingIndicatorTimeoutId = null;
+    this._containerScrollHandler = this._onContainerScroll.bind(this);
   }
 
   setLoadingIndicatorDelay(loadingIndicatorDelay: number) {
@@ -42,14 +47,17 @@ export class LoadingSupport extends WidgetSupport {
     }
   }
 
-  renderLoading() {
+  /**
+   * @param immediate whether the {@link loadingIndicatorDelay} should be ignored and the indicator rendered immediately.
+   */
+  renderLoading(immediate = false) {
     // Clear any pending loading function
     clearTimeout(this._loadingIndicatorTimeoutId);
     this._ensure$Container();
 
     if (this.widget.isLoading()) {
       // add loading indicator
-      if (this.loadingIndicatorDelay && !this.widget.rendering) {
+      if (!immediate && this.loadingIndicatorDelay && !this.widget.rendering) {
         this._loadingIndicatorTimeoutId = setTimeout(
           this._renderLoadingIndicator.bind(this), this.loadingIndicatorDelay);
       } else {
@@ -68,8 +76,22 @@ export class LoadingSupport extends WidgetSupport {
 
     // Hide widget content
     this.$container.addClass('loading');
+    if (this.withGlassPane) {
+      this._glassPane = scout.create(GlassPane, {
+        parent: this.widget,
+        cssClass: 'loading-glasspane'
+      });
+      this._glassPane.render(this.$container);
+      if (this.$container.data('scrollable')) {
+        // If $container is scrollable, glasspane needs to be moved into the viewport
+        this._updateGlassPanePosition();
+        this.$container.on('scroll', this._containerScrollHandler);
+      }
+    }
+
     // Create loading indicator
-    this._$loadingIndicator = this.$container.appendDiv('loading-indicator');
+    let $indicatorParent = this._glassPane ? this._glassPane.$container : this.$container;
+    this._$loadingIndicator = $indicatorParent.appendDiv('loading-indicator');
   }
 
   protected _removeLoadingIndicator() {
@@ -94,5 +116,20 @@ export class LoadingSupport extends WidgetSupport {
       this._$loadingIndicator.remove();
       this._$loadingIndicator = null;
     }
+    this.$container?.off('scroll', this._containerScrollHandler);
+    this._glassPane?.destroy();
+  }
+
+  protected _onContainerScroll(event: JQuery.ScrollEvent) {
+    this._updateGlassPanePosition();
+  }
+
+  protected _updateGlassPanePosition() {
+    if (!this._glassPane?.rendered || !this.$container) {
+      return;
+    }
+    this._glassPane.$container
+      .cssTop(this.$container.scrollTop())
+      .cssLeft(this.$container.scrollLeft());
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,7 +40,8 @@ export class Accordion extends Widget implements AccordionModel {
 
   protected override _createLoadingSupport(): LoadingSupport {
     return new LoadingSupport({
-      widget: this
+      widget: this,
+      withGlassPane: true
     });
   }
 
