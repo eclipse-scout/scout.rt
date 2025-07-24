@@ -6077,7 +6077,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       return;
     }
     this._setColumns(columnOrModels, initValue);
-    if (this.rendered) {
+    if (this._isDataRendered()) {
       this._renderColumns();
     }
   }
@@ -6259,14 +6259,14 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   /**
    * Deletes the given {@link Column} from {@link Table.columns}.
    */
-  deleteColumn(column: Column) {
+  deleteColumn(column: Column<any>) {
     this.deleteColumns([column]);
   }
 
   /**
    * Deletes the given {@link Column}s from {@link Table.columns}.
    */
-  deleteColumns(columns: Column[]) {
+  deleteColumns(columns: Column<any>[]) {
     if (!columns?.length) {
       return;
     }

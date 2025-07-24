@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Column, EventHandler, FormField, GroupBox, InitModelOf, LogicalGridLayoutConfig, LookupRow, PlaceholderField, PropertyChangeEvent, scout, SmartField, StaticLookupCall, Table, TableGroupEvent, TableSortEvent,
-  TileTableHeaderBoxModel, TileTableHeaderGroupByLookupCall, TileTableHeaderSortByLookupCall, TileTableHeaderSortKey, ValueField
+  arrays, Column, EventHandler, FormField, GroupBox, InitModelOf, LogicalGridLayoutConfig, LookupRow, PlaceholderField, PropertyChangeEvent, scout, SmartField, StaticLookupCall, Table, TableColumnStructureChangedEvent, TableGroupEvent,
+  TableSortEvent, TileTableHeaderBoxModel, TileTableHeaderGroupByLookupCall, TileTableHeaderSortByLookupCall, TileTableHeaderSortKey, ValueField
 } from '../index';
 
 export class TileTableHeaderBox extends GroupBox implements TileTableHeaderBoxModel {
@@ -23,6 +23,7 @@ export class TileTableHeaderBox extends GroupBox implements TileTableHeaderBoxMo
   isSorting: boolean;
   protected _tableGroupHandler: EventHandler<TableGroupEvent>;
   protected _tableSortHandler: EventHandler<TableSortEvent>;
+  protected _tableColumnStructureChangedHandler: EventHandler<TableColumnStructureChangedEvent>;
   protected _destroyHandler: () => void;
 
   constructor() {
@@ -41,18 +42,21 @@ export class TileTableHeaderBox extends GroupBox implements TileTableHeaderBoxMo
 
     this._tableGroupHandler = this._onTableGroup.bind(this);
     this._tableSortHandler = this._onTableSort.bind(this);
+    this._tableColumnStructureChangedHandler = this._onTableColumnStructureChanged.bind(this);
     this._destroyHandler = this._uninstallListeners.bind(this);
   }
 
   protected _installListeners() {
     this.table.on('group', this._tableGroupHandler);
     this.table.on('sort', this._tableSortHandler);
+    this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
     this.table.one('destroy', this._destroyHandler);
   }
 
   protected _uninstallListeners() {
     this.table.off('group', this._tableGroupHandler);
     this.table.off('sort', this._tableSortHandler);
+    this.table.off('columnStructureChanged', this._tableColumnStructureChangedHandler);
   }
 
   protected override _init(model: InitModelOf<this>) {
@@ -190,5 +194,21 @@ export class TileTableHeaderBox extends GroupBox implements TileTableHeaderBoxMo
     if (!this.isSorting) {
       this._syncSortingGroupingFields();
     }
+  }
+
+  protected _onTableColumnStructureChanged(event: TableColumnStructureChangedEvent) {
+    const groupByLookupCall = this.groupByField.lookupCall;
+    if (groupByLookupCall instanceof StaticLookupCall) {
+      groupByLookupCall.refreshData();
+      this.groupByField.setVisible(!arrays.empty(groupByLookupCall.data));
+    }
+
+    const sortByLookupCall = this.sortByField.lookupCall;
+    if (sortByLookupCall instanceof StaticLookupCall) {
+      sortByLookupCall.refreshData();
+      this.sortByField.setVisible(!arrays.empty(sortByLookupCall.data));
+    }
+
+    this._syncSortingGroupingFields();
   }
 }
