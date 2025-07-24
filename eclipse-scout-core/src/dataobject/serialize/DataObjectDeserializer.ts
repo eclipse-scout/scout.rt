@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, Constructor, dataObjects, DoValueMetaData, doValueMetaData, InitModelOf, ObjectModel, objects, ObjectWithType, scout} from '../../index';
+import {BaseDoEntity, Constructor, dataObjects, DoValueMetaData, doValueMetaData, InitModelOf, ObjectModel, objects, ObjectWithType, Predicate, scout} from '../../index';
 
 export class DataObjectDeserializer implements DataObjectDeserializerModel, ObjectWithType {
 
@@ -16,9 +16,15 @@ export class DataObjectDeserializer implements DataObjectDeserializerModel, Obje
   id: string;
   objectType: string;
   createPojoIfDoIsUnknown: boolean;
+  retainTypeVersion: Predicate<object>;
 
   constructor(model?: InitModelOf<DataObjectDeserializer>) {
     this.createPojoIfDoIsUnknown = !!model?.createPojoIfDoIsUnknown;
+    this.retainTypeVersion = scout.nvl(model?.retainTypeVersion, (obj: object) => !(obj instanceof BaseDoEntity));
+    if (!objects.isFunction(this.retainTypeVersion)) {
+      const retain = !!this.retainTypeVersion;
+      this.retainTypeVersion = () => retain;
+    }
   }
 
   deserialize<T extends object>(value: any, valueMetaData?: DoValueMetaData<T>): T {
@@ -42,10 +48,16 @@ export class DataObjectDeserializer implements DataObjectDeserializerModel, Obje
     const resultObj = this._createResultObject(constructor);
     const proto = Object.getPrototypeOf(constructor).prototype;
     Object.keys(rawObj)
-      .filter(key => key !== '_typeVersion') // Ignore _typeVersion as this is not required on the client. At runtime only the latest version can exist anyway and the backend could re-create this information from its Java annotation.
+      // Ignore _typeVersion as it is handled later on.
+      .filter(key => key !== '_typeVersion')
       .forEach(key => {
         resultObj[key] = this._convertFieldValue(proto, rawObj, key, rawObj[key]);
       });
+
+    if (rawObj.hasOwnProperty('_typeVersion') && this.retainTypeVersion(resultObj)) {
+      resultObj['_typeVersion'] = this._convertFieldValue(proto, rawObj, '_typeVersion', rawObj['_typeVersion']);
+    }
+
     return resultObj;
   }
 
@@ -76,8 +88,9 @@ export class DataObjectDeserializer implements DataObjectDeserializerModel, Obje
 export interface DataObjectDeserializerModel extends ObjectModel<DataObjectDeserializer> {
   /**
    * Controls the kind of object that will be created when deserializing unknown DataObjects.
-   * If true, a pojo will be created for unknown DOs. If false, instances of {@link BaseDoEntity} will be created.
-   * Default is false.
+   * If `true` a pojo will be created for unknown DOs. If `false`, instances of {@link BaseDoEntity} will be created.
+   * Changing the type of the deserialized DataObject may change the deserialization behaviour of the property '_typeVersion' (see {@link retainTypeVersion} for more details).
+   * Default is `false`.
    *
    * A DataObject can be unknown e.g. if:
    * <ol>
@@ -85,5 +98,12 @@ export interface DataObjectDeserializerModel extends ObjectModel<DataObjectDeser
    *   <li>There is no _type attribute and the TypeScript attribute declaration (metadata) does not provide a class type which could be used as fallback.</li>
    * </ol>
    */
-  createPojoIfDoIsUnknown: boolean;
+  createPojoIfDoIsUnknown?: boolean;
+  /**
+   * Controls whether the '_typeVersion' property is retained when deserializing DataObjects.
+   * The property can be given as a {@link boolean} or a {@link Predicate}, whose input is the deserialized DataObject.
+   * If `true`, the '_typeVersion' will be set on the deserialized DataObject. If `false`, it will be ignored.
+   * Default is a {@link Predicate} that ignores the '_typeVersion' if the deserialized DataObject is instance of {@link BaseDoEntity}.
+   */
+  retainTypeVersion?: boolean | Predicate<object>;
 }
