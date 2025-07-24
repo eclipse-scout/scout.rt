@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, BaseDoEntity, Constructor, DataObjectDeserializer, dataObjects, dates, DefaultDoTypeResolver, DoValueMetaData, ObjectFactory, objects, scout, typeName} from '../../src/index';
+import {arrays, BaseDoEntity, Constructor, DataObjectDeserializer, dataObjects, dates, DefaultDoTypeResolver, DoEntity, DoValueMetaData, ObjectFactory, objects, scout, typeName} from '../../src/index';
 
 describe('DataObjectDeserializer', () => {
 
@@ -131,20 +131,96 @@ describe('DataObjectDeserializer', () => {
     expect(result.num).toBe(1234);
   });
 
-  it('ignores _typeVersion', () => {
-    const result = dataObjects.parse('{' +
-      '  "value": 1234,' +
+  it('ignores _typeVersion depending on retainTypeVersion-option', () => {
+    const json = '{' +
       '  "_type": "whatever",' +
-      '  "_typeVersion": "1.2.3"' +
-      '}') as any;
-    expect(result).toBeInstanceOf(BaseDoEntity); // as _type cannot be found.
-    expect(result._type).toBe('whatever'); // is kept
+      '  "_typeVersion": "1.2.3",' +
+      '  "value": 1234,' +
+      '  "nestedObj": {' +
+      '    "_type": "scout.Fixture01",' +
+      '    "_typeVersion": "3.2.1"' +
+      '  }' +
+      '}';
 
-    // _typeVersion is skipped when deserializing.
-    // _typeVersion is never required as at runtime only the newest typeVersion might exist (only during migration old versions may exist).
-    // Therefore, the _typeVersion is not required on the client as it is a backend-only property required for the migration only.
-    expect(result._typeVersion).toBeUndefined();
-    expect(result.value).toBe(1234);
+    const baseDoEntity = dataObjects.parse(json) as any;
+    expect(baseDoEntity).toBeInstanceOf(BaseDoEntity); // as _type cannot be found.
+    expect(baseDoEntity._type).toBe('whatever'); // is kept
+    // retainTypeVersion is false if object is instance of BaseDoEntity -> _typeVersion is skipped when deserializing
+    expect(baseDoEntity._typeVersion).toBeUndefined();
+    expect(baseDoEntity.value).toBe(1234);
+    expect(baseDoEntity.nestedObj).toBeInstanceOf(Fixture01Do);
+    // retainTypeVersion is false if object is instance of BaseDoEntity -> _typeVersion is skipped when deserializing
+    expect(baseDoEntity.nestedObj._typeVersion).toBeUndefined();
+
+    const baseDoEntityWithTypeVersion = dataObjects.parse(json, null, {retainTypeVersion: true}) as any;
+    expect(baseDoEntityWithTypeVersion).toBeInstanceOf(BaseDoEntity); // as _type cannot be found.
+    expect(baseDoEntityWithTypeVersion._type).toBe('whatever'); // is kept
+    // _typeVersion is NOT skipped when deserializing
+    expect(baseDoEntityWithTypeVersion._typeVersion).toBe('1.2.3');
+    expect(baseDoEntityWithTypeVersion.value).toBe(1234);
+    expect(baseDoEntityWithTypeVersion.nestedObj).toBeInstanceOf(Fixture01Do);
+    // _typeVersion is NOT skipped when deserializing
+    expect(baseDoEntityWithTypeVersion.nestedObj._typeVersion).toBe('3.2.1');
+
+    const baseDoEntityWithoutTypeVersion = dataObjects.parse(json, null, {retainTypeVersion: false}) as any;
+    expect(baseDoEntityWithoutTypeVersion).toBeInstanceOf(BaseDoEntity); // as _type cannot be found.
+    expect(baseDoEntityWithoutTypeVersion._type).toBe('whatever'); // is kept
+    // _typeVersion is skipped when deserializing
+    expect(baseDoEntityWithoutTypeVersion._typeVersion).toBeUndefined();
+    expect(baseDoEntityWithoutTypeVersion.value).toBe(1234);
+    expect(baseDoEntityWithoutTypeVersion.nestedObj).toBeInstanceOf(Fixture01Do);
+    // _typeVersion is skipped when deserializing
+    expect(baseDoEntityWithoutTypeVersion.nestedObj._typeVersion).toBeUndefined();
+
+    const baseDoEntityWithTypeVersionPredicate = dataObjects.parse(json, null, {retainTypeVersion: (obj: DoEntity) => obj._type !== 'whatever'}) as any;
+    expect(baseDoEntityWithTypeVersionPredicate).toBeInstanceOf(BaseDoEntity); // as _type cannot be found.
+    expect(baseDoEntityWithTypeVersionPredicate._type).toBe('whatever'); // is kept
+    // _typeVersion is skipped when deserializing
+    expect(baseDoEntityWithTypeVersionPredicate._typeVersion).toBeUndefined();
+    expect(baseDoEntityWithTypeVersionPredicate.value).toBe(1234);
+    expect(baseDoEntityWithTypeVersionPredicate.nestedObj).toBeInstanceOf(Fixture01Do);
+    // _typeVersion is NOT skipped when deserializing
+    expect(baseDoEntityWithTypeVersionPredicate.nestedObj._typeVersion).toBe('3.2.1');
+
+    const pojo = dataObjects.parse(json, null, {createPojoIfDoIsUnknown: true}) as any;
+    expect(pojo).not.toBeInstanceOf(BaseDoEntity); // as _type cannot be found.
+    expect(pojo._type).toBe('whatever'); // is kept
+    // retainTypeVersion is true if object is not instance of BaseDoEntity -> _typeVersion is NOT skipped when deserializing
+    expect(pojo._typeVersion).toBe('1.2.3');
+    expect(pojo.value).toBe(1234);
+    expect(pojo.nestedObj).toBeInstanceOf(Fixture01Do);
+    // retainTypeVersion is false if object is instance of BaseDoEntity -> _typeVersion is skipped when deserializing
+    expect(pojo.nestedObj._typeVersion).toBeUndefined();
+
+    const pojoWithTypeVersion = dataObjects.parse(json, null, {createPojoIfDoIsUnknown: true, retainTypeVersion: true}) as any;
+    expect(pojoWithTypeVersion).not.toBeInstanceOf(BaseDoEntity); // as _type cannot be found.
+    expect(pojoWithTypeVersion._type).toBe('whatever'); // is kept
+    // _typeVersion is NOT skipped when deserializing
+    expect(pojoWithTypeVersion._typeVersion).toBe('1.2.3');
+    expect(pojoWithTypeVersion.value).toBe(1234);
+    expect(pojoWithTypeVersion.nestedObj).toBeInstanceOf(Fixture01Do);
+    // _typeVersion is NOT skipped when deserializing
+    expect(pojoWithTypeVersion.nestedObj._typeVersion).toBe('3.2.1');
+
+    const pojoWithoutTypeVersion = dataObjects.parse(json, null, {createPojoIfDoIsUnknown: true, retainTypeVersion: false}) as any;
+    expect(pojoWithoutTypeVersion).not.toBeInstanceOf(BaseDoEntity); // as _type cannot be found.
+    expect(pojoWithoutTypeVersion._type).toBe('whatever'); // is kept
+    // _typeVersion is skipped when deserializing
+    expect(pojoWithoutTypeVersion._typeVersion).toBeUndefined();
+    expect(pojoWithoutTypeVersion.value).toBe(1234);
+    expect(pojoWithoutTypeVersion.nestedObj).toBeInstanceOf(Fixture01Do);
+    // _typeVersion is skipped when deserializing
+    expect(pojoWithoutTypeVersion.nestedObj._typeVersion).toBeUndefined();
+
+    const pojoWithTypeVersionPredicate = dataObjects.parse(json, null, {createPojoIfDoIsUnknown: true, retainTypeVersion: (obj: DoEntity) => obj._type !== 'whatever'}) as any;
+    expect(pojoWithTypeVersionPredicate).not.toBeInstanceOf(BaseDoEntity); // as _type cannot be found.
+    expect(pojoWithTypeVersionPredicate._type).toBe('whatever'); // is kept
+    // _typeVersion is skipped when deserializing
+    expect(pojoWithTypeVersionPredicate._typeVersion).toBeUndefined();
+    expect(pojoWithTypeVersionPredicate.value).toBe(1234);
+    expect(pojoWithTypeVersionPredicate.nestedObj).toBeInstanceOf(Fixture01Do);
+    // _typeVersion is NOT skipped when deserializing
+    expect(pojoWithTypeVersionPredicate.nestedObj._typeVersion).toBe('3.2.1');
   });
 
   it('throws if expected and given type differ', () => {
