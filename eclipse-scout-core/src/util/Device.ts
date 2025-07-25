@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -498,10 +498,6 @@ export class Device implements DeviceModel, ObjectWithType {
       // Check if scrollbar is vanished if class hybrid-scrollable is applied which hides the scrollbar, see also scrollbars.js and Scrollbar.less
       return this._detectScrollbarWidth('hybrid-scrollable') === 0;
     });
-  }
-
-  supportsCopyFromDisabledInputFields(): boolean {
-    return Device.Browser.FIREFOX !== this.browser;
   }
 
   /**

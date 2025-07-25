@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Action, aria, arrays, clipboard, CloneOptions, Column, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, DragAndDropOptions, DropType, EnumObject, EventHandler, fields, FieldStatus, FormFieldClipboardExportEvent,
-  FormFieldEventMap, FormFieldLayout, FormFieldModel, FormFieldValidationResultProvider, GridData, GroupBox, HierarchyChangeEvent, HtmlComponent, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, ObjectOrChildModel,
-  ObjectOrModel, ObjectOrType, objects, Predicate, PropertyChangeEvent, scout, Status, StatusMenuMapping, StatusOrModel, strings, styles, TableRow, Tooltip, tooltips, TooltipSupport, TreeVisitor, TreeVisitResult, Widget
+  AbstractLayout, Action, aria, arrays, clipboard, CloneOptions, Column, Device, dragAndDrop, DragAndDropHandler, DragAndDropOptions, DropType, EnumObject, EventHandler, fields, FieldStatus, FormFieldClipboardExportEvent, FormFieldEventMap,
+  FormFieldLayout, FormFieldModel, FormFieldValidationResultProvider, GridData, GroupBox, HierarchyChangeEvent, HtmlComponent, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, ObjectOrChildModel, ObjectOrModel,
+  ObjectOrType, objects, Predicate, PropertyChangeEvent, scout, Status, StatusMenuMapping, StatusOrModel, strings, styles, TableRow, Tooltip, tooltips, TooltipSupport, TreeVisitor, TreeVisitResult, Widget
 } from '../../index';
 import $ from 'jquery';
 
@@ -65,12 +65,6 @@ export class FormField extends Widget implements FormFieldModel {
   onFieldTooltipOptionsCreator: (this: FormField) => InitModelOf<TooltipSupport>;
   dragAndDropHandler: DragAndDropHandler;
   validationResultProvider: FormFieldValidationResultProvider;
-  /**
-   * Some browsers don't support copying text from disabled input fields. If such a browser is detected
-   * and this flag is true (default is false), an overlay DIV is rendered over disabled fields which
-   * provides a custom copy context menu that opens the ClipboardForm.
-   */
-  disabledCopyOverlay: boolean;
 
   $label: JQuery;
   /**
@@ -92,7 +86,6 @@ export class FormField extends Widget implements FormFieldModel {
    */
   $status: JQuery;
   $mandatory: JQuery;
-  $disabledCopyOverlay: JQuery;
   protected _menuPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Menu>>;
   protected _hierarchyChangeHandler: EventHandler<HierarchyChangeEvent>;
 
@@ -137,9 +130,6 @@ export class FormField extends Widget implements FormFieldModel {
     this.$fieldContainer = null;
     this.$icon = null;
     this.$status = null;
-
-    this.disabledCopyOverlay = false;
-    this.$disabledCopyOverlay = null;
 
     this._addWidgetProperties(['keyStrokes', 'menus', 'statusMenuMappings']);
     this._addCloneProperties(['dropType', 'dropMaximumSize', 'errorStatus', 'fieldStyle', 'gridDataHints', 'gridData', 'label', 'labelVisible', 'labelPosition',
@@ -313,7 +303,6 @@ export class FormField extends Widget implements FormFieldModel {
     this._removeLabel();
     this._removeIcon();
     this.removeMandatoryIndicator();
-    this._removeDisabledCopyOverlay();
     dragAndDrop.uninstallDragAndDropHandler(this);
   }
 
@@ -779,7 +768,6 @@ export class FormField extends Widget implements FormFieldModel {
     if (this.$field) {
       this.$field.setEnabled(this.enabledComputed);
     }
-    this._updateDisabledCopyOverlay();
     this._installOrUninstallDragAndDropHandler();
   }
 
@@ -1381,56 +1369,6 @@ export class FormField extends Widget implements FormFieldModel {
       dropType: () => this.dropType,
       onDrop: event => this.trigger('drop', event)
     };
-  }
-
-  protected _updateDisabledCopyOverlay() {
-    if (this.disabledCopyOverlay && !Device.get().supportsCopyFromDisabledInputFields()) {
-      if (this.enabledComputed) {
-        this._removeDisabledCopyOverlay();
-      } else {
-        this._renderDisabledCopyOverlay();
-        this.revalidateLayout(); // because bounds of overlay is set in FormFieldLayout
-      }
-    }
-  }
-
-  protected _renderDisabledCopyOverlay() {
-    if (!this.$disabledCopyOverlay) {
-      this.$disabledCopyOverlay = this.$container
-        .appendDiv('disabled-overlay')
-        .on('contextmenu', this._createCopyContextMenu.bind(this));
-    }
-  }
-
-  protected _removeDisabledCopyOverlay() {
-    if (this.$disabledCopyOverlay) {
-      this.$disabledCopyOverlay.remove();
-      this.$disabledCopyOverlay = null;
-    }
-  }
-
-  protected _createCopyContextMenu(event: JQuery.ContextMenuEvent) {
-    if (!this.visible || strings.empty(this.displayText)) {
-      return;
-    }
-
-    let menu = scout.create(Menu, {
-      parent: this,
-      text: this.session.text('ui.Copy'),
-      inheritAccessibility: false
-    });
-    menu.on('action', event => this.exportToClipboard());
-
-    let popup = scout.create(ContextMenuPopup, {
-      parent: this,
-      menuItems: [menu],
-      cloneMenuItems: false,
-      location: {
-        x: event.pageX,
-        y: event.pageY
-      }
-    });
-    popup.open();
   }
 
   /**
