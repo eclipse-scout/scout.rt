@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -511,7 +511,7 @@ export class Device implements DeviceModel, ObjectWithType {
   }
 
   supportsCopyFromDisabledInputFields(): boolean {
-    return Device.Browser.FIREFOX !== this.browser;
+    return true; // Every browser supports it now. The disabledCopyOverlay will be removed with 25.2.
   }
 
   /**
