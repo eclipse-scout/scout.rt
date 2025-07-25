@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -166,25 +166,23 @@ textarea,
   border: 1px solid @control-border-color;
   border-radius: @control-border-radius;
 
-  &.disabled {
-    background-color: @control-disabled-background-color;
-    border-color: @control-disabled-border-color;
-    color: @control-disabled-color;
-  }
-
   &:focus,
   &.focused {
     #scout.focus-border();
   }
 
   &.has-error {
-    border-color: @error-border-color;
     background-color: @error-background-color;
+    border-color: @error-border-color;
+    --focus-box-shadow-color: @error-focus-box-shadow-color;
   }
 
-  &.has-error:focus,
-  &.has-error.focused {
-    #scout.focus-box-shadow(@box-shadow-color: @error-focus-box-shadow-color);
+  &.disabled {
+    background-color: @control-disabled-background-color;
+    border-color: @control-disabled-border-color;
+    --focus-box-shadow-color: transparent;
+    color: @control-disabled-color;
+    cursor: default;
   }
 
   &.read-only {
@@ -205,6 +203,11 @@ input[type="password"].alternative {
   /* Compensate padding-bottom to align input text with label on the left */
   /* It won't be perfect (especially when zoomed) but should be good enough */
   padding-top: @text-field-padding-top-compensation;
+
+  &:focus.disabled,
+  &.focused.disabled {
+    padding-bottom: 1px;
+  }
 }
 
 input.alternative,
@@ -218,15 +221,10 @@ input.alternative,
   padding-left: @text-field-alternative-padding-left;
   padding-right: @text-field-alternative-padding-right;
 
-  &.disabled {
-    color: @disabled-color;
-    border-bottom-style: dashed;
-    border-bottom-color: @text-field-alternative-disabled-border-color;
-  }
-
   &:focus,
   &.focused {
     color: @focus-color;
+    border-color: transparent;
     #scout.alternative-focus-border();
   }
 
@@ -235,12 +233,11 @@ input.alternative,
     border-bottom-color: @error-border-color;
   }
 
-  &.has-error:focus,
-  &.has-error.focused {
-    border-bottom-color: @error-border-color;
-    border-bottom-width: 2px;
-    box-shadow: none;
-    padding-bottom: 0;
+  &.disabled {
+    color: @disabled-color;
+    border-bottom-style: dashed;
+    border-bottom-color: @text-field-alternative-disabled-border-color;
+    border-bottom-width: 1px;
   }
 
   &.read-only {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,9 +29,10 @@ function focusable(element, requireTabbable, excludeUnfocusable) {
   }
 
   // Some elements are focusable natively, others can be made focusable by adding a tabindex (positive or negative)
+  // ReadOnly inputs with tabIndex < 0 may get the focus but don't look focused -> we don't consider them focusable, see also jquery-scout#setEnabled(boolean)
   let nodeName = element.nodeName.toLowerCase();
   let focusable = /^(input|select|textarea|button|object)$/.test(nodeName)
-    ? !element.disabled
+    ? !element.disabled && !(element.readOnly && tabIndex < 0)
     : hasTabIndex || (nodeName === 'a' && element.href);
 
   return focusable && visible(element); // the element and all of its ancestors must be visible

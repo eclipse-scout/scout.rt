@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -66,17 +66,8 @@ describe('jquery-scout', () => {
 
   describe('setEnabled', () => {
 
-    it('DIV does not have disabled attribute', () => {
-      $e.setEnabled(false);
-      expect($e.hasClass('disabled')).toBe(true);
-      expect($e.attr('disabled')).toBeUndefined();
-      $e.setEnabled(true);
-      expect($e.hasClass('disabled')).toBe(false);
-      expect($e.attr('disabled')).toBeUndefined();
-    });
-
-    it('INPUT must have disabled attribute', () => {
-      $e = $('<input>');
+    it('sets disabled attribute for buttons', () => {
+      $e = $('<button>');
       $e.setEnabled(false);
       expect($e.hasClass('disabled')).toBe(true);
       expect($e.attr('disabled')).toBe('disabled');
@@ -85,6 +76,109 @@ describe('jquery-scout', () => {
       expect($e.attr('disabled')).toBeUndefined();
     });
 
+    it('does not set disabled attribute if element does not support it', () => {
+      $e.setEnabled(false);
+      expect($e.hasClass('disabled')).toBe(true);
+      expect($e.attr('disabled')).toBeUndefined();
+      $e.setEnabled(true);
+      expect($e.hasClass('disabled')).toBe(false);
+      expect($e.attr('disabled')).toBeUndefined();
+    });
+
+    it('sets readonly attribute for inputs', () => {
+      $e = $('<input>');
+      $e.setEnabled(false);
+      expect($e.hasClass('disabled')).toBe(true);
+      expect($e.attr('disabled')).toBeUndefined();
+      expect($e.attr('readonly')).toBe('readonly');
+
+      $e.setEnabled(true);
+      expect($e.hasClass('disabled')).toBe(false);
+      expect($e.attr('disabled')).toBeUndefined();
+      expect($e.attr('readonly')).toBeUndefined();
+
+      $e = $('<input type="text">');
+      $e.setEnabled(false);
+      expect($e.hasClass('disabled')).toBe(true);
+      expect($e.attr('disabled')).toBeUndefined();
+      expect($e.attr('readonly')).toBe('readonly');
+
+      $e = $('<textarea>');
+      $e.setEnabled(false);
+      expect($e.hasClass('disabled')).toBe(true);
+      expect($e.attr('disabled')).toBeUndefined();
+      expect($e.attr('readonly')).toBe('readonly');
+    });
+
+    it('does not set readonly attribute if element does not support it', () => {
+      $e = $('<input type="button">');
+      $e.setEnabled(false);
+      expect($e.hasClass('disabled')).toBe(true);
+      expect($e.attr('disabled')).toBe('disabled');
+      expect($e.attr('readonly')).toBeUndefined();
+
+      $e.setEnabled(true);
+      expect($e.hasClass('disabled')).toBe(false);
+      expect($e.attr('disabled')).toBeUndefined();
+      expect($e.attr('readonly')).toBeUndefined();
+    });
+
+    it('sets tabindex to -1 if readonly and not explicitly requested', () => {
+      $e = $('<input type="text">');
+      $e.setEnabled(false);
+      expect($e.attr('readonly')).toBe('readonly');
+      expect($e.attr('tabindex')).toBe('-1');
+
+      $e.setEnabled(true);
+      expect($e.attr('readonly')).toBeUndefined();
+      expect($e.attr('tabindex')).toBeUndefined();
+
+      $e.setTabbable(true);
+      expect($e.attr('readonly')).toBeUndefined();
+      expect($e.attr('tabindex')).toBe('0');
+
+      $e.setEnabled(false);
+      expect($e.attr('readonly')).toBe('readonly');
+      expect($e.attr('tabindex')).toBe('0'); // Still tabbable because field wants to be tabbable even if disabled.
+
+      $e.setTabbable(false);
+      expect($e.attr('readonly')).toBe('readonly');
+      expect($e.attr('tabindex')).toBe('-1'); // Is now set to -1 because it is readonly
+
+      $e.setTabbable(true);
+      expect($e.attr('readonly')).toBe('readonly');
+      expect($e.attr('tabindex')).toBe('0');
+
+      $e.setTabbable(false);
+      expect($e.attr('readonly')).toBe('readonly');
+      expect($e.attr('tabindex')).toBe('-1');
+
+      $e.setEnabled(true);
+      expect($e.attr('readonly')).toBeUndefined();
+      expect($e.attr('tabindex')).toBeUndefined();
+    });
+
+    it('does not set tabindex if not readonly', () => {
+      $e = $('<input type="button">');
+      $e.setEnabled(false);
+      expect($e.attr('disabled')).toBe('disabled');
+      expect($e.attr('readonly')).toBeUndefined();
+      expect($e.attr('tabindex')).toBeUndefined();
+
+      $e.setEnabled(true);
+      expect($e.attr('disabled')).toBeUndefined();
+      expect($e.attr('readonly')).toBeUndefined();
+      expect($e.attr('tabindex')).toBeUndefined();
+
+      $e.setTabbable(true);
+      expect($e.attr('tabindex')).toBe('0');
+
+      $e.setEnabled(false);
+      expect($e.attr('tabindex')).toBe('0'); // Still tabbable because field wants to be tabbable even if disabled.
+
+      $e.setTabbable(false);
+      expect($e.attr('tabindex')).toBeUndefined();
+    });
   });
 
   describe('toggleAttr', () => {

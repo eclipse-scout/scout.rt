@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Device, FormField, FormFieldStatusPosition, Popup, scout, strings, TabItem, ValueField, Widget, widgets} from '../../index';
+import $ from 'jquery';
 
 /**
  * Calls JQuery $.text() for touch-devices and $.val() for all other devices, used together with #makeInputOrDiv().
@@ -175,5 +176,37 @@ export const fields = {
   focusAndInsertText($input: JQuery<HTMLInputElement | HTMLTextAreaElement>, text: string) {
     $input[0].focus();
     $input.document(true).execCommand('insertText', false, text);
+  },
+
+  /**
+   * @returns true if the element supports the readonly attribute
+   */
+  supportsReadonlyAttribute($element: JQuery | HTMLElement) {
+    let $elem = $.ensure($element);
+    if (!$elem.length) {
+      return false;
+    }
+    if ($elem.is('textarea')) {
+      return true;
+    }
+    // According to https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/readonly
+    return fields.isInputType($elem, 'text', 'search', 'tel', 'url', 'email', 'password', 'date', 'month', 'week', 'time', 'datetime-local', 'datetime-number');
+  },
+
+  /**
+   * Returns true if the given element is an input element and its type attribute matches one of the given types.
+   * Also returns true if the element is an input without a type attribute and the specified types contain the 'text' type
+   * because an input without type attribute defaults to the type text.
+   */
+  isInputType($element: JQuery | HTMLElement, ...types: string[]): boolean | null {
+    let $elem = $.ensure($element);
+    if (!$elem.length) {
+      return false;
+    }
+    if (!$elem.is('input')) {
+      return false;
+    }
+    let type = $elem.attr('type') || 'text'; // input without type defaults to text
+    return types.includes(type);
   }
 };

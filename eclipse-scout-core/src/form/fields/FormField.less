@@ -22,14 +22,6 @@
     color: @label-color;
     font-size: @field-label-font-size;
 
-    .disabled& {
-      color: @label-disabled-color;
-    }
-
-    .read-only& {
-      color: @label-color;
-    }
-
     &.top {
       color: @top-label-color;
       font-size: @top-label-font-size;
@@ -55,6 +47,14 @@
 
     .has-error& {
       color: @error-color;
+    }
+
+    .disabled& {
+      color: @label-disabled-color;
+    }
+
+    .read-only& {
+      color: @label-color;
     }
   }
 

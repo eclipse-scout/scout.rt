@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -120,5 +120,21 @@ describe('fields', () => {
 
     expect(tabBox.selectedTab).toBe(tabA);
     expect(tabBoxA.selectedTab).toBe(tabAB);
+  });
+
+  describe('isInputType', () => {
+    it('returns true for inputs that have one of the specified types', () => {
+      expect(fields.isInputType($(), 'text', 'checkbox')).toBe(false);
+      expect(fields.isInputType($('<textarea>'))).toBe(false);
+      expect(fields.isInputType($('<textarea>'), 'button')).toBe(false);
+      expect(fields.isInputType($('<input type="button">'), 'text', 'checkbox')).toBe(false);
+      expect(fields.isInputType($('<input type="button">'), 'button', 'checkbox')).toBe(true);
+      expect(fields.isInputType($('<input type="button">')[0], 'button', 'checkbox')).toBe(true);
+    });
+
+    it('returns true for inputs without type if type text is specified', () => {
+      expect(fields.isInputType($('<input>'), 'button', 'checkbox')).toBe(false);
+      expect(fields.isInputType($('<input>'), 'text', 'checkbox')).toBe(true);
+    });
   });
 });

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FocusManagerSpecHelper, FormSpecHelper} from '../../src/testing/index';
-import {FocusManager, FocusRule, focusUtils, GlassPane, scout} from '../../src/index';
+import {FocusManagerSpecHelper, FormSpecHelper, JQueryTesting} from '../../src/testing/index';
+import {FocusManager, FocusRule, GlassPane, scout} from '../../src/index';
 
 describe('FocusManager', () => {
   let session: SandboxSession, formHelper: FormSpecHelper, focusHelper: FocusManagerSpecHelper, focusManager: FocusManager;
@@ -16,7 +16,12 @@ describe('FocusManager', () => {
   beforeEach(() => {
     setFixtures(sandbox());
     jasmine.Ajax.install();
-    session = sandboxSession();
+    session = sandboxSession({
+      desktop: {
+        headerVisible: true,
+        benchVisible: true
+      }
+    });
     focusManager = session.focusManager;
     formHelper = new FormSpecHelper(session);
     focusHelper = new FocusManagerSpecHelper();
@@ -37,16 +42,9 @@ describe('FocusManager', () => {
     return $container;
   }
 
-  describe('isSelectableText', () => {
-
-    it('must return true for disabled text-fields', () => {
-      let $textField = $('<input>')
-        .attr('type', 'text')
-        .attr('disabled', 'disabled');
-      expect(focusUtils.isSelectableText($textField)).toBe(true);
-    });
-
-  });
+  function expectMouseDownToPreventDefault(prevented: boolean) {
+    session.$entryPoint.one('mousedown', e => expect(e.isDefaultPrevented()).toBe(prevented));
+  }
 
   describe('validateFocus', () => {
 
@@ -365,6 +363,66 @@ describe('FocusManager', () => {
       glassPane3.render($(input3));
       focusManager.focusNextTabbable(input1);
       expect(document.activeElement).toBe(session.$entryPoint[0]);
+    });
+  });
+
+  describe('findFirstFocusableElement', () => {
+    it('ignores disabled form fields', async () => {
+      jasmine.clock().uninstall();
+      let form = formHelper.createFormWithFields(session.desktop, false, 2);
+      form.rootGroupBox.fields[0].setEnabled(false);
+      await form.open();
+
+      expect(focusManager.findFirstFocusableElement(form.$container)).toBe(form.rootGroupBox.fields[1].$field[0]);
+    });
+
+    it('ignores readonly and disabled inputs', async () => {
+      let $inputContainer = session.$entryPoint.appendDiv();
+      $inputContainer.appendElement('<input type="text">').setEnabled(false);
+      $inputContainer.appendElement('<input type="text" readonly="readonly" tabindex="-1">'); // should be the same as the result of setEnabled(false)
+      $inputContainer.appendElement('<input type="text" disabled="disabled">');
+      let $input = $inputContainer.appendElement('<input type="text">');
+      expect(focusManager.findFirstFocusableElement($inputContainer)).toBe($input[0]);
+
+      let $buttonContainer = session.$entryPoint.appendDiv();
+      $buttonContainer.appendElement('<button>button</button>>').setEnabled(false);
+      $buttonContainer.appendElement('<button disabled="disabled">button</button>>'); // should be the same as the result of setEnabled(false)
+      let $button = $buttonContainer.appendElement('<button>button</button>>');
+      expect(focusManager.findFirstFocusableElement($buttonContainer)).toBe($button[0]);
+    });
+
+    it('does not ignore readonly inputs without tabindex or tabindex => 0', () => {
+      // A readonly input normally is tabbable. In Scout, when an input is disabled, we don't want it to be tabbable so we set tabindex to -1.
+      // But maybe there are use cases where a readonly input should be tabbable. To do so, just don't use jquery-scout#setEnabled(boolean) and set the readonly attribute explicitly.
+      // In that case, it should get the initial focus because the user can tab to it.
+      let $container = session.$entryPoint.appendDiv();
+      $container.appendElement('<input type="text" readonly="readonly" tabindex="-1">');
+      let $input = $container.appendElement('<input type="text" readonly="readonly">');
+      expect(focusManager.findFirstFocusableElement($container)).toBe($input[0]);
+
+      let $container2 = session.$entryPoint.appendDiv();
+      $container2.appendElement('<input type="text" readonly="readonly" tabindex="-1">');
+      let $input2 = $container2.appendElement('<input type="text" readonly="readonly" tabindex="0">');
+      expect(focusManager.findFirstFocusableElement($container2)).toBe($input2[0]);
+    });
+  });
+
+  describe('_acceptFocusChangeOnMouseDown', () => {
+    it('accepts the focus if a readonly input was clicked', () => {
+      let $container = session.$entryPoint.appendDiv();
+      let $input1 = $container.appendElement('<input type="text">').setEnabled(false);
+      let $input2 = $container.appendElement('<input type="text" readonly="readonly" tabindex="-1">'); // should be the same as the result of setEnabled(false)
+      let $input3 = $container.appendElement('<input type="text" readonly="readonly">');
+      // Browsers nowadays completely ignore mouse events on disabled inputs, so it is not necessary to handle this case
+
+      expectMouseDownToPreventDefault(false);
+      JQueryTesting.triggerMouseDown($input1);
+
+      expectMouseDownToPreventDefault(false);
+      JQueryTesting.triggerMouseDown($input2);
+
+      expectMouseDownToPreventDefault(false);
+      JQueryTesting.triggerMouseDown($input3);
     });
   });
 });
