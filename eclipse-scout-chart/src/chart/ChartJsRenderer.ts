@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -2499,7 +2499,11 @@ export class ChartJsRenderer extends AbstractChartRenderer {
 
   protected _adjustSize(config: ChartConfig, chartArea: ChartArea) {
     this._adjustBubbleSizes(config, chartArea);
-    this._adjustGridMaxMin(config, chartArea);
+    // chartJs sets the chartArea depending on the Bubble Sizes and subtracts the max radius from the height / width.
+    // this results in a different grid layout, and we need to refresh before the next calculations.
+    this.refresh();
+    // adjust max and min with the refreshed chartArea
+    this._adjustGridMaxMin(config, this.chartJs.chartArea);
   }
 
   protected _adjustBubbleSizes(config: ChartConfig, chartArea: ChartArea) {
@@ -2569,7 +2573,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     }));
   }
 
-  protected _computeMaxMinValue(config: ChartConfig, datasets: ChartDataset[], identifier?: string, exact?: boolean, boundRange?: boolean, padding?: number, space?: number): Boundary {
+  protected _computeMaxMinValue(config: ChartConfig, datasets: ChartDataset[], identifier?: string, exact?: boolean, boundRange?: boolean, padding?: number, space?: number, offset?: boolean): Boundary {
     if (!datasets) {
       return;
     }
@@ -2624,6 +2628,13 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     if (padding && space && space > 2 * padding) {
       let valuePerPixel = (maxValue - minValue) / (space - 2 * padding),
         paddingValue = valuePerPixel * padding;
+
+      // When there are only integers and an offset, the offset will cover at least a span of 0.5 (half the space between two ticks, stepSize = 1).
+      // Therefore, a paddingValue between 0 and 0.5 can be eliminated.
+      if (offset && this.onlyIntegers && 0 < paddingValue && paddingValue <= 0.5) {
+        paddingValue = 0;
+      }
+
       maxBoundary = Math.max(maxBoundary, maxValue - adjust + paddingValue);
       minBoundary = Math.min(minBoundary, minValue - adjust - paddingValue);
     }
@@ -2746,12 +2757,16 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       padding = padding + (config.options.elements.point.hoverRadius as number);
     }
 
-    if (offset) {
-      boundary = this._computeMaxMinValue(config, datasets, identifier, labelMap, true);
-    } else {
-      boundary = this._computeMaxMinValue(config, datasets, identifier, labelMap, true, padding, space);
-    }
+    boundary = this._computeMaxMinValue(config, datasets, identifier, labelMap, true, padding, space, offset);
     if (labelMap) {
+      // if we have a labelMap compare the min and max key of the labelMap and the boundary.
+      // in order to show all data and labels we have to take lowest and highest value.
+      const keys = Object.keys(labelMap).map(Number).filter(isFinite);
+      if (keys.length) {
+        boundary.minValue = Math.min(boundary.minValue, Math.min(...keys));
+        boundary.maxValue = Math.max(boundary.maxValue, Math.max(...keys));
+      }
+
       boundary.maxValue = Math.ceil(boundary.maxValue);
       boundary.minValue = Math.floor(boundary.minValue);
     }
