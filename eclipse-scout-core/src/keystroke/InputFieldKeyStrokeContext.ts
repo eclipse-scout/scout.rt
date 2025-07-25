@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {keys, KeyStrokeContext, keyStrokeModifier, ScoutKeyboardEvent} from '../index';
+import {fields, keys, KeyStrokeContext, keyStrokeModifier, ScoutKeyboardEvent} from '../index';
 import $ from 'jquery';
 
 /**
@@ -117,8 +117,13 @@ export class InputFieldKeyStrokeContext extends KeyStrokeContext {
 
   isButton($element: HTMLElement | JQuery): boolean {
     let $elem = $.ensure($element);
-    let buttonTypes = ['button', 'input[type=button]', 'input[type=checkbox', 'input[type=color]', 'input[type=file]', 'input[type=image]', 'input[type=radio]', 'input[type=reset]', 'input[type=submit]'];
-    return buttonTypes.some(type => $elem.is(type));
+    if (!$elem.length) {
+      return false;
+    }
+    if ($elem.is('button')) {
+      return true;
+    }
+    return fields.isInputType($elem, 'button', 'checkbox', 'color', 'file', 'image', 'radio', 'reset', 'submit');
   }
 
   protected _isNumberKeyStroke(event: ScoutKeyboardEvent): boolean {

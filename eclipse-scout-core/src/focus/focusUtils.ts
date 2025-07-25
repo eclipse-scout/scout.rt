@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -61,7 +61,6 @@ export const focusUtils = {
 
   /**
    * @returns whether the given element contains content which is selectable to the user, e.g. to be copied into clipboard.
-   * It also returns true for disabled text-fields, because the user must be able to select and copy text from these text-fields.
    */
   isSelectableText(element: HTMLElement | JQuery): boolean {
     let $element = $(element);
@@ -89,9 +88,6 @@ export const focusUtils = {
       return false;
     }
 
-    if ($element.is('input[disabled][type=text], textarea[disabled]')) {
-      return true;
-    }
     // When element or its children have text, it should be selectable.
     // The old implementation only looked at the text of the element itself
     // but not at the text of its children. With the old approach it was not

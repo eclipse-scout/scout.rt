@@ -431,7 +431,7 @@ export class FocusManager implements FocusManagerOptions {
     }
 
     // Allow focus gain on focusable elements.
-    if ($element.is(':focusable')) {
+    if ($element.is(':focusable, input[readonly], textarea[readonly]')) {
       return true;
     }
 

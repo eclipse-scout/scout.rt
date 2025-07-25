@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,7 @@
  * jQuery plugin with scout extensions
  */
 import $ from 'jquery';
-import {aria, arrays, Device, Dimension, events, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
+import {aria, arrays, Device, Dimension, events, fields, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
 
 // === internal methods ===
 
@@ -696,10 +696,28 @@ $.fn.setEnabled = function(enabled) {
   this.toggleClass('disabled', !enabled);
   // Toggle disabled attribute for elements that support it (see http://www.w3.org/TR/html5/disabled-elements.html)
   if (this.is('button, input, select, textarea, optgroup, option, fieldset')) {
-    this.toggleAttr('disabled', !enabled);
+    // Text input and text areas should be readonly instead of disabled to make copying text easier.
+    // Even though Firefox nowadays allows to copy the text from a disabled element, it still lacks support for selecting all text:
+    // ctrl-a does not work and the select all menu entry in the context menu just does nothing.
+    if (fields.supportsReadonlyAttribute(this)) {
+      this.toggleAttr('readonly', !enabled);
+      this._updateTabIndexForReadOnly();
+    } else {
+      this.toggleAttr('disabled', !enabled);
+    }
   }
   this.trigger(enabled ? 'enable' : 'disable');
   return this;
+};
+
+$.fn._updateTabIndexForReadOnly = function() {
+  if (this.isTabbable()) {
+    // If element should be tabbable, don't change the tabindex
+    return this;
+  }
+  const readonly = this.attr('readonly');
+  // Otherwise make it focusable but not tabbable, because readonly elements are tabbable by default, but we don't want them to be
+  return this.attr('tabindex', readonly ? -1 : null);
 };
 
 $.fn.isEnabled = function() {
@@ -748,15 +766,18 @@ $.fn.isVisibilityHidden = function() {
 };
 
 $.fn.setTabbable = function(tabbable) {
-  return this.attr('tabindex', tabbable ? 0 : null);
-};
-
-$.fn.setTabbableOrFocusable = function(tabbable) {
-  return this.attr('tabindex', tabbable ? 0 : -1);
+  this.attr('tabindex', tabbable ? 0 : null);
+  // Re-evaluate tabindex considering readonly state
+  this._updateTabIndexForReadOnly();
+  return this;
 };
 
 $.fn.isTabbable = function() {
   return this.attr('tabindex') >= 0;
+};
+
+$.fn.setTabbableOrFocusable = function(tabbable) {
+  return this.attr('tabindex', tabbable ? 0 : -1);
 };
 
 $.fn.placeholder = function(placeholder) {
