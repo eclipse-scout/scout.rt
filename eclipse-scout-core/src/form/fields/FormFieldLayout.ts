@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractLayout, BasicField, Device, Dimension, EventHandler, FormField, graphics, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, Insets, PropertyChangeEvent, Rectangle, scout, scrollbars} from '../../index';
+import {AbstractLayout, BasicField, Dimension, EventHandler, FormField, graphics, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, Insets, PropertyChangeEvent, Rectangle, scout, scrollbars} from '../../index';
 
 /**
  * Form-Field Layout, for a form-field with label, status, mandatory-indicator and a field.
@@ -186,37 +186,6 @@ export class FormFieldLayout extends AbstractLayout {
     // Check for scrollbars, update them if necessary
     if (formField.$field) {
       scrollbars.update(formField.$field, true);
-    }
-
-    this._layoutDisabledCopyOverlay();
-  }
-
-  protected _layoutDisabledCopyOverlay() {
-    if (this.formField.$field && this.formField.$disabledCopyOverlay) {
-      let $overlay = this.formField.$disabledCopyOverlay;
-      let $field = this.formField.$field;
-
-      let pos = $field.position();
-      let padding = graphics.insets($field, {
-        includePadding: true
-      });
-
-      // subtract scrollbars sizes from width and height so overlay does not block scrollbars
-      // we read the size from the scrollbar from our device, because we already determined
-      // it on startup. Only do this when element is scrollable.
-      let elem = $field[0];
-      let overflowX = $field.css('overflow-x');
-      let overflowY = $field.css('overflow-y');
-      let scrollHorizontal = overflowX === 'scroll' || overflowX === 'auto' && (elem.scrollWidth - elem.clientWidth) > 0;
-      let scrollVertical = overflowY === 'scroll' || overflowY === 'auto' && (elem.scrollHeight - elem.clientHeight) > 0;
-      let scrollbarSize = Device.get().scrollbarWidth;
-
-      $overlay
-        .css('top', pos.top)
-        .css('left', pos.left)
-        .width($field.width() + padding.horizontal() - (scrollVertical ? scrollbarSize : 0))
-        .height($field.height() + padding.vertical() - (scrollHorizontal ? scrollbarSize : 0));
-
     }
   }
 

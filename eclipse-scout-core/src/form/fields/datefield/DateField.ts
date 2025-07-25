@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -69,7 +69,6 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     this.dateHasText = false;
     this.dateFocused = false;
     this.dateFormatPattern = null;
-    this.disabledCopyOverlay = true;
     this.hasDate = true;
     this.touchMode = false;
     this.embedded = false;

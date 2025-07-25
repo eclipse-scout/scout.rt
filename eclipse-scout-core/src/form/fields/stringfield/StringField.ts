@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -323,11 +323,6 @@ export class StringField extends BasicField<string> implements StringFieldModel 
   }
 
   protected override _renderDisplayText() {
-    if (this.multilineText && this.$disabledCopyOverlay) {
-      // Changing the value might change the visibility of the scrollbars -> overlay size needs to be adjusted
-      this.invalidateLayoutTree(false);
-    }
-
     if (this.inputObfuscated && this.focused) {
       // If a new display text is set (e.g. because value in model changed) and field is focused,
       // do not display new display text but clear content (as in _onFieldFocus).
