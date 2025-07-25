@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -173,7 +173,7 @@ describe('ChartJsRendererSpec', () => {
       });
     });
 
-    it('bubble chart, min/max is set on x and y axis, axis without offset take max(r) into account', () => {
+    it('bubble chart, min/max is set on x and y axis, take max(r) into account', () => {
       let config = $.extend(true, {}, defaultScalesConfig, {
         type: Chart.Type.BUBBLE,
         options: {
@@ -204,16 +204,23 @@ describe('ChartJsRendererSpec', () => {
         yValuePerPixel = (maxY - minY) / (height - 2 * padding),
         yPaddingValue = yValuePerPixel * padding;
 
+      let width = Math.abs(chartArea.right - chartArea.left), // 750
+        maxX = 43,
+        minX = 11,
+        xValuePerPixel = (maxX - minX) / (width - 2 * padding),
+        xPaddingValue = xValuePerPixel * padding; // 2.63..
+
       expect(config.options.scales.x).toEqual({
         minSpaceBetweenTicks: 150, // default value, not part of this test
         offset: true,
-        suggestedMax: 46,
-        suggestedMin: 11,
+        suggestedMax: 46, // boundary after adjust (-11) and rounding function (see ChartJsRenderer._calculateBoundaryPositive) is [0, 35], which already includes the padding (43 - 11 + 2.63.. = 34.63..) -> no xPaddingValue here
+        suggestedMin: 11 - xPaddingValue,
         ticks: {
           maxTicksLimit: 6,
           stepSize: undefined // default value, not part of this test
         }
       });
+
       expect(config.options.scales.y).toEqual({
         minSpaceBetweenTicks: 35, // default value, not part of this test
         suggestedMax: 43 + yPaddingValue,
@@ -225,7 +232,7 @@ describe('ChartJsRendererSpec', () => {
       });
     });
 
-    it('bubble chart, min/max is set on x and y axis, axis without offset take max(r) into account, axis with labelMap calculate exact min/max', () => {
+    it('bubble chart, min/max is set on x and y axis, take max(r) into account, axis with labelMap calculate exact min/max', () => {
 
       let labelMap = {
           11: 'Label 11',
@@ -261,11 +268,24 @@ describe('ChartJsRendererSpec', () => {
 
       renderer._adjustGridMaxMin(config, chartArea);
 
+      let height = Math.abs(chartArea.top - chartArea.bottom),
+        padding = 53, // max(r)
+        maxY = 43,
+        minY = 11,
+        yValuePerPixel = (maxY - minY) / (height - 2 * padding),
+        yPaddingValue = yValuePerPixel * padding;
+
+      let width = Math.abs(chartArea.right - chartArea.left),
+        maxX = 43,
+        minX = 11,
+        xValuePerPixel = (maxX - minX) / (width - 2 * padding),
+        xPaddingValue = xValuePerPixel * padding;
+
       expect(config.options.scales.x).toEqual({
         minSpaceBetweenTicks: 150, // default value, not part of this test
         offset: true,
-        suggestedMax: 43,
-        suggestedMin: 11,
+        suggestedMax: Math.ceil(43 + xPaddingValue),
+        suggestedMin: Math.floor(11 - xPaddingValue),
         ticks: {
           maxTicksLimit: 6,
           stepSize: undefined // default value, not part of this test
@@ -273,8 +293,64 @@ describe('ChartJsRendererSpec', () => {
       });
       expect(config.options.scales.y).toEqual({
         minSpaceBetweenTicks: 35, // default value, not part of this test
-        suggestedMax: 52,
-        suggestedMin: 2,
+        suggestedMax: Math.ceil(43 + yPaddingValue),
+        suggestedMin: Math.floor(11 - yPaddingValue),
+        ticks: {
+          maxTicksLimit: 9,
+          stepSize: undefined // default value, not part of this test
+        }
+      });
+    });
+
+    it('bubble chart, min/max is set on x and y axis, take max(r) into account, axis with labelMap calculate exact min/max considering offset size and labelMap', () => {
+      let labelMap = {
+          0: 'Label 0',
+          1: 'Label 1',
+          2: 'Label 2',
+          3: 'Label 3',
+          4: 'Label 4',
+          5: 'Label 5',
+          6: 'Label 6'
+        },
+        config = $.extend(true, {}, defaultScalesConfig, {
+          type: Chart.Type.BUBBLE,
+          options: {
+            scales: {
+              x: {
+                offset: true
+              }
+            },
+            xLabelMap: labelMap,
+            yLabelMap: labelMap
+          }
+        });
+
+      config.data.datasets[0].data = [
+        {x: 3, y: 0, r: 47},
+        {x: 4, y: 1, r: 29},
+        {x: 2, y: 2, r: 19},
+        {x: 3, y: 3, r: 53},
+        {x: 4, y: 4, r: 13},
+        {x: 5, y: 5, r: 11},
+        {x: 6, y: 6, r: 37}
+      ];
+
+      renderer._adjustGridMaxMin(config, chartArea);
+
+      expect(config.options.scales.x).toEqual({
+        minSpaceBetweenTicks: 150, // default value, not part of this test
+        offset: true,
+        suggestedMax: 6, // offset is sufficient
+        suggestedMin: 0, // offset is sufficient
+        ticks: {
+          maxTicksLimit: 6,
+          stepSize: undefined // default value, not part of this test
+        }
+      });
+      expect(config.options.scales.y).toEqual({
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 8, // offset is not big enough for y scale -> adjust
+        suggestedMin: -2, // offset is not big enough for y scale -> adjust
         ticks: {
           maxTicksLimit: 9,
           stepSize: undefined // default value, not part of this test
