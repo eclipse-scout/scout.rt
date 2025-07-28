@@ -83,14 +83,18 @@ class ServerMultipartMessage implements IMultipartMessage {
   protected PartInputStream m_partInputStream;
 
   public ServerMultipartMessage(MediaType mediaType, InputStream inputStream) {
+    this(assertNotNull(mediaType.getParameters().get("boundary"), "boundary parameter in media type is required"), inputStream);
+  }
+
+  public ServerMultipartMessage(String boundary, InputStream inputStream) {
+    assertNotNullOrEmpty(boundary, "boundary parameter in media type is required");
     // boundary used within message is prefixed by -- (see https://www.w3.org/Protocols/rfc1341/7_2_Multipart.html)
-    String boundary = "--" + assertNotNull(mediaType.getParameters().get("boundary"), "boundary parameter in media type is required");
     // boundary must always be in 7-bit ASCII (https://www.w3.org/Protocols/rfc1341/7_2_Multipart.html), still use UTF-8, same bytes then
-    m_newlineBoundaryBytes = ("\r\n" + boundary).getBytes(StandardCharsets.UTF_8);
+    m_newlineBoundaryBytes = ("\r\n--" + boundary).getBytes(StandardCharsets.UTF_8);
 
     // require an input stream with mark support
     m_inputStream = inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
-    m_partInputStream = readStartBoundary(boundary, m_inputStream);
+    m_partInputStream = readStartBoundary("--" + boundary, m_inputStream);
   }
 
   /**
