@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,6 +23,13 @@ import org.eclipse.scout.rt.server.commons.servlet.HttpProxyRequestContext;
 import org.eclipse.scout.rt.server.commons.servlet.HttpProxyRequestOptions;
 
 public abstract class AbstractRestProxyRequestHandler extends AbstractUiServletRequestHandler {
+
+  /**
+   * HTTP header used to mark requests originating from ScoutJS (i.e. proxied REST call).
+   * The header value {@code true} (case-insensitive!) is considered proxied. All other
+   * values or the absence of the header are considered not-proxied.
+   */
+  public static final String PROXIED_REQUEST_HTTP_HEADER = "X-ScoutProxiedRequest";
 
   private HttpProxy m_proxy;
 
@@ -71,6 +78,12 @@ public abstract class AbstractRestProxyRequestHandler extends AbstractUiServletR
 
   protected void proxy(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     HttpProxyRequestOptions options = createHttpProxyRequestOptions(req, resp);
+
+    if (options == null) {
+      options = new HttpProxyRequestOptions();
+    }
+    addProxiedRequestHeader(options);
+
     getProxy().proxy(req, resp, options);
   }
 
@@ -78,6 +91,16 @@ public abstract class AbstractRestProxyRequestHandler extends AbstractUiServletR
    * @return options to be used for an HTTP through the proxy
    */
   protected abstract HttpProxyRequestOptions createHttpProxyRequestOptions(HttpServletRequest req, HttpServletResponse resp);
+
+  protected void addProxiedRequestHeader(HttpProxyRequestOptions options) {
+    if (isProxiedRequestHeaderEnabled()) {
+      options.withCustomRequestHeader(PROXIED_REQUEST_HTTP_HEADER, Boolean.TRUE.toString());
+    }
+  }
+
+  protected boolean isProxiedRequestHeaderEnabled() {
+    return true;
+  }
 
   protected HttpProxyRequestContext createHttpProxyRequestContext(HttpServletRequest req) {
     return BEANS.get(HttpProxyRequestContext.class)
