@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -377,6 +377,11 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
     if ($field) {
       $field.placeholder(hasTags ? '' : this.label);
     }
+  }
+
+  protected override _updateErrorStatusClasses(statusClass: string, hasStatus: boolean) {
+    super._updateErrorStatusClasses(statusClass, hasStatus);
+    this._updateErrorStatusClassesOnElement(this.$fieldContainer, statusClass, hasStatus);
   }
 
   protected _createFieldAdapter(): TagFieldKeyStrokeAdapter {
