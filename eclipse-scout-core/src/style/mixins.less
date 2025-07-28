@@ -50,7 +50,7 @@
 
   .focus-border(@box-shadow-size: @focus-box-shadow-size, @box-shadow-color: @focus-box-shadow-color, @border-color: @focus-box-shadow-border-color) {
     #scout.focus-box-shadow(@box-shadow-size, @box-shadow-color);
-    border-color: @border-color;
+    border-color: var(--focus-border-color, @border-color);
   }
 
   .no-focus-border() {

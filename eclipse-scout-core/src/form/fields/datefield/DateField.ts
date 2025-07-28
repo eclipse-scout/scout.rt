@@ -246,6 +246,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
       this._renderDisplayText();
       this._renderFieldStyle();
       this._renderEnabled();
+      this._renderErrorStatus();
       this.htmlDateTimeComposite.invalidateLayoutTree();
     }
     this._renderDateClearable();
@@ -300,6 +301,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
       this._renderDisplayText();
       this._renderFieldStyle();
       this._renderEnabled();
+      this._renderErrorStatus();
       this.htmlDateTimeComposite.invalidateLayoutTree();
     }
     this._renderTimeClearable();
@@ -507,11 +509,8 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     this._setProperty('allowedDates', truncDates);
   }
 
-  /** @internal */
-  override _renderErrorStatus() {
-    super._renderErrorStatus();
-    let hasStatus = !!this.errorStatus,
-      statusClass = this._errorStatusClass();
+  protected override _updateErrorStatusClasses(statusClass: string, hasStatus: boolean) {
+    super._updateErrorStatusClasses(statusClass, hasStatus);
 
     if (this.$dateField) {
       this._updateErrorStatusClassesOnElement(this.$dateField, statusClass, hasStatus);
@@ -533,7 +532,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     }
   }
 
-  protected _errorStatusClass(): string {
+  protected override _errorStatusClass(): string {
     return (this.errorStatus && !this._isSuppressStatusField()) ? 'has-' + this.errorStatus.cssClass() : '';
   }
 

@@ -454,12 +454,17 @@ export class FormField extends Widget implements FormFieldModel {
 
   /** @internal */
   _renderErrorStatus() {
-    let status = this._errorStatus(),
-      hasStatus = !!status,
-      statusClass = (hasStatus && !this._isSuppressStatusField()) ? 'has-' + status.cssClass() : '';
+    let hasStatus = !!this._errorStatus();
+    let statusClass = this._errorStatusClass();
 
     this._updateErrorStatusClasses(statusClass, hasStatus);
     this._updateFieldStatus();
+  }
+
+  protected _errorStatusClass(): string {
+    let status = this._errorStatus();
+    let hasStatus = !!status;
+    return (hasStatus && !this._isSuppressStatusField()) ? 'has-' + status.cssClass() : '';
   }
 
   protected _updateErrorStatusClasses(statusClass: string, hasStatus: boolean) {
