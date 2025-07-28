@@ -4594,7 +4594,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    * @param width new column size
    */
   resizeColumn(column: Column<any>, width: number) {
-    if (column.fixedWidth) {
+    if (column.fixedWidth || !column.table) {
+      // Do nothing if column has fixed with or if it has been destroyed (column.table is null)
       return;
     }
     width = Math.floor(width);
