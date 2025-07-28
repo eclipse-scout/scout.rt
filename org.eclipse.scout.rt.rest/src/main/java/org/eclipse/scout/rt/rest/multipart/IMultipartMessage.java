@@ -71,4 +71,11 @@ public interface IMultipartMessage extends Iterator<IMultipartPart> {
   static IMultipartMessage of(MediaType mediaType, InputStream inputStream) {
     return new ServerMultipartMessage(mediaType, inputStream);
   }
+
+  /**
+   * Manually creates a {@link IMultipartMessage} based on a given boundary and input stream.
+   */
+  static IMultipartMessage of(String boundary, InputStream inputStream) {
+    return new ServerMultipartMessage(boundary, inputStream);
+  }
 }
