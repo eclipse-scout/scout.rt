@@ -62,9 +62,11 @@ export const widgets = {
   /**
    * Sets a property using the given setter after reading the value using the getter and preserving it on the preserver using the preserverName.
    * The preserved property can be reset using {@link resetProperty}.
+   *
+   * *Note*: The property will only be preserved if the preserved property is undefined, so it must not be initialized to null or any other value.
    */
   preserveAndSetProperty(setter: () => void, getter: () => any, preserver: object, preserverName: string) {
-    if (preserver[preserverName] === null) {
+    if (preserver[preserverName] === undefined) {
       preserver[preserverName] = getter();
     }
     setter();
@@ -72,14 +74,11 @@ export const widgets = {
 
   /**
    * Resets a property that has been preserved on the preserver by {@link preserveAndSetProperty} using the given setter. Sets the preserved property to null afterward.
-   * @param setter
-   * @param preserver
-   * @param preserverName
    */
   resetProperty(setter: (value) => void, preserver: object, preserverName: string) {
-    if (preserver[preserverName] != null) {
+    if (preserver[preserverName] !== undefined) {
       setter(preserver[preserverName]);
-      preserver[preserverName] = null;
+      preserver[preserverName] = undefined;
     }
   }
 };

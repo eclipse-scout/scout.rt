@@ -84,7 +84,6 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     this.$body = null;
     this.$title = null;
     this.$subLabel = null;
-    this._statusPositionOrig = null;
   }
 
   static BorderDecoration = {
