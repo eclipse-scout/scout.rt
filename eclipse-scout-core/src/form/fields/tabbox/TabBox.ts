@@ -44,7 +44,6 @@ export class TabBox extends CompositeField implements TabBoxModel {
     this.tabAreaStyle = TabArea.DisplayStyle.DEFAULT;
 
     this._$tabContent = null;
-    this._statusPositionOrig = null;
     this._addWidgetProperties(['tabItems', 'selectedTab']);
     this._addPreserveOnPropertyChangeProperties(['selectedTab']);
 

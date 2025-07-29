@@ -78,7 +78,6 @@ export class Popup extends Widget implements PopupModel {
     this.windowPaddingX = 10;
     this.windowPaddingY = 5;
     this.withGlassPane = false;
-    this._withGlassPane = null;
     this.withFocusContext = true;
     this.initialFocus = () => FocusRule.AUTO;
     this.focusableContainer = false;
@@ -95,11 +94,8 @@ export class Popup extends Widget implements PopupModel {
     this.boundToAnchor = true;
     this.withArrow = false;
     this.closeOnAnchorMouseDown = true;
-    this._closeOnAnchorMouseDown = null;
     this.closeOnMouseDownOutside = true;
-    this._closeOnMouseDownOutside = null;
     this.closeOnOtherPopupOpen = true;
-    this._closeOnOtherPopupOpen = null;
     this.modal = false;
     this._openLater = false;
 
