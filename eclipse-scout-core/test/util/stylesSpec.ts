@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -326,6 +326,312 @@ describe('styles', () => {
       expect(styles.rgbToHex('rgba(18,58,188,0.5)', true)).toEqual('#123abc');
       expect(styles.rgbToHex('rgba(171,205,239,0.3)', true)).toEqual('#abcdef');
       expect(styles.rgbToHex('rgba(255,255,255,0.1)', true)).toEqual('#ffffff');
+    });
+  });
+
+  describe('modifying css classes', () => {
+
+    it('adds css class', () => {
+      expect(styles.addCssClass(null, null)).toBe('');
+      expect(styles.addCssClass('', null)).toBe('');
+      expect(styles.addCssClass('foo', null)).toBe('foo');
+      expect(styles.addCssClass('foo bar', null)).toBe('foo bar');
+      expect(styles.addCssClass('bar foo', null)).toBe('bar foo');
+      expect(styles.addCssClass('   foo   bar   ', null)).toBe('foo bar');
+      expect(styles.addCssClass('foo bar foo', null)).toBe('foo bar foo');
+
+      expect(styles.addCssClass(null, '')).toBe('');
+      expect(styles.addCssClass('', '')).toBe('');
+      expect(styles.addCssClass('foo', '')).toBe('foo');
+      expect(styles.addCssClass('foo bar', '')).toBe('foo bar');
+      expect(styles.addCssClass('bar foo', '')).toBe('bar foo');
+      expect(styles.addCssClass('   foo   bar   ', '')).toBe('foo bar');
+      expect(styles.addCssClass('foo bar foo', '')).toBe('foo bar foo');
+
+      expect(styles.addCssClass(null, 'foo')).toBe('foo');
+      expect(styles.addCssClass('', 'foo')).toBe('foo');
+      expect(styles.addCssClass('foo', 'foo')).toBe('foo');
+      expect(styles.addCssClass('foo bar', 'foo')).toBe('foo bar');
+      expect(styles.addCssClass('bar foo', 'foo')).toBe('bar foo');
+      expect(styles.addCssClass('   foo   bar   ', 'foo')).toBe('foo bar');
+      expect(styles.addCssClass('foo bar foo', 'foo')).toBe('foo bar foo');
+
+      expect(styles.addCssClass(null, 'bar')).toBe('bar');
+      expect(styles.addCssClass('', 'bar')).toBe('bar');
+      expect(styles.addCssClass('foo', 'bar')).toBe('foo bar');
+      expect(styles.addCssClass('foo bar', 'bar')).toBe('foo bar');
+      expect(styles.addCssClass('bar foo', 'bar')).toBe('bar foo');
+      expect(styles.addCssClass('   foo   bar   ', 'bar')).toBe('foo bar');
+      expect(styles.addCssClass('foo bar foo', 'bar')).toBe('foo bar foo');
+
+      expect(styles.addCssClass(null, '   foo   ')).toBe('foo');
+      expect(styles.addCssClass('', '   foo   ')).toBe('foo');
+      expect(styles.addCssClass('foo', '   foo   ')).toBe('foo');
+      expect(styles.addCssClass('foo bar', '   foo   ')).toBe('foo bar');
+      expect(styles.addCssClass('bar foo', '   foo   ')).toBe('bar foo');
+      expect(styles.addCssClass('   foo   bar   ', '   foo   ')).toBe('foo bar');
+      expect(styles.addCssClass('foo bar foo', '   foo   ')).toBe('foo bar foo');
+
+      expect(styles.addCssClass(null, 'foo bar')).toBe('foo bar');
+      expect(styles.addCssClass('', 'foo bar')).toBe('foo bar');
+      expect(styles.addCssClass('foo', 'foo bar')).toBe('foo bar');
+      expect(styles.addCssClass('foo bar', 'foo bar')).toBe('foo bar');
+      expect(styles.addCssClass('bar foo', 'foo bar')).toBe('bar foo');
+      expect(styles.addCssClass('   foo   bar   ', 'foo bar')).toBe('foo bar');
+      expect(styles.addCssClass('foo bar foo', 'foo bar')).toBe('foo bar foo');
+
+      expect(styles.addCssClass(null, 'foo bar foo')).toBe('foo bar');
+      expect(styles.addCssClass('', 'foo bar foo')).toBe('foo bar');
+      expect(styles.addCssClass('foo', 'foo bar foo')).toBe('foo bar');
+      expect(styles.addCssClass('foo bar', 'foo bar foo')).toBe('foo bar');
+      expect(styles.addCssClass('bar foo', 'foo bar foo')).toBe('bar foo');
+      expect(styles.addCssClass('   foo   bar   ', 'foo bar foo')).toBe('foo bar');
+      expect(styles.addCssClass('foo bar foo', 'foo bar foo')).toBe('foo bar foo');
+    });
+
+    it('removes css class', () => {
+      expect(styles.removeCssClass(null, null)).toBe('');
+      expect(styles.removeCssClass('', null)).toBe('');
+      expect(styles.removeCssClass('foo', null)).toBe('foo');
+      expect(styles.removeCssClass('foo bar', null)).toBe('foo bar');
+      expect(styles.removeCssClass('bar foo', null)).toBe('bar foo');
+      expect(styles.removeCssClass('   foo   bar   ', null)).toBe('foo bar');
+      expect(styles.removeCssClass('foo bar foo', null)).toBe('foo bar foo');
+
+      expect(styles.removeCssClass(null, '')).toBe('');
+      expect(styles.removeCssClass('', '')).toBe('');
+      expect(styles.removeCssClass('foo', '')).toBe('foo');
+      expect(styles.removeCssClass('foo bar', '')).toBe('foo bar');
+      expect(styles.removeCssClass('bar foo', '')).toBe('bar foo');
+      expect(styles.removeCssClass('   foo   bar   ', '')).toBe('foo bar');
+      expect(styles.removeCssClass('foo bar foo', '')).toBe('foo bar foo');
+
+      expect(styles.removeCssClass(null, 'foo')).toBe('');
+      expect(styles.removeCssClass('', 'foo')).toBe('');
+      expect(styles.removeCssClass('foo', 'foo')).toBe('');
+      expect(styles.removeCssClass('foo bar', 'foo')).toBe('bar');
+      expect(styles.removeCssClass('bar foo', 'foo')).toBe('bar');
+      expect(styles.removeCssClass('   foo   bar   ', 'foo')).toBe('bar');
+      expect(styles.removeCssClass('foo bar foo', 'foo')).toBe('bar');
+
+      expect(styles.removeCssClass(null, 'bar')).toBe('');
+      expect(styles.removeCssClass('', 'bar')).toBe('');
+      expect(styles.removeCssClass('foo', 'bar')).toBe('foo');
+      expect(styles.removeCssClass('foo bar', 'bar')).toBe('foo');
+      expect(styles.removeCssClass('bar foo', 'bar')).toBe('foo');
+      expect(styles.removeCssClass('   foo   bar   ', 'bar')).toBe('foo');
+      expect(styles.removeCssClass('foo bar foo', 'bar')).toBe('foo foo');
+
+      expect(styles.removeCssClass(null, '   foo   ')).toBe('');
+      expect(styles.removeCssClass('', '   foo   ')).toBe('');
+      expect(styles.removeCssClass('foo', '   foo   ')).toBe('');
+      expect(styles.removeCssClass('foo bar', '   foo   ')).toBe('bar');
+      expect(styles.removeCssClass('bar foo', '   foo   ')).toBe('bar');
+      expect(styles.removeCssClass('   foo   bar   ', '   foo   ')).toBe('bar');
+      expect(styles.removeCssClass('foo bar foo', '   foo   ')).toBe('bar');
+
+      expect(styles.removeCssClass(null, 'foo bar')).toBe('');
+      expect(styles.removeCssClass('', 'foo bar')).toBe('');
+      expect(styles.removeCssClass('foo', 'foo bar')).toBe('');
+      expect(styles.removeCssClass('foo bar', 'foo bar')).toBe('');
+      expect(styles.removeCssClass('bar foo', 'foo bar')).toBe('');
+      expect(styles.removeCssClass('   foo   bar   ', 'foo bar')).toBe('');
+      expect(styles.removeCssClass('foo bar foo', 'foo bar')).toBe('');
+
+      expect(styles.removeCssClass(null, 'foo bar foo')).toBe('');
+      expect(styles.removeCssClass('', 'foo bar foo')).toBe('');
+      expect(styles.removeCssClass('foo', 'foo bar foo')).toBe('');
+      expect(styles.removeCssClass('foo bar', 'foo bar foo')).toBe('');
+      expect(styles.removeCssClass('bar foo', 'foo bar foo')).toBe('');
+      expect(styles.removeCssClass('   foo   bar   ', 'foo bar foo')).toBe('');
+      expect(styles.removeCssClass('foo bar foo', 'foo bar foo')).toBe('');
+    });
+
+    it('toggles css class', () => {
+      expect(styles.toggleCssClass(null, null, true)).toBe('');
+      expect(styles.toggleCssClass('', null, true)).toBe('');
+      expect(styles.toggleCssClass('foo', null, true)).toBe('foo');
+      expect(styles.toggleCssClass('foo bar', null, true)).toBe('foo bar');
+      expect(styles.toggleCssClass('bar foo', null, true)).toBe('bar foo');
+      expect(styles.toggleCssClass('   foo   bar   ', null, true)).toBe('foo bar');
+      expect(styles.toggleCssClass('foo bar foo', null, true)).toBe('foo bar foo');
+
+      expect(styles.toggleCssClass(null, '', true)).toBe('');
+      expect(styles.toggleCssClass('', '', true)).toBe('');
+      expect(styles.toggleCssClass('foo', '', true)).toBe('foo');
+      expect(styles.toggleCssClass('foo bar', '', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('bar foo', '', true)).toBe('bar foo');
+      expect(styles.toggleCssClass('   foo   bar   ', '', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('foo bar foo', '', true)).toBe('foo bar foo');
+
+      expect(styles.toggleCssClass(null, 'foo', true)).toBe('foo');
+      expect(styles.toggleCssClass('', 'foo', true)).toBe('foo');
+      expect(styles.toggleCssClass('foo', 'foo', true)).toBe('foo');
+      expect(styles.toggleCssClass('foo bar', 'foo', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('bar foo', 'foo', true)).toBe('bar foo');
+      expect(styles.toggleCssClass('   foo   bar   ', 'foo', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('foo bar foo', 'foo', true)).toBe('foo bar foo');
+
+      expect(styles.toggleCssClass(null, 'bar', true)).toBe('bar');
+      expect(styles.toggleCssClass('', 'bar', true)).toBe('bar');
+      expect(styles.toggleCssClass('foo', 'bar', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('foo bar', 'bar', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('bar foo', 'bar', true)).toBe('bar foo');
+      expect(styles.toggleCssClass('   foo   bar   ', 'bar', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('foo bar foo', 'bar', true)).toBe('foo bar foo');
+
+      expect(styles.toggleCssClass(null, '   foo   ', true)).toBe('foo');
+      expect(styles.toggleCssClass('', '   foo   ', true)).toBe('foo');
+      expect(styles.toggleCssClass('foo', '   foo   ', true)).toBe('foo');
+      expect(styles.toggleCssClass('foo bar', '   foo   ', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('bar foo', '   foo   ', true)).toBe('bar foo');
+      expect(styles.toggleCssClass('   foo   bar   ', '   foo   ', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('foo bar foo', '   foo   ', true)).toBe('foo bar foo');
+
+      expect(styles.toggleCssClass(null, 'foo bar', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('', 'foo bar', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('foo', 'foo bar', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('foo bar', 'foo bar', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('bar foo', 'foo bar', true)).toBe('bar foo');
+      expect(styles.toggleCssClass('   foo   bar   ', 'foo bar', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('foo bar foo', 'foo bar', true)).toBe('foo bar foo');
+
+      expect(styles.toggleCssClass(null, 'foo bar foo', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('', 'foo bar foo', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('foo', 'foo bar foo', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('foo bar', 'foo bar foo', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('bar foo', 'foo bar foo', true)).toBe('bar foo');
+      expect(styles.toggleCssClass('   foo   bar   ', 'foo bar foo', true)).toBe('foo bar');
+      expect(styles.toggleCssClass('foo bar foo', 'foo bar foo', true)).toBe('foo bar foo');
+
+      expect(styles.toggleCssClass(null, null, false)).toBe('');
+      expect(styles.toggleCssClass('', null, false)).toBe('');
+      expect(styles.toggleCssClass('foo', null, false)).toBe('foo');
+      expect(styles.toggleCssClass('foo bar', null, false)).toBe('foo bar');
+      expect(styles.toggleCssClass('bar foo', null, false)).toBe('bar foo');
+      expect(styles.toggleCssClass('   foo   bar   ', null, false)).toBe('foo bar');
+      expect(styles.toggleCssClass('foo bar foo', null, false)).toBe('foo bar foo');
+
+      expect(styles.toggleCssClass(null, '', false)).toBe('');
+      expect(styles.toggleCssClass('', '', false)).toBe('');
+      expect(styles.toggleCssClass('foo', '', false)).toBe('foo');
+      expect(styles.toggleCssClass('foo bar', '', false)).toBe('foo bar');
+      expect(styles.toggleCssClass('bar foo', '', false)).toBe('bar foo');
+      expect(styles.toggleCssClass('   foo   bar   ', '', false)).toBe('foo bar');
+      expect(styles.toggleCssClass('foo bar foo', '', false)).toBe('foo bar foo');
+
+      expect(styles.toggleCssClass(null, 'foo', false)).toBe('');
+      expect(styles.toggleCssClass('', 'foo', false)).toBe('');
+      expect(styles.toggleCssClass('foo', 'foo', false)).toBe('');
+      expect(styles.toggleCssClass('foo bar', 'foo', false)).toBe('bar');
+      expect(styles.toggleCssClass('bar foo', 'foo', false)).toBe('bar');
+      expect(styles.toggleCssClass('   foo   bar   ', 'foo', false)).toBe('bar');
+      expect(styles.toggleCssClass('foo bar foo', 'foo', false)).toBe('bar');
+
+      expect(styles.toggleCssClass(null, 'bar', false)).toBe('');
+      expect(styles.toggleCssClass('', 'bar', false)).toBe('');
+      expect(styles.toggleCssClass('foo', 'bar', false)).toBe('foo');
+      expect(styles.toggleCssClass('foo bar', 'bar', false)).toBe('foo');
+      expect(styles.toggleCssClass('bar foo', 'bar', false)).toBe('foo');
+      expect(styles.toggleCssClass('   foo   bar   ', 'bar', false)).toBe('foo');
+      expect(styles.toggleCssClass('foo bar foo', 'bar', false)).toBe('foo foo');
+
+      expect(styles.toggleCssClass(null, '   foo   ', false)).toBe('');
+      expect(styles.toggleCssClass('', '   foo   ', false)).toBe('');
+      expect(styles.toggleCssClass('foo', '   foo   ', false)).toBe('');
+      expect(styles.toggleCssClass('foo bar', '   foo   ', false)).toBe('bar');
+      expect(styles.toggleCssClass('bar foo', '   foo   ', false)).toBe('bar');
+      expect(styles.toggleCssClass('   foo   bar   ', '   foo   ', false)).toBe('bar');
+      expect(styles.toggleCssClass('foo bar foo', '   foo   ', false)).toBe('bar');
+
+      expect(styles.toggleCssClass(null, 'foo bar', false)).toBe('');
+      expect(styles.toggleCssClass('', 'foo bar', false)).toBe('');
+      expect(styles.toggleCssClass('foo', 'foo bar', false)).toBe('');
+      expect(styles.toggleCssClass('foo bar', 'foo bar', false)).toBe('');
+      expect(styles.toggleCssClass('bar foo', 'foo bar', false)).toBe('');
+      expect(styles.toggleCssClass('   foo   bar   ', 'foo bar', false)).toBe('');
+      expect(styles.toggleCssClass('foo bar foo', 'foo bar', false)).toBe('');
+
+      expect(styles.toggleCssClass(null, 'foo bar foo', false)).toBe('');
+      expect(styles.toggleCssClass('', 'foo bar foo', false)).toBe('');
+      expect(styles.toggleCssClass('foo', 'foo bar foo', false)).toBe('');
+      expect(styles.toggleCssClass('foo bar', 'foo bar foo', false)).toBe('');
+      expect(styles.toggleCssClass('bar foo', 'foo bar foo', false)).toBe('');
+      expect(styles.toggleCssClass('   foo   bar   ', 'foo bar foo', false)).toBe('');
+      expect(styles.toggleCssClass('foo bar foo', 'foo bar foo', false)).toBe('');
+    });
+
+    it('has css class', () => {
+      expect(styles.hasCssClass(null, null)).toBeTrue();
+      expect(styles.hasCssClass('', null)).toBeTrue();
+      expect(styles.hasCssClass('foo', null)).toBeTrue();
+      expect(styles.hasCssClass('foo bar', null)).toBeTrue();
+      expect(styles.hasCssClass('bar foo', null)).toBeTrue();
+      expect(styles.hasCssClass('   foo   bar   ', null)).toBeTrue();
+      expect(styles.hasCssClass('foo bar foo', null)).toBeTrue();
+
+      expect(styles.hasCssClass(null, '')).toBeTrue();
+      expect(styles.hasCssClass('', '')).toBeTrue();
+      expect(styles.hasCssClass('foo', '')).toBeTrue();
+      expect(styles.hasCssClass('foo bar', '')).toBeTrue();
+      expect(styles.hasCssClass('bar foo', '')).toBeTrue();
+      expect(styles.hasCssClass('   foo   bar   ', '')).toBeTrue();
+      expect(styles.hasCssClass('foo bar foo', '')).toBeTrue();
+
+      expect(styles.hasCssClass(null, 'foo')).toBeFalse();
+      expect(styles.hasCssClass('', 'foo')).toBeFalse();
+      expect(styles.hasCssClass('foo', 'foo')).toBeTrue();
+      expect(styles.hasCssClass('foo bar', 'foo')).toBeTrue();
+      expect(styles.hasCssClass('bar foo', 'foo')).toBeTrue();
+      expect(styles.hasCssClass('   foo   bar   ', 'foo')).toBeTrue();
+      expect(styles.hasCssClass('foo bar foo', 'foo')).toBeTrue();
+
+      expect(styles.hasCssClass(null, 'bar')).toBeFalse();
+      expect(styles.hasCssClass('', 'bar')).toBeFalse();
+      expect(styles.hasCssClass('foo', 'bar')).toBeFalse();
+      expect(styles.hasCssClass('foo bar', 'bar')).toBeTrue();
+      expect(styles.hasCssClass('bar foo', 'bar')).toBeTrue();
+      expect(styles.hasCssClass('   foo   bar   ', 'bar')).toBeTrue();
+      expect(styles.hasCssClass('foo bar foo', 'bar')).toBeTrue();
+
+      expect(styles.hasCssClass(null, '   foo   ')).toBeFalse();
+      expect(styles.hasCssClass('', '   foo   ')).toBeFalse();
+      expect(styles.hasCssClass('foo', '   foo   ')).toBeTrue();
+      expect(styles.hasCssClass('foo bar', '   foo   ')).toBeTrue();
+      expect(styles.hasCssClass('bar foo', '   foo   ')).toBeTrue();
+      expect(styles.hasCssClass('   foo   bar   ', '   foo   ')).toBeTrue();
+      expect(styles.hasCssClass('foo bar foo', '   foo   ')).toBeTrue();
+
+      expect(styles.hasCssClass(null, 'foo bar')).toBeFalse();
+      expect(styles.hasCssClass('', 'foo bar')).toBeFalse();
+      expect(styles.hasCssClass('foo', 'foo bar')).toBeFalse();
+      expect(styles.hasCssClass('foo bar', 'foo bar')).toBeTrue();
+      expect(styles.hasCssClass('bar foo', 'foo bar')).toBeTrue();
+      expect(styles.hasCssClass('   foo   bar   ', 'foo bar')).toBeTrue();
+      expect(styles.hasCssClass('foo bar foo', 'foo bar')).toBeTrue();
+
+      expect(styles.hasCssClass(null, 'foo bar foo')).toBeFalse();
+      expect(styles.hasCssClass('', 'foo bar foo')).toBeFalse();
+      expect(styles.hasCssClass('foo', 'foo bar foo')).toBeFalse();
+      expect(styles.hasCssClass('foo bar', 'foo bar foo')).toBeTrue();
+      expect(styles.hasCssClass('bar foo', 'foo bar foo')).toBeTrue();
+      expect(styles.hasCssClass('   foo   bar   ', 'foo bar foo')).toBeTrue();
+      expect(styles.hasCssClass('foo bar foo', 'foo bar foo')).toBeTrue();
+    });
+
+    it('splits css class to array', () => {
+      expect(styles.cssClassAsArray(null)).toEqual([]);
+      expect(styles.cssClassAsArray('')).toEqual([]);
+      expect(styles.cssClassAsArray(' ')).toEqual([]);
+      expect(styles.cssClassAsArray('   ')).toEqual([]);
+
+      expect(styles.cssClassAsArray('foo')).toEqual(['foo']);
+      expect(styles.cssClassAsArray(' foo ')).toEqual(['foo']);
+      expect(styles.cssClassAsArray('   foo   ')).toEqual(['foo']);
+
+      expect(styles.cssClassAsArray('foo bar')).toEqual(['foo', 'bar']);
+      expect(styles.cssClassAsArray(' foo bar ')).toEqual(['foo', 'bar']);
+      expect(styles.cssClassAsArray('   foo   bar   ')).toEqual(['foo', 'bar']);
     });
   });
 });

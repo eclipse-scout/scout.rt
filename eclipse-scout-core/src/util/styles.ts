@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -497,6 +497,78 @@ export const styles = {
       style += 'font-family: ' + cssFontFamily + '; ';
     }
     return style;
+  },
+
+  /**
+   * Adds the css classes to the existing css classes.
+   *
+   * @param cssClass existing cssClass, multiple css classes separated by space.
+   * @param cssClassToAdd may contain multiple css classes separated by space.
+   */
+  addCssClass(cssClass: string, cssClassToAdd: string): string {
+    const cssClasses = styles.cssClassAsArray(cssClass);
+    const cssClassesToAdd = styles.cssClassAsArray(cssClassToAdd);
+
+    for (const cssClassToAdd of cssClassesToAdd) {
+      arrays.pushSet(cssClasses, cssClassToAdd);
+    }
+
+    return arrays.format(cssClasses, ' ');
+  },
+
+  /**
+   * Removes the css classes to the existing css classes.
+   *
+   * @param cssClass existing cssClass, multiple css classes separated by space.
+   * @param cssClassToRemove may contain multiple css classes separated by space.
+   */
+  removeCssClass(cssClass: string, cssClassToRemove: string): string {
+    const cssClasses = styles.cssClassAsArray(cssClass);
+    const cssClassesToRemove = styles.cssClassAsArray(cssClassToRemove);
+
+    arrays.removeAll(cssClasses, cssClassesToRemove);
+
+    return arrays.format(cssClasses, ' ');
+  },
+
+  /**
+   * Toggles, i.e. adds (see {@link styles#addCssClass}) or removes (see {@link styles#removeCssClass}), the css classes depending on the condition.
+   *
+   * @param cssClass existing cssClass, multiple css classes separated by space.
+   * @param cssClassToToggle may contain multiple css classes separated by space.
+   */
+  toggleCssClass(cssClass: string, cssClassToToggle: string, condition: boolean): string {
+    return condition
+      ? styles.addCssClass(cssClass, cssClassToToggle)
+      : styles.removeCssClass(cssClass, cssClassToToggle);
+  },
+
+  /**
+   * Checks whether the css classes are contained in the existing css classes.
+   *
+   * @param cssClass existing cssClass, multiple css classes separated by space.
+   * @param cssClassToFind may contain multiple css classes separated by space.
+   */
+  hasCssClass(cssClass: string, cssClassToFind: string): boolean {
+    const cssClasses = styles.cssClassAsArray(cssClass);
+    const cssClassesToFind = styles.cssClassAsArray(cssClassToFind);
+
+    return arrays.containsAll(cssClasses, cssClassesToFind);
+  },
+
+  /**
+   * Splits the css classes into an array.
+   *
+   * @param cssClass multiple css classes separated by space.
+   */
+  cssClassAsArray(cssClass: string): string[] {
+    cssClass ||= '';
+    cssClass = cssClass.trim();
+
+    if (!cssClass.length) {
+      return [];
+    }
+    return cssClass.split(' ').filter(Boolean);
   },
 
   _getElement(): HTMLDivElement {

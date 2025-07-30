@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, CarouselEventMap, CarouselLayout, CarouselModel, Device, events, GridData, HtmlComponent, InitModelOf, ObjectOrChildModel, SingleLayout, Widget} from '../index';
+import {arrays, CarouselEventMap, CarouselLayout, CarouselModel, Device, events, GridData, HtmlComponent, InitModelOf, ObjectOrChildModel, SingleLayout, styles, Widget} from '../index';
 
 export class Carousel extends Widget implements CarouselModel {
   declare model: CarouselModel;
@@ -206,7 +206,7 @@ export class Carousel extends Widget implements CarouselModel {
 
       // Add the CSS classes of the widget to be able to style the carousel items.
       // Use a suffix to prevent conflicts
-      let cssClasses = widget.cssClassAsArray();
+      let cssClasses = styles.cssClassAsArray(widget.cssClass);
       cssClasses.forEach(cssClass => $carouselItem.addClass(cssClass + '-carousel-item'));
       return $carouselItem;
     });
