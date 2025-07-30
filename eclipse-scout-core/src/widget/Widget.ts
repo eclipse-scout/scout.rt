@@ -10,7 +10,7 @@
 import {
   Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke, KeyStrokeContext, LayoutData,
   LoadingSupport, LogicalGrid, ModelAdapter, objectFactoryHints, ObjectIdProvider, ObjectOrChildModel, ObjectOrType, objects, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter, scout,
-  ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session, SomeRequired, strings, texts, TreeVisitResult, UuidPathOptions, WidgetEventMap, WidgetModel
+  ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session, SomeRequired, strings, styles, texts, TreeVisitResult, UuidPathOptions, WidgetEventMap, WidgetModel
 } from '../index';
 import $ from 'jquery';
 
@@ -1083,48 +1083,28 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    * @param cssClass may contain multiple css classes separated by space.
    */
   addCssClass(cssClass: string) {
-    let cssClasses = this.cssClassAsArray();
-    let cssClassesToAdd = Widget.cssClassAsArray(cssClass);
-    cssClassesToAdd.forEach(newCssClass => {
-      if (cssClasses.indexOf(newCssClass) >= 0) {
-        return;
-      }
-      cssClasses.push(newCssClass);
-    });
-    this.setProperty('cssClass', arrays.format(cssClasses, ' '));
+    this.setProperty('cssClass', styles.addCssClass(this.cssClass, cssClass));
   }
 
   /**
    * @param cssClass may contain multiple css classes separated by space.
    */
   removeCssClass(cssClass: string) {
-    let cssClasses = this.cssClassAsArray();
-    let cssClassesToRemove = Widget.cssClassAsArray(cssClass);
-    if (arrays.removeAll(cssClasses, cssClassesToRemove)) {
-      this.setProperty('cssClass', arrays.format(cssClasses, ' '));
-    }
+    this.setProperty('cssClass', styles.removeCssClass(this.cssClass, cssClass));
   }
 
   /**
    * @param cssClass may contain multiple css classes separated by space.
    */
   toggleCssClass(cssClass: string, condition: boolean) {
-    if (condition) {
-      this.addCssClass(cssClass);
-    } else {
-      this.removeCssClass(cssClass);
-    }
+    this.setProperty('cssClass', styles.toggleCssClass(this.cssClass, cssClass, condition));
   }
 
   /**
    * @returns true, if the {@link cssClass} property contains the given css class.
    */
   hasCssClass(cssClass: string): boolean {
-    return this.cssClassAsArray().includes(cssClass);
-  }
-
-  cssClassAsArray(): string[] {
-    return Widget.cssClassAsArray(this.cssClass);
+    return styles.hasCssClass(this.cssClass, cssClass);
   }
 
   /**
@@ -2458,19 +2438,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    */
   isAttachedAndRendered(): boolean {
     return (this.rendered || this.rendering) && this.$container.isAttached();
-  }
-
-  /* --- STATIC HELPERS ------------------------------------------------------------- */
-
-  static cssClassAsArray(cssClass: string): string[] {
-    let cssClasses = [],
-      cssClassesStr = cssClass || '';
-
-    cssClassesStr = cssClassesStr.trim();
-    if (cssClassesStr.length > 0) {
-      cssClasses = cssClassesStr.split(' ');
-    }
-    return cssClasses;
   }
 }
 

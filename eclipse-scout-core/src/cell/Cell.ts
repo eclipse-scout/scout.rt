@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CellModel, InitModelOf, Status, strings, ValueField} from '../index';
+import {CellModel, InitModelOf, Status, strings, styles, ValueField} from '../index';
 import $ from 'jquery';
 
 /**
@@ -113,6 +113,46 @@ export class Cell<TValue = any> implements CellModel<TValue> {
 
   setCssClass(cssClass: string) {
     this.cssClass = cssClass;
+  }
+
+  /**
+   * Adds the given css class to {@link Cell#cssClass}.
+   *
+   * @see styles#addCssClass
+   * @param cssClass may contain multiple css classes separated by space.
+   */
+  addCssClass(cssClass: string) {
+    this.setCssClass(styles.addCssClass(this.cssClass, cssClass));
+  }
+
+  /**
+   * Removes the given css class from {@link Cell#cssClass}.
+   *
+   * @see styles#removeCssClass
+   * @param cssClass may contain multiple css classes separated by space.
+   */
+  removeCssClass(cssClass: string) {
+    this.setCssClass(styles.removeCssClass(this.cssClass, cssClass));
+  }
+
+  /**
+   * Toggles the given css class in {@link Cell#cssClass}.
+   *
+   * @see styles#toggleCssClass
+   * @param cssClass may contain multiple css classes separated by space.
+   */
+  toggleCssClass(cssClass: string, condition: boolean) {
+    this.setCssClass(styles.toggleCssClass(this.cssClass, cssClass, condition));
+  }
+
+  /**
+   * Checks whether the css class is contained in {@link Cell#cssClass}.
+   *
+   * @see styles#hasCssClass
+   * @param cssClass may contain multiple css classes separated by space.
+   */
+  hasCssClass(cssClass: string): boolean {
+    return styles.hasCssClass(this.cssClass, cssClass);
   }
 
   setSortCode(sortCode: number) {
