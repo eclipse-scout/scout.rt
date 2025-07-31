@@ -613,11 +613,13 @@ export const arrays = {
   /**
    * Replacement for remove() that works for arrays of jQuery objects (compares DOM nodes).
    */
-  $remove(arr: JQuery[], $element: JQuery) {
+  $remove(arr: JQuery[], $element: JQuery): boolean {
     let index = arrays.$indexOf(arr, $element);
     if (index >= 0) {
       arr.splice(index, 1);
+      return true;
     }
+    return false;
   },
 
   randomElement<T>(array: T[]): T {

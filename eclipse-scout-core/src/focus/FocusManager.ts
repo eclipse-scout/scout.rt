@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -242,8 +242,9 @@ export class FocusManager implements FocusManagerOptions {
    * Unregisters the given glasspane target, so that the focus can be gained again for the target or one of its child controls.
    */
   unregisterGlassPaneTarget($glassPaneTarget: JQuery) {
-    arrays.$remove(this._glassPaneTargets, $glassPaneTarget);
-    this.validateFocus();
+    if (arrays.$remove(this._glassPaneTargets, $glassPaneTarget)) {
+      this.validateFocus();
+    }
   }
 
   unregisterGlassPaneDisplayParent(displayParent: DisplayParent) {

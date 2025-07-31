@@ -99,6 +99,7 @@ export class LoadingSupport extends WidgetSupport {
       return;
     }
 
+    this._glassPane?.unregisterTarget();
     this._$loadingIndicator.css('opacity', this._$loadingIndicator.css('opacity'));
     this._$loadingIndicator.addClass('animate-remove');
     this._$loadingIndicator.oneAnimationEnd(() => {

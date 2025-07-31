@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,9 +29,13 @@ export class GlassPane extends Widget {
   }
 
   protected override _remove() {
+    this.unregisterTarget();
+    super._remove();
+  }
+
+  unregisterTarget() {
     this.$parent.removeClass('glasspane-parent');
     this.session.focusManager.unregisterGlassPaneTarget(this.$parent);
-    super._remove();
   }
 
   protected _onMouseDown(event: MouseDownEvent) {

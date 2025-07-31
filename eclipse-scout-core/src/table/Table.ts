@@ -3611,6 +3611,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       this._postAttachActions.push(this.startCellEdit.bind(this, column, row, field));
       return;
     }
+    if (this.updateBuffer.isBuffering()) {
+      this.updateBuffer.one('complete', () => this.startCellEdit(column, row, field));
+      return;
+    }
 
     this.trigger('startCellEdit', {
       column: column,
