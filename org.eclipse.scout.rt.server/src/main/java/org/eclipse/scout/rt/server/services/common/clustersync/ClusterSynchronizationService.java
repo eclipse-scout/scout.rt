@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -146,6 +146,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   @Override
   public void publishTransactional(Serializable notification) {
     if (isEnabled()) {
+      LOG.trace("Adding {} to transaction", notification);
       getTransaction().addMessage(new ClusterNotificationMessage(notification, getNotificationProperties()));
     }
   }
@@ -170,6 +171,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
    */
   private void publishInternal(List<IClusterNotificationMessage> messages) {
     for (IClusterNotificationMessage message : messages) {
+      LOG.trace("Publishing {}", message);
       MOM.publish(ClusterMom.class, IClusterMomDestinations.CLUSTER_NOTIFICATION_TOPIC, message);
     }
     for (IClusterNotificationMessage im : messages) {
@@ -193,8 +195,11 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
       NodeId originNode = notificationMessage.getProperties().getOriginNode();
 
       if (m_nodeId.equals(originNode)) {
+        LOG.trace("Ignoring {} (reason: own node)", notificationMessage);
         return;
       }
+
+      LOG.trace("Handling {}", notificationMessage);
 
       getStatusInfoInternal().updateReceiveStatus(notificationMessage);
       getStatusInfoInternal(notificationMessage.getNotification().getClass()).updateReceiveStatus(notificationMessage);
