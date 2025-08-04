@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DesktopNotification, scout, Status, Widget} from '../../../src/index';
+import {DesktopNotification, scout, Status, StringField, Widget} from '../../../src/index';
 
 describe('DesktopNotification', () => {
   let session: SandboxSession, $sandbox: JQuery,
@@ -75,6 +75,69 @@ describe('DesktopNotification', () => {
     expect(notification.$container.find('.closer').length).toBe(1);
     expect(notification.$container.find('.desktop-notification-content').text()).toBe('bar');
     expect(notification.$container.hasClass('ok')).toBe(true);
+  });
+
+  it('initially ensures parent and owner point to desktop', () => {
+    let field = scout.create(StringField, {parent: session.desktop});
+    let notification = scout.create(DesktopNotification, {parent: field});
+    expect(notification.parent).toBe(session.desktop);
+    expect(notification.owner).toBe(session.desktop);
+    notification.show();
+
+    field.destroy();
+    expect(notification.destroyed).toBe(false);
+    expect(notification.rendered).toBe(true);
+  });
+
+  it('allows changing owner', () => {
+    // Changing owner is not explicitly prevented by the notification so it should be asserted that it behaves correctly,
+    // however it is probably used very rarely if at all.
+    let field = scout.create(StringField, {parent: session.desktop});
+    field.render();
+    let notification = scout.create(DesktopNotification, {parent: session.desktop});
+    notification.setOwner(field);
+    expect(notification.owner).toBe(field);
+
+    notification.show();
+    field.destroy();
+    expect(notification.destroyed).toBe(true);
+
+    // Also behaves correctly if field was never rendered
+    field = scout.create(StringField, {parent: session.desktop});
+    notification = scout.create(DesktopNotification, {parent: session.desktop});
+    notification.setOwner(field);
+    expect(notification.owner).toBe(field);
+
+    notification.show();
+    field.destroy();
+    expect(notification.destroyed).toBe(true);
+  });
+
+  it('allows changing parent', () => {
+    // Changing parent is not explicitly prevented by the notification so it should be asserted that it behaves correctly,
+    // however it is probably used very rarely if at all.
+    let field = scout.create(StringField, {parent: session.desktop});
+    field.render();
+    let notification = scout.create(DesktopNotification, {parent: session.desktop});
+    notification.setParent(field);
+    expect(notification.parent).toBe(field);
+
+    notification.show();
+    field.destroy();
+    expect(notification.destroyed).toBe(true);
+  });
+
+  it('does not vanish if parent is destroyed and was never rendered', () => {
+    let field = scout.create(StringField, {parent: session.desktop});
+    let notification = scout.create(DesktopNotification, {parent: session.desktop});
+    notification.setParent(field);
+    expect(notification.parent).toBe(field);
+
+    notification.show();
+    field.destroy();
+    expect(notification.destroyed).toBe(false);
+    expect(notification.rendered).toBe(true);
+    expect(notification.parent).toBe(session.desktop);
   });
 
   describe('native notification', () => {
