@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Cell, CellEditorPopup, Column, FormField, keys, scout, SmartColumn, StaticLookupCall, Status, StringField, Table, TableRow, Widget} from '../../../src/index';
+import {Cell, CellEditorPopup, Column, FormField, keys, scout, SmartColumn, SmartField, StaticLookupCall, Status, StringField, Table, TableRow, Widget} from '../../../src/index';
 import {FormSpecHelper, JQueryTesting, TableSpecHelper} from '../../../src/testing/index';
 
 describe('CellEditor', () => {
@@ -350,6 +350,25 @@ describe('CellEditor', () => {
 
       table.attach();
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
+      expect(table.cellEditorPopup.cell.field).toBe(field);
+    });
+
+    it('postpones opening if update buffer is buffering', () => {
+      table.insertColumn({
+        objectType: SmartColumn,
+        lookupCall: {objectType: DummyLookupCall},
+        editable: true
+      });
+      table.insertRows({cells: ['a', 'b', 'key0']});
+      expect(table.updateBuffer.isBuffering()).toBe(true);
+
+      let field = table.columns[2].createEditor(table.rows[0]);
+      table.startCellEdit(table.columns[2], table.rows[0], field);
+      expect(table.cellEditorPopup).toBe(null);
+
+      jasmine.clock().tick(500);
+      expect(table.updateBuffer.isBuffering()).toBe(false);
+      assertCellEditorIsOpen(table, table.columns[2], table.rows[0]);
       expect(table.cellEditorPopup.cell.field).toBe(field);
     });
 
