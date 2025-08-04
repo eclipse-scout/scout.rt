@@ -140,7 +140,7 @@ export const clipboard = {
     scout.assertParameter('parent', parent);
     status = status || clipboard._successStatus(parent.session);
     let notification = scout.create(DesktopNotification, {
-      parent: parent.findDesktop(), // use desktop as parent in case the given parent widget is destroyed before the notification duration has elapsed
+      parent: parent,
       closable: false,
       duration: status.isValid() ? 1234 : 3456, // use longer duration for errors because error message is longer
       status: status
