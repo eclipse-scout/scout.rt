@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -69,7 +69,7 @@ describe('CellEditor', () => {
   }
 
   describe('mouse click', () => {
-    let table, model, $rows, $cells0, $cells1, $cell0_0, $cell0_1, $cell1_0;
+    let table: Table, model, $rows, $cells0, $cells1, $cell0_0, $cell0_1, $cell1_0;
 
     beforeEach(() => {
       model = helper.createModelFixture(2, 2);
@@ -218,7 +218,7 @@ describe('CellEditor', () => {
   });
 
   describe('prepareCellEdit', () => {
-    let table;
+    let table: Table;
 
     beforeEach(() => {
       let model = helper.createModelFixture(2, 2);
@@ -277,6 +277,39 @@ describe('CellEditor', () => {
       jasmine.clock().tick(0);
       expect(triggeredEvent.column).toBe(table.columns[0]);
       expect(triggeredEvent.row).toBe(table.rows[0]);
+    });
+
+    it('can open the field popup', () => {
+      table.insertColumn({
+        objectType: SmartColumn,
+        lookupCall: {objectType: DummyLookupCall},
+        editable: true
+      });
+      table.insertRows({cells: ['1', '1', 'key0']});
+      table.prepareCellEdit(table.columns[2], table.rows[0], true);
+      expect(table.cellEditorPopup).toBe(null);
+
+      // Update buffer is updating because rows with smart values are inserted -> wait until lookup call is resolved and table.loading set to false
+      jasmine.clock().tick(500);
+      let field = (table.cellEditorPopup.cell.field as SmartField<any>);
+      expect(field.$field).toBeFocused();
+      expect(field.popup.rendered).toBe(true);
+
+      table.cancelCellEdit();
+
+      // Try again without loading delay so that loading indicator is rendered
+      table.loadingSupport.loadingIndicatorDelay = 0;
+      table.insertRows({cells: ['2', '2', 'key0']});
+      table.prepareCellEdit(table.columns[2], table.rows[0], true);
+      expect(table.cellEditorPopup).toBe(null);
+
+      // Again, wait for lookup call. Loading indicator is drawn on a glass pane and indicator removed by CSS animation.
+      // Glass pane must be deactivated immediately not only when the animation finishes,
+      // otherwise it would prevent the popup from being opened because smart field does not have the focus, see isFocused() in SmartField._lookupByTextOrAllDone.
+      jasmine.clock().tick(500);
+      field = (table.cellEditorPopup.cell.field as SmartField<any>);
+      expect(field.$field).toBeFocused();
+      expect(field.popup.rendered).toBe(true);
     });
   });
 

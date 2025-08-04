@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -230,14 +230,6 @@ export class FocusManager implements FocusManagerOptions {
     this.validateFocus();
   }
 
-  registerGlassPaneDisplayParent(displayParent: DisplayParent) {
-    this._glassPaneDisplayParents.push(displayParent);
-  }
-
-  registerGlassPaneRenderer(glassPaneRenderer: GlassPaneRenderer) {
-    this._glassPaneRenderers.push(glassPaneRenderer);
-  }
-
   /**
    * Unregisters the given glasspane target, so that the focus can be gained again for the target or one of its child controls.
    */
@@ -246,8 +238,16 @@ export class FocusManager implements FocusManagerOptions {
     this.validateFocus();
   }
 
+  registerGlassPaneDisplayParent(displayParent: DisplayParent) {
+    this._glassPaneDisplayParents.push(displayParent);
+  }
+
   unregisterGlassPaneDisplayParent(displayParent: DisplayParent) {
     arrays.remove(this._glassPaneDisplayParents, displayParent);
+  }
+
+  registerGlassPaneRenderer(glassPaneRenderer: GlassPaneRenderer) {
+    this._glassPaneRenderers.push(glassPaneRenderer);
   }
 
   unregisterGlassPaneRenderer(glassPaneRenderer: GlassPaneRenderer) {

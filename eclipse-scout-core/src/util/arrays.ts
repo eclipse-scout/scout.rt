@@ -601,6 +601,8 @@ export const arrays = {
 
   /**
    * Replacement for indexOf() that works for arrays of jQuery objects (compares DOM nodes).
+   *
+   * @returns the first index of `$element` in `arr` or -1 if the element could not be found.
    */
   $indexOf(arr: JQuery[], $element: JQuery): number {
     for (let i = 0; i < arr.length; i++) {
@@ -608,16 +610,21 @@ export const arrays = {
         return i;
       }
     }
+    return -1;
   },
 
   /**
    * Replacement for remove() that works for arrays of jQuery objects (compares DOM nodes).
+   *
+   * @returns true if the element was removed, false otherwise.
    */
-  $remove(arr: JQuery[], $element: JQuery) {
+  $remove(arr: JQuery[], $element: JQuery): boolean {
     let index = arrays.$indexOf(arr, $element);
     if (index >= 0) {
       arr.splice(index, 1);
+      return true;
     }
+    return false;
   },
 
   randomElement<T>(array: T[]): T {
