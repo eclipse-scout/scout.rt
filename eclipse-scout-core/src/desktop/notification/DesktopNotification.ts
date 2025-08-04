@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -61,6 +61,11 @@ export class DesktopNotification extends ScoutNotification implements DesktopNot
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
+
+    // A desktop notification belongs to the desktop and should stay visible until it is closed.
+    this.setParent(this.session.desktop);
+    this.setOwner(this.parent);
+
     let defaults = this.session.desktop.nativeNotificationDefaults;
     if (defaults) {
       this.nativeNotificationTitle = model.nativeNotificationTitle !== undefined ? model.nativeNotificationTitle : defaults.title;
@@ -238,8 +243,8 @@ export class DesktopNotification extends ScoutNotification implements DesktopNot
   }
 
   fadeOut() {
-    // prevent fadeOut from running more than once (for instance from the click of a user).
-    if (this._removing) {
+    // prevent fadeOut from running more than once (for instance from the click of a user) and do nothing if it is already being destroyed.
+    if (this._removing || this.destroying) {
       return;
     }
     this._removing = true;
