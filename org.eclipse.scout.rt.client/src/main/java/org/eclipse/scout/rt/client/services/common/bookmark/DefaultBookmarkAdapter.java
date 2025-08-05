@@ -37,12 +37,12 @@ public class DefaultBookmarkAdapter implements IBookmarkAdapter {
 
   @Override
   public String getTitle() {
-    return m_page.toPlainTextTitle();
+    return m_page.toPlainText();
   }
 
   @Override
   public String getText() {
-    return m_page.toPlainTextTitle();
+    return m_page.toPlainText();
   }
 
   @Override

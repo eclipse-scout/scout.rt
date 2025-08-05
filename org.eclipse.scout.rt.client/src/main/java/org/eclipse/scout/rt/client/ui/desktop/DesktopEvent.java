@@ -214,7 +214,7 @@ public class DesktopEvent extends EventObject implements IModelEvent {
       buf.append(" ").append(m_messageBox.getHeader());
     }
     if (m_outline != null) {
-      buf.append(" ").append(m_outline.getRootNode().toPlainTextTitle());
+      buf.append(" ").append(m_outline.getRootNode().toPlainText());
     }
     buf.append("]");
     return buf.toString();
