@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -301,6 +301,15 @@ public final class SeleniumExpectedConditions {
    */
   public static ExpectedCondition<List<WebElement>> tableToHaveNumberOfRows(final WebElement parentElement, final int numRows) {
     return containerToHaveNumberOfChildDivs(parentElement, "table-row", numRows);
+  }
+
+  /**
+   * @param parentElement
+   *     if not null, findElement below the given parent, if null, findElements in document
+   * @return The tiles found by the expected condition
+   */
+  public static ExpectedCondition<List<WebElement>> tableToHaveNumberOfTiles(final WebElement parentElement, final int numTiles) {
+    return containerToHaveNumberOfChildDivs(parentElement, "tile", numTiles);
   }
 
   /**
