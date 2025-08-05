@@ -415,22 +415,12 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   @Override
-  public String getPlainTextTitle() {
-    return m_plainTextTitle;
-  }
-
-  @Override
-  public void setPlainTextTitle(String cellTitle) {
-    m_plainTextTitle = cellTitle;
-  }
-
-  @Override
   public final void decorateCell() {
     try {
       interceptDecorateCell(m_cell);
     }
     catch (Exception t) {
-      LOG.error("node {} {}", getClass(), toPlainTextTitle(), t);
+      LOG.error("node {} {}", getClass(), toPlainText(), t);
     }
   }
 
