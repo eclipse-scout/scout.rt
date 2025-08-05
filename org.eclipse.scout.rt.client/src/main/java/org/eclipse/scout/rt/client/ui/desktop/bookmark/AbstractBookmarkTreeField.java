@@ -833,7 +833,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
         ITree tree = getTree();
         for (ITreeNode node : tree.getSelectedNodes()) {
           if (isBookmarkNode(node)) {
-            items.add(node.toPlainTextTitle());
+            items.add(node.toPlainText());
             filteredNodes.add(node);
           }
         }
