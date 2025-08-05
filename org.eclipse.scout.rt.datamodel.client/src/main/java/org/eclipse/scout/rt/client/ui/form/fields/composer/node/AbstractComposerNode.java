@@ -104,6 +104,6 @@ public abstract class AbstractComposerNode extends AbstractTreeNode {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "[" + toPlainTextTitle() + "]";
+    return getClass().getSimpleName() + "[" + toPlainText() + "]";
   }
 }

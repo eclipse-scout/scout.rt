@@ -463,8 +463,7 @@
       "lazyExpandingEnabled": false,
       "leaf": false,
       "childNodes": [],
-      "filterAccepted": true,
-      "plainTextTitle": null
+      "filterAccepted": true
     },
     "Page": {
       "detailTableVisible": true,
