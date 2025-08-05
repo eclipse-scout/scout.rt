@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -632,6 +632,42 @@ public class TableTest {
     assertEquals(0, table.getTableTileGridMediator().getTileMappings().size());
   }
 
+  @Test
+  public void testUpdateProgrammedFilterForTableWithTiles() {
+    P_TableWithTiles table = new P_TableWithTiles();
+    table.init();
+    fillTable(table);
+
+    assertEquals(5, table.getFilteredRowCount());
+    assertEquals(5, table.getRowCount());
+    assertNotNull(table.getTableTileGridMediator());
+    assertEquals(table.getRowCount(), table.getTableTileGridMediator().getTileMappings().size());
+
+    // test programmed filter added
+    ITableRowFilter programmedTableRowFilter = r -> table.getFirstColumn().getValue(r) <= 10;
+    table.addRowFilter(programmedTableRowFilter);
+    assertEquals(2, table.getFilteredRowCount());
+    assertEquals(5, table.getRowCount());
+    assertNotNull(table.getTableTileGridMediator());
+    assertEquals(table.getFilteredRowCount(), table.getTableTileGridMediator().getTileMappings().size());
+
+    // test programmed filter removed
+    table.removeRowFilter(programmedTableRowFilter);
+    assertEquals(5, table.getFilteredRowCount());
+    assertEquals(5, table.getRowCount());
+    assertNotNull(table.getTableTileGridMediator());
+    assertEquals(table.getRowCount(), table.getTableTileGridMediator().getTileMappings().size());
+
+    // test programmed filter and user filter added
+    table.addRowFilter(programmedTableRowFilter);
+    UserTableRowFilter userRowFilter = new UserTableRowFilter(CollectionUtility.hashSet(table.getRow(0)));
+    table.addRowFilter(userRowFilter);
+    assertEquals(1, table.getFilteredRowCount());
+    assertEquals(5, table.getRowCount());
+    assertNotNull(table.getTableTileGridMediator());
+    assertEquals("Tile deleted by user filter should not be deleted from the mapping since the ui handles this filter", 2, table.getTableTileGridMediator().getTileMappings().size());
+  }
+
   private void assertValidTestTable(P_Table table, int status) {
     assertRowCount(2, 0, table);
     assertStatusAndTable(table, status, table.getRow(0));
@@ -681,7 +717,7 @@ public class TableTest {
   }
 
   /**
-   * @param expectedStatus
+   * @param status
    * @return
    */
   private static String decodeStatus(int status) {
