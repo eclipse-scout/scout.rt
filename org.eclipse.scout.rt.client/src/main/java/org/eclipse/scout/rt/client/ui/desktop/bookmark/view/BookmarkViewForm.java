@@ -172,7 +172,7 @@ public class BookmarkViewForm extends AbstractForm {
            */
           @Override
           public boolean accept(ITreeNode node, int level) {
-            String text = node.toPlainTextTitle();
+            String text = node.toPlainText();
             return text == null || m_lowercaseFilterPattern == null || m_lowercaseFilterPattern.matcher(text.toLowerCase()).matches();
           }
         }
