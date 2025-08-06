@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 public class HtmlHelper {
 
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
-  private static final Pattern HTML_PARAGRAPH_END_TAGS = Pattern.compile("<br/?></div>|</div>|<br/?>|</p>|<p/>|</tr>|</h[1-6]>|</dt>|</dd>|</dl>|</table>|</li>|</head>", Pattern.CASE_INSENSITIVE);
+  private static final Pattern HTML_PARAGRAPH_END_TAGS = Pattern.compile("<br/?></div>|</div>|<br/?>|</p>|<p/>|</tr>|</h[1-6]>|</dt>|</dd>|</dl>|</li>|</head>", Pattern.CASE_INSENSITIVE);
   private static final Pattern HTML_SPACE_END_TAGS = Pattern.compile("</td>|</th>", Pattern.CASE_INSENSITIVE);
   private static final Pattern HTML_TAGS = Pattern.compile("<[^\\s>][^>]*>", Pattern.DOTALL);
   private static final Pattern HTML_SCRIPTS = Pattern.compile("<script\\b[^<]*(?:(?!</script>)<[^<]*)*</script>", Pattern.CASE_INSENSITIVE);
@@ -94,15 +94,16 @@ public class HtmlHelper {
     s = HTML_COMMENT.matcher(s).replaceAll("");
     // remove attribute values since they could contain special characters like >
     s = removeAttributeValues(s);
-    // newlines
+    // whitespace
     s = StringUtility.replace(s, "\r", "");
     s = StringUtility.replace(s, "\n", " ");
+    s = HTML_SPACE_END_TAGS.matcher(s).replaceAll(" ");
+    // newlines
     s = HTML_PARAGRAPH_END_TAGS.matcher(s).replaceAll("\n");
     // remove script and style contents
     s = HTML_SCRIPTS.matcher(s).replaceAll("");
     s = HTML_STYLES.matcher(s).replaceAll("");
     // remove tags
-    s = HTML_SPACE_END_TAGS.matcher(s).replaceAll(" ");
     s = HTML_TAGS.matcher(s).replaceAll("");
     // remove multiple spaces
     s = MULTIPLE_SPACES.matcher(s).replaceAll(" ");

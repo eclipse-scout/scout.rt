@@ -38,6 +38,7 @@ public class HtmlEntitiesTest {
     assertEquals("&auml;", entities.unescapeAll("&amp;auml;"));
     assertEquals("auml;", entities.unescapeAll("auml;"));
     assertEquals("drag&drop", entities.unescapeAll("drag&drop"));
+    assertEquals("&ä", entities.unescapeAll("&&auml;"));
   }
 
   @Test

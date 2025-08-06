@@ -98,9 +98,13 @@ public class HtmlHelperTest {
     assertEquals("line1\nx\nline2", helper.toPlainText("<p>line1<br>\nx</p><p>line2</p>"));
     assertEquals("line1 x\nline2", helper.toPlainText("<div>line1\nx</div><div>line2</div>")); // [?]
     assertEquals("line1\nline2", helper.toPlainText("<div>line1<br/></div><div>line2<br/></div>"));
+    assertEquals("a b\nc\n", helper.toPlainTextNoTrim("<div>a\nb<br>c</div>"));
+    assertEquals("a b\nc", helper.toPlainText("<div>a\nb<br>c</div>"));
 
     // Tables
     assertEquals("one two\nthree four", helper.toPlainText("<table><tr><td>one</td><td>two</td></tr><tr><td>three</td><td>four</td></tr></table>"));
+    assertEquals("1. line\n2. line\n", helper.toPlainTextNoTrim("<table><tr><td><b>1. line</b></td></tr><tr><td><i>2. line</i></td></tr></table>"));
+    assertEquals("1. line\n2. line", helper.toPlainText("<table><tr><td><b>1. line</b></td></tr><tr><td><i>2. line</i></td></tr></table>"));
 
     // Styles and Scripts
     assertEquals(

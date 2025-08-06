@@ -78,9 +78,11 @@ public class HtmlEntities {
         decoded = decodeNumericCharacterReference(encoded); // Numeric character reference
       }
       if (decoded == null) {
-        start = end + 1;
+        // Not a valid character reference -> skip '&' character (don't jump to end to support the following case: "&&amp;")
+        start = start + 1;
       }
       else {
+        // Replace character reference with decoded character
         sb.replace(start, end + 1, decoded);
         start = start + decoded.length();
       }
