@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.IShowInvisibleColumnsForm;
@@ -90,6 +91,7 @@ public class TableOrganizer implements ITableOrganizer {
     List<IColumn<?>> visibleColumns = columnSet.getVisibleColumns();
     visibleColumns.remove(column);
     columnSet.setVisibleColumns(visibleColumns);
+    ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);
   }
 
   @Override

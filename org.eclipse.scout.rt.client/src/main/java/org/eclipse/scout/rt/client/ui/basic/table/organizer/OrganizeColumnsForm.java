@@ -1097,6 +1097,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
   public void resetAll() {
     m_organizedTable.reset(false);
+    ClientUIPreferences.getInstance().removeTableColumnsConfig(m_organizedTable, null); // clear global profile
     if (isCustomizable() && m_organizedTable.getReloadHandler() != null) {
       m_organizedTable.getReloadHandler().reload(IReloadReason.ORGANIZE_COLUMNS);
     }
@@ -1105,6 +1106,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
   public void applyConfig(String configName) {
     applyConfigImpl(configName);
+    ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_organizedTable, null); // save new state as global profile
     if (isCustomizable() && m_organizedTable.getReloadHandler() != null) {
       m_organizedTable.getReloadHandler().reload(IReloadReason.ORGANIZE_COLUMNS);
     }
