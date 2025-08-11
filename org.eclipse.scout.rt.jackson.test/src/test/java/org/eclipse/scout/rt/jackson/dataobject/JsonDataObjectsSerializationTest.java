@@ -39,6 +39,8 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import org.eclipse.scout.rt.dataobject.BigDecimalDataObjectValue;
+import org.eclipse.scout.rt.dataobject.BooleanDataObjectValue;
 import org.eclipse.scout.rt.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoEntity;
@@ -47,10 +49,13 @@ import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDataObject;
+import org.eclipse.scout.rt.dataobject.IDataObjectValue;
 import org.eclipse.scout.rt.dataobject.IDoCollection;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
 import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
+import org.eclipse.scout.rt.dataobject.LongDataObjectValue;
+import org.eclipse.scout.rt.dataobject.StringDataObjectValue;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureHierarchicalLookupRowDo;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
@@ -2449,9 +2454,9 @@ public class JsonDataObjectsSerializationTest {
     try {
       String input = readResourceAsString("TestPersonDo.json");
       TestPersonDo personDo = s_dataObjectMapper.readValue(input, TestPersonDo.class);
-      assertEquals(personDo.getAddresses().get(0).getClass(), TestElectronicAddressDo.class);
-      assertEquals(personDo.getAddresses().get(1).getClass(), TestPhysicalAddressExDo.class);
-      assertEquals(personDo.getAddresses().get(2).getClass(), TestPhysicalAddressExDo.class);
+      assertEquals(TestElectronicAddressDo.class, personDo.getAddresses().get(0).getClass());
+      assertEquals(TestPhysicalAddressExDo.class, personDo.getAddresses().get(1).getClass());
+      assertEquals(TestPhysicalAddressExDo.class, personDo.getAddresses().get(2).getClass());
     }
     finally {
       BEANS.get(BeanTestingHelper.class).unregisterBean(registeredBean);
@@ -4125,6 +4130,66 @@ public class JsonDataObjectsSerializationTest {
 
     IDataObject marshalled = s_dataObjectMapper.readerFor(IDataObject.class).readValue(json);
     assertEqualsWithComparisonFailure(list, marshalled);
+  }
+
+  @Test
+  public void testSerializeDeserializeDataObject_String() throws Exception {
+    IDataObject entity = new StringDataObjectValue().withValue("stringValue");
+    String json = s_dataObjectMapper.writerFor(IDataObjectValue.class).writeValueAsString(entity);
+    s_testHelper.assertJsonEquals("\"stringValue\"", json);
+
+    IDataObject marshalled = s_dataObjectMapper.readerFor(IDataObject.class).readValue(json);
+    assertEqualsWithComparisonFailure(entity, marshalled);
+  }
+
+  @Test
+  public void testSerializeDeserializeDataObject_Long() throws Exception {
+    IDataObject entity = new LongDataObjectValue().withValue(12345L);
+    String json = s_dataObjectMapper.writerFor(IDataObjectValue.class).writeValueAsString(entity);
+    s_testHelper.assertJsonEquals("12345", json);
+
+    IDataObject marshalled = s_dataObjectMapper.readerFor(IDataObject.class).readValue(json);
+    assertEqualsWithComparisonFailure(entity, marshalled);
+  }
+
+  @Test
+  public void testSerializeDeserializeDataObject_BigDecimal() throws Exception {
+    IDataObject entity = new BigDecimalDataObjectValue().withValue(BigDecimal.valueOf(1.2345));
+    String json = s_dataObjectMapper.writerFor(IDataObjectValue.class).writeValueAsString(entity);
+    s_testHelper.assertJsonEquals("1.2345", json);
+
+    IDataObject marshalled = s_dataObjectMapper.readerFor(IDataObject.class).readValue(json);
+    assertEqualsWithComparisonFailure(entity, marshalled);
+  }
+
+  @Test
+  public void testSerializeDeserializeDataObject_True() throws Exception {
+    IDataObject entity = new BooleanDataObjectValue().withValue(true);
+    String json = s_dataObjectMapper.writerFor(IDataObjectValue.class).writeValueAsString(entity);
+    s_testHelper.assertJsonEquals("true", json);
+
+    IDataObject marshalled = s_dataObjectMapper.readerFor(IDataObject.class).readValue(json);
+    assertEqualsWithComparisonFailure(entity, marshalled);
+  }
+
+  @Test
+  public void testSerializeDeserializeDataObject_False() throws Exception {
+    IDataObject entity = new BooleanDataObjectValue().withValue(false);
+    String json = s_dataObjectMapper.writerFor(IDataObjectValue.class).writeValueAsString(entity);
+    s_testHelper.assertJsonEquals("false", json);
+
+    IDataObject marshalled = s_dataObjectMapper.readerFor(IDataObject.class).readValue(json);
+    assertEqualsWithComparisonFailure(entity, marshalled);
+  }
+
+  @Test
+  public void testSerializeDeserializeDataObject_Null() throws Exception {
+    IDataObject entity = null;
+    String json = s_dataObjectMapper.writerFor(IDataObjectValue.class).writeValueAsString(entity);
+    s_testHelper.assertJsonEquals("null", json);
+
+    IDataObject marshalled = s_dataObjectMapper.readerFor(IDataObject.class).readValue(json);
+    assertEqualsWithComparisonFailure(entity, marshalled);
   }
 
   // ------------------------------------ common test helper methods ------------------------------------
