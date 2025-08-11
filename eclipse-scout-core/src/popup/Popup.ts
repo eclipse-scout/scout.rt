@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -332,15 +332,21 @@ export class Popup extends Widget implements PopupModel {
       // The same applies for detaching, see _renderOnDetach
       let currentAnimateOpening = this.animateOpening;
       this.animateOpening = false;
-      this.open();
+      this.open(this.$parent);
       this.animateOpening = currentAnimateOpening;
     }
   }
 
   protected override _renderOnDetach() {
     this._openLater = true;
+
+    // keep $parent so that the DOM structure stays unchanged when re-attaching
+    const $parent = this.$parent;
+
     // If parent is detached, popup should be removed immediately, otherwise animation would still be visible even though parent has already gone.
     super.removeImmediately();
+
+    this.$parent = $parent;
     super._renderOnDetach();
   }
 
