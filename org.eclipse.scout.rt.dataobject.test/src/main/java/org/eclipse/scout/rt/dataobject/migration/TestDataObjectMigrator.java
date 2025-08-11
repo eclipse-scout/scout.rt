@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,5 +22,13 @@ public class TestDataObjectMigrator extends DataObjectMigrator {
   @Override
   public boolean applyStructureMigration(DataObjectMigrationContext ctx, IDataObject dataObject, NamespaceVersion toVersion) {
     return super.applyStructureMigration(ctx, dataObject, toVersion);
+  }
+
+  /**
+   * Override to change visibility from protected to public.
+   */
+  @Override
+  public <T extends IDataObject> DataObjectMigratorResult<T> applyValueMigration(DataObjectMigrationContext ctx, T dataObject) {
+    return super.applyValueMigration(ctx, dataObject);
   }
 }
