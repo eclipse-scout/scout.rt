@@ -385,6 +385,11 @@
     "TreeBox": {
       "clearable": "never"
     },
+    "FileChooser": {
+      "maximumUploadSize": 52428800,
+      "acceptTypes": [],
+      "multiSelect": false
+    },
     // Other objects
     "Cell": {
       "horizontalAlignment": -1,
@@ -633,7 +638,8 @@
         "WidgetPopup": {
           "FormPopup": null
         }
-      }
+      },
+      "FileChooser": null
     },
     "Column": {
       "BeanColumn": null,
