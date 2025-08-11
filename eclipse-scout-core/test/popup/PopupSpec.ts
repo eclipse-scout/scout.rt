@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1359,7 +1359,7 @@ describe('Popup', () => {
     });
   });
 
-  describe('open popup delayed/immediately', () => {
+  describe('open popup', () => {
 
     it('open popup not until parent is rendered and layouted', () => {
       let stringField = scout.create(StringField, {
@@ -1395,5 +1395,26 @@ describe('Popup', () => {
       expect(popup.rendered).toBe(true);
     });
 
+    it('open popup use same $parent on reattach', () => {
+      const stringField = scout.create(StringField, {
+        parent: session.desktop
+      });
+      const popup = scout.create(Popup, {
+        parent: stringField
+      });
+
+      stringField.render();
+      popup.open(stringField.$container);
+      expect(stringField.$container.has(popup.$container[0]).length).toBe(1);
+      expect(popup.$parent[0]).toBe(stringField.$container[0]);
+
+      stringField.detach();
+      expect(popup.rendered).toBeFalse();
+      expect(popup.$parent[0]).toBe(stringField.$container[0]);
+
+      stringField.attach();
+      expect(stringField.$container.has(popup.$container[0]).length).toBe(1);
+      expect(popup.$parent[0]).toBe(stringField.$container[0]);
+    });
   });
 });
