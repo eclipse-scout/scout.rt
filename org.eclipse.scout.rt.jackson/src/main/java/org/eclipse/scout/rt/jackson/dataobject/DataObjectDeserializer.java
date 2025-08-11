@@ -10,10 +10,15 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
+import org.eclipse.scout.rt.dataobject.BigDecimalDataObjectValue;
+import org.eclipse.scout.rt.dataobject.BooleanDataObjectValue;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.LongDataObjectValue;
+import org.eclipse.scout.rt.dataobject.StringDataObjectValue;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -48,8 +53,18 @@ public class DataObjectDeserializer extends StdDeserializer<IDataObject> {
         return p.getCodec().readValue(p, IDoEntity.class); // delegate to DoEntityDeserializer for object-like structure
       case START_ARRAY:
         return p.getCodec().readValue(p, DoList.class); // delegate to DoCollectionDeserializer for collection-like structure (using DoList as generic structure instead of DoSet or DoCollection)
+      case VALUE_STRING:
+        return new StringDataObjectValue().withValue(p.getValueAsString());
+      case VALUE_NUMBER_INT:
+        return new LongDataObjectValue().withValue(p.getValueAsLong());
+      case VALUE_NUMBER_FLOAT:
+        return new BigDecimalDataObjectValue().withValue(p.getCodec().readValue(p, BigDecimal.class)); // deserialize floating point numbers as BigDecimal
+      case VALUE_TRUE:
+        return new BooleanDataObjectValue().withValue(true);
+      case VALUE_FALSE:
+        return new BooleanDataObjectValue().withValue(false);
       default:
-        throw ctxt.wrongTokenException(p, handledType(), JsonToken.START_OBJECT, "expected start object or start array token");
+        throw ctxt.wrongTokenException(p, handledType(), JsonToken.START_OBJECT, null);
     }
   }
 }
