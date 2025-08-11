@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDataObject;
+import org.eclipse.scout.rt.dataobject.IDataObjectValue;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 import org.eclipse.scout.rt.dataobject.id.IId;
@@ -63,6 +64,9 @@ public class ScoutDataObjectSerializerProvider implements IDataObjectSerializerP
     }
     else if (ObjectUtility.isOneOf(rawClass, DoList.class, DoSet.class, DoCollection.class)) {
       return new DoCollectionSerializer<>(moduleContext, type);
+    }
+    if (IDataObjectValue.class.isAssignableFrom(rawClass)) {
+      return new DataObjectValueSerializer(type);
     }
     else if (Date.class.isAssignableFrom(rawClass)) {
       return new DoDateSerializer();
