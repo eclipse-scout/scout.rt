@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -384,7 +384,8 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
       text = StringUtility.replace(text.trim(), "٪", "%");
     }
     if (!text.isEmpty()) {
-      text = ensureSuffix(text);
+      // DecimalFormat.parse expects the prefix and suffix to be set in the correct format in the input.
+      text = ensurePrefixAndSuffix(text);
       ParsePosition p = new ParsePosition(0);
       BigDecimal valBeforeRounding = null;
 
@@ -524,17 +525,50 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
     return valBeforeRounding.round(new MathContext(precision, getRoundingMode()));
   }
 
-  private String ensureSuffix(String text) {
+  /**
+   * Returns the given text with the prefix and suffix in the correct format.
+   * If the text contains a prefix/suffix (possibly with additional/missing whitespace), it is removed.
+   * Adds the correct prefix and suffix.
+   */
+  private String ensurePrefixAndSuffix(String text) {
+    boolean isNegative = false;
+
+    // Prefix
+    String positivePrefix = getFormatInternal().getPositivePrefix();
+    String negativePrefix = getFormatInternal().getNegativePrefix();
+
+    String trimmedPositivePrefix = StringUtility.trim(positivePrefix);
+    String trimmedNegativePrefix = StringUtility.trim(negativePrefix);
+    if (StringUtility.hasText(trimmedPositivePrefix) && text.startsWith(trimmedPositivePrefix)) {
+      text = StringUtility.trim(text.substring(trimmedPositivePrefix.length()));
+    }
+    if (StringUtility.hasText(trimmedNegativePrefix) && text.startsWith(trimmedNegativePrefix)) {
+      text = StringUtility.trim(text.substring(trimmedNegativePrefix.length()));
+      isNegative = true;
+    }
+
+    // Suffix
     String positiveSuffix = getFormatInternal().getPositiveSuffix();
     String negativeSuffix = getFormatInternal().getNegativeSuffix();
 
-    if (positiveSuffix.equals(negativeSuffix)) {
-      String trimmedSuffix = StringUtility.trim(positiveSuffix);
-      if (text.endsWith(trimmedSuffix)) {
-        text = StringUtility.trim(text.substring(0, text.length() - trimmedSuffix.length()));
-      }
-      text = StringUtility.concatenateTokens(text, positiveSuffix);
+    String trimmedPositiveSuffix = StringUtility.trim(positiveSuffix);
+    String trimmedNegativeSuffix = StringUtility.trim(negativeSuffix);
+    if (StringUtility.hasText(trimmedPositiveSuffix) && text.endsWith(trimmedPositiveSuffix)) {
+      text = StringUtility.trim(text.substring(0, text.length() - trimmedPositiveSuffix.length()));
     }
+    if (StringUtility.hasText(trimmedNegativeSuffix) && text.endsWith(trimmedNegativeSuffix)) {
+      text = StringUtility.trim(text.substring(0, text.length() - trimmedNegativeSuffix.length()));
+      isNegative = true;
+    }
+
+    // Add the prefix and suffix.
+    if (isNegative) {
+      text = StringUtility.box(negativePrefix, text, negativeSuffix);
+    }
+    else {
+      text = StringUtility.box(positivePrefix, text, positiveSuffix);
+    }
+
     return text;
   }
 

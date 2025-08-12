@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,10 +17,12 @@ import {Locale, numbers, RoundingMode, scout, strings} from '../index';
  * - %
  */
 export class DecimalFormat {
+
   positivePrefix: string;
   positiveSuffix: string;
   negativePrefix: string;
   negativeSuffix: string;
+  protected _trimmedAffixReplacements: AffixReplacement[];
   groupingChar: string;
   lenientGroupingChars: string;
   groupLength: number;
@@ -92,6 +94,24 @@ export class DecimalFormat {
         this.negativeSuffix = this.negativeSuffix + this.positiveSuffix;
       }
     }
+
+    // The normalize function needs trimmed affixes.
+    this._trimmedAffixReplacements = [
+      {affix: strings.trim(this.positivePrefix), replacement: '+'},
+      {affix: strings.trim(this.positiveSuffix), replacement: ''},
+      {affix: strings.trim(this.negativePrefix), replacement: '-'},
+      {affix: strings.trim(this.negativeSuffix), replacement: ''}
+    ];
+    // Sort by the affix length (descending), so that shorter affixes possibly contained in longer ones are replaced later.
+    this._trimmedAffixReplacements.sort((a, b) => {
+      const lengthDiff = strings.length(b.affix) - strings.length(a.affix);
+      if (lengthDiff) {
+        return lengthDiff;
+      }
+      // If there are two affixes with the same length, they might be equal.
+      // In that case, handle the one with the replacement first: favor an error caused by an incorrect affix placement (e.g. '-' as a suffix) instead of a silent error.
+      return strings.length(a.replacement) > 0 ? -1 : 1;
+    });
 
     // find group length
     let posDecimalSeparator = this.pattern.indexOf(SYMBOLS.decimalSeparator);
@@ -241,32 +261,26 @@ export class DecimalFormat {
 
   /**
    * Convert to JS number format:
+   * - remove leading and trailing whitespace
+   * - remove/replace the trimmed affixes in descending order considering their length
    * - remove groupingChar and lenientGroupingChars
    * - replace decimalSeparatorChar with '.'
-   * - remove positiveSuffix and negativeSuffix
-   * - replace positivePrefix with '+'
-   * - replace negativePrefix with '-'
    */
   normalize(numberString: string): string {
     if (!numberString) {
       return numberString;
     }
-    let result = numberString
+
+    let result = numberString.trim();
+    for (let affix of this._trimmedAffixReplacements) {
+      if (strings.hasText(affix.affix)) {
+        result = result.replace(new RegExp(affix.affix, 'g'), affix.replacement);
+      }
+    }
+
+    result = result
       .replace(new RegExp('[' + this.groupingChar + this.lenientGroupingChars + ']', 'g'), '')
       .replace(new RegExp('[' + this.decimalSeparatorChar + ']', 'g'), '.');
-
-    if (strings.hasText(this.positivePrefix)) {
-      result = result.replace(new RegExp(this.positivePrefix, 'g'), '+');
-    }
-    if (strings.hasText(this.positiveSuffix)) {
-      result = result.replace(new RegExp(this.positiveSuffix, 'g'), '');
-    }
-    if (strings.hasText(this.negativePrefix)) {
-      result = result.replace(new RegExp(this.negativePrefix, 'g'), '-');
-    }
-    if (strings.hasText(this.negativeSuffix)) {
-      result = result.replace(new RegExp(this.negativeSuffix, 'g'), '');
-    }
 
     return result.replace(/\s/g, '');
   }
@@ -309,4 +323,9 @@ export interface DecimalFormatOptions {
    * default is {@link RoundingMode.HALF_UP}
    */
   roundingMode?: RoundingMode;
+}
+
+export interface AffixReplacement {
+  affix: string;
+  replacement: string;
 }
