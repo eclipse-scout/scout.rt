@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -536,7 +536,7 @@ public class ClientUIPreferences {
   }
 
   public void removeAllTableColumnPreferences(ITable table, String configName) {
-    if (table == null || StringUtility.isNullOrEmpty(configName)) {
+    if (table == null) {
       throw new IllegalArgumentException();
     }
     for (IColumn col : table.getColumns()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This utility class is used to call injected and execute test specific JavaScript code during Selenium test execution.
  *
- * @see src/test/resources/selenium.js
+ * @see "src/test/resources/selenium.js"
  */
 public final class SeleniumJavaScript {
 
