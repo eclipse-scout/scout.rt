@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FocusManagerSpecHelper, FormSpecHelper, JQueryTesting} from '../../src/testing/index';
-import {FocusManager, FocusRule, GlassPane, scout} from '../../src/index';
+import {Button, FocusManager, FocusRule, GlassPane, scout} from '../../src/index';
 
 describe('FocusManager', () => {
   let session: SandboxSession, formHelper: FormSpecHelper, focusHelper: FocusManagerSpecHelper, focusManager: FocusManager;
@@ -367,6 +367,23 @@ describe('FocusManager', () => {
   });
 
   describe('findFirstFocusableElement', () => {
+    it('ignores elements with class prevent-initial-focus', () => {
+      let $container = session.$entryPoint.appendDiv();
+      $container.appendElement('<input type="text" class="prevent-initial-focus">');
+      let $input2 = $container.appendElement('<input type="text">');
+      expect(focusManager.findFirstFocusableElement($container)).toBe($input2[0]);
+    });
+
+    it('ignores elements that have a parent with class prevent-initial-focus', () => {
+      let $root = session.$entryPoint.appendDiv('prevent-initial-focus');
+      let $container1 = $root.appendDiv();
+      $container1.appendElement('<input type="text">');
+
+      let $container2 = session.$entryPoint.appendDiv();
+      let $input2 = $container2.appendElement('<input type="text">');
+      expect(focusManager.findFirstFocusableElement($container2)).toBe($input2[0]);
+    });
+
     it('ignores disabled form fields', async () => {
       jasmine.clock().uninstall();
       let form = formHelper.createFormWithFields(session.desktop, false, 2);
@@ -408,6 +425,82 @@ describe('FocusManager', () => {
   });
 
   describe('_acceptFocusChangeOnMouseDown', () => {
+    it('does not accept the focus if a non-focusable container was clicked', () => {
+      let $container = session.$entryPoint.appendDiv();
+      expectMouseDownToPreventDefault(true);
+      JQueryTesting.triggerMouseDown($container);
+    });
+
+    it('accepts the focus if a focusable container was clicked', () => {
+      let $container1 = session.$entryPoint.appendDiv().setTabbable(true);
+      expectMouseDownToPreventDefault(false);
+      JQueryTesting.triggerMouseDown($container1);
+
+      let $container2 = session.$entryPoint.appendDiv().setTabbableOrFocusable(false);
+      expectMouseDownToPreventDefault(false);
+      JQueryTesting.triggerMouseDown($container2);
+    });
+
+    it('accepts the focus if an element inside a focusable container was clicked', () => {
+      let $container = session.$entryPoint.appendDiv().setTabbable(true);
+      let $elem = $container.appendSpan().text('text');
+
+      expectMouseDownToPreventDefault(false);
+      JQueryTesting.triggerMouseDown($elem);
+
+      $container.setTabbableOrFocusable(false);
+      expectMouseDownToPreventDefault(false);
+      JQueryTesting.triggerMouseDown($elem);
+
+      $container.setTabbable(false);
+      expectMouseDownToPreventDefault(true);
+      JQueryTesting.triggerMouseDown($elem);
+    });
+
+    it('does not accept the focus if the focusable container of the element is outside a focus-boundary', () => {
+      let $root = session.$entryPoint.appendDiv().setTabbable(true);
+      let $container = $root.appendDiv('focus-boundary');
+      let $elem = $container.appendSpan().text('text');
+
+      expectMouseDownToPreventDefault(true);
+      JQueryTesting.triggerMouseDown($elem);
+    });
+
+    it('accepts the focus if an element with user-select: text was clicked', () => {
+      let $container = session.$entryPoint.appendDiv();
+      let $elem1 = $container.appendSpan().text('text');
+      let $elem2 = $container.appendSpan().text('text').attr('style', 'user-select: text');
+
+      expectMouseDownToPreventDefault(true);
+      JQueryTesting.triggerMouseDown($elem1);
+
+      expectMouseDownToPreventDefault(false);
+      JQueryTesting.triggerMouseDown($elem2);
+    });
+
+    it('does not accept the focus if an element with the class unfocusable was clicked', async () => {
+      let $container = session.$entryPoint.appendDiv();
+      let $button1 = $container.appendElement('<button class="unfocusable">button</button>');
+      let $button2 = $container.appendElement('<button>button</button>');
+
+      expectMouseDownToPreventDefault(true);
+      JQueryTesting.triggerMouseDown($button1);
+
+      expectMouseDownToPreventDefault(false);
+      JQueryTesting.triggerMouseDown($button2);
+
+      // Scout buttons should have unfocusable class -> focus should be prevented
+      jasmine.clock().uninstall();
+      let form = formHelper.createFormWithFields(session.desktop, false, 0);
+      form.rootGroupBox.insertField({
+        objectType: Button,
+        processButton: false
+      });
+      await form.open();
+      expectMouseDownToPreventDefault(true);
+      JQueryTesting.triggerMouseDown(form.rootGroupBox.fields[0].$field);
+    });
+
     it('accepts the focus if a readonly input was clicked', () => {
       let $container = session.$entryPoint.appendDiv();
       let $input1 = $container.appendElement('<input type="text">').setEnabled(false);
