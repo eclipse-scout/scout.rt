@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -140,6 +140,68 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
       assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999"));
       assertParseToBigDecimalInternalThrowsRuntimeException("After setting an empty suffix an excpetion is expected when parsing text with suffix.", this, "9999 SUF");
     }
+  }
+
+  @Test
+  public void testParseValueWithPrefixWithWhitespace() {
+    for (Locale locale : DecimalFormat.getAvailableLocales()) {
+      DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(locale);
+      df.applyPattern(getFormat().toPattern());
+
+      testParseValueWithAffix(df, "$#");
+      testParseValueWithAffix(df, "$ #");
+      testParseValueWithAffix(df, "positive prefix #");
+      testParseValueWithAffix(df, " positive prefix#");
+    }
+  }
+
+  @Test
+  public void testParseValueWithSuffixWithWhitespace() {
+    for (Locale locale : DecimalFormat.getAvailableLocales()) {
+      DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(locale);
+      df.applyPattern(getFormat().toPattern());
+
+      testParseValueWithAffix(df, "#km/h");
+      testParseValueWithAffix(df, "# km/h");
+      testParseValueWithAffix(df, "#km / h ");
+      testParseValueWithAffix(df, "# km / h ");
+    }
+  }
+
+  @Test
+  public void testParseValueWithPrefixAndSuffixWithWhitespace() {
+    for (Locale locale : DecimalFormat.getAvailableLocales()) {
+      DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(locale);
+      df.applyPattern(getFormat().toPattern());
+
+      testParseValueWithAffix(df, " plus # pos;minus#neg");
+    }
+  }
+
+  /**
+   * Test parsing a value with affixes and whitespace.
+   */
+  protected void testParseValueWithAffix(DecimalFormat df, String pattern) {
+    df.applyPattern(pattern);
+    setFormat(df);
+    BigDecimal value = BigDecimal.valueOf(123);
+    String valueString = value.toString();
+
+    // test parsing the value without affixes
+    assertComparableEquals(value, parseValueInternal(valueString));
+
+    testParseValueWithAffix(valueString, value, df.getPositivePrefix(), df.getPositiveSuffix());
+    testParseValueWithAffix(valueString, value.negate(), df.getNegativePrefix(), df.getNegativeSuffix());
+  }
+
+  /**
+   * Test parsing the given value as string after concatenating the affixes (and whitespace).
+   */
+  private void testParseValueWithAffix(String valueString, BigDecimal expectedValue, String prefix, String suffix) {
+    assertComparableEquals(expectedValue, parseValueInternal(prefix + valueString + suffix));
+    assertComparableEquals(expectedValue, parseValueInternal(prefix + " " + valueString + " " + suffix));
+    assertComparableEquals(expectedValue, parseValueInternal(prefix + "   " + valueString + "   " + suffix));
+    assertComparableEquals(expectedValue, parseValueInternal(" " + prefix + " " + valueString + " " + suffix + " "));
   }
 
   @Test
