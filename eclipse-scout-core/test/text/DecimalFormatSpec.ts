@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -257,6 +257,16 @@ describe('DecimalFormat', () => {
       expect(decimalFormat.format(-1)).toBe('M1!00%');
     });
 
+    it('can handle percentages with space', () => {
+      let decimalFormat = new DecimalFormat(locale, {
+        pattern: '#,##0.00 \'%\''
+      });
+
+      expect(decimalFormat.format(0)).toBe('0.00 %');
+      expect(decimalFormat.format(12345.6789)).toBe('12\'345.68 %');
+      expect(decimalFormat.format(-1)).toBe('-1.00 %');
+    });
+
     it('can handle multiplier', () => {
       locale.decimalFormatSymbols.minusSign = 'M';
       locale.decimalFormatSymbols.decimalSeparator = '!';
@@ -368,6 +378,52 @@ describe('DecimalFormat', () => {
 
       expect(decimalFormat.normalize('plus42&')).toBe('+42&');
       expect(decimalFormat.normalize('MiNuS42§')).toBe('MiNuS42');
+
+      // multiple affixes
+      expect(decimalFormat.normalize('minus42§*plus42%')).toBe('-42*+42');
+      expect(decimalFormat.normalize('minus 42 § * plus 42 %')).toBe('-42*+42');
+      expect(decimalFormat.normalize('plus 42 % * plus42% / 42§ * minus42')).toBe('+42*+42/42*-42');
+    });
+
+    it('can handle prefix and suffix with space', () => {
+      let decimalFormat = new DecimalFormat(locale, {
+        pattern: 'plus ##0 m;negative number##0km/h'
+      });
+
+      expect(decimalFormat.normalize(' 42 ')).toBe('42');
+      expect(decimalFormat.normalize('42m ')).toBe('42');
+      expect(decimalFormat.normalize('42 m ')).toBe('42');
+      expect(decimalFormat.normalize('42km/h')).toBe('42');
+      expect(decimalFormat.normalize('42 km/h ')).toBe('42');
+      expect(decimalFormat.normalize('plus 42')).toBe('+42');
+      expect(decimalFormat.normalize(' plus 42 km/h')).toBe('+42');
+      expect(decimalFormat.normalize('+ 42 m')).toBe('+42');
+      expect(decimalFormat.normalize('negative number 42 m')).toBe('-42');
+
+      // Spaces inside the affixes have to match exactly.
+      // However, the letter 'm' matches and is therefore removed.
+      expect(decimalFormat.normalize('42 km / h')).toBe('42k/h');
+      expect(decimalFormat.normalize('negativenumber42m')).toBe('negativenuber42');
+
+      // multiple affixes
+      expect(decimalFormat.normalize('negative number42m*plus42km/h')).toBe('-42*+42');
+      expect(decimalFormat.normalize(' negative number 42 m * plus 42 km/h')).toBe('-42*+42');
+      expect(decimalFormat.normalize('plus 42 km/h * plus42km/h')).toBe('+42*+42');
+    });
+
+    it('can handle same positive suffix and negative prefix', () => {
+      let decimalFormat = new DecimalFormat(locale, {
+        pattern: 'plus ##0 n;n##0'
+      });
+
+      expect(decimalFormat.normalize('n 42')).toBe('-42');
+
+      // The following tests might not seem correct.
+      // However, distinguishing between the affixes would be too complex considering this should not happen anyway.
+      // In order to favor an error caused by an incorrect affix placement instead of a silent error, the affix is replaced by the prefix instead of just removed.
+      expect(decimalFormat.normalize('plus 42 n')).toBe('+42-');
+      expect(decimalFormat.normalize('plus 42 n 42')).toBe('+42-42');
+      expect(decimalFormat.normalize('n 42 n')).toBe('-42-');
     });
   });
 });
