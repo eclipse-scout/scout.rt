@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-  <a href="https://ci.eclipse.org/scout/job/scout-integration-25.2-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins" src="https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-25.2-RT-nightly_pipeline%2F"></a>
-  <a href="https://ci.eclipse.org/scout/job/scout-integration-25.2-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins tests" src="https://img.shields.io/jenkins/tests?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-25.2-RT-nightly_pipeline%2F"></a>
+  <a href="https://ci.eclipse.org/scout/job/scout-integration-26.1-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins" src="https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-25.2-RT-nightly_pipeline%2F"></a>
+  <a href="https://ci.eclipse.org/scout/job/scout-integration-26.1-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins tests" src="https://img.shields.io/jenkins/tests?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-25.2-RT-nightly_pipeline%2F"></a>
   <a href="https://www.npmjs.com/package/@eclipse-scout/core" target="_blank" rel="noopener noreferrer"><img alt="npm" src="https://img.shields.io/npm/dm/@eclipse-scout/core"></a>
   <a href="https://www.eclipse.org/legal/epl-2.0/" target="_blank" rel="noopener noreferrer"><img alt="NPM" src="https://img.shields.io/npm/l/@eclipse-scout/core"></a>
   <a href="https://www.npmjs.com/package/@eclipse-scout/core" target="_blank" rel="noopener noreferrer"><img alt="npm (scoped)" src="https://img.shields.io/npm/v/@eclipse-scout/core"></a>
@@ -22,7 +22,7 @@ This module contains the web runtime components running in the browser.
 
 If you are completely new and wondering what Eclipse Scout is, please visit our [website](https://eclipse.dev/scout/).
 
-To get started with Scout, follow our [Get Started Guide](https://eclipsescout.github.io/scout-docs/25.2/getstarted/getstarted.html).
+To get started with Scout, follow our [Get Started Guide](https://eclipsescout.github.io/scout-docs/26.1/getstarted/getstarted.html).
 
 ## Documentation
 
