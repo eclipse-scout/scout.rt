@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -35,8 +35,7 @@ import org.eclipse.scout.rt.api.data.code.CodeTypeRequest;
 import org.eclipse.scout.rt.api.data.code.IApiExposedCodeTypeDoProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.nls.NlsUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.rest.IRestResource;
 import org.slf4j.Logger;
@@ -128,8 +127,8 @@ public class CodeResource implements IRestResource {
     if (target == null) {
       return;
     }
-    target.withTexts(mergeTexts(from.getTexts(), target.getTexts()));
-    target.withTextsPlural(mergeTexts(from.getTextsPlural(), target.getTextsPlural()));
+    target.withTexts(NlsUtility.mergeTexts(from.getTexts(), target.getTexts()));
+    target.withTextsPlural(NlsUtility.mergeTexts(from.getTextsPlural(), target.getTextsPlural()));
     Collection<CodeDo> targetChildren = getChildCodes(target);
     from.getCodes().forEach(code -> mergeCodeTexts(code, targetChildren));
   }
@@ -145,45 +144,9 @@ public class CodeResource implements IRestResource {
     if (target == null) {
       return;
     }
-    target.withTexts(mergeTexts(from.getTexts(), target.getTexts()));
+    target.withTexts(NlsUtility.mergeTexts(from.getTexts(), target.getTexts()));
     Collection<CodeDo> targetChildren = getChildCodes(target);
     from.getChildren().forEach(code -> mergeCodeTexts(code, targetChildren));
-  }
-
-  /**
-   * Merges two text maps (languageTag to text). If there is already an entry in the target map with the same text and a
-   * languageTag that is a prefix of the entry in the from map, this entry is skipped as this text is considered to be
-   * inherited. <br>
-   * Examples:
-   * <ul>
-   * <li>merge {de_DE=groß} into {de=groß} => {de=groß}</li>
-   * <li>merge {de_CH=gross} into {de=groß} => {de=groß, de_CH=gross}</li>
-   * <li>merge {de=ok} into {en=ok} => {de=ok, en=ok}</li>
-   * </ul>
-   */
-  protected Map<String /* languageTag */, String /* text */> mergeTexts(Map<String /* languageTag */, String /* text */> fromTexts, Map<String /* languageTag */, String /* text */> targetTexts) {
-    if (CollectionUtility.isEmpty(targetTexts)) {
-      // no targetTexts -> return fromTexts
-      return fromTexts;
-    }
-
-    var result = new HashMap<>(targetTexts);
-
-    if (CollectionUtility.isEmpty(fromTexts)) {
-      // no fromTexts
-      return result;
-    }
-
-    fromTexts.entrySet()
-        .stream()
-        .filter(entry -> result.entrySet().stream()
-            // check if there is already an entry with a languageTag that is a prefix to the current one ...
-            .noneMatch(targetEntry -> StringUtility.startsWith(entry.getKey(), targetEntry.getKey())
-                // ... and the same text
-                && ObjectUtility.equals(entry.getValue(), targetEntry.getValue())))
-        .forEach(entry -> result.put(entry.getKey(), entry.getValue()));
-
-    return result;
   }
 
   protected Collection<CodeDo> getChildCodes(CodeTypeDo parent) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,11 @@
 package org.eclipse.scout.rt.platform.nls;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,6 +22,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.text.NlsKey;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 public final class NlsUtility {
 
@@ -147,6 +152,46 @@ public final class NlsUtility {
       }
       result = postProcessor.apply(textLocale, textKey, result, messageArguments);
     }
+    return result;
+  }
+
+  /**
+   * Merges all texts from {@code fromTexts} into {@code targetTexts} and returns the result as a new map. The key of each map is an
+   * IETF BCP 47 language tag string (e.g. {@code "en-US"}) and the value is a translated text (e.g. {@code "Hello World"}).
+   * <p>
+   * Language tags that have identical values to entries with shorter tags are automatically removed, as the text is considered
+   * inherited from the more general tag. Examples:
+   * <ul>
+   * <li><tt>{de_DE=groß}</tt> ∪ <tt>{de=groß}</tt> → <tt>{de=groß}</tt>
+   * <li><tt>{de_CH=gross}</tt> ∪ <tt>{de=groß}</tt> → <tt>{de=groß, de_CH=gross}</tt>
+   * <li><tt>{de=ok}</tt> ∪ <tt>{en=ok}</tt> → <tt>{de=ok, en=ok}</tt>
+   * </ul>
+   *
+   * @see Locale#toLanguageTag()
+   */
+  public static Map<String, String> mergeTexts(Map<String, String> fromTexts, Map<String, String> targetTexts) {
+    fromTexts = ObjectUtility.nvl(fromTexts, Collections.emptyMap());
+    targetTexts = ObjectUtility.nvl(targetTexts, Collections.emptyMap());
+
+    // Merge maps
+    Map<String, String> result = new HashMap<>();
+    result.putAll(targetTexts);
+    result.putAll(fromTexts);
+
+    // Remove unnecessary entries
+    result.entrySet().removeIf(entry -> {
+      String key = entry.getKey();
+      String value = entry.getValue();
+      while (key.contains("-")) {
+        key = key.substring(0, key.lastIndexOf("-"));
+        if (result.containsKey(key)) {
+          // found an existing entry with a shorter language tag -> remove longer entry if the values are the same, otherwise keep both
+          return Objects.equals(result.get(key), value);
+        }
+      }
+      return false; // keep entry
+    });
+
     return result;
   }
 }
