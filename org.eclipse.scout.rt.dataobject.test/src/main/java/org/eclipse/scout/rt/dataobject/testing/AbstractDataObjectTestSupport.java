@@ -24,8 +24,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.junit.Assert;
 
+@ApplicationScoped
 public abstract class AbstractDataObjectTestSupport {
 
   protected Path m_root;
@@ -71,6 +73,22 @@ public abstract class AbstractDataObjectTestSupport {
 
   public void setRoot(Path root) {
     m_root = root;
+  }
+
+  public Pattern getFilePattern() {
+    return m_filePattern;
+  }
+
+  public Pattern getTestFilePattern() {
+    return m_testFilePattern;
+  }
+
+  public Pattern getPackagePattern() {
+    return m_packagePattern;
+  }
+
+  public Pattern getPackageNamePrefixPattern() {
+    return m_packageNamePrefixPattern;
   }
 
   public void addPathExclusion(Path path) {
@@ -134,7 +152,7 @@ public abstract class AbstractDataObjectTestSupport {
 
   protected void collectFile(Path path, String content) {
     if (acceptFile(path, content)) {
-      Matcher matcher = m_packagePattern.matcher(content);
+      Matcher matcher = getPackagePattern().matcher(content);
       if (matcher.find()) {
         String packageName = matcher.group(1);
         m_files.put(path, packageName);
@@ -155,7 +173,7 @@ public abstract class AbstractDataObjectTestSupport {
 
   protected void collectTestFile(Path path, String content) {
     if (acceptTestFile(path, content)) {
-      Matcher matcher = m_packageNamePrefixPattern.matcher(content);
+      Matcher matcher = getPackageNamePrefixPattern().matcher(content);
       while (matcher.find()) {
         String packageNamePrefix = matcher.group(1);
         m_testFiles.computeIfAbsent(path, k -> new ArrayList<>()).add(packageNamePrefix);
