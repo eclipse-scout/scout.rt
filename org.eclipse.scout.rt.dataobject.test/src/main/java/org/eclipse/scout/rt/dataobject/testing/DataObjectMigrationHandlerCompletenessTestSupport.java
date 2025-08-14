@@ -10,9 +10,12 @@
 package org.eclipse.scout.rt.dataobject.testing;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.dataobject.migration.IDoStructureMigrationHandler;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Checks for each {@link IDoStructureMigrationHandler} if there exists a corresponding
@@ -25,7 +28,11 @@ public class DataObjectMigrationHandlerCompletenessTestSupport extends AbstractD
    */
   @Override
   protected Pattern createFilePattern() {
-    return Pattern.compile("class (?!Abstract)\\w+ (?:implements IDoStructureMigrationHandler\\s+|extends \\w*MigrationHandler\\s+|extends \\w*MigrationHandler_)");
+    return Pattern.compile("class (?!Abstract)\\w+\\s+(?:implements\\s+IDoStructureMigrationHandler\\s+|extends\\s+(?!\\w*(" + StringUtility.join("|", getExcludedParentClassSuffixes()) + "))\\w*MigrationHandler[\\s_]+)");
+  }
+
+  protected List<String> getExcludedParentClassSuffixes() {
+    return CollectionUtility.arrayList("ValueMigrationHandler");
   }
 
   /**
@@ -46,12 +53,12 @@ public class DataObjectMigrationHandlerCompletenessTestSupport extends AbstractD
 
   @Override
   protected boolean acceptFile(Path path, String content) {
-    return !path.toString().contains(Path.of("src/test").toString()) && path.getFileName().toString().contains("MigrationHandler") && m_filePattern.matcher(content).find();
+    return !path.toString().contains(Path.of("src/test").toString()) && !path.getFileName().toString().endsWith("Test.java") && path.getFileName().toString().contains("MigrationHandler") && getFilePattern().matcher(content).find();
   }
 
   @Override
   protected boolean acceptTestFile(Path path, String content) {
-    return path.getFileName().toString().endsWith("DoStructureMigrationHandlerCompletenessTest.java") && m_testFilePattern.matcher(content).find();
+    return path.getFileName().toString().endsWith("DoStructureMigrationHandlerCompletenessTest.java") && getTestFilePattern().matcher(content).find();
   }
 
   @Override

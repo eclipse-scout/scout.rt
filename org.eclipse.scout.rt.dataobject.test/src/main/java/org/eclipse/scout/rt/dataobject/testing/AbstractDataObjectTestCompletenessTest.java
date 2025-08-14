@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Test;
 
@@ -43,15 +44,15 @@ public abstract class AbstractDataObjectTestCompletenessTest {
   }
 
   protected DataObjectSignatureTestSupport createSignatureTestSupport() {
-    return new DataObjectSignatureTestSupport();
+    return BEANS.get(DataObjectSignatureTestSupport.class);
   }
 
   protected DataObjectMigrationHandlerCompletenessTestSupport createMigrationHandlerCompletenessTestSupport() {
-    return new DataObjectMigrationHandlerCompletenessTestSupport();
+    return BEANS.get(DataObjectMigrationHandlerCompletenessTestSupport.class);
   }
 
   protected IdStructureTestSupport createIdStructureTestSupport() {
-    return new IdStructureTestSupport();
+    return BEANS.get(IdStructureTestSupport.class);
   }
 
   protected List<Path> getPathExclusions() {
