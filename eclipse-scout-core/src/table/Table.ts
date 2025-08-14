@@ -3615,6 +3615,17 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       this.updateBuffer.one('complete', () => this.startCellEdit(column, row, field));
       return;
     }
+    if (this.cellEditorPopup) {
+      if (this.cellEditorPopup.cell.field === field) {
+        if (this.cellEditorPopup.rendered) {
+          // Do nothing if the editor is already open for the given field
+          return this.cellEditorPopup;
+        }
+      } else {
+        // Destroy existing editor if startCellEdit is called without completing or cancelling the existing editor first
+        this.endCellEdit(this.cellEditorPopup.cell.field);
+      }
+    }
 
     this.trigger('startCellEdit', {
       column: column,

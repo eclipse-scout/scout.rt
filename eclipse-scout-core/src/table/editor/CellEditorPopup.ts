@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Cell, CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorPopupModel, CellEditorTabKeyStroke, Column, EventHandler, events, graphics, InitModelOf, KeyStroke,
+  AbstractLayout, Cell, CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorPopupModel, CellEditorTabKeyStroke, Column, Event, EventHandler, events, graphics, InitModelOf, KeyStroke,
   KeyStrokeManagerKeyStrokeEvent, Point, Popup, Rectangle, scout, SomeRequired, Table, TableRow, TableRowOrderChangeAnimationEvent, TableRowOrderChangedEvent, ValueField, widgets
 } from '../../index';
 import $ from 'jquery';
@@ -41,6 +41,7 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
 
     this.table = options.column.table;
     this.link(this.cell.field);
+    this.on('close', this._onClose.bind(this));
   }
 
   protected override _createLayout(): AbstractLayout {
@@ -218,6 +219,12 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
   cancelEdit() {
     this.table.cancelCellEdit();
     this.remove();
+  }
+
+  protected _onClose(event: Event<Popup>) {
+    // Ensure current value is not discarded on unexpected close() calls, e.g. if another popup opens
+    event.preventDefault();
+    this.completeEdit();
   }
 
   protected override _onMouseDownOutside(event: MouseEvent) {
