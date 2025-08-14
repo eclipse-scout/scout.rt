@@ -52,12 +52,12 @@ public class IdStructureTestSupport extends AbstractDataObjectTestSupport {
 
   @Override
   protected boolean acceptFile(Path path, String content) {
-    return !path.toString().contains(Path.of("src/test").toString()) && m_filePattern.matcher(content).find();
+    return !path.toString().contains(Path.of("src/test").toString()) && !path.getFileName().toString().endsWith("Test.java") && getFilePattern().matcher(content).find();
   }
 
   @Override
   protected boolean acceptTestFile(Path path, String content) {
-    return path.getFileName().toString().endsWith("IdStructureTest.java") && m_testFilePattern.matcher(content).find();
+    return path.getFileName().toString().endsWith("IdStructureTest.java") && getTestFilePattern().matcher(content).find();
   }
 
   @Override
