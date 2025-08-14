@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Cell, CellEditorPopup, Column, FormField, keys, scout, SmartColumn, SmartField, StaticLookupCall, Status, StringField, Table, TableRow, Widget} from '../../../src/index';
+import {Cell, CellEditorPopup, Column, FormField, keys, Popup, scout, SmartColumn, SmartField, StaticLookupCall, Status, StringField, Table, TableRow, Widget} from '../../../src/index';
 import {FormSpecHelper, JQueryTesting, TableSpecHelper} from '../../../src/testing/index';
 
 describe('CellEditor', () => {
@@ -28,10 +28,7 @@ describe('CellEditor', () => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
-    let popup = findPopup();
-    if (popup) {
-      popup.close();
-    }
+    findPopup()?.destroy();
   });
 
   class DummyLookupCall extends StaticLookupCall<string> {
@@ -453,6 +450,61 @@ describe('CellEditor', () => {
 
       popup.position(); // Must not fail if popup is not rendered
     });
+
+    it('does nothing if the editor is already open for the given field', () => {
+      table.columns[0].setEditable(true);
+      let triggeredEvents = 0;
+      table.on('startCellEdit', event => {
+        triggeredEvents++;
+      });
+
+      let field = createStringField();
+      let popup = table.startCellEdit(table.columns[0], table.rows[0], field);
+      expect(popup.cell.field).toBe(field);
+      assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
+
+      let popup2 = table.startCellEdit(table.columns[0], table.rows[0], field);
+      expect(popup).toBe(popup2);
+      assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
+      expect(triggeredEvents).toBe(1);
+    });
+
+    it('ends existing cell edit if an editor is open', () => {
+      table.columns[0].setEditable(true);
+      table.insertColumn({
+        objectType: SmartColumn,
+        lookupCall: {objectType: DummyLookupCall},
+        editable: true
+      });
+      table.insertRows({cells: ['a', 'b', 'key0']});
+      let field = table.columns[2].createEditor(table.rows[0]);
+      table.startCellEdit(table.columns[2], table.rows[0], field);
+      jasmine.clock().tick(500);
+      assertCellEditorIsOpen(table, table.columns[2], table.rows[0]);
+      let popup = table.cellEditorPopup;
+      expect(popup.cell.field).toBe(field);
+      expect(field.rendered).toBe(true);
+
+      // Start cell edit on same cell again
+      let field2 = table.columns[2].createEditor(table.rows[0]);
+      table.startCellEdit(table.columns[2], table.rows[0], field2);
+      assertCellEditorIsOpen(table, table.columns[2], table.rows[0]);
+      let popup2 = table.cellEditorPopup;
+      expect(popup2.cell.field).toBe(field2);
+      expect(field2.rendered).toBe(true);
+      expect(popup.destroyed).toBe(true);
+      expect(field.destroyed).toBe(true);
+
+      // Start cell edit on another cell
+      let field3 = table.columns[0].createEditor(table.rows[0]);
+      table.startCellEdit(table.columns[0], table.rows[0], field3);
+      assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
+      let popup3 = table.cellEditorPopup;
+      expect(popup3.cell.field).toBe(field3);
+      expect(field3.rendered).toBe(true);
+      expect(popup2.destroyed).toBe(true);
+      expect(field2.destroyed).toBe(true);
+    });
   });
 
   describe('completeCellEdit', () => {
@@ -640,6 +692,17 @@ describe('CellEditor', () => {
       table.completeCellEdit();
       // CompleteCellEdit triggers updateRows which would reopen the editor -> this must not happen if the editor was closed
       expect(triggeredStartCellEditEvent).toBe(null);
+    });
+
+    it('is called when another popup opens', () => {
+      table.columns[0].setEditable(true);
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick(0);
+      table.cellEditorPopup.cell.field.setValue('my new value');
+
+      scout.create(Popup, {parent: session.desktop}).open();
+      expect(table.rows[0].cells[0].value).toBe('my new value');
+      expect(table.cellEditorPopup).toBe(null);
     });
   });
 
@@ -995,6 +1058,24 @@ describe('CellEditor', () => {
 
       expect($('.tooltip').length).toBe(0);
       expect(table.tooltips.length).toBe(0);
+    });
+  });
+
+  describe('close', () => {
+    it('calls completeCellEdit', () => {
+      let model = helper.createModelFixture(2, 2);
+      let table = helper.createTable(model);
+      table.render();
+      table.columns[0].setEditable(true);
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      spyOn(table, 'completeCellEdit');
+      jasmine.clock().tick(0);
+
+      // Editing is normally finished by calling completeCellEdit or cancelCellEdit
+      // Calling close just destroys the editor, and it will be re-opened once the table resp. the row will be re-rendered again because the table still has a reference.
+      // This is not expected -> if close is called (e.g. if another popup opens) the cell edit should be completed
+      table.cellEditorPopup.close();
+      expect(table.completeCellEdit).toHaveBeenCalled();
     });
   });
 });
