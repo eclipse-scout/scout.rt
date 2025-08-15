@@ -297,8 +297,7 @@ export class FormFieldLayout extends AbstractLayout {
         prefSizeField = htmlField.prefSize(options)
           .add(fieldMargins);
       } else {
-        prefSizeField = graphics.prefSize(formField.$fieldContainer, options)
-          .add(fieldMargins);
+        prefSizeField = this._getPrefFieldSize(formField, options, fieldMargins);
       }
     }
 
@@ -380,5 +379,10 @@ export class FormFieldLayout extends AbstractLayout {
       return HtmlEnvironment.get().fieldLabelWidth;
     }
     return this.formField.labelWidthInPixel;
+  }
+
+  protected _getPrefFieldSize(formField: FormField, options?: HtmlCompPrefSizeOptions, fieldMargins?: Insets) {
+    return graphics.prefSize(formField.$fieldContainer, options)
+        .add(fieldMargins);
   }
 }
