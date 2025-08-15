@@ -75,4 +75,10 @@ export interface StringFieldModel extends BasicFieldModel<string> {
    * Default is false.
    */
   wrapText?: boolean;
+  /**
+   * Adjust the size of the field to the height of its content
+   *
+   * Default is false
+   */
+  fitText?: boolean;
 }

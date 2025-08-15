@@ -33,6 +33,7 @@ export class StringField extends BasicField<string> implements StringFieldModel 
   trimText: boolean;
   wrapText: boolean;
   mouseClicked: boolean;
+  fitText: boolean;
   protected _selectionChangingActionHandler: (event: JQuery.TriggeredEvent) => void;
 
   constructor() {
@@ -53,6 +54,7 @@ export class StringField extends BasicField<string> implements StringFieldModel 
     this.spellCheckEnabled = false;
     this.trimText = true;
     this.wrapText = false;
+    this.fitText = false;
 
     this._selectionChangingActionHandler = this._onSelectionChangingAction.bind(this);
   }
@@ -150,6 +152,9 @@ export class StringField extends BasicField<string> implements StringFieldModel 
     if (this.inputObfuscated) {
       // Restore obfuscated display text.
       this.$field.val(this.displayText);
+    }
+    if (this.multilineText && this.fitText) {
+      this. revalidateLayoutTree();
     }
   }
 
@@ -470,6 +475,9 @@ export class StringField extends BasicField<string> implements StringFieldModel 
     } else if (event.type === 'keydown') {
       // Use set timeout to let the cursor move to the target position
       setTimeout(this._updateSelection.bind(this));
+      if (this.multilineText && this.fitText) {
+        this. revalidateLayoutTree();
+      }
     } else {
       this._updateSelection();
     }
