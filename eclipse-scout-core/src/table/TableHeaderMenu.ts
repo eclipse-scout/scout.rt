@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, aria, arrays, Cell, Column, ColumnUserFilter, ColumnUserFilterValues, Device, EnumObject, Event, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, InitModelOf, ListBoxTableAccessibilityRenderer, NumberColumn,
-  NumberColumnAggregationFunction, NumberField, Point, Popup, RowLayout, scout, scrollbars, SomeRequired, Table, TableHeader, TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuGroupItem,
-  TableHeaderMenuLayout, TableHeaderMenuModel, TableRow, TableRowModel, TableRowsCheckedEvent, ValueField
+  AbstractLayout, aria, arrays, Cell, Column, ColumnUserFilter, ColumnUserFilterValues, Device, EnumObject, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, InitModelOf, ListBoxTableAccessibilityRenderer, NumberColumn,
+  NumberColumnAggregationFunction, NumberField, Popup, RowLayout, scout, SomeRequired, Table, TableHeader, TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuGroupItem, TableHeaderMenuLayout,
+  TableHeaderMenuModel, TableRow, TableRowModel, TableRowsCheckedEvent, ValueField
 } from '../index';
 
 export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
@@ -127,7 +127,6 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
 
     this._onColumnMovedHandler = this._onColumnMoved.bind(this);
     this._tableHeaderScrollHandler = this._onAnchorScroll.bind(this);
-    this.on('locationChange', this._onLocationChange.bind(this));
 
     // Make sure the actions are not disabled even if the table is disabled
     // To disable the menu use headerEnabled or headerMenusEnabled
@@ -969,24 +968,16 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     this.setProperty('compact', compact);
   }
 
-  protected _onLocationChange(event: Event<Popup>) {
-    let headerItemBounds = graphics.offsetBounds(this.$headerItem),
-      $tableHeaderContainer = this.tableHeader.$container;
+  protected override _position(switchIfNecessary?: boolean) {
+    let headerItemBounds = graphics.offsetBounds(this.$headerItem);
+    let containerBounds = graphics.offsetBounds(this.tableHeader.$container);
 
-    this.$container.setVisible(true);
-    let containerBounds = graphics.offsetBounds(this.$container);
-
-    // menu must only be visible if the header item is in view (menu gets repositioned when the table gets scrolled -> make sure it won't be displayed outside of the table)
-    // check left side of the header item (necessary if header item is moved outside on the left side of the table)
-    let inView = scrollbars.isLocationInView(new Point(headerItemBounds.x, headerItemBounds.y), $tableHeaderContainer);
-    if (!inView) {
-      // if left side of the header is not in view, check if right side of the header and the menu, both must be visible)
-      // check right side of the header item (necessary if header item is moved outside on the right side of the table)
-      inView = scrollbars.isLocationInView(new Point(headerItemBounds.x + headerItemBounds.width, headerItemBounds.y + headerItemBounds.height), $tableHeaderContainer);
-      // check right side of the menu (necessary if header item is larger than menu, and if header item is moved outside on the left side of the table)
-      inView = inView && scrollbars.isLocationInView(new Point(containerBounds.x + containerBounds.width, containerBounds.y), $tableHeaderContainer);
-    }
+    // Hide menu when the header item is not in view (menu gets repositioned when the table gets scrolled).
+    // This cannot be done in _isAnchorInView() because the TableHeaderLayout would mark the menu as 'compact' when scrolling outside the right side of the table.
+    let inView = headerItemBounds.x < containerBounds.right() && headerItemBounds.right() > containerBounds.x;
     this.$container.setVisible(inView);
+
+    super._position(switchIfNecessary);
   }
 
   protected override _onAnchorScroll(event: JQuery.ScrollEvent) {
