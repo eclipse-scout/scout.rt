@@ -246,8 +246,8 @@ export class FocusContext {
   /**
    * Calls {@link #validateAndSetFocus} with {@link #lastValidFocusedElement}.
    */
-  validateFocus(filter?: () => boolean) {
-    this.validateAndSetFocus(this.lastValidFocusedElement, filter);
+  validateFocus(filter?: () => boolean, options?: FocusContextFocusOptions) {
+    this.validateAndSetFocus(this.lastValidFocusedElement, filter, options);
   }
 
   /**
