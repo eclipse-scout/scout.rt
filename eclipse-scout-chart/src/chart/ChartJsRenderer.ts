@@ -2501,17 +2501,13 @@ export class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   protected _adjustSize(config: ChartConfig, chartArea: ChartArea, options?: ChartJsRendererAdjustSizeOptions) {
-    this._adjustBubbleSizes(config, chartArea, options);
-    // chartJs sets the chartArea depending on the Bubble Sizes and subtracts the max radius from the height / width.
-    // this results in a different grid layout, and we need to refresh before the next calculations.
-    this.refresh();
-    // adjust max and min with the refreshed chartArea
-    this._adjustGridMaxMin(config, this.chartJs.chartArea, options);
+    chartArea = this._adjustBubbleSizes(config, chartArea, options);
+    this._adjustGridMaxMin(config, chartArea, options);
   }
 
-  protected _adjustBubbleSizes(config: ChartConfig, chartArea: ChartArea, options?: ChartJsRendererAdjustSizeOptions) {
+  protected _adjustBubbleSizes(config: ChartConfig, chartArea: ChartArea, options?: ChartJsRendererAdjustSizeOptions): ChartArea {
     if (config.type !== Chart.Type.BUBBLE) {
-      return;
+      return chartArea;
     }
 
     let datasets = config.data.datasets;
@@ -2574,6 +2570,15 @@ export class ChartJsRenderer extends AbstractChartRenderer {
         data.r = data.r * bubbleScalingFactor + bubbleRadiusOffset;
       }
     }));
+
+    if (!this.chartJs) {
+      return chartArea;
+    }
+
+    // chartJs sets the chartArea depending on the bubble sizes and subtracts the max radius from the height / width.
+    // this results in a different grid layout, and we need to refresh before the next calculations.
+    this.refresh();
+    return this.chartJs.chartArea;
   }
 
   protected _computeMaxMinValue(config: ChartConfig, datasets: ChartDataset[], options?: ChartJsRendererComputeMaxMinValueOptions): Boundary {
