@@ -26,8 +26,8 @@ describe('ChartJsRendererSpec', () => {
       super._adjustGridMaxMin(config, chartArea);
     }
 
-    override _adjustBubbleSizes(config: ChartConfig, chartArea: ChartArea) {
-      super._adjustBubbleSizes(config, chartArea);
+    override _adjustBubbleSizes(config: ChartConfig, chartArea: ChartArea): ChartArea {
+      return super._adjustBubbleSizes(config, chartArea);
     }
   }
 
