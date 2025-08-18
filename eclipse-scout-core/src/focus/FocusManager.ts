@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Device, DisplayParent, filters, FocusContext, FocusRule, focusUtils, GlassPaneRenderer, scout, Session} from '../index';
+import {arrays, Device, DisplayParent, filters, FocusContext, FocusContextFocusOptions, FocusRule, focusUtils, GlassPaneRenderer, scout, Session} from '../index';
 import $ from 'jquery';
 
 export interface FocusManagerOptions {
@@ -197,7 +197,7 @@ export class FocusManager implements FocusManagerOptions {
       return;
     }
     this._pushIfAbsentElseMoveTop(focusContext);
-    this.validateFocus();
+    this.validateFocus(null, {preventScroll: true});
   }
 
   /**
@@ -268,11 +268,12 @@ export class FocusManager implements FocusManagerOptions {
    * Enforces proper focus on the currently active focus context.
    *
    * @param filter Filter to exclude elements to gain focus.
+   * @param options options to customize the focus
    */
-  validateFocus(filter?: () => boolean) {
+  validateFocus(filter?: () => boolean, options?: FocusContextFocusOptions) {
     let activeContext = this._findActiveContext();
     if (activeContext) {
-      activeContext.validateFocus(filter);
+      activeContext.validateFocus(filter, options);
     }
   }
 
