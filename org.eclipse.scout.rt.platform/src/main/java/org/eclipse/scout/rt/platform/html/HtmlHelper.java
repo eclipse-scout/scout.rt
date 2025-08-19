@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -271,5 +272,145 @@ public class HtmlHelper {
       result.append(c);
     }
     return result.toString();
+  }
+
+  /**
+   * Truncates the text content of the given html using {@link #truncate(String, Integer, boolean)} without adding an ellipsis.
+   */
+  public String truncate(String html, Integer maxLength) {
+    return truncate(html, maxLength, false);
+  }
+
+  /**
+   * Truncates the text content of the given html without removing the html tags surrounding the remaining text.
+   * The html tags that follow the remaining text and don't close a tag opened before the text may be removed.
+   *
+   * @param html
+   *     the html content to truncate
+   * @param maxLength
+   *     the maximum length the truncated text will have
+   * @param addEllipsis
+   *     true to add an ellipsis character at the position where the text was truncated
+   */
+  public String truncate(String html, Integer maxLength, boolean addEllipsis) {
+    if (StringUtility.isNullOrEmpty(html)) {
+      return html;
+    }
+    if (maxLength <= 0) {
+      return addEllipsis ? "…" : "";
+    }
+    int size = html.length();
+    if (size <= maxLength) {
+      // Content fits completely with all tags, just return it as it is
+      return html;
+    }
+
+    boolean inTag = false;
+    boolean inEntity = false;
+    boolean inAttr = false;
+    boolean inComment = false;
+    char attrChar = '"';
+    int numOpenTags = 0;
+    int numTextChars = 0;
+    int ellipsisPos = -1;
+    StringBuilder result = new StringBuilder();
+    for (int i = 0; i < size; i++) {
+      char character = html.charAt(i);
+      if (numTextChars >= maxLength && !inTag && !inEntity && numOpenTags == 0) {
+        insertEllipsis(result, ellipsisPos);
+        // Abort if max length is reached but not in the middle of a tag or entity and only if all open tags are closed
+        break;
+      }
+      char prevChar = i > 1 ? html.charAt(i - 1) : '\0';
+      char nextChar = i < size - 1 ? html.charAt(i + 1) : '\0';
+      if (!inComment && character == '<' && i + 4 < size && "<!--".equals(html.substring(i, i + 4))) {
+        // Comment found <!--
+        inComment = true;
+        result.append(character);
+        continue;
+      }
+      if (inComment && i - 2 >= 0 && "-->".equals(html.substring(i - 2, i + 1))) {
+        // Closing comment found -->
+        inComment = false;
+        result.append(character);
+        continue;
+      }
+      if (!inComment && !inTag && character == '<') {
+        inTag = true;
+        if (nextChar == '/') {
+          // Closing tag found, e.g. </div>
+          numOpenTags = Math.max(numOpenTags - 1, 0);
+        }
+        else {
+          // Opening tag found e.g. <div>
+          numOpenTags++;
+        }
+        result.append(character);
+        continue;
+      }
+      if (inTag && !inAttr && character == '>') {
+        inTag = false;
+        if (prevChar == '/') {
+          // Self-closing tag found, e.g. <br/>
+          numOpenTags = Math.max(numOpenTags - 1, 0);
+        }
+        result.append(character);
+        continue;
+      }
+      if (inTag && !inAttr && ObjectUtility.isOneOf(character, '"', '\'')) {
+        // Attribute found with " or '
+        inAttr = true;
+        attrChar = character;
+        result.append(character);
+        continue;
+      }
+      if (inAttr && character == attrChar) {
+        // Closing attribute found
+        inAttr = false;
+        result.append(character);
+        continue;
+      }
+      if (!inComment && !inEntity && !inAttr && character == '&') {
+        // HTML entity (character reference) found, e.g. &gt;
+        inEntity = true;
+        result.append(character);
+        continue;
+      }
+      if (inEntity && character == ';') {
+        // Closing HTML entity found -> counts as one character
+        inEntity = false;
+        numTextChars++;
+        result.append(character);
+        ellipsisPos = updateEllipsisPos(result, maxLength, addEllipsis, ellipsisPos, numTextChars);
+        continue;
+      }
+      if (inTag || inEntity || inComment) {
+        result.append(character);
+        continue;
+      }
+      numTextChars++;
+      if (numTextChars <= maxLength) {
+        result.append(character);
+        ellipsisPos = updateEllipsisPos(result, maxLength, addEllipsis, ellipsisPos, numTextChars);
+      }
+      else {
+        insertEllipsis(result, ellipsisPos);
+        ellipsisPos = -1;
+      }
+    }
+    return result.toString();
+  }
+
+  protected int updateEllipsisPos(StringBuilder result, int maxLength, boolean addEllipsis, int ellipsisPos, int numChars) {
+    if (addEllipsis && numChars == maxLength) {
+      ellipsisPos = result.length();
+    }
+    return ellipsisPos;
+  }
+
+  protected void insertEllipsis(StringBuilder text, int position) {
+    if (position > -1) {
+      text.insert(position, '…');
+    }
   }
 }
