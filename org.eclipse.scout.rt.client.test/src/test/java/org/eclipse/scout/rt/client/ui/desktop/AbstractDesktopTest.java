@@ -113,6 +113,26 @@ public class AbstractDesktopTest {
   }
 
   @Test
+  public void testReady() {
+    AbstractDesktop d = new AbstractDesktop(){};
+    d.init();
+    d.getUIFacade().openFromUI();
+    assertFalse(d.isReady());
+    d.getUIFacade().fireGuiAttached(); // first attach
+    assertFalse(d.isReady());
+    d.getUIFacade().readyFromUI(); // simulate Browser ready
+    assertTrue(d.isReady());
+    d.getUIFacade().fireGuiAttached(); // second attach
+    assertTrue(d.isReady());
+    d.getUIFacade().fireGuiDetached(); // second detach
+    assertTrue(d.isReady()); // must still be ready as there is one gui still attached (even though the first has already detached).
+    d.getUIFacade().fireGuiDetached(); // last gui has detached
+    assertFalse(d.isReady());
+    d.dispose();
+    assertFalse(d.isReady());
+  }
+
+  @Test
   public void testDisplayStyle() {
     IDesktop desktop;
 
@@ -357,8 +377,8 @@ public class AbstractDesktopTest {
       f.start();
 
       // the openForms listBox should only have one (checked) entry for the top form (form_1)
-      assertEquals(f.getOpenFormsField().getValue().size(), 1);
-      assertEquals(f.getOpenFormsField().getCheckedKeyCount(), 1);
+      assertEquals(1, f.getOpenFormsField().getValue().size());
+      assertEquals(1, f.getOpenFormsField().getCheckedKeyCount());
       // the value of that single entry should be all the forms in the displayParent hierarchy with unsaved changes
       assertTrue(CollectionUtility.firstElement(f.getOpenFormsField().getValue()).containsAll(CollectionUtility.hashSet(form_1, form_1_1, form_1_1_1)));
     }
