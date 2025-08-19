@@ -2287,10 +2287,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   private void detachGui() {
-    setReadyInternal(false);
     setAttachedGuiCount(m_attachedGuiCount - 1);
     if (m_attachedGuiCount == 0) {
-      //this is the last call to detachGui, call extensions
+      setReadyInternal(false);
+
+      // this is the last call to detachGui, call extensions
       for (IDesktopExtension ext : getDesktopExtensions()) {
         try {
           ContributionCommand cc = ext.guiDetachedDelegate();
