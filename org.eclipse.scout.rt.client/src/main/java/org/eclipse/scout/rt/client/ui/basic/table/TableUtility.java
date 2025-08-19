@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 public final class TableUtility {
   private static final Logger LOG = LoggerFactory.getLogger(TableUtility.class);
+  private static HtmlHelper s_htmlHelper;
 
   private TableUtility() {
   }
@@ -189,7 +190,6 @@ public final class TableUtility {
    * </ul>
    */
   public static Object[][] exportRowsAsCSV(List<? extends ITableRow> rows, List<? extends IColumn> columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormats) {
-    final HtmlHelper htmlHelper = BEANS.get(HtmlHelper.class);
     int nr = rows.size();
     Object[][] a = new Object[nr + (includeLineForColumnNames ? 1 : 0) + (includeLineForColumnTypes ? 1 : 0) + (includeLineForColumnFormats ? 1 : 0)][columns.size()];
     for (int c = 0; c < columns.size(); c++) {
@@ -243,7 +243,7 @@ public final class TableUtility {
       int csvRowIndex = 0;
       if (includeLineForColumnNames) {
         IHeaderCell headerCell = columns.get(c).getHeaderCell();
-        a[csvRowIndex][c] = headerCell.isHtmlEnabled() ? htmlHelper.toPlainText(headerCell.getText()) : headerCell.getText();
+        a[csvRowIndex][c] = headerCell.isHtmlEnabled() ? getHtmlHelper().toPlainText(headerCell.getText()) : headerCell.getText();
         csvRowIndex++;
       }
       if (includeLineForColumnTypes) {
@@ -275,7 +275,7 @@ public final class TableUtility {
           }
           //special intercept for html
           if (type == String.class && text != null && columns.get(c).isHtmlEnabled()) {
-            text = htmlHelper.toPlainText(text);
+            text = getHtmlHelper().toPlainText(text);
           }
           a[csvRowIndex][c] = text;
         }
@@ -283,6 +283,16 @@ public final class TableUtility {
       }
     }
     return a;
+  }
+
+  /**
+   * @return a cached {@link HtmlHelper} that can be used inside loops to avoid many `BEANS.get` calls.
+   */
+  public static HtmlHelper getHtmlHelper() {
+    if (s_htmlHelper == null) {
+      s_htmlHelper = BEANS.get(HtmlHelper.class);
+    }
+    return s_htmlHelper;
   }
 
   @FunctionalInterface

@@ -272,4 +272,241 @@ public class HtmlHelperTest {
     assertEquals("\u0027\u0027\u0027", helper.toPlainText("&#39;&#x27;&apos;"));
     assertEquals("hi", helper.toPlainText("&#x68;&#x69;"));
   }
+
+  @Test
+  public void testTruncate() {
+    HtmlHelper helper = BEANS.get(HtmlHelper.class);
+
+    // Without tags
+    assertEquals("12345", helper.truncate("12345", 6));
+    assertEquals("12345", helper.truncate("12345", 5));
+    assertEquals("1234", helper.truncate("12345", 4));
+    assertEquals("1", helper.truncate("12345", 1));
+    assertEquals("", helper.truncate("12345", 0));
+
+    // Surrounding tags
+    assertEquals("<div>12345</div>", helper.truncate("<div>12345</div>", 100));
+    assertEquals("<div>12345</div>", helper.truncate("<div>12345</div>", 6));
+    assertEquals("<div>12345</div>", helper.truncate("<div>12345</div>", 5));
+    assertEquals("<div>1234</div>", helper.truncate("<div>12345</div>", 4));
+    assertEquals("<div>1</div>", helper.truncate("<div>12345</div>", 1));
+    assertEquals("", helper.truncate("<div>12345</div>", 0));
+
+    // Inline tags
+    assertEquals("1<bold>2</bold>345", helper.truncate("1<bold>2</bold>345", 6));
+    assertEquals("1<bold>2</bold>345", helper.truncate("1<bold>2</bold>345", 5));
+    assertEquals("1<bold>2</bold>34", helper.truncate("1<bold>2</bold>345", 4));
+    assertEquals("1<bold>2</bold>", helper.truncate("1<bold>2</bold>345", 2));
+    assertEquals("1", helper.truncate("1<bold>2</bold>345", 1));
+    assertEquals("", helper.truncate("1<bold>2</bold>345", 0));
+
+    // Surrounding and inline tags
+    assertEquals("<div>1<bold>2</bold><span style=\"color: blue;\">345</span></div>", helper.truncate("<div>1<bold>2</bold><span style=\"color: blue;\">345</span></div>", 6));
+    assertEquals("<div>1<bold>2</bold><span style=\"color: blue;\">345</span></div>", helper.truncate("<div>1<bold>2</bold><span style=\"color: blue;\">345</span></div>", 5));
+    assertEquals("<div>1<bold>2</bold><span style=\"color: blue;\">34</span></div>", helper.truncate("<div>1<bold>2</bold><span style=\"color: blue;\">345</span></div>", 4));
+    assertEquals("<div>1<bold>2</bold><span style=\"color: blue;\"></span></div>", helper.truncate("<div>1<bold>2</bold><span style=\"color: blue;\">345</span></div>", 2));
+    assertEquals("<div>1<bold></bold><span style=\"color: blue;\"></span></div>", helper.truncate("<div>1<bold>2</bold><span style=\"color: blue;\">345</span></div>", 1));
+    assertEquals("", helper.truncate("<div>1<bold>2</bold><span style=\"color: blue;\">345</span></div>", 0));
+
+    // Tags in attributes
+    assertEquals("1<a title=\"<div>asdf\">234</a>5", helper.truncate("1<a title=\"<div>asdf\">234</a>5", 6));
+    assertEquals("1<a title=\"<div>asdf\">234</a>5", helper.truncate("1<a title=\"<div>asdf\">234</a>5", 5));
+    assertEquals("1<a title=\"<div>asdf\">234</a>", helper.truncate("1<a title=\"<div>asdf\">234</a>5", 4));
+    assertEquals("1<a title=\"<div>asdf\">2</a>", helper.truncate("1<a title=\"<div>asdf\">234</a>5", 2));
+    assertEquals("1", helper.truncate("1<a title=\"<div>asdf\">234</a>5", 1));
+    assertEquals("", helper.truncate("1<a title=\"<div>asdf\">234</a>5", 0));
+    assertEquals("1<a title=\"</div>asdf\">234</a>", helper.truncate("1<a title=\"</div>asdf\">234</a>5", 4)); // CLosing tag in attribute
+
+    // Void tags
+    assertEquals("1<br>2<img src=\"http://asdf.com\">345", helper.truncate("1<br>2<img src=\"http://asdf.com\">345", 6));
+    assertEquals("1<br>2<img src=\"http://asdf.com\">345", helper.truncate("1<br>2<img src=\"http://asdf.com\">345", 5));
+    assertEquals("1<br>2<img src=\"http://asdf.com\">34", helper.truncate("1<br>2<img src=\"http://asdf.com\">345", 4));
+    // The result 1<br>2 would be even better but this would require a detection for void tags which just makes the implementation more complex with little benefit
+    assertEquals("1<br>2<img src=\"http://asdf.com\">", helper.truncate("1<br>2<img src=\"http://asdf.com\">345", 2));
+    assertEquals("1", helper.truncate("1<br>2<img src=\"http://asdf.com\">345", 1));
+    assertEquals("", helper.truncate("1<br>2<img src=\"http://asdf.com\">345", 0));
+
+    // Void tags with surrounding tags
+    assertEquals("<div>1<br>234</div>", helper.truncate("<div>1<br>2345</div>", 4));
+    assertEquals("<div>1<br></div>", helper.truncate("<div>1<br>2345</div>", 1));
+    assertEquals("<div>1<img src=\"http://asdf.com\">234</div>", helper.truncate("<div>1<img src=\"http://asdf.com\">2345</div>", 4));
+    assertEquals("<div>1<img src=\"http://asdf.com\"></div>", helper.truncate("<div>1<img src=\"http://asdf.com\">2345</div>", 1));
+    assertEquals("<div>1<img src=\"blob:abc\">234</div>", helper.truncate("<div>1<img src=\"blob:abc\">2345</div>", 4));
+    assertEquals("<div>1<img src=\"blob:abc\"></div>", helper.truncate("<div>1<img src=\"blob:abc\">2345</div>", 1));
+
+    // Self-closing tags
+    assertEquals("1<br/>2<img src=\"http://asdf.com\" />345", helper.truncate("1<br/>2<img src=\"http://asdf.com\" />345", 6));
+    assertEquals("1<br/>2<img src=\"http://asdf.com\" />345", helper.truncate("1<br/>2<img src=\"http://asdf.com\" />345", 5));
+    assertEquals("1<br/>2<img src=\"http://asdf.com\" />34", helper.truncate("1<br/>2<img src=\"http://asdf.com\" />345", 4));
+    assertEquals("1<br/>2", helper.truncate("1<br/>2<img src=\"http://asdf.com\" />345", 2));
+    assertEquals("1", helper.truncate("1<br/>2<img src=\"http://asdf.com\" />345", 1));
+    assertEquals("", helper.truncate("1<br/>2<img src=\"http://asdf.com\" />345", 0));
+
+    // Self-closing tags with surrounding tags
+    assertEquals("<div>1<br/>234</div>", helper.truncate("<div>1<br/>2345</div>", 4));
+    assertEquals("<div>1<br/></div>", helper.truncate("<div>1<br/>2345</div>", 1));
+    assertEquals("<div>1<img src=\"http://asdf.com\"/>234</div>", helper.truncate("<div>1<img src=\"http://asdf.com\"/>2345</div>", 4));
+    assertEquals("<div>1<img src=\"http://asdf.com\"/></div>", helper.truncate("<div>1<img src=\"http://asdf.com\"/>2345</div>", 1));
+    assertEquals("<div>1<img src=\"blob:abc\"/>234</div>", helper.truncate("<div>1<img src=\"blob:abc\"/>2345</div>", 4));
+    assertEquals("<div>1<img src=\"blob:abc\"/></div>", helper.truncate("<div>1<img src=\"blob:abc\"/>2345</div>", 1));
+
+    // Character references (html entities)
+    assertEquals("1&gt;345&#60;78&#x3C;", helper.truncate("1&gt;345&#60;78&#x3C;", 10));
+    assertEquals("1&gt;345&#60;78&#x3C;", helper.truncate("1&gt;345&#60;78&#x3C;", 9));
+    assertEquals("1&gt;345&#60;78", helper.truncate("1&gt;345&#60;78&#x3C;", 8));
+    assertEquals("1&gt;3", helper.truncate("1&gt;345&#60;78&#x3C;", 3));
+    assertEquals("1&gt;", helper.truncate("1&gt;345&#60;78&#x3C;", 2));
+    assertEquals("1", helper.truncate("1&gt;345&#60;78&#x3C;", 1));
+    assertEquals("", helper.truncate("1&gt;345&#60;78&#x3C;", 0));
+
+    // Character references in attributes
+    assertEquals("1<a title=\"&gt;abc\">234</a>5", helper.truncate("1<a title=\"&gt;abc\">234</a>5", 5));
+    assertEquals("1<a title=\"&gt;abc\">234</a>", helper.truncate("1<a title=\"&gt;abc\">234</a>5", 4));
+    assertEquals("1<a title=\"&gt;abc\">2</a>", helper.truncate("1<a title=\"&gt;abc\">234</a>5", 2));
+    assertEquals("1", helper.truncate("1<a title=\"&gt;abc\">234</a>5", 1));
+    assertEquals("", helper.truncate("1<a title=\"&gt;abc\">234</a>5", 0));
+
+    // Attributes with " or ' and escaped
+    assertEquals("1<a title=\"&gt;abc&quot;hi&quot;\">234</a>", helper.truncate("1<a title=\"&gt;abc&quot;hi&quot;\">234</a>5", 4));
+    assertEquals("1<a title='&gt;abc&quot;hi&quot;'>234</a>", helper.truncate("1<a title='&gt;abc&quot;hi&quot;'>234</a>5", 4));
+    assertEquals("1<a title='&gt;abc&apos;hi&apos;'>234</a>", helper.truncate("1<a title='&gt;abc&apos;hi&apos;'>234</a>5", 4));
+
+    // Comments
+    assertEquals("<div>12<!-- comment -->345</div>", helper.truncate("<div>12<!-- comment -->345</div>", 6));
+    assertEquals("<div>12<!-- comment -->345</div>", helper.truncate("<div>12<!-- comment -->345</div>", 5));
+    assertEquals("<div>12<!-- comment -->3</div>", helper.truncate("<div>12<!-- comment -->345</div>", 3));
+    assertEquals("<div>1<!-- comment --></div>", helper.truncate("<div>12<!-- comment -->345</div>", 1));
+    assertEquals("", helper.truncate("<div>12<!-- comment -->345</div>", 0));
+    assertEquals("1", helper.truncate("12<!-- comment -->", 1));
+    assertEquals("<div>12<!-- <comment> -->34</div>", helper.truncate("<div>12<!-- <comment> -->345</div>", 4));
+    assertEquals("<div>12<!-- <comment> --></div>", helper.truncate("<div>12<!-- <comment> -->345</div>", 2));
+
+    // Invalid html
+    assertEquals("<div>1<div>2</div></div>345", helper.truncate("<div>1<div>2</div></div>345</div>", 5));
+    assertEquals("<div>1<div>2</div></div>", helper.truncate("<div>1<div>2</div></div>345</div>", 2));
+    assertEquals("1</div>2<bold>345</bold>", helper.truncate("1</div>2<bold>345</bold>", 5));
+    assertEquals("1</div>2<bold>34</bold>", helper.truncate("1</div>2<bold>345</bold>", 4));
+    assertEquals("1</div>2", helper.truncate("1</div>2<bold>345</bold>", 2));
+    // Everything after & counts as one until ;. Browsers may be more lenient and still render &gt without ; or render &asdf as it is. We simplify ignore these cases as we cannot assume what the browser will do.
+    assertEquals("1&gt345&#60;78", helper.truncate("1&gt345&#60;78&#x3C;", 4));
+    assertEquals("<!-- 123", helper.truncate("<!-- 123", 2));
+
+    // Corner cases
+    assertEquals(null, helper.truncate(null, 6));
+    assertEquals("", helper.truncate("12345", -1));
+  }
+
+  @Test
+  public void truncateWithEllipsis() {
+    HtmlHelper helper = BEANS.get(HtmlHelper.class);
+
+    // Without tags
+    assertEquals("12345", helper.truncate("12345", 5, true));
+    assertEquals("1234…", helper.truncate("12345", 4, true));
+    assertEquals("1…", helper.truncate("12345", 1, true));
+    assertEquals("…", helper.truncate("12345", 0, true));
+
+    // Surrounding tags
+    assertEquals("<div>12345</div>", helper.truncate("<div>12345</div>", 5, true));
+    assertEquals("<div>1234…</div>", helper.truncate("<div>12345</div>", 4, true));
+    assertEquals("<div>1…</div>", helper.truncate("<div>12345</div>", 1, true));
+    assertEquals("…", helper.truncate("<div>12345</div>", 0, true));
+
+    // Inline tags
+    assertEquals("1<bold>2</bold>345", helper.truncate("1<bold>2</bold>345", 5, true));
+    assertEquals("1<bold>2</bold>34…", helper.truncate("1<bold>2</bold>345", 4, true));
+    assertEquals("1<bold>2…</bold>", helper.truncate("1<bold>2</bold>345", 2, true));
+    assertEquals("1…", helper.truncate("1<bold>2</bold>345", 1, true));
+    assertEquals("…", helper.truncate("1<bold>2</bold>345", 0, true));
+
+    // Surrounding and inline tags
+    assertEquals("<div>1<bold>2</bold><span style=\"color: blue;\">345</span></div>", helper.truncate("<div>1<bold>2</bold><span style=\"color: blue;\">345</span></div>", 5, true));
+    assertEquals("<div>1<bold>2</bold><span style=\"color: blue;\">34…</span></div>", helper.truncate("<div>1<bold>2</bold><span style=\"color: blue;\">345</span></div>", 4, true));
+    assertEquals("<div>1<bold>2…</bold><span style=\"color: blue;\"></span></div>", helper.truncate("<div>1<bold>2</bold><span style=\"color: blue;\">345</span></div>", 2, true));
+    assertEquals("<div>1…<bold></bold><span style=\"color: blue;\"></span></div>", helper.truncate("<div>1<bold>2</bold><span style=\"color: blue;\">345</span></div>", 1, true));
+    assertEquals("…", helper.truncate("<div>1<bold>2</bold><span style=\"color: blue;\">345</span></div>", 0, true));
+
+    // Tags in attributes
+    assertEquals("1<a title=\"<div>asdf\">234</a>5", helper.truncate("1<a title=\"<div>asdf\">234</a>5", 5, true));
+    assertEquals("1<a title=\"<div>asdf\">234…</a>", helper.truncate("1<a title=\"<div>asdf\">234</a>5", 4, true));
+    assertEquals("1<a title=\"<div>asdf\">2…</a>", helper.truncate("1<a title=\"<div>asdf\">234</a>5", 2, true));
+    assertEquals("1…", helper.truncate("1<a title=\"<div>asdf\">234</a>5", 1, true));
+    assertEquals("…", helper.truncate("1<a title=\"<div>asdf\">234</a>5", 0, true));
+    assertEquals("1<a title=\"</div>asdf\">234…</a>", helper.truncate("1<a title=\"</div>asdf\">234</a>5", 4, true)); // CLosing tag in attribute
+
+    // Void tags
+    assertEquals("1<br>2<img src=\"http://asdf.com\">345", helper.truncate("1<br>2<img src=\"http://asdf.com\">345", 5, true));
+    assertEquals("1<br>2<img src=\"http://asdf.com\">34…", helper.truncate("1<br>2<img src=\"http://asdf.com\">345", 4, true));
+    // The result 1<br>2 would be even better but this would require a detection for void tags which just makes the implementation more complex with little benefit
+    assertEquals("1<br>2…<img src=\"http://asdf.com\">", helper.truncate("1<br>2<img src=\"http://asdf.com\">345", 2, true));
+    assertEquals("1…", helper.truncate("1<br>2<img src=\"http://asdf.com\">345", 1, true));
+    assertEquals("…", helper.truncate("1<br>2<img src=\"http://asdf.com\">345", 0, true));
+
+    // Void tags with surrounding tags
+    assertEquals("<div>1…<br></div>", helper.truncate("<div>1<br>2345</div>", 1, true));
+    assertEquals("<div>1<img src=\"http://asdf.com\">234…</div>", helper.truncate("<div>1<img src=\"http://asdf.com\">2345</div>", 4, true));
+    assertEquals("<div>1…<img src=\"http://asdf.com\"></div>", helper.truncate("<div>1<img src=\"http://asdf.com\">2345</div>", 1, true));
+    assertEquals("<div>1<img src=\"blob:abc\">234…</div>", helper.truncate("<div>1<img src=\"blob:abc\">2345</div>", 4, true));
+    assertEquals("<div>1…<img src=\"blob:abc\"></div>", helper.truncate("<div>1<img src=\"blob:abc\">2345</div>", 1, true));
+
+    // Self-closing tags
+    assertEquals("1<br/>2<img src=\"http://asdf.com\" />345", helper.truncate("1<br/>2<img src=\"http://asdf.com\" />345", 5, true));
+    assertEquals("1<br/>2<img src=\"http://asdf.com\" />34…", helper.truncate("1<br/>2<img src=\"http://asdf.com\" />345", 4, true));
+    assertEquals("1<br/>2…", helper.truncate("1<br/>2<img src=\"http://asdf.com\" />345", 2, true));
+    assertEquals("1…", helper.truncate("1<br/>2<img src=\"http://asdf.com\" />345", 1, true));
+    assertEquals("…", helper.truncate("1<br/>2<img src=\"http://asdf.com\" />345", 0, true));
+
+    // Self-closing tags with surrounding tags
+    assertEquals("<div>1<br/>234…</div>", helper.truncate("<div>1<br/>2345</div>", 4, true));
+    assertEquals("<div>1…<br/></div>", helper.truncate("<div>1<br/>2345</div>", 1, true));
+    assertEquals("<div>1<img src=\"http://asdf.com\"/>234…</div>", helper.truncate("<div>1<img src=\"http://asdf.com\"/>2345</div>", 4, true));
+    assertEquals("<div>1…<img src=\"http://asdf.com\"/></div>", helper.truncate("<div>1<img src=\"http://asdf.com\"/>2345</div>", 1, true));
+    assertEquals("<div>1<img src=\"blob:abc\"/>234…</div>", helper.truncate("<div>1<img src=\"blob:abc\"/>2345</div>", 4, true));
+    assertEquals("<div>1…<img src=\"blob:abc\"/></div>", helper.truncate("<div>1<img src=\"blob:abc\"/>2345</div>", 1, true));
+
+    // Character references (html entities)
+    assertEquals("1&gt;345&#60;78&#x3C;", helper.truncate("1&gt;345&#60;78&#x3C;", 9, true));
+    assertEquals("1&gt;345&#60;78…", helper.truncate("1&gt;345&#60;78&#x3C;", 8, true));
+    assertEquals("1&gt;3…", helper.truncate("1&gt;345&#60;78&#x3C;", 3, true));
+    assertEquals("1&gt;…", helper.truncate("1&gt;345&#60;78&#x3C;", 2, true));
+    assertEquals("1…", helper.truncate("1&gt;345&#60;78&#x3C;", 1, true));
+    assertEquals("…", helper.truncate("1&gt;345&#60;78&#x3C;", 0, true));
+
+    // Character references in attributes
+    assertEquals("1<a title=\"&gt;abc\">234</a>5", helper.truncate("1<a title=\"&gt;abc\">234</a>5", 5, true));
+    assertEquals("1<a title=\"&gt;abc\">234…</a>", helper.truncate("1<a title=\"&gt;abc\">234</a>5", 4, true));
+    assertEquals("1<a title=\"&gt;abc\">2…</a>", helper.truncate("1<a title=\"&gt;abc\">234</a>5", 2, true));
+    assertEquals("1…", helper.truncate("1<a title=\"&gt;abc\">234</a>5", 1, true));
+    assertEquals("…", helper.truncate("1<a title=\"&gt;abc\">234</a>5", 0, true));
+
+    // Attributes with " or ' and escaped
+    assertEquals("1<a title=\"&gt;abc&quot;hi&quot;\">234…</a>", helper.truncate("1<a title=\"&gt;abc&quot;hi&quot;\">234</a>5", 4, true));
+    assertEquals("1<a title='&gt;abc&quot;hi&quot;'>234…</a>", helper.truncate("1<a title='&gt;abc&quot;hi&quot;'>234</a>5", 4, true));
+    assertEquals("1<a title='&gt;abc&apos;hi&apos;'>234…</a>", helper.truncate("1<a title='&gt;abc&apos;hi&apos;'>234</a>5", 4, true));
+
+    // Comments
+    assertEquals("<div>12<!-- comment -->345</div>", helper.truncate("<div>12<!-- comment -->345</div>", 5, true));
+    assertEquals("<div>12<!-- comment -->3…</div>", helper.truncate("<div>12<!-- comment -->345</div>", 3, true));
+    assertEquals("<div>1…<!-- comment --></div>", helper.truncate("<div>12<!-- comment -->345</div>", 1, true));
+    assertEquals("…", helper.truncate("<div>12<!-- comment -->345</div>", 0, true));
+    assertEquals("1…", helper.truncate("12<!-- comment -->", 1, true));
+    assertEquals("<div>12<!-- <comment> -->34…</div>", helper.truncate("<div>12<!-- <comment> -->345</div>", 4, true));
+    assertEquals("<div>12…<!-- <comment> --></div>", helper.truncate("<div>12<!-- <comment> -->345</div>", 2, true));
+
+    // Invalid html
+    assertEquals("<div>1<div>2</div></div>345…", helper.truncate("<div>1<div>2</div></div>345</div>", 5, true));
+    assertEquals("<div>1<div>2…</div></div>", helper.truncate("<div>1<div>2</div></div>345</div>", 2, true));
+    assertEquals("1</div>2<bold>345</bold>", helper.truncate("1</div>2<bold>345</bold>", 5, true));
+    assertEquals("1</div>2<bold>34…</bold>", helper.truncate("1</div>2<bold>345</bold>", 4, true));
+    assertEquals("1</div>2…", helper.truncate("1</div>2<bold>345</bold>", 2, true));
+    // Everything after & counts as one until ;. Browsers may be more lenient and still render &gt without ; or render &asdf as it is. We simplify ignore these cases as we cannot assume what the browser will do.
+    assertEquals("1&gt345&#60;78…", helper.truncate("1&gt345&#60;78&#x3C;", 4, true));
+    assertEquals("<!-- 123", helper.truncate("<!-- 123", 2, true));
+
+    // Corner cases
+    assertEquals("", helper.truncate("", 5, true));
+    assertEquals("", helper.truncate("", 0, true));
+    assertEquals(null, helper.truncate(null, 5, true));
+    assertEquals("…", helper.truncate("1", 0, true));
+  }
 }
