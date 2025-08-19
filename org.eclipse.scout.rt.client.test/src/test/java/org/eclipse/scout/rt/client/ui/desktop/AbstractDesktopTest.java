@@ -113,6 +113,26 @@ public class AbstractDesktopTest {
   }
 
   @Test
+  public void testReady() {
+    AbstractDesktop d = new AbstractDesktop(){};
+    d.init();
+    d.getUIFacade().openFromUI();
+    assertFalse(d.isReady());
+    d.getUIFacade().fireGuiAttached(); // first attach
+    assertFalse(d.isReady());
+    d.getUIFacade().readyFromUI(); // simulate Browser ready
+    assertTrue(d.isReady());
+    d.getUIFacade().fireGuiAttached(); // second attach
+    assertTrue(d.isReady());
+    d.getUIFacade().fireGuiDetached(); // second detach
+    assertTrue(d.isReady()); // must still be ready as there is one gui still attached (even though the first has already detached).
+    d.getUIFacade().fireGuiDetached(); // last gui has detached
+    assertFalse(d.isReady());
+    d.dispose();
+    assertFalse(d.isReady());
+  }
+
+  @Test
   public void testDisplayStyle() {
     IDesktop desktop;
 
