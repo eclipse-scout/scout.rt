@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IStringColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.TableUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
@@ -42,12 +43,11 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    */
 
   /**
-   * Configures the maximum length of text in this column. This configuration only limits the text length in case of
-   * editable cells.
+   * Configures the maximum length of text in this column. This value is also used by the cell editor if the column is editable.
    * <p>
    * Subclasses can override this method. Default is {@code 4000}.
    *
-   * @return Maximum length of text in an editable cell.
+   * @return Maximum length of text
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(130)
@@ -185,7 +185,12 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   protected String/* validValue */ validateValueInternal(ITableRow row, String rawValue) {
     String value = super.validateValueInternal(row, rawValue);
     if (value != null && value.length() > getMaxLength()) {
-      value = value.substring(0, getMaxLength());
+      if (isHtmlEnabled()) {
+        value = TableUtility.getHtmlHelper().truncate(value, getMaxLength(), true);
+      }
+      else {
+        value = value.substring(0, getMaxLength()) + "…";
+      }
     }
     return StringUtility.nullIfEmpty(value);
   }
