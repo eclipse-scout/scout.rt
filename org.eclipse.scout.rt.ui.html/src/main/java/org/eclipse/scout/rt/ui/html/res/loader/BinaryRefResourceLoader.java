@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -52,7 +52,7 @@ public class BinaryRefResourceLoader extends AbstractResourceLoader {
 
   @Override
   public IHttpResourceCache getCache(HttpCacheKey cacheKey) {
-    HttpSession httpSession = getRequest().getSession();
+    HttpSession httpSession = getRequest().getSession(false);
     if (httpSession == null) {
       return null;
     }
@@ -103,7 +103,7 @@ public class BinaryRefResourceLoader extends AbstractResourceLoader {
 
   @Override
   public BinaryResource loadResource(String pathInfo) {
-    HttpSession httpSession = getRequest().getSession();
+    HttpSession httpSession = getRequest().getSession(false);
     if (httpSession == null) {
       return null;
     }
