@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,18 +11,24 @@ import {LookupCallColumnModel} from '../../index';
 
 export interface SmartColumnModel<TValue> extends LookupCallColumnModel<TValue> {
   /**
-   * Configures the {@link SmartFieldModel.browseAutoExpandAll} of the cell editor if the column is editable.
+   * Configures the {@link SmartFieldModel.browseAutoExpandAll} of the cell editor if the column is {@link editable}.
    * Does not have an effect otherwise.
+   *
+   * Default is true.
    */
   browseAutoExpandAll?: boolean;
   /**
-   * Configures the {@link SmartFieldModel.browseLoadIncremental} of the cell editor if the column is editable.
+   * Configures the {@link SmartFieldModel.browseLoadIncremental} of the cell editor if the column is {@link editable}.
    * Does not have an effect otherwise.
+   *
+   * Default is false.
    */
   browseLoadIncremental?: boolean;
   /**
-   * Configures the {@link SmartFieldModel.activeFilterEnabled} of the cell editor if the column is editable.
+   * Configures the {@link SmartFieldModel.activeFilterEnabled} of the cell editor if the column is {@link editable}.
    * Does not have an effect otherwise.
+   *
+   * Default is false.
    */
   activeFilterEnabled?: boolean;
 }
