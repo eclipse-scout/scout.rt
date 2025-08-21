@@ -17,7 +17,7 @@ import {Cell, codes, CodeType, LookupCallColumn, LookupCallOrModel, LookupRow, o
  * It should be used instead of the property selectedRows from Table.js which must not be used here.
  * 'row' can be null or undefined in some cases. Hence, some care is needed when listening to this event.
  */
-export class SmartColumn<TValue> extends LookupCallColumn<TValue> {
+export class SmartColumn<TValue> extends LookupCallColumn<TValue> implements SmartColumnModel<TValue> {
   declare model: SmartColumnModel<TValue>;
   declare eventMap: SmartColumnEventMap<TValue>;
   declare self: SmartColumn<any>;
