@@ -558,6 +558,7 @@ export * from './table/columns/ColumnOptimalWidthMeasurer';
 export * from './table/columns/AlphanumericSortingStringColumn';
 export * from './table/columns/BeanColumn';
 export * from './table/columns/BooleanColumn';
+export * from './table/columns/BooleanColumnModel';
 export * from './table/columns/CompactColumn';
 export * from './table/columns/CompactBean';
 export * from './table/columns/CompactLine';

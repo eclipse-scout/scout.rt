@@ -7,13 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Cell, CheckBoxField, Column, comparators, scout, TableRow} from '../../index';
+import {BooleanColumnModel, Cell, CheckBoxField, Column, comparators, scout, TableRow} from '../../index';
 
 /**
- * May be an ordinary boolean column or the table's checkable column (table.checkableColumn)
- * Difference: the table's checkable column represents the row.checked state, other boolean columns represent their own value.
+ * A column holding boolean values represented by check boxes.
  */
-export class BooleanColumn extends Column<boolean> {
+export class BooleanColumn extends Column<boolean> implements BooleanColumnModel {
+  declare model: BooleanColumnModel;
   triStateEnabled: boolean;
 
   constructor() {
