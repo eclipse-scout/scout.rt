@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,20 @@ export interface NumberColumnModel extends ColumnModel<number> {
    * @see NumberField.fractionDigits
    */
   fractionDigits?: number;
+  /**
+   * Defines the {@link NumberFieldModel.minValue} of the cell editor if the column is {@link editable}.
+   *
+   * The property will only be passed to the cell editor and has no effect on the column itself.
+   *
+   * Default is null.
+   */
   minValue?: number;
+  /**
+   * Defines the {@link NumberFieldModel.maxValue} of the cell editor if the column is {@link editable}.
+   *
+   * The property will only be passed to the cell editor and has no effect on the column itself.
+   *
+   * Default is null.
+   */
   maxValue?: number;
 }
