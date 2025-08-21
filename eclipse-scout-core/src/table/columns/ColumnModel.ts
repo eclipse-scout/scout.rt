@@ -199,7 +199,9 @@ export interface ColumnModel<TValue = string> extends ObjectModelWithUuid<Column
   htmlEnabled?: boolean;
 
   /**
-   * Configures whether this column value is mandatory (required). This only affects editable columns (see {@link editable}).
+   * Configures whether the cells of this column require a value.
+   *
+   * This only affects {@link editable} columns.
    *
    * Default is false.
    */
@@ -274,6 +276,10 @@ export interface ColumnModel<TValue = string> extends ObjectModelWithUuid<Column
   showSeparator?: boolean;
 
   /**
+   * Defines the {@link StringFieldModel.maxLength} of the text in the cell editor if the column is {@link editable}.
+   *
+   * This property will only be passed to the cell editor and has no effect on the column itself.
+   *
    * Default is 4000.
    */
   maxLength?: number;
@@ -284,6 +290,14 @@ export interface ColumnModel<TValue = string> extends ObjectModelWithUuid<Column
   text?: string;
 
   /**
+   * Configures whether the text in this column is automatically wrapped if it is wider than the column (_soft wrap_).
+   *
+   * The property only has an effect if {@link Table.multilineText} is enabled.
+   * Explicit line breaks are not affected.
+   *
+   * By default, the property only affects the displayed cell text.
+   * Whether the cell editor applies automatic text wrapping as well depends on the specific column type.
+   *
    * Default is false.
    */
   textWrap?: boolean;

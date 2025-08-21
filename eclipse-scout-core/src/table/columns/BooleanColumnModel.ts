@@ -7,18 +7,16 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ValueFieldModel} from '../../../index';
+import {ColumnModel} from '../../index';
 
-export interface CheckBoxFieldModel extends ValueFieldModel<boolean> {
+export interface BooleanColumnModel extends ColumnModel<boolean> {
   /**
-   * Specifies whether the value can represent three states.
+   * Specifies whether the cell values can represent three states.
    *
    * - true: the value can be true, false or null. Null is the third state that represents "undefined".
-   * - false: the value can be true or false. It is never null (setting the value to null will automatically convert it to false).
+   * - false: the value can be true or false. The value is never null (setting the value to null will automatically convert it to false).
    *
    * Default is false.
    */
   triStateEnabled?: boolean;
-  wrapText?: boolean;
-  keyStroke?: string;
 }
