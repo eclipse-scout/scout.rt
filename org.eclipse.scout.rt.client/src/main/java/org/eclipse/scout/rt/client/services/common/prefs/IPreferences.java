@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,21 +7,21 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.shared.services.common.prefs;
+package org.eclipse.scout.rt.client.services.common.prefs;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
-import org.eclipse.scout.rt.shared.ISession;
 
 /**
  * Preferences store for a single node of a single user scope.
  *
- * @see Preferences#get(ISession, String)
+ * @see Preferences#get(IClientSession, String)
  * @see IUserPreferencesService
  * @since 5.1
  */
@@ -335,11 +335,11 @@ public interface IPreferences extends Serializable {
   String name();
 
   /**
-   * Gets the {@link ISession} that represents the user scope of this node.
+   * Gets the {@link IClientSession} that represents the user scope of this node.
    *
-   * @return The {@link ISession} this node belongs to.
+   * @return The {@link IClientSession} this node belongs to.
    */
-  ISession userScope();
+  IClientSession userScope();
 
   /**
    * Forces any changes in the contents of this node and its descendants to the persistent store.

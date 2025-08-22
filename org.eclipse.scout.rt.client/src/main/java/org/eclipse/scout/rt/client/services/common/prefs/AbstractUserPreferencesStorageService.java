@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,18 +7,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.shared.services.common.prefs;
+package org.eclipse.scout.rt.client.services.common.prefs;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.ISession;
 
 /**
  * Abstract implementation to store the preferences on the session.
  *
- * @see Preferences#get(ISession, String)
+ * @see Preferences#get(IClientSession, String)
  * @since 5.1
  */
 public abstract class AbstractUserPreferencesStorageService implements IUserPreferencesStorageService {
@@ -27,7 +27,7 @@ public abstract class AbstractUserPreferencesStorageService implements IUserPref
 
   @Override
   @SuppressWarnings("unchecked")
-  public IPreferences getPreferences(ISession session, String nodeId) {
+  public IPreferences getPreferences(IClientSession session, String nodeId) {
     if (session == null) {
       throw new IllegalArgumentException("No user scope available.");
     }
@@ -60,7 +60,7 @@ public abstract class AbstractUserPreferencesStorageService implements IUserPref
   /**
    * @return Gets the user scope identifier for the given session.
    */
-  protected String getUserScope(ISession session) {
+  protected String getUserScope(IClientSession session) {
     String userId = session.getUserId();
     if (StringUtility.hasText(userId)) {
       return userId.trim();
