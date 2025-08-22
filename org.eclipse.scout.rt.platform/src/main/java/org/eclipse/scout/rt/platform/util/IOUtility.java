@@ -18,7 +18,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -33,6 +32,8 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
@@ -85,21 +86,48 @@ public final class IOUtility {
   }
 
   /**
-   * Reads the content of a file in the specified encoding (charset-name) e.g. "UTF-8"
-   * <p>
-   * If no encoding is provided, the system default encoding is used
+   * Reads the content of a file into a {@link String}. Use only for small files.
+   *
+   * @param filepath
+   *     The file to read. Must not be {@code null}.
+   * @param encoding
+   *     An optional encoding to read the file (e.g. {@code StandardCharsets.UTF_8.name()}). If no encoding is given, the standard charset is used (see {@link Charset#defaultCharset()}).
+   * @return The file content as {@link String}.
+   * @throws ProcessingException
+   *     in case there is an I/O error reading the file.
    */
   public static String getContentInEncoding(String filepath, String encoding) {
     return getContentInEncoding(toFile(filepath), encoding);
   }
 
   /**
-   * Reads the content of a file in the specified encoding (charset-name) e.g. "UTF-8"
-   * <p>
-   * If no encoding is provided, the system default encoding is used
+   * Reads the content of a file into a {@link String}. Use only for small files.
+   *
+   * @param file
+   *     The file to read. Must not be {@code null}.
+   * @param encoding
+   *     An optional encoding to read the file (e.g. {@code StandardCharsets.UTF_8.name()}). If no encoding is given, the standard charset is used (see {@link Charset#defaultCharset()}).
+   * @return The file content as {@link String}.
+   * @throws ProcessingException
+   *     in case there is an I/O error reading the file.
    */
   public static String getContentInEncoding(File file, String encoding) {
-    try (FileInputStream in = new FileInputStream(file)) {
+    return getContentInEncoding(file.toPath(), encoding);
+  }
+
+  /**
+   * Reads the content of a file into a {@link String}. Use only for small files.
+   *
+   * @param file
+   *     The file to read. Must not be {@code null}.
+   * @param encoding
+   *     An optional encoding to read the file (e.g. {@code StandardCharsets.UTF_8.name()}). If no encoding is given, the standard charset is used (see {@link Charset#defaultCharset()}).
+   * @return The file content as {@link String}.
+   * @throws ProcessingException
+   *     in case there is an I/O error reading the file.
+   */
+  public static String getContentInEncoding(Path file, String encoding) {
+    try (InputStream in = new BufferedInputStream(Files.newInputStream(file))) {
       return readString(in, encoding);
     }
     catch (IOException e) {
@@ -914,32 +942,34 @@ public final class IOUtility {
   }
 
   /**
-   * The text passed to this method is tried to wellform as a URL. If the text can not be transformed into a URL the
-   * method returns null.
+   * Tries to convert the text to a URL. If it is no url yet, it tries to convert to an email URL (mailto:) if it contains an '@' or a https URL otherwise.
+   *
+   * @return the {@link URL} or {@code null} if it cannot be converted.
    */
   public static URL urlTextToUrl(String urlText) {
-    String text = urlText;
-    URL url = null;
-    if (text != null && !text.isEmpty()) {
-      try {
-        url = new URL(text);
+    if (StringUtility.isNullOrEmpty(urlText)) {
+      return null;
+    }
+    try {
+      return new URI(urlText).toURL();
+    }
+    catch (MalformedURLException | URISyntaxException e) {
+      String text = urlText;
+      if (text.indexOf('@') >= 0) {
+        text = "mailto:" + text;
       }
-      catch (MalformedURLException e) {
-        if (text.contains("@")) {
-          text = "mailto:" + text;
-        }
-        else {
-          text = "http://" + text;
-        }
-        try {
-          url = new URL(text);
-        }
-        catch (MalformedURLException e1) {
-          LOG.debug("Could not create url from '{}'", text, e1);
-        }
+      else {
+        text = "https://" + text;
+      }
+
+      try {
+        return new URI(text).toURL();
+      }
+      catch (MalformedURLException | URISyntaxException e1) {
+        LOG.debug("Could not create url from '{}'.", urlText, e1);
       }
     }
-    return url;
+    return null;
   }
 
   /**

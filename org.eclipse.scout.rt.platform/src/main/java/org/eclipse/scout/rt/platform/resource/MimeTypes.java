@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -92,7 +92,7 @@ public final class MimeTypes {
 
   /**
    * Verify file content or {@link BinaryResource}. Check headers and content in order to find out if the file is valid
-   * or corrupt or malware
+   * or corrupt.
    * <p>
    * If no {@link IMimeMagic} is available for resource then nothing is done.
    *
@@ -104,15 +104,17 @@ public final class MimeTypes {
     if (mimeType == null) {
       return true;
     }
-    if (mimeType.getMagic() != null) {
-      //there is a verifier, let's decide
-      if (mimeType.getMagic().matches(res)) {
-        return true;
-      }
-      return false;
+
+    IMimeMagic magic = mimeType.getMagic();
+    if (magic != null) {
+      // there is a verifier, let's decide
+      return magic.matches(res);
     }
-    //no verifier, check if the file content yields a different mime major part than the file extension
-    Set<String> detectedMajorParts = MimeTypes.findByContentMagic(res).stream().map(t -> t.getMajorPart()).collect(Collectors.toSet());
+
+    // no verifier, check if the file content yields a different mime major part than the file extension
+    Set<String> detectedMajorParts = findByContentMagic(res).stream()
+        .map(IMimeType::getMajorPart)
+        .collect(Collectors.toSet());
     if (detectedMajorParts.isEmpty() || detectedMajorParts.contains(ext)) {
       return true;
     }
