@@ -1019,7 +1019,7 @@ describe('Desktop', () => {
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, messagebox, dialog1, dialog2]));
       expect(desktop.activeForm).toBe(dialog2);
 
-      messagebox.$container.mousedown();
+      JQueryTesting.triggerMouseDown(messagebox.$container);
       // expect dialog0 and messagebox on top
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2, dialog0, messagebox]));
       expect(desktop.activeForm).toBe(dialog0);
@@ -1145,7 +1145,7 @@ describe('Desktop', () => {
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, fileChooser, dialog1, dialog2]));
       expect(desktop.activeForm).toBe(dialog2);
 
-      fileChooser.$container.mousedown();
+      JQueryTesting.triggerMouseDown(fileChooser.$container);
       // expect dialog0 and fileChooser on top
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2, dialog0, fileChooser]));
       expect(desktop.activeForm).toBe(dialog0);
@@ -1227,6 +1227,24 @@ describe('Desktop', () => {
       // expect viewForm0 as currentView and dialog0 in the DOM again
       expect(tabBox.currentView).toEqual(viewForm0);
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0]));
+    });
+
+    it('is called on form mousedown but only once', async () => {
+      let dialog = formHelper.createFormWithOneField({
+        modal: false
+      });
+      await dialog.open();
+      session.desktop.activateForm(null);
+      expect(desktop.activeForm).toBe(null);
+
+      let spy = spyOn(desktop, 'activateForm').and.callThrough();
+      JQueryTesting.triggerMouseDownCapture(dialog.$container);
+      expect(desktop.activeForm).toBe(dialog);
+      expect(spy.calls.count()).toBe(1);
+
+      JQueryTesting.triggerMouseDownCapture(dialog.$container);
+      expect(desktop.activeForm).toBe(dialog);
+      expect(spy.calls.count()).toBe(1);
     });
   });
 
