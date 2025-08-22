@@ -18,6 +18,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.services.common.prefs.IPreferences;
+import org.eclipse.scout.rt.client.services.common.prefs.Preferences;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -32,12 +34,9 @@ import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.prefs.CustomClientPreferenceId;
 import org.eclipse.scout.rt.shared.prefs.ICustomClientPreferenceDo;
-import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
-import org.eclipse.scout.rt.shared.services.common.prefs.Preferences;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -56,7 +55,7 @@ public class ClientUIPreferences {
   /**
    * @return a new instance of the {@link ClientUIPreferences}
    * @throws IllegalArgumentException
-   *     When no {@link IClientSession} is available in the current thread context ( {@link ISession#CURRENT}).
+   *     When no {@link IClientSession} is available in the current thread context ( {@link IClientSession#CURRENT}).
    */
   public static ClientUIPreferences getInstance() {
     return getInstance(ClientSessionProvider.currentSession());
@@ -98,7 +97,7 @@ public class ClientUIPreferences {
   protected String getUserAgentPrefix() {
     UserAgent currentUserAgent;
     if (m_prefs != null && m_prefs.userScope() instanceof IClientSession) {
-      currentUserAgent = ((IClientSession) m_prefs.userScope()).getUserAgent();
+      currentUserAgent = m_prefs.userScope().getUserAgent();
     }
     else {
       currentUserAgent = UserAgentUtility.getCurrentUserAgent();

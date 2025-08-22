@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,15 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.shared.services.common.prefs;
+package org.eclipse.scout.rt.client.services.common.prefs;
 
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.ISession;
 
 /**
  * User preference service that is capable to persist preferences to a preference store.
  *
- * @see Preferences#get(ISession, String)
+ * @see Preferences#get(IClientSession, String)
  * @since 5.1
  */
 public interface IUserPreferencesStorageService extends IUserPreferencesService {

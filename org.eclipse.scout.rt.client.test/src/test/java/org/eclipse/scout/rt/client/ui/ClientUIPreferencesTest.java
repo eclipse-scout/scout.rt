@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,9 @@ import static org.junit.Assert.*;
 
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.services.common.prefs.AbstractUserPreferencesStorageService;
+import org.eclipse.scout.rt.client.services.common.prefs.IPreferences;
+import org.eclipse.scout.rt.client.services.common.prefs.IUserPreferencesStorageService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -26,9 +29,6 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.prefs.CustomClientPreferenceId;
-import org.eclipse.scout.rt.shared.services.common.prefs.AbstractUserPreferencesStorageService;
-import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
-import org.eclipse.scout.rt.shared.services.common.prefs.IUserPreferencesStorageService;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.shared.services.common.prefs;
+package org.eclipse.scout.rt.client.services.common.prefs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
@@ -24,7 +25,6 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
-import org.eclipse.scout.rt.shared.ISession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,12 +62,12 @@ public class Preferences implements IPreferences {
   private static final long serialVersionUID = 1L;
 
   private final String m_name;
-  private final transient ISession m_session;
+  private final transient IClientSession m_session;
   private final Map<String, String> m_prefs;
   private final transient FastListenerList<IPreferenceChangeListener> m_eventListeners;
   private boolean m_dirty;
 
-  protected Preferences(String name, ISession userScope) {
+  protected Preferences(String name, IClientSession userScope) {
     this(name, userScope, new LinkedHashMap<>(), false);
   }
 
@@ -75,7 +75,7 @@ public class Preferences implements IPreferences {
     this(other.m_name, other.m_session, other.m_prefs, other.m_dirty);
   }
 
-  protected Preferences(String name, ISession userScope, Map<String, String> prefs, boolean dirty) {
+  protected Preferences(String name, IClientSession userScope, Map<String, String> prefs, boolean dirty) {
     m_name = name;
     m_session = userScope;
     m_prefs = prefs;
@@ -91,7 +91,7 @@ public class Preferences implements IPreferences {
    * Gets the {@link IPreferences} for the given <code>nodeId</code> and the given <code>userScope</code>
    *
    * @param userScope
-   *     The {@link ISession} for which the settings should be retrieved. Must not be <code>null</code>.
+   *     The {@link IClientSession} for which the settings should be retrieved. Must not be <code>null</code>.
    * @param nodeId
    *     The id of the node to retrieve. Must not be <code>null</code>.
    * @return The {@link IPreferences} for the given node and scope.
@@ -100,7 +100,7 @@ public class Preferences implements IPreferences {
    * @throws IllegalArgumentException
    *     if the session or nodeId is <code>null</code>.
    */
-  public static IPreferences get(ISession userScope, String nodeId) {
+  public static IPreferences get(IClientSession userScope, String nodeId) {
     IUserPreferencesService service = BEANS.get(IUserPreferencesService.class);
     if (service == null) {
       LOG.warn("No preferences service could be found!");
@@ -374,7 +374,7 @@ public class Preferences implements IPreferences {
   }
 
   @Override
-  public ISession userScope() {
+  public IClientSession userScope() {
     return m_session;
   }
 

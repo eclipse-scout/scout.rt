@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,17 +7,17 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.shared.services.common.prefs;
+package org.eclipse.scout.rt.client.services.common.prefs;
 
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -38,13 +38,13 @@ public class PreferencesTest {
     prefs.putInt("int", 123);
     prefs.putLong("long", 123L);
 
-    assertEquals(true, prefs.isDirty());
+    assertTrue(prefs.isDirty());
     assertEquals("X", prefs.name());
     assertEquals(7, prefs.keys().size());
     assertEquals("Any", prefs.get("any", null));
     assertEquals("Xyz", prefs.get("xyz", "Xyz"));
-    assertEquals(true, prefs.getBoolean("bool", false));
-    assertEquals(true, prefs.getBoolean("xyz", true));
+    assertTrue(prefs.getBoolean("bool", false));
+    assertTrue(prefs.getBoolean("xyz", true));
     assertArrayEquals(new byte[]{(byte) 1, (byte) 2, (byte) 3}, prefs.getByteArray("byte", null));
     assertArrayEquals(new byte[]{(byte) 9,}, prefs.getByteArray("xyz", new byte[]{(byte) 9,}));
     assertEquals(1.23, prefs.getDouble("double", 0), 0.0);
@@ -164,7 +164,7 @@ public class PreferencesTest {
     private boolean m_flushed = false;
 
     @Override
-    public IPreferences getPreferences(ISession userScope, String nodeId) {
+    public IPreferences getPreferences(IClientSession userScope, String nodeId) {
       return null;
     }
 
