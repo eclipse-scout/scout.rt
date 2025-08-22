@@ -9,7 +9,8 @@
  */
 import {
   AbstractLayout, Action, arrays, BenchColumnLayoutData, BusyIndicatorOptions, BusySupport, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel,
-  DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form,
+  DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayChild, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser,
+  FileChooserController, Form,
   GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, objects,
   OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
   SplitterPositionChangeEvent, strings, styles, Tooltip, Tree, TreeDisplayStyle, UnsavedFormChangesForm, URL, ViewButton, webstorage, Widget, widgets
