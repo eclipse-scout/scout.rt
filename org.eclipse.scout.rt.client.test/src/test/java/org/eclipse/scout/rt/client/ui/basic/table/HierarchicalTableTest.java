@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -50,9 +50,8 @@ public class HierarchicalTableTest {
   }
 
   /**
-   * Table expect always to have all parent rows
+   * Table ignores rows with non-existing parent.
    */
-  @Test(expected = IllegalArgumentException.class)
   public void testAddRowsWithInvalidRowList() {
     P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
     table.init();
@@ -61,12 +60,14 @@ public class HierarchicalTableTest {
     rows.add(table.createRow(new Object[]{2, null}));
     rows.add(table.createRow(new Object[]{3, 4}));
     table.addRows(rows);
+
+    assertEquals(3, table.getRowCount());
+    assertEquals(2, table.getFilteredRowCount());
   }
 
   /**
-   * Table expect always to have all parent rows
+   * Table ignores rows with non-existing parent.
    */
-  @Test(expected = IllegalArgumentException.class)
   public void testAddRowWithUnresolvedParentRow() {
     P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
     table.init();
@@ -74,8 +75,12 @@ public class HierarchicalTableTest {
     rows.add(table.createRow(new Object[]{1, null}));
     rows.add(table.createRow(new Object[]{2, null}));
     table.addRows(rows);
+    assertEquals(2, table.getRowCount());
+    assertEquals(2, table.getFilteredRowCount());
 
     table.addRow(table.createRow(new Object[]{3, 4}));
+    assertEquals(3, table.getRowCount());
+    assertEquals(2, table.getFilteredRowCount());
   }
 
   /**
