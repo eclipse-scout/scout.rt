@@ -119,7 +119,7 @@ public abstract class AbstractConfigProperty<DATA_TYPE, RAW_TYPE> implements ICo
     configChangedListeners().list().forEach(listener -> listener.configPropertyChanged(e));
   }
 
-  private static final class P_ParsedPropertyValueEntry<TYPE> {
+  protected static final class P_ParsedPropertyValueEntry<TYPE> {
     private final TYPE m_value;
     private final PlatformException m_exc;
 
