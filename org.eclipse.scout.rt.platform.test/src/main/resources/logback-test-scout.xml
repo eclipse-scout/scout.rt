@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2024 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,9 @@
   -->
 <included>
   <!-- This file is included in all scout test logback configurations -->
+
+  <contextListener class="org.eclipse.scout.rt.platform.logger.AutoRegisteringJulLevelChangePropagator" />
+
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <filter class="org.eclipse.scout.rt.platform.logger.LevelRangeFilter">
       <levelMin>TRACE</levelMin>
