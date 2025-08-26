@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,7 +33,6 @@ export class StringField extends BasicField<string> implements StringFieldModel 
   trimText: boolean;
   wrapText: boolean;
   mouseClicked: boolean;
-  fitText: boolean;
   protected _selectionChangingActionHandler: (event: JQuery.TriggeredEvent) => void;
 
   constructor() {
@@ -54,7 +53,6 @@ export class StringField extends BasicField<string> implements StringFieldModel 
     this.spellCheckEnabled = false;
     this.trimText = true;
     this.wrapText = false;
-    this.fitText = false;
 
     this._selectionChangingActionHandler = this._onSelectionChangingAction.bind(this);
   }
@@ -152,9 +150,6 @@ export class StringField extends BasicField<string> implements StringFieldModel 
     if (this.inputObfuscated) {
       // Restore obfuscated display text.
       this.$field.val(this.displayText);
-    }
-    if (this.multilineText && this.fitText) {
-      this. revalidateLayoutTree();
     }
   }
 
@@ -357,6 +352,9 @@ export class StringField extends BasicField<string> implements StringFieldModel 
         });
       }
     }
+    if (this.fitText && oldDisplayText !== displayText) {
+      this.invalidateLayoutTree();
+    }
   }
 
   /**
@@ -418,6 +416,10 @@ export class StringField extends BasicField<string> implements StringFieldModel 
     this.$field.attr('wrap', this.wrapText ? 'soft' : 'off');
   }
 
+  get fitText(): boolean {
+    return this.gridData.useUiWidth || this.gridData.useUiHeight;
+  }
+
   setTrimText(trimText: boolean) {
     this.setProperty('trimText', trimText);
   }
@@ -475,11 +477,15 @@ export class StringField extends BasicField<string> implements StringFieldModel 
     } else if (event.type === 'keydown') {
       // Use set timeout to let the cursor move to the target position
       setTimeout(this._updateSelection.bind(this));
-      if (this.multilineText && this.fitText) {
-        this. revalidateLayoutTree();
-      }
     } else {
       this._updateSelection();
+    }
+  }
+
+  protected override _onFieldInput() {
+    super._onFieldInput();
+    if (this.fitText) {
+      this.invalidateLayoutTree();
     }
   }
 
