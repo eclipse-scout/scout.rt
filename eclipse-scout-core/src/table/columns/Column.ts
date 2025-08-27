@@ -240,7 +240,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
    * 'My Company' --> { text: 'MyCompany'; }
    *
    * @see JsonCell.java
-   * @param vararg either a Cell instance or a scalar value
+   * @param vararg either a Cell instance or a raw value
    */
   initCell(vararg: TValue | Cell<TValue>, row?: TableRow): Cell<TValue> {
     let cell = this._ensureCell(vararg);
@@ -255,9 +255,9 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 
   /**
    * Ensures that a Cell instance is returned.
-   * When vararg is a scalar value a new Cell instance is created and the value is set as {@link cell.value} property.
+   * When vararg is a raw value a new Cell instance is created and the value is set as {@link cell.value} property.
    *
-   * @param vararg either a Cell instance or a scalar value
+   * @param vararg either a Cell instance or a raw value
    */
   private _ensureCell(vararg: Cell<TValue> | TValue): Cell<TValue> {
     let cell: Cell<TValue>;
@@ -268,7 +268,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
       // value may be set but may have the wrong type (e.g. text instead of date) -> ensure type
       cell.value = this._ensureValue(cell.value);
     } else {
-      // in this case 'vararg' is only a scalar value, typically a string
+      // in this case 'vararg' is only a raw value, typically a string
       let cellType = Cell<TValue>;
       cell = scout.create(cellType, {
         value: this._ensureValue(vararg)
@@ -279,10 +279,10 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   }
 
   /**
-   * Override this method to create a value based on the given scalar value.
+   * Override this method to create a value based on the given raw value.
    */
-  protected _ensureValue(scalar: TValue | string): TValue {
-    return scalar as TValue;
+  protected _ensureValue(rawValue: TValue | any): TValue {
+    return rawValue as TValue;
   }
 
   protected _updateCellText(row: TableRow, cell: Cell<TValue>) {
