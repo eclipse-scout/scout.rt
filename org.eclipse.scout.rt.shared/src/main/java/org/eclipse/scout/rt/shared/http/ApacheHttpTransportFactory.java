@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,6 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.impl.DefaultClientConnectionReuseStrategy;
-import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
 import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -109,17 +108,12 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     }
   }
 
-  protected void addRetrySettings(HttpClientBuilder builder) {
+  public void addRetrySettings(HttpClientBuilder builder) {
     // see very similar code in org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager.addRetrySettings(HttpAsyncClientBuilder), unfortunately there is no common interface
     final boolean retryOnNoHttpResponseException = CONFIG.getPropertyValue(ApacheHttpTransportRetryOnNoHttpResponseExceptionProperty.class);
     final boolean retryOnSocketExceptionByConnectionReset = CONFIG.getPropertyValue(ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty.class);
-    if (retryOnNoHttpResponseException || retryOnSocketExceptionByConnectionReset) {
-      CustomHttpRequestRetryStrategy retryStrategy = new CustomHttpRequestRetryStrategy(1, retryOnNoHttpResponseException, retryOnSocketExceptionByConnectionReset);
-      retryStrategy.enable(builder);
-    }
-    else {
-      builder.setRetryStrategy(new DefaultHttpRequestRetryStrategy());
-    }
+    CustomHttpRequestRetryStrategy retryStrategy = new CustomHttpRequestRetryStrategy(1, retryOnNoHttpResponseException, retryOnSocketExceptionByConnectionReset);
+    retryStrategy.enable(builder);
   }
 
   protected void addRedirectSettings(HttpClientBuilder builder) {

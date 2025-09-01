@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.http.retry;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ConnectException;
+import java.net.NoRouteToHostException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,6 +36,7 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ConnectionClosedException;
 import org.apache.hc.core5.http.HttpException;
 import org.apache.hc.core5.http.HttpRequest;
+import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.NoHttpResponseException;
 import org.apache.hc.core5.http.protocol.HttpContext;
@@ -53,6 +55,12 @@ public class CustomHttpRequestRetryStrategy extends DefaultHttpRequestRetryStrat
 
   public static final String RETRY_ENABLER_EXEC_CHAIN_NAME = OneTimeRetryPrepareExecChainHandler.class.getSimpleName();
 
+  /**
+   * Certain status codes may be retried by the super-class, see {@link #retryRequest(HttpResponse, int, HttpContext)}; this extension allows a header to be set on response as hint to disapprove an additional retry. This extension will
+   * honor this header (regardless of its value) and avoid retrying responses supplying this header; however other clients may behave differently.
+   */
+  public static final String FINAL_RESPONSE_HEADER = "X-Scout-Final-Response";
+
   private final Set<Class<? extends IOException>> m_nonRetriableClasses;
   private final boolean m_retryOnNoHttpResponseException;
   private final boolean m_retryOnSocketExceptionByConnectionReset;
@@ -66,6 +74,7 @@ public class CustomHttpRequestRetryStrategy extends DefaultHttpRequestRetryStrat
             UnknownHostException.class,
             ConnectException.class,
             ConnectionClosedException.class,
+            NoRouteToHostException.class,
             SSLException.class),
         retryOnNoHttpResponseException,
         retryOnSocketExceptionByConnectionReset,
@@ -121,11 +130,9 @@ public class CustomHttpRequestRetryStrategy extends DefaultHttpRequestRetryStrat
     if (this.m_nonRetriableClasses.contains(exception.getClass())) {
       return false;
     }
-    else {
-      for (final Class<? extends IOException> rejectException : this.m_nonRetriableClasses) {
-        if (rejectException.isInstance(exception)) {
-          return false;
-        }
+    for (final Class<? extends IOException> rejectException : this.m_nonRetriableClasses) {
+      if (rejectException.isInstance(exception)) {
+        return false;
       }
     }
     if (request instanceof CancellableDependency && ((CancellableDependency) request).isCancelled()) {
@@ -134,6 +141,24 @@ public class CustomHttpRequestRetryStrategy extends DefaultHttpRequestRetryStrat
 
     // Retry if the request is considered idempotent or for stale socket channel (assumption)
     return handleAsIdempotent(request) || detectStaleSocketChannel(exception);
+  }
+
+  @Override
+  public boolean retryRequest(HttpResponse response, int execCount, HttpContext context) {
+    boolean skipRetryByHeaderSetOnResponse = isFinalResponse(response);
+    if (skipRetryByHeaderSetOnResponse) {
+      LOG.trace("Respect response header {} to skip retry", FINAL_RESPONSE_HEADER);
+      return false;
+    }
+
+    return super.retryRequest(response, execCount, context);
+  }
+
+  /**
+   * @return true if {@link #FINAL_RESPONSE_HEADER} is set for response regardless of header value (and thus retry should be skipped regardless of status code)
+   */
+  protected boolean isFinalResponse(HttpResponse response) {
+    return response.containsHeader(FINAL_RESPONSE_HEADER);
   }
 
   /**
