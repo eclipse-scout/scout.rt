@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,6 @@ import org.apache.hc.client5.http.async.AsyncExecCallback;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.DefaultClientConnectionReuseStrategy;
-import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
 import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
@@ -143,13 +142,8 @@ public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManage
     // see very similar code in org.eclipse.scout.rt.shared.http.ApacheHttpTransportFactory.addRetrySettings(HttpClientBuilder), unfortunately there is no common interface
     final boolean retryOnNoHttpResponseException = CONFIG.getPropertyValue(ApacheHttpTransportRetryOnNoHttpResponseExceptionProperty.class);
     final boolean retryOnSocketExceptionByConnectionReset = CONFIG.getPropertyValue(ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty.class);
-    if (retryOnNoHttpResponseException || retryOnSocketExceptionByConnectionReset) {
-      CustomHttpRequestRetryStrategy retryStrategy = new CustomHttpRequestRetryStrategy(1, retryOnNoHttpResponseException, retryOnSocketExceptionByConnectionReset);
-      retryStrategy.enable(builder);
-    }
-    else {
-      builder.setRetryStrategy(new DefaultHttpRequestRetryStrategy());
-    }
+    CustomHttpRequestRetryStrategy retryStrategy = new CustomHttpRequestRetryStrategy(1, retryOnNoHttpResponseException, retryOnSocketExceptionByConnectionReset);
+    retryStrategy.enable(builder);
   }
 
   protected void addRedirectSettings(HttpAsyncClientBuilder builder) {
