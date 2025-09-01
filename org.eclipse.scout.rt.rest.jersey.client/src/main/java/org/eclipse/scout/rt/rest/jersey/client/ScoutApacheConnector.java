@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -88,6 +88,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.rest.IRestHttpRequestUriEncoder;
 import org.eclipse.scout.rt.rest.client.RestClientProperties;
+import org.eclipse.scout.rt.shared.http.ApacheHttpTransportFactory;
 import org.eclipse.scout.rt.shared.http.HttpClientMetricsHelper;
 import org.eclipse.scout.rt.shared.http.proxy.ConfigurableProxySelector;
 import org.glassfish.jersey.client.ClientProperties;
@@ -142,7 +143,10 @@ public class ScoutApacheConnector implements Connector {
     boolean enableCookies = initCookieConfig(config, clientBuilder, requestConfigBuilder);
     m_cookieStore = createCookieStore(clientBuilder, enableCookies);
 
-    // (4) setup and build HTTP client
+    // (4) setup custom retry handling
+    BEANS.get(ApacheHttpTransportFactory.class).addRetrySettings(clientBuilder);
+
+    // (5) setup and build HTTP client
     m_requestConfig = buildRequestConfig(requestConfigBuilder);
     clientBuilder.setDefaultRequestConfig(m_requestConfig);
     clientBuilder.disableDefaultUserAgent(); // disable sending user agent header like "Apache-HttpClient/4.5.13 (Java/1.8.0_191)"
