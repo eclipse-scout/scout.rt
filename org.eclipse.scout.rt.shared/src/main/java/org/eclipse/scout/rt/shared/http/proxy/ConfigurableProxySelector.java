@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
@@ -90,30 +91,55 @@ public class ConfigurableProxySelector extends ProxySelector {
    * {@link ProxyIgnoreProperty} if this class is not constructed by the bean manager.
    */
   public ConfigurableProxySelector(Class<? extends AbstractStringListConfigProperty> proxyProperty, Class<? extends AbstractStringListConfigProperty> ignoreProxyProperty) {
-    // load proxy map
-    List<String> proxyMap = CONFIG.getPropertyValue(proxyProperty);
-    m_proxyMap = new HashMap<>();
-    if (proxyMap != null) {
-      for (String proxyConfiguration : proxyMap) {
-        Pattern pattern = Pattern.compile(proxyConfiguration.substring(0, proxyConfiguration.lastIndexOf('=')), Pattern.CASE_INSENSITIVE);
-        String proxyAddress = proxyConfiguration.substring(proxyConfiguration.lastIndexOf('=') + 1);
-        String hostname = proxyAddress.substring(0, proxyAddress.lastIndexOf(':'));
-        int port = Integer.parseInt(proxyAddress.substring(proxyAddress.lastIndexOf(':') + 1));
-        Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress(hostname, port));
-        m_proxyMap.put(pattern, proxy);
-      }
-    }
-    LOG.trace("Proxy configuration: {}", m_proxyMap);
+    this(CONFIG.getPropertyValue(proxyProperty), CONFIG.getPropertyValue(ignoreProxyProperty));
+  }
 
-    // load ignore proxy list
-    List<String> proxyIgnoreList = CONFIG.getPropertyValue(ignoreProxyProperty);
-    m_proxyIgnoreList = new ArrayList<>();
-    if (proxyIgnoreList != null) {
-      for (String ignoreProxy : proxyIgnoreList) {
-        m_proxyIgnoreList.add(Pattern.compile(ignoreProxy, Pattern.CASE_INSENSITIVE));
-      }
+  public ConfigurableProxySelector(List<String> proxyConfigList, List<String> proxyIgnoreList) {
+    m_proxyMap = loadProxyMap(proxyConfigList == null ? Collections.emptyList() : proxyConfigList);
+    m_proxyIgnoreList = loadProxyIgnoreList(proxyIgnoreList == null ? Collections.emptyList() : proxyIgnoreList);
+  }
+
+  protected Map<Pattern, Proxy> loadProxyMap(List<String> proxyConfigList) {
+    // load proxy map
+    Map<Pattern, Proxy> proxyMap = new HashMap<>();
+    proxyConfigList.forEach(e -> addProxyToProxyMap(proxyMap, e));
+    LOG.trace("Proxy configuration: {}", proxyMap);
+    return proxyMap;
+  }
+
+  protected void addProxyToProxyMap(Map<Pattern, Proxy> proxyMap, String proxyConfiguration) {
+    int lastDelimiterIndex = proxyConfiguration.lastIndexOf('=');
+    int secondLastDelimiterIndex = proxyConfiguration.lastIndexOf('=', lastDelimiterIndex - 1);
+    Proxy.Type type;
+    int patternEndIndex;
+    if (secondLastDelimiterIndex == -1) {
+      type = Type.HTTP;
+      patternEndIndex = lastDelimiterIndex;
     }
-    LOG.trace("Proxy ignore list: {}", m_proxyIgnoreList);
+    else {
+      String typeAsString = proxyConfiguration.substring(secondLastDelimiterIndex + 1, lastDelimiterIndex);
+      type = Type.valueOf(typeAsString);
+      patternEndIndex = secondLastDelimiterIndex;
+    }
+    Pattern pattern = Pattern.compile(proxyConfiguration.substring(0, patternEndIndex), Pattern.CASE_INSENSITIVE);
+    if (type == Type.DIRECT) {
+      proxyMap.put(pattern, Proxy.NO_PROXY);
+    }
+    else {
+      String proxyAddress = proxyConfiguration.substring(lastDelimiterIndex + 1);
+      int colonIndex = proxyAddress.lastIndexOf(':');
+      String hostname = proxyAddress.substring(0, colonIndex);
+      int port = Integer.parseInt(proxyAddress.substring(colonIndex + 1));
+      proxyMap.put(pattern, new Proxy(type, new InetSocketAddress(hostname, port)));
+    }
+  }
+
+  protected List<Pattern> loadProxyIgnoreList(List<String> proxyIgnoreConfigList) {
+    final List<Pattern> proxyIgnorePatternList = proxyIgnoreConfigList.stream()
+        .map(e -> Pattern.compile(e, Pattern.CASE_INSENSITIVE))
+        .collect(Collectors.toList());
+    LOG.trace("Proxy ignore list: {}", proxyIgnorePatternList);
+    return proxyIgnorePatternList;
   }
 
   public boolean isUseSystemDefaultProxySelectorAsFallback() {
@@ -136,12 +162,17 @@ public class ConfigurableProxySelector extends ProxySelector {
     return m_proxyMap;
   }
 
+  public List<Pattern> getProxyIgnoreList() {
+    return m_proxyIgnoreList;
+  }
+
   @Override
   public List<Proxy> select(URI uri) {
     LOG.trace("Selecting proxy for {}.", uri);
 
-    if (!m_proxyIgnoreList.isEmpty()) {
-      for (Pattern ignorePattern : m_proxyIgnoreList) {
+    List<Pattern> proxyIgnoreList = getProxyIgnoreList();
+    if (!proxyIgnoreList.isEmpty()) {
+      for (Pattern ignorePattern : proxyIgnoreList) {
         if (ignorePattern.matcher(uri.toString()).matches()) {
           LOG.trace("Using no proxy for {} specified by proxy ignore list.", uri);
           return Collections.singletonList(Proxy.NO_PROXY);
@@ -149,9 +180,10 @@ public class ConfigurableProxySelector extends ProxySelector {
       }
     }
 
-    if (!m_proxyMap.isEmpty()) {
+    Map<Pattern, Proxy> proxyMap = getProxyMap();
+    if (!proxyMap.isEmpty()) {
       List<Proxy> proxyList = new ArrayList<>();
-      for (Entry<Pattern, Proxy> entry : m_proxyMap.entrySet()) {
+      for (Entry<Pattern, Proxy> entry : proxyMap.entrySet()) {
         if (entry.getKey().matcher(uri.toString()).matches()) {
           proxyList.add(entry.getValue());
         }
