@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.holders.ObjectHolder;
 import org.eclipse.scout.rt.platform.holders.StringHolder;
@@ -107,9 +108,17 @@ public class RestRequestCancellationRegistryTest {
     assertFalse(m_registry.cancel("1", null));
     assertFalse(m_runMonitor.isCancelled());
 
-    assertNotNull(m_registry.register("1", null, m_runMonitor));
-    assertTrue(m_registry.cancel("1", null));
-    assertTrue(m_runMonitor.isCancelled());
+    IRegistrationHandle otherHandle = m_registry.register("1", null, m_runMonitor);
+    assertNotNull(otherHandle);
+    RunContexts.empty().withRunMonitor(m_runMonitor).run(() -> {
+      assertTrue(m_registry.cancel("1", null));
+      assertTrue(m_runMonitor.isCancelled());
+
+      // reset interruption state on dispose
+      assertTrue(Thread.currentThread().isInterrupted());
+      otherHandle.dispose();
+      assertFalse(Thread.currentThread().isInterrupted());
+    });
   }
 
   @Test
