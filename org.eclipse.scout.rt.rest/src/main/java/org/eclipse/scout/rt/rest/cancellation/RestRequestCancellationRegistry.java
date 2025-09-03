@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -52,7 +52,13 @@ public class RestRequestCancellationRegistry {
       return null;
     }
 
-    return () -> cancellationInfos.remove(requestId);
+    return () -> {
+      RequestCancellationInfo info = cancellationInfos.remove(requestId);
+      if (info != null && info.getRunMonitor().isCancelled() && Thread.interrupted()) {
+        // as thread may be used by other operations as well; interrupted state must be reset after previous interruption
+        LOG.trace("Reset interrupted state for cancelled and interrupted request {}", requestId);
+      }
+    };
   }
 
   public boolean cancel(String requestId, Object userId) {
