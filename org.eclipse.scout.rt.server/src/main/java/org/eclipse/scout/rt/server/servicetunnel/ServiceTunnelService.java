@@ -16,8 +16,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.function.LongPredicate;
 
 import javax.security.auth.Subject;
 
@@ -41,8 +39,6 @@ import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.rest.id.IdSignatureClientRequestFilter;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.commons.idempotent.DuplicateRequestException;
-import org.eclipse.scout.rt.server.commons.idempotent.SequenceNumberDuplicateDetector;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.context.HttpServerRunContextProducer;
@@ -111,16 +107,6 @@ public class ServiceTunnelService {
               interruption.restore();
             }
           }, DefaultExceptionTranslator.class);
-    }
-    catch (DuplicateRequestException e) {
-      final boolean interrupted = Thread.interrupted();
-      if (interrupted) {
-        LOG.debug("Duplicate Request{}", interruptInfo(interrupted), e);
-      }
-      else {
-        LOG.warn("Duplicate Request{}", interruptInfo(interrupted), e);
-      }
-      throw new WebApplicationException("Request is a duplicate", Response.Status.CONFLICT);
     }
     catch (Throwable e) {//NOSONAR
       final boolean interrupted = Thread.interrupted();
@@ -193,25 +179,8 @@ public class ServiceTunnelService {
       final HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
       final IServerSession session = m_serverRunContextProducer.get().getOrCreateScoutSession(req, serverRunContext, serviceRequest.getSessionId());
       serverRunContext.withSession(session);
-
-      // duplicate detection
-      LongPredicate duplicateRequestDetector = (LongPredicate) session
-          .computeDataIfAbsent(DUPLICATE_REQUEST_DETECTOR_SESSION_KEY, this::createRequestSequenceValidator);
-      if (!duplicateRequestDetector.test(serviceRequest.getRequestSequence())) {
-        String msg = "clientNodeId: " + serviceRequest.getClientNodeId() + ", "
-            + "sessionId: " + serviceRequest.getSessionId() + ", "
-            + "operation: " + serviceRequest.getServiceInterfaceClassName() + "." + serviceRequest.getOperation();
-        throw DuplicateRequestException.create(msg, serviceRequest.getRequestSequence());
-      }
     }
     return serverRunContext;
-  }
-
-  /**
-   * @return a function that returns true for valid request numbers and false for duplicate request number
-   */
-  protected LongPredicate createRequestSequenceValidator() {
-    return new SequenceNumberDuplicateDetector(100, 1, TimeUnit.MINUTES, true);
   }
 
   protected IRegistrationHandle registerForCancellation(ServerRunContext runContext, ServiceTunnelRequest req) {
