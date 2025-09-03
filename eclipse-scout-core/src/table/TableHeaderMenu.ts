@@ -650,7 +650,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       cssClass: 'optimize-width'
     });
     optimizeWidthButton.on('action', () => {
-      this.table.resizeToFit(this.column);
+      this.column.resizeToFit();
       this.close();
     });
     let optimizeWidthAllButton = scout.create(TableHeaderMenuButton, {
@@ -659,7 +659,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       cssClass: 'optimize-widths'
     });
     optimizeWidthAllButton.on('action', () => {
-      this.table.visibleColumns().forEach(column => this.table.resizeToFit(column));
+      this.table.visibleColumns().forEach(column => column.resizeToFit());
       this.close();
     });
     let widthField = scout.create(NumberField, {

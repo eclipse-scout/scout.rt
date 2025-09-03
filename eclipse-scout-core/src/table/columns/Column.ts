@@ -913,6 +913,10 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     }));
   }
 
+  resizeToFit(maxWidth?: number) {
+    this.table?.resizeToFit(this, maxWidth);
+  }
+
   calculateOptimalWidth(): number | JQuery.Promise<number> {
     return this.optimalWidthMeasurer.measure();
   }

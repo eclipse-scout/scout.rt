@@ -801,14 +801,12 @@ export class TableHeader extends Widget implements TableHeaderModel {
 
     if (event.shiftKey) {
       // Optimize all columns
-      this._visibleColumns().forEach(column => {
-        this.table.resizeToFit(column);
-      });
+      this._visibleColumns().forEach(column => column.resizeToFit());
     } else {
       // Optimize the column left of the separator
       let $header = $(event.target).prev();
       let column = $header.data('column');
-      this.table.resizeToFit(column);
+      column.resizeToFit();
     }
   }
 

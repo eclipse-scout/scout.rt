@@ -913,4 +913,24 @@ describe('Column', () => {
       });
     }
   });
+
+  describe('resizeToFit', () => {
+
+    it('delegates to table', () => {
+      const model = helper.createModelFixture(2);
+      const table = helper.createTable(model);
+      const [column0, column1] = table.columns;
+
+      table.render();
+
+      spyOn(table, 'resizeToFit').and.callThrough();
+
+      column0.resizeToFit();
+      expect(table.resizeToFit).toHaveBeenCalledOnceWith(column0, undefined);
+
+      column1.resizeToFit(42);
+      expect(table.resizeToFit).toHaveBeenCalledTimes(2);
+      expect(table.resizeToFit).toHaveBeenCalledWith(column1, 42);
+    });
+  });
 });
