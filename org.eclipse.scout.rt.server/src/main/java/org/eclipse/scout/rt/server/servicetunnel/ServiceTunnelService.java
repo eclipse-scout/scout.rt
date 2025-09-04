@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongPredicate;
 
@@ -31,12 +30,7 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
-import org.eclipse.scout.rt.platform.transaction.TransactionCancelledError;
-import org.eclipse.scout.rt.platform.util.ConnectionErrorDetector;
 import org.eclipse.scout.rt.platform.util.LazyValue;
-import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.rest.id.IdSignatureClientRequestFilter;
@@ -122,30 +116,9 @@ public class ServiceTunnelService {
       }
       throw new WebApplicationException("Request is a duplicate", Response.Status.CONFLICT);
     }
-    catch (Throwable e) {//NOSONAR
-      final boolean interrupted = Thread.interrupted();
-      if (isConnectionError(e)) {
-        // Ignore disconnect errors: do not throw an exception, if the client closed the connection.
-        LOG.debug("Connection Error{}", interruptInfo(interrupted), e);
-        // do not call sendError, as the connection is invalid anyway. May throw IllegalStateException otherwise hiding the original exception.
-      }
-      else if (isInterruption(e)) {
-        if (isCancellation(e)) {
-          // cancelled by client
-          LOG.debug("Cancelled by client{}", interruptInfo(interrupted), e);
-          throw new WebApplicationException("Request processing was cancelled", Response.Status.ACCEPTED);
-        }
-        else {
-          // other interruption
-          LOG.info("Interruption{}", interruptInfo(interrupted), e);
-          throw new WebApplicationException("Request processing was interrupted", Response.Status.ACCEPTED);
-        }
-      }
-      else {
-        Optional<HttpServletRequest> optRequest = Optional.ofNullable(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get());
-        LOG.error("Client={}@{}/{}", optRequest.map(HttpServletRequest::getRemoteUser), optRequest.map(HttpServletRequest::getRemoteAddr), optRequest.map(HttpServletRequest::getRemoteHost), e);
-        throw new WebApplicationException("Error while processing request", Response.Status.INTERNAL_SERVER_ERROR);
-      }
+    catch (Exception e) {
+      // FIXME removeme
+      throw new RuntimeException(e);
     }
   }
 
@@ -258,23 +231,5 @@ public class ServiceTunnelService {
    */
   protected BinaryServiceTunnelContentHandler createContentHandler() {
     return BEANS.get(BinaryServiceTunnelContentHandler.class);
-  }
-
-  protected boolean isConnectionError(Throwable e) {
-    return BEANS.get(ConnectionErrorDetector.class).isConnectionError(e);
-  }
-
-  protected boolean isInterruption(Throwable e) {
-    return BEANS.get(DefaultExceptionTranslator.class).throwableCausesAccept(e, t -> t instanceof AbstractInterruptionError);
-  }
-
-  /**
-   * Special case of {@link AbstractInterruptionError}.
-   */
-  protected boolean isCancellation(Throwable e) {
-    return BEANS.get(DefaultExceptionTranslator.class).throwableCausesAccept(e,
-        t -> t instanceof FutureCancelledError
-            || t instanceof TransactionCancelledError
-            || t instanceof ThreadInterruptedError);
   }
 }
