@@ -406,6 +406,11 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
     this.$node.toggleClass('compact-root', this.compactRoot);
     this.$node.toggleClass('has-tile-overview', this.showTileOverview ||
       (this.compactRoot && this.outline.detailContent instanceof TileOutlineOverview));
+
+    // FIXME bsh [js-page] DO NOT PUSH
+    if (this.objectType !== 'Page') {
+      this.$node.attr('data-js-only', this.modelClass ? 'hybrid' : 'true');
+    }
   }
 
   // see Java: AbstractPage#pageActivatedNotify
