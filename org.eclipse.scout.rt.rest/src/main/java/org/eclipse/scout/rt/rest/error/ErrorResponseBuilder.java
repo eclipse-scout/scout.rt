@@ -9,14 +9,21 @@
  */
 package org.eclipse.scout.rt.rest.error;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.Response.Status;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
  * Builder for {@link ErrorDo} and {@link ErrorResponse} objects.
@@ -30,6 +37,7 @@ public class ErrorResponseBuilder {
   private String m_message;
   private String m_severity;
   private boolean m_correlationId = true;
+  private Map<String, String> m_headers = new LinkedHashMap<>();
 
   public ErrorResponseBuilder withHttpStatus(int httpStatus) {
     m_httpStatus = httpStatus;
@@ -85,11 +93,25 @@ public class ErrorResponseBuilder {
     return this;
   }
 
+  public ErrorResponseBuilder addHeader(String key, String value) {
+    m_headers.put(key, value);
+    return this;
+  }
+
+  /**
+   * Replaces all previously set headers
+   */
+  public ErrorResponseBuilder withHeaders(Map<String, String> headers) {
+    m_headers = new HashMap<>(ObjectUtility.nvl(headers, Collections.emptyMap()));
+    return this;
+  }
+
   public Response build() {
-    return Response.status(m_httpStatus)
+    ResponseBuilder response = Response.status(m_httpStatus)
         .entity(BEANS.get(ErrorResponse.class).withError(buildError()))
-        .type(MediaType.APPLICATION_JSON)
-        .build();
+        .type(MediaType.APPLICATION_JSON);
+    m_headers.forEach((k, v) -> response.header(k, v));
+    return response.build();
   }
 
   protected ErrorDo buildError() {
