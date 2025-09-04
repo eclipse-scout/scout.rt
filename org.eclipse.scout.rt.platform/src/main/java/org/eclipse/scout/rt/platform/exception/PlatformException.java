@@ -32,6 +32,13 @@ public class PlatformException extends RuntimeException implements IThrowableWit
   private final List<String> m_contextInfos = new ArrayList<>();
 
   /**
+   * Creates a {@link PlatformException} with a simple message without message arguments.
+   */
+  public PlatformException(final String message) {
+    super(message, null);
+  }
+
+  /**
    * Creates a {@link PlatformException} from the given message.
    * <p>
    * Optionally, <em>formatting anchors</em> in the form of {} pairs can be used in the message, which will be replaced

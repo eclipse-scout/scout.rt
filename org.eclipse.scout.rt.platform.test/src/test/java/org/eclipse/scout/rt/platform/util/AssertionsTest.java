@@ -15,14 +15,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class AssertionsTest {
-
-  @Rule
-  public ExpectedException expectedEx = ExpectedException.none();
 
   @Test
   public void testInstance() {
@@ -43,16 +38,20 @@ public class AssertionsTest {
 
   @Test
   public void testInstanceCustomMessage() {
-    expectedEx.expect(AssertionException.class);
-    expectedEx.expectMessage("custom arg1");
-    Assertions.assertInstance(new Object(), String.class, "custom {}", "arg1");
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertInstance(new Object(), String.class, "custom"));
+    assertEquals("Assertion error: custom", e.getMessage());
+  }
+
+  @Test
+  public void testInstanceCustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertInstance(new Object(), String.class, "custom {}", "arg1"));
+    assertEquals("Assertion error: custom arg1", e.getMessage());
   }
 
   @Test
   public void testInstanceCustomMessageNullValue() {
-    expectedEx.expect(AssertionException.class);
-    expectedEx.expectMessage("custom arg1");
-    Assertions.assertInstance(null, String.class, "custom {}", "arg1");
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertInstance(null, String.class, "custom {}", "arg1"));
+    assertEquals("Assertion error: custom arg1", e.getMessage());
   }
 
   @Test
@@ -79,9 +78,14 @@ public class AssertionsTest {
 
   @Test
   public void testTypeCustomMessage() {
-    expectedEx.expect(AssertionException.class);
-    expectedEx.expectMessage("custom arg1");
-    Assertions.assertType(new Object(), String.class, "custom {}", "arg1");
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertType(new Object(), String.class, "custom"));
+    assertEquals("Assertion error: custom", e.getMessage());
+  }
+
+  @Test
+  public void testTypeCustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertType(new Object(), String.class, "custom {}", "arg1"));
+    assertEquals("Assertion error: custom arg1", e.getMessage());
   }
 
   @Test
@@ -101,50 +105,54 @@ public class AssertionsTest {
   }
 
   @Test
+  public void testNotNullCustomMessage() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertNotNull(null, "custom"));
+    assertEquals("Assertion error: custom", e.getMessage());
+  }
+
+  @Test
+  public void testNotNullCustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertNotNull(null, "custom {}", "arg1"));
+    assertEquals("Assertion error: custom arg1", e.getMessage());
+  }
+
+  @Test
   public void testNotNullOrEmpty_Positive() {
     assertEquals("NOT-NULL", Assertions.assertNotNullOrEmpty("NOT-NULL"));
   }
 
-  @Test
+  @Test(expected = AssertionException.class)
   public void testNotNullOrEmpty_Negative1() {
-    // Verify 'NULL'
-    try {
-      Assertions.assertNotNullOrEmpty(null);
-      fail();
-    }
-    catch (AssertionException e) {
-      // NOOP
-    }
+    Assertions.assertNotNullOrEmpty(null);
+  }
 
-    // Verify 'empty'
-    try {
-      Assertions.assertNotNullOrEmpty("");
-      fail();
-    }
-    catch (AssertionException e) {
-      // NOOP
-    }
+  @Test(expected = AssertionException.class)
+  public void testNotNullOrEmpty_Negative2() {
+    Assertions.assertNotNullOrEmpty("");
   }
 
   @Test
-  public void testNotNullOrEmpty_Negative2() {
-    // Verify 'NULL'
-    try {
-      Assertions.assertNotNullOrEmpty(null, "failure");
-      fail();
-    }
-    catch (AssertionException e) {
-      // NOOP
-    }
+  public void testNotNullOrEmpty_Negative1_CustomMessage() {
+    AssertionException e1 = assertThrows(AssertionException.class, () -> Assertions.assertNotNullOrEmpty(null, "failure"));
+    assertEquals("Assertion error: failure", e1.getMessage());
+  }
 
-    // Verify 'empty'
-    try {
-      Assertions.assertNotNullOrEmpty("", "failure");
-      fail();
-    }
-    catch (AssertionException e) {
-      // NOOP
-    }
+  @Test
+  public void testNotNullOrEmpty_Negative2_CustomMessage() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertNotNullOrEmpty("", "failure"));
+    assertEquals("Assertion error: failure", e.getMessage());
+  }
+
+  @Test
+  public void testNotNullOrEmpty_Negative1_CustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertNotNullOrEmpty(null, "failure {}", "arg1"));
+    assertEquals("Assertion error: failure arg1", e.getMessage());
+  }
+
+  @Test
+  public void testNotNullOrEmpty_Negative2_CustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertNotNullOrEmpty("", "failure {}", "arg1"));
+    assertEquals("Assertion error: failure arg1", e.getMessage());
   }
 
   @Test
@@ -158,6 +166,18 @@ public class AssertionsTest {
   }
 
   @Test
+  public void testTrue_Negative_CustomMessage() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertTrue(false, "failure"));
+    assertEquals("Assertion error: failure", e.getMessage());
+  }
+
+  @Test
+  public void testTrue_Negative_CustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertTrue(false, "failure {}", "arg1"));
+    assertEquals("Assertion error: failure arg1", e.getMessage());
+  }
+
+  @Test
   public void testFalse_Positive() {
     assertFalse(Assertions.assertFalse(false));
   }
@@ -168,13 +188,37 @@ public class AssertionsTest {
   }
 
   @Test
-  public void testNull_positive() {
+  public void testFalse_Negative_CustomMessage() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertFalse(true, "failure"));
+    assertEquals("Assertion error: failure", e.getMessage());
+  }
+
+  @Test
+  public void testFalse_Negative_CustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertFalse(true, "failure {}", "arg1"));
+    assertEquals("Assertion error: failure arg1", e.getMessage());
+  }
+
+  @Test
+  public void testNull_Positive() {
     assertNull(Assertions.assertNull(null));
   }
 
   @Test(expected = AssertionException.class)
-  public void testNull_negative() {
+  public void testNull_Negative() {
     Assertions.assertNull(new Object());
+  }
+
+  @Test
+  public void testNull_Negative_CustomMessage() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertNull(new Object(), "failure"));
+    assertEquals("Assertion error: failure", e.getMessage());
+  }
+
+  @Test
+  public void testNull_Negative_CustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertNull(new Object(), "failure {}", "arg1"));
+    assertEquals("Assertion error: failure arg1", e.getMessage());
   }
 
   @Test
@@ -193,6 +237,18 @@ public class AssertionsTest {
   }
 
   @Test
+  public void testLess_CustomMessage() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertLess(1, 0, "failure"));
+    assertEquals("Assertion error: failure", e.getMessage());
+  }
+
+  @Test
+  public void testLess_CustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertLess(1, 0, "failure {}", "arg1"));
+    assertEquals("Assertion error: failure arg1", e.getMessage());
+  }
+
+  @Test
   public void testLessOrEqual1() {
     assertEquals(1, Assertions.assertLessOrEqual(1, 2).intValue());
   }
@@ -205,6 +261,18 @@ public class AssertionsTest {
   @Test(expected = AssertionException.class)
   public void testLessOrEqual3() {
     Assertions.assertLessOrEqual(1, 0);
+  }
+
+  @Test
+  public void testLessOrEqual_CustomMessage() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertLessOrEqual(1, 0, "failure"));
+    assertEquals("Assertion error: failure", e.getMessage());
+  }
+
+  @Test
+  public void testLessOrEqual_CustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertLessOrEqual(1, 0, "failure {}", "arg1"));
+    assertEquals("Assertion error: failure arg1", e.getMessage());
   }
 
   @Test(expected = AssertionException.class)
@@ -222,6 +290,18 @@ public class AssertionsTest {
     assertEquals(1, Assertions.assertGreater(1, 0).intValue());
   }
 
+  @Test
+  public void testGreater_CustomMessage() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertGreater(1, 2, "failure"));
+    assertEquals("Assertion error: failure", e.getMessage());
+  }
+
+  @Test
+  public void testGreater_CustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertGreater(1, 2, "failure {}", "arg1"));
+    assertEquals("Assertion error: failure arg1", e.getMessage());
+  }
+
   @Test(expected = AssertionException.class)
   public void testGreaterOrEqual1() {
     Assertions.assertGreaterOrEqual(1, 2);
@@ -235,6 +315,18 @@ public class AssertionsTest {
   @Test
   public void testGreaterOrEqual3() {
     assertEquals(1, Assertions.assertGreaterOrEqual(1, 0).intValue());
+  }
+
+  @Test
+  public void testGreaterOrEqual_CustomMessage() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertGreaterOrEqual(1, 2, "failure"));
+    assertEquals("Assertion error: failure", e.getMessage());
+  }
+
+  @Test
+  public void testGreaterOrEqual_CustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertGreaterOrEqual(1, 2, "failure {}", "arg1"));
+    assertEquals("Assertion error: failure arg1", e.getMessage());
   }
 
   @Test(expected = AssertionException.class)
@@ -253,6 +345,18 @@ public class AssertionsTest {
   }
 
   @Test
+  public void testEqual_CustomMessage() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertEqual(1, 0, "failure"));
+    assertEquals("Assertion error: failure", e.getMessage());
+  }
+
+  @Test
+  public void testEqual_CustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertEqual(1, 0, "failure {}", "arg1"));
+    assertEquals("Assertion error: failure arg1", e.getMessage());
+  }
+
+  @Test
   public void testEquals1() {
     assertEquals("value", Assertions.assertEquals("value", "value"));
   }
@@ -260,6 +364,18 @@ public class AssertionsTest {
   @Test(expected = AssertionException.class)
   public void testEquals2() {
     Assertions.assertEquals("value", "something other");
+  }
+
+  @Test
+  public void testEquals_CustomMessage() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertEquals("value", "something other", "failure"));
+    assertEquals("Assertion error: failure", e.getMessage());
+  }
+
+  @Test
+  public void testEquals_CustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertEquals("value", "something other", "failure {}", "arg1"));
+    assertEquals("Assertion error: failure arg1", e.getMessage());
   }
 
   @Test(expected = AssertionException.class)
@@ -273,6 +389,18 @@ public class AssertionsTest {
   }
 
   @Test
+  public void testNotEquals_CustomMessage() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertNotEquals("value", "value", "failure"));
+    assertEquals("Assertion error: failure", e.getMessage());
+  }
+
+  @Test
+  public void testNotEquals_CustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertNotEquals("value", "value", "failure {}", "arg1"));
+    assertEquals("Assertion error: failure arg1", e.getMessage());
+  }
+
+  @Test
   public void testSame() {
     Object object = new Object();
     assertSame(object, Assertions.assertSame(object, object));
@@ -281,6 +409,18 @@ public class AssertionsTest {
   @Test(expected = AssertionException.class)
   public void testSame2() {
     Assertions.assertSame(new Object(), new Object());
+  }
+
+  @Test
+  public void testSame_CustomMessage() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertSame(new Object(), new Object(), "failure"));
+    assertEquals("Assertion error: failure", e.getMessage());
+  }
+
+  @Test
+  public void testSame_CustomMessageWithArgs() {
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertSame(new Object(), new Object(), "failure {}", "arg1"));
+    assertEquals("Assertion error: failure arg1", e.getMessage());
   }
 
   @Test(expected = AssertionException.class)
@@ -296,6 +436,20 @@ public class AssertionsTest {
   }
 
   @Test
+  public void testNotSame_CustomMessage() {
+    Object object = new Object();
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertNotSame(object, object, "failure"));
+    assertEquals("Assertion error: failure", e.getMessage());
+  }
+
+  @Test
+  public void testNotSame_CustomMessageWithArgs() {
+    Object object = new Object();
+    AssertionException e = assertThrows(AssertionException.class, () -> Assertions.assertNotSame(object, object, "failure {}", "arg1"));
+    assertEquals("Assertion error: failure arg1", e.getMessage());
+  }
+
+  @Test
   public void testFail() {
     // 1. Test with simple message
     try {
@@ -306,7 +460,7 @@ public class AssertionsTest {
       assertEquals("Assertion error: failure", e.getMessage());
     }
 
-    // 2. Test with message with message arguments
+    // 2. Test with message and message arguments
     try {
       Assertions.fail("failure [{}, {}]", "A", "B");
       fail();
