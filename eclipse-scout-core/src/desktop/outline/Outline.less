@@ -419,4 +419,23 @@
   .keyframes-tree-node-prev-selection();
 }
 
-/* NOSONAR */
+// FIXME bsh [js-page] DO NOT PUSH
+.tree-node[data-js-only] > .text::after {
+  content: 'JS';
+  font-size: 10px;
+  padding: 2px 5px;
+  margin-left: 10px;
+  position: absolute;
+  pointer-events: none;
+  border-radius: 3px;
+  color: @highlight-inverted-background-color;
+  background-color: @text-inverted-color;
+  border: 1px solid @highlight-inverted-background-color;
+}
+
+.tree-node[data-js-only=hybrid] > .text::after {
+  content: 'HY';
+  color: @text-inverted-color;
+  background-color: @highlight-inverted-background-color;
+  border: 1px solid transparent;
+}
