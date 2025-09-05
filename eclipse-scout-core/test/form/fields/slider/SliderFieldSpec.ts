@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -65,6 +65,23 @@ describe('SliderField', () => {
       expect(field.value).toBe(10);
       expect(field.slider.value).toBe(10);
       expect(field.displayText).toBe('10');
+    });
+
+    it('moves the thumb to the max with inappropriate step size', () => {
+      field.render();
+
+      field.setMinValue(0);
+      field.setMaxValue(5);
+      field.setStep(4);
+
+      expect(field.value).toBe(0);
+      expect(field.slider.value).toBe(0);
+      expect(field.displayText).toBe('0');
+
+      field.slider.move(5);
+      expect(field.value).toBe(5);
+      expect(field.slider.value).toBe(5);
+      expect(field.displayText).toBe('5');
     });
 
     it('limits the min & max value', () => {
