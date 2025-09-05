@@ -24,18 +24,24 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.rest.client.IRestClientHelper;
 import org.eclipse.scout.rt.rest.client.IRestResourceClient;
+import org.eclipse.scout.rt.rest.id.IdSignatureClientRequestFilter;
+import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelConstants;
 
 public class ProcessResourceClient implements IRestResourceClient {
 
   protected static final String RESOURCE_PATH = ServiceTunnelConstants.PROCESS_PATH;
 
-  public Response call(InputStream inputStream) {
+  public Response call(InputStream inputStream, boolean addIdSignatureHeader) {
     WebTarget target = helper().target(RESOURCE_PATH);
 
     Builder builder = target
         .request()
         .accept(MediaType.APPLICATION_OCTET_STREAM);
+
+    if (addIdSignatureHeader) {
+      addIdSignatureHeader(builder);
+    }
 
     return builder.post(Entity.entity(
         inputStream,
@@ -45,6 +51,13 @@ public class ProcessResourceClient implements IRestResourceClient {
             CONFIG.getPropertyValue(CompressServiceTunnelRequestProperty.class) ? "gzip" : null // enable request compression, see GzipEncoder for handling
         )
     ));
+  }
+
+  /**
+   * Service tunnel does not use {@link IdSignatureClientRequestFilter} as {@link TunnelToServer} annotation decides whether header should be added
+   */
+  protected void addIdSignatureHeader(Builder builder) {
+    builder.header(IdSignatureClientRequestFilter.ID_SIGNATURE_HTTP_HEADER, Boolean.TRUE.toString());
   }
 
   protected IRestClientHelper helper() {

@@ -42,6 +42,7 @@ import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.opentelemetry.HttpServiceTunnelInstrumenterFactory;
 import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandler;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelOptions;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -92,21 +93,21 @@ public class HttpServiceTunnel {
    *     the data created by the {@link BinaryServiceTunnelContentHandler} used by this tunnel Create url connection and
    *     write post data (if required)
    */
-  protected Response executeRequestInternal(ServiceTunnelRequest call, byte[] callData) throws IOException {
-    return BEANS.get(ProcessResourceClient.class).call(new ByteArrayInputStream(callData));
+  protected Response executeRequestInternal(ServiceTunnelOptions options, ServiceTunnelRequest call, byte[] callData) throws IOException {
+    return BEANS.get(ProcessResourceClient.class).call(new ByteArrayInputStream(callData), options.isIdSignature());
   }
 
-  protected Response executeRequest(ServiceTunnelRequest call, byte[] callData) throws IOException {
+  protected Response executeRequest(ServiceTunnelOptions options, ServiceTunnelRequest call, byte[] callData) throws IOException {
     Context parentContext = Context.current();
 
     if (!m_instrumenter.shouldStart(parentContext, call)) {
-      return executeRequestInternal(call, callData);
+      return executeRequestInternal(options, call, callData);
     }
 
     Context context = m_instrumenter.start(parentContext, call);
     Response response;
     try (Scope ignored = context.makeCurrent()) {
-      response = executeRequestInternal(call, callData);
+      response = executeRequestInternal(options, call, callData);
     }
     catch (Throwable t) {
       m_instrumenter.end(context, call, null, t);
@@ -121,19 +122,19 @@ public class HttpServiceTunnel {
    * The argument array may contain IHolder values which are updated as OUT parameters when the backend call has
    * completed flags are custom flags not used by the framework itself
    */
-  public Object invokeService(Class serviceInterfaceClass, Method operation, Object[] callerArgs) {
+  public Object invokeService(ServiceTunnelOptions options, Class serviceInterfaceClass, Method operation, Object[] callerArgs) {
     LOG.debug("{}.{}({})", serviceInterfaceClass, operation, callerArgs);
     ServiceTunnelRequest request = createRequest(serviceInterfaceClass, operation, callerArgs);
     interceptRequest(request);
-    return invokeService(request);
+    return invokeService(options, request);
   }
 
-  public Object invokeService(ServiceTunnelRequest request) {
+  public Object invokeService(ServiceTunnelOptions options, ServiceTunnelRequest request) {
     final long t0 = System.nanoTime();
 
     checkAlreadyCancelled(request);
     beforeTunnel(request);
-    ServiceTunnelResponse response = tunnel(request);
+    ServiceTunnelResponse response = tunnel(options, request);
     afterTunnel(t0, response);
 
     // Exception handling
@@ -187,8 +188,8 @@ public class HttpServiceTunnel {
    * To enable cancellation, the callable returned must also implement {@link ICancellable}, so that the remote
    * operation can be cancelled once the current {@link RunMonitor} gets cancelled.
    */
-  protected RemoteServiceInvocationCallable createRemoteServiceInvocationCallable(ServiceTunnelRequest serviceRequest) {
-    return new RemoteServiceInvocationCallable(this, serviceRequest);
+  protected RemoteServiceInvocationCallable createRemoteServiceInvocationCallable(ServiceTunnelOptions options, ServiceTunnelRequest serviceRequest) {
+    return new RemoteServiceInvocationCallable(this, options, serviceRequest);
   }
 
   /**
@@ -200,14 +201,14 @@ public class HttpServiceTunnel {
    *
    * @return response sent by the server; is never <code>null</code>.
    */
-  protected ServiceTunnelResponse tunnel(final ServiceTunnelRequest serviceRequest) {
+  protected ServiceTunnelResponse tunnel(final ServiceTunnelOptions options, final ServiceTunnelRequest serviceRequest) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("requestSequence {} {}.{}", serviceRequest.getRequestSequence(), serviceRequest.getServiceInterfaceClassName(), serviceRequest.getOperation());
     }
     final long requestSequence = serviceRequest.getRequestSequence();
 
     // Create the Callable to be given to the job manager for execution.
-    final RemoteServiceInvocationCallable remoteInvocationCallable = createRemoteServiceInvocationCallable(serviceRequest);
+    final RemoteServiceInvocationCallable remoteInvocationCallable = createRemoteServiceInvocationCallable(options, serviceRequest);
 
     // Register the execution monitor as child monitor of the current monitor so that the service request is cancelled once the current monitor gets cancelled.
     // Invoke the service operation asynchronously (to enable cancellation) and wait until completed or cancelled.

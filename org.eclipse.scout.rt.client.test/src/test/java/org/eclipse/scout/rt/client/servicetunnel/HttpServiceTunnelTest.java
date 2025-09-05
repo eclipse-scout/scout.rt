@@ -64,7 +64,7 @@ public class HttpServiceTunnelTest {
     HttpServiceTunnel tunnel = createHttpServiceTunnel(expectedResponse);
 
     ServiceTunnelRequest request = new ServiceTunnelRequest("IPingService", "ping", null, null);
-    ServiceTunnelResponse response = tunnel.tunnel(request);
+    ServiceTunnelResponse response = tunnel.tunnel(null, request);
     assertNotNull(response);
     assertEquals("testData", response.getData());
   }
@@ -75,7 +75,7 @@ public class HttpServiceTunnelTest {
     HttpServiceTunnel tunnel = createHttpServiceTunnel(expectedResponse);
 
     ServiceTunnelRequest request = new ServiceTunnelRequest("IPingService", "ping", null, null);
-    ServiceTunnelResponse response = tunnel.tunnel(request);
+    ServiceTunnelResponse response = tunnel.tunnel(null, request);
     assertNotNull(response);
     assertTrue(response.getException() instanceof HttpServiceTunnelException);
     assertEquals(401, ((HttpServiceTunnelException) response.getException()).getHttpStatus());

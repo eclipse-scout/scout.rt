@@ -9,15 +9,11 @@
  */
 package org.eclipse.scout.rt.client.servicetunnel;
 
-import static org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelOptions.ID_SIGNATURE_PROP;
-
 import java.lang.reflect.Method;
-import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
-import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.interceptor.DecoratingProxy;
 import org.eclipse.scout.rt.platform.interceptor.IInstanceInvocationHandler;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -59,17 +55,7 @@ public class ServiceTunnelProxyProducer<T> implements IBeanInstanceProducer<T>, 
       LOG.debug("Tunnel call to {}.{}({})", getInterfaceClass(), method.getName(), VerboseUtility.dumpObjects(args));
     }
 
-    Callable<Object> invokeService = () -> BEANS.get(HttpServiceTunnel.class).invokeService(getInterfaceClass(), method, args);
-
-    // check the idSignature flag
-    if (getOptions().isIdSignature()) {
-      // add run context property
-      return RunContexts.copyCurrent()
-          .withProperty(ID_SIGNATURE_PROP, true)
-          .call(invokeService);
-    }
-
-    return invokeService.call();
+    return BEANS.get(HttpServiceTunnel.class).invokeService(getOptions(), getInterfaceClass(), method, args);
   }
 
   protected Class<?> getInterfaceClass() {

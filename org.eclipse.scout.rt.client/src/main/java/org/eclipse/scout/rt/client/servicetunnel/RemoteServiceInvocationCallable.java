@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandler;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelOptions;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.slf4j.Logger;
@@ -51,11 +52,13 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
   private static final Logger LOG = LoggerFactory.getLogger(RemoteServiceInvocationCallable.class);
 
   private final HttpServiceTunnel m_tunnel;
+  private final ServiceTunnelOptions m_options;
   private final ServiceTunnelRequest m_serviceRequest;
   private final BinaryServiceTunnelContentHandler m_contentHandler;
 
-  public RemoteServiceInvocationCallable(final HttpServiceTunnel tunnel, final ServiceTunnelRequest serviceRequest) {
+  public RemoteServiceInvocationCallable(HttpServiceTunnel tunnel, ServiceTunnelOptions options, ServiceTunnelRequest serviceRequest) {
     m_tunnel = tunnel;
+    m_options = options;
     m_serviceRequest = serviceRequest;
     m_contentHandler = BEANS.get(BinaryServiceTunnelContentHandler.class);
   }
@@ -83,7 +86,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
       nBytes = requestData.length;
 
       // Send the request to the server.
-      try (Response resp = m_tunnel.executeRequest(m_serviceRequest, requestData)) {
+      try (Response resp = m_tunnel.executeRequest(m_options, m_serviceRequest, requestData)) {
         m_tunnel.interceptHttpResponse(resp, m_serviceRequest);
 
         try (InputStream in = resp.readEntity(InputStream.class)) {
@@ -160,7 +163,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
       request.setClientNodeId(m_serviceRequest.getClientNodeId());
       request.setSessionId(sessionId);
       request.setUserAgent(m_serviceRequest.getUserAgent());
-      m_tunnel.invokeService(request);
+      m_tunnel.invokeService(null, request);
     }
     catch (final FutureCancelledError | ThreadInterruptedError e) { // NOSONAR
       // NOOP: Do not cancel 'cancel-request' to prevent loop.
