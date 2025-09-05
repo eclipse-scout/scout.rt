@@ -73,9 +73,15 @@ export class PlainTextEncoder {
       text = text.trim();
     }
 
+    // Decore character references
     let textarea = this._cachedElement.get();
     textarea.innerHTML = text;
-    return textarea.value;
+    text = textarea.value;
+
+    // Convert non-breaking spaces to normal spaces
+    text = text.replace(/\u00A0/g, ' ');
+
+    return text;
   }
 
   removeAttributeValues(text: string): string {
