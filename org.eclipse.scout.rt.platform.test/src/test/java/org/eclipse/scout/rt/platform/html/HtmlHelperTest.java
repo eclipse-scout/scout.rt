@@ -46,8 +46,8 @@ public class HtmlHelperTest {
     assertEquals("one \t two", helper.toPlainText("one &#9; two"));
     assertEquals("one\ttwo", helper.toPlainText("one" + StringUtility.HTML_ENCODED_TAB + "two"));
     assertEquals("one two", helper.toPlainText("one   two"));
-    assertEquals("one\u00A0\u00A0 two", helper.toPlainText("one&nbsp;&nbsp; two"));
-    assertEquals("one\u00A0\u00A0\u00A0\u00A0two", helper.toPlainText("one&#160;&#xa0;&#Xa0;&#xA0;two")); // HTML5 spec allows for mixed case hex values.
+    assertEquals("one   two", helper.toPlainText("one&nbsp;&nbsp; two"));
+    assertEquals("one    two", helper.toPlainText("one&#160;&#xa0;&#Xa0;&#xA0;two")); // HTML5 spec allows for mixed case hex values.
     assertEquals("one\t\ttwo", helper.toPlainText("one&#x9;&#X9;two")); // HTML5 spec allows for mixed case hex values.
     assertEquals("Unterraschungsfeier", helper.toPlainText("<div class=\"rte-line\">Unter<u>rasch</u>u<span class=\"rte-highlight\" style=\"background-color: rgb(255, 219, 157)\">ngs</span>feier<br></div>")); // Formating tags within a single word.
     assertEquals("Header 1\nHeader 2", helper.toPlainText("<h1>Header 1</h1><h1>Header 2</h1>")); // Headers
@@ -81,7 +81,7 @@ public class HtmlHelperTest {
     assertEquals("Unterraschungsfeier",
         helper.toPlainText("<html><body><div class=\"rte-line\">Unter<u>rasch</u>u<span class=\"rte-highlight\" style=\"background-color: rgb(255, 219, 157)\">ngs</span>feier<br></div></body></html>"));
     assertEquals("Z1\nZ2", helper.toPlainText("<p>Z1</p><span></span><p>Z2</p>"));
-    assertEquals("Guten Tag\n\n\u00A0\n\nZeile 2", helper.toPlainText("<html><body><div><div><p>Guten Tag<o:p></o:p></p></div><div><p><o:p>&nbsp;</o:p></span></p></div><div><p><span>Zeile 2<o:p></o:p></span></p></div></div></body></html>"));
+    assertEquals("Guten Tag\n\n \n\nZeile 2", helper.toPlainText("<html><body><div><div><p>Guten Tag<o:p></o:p></p></div><div><p><o:p>&nbsp;</o:p></span></p></div><div><p><span>Zeile 2<o:p></o:p></span></p></div></div></body></html>"));
     assertEquals("’", helper.toPlainText("&#8217;"));
     assertEquals("+", helper.toPlainText("&#43;"));
     assertEquals("+", helper.toPlainText("&#x2B;"));
@@ -92,9 +92,9 @@ public class HtmlHelperTest {
     assertEquals("a\nb", helper.toPlainText("a<br>b"));
     assertEquals("a\nb", helper.toPlainText("a <br/> b"));
     assertEquals("a\nb", helper.toPlainText("a    <br/> b"));
-    assertEquals("a\u00A0\nb", helper.toPlainText("a&nbsp;<br/> b"));
-    assertEquals("a \u00A0\nb", helper.toPlainText("a  &nbsp;  <br/>  b  "));
-    assertEquals("a\n\u00A0\u00A0b\n\u00A0\u00A0\u00A0\u00A0c", helper.toPlainText("a<br>&nbsp;&nbsp;b<br>&nbsp;&nbsp;&nbsp;&nbsp;c"));
+    assertEquals("a \nb", helper.toPlainText("a&nbsp;<br/> b"));
+    assertEquals("a  \nb", helper.toPlainText("a  &nbsp;  <br/>  b  "));
+    assertEquals("a\n  b\n    c", helper.toPlainText("a<br>&nbsp;&nbsp;b<br>&nbsp;&nbsp;&nbsp;&nbsp;c"));
     assertEquals("line", helper.toPlainText("<br/>line"));
     assertEquals("\nline", helper.toPlainTextNoTrim("<br/>line"));
     assertEquals("line1\nx\nline2", helper.toPlainText("<p>line1<br>\nx</p><p>line2</p>"));

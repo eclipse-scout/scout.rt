@@ -100,7 +100,7 @@ describe('PlainTextEncoder', () => {
 
   it('converts &nbsp;, &amp;, &gt;, &lt;', () => {
     let htmlText = '<b>first&nbsp;word</b>&nbsp;next word';
-    expect(encoder.encode(htmlText)).toBe('first word next word');
+    expect(encoder.encode(htmlText)).toBe('first word next word');
 
     htmlText = '<b>first&amp;word</b>&amp;next word';
     expect(encoder.encode(htmlText)).toBe('first&word&next word');
@@ -290,10 +290,10 @@ describe('PlainTextEncoder', () => {
     expect(encoder.encode('one\rtwo')).toBe('onetwo');
     expect(encoder.encode('one<br/>\r\ntwo')).toBe('one\ntwo');
     expect(encoder.encode('one   two')).toBe('one two');
-    expect(encoder.encode('one&nbsp;&nbsp; two')).toBe('one\u00a0\u00a0 two');
+    expect(encoder.encode('one&nbsp;&nbsp; two')).toBe('one   two');
     expect(encoder.encode('one &#9; two')).toBe('one \t two');
     expect(encoder.encode(' one <br>\n two  <br>\n   three ')).toBe('one\ntwo\nthree');
-    expect(encoder.encode('a<br>\n&nbsp;&nbsp;b<br>\n&nbsp;&nbsp;&nbsp;&nbsp;c')).toBe('a\n\u00A0\u00A0b\n\u00A0\u00A0\u00A0\u00A0c');
+    expect(encoder.encode('a<br>\n&nbsp;&nbsp;b<br>\n&nbsp;&nbsp;&nbsp;&nbsp;c')).toBe('a\n  b\n    c');
   });
 
   it('decodes special characters', () => {
@@ -328,8 +328,8 @@ describe('PlainTextEncoder', () => {
       expect(encoder.encode('one&#9;two')).toBe('one\ttwo');
       expect(encoder.encode('one &#9; two')).toBe('one \t two');
       expect(encoder.encode('one   two')).toBe('one two');
-      expect(encoder.encode('one&nbsp;&nbsp; two')).toBe('one\u00A0\u00A0 two');
-      expect(encoder.encode('one&#160;&#xa0;&#Xa0;&#xA0;two')).toBe('one\u00A0\u00A0\u00A0\u00A0two'); // HTML5 spec allows for mixed case hex values.
+      expect(encoder.encode('one&nbsp;&nbsp; two')).toBe('one   two');
+      expect(encoder.encode('one&#160;&#xa0;&#Xa0;&#xA0;two')).toBe('one    two'); // HTML5 spec allows for mixed case hex values.
       expect(encoder.encode('one&#x9;&#X9;two')).toBe('one\t\ttwo'); // HTML5 spec allows for mixed case hex values.
       expect(encoder.encode('<div class="rte-line">Unter<u>rasch</u>u<span class="rte-highlight" style="background-color: rgb(255, 219, 157)">ngs</span>feier<br></div>')).toBe('Unterraschungsfeier'); // Formating tags within a single word.
       expect(encoder.encode('<h1>Header 1</h1><h1>Header 2</h1>')).toBe('Header 1\nHeader 2'); // Headers
@@ -360,7 +360,7 @@ describe('PlainTextEncoder', () => {
       expect(encoder.encode('<html><head>one &amp; two</head><body>three</body></html>')).toBe('one & two\nthree'); // [?!] does not handle <head> differently than any other tag
       expect(encoder.encode('<html><body><div class="rte-line">Unter<u>rasch</u>u<span class="rte-highlight" style="background-color: rgb(255, 219, 157)">ngs</span>feier<br></div></body></html>')).toBe('Unterraschungsfeier');
       expect(encoder.encode('<p>Z1</p><span></span><p>Z2</p>')).toBe('Z1\nZ2');
-      expect(encoder.encode('<html><body><div><div><p>Guten Tag<o:p></o:p></p></div><div><p><o:p>&nbsp;</o:p></span></p></div><div><p><span>Zeile 2<o:p></o:p></span></p></div></div></body></html>')).toBe('Guten Tag\n\n\u00A0\n\nZeile 2');
+      expect(encoder.encode('<html><body><div><div><p>Guten Tag<o:p></o:p></p></div><div><p><o:p>&nbsp;</o:p></span></p></div><div><p><span>Zeile 2<o:p></o:p></span></p></div></div></body></html>')).toBe('Guten Tag\n\n \n\nZeile 2');
       expect(encoder.encode('&#8217;')).toBe('’');
       expect(encoder.encode('&#43;')).toBe('+');
       expect(encoder.encode('&#x2B;')).toBe('+');
@@ -371,9 +371,9 @@ describe('PlainTextEncoder', () => {
       expect(encoder.encode('a<br>b')).toBe('a\nb');
       expect(encoder.encode('a <br/> b')).toBe('a\nb');
       expect(encoder.encode('a    <br/> b')).toBe('a\nb');
-      expect(encoder.encode('a&nbsp;<br/> b')).toBe('a\u00A0\nb');
-      expect(encoder.encode('a  &nbsp;  <br/>  b  ')).toBe('a \u00A0\nb');
-      expect(encoder.encode('a<br>&nbsp;&nbsp;b<br>&nbsp;&nbsp;&nbsp;&nbsp;c')).toBe('a\n\u00A0\u00A0b\n\u00A0\u00A0\u00A0\u00A0c');
+      expect(encoder.encode('a&nbsp;<br/> b')).toBe('a \nb');
+      expect(encoder.encode('a  &nbsp;  <br/>  b  ')).toBe('a  \nb');
+      expect(encoder.encode('a<br>&nbsp;&nbsp;b<br>&nbsp;&nbsp;&nbsp;&nbsp;c')).toBe('a\n  b\n    c');
       expect(encoder.encode('<br/>line')).toBe('line');
       expect(encoder.encode('<br/>line', {trim: false})).toBe('\nline');
       expect(encoder.encode('<p>line1<br>\nx</p><p>line2</p>')).toBe('line1\nx\nline2');

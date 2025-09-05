@@ -113,6 +113,9 @@ public class HtmlHelper {
     // character references
     s = BEANS.get(HtmlEntities.class).unescapeAll(s);
 
+    // convert non-breaking spaces to normal spaces
+    s = s.replaceAll("\u00A0", " ");
+
     return s;
   }
 
