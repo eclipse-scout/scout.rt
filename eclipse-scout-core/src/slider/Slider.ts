@@ -244,7 +244,7 @@ export class Slider extends Widget implements SliderModel {
   }
 
   protected _calculateSteppedValue(value: number) {
-    if (!this.step) { // 0 or not set
+    if (!this.step || value === this.maxValue) { // 0, not set or max value
       return value;
     }
     const stepsFromMin = Math.round((value - this.minValue) / this.step);
