@@ -1635,7 +1635,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected void handleModelColumnAggregationChanged(TableEvent event) {
     JSONObject jsonEvent = new JSONObject();
     JSONArray eventParts = new JSONArray();
-    for (IColumn<?> c : event.getColumns()) {
+    Collection<IColumn<?>> columns = filterVisibleColumns(event.getColumns());
+    if (columns.isEmpty()) {
+      return;
+    }
+    for (IColumn<?> c : columns) {
       Assertions.assertInstance(c, INumberColumn.class, "ColumnAggregation is only supported on NumberColumns");
       JSONObject eventPart = new JSONObject();
       putProperty(eventPart, "columnId", getColumnId(c));
@@ -1649,7 +1653,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected void handleModelColumnBackgroundEffectChanged(TableEvent event) {
     JSONObject jsonEvent = new JSONObject();
     JSONArray eventParts = new JSONArray();
-    for (IColumn<?> c : event.getColumns()) {
+    Collection<IColumn<?>> columns = filterVisibleColumns(event.getColumns());
+    if (columns.isEmpty()) {
+      return;
+    }
+    for (IColumn<?> c : columns) {
       Assertions.assertInstance(c, INumberColumn.class, "ColumnBackgroundEffect is only supported on NumberColumns");
       JSONObject eventPart = new JSONObject();
       putProperty(eventPart, "columnId", getColumnId(c));
