@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Cell, CellEditorPopup, Column, FormField, keys, Popup, scout, SmartColumn, SmartField, StaticLookupCall, Status, StringField, Table, TableRow, Widget} from '../../../src/index';
-import {FormSpecHelper, JQueryTesting, TableSpecHelper} from '../../../src/testing/index';
+import {FormSpecHelper, JQueryTesting, SpecSmartField, TableSpecHelper} from '../../../src/testing/index';
 
 describe('CellEditor', () => {
   let session: SandboxSession;
@@ -508,7 +508,7 @@ describe('CellEditor', () => {
   });
 
   describe('completeCellEdit', () => {
-    let table;
+    let table: Table;
 
     beforeEach(() => {
       let model = helper.createModelFixture(2, 2);
@@ -707,10 +707,11 @@ describe('CellEditor', () => {
   });
 
   describe('completeCellEdit in SmartColumn', () => {
-    let table;
+    let table: Table;
+    let lookupCall: DummyLookupCall;
 
     beforeEach(() => {
-      let lookupCall = new DummyLookupCall();
+      lookupCall = new DummyLookupCall();
       lookupCall.init({session: session});
 
       table = helper.createTable({
@@ -778,14 +779,33 @@ describe('CellEditor', () => {
       table.markRowsAsNonChanged();
       table.prepareCellEdit(table.columns[0], table.rows[0], true);
       jasmine.clock().tick(300);
-      table.cellEditorPopup.cell.field.$field.val('Key 1');
-      table.cellEditorPopup.cell.field._userWasTyping = true;
+      let field = table.cellEditorPopup.cell.field as SpecSmartField;
+      field.$field.val('Key 1');
+      field._userWasTyping = true;
       table.cellEditorPopup.completeEdit(); // Will execute table.completeCellEdit async
       table.remove();
       jasmine.clock().tick(300);
       expect(table.rows[0].cells[0].value).toBe('key1');
       expect(table.rows[0].cells[0].text).toBe('Key 1');
       expect(table.rows[0].status).toBe(TableRow.Status.UPDATED);
+    });
+
+    it('closes the editor even if acceptInput was called again', async () => {
+      jasmine.clock().uninstall();
+      table.columns[0].setEditable(true);
+      lookupCall.setDelay(5);
+      await table.prepareCellEdit(table.columns[0], table.rows[0], true);
+      let popup = table.cellEditorPopup;
+      let field = popup.cell.field as SpecSmartField;
+      field.$field.val('asdf');
+      field._userWasTyping = true;
+
+      let completed = table.cellEditorPopup.completeEdit();
+      setTimeout(() => table.cellEditorPopup.cell.field.acceptInput()); // May happen if another popup opens that requests the focus -> smart field loses focus and accepts input
+      await completed;
+      await popup.when('destroy');
+      expect(table.cellEditorPopup).toBe(null);
+      expect(table.cell(table.columns[0], table.rows[0]).text).toBe('asdf');
     });
   });
 
