@@ -21,13 +21,13 @@ export class TableUiPreferences implements ObjectWithType {
   /**
    * Key for the current global preferences of a table, i.e. preferences that are not stored in a specific settings profile.
    */
-  static PROFILE_ID_GLOBAL = 'global-' + 'a134390b-bfef-4b9e-a14e-425df161e768';
+  static readonly PROFILE_ID_GLOBAL = 'global-' + 'a134390b-bfef-4b9e-a14e-425df161e768';
 
   /**
    * Special key used to store table settings of a bookmarked table page. The bookmark support will consider this state as
    * the "factory settings" when the page is displayed in the bookmark outline.
    */
-  static PROFILE_ID_BOOKMARK = 'bookmark-' + 'aebcacd2-ddb6-4b7f-8673-d1585701d388';
+  static readonly PROFILE_ID_BOOKMARK = 'bookmark-' + 'aebcacd2-ddb6-4b7f-8673-d1585701d388';
 
   objectType: string;
 
@@ -133,6 +133,23 @@ export class TableUiPreferences implements ObjectWithType {
   protected _uninstallTableListener(table: Table) {
     table.off('columnMoved columnResized columnStructureChanged group sort aggregationFunctionChanged columnBackgroundEffectChanged', this._tableColumnListener);
     table.off('propertyChange:tileMode', this._tableTileModeListener);
+  }
+
+  /**
+   * Executes the specified runnable immediately. During its execution, all table events are ignored by this
+   * {@link TableUiPreferences} instance. The events themselves are not suppressed, i.e. other listeners are
+   * still triggered. Useful for making table adjustments that should _not_ be stored in the global profile.
+   */
+  withIgnoreTableEvents(runnable: () => void) {
+    if (!runnable) {
+      return;
+    }
+    this._ignoreTableEvents = true;
+    try {
+      runnable();
+    } finally {
+      this._ignoreTableEvents = false;
+    }
   }
 
   protected get _ignoreTableEvents(): boolean {
@@ -384,17 +401,14 @@ export class TableUiPreferences implements ObjectWithType {
     }
     scout.assertParameter('table', table, Table);
 
-    this._ignoreTableEvents = true;
-    try {
+    this.withIgnoreTableEvents(() => {
       this._applyTablePreferencesInternal(table, prefs, options);
 
       let profile = this.getProfile(prefs, profileId);
       if (profile) {
         this._applyTablePreferenceProfileInternal(table, profile, options);
       }
-    } finally {
-      this._ignoreTableEvents = false;
-    }
+    });
   }
 
   /**
@@ -406,12 +420,9 @@ export class TableUiPreferences implements ObjectWithType {
     }
     scout.assertParameter('table', table, Table);
 
-    this._ignoreTableEvents = true;
-    try {
+    this.withIgnoreTableEvents(() => {
       this._applyTablePreferenceProfileInternal(table, profile, options);
-    } finally {
-      this._ignoreTableEvents = false;
-    }
+    });
   }
 
   protected _applyTablePreferencesInternal(table: Table, prefs: TableClientUiPreferencesDo, options?: ApplyTablePreferencesOptions) {

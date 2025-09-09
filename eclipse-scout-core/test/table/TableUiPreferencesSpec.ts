@@ -461,6 +461,42 @@ describe('TableUiPreferences', () => {
       expect(profile2.columns.map(c => c.visible)).toEqual([false, true, false, true, true, true]);
       expect(profile2.columns.map(c => c.width)).toEqual([60, 102, 103, 104, 105, 106]);
     });
+
+    it('can ignore table events', () => {
+      let table = scout.create(SpecTable, {
+        parent: session.desktop,
+        id: 't1',
+        uiPreferencesEnabled: true
+      });
+      let prefStore = SpecUiPreferencesStore.get();
+      let c2 = table.columnById('c2');
+
+      expect(prefStore.loadCount).toBe(0);
+      expect(prefStore.storeCount).toBe(0);
+
+      c2.setWidth(202);
+
+      jasmine.clock().tick(1000);
+      expect(prefStore.loadCount).toBe(0);
+      expect(prefStore.storeCount).toBe(1);
+      expect(prefStore.preferences?.tablePreferences[0]?.tablePreferenceProfiles?.get(TableUiPreferences.PROFILE_ID_GLOBAL)?.columns[1]?.width).toBe(202);
+
+      tableUiPreferences.withIgnoreTableEvents(() => {
+        c2.setWidth(303);
+      });
+
+      jasmine.clock().tick(1000);
+      expect(prefStore.loadCount).toBe(0);
+      expect(prefStore.storeCount).toBe(1);
+      expect(prefStore.preferences?.tablePreferences[0]?.tablePreferenceProfiles?.get(TableUiPreferences.PROFILE_ID_GLOBAL)?.columns[1]?.width).toBe(202);
+
+      c2.setWidth(404);
+
+      jasmine.clock().tick(1000);
+      expect(prefStore.loadCount).toBe(0);
+      expect(prefStore.storeCount).toBe(2);
+      expect(prefStore.preferences?.tablePreferences[0]?.tablePreferenceProfiles?.get(TableUiPreferences.PROFILE_ID_GLOBAL)?.columns[1]?.width).toBe(404);
+    });
   });
 
   // -----------------------------------------------------------------------------------------
