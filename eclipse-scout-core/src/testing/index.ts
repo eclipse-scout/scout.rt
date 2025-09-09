@@ -26,6 +26,7 @@ export * from './form/FormSpecHelper';
 export * from './form/fields/CloneSpecHelper';
 export * from './form/fields/beanfield/TestBeanField';
 export * from './form/fields/smartfield/proposalFieldSpecHelper';
+export * from './form/fields/smartfield/SpecSmartField';
 export * from './form/fields/tabbox/TabBoxSpecHelper';
 export * from './desktop/outline/OutlineSpecHelper';
 export * from './lookup/DummyLookupCall';

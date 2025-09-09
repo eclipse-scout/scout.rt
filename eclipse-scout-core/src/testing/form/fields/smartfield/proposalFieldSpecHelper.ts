@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -112,10 +112,6 @@ export class SpecProposalField extends ProposalField {
   override acceptInput(sync?: boolean): JQuery.Promise<void> | void {
     this._acceptInputEnabled = true; // accept all inputs, no need for a timeout
     return super.acceptInput(sync);
-  }
-
-  override _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<string>): JQuery.Promise<void> | void {
-    return super._acceptInput(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
   }
 }
 
