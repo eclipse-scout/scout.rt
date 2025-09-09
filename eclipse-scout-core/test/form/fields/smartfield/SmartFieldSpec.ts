@@ -8,60 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  fields, keys, LookupResult, LookupRow, PrepopulatedLookupCall, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup, StaticLookupCall, Status, strings,
-  ValidationFailedStatus
+  fields, FullModelOf, InitModelOf, keys, LookupCall, LookupResult, LookupRow, ObjectOrModel, PrepopulatedLookupCall, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup,
+  StaticLookupCall, Status, strings, ValidationFailedStatus
 } from '../../../../src/index';
-import {ColumnDescriptorDummyLookupCall, DelayedStaticLookupCall, DummyLookupCall, FormSpecHelper, JQueryTesting, MicrotaskStaticLookupCall} from '../../../../src/testing/index';
-import {LookupCall} from '../../../../src/lookup/LookupCall';
-import {SmartFieldLookupResult} from '../../../../src/form/fields/smartfield/SmartField';
-import {FullModelOf, InitModelOf, ObjectOrModel} from '../../../../src/scout';
+import {ColumnDescriptorDummyLookupCall, DelayedStaticLookupCall, DummyLookupCall, FormSpecHelper, JQueryTesting, MicrotaskStaticLookupCall, SpecSmartField} from '../../../../src/testing/index';
 import $ from 'jquery';
 
 describe('SmartField', () => {
 
   let session: SandboxSession, field: SpecSmartField, lookupRow: LookupRow<number>, helper: FormSpecHelper;
-
-  class SpecSmartField extends SmartField<number> {
-    declare _userWasTyping: boolean;
-    declare _lastSearchText: string;
-    declare _pendingOpenPopup: boolean;
-
-    override _readSearchText(): string {
-      return super._readSearchText();
-    }
-
-    override _onFieldKeyUp(event: JQuery.KeyUpEvent) {
-      super._onFieldKeyUp(event);
-    }
-
-    override _acceptByText(sync: boolean, searchText: string) {
-      super._acceptByText(sync, searchText);
-    }
-
-    override _lookupByTextOrAll(browse?: boolean, searchText?: string, searchAlways?: boolean): JQuery.Promise<any> {
-      return super._lookupByTextOrAll(browse, searchText, searchAlways);
-    }
-
-    override _lookupByTextOrAllDone(result: SmartFieldLookupResult<number>) {
-      super._lookupByTextOrAllDone(result);
-    }
-
-    override _executeLookup(lookupCall: LookupCall<number>, abortExisting?: boolean): JQuery.Promise<SmartFieldLookupResult<number>> {
-      return super._executeLookup(lookupCall, abortExisting);
-    }
-
-    override _formatValue(value: number): string | JQuery.Promise<string> {
-      return super._formatValue(value);
-    }
-
-    override _copyValuesFromField(otherField: SmartField<number>) {
-      super._copyValuesFromField(otherField);
-    }
-
-    override _getLastSearchText(): string {
-      return super._getLastSearchText();
-    }
-  }
 
   class SpecSmartFieldTouchPopup extends SmartFieldTouchPopup<number> {
     declare _widget: ProposalChooser<number, any, any>;

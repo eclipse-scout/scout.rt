@@ -327,7 +327,14 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
       selectedLookupRow = this._getSelectedLookupRow(searchTextChanged);
 
     this._setProperty('displayText', searchText);
+
+    let oldDeferred = this._acceptInputDeferred;
     this._acceptInputDeferred = $.Deferred();
+    if (oldDeferred.state() === 'pending') {
+      // Ensure old deferred will always be resolved
+      this._acceptInputDeferred.promise().then(() => oldDeferred.resolve());
+    }
+
     this._flushLookupStatus();
     this._clearPendingLookup();
 

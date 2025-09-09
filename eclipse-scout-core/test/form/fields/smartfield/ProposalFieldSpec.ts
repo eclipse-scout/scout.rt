@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -155,7 +155,10 @@ describe('ProposalField', () => {
   it('should clear error status on search text change', () => {
     field.setErrorStatus(Status.error('functional'));
     expect(field.errorStatus.containsStatus(Status)).toBe(true);
-    field._acceptInput(false, 'Bar', false, true, null);
+    field.render();
+    field.$field.val('Bar');
+    field._userWasTyping = true;
+    field.acceptInput();
     expect(field['getErrorStatus']).toBeUndefined();
   });
 
