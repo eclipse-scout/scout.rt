@@ -2970,7 +2970,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    * Meaning: Recalculates the min / max values and renders the background effect again.
    */
   protected _updateBackgroundEffect() {
-    this.columns.forEach((column: NumberColumn) => {
+    this.columns.forEach(column => {
+      if (!(column instanceof NumberColumn)) {
+        return;
+      }
       if (!column.backgroundEffect) {
         return;
       }
@@ -2982,7 +2985,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    * Recalculates the values necessary for the background effect of every column, if column.backgroundEffect is set
    */
   protected _calculateValuesForBackgroundEffect() {
-    this.columns.forEach((column: NumberColumn) => {
+    this.columns.forEach(column => {
+      if (!(column instanceof NumberColumn)) {
+        return;
+      }
       if (!column.backgroundEffect) {
         return;
       }
@@ -5549,7 +5555,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    * Renders the background effect of every column, if column.backgroundEffect is set
    */
   protected _renderBackgroundEffect() {
-    this.columns.forEach((column: NumberColumn) => {
+    this.columns.forEach(column => {
+      if (!(column instanceof NumberColumn)) {
+        return;
+      }
       if (!column.backgroundEffect) {
         return;
       }
