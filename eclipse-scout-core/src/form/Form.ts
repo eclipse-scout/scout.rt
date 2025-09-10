@@ -397,8 +397,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
    *
    * @see setBusy
    */
-  withBusyHandling<T>(action: () => JQuery.Promise<T>): JQuery.Promise<T> {
-    this.setBusy(true);
+  withBusyHandling<T>(action: () => JQuery.Promise<T>, opts?: Pick<BusyIndicatorOptions, 'renderDelay'>): JQuery.Promise<T> {
+    this.setBusy(opts ? {...opts, busy: true} : true);
     try {
       return action()
         .always(() => this.setBusy(false));
@@ -411,8 +411,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
   /**
    * @deprecated use {@link withBusyHandling}.
    */
-  protected _withBusyHandling<T>(action: () => JQuery.Promise<T>): JQuery.Promise<T> {
-    return this.withBusyHandling(action);
+  protected _withBusyHandling<T>(action: () => JQuery.Promise<T>, opts?: Pick<BusyIndicatorOptions, 'renderDelay'>): JQuery.Promise<T> {
+    return this.withBusyHandling(action, opts);
   }
 
   /**
