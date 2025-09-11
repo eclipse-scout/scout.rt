@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -391,11 +391,11 @@ public class UiNotificationRegistry {
 
       List<UiNotificationMessageDo> uiNotifications = getNotifications().computeIfAbsent(topic, key -> new ArrayList<>());
       uiNotifications.add(message);
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Added new ui notification {} for topic {}. New size: {}", notification, topic, uiNotifications.size());
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("Added new ui notification {} for topic {}. New size: {}", notification, topic, uiNotifications.size());
       }
       else {
-        LOG.info("Added new ui notification with id {} for topic {}. New size: {}", notification.getId(), topic, uiNotifications.size());
+        LOG.debug("Added new ui notification with id {} for topic {}. New size: {}", notification.getId(), topic, uiNotifications.size());
       }
 
       startCleanupJob(); // inside lock to ensure cleanup job will be started only once
