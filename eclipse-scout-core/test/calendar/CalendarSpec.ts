@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Calendar, CalendarComponent, CalendarItem, CalendarResourceDo, DateRange, dates, scout, TreeBoxTreeNode, UuidPool} from '../../src/index';
+import {Calendar, CalendarComponent, CalendarItem, CalendarResourceDo, DateRange, dates, scout, TreeBoxTreeNode, TreeVisitResult, UuidPool} from '../../src/index';
 import {JQueryTesting} from '../../src/testing/index';
 
 describe('Calendar', () => {
@@ -935,7 +935,7 @@ describe('Calendar', () => {
         tree.visitNodes(node => {
           if ((<TreeBoxTreeNode<string>>node).lookupRow.key === resourceId) {
             JQueryTesting.triggerClick(node.$node);
-            return true;
+            return TreeVisitResult.SKIP_SUBTREE;
           }
         });
       };
