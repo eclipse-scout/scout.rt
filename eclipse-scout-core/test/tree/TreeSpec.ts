@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, graphics, icons, objects, Range, scout, scrollbars, strings, Tree, TreeField, TreeModel, TreeNode, TreeNodeModel} from '../../src/index';
+import {arrays, graphics, icons, objects, Range, scout, scrollbars, strings, Tree, TreeField, TreeModel, TreeNode, TreeNodeModel, TreeVisitResult} from '../../src/index';
 import {JQueryTesting, SpecTree, SpecTreeModel, TreeSpecHelper} from '../../src/testing/index';
 
 describe('Tree', () => {
@@ -3673,7 +3673,7 @@ describe('Tree', () => {
 
         tree.visitNodes(node => {
           if (node.level === 0 && node !== nodeToChange) {
-            return true;
+            return TreeVisitResult.SKIP_SUBTREE;
           }
           clones.push({
             checked: node.checked,
@@ -4411,6 +4411,127 @@ describe('Tree', () => {
 
       tree.addFilter(node => node !== tree.nodes[0]);
       expect(tree.focusedNode).toBe(null);
+    });
+  });
+
+  describe('findNode', () => {
+    class CustomNode1 extends TreeNode {
+    }
+
+    class CustomNode2 extends CustomNode1 {
+    }
+
+    class CustomNode3 extends CustomNode2 {
+    }
+
+    it('finds the first node which has the given type', () => {
+      let tree = scout.create(Tree, {
+        parent: session.desktop
+      });
+      tree.insertNodes([{
+        text: 'node 1'
+      }, {
+        text: 'node 2'
+      }]);
+      tree.insertNodes([{
+        objectType: CustomNode1,
+        text: 'node 1_1'
+      }, {
+        objectType: CustomNode1,
+        text: 'node 1_2'
+      }], tree.nodes[0]);
+      tree.insertNodes([{
+        objectType: CustomNode2,
+        text: 'node 2_1'
+      }, {
+        objectType: CustomNode2,
+        text: 'node 2_2'
+      }], tree.nodes[1]);
+
+      expect(tree.findNode(CustomNode1)).toBe(tree.nodes[0].childNodes[0]);
+      expect(tree.findNode(CustomNode2)).toBe(tree.nodes[1].childNodes[0]);
+      expect(tree.findNode(CustomNode3)).toBe(null);
+    });
+
+    it('finds the first node that is accepted by the given predicate', () => {
+      let tree = scout.create(Tree, {
+        parent: session.desktop
+      });
+      tree.insertNodes([{
+        text: 'node 1'
+      }, {
+        text: 'node 2'
+      }]);
+      tree.insertNodes([{
+        objectType: TreeNode,
+        text: 'node 1_1'
+      }, {
+        objectType: TreeNode,
+        text: 'node 1_2'
+      }], tree.nodes[0]);
+      tree.insertNodes([{
+        objectType: TreeNode,
+        text: 'node 2_1'
+      }, {
+        objectType: TreeNode,
+        text: 'node 2_2'
+      }], tree.nodes[1]);
+
+      expect(tree.findNode(node => node.text === 'node 2')).toBe(tree.nodes[1]);
+      expect(tree.findNode(node => node.text === 'node 1_2')).toBe(tree.nodes[0].childNodes[1]);
+      expect(tree.findNode(node => node instanceof TreeNode)).toBe(tree.nodes[0]);
+      expect(tree.findNode(node => node.text === '')).toBe(null);
+    });
+  });
+
+  describe('visitNodes', () => {
+    it('visits all nodes top down', () => {
+      let model = helper.createModelFixture(2, 2);
+      let tree = helper.createTree(model);
+      let visitedNodeIds = [];
+      tree.visitNodes(node => {
+        visitedNodeIds.push(node.id);
+      });
+      expect(visitedNodeIds).toEqual(['0', '0_0', '0_0_0', '0_0_1', '0_1', '0_1_0', '0_1_1', '1', '1_0', '1_0_0', '1_0_1', '1_1', '1_1_0', '1_1_1']);
+    });
+
+    it('can be aborted when returning TreeVisitResult.TERMINATE', () => {
+      let model = helper.createModelFixture(2, 2);
+      let tree = helper.createTree(model);
+      let visitedNodeIds = [];
+      tree.visitNodes(node => {
+        visitedNodeIds.push(node.id);
+        if (node.id === '0_0_1') {
+          return TreeVisitResult.TERMINATE;
+        }
+      });
+      expect(visitedNodeIds).toEqual(['0', '0_0', '0_0_0', '0_0_1']);
+    });
+
+    it('can be aborted when returning true', () => {
+      let model = helper.createModelFixture(2, 2);
+      let tree = helper.createTree(model);
+      let visitedNodeIds = [];
+      tree.visitNodes(node => {
+        visitedNodeIds.push(node.id);
+        if (node.id === '0_0_1') {
+          return true;
+        }
+      });
+      expect(visitedNodeIds).toEqual(['0', '0_0', '0_0_0', '0_0_1']);
+    });
+
+    it('skips subtree when returning TreeVisitResult.SKIP_SUBTREE', () => {
+      let model = helper.createModelFixture(2, 2);
+      let tree = helper.createTree(model);
+      let visitedNodeIds = [];
+      tree.visitNodes(node => {
+        visitedNodeIds.push(node.id);
+        if (node.id === '0') {
+          return TreeVisitResult.SKIP_SUBTREE;
+        }
+      });
+      expect(visitedNodeIds).toEqual(['0', '1', '1_0', '1_0_0', '1_0_1', '1_1', '1_1_0', '1_1_1']);
     });
   });
 });

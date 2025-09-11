@@ -9,7 +9,7 @@
  */
 import {
   App, arrays, CellModel, ChildModelOf, defaultValues, Event, ModelAdapter, objects, RemoteEvent, scout, Tree, TreeDropEvent, TreeNode, TreeNodeActionEvent, TreeNodeClickEvent, TreeNodeExpandedEvent, TreeNodeModel, TreeNodesCheckedEvent,
-  TreeNodesSelectedEvent
+  TreeNodesSelectedEvent, TreeVisitResult
 } from '../index';
 
 export class TreeAdapter extends ModelAdapter {
@@ -35,7 +35,7 @@ export class TreeAdapter extends ModelAdapter {
     Tree.visitNodes((node: TreeNode, parentNode: TreeNode) => {
       if (node.checked) {
         this.widget.checkNodes(node, {checked: true});
-        return true; // Skip subtree
+        return TreeVisitResult.SKIP_SUBTREE;
       }
     }, this.widget.nodes, null);
   }

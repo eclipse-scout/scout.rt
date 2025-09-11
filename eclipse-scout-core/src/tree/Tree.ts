@@ -10,9 +10,9 @@
 import {
   AbstractTreeNavigationKeyStroke, Action, aria, arrays, ContextMenuPopup, DesktopPopupOpenEvent, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, Filterable, FilterOrFunction,
   FilterResult, FilterSupport, FullModelOf, graphics, HtmlComponent, InitModelOf, keys, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuFilter, MenuItemsOrder, menus as menuUtil, ObjectOrChildModel,
-  ObjectOrModel, objects, Range, Rectangle, scout, scrollbars, ScrollDirection, ScrollToAlignment, ScrollToOptions, strings, tooltips, TreeBreadcrumbFilter, TreeCheckKeyStroke, TreeCheckNodesResult, TreeCollapseAllKeyStroke,
+  ObjectOrModel, objects, Predicate, Range, Rectangle, scout, scrollbars, ScrollDirection, ScrollToAlignment, ScrollToOptions, strings, tooltips, TreeBreadcrumbFilter, TreeCheckKeyStroke, TreeCheckNodesResult, TreeCollapseAllKeyStroke,
   TreeCollapseOrDrillUpKeyStroke, TreeEventMap, TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeModel, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationHomeKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel,
-  TreeSelectKeyStroke, UpdateFilteredElementsOptions, Widget
+  TreeSelectKeyStroke, TreeVisitResult, UpdateFilteredElementsOptions, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -400,12 +400,33 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   }
 
   /**
-   * pre-order (top-down) traversal of the tree-nodes of this tree.
+   * Pre-order (top-down) traversal of the tree nodes of this tree.
    *
-   * If func returns true the children of the visited node are not visited.
+   * @see Tree.visitNodes
    */
-  visitNodes(func: (node: TreeNode, parentNode?: TreeNode) => boolean | void, parentNode?: TreeNode) {
-    return Tree.visitNodes(func, this.nodes, parentNode);
+  visitNodes(visitor: (node: TreeNode, parentNode?: TreeNode) => boolean | TreeVisitResult | void, parentNode?: TreeNode): boolean | TreeVisitResult {
+    return Tree.visitNodes(visitor, this.nodes, parentNode);
+  }
+
+  /**
+   * @param predicateOrClass may be a {@link Predicate} or a subclass of {@link TreeNode}.
+   * @returns the first node for which the given predicate returns true or that matches the given node type if a subclass of {@link TreeNode} is provided.
+   */
+  findNode<T extends TreeNode>(predicateOrClass: Predicate<TreeNode> | (abstract new() => T)): T {
+    let predicate;
+    if (objects.isSameOrExtendsClass(predicateOrClass, TreeNode)) {
+      predicate = node => node instanceof predicateOrClass;
+    } else {
+      predicate = predicateOrClass;
+    }
+    let foundNode = null;
+    this.visitNodes((node: TreeNode, parentNode?: TreeNode) => {
+      if (predicate(node)) {
+        foundNode = node;
+        return true;
+      }
+    });
+    return foundNode;
   }
 
   protected override _render() {
@@ -3695,20 +3716,27 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   }
 
   /**
-   * pre-order (top-down) traversal of the tree-nodes provided.<br>
-   * if func returns true the children of the visited node are not visited.
+   * Pre-order (top-down) traversal of the provided tree nodes.
+   *
+   * To abort the visiting, the `visitor` can return `true` or {@link TreeVisitResult.TERMINATE}.
+   * To skip a subtree, the `visitor` can return {@link TreeVisitResult.SKIP_SUBTREE}.
    */
-  static visitNodes(func: (node: TreeNode, parentNode?: TreeNode) => boolean | void, nodes: TreeNode[], parentNode?: TreeNode) {
-    let i, node;
+  static visitNodes(visitor: (node: TreeNode, parentNode?: TreeNode) => boolean | TreeVisitResult | void, nodes: TreeNode[], parentNode?: TreeNode): boolean | TreeVisitResult {
     if (!nodes) {
       return;
     }
 
-    for (i = 0; i < nodes.length; i++) {
-      node = nodes[i];
-      let doNotProcessChildren = func(node, parentNode);
-      if (!doNotProcessChildren && node.childNodes.length > 0) {
-        Tree.visitNodes(func, node.childNodes, node);
+    for (let node of nodes) {
+      let visitResult = visitor(node, parentNode);
+      if (visitResult === true || visitResult === TreeVisitResult.TERMINATE) {
+        // Visitor wants to abort the visiting
+        return TreeVisitResult.TERMINATE;
+      }
+      if (visitResult !== TreeVisitResult.SKIP_SUBTREE && node.childNodes.length > 0) {
+        visitResult = Tree.visitNodes(visitor, node.childNodes, node);
+        if (visitResult === true || visitResult === TreeVisitResult.TERMINATE) {
+          return TreeVisitResult.TERMINATE;
+        }
       }
     }
   }
