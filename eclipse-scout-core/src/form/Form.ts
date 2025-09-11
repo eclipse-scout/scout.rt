@@ -982,9 +982,6 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   protected _onDialogMouseDown() {
-    if (this.session.desktop.activeForm === this) {
-      return;
-    }
     this.activate();
   }
 

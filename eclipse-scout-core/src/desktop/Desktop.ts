@@ -9,8 +9,7 @@
  */
 import {
   AbstractLayout, Action, arrays, BenchColumnLayoutData, BusyIndicatorOptions, BusySupport, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel,
-  DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayChild, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser,
-  FileChooserController, Form,
+  DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form,
   GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, objects,
   OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
   SplitterPositionChangeEvent, strings, styles, Tooltip, Tree, TreeDisplayStyle, UnsavedFormChangesForm, URL, ViewButton, webstorage, Widget, widgets
@@ -1193,7 +1192,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     let displayParent: DisplayParent = form.displayParent || this;
     form.setDisplayParent(displayParent);
 
-    this._setFormActivated(form);
+    this.activateForm(form);
     // register listener to recover active form when child dialog is removed
     displayParent.formController.registerAndRender(form, position, true);
   }
@@ -1319,6 +1318,9 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
    * Only one form can be active at once. The currently active form is reflected by {@link activeForm}.
    */
   activateForm(form: Form) {
+    if (this.activeForm === form) {
+      return;
+    }
     let displayParent = form?.displayParent || this;
     displayParent.formController.activateForm(form);
   }

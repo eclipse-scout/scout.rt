@@ -1229,7 +1229,7 @@ describe('Desktop', () => {
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0]));
     });
 
-    it('is called on form mousedown but only once', async () => {
+    it('is called on form mousedown', async () => {
       let dialog = formHelper.createFormWithOneField({
         modal: false
       });
@@ -1240,9 +1240,23 @@ describe('Desktop', () => {
       let spy = spyOn(desktop, 'activateForm').and.callThrough();
       JQueryTesting.triggerMouseDownCapture(dialog.$container);
       expect(desktop.activeForm).toBe(dialog);
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it('does nothing if the form is already active', async () => {
+      let dialog = formHelper.createFormWithOneField({
+        modal: false
+      });
+      await dialog.open();
+      session.desktop.activateForm(null);
+      expect(desktop.activeForm).toBe(null);
+
+      let spy = spyOn(desktop.formController, 'activateForm').and.callThrough();
+      desktop.activateForm(dialog);
+      expect(desktop.activeForm).toBe(dialog);
       expect(spy.calls.count()).toBe(1);
 
-      JQueryTesting.triggerMouseDownCapture(dialog.$container);
+      desktop.activateForm(dialog);
       expect(desktop.activeForm).toBe(dialog);
       expect(spy.calls.count()).toBe(1);
     });
@@ -1446,6 +1460,21 @@ describe('Desktop', () => {
       expect(dialog.rendered).toBe(true);
       expect(desktop.activeForm).toBe(dialog);
     });
+
+    it('will be set to the form that was just opened even if display parent is outline', async () => {
+      let outline = outlineHelper.createOutlineWithOneDetailForm();
+      let form = formHelper.createViewWithOneField({displayParent: outline});
+      expect(desktop.outline).toBe(null);
+      expect(desktop.activeForm).toBe(null);
+
+      await form.open();
+      expect(desktop.outline).toBe(outline);
+      expect(desktop.activeForm).toBe(form);
+
+      form.close();
+      expect(desktop.outline).toBe(outline);
+      expect(desktop.activeForm).toBe(null);
+    });
   });
 
   describe('createFormExclusive', () => {
@@ -1537,6 +1566,7 @@ describe('Desktop', () => {
       let outline = outlineHelper.createOutlineWithOneDetailForm();
       let form = session.desktop.createFormExclusive(() => formHelper.createViewWithOneField({displayParent: outline}), 5);
       await form.open();
+      expect(session.desktop.activeForm).toBe(form);
 
       // Should only activate form
       let form2 = session.desktop.createFormExclusive(() => formHelper.createViewWithOneField(), 5);
