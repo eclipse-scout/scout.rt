@@ -16,9 +16,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.dataobject.id.IIds;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.LazyValue;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.healthcheck.IHealthChecker.IHealthCheckCategory;
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
@@ -26,6 +28,7 @@ import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 /**
  * The <code>HealthCheckServlet</code> uses {@link HealthCheckService} classes to determine the application status. If
@@ -76,18 +79,18 @@ public class HealthCheckServlet extends AbstractHttpServlet {
     HealthCheckResult result = BEANS.get(HealthCheckService.class).check(category);
 
     int statusCode = result.getFailedChecks().isEmpty() ? HttpServletResponse.SC_OK : HttpServletResponse.SC_SERVICE_UNAVAILABLE;
-    String output = generateOutput(statusCode, result, false);
+    String output = generateOutput(statusCode, result, category, false);
 
     resp.setContentType("text/plain");
     resp.setStatus(statusCode);
 
-    LazyValue<String> detailedOutput = new LazyValue<>(() -> generateOutput(statusCode, result, true));
+    LazyValue<String> detailedOutput = new LazyValue<>(() -> generateOutput(statusCode, result, category, true));
     boolean isDevelopmentMode = Platform.get().inDevelopmentMode();
     if (statusCode != HttpServletResponse.SC_OK) {
       LOG.warn("Status {}", StringUtility.replaceNewLines(detailedOutput.get(), ", "));
     }
     else if (LOG.isDebugEnabled() || isDevelopmentMode) {
-      LOG.debug("Status {}", StringUtility.replaceNewLines(detailedOutput.get(), ", "));
+      LOG.atLevel(isDevelopmentMode ? Level.INFO : Level.DEBUG).log("Status {}", StringUtility.replaceNewLines(detailedOutput.get(), ", "));
     }
     resp.getWriter().print(isDevelopmentMode ? detailedOutput.get() : output);
   }
@@ -114,11 +117,13 @@ public class HealthCheckServlet extends AbstractHttpServlet {
     return category;
   }
 
-  protected String generateOutput(int statusCode, HealthCheckResult result, boolean includeDetails) {
+  protected String generateOutput(int statusCode, HealthCheckResult result, HealthCheckCategoryId category, boolean includeDetails) {
     StringBuilder buf = new StringBuilder();
     buf.append(statusCode);
     buf.append(' ');
     buf.append(result.isSuccess() ? "OK" : "SERVICE_UNAVAILABLE");
+    buf.append("\nCategory:");
+    buf.append(ObjectUtility.nvl(IIds.toString(category), "-"));
     if (includeDetails) {
       for (IHealthChecker check : result.getAllChecks()) {
         buf.append('\n');
