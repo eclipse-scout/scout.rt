@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxCall, AjaxCallModel, AjaxError, BaseDoEntity, dataObjects, DoEntity, objects, scout} from '../index';
+import {AjaxCall, AjaxCallModel, AjaxError, BaseDoEntity, dataObjects, objects, scout} from '../index';
 import $ from 'jquery';
 
 /**
@@ -230,20 +230,18 @@ export const ajax = {
   // --------------------------------------
 
   /**
-   * Performs an HTTP GET request to the given URL and converts the response to a data object.
+   * Performs an HTTP GET request to the given URL.
+   * Supports automatic {@link BaseDoEntity} deserialization of the response.
    *
    * @param url The URL of the request.
    * @param options additional settings for the request.
    *        Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.
    * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
-   * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or `null`.
+   * @returns A promise which is resolved when the request succeeds.
+   *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  getDataObject<TDoOut extends BaseDoEntity>(
-    url: string,
-    options?: AjaxSettings,
-    model?: AjaxCallModel
-  ): JQuery.Promise<TDoOut, AjaxError> {
+  getDataObject(url: string, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'GET'
@@ -252,22 +250,20 @@ export const ajax = {
   },
 
   /**
-   * Sends the given data object with an HTTP POST request to the given URL. The result is expected to be a data object as well.
+   * Performs an HTTP POST request using JSON as format for the request and the response.
+   * Supports automatic {@link BaseDoEntity} serialization and deserialization of the request data and response.
    *
    * @param url The URL of the request.
-   * @param dataObject The data object to send or `null`.
+   * @param data The data to be sent or `null`.
+   *        If it is a {@link BaseDoEntity} it will automatically be converted to a string using {@link dataObjects.stringify}.
    * @param options additional settings for the request.
    *        Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.
    * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
-   * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or `null`.
+   * @returns A promise which is resolved when the request succeeds.
+   *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  postDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(
-    url: string,
-    dataObject?: TDoIn,
-    options?: AjaxSettings,
-    model?: AjaxCallModel
-  ): JQuery.Promise<TDoOut, AjaxError> {
+  postDataObject(url: string, dataObject?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'POST'
@@ -276,82 +272,80 @@ export const ajax = {
   },
 
   /**
-   * Sends the given data object with an HTTP PUT request to the given URL. The result is expected to be a data object as well.
+   * Performs an HTTP PUT request using JSON as format for the request and the response.
+   * Supports automatic {@link BaseDoEntity} serialization and deserialization of the request data and response.
    *
    * @param url The URL of the request.
-   * @param dataObject The data object to send or `null`.
+   * @param data The data to be sent or `null`.
+   *        If it is a {@link BaseDoEntity} it will automatically be converted to a string using {@link dataObjects.stringify}.
    * @param options additional settings for the request.
    *        Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.
    * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
-   * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or `null`.
+   * @returns A promise which is resolved when the request succeeds.
+   *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  putDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(
-    url: string,
-    dataObject?: TDoIn,
-    options?: AjaxSettings,
-    model?: AjaxCallModel
-  ): JQuery.Promise<TDoOut, AjaxError> {
+  putDataObject(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'PUT'
     }, options);
-    return ajax.callDataObject(opts, dataObject, model);
+    return ajax.callDataObject(opts, data, model);
   },
 
   /**
-   * Sends the given data object with an HTTP DELETE request to the given URL. The result is expected to be a data object as well.
+   * Performs an HTTP DELETE request using JSON as format for the request and the response.
+   * Supports automatic {@link BaseDoEntity} serialization and deserialization of the request data and response.
    *
    * @param url The URL of the request.
-   * @param dataObject The data object to send or `null`.
+   * @param data The data to be sent or `null`.
+   *        If it is a {@link BaseDoEntity} it will automatically be converted to a string using {@link dataObjects.stringify}.
    * @param options additional settings for the request.
    *        Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.
    * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
-   * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or `null`.
+   * @returns A promise which is resolved when the request succeeds.
+   *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  removeDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(
-    url: string,
-    dataObject?: TDoIn,
-    options?: AjaxSettings,
-    model?: AjaxCallModel
-  ): JQuery.Promise<TDoOut, AjaxError> {
+  removeDataObject(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'DELETE'
     }, options);
-    return ajax.callDataObject(opts, dataObject, model);
+    return ajax.callDataObject(opts, data, model);
   },
 
   /**
-   * Sends the given data object with an HTTP request. The result is expected to be a data object as well.
+   * Performs an HTTP request using JSON as format for the request and the response.
+   * Supports automatic {@link BaseDoEntity} serialization and deserialization of the request data and response.
    *
    * @param options Settings for the request. Must contain the properties `url` and `method`.
    *        Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.
-   * @param dataObject The data object to send or `null`.
+   * @param data The data to be sent or `null`.
+   *        If it is a {@link BaseDoEntity} it will automatically be converted to a string using {@link dataObjects.stringify}.
    * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
-   * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or `null`.
+   * @returns A promise which is resolved when the request succeeds.
+   *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  callDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(
-    options: UrlAjaxSettings,
-    dataObject?: TDoIn,
-    model?: AjaxCallModel
-  ): JQuery.Promise<TDoOut, AjaxError> {
-    return ajax.createCallDataObject(options, dataObject, model).call();
+  callDataObject(options: UrlAjaxSettings, data?: any, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+    return ajax.createCallDataObject(options, data, model).call();
   },
 
   /**
    * Creates an {@link AjaxCall} which sends the given data object as json.
+   * Supports automatic {@link BaseDoEntity} serialization and deserialization.
    *
    * @param options Settings for the request. Must contain the property 'url' and 'method'.
-   *         Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.
-   * @param dataObject The data object to send or `null`.
+   *        Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.
+   * @param data The data to be sent or `null`.
+   *        If it is a {@link BaseDoEntity} it will automatically be converted to a string using {@link dataObjects.stringify}.
    * @param model Properties for the {@link AjaxCall} which is created.
-   * @returns an {@link AjaxCall} which sends the given data object, pre-configured using the given options and model. The result of the call is converted to a data object automatically.
+   * @returns an {@link AjaxCall} which sends the given data, pre-configured using the given options and model.
+   *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    */
-  createCallDataObject(options: UrlAjaxSettings, dataObject?: DoEntity | void, model?: AjaxCallModel): AjaxCall {
-    const json = dataObject && dataObjects.stringify(dataObject);
+  createCallDataObject(options: UrlAjaxSettings, data?: any, model?: AjaxCallModel): AjaxCall {
+    const json = data && dataObjects.stringify(data);
     const opts: AjaxSettings = $.extend({}, {
       converters: {
         'text json': data => dataObjects.parse(data)
