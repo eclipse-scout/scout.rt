@@ -103,10 +103,11 @@ public class UiNotificationRegistry {
    * will also complete with an empty list of notifications if the given timeout expires.
    */
   public CompletableFuture<List<UiNotificationDo>> getOrWait(List<TopicDo> topics, String user, long timeout) {
-    List<String> topicNames = topics.stream().map(topic -> topic.getName()).collect(Collectors.toList());
     List<UiNotificationDo> notifications = get(topics, user);
     if (!notifications.isEmpty() || timeout <= 0) {
-      LOG.info("Returning {} notifications for topics {} and user {} without waiting.", notifications.size(), topicNames, user);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Returning {} notifications for topics {} and user {} without waiting.", notifications.size(), getNotificationTopics(notifications), user);
+      }
       return CompletableFuture.completedFuture(notifications);
     }
 
@@ -114,13 +115,16 @@ public class UiNotificationRegistry {
     final UiNotificationListener listener = event -> {
       List<UiNotificationDo> newNotifications = get(topics, user);
       if (!newNotifications.isEmpty()) {
-        LOG.info("New notifications received for topics {} and user {}.", topicNames, user);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("New notifications received for topics {} and user {}.", getNotificationTopics(newNotifications), user);
+        }
         future.complete(newNotifications);
       }
     };
+    List<String> topicNames = topics.stream().map(topic -> topic.getName()).collect(Collectors.toList());
     addListeners(topicNames, listener);
 
-    LOG.debug("Waiting for new notifications for topics {} and user {}.", topicNames, user);
+    LOG.trace("Waiting for new notifications for topics {} and user {}.", topicNames, user);
 
     return future.thenApply(uiNotificationDos -> {
       removeListeners(topicNames, user, listener);
@@ -177,7 +181,9 @@ public class UiNotificationRegistry {
 
       // Return notifications that just act as subscription start markers
       if (lastKnownNotifications.isEmpty()) {
-        return createSubscriptionStartNotifications(topic, notificationStream);
+        List<UiNotificationDo> subscriptionStartNotifications = createSubscriptionStartNotifications(topic, notificationStream);
+        LOG.debug("Subscribed for topic {}", topic);
+        return subscriptionStartNotifications;
       }
 
       // If the last element is SUBSCRIPTION_START_ID, return all elements
@@ -593,5 +599,12 @@ public class UiNotificationRegistry {
    */
   public String currentNodeId() {
     return Base64Utility.encode(SecurityUtility.hash(NodeId.current().toString().getBytes()));
+  }
+
+  /**
+   * @return the topic names of the given notifications.
+   */
+  public static Set<String> getNotificationTopics(List<UiNotificationDo> notifications) {
+    return notifications.stream().map(notification -> notification.getTopic()).collect(Collectors.toSet());
   }
 }
