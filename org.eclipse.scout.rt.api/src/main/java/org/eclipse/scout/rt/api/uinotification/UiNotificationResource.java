@@ -10,6 +10,8 @@
 package org.eclipse.scout.rt.api.uinotification;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.BadRequestException;
@@ -23,6 +25,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 
 import org.eclipse.scout.rt.api.data.uinotification.TopicDo;
+import org.eclipse.scout.rt.api.data.uinotification.UiNotificationDo;
 import org.eclipse.scout.rt.api.data.uinotification.UiNotificationRequest;
 import org.eclipse.scout.rt.api.data.uinotification.UiNotificationResponse;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -65,17 +68,37 @@ public class UiNotificationResource implements IRestResource {
     getRegistry().getOrWait(topics, userId)
         .thenApply((notifications) -> {
           if (asyncResponse.isSuspended() && !clientDisconnectedListener.isDisconnected()) {
-            if (!notifications.isEmpty()) {
-              LOG.info("Resuming async response with {} notifications for topics {} and user {}", notifications.size(), topics, userId);
-            }
-            else {
-              LOG.debug("Resuming async response with {} notifications for topics {} and user {}", notifications.size(), topics, userId);
-            }
+            logResponse(notifications, topics, userId);
             return asyncResponse.resume((new UiNotificationResponse().withNotifications(notifications)));
           }
           LOG.debug("Response is not available anymore, discarding {} notifications for topics {} and user {}", notifications.size(), topics, userId);
           return false;
         });
+  }
+
+  protected void logResponse(List<UiNotificationDo> notifications, List<TopicDo> topics, String userId) {
+    if (notifications.isEmpty()) {
+      if (LOG.isTraceEnabled()) {
+        List<String> topicNames = topics.stream().map(topic -> topic.getName()).collect(Collectors.toList());
+        LOG.trace("Resuming async response without any new notifications for topics {} and user {}", topicNames, userId);
+      }
+      return;
+    }
+    if (!LOG.isInfoEnabled()) {
+      return;
+    }
+
+    String message = "Resuming async response: ";
+    Map<Boolean, List<UiNotificationDo>> groups = notifications.stream().collect(Collectors.partitioningBy(notification -> notification.isSubscriptionStart()));
+    List<UiNotificationDo> subscriptions = groups.get(true);
+    if (subscriptions.size() > 0) {
+      message += String.format("%s new subscription(s) for topics %s. ", subscriptions.size(), UiNotificationRegistry.getNotificationTopics(subscriptions));
+    }
+    notifications = groups.get(false);
+    if (notifications.size() > 0) {
+      message += String.format("%s new notification(s) for topics %s. ", notifications.size(), UiNotificationRegistry.getNotificationTopics(notifications));
+    }
+    LOG.info(message);
   }
 
   protected String getUserId() {
