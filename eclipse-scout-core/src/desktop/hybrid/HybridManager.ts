@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AnyDoEntity, Event, EventHandler, EventListener, EventMapOf, Form, HybridActionContextElements, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent, HybridManagerWidgetRemoveEvent, InitModelOf, ObjectOrChildModel,
-  Session, UuidPool, Widget
+  AnyDoEntity, App, Event, EventHandler, EventListener, EventMapOf, Form, HybridActionContextElements, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent, HybridManagerWidgetRemoveEvent, InitModelOf, ObjectOrChildModel,
+  scout, Session, UuidPool, Widget
 } from '../../index';
 
 /**
@@ -30,9 +30,12 @@ export class HybridManager extends Widget {
 
   // static helpers
 
-  static get(session: Session, wait?: false): HybridManager;
-  static get(session: Session, wait: true): JQuery.Promise<HybridManager>;
-  static get(session: Session, wait?: boolean): HybridManager | JQuery.Promise<HybridManager> {
+  static get(session?: Session, wait?: false): HybridManager;
+  static get(session?: Session, wait?: true): JQuery.Promise<HybridManager>;
+  static get(session?: Session, wait?: boolean): HybridManager | JQuery.Promise<HybridManager> {
+    session = session || App.get().sessions[0];
+    scout.assertParameter('session', session);
+
     const findHybridManager = () => session.desktop.addOns.find(addOn => addOn instanceof HybridManager) as HybridManager;
 
     if (!wait) {
