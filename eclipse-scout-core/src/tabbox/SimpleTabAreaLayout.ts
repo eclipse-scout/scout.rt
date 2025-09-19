@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractLayout, ContextMenuPopup, Dimension, graphics, Menu, PrefSizeOptions, scout, SimpleTabArea, styles, widgets} from '../index';
+import {AbstractLayout, ContextMenuPopup, Dimension, graphics, Menu, PrefSizeOptions, scout, SimpleTabArea, styles, tooltips, widgets} from '../index';
 import $ from 'jquery';
 
 export class SimpleTabAreaLayout extends AbstractLayout {
@@ -89,6 +89,10 @@ export class SimpleTabAreaLayout extends AbstractLayout {
     this._$overflowTab = htmlContainer.$comp
       .appendDiv('simple-overflow-tab-item')
       .on('mousedown', this._onOverflowTabItemMouseDown.bind(this));
+    tooltips.install(this._$overflowTab, {
+      parent: this.tabArea,
+      text: '${textKey:ui.MoreTabs}'
+    });
     this._$overflowTab.appendDiv('num-tabs').text(numOverflowTabs);
 
     $tabs.each((i, tab) => {

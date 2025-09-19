@@ -17,9 +17,8 @@ export class NavigateDownButton extends NavigateButton {
 
   constructor() {
     super();
-    this._defaultIconId = icons.ANGLE_DOWN;
-    this._defaultText = 'ui.Continue';
-    this.iconId = this._defaultIconId;
+    this.tooltipText = '${textKey:ui.NavigateDown}';
+    this.iconId = icons.ANGLE_DOWN;
     this.keyStroke = 'enter';
     this._detailTableRowsSelectedHandler = this._onDetailTableRowsSelected.bind(this);
     this._detailTableRowsChangedHandler = this._onDetailTableRowsChanged.bind(this);

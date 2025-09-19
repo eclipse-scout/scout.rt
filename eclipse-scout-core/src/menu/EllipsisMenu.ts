@@ -23,6 +23,7 @@ export class EllipsisMenu extends Menu implements EllipsisMenuModel {
     this.stackable = false;
     this.horizontalAlignment = 1;
     this.iconId = icons.ELLIPSIS_V;
+    this.tooltipText = '${textKey:ui.MoreActions}';
     this.tabbable = false;
     this._addPreserveOnPropertyChangeProperties(['childActions']);
   }

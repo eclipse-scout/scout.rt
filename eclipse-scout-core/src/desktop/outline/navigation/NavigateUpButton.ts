@@ -14,9 +14,8 @@ export class NavigateUpButton extends NavigateButton {
 
   constructor() {
     super();
-    this._defaultIconId = icons.ANGLE_UP;
-    this._defaultText = 'ui.Up';
-    this.iconId = this._defaultIconId;
+    this.tooltipText = '${textKey:ui.NavigateUp}';
+    this.iconId = icons.ANGLE_UP;
     this.keyStroke = 'backspace';
   }
 

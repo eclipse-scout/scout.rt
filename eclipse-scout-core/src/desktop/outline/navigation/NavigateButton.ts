@@ -23,38 +23,20 @@ export abstract class NavigateButton extends Menu implements NavigateButtonModel
   node: Page;
   outline: Outline;
   altKeyStrokeContext: KeyStrokeContext;
-  overflow: boolean;
-
-  protected _defaultText: string;
-  protected _defaultIconId: string;
 
   constructor() {
     super();
 
-    this.node = null;
-    this.outline = null;
     this.actionStyle = Action.ActionStyle.BUTTON;
-    this._addCloneProperties(['node', 'outline', 'altKeyStrokeContext']);
     this.inheritAccessibility = false;
+    this._addCloneProperties(['node', 'outline', 'altKeyStrokeContext']);
   }
 
   protected override _render() {
-    if (this.overflow) {
-      this.text = this.session.text(this._defaultText);
-      this.iconId = null;
-    } else {
-      this.text = null;
-      this.iconId = this._defaultIconId;
-    }
     this.updateEnabled();
     super._render();
     this.$container.addClass('navigate-button small');
     this.altKeyStrokeContext.registerKeyStroke(this);
-  }
-
-  protected override _renderProperties() {
-    super._renderProperties();
-    aria.label(this.$container, this.session.text(this._defaultText));
   }
 
   protected override _remove() {
