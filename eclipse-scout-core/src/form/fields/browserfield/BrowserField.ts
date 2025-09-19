@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -76,7 +76,6 @@ export class BrowserField extends FormField implements BrowserFieldModel {
   protected override _render() {
     this.addContainer(this.$parent, 'browser-field', new BrowserFieldLayout(this));
     this.addLabel();
-    this.addStatus();
 
     if (!this.showInExternalWindow) {
       // mode 1: <iframe>
@@ -103,6 +102,7 @@ export class BrowserField extends FormField implements BrowserFieldModel {
       // use setTimeout to call method, because _openPopupWindow must be called after layouting
       setTimeout(this._openPopupWindow.bind(this, true), 20);
     }
+    this.addStatus();
   }
 
   protected override _renderProperties() {

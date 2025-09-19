@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -143,4 +143,16 @@ export interface TooltipModel extends WidgetModel {
    * If no element is specified, the tooltip will be positioned at the given {@link origin} resp. at the origin computed by {@link originProducer}.
    */
   $anchor?: JQuery;
+  /**
+   * Makes the tooltip focusable.
+   *
+   * Default is false.
+   */
+  withFocusContext?: boolean;
+  /**
+   * Configures whether the container of the tooltip should be focusable if {@link withFocusContext} is set.
+   *
+   * Default is true.
+   */
+  focusableContainer?: boolean;
 }

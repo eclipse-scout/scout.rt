@@ -7,11 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ContextMenuPopup, HAlign, keys, MenuNavigationExecKeyStroke, menuNavigationKeyStrokes, ScoutKeyboardEvent} from '../index';
+import {ContextMenuContainer, HAlign, keys, MenuNavigationExecKeyStroke, menuNavigationKeyStrokes, ScoutKeyboardEvent} from '../index';
 
 export class MenuExecByNumberKeyStroke extends MenuNavigationExecKeyStroke {
 
-  constructor(popup: ContextMenuPopup, menuItemClass: string) {
+  constructor(popup: ContextMenuContainer, menuItemClass: string) {
     super(popup, menuItemClass);
     this._menuItemClass = menuItemClass;
     this.which = [keys[1], keys[2], keys[3], keys[4], keys[5], keys[6], keys[7], keys[8], keys[9]];

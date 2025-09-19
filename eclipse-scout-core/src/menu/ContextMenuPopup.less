@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -50,19 +50,34 @@
     }
 
     &.selected {
-      background-color: @item-selection-background-color;
+      color: @selected-color;
+
+      & > .font-icon {
+        color: @selected-color;
+      }
 
       &.has-popup {
         color: @context-menu-item-color;
 
-        &.disabled {
-          color: @menu-item-disabled-color;
-          background-color: @item-selection-background-color;
+        & > .font-icon {
+          color: @context-menu-item-icon-color;
         }
       }
 
-      & > .submenu-icon {
-        transform: none;
+      &.disabled {
+        color: @selected-color;
+
+        & > .font-icon {
+          color: @selected-color;
+        }
+      }
+    }
+
+    &.focused {
+      background-color: @context-menu-item-focused-background-color;
+
+      &.selected {
+        background-color: @selected-hover-background-color;
       }
     }
 

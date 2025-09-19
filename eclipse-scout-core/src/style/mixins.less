@@ -194,9 +194,16 @@
   .status {
     display: flex;
     align-items: center;
+    cursor: pointer;
+    --icon: '';
+    --color: inherit;
+    --hover-color: @hover-color;
+    --active-color: @active-color;
 
     &::before {
       #scout.font-icon();
+      content: var(--icon);
+      color: var(--color);
       font-size: @status-font-icon-size;
       border-radius: @control-border-radius;
       width: @field-status-size;
@@ -205,120 +212,58 @@
       align-items: center;
       justify-content: center;
     }
+
+    &:hover::before {
+      background-color: @hover-background-color;
+      color: var(--hover-color);
+    }
+
+    &:active::before,
+    &.selected::before {
+      background-color: @active-background-color;
+      color: var(--active-color);
+    }
+
+    &:focus::before,
+    &.focused::before {
+      #scout.focus-box-shadow();
+    }
   }
 
   .menu-status {
-    visibility: visible;
-    cursor: pointer;
-
-    &::before {
-      content: @icon-ellipsis-v;
-      color: @status-menu-color;
-      font-size: @status-font-icon-size;
-    }
-
-    &:hover::before {
-      background-color: @hover-background-color;
-      color: @status-menu-hover-color;
-    }
-
-    &:active::before,
-    &.selected::before {
-      background-color: @active-background-color;
-      color: @status-menu-hover-color;
-    }
+    --icon: @icon-ellipsis-v;
+    --color: @status-menu-color;
+    --hover-color: @status-menu-hover-color;
+    --active-color: @status-menu-hover-color;
   }
 
-  .tooltip-status {
-    visibility: visible;
-    cursor: pointer;
-
-    &::before {
-      content: @icon-info;
-      color: @status-info-color;
-      font-size: @status-font-icon-size;
-    }
-
-    &:hover::before {
-      background-color: @hover-background-color;
-      color: @status-info-hover-color;
-    }
-
-    &:active::before,
-    &.selected::before {
-      background-color: @active-background-color;
-      color: @status-info-hover-color;
-    }
-  }
-
+  .tooltip-status,
   .info-status {
-    #scout.tooltip-status();
+    --icon: @icon-info;
+    --color: @status-info-color;
+    --hover-color: @status-info-hover-color;
+    --active-color: @status-info-hover-color;
   }
 
   .ok-status {
-    visibility: visible;
-    cursor: pointer;
-
-    &::before {
-      content: @icon-info;
-      color: @status-ok-color;
-      font-size: @status-font-icon-size;
-    }
-
-    &:hover::before {
-      background-color: @hover-background-color;
-      color: @status-ok-hover-color;
-    }
-
-    &:active::before,
-    &.selected::before {
-      background-color: @active-background-color;
-      color: @status-ok-hover-color;
-    }
+    --icon: @icon-info;
+    --color: @status-ok-color;
+    --hover-color: @status-ok-hover-color;
+    --active-color: @status-ok-hover-color;
   }
 
   .warning-status {
-    visibility: visible;
-    cursor: pointer;
-
-    &::before {
-      content: @icon-exclamation-mark-circle;
-      color: @status-warning-color;
-      font-size: @status-font-icon-size;
-    }
-
-    &:hover::before {
-      background-color: @hover-background-color;
-      color: @status-warning-hover-color;
-    }
-
-    &:active::before,
-    &.selected::before {
-      background-color: @active-background-color;
-      color: @status-warning-hover-color;
-    }
+    --icon: @icon-exclamation-mark-circle;
+    --color: @status-warning-color;
+    --hover-color: @status-warning-hover-color;
+    --active-color: @status-warning-hover-color;
   }
 
   .error-status {
-    visibility: visible;
-    cursor: pointer;
-
-    &::before {
-      content: @icon-exclamation-mark-circle;
-      color: @status-error-color;
-      font-size: @status-font-icon-size;
-    }
-
-    &:hover::before {
-      background-color: @hover-background-color;
-      color: @status-error-hover-color;
-    }
-
-    &:active::before,
-    &.selected::before {
-      background-color: @active-background-color;
-      color: @status-error-hover-color;
-    }
+    --icon: @icon-exclamation-mark-circle;
+    --color: @status-error-color;
+    --hover-color: @status-error-hover-color;
+    --active-color: @status-error-hover-color;
   }
 
   .loading-indicator(@loading-animation-size: 30px, @border-width: 1px) {

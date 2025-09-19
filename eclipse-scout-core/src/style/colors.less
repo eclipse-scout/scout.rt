@@ -227,6 +227,7 @@
 @compact-outline-menu-item-disabled-color: @disabled-inverted-color;
 @context-menu-item-color: @text-color;
 @context-menu-item-icon-color: @link-color;
+@context-menu-item-focused-background-color: @item-selection-background-color;
 @dashboard-tile-border-color: darken(@palette-gray-3, 5%);
 @dashboard-tile-default-selected-border-color: @item-selection-border-color;
 @dashboard-tile-default-inverted-selected-border-color: @palette-blue-5;
@@ -526,7 +527,17 @@
 @tooltip-warning-color: @text-inverted-color;
 @tooltip-error-background-color: @error-color;
 @tooltip-error-color: @text-inverted-color;
-@tooltip-menu-hover-background-color: fade(@palette-white, 15%);
+@tooltip-menu-hover-background-color: fade(@palette-black, 15%);
+@tooltip-menu-selected-background-color: fade(@palette-black, 40%);
+@tooltip-menu-selected-hover-background-color: fade(@palette-black, 60%);
+@tooltip-menu-focused-background-color: fade(@palette-black, 30%);
+@tooltip-menu-info-hover-background-color: fade(@palette-white, 15%);
+@tooltip-menu-info-selected-color: @tooltip-info-color;
+@tooltip-menu-info-selected-background-color: @tooltip-menu-selected-background-color;
+@tooltip-menu-info-selected-hover-background-color: @tooltip-menu-selected-hover-background-color;
+@tooltip-menu-item-selected-disabled-color: fade(@tooltip-menu-info-selected-color, 50%);
+@tooltip-menu-info-selected-disabled-background-color: @tooltip-menu-info-selected-background-color;
+@tooltip-menu-info-focused-background-color: fade(@palette-white, 22%);
 @top-label-color: @label-color;
 @top-label-disabled-color: @label-disabled-color;
 @tree-node-active-background-color: @item-active-background-color;

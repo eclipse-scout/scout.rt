@@ -153,6 +153,7 @@
 @column-background-effect-gradient2-end-background-color: mix(@palette-red-4, @background-color, 30%);
 @column-background-effect-bar-chart-background-color: fade(@palette-blue-3, 40%);
 @context-menu-item-icon-color: @palette-gray-4;
+@context-menu-item-focused-background-color: fade(@palette-white, 22%);
 @cell-editor-background-color: transparent;
 @date-picker-day-disabled-color: @disabled-color;
 @date-picker-out-color: @calendar-out-color;
@@ -270,6 +271,17 @@
 @tile-table-default-color: @tile-default-color;
 @tile-placeholder-background-color: @fade-white-2;
 @tile-scrollbar-thumb-inverted-main-color: @palette-white;
+@tooltip-menu-hover-background-color: fade(@palette-black, 8%);
+@tooltip-menu-selected-background-color: fade(@palette-white, 40%);
+@tooltip-menu-selected-hover-background-color: fade(@palette-white, 50%);
+@tooltip-menu-focused-background-color: fade(@palette-black, 12%);
+@tooltip-menu-info-selected-color: @selected-color;
+// Info Tooltip with menus looks the same as a regular context menu -> use same styles
+@tooltip-menu-info-selected-background-color: @selected-background-color;
+@tooltip-menu-info-selected-hover-background-color: @selected-hover-background-color;
+@tooltip-menu-item-selected-disabled-color: @tooltip-menu-info-selected-color;
+@tooltip-menu-info-selected-disabled-background-color: @selected-disabled-background-color;
+@tooltip-menu-info-focused-background-color: @context-menu-item-focused-background-color;
 @tooltip-info-background-color: @palette-gray-6;
 @tooltip-info-color: @text-color-1;
 @tooltip-menu-color: @text-color;

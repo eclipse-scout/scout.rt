@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,7 +37,11 @@ export class EllipsisMenu extends Menu implements EllipsisMenuModel {
 
     if (childActions) {
       // close all actions that have been added to the ellipsis
-      childActions.forEach(ca => ca.setSelected(false));
+      childActions.forEach(ca => {
+        if (ca.togglesPopupOrSubMenu()) {
+          ca.setSelected(false);
+        }
+      });
     }
   }
 

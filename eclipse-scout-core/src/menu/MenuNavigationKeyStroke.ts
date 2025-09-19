@@ -7,17 +7,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ContextMenuPopup, KeyStroke, ScoutKeyboardEvent} from '../index';
+import {KeyStroke, menus, ScoutKeyboardEvent, Widget} from '../index';
 
 export class MenuNavigationKeyStroke extends KeyStroke {
-  declare field: ContextMenuPopup;
+  declare field: ContextMenuContainer;
 
   protected _menuItemClass: string;
 
-  constructor(popup: ContextMenuPopup) {
+  constructor(popup: ContextMenuContainer) {
     super();
     this.field = popup;
     this.inheritAccessibility = false;
+    this.repeatable = true;
   }
 
   protected override _accept(event: ScoutKeyboardEvent): boolean {
@@ -28,17 +29,20 @@ export class MenuNavigationKeyStroke extends KeyStroke {
     return accepted;
   }
 
-  protected _changeSelection($oldItem: JQuery, $newItem: JQuery) {
+  protected _changeFocus($oldItem: JQuery, $newItem: JQuery) {
     if ($newItem.length === 0) {
-      // do not change selection
+      // do not change focus
       return;
     }
-    $newItem.setSelected(true).focus();
-    if (this.field.updateNextToSelected) {
-      this.field.updateNextToSelected(this._menuItemClass, $newItem);
-    }
+    $newItem.addClass('focused');
+    menus.updateAriaActiveDescendant(this.field.$container, this.field.$body || this.field.$container, this._menuItemClass, $newItem);
     if ($oldItem.length > 0) {
-      $oldItem.setSelected(false);
+      $oldItem.removeClass('focused');
     }
   }
+}
+
+export interface ContextMenuContainer extends Widget {
+  $body?: JQuery;
+  bodyAnimating?: boolean;
 }
