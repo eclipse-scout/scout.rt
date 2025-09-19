@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, LookupRow, objects, ProposalFieldEventMap, ProposalFieldModel, SmartField, SmartFieldLookupResult, strings} from '../../../index';
+import {LookupRow, objects, ProposalFieldEventMap, ProposalFieldModel, SmartField, SmartFieldLookupResult, strings} from '../../../index';
 import $ from 'jquery';
 
 export class ProposalField extends SmartField<string> implements ProposalFieldModel {
@@ -39,10 +39,6 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
 
   override cssClassName(): string {
     return 'proposal-field';
-  }
-
-  protected override _addAriaFieldDescription() {
-    aria.addHiddenDescriptionAndLinkToElement(this.$field, this.id + '-func-desc', this.session.text('ui.AriaProposalFieldDescription'));
   }
 
   protected override _handleEnterKey(event: JQuery.KeyDownEvent) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -131,19 +131,6 @@ describe('FileChooserField', () => {
       expect(field.$field.attr('aria-labelledby')).toBeTruthy();
       expect(field.$field.attr('aria-labelledby')).toBe(field.$label.attr('id'));
       expect(field.$field.attr('aria-label')).toBeFalsy();
-    });
-
-    it('has aria-describedby description for its functionality', () => {
-      let field = scout.create(FileChooserField, {
-        parent: session.desktop,
-        label: 'label'
-      });
-      field.render();
-
-      let $fieldDescription = field.$fieldContainer.find('#desc' + field.id + '-func-desc');
-      expect(field.fileInput.$fileInput.attr('aria-describedby')).toBeTruthy();
-      expect(field.fileInput.$fileInput.attr('aria-describedby')).toBe($fieldDescription.eq(0).attr('id'));
-      expect(field.fileInput.$fileInput.attr('aria-description')).toBeFalsy();
     });
   });
 });

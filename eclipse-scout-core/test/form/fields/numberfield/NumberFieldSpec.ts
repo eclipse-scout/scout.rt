@@ -718,17 +718,5 @@ describe('NumberField', () => {
       expect(field.$field.attr('aria-labelledby')).toBe(field.$label.attr('id'));
       expect(field.$field.attr('aria-label')).toBeFalsy();
     });
-
-    it('has aria-describedby description for its functionality', () => {
-      let field = scout.create(NumberField, {
-        parent: session.desktop,
-        label: 'label'
-      });
-      field.render();
-      let $fieldDescription = field.$container.find('#desc' + field.id + '-func-desc');
-      expect(field.$field.attr('aria-describedby')).toBeTruthy();
-      expect(field.$field.attr('aria-describedby')).toBe($fieldDescription.eq(0).attr('id'));
-      expect(field.$field.attr('aria-description')).toBeFalsy();
-    });
   });
 });

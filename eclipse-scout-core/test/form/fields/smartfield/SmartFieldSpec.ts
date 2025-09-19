@@ -1307,17 +1307,6 @@ describe('SmartField', () => {
       expect(smartField.$field.attr('aria-label')).toBeFalsy();
     });
 
-    it('has aria-describedby description for its functionality', () => {
-      let field = createFieldWithLookupCall({}, {
-        objectType: ColumnDescriptorDummyLookupCall
-      });
-      field.render();
-      let $fieldDescription = field.$container.find('#desc' + field.id + '-func-desc');
-      expect(field.$field.attr('aria-describedby')).toBeTruthy();
-      expect(field.$field.attr('aria-describedby')).toBe($fieldDescription.eq(0).attr('id'));
-      expect(field.$field.attr('aria-description')).toBeFalsy();
-    });
-
     it('has a non empty status container that lists count of available options', () => {
       let field = createFieldWithLookupCall({}, {
         objectType: ColumnDescriptorDummyLookupCall

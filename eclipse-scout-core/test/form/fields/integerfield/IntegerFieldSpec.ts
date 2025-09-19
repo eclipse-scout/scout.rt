@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -183,18 +183,6 @@ describe('IntegerField', () => {
       field.setValue(12.3456789);
       expect(field.value).toBe(13);
       expect(field.displayText).toBe('13.0');
-    });
-  });
-
-  describe('aria properties', () => {
-
-    it('has aria-describedby description for its functionality', () => {
-      let field = helper.createField(IntegerField);
-      field.render();
-      let $fieldDescription = field.$container.find('#desc' + field.id + '-func-desc');
-      expect(field.$field.attr('aria-describedby')).toBeTruthy();
-      expect(field.$field.attr('aria-describedby')).toBe($fieldDescription.eq(0).attr('id'));
-      expect(field.$field.attr('aria-description')).toBeFalsy();
     });
   });
 });

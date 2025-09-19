@@ -208,7 +208,6 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     }
     this.addIcon();
     this.addStatus();
-    this._addAriaFieldDescription();
   }
 
   protected _addScreenReaderStatus() {
@@ -216,10 +215,6 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     this.$screenReaderStatus = this.$container.appendDiv();
     aria.role(this.$screenReaderStatus, 'status');
     aria.screenReaderOnly(this.$screenReaderStatus);
-  }
-
-  protected _addAriaFieldDescription() {
-    aria.addHiddenDescriptionAndLinkToElement(this.$field, this.id + '-func-desc', this.session.text('ui.AriaSmartFieldDescription'));
   }
 
   protected override _renderProperties() {
