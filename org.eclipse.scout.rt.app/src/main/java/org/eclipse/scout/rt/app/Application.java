@@ -42,7 +42,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -76,6 +75,7 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCoo
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigSecureProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionTimeoutProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationUseTlsProperty;
+import org.eclipse.scout.rt.app.handler.ScoutJettyErrorHandler;
 import org.eclipse.scout.rt.app.servlet.ScoutServletContextHandler;
 import org.eclipse.scout.rt.jetty.IServletContributor;
 import org.eclipse.scout.rt.jetty.IServletFilterContributor;
@@ -342,14 +342,11 @@ public class Application {
   }
 
   /**
-   * Installs the default error handler. This default implementation doesn't show the servlet and doesn't send any stack
-   * traces to the client.
+   * Installs the default error handler. This custom implementation doesn't show the servlet and doesn't send any stack
+   *traces to the client. Furthermore, no internal URIs are exposes in error messages.
    */
   protected void installErrorHandler(Server server) {
-    ErrorHandler handler = new ErrorHandler();
-    handler.setShowMessageInTitle(false);
-    handler.setShowStacks(false);
-    server.setErrorHandler(handler);
+    server.setErrorHandler(BEANS.get(ScoutJettyErrorHandler.class));
   }
 
   protected Handler createHandler() {
