@@ -18,15 +18,16 @@ export class SmartFieldMultiline<TValue> extends SmartField<TValue> {
   }
 
   protected override _render() {
-    let $input, htmlComp;
-
     this.addContainer(this.$parent, 'smart-field has-icon', new SmartFieldLayout(this));
     this.addLabel();
+    if (!this.embedded) {
+      this.addMandatoryIndicator();
+    }
     this.addFieldContainer(this.$parent.makeDiv('multiline'));
-    htmlComp = HtmlComponent.install(this.$fieldContainer, this.session);
+    let htmlComp = HtmlComponent.install(this.$fieldContainer, this.session);
     htmlComp.setLayout(new SmartFieldMultilineLayout(this));
 
-    $input = fields.makeInputOrDiv(this, 'multiline-input')
+    let $input = fields.makeInputOrDiv(this, 'multiline-input')
       .on('mousedown', this._onFieldMouseDown.bind(this))
       .appendTo(this.$fieldContainer);
 
@@ -44,9 +45,6 @@ export class SmartFieldMultiline<TValue> extends SmartField<TValue> {
     this._$multilineLines = this.$fieldContainer
       .appendDiv('multiline-lines')
       .on('click', this._onMultilineLinesClick.bind(this));
-    if (!this.embedded) {
-      this.addMandatoryIndicator();
-    }
     this.addIcon();
     this.addStatus();
   }

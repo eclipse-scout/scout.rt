@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -63,6 +63,7 @@ export class ImageField extends FormField implements ImageFieldModel {
 
   protected override _render() {
     this.addContainer(this.$parent, 'image-field', new ImageFieldLayout(this));
+    this.addLabel();
     this.addFieldContainer(this.$parent.makeDiv());
 
     // Complete the layout hierarchy between the image field and the image
@@ -70,7 +71,6 @@ export class ImageField extends FormField implements ImageFieldModel {
     htmlComp.setLayout(new SingleLayout());
     this.icon.render(this.$fieldContainer);
 
-    this.addLabel();
     this.addField(this.icon.$container);
     this.addStatus();
   }

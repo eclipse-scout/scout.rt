@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,8 +20,8 @@ export class SvgField extends FormField implements SvgFieldModel {
   protected override _render() {
     this.addContainer(this.$parent, 'svg-field');
     this.addLabel();
-    this.addField(this.$parent.makeDiv());
     this.addMandatoryIndicator();
+    this.addField(this.$parent.makeDiv());
     this.addStatus();
   }
 

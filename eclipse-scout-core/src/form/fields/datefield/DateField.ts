@@ -156,11 +156,11 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
   protected override _render() {
     this.addContainer(this.$parent, 'date-field');
     this.addLabel();
-    this.addField(this.$parent.makeDiv('date-time-composite'));
-    this.addStatus();
     if (!this.embedded) {
       this.addMandatoryIndicator();
     }
+    this.addField(this.$parent.makeDiv('date-time-composite'));
+    this.addStatus();
 
     this.htmlDateTimeComposite = HtmlComponent.install(this.$field, this.session);
     this.htmlDateTimeComposite.setLayout(new DateTimeCompositeLayout(this));

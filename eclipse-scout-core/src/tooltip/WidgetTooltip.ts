@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,17 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FocusRule, keys, KeyStrokeContext, ObjectOrChildModel, scout, ScoutKeyboardEvent, Tooltip, Widget, WidgetTooltipEventMap, WidgetTooltipModel} from '../index';
+import {keys, ObjectOrChildModel, Tooltip, Widget, WidgetTooltipEventMap, WidgetTooltipModel} from '../index';
 
 export class WidgetTooltip extends Tooltip implements WidgetTooltipModel {
   declare model: WidgetTooltipModel;
   declare eventMap: WidgetTooltipEventMap;
   declare self: WidgetTooltip;
 
-  keyStrokeStopPropagationInterceptor: (event: ScoutKeyboardEvent) => void;
-  withFocusContext: boolean;
-  initialFocus: () => FocusRule;
-  focusableContainer: boolean;
   content: Widget;
   $widgetContainer: JQuery;
 
@@ -27,26 +23,9 @@ export class WidgetTooltip extends Tooltip implements WidgetTooltipModel {
     this.$widgetContainer = null;
     this.content = null;
     this._addWidgetProperties(['content']);
-    this.keyStrokeStopPropagationInterceptor = event => {
-      if (scout.isOneOf(event.which, keys.ESC, keys.ENTER)) {
-        return;
-      }
-      event.stopPropagation();
-    };
     this.withFocusContext = true;
-    this.initialFocus = () => FocusRule.AUTO;
     this.focusableContainer = false;
-  }
-
-  protected override _createKeyStrokeContext(): KeyStrokeContext {
-    return new KeyStrokeContext();
-  }
-
-  protected override _initKeyStrokeContext() {
-    super._initKeyStrokeContext();
-    if (this.keyStrokeStopPropagationInterceptor) {
-      this.keyStrokeContext.registerStopPropagationInterceptor(this.keyStrokeStopPropagationInterceptor);
-    }
+    this._closeKeysWhenFocused = [keys.ESC, keys.ENTER];
   }
 
   protected override _render() {
@@ -79,19 +58,11 @@ export class WidgetTooltip extends Tooltip implements WidgetTooltipModel {
     if (!this.rendering) {
       this.position();
     }
-
-    // Focus the widget
-    // It is important that this happens after layouting and positioning, otherwise we'd focus an element
-    // that is currently not on the screen. Which would cause the whole desktop to
-    // be shifted for a few pixels.
-    if (this.withFocusContext && this.content) {
-      this.session.focusManager.installFocusContext(this.$widgetContainer, this.initialFocus());
-    }
+    this.session.focusManager.validateFocus();
   }
 
   protected _removeContent() {
     if (this.content) {
-      this.session.focusManager.uninstallFocusContext(this.$widgetContainer);
       this.content.remove();
     }
   }

@@ -41,6 +41,14 @@ describe('FormField', () => {
     override _isSuppressStatusIcon(): boolean {
       return super._isSuppressStatusIcon();
     }
+
+    override _removeField() {
+      super._removeField();
+    }
+
+    override _removeStatus() {
+      super._removeStatus();
+    }
   }
 
   function createFormField(model: InitModelOf<FormField>): SpecFormField {
@@ -966,6 +974,50 @@ describe('FormField', () => {
       let provider = scout.create(CustomValidationResultProvider, {field});
       field.setValidationResultProvider(provider);
       expect(field.validationResultProvider).toBe(provider);
+    });
+  });
+
+  describe('addFieldContainer', () => {
+    it('appends field container to container', () => {
+      let field = createFormField(helper.createFieldModel());
+      field.render();
+      expect(field.$container.has(field.$fieldContainer[0]).length > 0).toBe(true);
+
+      field._removeField();
+      expect(field.$fieldContainer).toBe(null);
+
+      let $fieldContainer = field.$container.makeDiv();
+      field.addFieldContainer($fieldContainer);
+      expect($fieldContainer[0]).toBe(field.$fieldContainer[0]);
+      expect(field.$container.has(field.$fieldContainer[0]).length > 0).toBe(true);
+    });
+
+    it('ensures field container is before status', () => {
+      let field = createFormField(helper.createFieldModel());
+      field.render();
+      expect(field.$container.has(field.$fieldContainer[0]).length > 0).toBe(true);
+      expect(field.$fieldContainer.next()[0]).toBe(field.$status[0]);
+
+      field._removeField();
+      expect(field.$fieldContainer).toBe(null);
+      expect(field.$status).toBeTruthy();
+
+      let $fieldContainer = field.$container.makeDiv();
+      field.addFieldContainer($fieldContainer);
+      expect($fieldContainer[0]).toBe(field.$fieldContainer[0]);
+      expect(field.$container.has(field.$fieldContainer[0]).length > 0).toBe(true);
+      expect(field.$fieldContainer.next()[0]).toBe(field.$status[0]);
+
+      // Still valid after re-rendering
+      field.remove();
+      field.render();
+      expect(field.$container.has(field.$fieldContainer[0]).length > 0).toBe(true);
+      expect(field.$fieldContainer.next()[0]).toBe(field.$status[0]);
+
+      field._removeField();
+      field._removeStatus();
+      expect(field.$fieldContainer).toBe(null);
+      expect(field.$status).toBe(null);
     });
   });
 });

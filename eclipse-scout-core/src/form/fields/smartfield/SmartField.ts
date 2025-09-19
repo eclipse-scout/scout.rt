@@ -186,6 +186,9 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
   protected override _render() {
     this.addContainer(this.$parent, 'has-icon ' + this.cssClassName(), new SmartFieldLayout(this));
     this.addLabel();
+    if (!this.embedded) {
+      this.addMandatoryIndicator();
+    }
 
     let fieldFunc = this.isDropdown() ? fields.makeInputDiv : fields.makeInputOrDiv;
     let $field = (fieldFunc.call(fields, this) as JQuery<HTMLInputElement>)
@@ -203,9 +206,6 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     aria.expanded($field, false);
     this._addScreenReaderStatus();
 
-    if (!this.embedded) {
-      this.addMandatoryIndicator();
-    }
     this.addIcon();
     this.addStatus();
   }

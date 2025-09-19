@@ -71,8 +71,8 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     this.addContainer(this.$parent, 'lookup-box');
     this.addLabel();
     this.addMandatoryIndicator();
-    this.addStatus();
     this.addFieldContainer(this.$parent.makeDiv());
+    this.addStatus();
 
     let htmlComp = HtmlComponent.install(this.$fieldContainer, this.session);
     htmlComp.setLayout(this._createFieldContainerLayout());

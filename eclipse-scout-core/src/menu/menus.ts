@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, arrays, ComboMenu, EllipsisMenu, InitModelOf, Menu, MenuDestinations, ObjectOrChildModel, scout, Widget} from '../index';
+import {Action, aria, arrays, ComboMenu, EllipsisMenu, InitModelOf, Menu, MenuDestinations, ObjectOrChildModel, scout, Widget} from '../index';
 import $ from 'jquery';
 
 export type MenuFilterOptions = {
@@ -227,6 +227,12 @@ export const menus = {
     }
     let menus = arrays.diff(menuOwner.menus, menusToDelete);
     menuOwner.setMenus(menus);
+  },
+
+  updateAriaActiveDescendant($container: JQuery, $body: JQuery, menuItemClass?: string, $selectedItem?: JQuery) {
+    menuItemClass = menuItemClass || 'menu-item';
+    $selectedItem = $selectedItem || $body.find('.' + menuItemClass + '.selected');
+    aria.linkElementWithActiveDescendant($container, $selectedItem);
   }
 };
 

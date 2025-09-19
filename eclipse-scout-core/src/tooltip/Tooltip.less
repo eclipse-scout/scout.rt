@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -61,28 +61,98 @@
     border-radius: 0;
     padding: @tooltip-padding-y @context-menu-item-padding-right @tooltip-padding-y @context-menu-item-padding-left;
 
-    &:hover {
-      background-color: @tooltip-menu-hover-background-color;
-    }
-
     & > .submenu-icon {
       padding-left: 5px;
     }
 
+    &.selected:not(.has-popup) {
+      background-color: @tooltip-menu-selected-background-color;
+
+      &:hover {
+        background-color: @tooltip-menu-selected-hover-background-color;
+      }
+
+      &.focused {
+        background-color: @tooltip-menu-selected-hover-background-color;
+      }
+
+      &.disabled {
+        background-color: @tooltip-menu-selected-background-color;
+      }
+    }
+
+    &:hover {
+      background-color: @tooltip-menu-hover-background-color;
+    }
+
+    &.focused {
+      background-color: @tooltip-menu-focused-background-color;
+    }
+
+    &.disabled {
+      background-color: transparent;
+    }
+
     .ok > & {
       color: @tooltip-ok-color;
+
+      &.disabled {
+        color: fade(@tooltip-ok-color, 50%);
+      }
     }
 
     .info > & {
       color: @tooltip-menu-color;
+
+      &.disabled {
+        color: fade(@tooltip-menu-color, 50%);
+      }
+
+      &.selected:not(.has-popup) {
+        color: @tooltip-menu-info-selected-color;
+        background-color: @tooltip-menu-info-selected-background-color;
+
+        &:hover {
+          background-color: @tooltip-menu-info-selected-hover-background-color;
+        }
+
+        &.focused {
+          background-color: @tooltip-menu-info-selected-hover-background-color;
+        }
+
+        &.disabled {
+          color: @tooltip-menu-item-selected-disabled-color;
+          background-color: @tooltip-menu-info-selected-disabled-background-color;
+        }
+      }
+
+      &:hover {
+        background-color: @tooltip-menu-info-hover-background-color;
+      }
+
+      &.focused {
+        background-color: @tooltip-menu-info-focused-background-color;
+      }
+
+      &.disabled {
+        background-color: transparent;
+      }
     }
 
     .warning > & {
       color: @tooltip-warning-color;
+
+      &.disabled {
+        color: fade(@tooltip-warning-color, 50%);
+      }
     }
 
     .error > & {
       color: @tooltip-error-color;
+
+      &.disabled {
+        color: fade(@tooltip-error-color, 50%);
+      }
     }
   }
 }

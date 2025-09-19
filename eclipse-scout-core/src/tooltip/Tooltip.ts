@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Desktop, Form, graphics, InitModelOf, keys, Menu, ObjectOrChildModel, Point, Rectangle, scout, scrollbars, Status, StatusSeverity, strings, TooltipEventMap, TooltipModel, Widget, WidgetPopup} from '../index';
+import {
+  aria, arrays, Desktop, Form, graphics, InitModelOf, keys, KeyStrokeContext, Menu, menuNavigationKeyStrokes, ObjectOrChildModel, Point, Rectangle, scout, scrollbars, Status, StatusSeverity, strings, TooltipEventMap, TooltipModel, Widget,
+  WidgetPopup
+} from '../index';
 import $ from 'jquery';
 import KeyDownEvent = JQuery.KeyDownEvent;
 
@@ -27,6 +30,8 @@ export class Tooltip extends Widget implements TooltipModel {
   clipOrigin: boolean;
   windowPaddingX: number;
   windowPaddingY: number;
+  withFocusContext: boolean;
+  focusableContainer: boolean;
   origin: Rectangle;
   originRelativeToParent: boolean;
   originProducer: ($anchor: JQuery) => Rectangle;
@@ -48,6 +53,7 @@ export class Tooltip extends Widget implements TooltipModel {
   protected _keydownHandler: (event: KeyDownEvent) => void;
   protected _anchorScrollHandler: (event: JQuery.ScrollEvent) => void;
   protected _moveHandler: () => void;
+  protected _closeKeysWhenFocused: number[];
 
   constructor() {
     super();
@@ -69,6 +75,8 @@ export class Tooltip extends Widget implements TooltipModel {
     this.scrollType = 'position';
     this.htmlEnabled = false;
     this.menus = [];
+    this.withFocusContext = false;
+    this.focusableContainer = true;
     this.$anchor = null;
     this.$arrow = null;
     this.$content = null;
@@ -76,11 +84,13 @@ export class Tooltip extends Widget implements TooltipModel {
 
     this._popup = null;
     this._openLater = false;
+    this._closeKeysWhenFocused = [keys.ESC];
   }
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.resolveTextKeys(['text']);
+    this._setMenus(this.menus);
   }
 
   override render($parent?: JQuery) {
@@ -99,6 +109,7 @@ export class Tooltip extends Widget implements TooltipModel {
     this.$container = this.$parent
       .appendDiv('tooltip')
       .data('tooltip', this);
+    aria.role(this.$container, 'tooltip');
     if (this.cssClass) {
       this.$container.addClass(this.cssClass);
     }
@@ -114,10 +125,10 @@ export class Tooltip extends Widget implements TooltipModel {
       this._mouseDownHandler = this._onDocumentMouseDown.bind(this);
       // The listener needs to be executed in the capturing phase -> Allows for having context menus inside the tooltip, otherwise click on context menu header would close the tooltip
       this.$container.document(true).addEventListener('mousedown', this._mouseDownHandler, true); // true=the event handler is executed in the capturing phase
-
-      this._keydownHandler = this._onDocumentKeyDown.bind(this);
-      this.$container.document().on('keydown', this._keydownHandler);
     }
+
+    this._keydownHandler = this._onDocumentKeyDown.bind(this);
+    this.$container.document().on('keydown', this._keydownHandler);
 
     if (this.$anchor && this.scrollType) {
       this._anchorScrollHandler = this._onAnchorScroll.bind(this);
@@ -137,6 +148,15 @@ export class Tooltip extends Widget implements TooltipModel {
     }
 
     this.findDesktopIf$Parent()?.tooltipRendered(this);
+  }
+
+  protected override _renderProperties() {
+    super._renderProperties();
+    this._renderWithFocusContext();
+  }
+
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
+    return new KeyStrokeContext();
   }
 
   protected override _postRender() {
@@ -165,6 +185,9 @@ export class Tooltip extends Widget implements TooltipModel {
     }
     this._popup = null;
     this.$menus = null;
+    if (this.withFocusContext) {
+      this.session.focusManager.uninstallFocusContext(this._$focusContainer());
+    }
     super._remove();
     this.findDesktopIf$Parent()?.tooltipRemoved(this);
   }
@@ -214,6 +237,28 @@ export class Tooltip extends Widget implements TooltipModel {
     return this.removalPending;
   }
 
+  setWithFocusContext(withFocusContext: boolean) {
+    this.setProperty('withFocusContext', withFocusContext);
+  }
+
+  protected _renderWithFocusContext() {
+    if (!this.withFocusContext) {
+      if (this.rendered) {
+        this.$container.removeAttr('tabindex');
+        this.session.focusManager.uninstallFocusContext(this._$focusContainer());
+      }
+      return;
+    }
+    if (this.focusableContainer) {
+      this.$container.attr('tabindex', -1);
+    }
+    this.session.focusManager.installFocusContext(this._$focusContainer());
+  }
+
+  protected _$focusContainer() {
+    return this.$container;
+  }
+
   setText(text: string) {
     this.setProperty('text', text);
   }
@@ -255,9 +300,20 @@ export class Tooltip extends Widget implements TooltipModel {
     this.setProperty('menus', menus);
   }
 
+  protected _setMenus(menus: ObjectOrChildModel<Menu>[]) {
+    this._setProperty('menus', menus);
+    if (this.menus.length) {
+      menuNavigationKeyStrokes.unregisterKeyStrokes(this.keyStrokeContext);
+      menuNavigationKeyStrokes.registerKeyStrokes(this.keyStrokeContext, this, 'menu-item');
+      menus.forEach(menu => menu.setTabbable(false));
+    } else {
+      menuNavigationKeyStrokes.unregisterKeyStrokes(this.keyStrokeContext);
+    }
+  }
+
   protected _renderMenus() {
-    let maxIconWidth = 0,
-      menus = this.menus;
+    let maxIconWidth = 0;
+    let menus = this.menus;
 
     if (menus.length > 0 && !this.$menus) {
       this.$menus = this.$container.appendDiv('tooltip-menus');
@@ -265,6 +321,9 @@ export class Tooltip extends Widget implements TooltipModel {
       this.$menus.remove();
       this.$menus = null;
     }
+
+    // According to spec, a tooltip must not contain interactive elements -> use menu role instead
+    aria.role(this.$container, menus.length > 0 ? 'menu' : 'tooltip');
 
     // Render menus
     menus.forEach(menu => {
@@ -456,14 +515,25 @@ export class Tooltip extends Widget implements TooltipModel {
   }
 
   protected _onDocumentKeyDown(event: KeyDownEvent) {
-    if (scout.isOneOf(event.which,
+    let $target = $(event.target);
+    let targetWidget = scout.widget($target);
+    if (this.isOrHas(targetWidget)) {
+      // If focus is in tooltip, only close it when pressing ESC, every other key press must not close it.
+      // It is not sufficient to check the dom hierarchy using $container.has($target)
+      // because the tooltip may open other popups (e.g. sub context menu).
+      if (this._closeKeysWhenFocused.includes(event.which)) {
+        this.destroy();
+      }
+      return;
+    }
+
+    // If autoRemove is true, every key press closes the tooltip, except for certain 'modifier' keys
+    if (this.autoRemove && !scout.isOneOf(event.which,
       keys.CTRL, keys.SHIFT, keys.ALT,
       keys.NUM_LOCK, keys.CAPS_LOCK, keys.SCROLL_LOCK,
       keys.WIN_LEFT, keys.WIN_RIGHT, keys.SELECT,
       keys.PAUSE, keys.PRINT_SCREEN)) {
-      return;
+      this.destroy();
     }
-
-    this.destroy();
   }
 }

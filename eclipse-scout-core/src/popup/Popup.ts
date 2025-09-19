@@ -655,7 +655,7 @@ export class Popup extends Widget implements PopupModel {
 
     targetWidget = scout.widget($target);
 
-    // close the popup only if the click happened outside of the popup and its children
+    // close the popup only if the click happened outside the popup and its children
     // It is not sufficient to check the dom hierarchy using $container.has($target)
     // because the popup may open other popups which probably is not a dom child but a sibling
     // Also ignore clicks if the popup is covert by a glasspane

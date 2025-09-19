@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -46,6 +46,7 @@ describe('WidgetTooltipSpec', () => {
     expect(content instanceof StringField).toBe(true);
     expect(content.rendered).toBe(true);
     expect(content.$field.val()).toBe('Test1');
+    expect(content.$field).toBeFocused();
     expect(tooltip.$container).toHaveClass('special-tooltip');
 
     tooltip.remove();

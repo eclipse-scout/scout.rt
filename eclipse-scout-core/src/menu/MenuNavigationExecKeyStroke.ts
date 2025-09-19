@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,11 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ContextMenuPopup, keys, MenuNavigationKeyStroke, menuNavigationKeyStrokes} from '../index';
+import {ContextMenuContainer, keys, MenuNavigationKeyStroke, menuNavigationKeyStrokes} from '../index';
 
 export class MenuNavigationExecKeyStroke extends MenuNavigationKeyStroke {
 
-  constructor(popup: ContextMenuPopup, menuItemClass: string) {
+  constructor(popup: ContextMenuContainer, menuItemClass: string) {
     super(popup);
     this._menuItemClass = menuItemClass;
     this.stopImmediatePropagation = true;
@@ -20,7 +20,7 @@ export class MenuNavigationExecKeyStroke extends MenuNavigationKeyStroke {
   }
 
   override handle(event: JQuery.KeyboardEventBase) {
-    let $menuItem = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass).$selected;
+    let $menuItem = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass).$focused;
     if ($menuItem.length > 0) {
       $menuItem.data('widget').doAction();
     }

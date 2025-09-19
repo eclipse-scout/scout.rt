@@ -192,7 +192,7 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
     parentMenu.$placeHolder.replaceWith(parentMenu.$container);
     parentMenu.$container.toggleClass('expanded', false);
     this._updateFirstLastClass();
-    this.updateNextToSelected('menu-item', parentMenu.$container);
+    this.updateAriaActiveDescendant('menu-item', parentMenu.$container);
 
     parentMenu.$subMenuBody.detach();
     this._processSubMenuQueue();
@@ -240,8 +240,6 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
     let popupBounds = this.htmlComp.bounds();
     let $oldBody = this.$body;
     internalParentMenu.__originalParent.$subMenuBody = $oldBody;
-    let $menuItems = this.$body.find('.menu-item');
-    $menuItems.removeClass('next-to-selected');
 
     if (!internalParentMenu.$subMenuBody) {
       this._renderBody();
@@ -270,7 +268,7 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
     HtmlComponent.get(this.$body).invalidateLayoutTree();
     this.validateLayoutTree();
     this.position();
-    this.updateNextToSelected();
+    this.updateAriaActiveDescendant();
 
     if (animated) {
       this._animateRenderSubMenuItems(internalParentMenu, popupBounds, parentMenuPosition);
@@ -427,8 +425,12 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
   protected _onCloneMenuPropertyChange(event: PropertyChangeEvent) {
     if (event.propertyName === 'selected') {
       let menu = event.source as Menu;
-      // Only trigger property change, setSelected would try to render the selected state which must not happen for the original menu
-      menu.cloneOf.triggerPropertyChange('selected', event.oldValue, event.newValue);
+      if (menu.cloneOf.togglesPopupOrSubMenu()) {
+        // Only trigger property change, setSelected would try to render the selected state which must not happen for the original menu
+        menu.cloneOf.triggerPropertyChange('selected', event.oldValue, event.newValue);
+      } else {
+        menu.cloneOf.setSelected(event.newValue);
+      }
     }
   }
 
@@ -509,15 +511,10 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
     }
   }
 
-  updateNextToSelected(menuItemClass?: string, $selectedItem?: JQuery) {
-    menuItemClass = menuItemClass ? menuItemClass : 'menu-item';
-    let $all = this.$body.find('.' + menuItemClass);
-    $selectedItem = $selectedItem ? $selectedItem : this.$body.find('.' + menuItemClass + '.selected');
+  updateAriaActiveDescendant(menuItemClass?: string, $selectedItem?: JQuery) {
+    menuItemClass = menuItemClass || 'menu-item';
+    $selectedItem = $selectedItem || this.$body.find('.' + menuItemClass + '.selected');
     aria.linkElementWithActiveDescendant(this.$container, $selectedItem);
-    $all.removeClass('next-to-selected');
-    if ($selectedItem.hasClass('selected')) {
-      $selectedItem.nextAll(':visible').first().addClass('next-to-selected');
-    }
   }
 
   protected _onMenuItemAction(event: Event<Action>) {
@@ -537,10 +534,9 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
     if (event.propertyName === 'visible') {
       this._updateFirstLastClass();
     } else if (event.propertyName === 'selected') {
-      // Keystroke navigation marks the currently focused item as selected.
-      // When a sub menu item is opened while another element is selected (focused), make sure the other element gets unselected.
-      // Otherwise, two items would be selected when the sub menu is closed again.
-      this._deselectSiblings(event.source as Menu);
+      // When a sub menu item is opened while another element is focused, make sure to remove the focus from the other element.
+      // Otherwise, two items would look focused when the sub menu is closed again.
+      this._unfocusSiblings(event.source as Menu);
     } else if (event.propertyName === 'iconId') {
       if (this.rendered) {
         // Update text alignment if an icon changes while popup is open
@@ -557,12 +553,12 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
   }
 
   /**
-   * Deselects the visible siblings of the given menu item. It just removes the CSS class and does not modify the selected property.
+   * Removes the CSS class 'focused' from the visible siblings of the given menu item.
    */
-  protected _deselectSiblings(menuItem: Menu) {
+  protected _unfocusSiblings(menuItem: Menu) {
     menuItem.$container.siblings('.menu-item').each((i, elem) => {
       let $menuItem = $(elem);
-      $menuItem.setSelected(false);
+      $menuItem.removeClass('focused');
     });
   }
 

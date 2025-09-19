@@ -116,7 +116,7 @@ export class FormMenu extends Menu implements FormMenuModel {
 
   protected _setSelected(selected: boolean) {
     this._setProperty('selected', selected);
-    if (this.popupStyle === FormMenu.PopupStyle.MOBILE && this._doActionTogglesPopup()) {
+    if (this.popupStyle === FormMenu.PopupStyle.MOBILE && this.form) {
       // Mobile Popup can be rendered even if menu is not. This is useful if a tool form menu should be opened while the desktop bench is open instead of the outline
       // Open will be called in renderSelected again but won't do anything
       if (this.selected) {
@@ -142,7 +142,15 @@ export class FormMenu extends Menu implements FormMenuModel {
     // (either by an exception if its already open, or it may be rendered into the wrong menu).
     // To prevent that, we ensure the other popup is really closed before opening the new one.
     this._closeOtherPopupsForSameMenu();
-    return super._canOpenPopup();
+    if (!super._canOpenPopup()) {
+      return false;
+    }
+
+    // Recheck if opening is still possible (maybe destroying the popup changed that, e.g. form was set to null)
+    if (!this.form) {
+      return false;
+    }
+    return true;
   }
 
   protected _closeOtherPopupsForSameMenu() {
@@ -209,7 +217,7 @@ export class FormMenu extends Menu implements FormMenuModel {
   }
 
   protected override _doActionTogglesPopup(): boolean {
-    return !!this.form;
+    return true;
   }
 
   override updateAriaRole() {

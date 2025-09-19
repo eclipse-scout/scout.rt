@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, arrays, ContextMenuPopup, EventHandler, FieldStatusEventMap, FieldStatusModel, FormField, FormFieldStatusPosition, HierarchyChangeEvent, HtmlComponent, Menu, PropertyChangeEvent, scout, Status, StatusOrModel, strings, Tooltip,
-  Widget
+  aria, arrays, ContextMenuPopup, EventHandler, FieldStatusEventMap, FieldStatusExecKeyStroke, FieldStatusModel, FormField, FormFieldStatusPosition, HierarchyChangeEvent, HtmlComponent, KeyStrokeContext, Menu, PropertyChangeEvent, scout,
+  Status, StatusOrModel, strings, Tooltip, Widget
 } from '../../index';
 
 export class FieldStatus extends Widget implements FieldStatusModel {
@@ -37,16 +37,33 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     this.updating = false;
     this.autoRemove = true;
     this.position = FormField.StatusPosition.DEFAULT;
+    this.inheritAccessibility = false;
+    this.preventInitialFocus = true;
+    this.preventClickFocus = true;
+    this.menus = [];
 
     this._parents = [];
     this._parentPropertyChangeListener = this._onParentPropertyChange.bind(this);
     this._parentHierarchyChangeListener = this._onParentHierarchyChange.bind(this);
   }
 
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
+    return new KeyStrokeContext();
+  }
+
+  protected override _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
+    this.keyStrokeContext.registerKeyStroke(new FieldStatusExecKeyStroke(this));
+  }
+
   protected override _render() {
     this.$container = this.$parent.appendSpan('status')
       .on('mousedown', this._onStatusMouseDown.bind(this));
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    aria.role(this.$container, 'button');
+    aria.hasPopup(this.$container, 'menu');
+    aria.expanded(this.$container, false);
+    this._updateVisibility();
   }
 
   protected override _remove() {
@@ -65,6 +82,16 @@ export class FieldStatus extends Widget implements FieldStatusModel {
   protected override _renderProperties() {
     super._renderProperties();
     this._renderPosition();
+  }
+
+  protected override _renderEnabled() {
+    super._renderEnabled();
+    this._updateTabbable();
+  }
+
+  protected _updateTabbable() {
+    let hasMenus = !!this.menus.length;
+    this.$container.setTabbable(hasMenus && this.enabledComputed);
   }
 
   update(status: StatusOrModel, menus: Menu | Menu[], autoRemove: boolean, showStatus?: boolean) {
@@ -93,6 +120,30 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     if (!this.updating) {
       this._updatePopup();
     }
+    this._updateAriaLabel();
+    this._updateVisibility();
+  }
+
+  protected _updateVisibility() {
+    let invisible = !this.menus.length && !this.status;
+    if (invisible && this.isFocused()) {
+      this.session.focusManager.focusNextTabbable(this.getFocusableElement());
+    }
+    this.$container.toggleClass('invisible', invisible);
+  }
+
+  protected _updateAriaLabel() {
+    let hasMenus = this.menus.length > 0;
+
+    let label = this.session.text('ui.MoreInformation');
+    if (hasMenus) {
+      label = this.session.text('ui.MoreActions');
+    } else if (this.status?.isWarning()) {
+      label = this.session.text('ui.Warning');
+    } else if (this.status?.isError()) {
+      label = this.session.text('ui.ErrorMessage');
+    }
+    aria.label(this.$container, label);
   }
 
   setPosition(position: FormFieldStatusPosition) {
@@ -119,6 +170,9 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     if (!this.updating) {
       this._updatePopup();
     }
+    this._updateAriaLabel();
+    this._updateVisibility();
+    this._updateTabbable();
   }
 
   setAutoRemove(autoRemove: boolean) {
@@ -145,7 +199,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     if (!this._requiresTooltip()) {
       this.hideTooltip();
     }
-    if (arrays.empty(this.menus)) {
+    if (!this.menus.length) {
       this.hideContextMenu();
     }
     if (showStatus === true) {
@@ -159,7 +213,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     if (!this.status || !this.rendered) {
       return false;
     }
-    if (arrays.empty(this.menus) && !strings.hasText(this.status.message)) {
+    if (!this.menus.length && !strings.hasText(this.status.message)) {
       return false;
     }
     return true;
@@ -197,10 +251,14 @@ export class FieldStatus extends Widget implements FieldStatusModel {
       this.tooltip.render();
       aria.role(this.tooltip.$content, 'alert');
       this.$container.addClass('selected');
+      aria.expanded(this.$container, true);
+      aria.linkElementWithControls(this.$container, this.tooltip.$container);
       this.tooltip.one('destroy', () => {
         this.tooltip = null;
         if (this.$container) {
           this.$container.removeClass('selected');
+          aria.expanded(this.$container, false);
+          aria.removeControls(this.$container);
         }
       });
     }
@@ -234,10 +292,14 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     });
     this.contextMenu.open();
     this.$container.addClass('selected');
+    aria.expanded(this.$container, true);
+    aria.linkElementWithControls(this.$container, this.contextMenu.$container);
     this.contextMenu.one('destroy', () => {
       this.contextMenu = null;
       if (this.$container) {
         this.$container.removeClass('selected');
+        aria.expanded(this.$container, false);
+        aria.removeControls(this.$container);
       }
     });
   }
@@ -288,7 +350,23 @@ export class FieldStatus extends Widget implements FieldStatusModel {
   protected _onStatusMouseDown(event: JQuery.MouseDownEvent) {
     let statusDownEvent = this.trigger('statusMouseDown', event);
     if (!statusDownEvent.defaultPrevented) {
-      this.togglePopup();
+      this.doAction();
+    }
+  }
+
+  doAction() {
+    this.togglePopup();
+
+    // Ensure the user can use keyboard to select the menus inside the tooltip.
+    // Ideally, a tooltip would always be a focus context if it had menus, but some status tooltips will be opened during field input.
+    // In that case we do not want the tooltip to take the focus away from the input
+    // -> Only do it when the user explicitly requested the opening of the tooltip.
+    let withFocusContext = this.menus.length > 0;
+    this.tooltip?.setWithFocusContext(withFocusContext);
+
+    // Remove 'alert' role to prevent a screen reader from reading it twice if it gains focus
+    if (withFocusContext) {
+      aria.role(this.tooltip?.$content, null);
     }
   }
 

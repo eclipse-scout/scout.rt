@@ -80,6 +80,31 @@ describe('TableField', () => {
       expect(session.getModelAdapter(table.id)).toBeFalsy();
     });
 
+    it('positions the table before the status', () => {
+      let tableField = createTableFieldWithTable();
+      tableField.render();
+
+      // Field needs to be before status for a correct tab order
+      expect(tableField.$status).toBeTruthy();
+      expect(tableField.$field.next()[0]).toBe(tableField.$status[0]);
+
+      tableField.setTable(null);
+      expect(tableField.$field).toBe(null);
+      expect(tableField.$status).toBeTruthy();
+
+      tableField.setTable(createTable(2, 2));
+      expect(tableField.$field.next()[0]).toBe(tableField.$status[0]);
+      expect(tableField.$status).toBeTruthy();
+
+      tableField.remove();
+      expect(tableField.$field).toBe(null);
+      expect(tableField.$status).toBe(null);
+
+      tableField.render();
+      expect(tableField.$field.next()[0]).toBe(tableField.$status[0]);
+      expect(tableField.$status).toBeTruthy();
+    });
+
     it('table gets class \'field\' to make it work with the form field layout', () => {
       let tableField = createTableFieldWithTable();
       tableField.render();

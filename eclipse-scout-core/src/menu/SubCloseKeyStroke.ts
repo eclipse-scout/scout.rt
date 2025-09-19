@@ -7,11 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ContextMenuPopup, keys, MenuNavigationExecKeyStroke, menuNavigationKeyStrokes, ScoutKeyboardEvent} from '../index';
+import {ContextMenuContainer, keys, MenuNavigationExecKeyStroke, menuNavigationKeyStrokes, ScoutKeyboardEvent} from '../index';
 
 export class SubCloseKeyStroke extends MenuNavigationExecKeyStroke {
 
-  constructor(popup: ContextMenuPopup, menuItemClass: string) {
+  constructor(popup: ContextMenuContainer, menuItemClass: string) {
     super(popup, menuItemClass);
     this._menuItemClass = menuItemClass;
     this.which = [keys.BACKSPACE];

@@ -258,8 +258,8 @@ export class FormField extends Widget implements FormFieldModel {
    * <pre>
    * this.addContainer(this.$parent, 'form-field');
    * this.addLabel();
-   * this.addField(this.$parent.makeDiv('foo', 'bar'));
    * this.addMandatoryIndicator();
+   * this.addField(this.$parent.makeDiv('foo', 'bar'));
    * this.addStatus();
    * </pre>
    */
@@ -268,8 +268,8 @@ export class FormField extends Widget implements FormFieldModel {
     // Subclasses typically override _render completely and add these parts by themselves
     this.addContainer(this.$parent);
     this.addLabel();
-    this.addField(this.$parent.makeDiv());
     this.addMandatoryIndicator();
+    this.addField(this.$parent.makeDiv());
     this.addStatus();
   }
 
@@ -1141,10 +1141,15 @@ export class FormField extends Widget implements FormFieldModel {
     this.$fieldContainer = $fieldContainer
       .addClass('field');
 
-    // Only append if not already appended, or it is not the last element so that append would move it to the end
+    // Only append if not already appended
     // This can be important for some widgets, e.g. iframe which would cancel and restart the request on every dom insertion
-    if (this.$container.has($fieldContainer[0]).length === 0 || $fieldContainer.next().length > 0) {
+    if (this.$container.has($fieldContainer[0]).length === 0) {
       $fieldContainer.appendTo(this.$container);
+    }
+
+    // Status needs to be after field container to get the correct tab order
+    if (this.$status && !$fieldContainer.next().is(this.$status)) {
+      $fieldContainer.insertBefore(this.$status);
     }
   }
 
