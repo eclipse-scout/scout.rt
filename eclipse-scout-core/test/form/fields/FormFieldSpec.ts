@@ -843,10 +843,10 @@ describe('FormField', () => {
   });
 
   describe('aria properties', () => {
-    let formField, model;
+    let formField: SpecFormField;
 
     beforeEach(() => {
-      model = helper.createFieldModel();
+      let model = helper.createFieldModel();
       formField = createFormField(model);
     });
 
@@ -861,12 +861,58 @@ describe('FormField', () => {
     it('adds aria-description if there is a tooltip text', () => {
       formField.tooltipText = 'hello';
       formField.render();
-      expect(formField.$field.attr('aria-description')).toBeTruthy();
       expect(formField.$field.attr('aria-description')).toBe('hello');
       expect(formField.$field.attr('aria-describedby')).toBeFalsy();
 
       formField.setTooltipText(null);
       expect(formField.$field.attr('aria-description')).toBeFalsy();
+    });
+
+    it('adds aria-description if there is a non-error status', () => {
+      formField.addErrorStatus(Status.ok('status message'));
+      formField.render();
+      expect(formField.$field.attr('aria-description')).toBe('status message');
+
+      formField.setTooltipText('tooltip'); // Won't modify description
+      expect(formField.$field.attr('aria-description')).toBe('status message');
+
+      formField.clearErrorStatus();
+      expect(formField.$field.attr('aria-description')).toBe('tooltip');
+
+      formField.setTooltipText(null);
+      expect(formField.$field.attr('aria-description')).toBeFalsy();
+
+      formField.addErrorStatus(Status.ok('error status'));
+      expect(formField.$field.attr('aria-description')).toBe('error status');
+
+      formField.clearErrorStatus();
+      expect(formField.$field.attr('aria-description')).toBeFalsy();
+
+      formField.addErrorStatus(Status.error('error status'));
+      expect(formField.$field.attr('aria-description')).toBeFalsy();
+
+      formField.setTooltipText('tooltip');
+      expect(formField.$field.attr('aria-description')).toBeFalsy();
+
+      formField.clearErrorStatus();
+      expect(formField.$field.attr('aria-description')).toBe('tooltip');
+    });
+
+    it('adds aria-invalid and aria-errormessage if there is an error status', () => {
+      formField.addErrorStatus(Status.error('error status'));
+      formField.render();
+      expect(formField.$field.attr('aria-invalid')).toBe('true');
+      expect(formField.$field.attr('aria-errormessage')).toBe(formField.fieldStatus.tooltip.$content.attr('id'));
+
+      formField.clearErrorStatus();
+      expect(formField.$field.attr('aria-invalid')).toBeFalsy();
+
+      formField.addErrorStatus(Status.ok('ok status'));
+      expect(formField.$field.attr('aria-invalid')).toBeFalsy();
+
+      formField.addErrorStatus(Status.error('error status'));
+      expect(formField.$field.attr('aria-invalid')).toBe('true');
+      expect(formField.$field.attr('aria-errormessage')).toBe(formField.fieldStatus.tooltip.$content.attr('id'));
     });
 
     it('has aria-labelledby set if label position is not on field', () => {

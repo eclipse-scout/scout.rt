@@ -507,6 +507,15 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     this._setProperty('allowedDates', truncDates);
   }
 
+  protected override _updateAriaDescAndErrorMessage() {
+    if (this.$dateField) {
+      this._updateAriaDescAndErrorMessageOnElement(this.$dateField);
+    }
+    if (this.$timeField) {
+      this._updateAriaDescAndErrorMessageOnElement(this.$timeField);
+    }
+  }
+
   protected override _updateErrorStatusClasses(statusClass: string, hasStatus: boolean) {
     super._updateErrorStatusClasses(statusClass, hasStatus);
 

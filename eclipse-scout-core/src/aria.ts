@@ -191,6 +191,22 @@ export const aria = {
   },
 
   /**
+   * Links the given element with the given error message by setting aria-errormessage.
+   *
+   * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-errormessage">ARIA: aria-errormessage</a>
+   */
+  linkElementWithErrorMessage($elem: JQuery<Element>, $errorMessage: JQuery<Element>) {
+    aria._linkElementWithTargetElement($elem, $errorMessage, 'aria-errormessage', AriaLabelledByInsertPosition.FRONT, true);
+  },
+
+  removeErrorMessage($elem: JQuery<Element>) {
+    if (!$elem) {
+      return;
+    }
+    $elem.removeAttr('aria-errormessage');
+  },
+
+  /**
    * Adds aria heading semantics to {@param $header} and correctly assigns heading level information to the heading as well as the surrounding container {@param $elem}.
    * Avoid using empty {@param $header} objects because a screen reader may ignore them in the heading structure leading to inconsistent heading levels.
    * Default aria-level for headers is level 2.
@@ -337,6 +353,19 @@ export const aria = {
       return;
     }
     $elem.attr('aria-required', strings.asString(value));
+  },
+
+  /**
+   * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-invalid">ARIA: aria-invalid</a>
+   *
+   * @param $elem element to add/remove the attribute. If null, nothing is changed.
+   * @param value value of the attribute to set. If null, attribute is removed.
+   */
+  invalid($elem: JQuery<Element>, value: boolean) {
+    if (!$elem) {
+      return;
+    }
+    $elem.attr('aria-invalid', strings.asString(value));
   },
 
   /**
