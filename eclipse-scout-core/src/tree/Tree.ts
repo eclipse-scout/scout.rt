@@ -1095,13 +1095,8 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       return;
     }
 
-    if (expanded) {
-      $node.addClass('expanded');
-      aria.expanded($node, true);
-    } else {
-      $node.removeClass('expanded');
-      aria.expanded($node, false);
-    }
+    $node.toggleClass('expanded', expanded);
+    aria.expanded($node, expanded);
   }
 
   protected _renderSelection() {

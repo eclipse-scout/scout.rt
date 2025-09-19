@@ -58,6 +58,7 @@ export class TabArea extends Widget implements TabAreaModel {
       parent: this,
       cssClass: 'overflow-tab-item',
       iconId: null,
+      tooltipText: '${textKey:ui.MoreTabs}',
       inheritAccessibility: false,
       text: '0' // Initialize with the normal value to prevent unnecessary layout invalidation by the TabAreaLayout if ellipsis menus is not visible
     });
