@@ -191,22 +191,6 @@ export const aria = {
   },
 
   /**
-   * Adds {@param description} to {@param $elem} by adding and linking a screen reader only text to {@param $elem}
-   *
-   * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-describedby">ARIA: aria-describedby</a>
-   */
-  addHiddenDescriptionAndLinkToElement($elem: JQuery<Element>, id: string, description: string, position = AriaLabelledByInsertPosition.FRONT, replace = false): JQuery<Element> {
-    if (!$elem || strings.empty(description)) {
-      return;
-    }
-    let $descriptionElement = $elem.beforeDiv().addClass('text').attr('id', 'desc' + id).text(description);
-    aria.hidden($descriptionElement, true); // hide the element in the accessibility tree, or it may be read twice
-    aria.screenReaderOnly($descriptionElement);
-    aria.linkElementWithDescription($elem, $descriptionElement, position, replace);
-    return $descriptionElement;
-  },
-
-  /**
    * Adds aria heading semantics to {@param $header} and correctly assigns heading level information to the heading as well as the surrounding container {@param $elem}.
    * Avoid using empty {@param $header} objects because a screen reader may ignore them in the heading structure leading to inconsistent heading levels.
    * Default aria-level for headers is level 2.

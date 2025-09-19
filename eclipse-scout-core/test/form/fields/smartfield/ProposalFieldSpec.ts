@@ -222,14 +222,6 @@ describe('ProposalField', () => {
       expect(field.$field).toHaveAttr('role', 'combobox');
     });
 
-    it('has aria-describedby description for its functionality', () => {
-      field.render();
-      let $fieldDescription = field.$container.find('#desc' + field.id + '-func-desc');
-      expect(field.$field.attr('aria-describedby')).toBeTruthy();
-      expect(field.$field.attr('aria-describedby')).toBe($fieldDescription.eq(0).attr('id'));
-      expect(field.$field.attr('aria-description')).toBeFalsy();
-    });
-
     it('has a non empty status container that lists count of available options', () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open

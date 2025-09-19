@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, arrays, FileChooserFieldBrowseKeyStroke, FileChooserFieldDeleteKeyStroke, FileChooserFieldEventMap, FileChooserFieldModel, FileInput, FileInputChangeEvent, InitModelOf, objects, scout, ValueField} from '../../../index';
+import {arrays, FileChooserFieldBrowseKeyStroke, FileChooserFieldDeleteKeyStroke, FileChooserFieldEventMap, FileChooserFieldModel, FileInput, FileInputChangeEvent, InitModelOf, objects, scout, ValueField} from '../../../index';
 
 export class FileChooserField extends ValueField<File> implements FileChooserFieldModel {
   declare model: FileChooserFieldModel;
@@ -67,7 +67,6 @@ export class FileChooserField extends ValueField<File> implements FileChooserFie
     this._renderFileInput();
     this.addIcon();
     this.addStatus();
-    this._addAriaFieldDescription();
   }
 
   protected _renderFileInput() {
@@ -156,9 +155,5 @@ export class FileChooserField extends ValueField<File> implements FileChooserFie
     }
     let files = this.fileInput.files;
     return files && files.length ? files[0] : null;
-  }
-
-  protected _addAriaFieldDescription() {
-    aria.addHiddenDescriptionAndLinkToElement(this.fileInput.$fileInput, this.id + '-func-desc', this.session.text('ui.AriaFileChooserFieldDescription'));
   }
 }

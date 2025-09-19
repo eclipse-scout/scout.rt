@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1579,24 +1579,6 @@ describe('DateField', () => {
       field.render();
       expect(field.$dateFieldIcon).toHaveAttr('aria-hidden', 'true');
       expect(field.$timeFieldIcon).toHaveAttr('aria-hidden', 'true');
-    });
-
-    it('has aria-describedby descriptions for its functionality', () => {
-      let field = scout.create(DateField, {
-        parent: session.desktop,
-        label: 'label',
-        hasTime: true
-      });
-      field.render();
-      let $dateFieldDescription = field.$fieldContainer.find('#desc' + field.id + '-date-func-desc');
-      expect(field.$dateField.attr('aria-describedby')).toBeTruthy();
-      expect(field.$dateField.attr('aria-describedby')).toBe($dateFieldDescription.eq(0).attr('id'));
-      expect(field.$dateField.attr('aria-description')).toBeFalsy();
-
-      let $timeFieldDescription = field.$fieldContainer.find('#desc' + field.id + '-time-func-desc');
-      expect(field.$timeField.attr('aria-describedby')).toBeTruthy();
-      expect(field.$timeField.attr('aria-describedby')).toBe($timeFieldDescription.eq(0).attr('id'));
-      expect(field.$timeField.attr('aria-description')).toBeFalsy();
     });
 
     it('has date and time clear icons correctly rendered with role button and a label', () => {

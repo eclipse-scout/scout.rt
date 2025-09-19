@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -79,14 +79,6 @@ describe('SmartFieldMultiline', () => {
     it('has aria role combobox', () => {
       field.render();
       expect(field.$field).toHaveAttr('role', 'combobox');
-    });
-
-    it('has aria-describedby description for its functionality', () => {
-      field.render();
-      let $fieldDescription = field.$container.find('#desc' + field.id + '-func-desc');
-      expect(field.$field.attr('aria-describedby')).toBeTruthy();
-      expect(field.$field.attr('aria-describedby')).toBe($fieldDescription.eq(0).attr('id'));
-      expect(field.$field.attr('aria-description')).toBeFalsy();
     });
 
     it('has a non empty status container that lists count of available options', () => {
