@@ -1553,6 +1553,109 @@ describe('DateField', () => {
       expect(field.$timeField.attr('aria-required')).toBeFalsy();
     });
 
+    it('has aria-invalid and aria-errormessage set on date and time if there is an error status', () => {
+      let field = scout.create(DateField, {
+        parent: session.desktop,
+        label: 'label',
+        errorStatus: {
+          severity: Status.Severity.ERROR,
+          message: 'error status'
+        },
+        hasTime: true
+      });
+      field.render();
+
+      expect(field.$field.attr('aria-invalid')).toBeFalsy();
+      expect(field.$dateField.attr('aria-invalid')).toBe('true');
+      expect(field.$dateField.attr('aria-errormessage')).toBe(field.fieldStatus.tooltip.$content.attr('id'));
+      expect(field.$timeField.attr('aria-invalid')).toBe('true');
+      expect(field.$timeField.attr('aria-errormessage')).toBe(field.fieldStatus.tooltip.$content.attr('id'));
+
+      field.clearErrorStatus();
+      expect(field.$field.attr('aria-invalid')).toBeFalsy();
+      expect(field.$dateField.attr('aria-invalid')).toBeFalsy();
+      expect(field.$timeField.attr('aria-invalid')).toBeFalsy();
+
+      field.addErrorStatus(Status.ok('ok status'));
+      expect(field.$dateField.attr('aria-invalid')).toBeFalsy();
+      expect(field.$timeField.attr('aria-invalid')).toBeFalsy();
+
+      field.addErrorStatus(Status.error('error status'));
+      expect(field.$dateField.attr('aria-invalid')).toBe('true');
+      expect(field.$dateField.attr('aria-errormessage')).toBe(field.fieldStatus.tooltip.$content.attr('id'));
+      expect(field.$timeField.attr('aria-invalid')).toBe('true');
+      expect(field.$timeField.attr('aria-errormessage')).toBe(field.fieldStatus.tooltip.$content.attr('id'));
+    });
+
+    it('has aria-description set on date and time if there is a tooltip or a non-error status', () => {
+      let field = scout.create(DateField, {
+        parent: session.desktop,
+        label: 'label',
+        errorStatus: {
+          severity: Status.Severity.OK,
+          message: 'ok status'
+        },
+        hasTime: true
+      });
+      field.render();
+      expect(field.$field.attr('aria-description')).toBeFalsy();
+      expect(field.$dateField.attr('aria-description')).toBe('ok status');
+      expect(field.$timeField.attr('aria-description')).toBe('ok status');
+
+      field.setTooltipText('tooltip'); // Won't modify description
+      expect(field.$field.attr('aria-description')).toBeFalsy();
+      expect(field.$dateField.attr('aria-description')).toBe('ok status');
+      expect(field.$timeField.attr('aria-description')).toBe('ok status');
+
+      field.clearErrorStatus();
+      expect(field.$field.attr('aria-description')).toBeFalsy();
+      expect(field.$dateField.attr('aria-description')).toBe('tooltip');
+      expect(field.$timeField.attr('aria-description')).toBe('tooltip');
+
+      field.setTooltipText(null);
+      expect(field.$field.attr('aria-description')).toBeFalsy();
+      expect(field.$dateField.attr('aria-description')).toBeFalsy();
+      expect(field.$timeField.attr('aria-description')).toBeFalsy();
+
+      field.addErrorStatus(Status.ok('ok status'));
+      expect(field.$field.attr('aria-description')).toBeFalsy();
+      expect(field.$dateField.attr('aria-description')).toBe('ok status');
+      expect(field.$timeField.attr('aria-description')).toBe('ok status');
+
+      field.clearErrorStatus();
+      expect(field.$field.attr('aria-description')).toBeFalsy();
+      expect(field.$dateField.attr('aria-description')).toBeFalsy();
+      expect(field.$timeField.attr('aria-description')).toBeFalsy();
+
+      field.addErrorStatus(Status.error('error status'));
+      expect(field.$field.attr('aria-description')).toBeFalsy();
+      expect(field.$dateField.attr('aria-description')).toBeFalsy();
+      expect(field.$timeField.attr('aria-description')).toBeFalsy();
+
+      field.setTooltipText('tooltip');
+      expect(field.$field.attr('aria-description')).toBeFalsy();
+      expect(field.$dateField.attr('aria-description')).toBeFalsy();
+      expect(field.$timeField.attr('aria-description')).toBeFalsy();
+
+      field.clearErrorStatus();
+      expect(field.$field.attr('aria-description')).toBeFalsy();
+      expect(field.$dateField.attr('aria-description')).toBe('tooltip');
+      expect(field.$timeField.attr('aria-description')).toBe('tooltip');
+
+      field.setHasTime(false);
+      field.setHasDate(false);
+      expect(field.$dateField).toBe(null);
+      expect(field.$timeField).toBe(null);
+
+      field.setHasDate(true);
+      expect(field.$dateField.attr('aria-description')).toBe('tooltip');
+      expect(field.$timeField).toBe(null);
+
+      field.setHasTime(true);
+      expect(field.$dateField.attr('aria-description')).toBe('tooltip');
+      expect(field.$timeField.attr('aria-description')).toBe('tooltip');
+    });
+
     it('has aria-labelledby set on date and time', () => {
       let field = scout.create(DateField, {
         parent: session.desktop,

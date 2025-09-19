@@ -518,6 +518,25 @@ export class FormField extends Widget implements FormFieldModel {
     }
   }
 
+  protected _updateAriaDescAndErrorMessage() {
+    this._updateAriaDescAndErrorMessageOnElement(this.$field);
+  }
+
+  protected _updateAriaDescAndErrorMessageOnElement($field: JQuery) {
+    let status = this._errorStatus();
+    let description = status?.message || this.tooltipText;
+    let errorSeverity = status?.severity === Status.Severity.ERROR;
+    if (errorSeverity && this.fieldStatus?.tooltip?.$content) {
+      aria.invalid($field, true);
+      aria.linkElementWithErrorMessage($field, this.fieldStatus.tooltip.$content);
+      description = null; // Also remove description to make it consistent with the visual behavior
+    } else {
+      aria.invalid($field, null);
+      aria.removeErrorMessage($field);
+    }
+    aria.description($field, description);
+  }
+
   hasStatusTooltip(): boolean {
     return this.tooltipAnchor === FormField.TooltipAnchor.DEFAULT && strings.hasText(this.tooltipText);
   }
