@@ -314,7 +314,9 @@ export class FileChooser extends Widget implements FileChooserModel {
       let $remove = $file
         .appendSpan('remove')
         .on('click', this.removeFile.bind(this, file));
-      let $removeLink = $file.makeElement('<a>', 'remove-link', this.session.text('Remove'));
+      let $removeLink = $file
+        .makeElement('<a>', 'remove-link', this.session.text('Remove'))
+        .setTabbable(true);
       $remove.append($removeLink);
     });
     scrollbars.update(this.$files);
