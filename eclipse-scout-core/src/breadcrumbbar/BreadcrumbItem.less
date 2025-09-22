@@ -20,8 +20,25 @@
     font-weight: bold;
   }
 
-  &:hover:not(.disabled) {
+  &:hover {
     color: @link-hover-color;
+  }
+
+  &:active {
+    color: @link-active-color;
+  }
+
+  &:focus {
+    box-shadow: none;
+
+    & > .text {
+      #scout.focus-border();
+      border-radius: 3px;
+    }
+  }
+
+  &.disabled {
+    color: @disabled-color;
   }
 
   &:not(.first)::before {
@@ -31,17 +48,5 @@
     display: block;
     margin: 0 5px;
     cursor: default;
-  }
-
-  &:not(.disabled):active {
-    color: @link-active-color;
-  }
-
-  &:not(.disabled) {
-    cursor: pointer;
-  }
-
-  &.disabled {
-    color: @disabled-color;
   }
 }

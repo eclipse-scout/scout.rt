@@ -8,20 +8,18 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {arrays, BreadcrumbBarEventMap, BreadcrumbBarLayout, BreadcrumbBarModel, BreadcrumbItem, HtmlComponent, InitModelOf, ObjectOrChildModel, scout, Widget} from '../index';
+import {aria, arrays, BreadcrumbBarEventMap, BreadcrumbBarLayout, BreadcrumbBarModel, BreadcrumbItem, HtmlComponent, InitModelOf, Menu, ObjectOrChildModel, scout, Widget} from '../index';
 
 export class BreadcrumbBar extends Widget implements BreadcrumbBarModel {
   declare model: BreadcrumbBarModel;
   declare eventMap: BreadcrumbBarEventMap;
   declare self: BreadcrumbBar;
 
-  breadcrumbItems: BreadcrumbItem[];
+  breadcrumbItems: BreadcrumbItem[] = [];
   ellipsisBreadcrumbItem: BreadcrumbItem;
 
   constructor() {
     super();
-    this.breadcrumbItems = [];
-    this.ellipsisBreadcrumbItem = null;
 
     this._addWidgetProperties(['breadcrumbItems']);
   }
@@ -84,6 +82,7 @@ export class BreadcrumbBar extends Widget implements BreadcrumbBarModel {
     this.breadcrumbItems.forEach(breadcrumb => {
       if (breadcrumb.rendered) {
         breadcrumb.$container.removeClass('first last');
+        aria.current(breadcrumb.$container, null);
         if (breadcrumb.visible) {
           visibleCrumbs.push(breadcrumb);
         }
@@ -91,7 +90,9 @@ export class BreadcrumbBar extends Widget implements BreadcrumbBarModel {
     });
     if (visibleCrumbs.length) {
       visibleCrumbs[0].$container.addClass('first');
-      visibleCrumbs[visibleCrumbs.length - 1].$container.addClass('last');
+      let lastCrumb = visibleCrumbs[visibleCrumbs.length - 1];
+      lastCrumb.$container.addClass('last');
+      aria.current(lastCrumb.$container, 'page');
     }
   }
 }
