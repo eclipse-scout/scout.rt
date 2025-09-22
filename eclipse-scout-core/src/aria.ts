@@ -579,5 +579,18 @@ export const aria = {
       return;
     }
     $elem.attr('aria-modal', strings.asString(value));
+  },
+
+  /**
+   * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-current">ARIA: aria-current</a>
+   *
+   * @param $elem element to add/remove the attribute. If null, nothing is changed.
+   * @param value value of the attribute to set. If null, attribute is removed.
+   */
+  current($elem: JQuery<Element>, value: 'page' | 'step' | 'location' | 'date' | 'time' | 'true' | 'false' | boolean) {
+    if (!$elem) {
+      return;
+    }
+    $elem.attr('aria-current', strings.asString(value));
   }
 };
