@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, ActionExecKeyStroke, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, TableHeaderMenuButtonModel, TableHeaderMenuGroup, TableHeaderMenuGroupItem} from '../index';
+import {Action, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, TableHeaderMenuButtonModel, TableHeaderMenuGroup, TableHeaderMenuGroupItem} from '../index';
 
 export class TableHeaderMenuButton extends Action implements TableHeaderMenuButtonModel, TableHeaderMenuGroupItem {
   declare parent: TableHeaderMenuGroup;
@@ -25,12 +25,6 @@ export class TableHeaderMenuButton extends Action implements TableHeaderMenuButt
     this.textVisible = false;
     this.tabbable = true;
     this.actionStyle = Action.ActionStyle.BUTTON;
-  }
-
-  protected override _initKeyStrokeContext() {
-    super._initKeyStrokeContext();
-
-    this.keyStrokeContext.registerKeyStroke(new ActionExecKeyStroke(this));
   }
 
   protected override _render() {

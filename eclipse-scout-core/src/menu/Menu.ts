@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, ActionKeyStroke, aria, arrays, CloneOptions, ContextMenuPopup, EnumObject, HtmlComponent, icons, InitModelOf, MenuBarPopup, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, MenuOrder,
-  ObjectOrChildModel, Popup, PopupAlignment, PropertyChangeEvent, scout, strings, tooltips, TreeVisitor, TreeVisitResult
+  Action, ActionExecKeyStroke, ActionKeyStroke, aria, arrays, CloneOptions, ContextMenuPopup, EnumObject, HtmlComponent, icons, InitModelOf, MenuBarPopup, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel,
+  MenuOrder, ObjectOrChildModel, Popup, PopupAlignment, PropertyChangeEvent, scout, strings, tooltips, TreeVisitor, TreeVisitResult
 } from '../index';
 
 export type SubMenuVisibility = EnumObject<typeof Menu.SubMenuVisibility>;
@@ -105,10 +105,8 @@ export class Menu extends Action implements MenuModel {
     this._setChildActions(this.childActions);
   }
 
-  protected override _initKeyStrokeContext() {
-    super._initKeyStrokeContext();
-
-    this.keyStrokeContext.registerKeyStroke(new MenuExecKeyStroke(this));
+  protected override _createExecKeyStroke(): ActionExecKeyStroke {
+    return new MenuExecKeyStroke(this);
   }
 
   protected override _render() {

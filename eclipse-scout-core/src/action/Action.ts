@@ -8,7 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, ActionEventMap, ActionKeyStroke, ActionModel, Alignment, aria, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, LoadingSupport, NullLayout, scout, TooltipPosition, tooltips,
+  AbstractLayout, ActionEventMap, ActionExecKeyStroke, ActionKeyStroke, ActionModel, Alignment, aria, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, LoadingSupport, MenuExecKeyStroke, NullLayout,
+  scout,
+  TooltipPosition, tooltips,
   TooltipSupport, Widget
 } from '../index';
 import $ from 'jquery';
@@ -100,16 +102,6 @@ export class Action extends Widget implements ActionModel {
     ALWAYS: 1
   } as const;
 
-  protected override _createKeyStrokeContext(): KeyStrokeContext {
-    return new KeyStrokeContext();
-  }
-
-  protected override _createLoadingSupport(): LoadingSupport {
-    return new LoadingSupport({
-      widget: this
-    });
-  }
-
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.actionKeyStroke = this._createActionKeyStroke();
@@ -126,6 +118,26 @@ export class Action extends Widget implements ActionModel {
     this.resolveTextKeys(['text', 'tooltipText']);
     this.resolveIconIds(['iconId']);
     this._setKeyStroke(this.keyStroke);
+  }
+
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
+    return new KeyStrokeContext();
+  }
+
+  protected override _createLoadingSupport(): LoadingSupport {
+    return new LoadingSupport({
+      widget: this
+    });
+  }
+
+  protected override _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
+
+    this.keyStrokeContext.registerKeyStroke(this._createExecKeyStroke());
+  }
+
+  protected _createExecKeyStroke(): ActionExecKeyStroke {
+    return new ActionExecKeyStroke(this);
   }
 
   protected override _render() {
