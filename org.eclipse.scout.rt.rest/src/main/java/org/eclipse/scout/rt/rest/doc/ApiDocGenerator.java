@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -72,6 +72,7 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
+import org.eclipse.scout.rt.rest.IRestMediaType;
 import org.eclipse.scout.rt.rest.IRestResource;
 import org.eclipse.scout.rt.rest.RestApplicationScope;
 import org.eclipse.scout.rt.rest.RestApplicationScopes;
@@ -426,7 +427,7 @@ public class ApiDocGenerator {
     // Main HTML content
     final IHtmlDocument html = toHtml(scope, getResourceDescriptors());
     return Response.ok()
-        .type(MediaType.TEXT_HTML)
+        .type(IRestMediaType.TEXT_HTML_UTF8)
         .entity(html.toHtml())
         .build();
   }
