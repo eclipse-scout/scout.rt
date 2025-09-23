@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.rest.IRestResource;
 import org.eclipse.scout.rt.rest.error.ErrorDo;
 import org.eclipse.scout.rt.rest.error.ErrorResponse;
 import org.slf4j.Logger;
@@ -165,7 +166,7 @@ public class RestClientTestEchoServlet extends HttpServlet {
                   HTML.div(status == null ? "unknown" : status.getReasonPhrase())))
           .toHtml();
       resp.getOutputStream().print(content);
-      resp.setContentType(MediaType.TEXT_HTML);
+      resp.setContentType(IRestResource.TEXT_HTML_UTF8);
     }
   }
 
