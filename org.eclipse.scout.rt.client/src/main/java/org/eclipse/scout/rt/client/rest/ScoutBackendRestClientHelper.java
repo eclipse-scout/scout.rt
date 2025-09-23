@@ -16,6 +16,7 @@ import java.util.Optional;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.core.Response;
 
 import org.eclipse.scout.rt.client.servicetunnel.ServiceTunnelClientConfigProperties.BackendUrlProperty;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -26,6 +27,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.rest.ServletConstants;
 import org.eclipse.scout.rt.rest.cancellation.RestRequestCancellationClientRequestFilter;
 import org.eclipse.scout.rt.rest.client.AbstractRestClientHelper;
+import org.eclipse.scout.rt.rest.client.proxy.ErrorDoRestClientExceptionTransformer;
 import org.eclipse.scout.rt.rest.id.IdSignatureClientRequestFilter;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelOptions;
 
@@ -53,6 +55,12 @@ public class ScoutBackendRestClientHelper extends AbstractRestClientHelper {
 
     BEANS.all(IScoutBackendRestClientBuilderContributor.class).forEach(contributor -> contributor.contribute(clientBuilder));
   }
+
+  @Override
+  protected RuntimeException transformException(RuntimeException e, Response response) {
+    return BEANS.get(ErrorDoRestClientExceptionTransformer.class).transform(e, response);
+  }
+
 
   @Bean
   public interface IScoutBackendRestClientBuilderContributor {
