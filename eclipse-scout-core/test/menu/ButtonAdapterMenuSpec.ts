@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -85,12 +85,12 @@ describe('ButtonAdapterMenu', () => {
   describe('focusable element', () => {
 
     it('button should delegate to adapter menu', () => {
-      expect(button.getFocusableElement()).toBe(null);
-      expect(adapterMenu.getFocusableElement()).toBe(null);
+      expect(button.get$Focusable().length).toBe(0);
+      expect(adapterMenu.get$Focusable().length).toBe(0);
       adapterMenu.render($sandbox);
       let adapterMenuContainer = adapterMenu.$container[0];
-      expect(button.getFocusableElement()).toBe(adapterMenuContainer);
-      expect(adapterMenu.getFocusableElement()).toBe(adapterMenuContainer);
+      expect(button.get$Focusable()[0]).toBe(adapterMenuContainer);
+      expect(adapterMenu.get$Focusable()[0]).toBe(adapterMenuContainer);
     });
 
   });

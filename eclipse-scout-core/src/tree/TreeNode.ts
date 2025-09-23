@@ -425,6 +425,9 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
     if ($node.hasClass('parent-of-selected')) {
       cssClass += ' parent-of-selected';
     }
+    if ($node.hasClass('focused')) {
+      cssClass += ' focused';
+    }
     return cssClass;
   }
 

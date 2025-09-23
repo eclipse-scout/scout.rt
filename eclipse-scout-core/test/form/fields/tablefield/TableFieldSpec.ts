@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Column, Status, Table, TableField, TableModel, TableRow} from '../../../../src/index';
-import {FormSpecHelper, SpecTable, TableModelWithCells, TableSpecHelper} from '../../../../src/testing/index';
+import {FormSpecHelper, SpecTable, SpecTableModel, TableSpecHelper} from '../../../../src/testing/index';
 
 describe('TableField', () => {
   let session: SandboxSession;
@@ -45,7 +45,7 @@ describe('TableField', () => {
     return tableHelper.createTable(createTableModel(colCount, rowCount));
   }
 
-  function createTableModel(colCount: number, rowCount: number): TableModelWithCells {
+  function createTableModel(colCount: number, rowCount: number): SpecTableModel {
     return tableHelper.createModelFixture(colCount, rowCount);
   }
 

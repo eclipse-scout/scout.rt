@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LocaleSpecHelper, SpecTable, TableModelWithCells, TableSpecHelper} from '../../../src/testing/index';
+import {LocaleSpecHelper, SpecTable, SpecTableModel, TableSpecHelper} from '../../../src/testing/index';
 import {AggregateTableControl, Cell, Column, DecimalFormat, InitModelOf, NumberColumn, scout, TableControl, TableControlModel, TableRowModel} from '../../../src/index';
 
 describe('AggregateTableControl', () => {
@@ -55,7 +55,7 @@ describe('AggregateTableControl', () => {
   }
 
   describe('aggregate', () => {
-    let model: TableModelWithCells, table: SpecTable, column0: Column, column1: NumberColumn, column2: NumberColumn,
+    let model: SpecTableModel, table: SpecTable, column0: Column, column1: NumberColumn, column2: NumberColumn,
       rows: (TableRowModel & { cells: Cell[] })[], tableControl: AggregateTableControl;
 
     function prepareTable() {
@@ -263,7 +263,7 @@ describe('AggregateTableControl', () => {
     });
   });
 
-  describe('eanbled state', () => {
+  describe('enabled state', () => {
     let rows, model, table, tableControl;
 
     function prepareTable() {

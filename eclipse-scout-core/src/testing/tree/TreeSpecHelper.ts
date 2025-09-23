@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, CompactTree, CompactTreeAdapter, InitModelOf, ModelAdapter, ObjectIdProvider, ObjectType, RemoteEvent, Session, Tree, TreeAdapter, TreeModel, TreeNode, TreeNodeModel, Widget} from '../../index';
+import {arrays, CompactTree, CompactTreeAdapter, InitModelOf, ModelAdapter, ObjectIdProvider, ObjectType, ObjectWithType, RemoteEvent, Session, SomeRequired, Tree, TreeAdapter, TreeModel, TreeNode, TreeNodeModel, Widget} from '../../index';
 import {SpecTree} from '../index';
 import $ from 'jquery';
 
@@ -18,7 +18,7 @@ export class TreeSpecHelper {
     this.session = session;
   }
 
-  createModel(nodes: TreeNodeModel[]): TreeModel & { id: string; objectType: string; parent: Widget; session: Session } {
+  createModel(nodes: TreeNodeModel[]): SpecTreeModel {
     let model = createSimpleModel('Tree', this.session) as TreeModel & { objectType: ObjectType<Tree> };
 
     if (nodes) {
@@ -27,7 +27,7 @@ export class TreeSpecHelper {
     return model as TreeModel & { id: string; objectType: string; parent: Widget; session: Session };
   }
 
-  createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): TreeModel & { id: string; objectType: string; parent: Widget; session: Session } {
+  createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): SpecTreeModel {
     return this.createModel(this.createModelNodes(nodeCount, depth, {expanded: expanded}));
   }
 
@@ -75,7 +75,7 @@ export class TreeSpecHelper {
     return tree;
   }
 
-  createTreeAdapter(model: InitModelOf<ModelAdapter> | TreeModel & { session: Session; id: string; objectType: string }): TreeAdapter {
+  createTreeAdapter(model: InitModelOf<ModelAdapter> | SpecTreeModel): TreeAdapter {
     let adapter = new TreeAdapter();
     adapter.init(model);
     return adapter;
@@ -87,7 +87,7 @@ export class TreeSpecHelper {
     return tree as CompactTree & SpecTree;
   }
 
-  createCompactTreeAdapter(model: InitModelOf<TreeAdapter>): TreeAdapter {
+  createCompactTreeAdapter(model: InitModelOf<TreeAdapter> | SpecTreeModel): TreeAdapter {
     model.objectType = 'Tree:Compact';
     let tree = new CompactTreeAdapter();
     tree.init(model);
@@ -202,3 +202,5 @@ export class TreeSpecHelper {
     };
   }
 }
+
+export type SpecTreeModel = SomeRequired<TreeModel, 'id' | 'session' | 'parent' | 'objectType'> & ObjectWithType;

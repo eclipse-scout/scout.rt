@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,13 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {SpecTable, TableModelWithCells, TableSpecHelper} from '../../src/testing/index';
+import {SpecTable, SpecTableModel, TableSpecHelper} from '../../src/testing/index';
 import {HtmlTile, KeyTableFilter, scout, TableTextUserFilter} from '../../src';
 
 describe('TableTileModeSpec', () => {
   let session: SandboxSession;
   let helper: TableSpecHelper;
-  let model: TableModelWithCells;
+  let model: SpecTableModel;
   let table: SpecTable;
 
   beforeEach(() => {

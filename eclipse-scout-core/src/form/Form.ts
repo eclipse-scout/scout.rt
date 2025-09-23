@@ -1565,25 +1565,6 @@ export class Form extends Widget implements FormModel, DisplayParent {
     }
   }
 
-  /**
-   * This method returns the HtmlElement (DOM node) which is used by FocusManager/FocusContext/Popup
-   * to focus the initial element. The impl. of these classes relies on HtmlElements, so we can not
-   * easily use the focus() method of FormField here. Furthermore, some classes like Button
-   * are sometimes 'adapted' by a ButtonAdapterMenu, which means the Button itself is not rendered, but
-   * we must know the $container of the adapter menu to focus the correct element. That's why we call
-   * the getFocusableElement() method.
-   */
-  protected _initialFocusElement() {
-    let focusElement;
-    if (this.initialFocus) {
-      focusElement = this.initialFocus.getFocusableElement();
-    }
-    if (!focusElement) {
-      focusElement = this.session.focusManager.findFirstFocusableElement(this.$container);
-    }
-    return focusElement;
-  }
-
   protected override _installFocusContext() {
     if (this.isDialog() || this.isPopupWindow()) {
       this.session.focusManager.installFocusContext(this.$container, FocusRule.NONE);

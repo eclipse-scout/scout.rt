@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, InputFieldKeyStrokeContext, keys, KeyStrokeContext, keyStrokeModifier, Outline, scout, SearchOutlineEventMap, SearchOutlineLayout, SearchOutlineModel} from '../../index';
+import {aria, InputFieldKeyStrokeContext, keys, KeyStrokeContext, keyStrokeModifier, Outline, scout, SearchOutlineDownKeyStroke, SearchOutlineEventMap, SearchOutlineLayout, SearchOutlineModel, SearchOutlineUpKeyStroke} from '../../index';
 import $ from 'jquery';
 
 export class SearchOutline extends Outline implements SearchOutlineModel {
@@ -35,7 +35,10 @@ export class SearchOutline extends Outline implements SearchOutlineModel {
 
   protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
+
     this.searchFieldKeyStrokeContext = this._createKeyStrokeContextForSearchField();
+    this.searchFieldKeyStrokeContext.registerKeyStroke(new SearchOutlineDownKeyStroke(this));
+    this.searchFieldKeyStrokeContext.registerKeyStroke(new SearchOutlineUpKeyStroke(this));
   }
 
   protected _createKeyStrokeContextForSearchField(): KeyStrokeContext {

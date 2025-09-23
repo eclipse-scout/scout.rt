@@ -11,7 +11,7 @@ import {
   Action, arrays, BeanColumn, BooleanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, SmartColumn, StaticLookupCall,
   Status, strings, Table, TableAdapter, TableField, TableRow, TableRowModel, TableUserFilter, Tooltip
 } from '../../src/index';
-import {JQueryTesting, LocaleSpecHelper, SpecTable, TableModelWithCells, TableSpecHelper} from '../../src/testing/index';
+import {JQueryTesting, LocaleSpecHelper, SpecTable, SpecTableModel, TableSpecHelper} from '../../src/testing/index';
 import $ from 'jquery';
 
 describe('Table', () => {
@@ -1381,7 +1381,7 @@ describe('Table', () => {
   });
 
   describe('sort', () => {
-    let model: TableModelWithCells, table: SpecTable, adapter: TableAdapter, column0: Column<any>, column1: Column<any>, column2: Column<any>;
+    let model: SpecTableModel, table: SpecTable, adapter: TableAdapter, column0: Column<any>, column1: Column<any>, column2: Column<any>;
     let $colHeaders, $header0, $header1, $header2;
 
     function prepareTable() {

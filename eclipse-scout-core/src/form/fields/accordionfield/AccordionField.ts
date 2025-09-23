@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -89,11 +89,8 @@ export class AccordionField extends FormField implements AccordionFieldModel {
     this.invalidateLayoutTree();
   }
 
-  override getFocusableElement(): HTMLElement | JQuery {
-    if (this.accordion) {
-      return this.accordion.getFocusableElement();
-    }
-    return null;
+  override get$Focusable(): JQuery {
+    return this.accordion?.get$Focusable();
   }
 
   override getDelegateScrollable(): Accordion {

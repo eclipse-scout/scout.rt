@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,7 +21,7 @@ export interface TreeModel extends WidgetModel {
    * The state of a node is a representation of its children.
    * - When none of the children are checked, the node is unchecked
    * - When some of the children are checked, the node is partly checked
-   * - When all of the children are checked, the node is also checked
+   * - When all children are checked, the node is also checked
    *
    * Only has an effect if the tree is checkable.
    *
@@ -97,6 +97,22 @@ export interface TreeModel extends WidgetModel {
    */
   scrollToSelection?: boolean;
   selectedNodes?: string[] | TreeNode[];
+  /**
+   * Defines the node that has the focus when the tree is focused.
+   *
+   * The focused node can be changed using keyboard navigation.
+   *
+   * This property only has an effect if {@link nodesFocusable} is set to true.
+   */
+  focusedNode?: string | TreeNode;
+  /**
+   * Defines whether the nodes should show a focus indicator when the tree is focused.
+   *
+   * The currently focused node is defined by {@link focusedNode}.
+   *
+   * Default is false.
+   */
+  nodesFocusable?: boolean;
   /**
    * The filters control which nodes are allowed to be displayed in the table.
    *

@@ -132,7 +132,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
   protected _updateVisibility() {
     let invisible = !this.menus.length && !this.status;
     if (invisible && this.isFocused()) {
-      this.session.focusManager.focusNextTabbable(this.getFocusableElement());
+      this.session.focusManager.focusNextTabbable(this.get$Focusable());
     }
     this.$container.toggleClass('invisible', invisible);
   }

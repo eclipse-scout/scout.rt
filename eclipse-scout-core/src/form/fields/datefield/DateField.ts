@@ -565,14 +565,8 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     }
   }
 
-  override getFocusableElement(): JQuery {
-    if (this.$dateField) {
-      return this.$dateField;
-    }
-    if (this.$timeField) {
-      return this.$timeField;
-    }
-    return null;
+  override get$Focusable(): JQuery {
+    return this.$dateField || this.$timeField;
   }
 
   protected _onDateFieldMouseDown() {

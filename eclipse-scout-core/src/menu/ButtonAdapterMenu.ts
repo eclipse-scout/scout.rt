@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -102,7 +102,7 @@ export class ButtonAdapterMenu extends Menu implements ButtonAdapterMenuModel {
       return false;
     }
     this.menubar.setTabbableMenu(this);
-    return this.session.focusManager.requestFocus(this.getFocusableElement());
+    return this.session.focusManager.requestFocus(this.get$Focusable());
   }
 
   static adaptButtonProperties(buttonProperties: ButtonModel & { gridData?: GridData }, menuProperties?: InitModelOf<ButtonAdapterMenu>): InitModelOf<ButtonAdapterMenu> {

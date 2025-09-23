@@ -230,12 +230,9 @@ export class Accordion extends Widget implements AccordionModel {
     this.invalidateLayoutTree();
   }
 
-  override getFocusableElement(): HTMLElement | JQuery {
+  override get$Focusable(): JQuery {
     let group = widgets.findFirstFocusableWidget(this.groups, this);
-    if (group) {
-      return group.getFocusableElement();
-    }
-    return null;
+    return group?.get$Focusable();
   }
 
   /** @see AccordionModel.exclusiveExpand */

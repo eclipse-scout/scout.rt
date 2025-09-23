@@ -168,9 +168,9 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
     return this.fields;
   }
 
-  override getFocusableElement(): HTMLElement | JQuery {
+  override get$Focusable(): JQuery {
     // The first button may not be focusable because it is not selected and therefore has no tab index -> find the first focusable button
-    return this.session.focusManager.findFirstFocusableElement(this.$container);
+    return $(this.session.focusManager.findFirstFocusableElement(this.$container));
   }
 
   setFields(fields: ObjectOrChildModel<FormField>[]) {

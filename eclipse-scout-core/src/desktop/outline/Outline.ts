@@ -9,11 +9,12 @@
  */
 import {
   arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, DisplayParent, DisplayViewId, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FullModelOf, GlassPaneTarget, GroupBox,
-  GroupBoxMenuItemsOrder, HtmlComponent, Icon, InitModelOf, keys, KeyStrokeContext, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton,
-  NavigateUpButton, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, Page,
-  PageLayout, PageModel, PropertyChangeEvent, scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent,
+  GroupBoxMenuItemsOrder, HtmlComponent, Icon, InitModelOf, keys, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton,
+  ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, OutlineSelectKeyStroke, Page,
+  PageLayout, PageModel,
+  PropertyChangeEvent, scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent, TreeCollapseAllKeyStroke,
   TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodesDeletedEvent, TreeNodesInsertedEvent, TreeNodesSelectedEvent,
-  TreeNodesUpdatedEvent, Widget
+  TreeNodesUpdatedEvent, TreeSelectKeyStroke, Widget
 } from '../../index';
 
 export class Outline extends Tree implements DisplayParent, OutlineModel {
@@ -92,6 +93,9 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.titleMenuBar = null;
     this.nodeMenuBar = null;
     this.nodeMenuBarVisible = false;
+    this.nodesFocusable = true;
+    this.preventInitialFocus = true;
+    this.preventClickFocus = true;
     this.detailMenuBar = null;
     this.detailMenuBarVisible = false;
     this.dialogs = [];
@@ -165,7 +169,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this._setViews(this.views);
     this._setSelectedViewTabs(this.selectedViewTabs);
     this._setMenus(this.menus);
-    this._nodesSelectedInternal(this.selectedNodes);
+    this._nodesSelectedInternal();
     this.updateDetailContent();
   }
 
@@ -208,30 +212,36 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     return scout.create(nodeModel as FullModelOf<Page>);
   }
 
-  protected override _createKeyStrokeContext(): KeyStrokeContext {
-    return new OutlineKeyStrokeContext(this);
-  }
-
   protected override _filterMenus(argMenus: Menu[], destination: MenuDestinations, onlyVisible?: boolean, enableDisableKeyStrokes?: boolean): Menu[] {
     // show no context menus
     return [];
   }
 
   protected override _initTreeKeyStrokeContext() {
+    super._initTreeKeyStrokeContext();
+
+    // Create an outline keystroke context with the scope desktop so these keystrokes can be used from anywhere not only if the outline is focused
     let modifierBitMask = keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT; // NOSONAR
 
-    this.keyStrokeContext.registerKeyStrokes([
+    let outlineKeyStrokeContext = new OutlineKeyStrokeContext(this);
+    outlineKeyStrokeContext.registerKeyStrokes([
+      new OutlineNavigateToTopKeyStroke(this, modifierBitMask),
       new TreeNavigationUpKeyStroke(this, modifierBitMask),
       new TreeNavigationDownKeyStroke(this, modifierBitMask),
-      new OutlineNavigateToTopKeyStroke(this, modifierBitMask),
       new TreeNavigationEndKeyStroke(this, modifierBitMask),
       new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask, keys.LEFT, '←'),
       new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask, keys.SUBTRACT),
       new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask, keys.RIGHT, '→'),
       new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask, keys.ADD)
     ]);
+    outlineKeyStrokeContext.$scopeTarget = () => this.$container;
+    outlineKeyStrokeContext.$bindTarget = () => this.session.$entryPoint;
+    this.on('render', () => this.session.keyStrokeManager.installKeyStrokeContext(outlineKeyStrokeContext));
+    this.on('remove', () => this.session.keyStrokeManager.uninstallKeyStrokeContext(outlineKeyStrokeContext));
 
-    this.keyStrokeContext.$bindTarget = () => this.session.$entryPoint;
+    // Remove the keystrokes which are replaced by outline specific ones
+    this.keyStrokeContext.unregisterKeyStroke(this.keyStrokeContext.keyStrokes.find(keystroke => keystroke instanceof TreeCollapseAllKeyStroke || keystroke instanceof TreeSelectKeyStroke));
+    this.keyStrokeContext.registerKeyStroke(new OutlineSelectKeyStroke(this));
   }
 
   protected override _render() {
@@ -335,11 +345,6 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     if (this.titleVisible) {
       this.titleMenuBar.render(this.$title);
     }
-  }
-
-  protected override _renderEnabled() {
-    super._renderEnabled();
-    this.$container.setTabbable(false);
   }
 
   protected override _initTreeNodeInternal(node: Page, parentNode: Page) {
@@ -490,7 +495,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.updateDetailContent();
   }
 
-  protected override _nodesSelectedInternal(nodes: Page[]) {
+  protected override _nodesSelectedInternal() {
     let activePage = this.activePage();
     // This block here is similar to what's done in Java's DefaultPageChangeStrategy
     if (activePage) {

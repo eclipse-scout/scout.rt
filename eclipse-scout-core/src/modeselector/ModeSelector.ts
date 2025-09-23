@@ -100,9 +100,9 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
     });
   }
 
-  override getFocusableElement(): HTMLElement | JQuery {
+  override get$Focusable(): JQuery {
     // The first mode may not be focusable because it is not selected and therefore has no tab index -> find the first focusable button
-    return this.session.focusManager.findFirstFocusableElement(this.$container);
+    return $(this.session.focusManager.findFirstFocusableElement(this.$container));
   }
 
   setModes(modes: ObjectOrChildModel<Mode<TModeRef>>[]) {

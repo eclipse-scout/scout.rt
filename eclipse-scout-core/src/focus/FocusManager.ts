@@ -294,10 +294,11 @@ export class FocusManager implements FocusManagerOptions {
    */
   requestFocus(element: HTMLElement | JQuery, filter?: () => boolean, options?: RequestFocusOptions): boolean {
     options = options || {};
-    let htmlElement: HTMLElement = element instanceof $ ? element[0] : element;
-    if (!htmlElement) {
+    let $element = $.ensure(element);
+    if (!$element.is(':focusable')) {
       return false;
     }
+    let htmlElement = $element[0];
 
     let context = this._findFocusContextFor(htmlElement);
     if (context) {

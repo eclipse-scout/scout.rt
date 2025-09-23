@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -126,9 +126,9 @@ export abstract class ProposalChooser<TValue, TContent extends ProposalChooserCo
   protected _renderContent() {
     this.content.render();
 
-    // Make sure container never gets the focus, but looks focused
-    this.content.$container.setTabbable(false);
-    this.content.$container.addClass('focused');
+    // Make sure focusable container never gets the focus, but looks focused
+    this.content.get$Focusable().setTabbable(false);
+    this.content.get$Focusable().addClass('focused');
   }
 
   protected override _renderProperties() {

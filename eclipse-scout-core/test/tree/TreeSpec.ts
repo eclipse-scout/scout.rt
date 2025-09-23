@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {graphics, icons, objects, Page, Range, scout, scrollbars, strings, Tree, TreeField, TreeModel, TreeNode, TreeNodeModel} from '../../src/index';
-import {JQueryTesting, SpecTree, TreeSpecHelper} from '../../src/testing/index';
+import {graphics, icons, objects, Range, scout, scrollbars, strings, Tree, TreeField, TreeModel, TreeNode, TreeNodeModel} from '../../src/index';
+import {JQueryTesting, SpecTree, SpecTreeModel, TreeSpecHelper} from '../../src/testing/index';
 
 describe('Tree', () => {
   let session: SandboxSession;
@@ -462,8 +462,8 @@ describe('Tree', () => {
   });
 
   describe('updateNodes', () => {
-    let model;
-    let tree;
+    let model: SpecTreeModel;
+    let tree: SpecTree;
     let node0;
     let child0;
 
@@ -601,7 +601,7 @@ describe('Tree', () => {
   });
 
   describe('changeNode', () => {
-    let model, tree, nodes, node0, node1, child0, child1_1;
+    let model: TreeModel, tree: SpecTree, nodes, node0, node1, child0, child1_1;
 
     beforeEach(() => {
       model = helper.createModelFixture(3, 3, false);
@@ -711,8 +711,6 @@ describe('Tree', () => {
       tree.selectNode(node1);
       tree.render();
 
-      tree._isGroupingEnd = node => node.nodeType === Page.NodeType.TABLE;
-
       let $groupNodes = tree.$data.find('.tree-node.group');
       expect($groupNodes.length).toBe(1);
       expect($groupNodes.eq(0)[0]).toBe(node1.$node[0]);
@@ -733,7 +731,7 @@ describe('Tree', () => {
       tree.render();
       let orig = tree._updateNodePaddingsLeft;
       // If queueMicrotask fails in changeNode, test won't fail -> create spy with try catch to ensure test fails
-      spyOn(tree, SpecTree.prototype._updateNodePaddingsLeft.name).and.callFake(() => {
+      spyOn(tree, '_updateNodePaddingsLeft').and.callFake(() => {
         try {
           orig();
         } catch (err) {
@@ -752,8 +750,8 @@ describe('Tree', () => {
   });
 
   describe('deleteNodes', () => {
-    let model;
-    let tree;
+    let model: SpecTreeModel;
+    let tree: SpecTree;
     let node0;
     let node1;
     let node2;
@@ -1069,8 +1067,8 @@ describe('Tree', () => {
   });
 
   describe('deleteAllChildNodes', () => {
-    let model;
-    let tree;
+    let model: SpecTreeModel;
+    let tree: SpecTree;
     let node0;
     let node1;
     let node2;
@@ -2290,7 +2288,7 @@ describe('Tree', () => {
   });
 
   describe('expandNode', () => {
-    let model, tree, nodes, node1;
+    let model: SpecTreeModel, tree: SpecTree, nodes, node1;
 
     beforeEach(() => {
       model = helper.createModelFixture(3, 3);
@@ -2563,7 +2561,7 @@ describe('Tree', () => {
   });
 
   describe('updateItemPath', () => {
-    let model, tree, node1, child1, grandchild1, nodes;
+    let model: SpecTreeModel, tree: SpecTree, node1, child1, grandchild1, nodes;
 
     beforeEach(() => {
       model = helper.createModelFixture(3, 3);
@@ -2574,9 +2572,9 @@ describe('Tree', () => {
       grandchild1 = child1.childNodes[1];
     });
 
-    it('Sets css class group on every element within the same group', () => {
+    it('sets css class group on every element within the same group', () => {
       tree.render();
-      tree._isGroupingEnd = node => node.nodeType === Page.NodeType.TABLE;
+      tree._isGroupingEnd = (node: TreeNode & { nodeType: string }) => node.nodeType === 'type1';
 
       tree.selectNodes([]);
       tree._renderViewport();
@@ -2589,14 +2587,14 @@ describe('Tree', () => {
       expect($groupNodes.length).toBe(1);
       expect($groupNodes.eq(0)[0]).toBe(node1.$node[0]);
 
-      node1.nodeType = Page.NodeType.TABLE;
+      node1.nodeType = 'type1';
       tree.selectNodes(child1);
       tree._renderViewport();
       $groupNodes = tree.$data.find('.tree-node.group');
       expect($groupNodes.length).toBe(1);
       expect($groupNodes.eq(0)[0]).toBe(child1.$node[0]);
 
-      node1.nodeType = Page.NodeType.TABLE;
+      node1.nodeType = 'type1';
       tree.selectNodes(grandchild1);
       tree._renderViewport();
       $groupNodes = tree.$data.find('.tree-node.group');
@@ -2609,7 +2607,7 @@ describe('Tree', () => {
   });
 
   describe('updateNodeOrder', () => {
-    let model, tree, nodes;
+    let model: SpecTreeModel, tree: SpecTree, nodes;
 
     beforeEach(() => {
       model = helper.createModelFixture(3, 3);
@@ -3216,7 +3214,8 @@ describe('Tree', () => {
   describe('test visible list and map', () => {
 
     describe('with initial all expanded nodes', () => {
-      let model, tree;
+      let model: SpecTreeModel, tree: SpecTree;
+
       beforeEach(() => {
         model = helper.createModelFixture(3, 2, true);
         tree = helper.createTree(model);
@@ -3447,7 +3446,8 @@ describe('Tree', () => {
     });
 
     describe('with initial all closed nodes', () => {
-      let model, tree;
+      let model: SpecTreeModel, tree: SpecTree;
+
       beforeEach(() => {
         model = helper.createModelFixture(3, 2, false);
         tree = helper.createTree(model);
@@ -3466,11 +3466,14 @@ describe('Tree', () => {
       });
 
       it('insert child node collapsed parent', () => {
-        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
-        newNode0Child3.expanded = true;
-        tree.insertNodes([newNode0Child3], tree.nodes[0]);
-        let newNode0Child3Child0 = helper.createModelNode('0_3_1', 'newNode0Child3Child0');
-        tree.insertNodes([newNode0Child3Child0], tree.nodeById(newNode0Child3.id));
+        let newNode0Child3Model = helper.createModelNode('0_3', 'newNode0Child3', {expanded: true});
+        tree.insertNodes([newNode0Child3Model], tree.nodes[0]);
+        let newNode0Child3 = tree.nodeById(newNode0Child3Model.id);
+
+        let newNode0Child3Child0Model = helper.createModelNode('0_3_1', 'newNode0Child3Child0');
+        tree.insertNodes([newNode0Child3Child0Model], newNode0Child3);
+        let newNode0Child3Child0 = tree.nodeById(newNode0Child3Child0Model.id);
+
         expect(tree.visibleNodesFlat.indexOf(newNode0Child3) > -1).toBeFalsy();
         expect(tree.visibleNodesMap[newNode0Child3.id]).toBeFalsy();
         expect(tree.visibleNodesFlat.indexOf(newNode0Child3Child0) > -1).toBeFalsy();
@@ -3566,8 +3569,7 @@ describe('Tree', () => {
     it('with animateRemoval should prevent upcoming dom modifications', () => {
       $('<style>' +
         '.tree-node {height: 30px; }' +
-        '.tree {height: 50px; overflow: hidden;}' +
-        '.tree-data.scrollable-tree {height: 50px; overflow: hidden;}' +
+        '.tree-data {height: 50px; overflow: hidden;}' +
         '</style>').appendTo($('#sandbox'));
       let model = helper.createModelFixture(10, 1, false);
       let tree = helper.createTree(model);
@@ -3596,13 +3598,12 @@ describe('Tree', () => {
   });
 
   describe('ensureExpansionVisible', () => {
-    let model, tree, nodes, $scrollable, nodeHeight;
+    let model: SpecTreeModel, tree: SpecTree, nodes, $scrollable, nodeHeight;
 
     beforeEach(() => {
       $('<style>' +
         '.tree-node {height: 28px; }' +
-        '.tree {height: 230px; overflow: hidden;}' +
-        '.tree-data.scrollable-tree {height: 230px; overflow: hidden;}' +
+        '.tree-data {height: 230px; overflow: hidden;}' +
         '</style>').appendTo($('#sandbox'));
 
       model = helper.createModelFixture(10, 2, false);
@@ -3691,7 +3692,7 @@ describe('Tree', () => {
   });
 
   describe('aria properties', () => {
-    let model;
+    let model: SpecTreeModel;
     let tree: SpecTree;
     let node0;
     let child0;
@@ -3735,6 +3736,209 @@ describe('Tree', () => {
       $allNodes.each((index, htmlNode) => {
         expect($(htmlNode)).toHaveAttr('aria-level', String(parseInt($(htmlNode).attr('data-level')) + 1));
       });
+    });
+  });
+
+  describe('focusedNode', () => {
+    let model: SpecTreeModel;
+    let tree: SpecTree;
+
+    beforeEach(() => {
+      model = helper.createModelFixture(3, 3);
+      tree = helper.createTree(model);
+      tree.setNodesFocusable(true);
+    });
+
+    it('only has an effect if nodesFocusable is set to true', () => {
+      tree = helper.createTree({...model, focusedNode: model.nodes[1].id});
+      expect(tree.focusedNode).toBe(tree.nodes[1]);
+
+      tree.render();
+      expect(tree.focusedNode.$node).not.toHaveClass('focused'); // focusedNode is set but won't be rendered
+
+      tree.setNodesFocusable(true);
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+
+      tree.setNodesFocusable(false);
+      expect(tree.focusedNode.$node).not.toHaveClass('focused');
+    });
+
+    it('is set to the selected node initially', () => {
+      tree = helper.createTree({...model, selectedNodes: [model.nodes[1].id], nodesFocusable: true});
+      expect(tree.selectedNodes[0]).toBe(tree.nodes[1]);
+      expect(tree.focusedNode).toBe(tree.nodes[1]);
+
+      tree.render();
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+    });
+
+    it('is set to the first visible node when tree is focused and no node focused yet', () => {
+      tree = helper.createTree({...model, nodesFocusable: true});
+      expect(tree.focusedNode).toBeUndefined();
+
+      tree.render();
+      tree.addFilter(node => node === tree.nodes[1]);
+      tree.focus();
+      expect(tree.focusedNode).toBe(tree.visibleNodesFlat[0]);
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+    });
+
+    it('can be initially set', () => {
+      tree = helper.createTree({...model, focusedNode: model.nodes[1].id, nodesFocusable: true});
+      expect(tree.focusedNode).toBe(tree.nodes[1]);
+
+      tree.render();
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+    });
+
+    it('is updated when the selected node changes', () => {
+      expect(tree.selectedNodes).toEqual([]);
+      expect(tree.focusedNode).toBeUndefined();
+
+      tree.selectNode(tree.nodes[1]);
+      expect(tree.selectedNodes[0]).toBe(tree.nodes[1]);
+      expect(tree.focusedNode).toBe(tree.nodes[1]);
+
+      tree.render();
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+
+      tree.selectNode(tree.nodes[0]);
+      expect(tree.selectedNodes[0]).toBe(tree.nodes[0]);
+      expect(tree.focusedNode).toBe(tree.nodes[0]);
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+      expect(tree.nodes[1]).not.toHaveClass('focused');
+
+      tree.selectNode(null);
+      expect(tree.selectedNodes).toEqual([]);
+      expect(tree.focusedNode).toBe(null);
+    });
+
+    it('is updated when the already selected node is clicked', () => {
+      tree.render();
+      tree.selectNode(tree.nodes[1]);
+      expect(tree.selectedNodes[0]).toBe(tree.nodes[1]);
+      expect(tree.focusedNode).toBe(tree.nodes[1]);
+
+      tree.setFocusedNode(tree.nodes[0]);
+      expect(tree.focusedNode).toBe(tree.nodes[0]);
+
+      JQueryTesting.triggerMouseDown(tree.nodes[1].$node);
+      expect(tree.focusedNode).toBe(tree.nodes[1]);
+    });
+
+    it('is updated when setFocusedNode is called', () => {
+      tree.setFocusedNode(tree.nodes[1]);
+      expect(tree.focusedNode).toBe(tree.nodes[1]);
+      expect(tree.selectedNodes).toEqual([]);
+
+      tree.render();
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+
+      tree.setFocusedNode(tree.nodes[0]);
+      expect(tree.focusedNode).toBe(tree.nodes[0]);
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+      expect(tree.nodes[1]).not.toHaveClass('focused');
+
+      tree.setFocusedNode(null);
+      expect(tree.focusedNode).toBe(null);
+    });
+
+    it('is rendered when node is rendered', () => {
+      tree.render();
+      tree.setFocusedNode(tree.nodes[0].childNodes[0]);
+      expect(tree.focusedNode.$node).toBe(null);
+
+      tree.expandNode(tree.nodes[0]);
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+
+      tree.setViewRangeSize(5);
+      tree.expandNode(tree.nodes[1]);
+      tree.setFocusedNode(tree.nodes[1].childNodes[2]);
+      expect(tree.focusedNode.$node).toBe(null);
+
+      tree.scrollTo(tree.focusedNode);
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+    });
+
+    it('ensures expansion is visible if expanded node is focused', () => {
+      $('<style>' +
+        '.tree-node {height: 28px; }' +
+        '.tree-data {height: 130px; overflow: hidden;}' +
+        '</style>').appendTo($('#sandbox'));
+      tree.render();
+      tree.expandNode(tree.nodes[0]);
+      expect(tree.nodes[1].childNodes[2].$node).toBe(null);
+      expect(tree.$data[0].scrollTop).toBe(0);
+
+      tree.setFocusedNode(tree.nodes[1]);
+      tree.expandNode(tree.nodes[1]);
+      expect(tree.$data[0].scrollTop).toBeGreaterThan(0);
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+      expect(tree.nodes[1].childNodes[2].$node).not.toBe(null);
+    });
+
+    it('is set to null when node is deleted', () => {
+      tree.render();
+      tree.setFocusedNode(tree.nodes[0]);
+      expect(tree.focusedNode).toBe(tree.nodes[0]);
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+
+      tree.deleteNode(tree.nodes[0]);
+      expect(tree.focusedNode).toBe(null);
+
+      tree.setFocusedNode(tree.nodes[1]);
+      tree.expandNode(tree.nodes[1]);
+      expect(tree.focusedNode).toBe(tree.nodes[1]);
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+
+      tree.deleteAllChildNodes(tree.nodes[1]);
+      expect(tree.focusedNode).toBe(tree.nodes[1]);
+
+      tree.deleteAllNodes();
+      expect(tree.focusedNode).toBe(null);
+    });
+
+    it('is set to null when node is filtered', () => {
+      model = helper.createModelFixture(3, 0);
+      tree = helper.createTree({...model, nodesFocusable: true});
+      tree.render();
+      tree.setFocusedNode(tree.nodes[0]);
+      expect(tree.focusedNode).toBe(tree.nodes[0]);
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+
+      tree.addFilter(node => node !== tree.nodes[1]);
+      expect(tree.focusedNode).toBe(tree.nodes[0]); // Still set because still visible
+
+      tree.addFilter(node => node !== tree.nodes[0]);
+      expect(tree.focusedNode).toBe(null);
+    });
+
+    it('sets no-nodes-focused on tree if no nodes are focused', () => {
+      tree.render();
+      expect(tree.$container).toHaveClass('no-nodes-focused');
+
+      tree.setFocusedNode(tree.nodes[0]);
+      expect(tree.$container).not.toHaveClass('no-nodes-focused');
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+
+      tree.setNodesFocusable(false);
+      expect(tree.$container).toHaveClass('no-nodes-focused');
+      expect(tree.focusedNode.$node).not.toHaveClass('focused');
+
+      tree.setNodesFocusable(true);
+      expect(tree.$container).not.toHaveClass('no-nodes-focused');
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+
+      let hideAllNodesFilter = node => false;
+      tree.addFilter(hideAllNodesFilter);
+      expect(tree.$container).toHaveClass('no-nodes-focused');
+
+      tree.removeFilter(hideAllNodesFilter);
+      expect(tree.$container).toHaveClass('no-nodes-focused');
+
+      tree.deleteAllNodes();
+      expect(tree.$container).toHaveClass('no-nodes-focused');
+      expect(tree.focusedNode).toBe(null);
     });
   });
 });

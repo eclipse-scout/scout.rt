@@ -34,7 +34,7 @@ export class TreeExpandOrDrillDownKeyStroke extends AbstractTreeNavigationKeyStr
   }
 
   isNodeExpandable(node: TreeNode): boolean {
-    return !node.expanded && !node.leaf;
+    return !node.leaf && !node.expanded || node.expandedLazy;
   }
 
   override handle(event: JQuery.KeyboardEventBase & TreeEventCurrentNode) {
@@ -44,10 +44,10 @@ export class TreeExpandOrDrillDownKeyStroke extends AbstractTreeNavigationKeyStr
         lazy: false // always show all nodes on node double click
       });
     } else {
-      let visibleChildNodes = currentNode.childNodes.filter(function(node) {
+      let visibleChildNodes = currentNode.childNodes.filter(node => {
         // Filter using isFilterAccepted does not work because node.filterAccepted is wrong for visible child nodes of a lazy expanded node
         return this.field.visibleNodesFlat.indexOf(node) > -1;
-      }, this);
+      });
       if (visibleChildNodes.length > 0) {
         this.selectNodesAndReveal(visibleChildNodes[0], true);
       }
