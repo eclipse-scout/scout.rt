@@ -10,11 +10,14 @@
 package org.eclipse.scout.rt.client.servicetunnel;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
@@ -25,18 +28,18 @@ import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
@@ -48,8 +51,6 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.api.client.http.HttpResponse;
 
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
@@ -82,31 +83,17 @@ public class HttpServiceTunnel {
     return m_active;
   }
 
-  /**
-   * Execute a {@link ServiceTunnelRequest}, returns the plain {@link HttpResponse} - (executed and) ready to be
-   * processed to create a {@link ServiceTunnelResponse}.
-   *
-   * @param call
-   *     the original call
-   * @param callData
-   *     the data created by the {@link BinaryServiceTunnelContentHandler} used by this tunnel Create url connection and
-   *     write post data (if required)
-   */
-  protected Response executeRequestInternal(ServiceTunnelRequest call, byte[] callData) throws IOException {
-    return BEANS.get(ProcessResourceClient.class).call(new ByteArrayInputStream(callData));
-  }
-
   protected Response executeRequest(ServiceTunnelRequest call, byte[] callData) throws IOException {
     Context parentContext = Context.current();
 
     if (!m_instrumenter.shouldStart(parentContext, call)) {
-      return executeRequestInternal(call, callData);
+      return BEANS.get(ProcessResourceClient.class).call(new ByteArrayInputStream(callData));
     }
 
     Context context = m_instrumenter.start(parentContext, call);
     Response response;
     try (Scope ignored = context.makeCurrent()) {
-      response = executeRequestInternal(call, callData);
+      response = BEANS.get(ProcessResourceClient.class).call(new ByteArrayInputStream(callData));
     }
     catch (Throwable t) {
       m_instrumenter.end(context, call, null, t);
@@ -182,16 +169,6 @@ public class HttpServiceTunnel {
   }
 
   /**
-   * Creates the {@link Callable} to invoke the remote service operation described by 'serviceRequest'.
-   * <p>
-   * To enable cancellation, the callable returned must also implement {@link ICancellable}, so that the remote
-   * operation can be cancelled once the current {@link RunMonitor} gets cancelled.
-   */
-  protected RemoteServiceInvocationCallable createRemoteServiceInvocationCallable(ServiceTunnelRequest serviceRequest) {
-    return new RemoteServiceInvocationCallable(this, serviceRequest);
-  }
-
-  /**
    * Invokes the service operation remotely on server.
    * <p>
    * This method returns, once the current {@link RunMonitor} gets cancelled. When being cancelled, a cancellation
@@ -204,28 +181,61 @@ public class HttpServiceTunnel {
     if (LOG.isDebugEnabled()) {
       LOG.debug("requestSequence {} {}.{}", serviceRequest.getRequestSequence(), serviceRequest.getServiceInterfaceClassName(), serviceRequest.getOperation());
     }
-    final long requestSequence = serviceRequest.getRequestSequence();
 
-    // Create the Callable to be given to the job manager for execution.
-    final RemoteServiceInvocationCallable remoteInvocationCallable = createRemoteServiceInvocationCallable(serviceRequest);
-
-    // Register the execution monitor as child monitor of the current monitor so that the service request is cancelled once the current monitor gets cancelled.
-    // Invoke the service operation asynchronously (to enable cancellation) and wait until completed or cancelled.
-    final IFuture<ServiceTunnelResponse> future = Jobs
-        .schedule(remoteInvocationCallable,
-            Jobs.newInput().withRunContext(RunContext.CURRENT.get().copy())
-                .withName(createServiceRequestName(requestSequence))
-                .withExceptionHandling(null, false)); // do not handle uncaught exceptions because typically invoked from within a model job (might cause a deadlock, because ClientExceptionHandler schedules and waits for a model job to visualize the exception).
+    BinaryServiceTunnelContentHandler contentHandler = BEANS.get(BinaryServiceTunnelContentHandler.class);
+    long nBytes = 0;
+    final long tStart = LOG.isDebugEnabled() ? System.nanoTime() : 0L;
 
     try {
-      return future.awaitDoneAndGet();
+      final ByteArrayOutputStream requestMessage = new ByteArrayOutputStream();
+      contentHandler.writeRequest(requestMessage, serviceRequest);
+      requestMessage.close();
+      final byte[] requestData = requestMessage.toByteArray();
+      nBytes = requestData.length;
+
+      // Send the request to the server.
+      try (Response resp = executeRequest(serviceRequest, requestData)) {
+        interceptHttpResponse(resp, serviceRequest);
+
+        try (InputStream in = resp.readEntity(InputStream.class)) {
+          // Receive the response.
+          ServiceTunnelResponse response = contentHandler.readResponse(in);
+          if (response == null) {
+            return new ServiceTunnelResponse(new ProcessingException("Response contains no content")
+                .withContextInfo("http-status", "{} {}", resp.getStatus(), resp.getStatusInfo())
+                .withContextInfo("http-headers", resp.getHeaders() + ""));
+          }
+          return response;
+        }
+        catch (ClassNotFoundException e) {
+          return new ServiceTunnelResponse(e);
+        }
+      }
     }
-    catch (ThreadInterruptedError e) { // NOSONAR
-      future.cancel(true); // Ensure the monitor to be cancelled once this thread is interrupted to cancel the remote call.
-      return new ServiceTunnelResponse(new ThreadInterruptedError("UserInterrupted")); // Interruption has precedence over computation result or computation error.
+    catch (RemoteSystemUnavailableException exception) {
+      Throwable cause = exception.getCause();
+      if (cause instanceof WebApplicationException) {
+        int status = ((WebApplicationException) cause).getResponse().getStatus();
+        return new ServiceTunnelResponse(new HttpServiceTunnelException(status, "Service tunnel request failed with status code {}", status));
+      }
+      throw new ProcessingException("Service tunnel request failed", cause);
     }
-    catch (FutureCancelledError e) { // NOSONAR
-      return new ServiceTunnelResponse(new FutureCancelledError("UserInterrupted")); // Cancellation has precedence over computation result or computation error.
+    catch (IOException e) {
+      if (Thread.currentThread().isInterrupted()) {
+        LOG.debug("Ignoring IOException for interrupted thread.", e);
+        return new ServiceTunnelResponse(new ThreadInterruptedError("Thread is interrupted.", e));
+      }
+      else if (RunMonitor.CURRENT.get().isCancelled()) {
+        LOG.debug("Ignoring IOException for cancelled thread.", e);
+        return new ServiceTunnelResponse(new FutureCancelledError("RunMonitor is cancelled.", e));
+      }
+      return new ServiceTunnelResponse(e);
+    }
+    finally {
+      if (LOG.isDebugEnabled()) {
+        final long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - tStart);
+        LOG.debug("TIME {}.{} {}ms {} bytes", serviceRequest.getServiceInterfaceClassName(), serviceRequest.getOperation(), elapsedMillis, nBytes);
+      }
     }
   }
 

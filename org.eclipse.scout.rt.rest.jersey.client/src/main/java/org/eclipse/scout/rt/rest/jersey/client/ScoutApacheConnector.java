@@ -585,6 +585,20 @@ public class ScoutApacheConnector implements Connector {
     if (runMonitor == null) {
       return IRegistrationHandle.NULL_HANDLE;
     }
+    ICancellable requestAborter = new ICancellable() {
+      @Override
+      public boolean isCancelled() {
+        return request.isAborted();
+      }
+
+      @Override
+      public boolean cancel(boolean interruptIfRunning) {
+        LOG.debug("Aborting HTTP REST request");
+        request.abort();
+        return true;
+      }
+    };
+    clientRequest.setProperty(RestClientProperties.REQUEST_ABORTER, requestAborter);
     ICancellable cancellable;
     Object c = clientRequest.getProperty(RestClientProperties.CANCELLABLE);
     if (c instanceof ICancellable) {
@@ -595,22 +609,13 @@ public class ScoutApacheConnector implements Connector {
       if (c != null) {
         LOG.debug("non-null cancellable has unexpected type: " + c.getClass());
       }
-      cancellable = new ICancellable() {
-        @Override
-        public boolean isCancelled() {
-          return request.isAborted();
-        }
-
-        @Override
-        public boolean cancel(boolean interruptIfRunning) {
-          LOG.debug("Aborting HTTP REST request");
-          request.abort();
-          return true;
-        }
-      };
+      cancellable = requestAborter;
     }
     runMonitor.registerCancellable(cancellable);
-    return () -> runMonitor.unregisterCancellable(cancellable);
+    return () -> {
+      runMonitor.unregisterCancellable(cancellable);
+      clientRequest.removeProperty(RestClientProperties.REQUEST_ABORTER);
+    };
   }
 
   @SuppressWarnings("resource")

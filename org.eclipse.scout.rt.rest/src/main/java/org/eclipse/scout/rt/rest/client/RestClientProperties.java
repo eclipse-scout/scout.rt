@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -117,8 +117,19 @@ public final class RestClientProperties {
 
   /**
    * Optional custom {@link ICancellable} used by HTTP connection providers that support cancellation.
+   * If none provided the HTTP connection provider may still try to abort the request; however if a non-null value is provided the connection
+   * provider will not abort the request and the {@link ICancellable} provided will be called.
+   * <p>
+   * The {@link ICancellable} may use the {@link #REQUEST_ABORTER} to abort the request (which would regularly be done if no {@link ICancellable} is set).
+   * <p>
+   * This property may be set by REST client implementations (e.g. by a request filter).
    */
   public static final String CANCELLABLE = "scout.rest.client.cancellable";
+
+  /**
+   * Optional custom {@link ICancellable} which may be set by HTTP connection provider during execution to abort a running request (e.g. may be used within {@link #CANCELLABLE}).
+   */
+  public static final String REQUEST_ABORTER = "scout.rest.client.requestAborter";
 
   /**
    * Implementation to use for encoding the request URI, i.e. the URI used in the request line (GET [request-uri]
