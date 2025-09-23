@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 import {keys, KeyStroke, ScoutKeyboardEvent, Tree} from '../../index';
 
-export class TreeSpaceKeyStroke extends KeyStroke {
+export class TreeCheckKeyStroke extends KeyStroke {
   declare field: Tree;
 
   constructor(tree: Tree) {
@@ -28,6 +28,6 @@ export class TreeSpaceKeyStroke extends KeyStroke {
     let selectedNodes = this.field.selectedNodes.filter(node => node.enabled);
     // Toggle checked state to 'true', except if every node is already checked
     let checked = selectedNodes.some(node => !node.checked);
-    selectedNodes.forEach(node => this.field.checkNode(node, checked));
+    this.field.checkNodes(selectedNodes, {checked});
   }
 }

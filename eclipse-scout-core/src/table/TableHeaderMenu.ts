@@ -824,7 +824,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     });
     this.filterTable.insertRows(tableRows);
     this.filterTable.render(this.$filterTableGroup);
-    aria.linkElementWithLabel(this.filterTable.$container, this.$filterTableGroupTitle);
+    aria.linkElementWithLabel(this.filterTable.get$Focusable(), this.$filterTableGroupTitle);
     // must do this in a setTimeout, since table/popup is not visible yet (same as Table#revealSelection).
     setTimeout(this.filterTable.revealChecked.bind(this.filterTable));
 

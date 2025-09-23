@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ import {DoubleClickSupport, Range, Tree, TreeNode} from '../../index';
 
 export class SpecTree extends Tree {
   declare _doubleClickSupport: DoubleClickSupport & { _lastTimestamp: number };
+  declare _changeNodeTaskScheduled: boolean;
 
   override _initNodes(nodes: TreeNode[], parentNode?: TreeNode) {
     super._initNodes(nodes, parentNode);
@@ -34,5 +35,9 @@ export class SpecTree extends Tree {
 
   override _onScroll(event?: JQuery.ScrollEvent) {
     super._onScroll(event);
+  }
+
+  override _isGroupingEnd(node: TreeNode): boolean {
+    return super._isGroupingEnd(node);
   }
 }

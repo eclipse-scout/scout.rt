@@ -100,7 +100,7 @@ export class TableHeaderMenuGroup extends Widget implements TableHeaderMenuGroup
     // Remove aria-label because aria-labelledby points to a more sophisticated text
     aria.label(item.$container, null);
     // link item with the group header, the header is updated with the text of the action
-    aria.linkElementWithLabel($(item.getFocusableElement()), this.$text, AriaLabelledByInsertPosition.FRONT, true);
+    aria.linkElementWithLabel(item.get$Focusable(), this.$text, AriaLabelledByInsertPosition.FRONT, true);
 
     item.$container
       .on('focusin mouseenter', () => this.appendText(item.computeGroupSuffix()))

@@ -28,11 +28,8 @@ export abstract class CompositeField extends FormField {
     fields.activateFirstField(this, this.getFields());
   }
 
-  override getFocusableElement(): HTMLElement | JQuery {
+  override get$Focusable(): JQuery {
     let field = widgets.findFirstFocusableWidget(this.getFields(), this);
-    if (field) {
-      return field.getFocusableElement();
-    }
-    return null;
+    return field?.get$Focusable();
   }
 }

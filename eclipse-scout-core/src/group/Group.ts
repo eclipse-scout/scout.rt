@@ -318,10 +318,7 @@ export class Group<TBody extends Widget = Widget> extends Widget implements Grou
     this.body.invalidateLayoutTree();
   }
 
-  override getFocusableElement(): HTMLElement | JQuery {
-    if (!this.rendered) {
-      return null;
-    }
+  override get$Focusable(): JQuery {
     return this.$header;
   }
 

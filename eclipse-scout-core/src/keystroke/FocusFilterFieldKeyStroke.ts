@@ -55,8 +55,6 @@ export class FocusFilterFieldKeyStroke extends KeyStroke {
 
     // Focus the field and move cursor to the end.
     if (this.field.session.focusManager.requestFocus($filterInput)) {
-      $filterInput.focus();
-
       let length = scout.nvl($filterInput.val(), '').length;
       $filterInput[0].setSelectionRange(length, length);
     }

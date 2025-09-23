@@ -24,9 +24,9 @@
     }
 
     &.no-rows-selected,
-    &.no-nodes-selected {
-      &:focus,
-      &.focused {
+    &.no-nodes-selected.no-nodes-focused {
+      &:has(.tree-data:is(:focus, .focused)),
+      &:has(.table-data:is(:focus, .focused)) {
         #scout.focus-border();
       }
     }

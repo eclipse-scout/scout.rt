@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Cell, CellModel, ChildModelOf, Column, ColumnModel, comparators, DecimalFormat, Filter, InitModelOf, MenuModel, ModelAdapter, NumberColumnModel, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, objects, ObjectType, Primitive,
-  RemoteEvent, scout, Session, Table, TableModel, TableRow, TableRowModel, TableTextUserFilter, TextColumnUserFilter, Widget
+  arrays, Cell, CellModel, ChildModelOf, Column, ColumnModel, comparators, DecimalFormat, Filter, InitModelOf, MenuModel, ModelAdapter, NumberColumnModel, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, objects, ObjectType,
+  ObjectWithType, Primitive, RemoteEvent, scout, Session, SomeRequired, Table, TableModel, TableRow, TableRowModel, TableTextUserFilter, TextColumnUserFilter
 } from '../../index';
 import {MenuSpecHelper, SpecTable, SpecTableAdapter} from '../index';
 import $ from 'jquery';
@@ -23,8 +23,8 @@ export class TableSpecHelper {
     this.menuHelper = new MenuSpecHelper(session);
   }
 
-  createModel(columns: ObjectOrChildModel<Column<any>>[], rows: ObjectOrModel<TableRow>[]): TableModelWithCells {
-    let model = createSimpleModel('Table', this.session) as TableModelWithCells;
+  createModel(columns: ObjectOrChildModel<Column<any>>[], rows: ObjectOrModel<TableRow>[]): SpecTableModel {
+    let model = createSimpleModel('Table', this.session) as SpecTableModel;
 
     // Server will never send undefined -> don't create model with undefined properties.
     if (rows) {
@@ -168,7 +168,7 @@ export class TableSpecHelper {
    * Creates #rowCount rows where columns are either the column count or the column objects.
    * Passing the column objects allows to consider the column type for cell creation.
    */
-  createModelRows(columns: number | ColumnModel<any>[], rowCount: number, parentRow?: TableRow | string): TableRowModelWithCells[] {
+  createModelRows(columns: number | ColumnModel<any>[], rowCount: number, parentRow?: TableRow | string): SpecTableRowModel[] {
     if (!rowCount) {
       return;
     }
@@ -180,7 +180,7 @@ export class TableSpecHelper {
     return rows;
   }
 
-  createModelSingleColumnByTexts(texts: string[]): TableModelWithCells {
+  createModelSingleColumnByTexts(texts: string[]): SpecTableModel {
     let rows = [];
     for (let i = 0; i < texts.length; i++) {
       rows.push(this.createModelRowByTexts(null, texts[i]));
@@ -188,7 +188,7 @@ export class TableSpecHelper {
     return this.createModel(this.createModelColumns(1), rows);
   }
 
-  createModelSingleColumnByValues(values: any[], columnType: ObjectType<Column>): TableModelWithCells {
+  createModelSingleColumnByValues(values: any[], columnType: ObjectType<Column>): SpecTableModel {
     let rows = [];
     for (let i = 0; i < values.length; i++) {
       rows.push(this.createModelRowByValues(null, values[i]));
@@ -196,7 +196,7 @@ export class TableSpecHelper {
     return this.createModel(this.createModelColumns(1, columnType), rows);
   }
 
-  createModelFixture(colCount: number, rowCount?: number): TableModelWithCells {
+  createModelFixture(colCount: number, rowCount?: number): SpecTableModel {
     return this.createModel(this.createModelColumns(colCount), this.createModelRows(colCount, rowCount));
   }
 
@@ -205,7 +205,7 @@ export class TableSpecHelper {
     return this.createTable(model);
   }
 
-  createModelSingleConfiguredCheckableColumn(rowCount: number): TableModelWithCells {
+  createModelSingleConfiguredCheckableColumn(rowCount: number): SpecTableModel {
     let cols = this.createModelColumns(1);
     cols[0].checkable = true;
     return this.createModel(cols, this.createModelRows(1, rowCount));
@@ -219,9 +219,9 @@ export class TableSpecHelper {
     return scout.create(SpecTable, model as InitModelOf<Table>);
   }
 
-  createTableAdapter(model: InitModelOf<ModelAdapter> | TableModel & { session: Session; id: string }): SpecTableAdapter {
+  createTableAdapter(model: InitModelOf<ModelAdapter> | SpecTableModel): SpecTableAdapter {
     let tableAdapter = new SpecTableAdapter();
-    tableAdapter.init(model as InitModelOf<SpecTableAdapter>);
+    tableAdapter.init(model);
     return tableAdapter;
   }
 
@@ -378,5 +378,5 @@ export class TableSpecHelper {
   }
 }
 
-export type TableRowModelWithCells = TableRowModel & { cells: Cell[] };
-export type TableModelWithCells = TableModel & { id: string; parent: Widget; session: Session; objectType: ObjectType<Table> };
+export type SpecTableRowModel = TableRowModel & { cells: Cell[] };
+export type SpecTableModel = SomeRequired<TableModel, 'id' | 'session' | 'parent' | 'objectType'> & ObjectWithType;

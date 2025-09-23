@@ -8,6 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 .outline.tree {
+  --focus-node-selected-background-color: @outline-selection-background-color;
+
   & > .tree-data {
     padding-top: @outline-data-padding-top;
 
@@ -79,7 +81,7 @@
         }
 
         & > .font-icon {
-          color: @outline-node-selected-icon-color;;
+          color: @outline-node-selected-icon-color;
         }
       }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -208,10 +208,7 @@ export class BusyIndicator extends Widget implements BusyIndicatorModel {
    * Used by CloseKeyStroke
    */
   close() {
-    if (this.cancelButton && this.cancelButton.$container && this.session.focusManager.requestFocus(this.cancelButton.$container)) {
-      this.cancelButton.$container.focus();
-      this.cancelButton.doAction();
-    }
+    this.cancelButton?.doAction();
   }
 
   protected _onCancelClick(event: Event) {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {defaultValues, RemoteEvent, RemoteResponse, RemoteTableOrganizer, Table, TableAdapter, TableRow, TableTextUserFilter} from '../../src/index';
-import {LocaleSpecHelper, SpecTable, SpecTableAdapter, TableModelWithCells, TableSpecHelper} from '../../src/testing/index';
+import {LocaleSpecHelper, SpecTable, SpecTableAdapter, SpecTableModel, TableSpecHelper} from '../../src/testing/index';
 
 describe('TableAdapter', () => {
   let session: SandboxSession;
@@ -210,7 +210,7 @@ describe('TableAdapter', () => {
     });
 
     describe('rowsDeleted event', () => {
-      let model: TableModelWithCells;
+      let model: SpecTableModel;
       let table: Table;
       let adapter: SpecTableAdapter;
       let rows: TableRow[];

@@ -61,12 +61,12 @@
 
   .focus-box-shadow(@box-shadow-size: @focus-box-shadow-size, @box-shadow-color: @focus-box-shadow-color) {
     outline: none;
-    box-shadow: 0 0 0 @box-shadow-size var(--focus-box-shadow-color, @box-shadow-color);
+    box-shadow: 0 0 0 var(--focus-box-shadow-size, @box-shadow-size) var(--focus-box-shadow-color, @box-shadow-color);
   }
 
-  .focus-inset-box-shadow() {
+  .focus-inset-box-shadow(@box-shadow-size: @focus-box-shadow-size, @box-shadow-color: @focus-box-shadow-color) {
     outline: none;
-    box-shadow: inset 0 0 0 @focus-box-shadow-size @focus-box-shadow-color;
+    box-shadow: inset 0 0 0 var(--focus-box-shadow-size, @box-shadow-size) var(--focus-box-shadow-color, @box-shadow-color);
   }
 
   .focus-box-shadow-transition() {

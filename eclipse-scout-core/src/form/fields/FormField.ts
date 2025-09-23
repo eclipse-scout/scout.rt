@@ -1011,22 +1011,11 @@ export class FormField extends Widget implements FormFieldModel {
       return false;
     }
 
-    let focusableElement = this.getFocusableElement();
-    if (focusableElement) {
-      return this.session.focusManager.requestFocus(focusableElement);
-    }
-    return false;
+    return this.session.focusManager.requestFocus(this.get$Focusable());
   }
 
-  /**
-   * This method returns the HtmlElement to be used as initial focus element or when {@link #focus()} is called.
-   * It can be overridden, in case the FormField needs to return something other than this.$field[0].
-   */
-  override getFocusableElement(): HTMLElement | JQuery {
-    if (this.rendered && this.$field) {
-      return this.$field[0];
-    }
-    return null;
+  override get$Focusable(): JQuery {
+    return this.$field;
   }
 
   protected _onFieldFocus(event: JQuery.FocusEvent) {
@@ -1046,10 +1035,7 @@ export class FormField extends Widget implements FormFieldModel {
       return;
     }
     // Explicitly don't use this.focus() because this.focus uses the focus manager which may be disabled (e.g. on mobile devices)
-    let focusableElement = this.getFocusableElement();
-    if (focusableElement) {
-      $.ensure(focusableElement).focus();
-    }
+    this.get$Focusable()?.focus();
   }
 
   override get$Scrollable(): JQuery {

@@ -281,11 +281,8 @@ export class TabBox extends CompositeField implements TabBoxModel {
   /**
    * @returns the focusable element of the selected tab.
    */
-  override getFocusableElement(): HTMLElement | JQuery {
-    if (this.selectedTab) {
-      return this.selectedTab.getFocusableElement();
-    }
-    return null;
+  override get$Focusable(): JQuery {
+    return this.selectedTab?.get$Focusable();
   }
 
   isTabItemFocused(tabItem: TabItem): boolean {

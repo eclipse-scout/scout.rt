@@ -18,12 +18,11 @@
   --table-aggregate-row-padding-y-small: @table-aggregate-padding-y-small;
   --table-aggregate-row-padding-y-large: @table-aggregate-padding-y-large;
 
-  &:focus,
-  &.focused,
-  &.perma-focus {
+  &.perma-focus > .table-data,
+  & > .table-data:is(:focus, .focused) {
     outline: none;
 
-    & > .table-data > .table-row {
+    & > .table-row {
       &.selected {
         background-color: @item-selection-background-color;
 
@@ -92,20 +91,21 @@
           background-color: @selected-disabled-background-color;
         }
       }
-    }
 
-    &.keyboard-navigation:focus,
-    &.keyboard-navigation.focused {
-      & > .table-data > .table-row {
-        &.selected {
-          background-color: @hover-background-color;
+      &.keyboard-navigation:focus,
+      &.keyboard-navigation.focused {
+        & > .table-row {
+          &.selected {
+            #scout.focus-inset-box-shadow();
 
-          &.checked {
-            background-color: @selected-hover-background-color;
+            &.checked {
+              --focus-box-shadow-size: 4px;
+            }
           }
         }
       }
     }
+
   }
 
   &.structured {

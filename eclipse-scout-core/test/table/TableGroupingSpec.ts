@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {AggregateTableControl, arrays, Column, NumberColumn, Range, scout, Table} from '../../src/index';
-import {SpecTable, SpecTableAdapter, TableModelWithCells, TableRowModelWithCells, TableSpecHelper} from '../../src/testing/index';
+import {SpecTable, SpecTableAdapter, SpecTableModel, SpecTableRowModel, TableSpecHelper} from '../../src/testing/index';
 
 describe('Table Grouping', () => {
 
-  let session: SandboxSession, helper: TableSpecHelper, model: TableModelWithCells, table: SpecTable;
-  let column0: Column, column1: Column, column2: Column, column3: NumberColumn, column4: NumberColumn, rows: TableRowModelWithCells[], columns, adapter: SpecTableAdapter;
+  let session: SandboxSession, helper: TableSpecHelper, model: SpecTableModel, table: SpecTable;
+  let column0: Column, column1: Column, column2: Column, column3: NumberColumn, column4: NumberColumn, rows: SpecTableRowModel[], columns, adapter: SpecTableAdapter;
   let $colHeaders, $header0, $header1;
 
   beforeEach(() => {

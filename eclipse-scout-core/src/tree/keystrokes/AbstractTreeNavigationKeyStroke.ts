@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {HAlign, KeyStroke, keyStrokeModifier, ScoutKeyboardEvent, Tree, TreeNode} from '../../index';
+import {arrays, HAlign, KeyStroke, keyStrokeModifier, ScoutKeyboardEvent, Tree, TreeNode} from '../../index';
 
 export type TreeEventCurrentNode = {
   _treeCurrentNode?: TreeNode;
@@ -16,8 +16,9 @@ export type TreeEventCurrentNode = {
 
 export class AbstractTreeNavigationKeyStroke extends KeyStroke {
   declare field: Tree;
+  nodesFocusable: boolean;
 
-  constructor(tree: Tree, modifierBitMask: number) {
+  constructor(tree: Tree, modifierBitMask?: number) {
     super();
     this.field = tree;
     this.repeatable = true;
@@ -41,11 +42,9 @@ export class AbstractTreeNavigationKeyStroke extends KeyStroke {
       return false;
     }
 
-    if (this.field.selectedNodes.length > 0) {
-      event._treeCurrentNode = this.field.selectedNodes[0];
-      event._$treeCurrentNode = event._treeCurrentNode.$node;
-    }
-    this.field.$container.addClass('keyboard-navigation');
+    event._treeCurrentNode = this.nodesFocusable && this.field.focusedNode || this.field.selectedNodes?.[0];
+    event._$treeCurrentNode = event._treeCurrentNode?.$node;
+    this.field.get$Focusable().addClass('keyboard-navigation');
     return true;
   }
 
@@ -61,10 +60,20 @@ export class AbstractTreeNavigationKeyStroke extends KeyStroke {
   }
 
   selectNodesAndReveal(newSelection: TreeNode | TreeNode[], debounceSend?: boolean) {
-    this.field.selectNodes(newSelection, debounceSend);
-    this.field.revealSelection();
+    newSelection = arrays.ensure(newSelection);
+    if (this.nodesFocusable) {
+      this.field.setFocusedNode(newSelection[0]);
+      this.field.scrollTo(newSelection[0]);
+    } else {
+      this.field.selectNodes(newSelection, debounceSend);
+      this.field.revealSelection();
+    }
     if (!this.field.isFocused()) {
       this.field.focus();
     }
+  }
+
+  setNodesFocusable(nodesFocusable: boolean) {
+    this.nodesFocusable = nodesFocusable;
   }
 }

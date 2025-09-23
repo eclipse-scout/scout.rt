@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -456,11 +456,11 @@ export class Button extends FormField implements ButtonModel {
     aria.linkElementWithLabel($element, this.$buttonLabel);
   }
 
-  override getFocusableElement(): HTMLElement | JQuery {
+  override get$Focusable(): JQuery {
     if (this.adaptedBy) {
-      return this.adaptedBy.getFocusableElement();
+      return this.adaptedBy.get$Focusable();
     }
-    return super.getFocusableElement();
+    return super.get$Focusable();
   }
 
   override isFocusable(checkTabbable?: boolean): boolean {

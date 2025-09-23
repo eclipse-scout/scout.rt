@@ -23,8 +23,7 @@
     }
 
     &.no-rows-selected {
-      &:focus,
-      &.focused {
+      &:has(.table-data:is(:focus, .focused)) {
         #scout.focus-border();
       }
     }

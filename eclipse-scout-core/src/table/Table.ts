@@ -3759,10 +3759,11 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   override get$Scrollable(): JQuery {
-    if (this.$data) {
-      return this.$data;
-    }
-    return this.$container;
+    return this.$data || this.$container;
+  }
+
+  override get$Focusable(): JQuery {
+    return this.$data || this.$container;
   }
 
   /** @see TableModel.scrollToSelection */
@@ -5689,7 +5690,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       this.$data.setEnabled(enabled);
     }
 
-    this.$container.setTabbableOrFocusable(enabled);
+    this.get$Focusable().setTabbableOrFocusable(enabled);
   }
 
   protected override _renderDisabledStyle() {
@@ -6538,10 +6539,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     }
     // Set table style to focused if a context menu or a menu bar popup opens, so that it looks as it still has the focus
     if (this.has(popup) && popup instanceof ContextMenuPopup) {
-      this.$container.addClass('focused');
+      this.get$Focusable().addClass('focused');
       popup.one('destroy', () => {
         if (this._isDataRendered()) {
-          this.$container.removeClass('focused');
+          this.get$Focusable().removeClass('focused');
         }
       });
     }
