@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -72,10 +72,10 @@ public class StatementProcessorTest {
   public void testDuplicateBindNames() {
     final String bind1Name = "bind1";
     final String bind2Name = "bind2";
-    final String bindSessionName = "userId";
+    final String bindUserId = "userId";
     final String stmtWithInBinds = "select :" + bind1Name + ", :" + bind2Name + " from dual";
     final String stmtWithOutBinds = "select 1, 2 from dual into :" + bind1Name + ", :" + bind2Name;
-    final String stmtWithSessionProperty = "select :" + bindSessionName + ", :" + bind1Name + " from dual";
+    final String stmtWithUserId = "select :" + bindUserId + ", :" + bind1Name + " from dual";
 
     // test in binds
     assertArrayEquals(new String[]{}, exec(true, stmtWithInBinds, new NVPair(bind1Name, null), new NVPair(bind2Name, null)));
@@ -85,8 +85,8 @@ public class StatementProcessorTest {
     assertArrayEquals(new String[]{}, exec(true, stmtWithOutBinds, new NVPair(bind1Name, new IntegerHolder()), new NVPair(bind2Name, new IntegerHolder())));
     assertArrayEquals(new String[]{bind1Name}, exec(true, stmtWithOutBinds, new NVPair(bind1Name, new IntegerHolder()), new NVPair(bind2Name, new IntegerHolder()), new NVPair(bind1Name, new IntegerHolder())));
 
-    // test duplicate with property from session
-    assertArrayEquals(new String[]{bindSessionName}, exec(true, stmtWithSessionProperty, new NVPair(bindSessionName, null), new NVPair(bind1Name, null)));
+    // test duplicate with userId
+    assertArrayEquals(new String[]{bindUserId}, exec(true, stmtWithUserId, new NVPair(bindUserId, null), new NVPair(bind1Name, null)));
 
     // test with duplicate check disabled
     assertArrayEquals(new String[]{}, exec(false, stmtWithInBinds, new NVPair(bind1Name, null), new NVPair(bind2Name, null), new NVPair(bind1Name, null)));

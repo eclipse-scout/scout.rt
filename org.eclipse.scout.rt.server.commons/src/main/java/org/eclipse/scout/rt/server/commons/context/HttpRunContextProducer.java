@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,8 +21,10 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.logging.ServletDiagnosticsProviderFactory;
+import org.eclipse.scout.rt.shared.user.UserId;
 
 /**
  * Creates a {@link RunContext} based on a {@link HttpServletRequest} and the current JAAS context.
@@ -62,6 +64,7 @@ public class HttpRunContextProducer {
 
     return contextToFill
         .withSubject(Subject.current())
+        .withThreadLocal(UserId.CURRENT, BEANS.get(IAccessControlService.class).getUserId(Subject.current()))
         .withCorrelationId(currentCorrelationId(req))
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)

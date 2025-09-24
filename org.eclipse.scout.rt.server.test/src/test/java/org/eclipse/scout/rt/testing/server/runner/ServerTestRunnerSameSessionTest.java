@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.user.UserId;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunnerSameSessionTest.JUnitServerSession;
 import org.junit.AfterClass;
@@ -39,7 +40,7 @@ public class ServerTestRunnerSameSessionTest {
     m_serverSessions = new HashSet<>();
     ISession serverSession = IServerSession.CURRENT.get();
     assertTrue(serverSession instanceof JUnitServerSession);
-    assertEquals("anna", serverSession.getUserId());
+    assertEquals("anna", UserId.CURRENT.get());
     m_serverSessions.add(serverSession);
 
     m_transactions = new HashSet<>();
@@ -52,7 +53,7 @@ public class ServerTestRunnerSameSessionTest {
   public void test1() {
     ISession serverSession = IServerSession.CURRENT.get();
     assertTrue(serverSession instanceof JUnitServerSession);
-    assertEquals("anna", serverSession.getUserId());
+    assertEquals("anna", UserId.CURRENT.get());
     m_serverSessions.add(serverSession);
 
     ITransaction transaction = ITransaction.CURRENT.get();
@@ -64,7 +65,7 @@ public class ServerTestRunnerSameSessionTest {
   public void test2() {
     ISession serverSession = IServerSession.CURRENT.get();
     assertTrue(serverSession instanceof JUnitServerSession);
-    assertEquals("anna", serverSession.getUserId());
+    assertEquals("anna", UserId.CURRENT.get());
     m_serverSessions.add(serverSession);
 
     ITransaction transaction = ITransaction.CURRENT.get();
@@ -76,7 +77,7 @@ public class ServerTestRunnerSameSessionTest {
   public static void afterClass() {
     ISession serverSession = IServerSession.CURRENT.get();
     assertTrue(serverSession instanceof JUnitServerSession);
-    assertEquals("anna", serverSession.getUserId());
+    assertEquals("anna", UserId.CURRENT.get());
     m_serverSessions.add(serverSession);
 
     ITransaction transaction = ITransaction.CURRENT.get();

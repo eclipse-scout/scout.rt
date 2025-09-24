@@ -13,7 +13,6 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
-import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 
 /**
@@ -31,11 +30,6 @@ public interface ISession {
    * @return the session id corresponding client and server sessions do have the same id.
    */
   String getId();
-
-  /**
-   * Authenticated userId, extracted by {@link IAccessControlService#getUserIdOfCurrentSubject()}
-   */
-  String getUserId();
 
   /**
    * Returns true if the session has been loaded and is running.

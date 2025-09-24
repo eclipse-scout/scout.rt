@@ -15,11 +15,13 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
+import org.eclipse.scout.rt.shared.user.UserId;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
@@ -41,6 +43,14 @@ public class ServerRunContextStatement extends Statement {
     m_serverSessionAnnotation = serverSessionAnnotation;
   }
 
+  protected Statement getNext() {
+    return m_next;
+  }
+
+  protected RunWithServerSession getServerSessionAnnotation() {
+    return m_serverSessionAnnotation;
+  }
+
   @Override
   public void evaluate() throws Throwable {
     if (m_serverSessionAnnotation == null) {
@@ -51,7 +61,7 @@ public class ServerRunContextStatement extends Statement {
     }
   }
 
-  private void evaluateWithServerRunContext() throws Throwable {
+  protected void evaluateWithServerRunContext() throws Throwable {
     final Subject currentSubject = Subject.current();
     if (currentSubject == null) {
       Assertions.fail("Subject must not be null. Use the annotation '{}' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
@@ -77,6 +87,7 @@ public class ServerRunContextStatement extends Statement {
       ServerRunContexts.copyCurrent()
           .withSession(serverSession)
           .withSubject(currentSubject) // set the test subject explicitly in case it is different to the session subject
+          .withThreadLocal(UserId.CURRENT, BEANS.get(IAccessControlService.class).getUserId(currentSubject))
           .withUserAgent(userAgent)
           .run(invoker);
       invoker.throwOnError();

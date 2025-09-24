@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -42,7 +42,6 @@ import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlTransactionMember;
 import org.eclipse.scout.rt.server.jdbc.ISelectStreamHandler;
@@ -63,12 +62,14 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.IToken;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueInputToken;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
-import org.eclipse.scout.rt.server.session.ServerSessionProvider;
+import org.eclipse.scout.rt.shared.user.UserId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("squid:S1166")
 public class StatementProcessor implements IStatementProcessor {
+  public static final String USER_ID_BIND_NAME = "userId";
+
   private static final Logger LOG = LoggerFactory.getLogger(StatementProcessor.class);
   private static final Pattern REGEX_DOT = Pattern.compile("[.]");
 
@@ -114,16 +115,17 @@ public class StatementProcessor implements IStatementProcessor {
       m_originalStm = stm;
       m_maxRowCount = maxRowCount;
       m_maxFetchMemorySize = maxFetchMemorySize;
-      // add session to binds if available
-      final IServerSession session = ServerSessionProvider.currentSession();
-      if (session != null) {
+      // add userId to binds if available
+      final String userId = UserId.CURRENT.get();
+      if (userId != null) {
+        NVPair userIdBindBase = new NVPair(USER_ID_BIND_NAME, userId);
         if (bindBases == null) {
-          m_bindBases = new Object[]{session};
+          m_bindBases = new Object[]{userIdBindBase};
         }
         else {
           m_bindBases = new Object[bindBases.length + 1];
           System.arraycopy(bindBases, 0, m_bindBases, 0, bindBases.length);
-          m_bindBases[m_bindBases.length - 1] = session;
+          m_bindBases[m_bindBases.length - 1] = userIdBindBase;
         }
       }
       else {
@@ -1131,7 +1133,7 @@ public class StatementProcessor implements IStatementProcessor {
         }
       }
       if (input == null) {
-        // strict search without dereferncing holder objects
+        // strict search without dereferencing holder objects
         input = createInputRec(bindToken, newPath, o, nullType);
       }
       return input;

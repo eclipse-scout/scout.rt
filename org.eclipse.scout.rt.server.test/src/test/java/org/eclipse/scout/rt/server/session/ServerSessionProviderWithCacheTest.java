@@ -107,7 +107,6 @@ public class ServerSessionProviderWithCacheTest {
     assertTrue(session.isActive());
     assertFalse(session.isStopping());
     assertFalse(session.isStopped());
-    assertEquals("anna", session.getUserId());
 
     // invoke provide again results in the same instance
     assertSame(session, provideSession(null, "anna"));
@@ -139,7 +138,6 @@ public class ServerSessionProviderWithCacheTest {
     assertTrue(session.isActive());
     assertFalse(session.isStopping());
     assertFalse(session.isStopped());
-    assertEquals("anna", session.getUserId());
 
     long sleepMillis = System.currentTimeMillis() - sessionCreatedMillis // time elapsed since session was created
         + FixtureServerSessionProviderWithCache.s_fixedCacheTimeToLiveMillis
@@ -157,7 +155,6 @@ public class ServerSessionProviderWithCacheTest {
     assertTrue(otherSession.isActive());
     assertFalse(otherSession.isStopping());
     assertFalse(otherSession.isStopped());
-    assertEquals("anna", otherSession.getUserId());
 
     // old session is stopped
     assertTrue(session.isStarted());

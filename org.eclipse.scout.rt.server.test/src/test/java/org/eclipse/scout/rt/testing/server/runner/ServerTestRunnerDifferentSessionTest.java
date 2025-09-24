@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.user.UserId;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunnerDifferentSessionTest.JUnitServerSession1;
 import org.junit.AfterClass;
@@ -40,7 +41,7 @@ public class ServerTestRunnerDifferentSessionTest {
     m_serverSessions = new HashSet<>();
     ISession serverSession = IServerSession.CURRENT.get();
     assertTrue(serverSession instanceof JUnitServerSession1);
-    assertEquals("anna", serverSession.getUserId());
+    assertEquals("anna", UserId.CURRENT.get());
     m_serverSessions.add(serverSession);
 
     m_transactions = new HashSet<>();
@@ -53,7 +54,7 @@ public class ServerTestRunnerDifferentSessionTest {
   public void test1() {
     ISession serverSession = IServerSession.CURRENT.get();
     assertTrue(serverSession instanceof JUnitServerSession1);
-    assertEquals("anna", serverSession.getUserId());
+    assertEquals("anna", UserId.CURRENT.get());
     m_serverSessions.add(serverSession);
 
     ITransaction transaction = ITransaction.CURRENT.get();
@@ -65,7 +66,7 @@ public class ServerTestRunnerDifferentSessionTest {
   public void test2() {
     ISession serverSession = IServerSession.CURRENT.get();
     assertTrue(serverSession instanceof JUnitServerSession1);
-    assertEquals("anna", serverSession.getUserId());
+    assertEquals("anna", UserId.CURRENT.get());
     m_serverSessions.add(serverSession);
 
     ITransaction transaction = ITransaction.CURRENT.get();
@@ -78,7 +79,7 @@ public class ServerTestRunnerDifferentSessionTest {
   public void test3() {
     ISession serverSession = IServerSession.CURRENT.get();
     assertTrue(serverSession instanceof JUnitServerSession2);
-    assertEquals("anna", serverSession.getUserId());
+    assertEquals("anna", UserId.CURRENT.get());
     m_serverSessions.add(serverSession);
 
     ITransaction transaction = ITransaction.CURRENT.get();
@@ -90,7 +91,7 @@ public class ServerTestRunnerDifferentSessionTest {
   public static void afterClass() {
     ISession serverSession = IServerSession.CURRENT.get();
     assertTrue(serverSession instanceof JUnitServerSession1);
-    assertEquals("anna", serverSession.getUserId());
+    assertEquals("anna", UserId.CURRENT.get());
     m_serverSessions.add(serverSession);
 
     ITransaction transaction = ITransaction.CURRENT.get();

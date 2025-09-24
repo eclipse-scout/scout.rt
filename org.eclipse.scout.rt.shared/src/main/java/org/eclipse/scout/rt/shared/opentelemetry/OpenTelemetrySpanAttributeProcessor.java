@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.opentelemetry.OpenTelemetryProperties.OpenTelemetrySpanAttributeProcessorEnabledProperty;
 import org.eclipse.scout.rt.platform.opentelemetry.OpenTelemetryProperties.OpenTelemetryTracingEnabledProperty;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.user.UserId;
 
 import io.opentelemetry.api.trace.Span;
 
@@ -52,7 +52,6 @@ public class OpenTelemetrySpanAttributeProcessor implements ICallableDecorator {
   }
 
   protected String getUserIdValue() {
-    final ISession currentSession = ISession.CURRENT.get();
-    return currentSession != null ? currentSession.getUserId() : null;
+    return UserId.CURRENT.get();
   }
 }
