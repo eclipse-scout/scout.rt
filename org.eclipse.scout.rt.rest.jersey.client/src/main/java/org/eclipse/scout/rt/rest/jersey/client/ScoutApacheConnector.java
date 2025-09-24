@@ -96,6 +96,7 @@ import org.glassfish.jersey.client.ClientRequest;
 import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.client.spi.AsyncConnectorCallback;
 import org.glassfish.jersey.client.spi.Connector;
+import org.glassfish.jersey.internal.Version;
 import org.glassfish.jersey.internal.util.PropertiesHelper;
 import org.glassfish.jersey.message.internal.HeaderUtils;
 import org.glassfish.jersey.message.internal.ReaderWriter;
@@ -545,11 +546,22 @@ public class ScoutApacheConnector implements Connector {
     }
   }
 
+  protected static final String DEFAULT_JERSEY_USER_AGENT = String.format("Jersey/%s (%s)", Version.getVersion(), "Scout Apache HttpClient Connector");
+
   /**
    * Adds a default user agent header if {@code RestClientProperties.SUPPRESS_DEFAULT_USER_AGENT} is {@code false} and
    * no user agent header is present.
    */
   protected void ensureDefaultUserAgent(ClientRequest clientRequest) {
+    // Remove default jersey user agent which is added by org.glassfish.jersey.client.ClientRuntime.addUserAgent()
+    // Default user agent should be suppressed by org.eclipse.scout.rt.rest.jersey.client.ScoutInvocationBuilderListener but
+    // this feature is currently broken see https://github.com/eclipse-ee4j/jersey/issues/5994
+    // TODO Remove this condition when Jersey issue 5994 was fixed
+    boolean hasDefaultJerseyUserAgent = DEFAULT_JERSEY_USER_AGENT.equals(clientRequest.getHeaderString(HttpHeaders.USER_AGENT));
+    if (hasDefaultJerseyUserAgent) {
+      clientRequest.getHeaders().remove(HttpHeaders.USER_AGENT);
+    }
+
     boolean suppressDefaultUserAgent = BooleanUtility.nvl(clientRequest.resolveProperty(RestClientProperties.SUPPRESS_DEFAULT_USER_AGENT, false));
     if (!suppressDefaultUserAgent && !clientRequest.getHeaders().containsKey(HttpHeaders.USER_AGENT)) {
       clientRequest.getHeaders().add(HttpHeaders.USER_AGENT, "Generic");
