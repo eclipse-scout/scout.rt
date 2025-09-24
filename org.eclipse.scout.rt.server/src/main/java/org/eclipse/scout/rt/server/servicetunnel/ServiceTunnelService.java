@@ -215,7 +215,7 @@ public class ServiceTunnelService {
 
     m_httpCacheControl.get().checkAndSetCacheHeaders(req, resp, null);
 
-    m_contentHandler.writeResponse(resp.getOutputStream(), serviceResponse);
+    m_contentHandler.writeResponse(out, serviceResponse);
   }
 
   // === INITIALIZATION ===

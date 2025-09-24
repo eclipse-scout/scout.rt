@@ -12,6 +12,10 @@ package org.eclipse.scout.rt.server.servicetunnel;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +38,8 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.TestServerSession;
@@ -65,7 +71,7 @@ import org.mockito.stubbing.Answer;
 @RunWith(ServerTestRunner.class)
 @RunWithServerSession(TestServerSession.class)
 @RunWithSubject("default")
-public class ServiceTunnelServletTest {
+public class ServiceTunnelServiceTest {
 
   private List<IBean<?>> m_beans;
 
@@ -161,12 +167,36 @@ public class ServiceTunnelServletTest {
 
   @Test
   public void testPostSuccessful() {
-    ServiceTunnelService s = new ServiceTunnelService();
+    verifyTestResponse(new ServiceTunnelService().evaluate(prepareTestRequest()));
+  }
+
+  @Test
+  public void testIncomingRequest() throws IOException, ClassNotFoundException {
+    ServiceTunnelService s = BEANS.get(ServiceTunnelService.class);
+    IObjectSerializer serializer = SerializationUtility.createObjectSerializer();
+    byte[] serializedReq = serializer.serialize(prepareTestRequest());
+    try (InputStream in = new ByteArrayInputStream(serializedReq); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+      IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.set(mock(HttpServletRequest.class));
+      IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.set(mock(HttpServletResponse.class));
+      s.incomingRequest(in, out);
+      byte[] byteArray = out.toByteArray();
+      verifyTestResponse(serializer.deserialize(byteArray, ServiceTunnelResponse.class));
+    }
+    finally {
+      IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.remove();
+      IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.remove();
+    }
+  }
+
+  private ServiceTunnelRequest prepareTestRequest() {
     Class[] parameterTypes = new Class[]{String.class};
     Object[] args = new Object[]{"test"};
     ServiceTunnelRequest req = new ServiceTunnelRequest(IPingService.class.getName(), "ping", parameterTypes, args);
     req.setUserAgent(UserAgents.createDefault().createIdentifier());
-    ServiceTunnelResponse res = s.evaluate(req);
+    return req;
+  }
+
+  private void verifyTestResponse(ServiceTunnelResponse res) {
     assertEquals("test", res.getData());
     assertNull(res.getException());
     assertEquals(0, res.getNotifications().size());
