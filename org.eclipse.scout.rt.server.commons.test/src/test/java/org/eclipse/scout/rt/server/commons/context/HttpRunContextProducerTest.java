@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,10 +25,13 @@ import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.commons.authentication.ServletFilterHelper;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -39,6 +42,14 @@ public class HttpRunContextProducerTest {
   static final String TEST_CID = "abc";
   static final Locale TEST_LOCALE = Locale.CANADA_FRENCH;
   static final Subject TEST_SUBJECT = BEANS.get(ServletFilterHelper.class).createSubject(BEANS.get(SimplePrincipalProducer.class).produce(TEST_SUBJECT_NAME));
+
+  @BeanMock
+  protected IAccessControlService m_mockAccessControlService;
+
+  @Before
+  public void before() {
+    when(m_mockAccessControlService.getUserIdOfCurrentSubject()).thenReturn(TEST_SUBJECT_NAME);
+  }
 
   @Test
   public void testCreateRunContextWithCid() {

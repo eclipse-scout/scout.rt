@@ -13,12 +13,12 @@ import static org.eclipse.scout.rt.shared.ISessionVariable.SHARED_CONTEXT_USER_I
 
 import java.util.Map;
 
-import org.eclipse.scout.rt.server.AbstractServerSession;
+import org.eclipse.scout.rt.shared.user.UserId;
 
 public class UserIdSharedVariableContributor implements IInitialSharedVariableContributor {
 
   @Override
   public void contribute(Map<String, Object> variables) {
-    variables.put(SHARED_CONTEXT_USER_ID, AbstractServerSession.CURRENT.get().getUserId());
+    variables.put(SHARED_CONTEXT_USER_ID, UserId.CURRENT.get());
   }
 }

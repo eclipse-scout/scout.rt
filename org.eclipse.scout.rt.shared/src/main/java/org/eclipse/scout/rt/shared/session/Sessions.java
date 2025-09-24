@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,12 +11,7 @@ package org.eclipse.scout.rt.shared.session;
 
 import java.math.BigInteger;
 
-import javax.security.auth.Subject;
-
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
-import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.ISession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,21 +53,5 @@ public final class Sessions {
 
     // use Base32 encoding because it is shorter than hex and does not include special characters and is case-insensitive (compared to Base64).
     return randomId.toString(32);
-  }
-
-  /**
-   * First, tries to get user id from session associated with current thread. If no active session can be found,
-   * {@link IAccessControlService#getUserIdOfCurrentSubject()} is called.
-   *
-   * @return current user id or <code>null</code> if user id can not be extracted from current {@link RunContext} and
-   * {@link Subject}
-   */
-  public static String getCurrentUserId() {
-    ISession session = ISession.CURRENT.get();
-    if (session != null && session.isActive()) {
-      // only an active session has a valid userId
-      return session.getUserId();
-    }
-    return BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
   }
 }

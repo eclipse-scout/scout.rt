@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.security.AllPermissionCollection;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.security.IPermissionCollection;
-import org.eclipse.scout.rt.shared.session.Sessions;
+import org.eclipse.scout.rt.shared.user.UserId;
 
 /**
  * {@link IAccessControlService} service for testing using {@link AllPermission}
@@ -27,7 +27,7 @@ public class AllAccessControlService extends AbstractAccessControlService<String
 
   @Override
   protected String getCurrentUserCacheKey() {
-    return Sessions.getCurrentUserId();
+    return UserId.CURRENT.get();
   }
 
   @Override

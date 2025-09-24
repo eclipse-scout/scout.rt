@@ -1,13 +1,7 @@
-#set( $symbol_pound = '#' )
-#set( $symbol_dollar = '$' )
-#set( $symbol_escape = '\' )
-package ${package}.shared.security;
-
 import org.eclipse.scout.rt.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.security.IPermissionCollection;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.session.Sessions;
 
 /**
  * {@link IAccessControlService} service that uses {@link ISession#getUserId()} as internal cache key required by
@@ -22,7 +16,7 @@ public class AccessControlService extends AbstractAccessControlService<String> {
 
   @Override
   protected String getCurrentUserCacheKey() {
-    return Sessions.getCurrentUserId();
+    return Users.CURRENT.get();
   }
 
   @Override

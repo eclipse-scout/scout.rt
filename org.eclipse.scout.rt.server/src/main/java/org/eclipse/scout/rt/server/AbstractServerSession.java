@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.rest.cancellation.RestRequestCancellationRegistry;
-import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
@@ -39,6 +38,7 @@ import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionData;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.eclipse.scout.rt.shared.session.SessionMetricsHelper;
+import org.eclipse.scout.rt.shared.user.UserId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +59,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   private volatile boolean m_active;
   private volatile boolean m_stopping;
   private final SessionData m_sessionData;
-  private String m_userId;
   private final ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>> m_objectExtensions;
 
   public AbstractServerSession(boolean autoInitConfig) {
@@ -73,10 +72,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     }
   }
 
-  private void assignUserId() {
-    m_userId = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
-  }
-
   /**
    * The session is running in its event loop
    */
@@ -88,11 +83,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   @Override
   public boolean isStopping() {
     return m_stopping;
-  }
-
-  @Override
-  public final String getUserId() {
-    return m_userId;
   }
 
   @Override
@@ -142,13 +132,12 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     assertFalse(isStopping(), "Session cannot be started because it is currently stopping.");
     m_id = assertNotNull(sessionId, "Session id must not be null");
 
-    assignUserId();
     interceptLoadSession();
 
     m_active = true;
 
     fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STARTED));
-    LOG.info("Server session started [session={}, user={}]", this, getUserId());
+    LOG.info("Server session started [session={}, user={}]", this, UserId.CURRENT.get());
   }
 
   /**
@@ -233,7 +222,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
       m_stopping = false;
       fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPED));
       m_sessionMetrics.sessionDestroyed(SESSION_TYPE);
-      LOG.info("Server session stopped [session={}, user={}]", this, getUserId());
+      LOG.info("Server session stopped [session={}, user={}]", this, UserId.CURRENT.get());
     }
   }
 

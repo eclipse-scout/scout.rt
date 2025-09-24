@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,8 +11,11 @@ package org.eclipse.scout.rt.server;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.security.auth.Subject;
+
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractSubjectConfigProperty;
 import org.eclipse.scout.rt.server.services.common.file.RemoteFileService;
 
 public final class ServerConfigProperties {
@@ -20,13 +23,13 @@ public final class ServerConfigProperties {
   private ServerConfigProperties() {
   }
 
-  public static class ClusterSyncUserProperty extends AbstractStringConfigProperty {
+  public static class ClusterSyncUserProperty extends AbstractSubjectConfigProperty {
 
     public static final String CLUSTER_SYNC_USER_NAME = "system";
 
     @Override
-    public String getDefaultValue() {
-      return CLUSTER_SYNC_USER_NAME;
+    public Subject getDefaultValue() {
+      return convertToSubject(CLUSTER_SYNC_USER_NAME);
     }
 
     @Override

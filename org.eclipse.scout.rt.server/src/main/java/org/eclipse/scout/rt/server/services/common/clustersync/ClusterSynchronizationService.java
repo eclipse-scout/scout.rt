@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -31,11 +31,12 @@ import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ClusterSyncUserProperty;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -43,8 +44,8 @@ import org.eclipse.scout.rt.server.mom.IClusterMomDestinations;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
+import org.eclipse.scout.rt.shared.user.UserId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +58,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   private final ConcurrentMap<Class<? extends Serializable>, ClusterNodeStatusInfo> m_messageStatusMap = new ConcurrentHashMap<>();
 
   private final Subject m_subject;
+  private final String m_userId;
 
   private volatile ISubscription m_subscription;
   private final Object m_subscriptionLock = new Object();
@@ -64,9 +66,16 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   private final NodeId m_nodeId = NodeId.current();
 
   public ClusterSynchronizationService() {
-    m_subject = new Subject();
-    m_subject.getPrincipals().add(new SimplePrincipal(CONFIG.getPropertyValue(ClusterSyncUserProperty.class)));
-    m_subject.setReadOnly();
+    m_subject = CONFIG.getPropertyValue(ClusterSyncUserProperty.class);
+    m_userId = BEANS.get(IAccessControlService.class).getUserId(m_subject);
+  }
+
+  public String getUserId() {
+    return m_userId;
+  }
+
+  public Subject getSubject() {
+    return m_subject;
   }
 
   @Override
@@ -182,9 +191,8 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
 
   @Override
   public IClusterNotificationProperties getNotificationProperties() {
-    ISession curentSession = ISession.CURRENT.get();
-    String userid = curentSession != null ? curentSession.getUserId() : "";
-    return new ClusterNotificationProperties(m_nodeId, userid);
+    String userId = StringUtility.emptyIfNull(UserId.CURRENT.get());
+    return new ClusterNotificationProperties(m_nodeId, userId);
   }
 
   @Override
@@ -204,14 +212,19 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
       getStatusInfoInternal().updateReceiveStatus(notificationMessage);
       getStatusInfoInternal(notificationMessage.getNotification().getClass()).updateReceiveStatus(notificationMessage);
 
-      ServerRunContext serverRunContext = ServerRunContexts.empty();
-      serverRunContext.withSubject(m_subject);
-      serverRunContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
-      serverRunContext.run(() -> {
+      createRunContext().run(() -> {
         NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
         reg.notifyNotificationHandlers(notificationMessage.getNotification());
       });
     }
+  }
+
+  protected ServerRunContext createRunContext() {
+    ServerRunContext serverRunContext = ServerRunContexts.empty()
+        .withSubject(m_subject)
+        .withThreadLocal(UserId.CURRENT, m_userId);
+    serverRunContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
+    return serverRunContext;
   }
 
   /**

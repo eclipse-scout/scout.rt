@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.shared.user.UserId;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,8 +33,7 @@ public class ServerRunContextProducerTest {
     assertNull((((ServerRunContext) RunContext.CURRENT.get()).getSession())); // ensure no previous session
     ServerRunContextProducer producer = BEANS.get(ServerRunContextProducer.class);
     ServerRunContext context = producer.produce(getSubjectForPrincipalName(username));
-    IServerSession session = context.getSession();
-    assertEquals(username, session.getUserId());
+    assertEquals(username, context.call(UserId.CURRENT::get));
   }
 
   @Test
@@ -47,7 +47,7 @@ public class ServerRunContextProducerTest {
       ServerRunContext context = producer.produce(getSubjectForPrincipalName(secondUsername));
       IServerSession session = context.getSession();
       assertNotEquals(previousSession, session);
-      assertEquals(secondUsername, session.getUserId());
+      assertEquals(secondUsername, context.call(UserId.CURRENT::get));
     });
   }
 
@@ -62,7 +62,7 @@ public class ServerRunContextProducerTest {
       ServerRunContext context = producer.produce(getSubjectForPrincipalName(secondUsername));
       IServerSession session = context.getSession();
       assertEquals(previousSession, session);
-      assertEquals(secondUsername, session.getUserId());
+      assertEquals(secondUsername, context.call(UserId.CURRENT::get));
     });
   }
 
@@ -70,8 +70,7 @@ public class ServerRunContextProducerTest {
     assertNull((((ServerRunContext) RunContext.CURRENT.get()).getSession())); // ensure no previous session
     ServerRunContextProducer producer = BEANS.get(ServerRunContextProducer.class);
     ServerRunContext context = producer.produce(getSubjectForPrincipalName(principalName));
-    IServerSession session = context.getSession();
-    assertEquals(principalName, session.getUserId());
+    assertEquals(principalName, context.call(UserId.CURRENT::get));
     Jobs.schedule(runnable, Jobs.newInput().withRunContext(context)).awaitDoneAndGet();
   }
 

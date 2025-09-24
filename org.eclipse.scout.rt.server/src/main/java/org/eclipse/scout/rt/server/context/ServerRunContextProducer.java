@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ServerSessionCacheExpirationProperty;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
+import org.eclipse.scout.rt.shared.user.UserId;
 
 /**
  * Producer for {@link ServerRunContext} objects having a userId based {@link IServerSession} cache that is <i>NOT</i>
@@ -43,6 +44,7 @@ public class ServerRunContextProducer extends RunContextProducer {
   public ServerRunContext produce(final Subject subject) {
     final ServerRunContext serverRunContext = ServerRunContexts.copyCurrent(true)
         .withSubject(subject)
+        .withThreadLocal(UserId.CURRENT, BEANS.get(IAccessControlService.class).getUserId(subject))
         .withTransactionScope(TransactionScope.REQUIRES_NEW);
 
     // ensure that the session belongs to the specified subject

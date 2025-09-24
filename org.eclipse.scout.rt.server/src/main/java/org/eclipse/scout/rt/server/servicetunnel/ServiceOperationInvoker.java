@@ -25,15 +25,15 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.security.ACCESS;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.services.ServiceUtility;
-import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceWithoutAuthorization;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.user.UserId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,9 +77,8 @@ public class ServiceOperationInvoker {
   }
 
   protected ServiceTunnelResponse invokeInternal(ServiceTunnelRequest serviceReq) throws ClassNotFoundException {
-    IServerSession serverSession = ServerSessionProvider.currentSession();
     if (LOG.isDebugEnabled()) {
-      String userId = serverSession != null ? serverSession.getUserId() : "";
+      String userId = StringUtility.emptyIfNull(UserId.CURRENT.get());
       LOG.debug("started {}.{} by {} at {}", serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), userId, new Date());
     }
     ServiceTunnelResponse serviceRes = null;

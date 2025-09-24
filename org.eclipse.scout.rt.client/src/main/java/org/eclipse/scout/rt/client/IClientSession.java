@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
@@ -95,6 +96,11 @@ public interface IClientSession extends ISession, IPropertyObserver {
   Subject getSubject();
 
   void setSubject(Subject subject);
+
+  /**
+   * Authenticated userId, extracted by {@link IAccessControlService#getUserIdOfCurrentSubject()} on server
+   */
+  String getUserId();
 
   /**
    * @return the desktop model associated with this client session
