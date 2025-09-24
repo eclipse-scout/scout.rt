@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.rest.jersey.client;
 
+import static jakarta.ws.rs.core.HttpHeaders.USER_AGENT;
 import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -36,7 +37,6 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation.Builder;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Configuration;
-import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
@@ -356,10 +356,22 @@ public class ScoutApacheConnectorTest {
     runTestUserAgent((helper, clientBuilder) -> { /* nop */ }, null, "Generic");
   }
 
+  public void testJerseyDefaultUserAgent() {
+    runTestUserAgent((helper, clientBuilder) -> {},
+        builder -> builder.header(USER_AGENT, "Jersey/3.1.11 (Scout Apache HttpClient Connector)"),
+        "Generic");
+
+    runTestUserAgent((helper, clientBuilder) -> {
+          // enable suppress default user agent "Generic" by ScoutApacheConnector
+          clientBuilder.property(RestClientProperties.SUPPRESS_DEFAULT_USER_AGENT, true);
+        }, builder -> builder.header(USER_AGENT, "Jersey/3.1.11 (Scout Apache HttpClient Connector)"),
+        null);
+  }
+
   @Test
   public void testNoUserAgent() {
     runTestUserAgent((helper, clientBuilder) -> {
-      // disable chunked transfer (e.g. buffering in memory is enabled)
+      // enable suppress default user agent "Generic" by ScoutApacheConnector
       clientBuilder.property(RestClientProperties.SUPPRESS_DEFAULT_USER_AGENT, true);
     }, null, null);
   }
@@ -367,21 +379,21 @@ public class ScoutApacheConnectorTest {
   @Test
   public void testCustomUserAgent() {
     runTestUserAgent((helper, clientBuilder) -> {},
-        builder -> builder.header(HttpHeaders.USER_AGENT, "mockAgent"),
+        builder -> builder.header(USER_AGENT, "mockAgent"),
         "mockAgent");
   }
 
   @Test
   public void testCustomUserAgentEmpty() {
     runTestUserAgent((helper, clientBuilder) -> {},
-        builder -> builder.header(HttpHeaders.USER_AGENT, ""),
+        builder -> builder.header(USER_AGENT, ""),
         "");
   }
 
   @Test
   public void testCustomUserAgentNull() {
     runTestUserAgent((helper, clientBuilder) -> {},
-        builder -> builder.header(HttpHeaders.USER_AGENT, null),
+        builder -> builder.header(USER_AGENT, null),
         "Generic");
   }
 
@@ -391,7 +403,7 @@ public class ScoutApacheConnectorTest {
     runTestUserAgent((helper, clientBuilder) -> {
           clientBuilder.property(RestClientProperties.SUPPRESS_DEFAULT_USER_AGENT, true);
         },
-        builder -> builder.header(HttpHeaders.USER_AGENT, null),
+        builder -> builder.header(USER_AGENT, null),
         null);
   }
 
@@ -401,7 +413,7 @@ public class ScoutApacheConnectorTest {
     runTestUserAgent((helper, clientBuilder) -> {
           clientBuilder.property(RestClientProperties.SUPPRESS_DEFAULT_USER_AGENT, true);
         },
-        builder -> builder.header(HttpHeaders.USER_AGENT, "mockAgent"),
+        builder -> builder.header(USER_AGENT, "mockAgent"),
         "mockAgent");
   }
 
@@ -416,6 +428,13 @@ public class ScoutApacheConnectorTest {
     WebTarget target = newHelper(clientBuilderCustomizer).target("echo")
         .queryParam(STATUS, Status.OK.getStatusCode());
 
+    // run mutiple requests with same target instance to ensure correct user agent in subsequent requests
+    for (int i = 0; i < 3; i++) {
+      runUsageAgentInvocation(invocationBuilderCustomizer, target, expectedUserAgent);
+    }
+  }
+
+  protected void runUsageAgentInvocation(Function<Builder, Builder> invocationBuilderCustomizer, WebTarget target, String expectedUserAgent) {
     Builder builder = target
         .request();
     if (invocationBuilderCustomizer != null) {
@@ -425,11 +444,11 @@ public class ScoutApacheConnectorTest {
     Response response = builder.get();
 
     assertNotNull(response);
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
     RestClientTestEchoResponse entity = response.readEntity(RestClientTestEchoResponse.class);
-    assertEquals(Response.Status.OK.getStatusCode(), entity.getEcho().getCode().intValue());
-    assertEquals(expectedUserAgent, entity.getReceivedHeaders().get(HttpHeaders.USER_AGENT));
+    assertEquals(Status.OK.getStatusCode(), entity.getEcho().getCode().intValue());
+    assertEquals(expectedUserAgent, entity.getReceivedHeaders().get(USER_AGENT));
 
     response.close();
   }
