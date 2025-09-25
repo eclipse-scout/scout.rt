@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.rest.IRestResource;
+import org.eclipse.scout.rt.rest.IRestMediaType;
 import org.eclipse.scout.rt.rest.error.ErrorDo;
 import org.eclipse.scout.rt.rest.error.ErrorResponse;
 import org.slf4j.Logger;
@@ -166,7 +166,7 @@ public class RestClientTestEchoServlet extends HttpServlet {
                   HTML.div(status == null ? "unknown" : status.getReasonPhrase())))
           .toHtml();
       resp.getOutputStream().print(content);
-      resp.setContentType(IRestResource.TEXT_HTML_UTF8);
+      resp.setContentType(IRestMediaType.TEXT_HTML_UTF8);
     }
   }
 
