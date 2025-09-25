@@ -72,6 +72,7 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
+import org.eclipse.scout.rt.rest.IRestMediaType;
 import org.eclipse.scout.rt.rest.IRestResource;
 import org.eclipse.scout.rt.rest.RestApplicationScope;
 import org.eclipse.scout.rt.rest.RestApplicationScopes;
@@ -426,7 +427,7 @@ public class ApiDocGenerator {
     // Main HTML content
     final IHtmlDocument html = toHtml(scope, getResourceDescriptors());
     return Response.ok()
-        .type(IRestResource.TEXT_HTML_UTF8)
+        .type(IRestMediaType.TEXT_HTML_UTF8)
         .entity(html.toHtml())
         .build();
   }

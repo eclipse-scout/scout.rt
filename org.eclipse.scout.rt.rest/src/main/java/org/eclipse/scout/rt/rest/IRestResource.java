@@ -9,9 +9,6 @@
  */
 package org.eclipse.scout.rt.rest;
 
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-
 import org.eclipse.scout.rt.platform.Bean;
 
 /**
@@ -19,10 +16,4 @@ import org.eclipse.scout.rt.platform.Bean;
  */
 @Bean
 public interface IRestResource {
-
-  /**
-   * When returning responses with content type text/html, it is best practice to include a charset.
-   * Use this constant in annotation {@link Produces} instead of {@link MediaType#TEXT_HTML}.
-   */
-  String TEXT_HTML_UTF8 = "text/html;charset=UTF-8";
 }
