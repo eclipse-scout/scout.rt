@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.platform.util.HexUtility;
  *
  * @since 10.x
  */
-@FunctionalInterface
 public interface IMimeMagic {
   IMimeMagic DOC_XLS_PPT = createMagic(0, "d0cf11e0a1b11ae1");
   IMimeMagic DOCX_XLSX_PPTX = createMagic(0, "d0cf11e0a1b11ae1", "504b0304", "504b0506", "504b0708"); // union of DOC_XLS_PPT (used for protected office files) and ZIP (used for non-protected office files)
@@ -40,39 +39,68 @@ public interface IMimeMagic {
   IMimeMagic ZIP = createMagic(0, "504b0304", "504b0506", "504b0708");
 
   /**
+   * @return The number of bytes of the longest magic number (including offset if present).
+   */
+  int length();
+
+  /**
+   * Checks if the given bytes match this MIME magic.
+   *
+   * @param content
+   *     The bytes to check or {@code null}.
+   * @return {@code true} if the given bytes contain this MIME magic bytes.
+   */
+  boolean matches(byte[] content);
+
+  /**
    * Validate file content or {@link BinaryResource}. Check headers and content in order to find out if the file is
    * valid or corrupt or malware
    *
    * @return true if the content of this resource complies with the mime type
    */
-  boolean matches(BinaryResource res);
+  default boolean matches(BinaryResource res) {
+    return res != null && matches(res.getContent());
+  }
 
   static IMimeMagic createMagic(int pos, String... hexMagics) {
     byte[][] magics = new byte[hexMagics.length][];
+    int maxLen = 0; // longest magic marker
     for (int i = 0; i < hexMagics.length; i++) {
       magics[i] = HexUtility.decode(hexMagics[i]);
+      maxLen = Math.max(maxLen, magics[i].length);
     }
-    return res -> {
-      byte[] content = res.getContent();
-      if (content == null) {
-        return false;
+    int magicsMaxLen = maxLen;
+
+    return new IMimeMagic() {
+      @Override
+      public int length() {
+        return pos + magicsMaxLen;
       }
-      for (byte[] magic : magics) {
-        if (content.length < pos + magic.length) {
-          continue;
+
+      @Override
+      public boolean matches(byte[] content) {
+        if (content == null || content.length == 0) {
+          return false;
         }
-        boolean match = true;
-        for (int i = 0; i < magic.length; i++) {
-          if (content[pos + i] != magic[i]) {
-            match = false;
-            break;
+        for (byte[] magic : magics) {
+          if (content.length < pos + magic.length) {
+            continue;
+          }
+          if (matchesMagic(content, magic)) {
+            return true;
           }
         }
-        if (match) {
-          return true;
-        }
+        return false;
       }
-      return false;
+
+      private boolean matchesMagic(byte[] content, byte[] magic) {
+        for (int i = 0; i < magic.length; i++) {
+          if (content[pos + i] != magic[i]) {
+            return false;
+          }
+        }
+        return true;
+      }
     };
   }
 }

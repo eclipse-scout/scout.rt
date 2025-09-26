@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,6 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.platform.resource;
+
+import java.io.File;
+import java.nio.file.Path;
 
 /**
  * Support for extensible {@link MimeType} enums
@@ -36,4 +39,8 @@ public interface IMimeType {
   IMimeMagic getMagic();
 
   void setMagic(IMimeMagic magic);
+
+  boolean matches(File f);
+
+  boolean matches(Path p);
 }

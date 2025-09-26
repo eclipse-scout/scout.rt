@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -119,7 +119,7 @@ public abstract class AbstractConfigProperty<DATA_TYPE, RAW_TYPE> implements ICo
     configChangedListeners().list().forEach(listener -> listener.configPropertyChanged(e));
   }
 
-  private static final class P_ParsedPropertyValueEntry<TYPE> {
+  protected static final class P_ParsedPropertyValueEntry<TYPE> {
     private final TYPE m_value;
     private final PlatformException m_exc;
 

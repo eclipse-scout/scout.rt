@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,9 +9,17 @@
  */
 package org.eclipse.scout.rt.platform.resource;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
+
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Enumeration for a few well-known extensions and their mime types.
@@ -48,7 +56,7 @@ public enum MimeType implements IMimeType {
   IFB("text/calendar", "ifb"),
   JAR("application/java-archive", "jar", IMimeMagic.ZIP),
   JPG("image/jpeg", "jpg", IMimeMagic.JPEG_JPG),
-  JPE("image/jpeg", "jpe"),
+  JPE("image/jpeg", "jpe", IMimeMagic.JPEG_JPG),
   JPEG("image/jpeg", "jpeg", IMimeMagic.JPEG_JPG),
   JFIF("image/jpeg", "jfif", IMimeMagic.JPEG_JPG),
   PJPEG("image/jpeg", "pjpeg", IMimeMagic.JPEG_JPG),
@@ -140,6 +148,44 @@ public enum MimeType implements IMimeType {
       }
     }
     return null;
+  }
+
+  @Override
+  public boolean matches(File f) {
+    if (f == null) {
+      return false;
+    }
+    return matches(f.toPath());
+  }
+
+  @Override
+  public boolean matches(Path p) {
+    if (p == null) {
+      return false;
+    }
+    if (!Files.isRegularFile(p)) {
+      return false;
+    }
+    String ext = getFileExtension();
+    if (StringUtility.hasText(ext)) {
+      String fileName = p.getFileName().toString();
+      String suffix = '.' + ext;
+      if (!fileName.regionMatches(true, fileName.length() - suffix.length(), suffix, 0, suffix.length())) {
+        return false;
+      }
+    }
+
+    IMimeMagic magic = getMagic();
+    if (magic == null) {
+      return true;
+    }
+    try (InputStream is = Files.newInputStream(p)) {
+      byte[] bytes = is.readNBytes(magic.length());
+      return magic.matches(bytes);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Unable to validate magic bytes of file '{}'.", p, e);
+    }
   }
 
   @Override
