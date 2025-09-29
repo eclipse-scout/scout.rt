@@ -18,7 +18,9 @@ import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
@@ -26,11 +28,13 @@ import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AutoCheckStyle;
 import org.eclipse.scout.rt.client.ui.basic.tree.CheckableStyle;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeUIFacade.NodeCellTuple;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
@@ -77,6 +81,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   public static final String EVENT_NODE_ACTION = "nodeAction";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
   public static final String EVENT_NODE_CHANGED = "nodeChanged";
+  public static final String EVENT_NODES_CHANGED = "nodesChanged";
   public static final String EVENT_CHILD_NODE_ORDER_CHANGED = "childNodeOrderChanged";
   public static final String EVENT_NODES_CHECKED = "nodesChecked";
   public static final String EVENT_REQUEST_FOCUS = "requestFocus";
@@ -1040,6 +1045,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     else if (EVENT_NODES_CHECKED.equals(event.getType())) {
       handleUiNodesChecked(event);
     }
+    else if (EVENT_NODES_CHANGED.equals(event.getType())) {
+      handleUiNodesChanged(event);
+    }
     else {
       super.handleUiEvent(event);
     }
@@ -1101,6 +1109,34 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     int eventType = expanded ? TreeEvent.TYPE_NODE_EXPANDED : TreeEvent.TYPE_NODE_COLLAPSED;
     addTreeEventFilterCondition(eventType).setNodes(CollectionUtility.arrayList(node));
     getModel().getUIFacade().setNodeExpandedFromUI(node, expanded, lazy);
+  }
+
+  protected void handleUiNodesChanged(JsonEvent event) {
+    JSONArray nodes = event.getData().getJSONArray(PROP_NODES);
+    List<NodeCellTuple> nodeCellTuples = IntStream.range(0, nodes.length())
+        .mapToObj(nodes::getJSONObject)
+        .map(json -> {
+          String nodeId = json.getString(PROP_NODE_ID);
+          ITreeNode node = optTreeNodeForNodeId(nodeId);
+          if (node == null) {
+            LOG.info("Requested tree-node with ID {} doesn't exist. Skip nodeChanged event", nodeId);
+            return null;
+          }
+          var cell = new Cell(node.getCell());
+          // keep in sync with token: [5vv7MGGQ5BQY5NXX7CwJ9tmL4]
+          cell.setText(json.optString("text"));
+          cell.setHtmlEnabled(json.optBoolean("htmlEnabled"));
+          cell.setCssClass(json.optString("cssClass"));
+          cell.setIconId(json.optString("iconId"));
+
+          return new NodeCellTuple(node, cell);
+        })
+        .filter(Objects::nonNull)
+        .toList();
+
+    // ignore all future node-changed-events by the model while processing this json event
+    addTreeEventFilterCondition(TreeEvent.TYPE_NODE_CHANGED).setNodes(nodeCellTuples.stream().map(NodeCellTuple::node).toList());
+    getModel().getUIFacade().changeNodesFromUI(nodeCellTuples);
   }
 
   @Override

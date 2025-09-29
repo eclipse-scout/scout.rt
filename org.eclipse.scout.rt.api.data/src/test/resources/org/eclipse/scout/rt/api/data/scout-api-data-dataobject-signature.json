@@ -109,6 +109,15 @@
     "_type" : "scout.EntityDataObjectSignature",
     "attributes" : [ {
       "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "id",
+      "valueType" : "IDI[org.eclipse.scout.rt.dataobject.id.IId]"
+    } ],
+    "typeName" : "scout.IdPageParam",
+    "typeVersion" : "scout-26.1.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
       "name" : "displayText",
       "valueType" : "CLASS[java.lang.String]"
     }, {

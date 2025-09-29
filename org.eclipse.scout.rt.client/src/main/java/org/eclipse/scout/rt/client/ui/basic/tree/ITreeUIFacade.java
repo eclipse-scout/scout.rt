@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,9 +9,11 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.MouseButton;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 
 public interface ITreeUIFacade {
@@ -57,4 +59,9 @@ public interface ITreeUIFacade {
   void fireAppLinkActionFromUI(String ref);
 
   void setDisplayStyleFromUI(String style);
+
+  void changeNodesFromUI(Collection<NodeCellTuple> nodeCellTuples);
+
+  record NodeCellTuple(ITreeNode node, ICell cell) {
+  }
 }

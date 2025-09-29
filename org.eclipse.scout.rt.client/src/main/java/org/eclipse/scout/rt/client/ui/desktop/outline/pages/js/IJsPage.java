@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,6 +9,10 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages.js;
 
+import java.util.List;
+
+import org.eclipse.scout.rt.api.data.page.IPageParamDo;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
@@ -34,4 +38,8 @@ public interface IJsPage extends IPage<ITable> {
   IDoEntity getJsPageModel();
 
   void setJsPageModel(IDoEntity jsPageModel);
+
+  void loadChildPages(List<IPageParamDo> pageParams, boolean replace);
+
+  void changeNode(ICell cell);
 }

@@ -113,6 +113,24 @@ export class TreeAdapter extends ModelAdapter {
     this._send('nodesChecked', data);
   }
 
+  sendNodesChanged(nodes: TreeNode[]) {
+    nodes = arrays.ensure(nodes)
+      .filter(node => TreeAdapter.isRemote(node));
+    if (!nodes.length) {
+      return;
+    }
+
+    this._send('nodesChanged', {
+      nodes: nodes.map(node => ({
+        nodeId: node.id,
+        text: node.text,
+        htmlEnabled: node.htmlEnabled,
+        cssClass: node.cssClass,
+        iconId: node.iconId
+      }))
+    });
+  }
+
   protected override _onWidgetEvent(event: Event<Tree>) {
     if (event.type === 'nodesSelected') {
       this._onWidgetNodesSelected(event as TreeNodesSelectedEvent);

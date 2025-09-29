@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.tree.IChildNodeIndexLookup;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
@@ -247,10 +248,23 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       JSONObject jsPageModel = ObjectUtility.nvl(json.optJSONObject(IJsPage.PROP_JS_PAGE_MODEL), new JSONObject());
 
       // Send the properties which might come from a summary column from a parent PageWithTable
-      jsPageModel.put("text", jsPage.getCell().getText());
-      jsPageModel.put("htmlEnabled", jsPage.getCell().isHtmlEnabled());
-      jsPageModel.put("cssClass", jsPage.getCell().getCssClass());
-      jsPageModel.put("iconId", jsPage.getCell().getIconId());
+      // keep in sync with token: [5vv7MGGQ5BQY5NXX7CwJ9tmL4]
+      putProperty(jsPageModel, "text", jsPage.getCell().getText());
+      putProperty(jsPageModel, "htmlEnabled", jsPage.getCell().isHtmlEnabled());
+      putProperty(jsPageModel, "cssClass", jsPage.getCell().getCssClass());
+      putProperty(jsPageModel, "iconId", jsPage.getCell().getIconId());
+
+      putProperty(json, IJsPage.PROP_JS_PAGE_MODEL, jsPageModel);
+    }
+
+    JSONArray childNodes = json.optJSONArray("childNodes");
+    if (childNodes != null && childNodes.length() > 0) {
+      JSONObject jsPageModel = ObjectUtility.nvl(json.optJSONObject(IJsPage.PROP_JS_PAGE_MODEL), new JSONObject());
+
+      // send child nodes and expanded state if js page has child nodes
+      putProperty(jsPageModel, "childNodes", childNodes);
+      putProperty(jsPageModel, "expanded", json.opt("expanded"));
+      putProperty(jsPageModel, "expandedLazy", json.opt("expandedLazy"));
 
       putProperty(json, IJsPage.PROP_JS_PAGE_MODEL, jsPageModel);
     }
