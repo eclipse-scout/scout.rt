@@ -160,10 +160,6 @@ export class PageWithTable extends Page implements PageWithTableModel {
   }
 
   protected _onTableReload(event: TableReloadEvent) {
-    if (this.expandedLazy) {
-      // If the page is expanded lazily, all child nodes will be gone -> collapse it to prevent showing the "+" icon without any child nodes
-      this.outline.setNodeExpanded(this, false);
-    }
     this.loadTableData(event.reloadReason);
   }
 

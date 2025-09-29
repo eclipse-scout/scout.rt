@@ -887,6 +887,57 @@ describe('Tree', () => {
         tree.render();
         expect(tree.calculateViewRangeSize()).toBe(4);
       });
+
+      it('collapses lazy expanded node if all child nodes were deleted', () => {
+        // smaller tree is enough for this test
+        model = helper.createModelFixture(3, 1, false);
+        tree = helper.createTree(model);
+        [node0, node1, node2] = tree.nodes;
+        node0.lazyExpandingEnabled = true;
+
+        const [node0Child0, node0Child1, node0Child2] = node0.childNodes;
+        const [node1Child0, node1Child1, node1Child2] = node1.childNodes;
+
+        // selecting a node expands its parent lazy
+        tree.selectNodes(node0Child0);
+        tree.expandNode(node1);
+
+        // node0 is expanded lazy
+        expect(node0.expanded).toBeTrue();
+        expect(node0.expandedLazy).toBeTrue();
+
+        // node1 is expanded
+        expect(node1.expanded).toBeTrue();
+        expect(node1.expandedLazy).toBeFalse();
+
+        expect(tree.visibleNodesFlat).toEqual([node0, node0Child0, node1, node1Child0, node1Child1, node1Child2, node2]);
+
+        // deleting only some of the child nodes does not collapse parents
+        tree.deleteNodes([node0Child2, node1Child2]);
+
+        // node0 is expanded lazy
+        expect(node0.expanded).toBeTrue();
+        expect(node0.expandedLazy).toBeTrue();
+
+        // node1 is expanded
+        expect(node1.expanded).toBeTrue();
+        expect(node1.expandedLazy).toBeFalse();
+
+        expect(tree.visibleNodesFlat).toEqual([node0, node0Child0, node1, node1Child0, node1Child1, node2]);
+
+        // deleting all child nodes collapses lazy expanded parents
+        tree.deleteNodes([node0Child0, node0Child1, node1Child0, node1Child1]);
+
+        // node0 is no longer expanded
+        expect(node0.expanded).toBeFalse();
+        expect(node0.expandedLazy).toBeFalse();
+
+        // node1 is still expanded
+        expect(node1.expanded).toBeTrue();
+        expect(node1.expandedLazy).toBeFalse();
+
+        expect(tree.visibleNodesFlat).toEqual([node0, node1, node2]);
+      });
     });
 
     describe('deleting a root node', () => {
@@ -1035,7 +1086,7 @@ describe('Tree', () => {
       node2 = tree.nodes[2];
       node1Child0 = node1.childNodes[0];
       node1Child1 = node1.childNodes[1];
-      node1Child2 = node1.childNodes[1];
+      node1Child2 = node1.childNodes[2];
     });
 
     it('deletes all nodes from model', () => {
@@ -1080,6 +1131,52 @@ describe('Tree', () => {
       expect(node1Child2.$node).toBe(null);
     });
 
+    it('collapses lazy expanded node', () => {
+      tree.collapseAll();
+      node0.lazyExpandingEnabled = true;
+
+      const [node0Child0] = node0.childNodes;
+
+      // selecting a node expands its parent lazy
+      tree.selectNodes(node0Child0);
+      tree.expandNode(node1);
+
+      // node0 is expanded lazy
+      expect(node0.expanded).toBeTrue();
+      expect(node0.expandedLazy).toBeTrue();
+
+      // node1 is expanded
+      expect(node1.expanded).toBeTrue();
+      expect(node1.expandedLazy).toBeFalse();
+
+      expect(tree.visibleNodesFlat).toEqual([node0, node0Child0, node1, node1Child0, node1Child1, node1Child2, node2]);
+
+      // deleting all child nodes collapses lazy expanded parents
+      tree.deleteAllChildNodes(node0);
+
+      // node0 is no longer expanded
+      expect(node0.expanded).toBeFalse();
+      expect(node0.expandedLazy).toBeFalse();
+
+      // node1 is still expanded
+      expect(node1.expanded).toBeTrue();
+      expect(node1.expandedLazy).toBeFalse();
+
+      expect(tree.visibleNodesFlat).toEqual([node0, node1, node1Child0, node1Child1, node1Child2, node2]);
+
+      // deleting all child nodes does not collapse expanded parent if it is not expanded lazy
+      tree.deleteAllChildNodes(node1);
+
+      // node0 is no longer expanded
+      expect(node0.expanded).toBeFalse();
+      expect(node0.expandedLazy).toBeFalse();
+
+      // node1 is still expanded
+      expect(node1.expanded).toBeTrue();
+      expect(node1.expandedLazy).toBeFalse();
+
+      expect(tree.visibleNodesFlat).toEqual([node0, node1, node2]);
+    });
   });
 
   describe('checkNodes', () => {

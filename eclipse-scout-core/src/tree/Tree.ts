@@ -2501,6 +2501,14 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       this._removeNodes(deletedNodes, parentNode || parentNodesToReindex);
     }
 
+    arrays.ensure(parentNode || parentNodesToReindex).forEach(p => {
+      if (p.expandedLazy && !p.childNodes.length) {
+        // If the parent node is expanded lazy, deleting all child nodes will result in the parent node showing the "+" icon without any child nodes (even if new child nodes are inserted again).
+        // Therefore, collapse parent node as this would be confusing for the user.
+        this.setNodeExpanded(p, false);
+      }
+    });
+
     this.trigger('nodesDeleted', {
       nodes: nodes,
       parentNode: parentNode
@@ -2534,6 +2542,12 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     // remove node from html document
     if (this.rendered) {
       this._removeNodes(nodes, parentNode);
+    }
+
+    if (parentNode?.expandedLazy) {
+      // If the parent node is expanded lazy, deleting all child nodes will result in the parent node showing the "+" icon without any child nodes (even if new child nodes are inserted again).
+      // Therefore, collapse parent node as this would be confusing for the user.
+      this.setNodeExpanded(parentNode, false);
     }
 
     this.trigger('allChildNodesDeleted', {

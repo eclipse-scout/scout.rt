@@ -1791,6 +1791,9 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
         applyNodeFiltersRecInternal(child, parent.isFilterAccepted(), level);
       }
       if (parent.getChildNodeCount() == 0) {
+        if (parent.isExpandedLazy()) {
+          setNodeExpanded(parent, false);
+        }
         fireAllChildNodesDeleted(parent, children);
       }
       else {
