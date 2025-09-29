@@ -7,18 +7,16 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractTreeNavigationKeyStroke, HAlign, keys, Tree, TreeEventCurrentNode} from '../../index';
+import {AbstractTreeNavigationKeyStroke, HAlign, keys, keyStrokeModifier, Tree, TreeEventCurrentNode} from '../../index';
 
 export class TreeCollapseAllKeyStroke extends AbstractTreeNavigationKeyStroke {
 
-  constructor(tree: Tree, keyStrokeModifier: number) {
-    super(tree, keyStrokeModifier);
+  constructor(tree: Tree) {
+    super(tree, keyStrokeModifier.CTRL);
     this.which = [keys.HOME];
     this.renderingHints.hAlign = HAlign.RIGHT;
     this.renderingHints.$drawingArea = ($drawingArea, event) => {
-      if (this.field.visibleNodesFlat.length > 0) {
-        return this.field.visibleNodesFlat[0].$node;
-      }
+      return this.field.visibleNodesFlat[0]?.$node;
     };
   }
 

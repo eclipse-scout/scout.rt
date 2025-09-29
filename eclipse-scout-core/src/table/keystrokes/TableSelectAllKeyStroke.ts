@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,7 +19,7 @@ export class TableSelectAllKeyStroke extends KeyStroke {
     this.which = [keys.A];
     this.renderingHints.offset = 14;
     this.renderingHints.$drawingArea = ($drawingArea, event) => {
-      return this.field.footer ? this.field.footer._$infoSelection.find('.table-info-button') : null;
+      return this.field.footer?._$infoSelection.find('.table-info-button');
     };
     this.inheritAccessibility = false;
   }

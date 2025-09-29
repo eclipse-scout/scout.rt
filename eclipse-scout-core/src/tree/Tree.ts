@@ -11,7 +11,7 @@ import {
   Action, aria, arrays, ContextMenuPopup, DesktopPopupOpenEvent, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, Filterable, FilterOrFunction, FilterResult, FilterSupport,
   FullModelOf, graphics, HtmlComponent, InitModelOf, keys, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuFilter, MenuItemsOrder, menus as menuUtil, ObjectOrChildModel, ObjectOrModel, objects,
   Range, Rectangle, scout, scrollbars, ScrollDirection, ScrollToOptions, strings, tooltips, TreeBreadcrumbFilter, TreeCheckNodesResult, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeEventMap, TreeExpandOrDrillDownKeyStroke,
-  TreeLayout, TreeModel, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
+  TreeLayout, TreeModel, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationHomeKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -292,12 +292,13 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       new TreeSpaceKeyStroke(this),
       new TreeNavigationUpKeyStroke(this, modifierBitMask),
       new TreeNavigationDownKeyStroke(this, modifierBitMask),
-      new TreeCollapseAllKeyStroke(this, modifierBitMask),
-      new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask, keys.LEFT, '←'),
-      new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask, keys.SUBTRACT, '-'),
+      new TreeNavigationHomeKeyStroke(this, modifierBitMask),
       new TreeNavigationEndKeyStroke(this, modifierBitMask),
+      new TreeCollapseAllKeyStroke(this),
+      new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask, keys.LEFT, '←'),
+      new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask, keys.SUBTRACT),
       new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask, keys.RIGHT, '→'),
-      new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask, keys.ADD, '+')
+      new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask, keys.ADD)
     ]);
   }
 
@@ -392,7 +393,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   protected _destroyTreeNode(node: TreeNode) {
     this._checkNode(node, false, false); // deleted = unchecked
     delete this.nodesMap[node.id];
-    this._removeFromFlatList(node, false); // ensure node is not longer in visible nodes list.
+    this._removeFromFlatList(node, false); // ensure node is no longer in visible nodes list.
     node.destroy();
 
     if (this._onNodeDeleted) { // Necessary for subclasses

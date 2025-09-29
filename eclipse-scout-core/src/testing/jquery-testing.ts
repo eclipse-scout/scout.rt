@@ -52,13 +52,10 @@ export const JQueryTesting = {
   },
 
   extendEventWithModifier<T extends { altKey: boolean; ctrlKey: boolean; shiftKey: boolean; metaKey: boolean }>(event: T, modifier?: KeyStrokeModifier): T {
-    if (!modifier) {
-      return event;
-    }
-    event.altKey = modifier.includes('alt');
-    event.ctrlKey = modifier.includes('ctrl');
-    event.shiftKey = modifier.includes('shift');
-    event.metaKey = modifier.includes('meta');
+    event.altKey = !!modifier?.includes('alt');
+    event.ctrlKey = !!modifier?.includes('ctrl');
+    event.shiftKey = !!modifier?.includes('shift');
+    event.metaKey = !!modifier?.includes('meta');
     return event;
   },
 

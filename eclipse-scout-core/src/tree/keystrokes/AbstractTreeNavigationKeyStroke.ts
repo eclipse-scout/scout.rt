@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,6 +30,9 @@ export class AbstractTreeNavigationKeyStroke extends KeyStroke {
 
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
     this.inheritAccessibility = false;
+    this.renderingHints.$drawingArea = ($drawingArea: JQuery, event: ScoutKeyboardEvent & TreeEventCurrentNode) => {
+      return this._computeNewSelection(event._treeCurrentNode)?.$node;
+    };
   }
 
   protected override _accept(event: ScoutKeyboardEvent & TreeEventCurrentNode): boolean {
@@ -53,8 +56,8 @@ export class AbstractTreeNavigationKeyStroke extends KeyStroke {
     }
   }
 
-  protected _computeNewSelection(currentNode: TreeNode): TreeNode | TreeNode[] {
-    return [];
+  protected _computeNewSelection(currentNode: TreeNode): TreeNode {
+    return null;
   }
 
   selectNodesAndReveal(newSelection: TreeNode | TreeNode[], debounceSend?: boolean) {

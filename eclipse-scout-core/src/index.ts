@@ -672,6 +672,7 @@ export * from './tree/keystrokes/AbstractTreeNavigationKeyStroke';
 export * from './tree/keystrokes/TreeSpaceKeyStroke';
 export * from './tree/keystrokes/TreeNavigationUpKeyStroke';
 export * from './tree/keystrokes/TreeNavigationDownKeyStroke';
+export * from './tree/keystrokes/TreeNavigationHomeKeyStroke';
 export * from './tree/keystrokes/TreeNavigationEndKeyStroke';
 export * from './tree/keystrokes/TreeCollapseAllKeyStroke';
 export * from './tree/keystrokes/TreeCollapseOrDrillUpKeyStroke';

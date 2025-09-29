@@ -226,9 +226,9 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
       new OutlineNavigateToTopKeyStroke(this, modifierBitMask),
       new TreeNavigationEndKeyStroke(this, modifierBitMask),
       new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask, keys.LEFT, '←'),
-      new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask, keys.SUBTRACT, '-'),
+      new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask, keys.SUBTRACT),
       new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask, keys.RIGHT, '→'),
-      new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask, keys.ADD, '+')
+      new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask, keys.ADD)
     ]);
 
     this.keyStrokeContext.$bindTarget = () => this.session.$entryPoint;

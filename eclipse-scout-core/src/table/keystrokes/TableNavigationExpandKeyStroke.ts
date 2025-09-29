@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,15 +11,13 @@ import {AbstractTableNavigationKeyStroke, ScoutKeyboardEvent, Table} from '../..
 
 export class TableNavigationExpandKeyStroke extends AbstractTableNavigationKeyStroke {
 
-  constructor(table: Table, key: number, displayText: string) {
+  constructor(table: Table, key: number, displayText?: string) {
     super(table);
     this.which = [key];
     this.renderingHints.text = displayText;
+    this.renderingHints.render = !!displayText;
     this.renderingHints.$drawingArea = ($drawingArea, event) => {
-      let row = this.field.selectedRows[0];
-      if (row) {
-        return row.$row;
-      }
+      return this.field.selectedRows[0]?.$row;
     };
   }
 
