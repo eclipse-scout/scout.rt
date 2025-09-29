@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -215,6 +215,7 @@ describe('TreeKeyStrokes', () => {
       JQueryTesting.triggerKeyDown(tree.$data, keys.HOME);
       helper.assertSelection(tree, [node0]);
     });
+
     it('selects first node in expanded tree', () => {
       let model = helper.createModelFixture(3, 1, true);
       let tree = helper.createTree(model);
@@ -226,6 +227,27 @@ describe('TreeKeyStrokes', () => {
       helper.selectNodesAndAssert(tree, [node0Child2]);
 
       JQueryTesting.triggerKeyDown(tree.$data, keys.HOME);
+      helper.assertSelection(tree, [node0]);
+      // Home does not collapse nodes
+      expect(tree.nodes[0].expanded).toBeTruthy();
+      expect(tree.nodes[1].expanded).toBeTruthy();
+      expect(tree.nodes[2].expanded).toBeTruthy();
+    });
+  });
+
+  describe('Ctrl-Home', () => {
+
+    it('collapses tree and selects first node', () => {
+      let model = helper.createModelFixture(3, 1, true);
+      let tree = helper.createTree(model);
+
+      let node0 = tree.nodes[0],
+        node0Child2 = node0.childNodes[2];
+
+      tree.render();
+      helper.selectNodesAndAssert(tree, [node0Child2]);
+
+      JQueryTesting.triggerKeyDown(tree.$data, keys.HOME, 'ctrl');
       helper.assertSelection(tree, [node0]);
       tree.visitNodes(node => {
         expect(node.expanded).toBeFalsy();

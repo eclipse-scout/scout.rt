@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,8 +19,8 @@ export class TableStartCellEditKeyStroke extends KeyStroke {
     this.which = [keys.ENTER];
     this.stopPropagation = true;
     this.renderingHints.$drawingArea = ($drawingArea, event: ScoutKeyboardEvent & { _editPosition?: TableCellPosition }) => {
-      let editPosition = event._editPosition,
-        columnIndex = this.field.visibleColumns().indexOf(editPosition.column);
+      let editPosition = event._editPosition;
+      let columnIndex = this.field.visibleColumns().indexOf(editPosition.column);
       if (columnIndex === 0) {
         // Other keystrokes like PageDown, Home etc. are displayed in the row -> make sure the cell edit keystroke will be displayed next to the other ones
         return editPosition.row.$row;

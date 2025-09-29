@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,10 +16,7 @@ export class TableNavigationHomeKeyStroke extends AbstractTableNavigationKeyStro
     this.which = [keys.HOME];
     this.renderingHints.text = 'Home';
     this.renderingHints.$drawingArea = ($drawingArea, event) => {
-      let viewport = this._viewportInfo();
-      if (viewport.firstRow) {
-        return viewport.firstRow.$row;
-      }
+      return this._viewportInfo().firstRow?.$row;
     };
   }
 

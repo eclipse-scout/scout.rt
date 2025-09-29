@@ -9,11 +9,11 @@
  */
 import {AbstractTreeNavigationKeyStroke, arrays, keys, Tree, TreeEventCurrentNode, TreeNode} from '../../index';
 
-export class TreeNavigationEndKeyStroke extends AbstractTreeNavigationKeyStroke {
+export class TreeNavigationHomeKeyStroke extends AbstractTreeNavigationKeyStroke {
 
   constructor(tree: Tree, modifierBitMask: number) {
     super(tree, modifierBitMask);
-    this.which = [keys.END];
+    this.which = [keys.HOME];
   }
 
   override handle(event: JQuery.KeyboardEventBase & TreeEventCurrentNode) {
@@ -24,6 +24,6 @@ export class TreeNavigationEndKeyStroke extends AbstractTreeNavigationKeyStroke 
   }
 
   protected override _computeNewSelection(currentNode: TreeNode): TreeNode {
-    return arrays.last(this.field.visibleNodesFlat);
+    return arrays.first(this.field.visibleNodesFlat);
   }
 }

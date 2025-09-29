@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,15 +11,17 @@ import {AbstractTreeNavigationKeyStroke, ScoutKeyboardEvent, Tree, TreeEventCurr
 
 export class TreeExpandOrDrillDownKeyStroke extends AbstractTreeNavigationKeyStroke {
 
-  constructor(tree: Tree, modifierBitMask: number, key: number, displayText: string) {
+  constructor(tree: Tree, modifierBitMask: number, key: number, displayText?: string) {
     super(tree, modifierBitMask);
     this.which = [key];
     this.renderingHints.text = displayText;
+    this.renderingHints.render = !!displayText;
     this.renderingHints.$drawingArea = ($drawingArea: JQuery, event: ScoutKeyboardEvent & TreeEventCurrentNode) => {
       let currentNode = event._treeCurrentNode;
       if (this.isNodeExpandable(currentNode)) {
         return currentNode.$node;
-      } else if (currentNode.childNodes.length > 0) {
+      }
+      if (currentNode.childNodes.length > 0) {
         return currentNode.childNodes[0].$node;
       }
     };
