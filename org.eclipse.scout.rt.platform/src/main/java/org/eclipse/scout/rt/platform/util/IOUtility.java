@@ -942,7 +942,7 @@ public final class IOUtility {
   }
 
   /**
-   * Tries to convert the text to a URL. If it is no url yet, it tries to convert to an email URL (mailto:) if it contains an '@' or a https URL otherwise.
+   * Tries to convert the text to a URL. If it is no url yet, it tries to convert to an email URL ({@code mailto:}) if it contains an '@' or a {@code https} URL otherwise.
    *
    * @return the {@link URL} or {@code null} if it cannot be converted.
    */
@@ -953,7 +953,7 @@ public final class IOUtility {
     try {
       return new URI(urlText).toURL();
     }
-    catch (MalformedURLException | URISyntaxException e) {
+    catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
       String text = urlText;
       if (text.indexOf('@') >= 0) {
         text = "mailto:" + text;
@@ -965,7 +965,7 @@ public final class IOUtility {
       try {
         return new URI(text).toURL();
       }
-      catch (MalformedURLException | URISyntaxException e1) {
+      catch (MalformedURLException | URISyntaxException | IllegalArgumentException e1) {
         LOG.debug("Could not create url from '{}'.", urlText, e1);
       }
     }

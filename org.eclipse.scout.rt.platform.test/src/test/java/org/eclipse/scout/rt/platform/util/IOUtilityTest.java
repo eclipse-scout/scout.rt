@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import static org.eclipse.scout.rt.platform.util.IOUtility.urlTextToUrl;
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertListEquals;
 import static org.junit.Assert.*;
 
@@ -24,6 +25,9 @@ import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -609,5 +613,17 @@ public class IOUtilityTest {
     IOUtility.writeString(out, expected);
     String actual = out.toString();
     assertEquals(expected, actual);
+  }
+
+  @Test
+  @SuppressWarnings("HttpUrlsUsage")
+  public void testUrlTextToUrl() throws URISyntaxException, MalformedURLException {
+    assertNull(urlTextToUrl(null));
+    assertNull(urlTextToUrl(""));
+    assertNull(urlTextToUrl("|"));
+    assertEquals(new URI("https://testurl").toURL(), urlTextToUrl("testurl"));
+    assertEquals(new URI("https://eclipsescout.github.io/").toURL(), urlTextToUrl("https://eclipsescout.github.io/"));
+    assertEquals(new URI("http://eclipsescout.github.io/").toURL(), urlTextToUrl("http://eclipsescout.github.io/"));
+    assertEquals(new URI("mailto:test@scout.github.io").toURL(), urlTextToUrl("test@scout.github.io"));
   }
 }
