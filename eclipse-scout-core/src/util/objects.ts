@@ -383,7 +383,11 @@ export const objects = {
   },
 
   /**
-   * @returns true if the given object is a plain old JavaScript object, which is an object created by the object literal notation ({}) or using `new Object()`.
+   * Checks if the given object is a plain old JavaScript object, which is an object created by the object literal notation (`{}`), `Object.create` or `new Object()`.
+   *
+   * Note: objects without prototype (e.g. created using `Object.create(null)` or {@link objects.createMap}) return true here.
+   * So methods typically <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object#instance_methods">inherited from Object</a> may not be available for a pojo!
+   * @returns true if it is a pojo, false otherwise.
    */
   isPojo<T>(obj: T): obj is Exclude<typeof obj, Primitive | undefined | null | T[]> {
     if (!objects.isObject(obj)) {
