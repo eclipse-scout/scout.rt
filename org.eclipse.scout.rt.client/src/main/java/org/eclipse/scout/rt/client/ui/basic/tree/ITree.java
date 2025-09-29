@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
@@ -550,4 +551,6 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    * color...) but no structural changes occurred.
    */
   void fireNodeChanged(ITreeNode treeNode);
+
+  void changeNode(ITreeNode node, ICell cell);
 }

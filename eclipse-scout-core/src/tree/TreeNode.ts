@@ -432,6 +432,46 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
     this.cssClass = cssClass;
   }
 
+  /**
+   * Adds the given css class to {@link TreeNode#cssClass}.
+   *
+   * @see styles#addCssClass
+   * @param cssClass may contain multiple css classes separated by space.
+   */
+  addCssClass(cssClass: string) {
+    this.setCssClass(styles.addCssClass(this.cssClass, cssClass));
+  }
+
+  /**
+   * Removes the given css class from {@link TreeNode#cssClass}.
+   *
+   * @see styles#removeCssClass
+   * @param cssClass may contain multiple css classes separated by space.
+   */
+  removeCssClass(cssClass: string) {
+    this.setCssClass(styles.removeCssClass(this.cssClass, cssClass));
+  }
+
+  /**
+   * Toggles the given css class in {@link TreeNode#cssClass}.
+   *
+   * @see styles#toggleCssClass
+   * @param cssClass may contain multiple css classes separated by space.
+   */
+  toggleCssClass(cssClass: string, condition: boolean) {
+    this.setCssClass(styles.toggleCssClass(this.cssClass, cssClass, condition));
+  }
+
+  /**
+   * Checks whether the css class is contained in {@link TreeNode#cssClass}.
+   *
+   * @see styles#hasCssClass
+   * @param cssClass may contain multiple css classes separated by space.
+   */
+  hasCssClass(cssClass: string): boolean {
+    return styles.hasCssClass(this.cssClass, cssClass);
+  }
+
   setEnabled(enabled: boolean) {
     this.enabled = enabled;
   }

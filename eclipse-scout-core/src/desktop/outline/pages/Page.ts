@@ -516,6 +516,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
     let page = row.page;
     page.enabled = row.enabled;
 
+    // keep in sync with token: [5vv7MGGQ5BQY5NXX7CwJ9tmL4]
     const summaryColumns = page._computeSummaryColumns(row);
     page.text = page.computeTextForRow(row, summaryColumns);
 

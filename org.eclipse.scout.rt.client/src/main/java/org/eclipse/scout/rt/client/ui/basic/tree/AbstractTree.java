@@ -51,6 +51,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TreeContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
@@ -2763,6 +2764,11 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     m_flags = FLAGS_BIT_HELPER.changeBit(SAVE_AND_RESTORE_SCROLLBARS, b, m_flags);
   }
 
+  @Override
+  public void changeNode(ITreeNode node, ICell cell) {
+    node.getCellForUpdate().updateFrom(cell);
+  }
+
   private abstract static class P_AbstractCountingTreeVisitor extends DepthFirstTreeVisitor<ITreeNode> {
 
     private int m_count;
@@ -3030,6 +3036,23 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     @Override
     public void setDisplayStyleFromUI(String style) {
       setDisplayStyle(style);
+    }
+
+    @Override
+    public void changeNodesFromUI(Collection<NodeCellTuple> nodeCellTuples) {
+      try {
+        pushUIProcessor();
+        try {
+          setTreeChanging(true);
+          nodeCellTuples.forEach(tuple -> changeNode(tuple.node(), tuple.cell()));
+        }
+        finally {
+          setTreeChanging(false);
+        }
+      }
+      finally {
+        popUIProcessor();
+      }
     }
   }// end private class
 
