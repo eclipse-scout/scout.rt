@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -527,6 +527,59 @@ public class AbstractTreeTest {
     assertEquals(2, recentEvents.size());
     assertTrue(recentEvents.contains(customEvent));
     assertTrue(recentEvents.contains(scrollToSelectionEvent));
+  }
+
+  @Test
+  public void testCollapsesLazyExpandedNodeIfAllChildNodesWereDeleted() {
+    var tree = new P_Tree();
+    var node0 = new P_TreeNode("0");
+    var node1 = new P_TreeNode("1");
+    var node0Child0 = new P_TreeNode("0_0");
+    var node0Child1 = new P_TreeNode("0_1");
+    var node0Child2 = new P_TreeNode("0_2");
+    var node1Child0 = new P_TreeNode("1_0");
+    var node1Child1 = new P_TreeNode("1_1");
+    var node1Child2 = new P_TreeNode("1_2");
+
+    node0.setLazyExpandingEnabled(true);
+    tree.addChildNodes(tree.getRootNode(), List.of(node0, node1));
+    tree.addChildNodes(node0, List.of(node0Child0, node0Child1, node0Child2));
+    tree.addChildNodes(node1, List.of(node1Child0, node1Child1, node1Child2));
+
+    tree.setNodeExpanded(node0, true);
+    tree.setNodeExpanded(node1, true);
+
+    // node0 is expanded lazy
+    assertTrue(node0.isExpanded());
+    assertTrue(node0.isExpandedLazy());
+
+    // node1 is expanded
+    assertTrue(node1.isExpanded());
+    assertFalse(node1.isExpandedLazy());
+
+    // deleting only some of the child nodes does not collapse parents
+    tree.removeChildNodes(node0, List.of(node0Child2));
+    tree.removeChildNodes(node1, List.of(node1Child2));
+
+    // node0 is expanded lazy
+    assertTrue(node0.isExpanded());
+    assertTrue(node0.isExpandedLazy());
+
+    // node1 is expanded
+    assertTrue(node1.isExpanded());
+    assertFalse(node1.isExpandedLazy());
+
+    // deleting all child nodes collapses lazy expanded parents
+    tree.removeChildNodes(node0, List.of(node0Child0, node0Child1));
+    tree.removeChildNodes(node1, List.of(node1Child0, node1Child1));
+
+    // node0 is no longer expanded
+    assertFalse(node0.isExpanded());
+    assertFalse(node0.isExpandedLazy());
+
+    // node1 is still expanded
+    assertTrue(node1.isExpanded());
+    assertFalse(node1.isExpandedLazy());
   }
 
   public static class P_Tree extends AbstractTree {
