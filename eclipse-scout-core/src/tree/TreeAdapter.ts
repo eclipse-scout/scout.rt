@@ -56,23 +56,34 @@ export class TreeAdapter extends ModelAdapter {
   }
 
   protected _onWidgetNodeClick(event: TreeNodeClickEvent) {
+    if (!TreeAdapter.isRemote(event.node)) {
+      return;
+    }
     this._send('nodeClick', {
       nodeId: event.node.id
     });
   }
 
   protected _onWidgetNodeAction(event: TreeNodeActionEvent) {
+    if (!TreeAdapter.isRemote(event.node)) {
+      return;
+    }
     this._send('nodeAction', {
       nodeId: event.node.id
     });
   }
 
   protected _onWidgetNodesSelected(event: TreeNodesSelectedEvent) {
-    let nodeIds = this.widget.nodesToIds(this.widget.selectedNodes);
+    const selectedNodes = arrays.ensure(this.widget.selectedNodes)
+      .filter(node => TreeAdapter.isRemote(node));
+    const nodeIds = this.widget.nodesToIds(selectedNodes);
     this._sendNodesSelected(nodeIds, event.debounce);
   }
 
   protected _onWidgetNodeExpanded(event: TreeNodeExpandedEvent) {
+    if (!TreeAdapter.isRemote(event.node)) {
+      return;
+    }
     this._send('nodeExpanded', {
       nodeId: event.node.id,
       expanded: event.expanded,
@@ -81,7 +92,10 @@ export class TreeAdapter extends ModelAdapter {
   }
 
   protected _onWidgetNodesChecked(event: TreeNodesCheckedEvent) {
-    this._sendNodesChecked(event.nodes);
+    const nodes = arrays.ensure(event.nodes)
+      .filter(node => TreeAdapter.isRemote(node));
+
+    this._sendNodesChecked(nodes);
   }
 
   protected _sendNodesChecked(nodes: TreeNode[]) {
@@ -282,6 +296,7 @@ export class TreeAdapter extends ModelAdapter {
     nodeModel = nodeModel || {};
     nodeModel.objectType = scout.nvl(nodeModel.objectType, this._getDefaultNodeObjectType());
     defaultValues.applyTo(nodeModel);
+    nodeModel.remote = true;
     return nodeModel as ChildModelOf<TreeNode>;
   }
 
@@ -319,6 +334,24 @@ export class TreeAdapter extends ModelAdapter {
     objects.replacePrototypeFunction(Tree, '_createTreeNode', TreeAdapter._createTreeNodeRemote, true);
     objects.replacePrototypeFunction(Tree, '_updateMarkChildrenChecked', TreeAdapter._updateMarkChildrenCheckedRemote, true);
   }
+
+  static isRemote(node: AdapterTreeNode, includeHybrid = true): boolean {
+    if (node?.remote) {
+      return true;
+    }
+    return includeHybrid ? !!node.__hybrid : false;
+  }
 }
 
 App.addListener('bootstrap', TreeAdapter.modifyTreePrototype);
+
+export interface AdapterTreeNode extends TreeNode {
+  /**
+   * This marker indicates a {@link TreeNode} that represent a remote node on the UI server.
+   */
+  remote?: boolean;
+  /**
+   * This marker indicates a {@link TreeNode} that represent a hybrid node on the UI server (i.e. a remote node where the representation on the UI server is just a wrapper).
+   */
+  __hybrid?: boolean;
+}

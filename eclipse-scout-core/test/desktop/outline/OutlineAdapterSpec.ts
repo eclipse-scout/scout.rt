@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {OutlineSpecHelper, TableSpecHelper, TreeSpecHelper} from '../../../src/testing';
-import {BaseDoEntity, DataObjectInventory, defaultValues, ObjectFactory, ObjectIdProvider, objects, Outline, Page, PageParamDo, PageWithNodes, typeName} from '../../../src';
+import {AdapterTreeNode, BaseDoEntity, DataObjectInventory, defaultValues, ObjectFactory, ObjectIdProvider, objects, Outline, Page, PageParamDo, PageWithNodes, typeName} from '../../../src';
 
 describe('OutlineAdapter', () => {
   let session: SandboxSession;
@@ -390,6 +390,26 @@ describe('OutlineAdapter', () => {
       let legacyDataObject = node['legacyDataObject'];
       expect(objects.isPojo(legacyDataObject)).toBe(true);
       expect(legacyDataObject.prop).toBe(5);
+    });
+
+    it('is marked with __hybrid', () => {
+      const treeHelper = new TreeSpecHelper(session);
+      const model = helper.createModelFixture(1);
+      const adapter = helper.createOutlineAdapter(model);
+      const outline = adapter.createWidget(model, session.desktop) as Outline;
+
+      adapter.onModelEvent(treeHelper.createNodesInsertedEvent(outline, [helper.createModelNode('0_0', 'newChildNode', {
+        nodeType: 'jsPage',
+        jsPageObjectType: 'outlineadapterspec.MyJsPage'
+      })]));
+      const [jsPage, page] = outline.nodes as AdapterTreeNode[]; // new node is inserted at at index 0
+
+      expect(jsPage).toBeInstanceOf(MyJsPage);
+      expect(jsPage.__hybrid).toBeTrue();
+
+      expect(page).toBeInstanceOf(Page);
+      expect(page).not.toBeInstanceOf(MyJsPage);
+      expect(page.__hybrid).toBeFalsy();
     });
   });
 

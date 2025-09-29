@@ -677,6 +677,7 @@ export * from './tree/keystrokes/TreeCollapseAllKeyStroke';
 export * from './tree/keystrokes/TreeCollapseOrDrillUpKeyStroke';
 export * from './tree/keystrokes/TreeExpandOrDrillDownKeyStroke';
 export * from './tree/CompactTree';
+export * from './tree/CompactTreeAdapter';
 export * from './tree/CompactTreeNode';
 export * from './tree/keystrokes/AbstractCompactTreeControlKeyStroke';
 export * from './tree/keystrokes/CompactTreeUpKeyStroke';

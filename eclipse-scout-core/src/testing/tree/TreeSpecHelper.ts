@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, CompactTree, InitModelOf, ModelAdapter, ObjectIdProvider, ObjectType, RemoteEvent, Session, Tree, TreeAdapter, TreeModel, TreeNode, TreeNodeModel, Widget} from '../../index';
+import {arrays, CompactTree, CompactTreeAdapter, InitModelOf, ModelAdapter, ObjectIdProvider, ObjectType, RemoteEvent, Session, Tree, TreeAdapter, TreeModel, TreeNode, TreeNodeModel, Widget} from '../../index';
 import {SpecTree} from '../index';
 import $ from 'jquery';
 
@@ -89,7 +89,7 @@ export class TreeSpecHelper {
 
   createCompactTreeAdapter(model: InitModelOf<TreeAdapter>): TreeAdapter {
     model.objectType = 'Tree:Compact';
-    let tree = new TreeAdapter();
+    let tree = new CompactTreeAdapter();
     tree.init(model);
     return tree;
   }

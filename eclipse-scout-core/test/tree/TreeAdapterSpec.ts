@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {defaultValues, RemoteEvent, Tree} from '../../src/index';
+import {AdapterTreeNode, defaultValues, RemoteEvent, Tree, TreeAdapter} from '../../src/index';
 import {JQueryTesting, TreeSpecHelper} from '../../src/testing/index';
 
 describe('TreeAdapter', () => {
@@ -660,6 +660,104 @@ describe('TreeAdapter', () => {
         expect(helper.findAllNodes(tree).length).toBe(10);
         expect(node0.childNodes[0].$node).toBeDefined();
       });
+    });
+  });
+
+  describe('events are only sent for remote and hybrid nodes', () => {
+    let adapter: TreeAdapter;
+    let tree: Tree;
+    let remoteNode: AdapterTreeNode;
+    let hybridNode: AdapterTreeNode;
+    let jsNode: AdapterTreeNode;
+
+    beforeEach(() => {
+      const model = helper.createModelFixture(3, 1);
+      adapter = helper.createTreeAdapter(model);
+      tree = adapter.createWidget(model, session.desktop) as Tree;
+      tree.render();
+
+      [remoteNode, hybridNode, jsNode] = tree.nodes as AdapterTreeNode[];
+      // all nodes created by the adapter are marked as remote
+      expect(remoteNode.remote).toBeTrue();
+      expect(remoteNode.__hybrid).toBeFalsy();
+
+      hybridNode.remote = false;
+      hybridNode.__hybrid = true;
+      jsNode.remote = false;
+      jsNode.__hybrid = false;
+    });
+
+    it('nodesSelected', () => {
+      tree.selectNodes([jsNode, hybridNode, remoteNode]);
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      const request = mostRecentJsonRequest();
+      expect(request).toContainEventsExactly([
+        new RemoteEvent(adapter.id, 'nodesSelected', {nodeIds: [hybridNode.id, remoteNode.id]})
+      ]);
+    });
+
+    it('nodeClick', () => {
+      JQueryTesting.triggerClick(jsNode.$node);
+      JQueryTesting.triggerClick(hybridNode.$node);
+      JQueryTesting.triggerClick(remoteNode.$node);
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      const request = mostRecentJsonRequest();
+      expect(request).toContainEventsExactly([
+        // no 'nodesSelected' for hybridNode as it is coalesced
+        new RemoteEvent(adapter.id, 'nodeClick', {nodeId: hybridNode.id}),
+        new RemoteEvent(adapter.id, 'nodesSelected', {nodeIds: [remoteNode.id]}),
+        new RemoteEvent(adapter.id, 'nodeClick', {nodeId: remoteNode.id})
+      ]);
+    });
+
+    it('nodeAction', () => {
+      tree.doNodeAction(jsNode, jsNode.expanded);
+      tree.doNodeAction(hybridNode, hybridNode.expanded);
+      tree.doNodeAction(remoteNode, remoteNode.expanded);
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      const request = mostRecentJsonRequest();
+      expect(request).toContainEventsExactly([
+        new RemoteEvent(adapter.id, 'nodeAction', {nodeId: hybridNode.id}),
+        new RemoteEvent(adapter.id, 'nodeAction', {nodeId: remoteNode.id})
+      ]);
+    });
+
+    it('nodeExpanded', () => {
+      tree.expandNode(jsNode);
+      tree.expandNode(hybridNode);
+      tree.expandNode(remoteNode);
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      const request = mostRecentJsonRequest();
+      expect(request).toContainEventsExactly([
+        new RemoteEvent(adapter.id, 'nodeExpanded', {nodeId: hybridNode.id, expanded: true, expandedLazy: false}),
+        new RemoteEvent(adapter.id, 'nodeExpanded', {nodeId: remoteNode.id, expanded: true, expandedLazy: false})
+      ]);
+    });
+
+    it('nodesChecked', () => {
+      tree.checkable = true;
+
+      tree.checkNodes([jsNode, hybridNode, remoteNode]);
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      const request = mostRecentJsonRequest();
+      expect(request).toContainEventsExactly([
+        new RemoteEvent(adapter.id, 'nodesChecked', {nodes: [{nodeId: hybridNode.id, checked: true}, {nodeId: remoteNode.id, checked: true}]})
+      ]);
     });
   });
 });
