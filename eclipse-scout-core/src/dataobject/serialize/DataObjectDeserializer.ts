@@ -13,6 +13,8 @@ export class DataObjectDeserializer implements DataObjectDeserializerModel, Obje
 
   declare model: DataObjectDeserializerModel;
 
+  protected static _TYPE_VERSION_ATTRIBUTE_NAME = '_typeVersion';
+
   id: string;
   objectType: string;
   createPojoIfDoIsUnknown: boolean;
@@ -49,13 +51,14 @@ export class DataObjectDeserializer implements DataObjectDeserializerModel, Obje
     const proto = Object.getPrototypeOf(constructor).prototype;
     Object.keys(rawObj)
       // Ignore _typeVersion as it is handled later on.
-      .filter(key => key !== '_typeVersion')
+      .filter(key => key !== DataObjectDeserializer._TYPE_VERSION_ATTRIBUTE_NAME)
       .forEach(key => {
         resultObj[key] = this._convertFieldValue(proto, rawObj, key, rawObj[key]);
       });
 
-    if (rawObj.hasOwnProperty('_typeVersion') && this.retainTypeVersion(resultObj)) {
-      resultObj['_typeVersion'] = this._convertFieldValue(proto, rawObj, '_typeVersion', rawObj['_typeVersion']);
+    const typeVersion = rawObj[DataObjectDeserializer._TYPE_VERSION_ATTRIBUTE_NAME];
+    if (typeVersion && this.retainTypeVersion(resultObj)) {
+      resultObj[DataObjectDeserializer._TYPE_VERSION_ATTRIBUTE_NAME] = this._convertFieldValue(proto, rawObj, DataObjectDeserializer._TYPE_VERSION_ATTRIBUTE_NAME, typeVersion);
     }
 
     return resultObj;
