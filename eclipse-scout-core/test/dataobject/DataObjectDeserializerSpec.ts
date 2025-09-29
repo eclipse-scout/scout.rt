@@ -90,6 +90,14 @@ describe('DataObjectDeserializer', () => {
     expect(dataobject.propObj.nestedNestedDate).toEqual(dates.parseJsonDate('2024-07-08 13:51:39.708Z'));
   });
 
+  it('can deserialize objects without prototype', () => {
+    let o1 = Object.create(null); // e.g. used by objects.createMap
+    let deserializer = new DataObjectDeserializer({
+      createPojoIfDoIsUnknown: true
+    });
+    expect(deserializer.deserialize(o1)).toEqual({});
+  });
+
   it('can detect type if an unknown dataobject is in between', () => {
     const fixture = `{
       "_type": "scout.Fixture03",

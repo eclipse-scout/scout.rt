@@ -53,6 +53,11 @@ describe('DataObjectSerializer', () => {
     expect(serialized.hasOwnProperty('propObj')).toBeFalse();
   });
 
+  it('can serialize objects without prototype', () => {
+    let o1 = Object.create(null); // e.g. used by objects.createMap
+    expect(dataObjects.serialize(o1)).toEqual({});
+  });
+
   it('fails on cycles', () => {
     const obj1 = {c: null, objectType: 'obj1'};
     const obj2 = {a: [obj1], objectType: 'obj2'};
