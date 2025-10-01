@@ -19,7 +19,8 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.json.JSONObject;
 
 /**
- * This custom implementation doesn't show the servlet and doesn't send any stack traces to the client. Furthermore, no internal URIs are exposes in error messages.
+ * This custom implementation omits sensitive information from error messages.
+ * Specifically, it does not expose the servlet name, the internal URI, or stack traces.
  */
 @Bean
 public class ScoutJettyErrorHandler extends ErrorHandler {
