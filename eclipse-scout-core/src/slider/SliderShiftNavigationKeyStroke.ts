@@ -21,11 +21,11 @@ export class SliderShiftNavigationKeyStroke extends SliderNavigationKeyStroke {
   override handle(event: JQuery.KeyboardEventBase) {
     switch (event.which) {
       case keys.LEFT:
-        this.field.move(-this._calculatePageMoveUnits(this.field));
+        this.field.move(-this._calculatePageMoveUnits());
         break;
 
       case keys.RIGHT:
-        this.field.move(this._calculatePageMoveUnits(this.field));
+        this.field.move(this._calculatePageMoveUnits());
         break;
 
     }
