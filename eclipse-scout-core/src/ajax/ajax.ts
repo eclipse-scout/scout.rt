@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxCall, AjaxCallModel, AjaxError, BaseDoEntity, dataObjects, objects, scout} from '../index';
+import {AjaxCall, AjaxCallModel, AjaxError, BaseDoEntity, DataObjectDeserializerModel, dataObjects, objects, scout} from '../index';
 import $ from 'jquery';
 
 /**
@@ -241,12 +241,12 @@ export const ajax = {
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  getDataObject(url: string, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  getDataObject(url: string, options?: AjaxSettings, model?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'GET'
     }, options);
-    return ajax.callDataObject(opts, null, model);
+    return ajax.callDataObject(opts, null, model, deserializerModel);
   },
 
   /**
@@ -263,12 +263,12 @@ export const ajax = {
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  postDataObject(url: string, dataObject?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  postDataObject(url: string, dataObject?: any, options?: AjaxSettings, model?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'POST'
     }, options);
-    return ajax.callDataObject(opts, dataObject, model);
+    return ajax.callDataObject(opts, dataObject, model, deserializerModel);
   },
 
   /**
@@ -285,12 +285,12 @@ export const ajax = {
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  putDataObject(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  putDataObject(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'PUT'
     }, options);
-    return ajax.callDataObject(opts, data, model);
+    return ajax.callDataObject(opts, data, model, deserializerModel);
   },
 
   /**
@@ -307,12 +307,12 @@ export const ajax = {
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  removeDataObject(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  removeDataObject(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'DELETE'
     }, options);
-    return ajax.callDataObject(opts, data, model);
+    return ajax.callDataObject(opts, data, model, deserializerModel);
   },
 
   /**
@@ -328,8 +328,8 @@ export const ajax = {
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  callDataObject(options: UrlAjaxSettings, data?: any, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
-    return ajax.createCallDataObject(options, data, model).call();
+  callDataObject(options: UrlAjaxSettings, data?: any, model?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
+    return ajax.createCallDataObject(options, data, model, deserializerModel).call();
   },
 
   /**
@@ -344,11 +344,11 @@ export const ajax = {
    * @returns an {@link AjaxCall} which sends the given data, pre-configured using the given options and model.
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    */
-  createCallDataObject(options: UrlAjaxSettings, data?: any, model?: AjaxCallModel): AjaxCall {
+  createCallDataObject(options: UrlAjaxSettings, data?: any, model?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): AjaxCall {
     const json = data && dataObjects.stringify(data);
     const opts: AjaxSettings = $.extend({}, {
       converters: {
-        'text json': data => dataObjects.parse(data)
+        'text json': data => dataObjects.parse(data, undefined, deserializerModel)
       },
       data: json || undefined
     }, options);
