@@ -22,36 +22,50 @@ export class SliderNavigationKeyStroke extends KeyStroke {
     this.repeatable = true;
   }
 
+  get slider(): Slider {
+    return this.field;
+  }
+
   override handle(event: JQuery.KeyboardEventBase) {
     switch (event.which) {
       case keys.LEFT:
-        this.field.move(-Math.abs(this.field.step));
+        this.slider.move(-Math.abs(this._calculateMoveSizeLeftWithRemainder()));
         break;
 
       case keys.RIGHT:
-        this.field.move(Math.abs(this.field.step));
+        this.slider.move(Math.abs(this.slider.step));
         break;
 
       case keys.PAGE_DOWN:
-        this.field.move(-this._calculatePageMoveUnits(this.field));
+        this.slider.move(-this._calculatePageMoveUnits());
         break;
 
       case keys.PAGE_UP:
-        this.field.move(this._calculatePageMoveUnits(this.field));
+        this.slider.move(this._calculatePageMoveUnits());
         break;
 
       case keys.HOME:
-        this.field.move(this.field.minValue - this.field.maxValue);
+        this.slider.move(this.slider.minValue - this.slider.maxValue);
         break;
 
       case keys.END:
-        this.field.move(this.field.maxValue - this.field.minValue);
+        this.slider.move(this.slider.maxValue - this.slider.minValue);
         break;
     }
   }
 
-  protected _calculatePageMoveUnits(slider: Slider) {
+  protected _calculateMoveSizeLeftWithRemainder(): number {
+    const lastStepRemainder = (this.slider.maxValue - this.slider.minValue) % this.slider.step;
+
+    if (this.slider.value === this.slider.maxValue && lastStepRemainder > 0) {
+      return lastStepRemainder;
+    }
+    return this.slider.step;
+  }
+
+  protected _calculatePageMoveUnits(): number {
     const PAGE_STEPS = 10;
-    return (slider.maxValue - slider.minValue) / PAGE_STEPS;
+    // The page move unit has to be at least as big as the step size
+    return Math.max((this.slider.maxValue - this.slider.minValue) / PAGE_STEPS, this.slider.step);
   }
 }
