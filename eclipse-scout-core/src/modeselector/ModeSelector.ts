@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -172,7 +172,7 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
     } else if (event.propertyName === 'visible') {
       this._updateMarkers();
     } else if (event.propertyName === 'enabled') {
-      this._updateSlider();
+      this._invalidateSliderLayout();
     }
   }
 
@@ -197,10 +197,13 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
         visibleModes[selectedModeIndex + 1].$container.addClass('after-selected');
       }
     }
-    this._updateSlider();
+    this._invalidateSliderLayout();
   }
 
-  /** @internal */
+  /**
+   * Updates the slider layout, do not call this method directly, use {@link _invalidateSliderLayout} instead
+   * @internal
+   */
   _updateSlider() {
     if (!this.$slider) {
       return;
@@ -213,6 +216,18 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
     this.$slider.cssLeft(selectedModePosX);
     this.$slider.cssWidth(selectedModeWidth);
     this.$slider.setVisible(this.selectedMode && this.selectedMode.$container && this.selectedMode.enabled);
+  }
+
+  /**
+   * In case the mode selector is visible, updates the slider layout (position and size) directly, including an animation.
+   * Otherwise, the layout tree is invalidated to ensure the slider is layouted by the next validation cycle, when the correct container sizes are available.
+   */
+  protected _invalidateSliderLayout() {
+    if (this.rendered && this.$slider.isAttached() && this.$slider.isEveryParentVisible()) {
+      this._updateSlider(); // update immediately (otherwise the CSS transition would not be triggered)
+    } else {
+      this.invalidateLayoutTree(false);
+    }
   }
 
   protected _registerDragHandlers($mode: JQuery) {
@@ -232,7 +247,7 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
       this.$container.children().removeClass(className);
       let newSelectedMode = this._computeNewSelectedMode(e);
       if (!newSelectedMode || newSelectedMode === this.selectedMode || !newSelectedMode.enabled) {
-        this._updateSlider(); // move back to original position
+        this._invalidateSliderLayout(); // moves slider back to original position
       } else {
         this.setSelectedMode(newSelectedMode); // updates the slider position
       }
