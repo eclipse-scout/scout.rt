@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {SliderField} from '../../../../src/index';
-import {FormSpecHelper} from '../../../../src/testing/index';
+import {keys, SliderField} from '../../../../src/index';
+import {FormSpecHelper, JQueryTesting} from '../../../../src/testing/index';
 import {InitModelOf} from '../../../../src/scout';
 
 describe('SliderField', () => {
@@ -65,6 +65,94 @@ describe('SliderField', () => {
       expect(field.value).toBe(10);
       expect(field.slider.value).toBe(10);
       expect(field.displayText).toBe('10');
+    });
+
+    it('moves the thumb within an inappropriate step size', () => {
+      field.render();
+
+      field.setMinValue(0);
+      field.setMaxValue(5);
+      field.setStep(4);
+
+      expect(field.value).toBe(0);
+      expect(field.slider.value).toBe(0);
+      expect(field.displayText).toBe('0');
+
+      field.slider.move(4.5);
+      expect(field.value).toBe(5);
+      expect(field.slider.value).toBe(5);
+      expect(field.displayText).toBe('5');
+
+      field.slider.move(-0.6);
+      expect(field.value).toBe(4);
+      expect(field.slider.value).toBe(4);
+      expect(field.displayText).toBe('4');
+    });
+
+    it('moves left from max with an inappropriate step size', () => {
+      field.render();
+
+      field.setMinValue(0);
+      field.setMaxValue(5);
+      field.setStep(4);
+      field.setValue(5);
+
+      expect(field.value).toBe(5);
+      expect(field.slider.value).toBe(5);
+      expect(field.displayText).toBe('5');
+
+      JQueryTesting.triggerKeyDownCapture(field.slider.$container, keys.LEFT);
+
+      expect(field.value).toBe(4);
+      expect(field.slider.value).toBe(4);
+      expect(field.displayText).toBe('4');
+    });
+
+    it('moves with page unit', () => {
+      field.render();
+
+      field.setMinValue(0);
+      field.setMaxValue(100);
+      field.setStep(1);
+
+      JQueryTesting.triggerKeyDownCapture(field.slider.$container, keys.PAGE_UP);
+
+      expect(field.value).toBe(10);
+      expect(field.slider.value).toBe(10);
+      expect(field.displayText).toBe('10');
+
+      JQueryTesting.triggerKeyDownCapture(field.slider.$container, keys.RIGHT, 'shift');
+
+      expect(field.value).toBe(20);
+      expect(field.slider.value).toBe(20);
+      expect(field.displayText).toBe('20');
+
+      JQueryTesting.triggerKeyDownCapture(field.slider.$container, keys.LEFT, 'shift');
+
+      expect(field.value).toBe(10);
+      expect(field.slider.value).toBe(10);
+      expect(field.displayText).toBe('10');
+
+      JQueryTesting.triggerKeyDownCapture(field.slider.$container, keys.PAGE_DOWN);
+
+      expect(field.value).toBe(0);
+      expect(field.slider.value).toBe(0);
+      expect(field.displayText).toBe('0');
+    });
+
+    it('moves with page unit and few steps (< 10)', () => {
+      field.render();
+
+      field.setMinValue(0);
+      field.setMaxValue(3);
+      field.setStep(1);
+      field.setValue(0);
+
+      JQueryTesting.triggerKeyDownCapture(field.slider.$container, keys.PAGE_UP);
+
+      expect(field.value).toBe(1);
+      expect(field.slider.value).toBe(1);
+      expect(field.displayText).toBe('1');
     });
 
     it('limits the min & max value', () => {

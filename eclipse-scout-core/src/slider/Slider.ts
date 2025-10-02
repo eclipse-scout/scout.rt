@@ -247,8 +247,23 @@ export class Slider extends Widget implements SliderModel {
     if (!this.step) { // 0 or not set
       return value;
     }
-    const stepsFromMin = Math.round((value - this.minValue) / this.step);
-    const steppedValue = stepsFromMin * this.step + this.minValue;
+
+    const range = this.maxValue - this.minValue;
+    const fullStepCount = Math.floor(range / this.step);
+    const lastStepStart = this.minValue + fullStepCount * this.step;
+    const lastStepSize = this.maxValue - lastStepStart;
+
+    let steppedValue: number;
+
+    if (lastStepSize > 0 && value > lastStepStart) {
+      // Value is in the range of the last (incomplete) step
+      steppedValue = (value - lastStepStart >= lastStepSize / 2) ? this.maxValue : lastStepStart;
+    } else {
+      // Value is within the full step range
+      const stepsFromMin = Math.round((value - this.minValue) / this.step);
+      steppedValue = this.minValue + stepsFromMin * this.step;
+    }
+
     return Math.round(steppedValue * Slider.FLOATING_POINT_ERROR_CORRECTION) / Slider.FLOATING_POINT_ERROR_CORRECTION;
   }
 }
