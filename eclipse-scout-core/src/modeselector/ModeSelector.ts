@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -172,7 +172,7 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
     } else if (event.propertyName === 'visible') {
       this._updateMarkers();
     } else if (event.propertyName === 'enabled') {
-      this._updateSlider();
+      this.invalidateLayoutTree(false);
     }
   }
 
@@ -197,10 +197,13 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
         visibleModes[selectedModeIndex + 1].$container.addClass('after-selected');
       }
     }
-    this._updateSlider();
+    this.invalidateLayoutTree(false);
   }
 
-  /** @internal */
+  /**
+   * Updates the slider layout, should only be called by the Mode Selector Layout
+   * @internal
+   */
   _updateSlider() {
     if (!this.$slider) {
       return;
@@ -232,7 +235,7 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
       this.$container.children().removeClass(className);
       let newSelectedMode = this._computeNewSelectedMode(e);
       if (!newSelectedMode || newSelectedMode === this.selectedMode || !newSelectedMode.enabled) {
-        this._updateSlider(); // move back to original position
+        this.invalidateLayoutTree(false); // moves slider back to original position
       } else {
         this.setSelectedMode(newSelectedMode); // updates the slider position
       }
