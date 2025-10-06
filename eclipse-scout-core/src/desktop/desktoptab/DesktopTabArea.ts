@@ -12,6 +12,11 @@ import {AbstractLayout, DesktopTab, DesktopTabAreaLayout, Form, SimpleTabArea} f
 export class DesktopTabArea extends SimpleTabArea<Form> {
   declare tabs: DesktopTab[];
 
+  constructor() {
+    super();
+    this.selectOnFocus = false;
+  }
+
   protected override _render() {
     super._render();
     this.$container.addClass('desktop-tab-area');
@@ -27,7 +32,7 @@ export class DesktopTabArea extends SimpleTabArea<Form> {
       return;
     }
     let firstTab = this.getVisibleTabs()[0];
-    desktop.$container.toggleClass('first-tab-selected', firstTab && firstTab.selected);
+    desktop.$container.toggleClass('first-tab-selected', !!firstTab?.selected);
   }
 
   override getTabs(): DesktopTab[] {

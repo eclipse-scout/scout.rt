@@ -50,31 +50,68 @@ export interface ScrollOptions {
   stop?: boolean;
 }
 
+export type ScrollHorizontalToAlignment = 'left' | 'center' | 'right';
+
+export interface ScrollHorizontalToOptions extends ScrollOptions {
+  /**
+   * Specifies where the element should be positioned in the view port. Can either be 'left', 'center' or 'right'.
+   *
+   * If unspecified, the following rules apply:
+   *   - If the element is before the visible area it will be aligned to left.
+   *   - If the element is after the visible area it will be aligned to right.
+   *   - If the element is already in the visible area no scrolling is done.
+   *
+   * Default is undefined.
+   */
+  align?: ScrollHorizontalToAlignment;
+  /**
+   * Additional margin to assume on the left of the target element (independent of any actual CSS margin).
+   * Useful when elements are positioned outside their boundaries (e.g. focus border).
+   *
+   * Default is 0.
+   */
+  scrollOffsetLeft?: number;
+  /**
+   * Additional margin to assume on the right of the target element (independent of any actual CSS margin).
+   * Useful when elements are positioned outside their boundaries (e.g. focus border).
+   *
+   * Default is 0.
+   */
+  scrollOffsetRight?: number;
+}
+
+export type ScrollToAlignment = 'top' | 'center' | 'bottom';
+
 export interface ScrollToOptions extends ScrollOptions {
   /**
    * Specifies where the element should be positioned in the view port. Can either be 'top', 'center' or 'bottom'.
+   *
    * If unspecified, the following rules apply:
    *   - If the element is above the visible area it will be aligned to top.
    *   - If the element is below the visible area it will be aligned to bottom.
    *   - If the element is already in the visible area no scrolling is done.
+   *
    * Default is undefined.
    */
-  align?: string;
-
+  align?: ScrollToAlignment;
   /**
-   * If true, all running animations are stopped before executing the current scroll request. Default is true.
+   * If true, all running animations are stopped before executing the current scroll request.
+   *
+   * Default is true.
    */
   stop?: boolean;
-
   /**
    * Additional margin to assume at the top of the target element (independent of any actual CSS margin).
-   * Useful when elements are positioned outside their boundaries (e.g. focus border). Default is 4.
+   * Useful when elements are positioned outside their boundaries (e.g. focus border).
+   *
+   * Default is 4.
    */
   scrollOffsetUp?: number;
-
   /**
    * Additional margin to assume at the bottom of the target element (independent of any actual CSS margin).
-   * Useful when elements are positioned outside their boundaries (e.g. focus border). Default is 8.
+   * Useful when elements are positioned outside their boundaries (e.g. focus border).
+   *
+   * Default is 8.
    */
   scrollOffsetDown?: number;
 }
@@ -629,8 +666,17 @@ export const scrollbars = {
     scrollbarArr.forEach(scrollbar => scrollbar.reset());
   },
 
+  reveal($element: JQuery, options?: ScrollToOptions | ScrollToAlignment) {
+    let $scrollParent = $element.scrollParent();
+    if ($scrollParent.length === 0) {
+      // No scrollable parent found -> scrolling is not possible
+      return;
+    }
+    scrollbars.scrollTo($scrollParent, $element, options);
+  },
+
   /**
-   * Scrolls the $scrollable to the given $element (must be a child of $scrollable)
+   * Scrolls the $scrollable to the given $element.
    *
    * @param $scrollable
    *          the scrollable object
@@ -640,7 +686,7 @@ export const scrollbars = {
    *          Shorthand version: If a string is passed instead
    *          of an object, the value is automatically converted to the option {@link ScrollToOptions.align}.
    */
-  scrollTo($scrollable: JQuery, $element: JQuery, opts?: ScrollToOptions | string) {
+  scrollTo($scrollable: JQuery, $element: JQuery, opts?: ScrollToOptions | ScrollToAlignment) {
     let options: ScrollToOptions;
     if (typeof opts === 'string') {
       options = {
@@ -651,26 +697,25 @@ export const scrollbars = {
     }
 
     let align = (options.align ? options.align.toLowerCase() : undefined);
-
-    let scrollTo,
-      scrollOffsetUp = scout.nvl(options.scrollOffsetUp, align === 'center' ? 0 : 4),
-      scrollOffsetDown = scout.nvl(options.scrollOffsetDown, align === 'center' ? 0 : 8),
-      scrollableH = $scrollable.height(),
-      elementBounds = graphics.offsetBounds($element),
-      scrollableBounds = graphics.offsetBounds($scrollable),
-      elementY = elementBounds.y - scrollableBounds.y,
-      elementH = elementBounds.height,
-      elementTop = elementY - scrollOffsetUp, // relative to scrollable y
-      elementBottom = elementY + elementH + scrollOffsetDown;
+    let scrollOffsetUp = scout.nvl(options.scrollOffsetUp, align === 'center' ? 0 : 4);
+    let scrollOffsetDown = scout.nvl(options.scrollOffsetDown, align === 'center' ? 0 : 8);
+    let scrollableBounds = graphics.offsetBounds($scrollable);
+    let scrollableH = scrollableBounds.height;
+    let elementBounds = graphics.offsetBounds($element);
+    let elementMargins = graphics.margins($element);
+    let elementY = elementBounds.y - scrollableBounds.y;
+    let elementTop = elementY - elementMargins.top - scrollOffsetUp; // relative to scrollable y
+    let elementH = elementBounds.height;
+    let elementBottom = elementY + elementH + elementMargins.bottom + scrollOffsetDown;
 
     //        ---          ^                     <-- elementTop
-    //         |           | scrollOffsetUp
+    //         |           | marginTop + scrollOffsetUp
     //         |           v
     //   +------------+    ^                     <-- elementY
     //   |  element   |    | elementH
     //   +------------+    v
     //         |           ^
-    //         |           | scrollOffsetDown
+    //         |           | marginBottom + scrollOffsetDown
     //        ---          v                     <-- elementBottom
 
     if (!align) {
@@ -680,26 +725,25 @@ export const scrollbars = {
       align = (elementTop < 0) ? 'top' : (elementBottom > scrollableH ? 'bottom' : undefined);
     }
 
-    if (align === 'center') {
-      // align center
-      scrollTo = $scrollable.scrollTop() + elementTop - Math.max(0, (scrollableH - elementH) / 2);
+    let scrollTo;
+    switch (align) {
+      case 'top':
+        scrollTo = $scrollable.scrollTop() + elementTop;
+        break;
+      case 'center':
+        scrollTo = $scrollable.scrollTop() + elementTop - Math.max(0, (scrollableH - elementH) / 2);
+        break;
+      case 'bottom': {
+        // On IE, a fractional position gets truncated when using scrollTop -> ceil to make sure the full element is visible
+        scrollTo = Math.ceil($scrollable.scrollTop() + elementBottom - scrollableH);
 
-    } else if (align === 'top') {
-      // align top
-      // Element is on the top of the view port -> scroll up
-      scrollTo = $scrollable.scrollTop() + elementTop;
-
-    } else if (align === 'bottom') {
-      // align bottom
-      // Element is on the Bottom of the view port -> scroll down
-      // On IE, a fractional position gets truncated when using scrollTop -> ceil to make sure the full element is visible
-      scrollTo = Math.ceil($scrollable.scrollTop() + elementBottom - scrollableH);
-
-      // If the viewport is very small, make sure the element is not moved outside on top
-      // Otherwise when calling this function again, since the element is on the top of the view port, the scroll pane would scroll down which results in flickering
-      let elementTopNew = elementTop - (scrollTo - $scrollable.scrollTop());
-      if (elementTopNew < 0) {
-        scrollTo = scrollTo + elementTopNew;
+        // If the viewport is very small, make sure the element is not moved outside on top
+        // Otherwise when calling this function again, since the element is on the top of the view port, the scroll pane would scroll down which results in flickering
+        let elementTopNew = elementTop - (scrollTo - $scrollable.scrollTop());
+        if (elementTopNew < 0) {
+          scrollTo = scrollTo + elementTopNew;
+        }
+        break;
       }
     }
     if (scrollTo !== undefined) {
@@ -717,20 +761,47 @@ export const scrollbars = {
   },
 
   /**
-   * Horizontally scrolls the $scrollable to the given $element (must be a child of $scrollable)
+   * Horizontally scrolls the $scrollable to the given $element.
+   *
+   * @param $scrollable
+   *          the scrollable object
+   * @param $element
+   *          the element to scroll to
    */
-  scrollHorizontalTo($scrollable: JQuery, $element: JQuery, options?: ScrollOptions) {
-    let scrollTo,
-      scrollableW = $scrollable.width(),
-      elementBounds = graphics.bounds($element, true),
-      elementLeft = elementBounds.x,
-      elementW = elementBounds.width;
+  scrollHorizontalTo($scrollable: JQuery, $element: JQuery, options?: ScrollHorizontalToOptions) {
+    let scrollOffsetLeft = scout.nvl(options?.scrollOffsetLeft, 0);
+    let scrollOffsetRight = scout.nvl(options?.scrollOffsetRight, 0);
+    let scrollableBounds = graphics.offsetBounds($scrollable);
+    let scrollableW = scrollableBounds.width;
+    let elementBounds = graphics.offsetBounds($element);
+    let elementMargins = graphics.margins($element);
+    let elementX = elementBounds.x - scrollableBounds.x;
+    let elementLeft = elementX - elementMargins.left - scrollOffsetLeft;
+    let elementW = elementBounds.width;
+    let elementRight = elementX + elementW + elementMargins.right + scrollOffsetRight;
 
-    if (elementLeft < 0) {
-      scrollbars.scrollLeft($scrollable, $scrollable.scrollLeft() + elementLeft, options);
-    } else if (elementLeft + elementW > scrollableW) {
-      // On IE, a fractional position gets truncated when using scrollTop -> ceil to make sure the full element is visible
-      scrollTo = Math.ceil($scrollable.scrollLeft() + elementLeft + elementW - scrollableW);
+    let align = options?.align;
+    if (!align) {
+      // If the element is above the visible area it will be aligned to left.
+      // If the element is below the visible area it will be aligned to right.
+      // If the element is already in the visible area no scrolling is done.
+      align = (elementLeft < 0) ? 'left' : (elementRight > scrollableW ? 'right' : undefined);
+    }
+
+    let scrollTo;
+    switch (align) {
+      case 'left':
+        scrollTo = Math.floor($scrollable.scrollLeft() + elementLeft);
+        break;
+      case 'center':
+        scrollTo = $scrollable.scrollLeft() + elementLeft - Math.max(0, (scrollableW - elementW) / 2);
+        break;
+      case 'right':
+        // On IE, a fractional position gets truncated when using scrollTop -> ceil to make sure the full element is visible
+        scrollTo = Math.ceil($scrollable.scrollLeft() + elementRight - scrollableW);
+        break;
+    }
+    if (scrollTo !== undefined) {
       scrollbars.scrollLeft($scrollable, scrollTo, options);
     }
   },

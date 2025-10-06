@@ -507,7 +507,7 @@ describe('MenuBar', () => {
       expect(menuBar.tabbableMenu).toBe(menu2);
 
       menu2.setEnabled(false);
-      expect(menuBar.defaultMenu).toBe(null);
+      expect(menuBar.defaultMenu).toBe(undefined);
       expect(menu2.$container).not.toHaveClass('default');
       expect(menuBar.tabbableMenu).toBe(menu1);
 
@@ -536,7 +536,7 @@ describe('MenuBar', () => {
       expect(menu2.$container).toHaveClass('default');
 
       menu2.setProperty('keyStroke', null);
-      expect(menuBar.defaultMenu).toBe(null);
+      expect(menuBar.defaultMenu).toBe(undefined);
       expect(menu1.$container).not.toHaveClass('default');
       expect(menu2.$container).not.toHaveClass('default');
 
@@ -552,7 +552,7 @@ describe('MenuBar', () => {
 
       menu1.setProperty('defaultMenu', false);
       menu2.setProperty('defaultMenu', false);
-      expect(menuBar.defaultMenu).toBe(null);
+      expect(menuBar.defaultMenu).toBe(undefined);
       expect(menu1.$container).not.toHaveClass('default');
       expect(menu2.$container).not.toHaveClass('default');
 
@@ -592,7 +592,7 @@ describe('MenuBar', () => {
       expect(menuBar.defaultMenu).toBe(menu2);
 
       menu2.setEnabled(false);
-      expect(menuBar.defaultMenu).toBe(null);
+      expect(menuBar.defaultMenu).toBe(undefined);
       expect(menu2.overflown).toBe(true);
 
       menu2.setEnabled(true);

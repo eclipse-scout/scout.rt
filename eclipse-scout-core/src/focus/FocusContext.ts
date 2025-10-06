@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {filters, FocusManager, focusUtils, graphics, keys, objects, Point, scout, scrollbars} from '../index';
+import {filters, FocusManager, FocusOptions, focusUtils, graphics, keys, objects, Point, scout, scrollbars} from '../index';
 import $ from 'jquery';
 import KeyDownEvent = JQuery.KeyDownEvent;
 import FocusInEvent = JQuery.FocusInEvent;
@@ -315,13 +315,11 @@ export class FocusContext {
   }
 }
 
-export interface FocusContextFocusOptions {
+export interface FocusContextFocusOptions extends FocusOptions {
   /**
-   * prevents scrolling to new focused element (defaults to false)
-   */
-  preventScroll?: boolean;
-  /**
-   * automatically selects the text content of the element if supported (defaults to false)
+   * Automatically selects the text content of the element if supported.
+   *
+   * Default is false.
    */
   selectText?: boolean;
 }

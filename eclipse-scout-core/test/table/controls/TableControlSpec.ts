@@ -158,7 +158,13 @@ describe('TableControl', () => {
       let action = createAction(createModel());
       table.setTableControls([action]);
       table.render();
-      expect(action.$container).toHaveAttr('role', 'button');
+      expect(action.$container).toHaveAttr('aria-pressed', 'false');
+
+      action.setSelected(true);
+      expect(action.$container).toHaveAttr('aria-pressed', 'true');
+
+      action.setSelected(false);
+      expect(action.$container).toHaveAttr('aria-pressed', 'false');
     });
   });
 });

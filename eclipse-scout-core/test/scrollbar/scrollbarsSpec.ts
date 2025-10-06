@@ -421,4 +421,107 @@ describe('scrollbars', () => {
       expect($container.attr('tabindex')).toBe('3');
     });
   });
+
+  describe('scrollHorizontalTo', () => {
+    function createHScrollable(): JQuery {
+      return $('<div>')
+        .css('height', '100px')
+        .css('width', '50px')
+        .css('text-wrap', 'nowrap')
+        .css('position', 'absolute')
+        .appendTo($('#sandbox'));
+    }
+
+    function createElements($parent: JQuery): JQuery {
+      for (let i = 0; i < 3; i++) {
+        $(`<span style="width: 60px; display: inline-block;">elem ${i}</span>`).appendTo($parent);
+      }
+      return $parent.children('span');
+    }
+
+    it('scrolls the scrollable horizontally until the element gets visible', () => {
+      let $container = createHScrollable();
+      scrollbars.install($container, {
+        parent: new NullWidget(),
+        session: session,
+        axis: 'x'
+      });
+      let $elements = createElements($container);
+      scrollbars.scrollHorizontalTo($container, $elements.eq(1));
+      expect($container.scrollLeft()).toBeCloseTo(70, -1); // right aligned when scrolling to the right
+
+      scrollbars.scrollHorizontalTo($container, $elements.eq(2));
+      expect($container.scrollLeft()).toBeCloseTo(130, -1);
+
+      scrollbars.scrollHorizontalTo($container, $elements.eq(1));
+      expect($container.scrollLeft()).toBeCloseTo(60, -1); // left aligned when scrolling to the left
+
+      scrollbars.scrollHorizontalTo($container, $elements.eq(0));
+      expect($container.scrollLeft()).toBe(0);
+    });
+
+    it('considers align option', () => {
+      let $container = createHScrollable();
+      scrollbars.install($container, {
+        parent: new NullWidget(),
+        session: session,
+        axis: 'x'
+      });
+      let $elements = createElements($container);
+      scrollbars.scrollHorizontalTo($container, $elements.eq(1), {align: 'left'});
+      expect($container.scrollLeft()).toBeCloseTo(60, -1);
+
+      scrollbars.scrollHorizontalTo($container, $elements.eq(2), {align: 'left'});
+      expect($container.scrollLeft()).toBeCloseTo(120, -1);
+
+      scrollbars.scrollHorizontalTo($container, $elements.eq(1), {align: 'right'});
+      expect($container.scrollLeft()).toBeCloseTo(70, -1);
+
+      scrollbars.scrollHorizontalTo($container, $elements.eq(0), {align: 'right'});
+      expect($container.scrollLeft()).toBeCloseTo(10, -1);
+
+      $container.cssWidth(100);
+      scrollbars.scrollHorizontalTo($container, $elements.eq(1), {align: 'center'});
+      expect($container.scrollLeft()).toBeCloseTo(40, -1);
+    });
+
+    it('considers element margins', () => {
+      let $container = createHScrollable();
+      scrollbars.install($container, {
+        parent: new NullWidget(),
+        session: session,
+        axis: 'x'
+      });
+      let $elements = createElements($container);
+      $elements.cssMarginX(10);
+      scrollbars.scrollHorizontalTo($container, $elements.eq(2));
+      expect($container.scrollLeft()).toBeCloseTo(190, -1);
+
+      scrollbars.scrollHorizontalTo($container, $elements.eq(0));
+      expect($container.scrollLeft()).toBe(0);
+
+      $container.cssWidth(100);
+      scrollbars.scrollHorizontalTo($container, $elements.eq(1), {align: 'center'});
+      expect($container.scrollLeft()).toBeCloseTo(60, -1);
+    });
+
+    it('considers offset option', () => {
+      let $container = createHScrollable();
+      scrollbars.install($container, {
+        parent: new NullWidget(),
+        session: session,
+        axis: 'x'
+      });
+      let $elements = createElements($container);
+      scrollbars.scrollHorizontalTo($container, $elements.eq(1), {scrollOffsetRight: 10});
+      expect($container.scrollLeft()).toBeCloseTo(80, -1);
+
+      scrollbars.scrollHorizontalTo($container, $elements.eq(2), {scrollOffsetLeft: 10, align: 'left'});
+      expect($container.scrollLeft()).toBeCloseTo(110, -1);
+
+      $container.cssWidth(100);
+      scrollbars.scrollHorizontalTo($container, $elements.eq(1), {scrollOffsetLeft: 10, align: 'center'});
+      expect($container.scrollLeft()).toBeCloseTo(30, -1);
+    });
+  });
 });

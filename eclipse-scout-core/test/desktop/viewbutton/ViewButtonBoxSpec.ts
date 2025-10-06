@@ -26,8 +26,7 @@ describe('ViewButtonBox', () => {
         viewButtons: [scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button1',
-          displayStyle: 'MENU',
-          visible: true
+          displayStyle: 'MENU'
         })]
       });
     });
@@ -37,14 +36,12 @@ describe('ViewButtonBox', () => {
         scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button1',
-          displayStyle: 'MENU',
-          visible: true
+          displayStyle: 'MENU'
         }),
         scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button2',
-          displayStyle: 'MENU',
-          visible: true
+          displayStyle: 'MENU'
         })
       ];
       viewButtonBox.setViewButtons(viewButtons);
@@ -91,8 +88,7 @@ describe('ViewButtonBox', () => {
         scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button1',
-          displayStyle: 'MENU',
-          visible: true
+          displayStyle: 'MENU'
         })
       ];
       viewButtonBox.setViewButtons(viewButtons);
@@ -111,14 +107,12 @@ describe('ViewButtonBox', () => {
         scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button1',
-          displayStyle: 'MENU',
-          visible: true
+          displayStyle: 'MENU'
         }),
         scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button2',
-          displayStyle: 'MENU',
-          visible: true
+          displayStyle: 'MENU'
         })
       ];
       viewButtonBox.setViewButtons(viewButtons);
@@ -133,14 +127,12 @@ describe('ViewButtonBox', () => {
         scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button1',
-          displayStyle: 'MENU',
-          visible: true
+          displayStyle: 'MENU'
         }),
         scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button2',
-          displayStyle: 'MENU',
-          visible: true
+          displayStyle: 'MENU'
         })
       ];
       viewButtonBox.setViewButtons(viewButtons);
@@ -160,14 +152,12 @@ describe('ViewButtonBox', () => {
         scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button1',
-          displayStyle: 'MENU',
-          visible: true
+          displayStyle: 'MENU'
         }),
         scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button2',
-          displayStyle: 'MENU',
-          visible: true
+          displayStyle: 'MENU'
         })
       ];
       viewButtonBox.setViewButtons(viewButtons);
@@ -264,8 +254,7 @@ describe('ViewButtonBox', () => {
         viewButtons: [scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button1',
-          displayStyle: 'MENU',
-          visible: true
+          displayStyle: 'MENU'
         })]
       });
     });
@@ -280,5 +269,97 @@ describe('ViewButtonBox', () => {
       expect(viewButtonBox.viewButtons[0].$container.attr('aria-label')).toBeTruthy();
       expect(viewButtonBox.viewButtons[0].$container.attr('aria-labelledby')).toBeFalsy();
     });
+  });
+
+  describe('tabindex', () => {
+    it('is set to first visible view button if there is no view menu', () => {
+      let viewButtonBox = scout.create(ViewButtonBox, {
+        parent: session.desktop,
+        viewButtons: [{
+          objectType: ViewButton,
+          visible: false
+        }, {
+          objectType: ViewButton
+        }]
+      });
+      viewButtonBox.render();
+      expect(viewButtonBox.viewButtons[0].$container).not.toHaveAttr('tabindex');
+      expect(viewButtonBox.viewButtons[1].$container).toHaveAttr('tabindex', '0');
+
+      viewButtonBox.viewButtons[0].setVisible(true);
+      expect(viewButtonBox.viewButtons[0].$container).toHaveAttr('tabindex', '0');
+      expect(viewButtonBox.viewButtons[1].$container).not.toHaveAttr('tabindex');
+    });
+
+    it('is set to dropdown if there is a view menu and a menu selected', () => {
+      let viewButtonBox = scout.create(ViewButtonBox, {
+        parent: session.desktop,
+        viewButtons: [{
+          objectType: ViewButton,
+          displayStyle: 'MENU'
+        }, {
+          objectType: ViewButton,
+          displayStyle: 'MENU',
+          selected: true
+        }, {
+          objectType: ViewButton
+        }]
+      });
+      viewButtonBox.render();
+      expect(viewButtonBox.tabbableCoordinator.items).toEqual([viewButtonBox.viewMenuTab.dropdown, viewButtonBox.viewButtons[2]]);
+      expect(viewButtonBox.tabbableCoordinator.currentItem).toBe(viewButtonBox.viewMenuTab.dropdown);
+      expect(viewButtonBox.viewMenuTab.selectedButton.$container).not.toHaveAttr('tabindex');
+      expect(viewButtonBox.viewMenuTab.dropdown.$container).toHaveAttr('tabindex', '0');
+
+      viewButtonBox.viewButtons[0].setVisible(false);
+      expect(viewButtonBox.viewMenuTab.visible).toBe(false);
+      expect(viewButtonBox.tabbableCoordinator.items).toEqual([viewButtonBox.viewButtons[1], viewButtonBox.viewButtons[2]]);
+      expect(viewButtonBox.tabbableCoordinator.currentItem).toBe(viewButtonBox.viewButtons[1]);
+      expect(viewButtonBox.viewMenuTab.selectedButton.$container).not.toHaveAttr('tabindex');
+      expect(viewButtonBox.viewButtons[1].$container).toHaveAttr('tabindex', '0');
+
+      viewButtonBox.viewButtons[0].setVisible(true);
+      expect(viewButtonBox.viewMenuTab.visible).toBe(true);
+      expect(viewButtonBox.tabbableCoordinator.items).toEqual([viewButtonBox.viewMenuTab.dropdown, viewButtonBox.viewButtons[2]]);
+      expect(viewButtonBox.tabbableCoordinator.currentItem).toBe(viewButtonBox.viewMenuTab.dropdown);
+      expect(viewButtonBox.viewMenuTab.selectedButton.$container).not.toHaveAttr('tabindex');
+      expect(viewButtonBox.viewMenuTab.dropdown.$container).toHaveAttr('tabindex', '0');
+    });
+
+    it('is set to selected button if there is a view menu but not selected', () => {
+      let viewButtonBox = scout.create(ViewButtonBox, {
+        parent: session.desktop,
+        viewButtons: [{
+          objectType: ViewButton,
+          displayStyle: 'MENU'
+        }, {
+          objectType: ViewButton,
+          displayStyle: 'MENU'
+        }, {
+          objectType: ViewButton,
+          selected: true
+        }]
+      });
+      viewButtonBox.render();
+      expect(viewButtonBox.tabbableCoordinator.items).toEqual([viewButtonBox.viewMenuTab.selectedButton, viewButtonBox.viewMenuTab.dropdown, viewButtonBox.viewButtons[2]]);
+      expect(viewButtonBox.tabbableCoordinator.currentItem).toBe(viewButtonBox.viewMenuTab.selectedButton);
+      expect(viewButtonBox.viewMenuTab.selectedButton.$container).toHaveAttr('tabindex', '0');
+      expect(viewButtonBox.viewMenuTab.dropdown.$container).not.toHaveAttr('tabindex', '0');
+
+      viewButtonBox.viewButtons[0].setSelected(true);
+      viewButtonBox.viewButtons[2].setSelected(false);
+      expect(viewButtonBox.tabbableCoordinator.items).toEqual([viewButtonBox.viewMenuTab.dropdown, viewButtonBox.viewButtons[2]]);
+      expect(viewButtonBox.tabbableCoordinator.currentItem).toBe(viewButtonBox.viewMenuTab.dropdown);
+      expect(viewButtonBox.viewMenuTab.selectedButton.$container).not.toHaveAttr('tabindex');
+      expect(viewButtonBox.viewMenuTab.dropdown.$container).toHaveAttr('tabindex', '0');
+
+      viewButtonBox.viewButtons[2].setSelected(true);
+      viewButtonBox.viewButtons[0].setSelected(false);
+      expect(viewButtonBox.tabbableCoordinator.items).toEqual([viewButtonBox.viewMenuTab.selectedButton, viewButtonBox.viewMenuTab.dropdown, viewButtonBox.viewButtons[2]]);
+      expect(viewButtonBox.tabbableCoordinator.currentItem).toBe(viewButtonBox.viewMenuTab.selectedButton);
+      expect(viewButtonBox.viewMenuTab.selectedButton.$container).toHaveAttr('tabindex', '0');
+      expect(viewButtonBox.viewMenuTab.dropdown.$container).not.toHaveAttr('tabindex', '0');
+    });
+
   });
 });

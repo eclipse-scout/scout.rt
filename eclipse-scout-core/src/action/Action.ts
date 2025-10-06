@@ -9,7 +9,7 @@
  */
 import {
   AbstractLayout, ActionEventMap, ActionExecKeyStroke, ActionKeyStroke, ActionModel, Alignment, aria, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, LoadingSupport, NullLayout, scout,
-  TooltipPosition, tooltips, TooltipSupport, Widget
+  TabbableItem, TooltipPosition, tooltips, TooltipSupport, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -17,7 +17,7 @@ export type ActionStyle = EnumObject<typeof Action.ActionStyle>;
 export type KeyStrokeFirePolicy = EnumObject<typeof Action.KeyStrokeFirePolicy>;
 export type ActionTextPosition = EnumObject<typeof Action.TextPosition>;
 
-export class Action extends Widget implements ActionModel {
+export class Action extends Widget implements ActionModel, TabbableItem {
   declare model: ActionModel;
   declare eventMap: ActionEventMap;
   declare self: Action;
@@ -178,6 +178,13 @@ export class Action extends Widget implements ActionModel {
     this.setProperty('actionStyle', actionStyle);
   }
 
+  /**
+   * @returns true if {@link actionStyle} is set to {@link Action.ActionStyle.BUTTON}.
+   */
+  isButton(): boolean {
+    return Action.ActionStyle.BUTTON === this.actionStyle;
+  }
+
   /** @see ActionModel.text */
   setText(text: string) {
     this.setProperty('text', text);
@@ -327,6 +334,10 @@ export class Action extends Widget implements ActionModel {
 
   protected _renderTabbable() {
     this.$container.setTabbable(this.tabbable && this.enabledComputed && !Device.get().supportsOnlyTouch());
+  }
+
+  isTabTarget(): boolean {
+    return this.enabledComputed && this.visible && !this.overflown;
   }
 
   /** @see ActionModel.compact */

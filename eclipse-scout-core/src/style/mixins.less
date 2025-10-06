@@ -148,13 +148,14 @@
     content: attr(placeholder);
   }
 
-  .overlay(@left: 0, @top: 0, @diffW: 0, @diffH: 0) {
-    position: absolute;
+  .pseudo-overlay(@top: 0, @right: @top, @bottom: @top, @left: @top) {
     content: '';
-    left: @left;
+    position: absolute;
     top: @top;
-    width: calc(~'100% + ' @diffW);
-    height: calc(~'100% + ' @diffH);
+    right: @right;
+    bottom: @bottom;
+    left: @left;
+    pointer-events: none; // Necessary when used as ::after element
   }
 
   /* Use dashed line instead of solid to avoid visual conflict with editable fields */

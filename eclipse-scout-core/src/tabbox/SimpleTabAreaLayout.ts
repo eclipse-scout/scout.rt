@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractLayout, ContextMenuPopup, Dimension, graphics, Menu, PrefSizeOptions, scout, SimpleTabArea, styles, tooltips, widgets} from '../index';
+import {AbstractLayout, Dimension, graphics, PrefSizeOptions, scout, SimpleTabArea, SimpleTabOverflowMenu, styles, widgets} from '../index';
 import $ from 'jquery';
 
 export class SimpleTabAreaLayout extends AbstractLayout {
@@ -16,8 +16,8 @@ export class SimpleTabAreaLayout extends AbstractLayout {
   tabMinSize: number;
   overflowTabItemSize: number;
   protected _horizontalTabs: boolean;
-  protected _$overflowTab: JQuery;
-  protected _overflowTabsIndizes: number[];
+  protected _overflowTab: SimpleTabOverflowMenu;
+  protected _overflowTabIndices: number[];
 
   constructor(tabArea: SimpleTabArea) {
     super();
@@ -26,34 +26,29 @@ export class SimpleTabAreaLayout extends AbstractLayout {
     this.tabMinSize = null;
     this.overflowTabItemSize = null;
     this._horizontalTabs = null;
-    this._$overflowTab = null;
-    this._overflowTabsIndizes = [];
+    this._overflowTabIndices = [];
   }
 
   override layout($container: JQuery) {
     this._initSizes();
 
-    let htmlContainer = this.tabArea.htmlComp,
-      containerSize = htmlContainer.size({
-        exact: true
-      }),
-      $tabs = htmlContainer.$comp.children('.simple-tab'),
-      numTabs = this.tabArea.getTabs().length,
-      smallPrefSize = this.smallPrefSize();
-
-    containerSize = containerSize.subtract(htmlContainer.insets());
+    let htmlContainer = this.tabArea.htmlComp;
+    let smallPrefSize = this.smallPrefSize();
+    let containerSize = htmlContainer.size({exact: true}).subtract(htmlContainer.insets());
 
     // Reset tabs
-    if (this._$overflowTab) {
-      this._$overflowTab.remove();
+    if (this._overflowTab) {
+      this._overflowTab.destroy();
     }
-    $tabs.setVisible(true);
-    this._overflowTabsIndizes = [];
-    widgets.updateFirstLastMarker(this.tabArea.getTabs());
+    let tabs = this.tabArea.getVisibleTabs(true);
+    tabs.forEach(tab => tab.setOverflown(false));
+    this._overflowTabIndices = [];
+    widgets.updateFirstLastMarker(tabs);
 
     // All tabs fit in container -> no overflow menu necessary
     if (this._getSize(smallPrefSize) <= this._getSize(containerSize)) {
       $container.removeClass('overflown');
+      this.tabArea._updateTabbableItems();
       return;
     }
 
@@ -61,18 +56,18 @@ export class SimpleTabAreaLayout extends AbstractLayout {
     $container.addClass('overflown');
     this._setSize(containerSize, this._getSize(containerSize) - this.overflowTabItemSize);
 
-    // check how many tabs fit into remaining containerSize.width or containerSize.height
+    // check how many tabs fit into remaining containerSize.width
     let numVisibleTabs = Math.floor(this._getSize(containerSize) / this.tabMinSize);
-    let numOverflowTabs = numTabs - numVisibleTabs;
 
     let selectedIndex = 0;
-    $tabs.each((i, tab) => {
-      if ($(tab).hasClass('selected')) {
+    tabs.forEach((tab, i) => {
+      if (tab.$container.isSelected()) {
         selectedIndex = i;
       }
     });
 
     // determine visible range
+    let numTabs = tabs.length;
     let rightEnd;
     let leftEnd = selectedIndex - Math.floor(numVisibleTabs / 2);
     if (leftEnd < 0) {
@@ -86,22 +81,22 @@ export class SimpleTabAreaLayout extends AbstractLayout {
       }
     }
 
-    this._$overflowTab = htmlContainer.$comp
-      .appendDiv('simple-overflow-tab-item')
-      .on('mousedown', this._onOverflowTabItemMouseDown.bind(this));
-    tooltips.install(this._$overflowTab, {
-      parent: this.tabArea,
-      text: '${textKey:ui.MoreTabs}'
-    });
-    this._$overflowTab.appendDiv('num-tabs').text(numOverflowTabs);
-
-    $tabs.each((i, tab) => {
+    tabs.forEach((tab, i) => {
       if (i < leftEnd || i > rightEnd) {
-        $(tab).setVisible(false);
-        this._overflowTabsIndizes.push(i);
+        tab.setOverflown(true);
+        this._overflowTabIndices.push(i);
       }
     });
+
+    this._overflowTab = scout.create(SimpleTabOverflowMenu, {
+      parent: this.tabArea,
+      tooltipText: '${textKey:ui.MoreTabs}',
+      overflowTabIndices: this._overflowTabIndices
+    });
+    this._overflowTab.render(htmlContainer.$comp);
+
     widgets.updateFirstLastMarker(this.tabArea.getVisibleTabs());
+    this.tabArea._updateTabbableItems();
   }
 
   protected _getSize(dimension: Dimension): number {
@@ -185,42 +180,5 @@ export class SimpleTabAreaLayout extends AbstractLayout {
     this.overflowTabItemSize = horizontal
       ? styles.getSize(cssClasses, 'min-width', 'minWidth') + styles.getSize(cssClasses, 'margin-left', 'marginLeft') + styles.getSize(cssClasses, 'margin-right', 'marginRight')
       : styles.getSize(cssClasses, 'min-height', 'minHeight') + styles.getSize(cssClasses, 'margin-top', 'marginTop') + styles.getSize(cssClasses, 'margin-bottom', 'marginBottom');
-  }
-
-  protected _onOverflowTabItemMouseDown(event: JQuery.MouseDownEvent) {
-    let tabArea = this.tabArea;
-    let overflowMenus = [];
-    let $overflowTabItem = $(event.currentTarget);
-    if ($overflowTabItem.data('popup')) {
-      $overflowTabItem.data('popup').close();
-      return;
-    }
-    this._overflowTabsIndizes.forEach(i => {
-      let tab = this.tabArea.getTabs()[i];
-      let menu = scout.create(Menu, {
-        parent: this.tabArea,
-        text: tab.getMenuText()
-      });
-      menu.on('action', function() {
-        $.log.isDebugEnabled() && $.log.debug('(SimpleTabAreaLayout#_onMouseDownOverflow) tab=' + this);
-        tabArea.selectTab(this);
-      }.bind(tab));
-      overflowMenus.push(menu);
-    });
-
-    let popup = scout.create(ContextMenuPopup, {
-      parent: this.tabArea,
-      menuItems: overflowMenus,
-      cloneMenuItems: false,
-      $anchor: $overflowTabItem,
-      closeOnAnchorMouseDown: false
-    });
-    $overflowTabItem.addClass('selected');
-    $overflowTabItem.data('popup', popup);
-    popup.one('remove', () => {
-      $overflowTabItem.removeClass('selected');
-      $overflowTabItem.data('popup', null);
-    });
-    popup.open();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -31,7 +31,7 @@ export class BreadcrumbBarField extends FormField implements BreadcrumbBarFieldM
     this._renderBreadcrumbBar();
   }
 
-  setBreadcrumbItems(breadcrumbItems: ObjectOrChildModel<BreadcrumbItem> | ObjectOrChildModel<BreadcrumbItem>[]) {
+  setBreadcrumbItems(breadcrumbItems: ObjectOrChildModel<BreadcrumbItem>[]) {
     if (!this.breadcrumbBar) {
       return;
     }

@@ -98,6 +98,11 @@ export type AriaRole =
   | 'treegrid'
   | 'treeitem';
 
+export type AriaHasPopup = 'menu' | 'listbox' | 'tree' | 'grid' | 'dialog' | 'true' | 'false' | boolean;
+export type AriaLive = 'assertive' | 'polite' | 'off';
+export type AriaCurrent = 'page' | 'step' | 'location' | 'date' | 'time' | 'true' | 'false' | boolean;
+export type AriaOrientation = 'horizontal' | 'vertical';
+
 export const aria = {
 
   /******************************************************************************************************************
@@ -431,7 +436,7 @@ export const aria = {
    * @param $elem element to add/remove the attribute. If null, nothing is changed.
    * @param type value of the attribute to set. If null, attribute is removed.
    */
-  hasPopup($elem: JQuery<Element>, type: 'menu' | 'listbox' | 'tree' | 'grid' | 'dialog' | 'true' | 'false' | boolean) {
+  hasPopup($elem: JQuery<Element>, type: AriaHasPopup) {
     if (!$elem) {
       return;
     }
@@ -483,7 +488,7 @@ export const aria = {
    * @param $elem element to add/remove the attribute. If null, nothing is changed.
    * @param value value of the attribute to set. If null, attribute is removed.
    */
-  live($elem: JQuery<Element>, value: 'assertive' | 'polite' | 'off') {
+  live($elem: JQuery<Element>, value: AriaLive) {
     if (!$elem) {
       return;
     }
@@ -587,10 +592,58 @@ export const aria = {
    * @param $elem element to add/remove the attribute. If null, nothing is changed.
    * @param value value of the attribute to set. If null, attribute is removed.
    */
-  current($elem: JQuery<Element>, value: 'page' | 'step' | 'location' | 'date' | 'time' | 'true' | 'false' | boolean) {
+  current($elem: JQuery<Element>, value: AriaCurrent) {
     if (!$elem) {
       return;
     }
     $elem.attr('aria-current', strings.asString(value));
+  },
+
+  /**
+   * Sets the aria-orientation attribute.
+   *
+   * If `$elem` has a role and the given orientation is the default orientation for that role, the attribute aria-orientation won't be set / will be removed.
+   * Also, if the role does not support the aria-orientation attribute, it won't be set / will be removed.
+   *
+   * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-orientation">ARIA: aria-orientation</a>
+   *
+   * @param $elem element to add/remove the attribute. If null, nothing is changed.
+   * @param value value of the attribute to set. If null, attribute is removed.
+   */
+  orientation($elem: JQuery<Element>, orientation: AriaOrientation) {
+    if (!$elem) {
+      return;
+    }
+    let role = $elem.attr('role');
+    if (role) {
+      if (!Object.keys(aria.orientationDefault()).includes(role)) {
+        // Don't set orientation if the role that doesn't support it
+        orientation = null;
+      } else {
+        // Don't set orientation if it is the role's default
+        orientation = aria.orientationDefault()[role] === orientation ? null : orientation;
+      }
+    }
+    $elem.attr('aria-orientation', strings.asString(orientation));
+  },
+
+  /**
+   * @returns the orientation defaults per role according to https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-orientation and https://www.w3.org/TR/wai-aria/#aria-orientation
+   */
+  orientationDefault(): Partial<Record<AriaRole, AriaOrientation>> {
+    return {
+      scrollbar: 'vertical',
+      tree: 'vertical',
+      treegrid: 'vertical',
+      listbox: 'vertical',
+      menu: 'vertical',
+      slider: 'horizontal',
+      separator: 'horizontal',
+      tablist: 'horizontal',
+      toolbar: 'horizontal',
+      menubar: 'horizontal',
+      radiogroup: undefined // inherits the orientation attribute from the abstract select role whose default is undefined
+    };
   }
 };
+

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, AriaLabelledByInsertPosition, InitModelOf, scout, TableHeaderMenuGroupEventMap, TableHeaderMenuGroupModel, Widget, widgets} from '../index';
+import {aria, AriaLabelledByInsertPosition, InitModelOf, scout, TabbableCoordinator, TableHeaderMenuButton, TableHeaderMenuGroupEventMap, TableHeaderMenuGroupModel, Widget, widgets} from '../index';
 
 export class TableHeaderMenuGroup extends Widget implements TableHeaderMenuGroupModel {
   declare model: TableHeaderMenuGroupModel;
@@ -18,17 +18,24 @@ export class TableHeaderMenuGroup extends Widget implements TableHeaderMenuGroup
   textKey: string;
   last: boolean;
   $text: JQuery;
+  tabbableCoordinator: TabbableCoordinator;
 
   constructor() {
     super();
     this.text = null;
     this.textKey = null;
     this.last = false;
+    this.tabbableCoordinator = scout.create(TabbableCoordinator, {parent: this});
   }
 
   protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this.text = scout.nvl(this.text, this.session.text(this.textKey));
+  }
+
+  protected override _addChild(child: Widget) {
+    super._addChild(child);
+    this.tabbableCoordinator.setItems(this.children.filter(child => child instanceof TableHeaderMenuButton) as TableHeaderMenuButton[]);
   }
 
   protected override _render() {

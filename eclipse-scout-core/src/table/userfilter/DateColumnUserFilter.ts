@@ -113,7 +113,7 @@ export class DateColumnUserFilter extends ColumnUserFilter implements ColumnUser
     this.dateToField.$field.on('input', '', $.debounce(this._onInput.bind(this)));
   }
 
-  override linkFieldsWithTitle($filterFieldsText: JQuery<HTMLDivElement>) {
+  override linkFieldsWithTitle($filterFieldsText: JQuery) {
     aria.linkElementWithLabel(this.dateFromField.$dateField, $filterFieldsText);
     aria.linkElementWithLabel(this.dateToField.$dateField, $filterFieldsText);
   }

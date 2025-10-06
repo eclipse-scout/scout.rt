@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Device, HtmlComponent, scout, TagBarEventMap, TagBarLayout, TagBarModel, TagBarOverflowPopup, tooltips, Widget} from '../index';
+import {arrays, Device, FocusOptions, HtmlComponent, scout, TagBarEventMap, TagBarLayout, TagBarModel, TagBarOverflowPopup, tooltips, Widget} from '../index';
 import $ from 'jquery';
 
 export class TagBar extends Widget implements TagBarModel {
@@ -195,7 +195,7 @@ export class TagBar extends Widget implements TagBarModel {
       .setTabbable(false);
   }
 
-  override focus(options?: { preventScroll?: boolean }): boolean {
+  override focus(options?: FocusOptions): boolean {
     this.$container.addClass('focused');
     this._removeFocusFromTagElements();
     this.closeOverflowPopup();

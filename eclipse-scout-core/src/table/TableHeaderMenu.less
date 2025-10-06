@@ -52,6 +52,21 @@
     margin-top: 5px;
   }
 
+  & > .table-header-menu-group.first {
+    display: flex;
+    align-items: start;
+    flex-wrap: wrap;
+
+    & > .table-header-menu-group-text {
+      flex-grow: 1;
+    }
+
+    & > .actions > .action {
+      height: 22px;
+      margin-top: -4px;
+    }
+  }
+
   & > .table-header-menu-group > .form-field {
     position: relative;
   }
@@ -254,14 +269,6 @@
   }
 }
 
-.table-header-menu-filter-actions {
-  float: right;
-}
-
-.table-header-menu-filter-toggle-checked {
-  display: inline;
-}
-
 .table-header-menu-filter-table.table-row-check {
   border: 1px solid @control-border-color;
   border-radius: @border-radius;
@@ -296,9 +303,6 @@
 }
 
 .table-header-menu-toggle-sort-order {
-  float: left;
-  padding-right: @table-header-menu-padding;
-
   &::before {
     #scout.font-icon();
   }

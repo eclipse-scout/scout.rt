@@ -7,11 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, Event, EventHandler, GlassPaneContribution, InitModelOf, ObjectIdProvider, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, tooltips, Widget} from '../index';
+import {aria, Device, Event, EventHandler, GlassPaneContribution, InitModelOf, ObjectIdProvider, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, TabbableItem, tooltips, Widget} from '../index';
 
 export type DisplayViewId = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C' | 'OUTLINE' | 'OUTLINE_SELECTOR' | 'PAGE_DETAIL' | 'PAGE_SEARCH' | 'PAGE_TABLE';
 
-export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabModel<TView> {
+export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabModel<TView>, TabbableItem {
   declare model: SimpleTabModel<TView>;
   declare eventMap: SimpleTabEventMap<TView>;
   declare self: SimpleTab<any>;
@@ -25,6 +25,8 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
   saveNeededVisible: boolean;
   status: Status;
   selected: boolean;
+  overflown: boolean;
+  tabbable: boolean;
   $title: JQuery;
   $subTitle: JQuery;
   $iconContainer: JQuery;
@@ -52,6 +54,9 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
     this.saveNeededVisible = false;
     this.status = null;
     this.selected = false;
+    this.tabbable = false;
+    this.preventInitialFocus = true;
+    this.overflown = false;
 
     this.$title = null;
     this.$subTitle = null;
@@ -126,6 +131,7 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
     this._renderSaveNeeded();
     this._renderStatus();
     this._renderSelected();
+    this._renderTabbable();
   }
 
   protected override _remove() {
@@ -155,6 +161,26 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
 
   protected _renderIconId() {
     this.$iconContainer.icon(this.iconId);
+  }
+
+  setTabbable(tabbable: boolean) {
+    this.setProperty('tabbable', tabbable);
+  }
+
+  protected _renderTabbable() {
+    this.$container.setTabbable(this.tabbable && this.enabledComputed && !Device.get().supportsOnlyTouch());
+  }
+
+  setOverflown(overflown: boolean) {
+    this.setProperty('overflown', overflown);
+  }
+
+  protected _renderOverflown() {
+    this.$container.toggleClass('overflown', this.overflown);
+  }
+
+  isTabTarget(): boolean {
+    return this.enabledComputed && this.visible && !this.overflown;
   }
 
   setClosable(closable: boolean) {
@@ -293,7 +319,6 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
       tooltips.cancel(this.$subTitle);
       tooltips.close(this.$subTitle);
     }
-    event.preventDefault();
   }
 
   protected _onClose(event: JQuery.ClickEvent) {

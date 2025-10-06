@@ -96,15 +96,6 @@ export class ButtonAdapterMenu extends Menu implements ButtonAdapterMenuModel {
     return actionExecuted;
   }
 
-  override focus(): boolean {
-    if (!this.rendered) {
-      this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this));
-      return false;
-    }
-    this.menubar.setTabbableMenu(this);
-    return this.session.focusManager.requestFocus(this.get$Focusable());
-  }
-
   static adaptButtonProperties(buttonProperties: ButtonModel & { gridData?: GridData }, menuProperties?: InitModelOf<ButtonAdapterMenu>): InitModelOf<ButtonAdapterMenu> {
     // @ts-expect-error
     menuProperties = menuProperties || {};

@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, InitModelOf, inspector, MenuBar, MenuDestinations, ObjectIdProvider, objects, PropertyChangeEvent, Rectangle, scout, scrollbars,
-  SomeRequired, strings, styles, Table, TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableHeaderEventMap, TableHeaderMenu, TableHeaderModel, tooltips, Widget
+  aria, arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, InitModelOf, inspector, ItemFocusEvent, keys, KeyStrokeContext, MenuBar, MenuDestinations, ObjectIdProvider, objects,
+  PropertyChangeEvent, Rectangle, scout, scrollbars, SomeRequired, strings, styles, TabbableCoordinator, TabbableItem, Table, TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent,
+  TableHeaderEventMap, TableHeaderMenu, TableHeaderModel, tooltips, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -26,6 +27,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
   menuBar: MenuBar;
   tableHeaderMenu: TableHeaderMenu;
   headerLabelId: string;
+  tabbableCoordinator: TabbableCoordinator;
   $menuBarContainer: JQuery;
   $filler: JQuery;
 
@@ -54,6 +56,9 @@ export class TableHeader extends Widget implements TableHeaderModel {
 
   protected override _init(options: InitModelOf<this>) {
     super._init(options);
+
+    this.tabbableCoordinator = scout.create(TabbableCoordinator, {parent: this});
+    this.tabbableCoordinator.on('itemFocus', this._onTabbableItemFocus.bind(this));
 
     this.menuBar = scout.create(MenuBar, {
       parent: this,
@@ -116,6 +121,19 @@ export class TableHeader extends Widget implements TableHeaderModel {
       this.$filler.css('visibility', 'visible').html('&nbsp;').addClass('empty');
     }
     this._reconcileScrollPos();
+    this._updateTabbableItems();
+  }
+
+  protected _updateTabbableItems() {
+    let headerItems = this.findHeaderItems().toArray().map(headerItem => {
+      let $headerItem = $(headerItem);
+      let item = this.tabbableCoordinator.findItemFor($headerItem);
+      if (item) {
+        return item;
+      }
+      return new TabbableItem($headerItem);
+    });
+    this.tabbableCoordinator.setItems([...headerItems, ...this.menuBar.menuItems]);
   }
 
   protected _renderColumn(column: Column<any>, index: number) {
@@ -124,7 +142,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
       isFirstColumn = (index === 0),
       isLastColumn = (index === visibleColumns.length - 1);
 
-    let $header = this.$filler.beforeDiv('table-header-item')
+    let $header = this.$filler.beforeDiv('table-header-item prevent-initial-focus')
       .setEnabled(this.enabled) // enabledComputed not used on purpose
       .data('column', column);
 
@@ -141,6 +159,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
     if (this.enabled) { // enabledComputed not used on purpose
       $header
         .on('click', this._onHeaderItemClick.bind(this))
+        .on('keydown', this._onHeaderItemKeyDown.bind(this))
         .on('mousedown', this._onHeaderItemMouseDown.bind(this));
     }
 
@@ -179,6 +198,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
 
   protected _removeColumns() {
     this._renderedColumns.slice().forEach(this._removeColumn, this);
+    this._updateTabbableItems();
   }
 
   protected _removeColumn(column: Column<any>) {
@@ -267,7 +287,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
             return;
           }
           // make sure selected header item is visible
-          scrollbars.scrollHorizontalTo(that.table.$data, $headerItem);
+          that._scrollToHeaderItem($headerItem);
 
           // move menu
           if (that.tableHeaderMenu && that.tableHeaderMenu.rendered) {
@@ -542,11 +562,14 @@ export class TableHeader extends Widget implements TableHeaderModel {
     let menuItems = this.table._filterMenus(this.table.menus, MenuDestinations.HEADER);
     this.menuBar.setHiddenByUi(!this.enabled); // enabledComputed not used on purpose
     this.menuBar.setMenuItems(menuItems);
+    if (this.rendered) {
+      this._updateTabbableItems();
+    }
   }
 
   protected _onTableColumnResized(event: TableColumnResizedEvent) {
-    let column = event.column,
-      lastColumn = this._lastVisibleColumn();
+    let column = event.column;
+    let lastColumn = this._lastVisibleColumn();
     this.resizeHeaderItem(column);
     if (lastColumn !== column) {
       this.resizeHeaderItem(lastColumn);
@@ -601,6 +624,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
     if (!this.dragging) {
       this._arrangeHeaderItems($([$movedHeader[0], $targetHeader[0]]));
     }
+    this._updateTabbableItems();
   }
 
   protected _visibleColumns(): Column<any>[] {
@@ -632,6 +656,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
     this.$container.append(this.$filler);
 
     this._arrangeHeaderItems($headers);
+    this._updateTabbableItems();
   }
 
   /**
@@ -641,22 +666,30 @@ export class TableHeader extends Widget implements TableHeaderModel {
     return !!(column.headerMenuEnabled && this.headerMenusEnabled);
   }
 
-  protected _onHeaderItemClick(event: JQuery.ClickEvent): boolean {
-    let $headerItem = $(event.currentTarget),
-      column = $headerItem.data('column') as Column<any>;
+  protected _onHeaderItemClick(event: JQuery.ClickEvent) {
+    this._doHeaderItemAction($(event.currentTarget), event.ctrlKey || event.shiftKey, event.shiftKey);
+  }
+
+  protected _onHeaderItemKeyDown(event: JQuery.KeyDownEvent) {
+    if (scout.isOneOf(event.which, keys.ENTER, keys.SPACE)) {
+      this._doHeaderItemAction($(event.currentTarget));
+      event.stopPropagation();
+    }
+  }
+
+  protected _doHeaderItemAction($headerItem: JQuery, toggleSort?: boolean, multiSort?: boolean) {
+    let column = $headerItem.data('column') as Column<any>;
 
     if (this.dragging || this.columnMoved) {
       this.dragging = false;
       this.columnMoved = false;
-    } else if (this.table.sortEnabled && (event.shiftKey || event.ctrlKey || !this._isHeaderMenuEnabled(column))) {
-      this.table.sort(column, $headerItem.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
-    } else if (this.tableHeaderMenu && this.tableHeaderMenu.isOpenFor($headerItem)) {
+    } else if (this.table.sortEnabled && (toggleSort || !this._isHeaderMenuEnabled(column))) {
+      this.table.sort(column, $headerItem.hasClass('sort-asc') ? 'desc' : 'asc', multiSort);
+    } else if (this.tableHeaderMenu?.isOpenFor($headerItem)) {
       this.closeHeaderMenu();
     } else if (this._isHeaderMenuEnabled(column)) {
       this.openHeaderMenu(column);
     }
-
-    return false;
   }
 
   protected _onHeaderItemMouseDown(event: JQuery.MouseDownEvent) {
@@ -884,5 +917,30 @@ export class TableHeader extends Widget implements TableHeaderModel {
     if (event.filter.filterType === ColumnUserFilter.TYPE && column.$header) {
       this._renderColumnState(column);
     }
+  }
+
+  protected _onTabbableItemFocus(event: ItemFocusEvent) {
+    if (!this.table.rendered) {
+      return;
+    }
+
+    let $item = event.item.$container;
+    if (!$item.hasClass('table-header-item')) {
+      // A header menu is focused, no scrolling necessary
+      return;
+    }
+
+    // If an element is focused using tab and the element was not in the viewport,
+    // the browser scrolls to that element -> revert this scrolling first
+    this._reconcileScrollPos();
+
+    this._scrollToHeaderItem($item);
+  }
+
+  protected _scrollToHeaderItem($item: JQuery<HTMLElement>) {
+    scrollbars.scrollHorizontalTo(this.table.$data, $item, {
+      scrollOffsetLeft: graphics.insets(this.$container).left,
+      scrollOffsetRight: this.$menuBarContainer.isVisible() ? this.$menuBarContainer.outerWidth(true) : 0
+    });
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ColumnUserFilter, FilterFieldsGroupBox, scout, StringField, strings, TableRow, TableUserFilterAddedEventData, TextColumnUserFilterModel, ValueFieldAcceptInputEvent} from '../../index';
+import {aria, ColumnUserFilter, FilterFieldsGroupBox, scout, StringField, strings, TableRow, TableUserFilterAddedEventData, TextColumnUserFilterModel, ValueFieldAcceptInputEvent} from '../../index';
 import $ from 'jquery';
 
 export class TextColumnUserFilter extends ColumnUserFilter {
@@ -66,5 +66,9 @@ export class TextColumnUserFilter extends ColumnUserFilter {
 
   override modifyFilterFields() {
     this.freeTextField.removeMandatoryIndicator();
+  }
+
+  override linkFieldsWithTitle($filterFieldsText: JQuery) {
+    aria.linkElementWithLabel(this.freeTextField.$field, $filterFieldsText);
   }
 }

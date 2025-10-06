@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,41 +29,19 @@
 .chart-select {
   display: flex;
   flex-flow: column;
-
   width: 75px;
   margin: 25px;
 
-
-  & > .icon {
+  & > .chart-type {
     padding: 15px 0;
     margin-bottom: 8px;
     min-width: 60px;
-
-    font-size: 26px;
-    font-weight: @icon-font-weight-light;
-    text-align: center;
-
     border-radius: @border-radius-medium;
+    transition: none; // Disable focus transition because other chart items also have no transition
 
-    color: @button-color;
-
-    &:not(.disabled) {
-      cursor: pointer;
-
-      &.selected,
-      &.selected:hover {
-        background-color: @default-button-background-color;
-        color: @default-button-color;
-      }
-
-      &:hover {
-        color: @button-hover-color;
-        background-color: @hover-background-color;
-      }
-    }
-
-    &.disabled {
-      color: @button-disabled-color;
+    & > .icon {
+      font-size: 26px;
+      font-weight: @icon-font-weight-light;
     }
   }
 }
@@ -137,6 +115,10 @@
     color: @selected-color;
   }
 
+  &:focus {
+    #scout.focus-inset-box-shadow();
+  }
+
   &.disabled {
     cursor: default;
     background-color: @table-control-container-background-color;
@@ -144,6 +126,11 @@
 
     &:hover {
       background-color: @table-control-container-background-color;
+    }
+
+    &.selected {
+      color: @selected-color;
+      background-color: @selected-disabled-background-color;
     }
   }
 

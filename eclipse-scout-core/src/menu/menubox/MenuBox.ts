@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, HtmlComponent, InitModelOf, Menu, MenuBoxEventMap, MenuBoxLayout, MenuBoxModel, ObjectOrChildModel, Widget} from '../../index';
+import {aria, EllipsisMenu, HtmlComponent, InitModelOf, Menu, MenuBoxEventMap, MenuBoxLayout, MenuBoxModel, ObjectOrChildModel, scout, TabbableCoordinator, Widget} from '../../index';
 
 export class MenuBox extends Widget implements MenuBoxModel {
   declare model: MenuBoxModel;
@@ -17,6 +17,7 @@ export class MenuBox extends Widget implements MenuBoxModel {
   compact: boolean;
   menus: Menu[];
   uiMenuCssClass: string;
+  tabbableCoordinator: TabbableCoordinator;
 
   protected _compactOrig: boolean;
 
@@ -30,15 +31,8 @@ export class MenuBox extends Widget implements MenuBoxModel {
 
   protected override _init(options: InitModelOf<this>) {
     super._init(options);
-    this._initMenus(this.menus);
-  }
-
-  protected _initMenus(menus: Menu[]) {
-    menus.forEach(this._initMenu.bind(this));
-  }
-
-  protected _initMenu(menu: Menu) {
-    menu.uiCssClass = this.uiMenuCssClass;
+    this.tabbableCoordinator = scout.create(TabbableCoordinator, {parent: this});
+    this._setMenus(this.menus);
   }
 
   protected override _render() {
@@ -57,6 +51,16 @@ export class MenuBox extends Widget implements MenuBoxModel {
 
   setMenus(menus: ObjectOrChildModel<Menu>[]) {
     this.setProperty('menus', menus);
+  }
+
+  protected _setMenus(menus: Menu[]) {
+    menus.forEach(menu => this._initMenu(menu));
+    this._setProperty('menus', menus);
+    this._updateTabbableItems();
+  }
+
+  protected _initMenu(menu: Menu) {
+    menu.uiCssClass = this.uiMenuCssClass;
   }
 
   protected _renderMenus() {
@@ -99,5 +103,16 @@ export class MenuBox extends Widget implements MenuBoxModel {
     }
     this.setCompact(this._compactOrig);
     this._compactOrig = undefined;
+  }
+
+  /**
+   * @internal
+   */
+  _updateTabbableItems(ellipsisMenu?: EllipsisMenu) {
+    let items = [...this.menus];
+    if (ellipsisMenu) {
+      items.push(ellipsisMenu);
+    }
+    this.tabbableCoordinator.setItems(items);
   }
 }
