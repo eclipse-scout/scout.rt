@@ -131,6 +131,10 @@
     color: @active-color;
   }
 
+  &.keyboard-navigation:focus {
+    #scout.focus-inset-box-shadow();
+  }
+
   &.selected {
     cursor: default;
     background-color: @simple-tab-selected-background-color;
@@ -138,6 +142,10 @@
     & > .title-line > .title {
       color: @simple-tab-selected-color;
     }
+  }
+
+  &.overflown {
+    display: none;
   }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,6 +22,11 @@ public class ChartUiTextContributor implements IUiTextContributor {
         "ui.Bio",
         "ui.Brd",
         "ui.Chart",
+        "ui.ChartTypeBar",
+        "ui.ChartTypeBarHorizontal",
+        "ui.ChartTypeLine",
+        "ui.ChartTypePie",
+        "ui.ChartTypeBubble",
         "ui.FulfillmentChartAriaDescription",
         "ui.Mio",
         "ui.Mrd",
@@ -30,7 +35,6 @@ public class ChartUiTextContributor implements IUiTextContributor {
         "ui.Tri",
         "ui.Trd",
         "ui.Value",
-        "ui.bar",
         "ui.groupedByWeekday",
         "ui.groupedByMonth",
         "ui.groupedByYear",

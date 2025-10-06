@@ -7,7 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Form, NavigateDownButton, NullWidget, Outline, Page, scout, Table, TableRow} from '../../../../src/index';
+import {Form, GroupBox, Menu, NavigateDownButton, NullWidget, Outline, Page, scout, Table, TableRow} from '../../../../src/index';
+import {OutlineSpecHelper} from '../../../../src/testing';
 
 describe('NavigateDownButton', () => {
 
@@ -259,5 +260,23 @@ describe('NavigateDownButton', () => {
       node.detailTable.selectRows(null);
       expect(menu._getDrillNode()).toBe(childNode1);
     });
+  });
+
+  it('is set as default menu', () => {
+    let outlineHelper = new OutlineSpecHelper(session);
+    let model = outlineHelper.createModelFixture(3, 2, true);
+    model.nodes[0].detailForm = scout.create(Form, {
+      parent: session.desktop,
+      rootGroupBox: {
+        objectType: GroupBox,
+        menus: [{objectType: Menu}] // Add a menu to test that default menu is correctly changed
+      }
+    });
+    model.nodes[0].detailFormVisible = true;
+    let outline = outlineHelper.createOutline(model);
+    let staticMenus = outline.nodes[0].detailForm.rootGroupBox.staticMenus;
+    expect(staticMenus[1] instanceof NavigateDownButton).toBe(true);
+    expect(staticMenus[1].tabbable).toBe(true);
+    expect(outline.nodes[0].detailForm.rootGroupBox.menuBar.defaultMenu).toBe(staticMenus[1]);
   });
 });

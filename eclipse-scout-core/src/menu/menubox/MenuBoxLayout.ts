@@ -159,7 +159,7 @@ export class MenuBoxLayout extends AbstractLayout {
   }
 
   collapse(containerSize: Dimension, menusWidth: number) {
-    this._createAndRenderEllipsis(this.menuBox.$container);
+    this._createAndRenderEllipsis();
     let collapsedMenus = this._moveOverflowMenusIntoEllipsis(containerSize, menusWidth);
     this.updateFirstAndLastMenuMarker(collapsedMenus);
   }
@@ -173,21 +173,23 @@ export class MenuBoxLayout extends AbstractLayout {
     this._removeMenusFromEllipsis(menus);
   }
 
-  protected _createAndRenderEllipsis($container: JQuery) {
+  protected _createAndRenderEllipsis() {
     let ellipsis = menuUtil.createEllipsisMenu({
       parent: this.menuBox,
       hidden: false,
       compact: this.menuBox.compact
     });
     ellipsis.uiCssClass = this.menuBox.uiMenuCssClass;
-    ellipsis.render($container);
+    ellipsis.render();
     this._ellipsis = ellipsis;
+    this.menuBox._updateTabbableItems(this._ellipsis);
   }
 
   protected _destroyEllipsis() {
     if (this._ellipsis) {
       this._ellipsis.destroy();
       this._ellipsis = null;
+      this.menuBox._updateTabbableItems(this._ellipsis);
     }
   }
 

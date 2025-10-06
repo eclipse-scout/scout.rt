@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Desktop, Event, EventHandler, HtmlComponent, InitModelOf, ObjectOrChildModel, OutlineViewButton, PropertyChangeEvent, scout, ViewButton, ViewButtonBoxEventMap, ViewButtonBoxModel, ViewMenuTab, Widget, widgets} from '../../index';
+import {
+  aria, Desktop, Event, EventHandler, HtmlComponent, InitModelOf, ObjectOrChildModel, OutlineViewButton, PropertyChangeEvent, scout, TabbableCoordinator, ViewButton, ViewButtonBoxEventMap, ViewButtonBoxModel, ViewMenuTab, Widget, widgets
+} from '../../index';
 
 export class ViewButtonBox extends Widget implements ViewButtonBoxModel {
   declare model: ViewButtonBoxModel;
@@ -20,6 +22,7 @@ export class ViewButtonBox extends Widget implements ViewButtonBoxModel {
   menuButtons: ViewButton[];
   tabButtons: ViewButton[];
   selectedMenuButtonAlwaysVisible: boolean;
+  tabbableCoordinator: TabbableCoordinator;
   protected _desktopOutlineChangeHandler: EventHandler<Event<Desktop>>;
   protected _viewButtonPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, ViewButton>>;
 
@@ -38,6 +41,7 @@ export class ViewButtonBox extends Widget implements ViewButtonBoxModel {
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.desktop = this.session.desktop;
+    this.tabbableCoordinator = scout.create(TabbableCoordinator, {parent: this});
     this.viewMenuTab = scout.create(ViewMenuTab, {
       parent: this
     });
@@ -47,6 +51,7 @@ export class ViewButtonBox extends Widget implements ViewButtonBoxModel {
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('view-button-box');
+    aria.role(this.$container, 'toolbar');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
 
     this.viewMenuTab.render();
@@ -82,9 +87,7 @@ export class ViewButtonBox extends Widget implements ViewButtonBoxModel {
   }
 
   protected _setViewButtons(viewButtons: ViewButton[]) {
-    if (this.viewButtons) {
-      this.viewButtons.forEach(viewButton => viewButton.off('propertyChange', this._viewButtonPropertyChangeHandler));
-    }
+    this.viewButtons?.forEach(viewButton => viewButton.off('propertyChange', this._viewButtonPropertyChangeHandler));
     this._setProperty('viewButtons', viewButtons);
     this.viewButtons.forEach(viewButton => viewButton.on('propertyChange', this._viewButtonPropertyChangeHandler));
     this._updateViewButtons();
@@ -126,6 +129,19 @@ export class ViewButtonBox extends Widget implements ViewButtonBoxModel {
     }
     this._updateVisibility();
     this._updateSelectedMenuButtonVisibility();
+    this._updateTabbableItems();
+  }
+
+  protected _updateTabbableItems() {
+    let selectedButton;
+    let dropdown;
+    if (this.viewMenuTab.visible) {
+      dropdown = this.viewMenuTab.dropdown;
+      if (!this.viewMenuTab.selected) {
+        selectedButton = this.viewMenuTab.selectedButton;
+      }
+    }
+    this.tabbableCoordinator.setItems([selectedButton, dropdown, ...this.tabButtons].filter(Boolean));
   }
 
   protected _updateVisibility() {
@@ -164,6 +180,8 @@ export class ViewButtonBox extends Widget implements ViewButtonBoxModel {
 
     // Inform viewMenu tab about new selection
     this.viewMenuTab.onViewButtonSelected();
+
+    this._updateTabbableItems();
   }
 
   protected _onViewButtonPropertyChange(event: PropertyChangeEvent<any, ViewButton>) {

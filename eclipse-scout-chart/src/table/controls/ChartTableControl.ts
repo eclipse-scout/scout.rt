@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Column, DateColumn, Event, EventListener, Icon, IconDesc, icons, InitModelOf, NumberColumn, objects, scout, scrollbars, strings, styles, Table, TableControl, TableMatrix, TableMatrixDateGroup, TableMatrixKeyAxis,
-  TableMatrixNumberGroup, TableMatrixResult, tooltips
+  Action, arrays, Column, DateColumn, Event, EventListener, IconDesc, icons, InitModelOf, keys, KeyStrokeContext, NumberColumn, objects, scout, scrollbars, strings, styles, TabbableCoordinator, TabbableItem, Table, TableControl,
+  TableMatrix, TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup, TableMatrixResult, tooltips
 } from '@eclipse-scout/core';
-import {Chart, ChartTableControlEventMap, ChartTableControlLayout, ChartTableControlModel, ChartTableUserFilter} from '../../index';
+import {Chart, ChartTableControlEventMap, ChartTableControlLayout, ChartTableControlModel, ChartTableUserFilter, FocusFirstChartTypeKeyStroke} from '../../index';
 import $ from 'jquery';
 import {BubbleDataPoint, ChartData, ChartType as ChartJsType} from 'chart.js';
 import {ChartConfig, ClickObject} from '../../chart/Chart';
@@ -37,10 +37,14 @@ export class ChartTableControl extends TableControl implements ChartTableControl
   $xAxisSelect: JQuery;
   $yAxisSelect: JQuery;
   $dataSelect: JQuery;
-  protected _chartTypeMap: Record<TableControlChartType, JQuery>;
+  protected _chartTypeMap: Record<TableControlChartType, Action>;
+  protected _chartTypeTabbableCoordinator: TabbableCoordinator;
   protected _aggregationMap: Record<string, JQuery>;
+  protected _aggregationTabbableCoordinator: TabbableCoordinator;
   protected _chartGroup1Map: Record<string, JQuery>;
+  protected _chartGroup1TabbableCoordinator: TabbableCoordinator;
   protected _chartGroup2Map: Record<string, JQuery>;
+  protected _chartGroup2TabbableCoordinator: TabbableCoordinator;
   protected _tableUpdatedHandler: (e: Event<Table>) => void;
   protected _tableColumnStructureChangedHandler: () => void;
   protected _chartValueClickedHandler: () => void;
@@ -70,6 +74,10 @@ export class ChartTableControl extends TableControl implements ChartTableControl
 
     this.dateGroup = null;
 
+    this._chartTypeTabbableCoordinator = scout.create(TabbableCoordinator, {parent: this, autoRegisterKeyStrokes: false, orientation: 'vertical'});
+    this._chartGroup1TabbableCoordinator = scout.create(TabbableCoordinator, {parent: this, autoRegisterKeyStrokes: false, orientation: 'vertical'});
+    this._chartGroup2TabbableCoordinator = scout.create(TabbableCoordinator, {parent: this, autoRegisterKeyStrokes: false, orientation: 'vertical'});
+    this._aggregationTabbableCoordinator = scout.create(TabbableCoordinator, {parent: this, autoRegisterKeyStrokes: false, orientation: 'vertical'});
     this._tableUpdatedHandler = this._onTableUpdated.bind(this);
     this._tableColumnStructureChangedHandler = this._onTableColumnStructureChanged.bind(this);
     this._chartValueClickedHandler = this._onChartValueClick.bind(this);
@@ -90,6 +98,11 @@ export class ChartTableControl extends TableControl implements ChartTableControl
   protected override _destroy() {
     this.table.off('columnStructureChanged', this._tableColumnStructureChangedHandler);
     super._destroy();
+  }
+
+  protected override _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
+    this.tableControlKeyStrokeContext.registerKeyStroke(new FocusFirstChartTypeKeyStroke(this));
   }
 
   protected override _computeEnabled(inheritAccessibility: boolean, parentEnabled: boolean): boolean {
@@ -120,6 +133,9 @@ export class ChartTableControl extends TableControl implements ChartTableControl
       this.$yAxisSelect.data('scroll-shadow').setVisible(true);
       this.$yAxisSelect.removeClass('animated');
     });
+    this._chartGroup2TabbableCoordinator.setItems(this.$yAxisSelect.hasClass('hide')
+      ? []
+      : this.$yAxisSelect.children('.select-axis').map((i, item) => new TabbableItem($(item))).get());
 
     if (this.contentRendered) {
       this.chart.$container.animateAVCSD('opacity', 0, () => {
@@ -130,8 +146,8 @@ export class ChartTableControl extends TableControl implements ChartTableControl
   }
 
   protected _selectChartType() {
-    objects.values(this._chartTypeMap).forEach($element => {
-      $element.setSelected(false);
+    objects.values(this._chartTypeMap).forEach(action => {
+      action.setSelected(false);
     });
     this._chartTypeMap[this.chartType].setSelected(true);
   }
@@ -197,24 +213,20 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     }
   }
 
-  protected _renderChartSelect(cssClass: string, chartType: TableControlChartType, iconId: string) {
-    let icon = scout.create(Icon, {
+  protected _renderChartSelect(cssClass: string, chartType: TableControlChartType, iconId: string, tooltipText: string) {
+    let action = scout.create(Action, {
       parent: this,
-      iconDesc: iconId,
-      cssClass: cssClass
+      iconId,
+      cssClass,
+      tooltipText
     });
-    icon.render(this.$chartSelect);
-    this.$contentContainer.one('remove', () => icon.destroy());
-    let $iconContainer = icon.$container;
-    $iconContainer
-      .toggleClass('disabled', !this.enabledComputed || !this._hasColumns())
-      .data('chartType', chartType);
+    action.render(this.$chartSelect);
+    action.$container.addClass('chart-type menu-item').data('chartType', chartType);
+    action.on('action', this._onChartTypeAction.bind(this));
+    action.setEnabled(this._hasColumns());
+    this.$contentContainer.one('remove', () => action.destroy());
 
-    if (this.enabledComputed && this._hasColumns()) {
-      $iconContainer.on('click', this._onClickChartType.bind(this));
-    }
-
-    this._chartTypeMap[chartType] = $iconContainer;
+    this._chartTypeMap[chartType] = action;
   }
 
   /**
@@ -225,25 +237,29 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     this.$chartSelect = this.$contentContainer.appendDiv('chart-select');
 
     // create chart types for selection
-    this._chartTypeMap = {} as Record<TableControlChartType, JQuery>;
+    this._chartTypeMap = {} as Record<TableControlChartType, Action>;
 
     let supportedChartTypes = this._getSupportedChartTypes();
 
     if (scout.isOneOf(Chart.Type.BAR, supportedChartTypes)) {
-      this._renderChartSelect('chart-bar', Chart.Type.BAR, icons.DIAGRAM_BARS_VERTICAL);
+      this._renderChartSelect('chart-bar', Chart.Type.BAR, icons.DIAGRAM_BARS_VERTICAL, this.session.text('ui.ChartTypeBar'));
     }
     if (scout.isOneOf(Chart.Type.BAR_HORIZONTAL, supportedChartTypes)) {
-      this._renderChartSelect('chart-stacked', Chart.Type.BAR_HORIZONTAL, icons.DIAGRAM_BARS_HORIZONTAL);
+      this._renderChartSelect('chart-stacked', Chart.Type.BAR_HORIZONTAL, icons.DIAGRAM_BARS_HORIZONTAL, this.session.text('ui.ChartTypeBarHorizontal'));
     }
     if (scout.isOneOf(Chart.Type.LINE, supportedChartTypes)) {
-      this._renderChartSelect('chart-line', Chart.Type.LINE, icons.DIAGRAM_LINE);
+      this._renderChartSelect('chart-line', Chart.Type.LINE, icons.DIAGRAM_LINE, this.session.text('ui.ChartTypeLine'));
     }
     if (scout.isOneOf(Chart.Type.PIE, supportedChartTypes)) {
-      this._renderChartSelect('chart-pie', Chart.Type.PIE, icons.DIAGRAM_PIE);
+      this._renderChartSelect('chart-pie', Chart.Type.PIE, icons.DIAGRAM_PIE, this.session.text('ui.ChartTypePie'));
     }
     if (scout.isOneOf(Chart.Type.BUBBLE, supportedChartTypes)) {
-      this._renderChartSelect('chart-bubble', Chart.Type.BUBBLE, icons.DIAGRAM_SCATTER);
+      this._renderChartSelect('chart-bubble', Chart.Type.BUBBLE, icons.DIAGRAM_SCATTER, this.session.text('ui.ChartTypeBubble'));
     }
+    let keyStrokeContext = new KeyStrokeContext({$bindTarget: this.$chartSelect, $scopeTarget: this.$chartSelect});
+    this.session.keyStrokeManager.installKeyStrokeContext(keyStrokeContext);
+    this._chartTypeTabbableCoordinator.registerKeyStrokes(this, keyStrokeContext);
+    this._chartTypeTabbableCoordinator.setItems(Object.values(this._chartTypeMap));
   }
 
   protected _getSupportedChartTypes(): TableControlChartType[] {
@@ -256,17 +272,27 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     ];
   }
 
-  protected _onClickChartType(event: JQuery.ClickEvent) {
-    let $target = $(event.currentTarget),
-      chartType = $target.data('chartType');
+  protected _onChartTypeAction(event: Event<Action>) {
+    const chartType = event.source.$container.data('chartType');
     this.setChartType(chartType);
   }
 
-  protected _onClickChartGroup(event: JQuery.ClickEvent) {
-    let $target = $(event.currentTarget),
-      groupId = $target.parent().data('groupId'),
-      column = $target.data('column'),
-      origModifier = $target.data('modifier');
+  protected _onChartGroupKeyDown(event: JQuery.KeyDownEvent) {
+    if (scout.isOneOf(event.which, keys.ENTER, keys.SPACE)) {
+      this._doChartGroupAction($(event.currentTarget));
+      event.stopPropagation();
+      event.preventDefault(); // Don't scroll when pressing space
+    }
+  }
+
+  protected _onChartGroupClick(event: JQuery.ClickEvent) {
+    this._doChartGroupAction($(event.currentTarget));
+  }
+
+  protected _doChartGroupAction($target: JQuery) {
+    let groupId = $target.parent().data('groupId');
+    let column = $target.data('column');
+    let origModifier = $target.data('modifier');
 
     // do nothing when item is disabled
     if (!$target.isEnabled()) {
@@ -284,8 +310,18 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     this._setChartGroup(groupId, config);
   }
 
-  protected _onClickAggregation(event: JQuery.ClickEvent) {
-    let $target = $(event.currentTarget);
+  protected _onAggregationKeyDown(event: JQuery.KeyDownEvent) {
+    if (scout.isOneOf(event.which, keys.ENTER, keys.SPACE)) {
+      this._doAggregationAction($(event.currentTarget));
+      event.stopPropagation();
+    }
+  }
+
+  protected _onAggregationClick(event: JQuery.ClickEvent) {
+    this._doAggregationAction($(event.currentTarget));
+  }
+
+  protected _doAggregationAction($target: JQuery) {
     // update modifier
     let origModifier = $target.data('modifier');
     let modifier = $target.isSelected() ? this._nextModifier(origModifier) : origModifier;
@@ -404,7 +440,9 @@ export class ChartTableControl extends TableControl implements ChartTableControl
   }
 
   protected override _renderContent($parent: JQuery) {
-    this.$contentContainer = $parent.appendDiv('chart-container');
+    this.$contentContainer = $parent.appendDiv('chart-container')
+      .attr('tabindex', '-1');
+    this.$contentContainer[0].focus(); // Pressing tab should select first chart type action
 
     // scrollbars
     this._installScrollbars();
@@ -485,14 +523,12 @@ export class ChartTableControl extends TableControl implements ChartTableControl
       return Math.abs(a[1] as number - 8) - Math.abs(b[1] as number - 8);
     });
 
-    let axisCount, enabled,
-      numberOfAxisItems = 0,
-      columns = matrix.columns(false); // filterNumberColumns false: number columns will be filtered below
+    let axisCount, enabled;
+    let columns = matrix.columns(false); // filterNumberColumns false: number columns will be filtered below
 
     // all x/y-axis for selection
     for (let c1 = 0; c1 < columns.length; c1++) {
-      let content, $div, $yDiv,
-        column1 = columns[c1];
+      let column1 = columns[c1];
 
       // Check if data-spread is too large. This is a problem in large tables where a column has unique values.
       // We cannot create DOM elements for each unique value because this causes all browser to stop script
@@ -509,11 +545,12 @@ export class ChartTableControl extends TableControl implements ChartTableControl
         enabled = (axisCount <= ChartTableControl.MAX_AXIS_COUNT);
       }
 
-      content = this._axisContentForColumn(column1);
+      let content = this._axisContentForColumn(column1);
 
-      $div = this.$contentContainer
-        .makeDiv('select-axis', this._plainAxisText(column1, content.text))
+      let $div = this.$contentContainer
+        .makeDiv('select-axis prevent-initial-focus', this._plainAxisText(column1, content.text))
         .data('column', column1)
+        .unfocusable()
         .setEnabled(enabled);
 
       if (!enabled) {
@@ -533,12 +570,13 @@ export class ChartTableControl extends TableControl implements ChartTableControl
       if (column1 instanceof DateColumn) {
         $div
           .data('modifier', TableMatrix.DateGroup.YEAR)
-          .appendDiv('select-axis-group', this.dateGroup[0][1]);
+          .appendDiv('select-axis-group', String(this.dateGroup[0][1]));
       }
 
       // install click handler or tooltip
       if (enabled) {
-        $div.on('click', this._onClickChartGroup.bind(this));
+        $div.on('click', this._onChartGroupClick.bind(this));
+        $div.on('keydown', this._onChartGroupKeyDown.bind(this));
         tooltips.installForEllipsis($div, {
           parent: this
         });
@@ -549,13 +587,21 @@ export class ChartTableControl extends TableControl implements ChartTableControl
         });
       }
 
-      numberOfAxisItems++;
-      $yDiv = $div.clone(true);
+      let $yDiv = $div.clone(true);
       this._chartGroup1Map[column1.id] = $div;
       this._chartGroup2Map[column1.id] = $yDiv;
       this.$xAxisSelect.append($div);
       this.$yAxisSelect.append($yDiv);
     }
+    let chartGroup1KeyStrokeContext = new KeyStrokeContext({$bindTarget: this.$xAxisSelect, $scopeTarget: this.$xAxisSelect});
+    this.session.keyStrokeManager.installKeyStrokeContext(chartGroup1KeyStrokeContext);
+    this._chartGroup1TabbableCoordinator.registerKeyStrokes(this, chartGroup1KeyStrokeContext);
+    this._chartGroup1TabbableCoordinator.setItems(this.$xAxisSelect.children('.select-axis').map((i, item) => new TabbableItem($(item))).get());
+
+    let chartGroup2KeyStrokeContext = new KeyStrokeContext({$bindTarget: this.$yAxisSelect, $scopeTarget: this.$yAxisSelect});
+    this.session.keyStrokeManager.installKeyStrokeContext(chartGroup2KeyStrokeContext);
+    this._chartGroup2TabbableCoordinator.registerKeyStrokes(this, chartGroup2KeyStrokeContext);
+    // Items will be set in _renderChartType
 
     // map for selection (column id, $element)
     this._aggregationMap = {};
@@ -572,7 +618,8 @@ export class ChartTableControl extends TableControl implements ChartTableControl
       // add data-count for no column restriction (all columns)
       let countDesc = this.session.text('ui.Count');
       this._aggregationMap.all = this.$dataSelect
-        .appendDiv('select-data data-count', countDesc)
+        .appendDiv('select-data data-count prevent-initial-focus', countDesc)
+        .unfocusable()
         .data('column', null)
         .data('modifier', TableMatrix.NumberGroup.COUNT);
 
@@ -592,7 +639,8 @@ export class ChartTableControl extends TableControl implements ChartTableControl
           }
 
           this._aggregationMap[column2.id] = this.$dataSelect
-            .appendDiv('select-data data-sum', columnText)
+            .appendDiv('select-data data-sum prevent-initial-focus', columnText)
+            .unfocusable()
             .data('column', column2)
             .data('modifier', TableMatrix.NumberGroup.SUM);
         }
@@ -600,7 +648,13 @@ export class ChartTableControl extends TableControl implements ChartTableControl
 
       // click handling for data
       $('.select-data', this.$contentContainer)
-        .on('click', this._onClickAggregation.bind(this));
+        .on('click', this._onAggregationClick.bind(this))
+        .on('keydown', this._onAggregationKeyDown.bind(this));
+
+      let keyStrokeContext = new KeyStrokeContext({$bindTarget: this.$dataSelect, $scopeTarget: this.$dataSelect});
+      this.session.keyStrokeManager.installKeyStrokeContext(keyStrokeContext);
+      this._aggregationTabbableCoordinator.registerKeyStrokes(this, keyStrokeContext);
+      this._aggregationTabbableCoordinator.setItems(this.$dataSelect.children('.select-data').map((i, item) => new TabbableItem($(item))).get());
     }
 
     return columnCount;

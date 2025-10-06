@@ -88,9 +88,12 @@ export class TableFooter extends Widget implements TableFooterModel {
     this._focusFilterFieldKeyStroke = null;
   }
 
-  protected override _render() {
-    let filter, $filter;
+  protected override _initKeyStrokeContext() {
+    this.table.tabbableControlsCoordinator.registerKeyStrokes(this);
+    super._initKeyStrokeContext();
+  }
 
+  protected override _render() {
     this.$container = this.$parent.appendDiv('table-footer');
     this._$window = this.$parent.window();
     this._$body = this.$parent.body();
@@ -104,12 +107,13 @@ export class TableFooter extends Widget implements TableFooterModel {
 
     // --- table controls section ---
     this._$controls = this.$container.appendDiv('table-controls');
+    aria.role(this._$controls, 'toolbar');
 
     // --- info section ---
     this._$info = this.$container.appendDiv('table-info');
 
     // text filter
-    $filter = this._$info.appendDiv('table-filter');
+    let $filter = this._$info.appendDiv('table-filter prevent-initial-focus');
     this._$textFilter = fields.makeTextField(this.$container, 'table-text-filter')
       .appendTo($filter)
       .on('input', '', this._createOnFilterFieldInputFunction().bind(this))
@@ -119,7 +123,7 @@ export class TableFooter extends Widget implements TableFooterModel {
     this._focusFilterFieldKeyStroke = new FocusFilterFieldKeyStroke(this.table);
     this.table.keyStrokeContext.registerKeyStroke(this._focusFilterFieldKeyStroke);
 
-    filter = this.table.getFilter(TableTextUserFilter.TYPE);
+    let filter = this.table.getFilter(TableTextUserFilter.TYPE) as TableTextUserFilter;
     if (filter) {
       this._$textFilter.val(filter.text);
     }
@@ -269,10 +273,10 @@ export class TableFooter extends Widget implements TableFooterModel {
   _renderControls() {
     let controls = this.table.tableControls;
     if (controls) {
-      controls.forEach(control => {
+      for (const control of controls) {
         control.setParent(this);
         control.render(this._$controls);
-      });
+      }
     } else {
       this._$controls.empty();
     }

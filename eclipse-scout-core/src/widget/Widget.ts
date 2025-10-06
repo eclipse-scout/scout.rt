@@ -8,9 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke, KeyStrokeContext, LayoutData,
+  Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, FocusOptions, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke, KeyStrokeContext,
+  LayoutData,
   LoadingSupport, LogicalGrid, ModelAdapter, objectFactoryHints, ObjectIdProvider, ObjectOrChildModel, ObjectOrType, objects, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter, scout,
-  ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session, SomeRequired, strings, styles, texts, TreeVisitResult, UuidPathOptions, WidgetEventMap, WidgetModel
+  ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToAlignment, ScrollToOptions, Session, SomeRequired, strings, styles, texts, TreeVisitResult, UuidPathOptions, WidgetEventMap, WidgetModel
 } from '../index';
 import $ from 'jquery';
 
@@ -2158,10 +2159,9 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   /**
    * Tries to set the focus on the {@link get$Focusable} of the widget.
    *
-   * @param options.preventScroll prevents scrolling to new focused element (defaults to false)
    * @returns true if the element could be focused, false if not
    */
-  focus(options?: { preventScroll?: boolean }): boolean {
+  focus(options?: FocusOptions): boolean {
     if (!this.rendered) {
       this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this, options));
       return false;
@@ -2388,16 +2388,11 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    *          an optional options object. Shorthand version: If a string is passed instead
    *          of an object, the value is automatically converted to the option {@link ScrollToOptions.align}.
    */
-  reveal(options?: ScrollToOptions | string) {
+  reveal(options?: ScrollToOptions | ScrollToAlignment) {
     if (!this.rendered) {
       return;
     }
-    let $scrollParent = this.$container.scrollParent();
-    if ($scrollParent.length === 0) {
-      // No scrollable parent found -> scrolling is not possible
-      return;
-    }
-    scrollbars.scrollTo($scrollParent, this.$container, options);
+    scrollbars.reveal(this.$container, options);
   }
 
   /**

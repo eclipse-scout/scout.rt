@@ -42,6 +42,7 @@ export * from './table/controls/ChartTableControlLayout';
 export * from './table/controls/ChartTableControlModel';
 export * from './table/controls/ChartTableUserFilter';
 export * from './table/controls/ChartTableUserFilterModel';
+export * from './table/controls/FocusFirstChartTypeKeyStroke';
 
 export default self;
 

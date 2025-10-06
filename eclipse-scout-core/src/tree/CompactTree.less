@@ -13,15 +13,6 @@
     margin-left: @mandatory-indicator-width;
   }
 
-  &:focus {
-    #scout.no-focus-border;
-
-    & > .tree-data > .nodes > .section > .section-node.selected {
-      text-decoration: underline;
-      color: @focus-color;
-    }
-  }
-
   & > .tree-data {
     position: relative;
     overflow: hidden;
@@ -61,6 +52,15 @@
             color: @hover-color;
           }
         }
+      }
+    }
+
+    &:focus {
+      #scout.no-focus-border;
+
+      & > .nodes > .section > .section-node.selected {
+        text-decoration: underline;
+        color: @focus-color;
       }
     }
   }

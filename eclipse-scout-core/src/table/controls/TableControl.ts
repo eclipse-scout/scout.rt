@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Action, ActionKeyStroke, HtmlComponent, InitModelOf, KeyStrokeContext, NullLayout, scout, styles, Table, TableControlActionKeyStroke, TableControlCloseKeyStroke, TableControlModel, TableFooter, TooltipSupport
+  AbstractLayout, Action, ActionKeyStroke, HtmlComponent, InitModelOf, KeyStrokeContext, NullLayout, styles, Table, TableControlActionKeyStroke, TableControlCloseKeyStroke, TableControlModel, TableFooter, TooltipSupport
 } from '../../index';
 
 export class TableControl extends Action implements TableControlModel {
@@ -143,16 +143,15 @@ export class TableControl extends Action implements TableControlModel {
     return this.$contentContainer;
   }
 
-  protected override _renderSelected(selected?: boolean, options?: {
+  protected override _renderSelected(options?: {
     closeWhenUnselected?: boolean;
     animate?: boolean;
   }) {
-    selected = scout.nvl(selected, this.selected);
     options = $.extend({}, {closeWhenUnselected: true}, options);
 
-    this.$container.setSelected(selected);
+    super._renderSelected();
 
-    if (selected) {
+    if (this.selected) {
       this.tableFooter.onControlSelected(this);
       this.renderContent();
     } else {
@@ -210,7 +209,7 @@ export class TableControl extends Action implements TableControlModel {
     this._setSelected(selected);
     options = $.extend({}, {closeWhenUnselected: true}, options);
     if (this.rendered) {
-      this._renderSelected(selected, options);
+      this._renderSelected(options);
     } else if (options.closeWhenUnselected && this.tableFooter && this === this.tableFooter.selectedControl && !selected) {
       this.tableFooter.onControlSelected(null);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,6 +23,10 @@
     &:hover {
       background-color: @view-menu-tab-hover-background-color;
       color: inherit;
+    }
+
+    &:focus {
+      #scout.focus-inset-box-shadow();
     }
 
     &.disabled {
@@ -121,6 +125,14 @@
 
       &:hover > .icon {
         background-color: @hover-background-color;
+      }
+
+      &:focus {
+        box-shadow: none;
+
+        & > .icon {
+          #scout.focus-inset-box-shadow();
+        }
       }
 
       &.disabled > .icon {

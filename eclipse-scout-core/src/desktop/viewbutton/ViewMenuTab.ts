@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, Desktop, EventHandler, HtmlComponent, icons, InitModelOf, KeyStrokeContext, OutlineViewButton, PropertyChangeEvent, scout, ViewButton, ViewMenuOpenKeyStroke, ViewMenuPopup, ViewMenuTabEventMap, ViewMenuTabModel, Widget
+  Action, aria, arrays, Desktop, EventHandler, HtmlComponent, icons, InitModelOf, KeyStrokeContext, OutlineViewButton, PropertyChangeEvent, scout, ViewButton, ViewMenuOpenKeyStroke, ViewMenuPopup, ViewMenuTabEventMap, ViewMenuTabModel,
+  Widget
 } from '../../index';
 
 /**
@@ -78,6 +79,7 @@ export class ViewMenuTab extends Widget implements ViewMenuTabModel {
     this.$container = this.$parent.appendDiv('view-tab view-menu-tab');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.dropdown.render(this.$container);
+    aria.label(this.dropdown.$container, this.session.text('ui.Views'));
     this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
     this.$container.appendDiv('edge right');
   }

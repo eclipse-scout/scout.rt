@@ -7,14 +7,25 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, ContextMenuPopup, DesktopTabArea, Form, HAlign, Menu, scout, SimpleTab} from '../../index';
+import {arrays, ContextMenuPopup, DesktopTabArea, DesktopTabCloseKeyStroke, DesktopTabExecKeyStroke, Form, HAlign, KeyStrokeContext, Menu, scout, SimpleTab} from '../../index';
 
 export class DesktopTab extends SimpleTab<Form> {
   declare parent: DesktopTabArea;
 
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
+    return new KeyStrokeContext();
+  }
+
+  protected override _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
+
+    this.keyStrokeContext.registerKeyStroke(new DesktopTabExecKeyStroke(this));
+    this.keyStrokeContext.registerKeyStroke(new DesktopTabCloseKeyStroke(this));
+  }
+
   protected override _render() {
     super._render();
-    this.$container.addClass('desktop-tab');
+    this.$container.addClass('desktop-tab unfocusable');
     this.$container.on('contextmenu', this._onContextMenu.bind(this));
     this.$container.prependDiv('edge left');
     this.$container.appendDiv('edge right');

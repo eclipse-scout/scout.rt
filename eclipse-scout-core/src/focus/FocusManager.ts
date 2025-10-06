@@ -16,19 +16,22 @@ export interface FocusManagerOptions {
   restrictedFocusGain?: boolean;
 }
 
-export interface RequestFocusOptions {
+export interface FocusOptions {
   /**
-   * prevents scrolling to new focused element (defaults to false)
+   * Prevents scrolling to new focused element.
+   *
+   * Default is false.
    */
   preventScroll?: boolean;
+}
+
+export interface RequestFocusOptions extends FocusContextFocusOptions {
   /**
-   * prevents focusing if not ready
+   * Prevents focusing if not ready.
+   *
+   * Default is false.
    */
   onlyIfReady?: boolean;
-  /**
-   * automatically selects the text content of the element if supported (defaults to false)
-   */
-  selectText?: boolean;
 }
 
 /**
@@ -155,7 +158,7 @@ export class FocusManager implements FocusManagerOptions {
    *
    * @param options a boolean whether to prevent scrolling to focused element or not (default is true)
    */
-  uninstallFocusContext($container: JQuery, options?: { preventScroll?: boolean }) {
+  uninstallFocusContext($container: JQuery, options?: FocusOptions) {
     options = $.extend({}, {preventScroll: true}, options);
     let focusContext = this.getFocusContext($container);
     if (!focusContext) {

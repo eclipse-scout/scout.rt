@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, arrays, EllipsisMenu, EnumObject, Event, EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, InitModelOf, keys, KeyStroke, KeyStrokeContext, Menu, MenuBarBox, MenuBarEventMap, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarModel,
-  MenuBarRightKeyStroke, MenuDestinations, MenuFilter, MenuOrder, menus, ObjectIdProvider, ObjectOrChildModel, OrderedMenuItems, PropertyChangeEvent, scout, TooltipPosition, Widget, widgets
+  aria, arrays, EllipsisMenu, EnumObject, Event, EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, InitModelOf, keys, KeyStroke, Menu, MenuBarBox, MenuBarEventMap, MenuBarLayout, MenuBarModel, MenuDestinations, MenuFilter, MenuOrder,
+  menus, ObjectIdProvider, ObjectOrChildModel, OrderedMenuItems, PropertyChangeEvent, scout, TabbableCoordinator, TooltipPosition, Widget, widgets
 } from '../../index';
 
 export type MenuBarEllipsisPosition = EnumObject<typeof MenuBar.EllipsisPosition>;
@@ -24,6 +24,7 @@ export class MenuBar extends Widget implements MenuBarModel {
   menuFilter: MenuFilter;
   position: MenuBarPosition;
   tabbable: boolean;
+  tabbableCoordinator: TabbableCoordinator;
   menuboxLeft: MenuBarBox;
   menuboxRight: MenuBarBox;
   menuItems: Menu[]; // original list of menuItems that was passed to setMenuItems(), only used to check if menubar has changed
@@ -52,7 +53,6 @@ export class MenuBar extends Widget implements MenuBarModel {
       right: [],
       all: []
     };
-    this.defaultMenu = null;
     this.ellipsisPosition = MenuBar.EllipsisPosition.RIGHT;
     this._menuItemPropertyChangeHandler = this._onMenuItemPropertyChange.bind(this);
     this._focusHandler = this._onMenuItemFocus.bind(this);
@@ -78,6 +78,13 @@ export class MenuBar extends Widget implements MenuBarModel {
     if (options.menuFilter) {
       this.menuFilter = (menus, destination) => options.menuFilter(menus, MenuDestinations.MENU_BAR);
     }
+    if (this.tabbable) {
+      this.tabbableCoordinator = scout.create(TabbableCoordinator, {
+        parent: this,
+        initialItemProvider: () => this.defaultMenu
+      });
+      this.tabbableCoordinator.on('propertyChange:currentItem', event => this.setTabbableMenu(event.newValue as Menu));
+    }
 
     this.menuboxLeft = scout.create(MenuBarBox, {
       parent: this,
@@ -97,19 +104,6 @@ export class MenuBar extends Widget implements MenuBarModel {
   protected override _destroy() {
     super._destroy();
     this._detachMenuHandlers();
-  }
-
-  protected override _createKeyStrokeContext(): KeyStrokeContext {
-    return new KeyStrokeContext();
-  }
-
-  protected override _initKeyStrokeContext() {
-    super._initKeyStrokeContext();
-
-    this.keyStrokeContext.registerKeyStrokes([
-      new MenuBarLeftKeyStroke(this),
-      new MenuBarRightKeyStroke(this)
-    ]);
   }
 
   protected override _render() {
@@ -199,7 +193,6 @@ export class MenuBar extends Widget implements MenuBarModel {
     if (rightFirst) {
       this.menuboxRight.setMenuItems(this.orderedMenuItems.right);
       this.menuboxLeft.setMenuItems(this.orderedMenuItems.left);
-
     } else {
       this.menuboxLeft.setMenuItems(this.orderedMenuItems.left);
       this.menuboxRight.setMenuItems(this.orderedMenuItems.right);
@@ -209,8 +202,8 @@ export class MenuBar extends Widget implements MenuBarModel {
     this._attachMenuHandlers();
 
     this.updateVisibility();
-    this.updateDefaultMenu();
-
+    this.updateDefaultMenu(false);
+    this.tabbableCoordinator?.setItems(this.allMenusAsFlatList());
     this._setProperty('menuItems', menuItems);
   }
 
@@ -226,9 +219,7 @@ export class MenuBar extends Widget implements MenuBarModel {
   }
 
   protected _createOrderedMenus(menuItems: Menu[]): OrderedMenuItems {
-    let orderedMenuItems = this.menuSorter.order(menuItems),
-      ellipsisIndex = -1,
-      ellipsis;
+    let orderedMenuItems = this.menuSorter.order(menuItems);
     orderedMenuItems.right.forEach(item => {
       item.rightAligned = true;
     });
@@ -239,7 +230,7 @@ export class MenuBar extends Widget implements MenuBarModel {
         this._ellipsis.setChildActions([]);
         this._ellipsis.destroy();
       }
-      ellipsis = scout.create(EllipsisMenu, {
+      let ellipsis = scout.create(EllipsisMenu, {
         parent: this,
         cssClass: 'overflow-menu-item'
       });
@@ -248,6 +239,7 @@ export class MenuBar extends Widget implements MenuBarModel {
       // add ellipsis to the correct position
       if (this.ellipsisPosition === MenuBar.EllipsisPosition.RIGHT) {
         // try right
+        let ellipsisIndex = -1;
         let reverseIndexPosition = this._getFirstStackableIndexPosition(orderedMenuItems.right.slice().reverse());
         if (reverseIndexPosition > -1) {
           ellipsisIndex = orderedMenuItems.right.length - reverseIndexPosition;
@@ -263,7 +255,7 @@ export class MenuBar extends Widget implements MenuBarModel {
         }
       } else {
         // try left
-        ellipsisIndex = this._getFirstStackableIndexPosition(orderedMenuItems.left);
+        let ellipsisIndex = this._getFirstStackableIndexPosition(orderedMenuItems.left);
         if (ellipsisIndex > -1) {
           orderedMenuItems.left.splice(ellipsisIndex, 0, ellipsis);
         } else {
@@ -293,29 +285,12 @@ export class MenuBar extends Widget implements MenuBarModel {
     return foundIndex;
   }
 
-  protected _updateTabbableMenu() {
-    // Make first valid MenuItem tabbable so that it can be focused. All other items
-    // are not tabbable. But they can be selected with the arrow keys.
-    if (this.tabbable) {
-      if (this.defaultMenu && this.defaultMenu.isTabTarget()) {
-        this.setTabbableMenu(this.defaultMenu);
-      } else {
-        this.setTabbableMenu(this.allMenusAsFlatList().find(item => item.isTabTarget()));
-      }
-    }
-  }
-
   setTabbableMenu(menu: Menu) {
     if (!this.tabbable || menu === this.tabbableMenu) {
       return;
     }
-    if (this.tabbableMenu) {
-      this.tabbableMenu.setTabbable(false);
-    }
     this.tabbableMenu = menu;
-    if (menu) {
-      menu.setTabbable(true);
-    }
+    this.tabbableCoordinator?.setCurrentItem(menu);
   }
 
   /**
@@ -339,10 +314,8 @@ export class MenuBar extends Widget implements MenuBarModel {
    * @param updateTabbableMenu if true (default), the "tabbable menu" is updated at the end of this method.
    */
   updateDefaultMenu(updateTabbableMenu?: boolean) {
-    let defaultMenu: Menu = null;
-    for (let i = 0; i < this.orderedMenuItems.all.length; i++) {
-      let item = this.orderedMenuItems.all[i];
-
+    let defaultMenu: Menu;
+    for (const item of this.orderedMenuItems.all) {
       if (!item.visible || !item.enabled || item.defaultMenu === false) {
         // Invisible or disabled menus and menus that explicitly have the "defaultMenu"
         // property set to false cannot be the default menu.
@@ -359,7 +332,7 @@ export class MenuBar extends Widget implements MenuBarModel {
 
     this.setDefaultMenu(defaultMenu);
     if (scout.nvl(updateTabbableMenu, true)) {
-      this._updateTabbableMenu();
+      this.tabbableCoordinator?.resetCurrentItem();
     }
   }
 
@@ -408,16 +381,7 @@ export class MenuBar extends Widget implements MenuBarModel {
   }
 
   protected _onMenuItemPropertyChange(event: PropertyChangeEvent) {
-    // We do not update the items directly, because this listener may be fired many times in one
-    // user request (because many menus change one or more properties). Therefore, we just invalidate
-    // the MenuBarLayout. It will be updated automatically after the user request has finished,
-    // because the layout calls rebuildItemsInternal().
     let source = event.source as Menu;
-    if (event.propertyName === 'overflown' || event.propertyName === 'enabledComputed' || event.propertyName === 'visible' || event.propertyName === 'hidden') {
-      if (!this.tabbableMenu || source === this.tabbableMenu) {
-        this._updateTabbableMenu();
-      }
-    }
     if (event.propertyName === 'overflown' || event.propertyName === 'hidden') {
       if (!this.defaultMenu || source === this.defaultMenu) {
         this.updateDefaultMenu();

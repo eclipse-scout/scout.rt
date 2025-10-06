@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, aria, arrays, Cell, Column, ColumnUserFilter, ColumnUserFilterValues, Device, EnumObject, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, InitModelOf, ListBoxTableAccessibilityRenderer, NumberColumn,
+  AbstractLayout, Action, aria, arrays, Cell, Column, ColumnUserFilter, ColumnUserFilterValues, Device, EnumObject, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, InitModelOf, ListBoxTableAccessibilityRenderer, NumberColumn,
   NumberColumnAggregationFunction, NumberField, Popup, RowLayout, scout, SomeRequired, Table, TableHeader, TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuGroupItem, TableHeaderMenuLayout,
   TableHeaderMenuModel, TableRow, TableRowModel, TableRowsCheckedEvent, ValueField
 } from '../index';
@@ -57,15 +57,15 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   minimumButton: TableHeaderMenuButton;
   maximumButton: TableHeaderMenuButton;
   filterFieldsGroupBox: FilterFieldsGroupBox;
+  filterToggleCheckedAction: Action;
+  filterSortOrderAction: Action;
 
   $rightGroups: JQuery[];
   $headerItem: JQuery;
   $columnActions: JQuery;
   $columnFilters: JQuery;
   $filterTableGroup: JQuery;
-  $filterToggleChecked: JQuery;
   $filterTableGroupTitle: JQuery;
-  $filterSortOrder: JQuery;
   $filterFieldsGroup: JQuery;
   $body: JQuery;
 
@@ -116,14 +116,6 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     this.maximumButton = null;
 
     this.$rightGroups = [];
-    this.$headerItem = null;
-    this.$columnActions = null;
-    this.$columnFilters = null;
-    this.$filterTableGroup = null;
-    this.$filterToggleChecked = null;
-    this.$filterTableGroupTitle = null;
-    this.$filterSortOrder = null;
-    this.$filterFieldsGroup = null;
 
     this._onColumnMovedHandler = this._onColumnMoved.bind(this);
     this._tableHeaderScrollHandler = this._onAnchorScroll.bind(this);
@@ -296,7 +288,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     }
 
     // Note: we should refactor code for filter-fields and filter-table so they could also
-    // work with a model-class (like the button menu groups). Currently this would cause to much work.
+    // work with a model-class (like the button menu groups). Currently, this would cause too much work.
     function toggleCssClass(group: JQuery | TableHeaderMenuGroup, cssClass: string, condition: boolean) {
       let $container = group instanceof TableHeaderMenuGroup ? group.$container : group;
       $container.toggleClass(cssClass, condition);
@@ -775,28 +767,32 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   }
 
   protected _renderFilterTable(): JQuery {
-    this.$filterTableGroup = this.$columnFilters
-      .appendDiv('table-header-menu-group first');
+    this.$filterTableGroup = this.$columnFilters.appendDiv('table-header-menu-group first');
     let htmlComp = HtmlComponent.install(this.$filterTableGroup, this.session);
     htmlComp.setLayout(new RowLayout());
-
-    let $filterActions = this.$filterTableGroup
-      .appendDiv('table-header-menu-filter-actions');
-
-    this.$filterSortOrder = $filterActions
-      .appendDiv('link table-header-menu-toggle-sort-order')
-      .on('click', this._onSortModeClick.bind(this))
-      .addClass(this.filterSortMode.cssClass);
-
-    this.$filterToggleChecked = $filterActions
-      .appendDiv('link table-header-menu-filter-toggle-checked')
-      .text(this.session.text(this.filterCheckedMode.text))
-      .on('click', this._onFilterCheckedModeClick.bind(this));
 
     this.$filterTableGroupTitle = this.$filterTableGroup
       .appendDiv('table-header-menu-group-text')
       .text(this._filterByText());
     HtmlComponent.install(this.$filterTableGroupTitle, this.session);
+
+    let $filterActions = this.$filterTableGroup.appendDiv('actions');
+    this.filterSortOrderAction = scout.create(Action, {
+      parent: this,
+      tooltipText: '${textKey:ui.SortByNumber}',
+      cssClass: `button borderless table-header-menu-toggle-sort-order ${this.filterSortMode.cssClass}`
+    });
+    this.filterSortOrderAction.render($filterActions);
+    this.filterSortOrderAction.on('action', this._onSortModeClick.bind(this));
+
+    this.filterToggleCheckedAction = scout.create(Action, {
+      parent: this,
+      text: this.session.text(this.filterCheckedMode.text),
+      tooltipText: '${textKey:ui.SelectAll}',
+      cssClass: 'button borderless table-header-menu-filter-toggle-checked'
+    });
+    this.filterToggleCheckedAction.render($filterActions);
+    this.filterToggleCheckedAction.on('action', this._onFilterCheckedModeClick.bind(this));
 
     this.filterTable = this._createFilterTable();
     this.filterTable.accessibilityRenderer = new ListBoxTableAccessibilityRenderer();
@@ -888,9 +884,11 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     let checkAll = this.filterCheckedMode.checkAll;
     this.filter.selectedValues = [];
     if (this.filterCheckedMode === checkedMode.ALL) {
+      this.filterToggleCheckedAction.setTooltipText(this.session.text('ui.SelectNone'));
       this.filterCheckedMode = checkedMode.NONE;
       this.filter.availableValues.forEach(filterValue => this.filter.selectedValues.push(filterValue.key));
     } else {
+      this.filterToggleCheckedAction.setTooltipText(this.session.text('ui.SelectAll'));
       this.filterCheckedMode = checkedMode.ALL;
     }
     this.filterTable.checkAll(checkAll);
@@ -903,10 +901,12 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       // sort by amount
       this.filterTable.sort(this.filterTable.columns[1], 'desc');
       this.filterSortMode = sortMode.AMOUNT;
+      this.filterSortOrderAction.setTooltipText(this.session.text('ui.SortAlphabetically'));
     } else {
       // sort alphabetically (first by invisible column to make sure empty cells are always at the bottom)
       this.filterTable.sort(this.filterTable.columns[2], 'asc');
       this.filterTable.sort(this.filterTable.columns[0], 'asc', true);
+      this.filterSortOrderAction.setTooltipText(this.session.text('ui.SortByNumber'));
       this.filterSortMode = sortMode.ALPHABETICALLY;
     }
     this._updateFilterTableActions();
@@ -922,12 +922,12 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
 
   protected _updateFilterTableActions() {
     // checked mode
-    this.$filterToggleChecked.text(this.session.text(this.filterCheckedMode.text));
+    this.filterToggleCheckedAction.setText(this.session.text(this.filterCheckedMode.text));
     // sort mode
     let sortMode = TableHeaderMenu.SortMode;
     let sortAlphabetically = this.filterSortMode === TableHeaderMenu.SortMode.ALPHABETICALLY;
-    this.$filterSortOrder.toggleClass(sortMode.ALPHABETICALLY.cssClass, sortAlphabetically);
-    this.$filterSortOrder.toggleClass(sortMode.AMOUNT.cssClass, !sortAlphabetically);
+    this.filterSortOrderAction.$container.toggleClass(sortMode.ALPHABETICALLY.cssClass, sortAlphabetically);
+    this.filterSortOrderAction.$container.toggleClass(sortMode.AMOUNT.cssClass, !sortAlphabetically);
   }
 
   protected _renderFilterFields(): JQuery {
@@ -1011,7 +1011,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   }
 
   protected override _onMouseDownOutside(event: MouseEvent) {
-    // close popup only if source of event is not $headerItem or one of it's children.
+    // close popup only if source of event is not $headerItem or one of its children.
     if (this.$headerItem.isOrHas(event.target as HTMLElement)) {
       return;
     }

@@ -46,7 +46,7 @@ export class BreadcrumbBarLayout extends AbstractLayout {
     while (prefSize.width > containerSize.width && currentIndex < visibleBreadcrumbItems.length - 1) {
       // remove breadcrumbItems until size fits or only 2 breadcrumbItems are visible
       const crumb = visibleBreadcrumbItems[currentIndex];
-      crumb.$container.hide();
+      crumb.setVisible(false);
       visibleBreadcrumbItems.splice(currentIndex, 1);
       prefSize = this._actualPrefSize(visibleBreadcrumbItems, true);
     }
@@ -60,7 +60,7 @@ export class BreadcrumbBarLayout extends AbstractLayout {
 
   protected _undoCollapse() {
     arrays.ensure(this._breadcrumbBar.breadcrumbItems).forEach(crumb => {
-      crumb.$container.show();
+      crumb.setVisible(true);
     });
   }
 
