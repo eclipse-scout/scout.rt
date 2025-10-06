@@ -29,7 +29,7 @@ export class TableHeaderMenuButton extends Action implements TableHeaderMenuButt
 
   protected override _render() {
     super._render();
-    this.$container = this.$container.addClass('table-header-menu-command button').unfocusable();
+    this.$container = this.$container.addClass('table-header-menu-command button');
     this.$icon = this.$container.appendSpan('icon font-icon');
   }
 

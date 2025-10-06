@@ -115,7 +115,6 @@ export class Menu extends Action implements MenuModel {
     } else {
       this._renderItem();
     }
-    this.$container.unfocusable();
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
   }
 
