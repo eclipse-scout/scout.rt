@@ -56,7 +56,7 @@ export class TabArea extends Widget implements TabAreaModel {
 
     this.ellipsis = scout.create(EllipsisMenu, {
       parent: this,
-      cssClass: 'overflow-tab-item unfocusable',
+      cssClass: 'overflow-tab-item',
       iconId: null,
       inheritAccessibility: false,
       text: '0' // Initialize with the normal value to prevent unnecessary layout invalidation by the TabAreaLayout if ellipsis menus is not visible

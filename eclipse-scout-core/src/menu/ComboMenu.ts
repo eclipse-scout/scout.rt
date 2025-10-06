@@ -22,7 +22,6 @@ export class ComboMenu extends Menu {
     if (this.uiCssClass) {
       this.$container.addClass(this.uiCssClass);
     }
-    this.$container.unfocusable();
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new ColumnLayout());
   }

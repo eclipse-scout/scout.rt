@@ -8,10 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, ActionEventMap, ActionExecKeyStroke, ActionKeyStroke, ActionModel, Alignment, aria, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, LoadingSupport, MenuExecKeyStroke, NullLayout,
-  scout,
-  TooltipPosition, tooltips,
-  TooltipSupport, Widget
+  AbstractLayout, ActionEventMap, ActionExecKeyStroke, ActionKeyStroke, ActionModel, Alignment, aria, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, LoadingSupport, NullLayout, scout,
+  TooltipPosition, tooltips, TooltipSupport, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -65,6 +63,7 @@ export class Action extends Widget implements ActionModel {
     this.selected = false;
     this.preventDoubleClick = false;
     this.tabbable = false;
+    this.preventClickFocus = true;
     this.text = null;
     this.textPosition = Action.TextPosition.DEFAULT;
     this.htmlEnabled = false;

@@ -45,7 +45,7 @@ export class BoxButtons extends Widget implements BoxButtonsModel {
       .filter(button => !button.rendered)
       .forEach(button => {
         button.render();
-        button.$container.unfocusable().addClass('button box-button');
+        button.$container.addClass('button box-button');
       });
   }
 
