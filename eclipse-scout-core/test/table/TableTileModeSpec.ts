@@ -34,108 +34,139 @@ describe('TableTileMode', () => {
     table.render();
   });
 
-  afterEach(() => {
-    session = null;
-    helper = null;
-    model = null;
-    table = null;
+  it('shows tiles instead of rows', () => {
+    table.setTileMode(true);
+    expect(table.tileMode).toBe(true);
+    expect(table.tableTileGridMediator.tiles.length).toBe(table.rows.length);
   });
 
-  describe('tile mode', () => {
-    it('table', () => {
-      expect(table.rendered).toBe(true);
+  it('synchronizes selection', () => {
+    table.setTileMode(true);
+    table.selectRows([table.rows[1], table.rows[2], table.rows[3]]);
+    expect(table.selectedRows.length).toBe(3);
+    expect(table.tableTileGridMediator.tileAccordion.getSelectedTileCount()).toBe(3);
+    table.tableTileGridMediator.tileAccordion.selectTile(table.tableTileGridMediator.tiles[1]);
+    expect(table.tableTileGridMediator.tileAccordion.getSelectedTileCount()).toBe(1);
+    expect(table.selectedRows.length).toBe(1);
+    expect(table.tableTileGridMediator.tiles[1].rowId).toBe(table.selectedRows[0].id);
+  });
+
+  it('groups data', () => {
+    table.columns[0].grouped = true;
+    table.sort(table.columns[0], 'desc');
+    table.setTileMode(true);
+    expect(table.tableTileGridMediator.tileAccordion.groups.length).toBe(5);
+  });
+
+  it('filters data (key filter)', () => {
+    table.setCellValue(table.columns[0], table.rows[0], 'u001');
+    table.setCellValue(table.columns[0], table.rows[1], 'u002');
+    table.setCellValue(table.columns[0], table.rows[2], 'u003');
+    table.setCellValue(table.columns[0], table.rows[3], 'u004');
+    table.setCellValue(table.columns[0], table.rows[4], 'u005');
+    table.setCellText(table.columns[0], table.rows[0], 'Alice Smith');
+    table.setCellText(table.columns[0], table.rows[1], 'Bob Jones');
+    table.setCellText(table.columns[0], table.rows[2], 'Charlie Black');
+    table.setCellText(table.columns[0], table.rows[3], 'Doris Smith');
+    table.setCellText(table.columns[0], table.rows[4], 'Elias Crawford');
+
+    table.setTileMode(true);
+    expect(table.filteredRows().length).toBe(5);
+    expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(5);
+
+    let filter1 = new KeyTableFilter(row => row.cells[0].value);
+    filter1.setAcceptedKeys('u001', 'u002', 'u003');
+    table.addFilter(filter1);
+    expect(table.filteredRows().length).toBe(3);
+    expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(3);
+
+    table.addFilter(filter1);
+    expect(table.filteredRows().length).toBe(3);
+    expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(3);
+
+    table.removeFilter(filter1);
+    expect(table.filteredRows().length).toBe(5);
+    expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(5);
+
+    let filter2 = new KeyTableFilter(row => row.cells[0].value);
+    filter2.setAcceptedKeys('u001', 'u003', 'u004', 'u005');
+    table.addFilter(filter2);
+    expect(table.filteredRows().length).toBe(4);
+    expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(4);
+
+    let filter3 = scout.create(TableTextUserFilter, {
+      session: session,
+      table: table,
+      text: 'jones'
     });
+    table.addFilter(filter3);
+    expect(table.filteredRows().length).toBe(0);
+    expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(0);
 
-    it('switch', () => {
-      table.setTileMode(true);
-      expect(table.tileMode).toBe(true);
-      expect(table.tableTileGridMediator.tiles.length).toBe(table.rows.length);
+    let filter4 = scout.create(TableTextUserFilter, {
+      session: session,
+      table: table,
+      text: 'black'
     });
+    table.addFilter(filter4);
+    expect(table.filteredRows().length).toBe(1);
+    expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(1);
 
-    it('selection synchronizes', () => {
-      table.setTileMode(true);
-      table.selectRows([table.rows[1], table.rows[2], table.rows[3]]);
-      expect(table.selectedRows.length).toBe(3);
-      expect(table.tableTileGridMediator.tileAccordion.getSelectedTileCount()).toBe(3);
-      table.tableTileGridMediator.tileAccordion.selectTile(table.tableTileGridMediator.tiles[1]);
-      expect(table.tableTileGridMediator.tileAccordion.getSelectedTileCount()).toBe(1);
-      expect(table.selectedRows.length).toBe(1);
-      expect(table.tableTileGridMediator.tiles[1].rowId).toBe(table.selectedRows[0].id);
+    let filter5 = scout.create(TableTextUserFilter, {
+      session: session,
+      table: table,
+      text: 'smith'
     });
+    table.addFilter(filter5);
+    expect(table.filteredRows().length).toBe(2);
+    expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(2);
 
-    it('groups data', () => {
-      table.columns[0].grouped = true;
-      table.sort(table.columns[0], 'desc');
-      table.setTileMode(true);
-      expect(table.tableTileGridMediator.tileAccordion.groups.length).toBe(5);
-    });
+    table.removeFilter(filter5);
+    expect(table.filteredRows().length).toBe(4);
+    expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(4);
+  });
 
-    it('filters data (key filter)', () => {
-      table.setCellValue(table.columns[0], table.rows[0], 'u001');
-      table.setCellValue(table.columns[0], table.rows[1], 'u002');
-      table.setCellValue(table.columns[0], table.rows[2], 'u003');
-      table.setCellValue(table.columns[0], table.rows[3], 'u004');
-      table.setCellValue(table.columns[0], table.rows[4], 'u005');
-      table.setCellText(table.columns[0], table.rows[0], 'Alice Smith');
-      table.setCellText(table.columns[0], table.rows[1], 'Bob Jones');
-      table.setCellText(table.columns[0], table.rows[2], 'Charlie Black');
-      table.setCellText(table.columns[0], table.rows[3], 'Doris Smith');
-      table.setCellText(table.columns[0], table.rows[4], 'Elias Crawford');
+  it('updates enabled state correctly', () => {
+    table.setEnabled(false);
+    expect(table.$data.isEnabled()).toBe(false);
 
-      table.setTileMode(true);
-      expect(table.filteredRows().length).toBe(5);
-      expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(5);
+    table.setTileMode(true);
+    table.setTileMode(false);
+    expect(table.$data.isEnabled()).toBe(false);
 
-      let filter1 = new KeyTableFilter(row => row.cells[0].value);
-      filter1.setAcceptedKeys('u001', 'u002', 'u003');
-      table.addFilter(filter1);
-      expect(table.filteredRows().length).toBe(3);
-      expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(3);
+    table.setEnabled(true);
+    expect(table.$data.isEnabled()).toBe(true);
 
-      table.addFilter(filter1);
-      expect(table.filteredRows().length).toBe(3);
-      expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(3);
+    table.setTileMode(true);
+    table.setEnabled(false);
+    table.setTileMode(false);
+    expect(table.$data.isEnabled()).toBe(false);
+  });
 
-      table.removeFilter(filter1);
-      expect(table.filteredRows().length).toBe(5);
-      expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(5);
+  it('restores focus', () => {
+    table.focus();
+    expect(table.$data).toHaveAttr('tabindex', '0');
+    expect(table.$container).not.toHaveAttr('tabindex');
+    expect(table.$data).toBeFocused();
 
-      let filter2 = new KeyTableFilter(row => row.cells[0].value);
-      filter2.setAcceptedKeys('u001', 'u003', 'u004', 'u005');
-      table.addFilter(filter2);
-      expect(table.filteredRows().length).toBe(4);
-      expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(4);
+    table.setTileMode(true);
+    expect(table.$data).not.toHaveAttr('tabindex');
+    expect(table.$container).toHaveAttr('tabindex', '0');
+    expect(table.$container).toBeFocused();
 
-      let filter3 = scout.create(TableTextUserFilter, {
-        session: session,
-        table: table,
-        text: 'jones'
-      });
-      table.addFilter(filter3);
-      expect(table.filteredRows().length).toBe(0);
-      expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(0);
+    table.setTileMode(false);
+    expect(table.$data).toHaveAttr('tabindex', '0');
+    expect(table.$container).not.toHaveAttr('tabindex');
+    expect(table.$data).toBeFocused();
 
-      let filter4 = scout.create(TableTextUserFilter, {
-        session: session,
-        table: table,
-        text: 'black'
-      });
-      table.addFilter(filter4);
-      expect(table.filteredRows().length).toBe(1);
-      expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(1);
+    let $input = session.$entryPoint.appendElement('<input>');
+    $input[0].focus();
+    expect($input).toBeFocused();
 
-      let filter5 = scout.create(TableTextUserFilter, {
-        session: session,
-        table: table,
-        text: 'smith'
-      });
-      table.addFilter(filter5);
-      expect(table.filteredRows().length).toBe(2);
-      expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(2);
+    table.setTileMode(true);
+    expect($input).toBeFocused();
 
-      table.removeFilter(filter5);
-      expect(table.filteredRows().length).toBe(4);
-      expect(table.tableTileGridMediator.tileAccordion.getFilteredTileCount()).toBe(4);
-    });
+    table.setTileMode(false);
+    expect($input).toBeFocused();
   });
 });
