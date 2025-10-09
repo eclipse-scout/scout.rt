@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, Group, InitModelOf, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, scout, ScrollToOptions, Table, TableAllRowsDeletedEvent,
+  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, focusUtils, Group, InitModelOf, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, scout, ScrollToOptions, Table, TableAllRowsDeletedEvent,
   TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableRow, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsSelectedEvent, TableRowTileMapping, TableTileGridMediatorEventMap,
   TableTileGridMediatorModel, TableUserFilter, Tile, TileAccordion, TileActionEvent, TileClickEvent, TileGrid, TileGridLayoutConfig, TileTableHierarchyFilter, Widget
 } from '../index';
@@ -408,6 +408,7 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
   }
 
   renderTileMode() {
+    let wasFocused = focusUtils.isOrHasActiveElement(this.table.$container);
     if (this.table.tileMode) {
       // if the table was previously in tileMode this is not necessary...
       if (this.table.$data) {
@@ -427,6 +428,9 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
       }
     }
     this.table._refreshMenuBarPosition();
+    if (wasFocused && !focusUtils.isOrHasActiveElement(this.table.$container)) {
+      this.table.focus();
+    }
     this.table.loadingSupport.remove();
     this.table.loadingSupport.renderLoading(true);
   }
@@ -675,6 +679,7 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
   protected _renderTileTableHeader() {
     if (this.table.tileTableHeader) {
       this.table.tileTableHeader.render();
+      this.table.footer?.$container?.before(this.table.tileTableHeader.$container);
     }
   }
 
@@ -687,6 +692,7 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
   protected _renderTileAccordion() {
     if (!this.tileAccordion.rendered) {
       this.tileAccordion.render();
+      this.table.footer?.$container?.before(this.tileAccordion.$container);
     }
   }
 

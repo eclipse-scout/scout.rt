@@ -652,6 +652,12 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     if (this.scrollToSelection) {
       this.revealSelection();
     }
+    if (!this.rendering) {
+      // Adjust enabled state and position if data is rendered later (e.g. after returning from tile mode)
+      this.$container.setTabbable(false);
+      this._renderEnabled();
+      this.footer?.$container?.before(this.$data);
+    }
   }
 
   protected override _renderProperties() {
@@ -690,6 +696,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.$data.remove();
     this.$data = null;
     this.$emptyData = null;
+    if (!this.removing) {
+      // update focusable container, e.g. when changing to tile mode
+      this._renderTabbable();
+    }
   }
 
   protected override _remove() {
