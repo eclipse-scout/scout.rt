@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -399,5 +399,24 @@ public class UriBuilderTest {
     assertEquals(7, builder.getParameters().size());
     builder.parameter("d", null);
     assertEquals(6, builder.getParameters().size());
+  }
+
+  @Test
+  public void testUmlautInvalid() throws URISyntaxException {
+    // invalid URL, the umlaut character is neither a reserved nor an unreserved character
+    // therefore encoding would be mandatory, see https://datatracker.ietf.org/doc/html/rfc3986#section-2
+    URI uri = new URI("http://localhost/ä");
+    UriBuilder builder = new UriBuilder(uri);
+    // same behavior in browser, try accessing URL with umlaut above in browser, URL is also encoded for request
+    assertEquals("http://localhost/%C3%A4", builder.createURI().toString());
+  }
+
+  @Test
+  public void testUmlautEncoded() throws URISyntaxException {
+    // perfectly valid URL (uses encoding)
+    URI uri = new URI("http://localhost/%C3%A4");
+    UriBuilder builder = new UriBuilder(uri);
+    // expect URI to be unchanged by UriBuilder, especially nothing should be decoded/nor encoded (input = output)
+    assertEquals(uri, builder.createURI());
   }
 }

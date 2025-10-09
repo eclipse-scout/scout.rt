@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -195,7 +195,7 @@ public class UriBuilder {
   // Another approach would be to use URL instead of URI since, the URL class does not change the query string.
   private URI createURIInternal(String encoding) throws URISyntaxException {
     final URI uri = new URI(m_scheme, null, m_host, m_port, m_path, null, null);
-    final String urlWithQuery = StringUtility.join("?", uri.toString(), getQueryString(encoding));
+    final String urlWithQuery = StringUtility.join("?", uri.toASCIIString(), getQueryString(encoding));
     final String fullUrl = StringUtility.join("#", urlWithQuery, m_fragment);
     return new URI(fullUrl);
   }
