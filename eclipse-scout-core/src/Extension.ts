@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,12 +40,21 @@ export class Extension<E> {
   next: (...args: any[]) => any;
 
   extend(extended: E, funcName: string) {
-    let origFunc = extended[funcName];
-    let extension = this;
+    const funcOrig = extended[funcName];
+    const extension = this;
     extended[funcName] = function(...args) {
+      const extendedOrig = extension.extended;
+      const nextOrig = extension.next;
+
       extension.extended = this;
-      extension.next = origFunc.bind(this);
-      return extension[funcName](...args);
+      extension.next = funcOrig.bind(this);
+
+      try {
+        return extension[funcName](...args);
+      } finally {
+        extension.extended = extendedOrig;
+        extension.next = nextOrig;
+      }
     };
   }
 
