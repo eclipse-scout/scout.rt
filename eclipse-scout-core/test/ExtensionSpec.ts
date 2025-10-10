@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Extension, scout, StringField} from '../src/index';
+import {arrays, Extension, scout, StringField, Tree, TreeNode} from '../src/index';
 import {LocaleSpecHelper} from '../src/testing/index';
 import {InitModelOf} from '../src/scout';
 
@@ -118,4 +118,60 @@ describe('Extension', () => {
 
   });
 
+  describe('recursively called extensions', () => {
+
+    let extendedBeforeNextCall: MyTreeNode[];
+    let extendedAfterNextCall: MyTreeNode[];
+
+    beforeEach(() => {
+      extendedBeforeNextCall = [];
+      extendedAfterNextCall = [];
+    });
+
+    class MyTreeNode extends TreeNode {
+    }
+
+    class MyTreeNodeExtension extends Extension<MyTreeNode> {
+      init() {
+        this.extend(MyTreeNode.prototype, '_init');
+      }
+
+      protected _init(model: InitModelOf<MyTreeNode>) {
+        const extended = this.extended;
+        extendedBeforeNextCall.push(extended);
+
+        this.next(model);
+
+        // extension is called for all child nodes during next-call -> expect that this.extended is reset after nested calls
+        expect(extended).toBe(this.extended);
+
+        extendedAfterNextCall.push(extended);
+      }
+    }
+
+    Extension.install(MyTreeNodeExtension);
+
+    it('always run with the correct context', () => {
+      arrays.clear(extendedBeforeNextCall);
+
+      scout.create(Tree, {
+        parent: session.desktop,
+        nodes: [{
+          objectType: MyTreeNode,
+          text: '0',
+          childNodes: [{
+            objectType: MyTreeNode,
+            text: '1',
+            childNodes: [{
+              objectType: MyTreeNode,
+              text: '2'
+            }]
+          }]
+        }]
+      });
+
+      expect(extendedBeforeNextCall.map(node => node.text)).toEqual(['0', '1', '2']);
+      expect(extendedAfterNextCall.map(node => node.text)).toEqual(['2', '1', '0']);
+    });
+  });
 });
