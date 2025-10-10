@@ -42,6 +42,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
@@ -529,6 +530,7 @@ public class UiNotificationRegistry {
             LOG.error("Exception while running ui notification registry cleanup job", t);
           }
         }, true)
+        .withExecutionHint(JobInput.EXECUTION_HINT_TESTING_DO_NOT_WAIT_FOR_THIS_JOB)
         .withExecutionTrigger(Jobs
             .newExecutionTrigger()
             .withSchedule(FixedDelayScheduleBuilder.repeatForever(getCleanupJobInterval(), TimeUnit.SECONDS))));
