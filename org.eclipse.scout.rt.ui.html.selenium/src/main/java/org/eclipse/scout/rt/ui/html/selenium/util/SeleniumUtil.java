@@ -34,6 +34,7 @@ public final class SeleniumUtil {
    * DOM attribute used by Scout widgets to identify the Scout Java model class.
    */
   private static final String ATTR_DATA_MODELCLASS = "data-modelclass";
+  private static final String ATTR_DATA_UUID = "data-uuid";
 
   private SeleniumUtil() {
   }
@@ -88,7 +89,7 @@ public final class SeleniumUtil {
    * This query solves the problem that we don't want to find partial matches for a CSS class-name when we query 'class'
    * attribute in the DOM. See
    * <a href="https://stackoverflow.com/questions/1604471/how-can-i-find-an-element-by-css-class-with-xpath">
-   *   how-can-i-find-an-element-by-css-class-with-xpath</a>
+   * how-can-i-find-an-element-by-css-class-with-xpath</a>
    */
   private static String cssClassQuery(String cssClass) {
     return "contains(concat(' ', normalize-space(@class), ' '), ' " + cssClass + " ')";
@@ -191,6 +192,14 @@ public final class SeleniumUtil {
   public static By byModelClassAttributeContainsNot(Class<?> modelClass, String attribute, String value) {
     return By.xpath(String.format("//*[@" + ATTR_DATA_MODELCLASS + "='%s' and contains(@%s, '%s') = false]",
         modelClass.getName(), attribute, value));
+  }
+
+  public static By byUuid(String uuid) {
+    return byUuid(uuid, null);
+  }
+
+  public static By byUuid(String uuid, String xPathIndex) {
+    return byAttributeValue(ATTR_DATA_UUID, uuid, xPathIndex);
   }
 
   /**

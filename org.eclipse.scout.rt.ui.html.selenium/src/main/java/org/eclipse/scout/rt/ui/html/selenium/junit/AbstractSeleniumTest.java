@@ -391,6 +391,14 @@ public abstract class AbstractSeleniumTest {
     return waitUntilTableCellClickable(null, cellText);
   }
 
+  public WebElement waitUntilTableRowClickable(WebElement cell) {
+    return waitUntilElementClickable(cell, By.xpath(".//ancestor::div[contains(@class, 'table-row')]"));
+  }
+
+  public WebElement waitUntilTableRowClickable(String cellText) {
+    return waitUntilTableRowClickable(waitUntilTableCellClickable(cellText));
+  }
+
   /**
    * Waits for all pending server calls to finish.
    */
