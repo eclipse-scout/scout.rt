@@ -15,9 +15,9 @@ import jakarta.ws.rs.client.ClientRequestFilter;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.authentication.DefaultAuthToken;
+import org.eclipse.scout.rt.shared.authentication.DefaultAuthTokenSigner;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelConstants;
-import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
-import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthTokenSigner;
 
 @Bean
 public class AuthenticationTokenClientRequestFilter implements ClientRequestFilter {
@@ -31,7 +31,7 @@ public class AuthenticationTokenClientRequestFilter implements ClientRequestFilt
   protected void addSignatureHeader(ClientRequestContext requestContext) {
     DefaultAuthToken token = BEANS.get(DefaultAuthTokenSigner.class).createDefaultSignedToken(DefaultAuthToken.class);
     if (token != null) {
-      requestContext.getHeaders().putSingle(ServiceTunnelConstants.TOKEN_AUTH_HTTP_HEADER, token.toString());
+      requestContext.getHeaders().putSingle(DefaultAuthToken.HTTP_HEADER_NAME, token.toString());
     }
   }
 

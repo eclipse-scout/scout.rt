@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,6 +29,10 @@ import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
+import org.eclipse.scout.rt.shared.authentication.DefaultAuthToken;
+import org.eclipse.scout.rt.shared.authentication.DefaultAuthTokenPrincipalProducer;
+import org.eclipse.scout.rt.shared.authentication.DefaultAuthTokenSigner;
+import org.eclipse.scout.rt.shared.authentication.DefaultAuthTokenVerifier;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;

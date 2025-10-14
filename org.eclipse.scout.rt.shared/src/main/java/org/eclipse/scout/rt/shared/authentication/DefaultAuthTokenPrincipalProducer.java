@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.shared.servicetunnel.http;
+package org.eclipse.scout.rt.shared.authentication;
 
 import java.security.Principal;
 import java.util.List;

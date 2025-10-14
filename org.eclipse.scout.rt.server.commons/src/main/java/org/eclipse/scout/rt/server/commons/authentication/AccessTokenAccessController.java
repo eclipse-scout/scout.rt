@@ -21,31 +21,28 @@ import jakarta.servlet.http.HttpSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.security.IPrincipalProducer2;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelConstants;
-import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
-import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthTokenPrincipalProducer;
-import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthTokenVerifier;
+import org.eclipse.scout.rt.shared.authentication.DefaultAuthToken;
+import org.eclipse.scout.rt.shared.authentication.DefaultAuthTokenPrincipalProducer;
+import org.eclipse.scout.rt.shared.authentication.DefaultAuthTokenVerifier;
 
 /**
- * Access controller to continue filter-chain if a valid AbstractHttpServiceTunnel#TOKEN_AUTH_HTTP_HEADER Service Tunnel
- * Token is provided with the request.
+ * Access controller to continue filter-chain if a valid {@link DefaultAuthToken#HTTP_HEADER_NAME} access token is provided with the request.
  * <p>
- * By design: The {@link Principal} for authenticated users is not put onto {@link HttpSession}, so that every tunnel
- * request is authenticated.
+ * By design: The {@link Principal} for authenticated users is not put onto {@link HttpSession}, so that every tunnel request is authenticated.
  *
  * @since 5.1
  */
-public class ServiceTunnelAccessTokenAccessController implements IAccessController {
+public class AccessTokenAccessController implements IAccessController {
 
-  private ServiceTunnelAccessTokenAuthConfig m_config;
+  private AccessTokenAuthConfig m_config;
   private boolean m_enabled;
 
-  public ServiceTunnelAccessTokenAccessController init() {
-    init(new ServiceTunnelAccessTokenAuthConfig());
+  public AccessTokenAccessController init() {
+    init(new AccessTokenAuthConfig());
     return this;
   }
 
-  public ServiceTunnelAccessTokenAccessController init(ServiceTunnelAccessTokenAuthConfig config) {
+  public AccessTokenAccessController init(AccessTokenAuthConfig config) {
     m_config = config;
     m_enabled = config.isEnabled() && config.getTokenClazz() != null && config.getTokenVerifier() != null && config.getTokenVerifier().isEnabled() && config.getPrincipalProducer2() != null;
     return this;
@@ -57,7 +54,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
       return false;
     }
 
-    String tokenString = request.getHeader(ServiceTunnelConstants.TOKEN_AUTH_HTTP_HEADER);
+    String tokenString = request.getHeader(DefaultAuthToken.HTTP_HEADER_NAME);
     if (StringUtility.isNullOrEmpty(tokenString)) {
       return false;
     }
@@ -88,9 +85,9 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
   }
 
   /**
-   * Configuration for {@link ServiceTunnelAccessTokenAccessController}.
+   * Configuration for {@link AccessTokenAccessController}.
    */
-  public static class ServiceTunnelAccessTokenAuthConfig {
+  public static class AccessTokenAuthConfig {
 
     private Class<? extends DefaultAuthToken> m_tokenClazz = DefaultAuthToken.class;
     private DefaultAuthTokenVerifier m_tokenVerifier = BEANS.get(DefaultAuthTokenVerifier.class);
@@ -101,7 +98,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
       return m_tokenClazz;
     }
 
-    public ServiceTunnelAccessTokenAuthConfig withTokenClazz(Class<? extends DefaultAuthToken> tokenClazz) {
+    public AccessTokenAuthConfig withTokenClazz(Class<? extends DefaultAuthToken> tokenClazz) {
       m_tokenClazz = tokenClazz;
       return this;
     }
@@ -110,7 +107,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
       return m_tokenVerifier;
     }
 
-    public ServiceTunnelAccessTokenAuthConfig withTokenVerifier(DefaultAuthTokenVerifier tokenVerifier) {
+    public AccessTokenAuthConfig withTokenVerifier(DefaultAuthTokenVerifier tokenVerifier) {
       m_tokenVerifier = tokenVerifier;
       return this;
     }
@@ -119,7 +116,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
       return m_enabled;
     }
 
-    public ServiceTunnelAccessTokenAuthConfig withEnabled(boolean enabled) {
+    public AccessTokenAuthConfig withEnabled(boolean enabled) {
       m_enabled = enabled;
       return this;
     }
@@ -138,7 +135,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
      *
      * @since 11.0
      */
-    public ServiceTunnelAccessTokenAuthConfig withPrincipalProducer2(IPrincipalProducer2 principalProducer) {
+    public AccessTokenAuthConfig withPrincipalProducer2(IPrincipalProducer2 principalProducer) {
       m_principalProducer = principalProducer;
       return this;
     }

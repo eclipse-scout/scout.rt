@@ -11,8 +11,6 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 
 public interface ServiceTunnelConstants {
 
-  String TOKEN_AUTH_HTTP_HEADER = "X-ScoutAccessToken";
-
   /**
    * Marker header for session-less requests.
    */
