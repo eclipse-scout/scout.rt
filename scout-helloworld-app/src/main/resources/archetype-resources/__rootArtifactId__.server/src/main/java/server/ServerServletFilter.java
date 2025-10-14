@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
@@ -28,13 +37,13 @@ import org.eclipse.scout.rt.server.commons.authentication.TrivialAccessControlle
 public class ServerServletFilter implements Filter {
 
   private TrivialAccessController m_trivialAccessController;
-  private ServiceTunnelAccessTokenAccessController m_tunnelAccessController;
+  private ServiceTunnelAccessTokenAccessController m_accessTokenAccessController;
   private DevelopmentAccessController m_developmentAccessController;
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
     m_trivialAccessController = BEANS.get(TrivialAccessController.class).init(new TrivialAuthConfig().withExclusionFilter(filterConfig.getInitParameter("filter-exclude")));
-    m_tunnelAccessController = BEANS.get(ServiceTunnelAccessTokenAccessController.class).init();
+    m_accessTokenAccessController = BEANS.get(ServiceTunnelAccessTokenAccessController.class).init();
     m_developmentAccessController = BEANS.get(DevelopmentAccessController.class).init();
   }
 
@@ -47,7 +56,7 @@ public class ServerServletFilter implements Filter {
       return;
     }
 
-    if (m_tunnelAccessController.handle(req, resp, chain)) {
+    if (m_accessTokenAccessController.handle(req, resp, chain)) {
       return;
     }
 
@@ -61,7 +70,7 @@ public class ServerServletFilter implements Filter {
   @Override
   public void destroy() {
     m_developmentAccessController.destroy();
-    m_tunnelAccessController.destroy();
+    m_accessTokenAccessController.destroy();
     m_trivialAccessController.destroy();
   }
 }
