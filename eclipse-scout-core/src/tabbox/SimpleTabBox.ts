@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
+  aria,
   arrays, Event, EventHandler, HtmlComponent, InitModelOf, LayoutData, ObjectIdProvider, scout, SimpleTabArea, SimpleTabBoxController, SimpleTabBoxEventMap, SimpleTabBoxLayout, SimpleTabBoxModel, SimpleTabView, SimpleTabViewContentLayout,
   Widget
 } from '../index';
@@ -66,6 +67,7 @@ export class SimpleTabBox<TView extends SimpleTabView = SimpleTabView> extends W
 
     // render content
     this.$viewContent = this.$container.appendDiv('tab-content');
+    aria.role(this.$viewContent, 'tabpanel');
     this.viewContent = HtmlComponent.install(this.$viewContent, this.session);
     this.viewContent.setLayout(new SimpleTabViewContentLayout(this));
   }

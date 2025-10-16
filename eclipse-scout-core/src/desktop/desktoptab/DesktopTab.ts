@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, ContextMenuPopup, DesktopTabArea, DesktopTabCloseKeyStroke, DesktopTabExecKeyStroke, Form, HAlign, KeyStrokeContext, Menu, scout, SimpleTab} from '../../index';
+import {aria, arrays, ContextMenuPopup, DesktopTabArea, DesktopTabCloseKeyStroke, DesktopTabExecKeyStroke, Form, HAlign, KeyStrokeContext, Menu, scout, SimpleTab} from '../../index';
 
 export class DesktopTab extends SimpleTab<Form> {
   declare parent: DesktopTabArea;
@@ -29,6 +29,12 @@ export class DesktopTab extends SimpleTab<Form> {
     this.$container.on('contextmenu', this._onContextMenu.bind(this));
     this.$container.prependDiv('edge left');
     this.$container.appendDiv('edge right');
+  }
+
+  protected override _renderSelected() {
+    super._renderSelected();
+    aria.role(this.$titleLine, this.selected ? 'heading' : null);
+    aria.level(this.$titleLine, this.selected ? 1 : null);
   }
 
   protected override _renderClosable() {

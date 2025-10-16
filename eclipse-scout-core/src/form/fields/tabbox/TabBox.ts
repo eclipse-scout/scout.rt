@@ -83,7 +83,6 @@ export class TabBox extends CompositeField implements TabBoxModel {
 
   protected override _render() {
     this.addContainer(this.$parent, 'tab-box', new TabBoxLayout(this));
-    aria.role(this.$container, 'tablist');
     this.header.render(this.$container);
     this.addStatus();
 

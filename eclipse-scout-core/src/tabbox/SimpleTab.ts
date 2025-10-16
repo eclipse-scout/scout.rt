@@ -107,6 +107,7 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
 
   protected override _render() {
     this.$container = this.$parent.prependDiv('simple-tab');
+    aria.role(this.$container, 'tab');
     this.$container.on('mousedown', this._onMouseDown.bind(this));
     this.$titleLine = this.$container.appendDiv('title-line');
     this.$iconContainer = this.$titleLine.appendDiv('icon-container');
@@ -299,8 +300,7 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
 
   protected _renderSelected() {
     this.$container.toggleClass('selected', this.selected);
-    aria.role(this.$titleLine, this.selected ? 'heading' : null);
-    aria.level(this.$titleLine, this.selected ? 1 : null);
+    aria.selected(this.$container, this.selected || null);
   }
 
   protected _onMouseDown(event: JQuery.MouseDownEvent) {
