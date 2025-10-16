@@ -236,9 +236,6 @@ public class BookmarkViewForm extends AbstractForm {
               }
               form.setBookmarkRootFolder(getUserBookmarkTreeField().getBookmarkRootFolder());
               form.setBookmark(b);
-              if (form.getBookmarkRootFolder() != form.getBookmarkRootFolder()) {
-                form.setFolder(form.getBookmarkRootFolder());
-              }
               form.startNew();
               form.waitFor();
               if (form.isFormStored()) {
