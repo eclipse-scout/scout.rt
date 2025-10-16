@@ -173,7 +173,7 @@ describe('TabBox', () => {
 
     it('has aria role tablist', () => {
       tabBox.render();
-      expect(tabBox.$container).toHaveAttr('role', 'tablist');
+      expect(tabBox.header.tabArea.$container).toHaveAttr('role', 'tablist');
     });
 
     it('has a content area with aria role tabpanel', () => {

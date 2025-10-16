@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
+  aria,
   arrays, EllipsisMenu, EnumObject, EventHandler, HtmlComponent, InitModelOf, KeyStrokeContext, ObjectIdProvider, PropertyChangeEvent, scout, SomeRequired, strings, Tab, TabAreaEventMap, TabAreaLayout, TabAreaLeftKeyStroke, TabAreaModel,
   TabAreaRightKeyStroke, TabBox, TabItem, Widget
 } from '../../../index';
@@ -78,6 +79,7 @@ export class TabArea extends Widget implements TabAreaModel {
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('tab-area');
+    aria.role(this.$container, 'tablist');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new TabAreaLayout(this));
 

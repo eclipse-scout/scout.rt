@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, EnumObject, Event, EventHandler, HtmlComponent, InitModelOf, scout, SimpleTab, SimpleTabAreaEventMap, SimpleTabAreaLayout, SimpleTabAreaModel, SimpleTabOverflowMenu, SimpleTabView, TabbableCoordinator, TabbableItem,
+  AbstractLayout, aria, EnumObject, Event, EventHandler, HtmlComponent, InitModelOf, scout, SimpleTab, SimpleTabAreaEventMap, SimpleTabAreaLayout, SimpleTabAreaModel, SimpleTabOverflowMenu, SimpleTabView, TabbableCoordinator, TabbableItem,
   Widget, widgets
 } from '../index';
 
@@ -67,6 +67,7 @@ export class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends 
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('simple-tab-area');
+    aria.role(this.$container, 'tablist');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(this._createLayout());
   }

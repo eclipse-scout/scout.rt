@@ -9,7 +9,7 @@
  */
 import {GroupBox, ObjectIdProvider, scout, SimpleTab, SimpleTabArea, SimpleTabBox} from '../../src/index';
 
-describe('SimpleTabArea', () => {
+describe('SimpleTabBox', () => {
   let session: SandboxSession;
 
   beforeEach(() => {
@@ -122,6 +122,75 @@ describe('SimpleTabArea', () => {
       expect(tabArea.tabs[0].uuid).toBe(`tab${ObjectIdProvider.DEPENDENT_UUID_DELIMITER}one`);
       expect(tabArea.tabs[1].uuid).toBe(`tab${ObjectIdProvider.DEPENDENT_UUID_DELIMITER}two`);
       expect(tabArea.tabs[2].uuid).toBe('3'); // Expect that explicit id is not overridden
+    });
+  });
+
+  describe('aria properties', () => {
+    let tabBox: SimpleTabBox;
+
+    beforeEach(() => {
+      tabBox = scout.create(SimpleTabBox, {
+        parent: session.desktop
+      });
+      let view1 = scout.create(GroupBox, {
+        parent: tabBox,
+        title: 'One'
+      });
+      let view2 = scout.create(GroupBox, {
+        parent: tabBox,
+        title: 'Two'
+      });
+      tabBox.addView(view1);
+      tabBox.addView(view2, false);
+      tabBox.render();
+    });
+
+    it('tab area has aria role tablist', () => {
+      expect(tabBox.tabArea.$container).toHaveAttr('role', 'tablist');
+    });
+
+    it('tab area has aria orientation vertical if position is left or right', () => {
+      tabBox = scout.create(SimpleTabBox, {
+        parent: session.desktop,
+        tabArea: {
+          objectType: SimpleTabArea,
+          position: SimpleTabArea.Position.LEFT
+        }
+      });
+      tabBox.render();
+      expect(tabBox.tabArea.$container).toHaveAttr('aria-orientation', 'vertical');
+
+      tabBox.tabArea.setPosition(SimpleTabArea.Position.BOTTOM);
+      expect(tabBox.tabArea.$container).not.toHaveAttr('aria-orientation');
+
+      tabBox.tabArea.setPosition(SimpleTabArea.Position.RIGHT);
+      expect(tabBox.tabArea.$container).toHaveAttr('aria-orientation', 'vertical');
+
+      tabBox.tabArea.setPosition(SimpleTabArea.Position.TOP);
+      expect(tabBox.tabArea.$container).not.toHaveAttr('aria-orientation');
+    });
+
+    it('tab content has aria role tabpanel', () => {
+      expect(tabBox.$viewContent).toHaveAttr('role', 'tabpanel');
+    });
+
+    it('tabs have aria role tab', () => {
+      tabBox.tabArea.tabs.forEach(tab => {
+        expect(tab.$container).toHaveAttr('role', 'tab');
+      });
+    });
+
+    it('selected tab has aria-selected property set to true', () => {
+      expect(tabBox.tabArea.tabs[0].$container).toHaveAttr('aria-selected', 'true');
+      expect(tabBox.tabArea.tabs[1].$container).not.toHaveAttr('aria-selected');
+
+      tabBox.activateView(tabBox.getViews()[1]);
+      expect(tabBox.tabArea.tabs[0].$container).not.toHaveAttr('aria-selected');
+      expect(tabBox.tabArea.tabs[1].$container).toHaveAttr('aria-selected', 'true');
+
+      tabBox.activateView(null);
+      expect(tabBox.tabArea.tabs[0].$container).not.toHaveAttr('aria-selected');
+      expect(tabBox.tabArea.tabs[1].$container).not.toHaveAttr('aria-selected');
     });
   });
 });
