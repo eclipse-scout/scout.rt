@@ -101,41 +101,10 @@
     position: absolute;
     margin-left: @field-status-margin-left;
     height: @field-status-size;
-
-    #scout.status();
   }
 
-  &.has-menus {
-
-    &.has-tooltip:not(.has-info):not(.has-ok):not(.has-warning):not(.has-error) {
-      & > .status::before {
-        content: @icon-ellipsis-circle;
-      }
-    }
-
-    & > .status {
-      #scout.menu-status();
-    }
-  }
-
-  &.has-tooltip > .status {
-    #scout.tooltip-status();
-  }
-
-  &.has-ok > .status {
-    #scout.ok-status();
-  }
-
-  &.has-info > .status {
-    #scout.info-status();
-  }
-
-  &.has-warning > .status {
-    #scout.warning-status();
-  }
-
-  &.has-error > .status {
-    #scout.error-status();
+  &.has-menus.has-tooltip:not(.has-info):not(.has-ok):not(.has-warning):not(.has-error) > .status {
+    --icon: @icon-ellipsis-circle;
   }
 
   &.cell-editor-form-field {

@@ -342,13 +342,16 @@ describe('Accordion', () => {
 
       group.setCollapsed(true);
       await group.when('bodyHeightChangeDone');
-      expect(field.fieldStatus).toBeNull();
+      expect(field.fieldStatus.rendered).toBeFalse();
+      expect(field.fieldStatus.tooltip).toBe(null);
 
       field.clearErrorStatus();
-      expect(field.fieldStatus).toBeNull();
+      expect(field.fieldStatus.rendered).toBeFalse();
+      expect(field.fieldStatus.tooltip).toBe(null);
 
       field.addErrorStatus(Status.error('I am a new error!!!'));
-      expect(field.fieldStatus).toBeNull();
+      expect(field.fieldStatus.rendered).toBeFalse();
+      expect(field.fieldStatus.tooltip).toBe(null);
 
       group.setCollapsed(false);
       await group.when('bodyHeightChangeDone');

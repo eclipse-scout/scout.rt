@@ -10,12 +10,12 @@
 #scout {
 
   .vendor(@property, @value) {
-    -webkit-@{property}: @value;
-    -moz-@{property}: @value;
-    -ms-@{property}: @value;
-    -o-@{property}: @value;
-      @{property}: @value;
-  }
+  -webkit-@{property}: @value;
+  -moz-@{property}: @value;
+  -ms-@{property}: @value;
+  -o-@{property}: @value;
+    @{property}: @value;
+}
 
   .glow(@color, @radius: 5px) {
     box-shadow: 0 0 @radius @color;
@@ -195,10 +195,12 @@
     display: flex;
     align-items: center;
     cursor: pointer;
-    --icon: '';
-    --color: inherit;
-    --hover-color: @hover-color;
-    --active-color: @active-color;
+
+    // Info-status is the default
+    --icon: @icon-info;
+    --color: @status-info-color;
+    --hover-color: @status-info-hover-color;
+    --active-color: @status-info-hover-color;
 
     &::before {
       #scout.font-icon();
@@ -211,6 +213,34 @@
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    &.has-menus {
+      --icon: @icon-ellipsis-v;
+      --color: @status-menu-color;
+      --hover-color: @status-menu-hover-color;
+      --active-color: @status-menu-hover-color;
+    }
+
+    &.has-ok {
+      --icon: @icon-info;
+      --color: @status-ok-color;
+      --hover-color: @status-ok-hover-color;
+      --active-color: @status-ok-hover-color;
+    }
+
+    &.has-warning {
+      --icon: @icon-exclamation-mark-circle;
+      --color: @status-warning-color;
+      --hover-color: @status-warning-hover-color;
+      --active-color: @status-warning-hover-color;
+    }
+
+    &.has-error {
+      --icon: @icon-exclamation-mark-circle;
+      --color: @status-error-color;
+      --hover-color: @status-error-hover-color;
+      --active-color: @status-error-hover-color;
     }
 
     &:hover::before {
@@ -228,42 +258,16 @@
     &.focused::before {
       #scout.focus-box-shadow();
     }
-  }
 
-  .menu-status {
-    --icon: @icon-ellipsis-v;
-    --color: @status-menu-color;
-    --hover-color: @status-menu-hover-color;
-    --active-color: @status-menu-hover-color;
-  }
+    &.disabled,
+    &:is(.has-menus, .has-ok, .has-warning, .has-error).disabled {
+      cursor: default;
 
-  .tooltip-status,
-  .info-status {
-    --icon: @icon-info;
-    --color: @status-info-color;
-    --hover-color: @status-info-hover-color;
-    --active-color: @status-info-hover-color;
-  }
-
-  .ok-status {
-    --icon: @icon-info;
-    --color: @status-ok-color;
-    --hover-color: @status-ok-hover-color;
-    --active-color: @status-ok-hover-color;
-  }
-
-  .warning-status {
-    --icon: @icon-exclamation-mark-circle;
-    --color: @status-warning-color;
-    --hover-color: @status-warning-hover-color;
-    --active-color: @status-warning-hover-color;
-  }
-
-  .error-status {
-    --icon: @icon-exclamation-mark-circle;
-    --color: @status-error-color;
-    --hover-color: @status-error-hover-color;
-    --active-color: @status-error-hover-color;
+      &::before {
+        color: @disabled-color;
+        background-color: transparent;
+      }
+    }
   }
 
   .loading-indicator(@loading-animation-size: 30px, @border-width: 1px) {

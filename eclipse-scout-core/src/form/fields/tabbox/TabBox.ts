@@ -231,7 +231,7 @@ export class TabBox extends CompositeField implements TabBoxModel {
 
   protected override _renderStatusPosition() {
     super._renderStatusPosition();
-    if (!this.fieldStatus) {
+    if (!this.fieldStatus.rendered) {
       return;
     }
     if (this.statusPosition === FormField.StatusPosition.TOP) {

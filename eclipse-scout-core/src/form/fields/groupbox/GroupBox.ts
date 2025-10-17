@@ -453,7 +453,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
   }
 
   protected _updateStatusPosition() {
-    if (!this.fieldStatus) {
+    if (!this.fieldStatus.rendered) {
       return;
     }
     if (this.statusPosition === FormField.StatusPosition.TOP) {
