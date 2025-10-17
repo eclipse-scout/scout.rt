@@ -29,6 +29,8 @@ export class FieldStatus extends Widget implements FieldStatusModel {
   protected _parentPropertyChangeListener: EventHandler<PropertyChangeEvent<any, Widget>>;
   protected _parentHierarchyChangeListener: EventHandler<HierarchyChangeEvent>;
 
+  static SEVERITY_CSS_CLASSES = 'has-error has-warning has-info has-ok';
+
   constructor() {
     super();
     this.tooltip = null;
@@ -57,13 +59,15 @@ export class FieldStatus extends Widget implements FieldStatusModel {
   }
 
   protected override _render() {
-    this.$container = this.$parent.appendSpan('status')
+    this.$container = this.$parent.appendSpan('status field-status')
       .on('mousedown', this._onStatusMouseDown.bind(this));
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     aria.role(this.$container, 'button');
     aria.hasPopup(this.$container, 'menu');
     aria.expanded(this.$container, false);
     this._updateVisibility();
+    this._updateHasStatus();
+    this.updateHasMenus();
   }
 
   protected override _remove() {
@@ -122,6 +126,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     }
     this._updateAriaLabel();
     this._updateVisibility();
+    this._updateHasStatus();
   }
 
   protected _updateVisibility() {
@@ -144,6 +149,23 @@ export class FieldStatus extends Widget implements FieldStatusModel {
       label = this.session.text('ui.ErrorMessage');
     }
     aria.label(this.$container, label);
+  }
+
+  protected _updateHasStatus() {
+    FieldStatus.updateHasStatus(this.$container, this.status);
+  }
+
+  /**
+   * Sets or removes the status severity css classes on the given `$container`.
+   */
+  static updateHasStatus($container: JQuery<HTMLElement>, status: Status) {
+    $container.removeClass(FieldStatus.SEVERITY_CSS_CLASSES);
+    if (!status) {
+      return;
+    }
+
+    let classes = 'has-' + status.cssClass();
+    $container.addClass(classes);
   }
 
   setPosition(position: FormFieldStatusPosition) {
@@ -173,6 +195,15 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     this._updateAriaLabel();
     this._updateVisibility();
     this._updateTabbable();
+    this.updateHasMenus();
+  }
+
+  /**
+   * Sets or removes the css class `has-menus` on the given `$container` or on `this.$container` if no container is provided.
+   */
+  updateHasMenus($container?: JQuery) {
+    $container = scout.nvl($container, this.$container);
+    $container.toggleClass('has-menus', !!this.menus.length);
   }
 
   setAutoRemove(autoRemove: boolean) {
@@ -355,6 +386,10 @@ export class FieldStatus extends Widget implements FieldStatusModel {
   }
 
   doAction() {
+    if (!this.enabledComputed) {
+      return;
+    }
+
     this.togglePopup();
 
     // Ensure the user can use keyboard to select the menus inside the tooltip.

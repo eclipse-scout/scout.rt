@@ -163,17 +163,12 @@ export class Tab extends Widget implements TabModel {
   }
 
   protected _renderErrorStatus() {
-    let hasStatus = !!this.errorStatus,
-      statusClass = hasStatus ? 'has-' + this.errorStatus.cssClass() : '';
-    this._updateErrorStatusClasses(statusClass);
+    this._updateErrorStatusClasses();
     this._updateStatus();
   }
 
-  protected _updateErrorStatusClasses(statusClass: string) {
-    this.$container.removeClass(FormField.SEVERITY_CSS_CLASSES);
-    if (statusClass) {
-      this.$container.addClass(statusClass);
-    }
+  protected _updateErrorStatusClasses() {
+    FieldStatus.updateHasStatus(this.$container, this.errorStatus);
   }
 
   protected _updateStatus() {

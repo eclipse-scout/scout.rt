@@ -132,7 +132,6 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
       parent: this,
       $anchor: this.$field,
       boundToAnchor: !this.touchMode,
-      cssClass: this._errorStatusClass(),
       closeOnAnchorMouseDown: false,
       field: this,
       allowedDates: this.allowedDates,
@@ -146,7 +145,6 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
       parent: this,
       $anchor: this.$timeField,
       boundToAnchor: !this.touchMode,
-      cssClass: this._errorStatusClass(),
       closeOnAnchorMouseDown: false,
       field: this,
       timeResolution: this.timePickerResolution
@@ -516,31 +514,27 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     }
   }
 
-  protected override _updateErrorStatusClasses(statusClass: string, hasStatus: boolean) {
-    super._updateErrorStatusClasses(statusClass, hasStatus);
+  protected override _updateErrorStatusClasses() {
+    super._updateErrorStatusClasses();
 
     if (this.$dateField) {
-      this._updateErrorStatusClassesOnElement(this.$dateField, statusClass, hasStatus);
+      this._updateErrorStatusClassesOnElement(this.$dateField);
 
       // Because the error color of field icons depends on the error status of sibling <input> elements.
       // The prediction fields are clones of the input fields, so the 'has-error' class has to be
       // removed from them as well to make the icon "valid".
-      this._updateErrorStatusClassesOnElement(this._$predictDateField, statusClass, hasStatus);
+      this._updateErrorStatusClassesOnElement(this._$predictDateField);
     }
 
     // Do the same for the time field
     if (this.$timeField) {
-      this._updateErrorStatusClassesOnElement(this.$timeField, statusClass, hasStatus);
-      this._updateErrorStatusClassesOnElement(this._$predictTimeField, statusClass, hasStatus);
+      this._updateErrorStatusClassesOnElement(this.$timeField);
+      this._updateErrorStatusClassesOnElement(this._$predictTimeField);
     }
 
     if (this.popup) {
-      this._updateErrorStatusClassesOnElement(this.popup.$container, statusClass, hasStatus);
+      this._updateErrorStatusClassesOnElement(this.popup.$container);
     }
-  }
-
-  protected override _errorStatusClass(): string {
-    return (this.errorStatus && !this._isSuppressStatusField()) ? 'has-' + this.errorStatus.cssClass() : '';
   }
 
   protected override _renderFont() {
@@ -1295,8 +1289,8 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
   override aboutToBlurByMouseDown(target: Element) {
     let eventOnDateField = this.$dateField ? (this.$dateField.isOrHas(target) || this.$dateFieldIcon.isOrHas(target) || (this.$dateClearIcon && this.$dateClearIcon.isOrHas(target))) : false,
       eventOnTimeField = this.$timeField ? (this.$timeField.isOrHas(target) || this.$timeFieldIcon.isOrHas(target) || (this.$timeClearIcon && this.$timeClearIcon.isOrHas(target))) : false,
-      eventOnPopup = this.popup && this.popup.$container.isOrHas(target),
-      eventOnStatus = this.fieldStatus && this.fieldStatus.$container.isOrHas(target),
+      eventOnPopup = this.popup?.$container.isOrHas(target),
+      eventOnStatus = this.fieldStatus.$container.isOrHas(target),
       datePicker = this.getDatePicker(),
       timePicker = this.getTimePicker();
 

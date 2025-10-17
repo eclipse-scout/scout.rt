@@ -90,8 +90,8 @@ export class SmartFieldMultiline<TValue> extends SmartField<TValue> {
     this._$multilineLines.toggleClass('focused', this.focused);
   }
 
-  protected override _updateErrorStatusClasses(statusClass: string, hasStatus: boolean) {
-    super._updateErrorStatusClasses(statusClass, hasStatus);
-    this._updateErrorStatusClassesOnElement(this._$multilineLines, statusClass, hasStatus);
+  protected override _updateErrorStatusClasses() {
+    super._updateErrorStatusClasses();
+    this._updateErrorStatusClassesOnElement(this._$multilineLines);
   }
 }

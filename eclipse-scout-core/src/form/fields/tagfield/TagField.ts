@@ -374,9 +374,9 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
     }
   }
 
-  protected override _updateErrorStatusClasses(statusClass: string, hasStatus: boolean) {
-    super._updateErrorStatusClasses(statusClass, hasStatus);
-    this._updateErrorStatusClassesOnElement(this.$fieldContainer, statusClass, hasStatus);
+  protected override _updateErrorStatusClasses() {
+    super._updateErrorStatusClasses();
+    this._updateErrorStatusClassesOnElement(this.$fieldContainer);
   }
 
   protected _createFieldAdapter(): TagFieldKeyStrokeAdapter {

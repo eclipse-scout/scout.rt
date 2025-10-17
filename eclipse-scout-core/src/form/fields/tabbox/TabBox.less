@@ -79,27 +79,6 @@
   & > .status {
     position: absolute;
     margin-left: @field-status-margin-left;
-    #scout.status();
-  }
-
-  .tab-box.has-tooltip > & > .status {
-    #scout.tooltip-status();
-  }
-
-  .tab-box.has-info > & > .status {
-    #scout.info-status();
-  }
-
-  .tab-box.has-ok > & > .status {
-    #scout.ok-status();
-  }
-
-  .tab-box.has-warning > & > .status {
-    #scout.warning-status();
-  }
-
-  .tab-box.has-error > & > .status {
-    #scout.error-status();
   }
 }
 
@@ -193,7 +172,6 @@
     display: inline-block;
     vertical-align: middle;
     margin-left: @field-status-margin-left;
-    #scout.status();
   }
 
   &.has-tooltip,
@@ -202,26 +180,6 @@
   &.has-ok,
   &.has-error {
     padding-right: @field-status-margin-left;
-  }
-
-  &.has-tooltip > .status {
-    #scout.tooltip-status();
-  }
-
-  &.has-info > .status {
-    #scout.info-status();
-  }
-
-  &.has-ok > .status {
-    #scout.ok-status();
-  }
-
-  &.has-warning > .status {
-    #scout.warning-status();
-  }
-
-  &.has-error > .status {
-    #scout.error-status();
   }
 }
 
