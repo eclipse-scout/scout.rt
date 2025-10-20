@@ -20,7 +20,7 @@
 
   <groupId>org.eclipse.scout.archetypes</groupId>
   <artifactId>scout-helloworld-app</artifactId>
-  <version>25.2-SNAPSHOT</version>
+  <version>25.2.11</version>
   <packaging>maven-archetype</packaging>
 
   <name>Scout Hello World Sample Application</name>
