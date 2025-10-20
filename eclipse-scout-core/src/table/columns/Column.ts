@@ -259,7 +259,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
    *
    * @param vararg either a Cell instance or a raw value
    */
-  private _ensureCell(vararg: Cell<TValue> | TValue): Cell<TValue> {
+  protected _ensureCell(vararg: Cell<TValue> | TValue): Cell<TValue> {
     let cell: Cell<TValue>;
 
     if (vararg instanceof Cell) {
