@@ -223,10 +223,10 @@ export class NumberColumn extends Column<number> implements NumberColumnModel {
       return this._barChart.bind(this);
     }
 
-    if (effect !== null) {
+    if (effect) {
       $.log.warn('Unsupported backgroundEffect: ' + effect);
-      return () => ({});
     }
+    return () => ({}); // nop
   }
 
   /** @internal */
