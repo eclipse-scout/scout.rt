@@ -214,6 +214,10 @@ export interface ColumnModel<TValue = string> extends ObjectModelWithUuid<Column
    */
   sortActive?: boolean;
 
+  /**
+   * Specifies whether this column can be used as the "node column" of a hierarchical table, i.e. the column showing
+   * the indentation and the table row controls. Default is true.
+   */
   nodeColumnCandidate?: boolean;
 
   guiOnly?: boolean;
