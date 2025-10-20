@@ -91,7 +91,7 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
       } else {
         mode.setTabbable(false);
       }
-    }, this);
+    });
   }
 
   getTabbableMode(): Mode<TModeRef> {
@@ -118,6 +118,7 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
         this.setSelectedMode(mode);
       }
     });
+    this._provideTabIndex();
   }
 
   protected _renderSlider() {

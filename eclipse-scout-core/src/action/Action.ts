@@ -62,7 +62,7 @@ export class Action extends Widget implements ActionModel {
     this.keyStrokeFirePolicy = Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
     this.selected = false;
     this.preventDoubleClick = false;
-    this.tabbable = false;
+    this.tabbable = true;
     this.preventClickFocus = true;
     this.text = null;
     this.textPosition = Action.TextPosition.DEFAULT;

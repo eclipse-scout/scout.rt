@@ -126,7 +126,8 @@ export class WidgetPopup<TContent extends Widget = Widget> extends Popup impleme
       cssClass: 'close-action menu-item',
       iconId: icons.REMOVE,
       text: this.session.text('ui.Close'),
-      textVisible: false
+      textVisible: false,
+      tabbable: false
     });
   }
 

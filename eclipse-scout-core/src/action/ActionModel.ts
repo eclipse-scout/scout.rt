@@ -82,7 +82,7 @@ export interface ActionModel extends WidgetModel {
   /**
    * Defines whether the action can be focused using keyboard.
    *
-   * Default is false.
+   * Default is true.
    */
   tabbable?: boolean;
   /**

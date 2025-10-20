@@ -63,7 +63,6 @@ export class BoxButtons extends Widget implements BoxButtonsModel {
   addButton(model: ActionModel, options?: ObjectFactoryOptions): Action {
     model = model || {};
     model.parent = this;
-    model.tabbable = true;
     model.actionStyle = Action.ActionStyle.BUTTON;
     model.preventDoubleClick = true;
     let button = scout.create(Action, model as InitModelOf<Action>, options);
