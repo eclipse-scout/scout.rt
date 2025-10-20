@@ -1286,47 +1286,6 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.setProperty('showOnOpen', showOnOpen);
   }
 
-  protected _updateTitleForDom() {
-    let titleText = this.title;
-    if (!titleText && this.closable) {
-      // Add '&nbsp;' to prevent title-box of a closable form from collapsing if title is empty
-      titleText = strings.plainText('&nbsp;');
-    }
-    if (titleText || this.subTitle) {
-      let $titles = getOrAppendChildDiv(this.$container, 'title-box');
-      // Render title
-      if (titleText) {
-        getOrAppendChildDiv($titles, 'title')
-          .text(titleText)
-          .icon(this.iconId);
-      } else {
-        removeChildDiv($titles, 'title');
-      }
-      // Render subTitle
-      if (strings.hasText(titleText)) {
-        getOrAppendChildDiv($titles, 'sub-title').text(this.subTitle);
-      } else {
-        removeChildDiv($titles, 'sub-title');
-      }
-    } else {
-      removeChildDiv(this.$container, 'title-box');
-    }
-
-    // ----- Helper functions -----
-
-    function getOrAppendChildDiv($parent, cssClass) {
-      let $div = $parent.children('.' + cssClass);
-      if ($div.length === 0) {
-        $div = this.$parent.appendDiv(cssClass);
-      }
-      return $div;
-    }
-
-    function removeChildDiv($parent, cssClass) {
-      $parent.children('.' + cssClass).remove();
-    }
-  }
-
   isDialog(): boolean {
     return this.displayHint === Form.DisplayHint.DIALOG;
   }
