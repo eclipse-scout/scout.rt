@@ -20,7 +20,7 @@ export class WidgetField extends FormField implements WidgetFieldModel {
   constructor() {
     super();
 
-    this.scrollable = true;
+    this.scrollable = false;
     this.fieldWidget = null;
     this._addWidgetProperties(['fieldWidget']);
   }

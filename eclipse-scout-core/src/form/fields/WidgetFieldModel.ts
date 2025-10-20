@@ -10,6 +10,14 @@
 import {FormFieldModel, ObjectOrChildModel, Widget} from '../../index';
 
 export interface WidgetFieldModel extends FormFieldModel {
+  /**
+   * Configures whether vertical scrollbars should be shown if the content is bigger than the available size.
+   *
+   * Default is false.
+   */
   scrollable?: boolean;
+  /**
+   * Configures the widget to be wrapped.
+   */
   fieldWidget?: ObjectOrChildModel<Widget>;
 }
