@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -461,6 +461,14 @@ public abstract class AbstractSeleniumTest {
   public WebElement waitForFirstTableRow() {
     String xpath = "//div[contains(@class, 'table-row')][1]";
     return waitUntilElementClickable(By.xpath(xpath));
+  }
+
+  /**
+   * Waits until there are no more table rows with the css classes 'showing' or 'hiding' (added by Table#_showRow, Table#_hideRow).
+   */
+  public void waitUntilTableRowAnimationDone() {
+    String xpath = "//div[contains(@class, 'table-row') and (contains(@class, 'showing') or contains(@class, 'hiding'))]";
+    waitUntil(driver -> driver.findElements(By.xpath(xpath)).isEmpty());
   }
 
   /**
