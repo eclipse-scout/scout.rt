@@ -22,9 +22,10 @@ describe('Action', () => {
   describe('defaults', () => {
 
     it('should be as expected', () => {
-      let action = new Action();
-      action.init(createSimpleModel('Action', session));
-      expect(action.tabbable).toBe(false);
+      let action = scout.create(Action, {
+        parent: session.desktop
+      });
+      expect(action.tabbable).toBe(true);
       expect(action.actionStyle).toBe(Action.ActionStyle.DEFAULT);
     });
 
@@ -33,12 +34,13 @@ describe('Action', () => {
   describe('setTabbable', () => {
 
     it('should modify $container tabindex', () => {
-      let action = new Action();
-      action.init(createSimpleModel('Action', session));
-      // because Action is 'abstract' and has no _render method yet
-      // but _renderProperties() is called anyway
-      action.$container = $sandbox;
-      action.render($sandbox);
+      let action = scout.create(Action, {
+        parent: session.desktop
+      });
+      action.render();
+      expect(action.$container.attr('tabindex')).toBe('0');
+
+      action.setTabbable(false);
       expect(action.$container.attr('tabindex')).toBe(undefined);
 
       action.setTabbable(true);

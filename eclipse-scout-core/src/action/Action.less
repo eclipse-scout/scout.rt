@@ -18,6 +18,11 @@
     color: @active-color;
   }
 
+  &:focus {
+    // Use inset shadow to ensure it will never be cut if the container uses overflow: hidden or scroll
+    #scout.focus-inset-box-shadow();
+  }
+
   &.disabled {
     color: @disabled-color;
     cursor: default;

@@ -32,7 +32,8 @@ export class MobilePopup extends WidgetPopup implements MobilePopupModel {
     return scout.create(Action, {
       parent: this,
       cssClass: 'closer',
-      iconId: icons.REMOVE_BOLD
+      iconId: icons.REMOVE_BOLD,
+      tabbable: false
     });
   }
 

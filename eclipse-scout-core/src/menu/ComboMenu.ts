@@ -14,6 +14,7 @@ export class ComboMenu extends Menu {
 
   constructor() {
     super();
+    this.tabbable = false;
     this._childVisibleChangeHandler = this._onChildVisibleChange.bind(this);
   }
 
