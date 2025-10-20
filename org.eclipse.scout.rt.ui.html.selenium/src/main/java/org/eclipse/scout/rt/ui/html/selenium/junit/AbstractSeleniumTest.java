@@ -465,6 +465,14 @@ public abstract class AbstractSeleniumTest {
   }
 
   /**
+   * Waits until there are no more table rows with the css classes 'showing' or 'hiding' (added by Table#_showRow, Table#_hideRow).
+   */
+  public void waitUntilTableRowAnimationDone() {
+    String xpath = "//div[contains(@class, 'table-row') and (contains(@class, 'showing') or contains(@class, 'hiding'))]";
+    waitUntil(driver -> driver.findElements(By.xpath(xpath)).isEmpty());
+  }
+
+  /**
    * Waits until a radio-button within the given radio button group is checked. The button is identified by its text.
    */
   public WebElement waitUntilRadioButtonChecked(WebElement radioButtonGroup, String radioButtonText) {
