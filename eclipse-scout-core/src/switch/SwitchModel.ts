@@ -11,30 +11,49 @@ import {Switch, SwitchDisplayStyle, WidgetModel} from '../index';
 
 export interface SwitchModel extends WidgetModel {
   /**
-   * Default is false
+   * Specifies the state of the switch.
+   *
+   * Default is false.
    */
   activated?: boolean;
+  /**
+   * Configures the label of the switch.
+   */
   label?: string;
   /**
-   * Default is false
+   * Defines whether HTML code in the {@link label} property should be interpreted. If set to false, the HTML will be encoded.
+   *
+   * Default is false.
    */
   labelHtmlEnabled?: boolean;
   /**
-   * Specifies if the label is visible. A value of `null` means "automatic", i.e. the label is
-   * automatically shown when the 'label' property contains text.
+   * Specifies whether the label should be visible.
+   *
+   * A value of `null` means "automatic", i.e. the label is automatically shown when the {@link label} property contains text.
+   *
+   * Default is `null`.
    */
   labelVisible?: boolean;
+  /**
+   * Configures the text to be displayed when the switch is hovered.
+   */
   tooltipText?: string;
   /**
-   * Default is false
+   * Configures whether an icon on the button should be shown indicating the state of the switch.
+   *
+   * Default is false.
    */
   iconVisible?: boolean;
   /**
-   * Default is {@link Switch.DisplayStyle.DEFAULT}
+   * Configures the display style of the switch.
+   *
+   * Default is {@link Switch.DisplayStyle.DEFAULT}.
    */
   displayStyle?: SwitchDisplayStyle;
   /**
-   * Default is false
+   * Defines whether the switch can be focused using keyboard.
+   *
+   * Default is true.
    */
   tabbable?: boolean;
 }

@@ -41,7 +41,7 @@ export class Switch extends Widget implements SwitchModel {
     this.tooltipText = null;
     this.iconVisible = false;
     this.displayStyle = Switch.DisplayStyle.DEFAULT;
-    this.tabbable = false;
+    this.tabbable = true;
 
     this.$label = null;
     this.$button = null;

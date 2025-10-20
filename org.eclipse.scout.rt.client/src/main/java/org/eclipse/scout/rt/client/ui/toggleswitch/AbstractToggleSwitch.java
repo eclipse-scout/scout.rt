@@ -114,7 +114,7 @@ public abstract class AbstractToggleSwitch extends AbstractWidget implements ITo
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(60)
   protected boolean getConfiguredTabbable() {
-    return false;
+    return true;
   }
 
   @Override
