@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ import {PromiseCreator} from '../index';
 import $ from 'jquery';
 
 export const promises = {
+
   /**
    * Use a promise creator to create a promise and wait until each promise has been done before the next
    * promise is created and executed.
@@ -120,3 +121,34 @@ export const promises = {
     }
   }
 };
+
+/**
+ * A helper class providing a {@link Promise} along with its associated `resolve` and `reject` functions,
+ * allowing explicit control over the promise's state. Only the underlying {@link #promise} should be exposed,
+ * rather than the {@link Deferred} instance.
+ *
+ * This is similar to jQuery's `$.Deferred` function, but is purely based on native ES6 promises.
+ *
+ * @template T The type of the value that the promise resolves to.
+ */
+export class Deferred<T> {
+
+  protected _resolve: (value: T) => void;
+  protected _reject: (reason: any) => void;
+  protected _promise = new Promise<T>((resolve, reject) => {
+    this._resolve = resolve;
+    this._reject = reject;
+  });
+
+  resolve(value: T) {
+    this._resolve(value);
+  }
+
+  reject(reason: any) {
+    this._reject(reason);
+  }
+
+  promise(): Promise<T> {
+    return this._promise;
+  }
+}
