@@ -33,6 +33,13 @@ export class BaseDoEntity {
   getContribution<TContributionDo extends BaseDoEntity>(contributionClassOrType: DoContributionClassOrType<TContributionDo>): TContributionDo {
     return dataObjects.getContribution(contributionClassOrType, this);
   }
+  
+  /**
+   * @see dataObjects.getContributions
+   */
+  getContributions<TContributionDo extends BaseDoEntity>(): TContributionDo[] {
+    return dataObjects.getContributions(this);
+  }
 
   /**
    * @see dataObjects.addContribution
