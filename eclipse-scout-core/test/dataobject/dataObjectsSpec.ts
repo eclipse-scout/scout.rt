@@ -118,6 +118,24 @@ describe('dataObjects', () => {
     });
   });
 
+  describe('getContributions', () => {
+    it('returns all contributions', () => {
+      let doEntity: DoEntityWithContributions = {};
+
+      expect(dataObjects.getContributions(doEntity)).toEqual([]);
+
+      let contrib = new DoContrib();
+      let contrib2: DoEntity = {
+        _type: 'PojoContrib2'
+      };
+      dataObjects.addContribution(contrib, doEntity);
+      dataObjects.addContribution(contrib2, doEntity);
+
+      expect(dataObjects.getContributions(doEntity)).toEqual([contrib, contrib2]);
+      expect(dataObjects.getContributions(null)).toEqual([]);
+    });
+  });
+
   describe('removeContribution', () => {
     it('removes the contribution for the given class', () => {
       const doEntity: DoEntityWithContributions = {};
