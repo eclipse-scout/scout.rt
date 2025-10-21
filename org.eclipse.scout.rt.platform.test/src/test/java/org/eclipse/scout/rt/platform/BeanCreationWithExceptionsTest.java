@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,6 +29,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests bean creation with constructor and / or {@link PostConstruct} methods throwing exceptions.
@@ -38,6 +40,8 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 @RunWithNewPlatform
 public class BeanCreationWithExceptionsTest {
+
+  private static final Logger LOG = LoggerFactory.getLogger(BeanCreationWithExceptionsTest.class);
 
   @Before
   public void before() {
@@ -343,14 +347,20 @@ public class BeanCreationWithExceptionsTest {
   }
 
   private static void assertTestBeanException(boolean expectedFromConstructor, BeanCreationException e) {
-    assertNotNull(e.getCause());
-    assertSame(TestBeanException.class, e.getCause().getClass());
-    TestBeanException tbe = (TestBeanException) e.getCause();
-    if (expectedFromConstructor) {
-      assertTrue(tbe.isFromConstructor());
+    try {
+      assertNotNull(e.getCause());
+      assertSame(TestBeanException.class, e.getCause().getClass());
+      TestBeanException tbe = (TestBeanException) e.getCause();
+      if (expectedFromConstructor) {
+        assertTrue(tbe.isFromConstructor());
+      }
+      else {
+        assertTrue(tbe.isFromPostConstruct());
+      }
     }
-    else {
-      assertTrue(tbe.isFromPostConstruct());
+    catch (AssertionError error) {
+      LOG.error("Assertion error during test, unexpected exception - rethrowing assertion error", e);
+      throw error;
     }
   }
 
