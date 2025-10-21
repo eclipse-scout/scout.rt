@@ -136,6 +136,16 @@ export const dataObjects = {
   },
 
   /**
+   * @returns all DO entity contributions as array.
+   */
+  getContributions<TContributionDo extends DoEntity>(doEntity: DoEntityWithContributions): TContributionDo[] {
+    if (!doEntity?._contributions?.length) {
+      return [];
+    }
+    return [...doEntity._contributions] as TContributionDo[];
+  },
+
+  /**
    * Adds a new DO entity contribution to the given DO entity.
    * Existing contributions for the same contribution class are replaced. If the contribution is a plain object, existing contributions with the same _type are replaced.
    */
