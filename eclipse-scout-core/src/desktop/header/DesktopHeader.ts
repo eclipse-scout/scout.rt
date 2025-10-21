@@ -302,7 +302,7 @@ export class DesktopHeader extends Widget implements DesktopHeaderModel {
 
   protected _outlineContentMenuBar(outlineContent: OutlineContent): MenuBar {
     if (outlineContent instanceof Form) {
-      return outlineContent.rootGroupBox.menuBar;
+      return outlineContent.rootGroupBox?.menuBar;
     }
     return (outlineContent as { menuBar?: MenuBar }).menuBar;
   }
