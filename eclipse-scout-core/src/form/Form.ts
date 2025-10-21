@@ -1543,6 +1543,10 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   renderInitialFocus() {
     let focused = false;
+    if (this.restoreFocus()) {
+      // If the form is re-rendered, the last focused element should be focused again
+      return;
+    }
     if (this.initialFocus) {
       focused = this.initialFocus.focus();
     } else {

@@ -9,8 +9,7 @@
  */
 import {
   Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, FocusOptions, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke, KeyStrokeContext,
-  LayoutData,
-  LoadingSupport, LogicalGrid, ModelAdapter, objectFactoryHints, ObjectIdProvider, ObjectOrChildModel, ObjectOrType, objects, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter, scout,
+  LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objectFactoryHints, ObjectIdProvider, ObjectOrChildModel, ObjectOrType, objects, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter, scout,
   ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToAlignment, ScrollToOptions, Session, SomeRequired, strings, styles, texts, TreeVisitResult, UuidPathOptions, WidgetEventMap, WidgetModel
 } from '../index';
 import $ from 'jquery';
@@ -98,13 +97,13 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    */
   _rendered: boolean;
   protected _$lastFocusedElement: JQuery;
+  protected _lastFocusedWidget: Widget;
   protected _focusInListener: (event: FocusEvent | JQuery.FocusInEvent) => void;
   protected _glassPaneContributions: GlassPaneContribution[];
   protected _parentDestroyHandler: EventHandler;
   protected _parentRemovingWhileAnimatingHandler: EventHandler;
   protected _postRenderActions: (() => void)[];
   protected _scrollHandler: (event: JQuery.ScrollEvent) => void;
-  protected _storedFocusedWidget: Widget;
 
   constructor() {
     super();
@@ -160,7 +159,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     // focus tracking
     this.trackFocus = false;
     this._$lastFocusedElement = null;
-    this._storedFocusedWidget = null;
+    this._lastFocusedWidget = null;
 
     this._glassPaneContributions = [];
     this._addCloneProperties(['visible', 'enabled', 'inheritAccessibility', 'cssClass', 'preventInitialFocus', 'preventClickFocus']);
@@ -585,7 +584,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       this.$container.off('focusin', this._focusInListener);
     }
     if (this._$lastFocusedElement) {
-      this._storedFocusedWidget = scout.widget(this._$lastFocusedElement);
+      this._lastFocusedWidget = scout.widget(this._$lastFocusedElement);
       this._$lastFocusedElement = null;
     }
     // remove children in reverse order.
@@ -2134,23 +2133,27 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     }
   }
 
-  restoreFocus() {
+  /**
+   * Focuses the element that was focused before the widget was removed or detached.
+   *
+   * The focus can only be restored if {@link trackFocus} is enabled.
+   */
+  restoreFocus(): boolean {
     if (this._$lastFocusedElement) {
-      this.session.focusManager.requestFocus(this._$lastFocusedElement);
-    } else if (this._storedFocusedWidget) {
-      this._storedFocusedWidget.focus();
-      this._storedFocusedWidget = null;
+      return this.session.focusManager.requestFocus(this._$lastFocusedElement);
     }
+    if (this._lastFocusedWidget) {
+      let focused = this._lastFocusedWidget.focus();
+      this._lastFocusedWidget = null;
+      return focused;
+    }
+    return false;
   }
 
   /**
    * Method invoked once a 'focusin' event is fired by this context's $container or one of its child controls.
    */
   protected _onFocusIn(event: FocusEvent | JQuery.FocusInEvent) {
-    // do not track focus events during rendering to avoid initial focus to be restored.
-    if (this.rendering) {
-      return;
-    }
     if (this.$container.has(event.target)) {
       this._$lastFocusedElement = $(event.target);
     }

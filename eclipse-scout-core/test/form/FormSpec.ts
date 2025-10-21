@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,8 +9,8 @@
  */
 import {FormSpecHelper, OutlineSpecHelper, SpecForm} from '../../src/testing/index';
 import {
-  App, CancelMenu, CloseMenu, Dimension, fields, FileChooser, Form, FormFieldMenu, FormModel, InitModelOf, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Popup, PopupBlockerHandler, Rectangle,
-  ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WrappedFormField
+  App, CancelMenu, CloseMenu, Dimension, fields, FileChooser, Form, FormFieldMenu, FormModel, InitModelOf, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Outline, Page, Popup, PopupBlockerHandler,
+  Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WrappedFormField
 } from '../../src/index';
 import {DateField, GroupBox} from '../../src';
 
@@ -989,30 +989,27 @@ describe('Form', () => {
     });
   });
 
-  describe('restore focus', () => {
-
-    let outlineHelper, desktop;
+  describe('restoreFocus', () => {
+    let outlineHelper: OutlineSpecHelper;
 
     beforeEach(() => {
-      desktop = session.desktop;
       outlineHelper = new OutlineSpecHelper(session);
     });
 
     /**
      * Scenario: Switch between two outline nodes and expect the focus in its detail forms are preserved.
      */
-    it('on detail forms', () => {
+    it('restores focus when a detail form is rendered', () => {
       // set up an outline with 2 nodes each node has a detail form with 3 fields
       let model = outlineHelper.createModelFixture(2, 0, true);
       let outline = outlineHelper.createOutline(model);
       outline.nodes.forEach(node => {
-        node.detailForm = helper.createFormWithFields(desktop, false, 3);
-        node.detailForm.nodeText = node.text;
+        node.detailForm = helper.createFormWithFields(session.desktop, false, 3);
         node.detailForm.initialFocus = node.detailForm.rootGroupBox.fields[1];
         node.detailFormVisible = true;
       });
 
-      desktop.setOutline(outline);
+      session.desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
 
       // expect the initial focus of the detail form is rendered.
@@ -1027,6 +1024,84 @@ describe('Form', () => {
       // switch back and expect the focus gets restored
       outline.selectNodes(outline.nodes[0]);
       expect(outline.nodes[0].detailForm.rootGroupBox.fields[2].isFocused()).toBe(true);
+    });
+
+    it('restores focus when a view is activated', async () => {
+      // Create a page so that desktop.bringOutlineToFront() works
+      let outline = scout.create(Outline, {
+        parent: session.desktop,
+        nodes: [{
+          objectType: Page,
+          detailForm: {objectType: Form}
+        }]
+      });
+      session.desktop.setOutline(outline);
+      outline.selectNodes(outline.nodes[0]);
+
+      let model = {
+        parent: session.desktop,
+        displayHint: Form.DisplayHint.VIEW,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [{
+            id: 'field1',
+            objectType: StringField
+          }, {
+            id: 'field2',
+            objectType: StringField
+          }]
+        }
+      };
+      let form = scout.create(Form, model);
+      await form.open();
+      expect(form.rootGroupBox.fields[0].isFocused()).toBe(true);
+
+      session.desktop.bringOutlineToFront();
+      expect(form.rootGroupBox.fields[0].isFocused()).toBe(false);
+
+      // Focus was in field 1 before -> restore it
+      form.activate();
+      expect(form.rootGroupBox.fields[0].isFocused()).toBe(true);
+
+      let form2 = scout.create(Form, {
+        ...model,
+        initialFocus: 'field2'
+      });
+      await form2.open();
+      expect(form2.rootGroupBox.fields[1].isFocused()).toBe(true);
+
+      // Focus should still be in field 1
+      form.activate();
+      expect(form.rootGroupBox.fields[0].isFocused()).toBe(true);
+
+      // Form 2 had the initial focus set to field 2 -> It should still be there
+      form2.activate();
+      expect(form2.rootGroupBox.fields[1].isFocused()).toBe(true);
+
+      // Change focus on form 2 which had an initial focus
+      form2.rootGroupBox.fields[0].focus();
+      expect(form2.rootGroupBox.fields[0].isFocused()).toBe(true);
+
+      form.activate();
+      expect(form.rootGroupBox.fields[0].isFocused()).toBe(true);
+
+      // Change focus on form 1 which didn't have an initial focus
+      form.rootGroupBox.fields[1].focus();
+      expect(form.rootGroupBox.fields[1].isFocused()).toBe(true);
+
+      // Activate form 2 -> initial focus must be ignored because a focus another field was explicitly focused
+      form2.activate();
+      expect(form2.rootGroupBox.fields[0].isFocused()).toBe(true);
+
+      // Activate form 1 -> focus must be restored to the explicitly focused field
+      form.activate();
+      expect(form.rootGroupBox.fields[1].isFocused()).toBe(true);
+
+      session.desktop.bringOutlineToFront();
+      expect(form.rootGroupBox.fields[0].isFocused()).toBe(false);
+
+      form.activate();
+      expect(form.rootGroupBox.fields[1].isFocused()).toBe(true);
     });
   });
 
