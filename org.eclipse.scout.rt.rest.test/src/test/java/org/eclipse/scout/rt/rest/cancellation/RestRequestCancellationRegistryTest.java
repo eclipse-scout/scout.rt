@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.holders.ObjectHolder;
@@ -29,12 +30,12 @@ import org.junit.runner.RunWith;
 public class RestRequestCancellationRegistryTest {
 
   private RestRequestCancellationRegistry m_registry;
-  private RunMonitor m_runMonitor;
+  private RunContext m_runContext;
 
   @Before
   public void before() {
     m_registry = new RestRequestCancellationRegistry();
-    m_runMonitor = BEANS.get(RunMonitor.class);
+    m_runContext = BEANS.get(RunContext.class).withRunMonitor(BEANS.get(RunMonitor.class));
   }
 
   @Test
@@ -42,9 +43,9 @@ public class RestRequestCancellationRegistryTest {
     Assert.assertThrows(AssertionException.class, () -> m_registry.register(null, null, null));
     Assert.assertThrows(AssertionException.class, () -> m_registry.register("1", null, null));
     Assert.assertThrows(AssertionException.class, () -> m_registry.register(null, "1", null));
-    Assert.assertThrows(AssertionException.class, () -> m_registry.register(null, null, m_runMonitor));
+    Assert.assertThrows(AssertionException.class, () -> m_registry.register(null, null, m_runContext));
 
-    m_registry.register("1", null, m_runMonitor);
+    m_registry.register("1", null, m_runContext);
   }
 
   @Test
@@ -55,64 +56,64 @@ public class RestRequestCancellationRegistryTest {
 
   @Test
   public void testRegisterAndCancel() {
-    assertFalse(m_runMonitor.isCancelled());
-    assertNotNull(m_registry.register("1", null, m_runMonitor));
+    assertFalse(m_runContext.getRunMonitor().isCancelled());
+    assertNotNull(m_registry.register("1", null, m_runContext));
 
     assertTrue(m_registry.cancel("1", null));
-    assertTrue(m_runMonitor.isCancelled());
+    assertTrue(m_runContext.getRunMonitor().isCancelled());
   }
 
   @Test
   public void testRegisterSameRequestIdMultipleTimes() {
-    assertFalse(m_runMonitor.isCancelled());
-    assertNotNull(m_registry.register("1", null, m_runMonitor));
-    assertNull(m_registry.register("1", "alice", m_runMonitor));
+    assertFalse(m_runContext.getRunMonitor().isCancelled());
+    assertNotNull(m_registry.register("1", null, m_runContext));
+    assertNull(m_registry.register("1", "alice", m_runContext));
   }
 
   @Test
   public void testCancelWithDifferentUser() {
-    assertFalse(m_runMonitor.isCancelled());
-    assertNotNull(m_registry.register("1", "alice", m_runMonitor));
+    assertFalse(m_runContext.getRunMonitor().isCancelled());
+    assertNotNull(m_registry.register("1", "alice", m_runContext));
 
     Assert.assertThrows(AccessForbiddenException.class, () -> m_registry.cancel("1", null));
-    assertFalse(m_runMonitor.isCancelled());
+    assertFalse(m_runContext.getRunMonitor().isCancelled());
 
     Assert.assertThrows(AccessForbiddenException.class, () -> m_registry.cancel("1", "eve"));
-    assertFalse(m_runMonitor.isCancelled());
+    assertFalse(m_runContext.getRunMonitor().isCancelled());
 
     assertTrue(m_registry.cancel("1", "alice"));
-    assertTrue(m_runMonitor.isCancelled());
+    assertTrue(m_runContext.getRunMonitor().isCancelled());
 
-    RunMonitor otherRunMonitor = BEANS.get(RunMonitor.class);
-    assertFalse(otherRunMonitor.isCancelled());
-    assertNotNull(m_registry.register("2", null, otherRunMonitor));
+    RunContext otherRunContext = BEANS.get(RunContext.class);
+    assertFalse(otherRunContext.getRunMonitor().isCancelled());
+    assertNotNull(m_registry.register("2", null, otherRunContext));
 
     assertTrue(m_registry.cancel("2", null));
-    assertTrue(otherRunMonitor.isCancelled());
+    assertTrue(otherRunContext.getRunMonitor().isCancelled());
 
-    otherRunMonitor = BEANS.get(RunMonitor.class);
-    assertFalse(otherRunMonitor.isCancelled());
-    assertNotNull(m_registry.register("3", null, otherRunMonitor));
+    otherRunContext = BEANS.get(RunContext.class);
+    assertFalse(otherRunContext.getRunMonitor().isCancelled());
+    assertNotNull(m_registry.register("3", null, otherRunContext));
 
     assertTrue(m_registry.cancel("3", "bob"));
-    assertTrue(otherRunMonitor.isCancelled());
+    assertTrue(otherRunContext.getRunMonitor().isCancelled());
   }
 
   @Test
   public void testRegistrationHandle() {
-    assertFalse(m_runMonitor.isCancelled());
-    IRegistrationHandle handle = m_registry.register("1", null, m_runMonitor);
+    assertFalse(m_runContext.getRunMonitor().isCancelled());
+    IRegistrationHandle handle = m_registry.register("1", null, m_runContext);
     assertNotNull(handle);
 
     handle.dispose();
     assertFalse(m_registry.cancel("1", null));
-    assertFalse(m_runMonitor.isCancelled());
+    assertFalse(m_runContext.getRunMonitor().isCancelled());
 
-    IRegistrationHandle otherHandle = m_registry.register("1", null, m_runMonitor);
+    IRegistrationHandle otherHandle = m_registry.register("1", null, m_runContext);
     assertNotNull(otherHandle);
-    RunContexts.empty().withRunMonitor(m_runMonitor).run(() -> {
+    RunContexts.empty().withRunMonitor(m_runContext.getRunMonitor()).run(() -> {
       assertTrue(m_registry.cancel("1", null));
-      assertTrue(m_runMonitor.isCancelled());
+      assertTrue(m_runContext.getRunMonitor().isCancelled());
 
       // reset interruption state on dispose
       assertTrue(Thread.currentThread().isInterrupted());
@@ -123,7 +124,7 @@ public class RestRequestCancellationRegistryTest {
 
   @Test
   public void testCancellationInfoNotExistsHandler() {
-    assertFalse(m_runMonitor.isCancelled());
+    assertFalse(m_runContext.getRunMonitor().isCancelled());
 
     StringHolder requestIdHolder = new StringHolder();
     ObjectHolder userIdHolder = new ObjectHolder();
@@ -149,6 +150,6 @@ public class RestRequestCancellationRegistryTest {
     assertEquals(expectedRequestId, requestIdHolder.getValue());
     assertEquals(expectedUserId, userIdHolder.getValue());
 
-    assertFalse(m_runMonitor.isCancelled());
+    assertFalse(m_runContext.getRunMonitor().isCancelled());
   }
 }

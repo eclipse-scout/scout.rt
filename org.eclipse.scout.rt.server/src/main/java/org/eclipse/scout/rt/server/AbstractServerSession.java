@@ -25,10 +25,11 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
+import org.eclipse.scout.rt.rest.cancellation.RestRequestCancellationRegistry;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
-import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
@@ -258,10 +259,11 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   protected void cancelRunningJobs() {
-    // Cancel globally registered RunMonitors of this session.
-    BEANS.get(RunMonitorCancelRegistry.class).cancelAllBySessionId(getId());
+    // cancel requests of this session.
+    BEANS.get(RestRequestCancellationRegistry.class)
+        .cancel(runContext -> runContext instanceof ServerRunContext && ((ServerRunContext) runContext).getSession() == AbstractServerSession.this);
 
-    // Cancel running jobs of this session.
+    // cancel running jobs of this session.
     Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
         .andMatch(new SessionFutureFilter(this))
         .andMatchNotFuture(IFuture.CURRENT.get())
