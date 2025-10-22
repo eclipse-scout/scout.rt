@@ -1,3 +1,8 @@
+#set( $symbol_dollar = '$' )
+#set( $symbol_pound = '#' )
+#set( $symbol_escape = '\' )
+ignoreScripts: true  $symbol_pound do not execute scripts (see https://pnpm.io/settings#ignorescripts)
+
 packages:
 - '.'
 - '${artifactId}.ui.html'
