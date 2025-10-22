@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.servicetunnel;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.net.ConnectException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +29,6 @@ import org.eclipse.scout.rt.platform.util.ConnectionErrorDetector;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -141,32 +139,6 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
         final long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - tStart);
         LOG.debug("TIME {}.{} {}ms {} bytes", m_serviceRequest.getServiceInterfaceClassName(), m_serviceRequest.getOperation(), elapsedMillis, nBytes);
       }
-    }
-  }
-
-  /**
-   * Cancels the remote service operation on server side.
-   */
-  public void cancel() {
-    try {
-      final String sessionId = m_serviceRequest.getSessionId();
-      if (sessionId == null) {
-        return; // cannot cancel an event without session. The IRunMonitorCancelService requires a session.
-      }
-
-      final Method serviceMethod = IRunMonitorCancelService.class.getMethod(IRunMonitorCancelService.CANCEL_METHOD, long.class);
-      final Object[] serviceArgs = {m_serviceRequest.getRequestSequence()};
-      ServiceTunnelRequest request = m_tunnel.createRequest(IRunMonitorCancelService.class, serviceMethod, serviceArgs);
-      request.setClientNodeId(m_serviceRequest.getClientNodeId());
-      request.setSessionId(sessionId);
-      request.setUserAgent(m_serviceRequest.getUserAgent());
-      m_tunnel.invokeService(request);
-    }
-    catch (final FutureCancelledError | ThreadInterruptedError e) { // NOSONAR
-      // NOOP: Do not cancel 'cancel-request' to prevent loop.
-    }
-    catch (RuntimeException | NoSuchMethodException e) {
-      LOG.warn("Failed to cancel server processing [requestSequence={}]", m_serviceRequest.getRequestSequence(), e);
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
-import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 
@@ -50,9 +49,6 @@ public class ServiceTunnelRequest implements Serializable {
 
   /**
    * @return the request sequence for this session
-   * <p>
-   * The sequence can be used to find and manipulate transactions of the same session. Such a scenario is used
-   * when cancelling "old" lookup requests using {@link IRunMonitorCancelService#cancel(long)}
    */
   public long getRequestSequence() {
     return m_requestSequence;

@@ -215,13 +215,7 @@ public class HttpServiceTunnel {
         .schedule(remoteInvocationCallable,
             Jobs.newInput().withRunContext(RunContext.CURRENT.get().copy())
                 .withName(createServiceRequestName(requestSequence))
-                .withExceptionHandling(null, false)) // do not handle uncaught exceptions because typically invoked from within a model job (might cause a deadlock, because ClientExceptionHandler schedules and waits for a model job to visualize the exception).
-        .whenDone(event -> {
-          if (event.isCancelled()) {
-            remoteInvocationCallable.cancel();
-          }
-        }, RunContext.CURRENT.get().copy()
-            .withRunMonitor(BEANS.get(RunMonitor.class))); // separate monitor to not cancel this cancellation action.
+                .withExceptionHandling(null, false)); // do not handle uncaught exceptions because typically invoked from within a model job (might cause a deadlock, because ClientExceptionHandler schedules and waits for a model job to visualize the exception).
 
     try {
       return future.awaitDoneAndGet();

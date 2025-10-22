@@ -75,7 +75,7 @@ public class RestRequestCancellationServletFilter implements Filter {
     }
 
     Object userId = resolveUserId(request);
-    return getCancellationRegistry().register(requestId, userId, runContext.getRunMonitor());
+    return getCancellationRegistry().register(requestId, userId, runContext);
   }
 
   /**

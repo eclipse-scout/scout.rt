@@ -42,8 +42,6 @@ import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.context.HttpServerRunContextProducer;
-import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
-import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry.IRegistrationHandle;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandler;
@@ -67,7 +65,6 @@ public class ServiceTunnelService {
   protected transient LazyValue<HttpServerRunContextProducer> m_serverRunContextProducer = new LazyValue<>(HttpServerRunContextProducer.class);
   protected transient LazyValue<HttpCacheControl> m_httpCacheControl = new LazyValue<>(HttpCacheControl.class);
   protected transient LazyValue<ServiceOperationInvoker> m_svcInvoker = new LazyValue<>(ServiceOperationInvoker.class);
-  protected transient LazyValue<RunMonitorCancelRegistry> m_runMonCancelRegistry = new LazyValue<>(RunMonitorCancelRegistry.class);
 
   @PostConstruct
   public void init() {
@@ -152,16 +149,10 @@ public class ServiceTunnelService {
     }
 
     final ServerRunContext serverRunContext = createServiceTunnelRunContext(serviceRequest);
-    final IRegistrationHandle registrationHandle = registerForCancellation(serverRunContext, serviceRequest);
-    try {
-      ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
-      // include client notifications in response (piggyback)
-      serviceResponse.setNotifications(serverRunContext.getClientNotificationCollector().consume());
-      return serviceResponse;
-    }
-    finally {
-      registrationHandle.unregister();
-    }
+    ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
+    // include client notifications in response (piggyback)
+    serviceResponse.setNotifications(serverRunContext.getClientNotificationCollector().consume());
+    return serviceResponse;
   }
 
   protected String interruptInfo(boolean interrupted) {
@@ -181,11 +172,6 @@ public class ServiceTunnelService {
       serverRunContext.withSession(session);
     }
     return serverRunContext;
-  }
-
-  protected IRegistrationHandle registerForCancellation(ServerRunContext runContext, ServiceTunnelRequest req) {
-    String sessionId = runContext.getSession() != null ? runContext.getSession().getId() : null;
-    return m_runMonCancelRegistry.get().register(runContext.getRunMonitor(), sessionId, req.getRequestSequence());
   }
 
   // === SERVICE INVOCATION ===

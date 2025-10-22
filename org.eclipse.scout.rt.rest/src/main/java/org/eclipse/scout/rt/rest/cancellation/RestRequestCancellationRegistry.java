@@ -9,16 +9,21 @@
  */
 package org.eclipse.scout.rt.rest.cancellation;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IPlatform.State;
+import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,19 +39,22 @@ public class RestRequestCancellationRegistry {
 
   private static final Logger LOG = LoggerFactory.getLogger(RestRequestCancellationRegistry.class);
 
+  private boolean m_destroyed = false;
   private final ConcurrentMap<String, RequestCancellationInfo> m_requestCancellationInfos = new ConcurrentHashMap<>();
 
   protected ConcurrentMap<String, RequestCancellationInfo> getRequestCancellationInfos() {
     return m_requestCancellationInfos;
   }
 
-  public IRegistrationHandle register(String requestId, Object userId, RunMonitor runMonitor) {
+  public IRegistrationHandle register(String requestId, Object userId, RunContext runContext) {
     assertNotNull(requestId, "requestId is required");
-    assertNotNull(runMonitor, "runMonitor is required");
+    assertNotNull(runContext, "runContext is required");
+    assertNotNull(runContext.getRunMonitor(), "runMonitor is required");
+    assertFalse(m_destroyed, "Registry not alive anymore");
 
     final ConcurrentMap<String, RequestCancellationInfo> cancellationInfos = getRequestCancellationInfos();
 
-    if (cancellationInfos.putIfAbsent(requestId, new RequestCancellationInfo(runMonitor, userId)) != null) {
+    if (cancellationInfos.putIfAbsent(requestId, new RequestCancellationInfo(runContext, userId)) != null) {
       // request id is already in use
       LOG.warn("Duplicate request id. Ignoring this request: [requestId:{}]", requestId);
       return null;
@@ -54,7 +62,7 @@ public class RestRequestCancellationRegistry {
 
     return () -> {
       RequestCancellationInfo info = cancellationInfos.remove(requestId);
-      if (info != null && info.getRunMonitor().isCancelled() && Thread.interrupted()) {
+      if (info != null && info.getRunContext().getRunMonitor().isCancelled() && Thread.interrupted()) {
         // as thread may be used by other operations as well; interrupted state must be reset after previous interruption
         LOG.trace("Reset interrupted state for cancelled and interrupted request {}", requestId);
       }
@@ -63,6 +71,12 @@ public class RestRequestCancellationRegistry {
 
   public boolean cancel(String requestId, Object userId) {
     return cancel(requestId, userId, this::handleCancellationInfoNotExists);
+  }
+
+  public void cancel(Predicate<RunContext> runContextPredicate) {
+    m_requestCancellationInfos.values().stream()
+        .filter(info -> runContextPredicate.test(info.getRunContext()))
+        .forEach(this::cancel);
   }
 
   /**
@@ -88,7 +102,19 @@ public class RestRequestCancellationRegistry {
       throw new AccessForbiddenException();
     }
 
-    return cancellationInfo.getRunMonitor().cancel(true);
+    return cancel(cancellationInfo);
+  }
+
+  /**
+   * Cancellation w/o further checks (e.g. forced).
+   */
+  protected boolean cancel(RequestCancellationInfo cancellationInfo) {
+    return cancellationInfo.getRunContext().getRunMonitor().cancel(true);
+  }
+
+  public void destroy() {
+    m_destroyed = true;
+    cancel(runContext -> true);
   }
 
   protected boolean checkAccess(Object requestingUserId, RequestCancellationInfo cancellationInfo) {
@@ -103,20 +129,33 @@ public class RestRequestCancellationRegistry {
 
   public static class RequestCancellationInfo {
 
-    private final RunMonitor m_runMonitor;
+    private final RunContext m_runContext;
     private final Object m_userId;
 
-    public RequestCancellationInfo(RunMonitor runMonitor, Object userId) {
-      m_runMonitor = runMonitor;
+    public RequestCancellationInfo(RunContext runContext, Object userId) {
+      m_runContext = runContext;
       m_userId = userId;
     }
 
-    public RunMonitor getRunMonitor() {
-      return m_runMonitor;
+    public RunContext getRunContext() {
+      return m_runContext;
     }
 
     public Object getUserId() {
       return m_userId;
+    }
+  }
+
+  /**
+   * {@link IPlatformListener} to shutdown this registry upon platform shutdown.
+   */
+  public static class PlatformListener implements IPlatformListener {
+
+    @Override
+    public void stateChanged(final PlatformEvent event) {
+      if (event.getState() == State.PlatformStopping) {
+        BEANS.get(RestRequestCancellationRegistry.class).destroy();
+      }
     }
   }
 }
