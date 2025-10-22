@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,6 +27,8 @@ import org.eclipse.scout.rt.platform.index.IndexedStore;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Registry that contains the {@link RunMonitor}s of operations which are currently executing, and which are subject for
@@ -37,6 +39,7 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
  */
 @ApplicationScoped
 public class RunMonitorCancelRegistry {
+  private static final Logger LOG = LoggerFactory.getLogger(RunMonitorCancelRegistry.class);
 
   private boolean m_destroyed;
   protected final IndexedStore<RegistryEntry> m_registry;
@@ -97,6 +100,10 @@ public class RunMonitorCancelRegistry {
     return () -> {
       synchronized (m_registryLock) {
         m_registry.remove(entry);
+        if (entry.getRunMonitor().isCancelled() && Thread.interrupted()) {
+          // as thread may be used by other operations as well; interrupted state must be reset after previous interruption
+          LOG.trace("Reset interrupted state for cancelled and interrupted run monitor - requestId:{}", requestId);
+        }
       }
     };
   }
