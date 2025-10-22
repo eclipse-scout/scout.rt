@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractLayout, Dimension, HtmlComponent, HtmlCompPrefSizeOptions, SimpleTabBox} from '../index';
+import {AbstractLayout, Dimension, HtmlComponent, HtmlCompPrefSizeOptions, Rectangle, SimpleTabArea, SimpleTabBox} from '../index';
 
 export class SimpleTabBoxLayout extends AbstractLayout {
   tabBox: SimpleTabBox;
@@ -18,30 +18,51 @@ export class SimpleTabBoxLayout extends AbstractLayout {
   }
 
   override layout($container: JQuery) {
-    let htmlContainer = HtmlComponent.get($container),
-      htmlViewContent = HtmlComponent.get(this.tabBox.$viewContent);
+    const htmlContainer = HtmlComponent.get($container);
+    const containerSize = htmlContainer.availableSize({exact: true}).subtract(htmlContainer.insets());
 
-    let containerSize = htmlContainer.availableSize({exact: true}).subtract(htmlContainer.insets());
-    let tabAreaSize = this._layoutTabArea(containerSize);
-    let viewContentSize = containerSize.subtract(htmlViewContent.margins());
-    viewContentSize.height -= tabAreaSize.height;
-    htmlViewContent.setSize(viewContentSize);
-  }
+    const htmlTabArea = HtmlComponent.get(this.tabBox.$tabArea);
+    const htmlViewContent = HtmlComponent.get(this.tabBox.$viewContent);
 
-  /**
-   * @returns used of the tab area
-   */
-  protected _layoutTabArea(containerSize: Dimension): Dimension {
-    if (!this.tabBox.rendered) {
-      return new Dimension(0, 0);
+    const tabAreaPosition = this.tabBox.tabArea.position;
+    const tabAreaPrefSize = htmlTabArea.prefSize();
+    const tabAreaMargins = htmlTabArea.margins();
+
+    let tabAreaSize: Dimension;
+    let viewContentSize: Dimension;
+
+    if (tabAreaPosition === SimpleTabArea.Position.TOP || tabAreaPosition === SimpleTabArea.Position.BOTTOM) {
+      tabAreaSize = new Dimension(containerSize.width, tabAreaPrefSize.height + tabAreaMargins.top + tabAreaMargins.bottom);
+      viewContentSize = new Dimension(containerSize.width, containerSize.height - tabAreaSize.height).subtract(htmlViewContent.margins());
+    } else if (tabAreaPosition === SimpleTabArea.Position.RIGHT || tabAreaPosition === SimpleTabArea.Position.LEFT) {
+      tabAreaSize = new Dimension(tabAreaPrefSize.width + tabAreaMargins.left + tabAreaMargins.right, containerSize.height);
+      viewContentSize = new Dimension(containerSize.width - tabAreaSize.width, containerSize.height).subtract(htmlViewContent.margins());
     }
-    // expected the tab area is layouted dynamically only
-    let htmlViewTabs = HtmlComponent.get(this.tabBox.$tabArea),
-      prefSize = htmlViewTabs.prefSize(),
-      margins = htmlViewTabs.margins();
-    let size = new Dimension(containerSize.width, prefSize.height + margins.top + margins.bottom);
-    htmlViewTabs.setSize(size);
-    return size;
+
+    let tabAreaBounds: Rectangle;
+    let viewContentBounds: Rectangle;
+
+    switch (tabAreaPosition) {
+      case SimpleTabArea.Position.TOP:
+        tabAreaBounds = new Rectangle(0, 0, tabAreaSize.width, tabAreaSize.height);
+        viewContentBounds = new Rectangle(0, tabAreaSize.height, viewContentSize.width, viewContentSize.height);
+        break;
+      case SimpleTabArea.Position.BOTTOM:
+        tabAreaBounds = new Rectangle(0, viewContentSize.height, tabAreaSize.width, tabAreaSize.height);
+        viewContentBounds = new Rectangle(0, 0, viewContentSize.width, viewContentSize.height);
+        break;
+      case SimpleTabArea.Position.RIGHT:
+        tabAreaBounds = new Rectangle(viewContentSize.width, 0, tabAreaSize.width, tabAreaSize.height);
+        viewContentBounds = new Rectangle(0, 0, viewContentSize.width, viewContentSize.height);
+        break;
+      case SimpleTabArea.Position.LEFT:
+        tabAreaBounds = new Rectangle(0, 0, tabAreaSize.width, tabAreaSize.height);
+        viewContentBounds = new Rectangle(tabAreaSize.width, 0, viewContentSize.width, viewContentSize.height);
+        break;
+    }
+
+    htmlTabArea.setBounds(tabAreaBounds);
+    htmlViewContent.setBounds(viewContentBounds);
   }
 
   /**
@@ -67,8 +88,16 @@ export class SimpleTabBoxLayout extends AbstractLayout {
       .add(htmlContainer.insets())
       .add(htmlViewContent.margins());
 
-    return new Dimension(
-      Math.max(viewTabsSize.width, viewContentSize.width),
-      viewContentSize.height + viewTabsSize.height);
+    const tabAreaPosition = this.tabBox.tabArea.position;
+    let prefWidth, prefHeight;
+    if (tabAreaPosition === SimpleTabArea.Position.TOP || tabAreaPosition === SimpleTabArea.Position.BOTTOM) {
+      prefWidth = Math.max(viewTabsSize.width, viewContentSize.width);
+      prefHeight = viewContentSize.height + viewTabsSize.height;
+    } else if (tabAreaPosition === SimpleTabArea.Position.RIGHT || tabAreaPosition === SimpleTabArea.Position.LEFT) {
+      prefWidth = viewTabsSize.width + viewContentSize.width;
+      prefHeight = Math.max(viewContentSize.height, viewTabsSize.height);
+    }
+
+    return new Dimension(prefWidth, prefHeight);
   }
 }
