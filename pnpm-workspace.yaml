@@ -1,3 +1,5 @@
+ignoreScripts: true  # do not execute scripts (see https://pnpm.io/settings#ignorescripts)
+
 packages:
   - 'eclipse-scout-cli'
   - 'eclipse-scout-core'
