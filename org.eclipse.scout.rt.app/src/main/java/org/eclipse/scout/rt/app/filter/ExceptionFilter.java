@@ -62,6 +62,18 @@ public class ExceptionFilter implements Filter {
       }
       throw new JettyQuietExceptionWrapper(e);
     }
+    finally {
+      if (Thread.interrupted()) {
+        HttpServletRequest req = (HttpServletRequest) request;
+        MDC.put(CorrelationIdContextValueProvider.KEY, req.getHeader(CorrelationId.HTTP_HEADER_NAME));
+        try {
+          LOG.debug("Reset interrupted state");
+        }
+        finally {
+          MDC.remove(CorrelationIdContextValueProvider.KEY);
+        }
+      }
+    }
   }
 
   /**
@@ -69,10 +81,6 @@ public class ExceptionFilter implements Filter {
    */
   protected boolean isCausedByQuietException(Throwable t) {
     return BEANS.get(DefaultExceptionTranslator.class).throwableCausesAccept(t, e -> e instanceof QuietException);
-  }
-
-  @Override
-  public void destroy() {
   }
 
   /**
