@@ -13,12 +13,28 @@
   white-space: nowrap;
   display: flex;
 
+  &.position-top,
+  &.position-bottom {
+    flex-direction: row;
+
+    & > .simple-overflow-tab-item {
+      min-width: 30px;
+    }
+  }
+
+  &.position-right,
+  &.position-left {
+    flex-direction: column;
+
+    & > .simple-overflow-tab-item {
+      min-height: 40px;
+    }
+  }
+
   & > .simple-overflow-tab-item {
-    border-right: 1px solid @border-color;
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
-    min-width: 30px;
     background-color: @simple-tab-background-color;
     text-align: center;
     cursor: pointer;
@@ -30,18 +46,22 @@
   }
 
   &.spread-even {
-    &:not(.overflown) {
-      & > .simple-tab {
-        flex-grow: 1;
+    & > .simple-tab {
+      flex-grow: 1;
+    }
 
-        &.last {
-          border-right-width: 0;
-        }
+    &.position-top,
+    &.position-bottom {
+      &:not(.overflown) > .simple-tab.last {
+        border-right-width: 0;
       }
     }
 
-    & > .simple-overflow-tab-item {
-      border-right-width: 0;
+    &.position-right,
+    &.position-left {
+      &:not(.overflown) > .simple-tab.last {
+        border-bottom-width: 0;
+      }
     }
   }
 }

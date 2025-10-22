@@ -13,10 +13,22 @@
   vertical-align: top;
   padding: @simple-tab-padding;
   background-color: @simple-tab-background-color;
-  border-right: 1px solid @border-color;
   cursor: pointer;
   width: 120px;
   min-width: 60px;
+  height: @desktop-header-height;
+
+  .position-top > &,
+  .position-bottom > & {
+    border-right: 1px solid @border-color;
+  }
+
+  .position-right > &,
+  .position-left > & {
+    border-bottom: 1px solid @border-color;
+    min-width: 120px;
+    min-height: @desktop-header-height;
+  }
 
   & > .title-line {
     display: flex;

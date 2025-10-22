@@ -9,6 +9,7 @@
  */
 import {AbstractLayout, EnumObject, Event, EventHandler, HtmlComponent, InitModelOf, SimpleTab, SimpleTabAreaEventMap, SimpleTabAreaLayout, SimpleTabAreaModel, SimpleTabView, Widget, widgets} from '../index';
 
+export type SimpleTabAreaPosition = EnumObject<typeof SimpleTabArea.Position>;
 export type SimpleTabAreaDisplayStyle = EnumObject<typeof SimpleTabArea.DisplayStyle>;
 
 export class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabAreaModel<TView> {
@@ -16,11 +17,19 @@ export class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends 
   declare eventMap: SimpleTabAreaEventMap<TView>;
   declare self: SimpleTabArea<any>;
 
+  static Position = {
+    TOP: 'top',
+    BOTTOM: 'bottom',
+    RIGHT: 'right',
+    LEFT: 'left'
+  } as const;
+
   static DisplayStyle = {
     DEFAULT: 'default',
     SPREAD_EVEN: 'spreadEven'
   } as const;
 
+  position: SimpleTabAreaPosition;
   displayStyle: SimpleTabAreaDisplayStyle;
   tabs: SimpleTab<TView>[];
 
@@ -29,6 +38,7 @@ export class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends 
 
   constructor() {
     super();
+    this.position = SimpleTabArea.Position.TOP;
     this.displayStyle = SimpleTabArea.DisplayStyle.DEFAULT;
     this.tabs = [];
     this._selectedViewTab = null;
@@ -53,8 +63,23 @@ export class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends 
 
   protected override _renderProperties() {
     super._renderProperties();
+    this._renderPosition();
     this._renderDisplayStyle();
     this._renderTabs();
+  }
+
+  setPosition(position: SimpleTabAreaPosition) {
+    this.setProperty('position', position);
+  }
+
+  protected _renderPosition() {
+    const positions: SimpleTabAreaPosition[] = [SimpleTabArea.Position.TOP, SimpleTabArea.Position.BOTTOM, SimpleTabArea.Position.LEFT, SimpleTabArea.Position.RIGHT];
+    positions.forEach(position => this.$container.toggleClass(this._cssClassForPosition(position), this.position === position));
+    this.invalidateLayoutTree();
+  }
+
+  protected _cssClassForPosition(position: SimpleTabAreaPosition) {
+    return 'position-' + position;
   }
 
   setDisplayStyle(displayStyle: SimpleTabAreaDisplayStyle) {
