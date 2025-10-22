@@ -30,6 +30,7 @@ public class ScoutDataObjectTestCompletenessTest extends AbstractDataObjectTestC
         Path.of("karma-jasmine-scout"),
         Path.of("scout-hellojs-app"),
         Path.of("scout-helloworld-app"),
-        Path.of("scout-jaxws-module"));
+        Path.of("scout-jaxws-module"),
+        Path.of("org/eclipse/scout/rt/rest/jersey/fixture"));
   }
 }
