@@ -7,9 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ObjectOrModel, SimpleTab, SimpleTabAreaDisplayStyle, SimpleTabView, WidgetModel} from '../index';
+import {ObjectOrModel, SimpleTab, SimpleTabAreaDisplayStyle, SimpleTabAreaPosition, SimpleTabView, WidgetModel} from '../index';
 
 export interface SimpleTabAreaModel<TView extends SimpleTabView = SimpleTabView> extends WidgetModel {
+  position?: SimpleTabAreaPosition;
   displayStyle?: SimpleTabAreaDisplayStyle;
   tabs?: ObjectOrModel<SimpleTab<TView>>[];
 }
