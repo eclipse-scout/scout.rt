@@ -89,7 +89,7 @@ export class DesktopHeaderLayout extends AbstractLayout {
     }
     // Ensure minimum width for the the overflow menu - expect if there are no tabs at all (in that case ensure min width of 0)
     let layout = tabArea.htmlComp.layout as DesktopTabAreaLayout;
-    let overflowTabItemWidth = layout.overflowTabItemWidth;
+    let overflowTabItemWidth = layout.overflowTabItemSize;
     tabsWidth = Math.max(tabsWidth, (tabArea.tabs.length ? overflowTabItemWidth : 0));
     setTabsSize();
 

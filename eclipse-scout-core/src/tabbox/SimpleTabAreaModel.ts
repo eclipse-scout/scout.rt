@@ -12,4 +12,7 @@ import {ObjectOrModel, SimpleTab, SimpleTabAreaDisplayStyle, SimpleTabView, Widg
 export interface SimpleTabAreaModel<TView extends SimpleTabView = SimpleTabView> extends WidgetModel {
   displayStyle?: SimpleTabAreaDisplayStyle;
   tabs?: ObjectOrModel<SimpleTab<TView>>[];
+  position?: SimpleTabAreaPosition;
 }
+
+export type SimpleTabAreaPosition = 'top' | 'right' | 'bottom' | 'left';

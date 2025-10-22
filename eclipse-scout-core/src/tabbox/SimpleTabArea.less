@@ -8,10 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 .simple-tab-area {
-  position: absolute;
-  top: 0;
   white-space: nowrap;
   display: flex;
+
+  &.position-top, &.position-bottom {
+    flex-direction: row;
+  }
+
+  &.position-right, &.position-left {
+    flex-direction: column;
+  }
 
   & > .simple-overflow-tab-item {
     border-right: 1px solid @border-color;

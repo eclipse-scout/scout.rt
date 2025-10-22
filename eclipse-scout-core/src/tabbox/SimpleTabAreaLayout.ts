@@ -12,9 +12,9 @@ import $ from 'jquery';
 
 export class SimpleTabAreaLayout extends AbstractLayout {
   tabArea: SimpleTabArea;
-  tabWidth: number;
-  tabMinWidth: number;
-  overflowTabItemWidth: number;
+  tabSize: number;
+  tabMinSize: number;
+  overflowTabItemSize: number;
   protected _$overflowTab: JQuery;
   protected _overflowTabsIndizes: number[];
 
@@ -24,12 +24,35 @@ export class SimpleTabAreaLayout extends AbstractLayout {
     this._$overflowTab = null;
     this._overflowTabsIndizes = [];
 
-    this.tabWidth = null;
-    this.tabMinWidth = null;
-    this.overflowTabItemWidth = null;
+    this.tabSize = null;
+    this.tabMinSize = null;
+    this.overflowTabItemSize = null;
+  }
+
+  protected _hasHorizontalTabs(): boolean {
+    return this.tabArea.position === 'top' || this.tabArea.position === 'bottom';
   }
 
   override layout($container: JQuery) {
+    let getDimension: (object: { width: number; height: number }) => number;
+    let setDimension: (object: { width: number; height: number }, v: number) => void;
+
+    if (this._hasHorizontalTabs()) {
+      getDimension = object => object.width;
+      setDimension = (object, width) => {
+        object.width = width;
+      };
+    } else {
+      getDimension = object => object.height;
+      setDimension = (object, height) => {
+        object.height = height;
+      };
+    }
+
+    this._layoutImpl($container, getDimension, setDimension);
+  }
+
+  protected _layoutImpl($container: JQuery, getDimension: (o: { width: number; height: number }) => number, setDimension: (o: { width: number; height: number }, v: number) => void) {
     let htmlContainer = this.tabArea.htmlComp,
       containerSize = htmlContainer.size({
         exact: true
@@ -51,17 +74,17 @@ export class SimpleTabAreaLayout extends AbstractLayout {
     widgets.updateFirstLastMarker(this.tabArea.getTabs());
 
     // All tabs fit in container -> no overflow menu necessary
-    if (smallPrefSize.width <= containerSize.width) {
+    if (getDimension(smallPrefSize) <= getDimension(containerSize)) {
       $container.removeClass('overflown');
       return;
     }
 
     // Not all tabs fit in container -> put tabs into overflow menu
     $container.addClass('overflown');
-    containerSize.width -= this.overflowTabItemWidth;
+    setDimension(containerSize, getDimension(containerSize) - this.overflowTabItemSize);
 
-    // check how many tabs fit into remaining containerSize.width
-    let numVisibleTabs = Math.floor(containerSize.width / this.tabMinWidth);
+    // check how many tabs fit into remaining containerSize.width or containerSize.height
+    let numVisibleTabs = Math.floor(getDimension(containerSize) / this.tabMinSize);
     let numOverflowTabs = numTabs - numVisibleTabs;
 
     let selectedIndex = 0;
@@ -99,31 +122,65 @@ export class SimpleTabAreaLayout extends AbstractLayout {
     widgets.updateFirstLastMarker(this.tabArea.getVisibleTabs());
   }
 
-  smallPrefSize(options: PrefSizeOptions & { minTabWidth?: number } = {}): Dimension {
+  smallPrefSize(options: PrefSizeOptions & { tabMinSize?: number } = {}): Dimension {
     this._initSizes();
-    options = $.extend({minTabWidth: this.tabMinWidth}, options);
+    options = $.extend({tabMinSize: this.tabMinSize}, options);
     return this.preferredLayoutSize(this.tabArea.$container, options);
   }
 
-  override preferredLayoutSize($container: JQuery, options?: PrefSizeOptions & { minTabWidth?: number }): Dimension {
+  override preferredLayoutSize($container: JQuery, options?: PrefSizeOptions & { tabMinSize?: number }): Dimension {
     this._initSizes();
-    let minTabWidth = scout.nvl(options.minTabWidth, 0) || scout.nvl(this.tabWidth, 0);
+    let getDimensionHint: (options: PrefSizeOptions) => number;
+    let createDimension: (prefSize: Dimension, minSize: number) => Dimension;
+
+    if (this._hasHorizontalTabs()) {
+      getDimensionHint = options => options.widthHint;
+      createDimension = (prefSize, minWidth) => new Dimension(minWidth, prefSize.height);
+    } else {
+      getDimensionHint = options => options.heightHint;
+      createDimension = (prefSize, minHeight) => new Dimension(prefSize.width, minHeight);
+    }
+
+    return this._preferredLayoutSize($container, options, getDimensionHint, createDimension);
+  }
+
+  protected _preferredLayoutSize($container: JQuery, options: PrefSizeOptions & { tabMinSize?: number }, getDimensionHint: (o: PrefSizeOptions) => number, createDimension: (prefSize: Dimension, minSize: number) => Dimension): Dimension {
+    let tabMinSize = scout.nvl(options.tabMinSize, 0) || scout.nvl(this.tabSize, 0);
     let numTabs = this.tabArea.getTabs().length;
-    let minWidth = numTabs * minTabWidth;
+    let minSize = numTabs * tabMinSize;
     options = $.extend({useCssSize: true}, options);
     let prefSize = graphics.prefSize(this.tabArea.$container, options);
-    if (options.widthHint && this.tabArea.displayStyle === SimpleTabArea.DisplayStyle.SPREAD_EVEN) {
-      minWidth = Math.max(options.widthHint, minWidth);
+    let sizeHint = getDimensionHint(options);
+    if (sizeHint && this.tabArea.displayStyle === SimpleTabArea.DisplayStyle.SPREAD_EVEN) {
+      minSize = Math.max(sizeHint, minSize);
     }
-    return new Dimension(minWidth, prefSize.height);
+    return createDimension(prefSize, minSize);
   }
 
   /**
-   * Reads the default sizes from CSS -> the tabs need to specify a width and a min-width.
+   * Reads the default sizes from CSS -> the tabs need to specify a width and a min-width or a height and a min-height.
    * The layout expects all tabs to have the same width.
    */
   protected _initSizes() {
-    if (this.tabWidth != null && this.tabMinWidth != null && this.overflowTabItemWidth != null) {
+    let getStylesTabSize: (cssClasses: string[]) => number;
+    let getStylesTabMinSize: (cssClasses: string[]) => number;
+    let getStylesOverflowTabItemSize: (cssClasses: string[]) => number;
+
+    if (this._hasHorizontalTabs()) {
+      getStylesTabSize = cssClasses => styles.getSize(cssClasses, 'width', 'width', 0);
+      getStylesTabMinSize = cssClasses => styles.getSize(cssClasses, 'min-width', 'minWidth');
+      getStylesOverflowTabItemSize = cssClasses => styles.getSize(cssClasses, 'min-width', 'minWidth') + styles.getSize(cssClasses, 'margin-left', 'marginLeft') + styles.getSize(cssClasses, 'margin-right', 'marginRight');
+    } else {
+      getStylesTabSize = cssClasses => styles.getSize(cssClasses, 'height', 'height', 0);
+      getStylesTabMinSize = cssClasses => styles.getSize(cssClasses, 'min-height', 'minHeight');
+      getStylesOverflowTabItemSize = cssClasses => styles.getSize(cssClasses, 'min-height', 'minHeight') + styles.getSize(cssClasses, 'margin-top', 'marginTop') + styles.getSize(cssClasses, 'margin-bottom', 'marginBottom');
+    }
+
+    this._initSizesImpl(getStylesTabSize, getStylesTabMinSize, getStylesOverflowTabItemSize);
+  }
+
+  protected _initSizesImpl(getStylesTabSize: (cssClasses: string[]) => number, getStylesTabMinSize: (cssClasses: string[]) => number, getStylesOverflowTabItemSize: (cssClasses: string[]) => number) {
+    if (this.tabSize != null && this.tabMinSize != null && this.overflowTabItemSize != null) {
       return;
     }
     let $tab = this.tabArea.$container.children('.simple-tab').eq(0);
@@ -133,16 +190,14 @@ export class SimpleTabAreaLayout extends AbstractLayout {
     $tab = $tab.clone().addClass('selected'); // Non selected items have a margin, selected ones don't -> we need to get the width incl. margin
     let tabAreaClasses = this.tabArea.$container.attr('class');
     let tabItemClasses = $tab.attr('class');
-    if (this.tabWidth === null) {
-      this.tabWidth = styles.getSize([tabAreaClasses, tabItemClasses], 'width', 'width', 0);
+    if (this.tabSize === null) {
+      this.tabSize = getStylesTabSize([tabAreaClasses, tabItemClasses]);
     }
-    if (this.tabMinWidth === null) {
-      this.tabMinWidth = styles.getSize([tabAreaClasses, tabItemClasses], 'min-width', 'minWidth');
+    if (this.tabMinSize === null) {
+      this.tabMinSize = getStylesTabMinSize([tabAreaClasses, tabItemClasses]);
     }
-    if (this.overflowTabItemWidth === null) {
-      this.overflowTabItemWidth = styles.getSize([tabAreaClasses, 'simple-overflow-tab-item'], 'min-width', 'minWidth');
-      this.overflowTabItemWidth += styles.getSize([tabAreaClasses, 'simple-overflow-tab-item'], 'margin-left', 'marginLeft');
-      this.overflowTabItemWidth += styles.getSize([tabAreaClasses, 'simple-overflow-tab-item'], 'margin-right', 'marginRight');
+    if (this.overflowTabItemSize === null) {
+      this.overflowTabItemSize = getStylesOverflowTabItemSize([tabAreaClasses, 'simple-overflow-tab-item']);
     }
   }
 

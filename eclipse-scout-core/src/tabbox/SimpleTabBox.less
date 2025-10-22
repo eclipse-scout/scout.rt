@@ -13,8 +13,15 @@
   min-height: @bench-view-min-height;
 
   & > .simple-tab-area {
-    position: relative;
-    height: @desktop-header-height;
+    position: absolute;
+
+    &.position-top, &.position-bottom {
+      height: @desktop-header-height;
+    }
+
+    &.position-right, &.position-left {
+      width: @desktop-header-height;
+    }
 
     /* Has the same effect as "border-bottom: 1px solid @border-color", but is over-drawable by child */
     /* elements (such as the selected view-tab). The border would not be, because of "overflow: hidden". */
@@ -22,16 +29,40 @@
     &::before {
       content: '';
       background-color: @border-color;
+      position: absolute;
+    }
+
+    &.position-top::before, &.position-bottom::before {
       width: 100%;
       height: 1px;
-      position: absolute;
-      top: calc(~'100% - 1px');
       left: 0;
+    }
+
+    &.position-top::before {
+      top: calc(~'100% - 1px');
+    }
+
+    &.position-bottom::before {
+      bottom: calc(~'100% - 1px');
+    }
+
+    &.position-right::before, &.position-left::before {
+      width: 1px;
+      height: 100%;
+      top: 0;
+    }
+
+    &.position-right::before {
+      right: calc(~'100% - 1px');
+    }
+
+    &.position-left::before {
+      left: calc(~'100% - 1px');
     }
   }
 
   & > .tab-content {
-    height: 100%;
+    position: absolute;
     background-color: @background-color;
   }
 }

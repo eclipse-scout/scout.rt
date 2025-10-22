@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractLayout, EnumObject, Event, EventHandler, HtmlComponent, InitModelOf, SimpleTab, SimpleTabAreaEventMap, SimpleTabAreaLayout, SimpleTabAreaModel, SimpleTabView, Widget, widgets} from '../index';
+import {AbstractLayout, EnumObject, Event, EventHandler, HtmlComponent, InitModelOf, SimpleTab, SimpleTabAreaEventMap, SimpleTabAreaLayout, SimpleTabAreaModel, SimpleTabAreaPosition, SimpleTabView, Widget, widgets} from '../index';
 
 export type SimpleTabAreaDisplayStyle = EnumObject<typeof SimpleTabArea.DisplayStyle>;
 
@@ -23,6 +23,7 @@ export class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends 
 
   displayStyle: SimpleTabAreaDisplayStyle;
   tabs: SimpleTab<TView>[];
+  position: SimpleTabAreaPosition;
 
   protected _selectedViewTab: SimpleTab<TView>;
   protected _tabClickHandler: EventHandler<Event<SimpleTab<TView>>>;
@@ -31,6 +32,7 @@ export class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends 
     super();
     this.displayStyle = SimpleTabArea.DisplayStyle.DEFAULT;
     this.tabs = [];
+    this.position = 'top';
     this._selectedViewTab = null;
     this._addWidgetProperties(['tabs']);
   }
@@ -42,7 +44,7 @@ export class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends 
   }
 
   protected override _render() {
-    this.$container = this.$parent.appendDiv('simple-tab-area');
+    this.$container = this.$parent.appendDiv('simple-tab-area').addClass('position-' + this.position);
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(this._createLayout());
   }
