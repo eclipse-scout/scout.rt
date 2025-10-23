@@ -25,7 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.authentication.DevelopmentAccessController;
-import org.eclipse.scout.rt.server.commons.authentication.ServiceTunnelAccessTokenAccessController;
+import org.eclipse.scout.rt.server.commons.authentication.AccessTokenAccessController;
 import org.eclipse.scout.rt.server.commons.authentication.TrivialAccessController;
 import org.eclipse.scout.rt.server.commons.authentication.TrivialAccessController.TrivialAuthConfig;
 
@@ -37,13 +37,13 @@ import org.eclipse.scout.rt.server.commons.authentication.TrivialAccessControlle
 public class ServerServletFilter implements Filter {
 
   private TrivialAccessController m_trivialAccessController;
-  private ServiceTunnelAccessTokenAccessController m_accessTokenAccessController;
+  private AccessTokenAccessController m_accessTokenAccessController;
   private DevelopmentAccessController m_developmentAccessController;
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
     m_trivialAccessController = BEANS.get(TrivialAccessController.class).init(new TrivialAuthConfig().withExclusionFilter(filterConfig.getInitParameter("filter-exclude")));
-    m_accessTokenAccessController = BEANS.get(ServiceTunnelAccessTokenAccessController.class).init();
+    m_accessTokenAccessController = BEANS.get(AccessTokenAccessController.class).init();
     m_developmentAccessController = BEANS.get(DevelopmentAccessController.class).init();
   }
 
