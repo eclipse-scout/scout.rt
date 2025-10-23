@@ -53,26 +53,25 @@ public class ExceptionFilter implements Filter {
       }
 
       HttpServletRequest req = (HttpServletRequest) request;
-      MDC.put(CorrelationIdContextValueProvider.KEY, req.getHeader(CorrelationId.HTTP_HEADER_NAME));
-      try {
-        LOG.warn(req.getRequestURI(), e);
-      }
-      finally {
-        MDC.remove(CorrelationIdContextValueProvider.KEY);
-      }
+      runWithCorrelationId(req.getHeader(CorrelationId.HTTP_HEADER_NAME), () -> LOG.warn(req.getRequestURI(), e));
+
       throw new JettyQuietExceptionWrapper(e);
     }
     finally {
       if (Thread.interrupted()) {
         HttpServletRequest req = (HttpServletRequest) request;
-        MDC.put(CorrelationIdContextValueProvider.KEY, req.getHeader(CorrelationId.HTTP_HEADER_NAME));
-        try {
-          LOG.debug("Reset interrupted state");
-        }
-        finally {
-          MDC.remove(CorrelationIdContextValueProvider.KEY);
-        }
+        runWithCorrelationId(req.getHeader(CorrelationId.HTTP_HEADER_NAME), () -> LOG.debug("Reset interrupted state - {}", req.getRequestURI()));
       }
+    }
+  }
+
+  protected void runWithCorrelationId(String correlationId, Runnable runnable) {
+    MDC.put(CorrelationIdContextValueProvider.KEY, correlationId);
+    try {
+      runnable.run();
+    }
+    finally {
+      MDC.remove(CorrelationIdContextValueProvider.KEY);
     }
   }
 

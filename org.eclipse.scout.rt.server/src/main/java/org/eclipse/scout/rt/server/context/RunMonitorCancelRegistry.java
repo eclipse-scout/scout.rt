@@ -102,7 +102,7 @@ public class RunMonitorCancelRegistry {
         m_registry.remove(entry);
         if (entry.getRunMonitor().isCancelled() && Thread.interrupted()) {
           // as thread may be used by other operations as well; interrupted state must be reset after previous interruption
-          LOG.trace("Reset interrupted state for cancelled and interrupted run monitor - requestId:{}", requestId);
+          LOG.trace("Reset interrupted state for cancelled and interrupted run monitor - [requestId:{}, sessionId:{}]", requestId, sessionId);
         }
       }
     };
