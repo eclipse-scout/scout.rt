@@ -1970,6 +1970,41 @@ describe('Widget', () => {
     });
   });
 
+  describe('preventInitialFocus', () => {
+    it('adds or removes the class prevent-initial-focus to the focusable element', () => {
+      let widget = createWidget({
+        parent: parent
+      });
+      widget.render(session.$entryPoint);
+      expect(widget.$container).not.toHaveClass('prevent-initial-focus');
+
+      widget.setPreventInitialFocus(true);
+      expect(widget.$container).toHaveClass('prevent-initial-focus');
+
+      widget.setPreventInitialFocus(false);
+      expect(widget.$container).not.toHaveClass('prevent-initial-focus');
+    });
+
+    it('does nothing if it is null or undefined', () => {
+      let widget = createWidget({
+        parent: parent,
+        cssClass: 'prevent-initial-focus'
+      });
+      widget.render(session.$entryPoint);
+      expect(widget.preventInitialFocus).toBeUndefined();
+      expect(widget.$container).toHaveClass('prevent-initial-focus');
+
+      widget.setPreventInitialFocus(false);
+      expect(widget.$container).not.toHaveClass('prevent-initial-focus');
+
+      widget.setPreventInitialFocus(true);
+      expect(widget.$container).toHaveClass('prevent-initial-focus');
+
+      widget.setPreventInitialFocus(null);
+      expect(widget.$container).toHaveClass('prevent-initial-focus');
+    });
+  });
+
   describe('prepareModel', () => {
     it('default case', () => {
       let model = {};

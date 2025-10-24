@@ -44,7 +44,6 @@ export class FormField extends Widget implements FormFieldModel {
   menus: Menu[];
   menusVisible: boolean;
   defaultMenuTypes: string[];
-  preventInitialFocus: boolean;
   /** If set to true, the field needs to be saved. This will be computed by {@link computeSaveNeeded}. */
   saveNeeded: boolean;
   checkSaveNeeded: boolean;
@@ -112,7 +111,6 @@ export class FormField extends Widget implements FormFieldModel {
     this.menus = [];
     this.menusVisible = true;
     this.defaultMenuTypes = [];
-    this.preventInitialFocus = false;
     this.saveNeeded = false;
     this.checkSaveNeeded = true;
     this.lifecycleBoundary = false;
@@ -133,7 +131,7 @@ export class FormField extends Widget implements FormFieldModel {
 
     this._addWidgetProperties(['keyStrokes', 'menus', 'statusMenuMappings']);
     this._addCloneProperties(['dropType', 'dropMaximumSize', 'errorStatus', 'fieldStyle', 'gridDataHints', 'gridData', 'label', 'labelVisible', 'labelPosition',
-      'labelWidthInPixel', 'labelUseUiWidth', 'mandatory', 'mode', 'preventInitialFocus', 'saveNeeded', 'touched', 'statusVisible', 'statusPosition', 'statusMenuMappings',
+      'labelWidthInPixel', 'labelUseUiWidth', 'mandatory', 'mode', 'saveNeeded', 'touched', 'statusVisible', 'statusPosition', 'statusMenuMappings',
       'tooltipText', 'tooltipAnchor']);
 
     this._menuPropertyChangeHandler = this._onMenuPropertyChange.bind(this);
@@ -292,7 +290,6 @@ export class FormField extends Widget implements FormFieldModel {
     this._renderLabelForegroundColor();
     this._renderLabelBackgroundColor();
     this._renderGridData();
-    this._renderPreventInitialFocus();
     this._renderFieldStyle();
   }
 
@@ -981,10 +978,6 @@ export class FormField extends Widget implements FormFieldModel {
     if (this.fieldStatus) {
       this.fieldStatus.hideTooltip();
     }
-  }
-
-  protected _renderPreventInitialFocus() {
-    this.$container.toggleClass('prevent-initial-focus', !!this.preventInitialFocus);
   }
 
   /**

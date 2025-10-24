@@ -21,8 +21,7 @@ export class CloneSpecHelper {
 
     // simple properties to be cloned
     properties.forEach(prop => {
-      expect(clone[prop]).toBeDefined();
-      expect(clone[prop]).toBe(original[prop]);
+      expect(clone[prop]).withContext(prop).toBe(original[prop]);
     });
 
     // widget properties to be cloned

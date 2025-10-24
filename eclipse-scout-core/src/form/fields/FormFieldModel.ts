@@ -118,12 +118,6 @@ export interface FormFieldModel extends WidgetModel {
    */
   menus?: ObjectOrChildModel<Menu>[];
   /**
-   * Defines whether the {@link FocusManager} is allowed to consider this field when computing the first focusable field in a container, e.g. in a {@link Form}.
-   *
-   * Default is false.
-   */
-  preventInitialFocus?: boolean;
-  /**
    * Defines the position of the status area, that displays {@link errorStatus}, {@link menus} and {@link tooltipText}.
    *
    * By default the status area is on the right side of the field.
