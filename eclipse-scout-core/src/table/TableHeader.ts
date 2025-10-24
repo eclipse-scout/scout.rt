@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, InitModelOf, inspector, ItemFocusEvent, keys, KeyStrokeContext, MenuBar, MenuDestinations, ObjectIdProvider, objects,
-  PropertyChangeEvent, Rectangle, scout, scrollbars, SomeRequired, strings, styles, TabbableCoordinator, TabbableItem, Table, TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent,
-  TableHeaderEventMap, TableHeaderMenu, TableHeaderModel, tooltips, Widget
+  aria, arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, InitModelOf, inspector, ItemFocusEvent, keys, MenuBar, MenuDestinations, objects, PropertyChangeEvent, Rectangle, scout,
+  scrollbars, SomeRequired, strings, styles, TabbableCoordinator, TabbableItem, Table, TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableHeaderEventMap, TableHeaderMenu, TableHeaderModel,
+  tooltips, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -26,7 +26,6 @@ export class TableHeader extends Widget implements TableHeaderModel {
   columnMoved: boolean;
   menuBar: MenuBar;
   tableHeaderMenu: TableHeaderMenu;
-  headerLabelId: string;
   tabbableCoordinator: TabbableCoordinator;
   $menuBarContainer: JQuery;
   $filler: JQuery;
@@ -46,7 +45,6 @@ export class TableHeader extends Widget implements TableHeaderModel {
     this.dragging = false;
     this.headerMenusEnabled = true;
     this.table = null;
-    this.headerLabelId = null;
     this._tableDataScrollHandler = this._onTableDataScroll.bind(this);
     this._tableAddFilterRemovedHandler = this._onTableAddFilterRemoved.bind(this);
     this._tableColumnResizedHandler = this._onTableColumnResized.bind(this);
@@ -145,16 +143,13 @@ export class TableHeader extends Widget implements TableHeaderModel {
     let $header = this.$filler.beforeDiv('table-header-item prevent-initial-focus')
       .setEnabled(this.enabled) // enabledComputed not used on purpose
       .data('column', column);
-
     aria.role($header, 'columnheader');
+    $header.appendSpan('table-header-item-text')
+      .attr('id', column.headerLabelId);
 
     let margins = graphics.margins($header);
     columnWidth -= margins.horizontal();
     $header.cssMinWidth(columnWidth).cssMaxWidth(columnWidth);
-
-    // add label id to header item text, so table cells can reference it for screen readers
-    this.headerLabelId = ObjectIdProvider.get().createUiSeqId();
-    $header.appendSpan('table-header-item-text').attr('id', this.headerLabelId);
 
     if (this.enabled) { // enabledComputed not used on purpose
       $header

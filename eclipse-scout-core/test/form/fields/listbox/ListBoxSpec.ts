@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Code, CodeLookupCall, codes, CodeType, ListBox, ListBoxModel, ListBoxTableAccessibilityRenderer, LookupCall, LookupResult, LookupRow, QueryBy, scout, Status, Table} from '../../../../src/index';
-import {DummyLookupCall, EmptyDummyLookupCall, ErroneousLookupCall, FormSpecHelper, LanguageDummyLookupCall} from '../../../../src/testing/index';
+import {arrays, Code, CodeLookupCall, codes, CodeType, ListBox, ListBoxAriaRules, ListBoxModel, LookupCall, LookupResult, LookupRow, QueryBy, scout, StaticLookupCall, Status, Table} from '../../../../src/index';
+import {DummyLookupCall, EmptyDummyLookupCall, ErroneousLookupCall, FormSpecHelper, LanguageDummyLookupCall, TableSpecHelper} from '../../../../src/testing/index';
 import {InitModelOf, ObjectOrModel} from '../../../../src/scout';
 import $ from 'jquery';
 
@@ -510,35 +510,56 @@ describe('ListBox', () => {
         label: 'hello'
       });
       listBox.render();
-      expect(listBox.$field.attr('aria-labelledby')).toBeTruthy();
-      expect(listBox.$field.attr('aria-labelledby')).toBe(listBox.$label.attr('id'));
-      expect(listBox.$field.attr('aria-label')).toBeFalsy();
+      expect(listBox.table.$data.attr('aria-labelledby')).toBe(listBox.$label.attr('id'));
+      expect(listBox.table.$data.attr('aria-label')).toBeFalsy();
     });
 
-    it('has a ListBoxTableAccessibilityRenderer set as its accessibility renderer', () => {
+    it('has listbox aria rules set', () => {
       let listBox = createFieldWithLookupCall();
-      expect(listBox.table.accessibilityRenderer instanceof ListBoxTableAccessibilityRenderer).toBe(true);
+      expect(listBox.table.ariaRules instanceof ListBoxAriaRules).toBe(true);
     });
 
     it('has a table with aria role listbox', () => {
       let listBox = createFieldWithLookupCall();
-      expect(listBox.table.$container).toHaveAttr('role', 'listbox');
-    });
-
-    it('has a data section with role group', () => {
-      let listBox = createFieldWithLookupCall();
-      expect(listBox.table.$data).toHaveAttr('role', 'group');
+      expect(listBox.table.$data).toHaveAttr('role', 'listbox');
     });
 
     it('has rows with aria role option', () => {
       let listBox = createFieldWithLookupCall();
-      expect(listBox.loading).toBe(true);
       jasmine.clock().tick(500);
-      expect(listBox.loading).toBe(false);
       expect(listBox.table.rows.length).toBeGreaterThan(0);
       listBox.table.rows.forEach(row => {
         expect(row.$row).toHaveAttr('role', 'option');
       });
+    });
+
+    it('has rows with posinset', () => {
+      let tableHelper = new TableSpecHelper(session);
+      let lookupData = [];
+      for (let i = 0; i < 20; i++) {
+        lookupData.push([i, `${i}`]);
+      }
+      let listBox = scout.create(ListBox, {
+        parent: session.desktop,
+        lookupCall: {
+          objectType: StaticLookupCall,
+          data: lookupData
+        }
+      });
+      listBox.table.setViewRangeSize(3);
+      listBox.render();
+      jasmine.clock().tick(500);
+      tableHelper.assertAriaPosInSetAndSize(listBox.table.rows, 0, 20);
+      tableHelper.assertNotAriaRowIndexAndCount(listBox.table);
+
+      listBox.table.scrollTo(arrays.last(listBox.table.rows));
+      tableHelper.assertAriaPosInSetAndSize(listBox.table.rows, 17, 20);
+      tableHelper.assertNotAriaRowIndexAndCount(listBox.table);
+
+      listBox.table.addFilter(row => row.lookupRow.key === 3);
+      listBox.table.$rows().stop(false, true); // Finish filter animation
+      tableHelper.assertAriaPosInSetAndSize(listBox.table.rows, 0, 1);
+      tableHelper.assertNotAriaRowIndexAndCount(listBox.table);
     });
   });
 });

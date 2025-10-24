@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Device, ObjectIdProvider, objects, strings} from './index';
+import {Device, ObjectIdProvider, objects, strings} from '../index';
 
 /**
  * Determines whether a labelledby id is inserted at the front or the back of current aria-labelledby value.
@@ -149,12 +149,7 @@ export const aria = {
     if (!$elem || !$targetElement || strings.empty(ariaAttribute)) {
       return;
     }
-    let targetId = $targetElement.attr('id') as string;
-    if (!targetId) {
-      // Create an id if the element does not have one yet
-      targetId = ObjectIdProvider.get().createUiSeqId();
-      $targetElement.attr('id', targetId);
-    }
+    let targetId = aria.ensureId($targetElement);
     if (!replace) {
       let attributeValue = $elem.attr(ariaAttribute) || '';
       if (attributeValue && !strings.contains(attributeValue, targetId)) {
@@ -170,6 +165,19 @@ export const aria = {
       }
     }
     $elem.attr(ariaAttribute, targetId);
+  },
+
+  /**
+   * @returns the value of the id attribute. If the element doesn't have an id, a new one will be created and assigned.
+   */
+  ensureId($element: JQuery<Element>): string {
+    let id = $element.attr('id');
+    if (!id) {
+      // Create an id if the element does not have one yet
+      id = ObjectIdProvider.get().createUiSeqId();
+      $element.attr('id', id);
+    }
+    return id;
   },
 
   /**

@@ -363,6 +363,40 @@ export class TableSpecHelper {
     expect(mostRecentJsonRequest()).toContainEvents(event);
   }
 
+  assertAriaRowIndexAndCount(table: Table, start: number, size: number) {
+    let rows = table.rows;
+    rows = rows.filter(row => !!row.$row);
+    expect(rows.length).toBeGreaterThan(0);
+    expect(table.$data.attr('aria-rowcount')).toBe(String(size));
+    for (let i = 0; i < rows.length; i += 1) {
+      const row = rows[i];
+      expect(row.$row).withContext(`row ${i}`).not.toHaveAttr('aria-rowcount');
+      expect(row.$row.attr('aria-rowindex')).withContext(`row ${i}`).toBe(`${start + i + 1}`);
+    }
+  }
+
+  assertNotAriaRowIndexAndCount(table: Table) {
+    let rows = table.rows;
+    rows = rows.filter(row => !!row.$row);
+    expect(rows.length).toBeGreaterThan(0);
+    expect(table.$data).not.toHaveAttr('aria-rowcount');
+    for (let i = 0; i < rows.length; i += 1) {
+      const row = rows[i];
+      expect(row.$row).withContext(`row ${i}`).not.toHaveAttr('aria-rowcount');
+      expect(row.$row).withContext(`row ${i}`).not.toHaveAttr('aria-index');
+    }
+  }
+
+  assertAriaPosInSetAndSize(rows: TableRow[], start: number, size: number) {
+    rows = rows.filter(row => !!row.$row);
+    expect(rows.length).toBeGreaterThan(0);
+    for (let i = 0; i < rows.length; i += 1) {
+      const row = rows[i];
+      expect(row.$row.attr('aria-setsize')).withContext(`row ${i}`).toBe(String(size));
+      expect(row.$row.attr('aria-posinset')).withContext(`row ${i}`).toBe(`${start + i + 1}`);
+    }
+  }
+
   getDisplayingContextMenu(table: Table): JQuery {
     return $('body').find('.context-menu');
   }

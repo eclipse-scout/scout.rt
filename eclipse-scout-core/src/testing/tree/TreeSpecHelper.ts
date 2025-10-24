@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, CompactTree, CompactTreeAdapter, InitModelOf, ModelAdapter, ObjectIdProvider, ObjectType, ObjectWithType, RemoteEvent, Session, SomeRequired, Tree, TreeAdapter, TreeModel, TreeNode, TreeNodeModel, Widget} from '../../index';
+import {
+  arrays, CompactTree, CompactTreeAdapter, InitModelOf, ModelAdapter, ObjectIdProvider, ObjectType, ObjectWithType, Range, RemoteEvent, Session, SomeRequired, Tree, TreeAdapter, TreeModel, TreeNode, TreeNodeModel, Widget
+} from '../../index';
 import {SpecTree} from '../index';
 import $ from 'jquery';
 
@@ -200,6 +202,16 @@ export class TreeSpecHelper {
         enabled: enabled
       }
     };
+  }
+
+  assertAriaPosInSetOnNodes(nodes: TreeNode[], start: number, size: number) {
+    nodes = nodes.filter(node => node.rendered && node.attached);
+    expect(nodes.length).toBeGreaterThan(0);
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
+      expect(node.$node.attr('aria-setsize')).withContext(`node ${i}`).toBe(String(size));
+      expect(node.$node.attr('aria-posinset')).withContext(`node ${i}`).toBe(`${start + i + 1}`);
+    }
   }
 }
 

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {graphics, icons, objects, Range, scout, scrollbars, strings, Tree, TreeField, TreeModel, TreeNode, TreeNodeModel} from '../../src/index';
+import {arrays, graphics, icons, objects, Range, scout, scrollbars, strings, Tree, TreeField, TreeModel, TreeNode, TreeNodeModel} from '../../src/index';
 import {JQueryTesting, SpecTree, SpecTreeModel, TreeSpecHelper} from '../../src/testing/index';
 
 describe('Tree', () => {
@@ -3706,18 +3706,29 @@ describe('Tree', () => {
 
     it('has aria role tree', () => {
       tree.render();
-      expect(tree.$container).toHaveAttr('role', 'tree');
+      expect(tree.$data).toHaveAttr('role', 'tree');
+    });
+
+    it('has aria-activedescendant set set if node is focused', () => {
+      tree.render();
+      expect(tree.$data.attr('aria-activedescendant')).toBeFalsy();
+
+      tree.setFocusedNode(tree.nodes[1]);
+      expect(tree.$data.attr('aria-activedescendant')).toBe(tree.nodes[1].$node.attr('id'));
+
+      tree.setFocusedNode(null);
+      expect(tree.$data.attr('aria-activedescendant')).toBeFalsy();
     });
 
     it('has aria-multiselectable set to true if multiCheck enabled', () => {
       tree.multiCheck = false;
       tree.render();
-      expect(tree.$container.attr('aria-multiselectable')).toBeFalsy();
+      expect(tree.$data.attr('aria-multiselectable')).toBeFalsy();
 
       tree = helper.createTree(model);
       tree.multiCheck = true;
       tree.render();
-      expect(tree.$container).toHaveAttr('aria-multiselectable', 'true');
+      expect(tree.$data).toHaveAttr('aria-multiselectable', 'true');
     });
 
     it('has nodes with aria role treeitem', () => {
@@ -3737,6 +3748,96 @@ describe('Tree', () => {
         expect($(htmlNode)).toHaveAttr('aria-level', String(parseInt($(htmlNode).attr('data-level')) + 1));
       });
     });
+
+    it('has posinset and setsize set on top level nodes', () => {
+      let model = helper.createModelFixture(20);
+      let tree = helper.createTree(model);
+      tree.setViewRangeSize(3);
+      tree.render();
+      helper.assertAriaPosInSetOnNodes(tree.nodes, 0, 20);
+
+      tree.scrollTo(arrays.last(tree.nodes));
+      helper.assertAriaPosInSetOnNodes(tree.nodes, 17, 20);
+
+      const filter = node => node === tree.nodes[2];
+      tree.scrollTo(tree.nodes[0]);
+      tree.addFilter(filter);
+      tree._renderViewport();
+      helper.assertAriaPosInSetOnNodes(tree.nodes, 0, 1);
+
+      tree.removeFilter(filter);
+      tree._renderViewport();
+      helper.assertAriaPosInSetOnNodes(tree.nodes, 0, 20);
+
+      tree.insertNodes(createModelNodes(1), null, 0);
+      tree._renderViewport();
+      helper.assertAriaPosInSetOnNodes(tree.nodes, 0, 21);
+
+      tree.deleteNodes(tree.nodes[0]);
+      tree._renderViewport();
+      helper.assertAriaPosInSetOnNodes(tree.nodes, 0, 20);
+    });
+
+    it('has posinset and setsize set on child nodes', () => {
+      let model = helper.createModelFixture(2);
+      let tree = helper.createTree(model);
+      tree.insertNodes(createModelNodes(10), tree.nodes[0]);
+      tree.insertNodes(createModelNodes(20), tree.nodes[1]);
+      tree.setViewRangeSize(5);
+      tree.render();
+      helper.assertAriaPosInSetOnNodes(tree.nodes, 0, 2);
+
+      tree.expandNode(tree.nodes[0]);
+      tree._renderViewport(); // ensure nodes are rendered (would be done by layout)
+      helper.assertAriaPosInSetOnNodes(tree.nodes[0].childNodes, 0, 10);
+
+      tree.collapseNode(tree.nodes[0]);
+      helper.assertAriaPosInSetOnNodes(tree.nodes, 0, 2);
+
+      tree.expandNode(tree.nodes[0]);
+      tree.scrollTo(arrays.last(tree.nodes));
+      helper.assertAriaPosInSetOnNodes(tree.nodes, 1, 2);
+      helper.assertAriaPosInSetOnNodes(tree.nodes[0].childNodes, 6, 10);
+
+      tree.scrollTo(tree.nodes[0]);
+      tree.expandNode(tree.nodes[1]);
+      tree._renderViewport();
+      helper.assertAriaPosInSetOnNodes(tree.nodes, 0, 2);
+      helper.assertAriaPosInSetOnNodes(tree.nodes[0].childNodes, 0, 10);
+
+      const filter = node => scout.isOneOf(node, tree.nodes[0].childNodes[3], tree.nodes[1].childNodes[2]);
+      tree.addFilter(filter);
+      tree._renderViewport();
+      helper.assertAriaPosInSetOnNodes(tree.nodes, 0, 2);
+      helper.assertAriaPosInSetOnNodes(tree.nodes[0].childNodes, 0, 1);
+      helper.assertAriaPosInSetOnNodes(tree.nodes[1].childNodes, 0, 1);
+
+      tree.removeFilter(filter);
+      tree._renderViewport();
+      helper.assertAriaPosInSetOnNodes(tree.nodes, 0, 2);
+      helper.assertAriaPosInSetOnNodes(tree.nodes[0].childNodes, 0, 10);
+
+      tree.insertNodes(createModelNodes(1), tree.nodes[0], 0);
+      tree._renderViewport();
+      helper.assertAriaPosInSetOnNodes(tree.nodes, 0, 2);
+      helper.assertAriaPosInSetOnNodes(tree.nodes[0].childNodes, 0, 11);
+
+      tree.deleteNodes(tree.nodes[0].childNodes.slice(0, 2));
+      tree._renderViewport();
+      helper.assertAriaPosInSetOnNodes(tree.nodes, 0, 2);
+      helper.assertAriaPosInSetOnNodes(tree.nodes[0].childNodes, 0, 9);
+    });
+
+    /**
+     * Creates nodes without ids, spec helper always creates ids which may be duplicate when inserting nodes into a tree that already has nodes
+     */
+    function createModelNodes(size: number) {
+      let nodes = [];
+      for (let i = 0; i < size; i++) {
+        nodes.push(helper.createModelNode());
+      }
+      return nodes;
+    }
   });
 
   describe('focusedNode', () => {

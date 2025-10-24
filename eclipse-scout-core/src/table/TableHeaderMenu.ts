@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Action, aria, arrays, Cell, Column, ColumnUserFilter, ColumnUserFilterValues, Device, EnumObject, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, InitModelOf, ListBoxTableAccessibilityRenderer, NumberColumn,
+  AbstractLayout, Action, aria, arrays, Cell, Column, ColumnUserFilter, ColumnUserFilterValues, Device, EnumObject, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, InitModelOf, ListBoxAriaRules, NumberColumn,
   NumberColumnAggregationFunction, NumberField, Popup, RowLayout, scout, SomeRequired, Table, TableHeader, TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuGroupItem, TableHeaderMenuLayout,
   TableHeaderMenuModel, TableRow, TableRowModel, TableRowsCheckedEvent, ValueField
 } from '../index';
@@ -795,7 +795,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     this.filterToggleCheckedAction.on('action', this._onFilterCheckedModeClick.bind(this));
 
     this.filterTable = this._createFilterTable();
-    this.filterTable.accessibilityRenderer = new ListBoxTableAccessibilityRenderer();
+    this.filterTable.ariaRules = new ListBoxAriaRules();
     this.filterTable.on('rowsChecked', this._filterTableRowsCheckedHandler);
     let tableRows: TableRowModel[] = [];
     this.filter.availableValues.forEach(filterValue => {

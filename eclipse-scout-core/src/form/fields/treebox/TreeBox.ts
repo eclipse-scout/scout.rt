@@ -45,6 +45,7 @@ export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<T
   protected _renderStructure() {
     this.tree.render(this.$fieldContainer);
     this.addField(this.tree.$container);
+    this._linkWithLabel(this.tree.$data);
   }
 
   protected _onTreeNodesChecked(event: TreeNodesCheckedEvent) {

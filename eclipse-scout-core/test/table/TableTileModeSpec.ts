@@ -10,7 +10,7 @@
 import {SpecTable, SpecTableModel, TableSpecHelper} from '../../src/testing/index';
 import {HtmlTile, KeyTableFilter, scout, TableTextUserFilter} from '../../src';
 
-describe('TableTileModeSpec', () => {
+describe('TableTileMode', () => {
   let session: SandboxSession;
   let helper: TableSpecHelper;
   let model: SpecTableModel;

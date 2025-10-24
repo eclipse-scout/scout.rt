@@ -4367,7 +4367,7 @@ describe('Table', () => {
       let model = helper.createModelFixture(2, 2);
       let table = helper.createTable(model);
       table.render();
-      expect(table.$container).toHaveAttr('role', 'grid');
+      expect(table.$data).toHaveAttr('role', 'grid');
     });
 
     it('has a header row with role row, with cells with role columnheader or separator', () => {
@@ -4390,17 +4390,61 @@ describe('Table', () => {
       });
     });
 
-    it('has a data section with role rowgroup, the rows contained are of role row, the cells of role gridcell', () => {
+    it('has rows with role row containing cells with role gridcell', () => {
       let model = helper.createModelFixture(2, 4);
       let table = helper.createTable(model);
       table.render();
-      expect(table.$data).toHaveAttr('role', 'rowgroup');
       table.rows.forEach(row => {
         expect(row.$row).toHaveAttr('role', 'row');
         row.$row.children('.table-cell').each((index, cell) => {
           expect($(cell)).toHaveAttr('role', 'gridcell');
         });
       });
+    });
+
+    it('has rowindex and rowcount set', () => {
+      let model = helper.createModelFixture(2, 20);
+      let table = helper.createTable(model);
+      table.setViewRangeSize(3);
+      table.render();
+      helper.assertAriaRowIndexAndCount(table, 0, 20);
+
+      table.scrollTo(arrays.last(table.rows));
+      helper.assertAriaRowIndexAndCount(table, 17, 20);
+
+      const filter = row => row === table.rows[2];
+      table.addFilter(filter);
+      table.$rows().stop(false, true); // Finish filter animation
+      helper.assertAriaRowIndexAndCount(table, 0, 1);
+
+      table.removeFilter(filter);
+      helper.assertAriaRowIndexAndCount(table, 0, 20);
+
+      table.updateRows([{id: table.rows[2].id, cells: ['new1', 'new21']}]);
+      helper.assertAriaRowIndexAndCount(table, 0, 20);
+
+      table.sort(table.columns[0], 'desc');
+      helper.assertAriaRowIndexAndCount(table, 0, 20);
+
+      table.sort(table.columns[0], 'asc');
+      helper.assertAriaRowIndexAndCount(table, 0, 20);
+
+      table.deleteRow(table.rows[0]);
+      helper.assertAriaRowIndexAndCount(table, 0, 19);
+
+      table.deleteAllRows();
+      expect(table.$data.attr('aria-rowcount')).toBe('0');
+
+      table.remove();
+      table.render();
+      expect(table.$data.attr('aria-rowcount')).toBe('0');
+
+      // All rows in viewport -> Test again some operations
+      table.insertRows(helper.createModelRows(3, 3));
+      helper.assertAriaRowIndexAndCount(table, 0, 3);
+
+      table.deleteRow(table.rows[0]);
+      helper.assertAriaRowIndexAndCount(table, 0, 2);
     });
 
     it('has selected rows and their cells set to aria-selected true', () => {
@@ -4444,13 +4488,20 @@ describe('Table', () => {
       let model = helper.createModelFixture(2, 4);
       let table = helper.createTable(model);
       table.render();
-      expect(table.$container.attr('aria-activedescendant')).toBeFalsy();
+      expect(table.$data.attr('aria-activedescendant')).toBeFalsy();
 
       table.selectRow(table.rows[0]);
-      expect(table.$container.attr('aria-activedescendant')).toBe(table.rows[0].$row.attr('id'));
+      expect(table.$data.attr('aria-activedescendant')).toBe(table.rows[0].$row.attr('id'));
 
       table.selectRow(table.rows[1]);
-      expect(table.$container.attr('aria-activedescendant')).toBe(table.rows[1].$row.attr('id'));
+      expect(table.$data.attr('aria-activedescendant')).toBe(table.rows[1].$row.attr('id'));
+
+      table.remove();
+      table.render();
+      expect(table.$data.attr('aria-activedescendant')).toBe(table.rows[1].$row.attr('id'));
+
+      table.deselectAll();
+      expect(table.$data.attr('aria-activedescendant')).toBe(table.rows[1].$row.attr('id')); // Still on the last action row
     });
 
     it('has a description for aggregation rows', () => {

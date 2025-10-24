@@ -332,8 +332,6 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
       .appendDiv('check-box')
       .toggleClass('checked', this.checked)
       .toggleClass('disabled', !this.enabled);
-    aria.role($checkbox, 'checkbox');
-    aria.checked($checkbox, this.checked);
     aria.checked(this.$node, this.checked);
     $checkbox.toggleClass('children-checked', !!this.childrenChecked);
 
@@ -381,11 +379,6 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
     if (!this.parentNode && tree.selectedNodes.length === 0 || // root nodes have class child-of-selected if no node is selected
       tree.isChildOfSelectedNodes(this)) {
       $node.addClass('child-of-selected');
-    }
-
-    if (this.parentNode) {
-      aria.posinset($node, this.childNodeIndex + 1); // starts counting from 1
-      aria.setsize($node, this.parentNode.childNodes.length);
     }
 
     this._renderText();

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Column, InitModelOf, ListBoxLayout, ListBoxModel, ListBoxTableAccessibilityRenderer, LookupBox, lookupField, LookupResult, LookupRow, ObjectOrChildModel, objects, scout, Table, TableModel, TableRowModel, TableRowsCheckedEvent,
+  arrays, Column, InitModelOf, ListBoxLayout, ListBoxModel, ListBoxAriaRules, LookupBox, lookupField, LookupResult, LookupRow, ObjectOrChildModel, objects, scout, Table, TableModel, TableRowModel, TableRowsCheckedEvent,
   Widget
 } from '../../../index';
 import $ from 'jquery';
@@ -36,7 +36,7 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
     if (!this.table) {
       this.table = this._createDefaultListBoxTable();
     }
-    this.table.accessibilityRenderer = new ListBoxTableAccessibilityRenderer();
+    this.table.ariaRules = new ListBoxAriaRules();
     // align checkableColumn in table with checkboxes of tree fields
     if (this.table.checkableColumn) { // may be null if a non-default list-box-table with checkable=false is used
       this.table.checkableColumn.minWidth = 28;
@@ -56,6 +56,7 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
   protected _renderStructure() {
     this.table.render(this.$fieldContainer);
     this.addField(this.table.$container);
+    this._linkWithLabel(this.table.$data);
   }
 
   protected _onTableRowsChecked(event: TableRowsCheckedEvent) {

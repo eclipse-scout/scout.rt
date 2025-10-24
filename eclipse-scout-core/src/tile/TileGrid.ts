@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractGrid, aria, arrays, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, EnumObject, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, GridData, HorizontalGrid, HtmlComponent,
-  InitModelOf, KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuDestinations, MenuFilter, menus as menuUtil, numbers, ObjectOrChildModel, ObjectOrModel, objects,
-  PlaceholderTile, Point, Predicate, Range, Rectangle, Resizable, scout, ScrollToOptions, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridModel, TileGridSelectAllKeyStroke,
-  TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileMoveHandler, TileResizeHandler,
-  TileTextFilter, tileUtil, UpdateFilteredElementsOptions, VirtualScrolling, Widget
+  AbstractGrid, aria, arrays, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, EnumObject, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, GridAriaRules, GridData, HorizontalGrid,
+  HorizontalListBoxAriaRules, HtmlComponent, InitModelOf, KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuDestinations, MenuFilter, menus as menuUtil, numbers,
+  ObjectOrChildModel, ObjectOrModel, objects, PlaceholderTile, Point, Predicate, Range, Rectangle, Resizable, scout, ScrollToOptions, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig,
+  TileGridModel, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke,
+  TileGridSelectUpKeyStroke, TileMoveHandler, TileResizeHandler, TileTextFilter, tileUtil, UpdateFilteredElementsOptions, VirtualScrolling, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -30,6 +30,8 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
 
   animateTileRemoval: boolean;
   animateTileInsertion: boolean;
+  ariaRules: GridAriaRules;
+  ariaRulesFilter: (element: any) => any;
   comparator: Comparator<TTile>;
   contextMenu: ContextMenuPopup;
   empty: boolean;
@@ -78,6 +80,8 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     super();
     this.animateTileRemoval = true;
     this.animateTileInsertion = true;
+    this.ariaRules = new HorizontalListBoxAriaRules();
+    this.ariaRulesFilter = roleOrAttribute => this.selectable ? roleOrAttribute : null; // Only apply rules if grid is selectable
     this.comparator = null;
     this.contextMenu = null;
     this._doubleClickSupport = new DoubleClickSupport();
@@ -238,6 +242,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
       .on('click', TILE_SELECTOR, this._onTileClick.bind(this))
       .on('dblclick', TILE_SELECTOR, this._onTileDoubleClick.bind(this));
     this.$filterFieldContainer = this.$container.prependDiv('filter-field-container');
+    this._updateAriaRole();
   }
 
   protected _createLayout(): TileGridLayout {
@@ -382,6 +387,34 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     }
   }
 
+  protected _updateAriaTileIndices() {
+    if (!this.virtual || !this.ariaRules.childRowIndexAttr) {
+      return;
+    }
+    for (let row = this.viewRangeRendered.from; row < this.viewRangeRendered.to; row++) {
+      this._eachTileInRow(row, (tile, i) => {
+        this._updateAriaTileIndex(tile, i);
+      });
+    }
+  }
+
+  protected _updateAriaTileIndex(tile: Tile, index: number) {
+    if (!this.virtual || !this.ariaRules.childRowIndexAttr) {
+      return;
+    }
+    tile.$container.attr(this.ariaRulesFilter(this.ariaRules.childRowIndexAttr), index + 1);
+    tile.$container.attr(this.ariaRulesFilter(this.ariaRules.childRowCountAttr), this._filteredTiles.length);
+  }
+
+  protected _updateAriaRole() {
+    aria.role(this.$container, this.ariaRulesFilter(this.ariaRules.role));
+    aria.orientation(this.$container, this.ariaRulesFilter(this.ariaRules.orientationAttr));
+  }
+
+  protected _updateAriaTileRole(tile: Tile) {
+    aria.role(tile.$container, this.ariaRulesFilter(this.ariaRules.cellRole || this.ariaRules.rowRole));
+  }
+
   protected _insertTiles(tiles: (TTile | PlaceholderTile)[]) {
     if (tiles.length === 0) {
       return;
@@ -420,6 +453,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     tile.render();
     tile.setLayoutData(new LogicalGridData(tile));
     tile.$container.addClass('newly-rendered');
+    this._updateAriaTileRole(tile);
   }
 
   protected _renderInsertTiles(tiles: (TTile | PlaceholderTile)[]) {
@@ -928,12 +962,22 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   protected _renderSelectable() {
     this.$container.toggleClass('selectable', this.selectable);
     this._updateTabbable();
+    if (this.rendered) {
+      // Aria attributes depend on selectable property -> update them if selectable changes on the fly
+      this._updateAriaRole();
+      this._updateAriaTileIndices();
+      this.renderedTiles().forEach(tile => this._updateAriaTileRole(tile));
+    }
     this.invalidateLayoutTree();
   }
 
   /** @see TileGridModel.multiSelect */
   setMultiSelect(multiSelect: boolean) {
     this.setProperty('multiSelect', multiSelect);
+  }
+
+  protected _renderMultiSelect() {
+    aria.multiselectable(this.$container, this.multiSelect || null);
   }
 
   /**
@@ -1348,12 +1392,11 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
 
   protected _renderVirtual() {
     this._updateVirtualScrollable();
-    if (!this.rendering) {
-      // No need to do it while rendering, will be done by the layout. But needs to be done if virtual changes on the fly
-      this.setViewRangeSize(this.calculateViewRangeSize(), false);
-    }
 
     if (this.rendered) {
+      // No need to do it while rendering, will be done by the layout. But needs to be done if virtual changes on the fly
+      this.setViewRangeSize(this.calculateViewRangeSize(), false);
+
       // When virtual toggles, remove all tiles and render them anew (to have the correct tiles rendered in the new mode)
       this._removeAllTiles();
       if (this.virtual) {
@@ -1501,11 +1544,12 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
       $.log.trace(this._rowsRenderedInfo());
     }
 
-    function renderTile(tile) {
+    function renderTile(tile: Tile, index: number) {
       if (tile.rendered) {
         return;
       }
       this._renderTile(tile);
+      this._updateAriaTileIndex(tile, index);
       tilesRendered++;
     }
   }
@@ -1559,6 +1603,8 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
       // invalidating may create a loop because the group resizes the body which triggers the TileGridLayout and eventually calls this function again -> Don't invalidate while layouting
       this.invalidateLayoutTree();
     }
+
+    this._updateAriaTileIndices();
     return tilesToRender;
   }
 
