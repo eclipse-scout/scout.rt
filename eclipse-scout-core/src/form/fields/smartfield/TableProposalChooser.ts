@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, arrays, Cell, Column, ColumnDescriptor, ColumnModel, ListBoxTableAccessibilityRenderer, lookupField, LookupRow, ObjectOrChildModel, objects, ProposalChooser, scout, SmartFieldLookupResult, Table, TableLayoutResetter, TableRow,
+  aria, arrays, Cell, Column, ColumnDescriptor, ColumnModel, ListBoxAriaRules, lookupField, LookupRow, ObjectOrChildModel, objects, ProposalChooser, scout, SmartFieldLookupResult, Table, TableLayoutResetter, TableRow,
   TableRowClickEvent, TableRowModel, TableRowsSelectedEvent
 } from '../../../index';
 
@@ -30,7 +30,7 @@ export class TableProposalChooser<TValue> extends ProposalChooser<TValue, Table,
 
     let table = this._createTable(columns, headerVisible);
     // this also renders smartfields with actual tables as list boxes, this seems to be fine
-    table.accessibilityRenderer = new ListBoxTableAccessibilityRenderer();
+    table.ariaRules = new ListBoxAriaRules();
     table.on('rowClick', this._onRowClick.bind(this));
     table.on('rowsSelected', this._onRowsSelected.bind(this));
 

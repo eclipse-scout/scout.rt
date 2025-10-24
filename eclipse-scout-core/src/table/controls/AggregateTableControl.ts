@@ -101,7 +101,7 @@ export class AggregateTableControl extends TableControl {
       } else {
         cell = column.createAggrValueCell(aggregateValue);
       }
-      $cell = $(column.buildCell(cell, {}));
+      $cell = $(column.buildCell(cell, new TableRow()));
       if (!isEmpty) {
         aggregateCells.push($cell);
       }

@@ -1233,6 +1233,19 @@ $.fn.copyCssClasses = function($other, classString) {
   return $this;
 };
 
+$.fn.copyAttributes = function($other, attributes) {
+  let $this = this;
+  for (const attribute of attributes.filter(Boolean)) {
+    let value = $other.attr(attribute);
+    if (objects.isNullOrUndefined(value)) {
+      $this.removeAttr(attribute);
+    } else {
+      $this.attr(attribute, value);
+    }
+  }
+  return $this;
+};
+
 $.fn.disableSpellcheck = function() {
   return this.attr('spellcheck', false);
 };

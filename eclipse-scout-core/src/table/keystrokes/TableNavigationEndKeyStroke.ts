@@ -49,9 +49,5 @@ export class TableNavigationEndKeyStroke extends AbstractTableNavigationKeyStrok
     if (!table.isFocused()) {
       table.focus();
     }
-
-    // Set active descendant to the new row. This should be done last so selection state/focus/etc. is
-    // all set correctly before the change of active descendant triggers the screen readers announcement.
-    aria.linkElementWithActiveDescendant(this.field.$container, lastRow.$row);
   }
 }

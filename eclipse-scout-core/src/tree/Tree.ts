@@ -422,7 +422,6 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('tree');
-    aria.role(this.$container, 'tree');
     if (this._additionalContainerClasses) {
       this.$container.addClass(this._additionalContainerClasses);
     }
@@ -445,6 +444,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       .on('mousedown', '.tree-node-control', this._onNodeControlMouseDown.bind(this))
       .on('mouseup', '.tree-node-control', this._onNodeControlMouseUp.bind(this))
       .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this));
+    aria.role(this.$data, 'tree');
     HtmlComponent.install(this.$data, this.session);
 
     if (this.isHorizontalScrollingEnabled()) {
@@ -803,6 +803,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     this._renderFiller();
     this._updateDomNodeWidth();
     this._renderSelection();
+    this._updateAriaNodeIndices();
   }
 
   protected _visibleNodesInViewRange(): TreeNode[] {
@@ -3185,7 +3186,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   }
 
   protected _renderMultiCheck() {
-    aria.multiselectable(this.$container, this.multiCheck || null);
+    aria.multiselectable(this.$data, this.multiCheck || null);
   }
 
   /**
@@ -3304,6 +3305,28 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       $node.insertAfter(this.$fillBefore);
     } else {
       this.$data.prepend($node);
+    }
+  }
+
+  protected _updateAriaNodeIndices() {
+    let parentNode: TreeNode;
+    let index = -1;
+    let nodes = [];
+    for (let i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {
+      let node = this.visibleNodesFlat[i];
+      if (node.parentNode === parentNode && index > -1) {
+        // Node has the same parent node as the last node, there is no need to do another index lookup > just increase index by 1
+        index++;
+      } else if (node.parentNode) {
+        nodes = node.parentNode.childNodes.filter(node => node.filterAccepted);
+        index = nodes.indexOf(node);
+      } else {
+        nodes = this.nodes.filter(node => node.filterAccepted);
+        index = nodes.indexOf(node);
+      }
+      parentNode = node.parentNode || undefined;
+      aria.posinset(node.$node, index + 1);
+      aria.setsize(node.$node, nodes.length);
     }
   }
 
@@ -3570,9 +3593,9 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   protected _updateActiveDescendant() {
     let node = this.focusedNode?.$node || this.selectedNode()?.$node;
     if (node) {
-      aria.linkElementWithActiveDescendant(this.$container, node);
+      aria.linkElementWithActiveDescendant(this.$data, node);
     } else {
-      aria.removeActiveDescendant(this.$container);
+      aria.removeActiveDescendant(this.$data);
     }
   }
 

@@ -80,8 +80,17 @@ export class BooleanColumn extends Column<boolean> implements BooleanColumnModel
         cssClass += ' expanded';
       }
     }
-    // empty aria label added so screen readers finds the checkbox in the column (adding &nbsp in the div content would work, too)
-    content = content + '<div aria-label=" " role="checkbox" ' + ariaChecked + ' class="' + checkBoxCssClass + '"></div>';
+
+    // A label is necessary so the content is correctly read even if the value is false.
+    // It also allows to toggle an editable column even without accessing edit mode first.
+    let ariaAttributes = `role="checkbox" ${ariaChecked}`;
+    if (this.table.headerVisible) {
+      ariaAttributes += `aria-labelledBy="${this.headerLabelId}"`;
+    } else {
+      ariaAttributes += `aria-label="${this.text}"`;
+    }
+
+    content = `${content}<div ${ariaAttributes} class="${checkBoxCssClass}"></div>`;
 
     return this._buildCell(cell, content, style, cssClass);
   }

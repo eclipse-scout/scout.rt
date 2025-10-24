@@ -473,9 +473,8 @@ describe('TreeBox', () => {
         label: 'test'
       });
       treeBox.render();
-      expect(treeBox.$field.attr('aria-labelledby')).toBeTruthy();
-      expect(treeBox.$field.attr('aria-labelledby')).toBe(treeBox.$label.attr('id'));
-      expect(treeBox.$field.attr('aria-label')).toBeFalsy();
+      expect(treeBox.tree.$data.attr('aria-labelledby')).toBe(treeBox.$label.attr('id'));
+      expect(treeBox.tree.$data.attr('aria-label')).toBeFalsy();
     });
   });
 

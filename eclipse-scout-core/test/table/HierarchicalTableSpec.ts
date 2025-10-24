@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Column, ColumnUserFilter, HierarchicalTableAccessibilityRenderer, Table, TableRow, TableRowModel} from '../../src/index';
+import {arrays, Column, ColumnUserFilter, scout, Table, TableRow, TableRowModel, TreeGridAriaRules} from '../../src/index';
 import {JQueryTesting, SpecTable, TableSpecHelper} from '../../src/testing/index';
 import $ from 'jquery';
 
@@ -949,10 +949,18 @@ describe('HierarchicalTableSpec', () => {
       ];
       table.insertRows(rows);
       table.render();
-      expect(table.$container).toHaveAttr('role', 'treegrid');
+      expect(table.$data).toHaveAttr('role', 'treegrid');
+
+      // Delete children -> changes to regular table
+      table.deleteRows([table.rootRows[0].childRows[0], table.rootRows[1].childRows[0]]);
+      expect(table.$data).toHaveAttr('role', 'grid');
+
+      // Insert children again -> changes to hierarchical table
+      table.insertRows(rows);
+      expect(table.$data).toHaveAttr('role', 'treegrid');
     });
 
-    it('has a HierarchicalTableAccessibilityRenderer set as its accessibility renderer', () => {
+    it('has treegrid aria rules set', () => {
       let model = helper.createModelFixture(1, 2);
       let table = helper.createTable(model);
       let rows = [
@@ -961,7 +969,7 @@ describe('HierarchicalTableSpec', () => {
       ];
       table.insertRows(rows);
       table.render();
-      expect(table.accessibilityRenderer instanceof HierarchicalTableAccessibilityRenderer).toBe(true);
+      expect(table.ariaRules instanceof TreeGridAriaRules).toBe(true);
     });
 
     it('has rows with aria-expanded set to true if rows are expanded', () => {
@@ -977,6 +985,113 @@ describe('HierarchicalTableSpec', () => {
       expect(table.rootRows[0].$row).toHaveAttr('aria-expanded', 'true');
       expect(table.rootRows[1].$row).toHaveAttr('aria-expanded', 'false');
     });
+
+    it('has posinset and setsize set', () => {
+      let model = helper.createModelFixture(2, 2);
+      let table = helper.createTable(model);
+      table.setViewRangeSize(5);
+      let rows = [
+        ...createModelRows(10, table.rootRows[0]),
+        ...createModelRows(20, table.rootRows[1])
+      ];
+      table.insertRows(rows);
+      table.render();
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+      helper.assertNotAriaRowIndexAndCount(table);
+
+      table.expandRow(table.rootRows[0]);
+      helper.assertAriaPosInSetAndSize(table.rootRows[0].childRows, 0, 10);
+
+      table.collapseRow(table.rootRows[0]);
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+
+      table.expandRow(table.rootRows[0]);
+      table.scrollTo(arrays.last(table.rootRows));
+      helper.assertAriaPosInSetAndSize(table.rootRows, 1, 2);
+      helper.assertAriaPosInSetAndSize(table.rootRows[0].childRows, 6, 10);
+
+      table.scrollTo(table.rootRows[0]);
+      table.expandRow(table.rootRows[1]);
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+      helper.assertAriaPosInSetAndSize(table.rootRows[0].childRows, 0, 10);
+
+      const filter = row => scout.isOneOf(row, table.rootRows[0].childRows[3], table.rootRows[1].childRows[2]);
+      table.addFilter(filter);
+      table.$rows().stop(false, true); // Finish filter animation
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+      helper.assertAriaPosInSetAndSize(table.rootRows[0].childRows, 0, 1);
+      helper.assertAriaPosInSetAndSize(table.rootRows[1].childRows, 0, 1);
+
+      table.removeFilter(filter);
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+      helper.assertAriaPosInSetAndSize(table.rootRows[0].childRows, 0, 10);
+
+      table.deleteRows(table.rootRows[0].childRows.slice(0, 2));
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+      helper.assertAriaPosInSetAndSize(table.rootRows[0].childRows, 0, 8);
+
+      table.deleteRows(table.rootRows[0].childRows.slice());
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+      helper.assertAriaPosInSetAndSize(table.rootRows[1].childRows, 0, 20);
+
+      table.insertRows(createModelRows(2, table.rootRows[0]));
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+      helper.assertAriaPosInSetAndSize(table.rootRows[0].childRows, 0, 2);
+
+      table.updateRows([{id: table.rootRows[1].id, cells: ['new1', 'new2']}]);
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+    });
+
+    it('has posinset and setsize set, even when all rows are in viewport', () => {
+      let model = helper.createModelFixture(2, 2);
+      let table = helper.createTable(model);
+      table.setViewRangeSize(100);
+      let rows = [
+        ...createModelRows(10, table.rootRows[0]),
+        ...createModelRows(20, table.rootRows[1])
+      ];
+      table.insertRows(rows);
+      table.render();
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+
+      table.expandRow(table.rootRows[0]);
+      helper.assertAriaPosInSetAndSize(table.rootRows[0].childRows, 0, 10);
+
+      table.collapseRow(table.rootRows[0]);
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+
+      table.expandAll();
+      const filter = row => scout.isOneOf(row, table.rootRows[0].childRows[3], table.rootRows[1].childRows[2]);
+      table.addFilter(filter);
+      table.$rows().stop(false, true); // Finish filter animation
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+      helper.assertAriaPosInSetAndSize(table.rootRows[0].childRows, 0, 1);
+      helper.assertAriaPosInSetAndSize(table.rootRows[1].childRows, 0, 1);
+
+      table.removeFilter(filter);
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+      helper.assertAriaPosInSetAndSize(table.rootRows[0].childRows, 0, 10);
+
+      table.deleteRows(table.rootRows[0].childRows.slice(0, 2));
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+      helper.assertAriaPosInSetAndSize(table.rootRows[0].childRows, 0, 8);
+
+      table.deleteRows(table.rootRows[0].childRows.slice());
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+      helper.assertAriaPosInSetAndSize(table.rootRows[1].childRows, 0, 20);
+
+      table.insertRows(createModelRows(2, table.rootRows[0]));
+      helper.assertAriaPosInSetAndSize(table.rootRows, 0, 2);
+      helper.assertAriaPosInSetAndSize(table.rootRows[0].childRows, 0, 2);
+    });
+
+    function createModelRows(size: number, parentRow: TableRow) {
+      let rows = [];
+      for (let i = 0; i < size; i++) {
+        rows.push({cells: [''], parentRow});
+      }
+      return rows;
+    }
   });
 
   describe('restoreSelection', () => {

@@ -1097,6 +1097,12 @@ declare global {
     copyCssClasses($other: JQuery, classString: string): this;
 
     /**
+     * Copies the values of the given attributes from the other element to the current one.
+     * If the attribute is not set on the other element, it will be removed on the current element as well.
+     */
+    copyAttributes($other: JQuery, attributes: string[]): this;
+
+    /**
      * Sets the attribute spellcheck to false.
      */
     disableSpellcheck(): this;

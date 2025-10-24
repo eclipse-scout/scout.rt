@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BooleanColumn, Cell, Column, DefaultTableAccessibilityRenderer, ListBoxTableAccessibilityRenderer, NumberColumn, scout, Table, Widget} from '../../../src/index';
+import {BooleanColumn, Cell, Column, ListBoxAriaRules, NumberColumn, scout, Table, Widget} from '../../../src/index';
 import {JQueryTesting, SpecTable, TableSpecHelper} from '../../../src/testing/index';
 
 describe('Column', () => {
@@ -833,18 +833,17 @@ describe('Column', () => {
 
   describe('aria properties', () => {
 
-    it('has cells with aria role gridcell if DefaultTableAccessibilityRenderer is used', () => {
+    it('has cells with aria role gridcell if GridAriaRules are used', () => {
       let model = helper.createModelSingleColumnByValues(['cell1'], 'Column');
       let table = helper.createTable(model);
-      table.accessibilityRenderer = new DefaultTableAccessibilityRenderer();
       table.render();
       expect(table.$cell(table.columns[0], table.rows[0].$row)).toHaveAttr('role', 'gridcell');
     });
 
-    it('has cells with no aria role if ListBoxTableAccessibilityRenderer is used', () => {
+    it('has cells with no aria role if ListBoxAriaRules are used', () => {
       let model = helper.createModelSingleColumnByValues(['cell1'], 'Column');
       let table = helper.createTable(model);
-      table.accessibilityRenderer = new ListBoxTableAccessibilityRenderer();
+      table.ariaRules = new ListBoxAriaRules();
       table.render();
       expect(table.$cell(table.columns[0], table.rows[0].$row)).not.toHaveAttr('role');
     });

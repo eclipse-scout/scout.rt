@@ -8,16 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractTableAccessibilityRenderer, Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke,
-  ContextMenuPopup, dataObjects, DefaultTableAccessibilityRenderer, Desktop, DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, ErrorHandler, EventHandler, Filter,
-  Filterable, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HierarchicalTableAccessibilityRenderer, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext,
-  LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects,
-  Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToAlignment, ScrollToOptions, Status, StatusOrModel, strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl,
-  TableCopyKeyStroke,
-  TableCustomizer, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke,
-  TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke,
-  TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUiPreferences, tableUiPreferences, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport,
-  UiPreferences, UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
+  Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke, ContextMenuPopup, dataObjects, Desktop,
+  DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, ErrorHandler, EventHandler, Filter, Filterable, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics,
+  GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, menus, NumberColumn,
+  NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToAlignment, ScrollToOptions, Status, StatusOrModel, strings,
+  styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke,
+  TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer,
+  TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUiPreferences,
+  tableUiPreferences, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences, UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -130,7 +128,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   filterSupport: FilterSupport<TableRow>;
   filteredElementsDirty: boolean;
   defaultMenuTypes: string[];
-  accessibilityRenderer: AbstractTableAccessibilityRenderer;
+  ariaRules: GridAriaRules;
   organizer: TableOrganizer;
   customizer: TableCustomizer;
   defaultRowAction: Action;
@@ -250,7 +248,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.filterSupport = this._createFilterSupport();
     this.filteredElementsDirty = false;
     this.defaultMenuTypes = [Table.MenuType.EmptySpace];
-    this.accessibilityRenderer = new DefaultTableAccessibilityRenderer();
+    this.ariaRules = new GridAriaRules();
     this.organizer = null;
     this.customizer = null;
 
@@ -610,7 +608,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   protected override _render() {
     this.$container = this.$parent.appendDiv('table')
       .addDeviceClass();
-    this.accessibilityRenderer.renderTable(this.$container);
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new TableLayout(this));
 
@@ -631,7 +628,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   /** @internal */
   _renderData() {
     this.$data = this.$container.appendDiv('table-data');
-    this.accessibilityRenderer.renderRowGroup(this.$data);
+    aria.role(this.$data, this.ariaRules.role);
     this.$data.on('mousedown', '.table-row', this._onRowMouseDown.bind(this))
       .on('mouseup', '.table-row', this._onRowMouseUp.bind(this))
       .on('dblclick', '.table-row', this._onRowDoubleClick.bind(this))
@@ -644,6 +641,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._calculateRowInsets();
     this._updateRowWidth();
     this._updateRowHeight();
+    this._updateAriaRowCount();
     this._renderViewport();
     if (this.scrollToSelection) {
       this.revealSelection();
@@ -798,11 +796,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
         pageY: event.pageY
       });
     }
-
-    // set active descendant to the clicked row, so it is announced by screen readers.
-    // This should be done last so selection state/focus/etc. is all set correctly before
-    // the change of active descendant triggers the screen readers announcement.
-    aria.linkElementWithActiveDescendant(this.$container, row.$row);
   }
 
   protected _isRowControl($target: JQuery): boolean {
@@ -1734,7 +1727,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._removeSortColumn(column);
   }
 
-  protected _buildRowDiv(row: TableRow): string {
+  /**
+   * @param index index of visible rows
+   */
+  protected _buildRowDiv(row: TableRow, rowIndex?: number): string {
     let rowWidth = this.rowWidth;
     let rowClass = 'table-row';
     if (row.cssClass) {
@@ -1755,27 +1751,45 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     }
 
     let ariaAttributes = '';
-    if (strings.hasText(this.accessibilityRenderer.rowRole)) {
+    if (strings.hasText(this.ariaRules.rowRole)) {
       let selected = this.isRowSelected(row) === true;
       let checked = String(row.checked === true);
       let disabled = !row.enabled;
-      ariaAttributes = ' role="' + this.accessibilityRenderer.rowRole + '"';
+      ariaAttributes = ` role="${this.ariaRules.rowRole}"`;
+      if (this.virtual && rowIndex >= 0) {
+        if (this.ariaRules.rowIndexAttr) {
+          ariaAttributes += ` ${this.ariaRules.rowIndexAttr}="${rowIndex + 1}"`;
+        }
+        // Also put child rows index and count even if it is not hierarchical.
+        // The values are the same as rowIndex and rowCount.
+        // Some aria roles need the count on each row (e.g. listbox).
+        // If it is hierarchical, the correct values will be set by _updateAriaRowIndices.
+        if (this.ariaRules.childRowIndexAttr) {
+          ariaAttributes += ` ${this.ariaRules.childRowIndexAttr}="${rowIndex + 1}"`;
+        }
+        if (this.ariaRules.childRowCountAttr) {
+          ariaAttributes += ` ${this.ariaRules.childRowCountAttr}="${this._filteredRows.length}"`;
+        }
+      }
+      if (this.hierarchical) {
+        ariaAttributes += ` ${this.ariaRules.levelAttr}="${row.hierarchyLevel + 1}"`;
+      }
       if (selected) {
         ariaAttributes += ' aria-selected="true"';
       }
       if (disabled) {
-        ariaAttributes += ' aria-disabled = "true"';
+        ariaAttributes += ' aria-disabled="true"';
       }
       if (this.checkable) {
-        ariaAttributes += ' aria-checked="' + checked + '"';
+        ariaAttributes += ` aria-checked="${checked}"`;
       }
       if (this.hierarchical && row.expandable) {
         let expanded = row.expanded;
-        ariaAttributes += ' aria-expanded="' + expanded + '"';
+        ariaAttributes += ` aria-expanded="${expanded}"`;
       }
     }
 
-    let rowDiv = '<div' + ariaAttributes + ' class="' + rowClass + '" style="width: ' + rowWidth + 'px">';
+    let rowDiv = `<div${ariaAttributes} class="${rowClass}" style="width: ${rowWidth}px">`;
     for (let i = 0; i < this.columns.length; i++) {
       let column = this.columns[i];
       if (column.visible) {
@@ -1785,6 +1799,42 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     rowDiv += '</div>';
 
     return rowDiv;
+  }
+
+  protected _updateAriaRowCount() {
+    // For hierarchical tables, this._filteredRows would be wrong, because it does not include visible children
+    // But a treegrid does not need the rowcount attribute to be set, so it does not matter, see TreeGridAriaRules
+    this.$data?.attr(this.ariaRules.rowCountAttr, this._filteredRows.length);
+  }
+
+  protected _updateAriaRowIndices(evenIfNotHierarchical = false) {
+    if (!this.virtual || !this.hierarchical && !evenIfNotHierarchical) {
+      // In non-hierarchical mode, _renderViewRange update the indices
+      // There are some situations, where rows are updated (removed) without calling _renderViewRange
+      // -> indices need to be updated in that case even for non-hierarchical tables
+      return;
+    }
+
+    let parentRow: TableRow;
+    let index = -1;
+    let rows = [];
+    for (let i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {
+      let row = this.visibleRows[i];
+      if (row.parentRow === parentRow && index > -1) {
+        // Row has the same parent row as the last row, there is no need to do another index lookup > just increase index by 1
+        index++;
+      } else if (row.parentRow) {
+        rows = this.visibleChildRows(row.parentRow);
+        index = rows.indexOf(row);
+      } else {
+        rows = this.hierarchical ? this.visibleRootRows() : this.visibleRows;
+        index = rows.indexOf(row);
+      }
+      parentRow = row.parentRow || undefined;
+      row.$row.attr(this.ariaRules.childRowIndexAttr, index + 1);
+      row.$row.attr(this.ariaRules.childRowCountAttr, rows.length);
+      row.$row.attr(this.ariaRules.rowIndexAttr, i + 1);
+    }
   }
 
   protected _calculateRowInsets() {
@@ -1908,7 +1958,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     // Build $rows (as string instead of jQuery objects due to efficiency reasons)
     for (let r = range.from; r < range.to; r++) {
       let row = rows[r];
-      rowString += this._buildRowDiv(row);
+      rowString += this._buildRowDiv(row, r);
       numRowsRendered++;
     }
 
@@ -2317,11 +2367,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   /** @internal */
-  _calcRowLevelPadding(row: { parentRow?: TableRow }): number {
-    if (!row) {
-      return -this.rowLevelPadding;
-    }
-    return this._calcRowLevelPadding(row.parentRow) + this.rowLevelPadding;
+  _calcRowLevelPadding(row: TableRow): number {
+    return row.hierarchyLevel * this.rowLevelPadding;
   }
 
   protected _showCellErrorForRow(row: TableRow) {
@@ -2779,7 +2826,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     let $aggregateRow = this.$container
       .makeDiv('table-aggregate-row')
       .data('aggregateRow', aggregateRow);
-    this.accessibilityRenderer.renderRow($aggregateRow);
+    aria.role($aggregateRow, this.ariaRules.rowRole);
     aria.description($aggregateRow, this.session.text('ui.Aggregation'));
     $aggregateRow.toggleClass('grouping-style-top', onTop);
     $aggregateRow.toggleClass('grouping-style-bottom', !onTop);
@@ -3330,6 +3377,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._group();
     this._updateBackgroundEffect();
     this._markAutoOptimizeWidthColumnsAsDirty();
+    this._updateAriaRowIndices(true);
     this._triggerRowsDeleted(rows);
 
     if (invalidate) {
@@ -3497,8 +3545,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
         // If it were updated during animated removal, the new row would immediately be inserted again, so the removal would not work.
         return;
       }
+
       let $updatedRow = $(this._buildRowDiv(row));
       $updatedRow.copyCssClasses(oldRow.$row, Table.SELECTION_CLASSES + ' first last');
+      $updatedRow.copyAttributes(oldRow.$row, [this.ariaRules.childRowIndexAttr, this.ariaRules.childRowCountAttr, this.ariaRules.rowIndexAttr]);
 
       // Check if the cell tooltip is currently pointing to a cell in this row. If yes, update its $anchor to the corresponding cell
       // in the new row. Otherwise, the tooltip position will be wrong, because the old anchor is no longer part of the DOM.
@@ -3548,11 +3598,14 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     // Has to be called before the property is set! Otherwise, the grouping will not completely be removed, since isGroupingPossible() will return false.
     if (hierarchical) {
       this.removeAllGroupColumns();
-    }
-    if (hierarchical && !(this.accessibilityRenderer instanceof HierarchicalTableAccessibilityRenderer)) {
-      this.accessibilityRenderer = new HierarchicalTableAccessibilityRenderer();
+      this.ariaRules = new TreeGridAriaRules();
+    } else {
+      this.ariaRules = new GridAriaRules();
     }
     this._setProperty('hierarchical', hierarchical);
+    if (this.rendered) {
+      aria.role(this.$data, this.ariaRules.role);
+    }
   }
 
   /**
@@ -3872,6 +3925,9 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       this.cellEditorPopup.position();
       this.cellEditorPopup.pack();
     }
+
+    let $row = this.selectionHandler.lastActionRow?.$row || rows[0]?.$row;
+    aria.linkElementWithActiveDescendant(this.$data, $row);
   }
 
   /** @internal */
@@ -4265,6 +4321,9 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       }
       return row.filterAccepted;
     });
+    if (this.rendered) {
+      this._updateAriaRowCount();
+    }
 
     if (changed) {
       this._triggerFilter();
@@ -4302,6 +4361,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       }
     });
     return visibleRows;
+  }
+
+  visibleRootRows(): TableRow[] {
+    return this.rootRows.filter(child => Boolean(this.visibleRowsMap[child.id]));
   }
 
   visibleChildRows(row: TableRow): TableRow[] {
@@ -4584,11 +4647,11 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   protected _renderMultiSelect() {
-    aria.multiselectable(this.$container, this.multiSelect || this.multiCheck ? true : null);
+    aria.multiselectable(this.$data, this.multiSelect || this.multiCheck ? true : null);
   }
 
   protected _renderMultiCheck() {
-    aria.multiselectable(this.$container, this.multiSelect || this.multiCheck ? true : null);
+    aria.multiselectable(this.$data, this.multiSelect || this.multiCheck ? true : null);
   }
 
   updateFilteredElements(result: FilterResult<TableRow>, opts: UpdateFilteredElementsOptions) {
@@ -5605,10 +5668,15 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       this.header = this._createHeader();
       this.header.render();
       this._renderEmptyData();
+      // Because the data has the grid role, the header needs to be included using aria-owns.
+      // Unfortunately, it will be included as last element, so the screen reader announces it as last row even if an explicit aria-rowindex is set.
+      // If the grid role was on the container, the screen reader uses browser mode instead of navigation mode when entering the table and keystrokes won't work
+      aria._linkElementWithTargetElement(this.$data, this.header.$container, 'aria-owns');
       changed = true;
     } else if (!this.headerVisible && this.header) {
       this._removeTableHeader();
       this._removeEmptyData();
+      this.$data.attr('aria-owns', null);
       changed = true;
     }
     this.$container.toggleClass('header-invisible', !this.header);
@@ -5974,6 +6042,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._renderEmptyData();
     this._renderBackgroundEffect();
     this._renderSelection();
+    this._updateAriaRowIndices();
     this.viewRangeDirty = false;
   }
 

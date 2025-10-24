@@ -51,6 +51,7 @@ export class TreeField extends FormField implements TreeFieldModel {
     }
     this.tree.render();
     this.addField(this.tree.$container);
+    this._linkWithLabel(this.tree.$data);
     this.$field.addDeviceClass();
     this.invalidateLayoutTree();
   }

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {GridData, Group, InitModelOf, PlaceholderTile, RemoteTileFilter, scout, Tile, TileGrid, TileGridModel, TileModel} from '../../src/index';
+import {arrays, GridData, Group, InitModelOf, ListBoxAriaRules, PlaceholderTile, Range, RemoteTileFilter, scout, Tile, TileGrid, TileGridModel, TileModel, VoidGridAriaRules} from '../../src/index';
 import {JQueryTesting} from '../../src/testing/index';
 
 describe('TileGrid', () => {
@@ -1453,6 +1453,99 @@ describe('TileGrid', () => {
       let tile0 = tileGrid.tiles[0];
       tileGrid.setFocusedTile(tile0);
       expect(tileGrid.$container.attr('aria-activedescendant')).toBe(tile0.$container.attr('id'));
+    });
+
+    describe('ListBoxAriaRules', () => {
+      let tileGrid: TileGrid;
+
+      beforeEach(() => {
+        tileGrid = createTileGrid(20, {
+          selectable: true
+        });
+      });
+
+      it('uses role listbox', () => {
+        tileGrid.render();
+        expect(tileGrid.ariaRules instanceof ListBoxAriaRules).toBe(true);
+        expect(tileGrid.$container).toHaveAttr('role', 'listbox');
+      });
+
+      it('has tiles with aria role option', () => {
+        tileGrid.render();
+        tileGrid.tiles.forEach(tile => {
+          expect(tile.$container).toHaveAttr('role', 'option');
+        });
+      });
+
+      it('has tiles with posinset if grid is virtual', () => {
+        tileGrid.setGridColumnCount(2);
+        tileGrid.setViewRangeSize(2);
+        tileGrid.setVirtual(true);
+        tileGrid.render();
+        tileGrid.validateLogicalGrid();
+        assertTilesInRange(new Range(0, 2), 20);
+
+        tileGrid.scrollTo(arrays.last(tileGrid.tiles));
+        assertTilesInRange(new Range(8, 10), 20);
+
+        tileGrid.addFilter(tile => scout.isOneOf(tile, tileGrid.tiles[2], tileGrid.tiles[3]));
+        assertTilesInRange(new Range(0, 1), 2);
+
+        tileGrid.removeFilter(tileGrid.filters[0]);
+        assertTilesInRange(new Range(0, 2), 20);
+
+        tileGrid.deleteTile(tileGrid.tiles[0]);
+        assertTilesInRange(new Range(0, 2), 19);
+
+        function assertTilesInRange(range: Range, size: number) {
+          let tiles = tileGrid.filteredTiles.filter(tile => tile.rendered);
+          expect(tiles.length).toBe(range.size() * tileGrid.gridColumnCount);
+          expect(tileGrid.viewRangeRendered).toEqual(range);
+          for (let i = 0; i < tiles.length; i++) {
+            const tile = tiles[i];
+            expect(tile.$container.attr('aria-posinset')).toBe(`${(range.from * tileGrid.gridColumnCount + i) + 1}`);
+            expect(tile.$container.attr('aria-setsize')).toBe(`${size}`);
+          }
+        }
+      });
+
+      it('is only applied if grid is selectable', () => {
+        tileGrid.setSelectable(false);
+        tileGrid.render();
+        tileGrid.setFocusedTile(tileGrid.tiles[1]);
+        expect(tileGrid.$container).not.toHaveAttr('role');
+        tileGrid.tiles.forEach(tile => {
+          expect(tile.$container).not.toHaveAttr('role');
+          expect(tile.$container).not.toHaveAttr('aria-posinset');
+          expect(tile.$container).not.toHaveAttr('aria-setsize');
+        });
+
+        tileGrid.setSelectable(true);
+        expect(tileGrid.$container).toHaveAttr('role', 'listbox');
+        tileGrid.tiles.forEach(tile => {
+          expect(tile.$container).toHaveAttr('role', 'option');
+          expect(tile.$container).not.toHaveAttr('aria-posinset'); // Not virtual
+          expect(tile.$container).not.toHaveAttr('aria-setsize');
+        });
+
+        tileGrid.setSelectable(false);
+        expect(tileGrid.$container).not.toHaveAttr('role');
+        tileGrid.tiles.forEach(tile => {
+          expect(tile.$container).not.toHaveAttr('role');
+          expect(tile.$container).not.toHaveAttr('aria-posinset');
+          expect(tile.$container).not.toHaveAttr('aria-setsize');
+        });
+
+        tileGrid.setVirtual(true);
+        tileGrid.setViewRangeSize(2);
+        tileGrid.setSelectable(true);
+        expect(tileGrid.$container).toHaveAttr('role', 'listbox');
+        tileGrid.renderedTiles().forEach(tile => {
+          expect(tile.$container).toHaveAttr('role', 'option');
+          expect(tile.$container).toHaveAttr('aria-posinset');
+          expect(tile.$container).toHaveAttr('aria-setsize');
+        });
+      });
     });
   });
 

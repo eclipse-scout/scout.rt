@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Comparator, Filter, FilterSupport, Menu, ObjectOrChildModel, ObjectOrModel, TextFilter, Tile, TileGridLayoutConfig, TileGridSelectionHandler, VirtualScrolling, WidgetModel} from '../index';
+import {Comparator, Filter, FilterSupport, GridAriaRules, Menu, ObjectOrChildModel, ObjectOrModel, TextFilter, Tile, TileGridLayoutConfig, TileGridSelectionHandler, VirtualScrolling, WidgetModel} from '../index';
 
 export interface TileGridModel extends WidgetModel {
   /**
@@ -18,6 +18,20 @@ export interface TileGridModel extends WidgetModel {
    * Specifies whether tiles should be animated when they are inserted. Default is true.
    */
   animateTileInsertion?: boolean;
+  /**
+   * Specifies the aria roles and attributes to apply to the tile grid and its tiles.
+   *
+   * Even though the aria role 'grid' looks like the obvious choice, a 'gridcell' needs to be in a 'row', but the tile grid does not create rows.
+   * A tile grid may just be a list of tiles that are selectable, or it may be a complex dashboard where the tiles are not selectable.
+   * If the tile grid is selectable, the user can navigate between the tiles using the left and right arrow keys.
+   * So, in that case, the tile grid can be seen as horizontal list box.
+   * This is why {@link HorizontalListBoxAriaRules} is used by default and only applied if the tile grid is {@link selectable}.
+   *
+   * If your tile grid has another semantic, you can use custom {@link GridAriaRules} or {@link VoidGridAriaRules} which does not add any aria roles or attributes.
+   *
+   * Default is an instance of {@link HorizontalListBoxAriaRules} which is only applied if the tile grid is {@link selectable}.
+   */
+  ariaRules?: GridAriaRules;
   /**
    * If a comparator is set, the tiles are sorted according to that comparator. Default is null.
    */

@@ -146,6 +146,7 @@ export class Tile extends Widget implements TileModel {
 
   protected _renderSelected() {
     this.$container.toggleClass('selected', this.selected);
+    aria.selected(this.$container, this.selected || null);
   }
 
   /** @see TileModel.selectable */

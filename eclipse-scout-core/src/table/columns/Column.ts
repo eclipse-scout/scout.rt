@@ -90,7 +90,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
    * @internal
    */
   _realWidth: number;
-
+  protected _headerLabelId: string;
   protected _tableColumnsChangedHandler: EventHandler<TableColumnMovedEvent | Event<Table>>;
 
   constructor() {
@@ -333,10 +333,10 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
       let aggregateValue = aggregateRow.contents[this.table.visibleColumns().indexOf(this)];
       cell = this.createAggrValueCell(aggregateValue);
     }
-    return this.buildCell(cell, {});
+    return this.buildCell(cell, new TableRow());
   }
 
-  buildCell(cell: Cell<TValue>, row: TableRow | { hasError?: boolean; expanded?: boolean; expandable?: boolean; parentRow?: TableRow }): string {
+  buildCell(cell: Cell<TValue>, row: TableRow): string {
     scout.assertParameter('cell', cell, Cell);
 
     let tableNodeColumn = this.table.isTableNodeColumn(this),
@@ -381,27 +381,19 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 
   protected _buildCell(cell: Cell<TValue>, content: string, style: string, cssClass: string): string {
     let ariaAttributes = '';
-    if (this.table.accessibilityRenderer && strings.hasText(this.table.accessibilityRenderer.cellRole)) {
-      ariaAttributes = ' role="' + this.table.accessibilityRenderer.cellRole + '"';
+    if (this.table.ariaRules.cellRole) {
+      ariaAttributes = ` role="${this.table.ariaRules.cellRole}"`;
     }
-    // Set the label of the cell to header name + cell content. The reference to cell content is needed, because
-    // without it screen readers may only announce the header name without the cell content. If there is no header
-    // to reference, we do not need to reference the cell either, because screen readers will announce the cell
-    // content naturally if there is no aria-labelledby
-    if (this.table.header && strings.hasText(this.table.header.headerLabelId)) {
-      let cellLabelId = ObjectIdProvider.get().createUiSeqId();
-      ariaAttributes += ' aria-labelledBy="' + this.table.header.headerLabelId + ' ' + cellLabelId + '" ' + 'id="' + cellLabelId + '"';
-    }
-    return '<div' + ariaAttributes + ' class="' + cssClass + '" style="' + style + '">' + content + '</div>';
+    return `<div${ariaAttributes} class="${cssClass}" style="${style}">${content}</div>`;
   }
 
   protected _expandIcon(expanded: boolean, rowPadding: number): string {
-    let style = 'padding-left: ' + (rowPadding + this.expandableIconLevel0CellPadding) + 'px';
+    let style = `padding-left: ${rowPadding + this.expandableIconLevel0CellPadding}px`;
     let cssClasses = 'table-row-control';
     if (expanded) {
       cssClasses += ' expanded';
     }
-    return '<div aria-hidden="true" class="' + cssClasses + '" style="' + style + '"></div>';
+    return `<div aria-hidden="true" class="${cssClasses}" style="${style}"></div>`;
   }
 
   protected _icon(iconId: string, hasText: boolean): string {
@@ -416,10 +408,10 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     icon = icons.parseIconId(iconId);
     if (icon.isFontIcon()) {
       cssClass += ' font-icon';
-      return '<span aria-hidden="true" class="' + icon.appendCssClass(cssClass) + '">' + icon.iconCharacter + '</span>';
+      return `<span aria-hidden="true" class="${icon.appendCssClass(cssClass)}">${icon.iconCharacter}</span>`;
     }
     cssClass += ' image-icon';
-    return '<img alt="" class="' + cssClass + '" src="' + icon.iconUrl + '">';
+    return `<img alt="" class="${cssClass}" src="${icon.iconUrl}">`;
   }
 
   protected _text(cell: Cell<TValue>): string {
@@ -433,7 +425,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
       if (text) {
         // Wrap in a span to make customization using css easier.
         // An empty text will be replaced with nbsp later on. To make that work, only wrap it if there is text.
-        text = '<span class="text">' + text + '</span>';
+        text = `<span class="text">${text}</span>`;
       }
     }
 
@@ -960,6 +952,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     let field = this._createEditor(row);
     let cell = this.cell(row);
     this._initEditorField(field, cell);
+    field.setLabel(this.text); // For screen readers
     field.setLabelVisible(false);
     field.setFieldStyle(FormField.FieldStyle.CLASSIC);
     let hints = new GridData(field.gridDataHints);
@@ -1226,6 +1219,16 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 
   realWidthIfAvailable(): number {
     return this._realWidth || this.width;
+  }
+
+  /**
+   * @returns an id that will be assigned to the text element of the column header so that it can be referenced by cells for screen reader purposes.
+   */
+  get headerLabelId(): string {
+    if (!this._headerLabelId) {
+      this._headerLabelId = ObjectIdProvider.get().createUiSeqId();
+    }
+    return this._headerLabelId;
   }
 }
 

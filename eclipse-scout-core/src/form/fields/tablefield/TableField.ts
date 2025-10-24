@@ -90,6 +90,7 @@ export class TableField extends FormField implements TableFieldModel {
     }
     this.table.render();
     this.addField(this.table.$container);
+    this._linkWithLabel(this.table.$data);
     this.$field.addDeviceClass();
     this.invalidateLayoutTree();
   }
