@@ -74,6 +74,22 @@ export interface WidgetModel extends ObjectModelWithUuid<Widget>, ObjectModelWit
    */
   trackFocus?: boolean;
   /**
+   * Defines whether the widget should look focused.
+   * It does _not_ focus the widget. It basically just toggles the class `focused`.
+   *
+   * To focus the widget, use {@link focus}.
+   */
+  focused?: boolean;
+  /**
+   * Defines whether the {@link FocusManager} is allowed to consider this widget when computing the first focusable field in a container.
+   *
+   * The property may be undefined which means the class will neither be removed nor added to {@link get$Focusable()}.
+   * This makes it possible to still use the css class `prevent-initial-focus` instead of this property.
+   *
+   * Default is undefined.
+   */
+  preventInitialFocus?: boolean;
+  /**
    * Configures the number of pixels that the {@link Widget.get$Scrollable} is scrolled vertically.
    *
    * The property is automatically updated whenever the content is scrolled so the scroll position can be reverted when the widget is rendered again after it has been removed.

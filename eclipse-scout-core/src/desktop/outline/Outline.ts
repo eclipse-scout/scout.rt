@@ -144,6 +144,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     // menu bars
     this.titleMenuBar = scout.create(MenuBar, {
       parent: this,
+      preventInitialFocus: true,
       menuOrder: new GroupBoxMenuItemsOrder()
     });
     this.nodeMenuBar = scout.create(MenuBar, {
@@ -333,7 +334,6 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
   protected _renderTitleMenuBar() {
     if (this.titleVisible) {
       this.titleMenuBar.render(this.$title);
-      this.titleMenuBar.$container.addClass('prevent-initial-focus');
     }
   }
 

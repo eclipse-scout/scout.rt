@@ -50,6 +50,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   enabledComputed: boolean;
   eventDelegators: EventDelegatorForCloning[];
   focused: boolean;
+  preventInitialFocus: boolean;
   /**
    * Widgets creating a HtmlComponent for the main $container should assign it to this variable.
    * This enables the execution of layout related operations like invalidateLayoutTree directly on the widget.
@@ -160,7 +161,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this._storedFocusedWidget = null;
 
     this._glassPaneContributions = [];
-    this._addCloneProperties(['visible', 'enabled', 'inheritAccessibility', 'cssClass']);
+    this._addCloneProperties(['visible', 'enabled', 'inheritAccessibility', 'cssClass', 'preventInitialFocus']);
     this._addMultiDimensionalProperty('enabled', true);
     this._addMultiDimensionalProperty('visible', true);
     this._addPropertyDimensionAlias('enabled', 'enabledGranted', {dimension: 'granted'});
@@ -478,7 +479,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   /**
    * Calls the render methods for each property that needs to be rendered during the rendering process initiated by {@link render}.
    * Each widget has to override this method and call the render methods for its own properties, after doing the super call.
-   * <p>
+   *
    * This method is called right after {@link _render} has been executed.
    */
   protected _renderProperties() {
@@ -487,6 +488,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this._renderVisible();
     this._renderTrackFocus();
     this._renderFocused();
+    this._renderPreventInitialFocus();
     this._renderLoading();
     this._renderScrollTop();
     this._renderScrollLeft();
@@ -1030,20 +1032,25 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     return true;
   }
 
-  /**
-   * This function does not set the focus to the field. It toggles the 'focused' class on the field container if present.
-   * Objects using widget as prototype must call this function onBlur and onFocus to ensure the class gets toggled.
-   *
-   *  Use {@link focus} to set the focus to the widget.
-   */
+  /** @see WidgetModel.focused */
   setFocused(focused: boolean) {
     this.setProperty('focused', focused);
   }
 
   protected _renderFocused() {
-    if (this.$container) {
-      this.$container.toggleClass('focused', this.focused);
+    this.$container?.toggleClass('focused', this.focused);
+  }
+
+  setPreventInitialFocus(preventInitialFocus: boolean) {
+    this.setProperty('preventInitialFocus', preventInitialFocus);
+  }
+
+  protected _renderPreventInitialFocus() {
+    if (objects.isNullOrUndefined(this.preventInitialFocus)) {
+      // Do not remove class as it may be added explicitly on the dom element instead of using this property
+      return;
     }
+    this.get$Focusable()?.toggleClass('prevent-initial-focus', this.preventInitialFocus);
   }
 
   protected _setCssClass(cssClass: string) {
