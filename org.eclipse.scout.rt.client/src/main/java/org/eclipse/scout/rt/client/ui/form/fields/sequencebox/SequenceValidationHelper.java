@@ -48,7 +48,7 @@ public class SequenceValidationHelper {
       if (endField.isValueChanging() && !StringUtility.isNullOrEmpty(endField.getLabel())) {
         errorField = endField;
       }
-      InvalidSequenceStatus errorStatus = new InvalidSequenceStatus(TEXTS.get("XMustBeGreaterThanOrEqualY", startField.getLabel(), endField.getLabel()));
+      InvalidSequenceStatus errorStatus = new InvalidSequenceStatus(TEXTS.get("XMustBeGreaterThanOrEqualY", endField.getLabel(), startField.getLabel()));
       errorField.addErrorStatus(errorStatus);
       return;
     }
