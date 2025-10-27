@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,8 +11,8 @@ import {
   AbstractGrid, aria, arrays, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, EnumObject, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, GridAriaRules, GridData, HorizontalGrid,
   HorizontalListBoxAriaRules, HtmlComponent, InitModelOf, KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuDestinations, MenuFilter, menus as menuUtil, numbers,
   ObjectOrChildModel, ObjectOrModel, objects, PlaceholderTile, Point, Predicate, Range, Rectangle, Resizable, scout, ScrollToOptions, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig,
-  TileGridModel, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke,
-  TileGridSelectUpKeyStroke, TileMoveHandler, TileResizeHandler, TileTextFilter, tileUtil, UpdateFilteredElementsOptions, VirtualScrolling, Widget
+  TileGridModel, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectFocusedKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke,
+  TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileMoveHandler, TileResizeHandler, TileTextFilter, tileUtil, UpdateFilteredElementsOptions, VirtualScrolling, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -126,8 +126,8 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this._filterMenusHandler = this._filterMenus.bind(this);
     this._renderViewPortAfterAttach = false;
     this._scrollParentScrollHandler = this._onScrollParentScroll.bind(this);
-    this._addWidgetProperties(['tiles', 'selectedTiles', 'menus']);
-    this._addPreserveOnPropertyChangeProperties(['selectedTiles']);
+    this._addWidgetProperties(['tiles', 'selectedTiles', 'focusedTile', 'menus']);
+    this._addPreserveOnPropertyChangeProperties(['selectedTiles', 'focusedTile']);
     this._addComputedProperties(['tiles', 'filteredTiles']);
 
     this.$fillBefore = null;
@@ -151,6 +151,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this._setMenus(this.menus);
     this._sortWhileInit();
     this.updateFilteredElements();
+    this._setFocusedTile(this.focusedTile);
   }
 
   protected override _createKeyStrokeContext(): KeyStrokeContext {
@@ -212,6 +213,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
       new TileGridSelectUpKeyStroke(this),
       new TileGridSelectFirstKeyStroke(this),
       new TileGridSelectLastKeyStroke(this),
+      new TileGridSelectFocusedKeyStroke(this),
       new ContextMenuKeyStroke(this, this.showContextMenu, this)
     ]);
   }
@@ -238,6 +240,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(this._createLayout());
     this.$container
+      .on('focus', this._onFocus.bind(this))
       .on('mousedown', TILE_SELECTOR, this._onTileMouseDown.bind(this))
       .on('click', TILE_SELECTOR, this._onTileClick.bind(this))
       .on('dblclick', TILE_SELECTOR, this._onTileDoubleClick.bind(this));
@@ -257,6 +260,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this._renderSelectable();
     this._renderEmpty();
     this._renderTextFilterEnabled();
+    this._renderFocusedTile();
   }
 
   protected override _remove() {
@@ -454,6 +458,9 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     tile.setLayoutData(new LogicalGridData(tile));
     tile.$container.addClass('newly-rendered');
     this._updateAriaTileRole(tile);
+    if (tile === this.focusedTile) {
+      this._renderFocusedTile();
+    }
   }
 
   protected _renderInsertTiles(tiles: (TTile | PlaceholderTile)[]) {
@@ -929,12 +936,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     if (this.focusedTile === tile) {
       return;
     }
-    this.focusedTile = tile;
-    if (tile) {
-      tile.markAsActiveDescendantFor(this.$container);
-    } else {
-      aria.removeActiveDescendant(this.$container);
-    }
+    this.setProperty('focusedTile', tile);
     if (!this.rendered || !tile || this.isFocused()) {
       return;
     }
@@ -948,11 +950,44 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     });
   }
 
+  protected _setFocusedTile(focusedTile: TTile) {
+    if (this.rendered) {
+      this._removeFocusedTile();
+    }
+    this._setProperty('focusedTile', this.selectable ? focusedTile : null);
+  }
+
+  protected _removeFocusedTile() {
+    this.focusedTile?.$container?.removeClass('focused');
+    this._updateAriaActiveDescendant();
+  }
+
+  protected _renderFocusedTile() {
+    this.focusedTile?.$container?.addClass('focused');
+    this._updateAriaActiveDescendant();
+  }
+
+  protected _updateAriaActiveDescendant() {
+    let $tile = this.ariaRulesFilter(this.focusedTile?.$container || this.selectedTiles[0]?.$container);
+    if ($tile) {
+      aria.linkElementWithActiveDescendant(this.$container, $tile);
+    } else {
+      aria.removeActiveDescendant(this.$container);
+    }
+  }
+
+  protected _onFocus(event: JQuery.FocusEvent) {
+    if (!this.focusedTile) {
+      this.setFocusedTile(this.selectedTiles[0] || this.filteredTiles[0]);
+    }
+  }
+
   /** @see TileGridModel.selectable */
   setSelectable(selectable: boolean) {
     this.setProperty('selectable', selectable);
     if (!selectable) {
       this.deselectAllTiles();
+      this.setFocusedTile(null);
     }
     this._tiles.forEach(tile => {
       tile.setSelectable(selectable);
@@ -965,6 +1000,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     if (this.rendered) {
       // Aria attributes depend on selectable property -> update them if selectable changes on the fly
       this._updateAriaRole();
+      this._updateAriaActiveDescendant();
       this._updateAriaTileIndices();
       this.renderedTiles().forEach(tile => this._updateAriaTileRole(tile));
     }
@@ -1010,9 +1046,6 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     arrays.removeAll(tilesToUnselect, tiles);
     tilesToUnselect.forEach(tile => {
       tile.setSelected(false);
-      if (tile === this.focusedTile) {
-        this.setFocusedTile(null);
-      }
     });
 
     // Select the tiles
@@ -1020,12 +1053,22 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
       tile.setSelected(true);
     });
 
+    if (this.focusedTile && !tiles.includes(this.focusedTile)) {
+      // When using keystrokes, the focused tile will be set to one of the selected tilse.
+      // If selectTiles() is called programmatically, setting the focused tile to null prevents a confusing behavior the next time keystrokes are used.
+      this.setFocusedTile(null);
+    }
+
     this.setProperty('selectedTiles', tiles.slice());
+  }
+
+  protected _renderSelectedTiles() {
+    this._updateAriaActiveDescendant();
   }
 
   /** @see selectTiles */
   selectTile(tile: TTile) {
-    this.selectTiles([tile]);
+    this.selectTiles(tile);
   }
 
   /**
@@ -1044,7 +1087,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   }
 
   deselectTile(tile: TTile) {
-    this.deselectTiles([tile]);
+    this.deselectTiles(tile);
   }
 
   deselectAllTiles() {

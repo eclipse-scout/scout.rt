@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, DisplayParent, DisplayViewId, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FullModelOf, GlassPaneTarget, GroupBox,
-  GroupBoxMenuItemsOrder, HtmlComponent, Icon, InitModelOf, keys, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton,
-  ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, OutlineSelectKeyStroke, Page,
-  PageLayout, PageModel,
-  PropertyChangeEvent, scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent, TreeCollapseAllKeyStroke,
-  TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodesDeletedEvent, TreeNodesInsertedEvent, TreeNodesSelectedEvent,
-  TreeNodesUpdatedEvent, TreeSelectKeyStroke, Widget
+  AbstractTreeNavigationKeyStroke, arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, DisplayParent, DisplayViewId, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FullModelOf,
+  GlassPaneTarget, GroupBox, GroupBoxMenuItemsOrder, HtmlComponent, Icon, InitModelOf, keys, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton,
+  NavigateUpButton, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview,
+  OutlineSelectKeyStroke, Page, PageLayout, PageModel, PropertyChangeEvent, scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeAllChildNodesDeletedEvent,
+  TreeChildNodeOrderChangedEvent, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodesDeletedEvent,
+  TreeNodesInsertedEvent, TreeNodesSelectedEvent, TreeNodesUpdatedEvent, TreeSelectKeyStroke, Widget
 } from '../../index';
 
 export class Outline extends Tree implements DisplayParent, OutlineModel {
@@ -222,7 +221,6 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
 
     // Create an outline keystroke context with the scope desktop so these keystrokes can be used from anywhere not only if the outline is focused
     let modifierBitMask = keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT; // NOSONAR
-
     let outlineKeyStrokeContext = new OutlineKeyStrokeContext(this);
     outlineKeyStrokeContext.registerKeyStrokes([
       new OutlineNavigateToTopKeyStroke(this, modifierBitMask),
@@ -236,6 +234,12 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     ]);
     outlineKeyStrokeContext.$scopeTarget = () => this.$container;
     outlineKeyStrokeContext.$bindTarget = () => this.session.$entryPoint;
+    for (const keyStroke of outlineKeyStrokeContext.keyStrokes) {
+      if (keyStroke instanceof AbstractTreeNavigationKeyStroke) {
+        // Don't focus the tree when using these keystrokes to not visualize the focused node because the selection will be moved.
+        keyStroke.setFocusTree(false);
+      }
+    }
     this.on('render', () => this.session.keyStrokeManager.installKeyStrokeContext(outlineKeyStrokeContext));
     this.on('remove', () => this.session.keyStrokeManager.uninstallKeyStrokeContext(outlineKeyStrokeContext));
 

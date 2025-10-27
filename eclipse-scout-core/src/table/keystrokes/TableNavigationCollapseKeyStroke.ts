@@ -51,7 +51,7 @@ export class TableNavigationCollapseKeyStroke extends AbstractTableNavigationKey
       focus = true;
     } else if (selectedRow.parentRow) {
       table.selectRow(selectedRow.parentRow);
-      table.selectionHandler.lastActionRow = selectedRow.parentRow;
+      table.setFocusedRow(selectedRow.parentRow);
       focus = true;
     }
     if (focus && !table.isFocused()) {

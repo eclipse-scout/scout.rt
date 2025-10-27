@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractTableNavigationKeyStroke, aria, arrays, keys, Table, TableRow} from '../../index';
+import {AbstractTableNavigationKeyStroke, arrays, keys, Table, TableRow} from '../../index';
 
 export class TableNavigationHomeKeyStroke extends AbstractTableNavigationKeyStroke {
 
@@ -26,25 +26,25 @@ export class TableNavigationHomeKeyStroke extends AbstractTableNavigationKeyStro
       firstRow = arrays.first(rows),
       selectedRows = table.selectedRows,
       newSelectedRows: TableRow[] = [],
-      lastActionRow = table.selectionHandler.lastActionRow,
-      lastActionRowIndex = -1;
+      focusedRow = table.focusedRow,
+      focusedRowIndex = -1;
 
     if (event.shiftKey && selectedRows.length > 0) {
-      if (lastActionRow) {
-        lastActionRowIndex = rows.indexOf(lastActionRow);
+      if (focusedRow) {
+        focusedRowIndex = rows.indexOf(focusedRow);
       }
-      // last action row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
-      if (lastActionRowIndex < 0) {
-        lastActionRow = arrays.first(selectedRows);
-        lastActionRowIndex = rows.indexOf(lastActionRow);
+      // focused row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
+      if (focusedRowIndex < 0) {
+        focusedRow = arrays.first(selectedRows);
+        focusedRowIndex = rows.indexOf(focusedRow);
       }
-      newSelectedRows = rows.slice(0, lastActionRowIndex);
+      newSelectedRows = rows.slice(0, focusedRowIndex);
       newSelectedRows = arrays.union(newSelectedRows, selectedRows);
     } else {
       newSelectedRows = [firstRow];
     }
 
-    table.selectionHandler.lastActionRow = firstRow;
+    table.setFocusedRow(firstRow);
     table.selectRows(newSelectedRows);
     table.scrollTo(firstRow);
     if (!table.isFocused()) {

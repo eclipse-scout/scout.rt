@@ -17,6 +17,13 @@ export type TreeEventCurrentNode = {
 export class AbstractTreeNavigationKeyStroke extends KeyStroke {
   declare field: Tree;
   nodesFocusable: boolean;
+  /**
+   * Defines whether the tree should be focused when navigating.
+   * This is necessary if the focus is in the filter field: pressing a navigation key should focus the tree to make left/right keystrokes work without closing the filter field
+   *
+   * Default is true.
+   */
+  focusTree = true;
 
   constructor(tree: Tree, modifierBitMask?: number) {
     super();
@@ -42,9 +49,19 @@ export class AbstractTreeNavigationKeyStroke extends KeyStroke {
       return false;
     }
 
-    event._treeCurrentNode = this.nodesFocusable && this.field.focusedNode || this.field.selectedNodes?.[0];
+    let selectedNode = this.field.selectedNode();
+    let focusedNode = this.field.focusedNode;
+    if (this.nodesFocusable) {
+      event._treeCurrentNode = focusedNode || selectedNode;
+    } else if (selectedNode) {
+      event._treeCurrentNode = selectedNode;
+    } else if (this.field.get$Focusable().hasClass('keyboard-navigation')) {
+      // Node focus is only visible when using keyboard unless nodesFocusable is true
+      // -> Ignore focused node if node focus is not visible so the user does not select a random node in the middle when pressing up or down
+      event._treeCurrentNode = focusedNode;
+    }
+
     event._$treeCurrentNode = event._treeCurrentNode?.$node;
-    this.field.get$Focusable().addClass('keyboard-navigation');
     return true;
   }
 
@@ -68,12 +85,16 @@ export class AbstractTreeNavigationKeyStroke extends KeyStroke {
       this.field.selectNodes(newSelection, debounceSend);
       this.field.revealSelection();
     }
-    if (!this.field.isFocused()) {
+    if (this.focusTree && !this.field.isFocused()) {
       this.field.focus();
     }
   }
 
   setNodesFocusable(nodesFocusable: boolean) {
     this.nodesFocusable = nodesFocusable;
+  }
+
+  setFocusTree(focusTree: boolean) {
+    this.focusTree = focusTree;
   }
 }

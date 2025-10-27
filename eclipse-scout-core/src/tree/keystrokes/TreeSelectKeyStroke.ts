@@ -8,16 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {HAlign, keys, KeyStroke, ScoutKeyboardEvent, Tree, TreeEventCurrentNode} from '../..';
+import {AbstractTreeNavigationKeyStroke, HAlign, keys, ScoutKeyboardEvent, Tree, TreeEventCurrentNode} from '../..';
 
-export class TreeSelectKeyStroke extends KeyStroke {
-  declare field: Tree;
+export class TreeSelectKeyStroke extends AbstractTreeNavigationKeyStroke {
 
   constructor(tree: Tree) {
-    super();
-    this.field = tree;
+    super(tree);
     this.which = [keys.SPACE, keys.ENTER];
-    this.inheritAccessibility = false;
     this.renderingHints.$drawingArea = ($drawingArea: JQuery, event: ScoutKeyboardEvent & TreeEventCurrentNode) => {
       return this.field.focusedNode?.$node;
     };
@@ -30,7 +27,7 @@ export class TreeSelectKeyStroke extends KeyStroke {
     if (!accepted) {
       return false;
     }
-    return this.field.nodesFocusable && this.field.focusedNode && !this.field.selectedNodes.includes(this.field.focusedNode);
+    return this.field.focusedNode && !this.field.isNodeSelected(this.field.focusedNode);
   }
 
   override handle(event: JQuery.KeyboardEventBase & TreeEventCurrentNode) {

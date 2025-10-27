@@ -136,6 +136,12 @@ export class FocusContext {
       return; // no valid element found
     }
 
+    // Mark element that user used keyboard to focus it.
+    // This is useful to use different focus CSS rules for mouse and keyboard focus.
+    // Also, set it before the element is focused so the element can react in a focus handler.
+    let $focusableElement = $(elementToFocus);
+    $focusableElement.addClass('keyboard-navigation');
+
     // Set focus manually if the target element does not correspond to the next element according to the
     // DOM order, or if there is currently no keyboard event in progress that will
     if (event && !explicitFocus) {
@@ -147,9 +153,6 @@ export class FocusContext {
       });
       $.suppressEvent(event);
     }
-
-    let $focusableElement = $(elementToFocus);
-    $focusableElement.addClass('keyboard-navigation');
 
     // Check if new focused element is currently visible, otherwise scroll the container
     let containerBounds = graphics.offsetBounds($focusableElement);

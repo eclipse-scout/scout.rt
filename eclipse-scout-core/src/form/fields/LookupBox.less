@@ -23,19 +23,8 @@
       border-radius: @control-alternative-border-radius;
     }
 
-    &.no-rows-selected,
-    &.no-nodes-selected.no-nodes-focused {
-      &:has(.tree-data:is(:focus, .focused)),
-      &:has(.table-data:is(:focus, .focused)) {
-        #scout.focus-border();
-      }
-    }
-
-    &.has-error {
-      border-color: @error-border-color;
-      --focus-border-color: @error-border-color;
-      --focus-box-shadow-color: @error-focus-box-shadow-color;
-    }
+    .table-field-no-rows-selected-focus();
+    .tree-field-no-nodes-selected-focus();
 
     & > .table-data > .table-row {
       & > .table-cell {

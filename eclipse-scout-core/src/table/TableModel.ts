@@ -71,6 +71,12 @@ export interface TableModel extends WidgetModel {
    * Default is {@link dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE}
    */
   dropMaximumSize?: number;
+  /**
+   * Defines the row that has the focus when the table is focused.
+   *
+   * The focused row can be changed using keyboard navigation.
+   */
+  focusedRow?: TableRow | string;
   groupingStyle?: TableGroupingStyle;
   tableStatus?: StatusOrModel;
   /**

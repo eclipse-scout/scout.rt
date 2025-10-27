@@ -26,8 +26,8 @@ export class TableNavigationPageUpKeyStroke extends AbstractTableNavigationKeySt
       rows = table.visibleRows,
       selectedRows = table.selectedRows,
       firstSelectedRow = arrays.first(selectedRows),
-      lastActionRow = table.selectionHandler.lastActionRow,
-      lastActionRowIndex = -1,
+      focusedRow = table.focusedRow,
+      focusedRowIndex = -1,
       newSelectedRows: TableRow[];
 
     // First row may be undefined if there is only one row visible in the viewport and this row is bigger than the viewport. In that case just scroll up.
@@ -40,18 +40,18 @@ export class TableNavigationPageUpKeyStroke extends AbstractTableNavigationKeySt
       }
     }
 
-    if (lastActionRow) {
-      lastActionRowIndex = rows.indexOf(lastActionRow);
+    if (focusedRow) {
+      focusedRowIndex = rows.indexOf(focusedRow);
     }
-    // last action row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
-    if (lastActionRowIndex < 0) {
-      lastActionRow = firstSelectedRow;
-      lastActionRowIndex = rows.indexOf(lastActionRow);
+    // focused row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
+    if (focusedRowIndex < 0) {
+      focusedRow = firstSelectedRow;
+      focusedRowIndex = rows.indexOf(focusedRow);
     }
 
     // If first row in viewport already is selected -> scroll a page up
     // Don't do it if multiple rows are selected and user only presses page up without shift
-    if (selectedRows.length > 0 && lastActionRow === viewport.firstRow && !(selectedRows.length > 1 && !event.shiftKey)) {
+    if (selectedRows.length > 0 && focusedRow === viewport.firstRow && !(selectedRows.length > 1 && !event.shiftKey)) {
       table.scrollPageUp();
       viewport = this._viewportInfo();
       if (!viewport.firstRow) {
@@ -61,13 +61,13 @@ export class TableNavigationPageUpKeyStroke extends AbstractTableNavigationKeySt
     }
 
     if (event.shiftKey && selectedRows.length > 0) {
-      newSelectedRows = rows.slice(rows.indexOf(viewport.firstRow), lastActionRowIndex);
+      newSelectedRows = rows.slice(rows.indexOf(viewport.firstRow), focusedRowIndex);
       newSelectedRows = arrays.union(selectedRows, newSelectedRows);
     } else {
       newSelectedRows = [viewport.firstRow];
     }
 
-    table.selectionHandler.lastActionRow = viewport.firstRow;
+    table.setFocusedRow(viewport.firstRow);
     table.selectRows(newSelectedRows, true);
     if (!table.isFocused()) {
       table.focus();

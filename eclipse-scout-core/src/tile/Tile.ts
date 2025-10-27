@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -289,17 +289,5 @@ export class Tile extends Widget implements TileModel {
       });
     }
     this.invalidateParentLogicalGrid();
-  }
-
-  /**
-   * Marks the element of this tile that is "focused" as the active descendant of the
-   * container that has the "real" focus. You may override this to e.g. account for
-   * custom navigation concepts in your tile, or if your tile should be announced
-   * differently by screen readers.
-   *
-   * @param $container the focused container for which to mark the active descendant
-   */
-  markAsActiveDescendantFor($container: JQuery) {
-    aria.linkElementWithActiveDescendant($container, this.$container);
   }
 }

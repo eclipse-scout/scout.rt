@@ -33,6 +33,20 @@
     }
   }
 
+  // Normally, the row focus is visualized using a different selection color, see above.
+  // If this is not the case (perma-focus) or if no rows are selected, add a focus shadow to the row when using keyboard navigation
+  &:is(.perma-focus, .no-rows-selected) > .table-data:is(:focus, .focused).keyboard-navigation > .table-row.focused {
+    &::after {
+      // Draw focus shadow in ::after element so that it covers colored cells
+      // It is also necessary to get the same shadow size on every border on a selected row because ::after element is a little bigger than the row
+      #scout.focus-inset-box-shadow();
+    }
+
+    &.selected::after {
+      --focus-box-shadow-size: 3px;
+    }
+  }
+
   &.checkable {
     & > .table-data > .table-row {
       cursor: pointer;
@@ -54,7 +68,8 @@
           background-color: transparent;
 
           &::after {
-            display: none;
+            border-width: 0;
+            border-radius: inherit; // use same radius as table row, e.g. in the table header filter it is rounded, in regular tables its not
           }
         }
 
@@ -92,15 +107,12 @@
         }
       }
 
-      &.keyboard-navigation:focus,
-      &.keyboard-navigation.focused {
-        & > .table-row {
-          &.selected {
-            #scout.focus-inset-box-shadow();
+      &.keyboard-navigation:is(:focus, .focused) {
+        & > .table-row.selected::after {
+          #scout.focus-inset-box-shadow();
 
-            &.checked {
-              --focus-box-shadow-size: 4px;
-            }
+          &.checked {
+            --focus-box-shadow-size: 3px;
           }
         }
       }
@@ -235,12 +247,17 @@
     background-color: @table-row-active-background-color;
   }
 
+  &:is(.selected, .focused)::after {
+    #scout.item-selection-border();
+    border-width: 0;
+    z-index: 1; // Ensure selection covers aggregate row which is moved -1px to top
+  }
+
   &.selected {
     background-color: @item-selection-nonfocus-background-color;
 
     &::after {
-      #scout.item-selection-border();
-      z-index: 1; // Ensure selection covers aggregate row which is moved -1px to top
+      border-width: @item-selection-border-width;
     }
   }
 

@@ -91,9 +91,12 @@ export class FocusManager implements FocusManagerOptions {
   installTopLevelMouseHandlers($container: JQuery) {
     // Install 'mousedown' on top-level $container to accept or prevent focus gain
     $container.on('mousedown', event => {
-      if (!this._acceptFocusChangeOnMouseDown($(event.target))) {
+      let $target = $(event.target);
+      if (!this._acceptFocusChangeOnMouseDown($target)) {
         event.preventDefault();
       }
+      // Remove keyboard-navigation class if user used mouse again
+      $target.closest('.keyboard-navigation').removeClass('keyboard-navigation');
       return true;
     });
   }

@@ -64,12 +64,16 @@
         }
       }
 
+      &::after {
+        border-radius: 0;
+      }
+
       &.selected {
         color: @outline-selection-color;
         background-color: @outline-selection-background-color;
 
         &::after {
-          display: none;
+          border-width: 0;
         }
 
         & > .tree-node-control {

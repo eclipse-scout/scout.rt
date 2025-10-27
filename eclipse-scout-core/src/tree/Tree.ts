@@ -229,7 +229,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     this._setDisplayStyle(this.displayStyle);
     this._setKeyStrokes(this.keyStrokes);
     this._setMenus(this.menus);
-    this._setFocusedNode(this.focusedNode || this.selectedNodes[0]);
+    this._setFocusedNode(this.focusedNode);
   }
 
   /**
@@ -548,7 +548,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
 
   protected _onFocus(event: JQuery.FocusEvent) {
     if (!this.focusedNode) {
-      this.setFocusedNode(this.visibleNodesFlat[0]);
+      this.setFocusedNode(this.selectedNodes[0] || this.visibleNodesFlat[0]);
     }
   }
 
@@ -1176,6 +1176,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
 
     this._updateNodePaddingsLeft();
     this._highlightPrevSelectedNode();
+    this._updateAriaActiveDescendant();
 
     if (this.scrollToSelection) {
       this.revealSelection();
@@ -2156,7 +2157,13 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
         }
       }
     }
-    this.setFocusedNode(selectedNode);
+
+    if (this.focusedNode && !nodes.includes(this.focusedNode)) {
+      // When using keystrokes, the focused node will be set to one of the selected nodes.
+      // If selectNodes() is called programmatically, setting the focused node to null prevents a confusing behavior the next time keystrokes are used.
+      this.setFocusedNode(null);
+    }
+
     this._updateItemPath(true);
     if (this.isBreadcrumbStyleActive()) {
       // In breadcrumb mode selected node has to be expanded
@@ -3562,7 +3569,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   }
 
   protected _renderNodesFocusable() {
-    this.get$Focusable().toggleClass('nodes-focusable', this.nodesFocusable);
+    this.$container.toggleClass('nodes-focusable', this.nodesFocusable);
     this._renderFocusedNode();
   }
 
@@ -3582,18 +3589,18 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
 
   protected _removeFocusedNode() {
     this.focusedNode?.$node?.removeClass('focused');
+    this._updateAriaActiveDescendant();
   }
 
   protected _renderFocusedNode() {
     this.focusedNode?.$node?.addClass('focused');
-    this.$container.toggleClass('no-nodes-focused', !this.nodesFocusable || !this.focusedNode);
-    this._updateActiveDescendant();
+    this._updateAriaActiveDescendant();
   }
 
-  protected _updateActiveDescendant() {
-    let node = this.focusedNode?.$node || this.selectedNode()?.$node;
-    if (node) {
-      aria.linkElementWithActiveDescendant(this.$data, node);
+  protected _updateAriaActiveDescendant() {
+    let $node = this.focusedNode?.$node || this.selectedNode()?.$node;
+    if ($node) {
+      aria.linkElementWithActiveDescendant(this.$data, $node);
     } else {
       aria.removeActiveDescendant(this.$data);
     }

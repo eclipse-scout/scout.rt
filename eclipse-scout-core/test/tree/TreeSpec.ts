@@ -3709,15 +3709,27 @@ describe('Tree', () => {
       expect(tree.$data).toHaveAttr('role', 'tree');
     });
 
-    it('has aria-activedescendant set set if node is focused', () => {
+    it('has aria-activedescendant set set if node is focused or selected', () => {
       tree.render();
-      expect(tree.$data.attr('aria-activedescendant')).toBeFalsy();
+      expect(tree.$data).not.toHaveAttr('aria-activedescendant');
 
-      tree.setFocusedNode(tree.nodes[1]);
-      expect(tree.$data.attr('aria-activedescendant')).toBe(tree.nodes[1].$node.attr('id'));
+      tree.setFocusedNode(tree.nodes[0].childNodes[1]);
+      expect(tree.$data).toHaveAttr('aria-activedescendant', tree.nodes[0].childNodes[1].$node.attr('id'));
+
+      tree.remove();
+      tree.render();
+      expect(tree.$data).toHaveAttr('aria-activedescendant', tree.nodes[0].childNodes[1].$node.attr('id'));
 
       tree.setFocusedNode(null);
-      expect(tree.$data.attr('aria-activedescendant')).toBeFalsy();
+      expect(tree.$data).not.toHaveAttr('aria-activedescendant');
+
+      tree.collapseAll();
+      tree.selectNode(tree.nodes[1]);
+      expect(tree.focusedNode).toBe(null);
+      expect(tree.$data).toHaveAttr('aria-activedescendant', tree.nodes[1].$node.attr('id'));
+
+      tree.setFocusedNode(tree.nodes[0].childNodes[1]);
+      expect(tree.$data).toHaveAttr('aria-activedescendant', tree.nodes[0].childNodes[1].$node.attr('id'));
     });
 
     it('has aria-multiselectable set to true if multiCheck enabled', () => {
@@ -3850,37 +3862,26 @@ describe('Tree', () => {
       tree.setNodesFocusable(true);
     });
 
-    it('only has an effect if nodesFocusable is set to true', () => {
-      tree = helper.createTree({...model, focusedNode: model.nodes[1].id});
-      expect(tree.focusedNode).toBe(tree.nodes[1]);
-
-      tree.render();
-      expect(tree.focusedNode.$node).not.toHaveClass('focused'); // focusedNode is set but won't be rendered
-
-      tree.setNodesFocusable(true);
-      expect(tree.focusedNode.$node).toHaveClass('focused');
-
-      tree.setNodesFocusable(false);
-      expect(tree.focusedNode.$node).not.toHaveClass('focused');
-    });
-
-    it('is set to the selected node initially', () => {
-      tree = helper.createTree({...model, selectedNodes: [model.nodes[1].id], nodesFocusable: true});
-      expect(tree.selectedNodes[0]).toBe(tree.nodes[1]);
-      expect(tree.focusedNode).toBe(tree.nodes[1]);
-
-      tree.render();
-      expect(tree.focusedNode.$node).toHaveClass('focused');
-    });
-
-    it('is set to the first visible node when tree is focused and no node focused yet', () => {
-      tree = helper.createTree({...model, nodesFocusable: true});
+    it('is set to the first selected or visible node when tree is focused and no node focused yet', () => {
+      tree = helper.createTree({...model});
       expect(tree.focusedNode).toBeUndefined();
 
+      let filter = node => node === tree.nodes[1];
       tree.render();
-      tree.addFilter(node => node === tree.nodes[1]);
+      tree.addFilter(filter);
       tree.focus();
       expect(tree.focusedNode).toBe(tree.visibleNodesFlat[0]);
+      expect(tree.focusedNode.$node).toHaveClass('focused');
+
+      tree.removeFilter(filter);
+      tree.selectNode(tree.nodes[1]);
+      tree.setFocusedNode(null);
+      expect(tree.focusedNode).toBe(null);
+
+      let $input = session.desktop.$container.appendElement('<input>');
+      $input[0].focus();
+      tree.focus();
+      expect(tree.focusedNode).toBe(tree.selectedNodes[0]);
       expect(tree.focusedNode.$node).toHaveClass('focused');
     });
 
@@ -3892,22 +3893,23 @@ describe('Tree', () => {
       expect(tree.focusedNode.$node).toHaveClass('focused');
     });
 
-    it('is updated when the selected node changes', () => {
+    it('is set to null when the selected node changes', () => {
       expect(tree.selectedNodes).toEqual([]);
       expect(tree.focusedNode).toBeUndefined();
 
+      tree.setFocusedNode(tree.nodes[0]);
       tree.selectNode(tree.nodes[1]);
       expect(tree.selectedNodes[0]).toBe(tree.nodes[1]);
-      expect(tree.focusedNode).toBe(tree.nodes[1]);
+      expect(tree.focusedNode).toBe(null);
 
       tree.render();
-      expect(tree.focusedNode.$node).toHaveClass('focused');
-
       tree.selectNode(tree.nodes[0]);
       expect(tree.selectedNodes[0]).toBe(tree.nodes[0]);
+      expect(tree.focusedNode).toBe(null);
+
+      tree.setFocusedNode(tree.nodes[0]);
       expect(tree.focusedNode).toBe(tree.nodes[0]);
       expect(tree.focusedNode.$node).toHaveClass('focused');
-      expect(tree.nodes[1]).not.toHaveClass('focused');
 
       tree.selectNode(null);
       expect(tree.selectedNodes).toEqual([]);
@@ -3916,6 +3918,7 @@ describe('Tree', () => {
 
     it('is updated when the already selected node is clicked', () => {
       tree.render();
+      tree.setFocusedNode(tree.nodes[1]);
       tree.selectNode(tree.nodes[1]);
       expect(tree.selectedNodes[0]).toBe(tree.nodes[1]);
       expect(tree.focusedNode).toBe(tree.nodes[1]);
@@ -4011,34 +4014,6 @@ describe('Tree', () => {
       expect(tree.focusedNode).toBe(tree.nodes[0]); // Still set because still visible
 
       tree.addFilter(node => node !== tree.nodes[0]);
-      expect(tree.focusedNode).toBe(null);
-    });
-
-    it('sets no-nodes-focused on tree if no nodes are focused', () => {
-      tree.render();
-      expect(tree.$container).toHaveClass('no-nodes-focused');
-
-      tree.setFocusedNode(tree.nodes[0]);
-      expect(tree.$container).not.toHaveClass('no-nodes-focused');
-      expect(tree.focusedNode.$node).toHaveClass('focused');
-
-      tree.setNodesFocusable(false);
-      expect(tree.$container).toHaveClass('no-nodes-focused');
-      expect(tree.focusedNode.$node).not.toHaveClass('focused');
-
-      tree.setNodesFocusable(true);
-      expect(tree.$container).not.toHaveClass('no-nodes-focused');
-      expect(tree.focusedNode.$node).toHaveClass('focused');
-
-      let hideAllNodesFilter = node => false;
-      tree.addFilter(hideAllNodesFilter);
-      expect(tree.$container).toHaveClass('no-nodes-focused');
-
-      tree.removeFilter(hideAllNodesFilter);
-      expect(tree.$container).toHaveClass('no-nodes-focused');
-
-      tree.deleteAllNodes();
-      expect(tree.$container).toHaveClass('no-nodes-focused');
       expect(tree.focusedNode).toBe(null);
     });
   });

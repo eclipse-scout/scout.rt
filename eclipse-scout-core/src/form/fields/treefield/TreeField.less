@@ -22,16 +22,22 @@
       border-radius: @control-alternative-border-radius;
     }
 
-    &.no-nodes-selected.no-nodes-focused {
-      &:has(.tree-data:is(:focus, .focused)) {
-        #scout.focus-border();
-      }
-    }
+    .tree-field-no-nodes-selected-focus();
+  }
+}
 
-    &.has-error {
-      border-color: @error-border-color;
-      --focus-border-color: @error-border-color;
-      --focus-box-shadow-color: @error-focus-box-shadow-color;
-    }
+// Mixin for focus border
+// The variables --tree-focus-* allow to change the color of the focus shadow and border of the tree only, not the one of the menu items or filter
+.tree-field-no-nodes-selected-focus {
+  &.no-nodes-selected:not(.nodes-focusable):has(.tree-data:is(:focus, .focused):not(.keyboard-navigation)) {
+    // If nodes are selected or node-focus is visible the focus is already visualized.
+    // Otherwise, show focus border on whole tree field when clicking or on programmatic focus and not on the node itself because it looks cleaner
+    #scout.focus-border(var(--tree-focus-box-shadow-size, @focus-box-shadow-size), var(--tree-focus-box-shadow-color, @focus-box-shadow-color), var(--tree-focus-border-color, @focus-border-color));
+  }
+
+  &.has-error {
+    border-color: @error-border-color;
+    --tree-focus-border-color: @error-border-color;
+    --tree-focus-box-shadow-color: @error-focus-box-shadow-color;
   }
 }

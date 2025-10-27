@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -94,6 +94,25 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[1]);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[2]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[3]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+    });
+
+    it('selects the next tile to the focused tile if tile focus is visible', () => {
+      let tileGrid = createTileGrid(4, {
+        selectable: true
+      });
+      let tiles = tileGrid.tiles;
+      tileGrid.render();
+      tileGrid.validateLayout();
+      tileGrid.setFocusedTile(tiles[1]);
+      tileGrid.get$Focusable().addClass('keyboard-navigation');
 
       JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
       expect(tileGrid.selectedTiles).toEqual([tiles[2]]);
@@ -223,6 +242,20 @@ describe('TileGridKeyStrokes', () => {
         JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT, 'shift');
       });
 
+      it('adds the focused tile and the next tile to the selection if tile focus is visible', () => {
+        let tileGrid = createTileGrid(4, {
+          selectable: true
+        });
+        let tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.validateLayout();
+        tileGrid.setFocusedTile(tiles[1]);
+        tileGrid.get$Focusable().addClass('keyboard-navigation');
+
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2]]);
+      });
+
       it('removes the next tile from the selection if the focused tile is the first tile of the selection', () => {
         let tileGrid = createTileGrid(4, {
           selectable: true
@@ -318,6 +351,25 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[2]);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+    });
+
+    it('selects the previous tile to the focused tile if tile focus is visible', () => {
+      let tileGrid = createTileGrid(4, {
+        selectable: true
+      });
+      let tiles = tileGrid.tiles;
+      tileGrid.render();
+      tileGrid.validateLayout();
+      tileGrid.setFocusedTile(tiles[2]);
+      tileGrid.get$Focusable().addClass('keyboard-navigation');
 
       JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
       expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
@@ -447,6 +499,20 @@ describe('TileGridKeyStrokes', () => {
         JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT, 'shift');
       });
 
+      it('adds the focused tile and the previous tile to the selection if tile focus is visible', () => {
+        let tileGrid = createTileGrid(4, {
+          selectable: true
+        });
+        let tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.validateLayout();
+        tileGrid.setFocusedTile(tiles[1]);
+        tileGrid.get$Focusable().addClass('keyboard-navigation');
+
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1]]);
+      });
+
       it('does nothing if the first tile is already selected', () => {
         let tileGrid = createTileGrid(4, {
           selectable: true
@@ -530,9 +596,7 @@ describe('TileGridKeyStrokes', () => {
         JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4]])).toBe(true);
       });
-
     });
-
   });
 
   describe('key down', () => {
@@ -545,6 +609,26 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[0]);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
+      expect(tileGrid.selectedTiles).toEqual([tiles[3]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
+      expect(tileGrid.selectedTiles).toEqual([tiles[6]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
+    });
+
+    it('selects the tile below the focused tile if tile focus is visible', () => {
+      let tileGrid = createTileGrid(8, {
+        selectable: true,
+        gridColumnCount: 3
+      });
+      let tiles = tileGrid.tiles;
+      tileGrid.render();
+      tileGrid.validateLayout();
+      tileGrid.setFocusedTile(tiles[0]);
+      tileGrid.get$Focusable().addClass('keyboard-navigation');
 
       JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
       expect(tileGrid.selectedTiles).toEqual([tiles[3]]);
@@ -652,7 +736,7 @@ describe('TileGridKeyStrokes', () => {
     });
 
     describe('with shift', () => {
-      it('adds the tiles between the focused and the newly focused tile to the selection', () => {
+      it('adds the tiles between the selected tile and the tile below to the selection', () => {
         let tileGrid = createTileGrid(9, {
           selectable: true,
           gridColumnCount: 3
@@ -664,6 +748,25 @@ describe('TileGridKeyStrokes', () => {
 
         JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4]]);
+
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
+      });
+
+      it('adds the tiles between the focused tile and the tile below to the selection if tile focus is visible', () => {
+        let tileGrid = createTileGrid(9, {
+          selectable: true,
+          gridColumnCount: 3
+        });
+        let tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.validateLayout();
+        tileGrid.setFocusedTile(tiles[1]);
+        tileGrid.get$Focusable().addClass('keyboard-navigation');
+
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4]]);
+        expect(tileGrid.focusedTile).toBe(tiles[4]);
 
         JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
@@ -745,8 +848,21 @@ describe('TileGridKeyStrokes', () => {
         JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
       });
-    });
 
+      it('adds the focused tile and the previous tile to the selection if tile focus is visible', () => {
+        let tileGrid = createTileGrid(4, {
+          selectable: true
+        });
+        let tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.validateLayout();
+        tileGrid.setFocusedTile(tiles[1]);
+        tileGrid.get$Focusable().addClass('keyboard-navigation');
+
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1]]);
+      });
+    });
   });
 
   describe('key up', () => {
@@ -759,6 +875,26 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(arrays.last(tiles));
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.UP);
+      expect(tileGrid.selectedTiles).toEqual([tiles[4]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.UP);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.UP);
+      expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.UP);
+    });
+
+    it('selects the tile above the focused tile if tile focus is visible', () => {
+      let tileGrid = createTileGrid(8, {
+        selectable: true,
+        gridColumnCount: 3
+      });
+      let tiles = tileGrid.tiles;
+      tileGrid.render();
+      tileGrid.validateLayout();
+      tileGrid.setFocusedTile(arrays.last(tiles));
+      tileGrid.get$Focusable().addClass('keyboard-navigation');
 
       JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.UP);
       expect(tileGrid.selectedTiles).toEqual([tiles[4]]);
@@ -851,7 +987,7 @@ describe('TileGridKeyStrokes', () => {
     });
 
     describe('with shift', () => {
-      it('adds the tiles between the focused and the newly focused tile to the selection', () => {
+      it('adds the tiles between the selected tile and the tile above the selection', () => {
         let tileGrid = createTileGrid(9, {
           selectable: true,
           gridColumnCount: 3
@@ -860,6 +996,24 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTile(tiles[7]);
+
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[4], tiles[5], tiles[6], tiles[7]]);
+
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
+      });
+
+      it('adds the tiles between the focused tile and the tile on top to the selection if tile focus is visible', () => {
+        let tileGrid = createTileGrid(9, {
+          selectable: true,
+          gridColumnCount: 3
+        });
+        let tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.validateLayout();
+        tileGrid.setFocusedTile(tiles[7]);
+        tileGrid.get$Focusable().addClass('keyboard-navigation');
 
         JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[4], tiles[5], tiles[6], tiles[7]]);
@@ -1124,7 +1278,5 @@ describe('TileGridKeyStrokes', () => {
         expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]]);
       });
     });
-
   });
-
 });

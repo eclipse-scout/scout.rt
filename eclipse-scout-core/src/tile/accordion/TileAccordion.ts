@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -571,7 +571,15 @@ export class TileAccordion<TTile extends Tile = Tile> extends Accordion implemen
     });
   }
 
+  /**
+   * @returns the focused tile of the group whose body has the focus. If no group body has the focus, the first focusedTile is returned.
+   */
   getFocusedTile(): TTile {
+    let focusedGroup = this.groups.find(group => group.body.isFocused());
+    if (focusedGroup) {
+      return focusedGroup.body.focusedTile;
+    }
+
     let focusedTile = null;
     this.groups.some(group => {
       if (group.body.focusedTile) {
