@@ -93,6 +93,13 @@ function _ceilNumber(val) {
   return objects.isNumber(val) ? Math.ceil(val) : val;
 }
 
+/**
+ * @returns -2 if the given element is scrollable unless the device supports only touch, see also comment in {@link scrollbars._installNativeInternal}
+ */
+function tabindexIfNotTabbable($elem) {
+  return $elem.data('scrollable') && !Device.get().supportsOnlyTouch() ? '-2' : null;
+}
+
 // === $ extensions ===
 
 /* !
@@ -710,7 +717,7 @@ $.fn._updateTabIndexForReadOnly = function() {
   }
   const readonly = this.attr('readonly');
   // Otherwise make it focusable but not tabbable, because readonly elements are tabbable by default, but we don't want them to be
-  return this.attr('tabindex', readonly ? -1 : null);
+  return this.attr('tabindex', readonly ? '-1' : tabindexIfNotTabbable(this));
 };
 
 $.fn.isEnabled = function() {
@@ -759,7 +766,7 @@ $.fn.isVisibilityHidden = function() {
 };
 
 $.fn.setTabbable = function(tabbable) {
-  this.attr('tabindex', tabbable ? 0 : null);
+  this.attr('tabindex', tabbable ? '0' : tabindexIfNotTabbable(this));
   // Re-evaluate tabindex considering readonly state
   this._updateTabIndexForReadOnly();
   return this;
@@ -770,7 +777,7 @@ $.fn.isTabbable = function() {
 };
 
 $.fn.setTabbableOrFocusable = function(tabbable) {
-  return this.attr('tabindex', tabbable ? 0 : -1);
+  return this.attr('tabindex', tabbable ? '0' : '-1');
 };
 
 $.fn.placeholder = function(placeholder) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -249,7 +249,9 @@ export const scrollbars = {
     // Under certain circumstances, browsers automatically make scroll containers focusable, e.g. https://developer.chrome.com/blog/keyboard-focusable-scrollers.
     // Because this interferes with Scout's focus management, we explicitly add a negative tabindex to disable this behavior.
     // The value '-2' (instead of '-1') means that the element is ignored by  the ':focusable' selector, see jquery-scout-selectors.js.
-    if ($container.attr('tabindex') === undefined) {
+    // But: '-2' should not be set on touch-only devices (e.g. smartphones) because FocusManager.restrictedFocusGain is disabled, so it would gain focus on click.
+    // Luckily, because tabbing is not possible on smartphones except for input fields, the special '-2' behavior is not required.
+    if ($container.attr('tabindex') === undefined && !Device.get().supportsOnlyTouch()) {
       $container.attr('tabindex', '-2');
     }
   },
