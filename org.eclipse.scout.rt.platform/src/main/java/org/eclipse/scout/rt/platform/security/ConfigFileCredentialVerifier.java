@@ -122,11 +122,11 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
     }
 
     final IPassword password = m_credentials.get(normalizeUsername(username));
-    if (password == null || !password.isEqual(passwordPlainText)) {
-      return AUTH_FORBIDDEN;
+    if (password != null && password.isEqual(passwordPlainText)) {
+      return AUTH_OK;
     }
 
-    return AUTH_OK;
+    return AUTH_FORBIDDEN;
   }
 
   protected String normalizeUsername(final String username) {
