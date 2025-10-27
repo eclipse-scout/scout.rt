@@ -9,6 +9,7 @@
  */
 
 import $ from 'jquery';
+import {scrollbars} from '../../src/index';
 
 describe('jquery-scout', () => {
 
@@ -178,6 +179,33 @@ describe('jquery-scout', () => {
 
       $e.setTabbable(false);
       expect($e.attr('tabindex')).toBeUndefined();
+    });
+  });
+
+  describe('setTabbable', () => {
+
+    it('sets tabindex to 0 if tabbable', () => {
+      expect($e.attr('tabindex')).not.toHaveAttr('tabindex');
+
+      $e.setTabbable(true);
+      expect($e.attr('tabindex')).toBe('0');
+
+      $e.setTabbable(false);
+      expect($e.attr('tabindex')).not.toHaveAttr('tabindex');
+    });
+
+    it('sets tabindex to -2 if not tabbable but scrollable', () => {
+      let session = sandboxSession();
+      scrollbars.install($e, {parent: session.desktop, hybridScrollbars: true});
+      expect($e.attr('tabindex')).toBe('-2');
+
+      $e.setTabbable(true);
+      expect($e.attr('tabindex')).toBe('0');
+
+      $e.setTabbable(false);
+      expect($e.attr('tabindex')).toBe('-2');
+
+      scrollbars.uninstall($e, session);
     });
   });
 
