@@ -72,7 +72,7 @@ public class SequenceValidationHelperTest {
     from.setValue(3L);
     m_helper.checkFromTo(from, to);
     assertEquals(InvalidSequenceStatus.ERROR, from.getErrorStatus().getSeverity());
-    assertEquals("'from-label' must be greater than or equal to 'to-label'", from.getErrorStatus().getMessage());
+    assertEquals("'to-label' must be greater than or equal to 'from-label'", from.getErrorStatus().getMessage());
     assertNull(to.getErrorStatus());
 
     // start null -> no error
