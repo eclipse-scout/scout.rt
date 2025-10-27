@@ -345,7 +345,7 @@ describe('TreeKeyStrokes', () => {
 
   describe('space', () => {
 
-    it('does nothing if no nodes are selected', () => {
+    it('does nothing if no nodes are selected or focused', () => {
       let model = helper.createModelFixture(3, 1, false);
       model.checkable = true;
       let tree = helper.createTree(model);
@@ -365,7 +365,38 @@ describe('TreeKeyStrokes', () => {
       });
     });
 
-    it('checks the selected node ', () => {
+    it('selects the focused node', () => {
+      let model = helper.createModelFixture(3, 1, false);
+      let tree = helper.createTree(model);
+
+      let node0 = tree.nodes[0];
+      tree.render();
+      tree.focus();
+      expect(tree.focusedNode).toBe(node0);
+      expect(tree.selectedNode()).toBeFalsy();
+
+      JQueryTesting.triggerKeyDown(tree.$data, keys.SPACE);
+      expect(tree.selectedNode()).toBe(node0);
+    });
+
+    it('selects and checks the focused node', () => {
+      let model = helper.createModelFixture(3, 1, false);
+      model.checkable = true;
+      let tree = helper.createTree(model);
+
+      let node0 = tree.nodes[0];
+      tree.render();
+      tree.focus();
+      expect(tree.focusedNode).toBe(node0);
+      expect(tree.selectedNode()).toBeFalsy();
+      expect(tree.checkedNodes.length).toBe(0);
+
+      JQueryTesting.triggerKeyDown(tree.$data, keys.SPACE);
+      expect(tree.selectedNode()).toBe(node0);
+      expect(tree.checkedNodes).toEqual([node0]);
+    });
+
+    it('checks the selected node', () => {
       let model = helper.createModelFixture(3, 1, false);
       model.checkable = true;
       let tree = helper.createTree(model);
@@ -386,7 +417,7 @@ describe('TreeKeyStrokes', () => {
       });
     });
 
-    it('unchecks the selected node ', () => {
+    it('unchecks the selected node', () => {
       let model = helper.createModelFixture(3, 1, false);
       model.checkable = true;
       let tree = helper.createTree(model);
@@ -403,7 +434,5 @@ describe('TreeKeyStrokes', () => {
         expect(node.checked).toBeFalsy();
       });
     });
-
   });
-
 });

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -49,7 +49,6 @@ export abstract class AbstractTableNavigationKeyStroke extends KeyStroke {
       return false;
     }
 
-    this.field.$container.addClass('keyboard-navigation');
     return true;
   }
 
@@ -198,6 +197,18 @@ export abstract class AbstractTableNavigationKeyStroke extends KeyStroke {
 
   protected override _isEnabled(): boolean {
     return !this.field.tileMode && super._isEnabled();
+  }
+
+  protected _getFocusedRow() {
+    let focusedRow = this.field.focusedRow;
+    if (focusedRow
+      && this.field.selectedRows.length === 0
+      && !this.field.get$Focusable().hasClass('keyboard-navigation')) {
+      // Row focus is only visible when using keyboard
+      // -> Ignore focused row if row focus is not visible so the user does not select a random row in the middle when pressing up or down
+      return null;
+    }
+    return focusedRow;
   }
 }
 

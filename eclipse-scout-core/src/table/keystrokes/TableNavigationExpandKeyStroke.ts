@@ -44,7 +44,7 @@ export class TableNavigationExpandKeyStroke extends AbstractTableNavigationKeySt
         // select first child
         let visibleChildRows = table.visibleChildRows(selectedRow);
         table.selectRow(visibleChildRows[0]);
-        table.selectionHandler.lastActionRow = visibleChildRows[0];
+        table.setFocusedRow(visibleChildRows[0]);
       } else {
         table.expandRow(selectedRow);
       }

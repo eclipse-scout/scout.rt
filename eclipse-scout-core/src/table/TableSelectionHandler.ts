@@ -19,7 +19,6 @@ import {scout, Table, TableRow} from '../index';
 export class TableSelectionHandler {
   table: Table;
   mouseMoveSelectionEnabled: boolean;
-  lastActionRow: TableRow;
   mouseOverHandler: (event: JQuery.MouseOverEvent) => void;
   select: boolean;
   counterDebug: number;
@@ -37,7 +36,6 @@ export class TableSelectionHandler {
     this.table = table;
     this.mouseMoveSelectionEnabled = true;
     this._mouseDown = false;
-    this.lastActionRow = null;
     this.mouseOverHandler = null;
     this.select = true;
     this.counterDebug = 0;
@@ -45,10 +43,6 @@ export class TableSelectionHandler {
     this.toIndex = -1;
     this._prevSelectedRowIndex = -1;
     this._maxSelectedRowIndex = -1;
-  }
-
-  clearLastSelectedRowMarker() {
-    this.lastActionRow = null;
   }
 
   // TODO [7.0] bsh: Table Selection | Try to merge this with TableKeystrokeContext
@@ -60,6 +54,7 @@ export class TableSelectionHandler {
 
     this._mouseDown = true;
     this.select = true;
+    let focusedRow = this.table.focusedRow;
     if (this.table.multiSelect && event.shiftKey) {
       // when a selected row in the middle of a selection-block has
       // been clicked while shift is pressed -> do nothing
@@ -68,9 +63,9 @@ export class TableSelectionHandler {
       }
       if (this.table.selectedRows.length === 0) {
         // Shift-click was pressed without selection -> behave like normal click
-        this.lastActionRow = row;
+        focusedRow = row;
       }
-      if (!this.lastActionRow) {
+      if (!focusedRow) {
         // The last action row may have been cleared, e.g. when rows have been replaced. In that case, simply assume
         // the first or the last of the currently selected rows as being the last action row to make shift-click
         // behave as expected (depending on which row is nearer from the clicked row).
@@ -78,14 +73,14 @@ export class TableSelectionHandler {
         let firstSelectedRow = this.table.selectedRows[0];
         let lastSelectedRow = this.table.selectedRows[this.table.selectedRows.length - 1];
         if (thisRowIndex <= (rows.indexOf(firstSelectedRow) + rows.indexOf(lastSelectedRow)) / 2) {
-          this.lastActionRow = firstSelectedRow;
+          focusedRow = firstSelectedRow;
         } else {
-          this.lastActionRow = lastSelectedRow;
+          focusedRow = lastSelectedRow;
         }
         this._maxSelectedRowIndex = rows.indexOf(lastSelectedRow);
-        this._prevSelectedRowIndex = rows.indexOf(this.lastActionRow);
+        this._prevSelectedRowIndex = rows.indexOf(focusedRow);
       }
-      this.fromIndex = rows.indexOf(this.lastActionRow);
+      this.fromIndex = rows.indexOf(focusedRow);
     } else if (event.ctrlKey) {
       this.select = !oldSelectedState;
     } else {
@@ -115,7 +110,8 @@ export class TableSelectionHandler {
     }
 
     $row.window().one('mouseup.selectionHandler', this.onMouseUp.bind(this));
-    this.lastActionRow = row;
+    focusedRow = row;
+    this.table.setFocusedRow(focusedRow);
   }
 
   onMouseOver(event: JQuery.MouseOverEvent) {
@@ -125,7 +121,7 @@ export class TableSelectionHandler {
 
     this.toIndex = rows.indexOf(row);
     this.handleSelection(event);
-    this.lastActionRow = row;
+    this.table.setFocusedRow(row);
   }
 
   handleSelection(event: JQuery.MouseEventBase) {

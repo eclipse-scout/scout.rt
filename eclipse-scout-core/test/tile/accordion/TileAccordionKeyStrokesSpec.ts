@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1424,7 +1424,46 @@ describe('TileAccordionKeyStrokes', () => {
         expect(accordion.getSelectedTiles()).toEqual([tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]]);
       });
     });
-
   });
 
+  describe('space', () => {
+    it('selects the focused tile', () => {
+      let accordion = createAccordion(2, {
+        selectable: true,
+        gridColumnCount: 3
+      });
+      let tiles0 = createTiles(3);
+      let tiles1 = createTiles(6);
+      accordion.groups[0].body.insertTiles(tiles0);
+      accordion.groups[1].body.insertTiles(tiles1);
+      let tiles = accordion.getTiles();
+      accordion.render();
+      accordion.validateLayout();
+      accordion.groups[0].$header[0].focus();
+      expect(accordion.groups[0].$header).toBeFocused();
+
+      session.focusManager.focusNextTabbable(session.$entryPoint.activeElement());
+      expect(accordion.groups[0].body.isFocused()).toBe(true);
+      expect(accordion.groups[0].body.$container).toHaveClass('keyboard-navigation');
+      expect(accordion.groups[0].body.focusedTile).toBe(tiles[0]);
+      expect(accordion.getFocusedTile()).toBe(tiles[0]);
+
+      JQueryTesting.triggerKeyDownCapture(accordion.groups[0].body.$container, keys.SPACE);
+      expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
+      JQueryTesting.triggerKeyUpCapture(accordion.groups[0].body.$container, keys.SPACE);
+
+      session.focusManager.focusNextTabbable(session.$entryPoint.activeElement());
+      expect(accordion.groups[1].$header).toBeFocused();
+
+      session.focusManager.focusNextTabbable(session.$entryPoint.activeElement());
+      expect(accordion.groups[1].body.isFocused()).toBe(true);
+      expect(accordion.groups[1].body.$container).toHaveClass('keyboard-navigation');
+      expect(accordion.groups[1].body.focusedTile).toBe(tiles[3]);
+      expect(accordion.getFocusedTile()).toBe(tiles[3]);
+
+      JQueryTesting.triggerKeyDownCapture(accordion.groups[1].body.$container, keys.SPACE);
+      expect(accordion.getSelectedTiles()).toEqual([tiles[3]]);
+      JQueryTesting.triggerKeyUpCapture(accordion.groups[1].body.$container, keys.SPACE);
+    });
+  });
 });

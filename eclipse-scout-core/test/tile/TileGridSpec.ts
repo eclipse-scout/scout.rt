@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, GridData, Group, InitModelOf, ListBoxAriaRules, PlaceholderTile, Range, RemoteTileFilter, scout, Tile, TileGrid, TileGridModel, TileModel, VoidGridAriaRules} from '../../src/index';
+import {arrays, GridData, Group, InitModelOf, ListBoxAriaRules, PlaceholderTile, Range, RemoteTileFilter, scout, Tile, TileGrid, TileGridModel, TileModel} from '../../src/index';
 import {JQueryTesting} from '../../src/testing/index';
 
 describe('TileGrid', () => {
@@ -88,6 +88,12 @@ describe('TileGrid', () => {
       expect(tileGrid.tiles[0].selected).toBe(false);
       expect(tileGrid.tiles[1].selected).toBe(false);
       expect(tileGrid.tiles[2].selected).toBe(false);
+
+      tileGrid.selectTiles([tileGrid.tiles[0], tileGrid.tiles[1], tileGrid.tiles[2]]);
+      expect(tileGrid.selectedTiles.length).toBe(3);
+
+      tileGrid.selectTile(null);
+      expect(tileGrid.selectedTiles.length).toBe(0);
     });
 
     it('does not select if selectable is false', () => {
@@ -182,6 +188,10 @@ describe('TileGrid', () => {
       expect(tileGrid.tiles[0].selected).toBe(false);
       expect(tileGrid.tiles[1].selected).toBe(false);
       expect(tileGrid.tiles[2].selected).toBe(false);
+
+      tileGrid.selectAllTiles();
+      tileGrid.deselectTile(null);
+      expect(tileGrid.selectedTiles.length).toBe(3);
     });
 
     it('triggers a property change event', () => {
@@ -827,11 +837,8 @@ describe('TileGrid', () => {
           expect(tile0.selected).toBe(false);
           expect(tileGrid.focusedTile).toBe(null);
         });
-
       });
-
     });
-
   });
 
   describe('click', () => {
@@ -864,10 +871,8 @@ describe('TileGrid', () => {
       let clickEventCount = 0;
       let selectEventCount = 0;
       let events = [];
-      tileGrid.on('propertyChange', event => {
-        if (event.propertyName === 'selectedTiles') {
-          selectEventCount++;
-        }
+      tileGrid.on('propertyChange:selectedTiles', event => {
+        selectEventCount++;
         events.push('select');
       });
       tileGrid.on('tileClick', event => {
@@ -899,10 +904,8 @@ describe('TileGrid', () => {
       let clickEventCount = 0;
       let actionEventCount = 0;
       let events = [];
-      tileGrid.on('propertyChange', event => {
-        if (event.propertyName === 'selectedTiles') {
-          selectEventCount++;
-        }
+      tileGrid.on('propertyChange:selectedTiles', event => {
+        selectEventCount++;
         events.push('select');
       });
       tileGrid.on('tileClick', event => {
@@ -1444,15 +1447,29 @@ describe('TileGrid', () => {
 
   describe('aria properties', () => {
 
-    it('has aria-activedescendant set if a tile receives focus', () => {
+    it('has aria-activedescendant set if a tile is focused or selected', () => {
       let tileGrid = createTileGrid(3, {
         selectable: true
       });
       tileGrid.render();
-      expect(tileGrid.$container.attr('aria-activedescendant')).toBeFalsy();
-      let tile0 = tileGrid.tiles[0];
-      tileGrid.setFocusedTile(tile0);
-      expect(tileGrid.$container.attr('aria-activedescendant')).toBe(tile0.$container.attr('id'));
+      expect(tileGrid.$container).not.toHaveAttr('aria-activedescendant');
+
+      tileGrid.setFocusedTile(tileGrid.tiles[1]);
+      expect(tileGrid.$container).toHaveAttr('aria-activedescendant', tileGrid.tiles[1].$container.attr('id'));
+
+      tileGrid.remove();
+      tileGrid.render();
+      expect(tileGrid.$container).toHaveAttr('aria-activedescendant', tileGrid.tiles[1].$container.attr('id'));
+
+      tileGrid.setFocusedTile(null);
+      expect(tileGrid.$container).not.toHaveAttr('aria-activedescendant');
+
+      tileGrid.selectTile(tileGrid.tiles[2]);
+      expect(tileGrid.focusedTile).toBe(null);
+      expect(tileGrid.$container).toHaveAttr('aria-activedescendant', tileGrid.tiles[2].$container.attr('id'));
+
+      tileGrid.setFocusedTile(tileGrid.tiles[1]);
+      expect(tileGrid.$container).toHaveAttr('aria-activedescendant', tileGrid.tiles[1].$container.attr('id'));
     });
 
     describe('ListBoxAriaRules', () => {
@@ -1513,6 +1530,7 @@ describe('TileGrid', () => {
         tileGrid.setSelectable(false);
         tileGrid.render();
         tileGrid.setFocusedTile(tileGrid.tiles[1]);
+        expect(tileGrid.$container).not.toHaveAttr('aria-activedescendant');
         expect(tileGrid.$container).not.toHaveAttr('role');
         tileGrid.tiles.forEach(tile => {
           expect(tile.$container).not.toHaveAttr('role');
@@ -1521,6 +1539,9 @@ describe('TileGrid', () => {
         });
 
         tileGrid.setSelectable(true);
+        expect(tileGrid.$container).not.toHaveAttr('aria-activedescendant');
+        tileGrid.setFocusedTile(tileGrid.tiles[1]);
+        expect(tileGrid.$container).toHaveAttr('aria-activedescendant', tileGrid.tiles[1].$container.attr('id'));
         expect(tileGrid.$container).toHaveAttr('role', 'listbox');
         tileGrid.tiles.forEach(tile => {
           expect(tile.$container).toHaveAttr('role', 'option');
@@ -1529,6 +1550,7 @@ describe('TileGrid', () => {
         });
 
         tileGrid.setSelectable(false);
+        expect(tileGrid.$container).not.toHaveAttr('aria-activedescendant');
         expect(tileGrid.$container).not.toHaveAttr('role');
         tileGrid.tiles.forEach(tile => {
           expect(tile.$container).not.toHaveAttr('role');
@@ -1539,6 +1561,9 @@ describe('TileGrid', () => {
         tileGrid.setVirtual(true);
         tileGrid.setViewRangeSize(2);
         tileGrid.setSelectable(true);
+        expect(tileGrid.$container).not.toHaveAttr('aria-activedescendant');
+        tileGrid.setFocusedTile(tileGrid.tiles[1]);
+        expect(tileGrid.$container).toHaveAttr('aria-activedescendant', tileGrid.tiles[1].$container.attr('id'));
         expect(tileGrid.$container).toHaveAttr('role', 'listbox');
         tileGrid.renderedTiles().forEach(tile => {
           expect(tile.$container).toHaveAttr('role', 'option');
@@ -1582,6 +1607,90 @@ describe('TileGrid', () => {
       // Verify that it works without using hints
       tile._setGridData(new GridData(tile.gridData));
       expect(triggered).toBe(false);
+    });
+  });
+
+  describe('focusedTile', () => {
+    it('is set to the first selected or visible tile when tileGrid is focused and no tile focused yet', () => {
+      let tileGrid = createTileGrid(3, {selectable: true});
+      expect(tileGrid.focusedTile).toBe(null);
+
+      tileGrid.render();
+      tileGrid.addFilter(tile => tile === tileGrid.tiles[1]);
+      tileGrid.focus();
+      expect(tileGrid.focusedTile).toBe(tileGrid.filteredTiles[0]);
+      expect(tileGrid.focusedTile.$container).toHaveClass('focused');
+
+      tileGrid.removeFilter(tileGrid.filters[0]);
+      tileGrid.selectTile(tileGrid.tiles[1]);
+      tileGrid.setFocusedTile(null);
+      expect(tileGrid.focusedTile).toBe(null);
+
+      let $input = session.desktop.$container.appendElement('<input>');
+      $input[0].focus();
+      tileGrid.focus();
+      expect(tileGrid.focusedTile).toBe(tileGrid.selectedTiles[0]);
+      expect(tileGrid.focusedTile.$container).toHaveClass('focused');
+    });
+
+    it('can be initially set', () => {
+      let tiles = [createTile(), createTile()];
+      let tileGrid = scout.create(TileGrid, {parent: session.desktop, selectable: true, tiles, focusedTile: tiles[1].id});
+      expect(tileGrid.focusedTile).toBe(tileGrid.tiles[1]);
+
+      tileGrid.render();
+      expect(tileGrid.focusedTile.$container).toHaveClass('focused');
+    });
+
+    it('is updated when setFocusedRow is called', () => {
+      let tileGrid = createTileGrid(3, {selectable: true});
+      tileGrid.setFocusedTile(tileGrid.tiles[1]);
+      expect(tileGrid.focusedTile).toBe(tileGrid.tiles[1]);
+      expect(tileGrid.selectedTiles).toEqual([]);
+
+      tileGrid.render();
+      expect(tileGrid.focusedTile.$container).toHaveClass('focused');
+
+      tileGrid.setFocusedTile(tileGrid.tiles[0]);
+      expect(tileGrid.focusedTile).toBe(tileGrid.tiles[0]);
+      expect(tileGrid.focusedTile.$container).toHaveClass('focused');
+      expect(tileGrid.tiles[1]).not.toHaveClass('focused');
+
+      tileGrid.setFocusedTile(null);
+      expect(tileGrid.focusedTile).toBe(null);
+    });
+
+    it('is rendered when tile is rendered', () => {
+      let tileGrid = createTileGrid(20, {selectable: true});
+      tileGrid.setGridColumnCount(2);
+      tileGrid.setViewRangeSize(2);
+      tileGrid.setVirtual(true);
+      tileGrid.render();
+      tileGrid.validateLogicalGrid();
+      tileGrid.setFocusedTile(tileGrid.tiles[10]);
+
+      tileGrid.scrollTo(arrays.last(tileGrid.tiles));
+      expect(tileGrid.focusedTile.$container).toBe(null);
+
+      tileGrid.scrollTo(tileGrid.focusedTile);
+      expect(tileGrid.focusedTile.$container).toHaveClass('focused');
+    });
+
+    it('is set to null if grid is not selectable', () => {
+      let tiles = [createTile(), createTile()];
+      let tileGrid = scout.create(TileGrid, {parent: session.desktop, selectable: false, tiles, focusedTile: tiles[1].id});
+      expect(tileGrid.selectable).toBe(false);
+      expect(tileGrid.focusedTile).toBe(null);
+
+      tileGrid.setFocusedTile(tileGrid.tiles[1]);
+      expect(tileGrid.focusedTile).toBe(null);
+
+      tileGrid.setSelectable(true);
+      tileGrid.setFocusedTile(tileGrid.tiles[1]);
+      expect(tileGrid.focusedTile).toBe(tileGrid.tiles[1]);
+
+      tileGrid.setSelectable(false);
+      expect(tileGrid.focusedTile).toBe(null);
     });
   });
 });

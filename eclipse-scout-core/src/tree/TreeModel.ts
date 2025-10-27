@@ -96,7 +96,7 @@ export interface TreeModel extends WidgetModel {
    * Default is false.
    */
   scrollToSelection?: boolean;
-  selectedNodes?: string[] | TreeNode[];
+  selectedNodes?: TreeNode[] | string[];
   /**
    * Defines the node that has the focus when the tree is focused.
    *
@@ -104,7 +104,7 @@ export interface TreeModel extends WidgetModel {
    *
    * This property only has an effect if {@link nodesFocusable} is set to true.
    */
-  focusedNode?: string | TreeNode;
+  focusedNode?: TreeNode | string;
   /**
    * Defines whether the nodes should show a focus indicator when the tree is focused.
    *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -77,7 +77,7 @@ describe('TableKeyStrokes', () => {
       helper.assertSelection(table, [table.rows[0]]);
 
       table.deselectAll();
-      table.selectionHandler.lastActionRow = table.rows[0];
+      table.setFocusedRow(table.rows[0]);
 
       JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [table.rows[0]]);
@@ -95,7 +95,7 @@ describe('TableKeyStrokes', () => {
       helper.assertSelection(table, [rows[0], rows[1]]);
     });
 
-    it('if first row already is selected but is not the last action row, the row above the last action row gets selected', () => {
+    it('if first row already is selected but is not the focused row, the row above the focused row gets selected', () => {
       let model = helper.createModelFixture(2, 5);
       let table = helper.createTable(model);
       let rows = table.rows;
@@ -103,13 +103,13 @@ describe('TableKeyStrokes', () => {
       table.render();
       helper.selectRowsAndAssert(table, [rows[0], rows[1], rows[2]]);
 
-      table.selectionHandler.lastActionRow = rows[2];
+      table.setFocusedRow(rows[2]);
 
       JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [rows[1]]);
     });
 
-    it('if there is a last action row, selects the row above last last action row', () => {
+    it('if there is a focused row, selects the row above last focused row', () => {
       let model = helper.createModelFixture(2, 5);
       let table = helper.createTable(model);
 
@@ -117,13 +117,13 @@ describe('TableKeyStrokes', () => {
       table.render();
       helper.selectRowsAndAssert(table, [rows[2], rows[4]]);
 
-      table.selectionHandler.lastActionRow = rows[4];
+      table.setFocusedRow(rows[4]);
 
       JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [rows[3]]);
     });
 
-    it('selects the row above the last action row even if the row above already is selected', () => {
+    it('selects the row above the focused row even if the row above already is selected', () => {
       let model = helper.createModelFixture(2, 5);
       let table = helper.createTable(model);
 
@@ -131,19 +131,19 @@ describe('TableKeyStrokes', () => {
       table.render();
       helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[4]]);
 
-      table.selectionHandler.lastActionRow = rows[4];
+      table.setFocusedRow(rows[4]);
 
       JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [rows[3]]);
     });
 
-    it('uses last row of selection as last action row if last action row is not visible anymore', () => {
+    it('uses last row of selection as focused row if focused row is not visible anymore', () => {
       let model = helper.createModelFixture(2, 6);
       let table = helper.createTable(model);
       let rows = table.rows;
       table.render();
       helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
-      table.selectionHandler.lastActionRow = rows[4];
+      table.setFocusedRow(rows[4]);
 
       table.addFilter({
         // @ts-expect-error
@@ -172,15 +172,14 @@ describe('TableKeyStrokes', () => {
         helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
       });
 
-      it('removes the row above from the selection if the last action row is the last row of the selection', () => {
+      it('removes the row above from the selection if the focused row is the last row of the selection', () => {
         let model = helper.createModelFixture(2, 6);
         let table = helper.createTable(model);
 
         let rows = table.rows;
         table.render();
         helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[4]]);
-
-        table.selectionHandler.lastActionRow = rows[4];
+        table.setFocusedRow(rows[4]);
 
         JQueryTesting.triggerKeyDown(table.$data, keys.UP, 'shift');
         helper.assertSelection(table, [rows[2], rows[3]]);
@@ -190,15 +189,14 @@ describe('TableKeyStrokes', () => {
         helper.assertSelection(table, [rows[1], rows[2]]);
       });
 
-      it('if the row above the last action row is not selected, adds the row above to the selection', () => {
+      it('if the row above the focused row is not selected, adds the row above to the selection', () => {
         let model = helper.createModelFixture(2, 6);
         let table = helper.createTable(model);
 
         let rows = table.rows;
         table.render();
         helper.selectRowsAndAssert(table, [rows[2], rows[5]]);
-
-        table.selectionHandler.lastActionRow = rows[5];
+        table.setFocusedRow(rows[5]);
 
         JQueryTesting.triggerKeyDown(table.$data, keys.UP, 'shift');
         helper.assertSelection(table, [rows[2], rows[4], rows[5]]);
@@ -260,7 +258,7 @@ describe('TableKeyStrokes', () => {
       helper.assertSelection(table, [table.rows[0]]);
 
       table.deselectAll();
-      table.selectionHandler.lastActionRow = table.rows[0];
+      table.setFocusedRow(table.rows[0]);
 
       JQueryTesting.triggerKeyDown(table.$data, keys.DOWN);
       helper.assertSelection(table, [table.rows[0]]);
@@ -278,41 +276,39 @@ describe('TableKeyStrokes', () => {
       helper.assertSelection(table, [rows[3], rows[4]]);
     });
 
-    it('if there is a last action row, selects the row below the last action row', () => {
+    it('if there is a focused row, selects the row below the focused row', () => {
       let model = helper.createModelFixture(2, 5);
       let table = helper.createTable(model);
 
       let rows = table.rows;
       table.render();
       helper.selectRowsAndAssert(table, [rows[2], rows[4]]);
-
-      table.selectionHandler.lastActionRow = rows[2];
+      table.setFocusedRow(rows[2]);
 
       JQueryTesting.triggerKeyDown(table.$data, keys.DOWN);
       helper.assertSelection(table, [rows[3]]);
     });
 
-    it('selects the row below the last action row even if the row below already is selected', () => {
+    it('selects the row below the focused row even if the row below already is selected', () => {
       let model = helper.createModelFixture(2, 5);
       let table = helper.createTable(model);
 
       let rows = table.rows;
       table.render();
       helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[4]]);
-
-      table.selectionHandler.lastActionRow = rows[2];
+      table.setFocusedRow(rows[2]);
 
       JQueryTesting.triggerKeyDown(table.$data, keys.DOWN);
       helper.assertSelection(table, [rows[3]]);
     });
 
-    it('uses last row of selection as last action row if last action row is not visible anymore', () => {
+    it('uses last row of selection as focused row if focused row is not visible anymore', () => {
       let model = helper.createModelFixture(2, 6);
       let table = helper.createTable(model);
       let rows = table.rows;
       table.render();
       helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
-      table.selectionHandler.lastActionRow = rows[1];
+      table.setFocusedRow(rows[1]);
 
       table.addFilter({
         // @ts-expect-error
@@ -341,15 +337,14 @@ describe('TableKeyStrokes', () => {
         helper.assertSelection(table, [rows[2], rows[3], rows[4]]);
       });
 
-      it('removes the row below from the selection if the last action row is the first row of the selection', () => {
+      it('removes the row below from the selection if the focused row is the first row of the selection', () => {
         let model = helper.createModelFixture(2, 6);
         let table = helper.createTable(model);
 
         let rows = table.rows;
         table.render();
         helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[4]]);
-
-        table.selectionHandler.lastActionRow = rows[2];
+        table.setFocusedRow(rows[2]);
 
         JQueryTesting.triggerKeyDown(table.$data, keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[3], rows[4]]);
@@ -359,15 +354,14 @@ describe('TableKeyStrokes', () => {
         helper.assertSelection(table, [rows[4], rows[5]]);
       });
 
-      it('if the row below the last action row is not selected, adds the row below to the selection', () => {
+      it('if the row below the focused row is not selected, adds the row below to the selection', () => {
         let model = helper.createModelFixture(2, 7);
         let table = helper.createTable(model);
 
         let rows = table.rows;
         table.render();
         helper.selectRowsAndAssert(table, [rows[2], rows[5]]);
-
-        table.selectionHandler.lastActionRow = rows[2];
+        table.setFocusedRow(rows[2]);
 
         JQueryTesting.triggerKeyDown(table.$data, keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[5]]);
@@ -376,9 +370,7 @@ describe('TableKeyStrokes', () => {
         JQueryTesting.triggerKeyDown(table.$data, keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[4], rows[5], rows[6]]);
       });
-
     });
-
   });
 
   describe('end', () => {
@@ -413,30 +405,31 @@ describe('TableKeyStrokes', () => {
         let rows = table.rows;
         table.render();
         helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
+        table.setFocusedRow(rows[4]);
 
         JQueryTesting.triggerKeyDown(table.$data, keys.END, 'shift');
         helper.assertSelection(table, [rows[1], rows[3], rows[4], rows[5]]);
       });
 
-      it('considers last action row as start row for new selection', () => {
+      it('considers focused row as start row for new selection', () => {
         let model = helper.createModelFixture(2, 6);
         let table = helper.createTable(model);
         let rows = table.rows;
         table.render();
         helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
-        table.selectionHandler.lastActionRow = rows[1];
+        table.setFocusedRow(rows[1]);
 
         JQueryTesting.triggerKeyDown(table.$data, keys.END, 'shift');
         helper.assertSelection(table, [rows[1], rows[2], rows[3], rows[4], rows[5]]);
       });
 
-      it('uses last row of selection as last action row if last action row is not visible anymore', () => {
+      it('uses last row of selection as focused row if focused row is not visible anymore', () => {
         let model = helper.createModelFixture(2, 6);
         let table = helper.createTable(model);
         let rows = table.rows;
         table.render();
         helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
-        table.selectionHandler.lastActionRow = rows[1];
+        table.setFocusedRow(rows[1]);
 
         table.addFilter({
           // @ts-expect-error
@@ -465,7 +458,7 @@ describe('TableKeyStrokes', () => {
         let rows = table.rows;
         table.render();
         helper.selectRowsAndAssert(table, [rows[0], rows[2]]);
-        table.selectionHandler.lastActionRow = rows[0];
+        table.setFocusedRow(rows[0]);
 
         JQueryTesting.triggerKeyDown(table.$data, keys.END, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
@@ -512,25 +505,25 @@ describe('TableKeyStrokes', () => {
         helper.assertSelection(table, [rows[0], rows[1], rows[2], rows[3], rows[5]]);
       });
 
-      it('considers last action row as start row for new selection', () => {
+      it('considers focused row as start row for new selection', () => {
         let model = helper.createModelFixture(2, 6);
         let table = helper.createTable(model);
         let rows = table.rows;
         table.render();
         helper.selectRowsAndAssert(table, [rows[1], rows[2], rows[4]]);
-        table.selectionHandler.lastActionRow = rows[4];
+        table.setFocusedRow(rows[4]);
 
         JQueryTesting.triggerKeyDown(table.$data, keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2], rows[3], rows[4]]);
       });
 
-      it('uses first row of selection as last action row if last action row is not visible anymore', () => {
+      it('uses first row of selection as focused row if focused row is not visible anymore', () => {
         let model = helper.createModelFixture(2, 6);
         let table = helper.createTable(model);
         let rows = table.rows;
         table.render();
         helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
-        table.selectionHandler.lastActionRow = rows[4];
+        table.setFocusedRow(rows[4]);
 
         table.addFilter({
           // @ts-expect-error
@@ -559,7 +552,7 @@ describe('TableKeyStrokes', () => {
         let rows = table.rows;
         table.render();
         helper.selectRowsAndAssert(table, [rows[0], rows[2]]);
-        table.selectionHandler.lastActionRow = rows[2];
+        table.setFocusedRow(rows[2]);
 
         JQueryTesting.triggerKeyDown(table.$data, keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
@@ -657,7 +650,7 @@ describe('TableKeyStrokes', () => {
       helper.assertSelection(table, [table.rows[0]]);
 
       table.deselectAll();
-      table.selectionHandler.lastActionRow = table.rows[0];
+      table.setFocusedRow(table.rows[0]);
 
       JQueryTesting.triggerKeyDown(table.$data, keys.PAGE_UP);
       helper.assertSelection(table, [table.rows[0]]);
@@ -677,7 +670,7 @@ describe('TableKeyStrokes', () => {
       helper.assertSelection(table, [table.rows[0]]);
 
       table.deselectAll();
-      table.selectionHandler.lastActionRow = table.rows[0];
+      table.setFocusedRow(table.rows[0]);
 
       JQueryTesting.triggerKeyDown(table.$data, keys.PAGE_DOWN);
       helper.assertSelection(table, [table.rows[0]]);

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractTableNavigationKeyStroke, aria, arrays, keys, Table, TableRow} from '../../index';
+import {AbstractTableNavigationKeyStroke, arrays, keys, Table, TableRow} from '../../index';
 
 export class TableNavigationPageDownKeyStroke extends AbstractTableNavigationKeyStroke {
 
@@ -26,8 +26,8 @@ export class TableNavigationPageDownKeyStroke extends AbstractTableNavigationKey
       rows = table.visibleRows,
       selectedRows = table.selectedRows,
       lastSelectedRow = arrays.last(selectedRows),
-      lastActionRow = table.selectionHandler.lastActionRow,
-      lastActionRowIndex = -1,
+      focusedRow = table.focusedRow,
+      focusedRowIndex = -1,
       newSelectedRows: TableRow[];
 
     // Last row may be undefined if there is only one row visible in the viewport and this row is bigger than the viewport. In that case just scroll down.
@@ -40,18 +40,18 @@ export class TableNavigationPageDownKeyStroke extends AbstractTableNavigationKey
       }
     }
 
-    if (lastActionRow) {
-      lastActionRowIndex = rows.indexOf(lastActionRow);
+    if (focusedRow) {
+      focusedRowIndex = rows.indexOf(focusedRow);
     }
-    // last action row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
-    if (lastActionRowIndex < 0) {
-      lastActionRow = lastSelectedRow;
-      lastActionRowIndex = rows.indexOf(lastActionRow);
+    // focused row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
+    if (focusedRowIndex < 0) {
+      focusedRow = lastSelectedRow;
+      focusedRowIndex = rows.indexOf(focusedRow);
     }
 
     // If last row in viewport already is selected -> scroll a page down
     // Don't do it if multiple rows are selected and user only presses page down without shift
-    if (selectedRows.length > 0 && lastActionRow === viewport.lastRow && !(selectedRows.length > 1 && !event.shiftKey)) {
+    if (selectedRows.length > 0 && focusedRow === viewport.lastRow && !(selectedRows.length > 1 && !event.shiftKey)) {
       table.scrollPageDown();
       viewport = this._viewportInfo();
       if (!viewport.lastRow) {
@@ -61,14 +61,14 @@ export class TableNavigationPageDownKeyStroke extends AbstractTableNavigationKey
     }
 
     if (event.shiftKey && selectedRows.length > 0) {
-      // Using lastActionRow instead of lastSelectedRow is essential if the user does a multi selection using ctrl and presses shift-pagedown afterward
-      newSelectedRows = rows.slice(lastActionRowIndex + 1, rows.indexOf(viewport.lastRow) + 1);
+      // Using focusedRow instead of lastSelectedRow is essential if the user does a multi selection using ctrl and presses shift-pagedown afterward
+      newSelectedRows = rows.slice(focusedRowIndex + 1, rows.indexOf(viewport.lastRow) + 1);
       newSelectedRows = arrays.union(selectedRows, newSelectedRows);
     } else {
       newSelectedRows = [viewport.lastRow];
     }
 
-    table.selectionHandler.lastActionRow = viewport.lastRow;
+    table.setFocusedRow(viewport.lastRow);
     table.selectRows(newSelectedRows, true);
     if (!table.isFocused()) {
       table.focus();

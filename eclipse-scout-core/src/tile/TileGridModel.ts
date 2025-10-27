@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,6 +47,12 @@ export interface TileGridModel extends WidgetModel {
    * @see Table.tiles
    */
   filters?: Filter<Tile>[];
+  /**
+   * Defines the tile that has the focus when the tile grid is focused.
+   *
+   * The focused tile can be changed using keyboard navigation.
+   */
+  focusedTile?: Tile | string;
   /**
    * Configures the preferred number of columns in the tile grid. Default is 4.
    *

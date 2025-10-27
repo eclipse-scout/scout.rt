@@ -35,6 +35,6 @@ export class TableSelectAllKeyStroke extends KeyStroke {
   override handle(event: JQuery.KeyboardEventBase) {
     let table = this.field;
     table.toggleSelection();
-    table.selectionHandler.lastActionRow = null;
+    table.setFocusedRow(null);
   }
 }

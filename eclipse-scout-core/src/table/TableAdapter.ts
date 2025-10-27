@@ -424,8 +424,6 @@ export class TableAdapter extends ModelAdapter {
     let rows = this.widget.rowsByIds(rowIds);
     this.addFilterForWidgetEventType('rowsSelected');
     this.widget.selectRows(rows);
-    // TODO [7.0] cgu what is this for? seems wrong here
-    this.widget.selectionHandler.clearLastSelectedRowMarker();
   }
 
   protected _onRowsChecked(rows: TableRowModel[]) {

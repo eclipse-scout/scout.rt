@@ -10,13 +10,13 @@
 import {
   Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke, ContextMenuPopup, dataObjects, Desktop,
   DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, ErrorHandler, EventHandler, events, Filter, Filterable, FilterOrFunction, FilterResult, FilterSupport, FullModelOf,
-  graphics,
-  GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, menus, NumberColumn,
-  NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToAlignment, ScrollToOptions, Status, StatusOrModel, strings,
-  styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke,
-  TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer,
-  TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUiPreferences,
-  tableUiPreferences, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences, UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
+  graphics, GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, menus,
+  NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToAlignment, ScrollToOptions, Status, StatusOrModel,
+  strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
+  TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke,
+  TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableSelectKeyStroke, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator,
+  TableToggleRowKeyStroke, TableTooltip, TableUiPreferences, tableUiPreferences, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences,
+  UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -42,6 +42,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   dropType: DropType;
   dropMaximumSize: number;
   dragAndDropHandler: DragAndDropHandler;
+  focusedRow: TableRow;
   groupingStyle: TableGroupingStyle;
   header: TableHeader;
   tableStatus: Status;
@@ -396,6 +397,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.menuBar = this._createMenuBar();
     this.menuBar.on('propertyChange:visible', () => this._refreshMenuBarClasses());
     this._setSelectedRows(this.selectedRows);
+    this._setFocusedRow(this.focusedRow);
     this._setKeyStrokes(this.keyStrokes);
     this._setMenus(this.menus);
     this._setDefaultRowAction(this.defaultRowAction);
@@ -546,6 +548,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       new TableNavigationExpandKeyStroke(this, keys.RIGHT, '→'),
       new TableNavigationExpandKeyStroke(this, keys.ADD),
       new TableStartCellEditKeyStroke(this),
+      new TableSelectKeyStroke(this),
       new TableSelectAllKeyStroke(this),
       new TableRefreshKeyStroke(this),
       new TableToggleRowKeyStroke(this),
@@ -633,7 +636,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.$data.on('mousedown', '.table-row', this._onRowMouseDown.bind(this))
       .on('mouseup', '.table-row', this._onRowMouseUp.bind(this))
       .on('dblclick', '.table-row', this._onRowDoubleClick.bind(this))
-      .on('contextmenu', event => event.preventDefault());
+      .on('contextmenu', event => event.preventDefault())
+      .on('focus', this._onFocus.bind(this));
     this._installScrollbars({
       axis: 'both'
     });
@@ -659,6 +663,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._renderTextFilterEnabled();
     this._renderMultiSelect();
     this._renderMultiCheck();
+    this._renderFocusedRow();
   }
 
   protected override _setCssClass(cssClass: string) {
@@ -868,7 +873,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     let pageX: number = scout.nvl(options.pageX, null);
     let pageY: number = scout.nvl(options.pageY, null);
     if (pageX === null || pageY === null) {
-      let rowToDisplay = this.isRowSelectedAndVisible(this.selectionHandler.lastActionRow) ? this.selectionHandler.lastActionRow : this.getLastSelectedAndVisibleRow();
+      let rowToDisplay = this.isRowSelectedAndVisible(this.focusedRow) ? this.focusedRow : this.getLastSelectedAndVisibleRow();
       if (rowToDisplay !== null) {
         let $rowToDisplay = rowToDisplay.$row;
         let offset = $rowToDisplay.offset();
@@ -939,6 +944,12 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     }
     this.scrollTop = scrollTop;
     this.scrollLeft = scrollLeft;
+  }
+
+  protected _onFocus(event: JQuery.FocusEvent) {
+    if (!this.focusedRow) {
+      this.setFocusedRow(this.selectedRows[0] || this.visibleRows[0]);
+    }
   }
 
   protected _renderTableStatus() {
@@ -3349,8 +3360,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       }
       delete this.rowsMap[row.id];
 
-      if (this.selectionHandler.lastActionRow === row) {
-        this.selectionHandler.clearLastSelectedRowMarker();
+      if (this.focusedRow === row) {
+        this.setFocusedRow(null);
       }
     }, rows);
 
@@ -3392,7 +3403,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
         this.cellEditorPopup.cancelEdit();
       }
 
-      this.selectionHandler.clearLastSelectedRowMarker();
+      this.setFocusedRow(null);
       this._removeRows();
     }
 
@@ -3480,8 +3491,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
         });
       }
       // selection
-      if (this.selectionHandler.lastActionRow === oldRow) {
-        this.selectionHandler.lastActionRow = row;
+      if (this.focusedRow === oldRow) {
+        this.setFocusedRow(row);
       }
       arrays.replace(this.selectedRows, oldRow, row);
       // replace row use index lookup for performance reasons
@@ -3809,6 +3820,39 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     return this.$data || this.$container;
   }
 
+  setFocusedRow(row: TableRow) {
+    this.setProperty('focusedRow', row);
+  }
+
+  protected _setFocusedRow(row: TableRow | string) {
+    if (this.rendered) {
+      this._removeFocusedRow();
+    }
+    if (typeof row === 'string') {
+      row = this.rowById(row as string);
+    }
+    this._setProperty('focusedRow', row);
+  }
+
+  protected _removeFocusedRow() {
+    this.focusedRow?.$row?.removeClass('focused');
+    this._updateAriaActiveDescendant();
+  }
+
+  protected _renderFocusedRow() {
+    this.focusedRow?.$row?.addClass('focused');
+    this._updateAriaActiveDescendant();
+  }
+
+  protected _updateAriaActiveDescendant() {
+    let $row = this.focusedRow?.$row || this.selectedRow()?.$row;
+    if ($row) {
+      aria.linkElementWithActiveDescendant(this.$data, $row);
+    } else {
+      aria.removeActiveDescendant(this.$data);
+    }
+  }
+
   /** @see TableModel.scrollToSelection */
   setScrollToSelection(scrollToSelection: boolean) {
     this.setProperty('scrollToSelection', scrollToSelection);
@@ -3916,9 +3960,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       this.cellEditorPopup.position();
       this.cellEditorPopup.pack();
     }
-
-    let $row = this.selectionHandler.lastActionRow?.$row || rows[0]?.$row;
-    aria.linkElementWithActiveDescendant(this.$data, $row);
+    this._updateAriaActiveDescendant();
   }
 
   /** @internal */
@@ -3994,6 +4036,12 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
     if (!this.multiSelect && rows.length > 1) {
       rows = [rows[0]];
+    }
+
+    if (this.focusedRow && !rows.includes(this.focusedRow)) {
+      // When using keystrokes, the focused row will be set to one of the selected rows.
+      // If selectRows() is called programmatically, setting the focused row to null prevents a confusing behavior the next time keystrokes are used.
+      this.setFocusedRow(null);
     }
 
     this.selectedRows = rows; // (Note: direct assignment is safe because the initial filtering created a copy of the original array)
@@ -4652,6 +4700,9 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
         applyFilters: false,
         filtersChanged: true
       });
+      if (result.newlyHidden.includes(this.focusedRow)) {
+        this.setFocusedRow(null);
+      }
       this.filteredElementsDirty = false;
     }
   }
@@ -6033,6 +6084,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._renderBackgroundEffect();
     this._renderSelection();
     this._updateAriaRowIndices();
+    this._renderFocusedRow();
     this.viewRangeDirty = false;
   }
 

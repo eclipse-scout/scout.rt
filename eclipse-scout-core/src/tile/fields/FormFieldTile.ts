@@ -89,13 +89,6 @@ export class FormFieldTile extends WidgetTile {
       }
     }
   }
-
-  override markAsActiveDescendantFor($container: JQuery) {
-    if (this.displayStyle === FormFieldTile.DisplayStyle.DASHBOARD
-      && this.tileWidget instanceof FormField) {
-      aria.linkElementWithActiveDescendant(this.$container, this.tileWidget?.$field);
-    }
-  }
 }
 
 export interface FormFieldTileEventMap extends WidgetTileEventMap {

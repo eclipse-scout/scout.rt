@@ -14,26 +14,30 @@
   --focus-node-selected-background-color: @item-selection-background-color;
   --focus-node-selected-border-color: @item-selection-border-color;
 
-  & > .tree-data {
-    &:is(:focus, .focused) {
-      outline: none;
+  & > .tree-data:is(:focus, .focused) {
+    outline: none;
 
-      & > :is(.tree-node.selected, .animation-wrapper > .tree-node.selected) {
-        background-color: var(--focus-node-selected-background-color);
+    & > :is(.tree-node.selected, .animation-wrapper > .tree-node.selected) {
+      background-color: var(--focus-node-selected-background-color);
 
-        &::after {
-          border-color: var(--focus-node-selected-border-color);
-        }
+      &::after {
+        border-color: var(--focus-node-selected-border-color);
+      }
+    }
+  }
+
+  // Normally, the node focus is visualized using a different selection color, see above.
+  // If no nodes are selected, add a focus shadow to the node when using keyboard navigation.
+  // Also, if the tree distinguishes between selection and focus (nodesFocusable is true), always add a focus shadow to the node.
+  &.nodes-focusable > .tree-data:is(:focus, .focused),
+  &.no-nodes-selected > .tree-data:is(:focus, .focused).keyboard-navigation {
+    & > :is(.tree-node.focused, .animation-wrapper > .tree-node.focused) {
+      &::after {
+        #scout.focus-inset-box-shadow();
       }
 
-      &.nodes-focusable.keyboard-navigation {
-        & > :is(.tree-node.focused, .animation-wrapper > .tree-node.focused ) {
-          #scout.focus-inset-box-shadow();
-
-          &.selected {
-            --focus-box-shadow-size: 4px;
-          }
-        }
+      &.selected::after {
+        --focus-box-shadow-size: 3px;
       }
     }
   }
@@ -100,11 +104,16 @@
     background-color: @tree-node-active-background-color;
   }
 
+  &:is(.selected, .focused)::after {
+    #scout.item-selection-border();
+    border-width: 0;
+  }
+
   &.selected {
     background-color: @item-selection-nonfocus-background-color;
 
     &::after {
-      #scout.item-selection-border();
+      border-width: @item-selection-border-width;
     }
   }
 

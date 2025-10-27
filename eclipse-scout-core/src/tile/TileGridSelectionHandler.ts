@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -158,6 +158,10 @@ export class TileGridSelectionHandler {
 
   getFocusedTile(): Tile {
     return this.tileGrid.focusedTile;
+  }
+
+  getGridOfFocusedTile(): TileGrid {
+    return this.getFocusedTile()?.parent as TileGrid;
   }
 
   /**
@@ -321,8 +325,17 @@ export class TileGridSelectionHandler {
   protected _computeFocusedTileOrSelection(diff: number): TileGridSelectionInstruction {
     let tiles = this.getVisibleTiles();
     let selectedTiles = this.getSelectedTiles();
+
+    let focusedTile = this.getFocusedTile();
+    if (focusedTile && this.getGridOfFocusedTile().$container.hasClass('keyboard-navigation')) {
+      // If focus is visible, return the focused tile. E.g. if the second tile is focused it must not focus the first tile when pressing down
+      return {
+        focusedTile: focusedTile,
+        selectedTiles: null
+      };
+    }
+
     if (selectedTiles.length === 0) {
-      let focusedTile;
       if (diff > 0) {
         // Select first tile if no tiles are selected (navigate down/right)
         focusedTile = arrays.first(tiles);

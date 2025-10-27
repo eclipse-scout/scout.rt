@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,6 +23,17 @@
 
   & > .tile {
     transition: @tile-grid-loading-transition;
+  }
+
+  &.keyboard-navigation > .tile {
+    transition: @tile-grid-loading-transition;
+
+    &.focused::after {
+      #scout.pseudo-overlay();
+      #scout.focus-inset-box-shadow();
+      --focus-box-shadow-size: 3px;
+      border-radius: inherit;
+    }
   }
 
   & > .scrollbar {

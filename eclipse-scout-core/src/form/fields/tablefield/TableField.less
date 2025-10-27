@@ -22,16 +22,21 @@
       border-radius: @control-alternative-border-radius;
     }
 
-    &.no-rows-selected {
-      &:has(.table-data:is(:focus, .focused)) {
-        #scout.focus-border();
-      }
-    }
+    .table-field-no-rows-selected-focus();
+  }
+}
 
-    &.has-error {
-      border-color: @error-border-color;
-      --focus-border-color: @error-border-color;
-      --focus-box-shadow-color: @error-focus-box-shadow-color;
-    }
+// Mixin for focus border
+// The variables --table-focus-* allow to change the color of the focus shadow and border of the table only, not the one of the menu items or filter
+.table-field-no-rows-selected-focus {
+  &.no-rows-selected:has(.table-data:is(:focus, .focused):not(.keyboard-navigation)) {
+    // Show focus border on whole table field when clicking or on programmatic focus and not on the row itself because it looks cleaner
+    #scout.focus-border(var(--table-focus-box-shadow-size, @focus-box-shadow-size), var(--table-focus-box-shadow-color, @focus-box-shadow-color), var(--table-focus-border-color, @focus-border-color));
+  }
+
+  &.has-error {
+    border-color: @error-border-color;
+    --table-focus-border-color: @error-border-color;
+    --table-focus-box-shadow-color: @error-focus-box-shadow-color;
   }
 }

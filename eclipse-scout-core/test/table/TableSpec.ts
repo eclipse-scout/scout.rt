@@ -3740,7 +3740,7 @@ describe('Table', () => {
       expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('2').$row), $scrollable)).toBe(false);
       expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('3').$row), $scrollable)).toBe(true);
       expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('4').$row), $scrollable)).toBe(true);
-      // node5 isn't visible anymore since node4's children use up all the space
+      // row5 isn't visible anymore since row4's children use up all the space
       expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('5').$row), $scrollable)).toBe(false);
     });
 
@@ -4484,24 +4484,31 @@ describe('Table', () => {
       expectSelected(table.rows[1], true);
     });
 
-    it('has aria-activedescendant set if a row is selected', () => {
+    it('has aria-activedescendant set if a row is focused or selected', () => {
       let model = helper.createModelFixture(2, 4);
       let table = helper.createTable(model);
       table.render();
-      expect(table.$data.attr('aria-activedescendant')).toBeFalsy();
+      expect(table.$data).not.toHaveAttr('aria-activedescendant');
 
-      table.selectRow(table.rows[0]);
-      expect(table.$data.attr('aria-activedescendant')).toBe(table.rows[0].$row.attr('id'));
-
-      table.selectRow(table.rows[1]);
-      expect(table.$data.attr('aria-activedescendant')).toBe(table.rows[1].$row.attr('id'));
+      table.setFocusedRow(table.rows[0]);
+      expect(table.$data).toHaveAttr('aria-activedescendant', table.rows[0].$row.attr('id'));
 
       table.remove();
       table.render();
-      expect(table.$data.attr('aria-activedescendant')).toBe(table.rows[1].$row.attr('id'));
+      expect(table.$data).toHaveAttr('aria-activedescendant', table.rows[0].$row.attr('id'));
 
-      table.deselectAll();
-      expect(table.$data.attr('aria-activedescendant')).toBe(table.rows[1].$row.attr('id')); // Still on the last action row
+      table.setFocusedRow(null);
+      expect(table.$data).not.toHaveAttr('aria-activedescendant');
+
+      table.selectRow(table.rows[0]);
+      expect(table.focusedRow).toBe(null);
+      expect(table.$data).toHaveAttr('aria-activedescendant', table.rows[0].$row.attr('id'));
+
+      table.selectRow(table.rows[1]);
+      expect(table.$data).toHaveAttr('aria-activedescendant', table.rows[1].$row.attr('id'));
+
+      table.setFocusedRow(table.rows[0]);
+      expect(table.$data).toHaveAttr('aria-activedescendant', table.rows[0].$row.attr('id'));
     });
 
     it('has a description for aggregation rows', () => {
@@ -5150,6 +5157,131 @@ describe('Table', () => {
       const columnStructureChangedEvent = await columnStructureChangedPromise;
       expect(columnStructureChangedEvent.oldColumns).toEqual([column0, column1, column2]);
       expect(columnStructureChangedEvent.newColumns.map(c => c.text)).toEqual([column2.text, 'foo', 'number']);
+    });
+  });
+
+  describe('focusedRow', () => {
+    it('is set to the first selected or visible row when table is focused and no row focused yet', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      expect(table.focusedRow).toBeUndefined();
+
+      table.render();
+      table.addFilter(row => row === table.rows[1]);
+      table.focus();
+      expect(table.focusedRow).toBe(table.visibleRows[0]);
+      expect(table.focusedRow.$row).toHaveClass('focused');
+
+      table.removeFilter(table.filters[0]);
+      table.selectRow(table.rows[1]);
+      table.setFocusedRow(null);
+      expect(table.focusedRow).toBe(null);
+
+      let $input = session.desktop.$container.appendElement('<input>');
+      $input[0].focus();
+      table.focus();
+      expect(table.focusedRow).toBe(table.selectedRows[0]);
+      expect(table.focusedRow.$row).toHaveClass('focused');
+    });
+
+    it('can be initially set', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable({...model, focusedRow: model.rows[1].id});
+      expect(table.focusedRow).toBe(table.rows[1]);
+
+      table.render();
+      expect(table.focusedRow.$row).toHaveClass('focused');
+    });
+
+    it('is set to null when the selected row changes', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      expect(table.selectedRows).toEqual([]);
+      expect(table.focusedRow).toBeUndefined();
+
+      table.setFocusedRow(table.rows[0]);
+      table.selectRow(table.rows[1]);
+      expect(table.selectedRows[0]).toBe(table.rows[1]);
+      expect(table.focusedRow).toBe(null);
+
+      table.render();
+      table.selectRow(table.rows[0]);
+      expect(table.selectedRows[0]).toBe(table.rows[0]);
+      expect(table.focusedRow).toBe(null);
+
+      table.setFocusedRow(table.rows[0]);
+      expect(table.focusedRow).toBe(table.rows[0]);
+      expect(table.focusedRow.$row).toHaveClass('focused');
+
+      table.selectRow(null);
+      expect(table.selectedRows).toEqual([]);
+      expect(table.focusedRow).toBe(null);
+    });
+
+    it('is updated when setFocusedRow is called', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      table.setFocusedRow(table.rows[1]);
+      expect(table.focusedRow).toBe(table.rows[1]);
+      expect(table.selectedRows).toEqual([]);
+
+      table.render();
+      expect(table.focusedRow.$row).toHaveClass('focused');
+
+      table.setFocusedRow(table.rows[0]);
+      expect(table.focusedRow).toBe(table.rows[0]);
+      expect(table.focusedRow.$row).toHaveClass('focused');
+      expect(table.rows[1]).not.toHaveClass('focused');
+
+      table.setFocusedRow(null);
+      expect(table.focusedRow).toBe(null);
+    });
+
+    it('is rendered when row is rendered', () => {
+      let model = helper.createModelFixture(2, 20);
+      let table = helper.createTable(model);
+      table.setViewRangeSize(5);
+      table.render();
+      table.setFocusedRow(table.rows[10]);
+      expect(table.focusedRow.$row).toBe(null);
+
+      table.scrollTo(table.focusedRow);
+      expect(table.focusedRow.$row).toHaveClass('focused');
+    });
+
+    it('is set to null when row is deleted', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      table.render();
+      table.setFocusedRow(table.rows[0]);
+      expect(table.focusedRow).toBe(table.rows[0]);
+      expect(table.focusedRow.$row).toHaveClass('focused');
+
+      table.deleteRow(table.rows[0]);
+      expect(table.focusedRow).toBe(null);
+
+      table.setFocusedRow(table.rows[1]);
+      table.expandRow(table.rows[1]);
+      expect(table.focusedRow).toBe(table.rows[1]);
+      expect(table.focusedRow.$row).toHaveClass('focused');
+
+      table.deleteAllRows();
+      expect(table.focusedRow).toBe(null);
+    });
+
+    it('is set to null when row is filtered', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      table.render();
+      table.setFocusedRow(table.rows[0]);
+      expect(table.focusedRow).toBe(table.rows[0]);
+      expect(table.focusedRow.$row).toHaveClass('focused');
+
+      table.addFilter(row => row !== table.rows[1]);
+      expect(table.focusedRow).toBe(table.rows[0]); // Still set because still visible
+
+      table.addFilter(row => row !== table.rows[0]);
+      expect(table.focusedRow).toBe(null);
     });
   });
 });
