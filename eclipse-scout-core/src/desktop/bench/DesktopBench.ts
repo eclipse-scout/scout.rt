@@ -242,7 +242,15 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
 
     if (this.desktop.rendered) {
       // Request focus on first element in outline content
-      this.session.focusManager.validateFocus();
+      // -> Ensures outline content is focused whenever it changes, e.g. a page is selected in the outline
+      // Do it only if focus is not already there to not break trackFocus feature, e.g. if the focus was in a field of a search form, it should still be in that field when returning to it.
+      // Calling focusManager.validateFocus() is not enough because that would only request the focus if it is not already in the current focus context, which is the whole desktop.
+      // So for example if the focus was in the outline, it would stay there when a page is selected.
+      let $outlineContent = this.outlineContent?.$container;
+      if ($outlineContent && !$outlineContent.isOrHas($outlineContent.activeElement())) {
+        let element = this.session.focusManager.findFirstFocusableElement($outlineContent);
+        this.session.focusManager.requestFocus(element);
+      }
     }
   }
 
