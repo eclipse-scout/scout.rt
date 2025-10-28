@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {arrays, Device, objects, Predicate, strings} from '../index';
+import $ from 'jquery';
 
 function isTouchEvent(event: JQuery.Event): event is JQuery.TouchEventBase {
   return event && strings.startsWith(event.type, 'touch');
@@ -183,6 +184,34 @@ export const events = {
         events.propagateEvent(target, event);
       });
     });
+  },
+
+  /**
+   * @returns the app-link which triggered the given event, or `null` if the app-link could not be identified
+   */
+  find$AppLink(event: JQuery.TriggeredEvent): JQuery {
+    // AppLinkKeyStroke is typically bound to the container, target is the element with the tabindex (app-link).
+    // Click listeners are typically bound to the app-link directly but the link may contain inner elements.
+    // In that case the target would be the inner element which is not an app-link.
+    let $start = $(event.target);
+    let $stop = $(event.delegateTarget);
+    let $appLink = $start.findUp($elem => $elem.hasClass('app-link'), $stop);
+    if ($appLink.length > 0) {
+      return $appLink;
+    }
+    return null;
+  },
+
+  /**
+   * Calls the given `triggerFunction` with the reference of the app link that triggered the given `event`.
+   */
+  triggerAppLinkAction(event: JQuery.TriggeredEvent, triggerFunction: (ref: string) => void) {
+    let $appLink = events.find$AppLink(event);
+    if (!$appLink) {
+      return;
+    }
+    let ref = $appLink.data('ref');
+    triggerFunction(ref);
   },
 
   /**

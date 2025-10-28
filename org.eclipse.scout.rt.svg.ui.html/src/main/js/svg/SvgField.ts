@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AppLinkKeyStroke, FormField} from '@eclipse-scout/core';
-import $ from 'jquery';
+import {AppLinkKeyStroke, events, FormField} from '@eclipse-scout/core';
 import {SvgFieldEventMap, SvgFieldModel} from '../index';
 
 export class SvgField extends FormField implements SvgFieldModel {
@@ -47,10 +46,8 @@ export class SvgField extends FormField implements SvgFieldModel {
       .unfocusable();
   }
 
-  protected _onAppLinkAction(event: JQuery.KeyboardEventBase | JQuery.ClickEvent) {
-    let $target = $(event.delegateTarget);
-    let ref = $target.data('ref') as string;
-    this._triggerAppLinkAction(ref);
+  protected _onAppLinkAction(event: JQuery.TriggeredEvent) {
+    events.triggerAppLinkAction(event, this._triggerAppLinkAction.bind(this));
     event.preventDefault();
   }
 

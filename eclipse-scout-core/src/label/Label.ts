@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AppLinkKeyStroke, HtmlComponent, InitModelOf, KeyStrokeContext, LabelEventMap, LabelModel, strings, Widget} from '../index';
-import $ from 'jquery';
+import {AppLinkKeyStroke, events, HtmlComponent, InitModelOf, KeyStrokeContext, LabelEventMap, LabelModel, strings, Widget} from '../index';
 
 export class Label extends Widget implements LabelModel {
   declare model: LabelModel;
@@ -102,10 +101,8 @@ export class Label extends Widget implements LabelModel {
     }
   }
 
-  protected _onAppLinkAction(event: JQuery.ClickEvent | JQuery.KeyboardEventBase) {
-    let $target = $(event.delegateTarget);
-    let ref = $target.data('ref');
-    this.triggerAppLinkAction(ref);
+  protected _onAppLinkAction(event: JQuery.TriggeredEvent) {
+    events.triggerAppLinkAction(event, this.triggerAppLinkAction.bind(this));
   }
 
   triggerAppLinkAction(ref: string) {
