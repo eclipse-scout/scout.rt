@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LabelFieldEventMap, LabelFieldModel, SelectAllTextInFieldKeyStroke, strings, texts, ValueField} from '../../../index';
+import {events, LabelFieldEventMap, LabelFieldModel, SelectAllTextInFieldKeyStroke, strings, texts, ValueField} from '../../../index';
 
 export class LabelField extends ValueField<string> implements LabelFieldModel {
   declare model: LabelFieldModel;
@@ -126,10 +126,8 @@ export class LabelField extends ValueField<string> implements LabelFieldModel {
     });
   }
 
-  protected _onAppLinkAction(event: JQuery.ClickEvent) {
-    let $target = $(event.delegateTarget);
-    let ref = $target.data('ref') as string;
-    this.triggerAppLinkAction(ref);
+  protected _onAppLinkAction(event: JQuery.TriggeredEvent) {
+    events.triggerAppLinkAction(event, this.triggerAppLinkAction.bind(this));
   }
 
   triggerAppLinkAction(ref: string) {

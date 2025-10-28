@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AppLinkKeyStroke, BeanFieldModel, ValueField} from '../../../index';
-import $ from 'jquery';
+import {AppLinkKeyStroke, BeanFieldModel, events, ValueField} from '../../../index';
 
 /**
  * Base class for fields where the value should be visualized.
@@ -79,8 +78,6 @@ export class BeanField<TValue extends object> extends ValueField<TValue> impleme
   }
 
   protected _onAppLinkAction(event: JQuery.TriggeredEvent) {
-    let $target = $(event.delegateTarget);
-    let ref = $target.data('ref');
-    this.triggerAppLinkAction(ref);
+    events.triggerAppLinkAction(event, this.triggerAppLinkAction.bind(this));
   }
 }

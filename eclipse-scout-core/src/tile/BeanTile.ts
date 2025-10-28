@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AppLinkActionEvent, HtmlComponent, Tile, TileEventMap, TileModel} from '../index';
-import $ from 'jquery';
+import {AppLinkActionEvent, events, HtmlComponent, Tile, TileEventMap, TileModel} from '../index';
 
 export interface BeanTileModel extends TileModel {
   bean?: object;
@@ -52,8 +51,6 @@ export class BeanTile<TBean extends object = object> extends Tile implements Bea
   }
 
   protected _onAppLinkAction(event: JQuery.TriggeredEvent) {
-    let $target = $(event.delegateTarget);
-    let ref = $target.data('ref');
-    this.triggerAppLinkAction(ref);
+    events.triggerAppLinkAction(event, this.triggerAppLinkAction.bind(this));
   }
 }

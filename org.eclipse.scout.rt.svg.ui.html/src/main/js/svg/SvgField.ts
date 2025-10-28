@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AppLinkKeyStroke, FormField} from '@eclipse-scout/core';
-import $ from 'jquery';
+import {AppLinkKeyStroke, events, FormField} from '@eclipse-scout/core';
 import {SvgFieldEventMap, SvgFieldModel} from '../index';
 
 export class SvgField extends FormField implements SvgFieldModel {
@@ -47,10 +46,8 @@ export class SvgField extends FormField implements SvgFieldModel {
       .unfocusable();
   }
 
-  protected _onAppLinkAction(event: JQuery.KeyboardEventBase | JQuery.ClickEvent) {
-    let $target = $(event.delegateTarget);
-    let ref = $target.data('ref') as string;
-    this._triggerAppLinkAction(ref);
+  protected _onAppLinkAction(event: JQuery.TriggeredEvent) {
+    events.triggerAppLinkAction(event, this._triggerAppLinkAction.bind(this));
     event.preventDefault();
   }
 

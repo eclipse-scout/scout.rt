@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AppLinkKeyStroke, HtmlFieldEventMap, HtmlFieldModel, scrollbars, SelectAllTextInFieldKeyStroke, ValueField} from '../../../index';
-import $ from 'jquery';
+import {AppLinkKeyStroke, events, HtmlFieldEventMap, HtmlFieldModel, scrollbars, SelectAllTextInFieldKeyStroke, ValueField} from '../../../index';
 
 export class HtmlField extends ValueField<string> implements HtmlFieldModel {
   declare model: HtmlFieldModel;
@@ -125,10 +124,8 @@ export class HtmlField extends ValueField<string> implements HtmlFieldModel {
     this.$field.toggleAttr('tabindex', !!this.selectable, '-1');
   }
 
-  protected _onAppLinkAction(event: JQuery.KeyboardEventBase | JQuery.ClickEvent) {
-    let $target = $(event.delegateTarget);
-    let ref = $target.data('ref') as string;
-    this.triggerAppLinkAction(ref);
+  protected _onAppLinkAction(event: JQuery.TriggeredEvent) {
+    events.triggerAppLinkAction(event, this.triggerAppLinkAction.bind(this));
   }
 
   triggerAppLinkAction(ref: string) {
