@@ -41,7 +41,6 @@ public final class SharedConfigProperties {
     @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Specifies the Base64 encoded private key for signing requests from the UI server to the backend server. By validating the signature the server can ensure the request is trustworthy.\n" +
-          "Furthermore, the CookieAccessController uses this private key to sign the cookie.\n" +
           "New public-private-key-pairs can be created by invoking the class '%s' on the command line.", SecurityUtility.class.getName());
     }
   }
