@@ -158,6 +158,25 @@
     pointer-events: none; // Necessary when used as ::after element
   }
 
+  /**
+   * Draws an ::after element that has the focus-box-shadow.
+   * An ::after element is necessary to add a little horizontal padding.
+   */
+
+  .link-focus-overlay {
+    position: relative;
+
+    &:focus {
+      box-shadow: none;
+
+      &::after {
+        #scout.focus-box-shadow();
+        #scout.pseudo-overlay(0, -2px, 0, -2px);
+        border-radius: @border-radius;
+      }
+    }
+  }
+
   /* Use dashed line instead of solid to avoid visual conflict with editable fields */
   .read-only() {
     background-color: transparent;

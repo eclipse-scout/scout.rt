@@ -22,6 +22,7 @@ export class AppLinkKeyStroke extends KeyStroke {
     this.which = [keys.SPACE, keys.ENTER];
     this.renderingHints.render = false;
     this.inheritAccessibility = false; // Links cannot be disabled, mouse handlers work as well
+    this.stopPropagation = true;
   }
 
   protected override _accept(event: ScoutKeyboardEvent): boolean {

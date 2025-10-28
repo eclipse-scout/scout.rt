@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AppLinkKeyStroke, HtmlComponent, InitModelOf, KeyStrokeContext, LabelEventMap, LabelModel, strings, Widget} from '../index';
-import $ from 'jquery';
+import {AppLinkKeyStroke, events, HtmlComponent, InitModelOf, KeyStrokeContext, LabelEventMap, LabelModel, strings, Widget} from '../index';
 
 export class Label extends Widget implements LabelModel {
   declare model: LabelModel;
@@ -102,10 +101,8 @@ export class Label extends Widget implements LabelModel {
     }
   }
 
-  protected _onAppLinkAction(event: JQuery.ClickEvent | JQuery.KeyboardEventBase) {
-    let $target = $(event.delegateTarget);
-    let ref = $target.data('ref');
-    this.triggerAppLinkAction(ref);
+  protected _onAppLinkAction(event: JQuery.TriggeredEvent) {
+    events.triggerAppLinkAction(event, this.triggerAppLinkAction.bind(this));
   }
 
   triggerAppLinkAction(ref: string) {

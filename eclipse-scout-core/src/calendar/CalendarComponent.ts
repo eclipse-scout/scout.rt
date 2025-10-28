@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, Calendar, CalendarComponentEventMap, CalendarComponentModel, DateRange, dates, icons, InitModelOf, JsonDateRange, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
+import {aria, Calendar, CalendarComponentEventMap, CalendarComponentModel, DateRange, dates, events, icons, InitModelOf, JsonDateRange, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
 import $ from 'jquery';
 
 export class CalendarComponent extends Widget implements CalendarComponentModel {
@@ -466,10 +466,8 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     });
   }
 
-  _onAppLinkAction(event: JQuery.ClickEvent) {
-    let $target = $(event.delegateTarget);
-    let ref = $target.data('ref') as string;
-    this.triggerAppLinkAction(ref);
+  _onAppLinkAction(event: JQuery.TriggeredEvent) {
+    events.triggerAppLinkAction(event, this.triggerAppLinkAction.bind(this));
   }
 }
 
