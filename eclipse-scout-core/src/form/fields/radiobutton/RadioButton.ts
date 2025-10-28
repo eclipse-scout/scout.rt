@@ -95,16 +95,6 @@ export class RadioButton<TValue> extends Button implements RadioButtonModel<TVal
     aria.checked(this.$radioButton, this.selected);
   }
 
-  setTabbable(tabbable: boolean) {
-    if (this.rendered) {
-      this.$field.setTabbable(tabbable && !Device.get().supportsOnlyTouch());
-    }
-  }
-
-  isTabbable(): boolean {
-    return this.rendered && this.$field.isTabbable();
-  }
-
   protected override _renderIconId() {
     super._renderIconId();
     let $icon = this.get$Icon();

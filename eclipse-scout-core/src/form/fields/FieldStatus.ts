@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, arrays, ContextMenuPopup, EventHandler, FieldStatusEventMap, FieldStatusExecKeyStroke, FieldStatusModel, FormField, FormFieldStatusPosition, HierarchyChangeEvent, HtmlComponent, KeyStrokeContext, Menu, PropertyChangeEvent, scout,
-  Status, StatusOrModel, strings, Tooltip, Widget
+  aria, arrays, ContextMenuPopup, Device, EventHandler, FieldStatusEventMap, FieldStatusExecKeyStroke, FieldStatusModel, FormField, FormFieldStatusPosition, HierarchyChangeEvent, HtmlComponent, KeyStrokeContext, Menu, PropertyChangeEvent,
+  scout, Status, StatusOrModel, strings, Tooltip, Widget
 } from '../../index';
 
 export class FieldStatus extends Widget implements FieldStatusModel {
@@ -88,14 +88,9 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     this._renderPosition();
   }
 
-  protected override _renderEnabled() {
-    super._renderEnabled();
-    this._updateTabbable();
-  }
-
-  protected _updateTabbable() {
+  protected override _renderTabbable() {
     let hasMenus = !!this.menus.length;
-    this.$container.setTabbable(hasMenus && this.enabledComputed);
+    this.$container.setTabbable(hasMenus && this.enabledComputed && !Device.get().supportsOnlyTouch());
   }
 
   update(status: StatusOrModel, menus: Menu | Menu[], autoRemove: boolean, showStatus?: boolean) {
@@ -194,7 +189,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     }
     this._updateAriaLabel();
     this._updateVisibility();
-    this._updateTabbable();
+    this._renderTabbable();
     this.updateHasMenus();
   }
 

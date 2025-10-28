@@ -21,7 +21,6 @@ export class Slider extends Widget implements SliderModel {
   minValue: number;
   maxValue: number;
   step: number;
-  tabbable: boolean;
 
   protected _mouseMoveHandler = this._onMouseMove.bind(this);
   protected _mouseUpHandler = this._onMouseUp.bind(this);
@@ -85,7 +84,6 @@ export class Slider extends Widget implements SliderModel {
     this._renderMinValue();
     this._renderMaxValue();
     this._renderStep();
-    this._renderTabbable();
   }
 
   protected override _remove() {
@@ -138,21 +136,6 @@ export class Slider extends Widget implements SliderModel {
 
   protected _renderStep() {
     this._update();
-  }
-
-  setTabbable(tabbable: boolean) {
-    this.setProperty('tabbable', tabbable);
-  }
-
-  protected _renderTabbable() {
-    this.$container.setTabbable(this.tabbable && this.enabledComputed && !Device.get().supportsOnlyTouch());
-  }
-
-  protected override _renderEnabled() {
-    super._renderEnabled();
-    if (this.rendered) {
-      this._renderTabbable();
-    }
   }
 
   protected _onMouseDown(event: JQuery.MouseDownEvent | JQuery.TouchStartEvent) {

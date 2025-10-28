@@ -206,7 +206,7 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
    */
   protected _provideTabIndex() {
     let tabSet;
-    this.radioButtons.forEach(function(radioButton) {
+    this.radioButtons.forEach(radioButton => {
       if (radioButton.enabledComputed && this.enabledComputed && !tabSet) {
         radioButton.setTabbable(true);
         tabSet = radioButton;
@@ -217,7 +217,7 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
       } else {
         radioButton.setTabbable(false);
       }
-    }, this);
+    });
   }
 
   setGridColumnCount(gridColumnCount: number) {
@@ -345,7 +345,7 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
 
   getTabbableButton(): RadioButton<TValue> {
     return arrays.find(this.radioButtons, button => {
-      return button.visible && button.isTabbable();
+      return button.visible && button.tabbable;
     });
   }
 

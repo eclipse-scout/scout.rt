@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Device, EnumObject, HtmlComponent, InitModelOf, KeyStrokeContext, objects, scout, strings, SwitchEventMap, SwitchModel, SwitchNavigationKeyStroke, SwitchToggleKeyStroke, tooltips, Widget} from '../index';
+import {EnumObject, HtmlComponent, InitModelOf, KeyStrokeContext, objects, scout, strings, SwitchEventMap, SwitchModel, SwitchNavigationKeyStroke, SwitchToggleKeyStroke, tooltips, Widget} from '../index';
 
 export class Switch extends Widget implements SwitchModel {
   declare model: SwitchModel;
@@ -26,7 +26,6 @@ export class Switch extends Widget implements SwitchModel {
   tooltipText: string;
   iconVisible: boolean;
   displayStyle: SwitchDisplayStyle;
-  tabbable: boolean;
 
   $label: JQuery;
   $button: JQuery;
@@ -68,20 +67,12 @@ export class Switch extends Widget implements SwitchModel {
     this._renderTooltipText();
     this._renderIconVisible();
     this._renderDisplayStyle();
-    this._renderTabbable();
   }
 
   protected override _remove() {
     this.$label = null;
     this.$button = null;
     super._remove();
-  }
-
-  protected override _renderEnabled() {
-    super._renderEnabled();
-    if (this.rendered) {
-      this._renderTabbable();
-    }
   }
 
   protected override _createKeyStrokeContext(): KeyStrokeContext {
@@ -169,14 +160,9 @@ export class Switch extends Widget implements SwitchModel {
     this.invalidateLayoutTree();
   }
 
-  setTabbable(tabbable: boolean) {
-    this.setProperty('tabbable', tabbable);
-  }
-
-  protected _renderTabbable() {
-    let tabbable = this.tabbable && this.enabledComputed && !Device.get().supportsOnlyTouch();
-    this.$container.setTabbable(tabbable);
-    this.$container.toggleClass('unfocusable', !!tabbable);
+  protected override _renderTabbable() {
+    super._renderTabbable();
+    this.$container.toggleClass('unfocusable', !!this.tabbable);
   }
 
   protected _onSwitchMouseDown(event: JQuery.MouseDownEvent) {

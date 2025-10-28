@@ -27,7 +27,11 @@ export interface SliderModel extends WidgetModel {
    */
   step?: number;
   /**
-   * Default is true
+   * Defines whether the slider can be focused using keyboard.
+   *
+   * Default is true.
+   *
+   * @see WidgetModel.tabbable.
    */
   tabbable?: boolean;
 }

@@ -79,6 +79,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   scrollTop: number;
   session: Session;
   trackFocus: boolean;
+  tabbable: boolean;
   uuid: string;
   uuidParent: ObjectWithUuid;
   visible: boolean;
@@ -162,7 +163,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this._lastFocusedWidget = null;
 
     this._glassPaneContributions = [];
-    this._addCloneProperties(['visible', 'enabled', 'inheritAccessibility', 'cssClass', 'preventInitialFocus', 'preventClickFocus']);
+    this._addCloneProperties(['visible', 'enabled', 'inheritAccessibility', 'cssClass', 'preventInitialFocus', 'preventClickFocus', 'tabbable']);
     this._addMultiDimensionalProperty('enabled', true);
     this._addMultiDimensionalProperty('visible', true);
     this._addPropertyDimensionAlias('enabled', 'enabledGranted', {dimension: 'granted'});
@@ -494,6 +495,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this._renderLoading();
     this._renderScrollTop();
     this._renderScrollLeft();
+    this._renderTabbable();
   }
 
   /**
@@ -937,11 +939,11 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   protected _renderEnabled() {
-    if (!this.$container) {
-      return;
-    }
-    this.$container.setEnabled(this.enabledComputed);
+    this.$container?.setEnabled(this.enabledComputed);
     this._renderDisabledStyle();
+    if (this.rendered) {
+      this._renderTabbable();
+    }
   }
 
   /** @see WidgetModel.inheritAccessibility */
@@ -1134,6 +1136,21 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    */
   protected _createLoadingSupport(): LoadingSupport {
     return null;
+  }
+
+  /** @see WidgetModel.tabbable */
+  setTabbable(tabbable: boolean) {
+    this.setProperty('tabbable', tabbable);
+  }
+
+  protected _renderTabbable() {
+    if (objects.isNullOrUndefined(this.tabbable)) {
+      return;
+    }
+    // Tabbable is set to false if device supports only touch (e.g. smartphones) because FocusManager.restrictedFocusGain is disabled, too.
+    // Otherwise, it could gain focus even if preventClickFocus is true.
+    // However, some widgets may still require a focus visualization even in touch mode, so it may have to be adjusted for some widgets.
+    this.get$Focusable()?.setTabbable(this.tabbable && this.enabledComputed && !Device.get().supportsOnlyTouch());
   }
 
   /** @see WidgetModel.loading */

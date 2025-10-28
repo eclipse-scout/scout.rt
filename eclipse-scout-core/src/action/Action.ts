@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, ActionEventMap, ActionExecKeyStroke, ActionKeyStroke, ActionModel, Alignment, aria, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, LoadingSupport, NullLayout, scout,
-  TabbableItem, TooltipPosition, tooltips, TooltipSupport, Widget
+  AbstractLayout, ActionEventMap, ActionExecKeyStroke, ActionKeyStroke, ActionModel, Alignment, aria, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, LoadingSupport, NullLayout, scout, TabbableItem,
+  TooltipPosition, tooltips, TooltipSupport, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -30,7 +30,6 @@ export class Action extends Widget implements ActionModel, TabbableItem {
   keyStrokeFirePolicy: KeyStrokeFirePolicy;
   selected: boolean;
   preventDoubleClick: boolean;
-  tabbable: boolean;
   actionKeyStroke: ActionKeyStroke;
   text: string;
   textPosition: ActionTextPosition;
@@ -75,7 +74,7 @@ export class Action extends Widget implements ActionModel, TabbableItem {
     this.showTooltipWhenSelected = true;
 
     this._doubleClickSupport = new DoubleClickSupport();
-    this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'preventDoubleClick', 'tabbable', 'text', 'textPosition', 'htmlEnabled', 'tooltipText', 'toggleAction']);
+    this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'preventDoubleClick', 'text', 'textPosition', 'htmlEnabled', 'tooltipText', 'toggleAction']);
   }
 
   static ActionStyle = {
@@ -161,7 +160,6 @@ export class Action extends Widget implements ActionModel, TabbableItem {
     this._renderTooltipText();
     this._renderKeyStroke();
     this._renderSelected();
-    this._renderTabbable();
     this._renderCompact();
     this._renderActionStyle();
     this._renderOverflown();
@@ -283,7 +281,6 @@ export class Action extends Widget implements ActionModel, TabbableItem {
     super._renderEnabled();
     if (this.rendered) { // No need to do this during initial rendering
       this._updateTooltip();
-      this._renderTabbable();
     }
   }
 
@@ -325,15 +322,6 @@ export class Action extends Widget implements ActionModel, TabbableItem {
     }
     let tooltipText = this._computeTooltipText();
     return !!tooltipText;
-  }
-
-  /** @see ActionModel.tabbable */
-  setTabbable(tabbable: boolean) {
-    this.setProperty('tabbable', tabbable);
-  }
-
-  protected _renderTabbable() {
-    this.$container.setTabbable(this.tabbable && this.enabledComputed && !Device.get().supportsOnlyTouch());
   }
 
   isTabTarget(): boolean {

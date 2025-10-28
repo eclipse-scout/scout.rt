@@ -5747,7 +5747,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     if (!this.tileMode) {
       this.$data.setEnabled(enabled);
     }
-
     this.get$Focusable().setTabbableOrFocusable(enabled);
   }
 

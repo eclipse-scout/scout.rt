@@ -86,9 +86,9 @@ export interface ActionModel extends WidgetModel {
    */
   preventClickFocus?: boolean;
   /**
-   * Defines whether the action can be focused using keyboard.
-   *
    * Default is true.
+   *
+   * @see WidgetModel.tabbable
    */
   tabbable?: boolean;
   /**
