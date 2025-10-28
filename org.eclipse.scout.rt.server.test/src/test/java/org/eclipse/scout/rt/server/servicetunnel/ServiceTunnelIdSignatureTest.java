@@ -20,7 +20,6 @@ import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.ws.rs.WebApplicationException;
 
 import org.eclipse.scout.rt.dataobject.DataObjectHolder;
 import org.eclipse.scout.rt.dataobject.DoEntity;
@@ -126,7 +125,7 @@ public class ServiceTunnelIdSignatureTest {
           .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, response)
           .run(() -> BEANS.get(ServiceTunnelService.class).incomingRequest(request.getInputStream(), response.getOutputStream()));
     }
-    catch (WebApplicationException t) {
+    catch (RuntimeException t) {
       // error occurred -> no response to read
       return null;
     }

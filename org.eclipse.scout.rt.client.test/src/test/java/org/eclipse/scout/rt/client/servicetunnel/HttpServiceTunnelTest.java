@@ -15,10 +15,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.core.Response.Status;
 
 import org.eclipse.scout.rt.client.servicetunnel.ServiceTunnelClientConfigProperties.BackendUrlProperty;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.rest.jersey.TestJerseyMockConnector;
 import org.eclipse.scout.rt.rest.jersey.TestingRestClientConfigFactory;
@@ -75,10 +77,8 @@ public class HttpServiceTunnelTest {
     HttpServiceTunnel tunnel = createHttpServiceTunnel(expectedResponse);
 
     ServiceTunnelRequest request = new ServiceTunnelRequest("IPingService", "ping", null, null);
-    ServiceTunnelResponse response = tunnel.tunnel(request);
-    assertNotNull(response);
-    assertTrue(response.getException() instanceof HttpServiceTunnelException);
-    assertEquals(401, ((HttpServiceTunnelException) response.getException()).getHttpStatus());
+    VetoException vetoException = assertThrows(VetoException.class, () -> tunnel.tunnel(request));
+    assertTrue(vetoException.getCause() instanceof NotAuthorizedException);
   }
 
   protected HttpServiceTunnel createHttpServiceTunnel(final MockLowLevelHttpResponse expectedResponse) throws IOException {

@@ -207,9 +207,6 @@ public class HttpServiceTunnel {
           }
           return response;
         }
-        catch (ClassNotFoundException e) {
-          return new ServiceTunnelResponse(e);
-        }
       }
     }
     catch (RemoteSystemUnavailableException exception) {
@@ -220,7 +217,7 @@ public class HttpServiceTunnel {
       }
       throw new ProcessingException("Service tunnel request failed", cause);
     }
-    catch (IOException e) {
+    catch (ClassNotFoundException | IOException e) {
       if (Thread.currentThread().isInterrupted()) {
         LOG.debug("Ignoring IOException for interrupted thread.", e);
         return new ServiceTunnelResponse(new ThreadInterruptedError("Thread is interrupted.", e));
