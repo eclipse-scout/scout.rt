@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -155,6 +155,35 @@
     top: @top;
     width: calc(~'100% + ' @diffW);
     height: calc(~'100% + ' @diffH);
+  }
+
+  .pseudo-overlay(@top: 0, @right: @top, @bottom: @top, @left: @top) {
+    content: '';
+    position: absolute;
+    top: @top;
+    right: @right;
+    bottom: @bottom;
+    left: @left;
+    pointer-events: none; // Necessary when used as ::after element
+  }
+
+  /**
+   * Draws an ::after element that has the focus-box-shadow.
+   * An ::after element is necessary to add a little horizontal padding.
+   */
+
+  .link-focus-overlay {
+    position: relative;
+
+    &:focus {
+      box-shadow: none;
+
+      &::after {
+        #scout.focus-box-shadow();
+        #scout.pseudo-overlay(0, -2px, 0, -2px);
+        border-radius: @border-radius;
+      }
+    }
   }
 
   /* Use dashed line instead of solid to avoid visual conflict with editable fields */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AppLinkActionEvent, HtmlComponent, Tile, TileEventMap, TileModel} from '../index';
-import $ from 'jquery';
+import {AppLinkActionEvent, events, HtmlComponent, Tile, TileEventMap, TileModel} from '../index';
 
 export interface BeanTileModel extends TileModel {
   bean?: object;
@@ -52,8 +51,6 @@ export class BeanTile<TBean extends object = object> extends Tile implements Bea
   }
 
   protected _onAppLinkAction(event: JQuery.TriggeredEvent) {
-    let $target = $(event.delegateTarget);
-    let ref = $target.data('ref');
-    this.triggerAppLinkAction(ref);
+    events.triggerAppLinkAction(event, this.triggerAppLinkAction.bind(this));
   }
 }

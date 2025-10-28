@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, HtmlComponent, Icon, icons, InitModelOf, NotificationEventMap, NotificationModel, scout, Status, StatusOrModel, strings, texts, Widget} from '../index';
-import $ from 'jquery';
+import {aria, events, HtmlComponent, Icon, icons, InitModelOf, NotificationEventMap, NotificationModel, scout, Status, StatusOrModel, strings, texts, Widget} from '../index';
 
 export class Notification extends Widget implements NotificationModel {
   declare model: NotificationModel;
@@ -201,10 +200,8 @@ export class Notification extends Widget implements NotificationModel {
     this.trigger('close');
   }
 
-  protected _onAppLinkAction(event: JQuery.ClickEvent) {
-    let $target = $(event.delegateTarget);
-    let ref = $target.data('ref') as string;
-    this.triggerAppLinkAction(ref);
+  protected _onAppLinkAction(event: JQuery.TriggeredEvent) {
+    events.triggerAppLinkAction(event, this.triggerAppLinkAction.bind(this));
   }
 
   triggerAppLinkAction(ref: string) {

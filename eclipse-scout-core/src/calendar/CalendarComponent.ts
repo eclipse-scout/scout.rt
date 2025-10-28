@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, Calendar, CalendarComponentEventMap, CalendarComponentModel, DateRange, dates, icons, InitModelOf, JsonDateRange, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
+import {aria, Calendar, CalendarComponentEventMap, CalendarComponentModel, DateRange, dates, events, icons, InitModelOf, JsonDateRange, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
 import $ from 'jquery';
 
 export class CalendarComponent extends Widget implements CalendarComponentModel {
@@ -466,10 +466,8 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     });
   }
 
-  _onAppLinkAction(event: JQuery.ClickEvent) {
-    let $target = $(event.delegateTarget);
-    let ref = $target.data('ref') as string;
-    this.triggerAppLinkAction(ref);
+  _onAppLinkAction(event: JQuery.TriggeredEvent) {
+    events.triggerAppLinkAction(event, this.triggerAppLinkAction.bind(this));
   }
 }
 

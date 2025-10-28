@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,6 +22,7 @@ export class AppLinkKeyStroke extends KeyStroke {
     this.which = [keys.SPACE, keys.ENTER];
     this.renderingHints.render = false;
     this.inheritAccessibility = false; // Links cannot be disabled, mouse handlers work as well
+    this.stopPropagation = true;
   }
 
   protected override _accept(event: ScoutKeyboardEvent): boolean {

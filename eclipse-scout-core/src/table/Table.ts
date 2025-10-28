@@ -9,8 +9,8 @@
  */
 import {
   AbstractTableAccessibilityRenderer, Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke,
-  ContextMenuPopup, dataObjects, DefaultTableAccessibilityRenderer, Desktop, DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, ErrorHandler, EventHandler, Filter,
-  Filterable, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HierarchicalTableAccessibilityRenderer, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext,
+  ContextMenuPopup, dataObjects, DefaultTableAccessibilityRenderer, Desktop, DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, ErrorHandler, EventHandler, events,
+  Filter, Filterable, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HierarchicalTableAccessibilityRenderer, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext,
   LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects,
   Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToOptions, Status, StatusOrModel, strings, styles, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer, TableEventMap,
   TableFooter, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke,
@@ -840,7 +840,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     let row = $row.data('row') as TableRow; // read row before the $row potentially could be replaced by the column specific logic on mouse up
     if (mouseButton === 1) {
       column.onMouseUp(event, $row);
-      $appLink = this._find$AppLink(event);
+      $appLink = events.find$AppLink(event);
     }
     if ($appLink) {
       this._triggerAppLinkAction(column, row, $appLink.data('ref'), $appLink);
@@ -2377,16 +2377,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       column = visibleColumns[visibleColumns.length - 1];
     }
     return column;
-  }
-
-  protected _find$AppLink(event: JQuery.MouseUpEvent): JQuery {
-    let $start = $(event.target);
-    let $stop = $(event.delegateTarget);
-    let $appLink = $start.findUp($elem => $elem.hasClass('app-link'), $stop);
-    if ($appLink.length > 0) {
-      return $appLink;
-    }
-    return null;
   }
 
   /** @internal */
