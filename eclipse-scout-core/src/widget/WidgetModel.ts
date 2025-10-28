@@ -74,6 +74,17 @@ export interface WidgetModel extends ObjectModelWithUuid<Widget>, ObjectModelWit
    */
   trackFocus?: boolean;
   /**
+   * Defines whether the widget can be focused using keyboard.
+   *
+   * The property may be undefined which means the tabindex will neither be removed nor added to {@link get$Focusable()}.
+   * This makes it possible to still assign the tabindex manually instead of using this property.
+   * This also means, if the property is undefined, the widget may be tabbable or maybe not,
+   * e.g. the widget itself could assign an explicit tabindex or its focusable element is an {@link HTMLInputElement} which is natively tabbable.
+   *
+   * Default is undefined.
+   */
+  tabbable?: boolean;
+  /**
    * Defines whether the widget should look focused.
    * It does _not_ focus the widget. It basically just toggles the class `focused`.
    *
@@ -93,7 +104,7 @@ export interface WidgetModel extends ObjectModelWithUuid<Widget>, ObjectModelWit
    * Defines whether the focus gain should be prevented when the widget is clicked.
    *
    * If set to true the class `unfocusable` will be set on {@link get$Focusable()} so it won't get the focus even if it was focusable.
-   * However, if the widget is tabbable, it may still get the focus by keyboard or if {@link focus} is called programmatically.
+   * However, if the widget is {@link tabbable}, it may still get the focus by keyboard or if {@link focus} is called programmatically.
    *
    * The property may be undefined which means the `unfocusable` class will neither be removed nor added to {@link get$Focusable()}.
    * This makes it possible to still use the css class directly instead of this property.

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, Device, Event, EventHandler, FieldStatus, FormField, HtmlComponent, HtmlEnvironment, InitModelOf, ObjectIdProvider, PropertyChangeEvent, scout, SomeRequired, Status, strings, TabEventMap, TabItem, TabModel, tooltips, Widget
+  aria, Device, Event, EventHandler, FieldStatus, HtmlComponent, HtmlEnvironment, InitModelOf, ObjectIdProvider, PropertyChangeEvent, scout, SomeRequired, Status, strings, TabEventMap, TabItem, TabModel, tooltips, Widget
 } from '../../../index';
 
 export class Tab extends Widget implements TabModel {
@@ -26,7 +26,6 @@ export class Tab extends Widget implements TabModel {
   tooltipText: string;
   fieldStatus: FieldStatus;
   tabItem: TabItem;
-  tabbable: boolean;
   $title: JQuery;
   $label: JQuery;
   $subLabel: JQuery;
@@ -117,7 +116,6 @@ export class Tab extends Widget implements TabModel {
     this._renderVisible();
     this._renderLabel();
     this._renderSubLabel();
-    this._renderTabbable();
     this._renderSelected();
     this._renderMarked();
     this._renderOverflown();
@@ -197,11 +195,7 @@ export class Tab extends Widget implements TabModel {
     return this.visible && !this.overflown && (!!this.errorStatus || strings.hasText(this.tooltipText));
   }
 
-  setTabbable(tabbable: boolean) {
-    this.setProperty('tabbable', tabbable);
-  }
-
-  protected _renderTabbable() {
+  protected override _renderTabbable() {
     this.$container.setTabbable(this.tabbable && !Device.get().supportsOnlyTouch());
   }
 

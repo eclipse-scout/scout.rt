@@ -26,7 +26,6 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
   status: Status;
   selected: boolean;
   overflown: boolean;
-  tabbable: boolean;
   $title: JQuery;
   $subTitle: JQuery;
   $iconContainer: JQuery;
@@ -132,7 +131,6 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
     this._renderSaveNeeded();
     this._renderStatus();
     this._renderSelected();
-    this._renderTabbable();
   }
 
   protected override _remove() {
@@ -162,14 +160,6 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
 
   protected _renderIconId() {
     this.$iconContainer.icon(this.iconId);
-  }
-
-  setTabbable(tabbable: boolean) {
-    this.setProperty('tabbable', tabbable);
-  }
-
-  protected _renderTabbable() {
-    this.$container.setTabbable(this.tabbable && this.enabledComputed && !Device.get().supportsOnlyTouch());
   }
 
   setOverflown(overflown: boolean) {

@@ -335,13 +335,13 @@ describe('RadioButtonGroup', () => {
 
       radioButtonGroup.selectButton(radioButtonGroup.radioButtons[0]);
       expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[0]);
-      expect(radioButtonGroup.radioButtons[0].isTabbable()).toBe(true);
-      expect(radioButtonGroup.radioButtons[1].isTabbable()).toBe(false);
+      expect(radioButtonGroup.radioButtons[0].tabbable).toBe(true);
+      expect(radioButtonGroup.radioButtons[1].tabbable).toBe(false);
 
       radioButtonGroup.selectButton(radioButtonGroup.radioButtons[1]);
       expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
-      expect(radioButtonGroup.radioButtons[0].isTabbable()).toBe(false);
-      expect(radioButtonGroup.radioButtons[1].isTabbable()).toBe(true);
+      expect(radioButtonGroup.radioButtons[0].tabbable).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].tabbable).toBe(true);
     });
 
     it('does not remove the tabindex if the button is deselected', () => {
@@ -351,15 +351,15 @@ describe('RadioButtonGroup', () => {
       radioButtonGroup.selectButton(radioButtonGroup.radioButtons[0]);
       expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[0]);
       expect(radioButtonGroup.radioButtons[0].selected).toBe(true);
-      expect(radioButtonGroup.radioButtons[0].isTabbable()).toBe(true);
+      expect(radioButtonGroup.radioButtons[0].tabbable).toBe(true);
       expect(radioButtonGroup.radioButtons[1].selected).toBe(false);
-      expect(radioButtonGroup.radioButtons[1].isTabbable()).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].tabbable).toBe(false);
 
       radioButtonGroup.selectButton(null);
       expect(radioButtonGroup.selectedButton).toBe(null);
-      expect(radioButtonGroup.radioButtons[0].isTabbable()).toBe(true);
+      expect(radioButtonGroup.radioButtons[0].tabbable).toBe(true);
       expect(radioButtonGroup.radioButtons[0].selected).toBe(false);
-      expect(radioButtonGroup.radioButtons[1].isTabbable()).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].tabbable).toBe(false);
       expect(radioButtonGroup.radioButtons[1].selected).toBe(false);
     });
 

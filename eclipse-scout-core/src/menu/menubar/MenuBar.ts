@@ -23,7 +23,6 @@ export class MenuBar extends Widget implements MenuBarModel {
   menuSorter: MenuOrder & { menuBar?: MenuBar };
   menuFilter: MenuFilter;
   position: MenuBarPosition;
-  tabbable: boolean;
   tabbableCoordinator: TabbableCoordinator;
   menuboxLeft: MenuBarBox;
   menuboxRight: MenuBarBox;
@@ -283,6 +282,10 @@ export class MenuBar extends Widget implements MenuBarModel {
     });
 
     return foundIndex;
+  }
+
+  protected override _renderTabbable() {
+    // nop
   }
 
   setTabbableMenu(menu: Menu) {

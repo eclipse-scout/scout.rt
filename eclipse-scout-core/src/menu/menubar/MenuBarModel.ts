@@ -13,6 +13,13 @@ export interface MenuBarModel extends WidgetModel {
   menuFilter?: MenuFilter;
   menuItems?: ObjectOrChildModel<Menu>[];
   position?: MenuBarPosition;
+  /**
+   * Defines whether the menubar can be focused using keyboard.
+   *
+   * Default is true.
+   *
+   * @see WidgetModel.tabbable.
+   */
   tabbable?: boolean;
   ellipsisPosition?: MenuBarEllipsisPosition;
   menuOrder?: MenuOrder;

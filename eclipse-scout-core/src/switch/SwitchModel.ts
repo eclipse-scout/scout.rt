@@ -51,9 +51,11 @@ export interface SwitchModel extends WidgetModel {
    */
   displayStyle?: SwitchDisplayStyle;
   /**
-   * Defines whether the switch can be focused using keyboard.
+   * Defines whether the slider can be focused using keyboard.
    *
    * Default is true.
+   *
+   * @see WidgetModel.tabbable.
    */
   tabbable?: boolean;
 }
