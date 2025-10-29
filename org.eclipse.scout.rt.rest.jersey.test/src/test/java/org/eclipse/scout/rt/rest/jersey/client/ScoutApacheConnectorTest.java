@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import java.util.stream.IntStream;
 
 import javax.net.ssl.SSLContext;
 
+import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.RedirectionException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -41,6 +43,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.cookie.StandardCookieSpec;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
@@ -65,6 +68,7 @@ import org.eclipse.scout.rt.rest.jersey.ProxyServletParameters;
 import org.eclipse.scout.rt.rest.jersey.RestClientHttpProxyServlet;
 import org.eclipse.scout.rt.rest.jersey.RestClientTestEchoResponse;
 import org.eclipse.scout.rt.rest.jersey.RestClientTestEchoServlet;
+import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestForceEncodeUriForRequestProperty;
 import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportConnectionKeepAliveProperty;
 import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportConnectionTimeToLiveProperty;
 import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportMaxConnectionsPerRouteProperty;
@@ -72,6 +76,7 @@ import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTran
 import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportValidateAfterInactivityProperty;
 import org.eclipse.scout.rt.shared.http.HttpClientMetricsHelper;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
+import org.eclipse.scout.rt.testing.platform.mock.MockConfigPropertyRule;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.ClientRequest;
@@ -789,5 +794,35 @@ public class ScoutApacheConnectorTest {
     clientRequestConsumer.accept(clientRequest);
     connector.initKeepAliveTimeout(clientRequest, requestConfigBuilder);
     assertEquals(expected >= 0 ? Timeout.ofMilliseconds(expected) : Timeout.of(BEANS.get(RestHttpTransportConnectionKeepAliveProperty.class).getDefaultValue(), TimeUnit.MILLISECONDS), requestConfigBuilder.build().getConnectionKeepAlive());
+  }
+
+  @Test
+  public void testForceEncodeUriForRequest_true() {
+    MockConfigPropertyRule<Boolean> rule = new MockConfigPropertyRule<>(RestForceEncodeUriForRequestProperty.class, true);
+    rule.run(() -> {
+      runTestForceEncodeUriForRequest(new URI("http://127.0.0.1/%C3%A4"), new URI("http://127.0.0.1/ä")); // umlaut must be encoded properly
+      runTestForceEncodeUriForRequest(new URI("http://127.0.0.1/%C3%A4"), new URI("http://127.0.0.1/%C3%A4")); // already properly encoded URL should be kept intact
+    });
+  }
+
+  @Test
+  public void testForceEncodeUriForRequest_false() {
+    MockConfigPropertyRule<Boolean> rule = new MockConfigPropertyRule<>(RestForceEncodeUriForRequestProperty.class, false);
+    rule.run(() -> {
+      for (URI uri : new URI[]{new URI("http://127.0.0.1/ä"), new URI("http://127.0.0.1/%C3%A4")}) {
+        runTestForceEncodeUriForRequest(uri, uri); // no re-encoding expected, request URI should always match inputUri
+      }
+    });
+  }
+
+  protected void runTestForceEncodeUriForRequest(URI expectedUriForRequest, URI inputUri) throws URISyntaxException {
+    Client client = Mockito.mock(Client.class);
+    Configuration configuration = Mockito.mock(Configuration.class);
+    ScoutApacheConnector connector = new ScoutApacheConnector(client, configuration);
+    ClientRequest clientRequest = Mockito.mock(ClientRequest.class);
+    when(clientRequest.getMethod()).thenReturn(HttpMethod.OPTIONS);
+    when(clientRequest.getUri()).thenReturn(inputUri);
+    HttpUriRequestBase uriHttpRequest = connector.getUriHttpRequest(clientRequest);
+    assertEquals(expectedUriForRequest, uriHttpRequest.getUri());
   }
 }
