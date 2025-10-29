@@ -1,6 +1,5 @@
 /*
-<<<<<<< HEAD
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,14 +14,14 @@ import java.util.function.Supplier;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
-import org.junit.rules.TestRule;
+import org.eclipse.scout.rt.testing.platform.util.AbstractScoutTestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 /**
  * Shortcut to replace a application scoped bean within a test.
  */
-public class RegisterBeanTestRule<BEAN> implements TestRule {
+public class RegisterBeanTestRule<BEAN> extends AbstractScoutTestRule {
 
   private final Class<? super BEAN> m_beanClazz;
   private final Supplier<BEAN> m_mockSupplier;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,6 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
-import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.core.Configuration;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -75,10 +75,12 @@ import org.apache.hc.core5.http.io.entity.BufferedHttpEntity;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
@@ -486,7 +488,14 @@ public class ScoutApacheConnector implements Connector {
     boolean bufferingEnabled = BooleanUtility.nvl(clientRequest.resolveProperty(RestClientProperties.DISABLE_CHUNKED_TRANSFER_ENCODING, Boolean.class));
     HttpEntity entity = getHttpEntity(clientRequest, bufferingEnabled);
 
-    HttpUriRequestBase request = new HttpUriRequestBase(clientRequest.getMethod(), clientRequest.getUri());
+    HttpUriRequestBase request = null;
+    try {
+      boolean encodeUriForRequest = CONFIG.getPropertyValue(RestForceEncodeUriForRequestProperty.class);
+      request = new HttpUriRequestBase(clientRequest.getMethod(), encodeUriForRequest ? new URI(clientRequest.getUri().toASCIIString()) : clientRequest.getUri());
+    }
+    catch (URISyntaxException e) {
+      throw new ProcessingException("Invalid URI for request: {}", clientRequest.getUri(), e);
+    }
     request.setEntity(entity);
     request.setConfig(requestConfigBuilder.build());
     return request;
@@ -853,6 +862,24 @@ public class ScoutApacheConnector implements Connector {
     @Override
     public String getKey() {
       return "scout.rest.client.http.connectionTimeToLive";
+    }
+  }
+
+  public static class RestForceEncodeUriForRequestProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public Boolean getDefaultValue() {
+      return true;
+    }
+
+    @Override
+    public String description() {
+      return "Specifies whether the URI should be re-encoded to force US-ASCII encoding (strict RFC 2396 compliance), default: " + getDefaultValue();
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.rest.client.http.forceEncodeUriForRequest";
     }
   }
 }
