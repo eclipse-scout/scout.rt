@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,14 +13,13 @@ import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
-import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 /**
  * Test rule to use a fixed locale.
  */
-public class LocaleTestRule implements TestRule {
+public class LocaleTestRule extends AbstractScoutTestRule {
 
   private Locale m_locale;
 
