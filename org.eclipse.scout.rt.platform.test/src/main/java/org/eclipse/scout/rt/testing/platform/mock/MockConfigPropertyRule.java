@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,11 +18,11 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
-import org.junit.rules.TestRule;
+import org.eclipse.scout.rt.testing.platform.util.AbstractScoutTestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-public class MockConfigPropertyRule<DATA_TYPE> implements TestRule {
+public class MockConfigPropertyRule<DATA_TYPE> extends AbstractScoutTestRule {
 
   private final Class<? extends IConfigProperty<DATA_TYPE>> m_configPropertyClazz;
   private DATA_TYPE m_initialValue;
