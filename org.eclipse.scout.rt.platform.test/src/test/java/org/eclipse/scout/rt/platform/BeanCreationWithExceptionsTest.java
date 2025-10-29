@@ -11,8 +11,11 @@ package org.eclipse.scout.rt.platform;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.annotation.PostConstruct;
 
@@ -21,6 +24,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -168,8 +172,7 @@ public class BeanCreationWithExceptionsTest {
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
     state.constructorLatch.countDown();
-    f1.awaitDoneAndGet();
-    f2.awaitDoneAndGet();
+    assertSame(f1.awaitDoneAndGet(), f2.awaitDoneAndGet());
     state.assertInvocations(1, 1);
   }
 
@@ -181,20 +184,9 @@ public class BeanCreationWithExceptionsTest {
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
     state.constructorLatch.countDown();
-    try {
-      f1.awaitDoneAndGet();
-      fail("expecting exception");
-    }
-    catch (BeanCreationException e) {
-      assertTestBeanException(true, e);
-    }
-    try {
-      f2.awaitDoneAndGet();
-      fail("expecting exception");
-    }
-    catch (BeanCreationException e) {
-      // expected
-    }
+    assertTestBeanException(true,
+        assertThrows(BeanCreationException.class, () -> f1.awaitDoneAndGet()),
+        assertThrows(BeanCreationException.class, () -> f2.awaitDoneAndGet()));
     state.assertInvocations(0, 0);
   }
 
@@ -206,21 +198,12 @@ public class BeanCreationWithExceptionsTest {
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
     state.constructorLatch.countDown();
-    try {
-      f1.awaitDoneAndGet();
-      fail("expecting exception");
-    }
-    catch (BeanCreationException e) {
-      assertTestBeanException(false, e);
-    }
-    try {
-      f2.awaitDoneAndGet();
-      fail("expecting exception");
-    }
-    catch (BeanCreationException e) {
-      // expected
-    }
-    state.assertInvocations(1, 0);
+    assertTestBeanException(false,
+        assertThrows(BeanCreationException.class, () -> f1.awaitDoneAndGet()),
+        assertThrows(BeanCreationException.class, () -> f2.awaitDoneAndGet()));
+    Assertions.assertGreaterOrEqual(state.numConstructorInvocations, 1);
+    Assertions.assertLessOrEqual(state.numConstructorInvocations, 2); // in rare cases constructor may be called twice, e.g. if almost everything of f2 is only run after f1 is finished
+    assertEquals(0, state.numPostConstructInvocations);
   }
 
   @Test
@@ -231,20 +214,9 @@ public class BeanCreationWithExceptionsTest {
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
     state.constructorLatch.countDown();
-    try {
-      f1.awaitDoneAndGet();
-      fail("expecting exception");
-    }
-    catch (BeanCreationException e) {
-      assertTestBeanException(true, e);
-    }
-    try {
-      f2.awaitDoneAndGet();
-      fail("expecting exception");
-    }
-    catch (BeanCreationException e) {
-      // expected
-    }
+    assertTestBeanException(true,
+        assertThrows(BeanCreationException.class, () -> f1.awaitDoneAndGet()),
+        assertThrows(BeanCreationException.class, () -> f2.awaitDoneAndGet()));
     state.assertInvocations(0, 0);
 
     // disable exceptions, try again
@@ -261,26 +233,19 @@ public class BeanCreationWithExceptionsTest {
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
     state.constructorLatch.countDown();
-    try {
-      f1.awaitDoneAndGet();
-      fail("expecting exception");
-    }
-    catch (BeanCreationException e) {
-      assertTestBeanException(false, e);
-    }
-    try {
-      f2.awaitDoneAndGet();
-      fail("expecting exception");
-    }
-    catch (BeanCreationException e) {
-      // expected
-    }
-    state.assertInvocations(1, 0);
+    assertTestBeanException(false,
+        assertThrows(BeanCreationException.class, () -> f1.awaitDoneAndGet()),
+        assertThrows(BeanCreationException.class, () -> f2.awaitDoneAndGet()));
+    Assertions.assertGreaterOrEqual(state.numConstructorInvocations, 1);
+    Assertions.assertLessOrEqual(state.numConstructorInvocations, 2); // in rare cases constructor may be called twice, e.g. if almost everything of f2 is only run after f1 is finished
+    assertEquals(0, state.numPostConstructInvocations);
 
     // disable exceptions, try again
     state.throwExceptionInPostConstruct = false;
     BEANS.get(TestBean.class);
-    state.assertInvocations(2, 1);
+    Assertions.assertGreaterOrEqual(state.numConstructorInvocations, 2);
+    Assertions.assertLessOrEqual(state.numConstructorInvocations, 3); // see above
+    assertEquals(1, state.numPostConstructInvocations);
   }
 
   @Test
@@ -291,49 +256,31 @@ public class BeanCreationWithExceptionsTest {
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
     state.constructorLatch.countDown();
-    try {
-      f1.awaitDoneAndGet();
-      fail("expecting exception");
-    }
-    catch (BeanCreationException e) {
-      assertTestBeanException(true, e);
-    }
-    try {
-      f2.awaitDoneAndGet();
-      fail("expecting exception");
-    }
-    catch (BeanCreationException e) {
-      // expected
-    }
+    assertTestBeanException(true,
+        assertThrows(BeanCreationException.class, () -> f1.awaitDoneAndGet()),
+        assertThrows(BeanCreationException.class, () -> f2.awaitDoneAndGet()));
     state.assertInvocations(0, 0);
 
     // disable constructor exception, enable postConstruct exception
     state.throwExceptionInConstructor = false;
     state.throwExceptionInPostConstruct = true;
     state.armLatch(true);
-    f1 = scheduleGetBean();
-    f2 = scheduleGetBean();
+    IFuture<TestBean> f3 = scheduleGetBean();
+    IFuture<TestBean> f4 = scheduleGetBean();
     state.constructorLatch.countDown();
-    try {
-      f1.awaitDoneAndGet();
-      fail("expecting exception");
-    }
-    catch (BeanCreationException e) {
-      assertTestBeanException(false, e);
-    }
-    try {
-      f2.awaitDoneAndGet();
-      fail("expecting exception");
-    }
-    catch (BeanCreationException e) {
-      // expected
-    }
-    state.assertInvocations(1, 0);
+    assertTestBeanException(false,
+        assertThrows(BeanCreationException.class, () -> f3.awaitDoneAndGet()),
+        assertThrows(BeanCreationException.class, () -> f4.awaitDoneAndGet()));
+    Assertions.assertGreaterOrEqual(state.numConstructorInvocations, 1);
+    Assertions.assertLessOrEqual(state.numConstructorInvocations, 2); // in rare cases constructor may be called twice, e.g. if almost everything of f4 is only run after f3 is finished
+    assertEquals(0, state.numPostConstructInvocations);
 
     // disable exceptions, try again
     state.throwExceptionInPostConstruct = false;
     BEANS.get(TestBean.class);
-    state.assertInvocations(2, 1);
+    Assertions.assertGreaterOrEqual(state.numConstructorInvocations, 2);
+    Assertions.assertLessOrEqual(state.numConstructorInvocations, 3); // see above
+    assertEquals(1, state.numPostConstructInvocations);
   }
 
   private static IFuture<TestBean> scheduleGetBean() {
@@ -344,6 +291,21 @@ public class BeanCreationWithExceptionsTest {
     }, Jobs.newInput().withExceptionHandling(new ExceptionHandler(), false));
     await(runningLatch);
     return future;
+  }
+
+  private static void assertTestBeanException(boolean expectedFromConstructor, BeanCreationException firstException, BeanCreationException secondException) {
+    // at least one creation exception must have "our" TestBeanException as a cause, might be the first, the second or both of them
+    // for a exception w/o a cause, it might also be a "Thread was waiting on bean instance creator thread which most likely failed" creation exception thrown in SingeltonBeanInstanceProducer.getOrCreateInstance(IBean<T>)
+    // the exception w/o a cause is currently not further verified
+    List<BeanCreationException> exceptionsWithCause = Stream.of(firstException, secondException)
+        .filter(e -> e.getCause() != null)
+        .collect(Collectors.toList());
+    if (exceptionsWithCause.isEmpty()) {
+      LOG.info("First exception", firstException);
+      LOG.info("Second exception", secondException);
+      fail("At least one exception must provide a cause, see log for further details on the two exceptions");
+    }
+    exceptionsWithCause.forEach(e -> assertTestBeanException(expectedFromConstructor, e));
   }
 
   private static void assertTestBeanException(boolean expectedFromConstructor, BeanCreationException e) {
