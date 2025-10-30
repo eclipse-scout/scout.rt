@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.jackson.dataobject.id.UnqualifiedIIdDeserializer;
 import org.eclipse.scout.rt.jackson.dataobject.id.UnqualifiedIIdMapKeyDeserializer;
 import org.eclipse.scout.rt.jackson.dataobject.id.UnqualifiedIIdMapKeySerializer;
 import org.eclipse.scout.rt.jackson.dataobject.id.UnqualifiedIIdSerializer;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
@@ -51,6 +52,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.ReferenceType;
 
+@Order(4500)
 public class ScoutDataObjectSerializerProvider implements IDataObjectSerializerProvider {
 
   @Override
