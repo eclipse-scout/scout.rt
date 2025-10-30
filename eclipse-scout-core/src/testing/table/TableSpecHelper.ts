@@ -410,6 +410,15 @@ export class TableSpecHelper {
     comparators.TEXT.installed = false;
     comparators.TEXT.collator = null;
   }
+
+  /**
+   * Stops the current animation and jumps to the end state.
+   *
+   * This is sometimes even necessary if `$.fx.off` is set to `true`.
+   */
+  finishRowAnimation(table: Table) {
+    table.$rows().stop(false, true);
+  }
 }
 
 export type SpecTableRowModel = TableRowModel & { cells: Cell[] };
