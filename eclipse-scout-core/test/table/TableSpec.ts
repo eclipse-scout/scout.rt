@@ -4361,6 +4361,43 @@ describe('Table', () => {
     });
   });
 
+  describe('tabbable', () => {
+    it('is not tabbable but focusable if it contains no rows', () => {
+      let model = helper.createModelFixture(2, 2);
+      let table = helper.createTable(model);
+      table.render();
+      expect(table.get$Focusable().attr('tabindex')).toBe('0');
+
+      const filter = row => false;
+      table.addFilter(filter);
+      expect(table.get$Focusable().attr('tabindex')).toBe('-1');
+
+      table.removeFilter(filter);
+      expect(table.get$Focusable().attr('tabindex')).toBe('0');
+
+      table.deleteAllRows();
+      expect(table.get$Focusable().attr('tabindex')).toBe('-1');
+
+      table.insertRows(helper.createModelRow());
+      expect(table.get$Focusable().attr('tabindex')).toBe('0');
+
+      table.setEnabled(false);
+      expect(table.get$Focusable().attr('tabindex')).toBe('-1');
+
+      table.deleteRow(table.rows[0]);
+      expect(table.get$Focusable().attr('tabindex')).toBe('-1');
+
+      table.setEnabled(true);
+      expect(table.get$Focusable().attr('tabindex')).toBe('-1');
+
+      table.insertRows(helper.createModelRow());
+      expect(table.get$Focusable().attr('tabindex')).toBe('0');
+
+      table.setTabbable(false);
+      expect(table.get$Focusable().attr('tabindex')).toBe('-2');
+    });
+  });
+
   describe('aria properties', () => {
 
     it('has aria role grid', () => {

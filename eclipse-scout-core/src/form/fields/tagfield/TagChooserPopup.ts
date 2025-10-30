@@ -67,9 +67,8 @@ export class TagChooserPopup extends Popup implements TagChooserPopupModel {
     this.table.render();
 
     // Make sure table never gets the focus, but looks focused
-    this.table.get$Focusable()
-      .setTabbable(false)
-      .addClass('focused');
+    this.table.setTabbable(false);
+    this.table.get$Focusable().addClass('focused');
   }
 
   setLookupResult(result: LookupResult<string>) {

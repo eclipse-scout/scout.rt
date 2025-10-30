@@ -280,17 +280,11 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     }
   }
 
-  protected override _renderEnabled() {
-    super._renderEnabled();
-
-    this._updateTabbable();
-  }
-
-  protected _updateTabbable() {
-    if (!this.textFilterEnabled && !this.selectable) {
-      this.$container.setTabbable(false);
+  protected override _renderTabbable() {
+    if (this.tabbable === false || (!this.textFilterEnabled && !this.selectable)) {
+      this.get$Focusable().setTabbable(false);
     } else {
-      this.$container.setTabbableOrFocusable(this.enabledComputed);
+      this.get$Focusable().setTabbableOrFocusable(this.enabledComputed && this.filteredTiles.length > 0);
     }
   }
 
@@ -388,6 +382,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
       this._renderTileDelta();
       this._renderTileOrder(currentTiles);
       this._renderInsertTiles(tilesToInsert);
+      this._renderTabbable();
     }
   }
 
@@ -996,7 +991,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
 
   protected _renderSelectable() {
     this.$container.toggleClass('selectable', this.selectable);
-    this._updateTabbable();
+    this._renderTabbable();
     if (this.rendered) {
       // Aria attributes depend on selectable property -> update them if selectable changes on the fly
       this._updateAriaRole();
@@ -1296,7 +1291,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   }
 
   protected _renderTextFilterEnabled() {
-    this._updateTabbable();
+    this._renderTabbable();
     this.filterSupport.renderFilterField();
   }
 
@@ -1322,6 +1317,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
         // But updating the view range is necessary anyway (fillers, scrollbars, viewRangeRendered etc.)
         this._renderTileDelta(result);
         this._renderTileOrder(this._tiles);
+        this._renderTabbable();
       }
     }
 

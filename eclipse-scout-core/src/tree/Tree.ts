@@ -139,6 +139,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     this.filterSupport = this._createFilterSupport();
     this.filteredElementsDirty = false;
     this.filterAnimated = true;
+    this.tabbable = true;
     this.checkedNodes = [];
     this.groupedNodes = {};
     this.visibleNodesFlat = [];
@@ -565,6 +566,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     }
     let viewRange = this._calculateCurrentViewRange();
     this._renderViewRange(viewRange);
+    this._renderTabbable();
   }
 
   protected _calculateCurrentViewRange(): Range {
@@ -1017,7 +1019,14 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     this._installOrUninstallDragAndDropHandler();
     let enabled = this.enabledComputed;
     this.$data.setEnabled(enabled);
-    this.get$Focusable().setTabbableOrFocusable(enabled);
+  }
+
+  protected override _renderTabbable() {
+    if (this.tabbable === false) {
+      this.get$Focusable().setTabbable(false);
+    } else {
+      this.get$Focusable().setTabbableOrFocusable(this.enabledComputed && this.visibleNodesFlat.length > 0);
+    }
   }
 
   protected override _renderDisabledStyle() {
@@ -1673,19 +1682,27 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   }
 
   protected _removeFromFlatList(node: TreeNode, animatedRemove: boolean) {
-    if (this.visibleNodesMap[node.id]) {
-      let index = this.visibleNodesFlat.indexOf(node);
-      this._removeChildrenFromFlatList(node, false);
-      if (this.isHorizontalScrollingEnabled()) {
-        // if node is the node which defines the widest width then recalculate width for render
-        if (node.width === this.maxNodeWidth) {
-          this.maxNodeWidth = 0;
-          this.nodeWidthDirty = true;
-        }
+    if (!this.visibleNodesMap[node.id]) {
+      return;
+    }
+
+    let index = this.visibleNodesFlat.indexOf(node);
+    this._removeChildrenFromFlatList(node, false);
+    if (this.isHorizontalScrollingEnabled()) {
+      // if node is the node which defines the widest width then recalculate width for render
+      if (node.width === this.maxNodeWidth) {
+        this.maxNodeWidth = 0;
+        this.nodeWidthDirty = true;
       }
-      this.visibleNodesFlat.splice(index, 1);
-      delete this.visibleNodesMap[node.id];
+    }
+    this.visibleNodesFlat.splice(index, 1);
+    delete this.visibleNodesMap[node.id];
+
+    if (this.rendered) {
       this.hideNode(node, animatedRemove);
+      if (this.visibleNodesFlat.length === 0) {
+        this._renderTabbable();
+      }
     }
   }
 
@@ -2015,12 +2032,18 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     } else if (insertBatch.$animationWrapper && insertBatch.animationCompleteFunc) {
       insertBatch.animationCompleteFunc.call(this);
     }
+    if (this.rendered) {
+      this._renderTabbable();
+    }
   }
 
   protected _addToVisibleFlatListNoCheck(node: TreeNode, insertIndex: number, animatedRendering: boolean) {
     arrays.insert(this.visibleNodesFlat, node, insertIndex);
     this.visibleNodesMap[node.id] = true;
-    this.showNode(node, animatedRendering, insertIndex);
+    if (this.rendered) {
+      this.showNode(node, animatedRendering, insertIndex);
+      this._renderTabbable();
+    }
   }
 
   scrollTo(node: TreeNode, options?: ScrollToOptions | ScrollToAlignment) {

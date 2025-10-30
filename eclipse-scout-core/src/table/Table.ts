@@ -207,6 +207,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.scrollTop = 0;
     this.selectedRows = [];
     this.sortEnabled = true;
+    this.tabbable = true;
     this.tableControls = [];
     this.tabbableControlsCoordinator = scout.create(TabbableCoordinator, {parent: this, autoRegisterKeyStrokes: false});
     this.tableStatusVisible = false;
@@ -4362,6 +4363,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     });
     if (this.rendered) {
       this._updateAriaRowCount();
+      this._renderTabbable();
     }
 
     if (changed) {
@@ -5798,7 +5800,17 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     if (!this.tileMode) {
       this.$data.setEnabled(enabled);
     }
-    this.get$Focusable().setTabbableOrFocusable(enabled);
+  }
+
+  protected override _renderTabbable() {
+    if (this.tabbable === false) {
+      this.get$Focusable().setTabbable(false);
+    } else {
+      // If there are no visible rows, it should not be in the tab list because no interaction is possible and focus may not be visible (e.g. on detail table which don't have a border like the table field does).
+      // But it should stay focusable to allow the following case:
+      // When using the SearchOutline, the focus should be in the detail table after searching. But the rows are inserted async, so the table needs to accept focus even if it has no rows
+      this.get$Focusable().setTabbableOrFocusable(this.enabledComputed && this._filteredRows.length > 0);
+    }
   }
 
   protected override _renderDisabledStyle() {
