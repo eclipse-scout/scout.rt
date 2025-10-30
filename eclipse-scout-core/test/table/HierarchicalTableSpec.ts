@@ -66,12 +66,6 @@ describe('HierarchicalTableSpec', () => {
     return expandedRows;
   }
 
-  function finishRowAnimation(table: Table) {
-    // Stop the current animation and jump to the end state
-    // $.fx.off = true does not seem to work consistently in this specific spec
-    table.$rows().stop(false, true);
-  }
-
   describe('add', () => {
     let table: SpecTable, rowIds: string[], rows: TableRowModel[];
 
@@ -220,7 +214,7 @@ describe('HierarchicalTableSpec', () => {
         parentRow = table.rows[0];
       newRow.parentRow = parentRow.id;
       table.collapseRow(parentRow);
-      finishRowAnimation(table);
+      helper.finishRowAnimation(table);
       table.insertRow(newRow);
 
       expect(table.rowsMap[parentRow.id].childRows.length).toBe(2);
@@ -280,7 +274,7 @@ describe('HierarchicalTableSpec', () => {
 
     it('leaf row with collapsed parent and expect the structure to be valid', () => {
       table.collapseRow(rows[3]);
-      finishRowAnimation(table);
+      helper.finishRowAnimation(table);
       expect(table.visibleRows.length).toBe(5);
       table.deleteRow(rows[5]);
       expect(rows[3].expanded).toBeFalsy();
@@ -415,7 +409,7 @@ describe('HierarchicalTableSpec', () => {
       expectRowIds(getUiRows(table), expectedRowIds);
 
       table.collapseRow(rows[1]);
-      finishRowAnimation(table);
+      helper.finishRowAnimation(table);
 
       expectRowIds(table.rows, expectedRowIds);
       expectRowIds(getTreeRows(table), expectedRowIds);
@@ -425,7 +419,7 @@ describe('HierarchicalTableSpec', () => {
       expectRowIds(getUiRows(table), [0, 1, 3]);
 
       table.collapseRow(rows[0]);
-      finishRowAnimation(table);
+      helper.finishRowAnimation(table);
 
       expectRowIds(table.rows, expectedRowIds);
       expectRowIds(getTreeRows(table), expectedRowIds);
@@ -455,7 +449,7 @@ describe('HierarchicalTableSpec', () => {
       expectRowIds(getUiRows(table), expectedRowIds);
 
       table.collapseAll();
-      finishRowAnimation(table);
+      helper.finishRowAnimation(table);
 
       expectRowIds(table.rows, expectedRowIds);
       expectRowIds(getTreeRows(table), expectedRowIds);
@@ -703,7 +697,7 @@ describe('HierarchicalTableSpec', () => {
         cells: ['newRow0Cell0']
       };
       table.updateRow(row0);
-      finishRowAnimation(table);
+      helper.finishRowAnimation(table);
 
       expectRowIds(table.rows, rowIds);
       expectRowIds(table.visibleRows, [0, 3]);

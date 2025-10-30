@@ -144,6 +144,7 @@ describe('TableFilter', () => {
       rows[0].id = row1.id;
       rows[0].cells[0].text = 'updated';
       table.updateRows(rows);
+      helper.finishRowAnimation(table);
 
       // expects no row to be visible
       let filteredRows = table.filteredRows();
