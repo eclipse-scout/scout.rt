@@ -76,6 +76,12 @@ export interface ActionModel extends WidgetModel {
   /**
    * Default is true.
    *
+   * @see WidgetModel.preventInitialFocus
+   */
+  preventInitialFocus?: boolean;
+  /**
+   * Default is true.
+   *
    * @see WidgetModel.preventClickFocus
    */
   preventClickFocus?: boolean;

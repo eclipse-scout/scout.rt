@@ -59,6 +59,7 @@ export class Menu extends Action implements MenuModel {
     this.popup = null;
     this.popupHorizontalAlignment = undefined;
     this.popupVerticalAlignment = undefined;
+    this.preventInitialFocus = undefined; // Don't always prevent initial focus: the focus manager will initially focus a menu item in a menubar if no other element is initially focusable
     this.stackable = true;
     this.separator = false;
     this.shrinkable = false;

@@ -61,4 +61,10 @@ export interface MenuModel extends ActionModel {
    */
   subMenuVisibility?: SubMenuVisibility;
   menuFilter?: MenuFilter;
+  /**
+   * Default is undefined.
+   *
+   * @see WidgetModel.preventInitialFocus
+   */
+  preventInitialFocus?: boolean;
 }
