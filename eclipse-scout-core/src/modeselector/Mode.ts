@@ -19,6 +19,7 @@ export class Mode<TRef = any> extends Action implements ModeModel<TRef> {
 
     this.selected = false;
     this.ref = null;
+    this.preventInitialFocus = false;
   }
 
   protected override _init(model: InitModelOf<this>) {
