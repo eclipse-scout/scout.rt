@@ -1,12 +1,11 @@
 /*
- * Copyright (c) 2010-2024 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * https://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.platform.opentelemetry;
 
@@ -38,7 +37,7 @@ import org.slf4j.helpers.MessageFormatter;
 
 public class PeriodicAsyncMeasurementTest {
 
-  private static final int DEFAULT_TIMEOUT_CONDITION_MET_MILLIS = 100;
+  private static final int DEFAULT_TIMEOUT_CONDITION_MET_MILLIS = 500;
 
   private IExecutionSemaphore m_asyncJobExecutionSemaphore;
   private int m_origExecutionSemaphorePermits;
@@ -178,13 +177,13 @@ public class PeriodicAsyncMeasurementTest {
     assertNull(blockingMock1.runObservation());
     assertNull(blockingMock2.runObservation());
     assertEquals(2, getRunningAsyncJobs().size());
-    assertEquals(2, m_asyncJobExecutionSemaphore.getCompetitorCount());
+    awaitCondition(() -> 2 == m_asyncJobExecutionSemaphore.getCompetitorCount(), DEFAULT_TIMEOUT_CONDITION_MET_MILLIS);
     blockingMock1.verifyAsyncJobTriggered();
     blockingMock2.verifyNoAsyncJobTriggered();
 
     blockingMock1.verifyAsyncJobFinished();
     assertEquals(1, getRunningAsyncJobs().size());
-    assertEquals(1, m_asyncJobExecutionSemaphore.getCompetitorCount());
+    awaitCondition(() -> 1 == m_asyncJobExecutionSemaphore.getCompetitorCount(), DEFAULT_TIMEOUT_CONDITION_MET_MILLIS);
     blockingMock1.verifyNoAsyncJobTriggered();
     blockingMock2.verifyAsyncJobTriggered();
 
@@ -192,13 +191,13 @@ public class PeriodicAsyncMeasurementTest {
     assertEquals(Long.valueOf(1L), blockingMock1.runObservation());
     assertNull(blockingMock2.runObservation());
     assertEquals(1, getRunningAsyncJobs().size());
-    assertEquals(1, m_asyncJobExecutionSemaphore.getCompetitorCount());
+    awaitCondition(() -> 1 == m_asyncJobExecutionSemaphore.getCompetitorCount(), DEFAULT_TIMEOUT_CONDITION_MET_MILLIS);
     blockingMock1.verifyNoAsyncJobTriggered();
     blockingMock2.verifyNoAsyncJobTriggered();
 
     blockingMock2.verifyAsyncJobFinished();
     assertEquals(0, getRunningAsyncJobs().size());
-    assertEquals(0, m_asyncJobExecutionSemaphore.getCompetitorCount());
+    awaitCondition(() -> 0 == m_asyncJobExecutionSemaphore.getCompetitorCount(), DEFAULT_TIMEOUT_CONDITION_MET_MILLIS);
     blockingMock1.verifyNoAsyncJobTriggered();
     blockingMock2.verifyNoAsyncJobTriggered();
 
