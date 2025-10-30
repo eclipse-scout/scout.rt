@@ -3691,6 +3691,43 @@ describe('Tree', () => {
     });
   });
 
+  describe('tabbable', () => {
+    it('is not tabbable but focusable if it contains no nodes', () => {
+      let model = helper.createModelFixture(4);
+      let tree = helper.createTree(model);
+      tree.render();
+      expect(tree.get$Focusable().attr('tabindex')).toBe('0');
+
+      const filter = node => false;
+      tree.addFilter(filter);
+      expect(tree.get$Focusable().attr('tabindex')).toBe('-1');
+
+      tree.removeFilter(filter);
+      expect(tree.get$Focusable().attr('tabindex')).toBe('0');
+
+      tree.deleteAllNodes();
+      expect(tree.get$Focusable().attr('tabindex')).toBe('-1');
+
+      tree.insertNodes(helper.createModelNode());
+      expect(tree.get$Focusable().attr('tabindex')).toBe('0');
+
+      tree.setEnabled(false);
+      expect(tree.get$Focusable().attr('tabindex')).toBe('-1');
+
+      tree.deleteNode(tree.nodes[0]);
+      expect(tree.get$Focusable().attr('tabindex')).toBe('-1');
+
+      tree.setEnabled(true);
+      expect(tree.get$Focusable().attr('tabindex')).toBe('-1');
+
+      tree.insertNodes(helper.createModelNode());
+      expect(tree.get$Focusable().attr('tabindex')).toBe('0');
+
+      tree.setTabbable(false);
+      expect(tree.get$Focusable().attr('tabindex')).toBe('-2');
+    });
+  });
+
   describe('aria properties', () => {
     let model: SpecTreeModel;
     let tree: SpecTree;

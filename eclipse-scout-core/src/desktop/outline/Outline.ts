@@ -709,6 +709,15 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.session.focusManager.validateFocus();
   }
 
+  protected override _renderTabbable() {
+    if (Device.get().supportsOnlyTouch()) {
+      // Prevent click focus even if FocusManager.restrictedFocusGain is disabled
+      this.get$Focusable().setTabbable(false);
+      return;
+    }
+    super._renderTabbable();
+  }
+
   sendToBack() {
     this.inBackground = true;
     this._renderInBackground();

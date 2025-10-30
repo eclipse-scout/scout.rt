@@ -166,6 +166,5 @@ describe('TagField', () => {
       expect(field.popup.table.rows.length).toBe(2);
       expect(eventCounter).toBe(1);
     });
-
   });
 });

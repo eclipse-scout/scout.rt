@@ -1445,6 +1445,51 @@ describe('TileGrid', () => {
     });
   });
 
+  describe('tabbable', () => {
+    it('is not tabbable but focusable if it contains no nodes', () => {
+      let tileGrid = createTileGrid(4, {
+        selectable: true
+      });
+      tileGrid.render();
+      expect(tileGrid.get$Focusable().attr('tabindex')).toBe('0');
+
+      const filter = tile => false;
+      tileGrid.addFilter(filter);
+      expect(tileGrid.get$Focusable().attr('tabindex')).toBe('-1');
+
+      tileGrid.removeFilter(filter);
+      expect(tileGrid.get$Focusable().attr('tabindex')).toBe('0');
+
+      tileGrid.deleteAllTiles();
+      expect(tileGrid.get$Focusable().attr('tabindex')).toBe('-1');
+
+      tileGrid.insertTiles(createTile());
+      expect(tileGrid.get$Focusable().attr('tabindex')).toBe('0');
+
+      tileGrid.setEnabled(false);
+      expect(tileGrid.get$Focusable().attr('tabindex')).toBe('-1');
+
+      tileGrid.deleteTile(tileGrid.tiles[0]);
+      expect(tileGrid.get$Focusable().attr('tabindex')).toBe('-1');
+
+      tileGrid.setEnabled(true);
+      expect(tileGrid.get$Focusable().attr('tabindex')).toBe('-1');
+
+      tileGrid.insertTiles(createTile());
+      expect(tileGrid.get$Focusable().attr('tabindex')).toBe('0');
+
+      tileGrid.setSelectable(false);
+      expect(tileGrid.get$Focusable().attr('tabindex')).toBe('-2');
+
+      // It should be tabbable if it has a text filter even if it is not selectable so the filter can be accessed using keyboard
+      tileGrid.setTextFilterEnabled(true);
+      expect(tileGrid.get$Focusable().attr('tabindex')).toBe('0');
+
+      tileGrid.setTabbable(false);
+      expect(tileGrid.get$Focusable().attr('tabindex')).toBe('-2');
+    });
+  });
+
   describe('aria properties', () => {
 
     it('has aria-activedescendant set if a tile is focused or selected', () => {

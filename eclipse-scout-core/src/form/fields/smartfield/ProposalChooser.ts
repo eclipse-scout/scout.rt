@@ -51,6 +51,7 @@ export abstract class ProposalChooser<TValue, TContent extends ProposalChooserCo
     }
 
     this.content = this._createContent();
+    this.content.setTabbable(false);
   }
 
   protected abstract _createContent(): TContent;
@@ -126,8 +127,7 @@ export abstract class ProposalChooser<TValue, TContent extends ProposalChooserCo
   protected _renderContent() {
     this.content.render();
 
-    // Make sure focusable container never gets the focus, but looks focused
-    this.content.get$Focusable().setTabbable(false);
+    // Make sure focusable container looks focused even though it is not focusable
     this.content.get$Focusable().addClass('focused');
   }
 
