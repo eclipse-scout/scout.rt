@@ -312,6 +312,9 @@ export class Group<TBody extends Widget = Widget> extends Widget implements Grou
   }
 
   protected _renderBody() {
+    if (this.collapsed) {
+      return;
+    }
     this.body.render();
     this.body.$container.insertAfter(this.$header);
     this.body.$container.addClass('group-body');
