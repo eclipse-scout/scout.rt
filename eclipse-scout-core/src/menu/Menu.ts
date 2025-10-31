@@ -540,6 +540,7 @@ export class Menu extends Action implements MenuModel {
     this.popup.one('destroy', event => {
       this.popup = null;
       aria.removeControls(this.$container);
+      this._updateTooltip();
     });
     // Unselect on close which comes earlier than destroy (before the animation), to give more immediate feedback
     this.popup.on('close', event => {
@@ -549,6 +550,8 @@ export class Menu extends Action implements MenuModel {
     if (this.uiCssClass) {
       this.popup.$container.addClass(this.uiCssClass);
     }
+
+    this._updateTooltip();
   }
 
   protected _createPopup(): Popup {
@@ -753,5 +756,14 @@ export class Menu extends Action implements MenuModel {
    */
   protected _showTextAsTooltip(): boolean {
     return this.text && !this.textVisible && this._textVisibleOrig;
+  }
+
+  protected override _shouldInstallTooltip(): boolean {
+    if (this.popup) {
+      // Don't show a tooltip if a popup is open because it may be drawn behind the popup
+      // Returning false will uninstall the tooltip support which also ensures the tooltip is closed if the user is opening a popup while the tooltip is open
+      return false;
+    }
+    return super._shouldInstallTooltip();
   }
 }
