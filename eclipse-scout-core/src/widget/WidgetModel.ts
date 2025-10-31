@@ -90,6 +90,18 @@ export interface WidgetModel extends ObjectModelWithUuid<Widget>, ObjectModelWit
    */
   preventInitialFocus?: boolean;
   /**
+   * Defines whether the focus gain should be prevented when the widget is clicked.
+   *
+   * If set to true the class `unfocusable` will be set on {@link get$Focusable()} so it won't get the focus even if it was focusable.
+   * However, if the widget is tabbable, it may still get the focus by keyboard or if {@link focus} is called programmatically.
+   *
+   * The property may be undefined which means the `unfocusable` class will neither be removed nor added to {@link get$Focusable()}.
+   * This makes it possible to still use the css class directly instead of this property.
+   *
+   * Default is undefined.
+   */
+  preventClickFocus?: boolean;
+  /**
    * Configures the number of pixels that the {@link Widget.get$Scrollable} is scrolled vertically.
    *
    * The property is automatically updated whenever the content is scrolled so the scroll position can be reverted when the widget is rendered again after it has been removed.
