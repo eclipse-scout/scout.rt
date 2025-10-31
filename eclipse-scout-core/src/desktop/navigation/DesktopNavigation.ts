@@ -95,7 +95,7 @@ export class DesktopNavigation extends Widget implements DesktopNavigationModel 
     aria.screenReaderOnly(this.$screenReaderStatus);
   }
 
-  _renderScreenReaderStatus() {
+  protected _renderScreenReaderStatus() {
     if (!this.$screenReaderStatus || !this.outline) {
       return;
     }

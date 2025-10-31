@@ -1322,6 +1322,15 @@ describe('SmartField', () => {
       expect(field.$screenReaderStatus.children('.sr-lookup-row-count').eq(0)).not.toBeEmpty();
     });
 
+    it('does not add status if field is not focused', () => {
+      let field = createFieldWithLookupCall({
+        value: 1
+      });
+      field.render();
+      jasmine.clock().tick(500);
+      expect(field.$screenReaderStatus.children('.sr-lookup-row-count').length).toBe(0);
+    });
+
     it('has a aria-expanded set correctly if pop up is open/closed', () => {
       let field = createFieldWithLookupCall({}, {
         objectType: ColumnDescriptorDummyLookupCall

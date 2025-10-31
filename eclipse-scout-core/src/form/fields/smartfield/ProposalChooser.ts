@@ -124,6 +124,11 @@ export abstract class ProposalChooser<TValue, TContent extends ProposalChooserCo
     }
   }
 
+  protected override _remove() {
+    this._clearScreenReaderStatus();
+    super._remove();
+  }
+
   protected _renderContent() {
     this.content.render();
 
@@ -205,9 +210,13 @@ export abstract class ProposalChooser<TValue, TContent extends ProposalChooserCo
         .text(this.status.message);
     } else {
       this.$status.text('');
-      this.smartField.$screenReaderStatus?.children('.sr-proposal-chooser-status').remove();
+      this._clearScreenReaderStatus();
     }
     this.htmlComp.invalidateLayoutTree();
+  }
+
+  protected _clearScreenReaderStatus() {
+    this.smartField.$screenReaderStatus?.children('.sr-proposal-chooser-status').remove();
   }
 
   /**
