@@ -211,7 +211,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
   }
 
   protected _addScreenReaderStatus() {
-    // status container that renders information about the look up
+    // status container that renders information about the lookup
     this.$screenReaderStatus = this.$container.appendDiv();
     aria.role(this.$screenReaderStatus, 'status');
     aria.screenReaderOnly(this.$screenReaderStatus);
@@ -236,14 +236,18 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     });
   }
 
-  _renderScreenReaderStatus(result: SmartFieldLookupResult<TValue>) {
-    if (result && this.$screenReaderStatus) {
-      this._clearScreenReaderStatus();
-      if (result.numLookupRows) {
-        this.$screenReaderStatus.appendSpan().addClass('sr-lookup-row-count').text(this.session.text('ui.NumProposals', result.numLookupRows));
-      } else {
-        this.$screenReaderStatus.appendSpan().addClass('sr-lookup-row-count').text(this.session.text('ui.NoProposals'));
-      }
+  protected _renderScreenReaderStatus(result: SmartFieldLookupResult<TValue>) {
+    if (!result || !this.$screenReaderStatus) {
+      return;
+    }
+    this._clearScreenReaderStatus();
+    if (!this.isFocused()) {
+      return;
+    }
+    if (result.numLookupRows) {
+      this.$screenReaderStatus.appendSpan().addClass('sr-lookup-row-count').text(this.session.text('ui.NumProposals', result.numLookupRows));
+    } else {
+      this.$screenReaderStatus.appendSpan().addClass('sr-lookup-row-count').text(this.session.text('ui.NoProposals'));
     }
   }
 
@@ -251,7 +255,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
    * Screen reader status should always be cleared if chooser is not visible, so everytime the chooser becomes visible, the status is announced to the
    * user
    */
-  _clearScreenReaderStatus() {
+  protected _clearScreenReaderStatus() {
     if (this.$screenReaderStatus) {
       this.$screenReaderStatus.children('.sr-lookup-row-count').remove();
     }
@@ -1082,7 +1086,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
   /**
    * Resets the aria properties that were changed by the pop up to indicate that the pop up is not open
    */
-  _resetPopupAriaProperties() {
+  protected _resetPopupAriaProperties() {
     aria.expanded(this.$field, false);
     aria.removeActiveDescendant(this.$field);
     this._clearScreenReaderStatus();
