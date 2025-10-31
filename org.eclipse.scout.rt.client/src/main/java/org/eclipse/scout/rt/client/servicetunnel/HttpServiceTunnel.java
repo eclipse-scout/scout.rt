@@ -35,7 +35,6 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -175,7 +174,7 @@ public class HttpServiceTunnel {
    * request is sent to the server, and the {@link ServiceTunnelResponse} returned contains an
    * {@link ThreadInterruptedError} to indicate cancellation.
    *
-   * @return response sent by the server; is never <code>null</code>.
+   * @return response sent by the server; is never <code>null</code>; in case of an error the response may as well contain an exception
    */
   protected ServiceTunnelResponse tunnel(final ServiceTunnelRequest serviceRequest) {
     if (LOG.isDebugEnabled()) {
@@ -215,7 +214,7 @@ public class HttpServiceTunnel {
         int status = ((WebApplicationException) cause).getResponse().getStatus();
         return new ServiceTunnelResponse(new HttpServiceTunnelException(status, "Service tunnel request failed with status code {}", status));
       }
-      throw new ProcessingException("Service tunnel request failed", cause);
+      return new ServiceTunnelResponse(new HttpServiceTunnelException("Service tunnel request failed", exception));
     }
     catch (ClassNotFoundException | IOException e) {
       if (Thread.currentThread().isInterrupted()) {
@@ -242,15 +241,6 @@ public class HttpServiceTunnel {
    */
   protected void interceptHttpResponse(Response httpResponse, ServiceTunnelRequest call) {
     // subclasses may intercept jersey response
-  }
-
-  /**
-   * Returns the name to decorate the thread's name while executing the service request.
-   */
-  protected String createServiceRequestName(final long requestSequence) {
-    final IFuture<?> currentFuture = IFuture.CURRENT.get();
-    final String submitter = (currentFuture != null ? currentFuture.getJobInput().getName() : Thread.currentThread().getName());
-    return String.format("Tunneling service request [seq=%s, submitter=%s]", requestSequence, submitter);
   }
 
   /**

@@ -53,8 +53,6 @@ import org.slf4j.LoggerFactory;
 public class ServiceTunnelService {
   private static final Logger LOG = LoggerFactory.getLogger(ServiceTunnelService.class);
 
-  protected static final String DUPLICATE_REQUEST_DETECTOR_SESSION_KEY = "DuplicateRequestDetector";
-
   protected transient BinaryServiceTunnelContentHandler m_contentHandler;
   protected transient LazyValue<HttpServerRunContextProducer> m_serverRunContextProducer = new LazyValue<>(HttpServerRunContextProducer.class);
   protected transient LazyValue<HttpCacheControl> m_httpCacheControl = new LazyValue<>(HttpCacheControl.class);
@@ -116,14 +114,10 @@ public class ServiceTunnelService {
     }
 
     final ServerRunContext serverRunContext = createServiceTunnelRunContext(serviceRequest);
-    ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
+    ServiceTunnelResponse serviceResponse = m_svcInvoker.get().invoke(serverRunContext, serviceRequest);
     // include client notifications in response (piggyback)
     serviceResponse.setNotifications(serverRunContext.getClientNotificationCollector().consume());
     return serviceResponse;
-  }
-
-  protected String interruptInfo(boolean interrupted) {
-    return interrupted ? ", thread was interrupted" : ", thread was not interrupted";
   }
 
   protected ServerRunContext createServiceTunnelRunContext(ServiceTunnelRequest serviceRequest) {
@@ -142,13 +136,6 @@ public class ServiceTunnelService {
   }
 
   // === SERVICE INVOCATION ===
-
-  /**
-   * Method invoked to delegate the HTTP request to the 'process service'.
-   */
-  protected ServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final ServiceTunnelRequest serviceTunnelRequest) {
-    return m_svcInvoker.get().invoke(serverRunContext, serviceTunnelRequest);
-  }
 
   // === MESSAGE UNMARSHALLING / MARSHALLING ===
 
