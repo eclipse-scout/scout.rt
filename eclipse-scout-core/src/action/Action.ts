@@ -308,6 +308,9 @@ export class Action extends Widget implements ActionModel, TabbableItem {
    * Installs or uninstalls tooltip based on tooltipText, selected and enabledComputed.
    */
   protected _updateTooltip() {
+    if (!this.$container) {
+      return;
+    }
     if (this._shouldInstallTooltip()) {
       tooltips.install(this.$container, this._configureTooltip());
     } else {
