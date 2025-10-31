@@ -51,6 +51,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   eventDelegators: EventDelegatorForCloning[];
   focused: boolean;
   preventInitialFocus: boolean;
+  preventClickFocus: boolean;
   /**
    * Widgets creating a HtmlComponent for the main $container should assign it to this variable.
    * This enables the execution of layout related operations like invalidateLayoutTree directly on the widget.
@@ -161,7 +162,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this._storedFocusedWidget = null;
 
     this._glassPaneContributions = [];
-    this._addCloneProperties(['visible', 'enabled', 'inheritAccessibility', 'cssClass', 'preventInitialFocus']);
+    this._addCloneProperties(['visible', 'enabled', 'inheritAccessibility', 'cssClass', 'preventInitialFocus', 'preventClickFocus']);
     this._addMultiDimensionalProperty('enabled', true);
     this._addMultiDimensionalProperty('visible', true);
     this._addPropertyDimensionAlias('enabled', 'enabledGranted', {dimension: 'granted'});
@@ -489,6 +490,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this._renderTrackFocus();
     this._renderFocused();
     this._renderPreventInitialFocus();
+    this._renderPreventClickFocus();
     this._renderLoading();
     this._renderScrollTop();
     this._renderScrollLeft();
@@ -1051,6 +1053,19 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       return;
     }
     this.get$Focusable()?.toggleClass('prevent-initial-focus', this.preventInitialFocus);
+  }
+
+  /** @see WidgetModel.preventClickFocus */
+  setPreventClickFocus(preventClickFocus: boolean) {
+    this.setProperty('preventClickFocus', preventClickFocus);
+  }
+
+  protected _renderPreventClickFocus() {
+    if (objects.isNullOrUndefined(this.preventClickFocus)) {
+      // Do not remove class as it may be added explicitly on the dom element instead of using this property
+      return;
+    }
+    this.get$Focusable()?.toggleClass('unfocusable', this.preventClickFocus);
   }
 
   protected _setCssClass(cssClass: string) {

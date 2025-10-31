@@ -51,6 +51,7 @@ export class Button extends FormField implements ButtonModel {
     this.statusVisible = false;
     this.systemType = Button.SystemType.NONE;
     this.preventDoubleClick = false;
+    this.preventClickFocus = true;
     this.stackable = true;
     this.shrinkable = false;
     this.$buttonLabel = null;
@@ -159,8 +160,7 @@ export class Button extends FormField implements ButtonModel {
 
     $button
       .on('mousedown', event => this._doubleClickSupport.mousedown(event))
-      .on('click', this._onClick.bind(this))
-      .unfocusable();
+      .on('click', this._onClick.bind(this));
 
     this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
 

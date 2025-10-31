@@ -42,8 +42,7 @@ export class TileButton extends Button {
           return;
         }
         this._onClick(event);
-      })
-      .unfocusable();
+      });
     this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
   }
 

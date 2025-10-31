@@ -49,6 +49,12 @@ export interface ButtonModel extends FormFieldModel {
    */
   preventDoubleClick?: boolean;
   /**
+   * Default is true.
+   *
+   * @see WidgetModel.preventClickFocus
+   */
+  preventClickFocus?: boolean;
+  /**
    * A stackable button will be stacked in a dropdown menu if there is not enough space in the menubar.
    * Default is true.
    */

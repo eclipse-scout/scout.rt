@@ -2005,6 +2005,41 @@ describe('Widget', () => {
     });
   });
 
+  describe('preventClickFocus', () => {
+    it('adds or removes the class unfocusable to the focusable element', () => {
+      let widget = createWidget({
+        parent: parent
+      });
+      widget.render(session.$entryPoint);
+      expect(widget.$container).not.toHaveClass('unfocusable');
+
+      widget.setPreventClickFocus(true);
+      expect(widget.$container).toHaveClass('unfocusable');
+
+      widget.setPreventClickFocus(false);
+      expect(widget.$container).not.toHaveClass('unfocusable');
+    });
+
+    it('does nothing if it is null or undefined', () => {
+      let widget = createWidget({
+        parent: parent,
+        cssClass: 'unfocusable'
+      });
+      widget.render(session.$entryPoint);
+      expect(widget.preventInitialFocus).toBeUndefined();
+      expect(widget.$container).toHaveClass('unfocusable');
+
+      widget.setPreventClickFocus(false);
+      expect(widget.$container).not.toHaveClass('unfocusable');
+
+      widget.setPreventClickFocus(true);
+      expect(widget.$container).toHaveClass('unfocusable');
+
+      widget.setPreventClickFocus(null);
+      expect(widget.$container).toHaveClass('unfocusable');
+    });
+  });
+
   describe('prepareModel', () => {
     it('default case', () => {
       let model = {};
