@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoStructureMigrationHandler;
 import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_4;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_4;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
@@ -24,7 +24,7 @@ public class RoomFixtureDoStructureMigrationHandler_4 extends AbstractDoStructur
 
   @Override
   public Class<? extends ITypeVersion> toTypeVersionClass() {
-    return CharlieFixture_4.class;
+    return Charliefixture_4.class;
   }
 
   /**

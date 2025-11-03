@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_3;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_3;
 
 /**
  * Introduced in namespace bravo with type version bravo-1, attribute name. Changes:
@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureType
  * </ul>
  */
 @TypeName("alfaFixture.PetFixture")
-@TypeVersion(AlfaFixture_3.class)
+@TypeVersion(Alfafixture_3.class)
 public class PetFixtureDo extends DoEntity {
 
   public DoValue<String> name() {

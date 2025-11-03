@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_2;
 
 /**
  * No changes.
@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureT
  * @since charlieFixture-2 but introduced and persisted without a type version first.
  */
 @TypeName("charlieFixture.PostalAddressFixture")
-@TypeVersion(CharlieFixture_2.class)
+@TypeVersion(Charliefixture_2.class)
 public class PostalAddressFixtureDo extends DoEntity {
 
   public DoValue<String> street() {

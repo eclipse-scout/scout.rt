@@ -43,6 +43,14 @@ public abstract class AbstractDataObjectTestCompletenessTest {
     support.failOnError();
   }
 
+  @Test
+  public void testTypeVersionClassNamingTestCompleteness() throws IOException {
+    TypeVersionClassNamingTestSupport support = createTypeVersionClassNamingTestSupport();
+    getPathExclusions().forEach(support::addPathExclusion);
+    support.doTest();
+    support.failOnError();
+  }
+
   protected DataObjectSignatureTestSupport createSignatureTestSupport() {
     return BEANS.get(DataObjectSignatureTestSupport.class);
   }
@@ -53,6 +61,10 @@ public abstract class AbstractDataObjectTestCompletenessTest {
 
   protected IdStructureTestSupport createIdStructureTestSupport() {
     return BEANS.get(IdStructureTestSupport.class);
+  }
+
+  protected TypeVersionClassNamingTestSupport createTypeVersionClassNamingTestSupport() {
+    return BEANS.get(TypeVersionClassNamingTestSupport.class);
   }
 
   protected List<Path> getPathExclusions() {

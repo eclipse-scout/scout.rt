@@ -21,8 +21,8 @@ import org.eclipse.scout.rt.dataobject.fixture.FirstSimpleContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.SecondSimpleContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.SimpleFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrator.DataObjectMigratorResult;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_1;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_2;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Test;
@@ -95,13 +95,13 @@ public class AbstractRemoveDoEntityContributionValueMigrationHandlerTest {
     // Unknown contribution 1 - should not be removed because of different type version
     IDoEntity expectedUnknownContribution1 = BEANS.get(DoEntity.class);
     expectedUnknownContribution1.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.MyTestContribution");
-    expectedUnknownContribution1.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_2.VERSION.unwrap());
+    expectedUnknownContribution1.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, Alfafixture_2.VERSION.unwrap());
     expectedUnknownContribution1.put("testValue", "myTestValue");
 
     // Unknown contribution 2 - should not be removed because there is no migration handler to remove the contribution
     IDoEntity expectedUnknownContribution2 = BEANS.get(DoEntity.class);
     expectedUnknownContribution2.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.MyOtherTestContribution");
-    expectedUnknownContribution2.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_1.VERSION.unwrap());
+    expectedUnknownContribution2.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, Alfafixture_1.VERSION.unwrap());
     expectedUnknownContribution2.put("otherTestValue", "myOtherTestValue");
 
     SimpleFixtureDo expected = createSimpleFixtureDo();
@@ -146,7 +146,7 @@ public class AbstractRemoveDoEntityContributionValueMigrationHandlerTest {
     // Unknown contribution
     IDoEntity contribution = BEANS.get(DoEntity.class);
     contribution.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.MyTestContribution");
-    contribution.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_1.VERSION.unwrap());
+    contribution.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, Alfafixture_1.VERSION.unwrap());
     contribution.put("testValue", "myTestValue");
 
     SimpleFixtureDo dataObject = createSimpleFixtureDo();
@@ -165,19 +165,19 @@ public class AbstractRemoveDoEntityContributionValueMigrationHandlerTest {
     // Unknown contribution 1
     IDoEntity nonExistingContribution1 = BEANS.get(DoEntity.class);
     nonExistingContribution1.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.MyTestContribution");
-    nonExistingContribution1.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_1.VERSION.unwrap());
+    nonExistingContribution1.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, Alfafixture_1.VERSION.unwrap());
     nonExistingContribution1.put("testValue", "myTestValue");
 
     // Unknown contribution 2 with different type version
     IDoEntity nonExistingContribution2 = BEANS.get(DoEntity.class);
     nonExistingContribution2.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.MyTestContribution");
-    nonExistingContribution2.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_2.VERSION.unwrap());
+    nonExistingContribution2.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, Alfafixture_2.VERSION.unwrap());
     nonExistingContribution2.put("testValue", "myTestValue");
 
     // Unknown contribution 3
     IDoEntity nonExistingContribution3 = BEANS.get(DoEntity.class);
     nonExistingContribution3.put(DoStructureMigrationHelper.TYPE_ATTRIBUTE_NAME, "scout.MyOtherTestContribution");
-    nonExistingContribution3.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, AlfaFixture_1.VERSION.unwrap());
+    nonExistingContribution3.put(DoStructureMigrationHelper.TYPE_VERSION_ATTRIBUTE_NAME, Alfafixture_1.VERSION.unwrap());
     nonExistingContribution3.put("otherTestValue", "myOtherTestValue");
 
     SimpleFixtureDo dataObject = createSimpleFixtureDo();
@@ -211,7 +211,7 @@ public class AbstractRemoveDoEntityContributionValueMigrationHandlerTest {
 
     @Override
     public Class<? extends ITypeVersion> typeVersionClass() {
-      return AlfaFixture_1.class;
+      return Alfafixture_1.class;
     }
 
     @Override
@@ -221,7 +221,7 @@ public class AbstractRemoveDoEntityContributionValueMigrationHandlerTest {
 
     @Override
     protected Class<? extends ITypeVersion> getContributionTypeVersionClass() {
-      return AlfaFixture_1.class;
+      return Alfafixture_1.class;
     }
   }
 
@@ -239,7 +239,7 @@ public class AbstractRemoveDoEntityContributionValueMigrationHandlerTest {
 
     @Override
     public Class<? extends ITypeVersion> typeVersionClass() {
-      return AlfaFixture_1.class;
+      return Alfafixture_1.class;
     }
 
     @Override
@@ -249,7 +249,7 @@ public class AbstractRemoveDoEntityContributionValueMigrationHandlerTest {
 
     @Override
     protected Class<? extends ITypeVersion> getContributionTypeVersionClass() {
-      return AlfaFixture_1.class;
+      return Alfafixture_1.class;
     }
   }
 }

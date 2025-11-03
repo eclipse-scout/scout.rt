@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationContextDataTarget;
 import org.eclipse.scout.rt.dataobject.migration.IDoStructureMigrationTargetContextData;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_2;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 
 @DoStructureMigrationContextDataTarget(typeNames = {"charlieFixture.PersonFixture"})
@@ -33,7 +33,7 @@ public class PersonFixtureTargetContextData implements IDoStructureMigrationTarg
     // A context data must only be initialized with an already migrated data object for a certain version.
     // The data object itself must be migrated as well as the correct type version must be set (in case type version switches are used within context)
     assertNotNull(doEntity.getString("relation")); // created by PersonFixtureDoStructureMigrationHandler_2
-    assertEquals(CharlieFixture_2.VERSION, NamespaceVersion.of(doEntity.getString("_typeVersion"))); // version must be updated before context data is initialized
+    assertEquals(Charliefixture_2.VERSION, NamespaceVersion.of(doEntity.getString("_typeVersion"))); // version must be updated before context data is initialized
 
     m_name = doEntity.getString("name");
     return true;

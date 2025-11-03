@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,24 +40,24 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDoStru
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomSizeFixtureDoValueMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypeFixtureDoValueMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureNamespace;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_1;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_2;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_3;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_6;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_7;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_3;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_6;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_7;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureNamespace;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.BravoFixture_1;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.BravoFixture_2;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.BravoFixture_3;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.Bravofixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.Bravofixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.Bravofixture_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureNamespace;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_1;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_2;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_3;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_4;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_5;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_3;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_4;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_5;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureNamespace;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureTypeVersions.DeltaFixture_1;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureTypeVersions.DeltaFixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureTypeVersions.Deltafixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureTypeVersions.Deltafixture_2;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -79,10 +79,10 @@ public class DataObjectMigrationInventoryTest {
     s_inventory = new TestDataObjectMigrationInventory(
         Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace(), new DeltaFixtureNamespace()),
         Arrays.asList(
-            new AlfaFixture_1(), new AlfaFixture_2(), new AlfaFixture_3(), new AlfaFixture_6(), // AlfaFixture_7 is explicitly not registered
-            new BravoFixture_1(), new BravoFixture_2(), new BravoFixture_3(),
-            new CharlieFixture_1(), new CharlieFixture_2(), new CharlieFixture_3(), new CharlieFixture_4(), new CharlieFixture_5(),
-            new DeltaFixture_1(), new DeltaFixture_2()),
+            new Alfafixture_1(), new Alfafixture_2(), new Alfafixture_3(), new Alfafixture_6(), // Alfafixture_7 is explicitly not registered
+            new Bravofixture_1(), new Bravofixture_2(), new Bravofixture_3(),
+            new Charliefixture_1(), new Charliefixture_2(), new Charliefixture_3(), new Charliefixture_4(), new Charliefixture_5(),
+            new Deltafixture_1(), new Deltafixture_2()),
         Arrays.asList(
             HouseFixtureStructureMigrationTargetContextData.class,
             HouseFixtureRawOnlyStructureMigrationTargetContextData.class,
@@ -112,9 +112,9 @@ public class DataObjectMigrationInventoryTest {
     TestDataObjectMigrationInventory inventory = new TestDataObjectMigrationInventory(
         Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace()),
         Arrays.asList(
-            new AlfaFixture_1(), new AlfaFixture_2(), new AlfaFixture_3(), new AlfaFixture_6(),
-            new BravoFixture_1(), new BravoFixture_2(), new BravoFixture_3(),
-            new CharlieFixture_1(), new CharlieFixture_2(), new CharlieFixture_3(), new CharlieFixture_4(), new CharlieFixture_5()),
+            new Alfafixture_1(), new Alfafixture_2(), new Alfafixture_3(), new Alfafixture_6(),
+            new Bravofixture_1(), new Bravofixture_2(), new Bravofixture_3(),
+            new Charliefixture_1(), new Charliefixture_2(), new Charliefixture_3(), new Charliefixture_4(), new Charliefixture_5()),
         Collections.emptyList(),
         Arrays.asList(new PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3()),
         Collections.emptyList());
@@ -124,9 +124,9 @@ public class DataObjectMigrationInventoryTest {
     assertThrows(PlatformException.class, () -> new TestDataObjectMigrationInventory(
         Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace()),
         Arrays.asList(
-            new AlfaFixture_1(), new AlfaFixture_2(), new AlfaFixture_3(), new AlfaFixture_6(),
-            new BravoFixture_1(), new BravoFixture_2(), new BravoFixture_3(),
-            new CharlieFixture_1(), new CharlieFixture_2(), new CharlieFixture_3(), new CharlieFixture_4(), new CharlieFixture_5()),
+            new Alfafixture_1(), new Alfafixture_2(), new Alfafixture_3(), new Alfafixture_6(),
+            new Bravofixture_1(), new Bravofixture_2(), new Bravofixture_3(),
+            new Charliefixture_1(), new Charliefixture_2(), new Charliefixture_3(), new Charliefixture_4(), new Charliefixture_5()),
         Collections.emptyList(),
         Arrays.asList(
             new PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3(),
@@ -141,12 +141,12 @@ public class DataObjectMigrationInventoryTest {
   public void testOrderedVersions() {
     assertEquals(
         Arrays.asList(
-            AlfaFixture_1.VERSION, BravoFixture_1.VERSION, CharlieFixture_1.VERSION, DeltaFixture_1.VERSION,
-            AlfaFixture_2.VERSION, BravoFixture_2.VERSION, CharlieFixture_2.VERSION, DeltaFixture_2.VERSION,
-            AlfaFixture_3.VERSION, BravoFixture_3.VERSION, CharlieFixture_3.VERSION,
-            CharlieFixture_4.VERSION,
-            AlfaFixture_6.VERSION,
-            CharlieFixture_5.VERSION // after charlieFixture-4, must not necessarily be after alfaFixture-6
+            Alfafixture_1.VERSION, Bravofixture_1.VERSION, Charliefixture_1.VERSION, Deltafixture_1.VERSION,
+            Alfafixture_2.VERSION, Bravofixture_2.VERSION, Charliefixture_2.VERSION, Deltafixture_2.VERSION,
+            Alfafixture_3.VERSION, Bravofixture_3.VERSION, Charliefixture_3.VERSION,
+            Charliefixture_4.VERSION,
+            Alfafixture_6.VERSION,
+            Charliefixture_5.VERSION // after charlieFixture-4, must not necessarily be after alfaFixture-6
         ),
         new ArrayList<>(s_inventory.m_orderedVersions));
   }
@@ -158,17 +158,17 @@ public class DataObjectMigrationInventoryTest {
   public void testTypeNameVersions() {
     assertEquals(
         CollectionUtility.hashMap(
-            new ImmutablePair<>("charlieFixture.BuildingFixture", Arrays.asList(CharlieFixture_2.VERSION)),
-            new ImmutablePair<>("charlieFixture.RoomFixture", Arrays.asList(CharlieFixture_2.VERSION, CharlieFixture_3.VERSION, CharlieFixture_4.VERSION, CharlieFixture_5.VERSION)),
-            new ImmutablePair<>("bravoFixture.PetFixture", Arrays.asList(BravoFixture_3.VERSION))),
+            new ImmutablePair<>("charlieFixture.BuildingFixture", Arrays.asList(Charliefixture_2.VERSION)),
+            new ImmutablePair<>("charlieFixture.RoomFixture", Arrays.asList(Charliefixture_2.VERSION, Charliefixture_3.VERSION, Charliefixture_4.VERSION, Charliefixture_5.VERSION)),
+            new ImmutablePair<>("bravoFixture.PetFixture", Arrays.asList(Bravofixture_3.VERSION))),
         s_inventory.m_typeNameVersions);
   }
 
   @Test
   public void testTypeNameToCurrentTypeVersion() {
-    assertEquals(CharlieFixture_3.VERSION, s_inventory.m_typeNameToCurrentTypeVersion.get("charlieFixture.HouseFixture"));
-    assertEquals(CharlieFixture_5.VERSION, s_inventory.m_typeNameToCurrentTypeVersion.get("charlieFixture.RoomFixture"));
-    assertEquals(CharlieFixture_2.VERSION, s_inventory.m_typeNameToCurrentTypeVersion.get("charlieFixture.PostalAddressFixture"));
+    assertEquals(Charliefixture_3.VERSION, s_inventory.m_typeNameToCurrentTypeVersion.get("charlieFixture.HouseFixture"));
+    assertEquals(Charliefixture_5.VERSION, s_inventory.m_typeNameToCurrentTypeVersion.get("charlieFixture.RoomFixture"));
+    assertEquals(Charliefixture_2.VERSION, s_inventory.m_typeNameToCurrentTypeVersion.get("charlieFixture.PostalAddressFixture"));
   }
 
   @Test
@@ -195,160 +195,160 @@ public class DataObjectMigrationInventoryTest {
   public void testIsUpToDateOrMigrationAvailable() {
     // Non-existing type names
     assertFalse(s_inventory.isUpToDateOrMigrationAvailable("lorem.Ipsum", null));
-    assertFalse(s_inventory.isUpToDateOrMigrationAvailable("lorem.Dolor", CharlieFixture_1.VERSION));
+    assertFalse(s_inventory.isUpToDateOrMigrationAvailable("lorem.Dolor", Charliefixture_1.VERSION));
 
     // Missing migration handler from charlieFixture-1 to -2 [lorem.Migrationless].
-    assertFalse(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.PostalAddressFixture", CharlieFixture_1.VERSION));
+    assertFalse(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.PostalAddressFixture", Charliefixture_1.VERSION));
 
     // Regular case [lorem.Example]
     assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", null));
-    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", CharlieFixture_1.VERSION));
-    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", CharlieFixture_2.VERSION));
-    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", CharlieFixture_3.VERSION));
-    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", CharlieFixture_4.VERSION));
-    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", CharlieFixture_5.VERSION)); // current type version
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", Charliefixture_1.VERSION));
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", Charliefixture_2.VERSION));
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", Charliefixture_3.VERSION));
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", Charliefixture_4.VERSION));
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", Charliefixture_5.VERSION)); // current type version
 
     // invalid, unknown type version
-    assertFalse(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", AlfaFixture_7.VERSION));
+    assertFalse(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", Alfafixture_7.VERSION));
 
     //  [lorem.One/lorem.Two]
-    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.BuildingFixture", CharlieFixture_1.VERSION));
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.BuildingFixture", Charliefixture_1.VERSION));
 
     // invalid, BuildingFixture not available for this type version (next version from full list is returned due to possible renamings)
-    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.BuildingFixture", CharlieFixture_3.VERSION));
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.BuildingFixture", Charliefixture_3.VERSION));
 
-    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.HouseFixture", CharlieFixture_3.VERSION)); // current type version
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.HouseFixture", Charliefixture_3.VERSION)); // current type version
   }
 
   @Test
   public void testFindNextMigrationHandlerVersion() {
     // Missing migration handler from charlieFixture-1 to -2 [lorem.Migrationless].
     assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.NO_MIGRATION_HANDLERS, null),
-        s_inventory.findNextMigrationHandlerVersion("charlieFixture.PostalAddressFixture", CharlieFixture_1.VERSION));
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.PostalAddressFixture", Charliefixture_1.VERSION));
 
     // Regular case [lorem.Example]
-    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.NO_TYPE_VERSION_YET, CharlieFixture_2.VERSION),
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.NO_TYPE_VERSION_YET, Charliefixture_2.VERSION),
         s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", null));
 
-    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, CharlieFixture_2.VERSION),
-        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_1.VERSION));
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, Charliefixture_2.VERSION),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", Charliefixture_1.VERSION));
 
-    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, CharlieFixture_3.VERSION),
-        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_2.VERSION));
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, Charliefixture_3.VERSION),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", Charliefixture_2.VERSION));
 
-    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, CharlieFixture_4.VERSION),
-        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_3.VERSION));
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, Charliefixture_4.VERSION),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", Charliefixture_3.VERSION));
 
-    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, CharlieFixture_5.VERSION),
-        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_4.VERSION));
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, Charliefixture_5.VERSION),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", Charliefixture_4.VERSION));
 
     assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.UP_TO_DATE, null),
-        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_5.VERSION)); // current type version
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", Charliefixture_5.VERSION)); // current type version
 
     assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.UNKNOWN_TYPE_VERSION, null),
-        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", AlfaFixture_7.VERSION)); // invalid, unknown type version
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", Alfafixture_7.VERSION)); // invalid, unknown type version
 
     //  [lorem.One/lorem.Two]
-    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, CharlieFixture_2.VERSION),
-        s_inventory.findNextMigrationHandlerVersion("charlieFixture.BuildingFixture", CharlieFixture_1.VERSION));
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, Charliefixture_2.VERSION),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.BuildingFixture", Charliefixture_1.VERSION));
 
     // invalid, BuildingFixture not available for this type version (next version from full list is returned due to possible renamings)
-    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, CharlieFixture_4.VERSION),
-        s_inventory.findNextMigrationHandlerVersion("charlieFixture.BuildingFixture", CharlieFixture_3.VERSION));
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, Charliefixture_4.VERSION),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.BuildingFixture", Charliefixture_3.VERSION));
 
     assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.UP_TO_DATE, null),
-        s_inventory.findNextMigrationHandlerVersion("charlieFixture.HouseFixture", CharlieFixture_3.VERSION)); // current type version
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.HouseFixture", Charliefixture_3.VERSION)); // current type version
   }
 
   @Test
   public void testGetVersions() {
-    assertThrows(AssertionException.class, () -> s_inventory.getVersions(CollectionUtility.emptyHashMap(), AlfaFixture_7.VERSION)); // alfaFixture-7 is unknown
+    assertThrows(AssertionException.class, () -> s_inventory.getVersions(CollectionUtility.emptyHashMap(), Alfafixture_7.VERSION)); // alfaFixture-7 is unknown
 
     assertEquals(CollectionUtility.emptyArrayList(), s_inventory.getVersions(CollectionUtility.emptyHashMap(), null));
-    assertEquals(CollectionUtility.emptyArrayList(), s_inventory.getVersions(CollectionUtility.emptyHashMap(), CharlieFixture_2.VERSION));
+    assertEquals(CollectionUtility.emptyArrayList(), s_inventory.getVersions(CollectionUtility.emptyHashMap(), Charliefixture_2.VERSION));
 
     // Only versions with handlers are returned
 
-    assertEquals(Arrays.asList(CharlieFixture_2.VERSION, BravoFixture_3.VERSION, CharlieFixture_3.VERSION, CharlieFixture_4.VERSION, CharlieFixture_5.VERSION),
+    assertEquals(Arrays.asList(Charliefixture_2.VERSION, Bravofixture_3.VERSION, Charliefixture_3.VERSION, Charliefixture_4.VERSION, Charliefixture_5.VERSION),
         s_inventory.getVersions(CollectionUtility.hashMap(
-                new ImmutablePair<>("charlieFixture.BuildingFixture", CharlieFixture_1.VERSION),
-                new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_1.VERSION)),
+                new ImmutablePair<>("charlieFixture.BuildingFixture", Charliefixture_1.VERSION),
+                new ImmutablePair<>("charlieFixture.RoomFixture", Charliefixture_1.VERSION)),
             null));
 
-    assertEquals(Arrays.asList(CharlieFixture_3.VERSION, CharlieFixture_4.VERSION, CharlieFixture_5.VERSION),
+    assertEquals(Arrays.asList(Charliefixture_3.VERSION, Charliefixture_4.VERSION, Charliefixture_5.VERSION),
         s_inventory.getVersions(CollectionUtility.hashMap(
-                new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-                new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_2.VERSION)),
+                new ImmutablePair<>("charlieFixture.HouseFixture", Charliefixture_2.VERSION),
+                new ImmutablePair<>("charlieFixture.RoomFixture", Charliefixture_2.VERSION)),
             null));
 
-    assertEquals(Arrays.asList(CharlieFixture_4.VERSION, CharlieFixture_5.VERSION),
+    assertEquals(Arrays.asList(Charliefixture_4.VERSION, Charliefixture_5.VERSION),
         s_inventory.getVersions(CollectionUtility.hashMap(
-                new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-                new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_3.VERSION)),
+                new ImmutablePair<>("charlieFixture.HouseFixture", Charliefixture_2.VERSION),
+                new ImmutablePair<>("charlieFixture.RoomFixture", Charliefixture_3.VERSION)),
             null));
 
-    assertEquals(Arrays.asList(CharlieFixture_5.VERSION),
+    assertEquals(Arrays.asList(Charliefixture_5.VERSION),
         s_inventory.getVersions(CollectionUtility.hashMap(
-                new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-                new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_4.VERSION)),
+                new ImmutablePair<>("charlieFixture.HouseFixture", Charliefixture_2.VERSION),
+                new ImmutablePair<>("charlieFixture.RoomFixture", Charliefixture_4.VERSION)),
             null));
 
     assertEquals(CollectionUtility.emptyArrayList(),
         s_inventory.getVersions(CollectionUtility.hashMap(
-                new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-                new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_5.VERSION)),
+                new ImmutablePair<>("charlieFixture.HouseFixture", Charliefixture_2.VERSION),
+                new ImmutablePair<>("charlieFixture.RoomFixture", Charliefixture_5.VERSION)),
             null));
 
     // With limit of toVersion
-    assertEquals(Arrays.asList(CharlieFixture_3.VERSION),
+    assertEquals(Arrays.asList(Charliefixture_3.VERSION),
         s_inventory.getVersions(CollectionUtility.hashMap(
-                new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-                new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_2.VERSION)),
-            CharlieFixture_3.VERSION));
+                new ImmutablePair<>("charlieFixture.HouseFixture", Charliefixture_2.VERSION),
+                new ImmutablePair<>("charlieFixture.RoomFixture", Charliefixture_2.VERSION)),
+            Charliefixture_3.VERSION));
 
-    // With limit of toVersion (lower than first returned version CharlieFixture_3)
+    // With limit of toVersion (lower than first returned version Charliefixture_3)
     assertEquals(Collections.emptyList(),
         s_inventory.getVersions(CollectionUtility.hashMap(
-                new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-                new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_2.VERSION)),
-            CharlieFixture_2.VERSION));
+                new ImmutablePair<>("charlieFixture.HouseFixture", Charliefixture_2.VERSION),
+                new ImmutablePair<>("charlieFixture.RoomFixture", Charliefixture_2.VERSION)),
+            Charliefixture_2.VERSION));
   }
 
   @Test
   public void testGetStructureMigrationHandlers() {
     assertThrows(AssertionException.class, () -> s_inventory.getStructureMigrationHandlers(null));
-    assertThrows(AssertionException.class, () -> s_inventory.getStructureMigrationHandlers(AlfaFixture_7.VERSION)); // no registered
+    assertThrows(AssertionException.class, () -> s_inventory.getStructureMigrationHandlers(Alfafixture_7.VERSION)); // no registered
 
     // alfaFixture-1
-    assertTrue(s_inventory.getStructureMigrationHandlers(AlfaFixture_1.VERSION).isEmpty()); // no handlers
+    assertTrue(s_inventory.getStructureMigrationHandlers(Alfafixture_1.VERSION).isEmpty()); // no handlers
 
     Map<String, IDoStructureMigrationHandler> migrationHandlers;
 
     // charlieFixture-2
-    migrationHandlers = s_inventory.getStructureMigrationHandlers(CharlieFixture_2.VERSION);
+    migrationHandlers = s_inventory.getStructureMigrationHandlers(Charliefixture_2.VERSION);
     assertEquals(2, migrationHandlers.size());
 
     assertTrue(migrationHandlers.get("charlieFixture.BuildingFixture") instanceof HouseFixtureDoStructureMigrationHandler_2);
     assertTrue(migrationHandlers.get("charlieFixture.RoomFixture") instanceof RoomFixtureDoStructureMigrationHandler_2);
 
     // bravoFixture-3
-    migrationHandlers = s_inventory.getStructureMigrationHandlers(BravoFixture_3.VERSION);
+    migrationHandlers = s_inventory.getStructureMigrationHandlers(Bravofixture_3.VERSION);
     assertEquals(1, migrationHandlers.size());
 
     assertTrue(migrationHandlers.get("bravoFixture.PetFixture") instanceof PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3);
 
     // charlieFixture-3
-    migrationHandlers = s_inventory.getStructureMigrationHandlers(CharlieFixture_3.VERSION);
+    migrationHandlers = s_inventory.getStructureMigrationHandlers(Charliefixture_3.VERSION);
     assertEquals(1, migrationHandlers.size());
     assertTrue(migrationHandlers.get("charlieFixture.RoomFixture") instanceof RoomFixtureDoStructureMigrationHandler_3);
 
     // charlieFixture-4
-    migrationHandlers = s_inventory.getStructureMigrationHandlers(CharlieFixture_4.VERSION);
+    migrationHandlers = s_inventory.getStructureMigrationHandlers(Charliefixture_4.VERSION);
     assertEquals(1, migrationHandlers.size());
     assertTrue(migrationHandlers.get("charlieFixture.RoomFixture") instanceof RoomFixtureDoStructureMigrationHandler_4);
 
     // charlieFixture-5
-    migrationHandlers = s_inventory.getStructureMigrationHandlers(CharlieFixture_5.VERSION);
+    migrationHandlers = s_inventory.getStructureMigrationHandlers(Charliefixture_5.VERSION);
     assertEquals(1, migrationHandlers.size());
     assertTrue(migrationHandlers.get("charlieFixture.RoomFixture") instanceof RoomFixtureDoStructureMigrationHandler_5);
   }
@@ -381,10 +381,10 @@ public class DataObjectMigrationInventoryTest {
     PlatformException exception = assertThrows(PlatformException.class, () -> new TestDataObjectMigrationInventory(
         Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace(), new DeltaFixtureNamespace()),
         Arrays.asList(
-            new AlfaFixture_1(), new AlfaFixture_2(),
-            new BravoFixture_1(), new BravoFixture_2(),
-            new CharlieFixture_1(), new CharlieFixture_2(),
-            new DeltaFixture_1(), new DeltaFixture_2()),
+            new Alfafixture_1(), new Alfafixture_2(),
+            new Bravofixture_1(), new Bravofixture_2(),
+            new Charliefixture_1(), new Charliefixture_2(),
+            new Deltafixture_1(), new Deltafixture_2()),
         Collections.emptyList(),
         Collections.emptyList(),
         Arrays.asList(

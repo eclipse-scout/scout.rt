@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,69 +14,69 @@ import java.util.Collection;
 
 import org.eclipse.scout.rt.dataobject.AbstractTypeVersion;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.BravoFixture_1;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.BravoFixture_2;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.BravoFixture_3;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.Bravofixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.Bravofixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.Bravofixture_3;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 
 public final class CharlieFixtureTypeVersions {
 
-  public static final class CharlieFixture_1 extends AbstractTypeVersion {
+  public static final class Charliefixture_1 extends AbstractTypeVersion {
 
     public static final NamespaceVersion VERSION = NamespaceVersion.of(CharlieFixtureNamespace.ID, "1");
 
-    public CharlieFixture_1() {
+    public Charliefixture_1() {
       super(VERSION);
     }
 
     @Override
     protected Collection<Class<? extends ITypeVersion>> getDependencyClasses() {
-      return Arrays.asList(BravoFixture_1.class);
+      return Arrays.asList(Bravofixture_1.class);
     }
   }
 
-  public static final class CharlieFixture_2 extends AbstractTypeVersion {
+  public static final class Charliefixture_2 extends AbstractTypeVersion {
 
     public static final NamespaceVersion VERSION = NamespaceVersion.of(CharlieFixtureNamespace.ID, "2");
 
-    public CharlieFixture_2() {
+    public Charliefixture_2() {
       super(VERSION);
     }
 
     @Override
     protected Collection<Class<? extends ITypeVersion>> getDependencyClasses() {
-      return Arrays.asList(BravoFixture_2.class);
+      return Arrays.asList(Bravofixture_2.class);
     }
   }
 
-  public static final class CharlieFixture_3 extends AbstractTypeVersion {
+  public static final class Charliefixture_3 extends AbstractTypeVersion {
 
     public static final NamespaceVersion VERSION = NamespaceVersion.of(CharlieFixtureNamespace.ID, "3");
 
-    public CharlieFixture_3() {
+    public Charliefixture_3() {
       super(VERSION);
     }
 
     @Override
     protected Collection<Class<? extends ITypeVersion>> getDependencyClasses() {
-      return Arrays.asList(BravoFixture_3.class);
+      return Arrays.asList(Bravofixture_3.class);
     }
   }
 
-  public static final class CharlieFixture_4 extends AbstractTypeVersion {
+  public static final class Charliefixture_4 extends AbstractTypeVersion {
 
     public static final NamespaceVersion VERSION = NamespaceVersion.of(CharlieFixtureNamespace.ID, "4");
 
-    public CharlieFixture_4() {
+    public Charliefixture_4() {
       super(VERSION);
     }
   }
 
-  public static final class CharlieFixture_5 extends AbstractTypeVersion {
+  public static final class Charliefixture_5 extends AbstractTypeVersion {
 
     public static final NamespaceVersion VERSION = NamespaceVersion.of(CharlieFixtureNamespace.ID, "5");
 
-    public CharlieFixture_5() {
+    public Charliefixture_5() {
       super(VERSION);
     }
   }

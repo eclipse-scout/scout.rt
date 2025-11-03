@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_5;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_5;
 
 /**
  * Change history:
@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureT
  * @since charlieFixture-1
  */
 @TypeName("charlieFixture.RoomFixture")
-@TypeVersion(CharlieFixture_5.class)
+@TypeVersion(Charliefixture_5.class)
 public class RoomFixtureDo extends DoEntity {
 
   public DoValue<String> name() {

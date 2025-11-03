@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoStructureMigrationHandler;
 import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_3;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_5;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_3;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_5;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -32,7 +32,7 @@ public class HouseFixtureDoStructureMigrationHandler_3 extends AbstractDoStructu
 
   @Override
   public Class<? extends ITypeVersion> toTypeVersionClass() {
-    return CharlieFixture_3.class;
+    return Charliefixture_3.class;
   }
 
   @Override
@@ -46,14 +46,14 @@ public class HouseFixtureDoStructureMigrationHandler_3 extends AbstractDoStructu
 
     rooms.add(BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.RoomFixture")
-        .put("_typeVersion", CharlieFixture_5.VERSION.unwrap()) // latest version, no structure migration will be applied
+        .put("_typeVersion", Charliefixture_5.VERSION.unwrap()) // latest version, no structure migration will be applied
         .put("name", "example room 1")
         .put("roomType", "room") // valid room type (already migrated), will not be migrated by RoomTypeFixtureDoValueMigrationHandler_2
         .build());
 
     rooms.add(BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.RoomFixture")
-        .put("_typeVersion", CharlieFixture_5.VERSION.unwrap()) // latest version, no structure migration will be applied
+        .put("_typeVersion", Charliefixture_5.VERSION.unwrap()) // latest version, no structure migration will be applied
         .put("name", "example room 2")
         .put("roomType", "standard-room") // old room type value, will be migrated by RoomTypeFixtureDoValueMigrationHandler_2
         .build());

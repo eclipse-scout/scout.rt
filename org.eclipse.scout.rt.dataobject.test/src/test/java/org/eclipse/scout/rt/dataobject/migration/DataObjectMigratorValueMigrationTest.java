@@ -54,8 +54,8 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.house.StreetNameStringI
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.StreetNameStringIdValueMigrationHandlerByMap_1;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.StreetNameWrapperDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.StreetNamesFixture;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_3;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_3;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_2;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -282,7 +282,7 @@ public class DataObjectMigratorValueMigrationTest {
     // raw DoEntity data object
     IDoEntity original = BEANS.get(DoEntityBuilder.class)
         .put("_type", "alfaFixture.CustomerFixture")
-        .put("_typeVersion", AlfaFixture_3.VERSION.unwrap())
+        .put("_typeVersion", Alfafixture_3.VERSION.unwrap())
         .put("firstName", "John")
         .put("lastName", "Doe")
         .put("gender", "m")
@@ -317,7 +317,7 @@ public class DataObjectMigratorValueMigrationTest {
     // raw DoEntity data object
     IDoEntity original = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.HouseFixture")
-        .put("_typeVersion", CharlieFixture_2.VERSION.unwrap()) // will be updated by HouseFixtureDoStructureMigrationHandler_3
+        .put("_typeVersion", Charliefixture_2.VERSION.unwrap()) // will be updated by HouseFixtureDoStructureMigrationHandler_3
         .build();
 
     DataObjectMigratorResult<IDoEntity> result = s_migrator.migrateDataObject(s_migrationContext, original, IDoEntity.class);
@@ -344,7 +344,7 @@ public class DataObjectMigratorValueMigrationTest {
     // raw DoEntity data object
     IDoEntity original = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.HouseFixture")
-        .put("_typeVersion", CharlieFixture_2.VERSION.unwrap()) // will be updated by HouseFixtureDoStructureMigrationHandler_3
+        .put("_typeVersion", Charliefixture_2.VERSION.unwrap()) // will be updated by HouseFixtureDoStructureMigrationHandler_3
         .build();
 
     DataObjectMigrationContext ctx = s_migrationContext.copy();

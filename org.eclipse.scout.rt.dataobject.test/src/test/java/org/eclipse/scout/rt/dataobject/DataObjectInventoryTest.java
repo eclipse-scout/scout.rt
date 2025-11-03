@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,12 +22,12 @@ import org.eclipse.scout.rt.dataobject.fixture.AbstractLoremFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.BiCompositeFixtureObject;
 import org.eclipse.scout.rt.dataobject.fixture.BiCompositeFixtureObjectDataObjectVisitorExtension;
 import org.eclipse.scout.rt.dataobject.fixture.CollectionFixtureDo;
-import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0;
-import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0_034;
-import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0_Duplicate;
-import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_No_Version;
-import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.NonRegisteredNamespaceFixture_1_0_0;
-import org.eclipse.scout.rt.dataobject.fixture.DataObjectProjectFixtureTypeVersions.DataObjectProjectFixture_1_2_3_004;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.Dataobjectfixture_1_0_0;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.Dataobjectfixture_1_0_0_034;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.Dataobjectfixture_1_0_0_Duplicate;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.Dataobjectfixture_No_Version;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.Nonregisterednamespacefixture_1_0_0;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectProjectFixtureTypeVersions.Dataobjectprojectfixture_1_2_3_004;
 import org.eclipse.scout.rt.dataobject.fixture.DateFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureInvalidTypeNameDo;
@@ -113,7 +113,7 @@ public class DataObjectInventoryTest {
     m_inventory.validateTypeVersionImplementors(); // no exception
 
     BeanTestingHelper beanTestingHelper = BEANS.get(BeanTestingHelper.class);
-    IBean<Object> fixtureNoVersionBean = beanTestingHelper.registerBean(new BeanMetaData(DataObjectFixture_No_Version.class));
+    IBean<Object> fixtureNoVersionBean = beanTestingHelper.registerBean(new BeanMetaData(Dataobjectfixture_No_Version.class));
     try {
       assertThrows(AssertionException.class, () -> m_inventory.validateTypeVersionImplementors());
     }
@@ -121,7 +121,7 @@ public class DataObjectInventoryTest {
       beanTestingHelper.unregisterBean(fixtureNoVersionBean);
     }
 
-    IBean<Object> fixtureNoRegisteredNamespaceBean = beanTestingHelper.registerBean(new BeanMetaData(NonRegisteredNamespaceFixture_1_0_0.class));
+    IBean<Object> fixtureNoRegisteredNamespaceBean = beanTestingHelper.registerBean(new BeanMetaData(Nonregisterednamespacefixture_1_0_0.class));
     try {
       assertThrows(AssertionException.class, () -> m_inventory.validateTypeVersionImplementors());
     }
@@ -129,7 +129,7 @@ public class DataObjectInventoryTest {
       beanTestingHelper.unregisterBean(fixtureNoRegisteredNamespaceBean);
     }
 
-    IBean<Object> fixtureDuplicateVersionBean = beanTestingHelper.registerBean(new BeanMetaData(DataObjectFixture_1_0_0_Duplicate.class));
+    IBean<Object> fixtureDuplicateVersionBean = beanTestingHelper.registerBean(new BeanMetaData(Dataobjectfixture_1_0_0_Duplicate.class));
     try {
       assertThrows(AssertionException.class, () -> m_inventory.validateTypeVersionImplementors());
     }
@@ -342,14 +342,14 @@ public class DataObjectInventoryTest {
   @Test
   public void testResolveTypeVersionClass() {
     assertNull(m_inventory.resolveTypeVersionClass(EntityFixtureDo.class));
-    assertEquals(DataObjectFixture_1_0_0.class, m_inventory.resolveTypeVersionClass(OtherEntityFixtureDo.class));
+    assertEquals(Dataobjectfixture_1_0_0.class, m_inventory.resolveTypeVersionClass(OtherEntityFixtureDo.class));
     assertNull(m_inventory.resolveTypeVersionClass(Object.class));
 
     m_inventory.registerClassByTypeVersion(ScoutFixtureDo.class);
-    assertEquals(DataObjectFixture_1_0_0_034.VERSION, m_inventory.getTypeVersion(ScoutFixtureDo.class));
+    assertEquals(Dataobjectfixture_1_0_0_034.VERSION, m_inventory.getTypeVersion(ScoutFixtureDo.class));
 
     m_inventory.registerClassByTypeVersion(ProjectFixtureDo.class);
-    assertEquals(DataObjectProjectFixture_1_2_3_004.VERSION, m_inventory.getTypeVersion(ProjectFixtureDo.class));
+    assertEquals(Dataobjectprojectfixture_1_2_3_004.VERSION, m_inventory.getTypeVersion(ProjectFixtureDo.class));
     assertNull(m_inventory.getTypeVersion(ProjectSubFixtureDo.class));
   }
 
@@ -369,8 +369,8 @@ public class DataObjectInventoryTest {
     assertEquals("ScoutFixture", inv.toTypeName(ProjectFixtureDo.class));
     assertEquals("ScoutFixture", inv.toTypeName(ProjectSubFixtureDo.class));
 
-    assertEquals(DataObjectFixture_1_0_0_034.VERSION, inv.getTypeVersion(ScoutFixtureDo.class));
-    assertEquals(DataObjectProjectFixture_1_2_3_004.VERSION, inv.getTypeVersion(ProjectFixtureDo.class));
+    assertEquals(Dataobjectfixture_1_0_0_034.VERSION, inv.getTypeVersion(ScoutFixtureDo.class));
+    assertEquals(Dataobjectprojectfixture_1_2_3_004.VERSION, inv.getTypeVersion(ProjectFixtureDo.class));
 
     assertNull(inv.getTypeVersion(ProjectSubFixtureDo.class));
 
