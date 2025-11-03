@@ -92,6 +92,18 @@ public final class XmlUtility {
    * @throws ParserConfigurationException
    */
   public static DocumentBuilder newDocumentBuilder() throws ParserConfigurationException {
+    return newDocumentBuilder(false);
+  }
+
+  /**
+   * @param namespaceAware
+   *        If set to {@code true}, the parser used to parse the input will provide support for XML namespaces,
+   *        {@code false} otherwise
+   *
+   * @return a new secure {@link DocumentBuilder} with disabled xml-external-entity
+   * @throws ParserConfigurationException
+   */
+  public static DocumentBuilder newDocumentBuilder(boolean namespaceAware) throws ParserConfigurationException {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
     for (Entry<String, Boolean> a : getXmlFeaturesMap().entrySet()) {
@@ -122,6 +134,7 @@ public final class XmlUtility {
     factory.setXIncludeAware(false);
     factory.setExpandEntityReferences(false);
     factory.setIgnoringComments(true);
+    factory.setNamespaceAware(namespaceAware);
     return factory.newDocumentBuilder();
   }
 
@@ -492,8 +505,24 @@ public final class XmlUtility {
    *     if there is an error parsing the content of the {@link String} into a {@link Document}.
    */
   public static Document getXmlDocument(String rawXml) {
+    return getXmlDocument(rawXml, false);
+  }
+
+  /**
+   * Creates an xml {@link Document} filled with the content of the given {@link String}.
+   *
+   * @param rawXml
+   *     The {@link String} holding the xml content.
+   * @param namespaceAware
+   *     If set to {@code true}, the parser used to parse the input will provide support for XML namespaces,
+   *     {@code false} otherwise
+   * @return A xml {@link Document} containing the data of the given {@link String}.
+   * @throws ProcessingException
+   *     if there is an error parsing the content of the {@link String} into a {@link Document}.
+   */
+  public static Document getXmlDocument(String rawXml, boolean namespaceAware) {
     try {
-      return newDocumentBuilder().parse(new InputSource(new StringReader(rawXml)));
+      return newDocumentBuilder(namespaceAware).parse(new InputSource(new StringReader(rawXml)));
     }
     catch (IOException | SAXException | ParserConfigurationException e) {
       throw new ProcessingException("Unable to load xml document.", e);
