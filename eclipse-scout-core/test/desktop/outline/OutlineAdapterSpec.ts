@@ -391,6 +391,28 @@ describe('OutlineAdapter', () => {
       expect(objects.isPojo(legacyDataObject)).toBe(true);
       expect(legacyDataObject.prop).toBe(5);
     });
+
+    it('has childNodeIndex set', () => {
+      const treeHelper = new TreeSpecHelper(session);
+      let model = helper.createModelFixture(1);
+      let adapter = helper.createOutlineAdapter(model);
+      let outline = adapter.createWidget(model, session.desktop) as Outline;
+
+      let nodes = [helper.createModelNode('0_0', 'newChildNode1', {
+        nodeType: 'jsPage',
+        jsPageObjectType: 'outlineadapterspec.MyJsPage'
+      }), helper.createModelNode('1_0', 'newChildNode2', {
+        nodeType: 'jsPage',
+        jsPageObjectType: 'outlineadapterspec.MyJsPage'
+      })];
+      adapter.onModelEvent(treeHelper.createNodesInsertedEvent(outline, nodes));
+      expect(outline.nodes[0].childNodeIndex).toBe(0);
+      expect(outline.nodes[0]).not.toBeInstanceOf(MyJsPage);
+      expect(outline.nodes[1]).toBeInstanceOf(MyJsPage);
+      expect(outline.nodes[1].childNodeIndex).toBe(1);
+      expect(outline.nodes[2]).toBeInstanceOf(MyJsPage);
+      expect(outline.nodes[2].childNodeIndex).toBe(2);
+    });
   });
 
   describe('pageParam', () => {
