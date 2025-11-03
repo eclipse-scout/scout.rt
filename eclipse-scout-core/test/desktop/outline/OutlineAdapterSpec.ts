@@ -402,7 +402,7 @@ describe('OutlineAdapter', () => {
         nodeType: 'jsPage',
         jsPageObjectType: 'outlineadapterspec.MyJsPage'
       })]));
-      const [jsPage, page] = outline.nodes as AdapterTreeNode[]; // new node is inserted at at index 0
+      const [page, jsPage] = outline.nodes as AdapterTreeNode[];
 
       expect(jsPage).toBeInstanceOf(MyJsPage);
       expect(jsPage.__hybrid).toBeTrue();
@@ -410,6 +410,28 @@ describe('OutlineAdapter', () => {
       expect(page).toBeInstanceOf(Page);
       expect(page).not.toBeInstanceOf(MyJsPage);
       expect(page.__hybrid).toBeFalsy();
+    });
+
+    it('has childNodeIndex set', () => {
+      const treeHelper = new TreeSpecHelper(session);
+      let model = helper.createModelFixture(1);
+      let adapter = helper.createOutlineAdapter(model);
+      let outline = adapter.createWidget(model, session.desktop) as Outline;
+
+      let nodes = [helper.createModelNode('0_0', 'newChildNode1', {
+        nodeType: 'jsPage',
+        jsPageObjectType: 'outlineadapterspec.MyJsPage'
+      }), helper.createModelNode('1_0', 'newChildNode2', {
+        nodeType: 'jsPage',
+        jsPageObjectType: 'outlineadapterspec.MyJsPage'
+      })];
+      adapter.onModelEvent(treeHelper.createNodesInsertedEvent(outline, nodes));
+      expect(outline.nodes[0].childNodeIndex).toBe(0);
+      expect(outline.nodes[0]).not.toBeInstanceOf(MyJsPage);
+      expect(outline.nodes[1]).toBeInstanceOf(MyJsPage);
+      expect(outline.nodes[1].childNodeIndex).toBe(1);
+      expect(outline.nodes[2]).toBeInstanceOf(MyJsPage);
+      expect(outline.nodes[2].childNodeIndex).toBe(2);
     });
   });
 
