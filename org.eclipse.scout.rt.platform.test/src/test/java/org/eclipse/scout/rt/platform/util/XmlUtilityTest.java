@@ -39,12 +39,24 @@ public class XmlUtilityTest {
   private static final String XML_PROLOG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
   private static final String EMPTY_XML = XML_PROLOG + "<root/>";
   private static final String SIMPLE_XML = XML_PROLOG + "<root><element/></root>";
+  private static final String SIMPLE_XML_WITH_TEST_NAMESPACE = XML_PROLOG + "<root xmlns=\"test-namespace\"><element/></root>";
   private static final String NESTED_XML = XML_PROLOG + "<root><otherElement><element nested=\"true\" attrib=\"value\"/></otherElement><element nested=\"false\" attrib=\"value\"/></root>";
 
   @Test
   public void testDocumentBuilderSimple() throws Exception {
     Document doc = XmlUtility.newDocumentBuilder().parse(new ByteArrayInputStream(SIMPLE_XML.getBytes(StandardCharsets.UTF_8)));
     assertEquals("root", doc.getDocumentElement().getNodeName());
+  }
+
+  @Test
+  public void testDocumentBuilderNamespaceAware() throws Exception {
+    Document doc = XmlUtility.newDocumentBuilder(false).parse(new ByteArrayInputStream(SIMPLE_XML_WITH_TEST_NAMESPACE.getBytes(StandardCharsets.UTF_8)));
+    assertEquals("root", doc.getDocumentElement().getNodeName());
+    assertNull(doc.getDocumentElement().getNamespaceURI());
+
+    doc = XmlUtility.newDocumentBuilder(true).parse(new ByteArrayInputStream(SIMPLE_XML_WITH_TEST_NAMESPACE.getBytes(StandardCharsets.UTF_8)));
+    assertEquals("root", doc.getDocumentElement().getNodeName());
+    assertEquals("test-namespace", doc.getDocumentElement().getNamespaceURI());
   }
 
   @Test
@@ -171,5 +183,16 @@ public class XmlUtilityTest {
     children = XmlUtility.getChildElementsWithAttributes(otherElement, "element", "attrib", "value");
     assertEquals(1, children.size());
     assertEquals("true", CollectionUtility.firstElement(children).getAttribute("nested"));
+  }
+
+  @Test
+  public void testGetXmlDocumentNamespaceAware() {
+    Element root = XmlUtility.getXmlDocument(SIMPLE_XML_WITH_TEST_NAMESPACE, false).getDocumentElement();
+    assertEquals("root", root.getNodeName());
+    assertNull(root.getNamespaceURI());
+
+    root = XmlUtility.getXmlDocument(SIMPLE_XML_WITH_TEST_NAMESPACE, true).getDocumentElement();
+    assertEquals("root", root.getNodeName());
+    assertEquals("test-namespace", root.getNamespaceURI());
   }
 }
