@@ -306,7 +306,8 @@ export class OutlineAdapter extends TreeAdapter {
       objectType: pageModel.jsPageObjectType,
       pageParam: pageParam,
       classId: pageModel.classId,
-      modelClass: pageModel.modelClass
+      modelClass: pageModel.modelClass,
+      childNodeIndex: pageModel.childNodeIndex
     };
   }
 
