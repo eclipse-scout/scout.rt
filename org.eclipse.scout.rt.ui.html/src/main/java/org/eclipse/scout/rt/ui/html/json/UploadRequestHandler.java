@@ -43,8 +43,10 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.resource.MimeTypes;
+import org.eclipse.scout.rt.platform.security.IResourceSanitizerImplementor;
 import org.eclipse.scout.rt.platform.security.MalwareScanner;
 import org.eclipse.scout.rt.platform.security.RejectedResourceException;
+import org.eclipse.scout.rt.platform.security.ResourceSanitizer;
 import org.eclipse.scout.rt.platform.security.UnsafeResourceException;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.HexUtility;
@@ -259,6 +261,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
           .build();
       verifyFileSafety(res);
       verifyFileIntegrity(res);
+      res = sanitizeResource(res);
 
       // properties are sent as form fields without file name by UI (see Session.ts)
       if (StringUtility.isNullOrEmpty(part.getSubmittedFileName())) {
@@ -400,5 +403,15 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       LOG.info(message, res.getFilename(), header);
       throw new RejectedResourceException(message, res.getFilename(), header);
     }
+  }
+
+  /**
+   * If there exists an {@link IResourceSanitizerImplementor} that accepts the given {@code res}
+   * it will be used to sanitize it
+   *
+   * @return a sanitized {@link BinaryResource}
+   */
+  protected BinaryResource sanitizeResource(BinaryResource res) {
+    return BEANS.get(ResourceSanitizer.class).sanitize(res);
   }
 }
