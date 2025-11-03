@@ -92,6 +92,18 @@ public final class XmlUtility {
    * @throws ParserConfigurationException
    */
   public static DocumentBuilder newDocumentBuilder() throws ParserConfigurationException {
+    return newDocumentBuilder(false);
+  }
+
+  /**
+   * @param namespaceAware
+   *        If set to {@code true}, the parser used to parse the input will provide support for XML namespaces,
+   *        {@code false} otherwise
+   *
+   * @return a new secure {@link DocumentBuilder} with disabled xml-external-entity
+   * @throws ParserConfigurationException
+   */
+  public static DocumentBuilder newDocumentBuilder(boolean namespaceAware) throws ParserConfigurationException {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
     for (Entry<String, Boolean> a : getXmlFeaturesMap().entrySet()) {
@@ -122,6 +134,7 @@ public final class XmlUtility {
     factory.setXIncludeAware(false);
     factory.setExpandEntityReferences(false);
     factory.setIgnoringComments(true);
+    factory.setNamespaceAware(namespaceAware);
     return factory.newDocumentBuilder();
   }
 
@@ -299,7 +312,7 @@ public final class XmlUtility {
   }
 
   /**
-   * Wellforms the given xml {@link Document} and flushes the result into the given output stream.
+   * Wellforms the given XML {@link Document} and flushes the result into the given output stream.
    *
    * @param document
    *     The document to wellform.
@@ -314,12 +327,12 @@ public final class XmlUtility {
       out.flush();
     }
     catch (IOException e) {
-      throw new ProcessingException("unable to flush xml document to output.", e);
+      throw new ProcessingException("unable to flush XML document to output.", e);
     }
   }
 
   /**
-   * Wellforms the given xml {@link Document} and flushes the result into the given {@link File}.
+   * Wellforms the given XML {@link Document} and flushes the result into the given {@link File}.
    *
    * @param document
    *     The document to wellform.
@@ -340,12 +353,12 @@ public final class XmlUtility {
       wellformDocument(document, out);
     }
     catch (IOException e) {
-      throw new ProcessingException("Exception writing xml file: '" + f.getAbsolutePath() + "'.", e);
+      throw new ProcessingException("Exception writing XML file: '" + f.getAbsolutePath() + "'.", e);
     }
   }
 
   /**
-   * Wellforms the given xml {@link Document} and flushes the result into the given {@link Writer}
+   * Wellforms the given XML {@link Document} and flushes the result into the given {@link Writer}
    *
    * @param document
    *     The document to wellform.
@@ -360,7 +373,7 @@ public final class XmlUtility {
       writer.flush();
     }
     catch (IOException e) {
-      throw new ProcessingException("unable to flush xml document to writer.", e);
+      throw new ProcessingException("unable to flush XML document to writer.", e);
     }
   }
 
@@ -375,16 +388,16 @@ public final class XmlUtility {
       transformer.transform(new DOMSource(document), result);
     }
     catch (TransformerException e) {
-      throw new ProcessingException("Unable to wellform xml.", e);
+      throw new ProcessingException("Unable to wellform XML.", e);
     }
   }
 
   /**
-   * Wellforms the given xml {@link Document} and returns the result as {@link String}.
+   * Wellforms the given XML {@link Document} and returns the result as {@link String}.
    *
    * @param document
    *     The document to wellform
-   * @return A {@link String} containing the xml {@link Document} content.
+   * @return A {@link String} containing the XML {@link Document} content.
    * @throws ProcessingException
    *     if there is an exception wellforming the document.
    */
@@ -395,13 +408,13 @@ public final class XmlUtility {
   }
 
   /**
-   * Takes the given xml input, creates an xml {@link Document} and returnes it as wellformed {@link String}.
+   * Takes the given XML input, creates an XML {@link Document} and returnes it as wellformed {@link String}.
    *
    * @param rawXml
-   *     The xml input.
-   * @return A {@link String} containing the wellformed xml.
+   *     The XML input.
+   * @return A {@link String} containing the wellformed XML.
    * @throws ProcessingException
-   *     if there is an exception wellforming the input xml.
+   *     if there is an exception wellforming the input XML.
    */
   public static String wellformXml(String rawXml) {
     return wellformDocument(getXmlDocument(rawXml));
@@ -423,17 +436,17 @@ public final class XmlUtility {
       return document;
     }
     catch (ParserConfigurationException e) {
-      LOG.debug("Could not create new xml document", e);
+      LOG.debug("Could not create new XML document", e);
     }
     return null;
   }
 
   /**
-   * Creates an xml {@link Document} filled with the given {@link InputStream}.
+   * Creates an XML {@link Document} filled with the given {@link InputStream}.
    *
    * @param is
    *     The input stream to use as data source.
-   * @return A xml {@link Document} containing the data of the given {@link InputStream}.
+   * @return An XML {@link Document} containing the data of the given {@link InputStream}.
    * @throws ProcessingException
    *     if there is an error reading from the {@link InputStream} or parsing the content.
    */
@@ -442,16 +455,16 @@ public final class XmlUtility {
       return newDocumentBuilder().parse(is);
     }
     catch (IOException | SAXException | ParserConfigurationException e) {
-      throw new ProcessingException("Unable to load xml document.", e);
+      throw new ProcessingException("Unable to load XML document.", e);
     }
   }
 
   /**
-   * Creates an xml {@link Document} filled with the content of the given {@link File}.
+   * Creates an XML {@link Document} filled with the content of the given {@link File}.
    *
    * @param f
    *     The {@link File} to use as data source.
-   * @return A xml {@link Document} containing the data of the given {@link File}.
+   * @return An XML {@link Document} containing the data of the given {@link File}.
    * @throws ProcessingException
    *     if there is an error reading from the {@link File} or parsing the content.
    */
@@ -460,16 +473,16 @@ public final class XmlUtility {
       return newDocumentBuilder().parse(f);
     }
     catch (IOException | SAXException | ParserConfigurationException e) {
-      throw new ProcessingException("Unable to load xml document.", e);
+      throw new ProcessingException("Unable to load XML document.", e);
     }
   }
 
   /**
-   * Creates an xml {@link Document} filled with the content of the given {@link URL}.
+   * Creates an XML {@link Document} filled with the content of the given {@link URL}.
    *
    * @param url
    *     The {@link URL} to use as data source.
-   * @return A xml {@link Document} containing the data of the given {@link URL}.
+   * @return An XML {@link Document} containing the data of the given {@link URL}.
    * @throws ProcessingException
    *     if there is an error reading from the {@link URL} or parsing the content.
    */
@@ -483,20 +496,36 @@ public final class XmlUtility {
   }
 
   /**
-   * Creates an xml {@link Document} filled with the content of the given {@link String}.
+   * Creates an XML {@link Document} filled with the content of the given {@link String}.
    *
    * @param rawXml
-   *     The {@link String} holding the xml content.
-   * @return A xml {@link Document} containing the data of the given {@link String}.
+   *     The {@link String} holding the XML content.
+   * @return An XML {@link Document} containing the data of the given {@link String}.
    * @throws ProcessingException
    *     if there is an error parsing the content of the {@link String} into a {@link Document}.
    */
   public static Document getXmlDocument(String rawXml) {
+    return getXmlDocument(rawXml, false);
+  }
+
+  /**
+   * Creates an XML {@link Document} filled with the content of the given {@link String}.
+   *
+   * @param rawXml
+   *     The {@link String} holding the XML content.
+   * @param namespaceAware
+   *     If set to {@code true}, the parser used to parse the input will provide support for XML namespaces,
+   *     {@code false} otherwise
+   * @return An XML {@link Document} containing the data of the given {@link String}.
+   * @throws ProcessingException
+   *     if there is an error parsing the content of the {@link String} into a {@link Document}.
+   */
+  public static Document getXmlDocument(String rawXml, boolean namespaceAware) {
     try {
-      return newDocumentBuilder().parse(new InputSource(new StringReader(rawXml)));
+      return newDocumentBuilder(namespaceAware).parse(new InputSource(new StringReader(rawXml)));
     }
     catch (IOException | SAXException | ParserConfigurationException e) {
-      throw new ProcessingException("Unable to load xml document.", e);
+      throw new ProcessingException("Unable to load XML document.", e);
     }
   }
 
