@@ -20,6 +20,8 @@ import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 
 import org.eclipse.scout.rt.dataobject.DataObjectHolder;
 import org.eclipse.scout.rt.dataobject.DoEntity;
@@ -129,7 +131,10 @@ public class ServiceTunnelIdSignatureTest {
       RunContexts.copyCurrent()
           .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, request)
           .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, response)
-          .run(() -> BEANS.get(ServiceTunnelService.class).incomingRequest(request.getInputStream(), response.getOutputStream()));
+          .run(() -> {
+            Response r = BEANS.get(ServiceTunnelService.class).incomingRequest(request.getInputStream());
+            ((StreamingOutput) r.getEntity()).write(response.getOutputStream());
+          });
     }
     catch (RuntimeException t) {
       // error occurred -> no response to read

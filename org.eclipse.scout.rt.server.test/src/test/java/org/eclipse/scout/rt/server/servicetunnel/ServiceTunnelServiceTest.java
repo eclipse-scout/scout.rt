@@ -14,7 +14,6 @@ import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +28,8 @@ import javax.security.auth.Subject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 
 import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -170,14 +171,15 @@ public class ServiceTunnelServiceTest {
   }
 
   @Test
-  public void testIncomingRequest() throws IOException, ClassNotFoundException {
+  public void testIncomingRequest() throws Exception {
     ServiceTunnelService s = BEANS.get(ServiceTunnelService.class);
     IObjectSerializer serializer = SerializationUtility.createObjectSerializer();
     byte[] serializedReq = serializer.serialize(prepareTestRequest());
     try (InputStream in = new ByteArrayInputStream(serializedReq); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
       IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.set(mock(HttpServletRequest.class));
       IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.set(mock(HttpServletResponse.class));
-      s.incomingRequest(in, out);
+      Response r = s.incomingRequest(in);
+      ((StreamingOutput) r.getEntity()).write(out);
       byte[] byteArray = out.toByteArray();
       verifyTestResponse(serializer.deserialize(byteArray, ServiceTunnelResponse.class));
     }
