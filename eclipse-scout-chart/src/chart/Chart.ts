@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -397,6 +397,19 @@ export class Chart extends Widget implements ChartModel {
     this.trigger('valueClick', {
       data: clickedItem,
       originalEvent
+    });
+  }
+
+  handleNonValueClick(originalEvent?: Event) {
+    this.trigger('nonValueClick', {
+      originalEvent
+    });
+  }
+
+  handleLegendClick(legentItemIndex: number, originalEvent?: Event) {
+    this.trigger('legendItemClick', {
+      legendItemIndex: legentItemIndex,
+      originalEvent: originalEvent
     });
   }
 }

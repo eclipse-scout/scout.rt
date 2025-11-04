@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -106,7 +106,7 @@ export class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
       .text(percentage + '%');
 
     if (this.chart.config.options.clickable) {
-      $arc.on('click', this._createClickObject(null, null), e => this.chart.handleValueClick(e.data));
+      $arc.on('click', this._createClickObject(null, null), this._onChartValueClick.bind(this));
     }
     if (!this.chart.config.options.autoColor && !chartGroupCss) {
       $arc.attr('fill', color);
