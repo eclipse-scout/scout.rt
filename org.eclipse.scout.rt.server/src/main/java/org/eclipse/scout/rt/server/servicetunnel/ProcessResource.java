@@ -17,7 +17,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.StreamingOutput;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.IRestResource;
@@ -29,8 +28,7 @@ public class ProcessResource implements IRestResource {
   @POST
   @Consumes(MediaType.APPLICATION_OCTET_STREAM)
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  public Response process(InputStream in) {
-    StreamingOutput stream = out -> BEANS.get(ServiceTunnelService.class).incomingRequest(in, out);
-    return Response.ok(stream).build();
+  public Response process(InputStream in) throws Exception {
+    return BEANS.get(ServiceTunnelService.class).incomingRequest(in);
   }
 }

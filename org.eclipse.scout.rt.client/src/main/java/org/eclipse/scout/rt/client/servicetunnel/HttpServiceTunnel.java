@@ -192,20 +192,14 @@ public class HttpServiceTunnel {
       final byte[] requestData = requestMessage.toByteArray();
       nBytes = requestData.length;
 
-      // Send the request to the server.
-      try (Response resp = executeRequest(serviceRequest, requestData)) {
-        interceptHttpResponse(resp, serviceRequest);
-
-        try (InputStream in = resp.readEntity(InputStream.class)) {
-          // Receive the response.
-          ServiceTunnelResponse response = contentHandler.readResponse(in);
-          if (response == null) {
-            return new ServiceTunnelResponse(new ProcessingException("Response contains no content")
-                .withContextInfo("http-status", "{} {}", resp.getStatus(), resp.getStatusInfo())
-                .withContextInfo("http-headers", resp.getHeaders() + ""));
-          }
-          return response;
-        }
+      Response response = executeRequest(serviceRequest, requestData);  // response will be closed by #readResponse
+      try {
+        interceptHttpResponse(response, serviceRequest);
+        return readResponse(response, contentHandler);
+      }
+      catch (Throwable t) {
+        response.close(); // close response in case of exception
+        throw t;
       }
     }
     catch (RemoteSystemUnavailableException exception) {
@@ -232,6 +226,23 @@ public class HttpServiceTunnel {
         final long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - tStart);
         LOG.debug("TIME {}.{} {}ms {} bytes", serviceRequest.getServiceInterfaceClassName(), serviceRequest.getOperation(), elapsedMillis, nBytes);
       }
+    }
+  }
+
+  /**
+   * Read {@link Response} and parse into {@link ServiceTunnelResponse}
+   * This method is responsible to close the given REST {@code response}.
+   */
+  protected ServiceTunnelResponse readResponse(Response response, BinaryServiceTunnelContentHandler contentHandler) throws IOException, ClassNotFoundException {
+    try (response; InputStream in = response.readEntity(InputStream.class)) {
+      // Receive the response.
+      ServiceTunnelResponse serviceTunnelResponse = contentHandler.readResponse(in);
+      if (serviceTunnelResponse == null) {
+        return new ServiceTunnelResponse(new ProcessingException("Response contains no content")
+            .withContextInfo("http-status", "{} {}", response.getStatus(), response.getStatusInfo())
+            .withContextInfo("http-headers", response.getHeaders() + ""));
+      }
+      return serviceTunnelResponse;
     }
   }
 

@@ -14,7 +14,6 @@ import static org.eclipse.scout.rt.server.commons.opentelemetry.SpanNamePropagat
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
 
 import javax.security.auth.Subject;
 
@@ -22,12 +21,12 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
-import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
@@ -63,38 +62,48 @@ public class ServiceTunnelService {
     m_contentHandler = createContentHandler();
   }
 
+  // === SERVICE INVOCATION ===
+
+  /**
+   * Handles incoming request by given {@link InputStream}, delegates handling of {@link ServiceTunnelResponse} to {@link #handleResponse(ServiceTunnelResponse)} default implementation.
+   */
+  public Response incomingRequest(InputStream in) throws Exception {
+    return handleIncomingRequest(in, this::handleResponse);
+  }
+
+  /**
+   * Default handling, writes {@link ServiceTunnelResponse} directly to the returned {@link Response}.
+   */
+  protected Response handleResponse(ServiceTunnelResponse response) {
+    StreamingOutput stream = out -> serializeServiceResponse(out, response);
+    return Response.ok(stream).build();
+  }
+
+  /**
+   * Handles incoming request by given {@link InputStream} and delegates response handling to given {@link ServiceTunnelResponseHandler}.
+   */
+  protected Response handleIncomingRequest(InputStream in, ServiceTunnelResponseHandler responseConsumer) throws Exception {
+    if (Subject.current() == null) {
+      throw new ForbiddenException();
+    }
+
+    // Add signature property to current run context if requested by current request. Property is required for correct deserialization of request and serialization of response.
+    // Serialize of response is performed deferred by StreamingOutput lambda response provided by #handleDefault which runs within the same run context.
+    if (enableSignature(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get())) {
+      RunContext.CURRENT.get().getPropertyMap().put(ServiceTunnelOptions.ID_SIGNATURE_PROP, true);
+    }
+
+    ServiceTunnelRequest serviceRequest = deserializeServiceRequest(in);
+    ServiceTunnelResponse serviceResponse = evaluate(serviceRequest);
+    return responseConsumer.handle(serviceResponse);
+  }
+
   /**
    * Check the {@link HttpServletRequest} if signature creation needs to be enabled. Default implementation checks
    * the {@link IdSignatureClientRequestFilter#ID_SIGNATURE_HTTP_HEADER}.
    */
   protected boolean enableSignature(HttpServletRequest servletRequest) {
     return Boolean.TRUE.toString().equalsIgnoreCase(servletRequest.getHeader(IdSignatureClientRequestFilter.ID_SIGNATURE_HTTP_HEADER));
-  }
-
-  // incoming request
-  public void incomingRequest(InputStream in, OutputStream out) {
-    if (Subject.current() == null) {
-      throw new ForbiddenException();
-    }
-
-    m_serverRunContextProducer.get()
-        .getInnerRunContextProducer()
-        .produce(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get(), IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get())
-        .withProperties(enableSignature(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get()) ? Map.of(ServiceTunnelOptions.ID_SIGNATURE_PROP, true) : Map.of())
-        .run(() -> {
-          ServiceTunnelRequest serviceRequest = deserializeServiceRequest(in);
-          ServiceTunnelResponse serviceResponse = evaluate(serviceRequest);
-
-          // Clear the current thread's interruption status before writing the response to the output stream.
-          // Otherwise, the stream gets silently corrupted, which triggers  a repetition of the current request by Java connection mechanism.
-          IRestorer interruption = ThreadInterruption.clear();
-          try {
-            serializeServiceResponse(out, serviceResponse);
-          }
-          finally {
-            interruption.restore();
-          }
-        }, ServiceTunnelExceptionTranslator.class);
   }
 
   protected ServiceTunnelResponse evaluate(ServiceTunnelRequest serviceRequest) {
@@ -135,8 +144,6 @@ public class ServiceTunnelService {
     return serverRunContext;
   }
 
-  // === SERVICE INVOCATION ===
-
   // === MESSAGE UNMARSHALLING / MARSHALLING ===
 
   /**
@@ -150,12 +157,18 @@ public class ServiceTunnelService {
    * Method invoked to serialize a service response to be sent back to the client.
    */
   protected void serializeServiceResponse(OutputStream out, ServiceTunnelResponse serviceResponse) throws IOException {
-    HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-    HttpServletResponse resp = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
-
-    m_httpCacheControl.get().checkAndSetCacheHeaders(req, resp, null);
-
-    m_contentHandler.writeResponse(out, serviceResponse);
+    // Clear the current thread's interruption status before writing the response to the output stream.
+    // Otherwise, the stream gets silently corrupted, which triggers  a repetition of the current request by Java connection mechanism.
+    IRestorer interruption = ThreadInterruption.clear();
+    try {
+      HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+      HttpServletResponse resp = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
+      m_httpCacheControl.get().checkAndSetCacheHeaders(req, resp, null);
+      m_contentHandler.writeResponse(out, serviceResponse);
+    }
+    finally {
+      interruption.restore();
+    }
   }
 
   // === INITIALIZATION ===
@@ -169,21 +182,9 @@ public class ServiceTunnelService {
     return BEANS.get(BinaryServiceTunnelContentHandler.class);
   }
 
-  public static class ServiceTunnelExceptionTranslator implements IExceptionTranslator<RuntimeException> {
+  // === HELPER ===
 
-    private DefaultExceptionTranslator m_defaultExceptionTranslator = BEANS.get(DefaultExceptionTranslator.class);
-
-    @Override
-    public RuntimeException translate(Throwable throwable) {
-      Exception translated = getDefaultExceptionTranslator().translate(throwable);
-      if (translated instanceof RuntimeException) {
-        return (RuntimeException) translated;
-      }
-      return new ProcessingException("Error while processing request", throwable);
-    }
-
-    protected DefaultExceptionTranslator getDefaultExceptionTranslator() {
-      return m_defaultExceptionTranslator;
-    }
+  protected interface ServiceTunnelResponseHandler {
+    Response handle(ServiceTunnelResponse serviceTunnelResponse) throws Exception;
   }
 }
