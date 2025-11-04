@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -274,7 +274,7 @@ export class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       }, this._createAnimationObjectWithTabIndexRemoval(expandFunc, this.animationDuration));
     }
     if (this.chart.config.options.clickable) {
-      $poly.on('click', renderPolyOptions.clickObject, e => this.chart.handleValueClick(e.data));
+      $poly.on('click', renderPolyOptions.clickObject, this._onChartValueClick.bind(this));
     }
     if (renderPolyOptions.fill) {
       $poly.attr('fill', renderPolyOptions.fill);

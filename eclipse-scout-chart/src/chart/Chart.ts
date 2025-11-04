@@ -399,6 +399,19 @@ export class Chart extends Widget implements ChartModel {
       originalEvent
     });
   }
+
+  handleNonValueClick(originalEvent?: Event) {
+    this.trigger('nonValueClick', {
+      originalEvent
+    });
+  }
+
+  handleLegendClick(legentItemIndex: number, originalEvent?: Event) {
+    this.trigger('legendItemClick', {
+      legendItemIndex: legentItemIndex,
+      originalEvent: originalEvent
+    });
+  }
 }
 
 export type ChartData = {

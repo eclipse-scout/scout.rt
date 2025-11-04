@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -387,7 +387,7 @@ export class VennChartRenderer extends AbstractSvgChartRenderer {
     }
 
     if (this.chart.config.options.clickable) {
-      $circle.on('click', this._createClickObject(null, circleIndex), e => this.chart.handleValueClick(e.data));
+      $circle.on('click', this._createClickObject(null, circleIndex), this._onChartValueClick.bind(this));
     }
 
     return $circle;
