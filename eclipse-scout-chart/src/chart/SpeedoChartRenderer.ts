@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -127,7 +127,8 @@ export class SpeedoChartRenderer extends AbstractSvgChartRenderer {
 
     this.$svg.addClass('speedo-chart-svg');
     if (this.chart.config.options.clickable) {
-      this.$svg.on('click', this._createClickObject(null, null), e => this.chart.handleValueClick(e.data));
+      this.$svg.off('click', this._nonValueClickHandler);
+      this.$svg.on('click', this._createClickObject(null, null), this._onChartValueClick.bind(this));
     }
   }
 

@@ -121,6 +121,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
   protected _tooltip: Tooltip;
   protected _tooltipTimeoutId: number;
   protected _updatingDatalabels: boolean;
+  protected _hoveringClickableElement: boolean;
 
   constructor(chart: Chart) {
     super(chart);
@@ -239,6 +240,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
   protected override _render() {
     if (!this.$canvas) {
       this.$canvas = this.chart.$container.appendElement('<canvas>') as JQuery<HTMLCanvasElement>;
+      this.$canvas.on('click', this._onCanvasClick.bind(this));
       aria.hidden(this.$canvas, true); // aria not supported yet
     }
     this.firstOpaqueBackgroundColor = styles.getFirstOpaqueBackgroundColor(this.$canvas);
@@ -2254,13 +2256,26 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     }
   }
 
+  protected _onCanvasClick(event: JQuery.ClickEvent) {
+    // Clicks on e.g. the axes don't trigger the onClickHandler of the chartJs Chart.
+    // To register additional actions depending on the area clicked and to cover the whole canvas, the clicks outside an element must already be processed here.
+    // If no item is present, a click in the chart but outside an element was made and a corresponding event gets triggered.
+    // Clicks on elements are handled in a separate method (see this#_onClick)
+    if (!this._hoveringClickableElement) {
+      this.chart.handleNonValueClick(event.originalEvent);
+    }
+    event.originalEvent.stopPropagation();
+  }
+
   protected _onClick(event: ChartEvent, items: ActiveElement[]) {
     if (!items.length) {
+      this.chart.handleNonValueClick(event.native);
       return;
     }
     let relevantItem = this._selectRelevantItem(items);
 
     if (this._isMaxSegmentsExceeded(this.chartJs.config, relevantItem.index)) {
+      this.chart.handleNonValueClick(event.native);
       return;
     }
 
@@ -2336,14 +2351,17 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
     if (items.length && !this._isMaxSegmentsExceeded(this.chartJs.config, items[0].index)) {
+      this._hoveringClickableElement = true;
       this.$canvas.css('cursor', 'pointer');
     } else {
+      this._hoveringClickableElement = false;
       this.$canvas.css('cursor', 'default');
     }
   }
 
   protected _onLegendClick(e: ChartEvent, legendItem: LegendItem, legend: LegendElement<any>) {
     if (!this.chartJs.config || !this.chartJs.config.type) {
+      this.chart.handleNonValueClick(e.native);
       return;
     }
 
@@ -2356,6 +2374,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     defaultLegendClick.call(this.chartJs, e, legendItem, legend);
     this._onLegendLeave(e, legendItem, legend);
     this._onLegendHoverPointer(e, legendItem, legend);
+    this.chart.handleLegendClick(legendItem.datasetIndex, e.native);
   }
 
   protected _onLegendHover(e: ChartEvent, legendItem: LegendItem, legend: LegendElement<any>) {
@@ -2386,6 +2405,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     if (!this.rendered || this.removing) {
       return;
     }
+    this._hoveringClickableElement = true;
     this.$canvas.css('cursor', 'pointer');
   }
 
@@ -2448,6 +2468,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     if (!this.rendered || this.removing) {
       return;
     }
+    this._hoveringClickableElement = false;
     this.$canvas.css('cursor', 'default');
   }
 

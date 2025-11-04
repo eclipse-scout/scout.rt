@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,9 +16,20 @@ export interface ChartValueClickEvent<C = Chart> extends ScoutEvent<C> {
   originalEvent?: Event;
 }
 
+export interface ChartNonValueClickEvent<C = Chart> extends ScoutEvent<C> {
+  originalEvent?: Event;
+}
+
+export interface ChartLegendItemClickEvent<C = Chart> extends ScoutEvent<C> {
+  legendItemIndex?: number;
+  originalEvent?: Event;
+}
+
 export interface ChartEventMap extends WidgetEventMap {
   'chartRender': ScoutEvent<Chart>;
   'valueClick': ChartValueClickEvent;
+  'nonValueClick': ChartNonValueClickEvent;
+  'legendItemClick': ChartLegendItemClickEvent;
   'propertyChange:chartRenderer': PropertyChangeEvent<AbstractChartRenderer>;
   'propertyChange:checkedItems': PropertyChangeEvent<ClickObject[]>;
   'propertyChange:config': PropertyChangeEvent<ChartConfig>;
