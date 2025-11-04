@@ -25,6 +25,8 @@ export class AbstractSvgChartRenderer extends AbstractChartRenderer {
 
   $svg: JQuery<SVGElement>;
 
+  protected _nonValueClickHandler: (event: JQuery.ClickEvent) => void;
+
   constructor(chart: Chart) {
     super(chart);
     this.chartBox = null;
@@ -33,6 +35,8 @@ export class AbstractSvgChartRenderer extends AbstractChartRenderer {
     this.maskId = 'Mask-' + ObjectIdProvider.get().createUiSeqId();
 
     this.suppressLegendBox = false;
+
+    this._nonValueClickHandler = this._onNonValueClick.bind(this);
   }
 
   static FONT_SIZE_SMALLEST = 'smallestFont';
@@ -46,6 +50,7 @@ export class AbstractSvgChartRenderer extends AbstractChartRenderer {
       aria.role(this.$svg, 'img');
       // labeling has to be done here because otherwise the svg is ignored
       this.linkChartWithFieldLabel(this.$svg);
+      this.$svg.on('click', this._nonValueClickHandler);
     }
     this.firstOpaqueBackgroundColor = styles.getFirstOpaqueBackgroundColor(this.$svg);
     // This works, because CSS specifies 100% width/height
@@ -139,6 +144,16 @@ export class AbstractSvgChartRenderer extends AbstractChartRenderer {
       dataIndex: xIndex,
       datasetIndex: datasetIndex
     };
+  }
+
+  protected _onChartValueClick(event: JQuery.ClickEvent) {
+    this.chart.handleValueClick(event.data, event.originalEvent);
+    event.stopPropagation();
+  }
+
+  protected _onNonValueClick(event: JQuery.ClickEvent) {
+    this.chart.handleNonValueClick(event.originalEvent);
+    event.stopPropagation();
   }
 
   protected _measureText(text: string, legendLabelClass?: string): { height: number; width: number } {
