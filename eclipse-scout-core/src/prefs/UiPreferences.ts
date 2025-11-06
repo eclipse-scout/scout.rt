@@ -138,6 +138,13 @@ export class UiPreferences implements ObjectWithType {
   }
 
   /**
+   * Clears all scheduled {@link store} tasks without actually storing anything (useful in tests).
+   */
+  tearDown() {
+    clearTimeout(this._storeTimeoutId);
+  }
+
+  /**
    * Marks the given handler as modified, i.e. the handler's export method will be called before the preferences
    * data is stored. If no handler is specified, _all_ handlers are marked as modified.
    */
