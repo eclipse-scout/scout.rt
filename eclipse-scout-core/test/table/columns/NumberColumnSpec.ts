@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -275,6 +275,32 @@ describe('NumberColumn', () => {
         table.setColumnBackgroundEffect(column0, 'colorGradient1');
         sendQueuedAjaxCalls();
         expect(jasmine.Ajax.requests.count()).toBe(1);
+      });
+
+      it('allows changing the backgroundEffect without rendering', () => {
+        const rows = helper.createModelRows(2, 2);
+        const table = helper.createTable(helper.createModel([
+          ...helper.createModelColumns(1),
+          ...helper.createModelColumns(1, NumberColumn)
+        ], rows));
+        const numberColumn = table.columns[1] as NumberColumn;
+
+        table.render();
+
+        expect(table.visibleColumns().length).toBe(2);
+
+        numberColumn.setVisible(false);
+        expect(table.visibleColumns().length).toBe(1);
+
+        let updatedColumns = [table.columns[0], numberColumn];
+        numberColumn.setVisible(true, false); // <-- false = don't render (but visibleColumns will immediately change!)
+        expect(table.visibleColumns().length).toBe(2);
+        numberColumn.setAggregationFunction('sum');
+        expect(() => numberColumn.setBackgroundEffect('barChart')).toThrowError(); // error during rendering because cells are not aligned yet
+        numberColumn.setBackgroundEffect('barChart', false); // <-- this works because of 'false'
+        table.setColumns(updatedColumns);
+
+        expect(table.visibleColumns().length).toBe(2);
       });
     });
   });

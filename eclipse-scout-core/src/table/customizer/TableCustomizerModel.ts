@@ -10,5 +10,5 @@
 import {ObjectModel, Table} from '../../index';
 
 export interface TableCustomizerModel extends ObjectModel {
-  parent: Table;
+  parent?: Table;
 }
