@@ -437,7 +437,8 @@ export class TableUiPreferences implements ObjectWithType {
   }
 
   protected _applyCustomizerData(table: Table, customizerData: ITableCustomizerDo, options?: ApplyTablePreferencesOptions) {
-    if (table.isCustomizable()) {
+    if (table.isCustomizable() && scout.nvl(options?.applyCustomizerData, true)) { // false while applying customizer data
+      // noinspection JSIgnoredPromiseFromCall
       table.customizer.setCustomizerData(customizerData);
     }
   }
@@ -480,7 +481,7 @@ export class TableUiPreferences implements ObjectWithType {
     if (column instanceof NumberColumn) {
       // Use setters to correctly update internal structures (e.g. aggrStart function)
       column.setAggregationFunction(columnPreferences.aggregationFunctionId as NumberColumnAggregationFunction);
-      column.setBackgroundEffect(columnPreferences.backgroundEffectId as NumberColumnBackgroundEffect);
+      column.setBackgroundEffect(columnPreferences.backgroundEffectId as NumberColumnBackgroundEffect, false); // false = don't redraw
     }
   }
 
@@ -501,6 +502,10 @@ export interface CreateTablePreferenceProfileOptions {
 }
 
 export interface ApplyTablePreferencesOptions {
+  /**
+   * Specifies whether to apply customizer data from the preference profile to the table. Default is `true`.
+   */
+  applyCustomizerData?: boolean;
   /**
    * Specifies whether to apply user filter states from the preference profile to the table. Default is `false`.
    */

@@ -163,9 +163,11 @@ export class TableOrganizer implements ObjectWithType {
     return arrays.hasElements(invisibleColumns);
   }
 
-  addColumn(column?: Column<any>): JQuery.Promise<void> {
+  addColumn(column?: Column<any>): Promise<void> {
     if (this.table.isCustomizable()) {
-      return this.table.customizer.addColumn(column);
+      return this.table.customizer.addCustomColumn(column)
+        .then(() => {
+        }); // ignore return value
     }
     return this._showInvisibleColumnsForm(column);
   }
@@ -196,7 +198,7 @@ export class TableOrganizer implements ObjectWithType {
     if (this.table.isCustomizable()) {
       let customizableColumns = columns.filter(column => this.table.customizer.isCustomizable(column));
       let nonCustomizableColumns = columns.filter(column => !this.table.customizer.isCustomizable(column));
-      this.table.customizer.removeColumns(customizableColumns);
+      this.table.customizer.removeCustomColumns(customizableColumns);
       this.hideColumns(nonCustomizableColumns);
     } else {
       this.hideColumns(columns);
@@ -219,11 +221,13 @@ export class TableOrganizer implements ObjectWithType {
     return false;
   }
 
-  modifyColumn(column: Column<any>): JQuery.Promise<void> {
+  modifyColumn(column: Column<any>): Promise<void> {
     if (this.table.isCustomizable() && this.table.customizer.isCustomizable(column)) {
-      return this.table.customizer.modifyColumn(column);
+      return this.table.customizer.modifyCustomColumn(column)
+        .then(() => {
+        }); // ignore return value
     }
-    return $.resolvedPromise(); // non-customized columns cannot be modified
+    return Promise.resolve(); // non-customized columns cannot be modified
   }
 
   /**
@@ -255,7 +259,7 @@ export class TableOrganizer implements ObjectWithType {
     return visibleNewPos < visibleColumns.length && visibleNewPos > visibleOldPos;
   }
 
-  protected _showInvisibleColumnsForm(insertAfterColumn?: Column<any>): JQuery.Promise<void> {
+  protected async _showInvisibleColumnsForm(insertAfterColumn?: Column<any>): Promise<void> {
     let form = scout.create(ShowInvisibleColumnsForm, {
       parent: this.table,
       data: {

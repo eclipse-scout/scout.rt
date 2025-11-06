@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -173,7 +173,7 @@ export class NumberColumn extends Column<number> implements NumberColumnModel {
     return this.decimalFormat.round(value);
   }
 
-  setBackgroundEffect(backgroundEffect: NumberColumnBackgroundEffect) {
+  setBackgroundEffect(backgroundEffect: NumberColumnBackgroundEffect, redraw = true) {
     let changed = this.setProperty('backgroundEffect', backgroundEffect);
     if (!changed) {
       return;
@@ -196,7 +196,7 @@ export class NumberColumn extends Column<number> implements NumberColumnModel {
       this.calcMaxValue = null;
     }
 
-    if (this.table.rendered) {
+    if (this.table.rendered && redraw) {
       this._renderBackgroundEffect();
     }
   }
