@@ -27,9 +27,9 @@ export class RemoteTableOrganizer extends TableOrganizer {
     return this.table.columnAddable;
   }
 
-  override addColumn(column: Column<any>): JQuery.Promise<void> {
+  override async addColumn(column: Column<any>): Promise<void> {
     (this.table.modelAdapter as TableAdapter).sendColumnOrganizeAction(column, 'add');
-    return $.resolvedPromise();
+    return Promise.resolve();
   }
 
   override isColumnRemovable(column: Column): boolean {
@@ -52,8 +52,8 @@ export class RemoteTableOrganizer extends TableOrganizer {
     return column.modifiable;
   }
 
-  override modifyColumn(column: Column<any>): JQuery.Promise<void> {
+  override async modifyColumn(column: Column<any>): Promise<void> {
     (this.table.modelAdapter as TableAdapter).sendColumnOrganizeAction(column, 'modify');
-    return $.resolvedPromise();
+    return Promise.resolve();
   }
 }

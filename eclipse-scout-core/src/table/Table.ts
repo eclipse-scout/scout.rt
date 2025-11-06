@@ -1044,8 +1044,9 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   protected _setCustomizer(customizer: TableCustomizer) {
+    customizer = TableCustomizer.ensure(customizer, this);
     if (customizer && customizer.table !== this) {
-      throw new Error(`Unexpected table in customizer (${customizer.table.id} instead of ${this.id}`);
+      throw new Error(`Unexpected table in customizer: ${customizer.table?.id} instead of ${this.id}`);
     }
     this._setProperty('customizer', customizer);
   }

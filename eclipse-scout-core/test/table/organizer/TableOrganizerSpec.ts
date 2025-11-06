@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {TableSpecHelper} from '../../../src/testing/index';
-import {arrays, Column, ITableCustomizerDo, scout, TableCustomizer, TableOrganizer} from '../../../src';
+import {arrays, Column, IColumnConfigDo, ITableCustomizerDo, scout, TableCustomizer, TableOrganizer} from '../../../src';
 
 describe('TableOrganizer', () => {
 
@@ -416,27 +416,39 @@ describe('TableOrganizer', () => {
 
   class SpecTableCustomizer extends TableCustomizer {
 
-    override setCustomizerData(customizerData: ITableCustomizerDo) {
-      // nop
+    override setCustomizerData(customizerData: ITableCustomizerDo): Promise<void> {
+      return Promise.resolve();
     }
 
     override getCustomizerData(): ITableCustomizerDo {
       return null;
     }
 
-    override addColumn(insertAfterColumn?: Column<any>): JQuery.Promise<void> {
-      return $.resolvedPromise();
+    override async createColumns(columnConfigs: IColumnConfigDo[]): Promise<Column<any>[]> {
+      return Promise.resolve(undefined);
     }
 
-    override modifyColumn(column: Column<any>): JQuery.Promise<void> {
-      return $.resolvedPromise();
+    override async addCustomColumn(positionOrInsertAfterColumn?: number | Column<any>): Promise<Column<any>[]> {
+      return Promise.resolve(undefined);
     }
 
-    override removeColumns(columns: Column<any>[]) {
+    override async addCustomColumnConfig(columnConfig: IColumnConfigDo, positionOrInsertAfterColumn?: number | Column<any>): Promise<Column<any>> {
+      return Promise.resolve(undefined);
+    }
+
+    override async modifyCustomColumn(column: Column<any>): Promise<Column<any>[]> {
+      return Promise.resolve(undefined);
+    }
+
+    override async modifyCustomColumnConfig(columnConfig: IColumnConfigDo): Promise<Column<any>> {
+      return Promise.resolve(undefined);
+    }
+
+    override removeCustomColumns(columns: Column<any>[]) {
       // nop
     }
 
-    override removeAllColumns() {
+    override removeAllCustomColumns() {
       // nop
     }
 

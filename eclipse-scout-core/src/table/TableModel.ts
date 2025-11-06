@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, Column, DropType, FilterOrFunction, Menu, ObjectOrChildModel, ObjectOrModel, StatusOrModel, TableCheckableStyle, TableCompactHandler, TableControl, TableCustomizer, TableGroupingStyle, TableHierarchicalStyle, TableOrganizer,
-  TableRow, TableSelectionHandler, TableTileGridMediator, TableUserFilterModel, Tile, TileTableHeaderBox, WidgetModel
+  Action, Column, DropType, FilterOrFunction, Menu, ObjectOrChildModel, ObjectOrModel, StatusOrModel, TableCheckableStyle, TableCompactHandler, TableControl, TableCustomizerOrModel, TableGroupingStyle, TableHierarchicalStyle,
+  TableOrganizer, TableRow, TableSelectionHandler, TableTileGridMediator, TableUserFilterModel, Tile, TileTableHeaderBox, WidgetModel
 } from '../index';
 
 export interface TableModel extends WidgetModel {
@@ -288,7 +288,7 @@ export interface TableModel extends WidgetModel {
    * {@link ITableCustomizerDo} in the {@link UiPreferences}. Since the data source must also provide additional data,
    * the customizer is `null` by default and a custom implementation has to be provided.
    */
-  customizer?: TableCustomizer;
+  customizer?: TableCustomizerOrModel;
   /**
    * The default action, that should be executed on row action.
    * If a string is provided, the action will be resolved automatically.

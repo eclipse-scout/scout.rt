@@ -186,7 +186,16 @@ export class TextColumnUserFilterStateDo extends BaseDoEntity implements IUserFi
   textFilter?: string;
 }
 
+/**
+ * Marker interface for the "customizer data" of a {@link TableCustomizer}.
+ */
 export interface ITableCustomizerDo extends BaseDoEntity {
+}
+
+/**
+ * Marker interface for a data object describing a "column configuration". Used when working with a {@link TableCustomizer}.
+ */
+export interface IColumnConfigDo extends BaseDoEntity {
 }
 
 // --------------------------------------------------
