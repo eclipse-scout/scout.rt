@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,14 +28,14 @@ public interface IRestClientHelper {
    *
    * @param resourcePath
    *     Path to the resource, relative to the API root. This path must <i>not</i> contain template strings (they
-   *     would be encoded).
+   *     would be encoded); also it must not be URL-encoded already (it would be encoded again).
    */
   WebTarget target(String resourcePath);
 
   /**
    * @param resourcePath
    *     Path to the resource, relative to the API root. This path must <i>not</i> contain template strings (they
-   *     would be encoded).
+   *     would be encoded); also it must not be URL-encoded already (it would be encoded again).
    * @param exceptionTransformer
    *     optional {@link IRestClientExceptionTransformer} used by the returned {@link WebTarget} and any objects it
    *     creates to transform {@link WebApplicationException}s and {@link jakarta.ws.rs.ProcessingException}s. The
