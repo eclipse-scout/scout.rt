@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -94,13 +94,15 @@ export class FocusContext {
    * behavior).
    */
   focusNextTabbable(forward = true, event?: KeyDownEvent) {
-    let $allFocusableElements = this.$container.find(':tabbable');
+    let activeElement = this.$container.activeElement(true);
+    let $allFocusableElements = this.$container.find(':focusable')
+      // Active element may have tabindex=-1 which makes it focusable but not tabbable -> include it otherwise activeElementIndex could not be resolved.
+      .filter((index, elem) => $(elem).is(':tabbable') || elem === activeElement);
     let $focusableElements = $allFocusableElements.filter((index, elem) => !this.focusManager.isElementCovertByGlassPane(elem));
     if ($focusableElements.length === 0) {
       return; // no focusable elements -> nothing to do
     }
 
-    let activeElement = this.$container.activeElement(true);
     let activeElementIndex = $focusableElements.index(activeElement);
     let firstFocusableElement = $focusableElements.first()[0];
     let lastFocusableElement = $focusableElements.last()[0];
