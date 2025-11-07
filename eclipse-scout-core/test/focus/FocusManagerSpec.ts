@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -365,6 +365,26 @@ describe('FocusManager', () => {
       glassPane3.render($(input3));
       focusManager.focusNextTabbable(input1);
       expect(document.activeElement).toBe(session.$entryPoint[0]);
+    });
+
+    it('works even if active element is not tabbable', () => {
+      let $container = session.$entryPoint.appendDiv();
+      let $elem1 = $container.appendDiv().attr('tabindex', '0');
+      let $elem2 = $container.appendDiv().attr('tabindex', '-1');
+      let $elem3 = $container.appendDiv().attr('tabindex', '0');
+      focusManager.installFocusContext($container);
+
+      focusManager.requestFocus($elem2);
+      expect(document.activeElement).toBe($elem2[0]);
+
+      focusManager.focusNextTabbable($container.activeElement(), false);
+      expect(document.activeElement).toBe($elem1[0]);
+      expect($elem1).toHaveClass('keyboard-navigation');
+
+      focusManager.focusNextTabbable($container.activeElement());
+      expect(document.activeElement).toBe($elem3[0]);
+      expect($elem3).toHaveClass('keyboard-navigation');
+      expect($elem1).not.toHaveClass('keyboard-navigation');
     });
   });
 });
