@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {keys, LookupRow, ProposalField, QueryBy, scout, SmartFieldTouchPopup, StaticLookupCall, Status} from '../../../../src/index';
-import {JQueryTesting, proposalFieldSpecHelper, ProposalFieldSpecHelperInput, SpecProposalField} from '../../../../src/testing';
+import {JQueryTesting, LookupRowSelectionStrategy, proposalFieldSpecHelper, ProposalFieldSpecHelperInput, SpecProposalField} from '../../../../src/testing';
 
 describe('ProposalField', () => {
 
@@ -145,6 +145,59 @@ describe('ProposalField', () => {
     jasmine.clock().tick(300);
     expect(field.displayText).toBe('Foo');
     expect(field.$field.val()).toBe('Foo');
+  });
+
+  describe('when lookupOnAcceptByText=true', () => {
+    let expectedLookupRow;
+
+    beforeEach(() => {
+      jasmine.clock().uninstall();
+      field.render();
+      field.lookupOnAcceptByText = true;
+
+      expectedLookupRow = scout.create((LookupRow<number>), {
+        key: 1,
+        text: 'Foo'
+      });
+    });
+
+    it('should select the lookupRow when a unique result is returned (touchMode = false)', async () => {
+      field.$field.focus();
+      field.$field.val('Foo');
+      await field.acceptInput();
+
+      expect(field.lookupRow.key).toBe(expectedLookupRow.key);
+    });
+
+    describe('and touchMode = true', () => {
+      beforeEach(() => {
+        field.touchMode = true;
+      });
+
+      it('should select the lookupRow when a unique result is returned and the touch popup is closed with OK', async () => {
+        field.$field.focus();
+        await field.openPopup(true);
+        let popup = field.popup as SmartFieldTouchPopup<any>;
+        popup._field.$field.val('Foo');
+
+        let closePromise = popup.when('close');
+        popup.doneAction.doAction();
+        await closePromise;
+        expect(field.lookupRow.key).toBe(expectedLookupRow.key);
+      });
+
+      it('should select the lookupRow when a unique result is returned and the touch popup is closed with ENTER', async () => {
+        field.$field.focus();
+        await field.openPopup(true);
+        let popup = field.popup as SmartFieldTouchPopup<any>;
+        popup._field.$field.val('Foo');
+
+        let closePromise = popup.when('close');
+        JQueryTesting.triggerKeyDownCapture(popup._field.$field, keys.ENTER);
+        await closePromise;
+        expect(field.lookupRow.key).toBe(expectedLookupRow.key);
+      });
+    });
   });
 
   it('should return value for last search-text', () => {
@@ -655,7 +708,124 @@ describe('ProposalField', () => {
         true);
     });
 
-    async function testProposalFieldInputs(inputs: (ProposalFieldSpecHelperInput | string)[], touchMode?: boolean) {
+    describe('when LookupRowSelectionStrategy ENTER is used', () => {
+      // ok > throw > warning
+      it('write \'ok\' > write \'throw\' > write \'warning\' (touchMode: false)', async () => {
+        await testProposalFieldInputs(
+          ['ok', 'throw', 'warning'],
+          false, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('write \'ok\' > write \'throw\' > write \'warning\' (touchMode: true)', async () => {
+        await testProposalFieldInputs(
+          ['ok', 'throw', 'warning'],
+          true, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('write \'ok\' > write \'throw\' > lookup \'warning\' (touchMode: false)', async () => {
+        await testProposalFieldInputs(
+          ['ok', 'throw', {text: 'warning', lookup: true}],
+          false, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('write \'ok\' > write \'throw\' > lookup \'warning\' (touchMode: true)', async () => {
+        await testProposalFieldInputs(
+          ['ok', 'throw', {text: 'warning', lookup: true}],
+          true, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('write \'ok\' > lookup \'throw\' > write \'warning\' (touchMode: false)', async () => {
+        await testProposalFieldInputs(
+          ['ok', {text: 'throw', lookup: true}, 'warning'],
+          false, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('write \'ok\' > lookup \'throw\' > write \'warning\' (touchMode: true)', async () => {
+        await testProposalFieldInputs(
+          ['ok', {text: 'throw', lookup: true}, 'warning'],
+          true, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('write \'ok\' > lookup \'throw\' > lookup \'warning\' (touchMode: false)', async () => {
+        await testProposalFieldInputs(
+          ['ok', {text: 'throw', lookup: true}, {text: 'warning', lookup: true}],
+          false, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('write \'ok\' > lookup \'throw\' > lookup \'warning\' (touchMode: true)', async () => {
+        await testProposalFieldInputs(
+          ['ok', {text: 'throw', lookup: true}, {text: 'warning', lookup: true}],
+          true, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('lookup \'ok\' > write \'throw\' > write \'warning\' (touchMode: false)', async () => {
+        await testProposalFieldInputs(
+          [{text: 'ok', lookup: true}, 'throw', 'warning'],
+          false, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('lookup \'ok\' > write \'throw\' > write \'warning\' (touchMode: true)', async () => {
+        await testProposalFieldInputs(
+          [{text: 'ok', lookup: true}, 'throw', 'warning'],
+          true, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('lookup \'ok\' > write \'throw\' > lookup \'warning\' (touchMode: false)', async () => {
+        await testProposalFieldInputs(
+          [{text: 'ok', lookup: true}, 'throw', {text: 'warning', lookup: true}],
+          false, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('lookup \'ok\' > write \'throw\' > lookup \'warning\' (touchMode: true)', async () => {
+        await testProposalFieldInputs(
+          [{text: 'ok', lookup: true}, 'throw', {text: 'warning', lookup: true}],
+          true, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('lookup \'ok\' > lookup \'throw\' > write \'warning\' (touchMode: false)', async () => {
+        await testProposalFieldInputs(
+          [{text: 'ok', lookup: true}, {text: 'throw', lookup: true}, 'warning'],
+          false, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('lookup \'ok\' > lookup \'throw\' > write \'warning\' (touchMode: true)', async () => {
+        await testProposalFieldInputs(
+          [{text: 'ok', lookup: true}, {text: 'throw', lookup: true}, 'warning'],
+          true, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('lookup \'ok\' > lookup \'throw\' > lookup \'warning\' (touchMode: false)', async () => {
+        await testProposalFieldInputs(
+          [{text: 'ok', lookup: true}, {text: 'throw', lookup: true}, {text: 'warning', lookup: true}],
+          false, LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('lookup \'ok\' > lookup \'throw\' > lookup \'warning\' (touchMode: true)', async () => {
+        await testProposalFieldInputs(
+          [{text: 'ok', lookup: true}, {text: 'throw', lookup: true}, {text: 'warning', lookup: true}],
+          true, LookupRowSelectionStrategy.ENTER);
+      });
+    });
+
+    describe('when LookupRowSelectionStrategy EXACT_TEXT is used', () => {
+      beforeEach(() => {
+        field.lookupOnAcceptByText = true;
+      });
+
+      it('write \'ok\' > write \'throw\' > write \'warning\' (touchMode: false)', async () => {
+        await testProposalFieldInputs(
+          ['ok', 'throw', 'warning'],
+          false, LookupRowSelectionStrategy.EXACT_TEXT);
+      });
+
+      it('write \'ok\' > write \'throw\' > write \'warning\' (touchMode: true)', async () => {
+        await testProposalFieldInputs(
+          ['ok', 'throw', 'warning'],
+          true, LookupRowSelectionStrategy.EXACT_TEXT);
+      });
+    });
+
+    async function testProposalFieldInputs(inputs: (ProposalFieldSpecHelperInput | string)[], touchMode?: boolean, selectionStrategy?: LookupRowSelectionStrategy) {
       await proposalFieldSpecHelper.testProposalFieldInputs(field, inputs, touchMode, {
         afterInput: (input: ProposalFieldSpecHelperInput) => {
           const {text, lookup} = input;
@@ -688,7 +858,7 @@ describe('ProposalField', () => {
           }
 
           // lookupRow is set and contains the correct values iff a lookupRow was selected
-          if (lookup) {
+          if (lookup || selectionStrategy === LookupRowSelectionStrategy.EXACT_TEXT) {
             expect(field.lookupRow).not.toBeNull();
             expect(field.lookupRow.text).toBe(text);
             expect(field.lookupRow.key).toBe(text);
@@ -696,7 +866,7 @@ describe('ProposalField', () => {
             expect(field.lookupRow).toBeNull();
           }
         }
-      });
+      }, selectionStrategy);
     }
 
     // select a value, then open and close the touch popup multiple times

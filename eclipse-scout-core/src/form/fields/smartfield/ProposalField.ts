@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,13 +16,6 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
   declare self: ProposalField;
 
   trimText: boolean;
-
-  /**
-   * If this flag is set to true the proposal field performs a lookup by text when
-   * accept proposal is called. The behavior is similar to what the smart-field does
-   * in that case, but without the need to have a valid single match as the result
-   * from the lookup.
-   */
   lookupOnAcceptByText: boolean;
 
   constructor() {
@@ -32,6 +25,8 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
     this.trimText = true;
 
     this.lookupOnAcceptByText = false;
+
+    this._addCloneProperties(['lookupOnAcceptByText']);
   }
 
   protected override _getValueFromLookupRow(lookupRow: LookupRow<string>): string {
@@ -57,8 +52,10 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
     // stop propagation (e.g. to avoid calls of other registered enter key-shortcuts, like the default
     // button on a form). See Widget.js for details about removing with or without CSS animations.
     let hasPopup = !!this.popup;
-    this.acceptInput();
-    if (this.popup) {
+    let promise = this.acceptInput();
+    if (promise) {
+      promise.always(this.closePopup.bind(this));
+    } else {
       this.closePopup();
     }
     if (hasPopup) {
@@ -133,6 +130,10 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
     this._userWasTyping = false;
     this._extendResult(result);
 
+    if (this.isPopupOpen()) {
+      this.popup.setLookupResult(result);
+    }
+
     // when there's exactly one result, we accept that lookup row
     if (result.uniqueMatch) {
       let lookupRow = result.uniqueMatch;
@@ -169,6 +170,7 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
    * the value is set and the lookup-row is null.
    */
   protected override _copyValuesFromField(otherField: ProposalField) {
+    this.lookupSeqNo = otherField.lookupSeqNo;
     if (this.lookupRow !== otherField.lookupRow) {
       this._setLookupRow(otherField.lookupRow); // only set property lookup
     }
@@ -180,7 +182,9 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
   protected override _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<string>): JQuery.Promise<void> | void {
     if (this.touchMode) {
       $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) Always send acceptInput for touch field');
-      this._inputAccepted(true, !!selectedLookupRow);
+      // When the lookup is accepted by text (e.g. when lookupOnAcceptByText = true), the SmartField#acceptInput cannot
+      // detect the selectedLookupRow, because it just takes the selected row of the Proposal chooser
+      this._inputAccepted(true, !!this.lookupRow);
       return;
     }
 
