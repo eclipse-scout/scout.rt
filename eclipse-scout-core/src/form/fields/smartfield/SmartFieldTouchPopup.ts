@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -94,7 +94,11 @@ export class SmartFieldTouchPopup<TValue> extends TouchPopup implements SmartFie
   }
 
   getSelectedLookupRow(): LookupRow<TValue> {
-    return this._widget.getSelectedLookupRow();
+    let lookupRow = this._widget.getSelectedLookupRow();
+    if (lookupRow?.enabled) {
+      return lookupRow;
+    }
+    return null;
   }
 
   protected _triggerEvent(event: ProposalChooserActiveFilterSelectedEvent<TValue> | ProposalChooserLookupRowSelectedEvent<TValue>) {
@@ -102,6 +106,7 @@ export class SmartFieldTouchPopup<TValue> extends TouchPopup implements SmartFie
   }
 
   setLookupResult(result: SmartFieldLookupResult<TValue>) {
+    this._setProperty('lookupResult', result);
     this._widget.setLookupResult(result);
   }
 
