@@ -24,9 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.dataobject.DataObjectHolder;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoEntityHolder;
-import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
-import org.eclipse.scout.rt.dataobject.IIdSignatureDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureIntegerId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
 import org.eclipse.scout.rt.dataobject.id.IdCodec.IdCodecFlag;
@@ -72,14 +70,14 @@ public class ServiceTunnelIdSignatureTest {
         new BeanMetaData(P_IdCodec.class).withReplace(true)
     );
     BEANS.get(TestingRestClientConfigFactory.class).setupMockConnectorProvider();
-
-    // create new instance of data object mapper because of the serializer cache. Otherwise, the replaced codec would still be used after the test
-    s_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(IDataObjectMapper.class, new JacksonDataObjectMapper()).withApplicationScoped(true)));
-    s_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(IIdSignatureDataObjectMapper.class, new JacksonIdSignatureDataObjectMapper()).withApplicationScoped(true)));
   }
 
+  @SuppressWarnings("deprecation")
   @AfterClass
   public static void afterClass() {
+    // clear serializer cache. Otherwise, the replaced codec might still be used after the test
+    BEANS.get(JacksonDataObjectMapper.class).getObjectMapper().clearCaches();
+    BEANS.get(JacksonIdSignatureDataObjectMapper.class).getObjectMapper().clearCaches();
     BeanTestingHelper.get().unregisterBeans(s_beans);
     BEANS.get(TestingRestClientConfigFactory.class).resetConnectorProvider();
   }

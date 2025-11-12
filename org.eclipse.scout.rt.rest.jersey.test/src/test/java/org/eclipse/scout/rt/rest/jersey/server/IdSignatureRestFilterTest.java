@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,7 +21,6 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation.Builder;
 import jakarta.ws.rs.core.MediaType;
 
-import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IIdSignatureDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureIntegerId;
@@ -55,15 +54,15 @@ public class IdSignatureRestFilterTest {
   public static void beforeClass() {
     s_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(P_IdCodec.class).withReplace(true)));
     BEANS.get(JerseyTestApplication.class).ensureStarted();
-
-    // create new instance of data object mapper because of the serializer cache. Otherwise, the replaced codec would still be used after the test
-    s_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(IDataObjectMapper.class, new JacksonDataObjectMapper()).withApplicationScoped(true)));
-    s_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(IPrettyPrintDataObjectMapper.class, new JacksonPrettyPrintDataObjectMapper()).withApplicationScoped(true)));
-    s_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(IIdSignatureDataObjectMapper.class, new JacksonIdSignatureDataObjectMapper()).withApplicationScoped(true)));
   }
 
+  @SuppressWarnings("deprecation")
   @AfterClass
   public static void afterClass() {
+    // clear serializer cache. Otherwise, the replaced codec might still be used after the test
+    BEANS.get(JacksonDataObjectMapper.class).getObjectMapper().clearCaches();
+    BEANS.get(JacksonPrettyPrintDataObjectMapper.class).getObjectMapper().clearCaches();
+    BEANS.get(JacksonIdSignatureDataObjectMapper.class).getObjectMapper().clearCaches();
     BeanTestingHelper.get().unregisterBeans(s_beans);
   }
 

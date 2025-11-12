@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.hc.core5.http.ContentType;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.ISocketReadInterceptor;
@@ -100,7 +101,7 @@ public class HttpSimpleTest {
   @Test
   public void testGet() throws IOException {
     m_server.withServletGetHandler((req, resp) -> {
-      resp.setContentType("text/plain;charset=UTF-8");
+      resp.setContentType(ContentType.TEXT_PLAIN.toString());
       resp.getOutputStream().println("Hello " + req.getParameter("foo"));
     });
 
@@ -114,17 +115,19 @@ public class HttpSimpleTest {
     assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
     assertEquals(new String(bytes), 11, bytes.length);//text + CR + LF
     String text = new String(bytes, StandardCharsets.UTF_8).trim();
-    assertEquals(text, "Hello bar");
+    assertEquals("Hello bar", text);
   }
 
   @Test
   public void testPost() throws IOException {
     m_server.withServletPostHandler((req, resp) -> {
-      assertEquals("text/plain;charset=UTF-8", req.getContentType());
+      ContentType contentTypeActual = ContentType.parse(req.getContentType());
+      assertEquals(ContentType.TEXT_PLAIN.getMimeType(), contentTypeActual.getMimeType());
+      assertEquals(ContentType.TEXT_PLAIN.getCharset(), contentTypeActual.getCharset());
       assertEquals("UTF-8", req.getCharacterEncoding());
       assertEquals(3, req.getContentLength());
       String arg = IOUtility.readString(req.getInputStream(), req.getCharacterEncoding(), req.getContentLength());
-      resp.setContentType("text/plain;charset=UTF-8");
+      resp.setContentType(ContentType.TEXT_PLAIN.toString());
       resp.getOutputStream().println("Post " + arg);
     });
 
@@ -142,7 +145,7 @@ public class HttpSimpleTest {
 
       @Override
       public String getType() {
-        return "text/plain;charset=UTF-8";
+        return ContentType.TEXT_PLAIN.toString();
       }
 
       @Override
@@ -158,13 +161,13 @@ public class HttpSimpleTest {
     assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
     assertEquals(new String(bytes), 10, bytes.length);//text + CR + LF
     String text = new String(bytes, StandardCharsets.UTF_8).trim();
-    assertEquals(text, "Post bar");
+    assertEquals("Post bar", text);
   }
 
   @Test
   public void testGetChunked() throws IOException {
     m_server.withServletGetHandler((req, resp) -> {
-      resp.setContentType("text/plain;charset=UTF-8");
+      resp.setContentType(ContentType.TEXT_PLAIN.toString());
       resp.setHeader("Transfer-Encoding", "chunked");
       for (int i = 0; i < 100; i++) {
         resp.getWriter().write("Line of chunked data " + i + "\r\n");

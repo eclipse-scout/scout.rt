@@ -43,7 +43,7 @@ public class JvmMetricProvider implements IMetricProvider {
     m_observables.addAll(Cpu.registerObservers(openTelemetry));
     m_observables.addAll(MemoryPools.registerObservers(openTelemetry));
     m_observables.addAll(Threads.registerObservers(openTelemetry));
-    m_observables.addAll(GarbageCollector.registerObservers(openTelemetry));
+    m_observables.addAll(GarbageCollector.registerObservers(openTelemetry, true));
   }
 
   @Override
