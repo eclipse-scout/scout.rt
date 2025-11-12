@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {LookupRow, ProposalChooser, ProposalField, SmartFieldLookupResult, SmartFieldPopup, SmartFieldTouchPopup} from '../../../../index';
+import {keys, LookupRow, ProposalChooser, ProposalField, SmartFieldLookupResult, SmartFieldPopup, SmartFieldTouchPopup, Table} from '../../../../index';
 import {JQueryTesting} from '../../../jquery-testing';
 
 export const proposalFieldSpecHelper = {
 
-  async testProposalFieldInputs(field: ProposalField, inputs: (ProposalFieldSpecHelperInput | string)[], touchMode?: boolean, callbacks?: ProposalFieldSpecHelperCallbacks) {
+  async testProposalFieldInputs(field: ProposalField, inputs: (ProposalFieldSpecHelperInput | string)[], touchMode?: boolean, callbacks?: ProposalFieldSpecHelperCallbacks, selectionStrategy?: LookupRowSelectionStrategy) {
     field.touchMode = touchMode;
     field.render();
 
@@ -34,8 +34,8 @@ export const proposalFieldSpecHelper = {
 
       callbacks.beforeInput(input);
 
-      if (lookup) {
-        const lookupRow = await proposalFieldSpecHelper.selectLookupRow(field, text);
+      if (lookup || selectionStrategy === LookupRowSelectionStrategy.EXACT_TEXT) {
+        const lookupRow = await proposalFieldSpecHelper.selectLookupRow(field, text, selectionStrategy);
         callbacks.afterSelectLookupRow(text, lookupRow);
       } else {
         await proposalFieldSpecHelper.acceptCustomText(field, text);
@@ -59,20 +59,37 @@ export const proposalFieldSpecHelper = {
       popup.doneAction.doAction();
     } else {
       field.$field.val(text);
-      field.acceptInput();
+      await field.acceptInput();
     }
   },
 
-  async selectLookupRow(field: ProposalField, text: string): Promise<LookupRow<string>> {
+  async selectLookupRow(field: ProposalField, text: string, strategy = LookupRowSelectionStrategy.CLICK): Promise<LookupRow<string>> {
     // find row for text
     const popup = await proposalFieldSpecHelper.openPopup(field);
+    const smartField = field.touchMode ? (popup as SpecSmartFieldTouchPopup<string>)._field : (popup as SmartFieldPopup<string>).smartField;
     const proposalChooser = field.touchMode ? (popup as SpecSmartFieldTouchPopup<string>)._widget : (popup as SmartFieldPopup<string>).proposalChooser;
-    const table = proposalChooser.content;
+    const table = proposalChooser.content as Table;
     const row = table.rows.find(r => r.cells[0].text === text);
 
-    // trigger row mousedown and mouseup
-    JQueryTesting.triggerMouseDown(row.$row);
-    JQueryTesting.triggerMouseUp(row.$row);
+    switch (strategy) {
+      case LookupRowSelectionStrategy.CLICK: {
+        JQueryTesting.triggerMouseDown(row.$row);
+        JQueryTesting.triggerMouseUp(row.$row);
+        break;
+      }
+      case LookupRowSelectionStrategy.ENTER: {
+        table.selectRow(row);
+        JQueryTesting.triggerKeyDownCapture(smartField.$field, keys.ENTER);
+        break;
+      }
+      case LookupRowSelectionStrategy.EXACT_TEXT: {
+        smartField.$field.val(text);
+        let closePromise = popup.when('close');
+        JQueryTesting.triggerKeyDownCapture(smartField.$field, keys.ENTER);
+        await closePromise;
+        return smartField.lookupRow;
+      }
+    }
 
     return row.lookupRow;
   },
@@ -117,4 +134,10 @@ export class SpecProposalField extends ProposalField {
 
 export class SpecSmartFieldTouchPopup<TValue> extends SmartFieldTouchPopup<TValue> {
   declare _widget: ProposalChooser<TValue, any, any>;
+}
+
+export enum LookupRowSelectionStrategy {
+  CLICK, // The desired row is clicked on
+  ENTER, // The desired row is selected using arrow keys and then enter is pressed
+  EXACT_TEXT // The exact value is typed into the smart field. In combination with the flag lookupOnAcceptByText, the row is selected
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {LookupRow, ModelAdapterSendOptions, ProposalFieldAdapter, scout, SmartFieldAcceptInputEvent, SmartFieldTouchPopup, StaticLookupCall, Status} from '../../../../src/index';
-import {proposalFieldSpecHelper, ProposalFieldSpecHelperCallbacks, ProposalFieldSpecHelperInput, SpecProposalField} from '../../../../src/testing';
+import {LookupRowSelectionStrategy, proposalFieldSpecHelper, ProposalFieldSpecHelperCallbacks, ProposalFieldSpecHelperInput, SpecProposalField} from '../../../../src/testing';
 
 describe('ProposalFieldAdapter', () => {
 
@@ -244,7 +244,97 @@ describe('ProposalFieldAdapter', () => {
         true);
     });
 
-    async function testProposalFieldInputs(inputs: (ProposalFieldSpecHelperInput | string)[], touchMode?: boolean, withErrorStatus?: boolean) {
+    describe('when lookupRowSelectionStrategy ENTER is selected', () => {
+
+      // foo > bar > foo > bar
+      it('lookup \'foo\' > lookup \'bar\' > write \'foo\' > write \'bar\' (touchMode: false, withErrorStatus: false)', async () => {
+        await testProposalFieldInputs(
+          [{text: 'foo', lookup: true}, {text: 'bar', lookup: true}, 'foo', 'bar'],
+          false,
+          false,
+          LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('lookup \'foo\' > lookup \'bar\' > write \'foo\' > write \'bar\' (touchMode: true, withErrorStatus: false)', async () => {
+        await testProposalFieldInputs(
+          [{text: 'foo', lookup: true}, {text: 'bar', lookup: true}, 'foo', 'bar'],
+          true,
+          false,
+          LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('lookup \'foo\' > lookup \'bar\' > write \'foo\' > write \'bar\' (touchMode: false, withErrorStatus: true)', async () => {
+        await testProposalFieldInputs(
+          [{text: 'foo', lookup: true}, {text: 'bar', lookup: true}, 'foo', 'bar'],
+          false,
+          true,
+          LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('lookup \'foo\' > lookup \'bar\' > write \'foo\' > write \'bar\' (touchMode: true, withErrorStatus: true)', async () => {
+        await testProposalFieldInputs(
+          [{text: 'foo', lookup: true}, {text: 'bar', lookup: true}, 'foo', 'bar'],
+          true,
+          true,
+          LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('write \'foo\' > write \'bar\' > lookup \'foo\' > lookup \'bar\' (touchMode: false, withErrorStatus: false)', async () => {
+        await testProposalFieldInputs(
+          ['foo', 'bar', {text: 'foo', lookup: true}, {text: 'bar', lookup: true}],
+          false,
+          false,
+          LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('write \'foo\' > write \'bar\' > lookup \'foo\' > lookup \'bar\' (touchMode: true, withErrorStatus: false)', async () => {
+        await testProposalFieldInputs(
+          ['foo', 'bar', {text: 'foo', lookup: true}, {text: 'bar', lookup: true}],
+          true,
+          false,
+          LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('write \'foo\' > write \'bar\' > lookup \'foo\' > lookup \'bar\' (touchMode: false, withErrorStatus: true)', async () => {
+        await testProposalFieldInputs(
+          ['foo', 'bar', {text: 'foo', lookup: true}, {text: 'bar', lookup: true}],
+          false,
+          true,
+          LookupRowSelectionStrategy.ENTER);
+      });
+
+      it('write \'foo\' > write \'bar\' > lookup \'foo\' > lookup \'bar\' (touchMode: true, withErrorStatus: true)', async () => {
+        await testProposalFieldInputs(
+          ['foo', 'bar', {text: 'foo', lookup: true}, {text: 'bar', lookup: true}],
+          true,
+          true,
+          LookupRowSelectionStrategy.ENTER);
+      });
+    });
+
+    describe('when LookupRowSelectionStrategy EXACT_TEXT is used', () => {
+      beforeEach(() => {
+        field.lookupOnAcceptByText = true;
+      });
+
+      it('write \'foo\' > write \'bar\' > write \'some\' (touchMode: false, withErrorStatus: true)', async () => {
+        await testProposalFieldInputs(
+          ['foo', 'bar', 'some'],
+          false,
+          true,
+          LookupRowSelectionStrategy.EXACT_TEXT);
+      });
+
+      it('write \'foo\' > write \'bar\' > write \'some\' (touchMode: true, withErrorStatus: true)', async () => {
+        await testProposalFieldInputs(
+          ['foo', 'bar', 'some'],
+          true,
+          true,
+          LookupRowSelectionStrategy.EXACT_TEXT);
+      });
+    });
+
+    async function testProposalFieldInputs(inputs: (ProposalFieldSpecHelperInput | string)[], touchMode?: boolean, withErrorStatus?: boolean, selectionStrategy?: LookupRowSelectionStrategy) {
       const callbacks: ProposalFieldSpecHelperCallbacks = {
         afterInput: (input: ProposalFieldSpecHelperInput) => {
           const {text} = input;
@@ -259,7 +349,7 @@ describe('ProposalFieldAdapter', () => {
         callbacks.beforeInput = (input: ProposalFieldSpecHelperInput) => field.setErrorStatus(Status.warning('I am a WARNING!'));
       }
 
-      await proposalFieldSpecHelper.testProposalFieldInputs(field, inputs, touchMode, callbacks);
+      await proposalFieldSpecHelper.testProposalFieldInputs(field, inputs, touchMode, callbacks, selectionStrategy);
     }
 
     function expectAcceptInputEvent(text: string, lookupRow?: LookupRow<string>) {
