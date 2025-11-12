@@ -2658,6 +2658,12 @@
     "interfaces" : [ "jakarta.ws.rs.core.Response$StatusType" ],
     "methods" : [ {
       "_type" : "scout.MethodSignature",
+      "modifiers" : 4106,
+      "name" : "$values",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.Response$Status[]"
+    }, {
+      "_type" : "scout.MethodSignature",
       "modifiers" : 1,
       "name" : "getStatusCode",
       "parameterTypes" : [ ],
@@ -2706,6 +2712,12 @@
     "_type" : "scout.ClassSignature",
     "interfaces" : [ ],
     "methods" : [ {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4106,
+      "name" : "$values",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.Response$Status$Family[]"
+    }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "familyOf",

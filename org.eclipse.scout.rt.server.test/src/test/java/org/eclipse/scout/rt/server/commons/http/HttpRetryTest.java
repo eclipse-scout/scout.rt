@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,6 +29,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.NoHttpResponseException;
 import org.apache.hc.core5.http.io.HttpClientConnection;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -85,7 +86,7 @@ public class HttpRetryTest {
 
   private void fixtureServletGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     servletGetLog.add(req.getHeader(CORRELATION_ID));
-    resp.setContentType("text/plain;charset=UTF-8");
+    resp.setContentType(ContentType.TEXT_PLAIN.toString());
     resp.getOutputStream().println("Hello " + req.getParameter("foo"));
   }
 
@@ -93,7 +94,9 @@ public class HttpRetryTest {
     servletPostLog.add(req.getHeader(CORRELATION_ID));
     String arg = null;
     try {
-      assertEquals("text/plain;charset=UTF-8", req.getContentType());
+      ContentType contentTypeActual = ContentType.parse(req.getContentType());
+      assertEquals(ContentType.TEXT_PLAIN.getMimeType(), contentTypeActual.getMimeType());
+      assertEquals(ContentType.TEXT_PLAIN.getCharset(), contentTypeActual.getCharset());
       assertEquals("UTF-8", req.getCharacterEncoding());
       assertEquals(3, req.getContentLength());
       arg = IOUtility.readString(req.getInputStream(), req.getCharacterEncoding(), req.getContentLength());
@@ -113,7 +116,7 @@ public class HttpRetryTest {
       }
     }
 
-    resp.setContentType("text/plain;charset=UTF-8");
+    resp.setContentType(ContentType.TEXT_PLAIN.toString());
     resp.getOutputStream().println("Post " + arg);
   }
 
@@ -141,7 +144,7 @@ public class HttpRetryTest {
       bytes = IOUtility.readBytes(in);
     }
     String text = new String(bytes, StandardCharsets.UTF_8).trim();
-    assertEquals(text, "Hello bar");
+    assertEquals("Hello bar", text);
     assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
     assertEquals(new String(bytes), 11, bytes.length);//text + CR + LF
     assertEquals(Arrays.asList("01"), servletGetLog);
@@ -185,7 +188,7 @@ public class HttpRetryTest {
 
       @Override
       public String getType() {
-        return "text/plain;charset=UTF-8";
+        return ContentType.TEXT_PLAIN.toString();
       }
 
       @Override
@@ -200,7 +203,7 @@ public class HttpRetryTest {
       bytes = IOUtility.readBytes(in);
     }
     String text = new String(bytes, StandardCharsets.UTF_8).trim();
-    assertEquals(text, "Post bar");
+    assertEquals("Post bar", text);
     assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
     assertEquals(new String(bytes), 10, bytes.length);//text + CR + LF
     String e1 = servletPostLog.poll(30, TimeUnit.SECONDS);
@@ -236,7 +239,7 @@ public class HttpRetryTest {
 
       @Override
       public String getType() {
-        return "text/plain;charset=UTF-8";
+        return ContentType.TEXT_PLAIN.toString();
       }
 
       @Override
@@ -293,7 +296,7 @@ public class HttpRetryTest {
 
       @Override
       public String getType() {
-        return "text/plain;charset=UTF-8";
+        return ContentType.TEXT_PLAIN.toString();
       }
 
       @Override
@@ -342,7 +345,7 @@ public class HttpRetryTest {
 
       @Override
       public String getType() {
-        return "text/plain;charset=UTF-8";
+        return ContentType.TEXT_PLAIN.toString();
       }
 
       @Override
@@ -357,7 +360,7 @@ public class HttpRetryTest {
       bytes = IOUtility.readBytes(in);
     }
     String text = new String(bytes, StandardCharsets.UTF_8).trim();
-    assertEquals(text, "Post bar");
+    assertEquals("Post bar", text);
     assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
     assertEquals(new String(bytes), 10, bytes.length);//text + CR + LF
     assertArrayEquals(new String[]{"05"}, servletPostLog.toArray());
@@ -384,7 +387,7 @@ public class HttpRetryTest {
 
       @Override
       public String getType() {
-        return "text/plain;charset=UTF-8";
+        return ContentType.TEXT_PLAIN.toString();
       }
 
       @Override
@@ -421,7 +424,7 @@ public class HttpRetryTest {
 
       @Override
       public String getType() {
-        return "text/plain;charset=UTF-8";
+        return ContentType.TEXT_PLAIN.toString();
       }
 
       @Override

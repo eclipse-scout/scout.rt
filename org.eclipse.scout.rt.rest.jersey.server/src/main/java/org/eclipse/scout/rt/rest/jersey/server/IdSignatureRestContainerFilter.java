@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.rest.container.IRestContainerResponseFilter;
 import org.eclipse.scout.rt.rest.param.IIdParamConverterProvider;
 import org.eclipse.scout.rt.rest.param.IIdParamConverterProvider.AbstractIdCodecParamConverter;
 import org.eclipse.scout.rt.rest.param.IIdParamConverterProvider.IdCodecFlags;
-import org.glassfish.jersey.internal.inject.AbstractBinder;
+import org.glassfish.jersey.inject.hk2.AbstractBinder;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.cfg.EndpointConfigBase;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.cfg.ObjectReaderInjector;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.cfg.ObjectReaderModifier;

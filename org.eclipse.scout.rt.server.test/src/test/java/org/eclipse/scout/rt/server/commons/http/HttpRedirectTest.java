@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,6 +26,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.hc.client5.http.impl.classic.RedirectExec;
+import org.apache.hc.core5.http.ContentType;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
@@ -87,7 +88,7 @@ public class HttpRedirectTest {
       resp.sendRedirect(redirectUrl);
       return;
     }
-    resp.setContentType("text/plain;charset=UTF-8");
+    resp.setContentType(ContentType.TEXT_PLAIN.toString());
     resp.getOutputStream().println("HTTP-GET:Hello " + req.getParameter("foo"));
   }
 
@@ -105,11 +106,13 @@ public class HttpRedirectTest {
       return;
     }
     String arg = null;
-    assertEquals("text/plain;charset=UTF-8", req.getContentType());
+    ContentType contentTypeActual = ContentType.parse(req.getContentType());
+    assertEquals(ContentType.TEXT_PLAIN.getMimeType(), contentTypeActual.getMimeType());
+    assertEquals(ContentType.TEXT_PLAIN.getCharset(), contentTypeActual.getCharset());
     assertEquals("UTF-8", req.getCharacterEncoding());
     assertEquals(3, req.getContentLength());
     arg = IOUtility.readString(req.getInputStream(), req.getCharacterEncoding(), req.getContentLength());
-    resp.setContentType("text/plain;charset=UTF-8");
+    resp.setContentType(ContentType.TEXT_PLAIN.toString());
     resp.getOutputStream().println("HTTP-POST:" + arg);
   }
 
@@ -214,7 +217,7 @@ public class HttpRedirectTest {
 
       @Override
       public String getType() {
-        return "text/plain;charset=UTF-8";
+        return ContentType.TEXT_PLAIN.toString();
       }
 
       @Override
