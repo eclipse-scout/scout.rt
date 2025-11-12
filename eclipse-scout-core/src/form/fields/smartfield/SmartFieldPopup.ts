@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,9 @@ import {
   SmartFieldPopupEventMap, SmartFieldPopupLayout, SmartFieldPopupModel, SomeRequired, StatusOrModel
 } from '../../../index';
 
+/**
+ * IMPORTANT: this popup logic is partially also implemented in <code>SmartFieldTouchPopup</code>. If you make changes here, also check the touch popup.
+ */
 export class SmartFieldPopup<TValue> extends Popup implements SmartFieldPopupModel<TValue> {
   declare model: SmartFieldPopupModel<TValue>;
   declare initModel: SomeRequired<this['model'], 'parent' | 'field'>;
@@ -76,7 +79,7 @@ export class SmartFieldPopup<TValue> extends Popup implements SmartFieldPopupMod
    */
   getSelectedLookupRow(): LookupRow<TValue> {
     let lookupRow = this.proposalChooser.getSelectedLookupRow();
-    if (lookupRow && lookupRow.enabled) {
+    if (lookupRow?.enabled) {
       return lookupRow;
     }
     return null;

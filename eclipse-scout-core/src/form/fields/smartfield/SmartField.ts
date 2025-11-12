@@ -103,7 +103,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
 
     this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
       'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired', 'columnDescriptors',
-      'displayStyle'
+      'displayStyle', 'lookupSeqNo'
     ]);
 
     this.$screenReaderStatus = null;
@@ -542,6 +542,10 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     this._userWasTyping = false;
     this._extendResult(result);
     this._notUnique = result.numLookupRows > 1;
+
+    if (this.isPopupOpen()) {
+      this.popup.setLookupResult(result);
+    }
 
     // when there's exactly one result, we accept that lookup row
     if (result.uniqueMatch) {
