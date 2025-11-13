@@ -100,6 +100,7 @@ public enum MimeType implements IMimeType {
   XLSM("application/vnd.ms-excel.sheet.macroEnabled.12", "xlsm", IMimeMagic.DOCX_XLSX_PPTX),
   XLTX("application/vnd.openxmlformats-officedocument.spreadsheetml.template", "xltx", IMimeMagic.DOCX_XLSX_PPTX),
   XML("text/xml", "xml"),
+  YAML("application/yaml", "yaml"),
   URI("text/x-uri", "url"),
   ZIP("application/zip", "zip", IMimeMagic.ZIP);
 
