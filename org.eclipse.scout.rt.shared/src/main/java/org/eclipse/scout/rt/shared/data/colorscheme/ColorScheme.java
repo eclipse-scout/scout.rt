@@ -19,7 +19,8 @@ public enum ColorScheme implements IColorScheme {
   DEFAULT_INVERTED(SchemeIds.SCHEME_ID_DEFAULT, true),
   ALTERNATIVE(SchemeIds.SCHEME_ID_ALTERNATIVE, false),
   ALTERNATIVE_INVERTED(SchemeIds.SCHEME_ID_ALTERNATIVE, true),
-  RAINBOW(SchemeIds.SCHEME_ID_RAINBOW, false);
+  RAINBOW(SchemeIds.SCHEME_ID_RAINBOW, false),
+  RAINBOW_INVERTED(SchemeIds.SCHEME_ID_RAINBOW, true);
 
   private final String m_schemeId;
   private final boolean m_inverted;
@@ -54,6 +55,10 @@ public enum ColorScheme implements IColorScheme {
         return ALTERNATIVE_INVERTED;
       case ALTERNATIVE_INVERTED:
         return ALTERNATIVE;
+      case RAINBOW:
+        return RAINBOW_INVERTED;
+      case RAINBOW_INVERTED:
+        return RAINBOW;
       default:
         return this; // unknown scheme cannot be inverted
     }
@@ -71,9 +76,11 @@ public enum ColorScheme implements IColorScheme {
       case ALTERNATIVE:
         return RAINBOW;
       case ALTERNATIVE_INVERTED:
-        return RAINBOW;
+        return RAINBOW_INVERTED;
       case RAINBOW:
         return DEFAULT;
+      case RAINBOW_INVERTED:
+        return DEFAULT_INVERTED;
       default:
         return this; // unknown scheme cannot be toggled
     }
