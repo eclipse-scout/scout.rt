@@ -6520,14 +6520,14 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   /**
    * @returns all columns marked as primaryKey column (see {@link Column.primaryKey})
    */
-  primaryKeyColumns(): Column[] {
+  primaryKeyColumns(): Column<any>[] {
     return this.filterColumns(column => column.primaryKey);
   }
 
   /**
    * @returns all columns marked as summary column (see {@link Column.summary})
    */
-  summaryColumns(): Column[] {
+  summaryColumns(): Column<any>[] {
     return this.filterColumns(column => column.summary);
   }
 
