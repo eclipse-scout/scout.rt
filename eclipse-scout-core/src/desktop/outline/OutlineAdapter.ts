@@ -250,6 +250,10 @@ export class OutlineAdapter extends TreeAdapter {
       this.modelAdapter._initDetailTable(page);
     }
     this.modelAdapter._linkNodeWithRowLater(page);
+
+    if (!TreeAdapter.isRemote(page, false) && TreeAdapter.isRemote(parentNode, false) && parentNode.nodeType === 'nodes') {
+      this.modelAdapter.sendNodesChanged([page]);
+    }
   }
 
   protected static override _createTreeNodeRemote(this: Outline & { modelAdapter: OutlineAdapter; _createTreeNodeOrig }, pageModel: PageModel) {
