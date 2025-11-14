@@ -433,6 +433,34 @@ describe('OutlineAdapter', () => {
       expect(outline.nodes[2]).toBeInstanceOf(MyJsPage);
       expect(outline.nodes[2].childNodeIndex).toBe(2);
     });
+
+    it('sends nodes changed of js child page of remote node page', () => {
+      const treeHelper = new TreeSpecHelper(session);
+      const model = helper.createModelFixture(1);
+      model.nodes[0].nodeType = 'nodes';
+      const adapter = helper.createOutlineAdapter(model);
+      const outline = adapter.createWidget(model, session.desktop) as Outline;
+
+      const [page] = outline.nodes as AdapterTreeNode[];
+
+      spyOn(adapter, 'sendNodesChanged').and.callThrough();
+
+      // top level node
+      adapter.onModelEvent(treeHelper.createNodesInsertedEvent(outline, [helper.createModelNode('1', 'newChildNode', {
+        nodeType: 'jsPage',
+        jsPageObjectType: 'outlineadapterspec.MyJsPage'
+      })]));
+
+      expect(adapter.sendNodesChanged).not.toHaveBeenCalled();
+
+      // child node of remote node page
+      adapter.onModelEvent(treeHelper.createNodesInsertedEvent(outline, [helper.createModelNode('0_0', 'newChildNode', {
+        nodeType: 'jsPage',
+        jsPageObjectType: 'outlineadapterspec.MyJsPage'
+      })], page.id));
+
+      expect(adapter.sendNodesChanged).toHaveBeenCalled();
+    });
   });
 
   describe('pageParam', () => {

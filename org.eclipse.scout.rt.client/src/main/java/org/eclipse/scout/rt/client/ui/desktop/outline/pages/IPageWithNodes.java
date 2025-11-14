@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,4 +25,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 public interface IPageWithNodes extends IPage<ITable> {
 
   void rebuildTableInternal();
+
+  /**
+   * Updates the table row with the content of the page.
+   */
+  void updateTableRowFromPage(IPage page);
 }
