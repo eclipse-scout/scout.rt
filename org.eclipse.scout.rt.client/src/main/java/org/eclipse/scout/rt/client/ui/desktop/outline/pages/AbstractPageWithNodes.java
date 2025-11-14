@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -293,6 +293,21 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     tableRowCell.updateFrom(pageCell);
     // ensure a value is set
     tableRowCell.setValue(pageCell.getText());
+  }
+
+  @Override
+  public void updateTableRowFromPage(IPage page) {
+    ITableRow row = getTableRowFor(page);
+    if (row == null) {
+      return;
+    }
+    try {
+      row.setRowChanging(true);
+      updateCellFromPageCell(row.getCellForUpdate(0), page.getCell());
+    }
+    finally {
+      row.setRowChanging(false);
+    }
   }
 
   private List<? extends IMenu> m_pageMenusOfSelection;

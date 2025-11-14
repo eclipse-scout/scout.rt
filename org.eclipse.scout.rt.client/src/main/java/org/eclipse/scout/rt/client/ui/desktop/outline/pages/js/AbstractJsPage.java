@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.id.IId;
@@ -204,5 +205,9 @@ public abstract class AbstractJsPage extends AbstractPage<ITable> implements IJs
     jsPageModel.put("iconId", cell.getIconId());
 
     setJsPageModel(jsPageModel);
+
+    if (getParentPage() instanceof IPageWithNodes pageWithNodes) {
+      pageWithNodes.updateTableRowFromPage(this);
+    }
   }
 }
