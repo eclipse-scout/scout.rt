@@ -4684,7 +4684,11 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   protected _renderTextFilterEnabled() {
-    this.filterSupport.renderFilterField();
+    let $filterField = this.filterSupport.renderFilterField();
+    if ($filterField && this.menuBar.rendered) {
+      // Ensure correct tab order
+      $filterField.insertBefore(this.menuBar.$container);
+    }
   }
 
   protected _renderMultiSelect() {

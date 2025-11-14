@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -91,12 +91,13 @@ export class FilterSupport<TElem extends FilterElement> extends WidgetSupport {
     return true;
   }
 
-  renderFilterField() {
+  renderFilterField(): JQuery {
     if (this.widget.isTextFilterFieldVisible()) {
       this._renderFilterField();
     } else {
       this._removeFilterField();
     }
+    return this._filterField?.$container;
   }
 
   protected _renderFilterField() {
@@ -116,7 +117,7 @@ export class FilterSupport<TElem extends FilterElement> extends WidgetSupport {
     });
     this._filterField.render(this.$container);
 
-    this._filterField.$field.attr('tabindex', -1);
+    this._filterField.$field.setTabbableOrFocusable(false);
 
     if (!this.widget.rendered) {
       this.widget.one('render', event => this._updateFilterFieldBackgroundColor());
@@ -169,8 +170,9 @@ export class FilterSupport<TElem extends FilterElement> extends WidgetSupport {
   }
 
   protected _onFilterFieldDisplayTextChanged(event: PropertyChangeEvent<string>) {
-    if (this._filterField && this._filterField.rendered) {
+    if (this._filterField?.rendered) {
       this._filterField.$container.toggleClass('empty', !event.newValue);
+      this._filterField.$field.setTabbableOrFocusable(!!event.newValue);
     }
     if (!this._updateTextFilterText(this._textFilter, event.newValue)) {
       return;
