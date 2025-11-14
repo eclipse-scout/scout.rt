@@ -598,6 +598,19 @@ describe('Tree', () => {
         expect($checkbox(child0).isEnabled()).toBe(false);
       });
     });
+
+    it('updates node size', () => {
+      tree.render();
+
+      let origWidth = node0.width;
+      let origMaxNodeWidth =tree.maxNodeWidth;
+      let expectedText = 'a very'+ strings.repeat(' long', 100) + ' text';
+      node0.setText(expectedText);
+      tree.updateNode(node0);
+      expect(node0.$node.text()).toBe(expectedText);
+      expect(node0.width).toBeGreaterThan(origWidth);
+      expect(tree.maxNodeWidth).toBeGreaterThan(origMaxNodeWidth);
+    });
   });
 
   describe('changeNode', () => {

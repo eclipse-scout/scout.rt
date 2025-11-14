@@ -2408,6 +2408,15 @@ export class Tree extends Widget implements TreeModel {
       updatedNodes.push(oldNode);
     });
 
+    // recompute node size if horizontal scrolling is enabled
+    if (this.isHorizontalScrollingEnabled()) {
+      let nodesToResize = updatedNodes.filter(n => n.rendered);
+      if (arrays.hasElements(nodesToResize)) {
+        this._updateNodeSize(nodesToResize);
+        this.invalidateLayoutTree();
+      }
+    }
+
     this.trigger('nodesUpdated', {
       nodes: updatedNodes
     });
@@ -3056,6 +3065,10 @@ export class Tree extends Widget implements TreeModel {
   }
 
   protected _installNodes(nodes: TreeNode[]) {
+    this._updateNodeSize(nodes);
+  }
+
+  protected _updateNodeSize(nodes: TreeNode[]) {
     // The measuring is separated into 3 blocks for performance reasons -> separates reading and setting of styles
     // 1. Prepare style for measuring
     if (this.isHorizontalScrollingEnabled()) {
