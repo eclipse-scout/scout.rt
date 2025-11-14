@@ -3212,7 +3212,11 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   }
 
   protected _renderTextFilterEnabled() {
-    this.filterSupport.renderFilterField();
+    let $filterField = this.filterSupport.renderFilterField();
+    if ($filterField && this.menuBar.rendered) {
+      // Ensure correct tab order
+      $filterField.insertBefore(this.menuBar.$container);
+    }
   }
 
   protected _renderMultiCheck() {
