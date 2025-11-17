@@ -66,6 +66,7 @@ public class UiTextContributor implements IUiTextContributor {
         "InvalidNumberMessageX",
         "InvalidValueMessageX",
         "NavigationBackward",
+        "NetErrorTitle",
         "NetSystemsNotAvailable",
         "No",
         "NoButton",

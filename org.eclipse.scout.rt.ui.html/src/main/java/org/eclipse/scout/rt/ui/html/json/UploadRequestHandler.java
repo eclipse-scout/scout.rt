@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.resource.MimeTypes;
@@ -178,6 +179,11 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       catch (UnsafeResourceException e) { // NOSONAR
         // LOG is done in MalwareScanner, verifyFileSafety is the only method throwing this exception
         writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createUnsafeUploadResponse());
+        return;
+      }
+      catch (RemoteSystemUnavailableException e) {
+        // A remote system required for file upload is not available (e.g. malware scanner)
+        writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createRemoteSystemUnavailableResponse());
         return;
       }
       catch (RejectedResourceException e) { // NOSONAR
