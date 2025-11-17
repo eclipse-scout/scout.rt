@@ -163,7 +163,8 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     UI_PROCESSING: 20,
     UNSAFE_UPLOAD: 30,
     REJECTED_UPLOAD: 31,
-    VERSION_MISMATCH: 40
+    VERSION_MISMATCH: 40,
+    REMOTE_SYSTEM_UNAVAILABLE: 50
   } as const;
 
   // Placeholder string for an empty filename
@@ -1087,6 +1088,14 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
       boxOptions.yesButtonAction = null; // NOP
       isFatalError = false; // unsafe upload allows the application to continue
+    } else if (jsonError.code === Session.JsonResponseError.REMOTE_SYSTEM_UNAVAILABLE) {
+      boxOptions.header = this.optText('NetErrorTitle', boxOptions.header);
+      boxOptions.body = this.optText('NetSystemsNotAvailable', 'The system is partially unavailable at the moment.')
+        + '\n\n'
+        + this.optText('PleaseTryAgainLater', 'Please try again later.');
+      boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
+      boxOptions.yesButtonAction = null; // NOP
+      isFatalError = false; // remote system unavailable allows the application to continue
     } else if (jsonError.code === Session.JsonResponseError.REJECTED_UPLOAD) {
       boxOptions.header = this.optText('ui.RejectedUpload', boxOptions.header);
       boxOptions.body = this.optText('ui.RejectedUploadMsg', boxOptions.body);
