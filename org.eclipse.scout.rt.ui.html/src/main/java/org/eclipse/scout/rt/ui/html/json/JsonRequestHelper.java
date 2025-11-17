@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -115,6 +115,17 @@ public class JsonRequestHelper {
   public JSONObject createVersionMismatchResponse() {
     final JsonResponse response = new JsonResponse();
     response.markAsError(JsonResponse.ERR_VERSION_MISMATCH, "Version mismatch");
+    return response.toJson();
+  }
+
+  /**
+   * UI Text <code>NetSystemsNotAvailable</code>
+   *
+   * @return {@link JSONObject} to indicate that a remote system is not available and therefore the request could not be completed.
+   */
+  public JSONObject createRemoteSystemUnavailableResponse() {
+    final JsonResponse response = new JsonResponse();
+    response.markAsError(JsonResponse.ERR_REMOTE_SYSTEM_UNAVAILABLE, "Remote system unavailable.");
     return response.toJson();
   }
 
