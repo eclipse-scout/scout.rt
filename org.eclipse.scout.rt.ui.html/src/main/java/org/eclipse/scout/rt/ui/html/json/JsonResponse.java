@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,6 +37,7 @@ public class JsonResponse {
   public static final int ERR_UNSAFE_UPLOAD = 30;
   public static final int ERR_REJECTED_UPLOAD = 31;
   public static final int ERR_VERSION_MISMATCH = 40;
+  public static final int ERR_REMOTE_SYSTEM_UNAVAILABLE = 50;
 
   public static final String PROP_SEQUENCE_NO = "#";
   public static final String PROP_COMBINED = "combined";
