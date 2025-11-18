@@ -67,8 +67,6 @@ public class JsonRequestHelper {
   }
 
   /**
-   * UI Text <code>ui.UnsafeUpload</code>
-   *
    * @return {@link JSONObject} to indicate that the file upload is unsafe.
    */
   public JSONObject createUnsafeUploadResponse() {
@@ -78,8 +76,6 @@ public class JsonRequestHelper {
   }
 
   /**
-   * UI Text <code>ui.RejectedUpload</code>
-   *
    * @return {@link JSONObject} to indicate that the file upload was rejected.
    */
   public JSONObject createRejectedUploadResponse() {
@@ -119,8 +115,6 @@ public class JsonRequestHelper {
   }
 
   /**
-   * UI Text <code>NetSystemsNotAvailable</code>
-   *
    * @return {@link JSONObject} to indicate that a remote system is not available and therefore the request could not be completed.
    */
   public JSONObject createRemoteSystemUnavailableResponse() {
