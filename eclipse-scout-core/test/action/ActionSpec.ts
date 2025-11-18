@@ -211,14 +211,33 @@ describe('Action', () => {
       let action = scout.create(Action, {
         parent: session.desktop,
         toggleAction: false,
+        text: 'hi',
+        tooltipText: 'hello'
+      });
+      action.render();
+      expect(action.$container.attr('aria-description')).toBe('hello');
+      expect(action.$container.attr('aria-describedby')).toBeFalsy();
+    });
+
+    it('uses tooltip as label if there is no text', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        toggleAction: false,
         tooltipText: 'hello',
         actionStyle: Action.ActionStyle.BUTTON
       });
       action.render();
-
-      expect(action.$container.attr('aria-description')).toBeTruthy();
-      expect(action.$container.attr('aria-description')).toBe('hello');
+      expect(action.$container.attr('aria-label')).toBe('hello');
+      expect(action.$container.attr('aria-description')).toBeFalsy();
       expect(action.$container.attr('aria-describedby')).toBeFalsy();
+
+      action.setText('text');
+      expect(action.$container.attr('aria-label')).toBeFalsy(); // not necessary because the text is visible
+      expect(action.$container.attr('aria-description')).toBe('hello');
+
+      action.setTextVisible(false);
+      expect(action.$container.attr('aria-label')).toBe('text');
+      expect(action.$container.attr('aria-description')).toBe('hello');
     });
 
     it('has aria pressed set correctly if toggle action', () => {
