@@ -261,7 +261,7 @@ module.exports = (env, args) => {
 
     let forkTsCheckerConfig = {
       typescript: {
-        memoryLimit: 4096,
+        memoryLimit: 8192,
         ...args.forkTypeCheckOptions?.typescript
       },
       ...args.forkTypeCheckOptions
