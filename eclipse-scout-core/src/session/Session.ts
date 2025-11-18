@@ -1081,7 +1081,9 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       isFatalError = false; // unsafe upload allows the application to continue
     } else if (jsonError.code === Session.JsonResponseError.REMOTE_SYSTEM_UNAVAILABLE) {
       boxOptions.header = this.optText('NetErrorTitle', boxOptions.header);
-      boxOptions.body = this.optText('NetSystemsNotAvailable', boxOptions.body);
+      boxOptions.body = this.optText('NetSystemsNotAvailable', 'The system is partially unavailable at the moment.')
+        + '\n\n'
+        + this.optText('PleaseTryAgainLater', 'Please try again later.');
       boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
       boxOptions.yesButtonAction = null; // NOP
       isFatalError = false; // remote system unavailable allows the application to continue
