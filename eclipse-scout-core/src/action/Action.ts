@@ -201,13 +201,10 @@ export class Action extends Widget implements ActionModel, TabbableItem {
       } else {
         this.$text.text(text);
       }
-      // not needed if text is visible
-      aria.label(this.$container, null);
     } else {
-      // add as label for screen readers
-      aria.label(this.$container, text);
       this._removeText();
     }
+    this._updateAriaLabel();
   }
 
   protected _removeText() {
@@ -316,7 +313,7 @@ export class Action extends Widget implements ActionModel, TabbableItem {
     } else {
       tooltips.uninstall(this.$container);
     }
-    aria.description(this.$container, this.tooltipText);
+    this._updateAriaLabel();
   }
 
   protected _shouldInstallTooltip(): boolean {
@@ -325,6 +322,25 @@ export class Action extends Widget implements ActionModel, TabbableItem {
     }
     let tooltipText = this._computeTooltipText();
     return !!tooltipText;
+  }
+
+  protected _updateAriaLabel() {
+    let ariaLabel = this.text;
+    let ariaDesc = this.tooltipText;
+    if (ariaLabel) {
+      if (this.textVisible) {
+        // not needed if text is visible
+        ariaLabel = null;
+      }
+    } else {
+      // Chrome Lighthouse reports and issue if an action has no label even if it has a description.
+      // It could be solved by setting a text and textVisible to false, but most actions that only have an icon set the tooltipText for this purpose.
+      // -> Use tooltipText as aria-label if there is no text
+      ariaLabel = ariaDesc;
+      ariaDesc = null;
+    }
+    aria.label(this.$container, ariaLabel);
+    aria.description(this.$container, ariaDesc);
   }
 
   isTabTarget(): boolean {
