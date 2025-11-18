@@ -34,7 +34,6 @@
 
   <logger name="org.quartz" level="WARN" />
   <logger name="org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer" level="DEBUG" />
-  <logger name="org.apache.activemq.audit" level="WARN" /> <!-- disable audit logging for ActiveMQ because the current version (2.38.0) is not fully Java 24 compatible yet (AuditLogger uses Subject.getSubject) -->
 
   <!-- Inclusion of optional, user-specific Logback configurations -->
   <include file="${LOGBACK_INCLUDE_XML}" optional="true" />
