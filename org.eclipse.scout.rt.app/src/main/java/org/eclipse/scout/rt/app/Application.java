@@ -18,6 +18,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyStore;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import jakarta.servlet.ServletException;
@@ -146,7 +148,7 @@ public class Application {
     StringBuilder sb = new StringBuilder();
     sb.append("Server ready. The application is available on the following addresses:\n");
     sb.append("---------------------------------------------------------------------\n");
-    sb.append("  ").append(protocol).append("://localhost:").append(port).append(contextPath).append('\n');
+    sb.append("  ").append(protocol).append("://").append(LocalHostAddressHelper.LOCALHOST).append(":").append(port).append(contextPath).append('\n');
     sb.append("  ").append(protocol).append("://").append(hostname).append(":").append(port).append(contextPath).append('\n');
     if (StringUtility.notEqualsIgnoreCase(hostname, ip)) {
       sb.append("  ").append(protocol).append("://").append(ip).append(":").append(port).append(contextPath).append('\n');
@@ -239,13 +241,13 @@ public class Application {
 
       if (keyStoreUri == null) {
         // no path available: create in memory only
-        KeyStore ks = certificateProvider.createSelfSignedCertificate(certAlias, autoCertName, keyStorePassword.toCharArray(), privateKeyPassword.toCharArray());
+        KeyStore ks = certificateProvider.createSelfSignedCertificate(certAlias, autoCertName, keyStorePassword.toCharArray(), privateKeyPassword.toCharArray(), getSubjectAlternativeNames());
         sslContextFactory.setKeyStore(ks);
       }
       else {
         // a non-existing key-store path was provided: create a new keystore file at that location
         LOG.info("Storing created keystore in '{}'.", keyStoreUri);
-        certificateProvider.autoCreateSelfSignedCertificate(keyStoreUri, keyStorePassword.toCharArray(), privateKeyPassword.toCharArray(), certAlias, autoCertName);
+        certificateProvider.autoCreateSelfSignedCertificate(keyStoreUri, keyStorePassword.toCharArray(), privateKeyPassword.toCharArray(), certAlias, autoCertName, getSubjectAlternativeNames());
         sslContextFactory.setKeyStorePath(keyStoreUri);
       }
     }
@@ -259,17 +261,13 @@ public class Application {
     sslContextFactory.setCertAlias(certAlias);
     sslContextFactory.setEndpointIdentificationAlgorithm("https");
     sslContextFactory.setIncludeCipherSuites(
-        //TLS 1.2
+        // TLS 1.2 (subset)
         "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
         "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
         "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
         "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
-        "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
-        "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
         "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
         "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
-        "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
         "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
         "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
         "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256",
@@ -278,11 +276,26 @@ public class Application {
         "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
         "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256",
         "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256",
-        //TLS 1.3
+        // TLS 1.3 (subset)
         "TLS_AES_256_GCM_SHA384",
         "TLS_AES_128_GCM_SHA256");
 
     return sslContextFactory;
+  }
+
+  protected String[] getSubjectAlternativeNames() {
+    LocalHostAddressHelper helper = BEANS.get(LocalHostAddressHelper.class);
+    List<String> sans = new ArrayList<>();
+    sans.add(LocalHostAddressHelper.LOCALHOST);
+    String hostName = helper.getHostName();
+    if (hostName != null && !hostName.equals(LocalHostAddressHelper.UNKNOWN)) {
+      sans.add(hostName);
+    }
+    String canonicalName = helper.getCanonicalHostName();
+    if (canonicalName != null && !canonicalName.equals(LocalHostAddressHelper.UNKNOWN) && !canonicalName.equals(hostName)) {
+      sans.add(canonicalName);
+    }
+    return sans.toArray(new String[0]);
   }
 
   protected Path resolveKeyStorePath(String path) {

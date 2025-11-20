@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 public class LocalHostAddressHelper {
 
   public static final String UNKNOWN = "unknown";
+  public static final String LOCALHOST = "localhost";
 
   /**
    * Instead of just throwing an UnknownHostException and giving up, this method grabs a suitable hostname from the
@@ -30,12 +31,32 @@ public class LocalHostAddressHelper {
    * @return The local hostname or {@value #UNKNOWN} if it cannot be determined.
    * @see InetAddress#getLocalHost()
    * @see InetAddress#getHostName()
-   * @see #parseUnknownHostException(UnknownHostException)
    */
   @SuppressWarnings("squid:S1166") // catch without rethrow
   public String getHostName() {
     try {
       return InetAddress.getLocalHost().getHostName();
+    }
+    catch (UnknownHostException e) {
+      return parseUnknownHostException(e);
+    }
+  }
+
+  /**
+   * Gets the fully qualified domain name of the localhost.
+   * <p>
+   * Instead of just throwing an UnknownHostException and giving up, this method grabs a suitable hostname from the
+   * exception and prevents the exception from being thrown. If a suitable hostname cannot be acquired from the
+   * exception {@link #UNKNOWN} is returned.
+   *
+   * @return The local hostname or {@value #UNKNOWN} if it cannot be determined.
+   * @see InetAddress#getLocalHost()
+   * @see InetAddress#getCanonicalHostName()
+   */
+  @SuppressWarnings("squid:S1166") // catch without rethrow
+  public String getCanonicalHostName() {
+    try {
+      return InetAddress.getLocalHost().getCanonicalHostName();
     }
     catch (UnknownHostException e) {
       return parseUnknownHostException(e);
