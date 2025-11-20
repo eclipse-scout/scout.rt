@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -45,6 +45,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -641,8 +643,7 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
             out.println(" Certificate");
             out.println("  format: " + cert.getType());
             out.println("  base64: " + Base64Utility.encode(cert.getEncoded()));
-            if (cert instanceof X509Certificate) {
-              X509Certificate x = (X509Certificate) cert;
+            if (cert instanceof X509Certificate x) {
               out.println("  issuerDN: " + x.getIssuerDN());
               out.println("  subjectDN: " + x.getSubjectDN());
               out.println("  notBefore: " + x.getNotBefore());
@@ -651,6 +652,12 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
               out.println("  extendedKeyUsage: " + x.getExtendedKeyUsage());
               out.println("  serialNumber: " + x.getSerialNumber());
               out.println("  version: " + x.getVersion());
+              List<String> sans = x.getSubjectAlternativeNames().stream()
+                  .flatMap(List::stream)
+                  .filter(san -> san instanceof String)
+                  .map(san -> (String) san)
+                  .collect(Collectors.toList());
+              out.println("  subjectAlternativeNames:" + sans);
             }
             out.println(" PublicKey");
             out.println("  format: " + cert.getPublicKey().getFormat());
