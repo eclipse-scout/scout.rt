@@ -45,6 +45,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -630,6 +632,12 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
               out.println("  extendedKeyUsage: " + x.getExtendedKeyUsage());
               out.println("  serialNumber: " + x.getSerialNumber());
               out.println("  version: " + x.getVersion());
+              List<String> sans = x.getSubjectAlternativeNames().stream()
+                  .flatMap(List::stream)
+                  .filter(san -> san instanceof String)
+                  .map(san -> (String)san)
+                  .collect(Collectors.toList());
+              out.println("  subjectAlternativeNames:" + sans);
             }
             out.println(" PublicKey");
             out.println("  format: " + cert.getPublicKey().getFormat());
