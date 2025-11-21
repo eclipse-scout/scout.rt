@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,9 +24,9 @@ export class PageTileButton extends TileButton implements PageTileButtonModel {
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
-    this.label = this.page.text;
-    this.iconId = this.page.overviewIconId;
-    this.labelHtmlEnabled = this.page.htmlEnabled;
+    this.label = this._text;
+    this.iconId = this._iconId;
+    this.labelHtmlEnabled = this._htmlEnabled;
 
     this.on('click', (event: Event<Button>) => {
       this.outline.selectNode(this.page);
@@ -34,8 +34,29 @@ export class PageTileButton extends TileButton implements PageTileButtonModel {
   }
 
   notifyPageChanged() {
-    this.setLabel(this.page.text);
-    this.setIconId(this.page.overviewIconId);
-    this.setLabelHtmlEnabled(this.page.htmlEnabled);
+    this.setLabel(this._text);
+    this.setIconId(this._iconId);
+    this.setLabelHtmlEnabled(this._htmlEnabled);
+  }
+
+  protected get _text(): string {
+    if (this.page?.overviewText !== undefined) {
+      return this.page.overviewText;
+    }
+    return this.page?.text;
+  }
+
+  protected get _iconId(): string {
+    if (this.page?.overviewIconId !== undefined) {
+      return this.page.overviewIconId;
+    }
+    return this.page?.iconId;
+  }
+
+  protected get _htmlEnabled(): boolean {
+    if (this.page?.overviewHtmlEnabled !== undefined) {
+      return !!this.page.overviewHtmlEnabled;
+    }
+    return this.page?.htmlEnabled;
   }
 }

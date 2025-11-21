@@ -32,9 +32,27 @@ export interface PageModel extends TreeNodeModel, ObjectModelWithUuid<TreeNode> 
    */
   drillDownOnRowClick?: boolean;
   /**
-   * The icon id which is used for icons in the tile outline overview.
+   * Configures the text which is used in the tile outline overview.
+   *
+   * If the value is `undefined`, the {@link PageTileButton} uses the {@link PageModel.text} instead.
+   * If no text should be displayed, set the value to `null`.
+   */
+  overviewText?: string;
+  /**
+   * Configures the icon which is used in the tile outline overview.
+   *
+   * If the value is `undefined`, the {@link PageTileButton} uses the {@link PageModel.iconId} instead.
+   * If no icon should be displayed, set the value to `null`.
    */
   overviewIconId?: string;
+  /**
+   * Configures whether HTML code in the {@link PageModel.overviewText} property should be interpreted. If set to false, the HTML will be encoded.
+   *
+   * If the value is `undefined`, the {@link PageTileButton} uses {@link PageModel.htmlEnabled} instead.
+   *
+   * Default is false.
+   */
+  overviewHtmlEnabled?: boolean;
   showTileOverview?: boolean;
   /**
    * True to inherit all menus (single selection) from the parent table page, false to inherit none.
