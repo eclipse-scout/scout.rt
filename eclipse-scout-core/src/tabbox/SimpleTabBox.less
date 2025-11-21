@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,6 +14,16 @@
 
   & > .simple-tab-area {
     position: absolute;
+
+    &.position-top,
+    &.position-bottom {
+      height: @desktop-header-height;
+    }
+
+    &.position-right,
+    &.position-left {
+      height: 100%;
+    }
 
     /* Has the same effect as "border-bottom: 1px solid @border-color", but is over-drawable by child */
     /* elements (such as the selected view-tab). The border would not be, because of "overflow: hidden". */
