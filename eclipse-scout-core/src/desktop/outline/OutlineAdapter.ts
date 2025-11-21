@@ -326,6 +326,7 @@ export class OutlineAdapter extends TreeAdapter {
   protected override _initNodeModel(nodeModel?: TreeNodeModel): ChildModelOf<Page> {
     const model = super._initNodeModel(nodeModel) as ChildModelOf<Page>;
     model.pageParam = dataObjects.deserialize(model.pageParam);
+    model.overviewIconId = model.overviewIconId || null;
     return model;
   }
 

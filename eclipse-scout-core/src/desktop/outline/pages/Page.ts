@@ -49,10 +49,9 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
    * True to select the page linked with the selected row when the row was selected. May be useful on touch devices.
    */
   drillDownOnRowClick: boolean;
-  /**
-   * The icon id which is used for icons in the tile outline overview.
-   */
+  overviewText: string;
   overviewIconId: string;
+  overviewHtmlEnabled: boolean;
   showTileOverview: boolean;
   inheritMenusFromParentTablePage: boolean;
   detailMenuContributors: PageDetailMenuContributor[];
@@ -91,7 +90,6 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
     this.classId = null;
     this.tableStatusVisible = true;
     this.drillDownOnRowClick = false;
-    this.overviewIconId = null;
     this.showTileOverview = false;
     this.inheritMenusFromParentTablePage = true;
     this.detailMenuContributors = [];
@@ -194,8 +192,16 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
     this.trigger('destroy');
   }
 
+  setOverviewText(overviewText: string) {
+    this.overviewText = overviewText;
+  }
+
   setOverviewIconId(overviewIconId: string) {
     this.overviewIconId = overviewIconId;
+  }
+
+  setOverviewHtmlEnabled(overviewHtmlEnabled: boolean) {
+    this.overviewHtmlEnabled = overviewHtmlEnabled;
   }
 
   protected _createDetailMenuContributors(): ObjectOrType<PageDetailMenuContributor>[] {
