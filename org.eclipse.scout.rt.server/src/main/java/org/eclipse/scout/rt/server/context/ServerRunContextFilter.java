@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.ServletConstants;
+import org.eclipse.scout.rt.rest.cancellation.CancellationResource;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ServerSessionCacheExpirationProperty;
@@ -79,15 +80,27 @@ public class ServerRunContextFilter implements Filter {
   }
 
   protected ServerRunContext lookupRunContext(HttpServletRequest req, HttpServletResponse resp) {
-    // session-less RunContext is only allowed for /api/process (/api = servlet path; /process = path info)
-    // ServiceOperationInvoker.mustAuthorize(Class<?>, Class<?>, Method, Object[]) does ensure authorization (and session) exists for operations which are not allowed session-less
-    boolean isWithoutSession = req.getHeader(ServiceTunnelConstants.WITHOUT_SESSION_HEADER) != null
-        && ServletConstants.API_PATH.equals(req.getServletPath())
-        && ("/" + ServiceTunnelConstants.PROCESS_PATH).equals(req.getPathInfo());
+    // session-less RunContext is only allowed for specific paths, see isRequestAllowedWithoutSession
+    boolean isWithoutSession = req.getHeader(ServiceTunnelConstants.WITHOUT_SESSION_HEADER) != null && isRequestAllowedWithoutSession(req);
     final ServerRunContext sessionContext = isWithoutSession
         ? null
         : getSessionContextProducer().produce(Subject.current());
     return getHttpServerRunContextProducer().produce(req, resp, null, sessionContext);
+  }
+
+  protected boolean isRequestAllowedWithoutSession(HttpServletRequest req) {
+    if (!ServletConstants.API_PATH.equals(req.getServletPath())) {
+      return false;
+    }
+
+    String pathInfo = req.getPathInfo();
+
+    // (1) allow for /api/process (/api = servlet path; /process = path info)
+    // ServiceOperationInvoker.mustAuthorize(Class<?>, Class<?>, Method, Object[]) does ensure authorization (and session) exists for operations which are not allowed session-less
+    //
+    // (2) allow for /api/cancellation/* (/api = servlet path; /cancellation/* = path info)
+    // RestRequestCancellationRegistry.checkAccess(Object, RequestCancellationInfo) does check actual userId even if no session is available
+    return ("/" + ServiceTunnelConstants.PROCESS_PATH).equals(pathInfo) || pathInfo.startsWith("/" + CancellationResource.PATH + "/");
   }
 
   @Override
