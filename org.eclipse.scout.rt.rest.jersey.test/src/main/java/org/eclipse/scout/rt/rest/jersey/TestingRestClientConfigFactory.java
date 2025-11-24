@@ -89,12 +89,12 @@ public class TestingRestClientConfigFactory extends JerseyClientConfigFactory {
 
     @Override
     protected int getMaxConnectionsTotal(Configuration config) {
-      return 1;
+      return 2;
     }
 
     @Override
     protected int getMaxConnectionsPerRoute(Configuration config) {
-      return 1;
+      return 2;
     }
   }
 }

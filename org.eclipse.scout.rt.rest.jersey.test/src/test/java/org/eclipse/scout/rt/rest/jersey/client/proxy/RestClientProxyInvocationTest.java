@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -274,9 +274,10 @@ public class RestClientProxyInvocationTest {
     PoolingHttpClientConnectionManager poolingConnectionManager = assertInstance(manager, PoolingHttpClientConnectionManager.class, "This test works with Apache HTTP client only. Adapt it for other libraries.");
     URI uri = URI.create(m_helper.getBaseUri());
     HttpHost target = new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort());
-    assertEquals(1, poolingConnectionManager.getMaxPerRoute(new HttpRoute(target)));
+    assertEquals(2, poolingConnectionManager.getMaxPerRoute(new HttpRoute(target)));
 
-    // invoke actual service
+    // invoke actual service (twice as we allow two connections, see above)
+    runnable.run();
     runnable.run();
 
     // verify that other REST services can be invoked (i.e. that the HTTP client was released to the pool)

@@ -27,8 +27,10 @@ import org.eclipse.scout.rt.security.IAccessControlService;
  * @see RestRequestCancellationRegistry
  * @see RestRequestCancellationClientRequestFilter
  */
-@Path("cancellation")
+@Path(CancellationResource.PATH)
 public class CancellationResource implements IRestResource {
+
+  public static final String PATH = "cancellation";
 
   @PUT
   @Path("{requestId}")
