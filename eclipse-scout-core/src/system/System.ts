@@ -7,9 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {InitModelOf, ObjectModel, ObjectWithType, scout} from '../scout';
-import {SomeRequired} from '../types';
-import {strings} from '../util/strings';
+import {InitModelOf, ObjectModel, ObjectWithType, scout, SomeRequired, strings} from '../index';
 
 /**
  * Represents a REST backend system.
