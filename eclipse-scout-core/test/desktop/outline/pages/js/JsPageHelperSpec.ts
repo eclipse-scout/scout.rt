@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Column, HybridManager, HybridManagerAdapter, InitModelOf, JsPageHelper, Outline, OutlineAdapter, Page, PageParamDo, PageWithTable, RemoteEvent, RemoteRequest, scout, styles, Table, TableRow, TreeNode, TreeNodeModel, typeName, UuidPool
+  Column, HybridManager, HybridManagerAdapter, InitModelOf, JsPageHelper, Outline, OutlineAdapter, Page, PageParamDo, PageWithNodes, PageWithTable, RemoteEvent, RemoteRequest, scout, styles, Table, TableRow, TreeNode, TreeNodeModel,
+  typeName, UuidPool
 } from '../../../../../src';
 import {OutlineSpecHelper} from '../../../../../src/testing';
 
@@ -169,7 +170,7 @@ describe('JsPageHelper', () => {
 
   describe('nodesDeleted', () => {
 
-    it('removes linked rows', async () => {
+    it('unlinks linked rows of a table page', async () => {
       outline.insertNode({
         ...outlineSpecHelper.createModelNode(null, 'bar'),
         objectType: MyPageWithTable,
@@ -192,6 +193,8 @@ describe('JsPageHelper', () => {
 
       await myPageWithTable.ensureLoadChildren();
 
+      const row1 = myPageWithTable.detailTable.rows[0];
+      const row2 = myPageWithTable.detailTable.rows[1];
       const row3 = myPageWithTable.detailTable.rows[2];
       const row4 = myPageWithTable.detailTable.rows[3];
 
@@ -206,21 +209,82 @@ describe('JsPageHelper', () => {
 
       expect(myPageWithTable.childrenLoaded).toBeTrue();
       expect(myPageWithTable.childNodes).toEqual([page3, page4]);
-      expect(myPageWithTable.detailTable.rows).toEqual([row3, row4]);
+      expect(myPageWithTable.detailTable.rows).toEqual([row1, row2, row3, row4]);
+      expect(row1.page).toBeFalsy();
+      expect(row2.page).toBeFalsy();
+      expect(row3.page).toBe(page3);
+      expect(row4.page).toBe(page4);
       expect(helper._childPagesById.size).toBe(2);
 
       outline.deleteNodes([page3, page4]);
 
       expect(myPageWithTable.childrenLoaded).toBeFalse();
       expect(myPageWithTable.childNodes.length).toBe(0);
-      expect(myPageWithTable.detailTable.rows.length).toBe(0);
+      expect(myPageWithTable.detailTable.rows).toEqual([row1, row2, row3, row4]);
+      expect(row1.page).toBeFalsy();
+      expect(row2.page).toBeFalsy();
+      expect(row3.page).toBeFalsy();
+      expect(row4.page).toBeFalsy();
+      expect(helper._childPagesById.size).toBe(0);
+    });
+
+    it('removes linked rows of a node page', async () => {
+      outline.insertNode({
+        ...outlineSpecHelper.createModelNode(null, 'bar'),
+        objectType: MyPageWithNodes,
+        childNodes: [
+          {__jsPageChildPageParam: {_type: 'scout.IdPageParam', id: '1'}},
+          {__jsPageChildPageParam: {_type: 'scout.IdPageParam', id: '2'}},
+          {__jsPageChildPageParam: {_type: 'scout.IdPageParam', id: '3'}},
+          {__jsPageChildPageParam: {_type: 'scout.IdPageParam', id: '4'}}
+        ]
+      });
+
+      const myPageWithNodes = outline.nodes[1] as MyPageWithNodes;
+      expect(myPageWithNodes).toBeInstanceOf(MyPageWithNodes);
+      myPageWithNodes.ensureDetailTable();
+
+      const helper = myPageWithNodes.jsPageHelper;
+      spyOn(helper, 'callLoadChildPages').and.callFake(async (idsOrPageParams: string | PageParamDo | (string | PageParamDo)[], replace?: boolean): Promise<void> => {
+        helper._addChildPagesToIdMap();
+      });
+
+      await myPageWithNodes.ensureLoadChildren();
+
+      const row3 = myPageWithNodes.detailTable.rows[2];
+      const row4 = myPageWithNodes.detailTable.rows[3];
+
+      expect(myPageWithNodes.childrenLoaded).toBeTrue();
+      expect(myPageWithNodes.childNodes.length).toBe(4);
+      expect(myPageWithNodes.detailTable.rows.length).toBe(4);
+      expect(helper._childPagesById.size).toBe(4);
+
+      const [page1, page2, page3, page4] = myPageWithNodes.childNodes;
+
+      outline.deleteNodes([page1, page2]);
+
+      expect(myPageWithNodes.childrenLoaded).toBeTrue();
+      expect(myPageWithNodes.childNodes).toEqual([page3, page4]);
+      expect(myPageWithNodes.detailTable.rows.length).toBe(2);
+      expect(myPageWithNodes.detailTable.rows).not.toEqual([row3, row4]);
+      expect(page1.row).toBeFalsy();
+      expect(page2.row).toBeFalsy();
+      expect(page3.row).toBe(myPageWithNodes.detailTable.rows[0]);
+      expect(page4.row).toBe(myPageWithNodes.detailTable.rows[1]);
+      expect(helper._childPagesById.size).toBe(2);
+
+      outline.deleteNodes([page3, page4]);
+
+      expect(myPageWithNodes.childrenLoaded).toBeFalse();
+      expect(myPageWithNodes.childNodes.length).toBe(0);
+      expect(myPageWithNodes.detailTable.rows.length).toBe(0);
       expect(helper._childPagesById.size).toBe(0);
     });
   });
 
   describe('allChildNodesDeleted', () => {
 
-    it('removes all rows', async () => {
+    it('unlinks all rows of a table page', async () => {
       outline.insertNode({
         ...outlineSpecHelper.createModelNode(null, 'bar'),
         objectType: MyPageWithTable,
@@ -234,6 +298,52 @@ describe('JsPageHelper', () => {
 
       const myPageWithTable = outline.nodes[1] as MyPageWithTable;
       expect(myPageWithTable).toBeInstanceOf(MyPageWithTable);
+      myPageWithTable.ensureDetailTable();
+
+      const helper = myPageWithTable.jsPageHelper;
+      spyOn(helper, 'callLoadChildPages').and.callFake(async (idsOrPageParams: string | PageParamDo | (string | PageParamDo)[], replace?: boolean): Promise<void> => {
+        helper._addChildPagesToIdMap();
+      });
+
+      await myPageWithTable.ensureLoadChildren();
+
+      const row1 = myPageWithTable.detailTable.rows[0];
+      const row2 = myPageWithTable.detailTable.rows[1];
+      const row3 = myPageWithTable.detailTable.rows[2];
+      const row4 = myPageWithTable.detailTable.rows[3];
+
+      expect(myPageWithTable.childrenLoaded).toBeTrue();
+      expect(myPageWithTable.childNodes.length).toBe(4);
+      expect(myPageWithTable.detailTable.rows.length).toBe(4);
+      expect(helper._childPagesById.size).toBe(4);
+
+      outline.deleteAllChildNodes(myPageWithTable);
+
+      expect(myPageWithTable.childrenLoaded).toBeFalse();
+      expect(myPageWithTable.childNodes.length).toBe(0);
+      expect(myPageWithTable.detailTable.rows.length).toBe(4);
+      expect(myPageWithTable.detailTable.rows).toEqual([row1, row2, row3, row4]);
+      expect(row1.page).toBeFalsy();
+      expect(row2.page).toBeFalsy();
+      expect(row3.page).toBeFalsy();
+      expect(row4.page).toBeFalsy();
+      expect(helper._childPagesById.size).toBe(0);
+    });
+
+    it('removes all rows of a node page', async () => {
+      outline.insertNode({
+        ...outlineSpecHelper.createModelNode(null, 'bar'),
+        objectType: MyPageWithNodes,
+        childNodes: [
+          {__jsPageChildPageParam: {_type: 'scout.IdPageParam', id: '1'}},
+          {__jsPageChildPageParam: {_type: 'scout.IdPageParam', id: '2'}},
+          {__jsPageChildPageParam: {_type: 'scout.IdPageParam', id: '3'}},
+          {__jsPageChildPageParam: {_type: 'scout.IdPageParam', id: '4'}}
+        ]
+      });
+
+      const myPageWithTable = outline.nodes[1] as MyPageWithNodes;
+      expect(myPageWithTable).toBeInstanceOf(MyPageWithNodes);
       myPageWithTable.ensureDetailTable();
 
       const helper = myPageWithTable.jsPageHelper;
@@ -1048,6 +1158,31 @@ class MyPageWithTable extends PageWithTable {
   protected override _createChildPage(row: TableRow): Page {
     const id = this.detailTable.columnById('IdColumn').cellValue(row);
     return this.jsPageHelper.findChildPage(id);
+  }
+}
+
+class MyPageWithNodes extends PageWithNodes {
+
+  jsPageHelper: SpecJsPageHelper;
+
+  protected override _init(model: InitModelOf<this>) {
+    super._init(model);
+    this.jsPageHelper = scout.create(SpecJsPageHelper, {page: this});
+  }
+
+  override destroy() {
+    super.destroy();
+    this.jsPageHelper.destroy();
+  }
+
+  protected override _createChildPages(): JQuery.Promise<Page[]> {
+    return $.when(this._createChildPagesAsync());
+  }
+
+  protected async _createChildPagesAsync(): Promise<Page[]> {
+    let ids = ['1', '2', '3', '4'];
+    await this.jsPageHelper.callLoadChildPages(ids);
+    return this.jsPageHelper.findChildPages(ids);
   }
 }
 

@@ -119,9 +119,11 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
       return;
     }
 
-    // remove corresponding rows, otherwise e.g. double-clicking a row will lead to errors as the page was deleted
-    const rows = pages.map(page => page.row).filter(Boolean);
-    this.page.detailTable.deleteRows(rows);
+    // remove or unlink corresponding rows, otherwise e.g. double-clicking a row will lead to errors as the page was deleted
+    if (this.page instanceof PageWithTable) {
+      pages.forEach(page => page.row && page.unlinkWithRow(page.row));
+    }
+    // Note: nothing to be done for PageWithNodes, because OutlineMediator#onChildPagesChanged automatically rebuilds the detail table on tree changes
   }
 
   protected _onAllChildNodesDeleted(event: TreeAllChildNodesDeletedEvent) {
@@ -139,8 +141,11 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
       return;
     }
 
-    // remove all rows, otherwise e.g. double-clicking a row will lead to errors as the page was deleted
-    this.page.detailTable.deleteAllRows();
+    // remove or unlink all rows, otherwise e.g. double-clicking a row will lead to errors as the page was deleted
+    if (this.page instanceof PageWithTable) {
+      this.page.detailTable.rows.forEach(row => row.page?.unlinkWithRow(row));
+    }
+    // Note: nothing to be done for PageWithNodes, because OutlineMediator#onChildPagesChanged automatically rebuilds the detail table on tree changes
   }
 
   protected _installPageWithTableListeners() {
