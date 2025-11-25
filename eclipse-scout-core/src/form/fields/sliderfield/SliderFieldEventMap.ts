@@ -7,9 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-
-import {PropertyChangeEvent} from '../../../events/PropertyChangeEvent';
-import {NumberFieldEventMap} from '../numberfield/NumberFieldEventMap';
+import {NumberFieldEventMap, PropertyChangeEvent} from '../../../index';
 
 export interface SliderFieldEventMap extends NumberFieldEventMap {
   'propertyChange:valueEditable': PropertyChangeEvent<boolean>;
