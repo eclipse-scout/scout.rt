@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EventEmitter, Filter, InitModelOf, objects, ObjectWithType, Session, SomeRequired, Table, TableRow, TableUserFilterModel} from '../../index';
+import {EventEmitter, Filter, InitModelOf, ObjectWithType, Session, SomeRequired, Table, TableRow, TableUserFilterModel} from '../../index';
 import $ from 'jquery';
 
 export abstract class TableUserFilter extends EventEmitter implements Filter<TableRow>, TableUserFilterModel, ObjectWithType {
@@ -55,13 +55,6 @@ export abstract class TableUserFilter extends EventEmitter implements Filter<Tab
   abstract createLabel(): string;
 
   abstract accept(row: TableRow): boolean;
-
-  equals(filter: Filter<TableRow>): boolean {
-    if (!(filter instanceof TableUserFilter)) {
-      return false;
-    }
-    return objects.equals(this.createKey(), filter.createKey());
-  }
 }
 
 export interface TableUserFilterAddedEventData {
