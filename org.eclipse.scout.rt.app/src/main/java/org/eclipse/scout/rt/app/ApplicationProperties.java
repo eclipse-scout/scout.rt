@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -360,6 +360,42 @@ public final class ApplicationProperties {
     @Override
     public String description() {
       return "Specifies whether the application context handler should also lookup resources w/o base resource. The default value is false.";
+    }
+  }
+
+  public static class ScoutApplicationThreadPoolMaxSizeProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.threadPool.maxSize";
+    }
+
+    @Override
+    public Integer getDefaultValue() {
+      return 2000;
+    }
+
+    @Override
+    public String description() {
+      return "Maximum number of threads that will be created for the application. Default value is " + getDefaultValue() + ".";
+    }
+  }
+
+  public static class ScoutApplicationMonitorLowResourceProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.monitorLowResource";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return Boolean.FALSE;
+    }
+
+    @Override
+    public String description() {
+      return "Enables monitoring for low resources of the Jetty server. Default value is " + getDefaultValue() + ".";
     }
   }
 }
