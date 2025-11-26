@@ -42,6 +42,7 @@ import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
@@ -51,6 +52,7 @@ import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationAutoCreateSelfSignedCertificateProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationCertificateAliasProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationConsoleInputHandlerEnabledProperty;
@@ -73,6 +75,7 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationHttpSessio
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationJvmShutdownHookEnabledProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationKeyStorePasswordProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationKeyStorePathProperty;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationMonitorLowResourceProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationPortProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationPrivateKeyPasswordProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigHttpOnlyProperty;
@@ -80,6 +83,7 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCoo
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigSameSiteProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigSecureProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionTimeoutProperty;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationThreadPoolMaxSizeProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationUseTlsProperty;
 import org.eclipse.scout.rt.app.handler.ScoutJettyErrorHandler;
 import org.eclipse.scout.rt.app.servlet.ScoutServletContextHandler;
@@ -195,7 +199,8 @@ public class Application {
 
   @SuppressWarnings("resource")
   protected Server createServer() {
-    Server server = new Server();
+    QueuedThreadPool threadPool = new QueuedThreadPool(CONFIG.getPropertyValue(ScoutApplicationThreadPoolMaxSizeProperty.class));
+    Server server = new Server(threadPool);
     ServerConnector connector;
     if (CONFIG.getPropertyValue(ScoutApplicationUseTlsProperty.class)) {
       connector = createHttpsServerConnector(server);
@@ -206,6 +211,7 @@ public class Application {
     connector.setPort(CONFIG.getPropertyValue(ScoutApplicationPortProperty.class));
     server.addConnector(connector);
     installErrorHandler(server);
+    installLowResourceMonitor(server);
 
     Handler handler = createHandler();
     server.setHandler(handler);
@@ -364,6 +370,16 @@ public class Application {
    */
   protected void installErrorHandler(Server server) {
     server.setErrorHandler(BEANS.get(ScoutJettyErrorHandler.class));
+  }
+
+  protected void installLowResourceMonitor(Server server) {
+    if (!CONFIG.getPropertyValue(ScoutApplicationMonitorLowResourceProperty.class)) {
+      return;
+    }
+    LowResourceMonitor lowResourceMonitor = BEANS.get(ScoutJettyLowResourceMonitorFactory.class).createLowResourceMonitor(server);
+    if (lowResourceMonitor != null) {
+      server.addBean(lowResourceMonitor);
+    }
   }
 
   protected Handler createHandler() {
