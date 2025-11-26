@@ -59,7 +59,7 @@ public abstract class AbstractHttpServlet extends HttpServlet {
   }
 
   /**
-   * Call {@link P_HttpInvocationHandler#invalidate()} either immediately or if request started an async operation
+   * Call {@link P_HttpInvocationHandler#invalidate(Throwable)} either immediately or if request started an async operation
    * register a listener to call these methods on completion.
    */
   protected void invalidateRequestAndResponse(HttpServletRequest req, P_HttpInvocationHandler requestProxyHandler, P_HttpInvocationHandler responseProxyHandler) {
@@ -67,8 +67,8 @@ public abstract class AbstractHttpServlet extends HttpServlet {
       invalidateAsync(req, requestProxyHandler, responseProxyHandler);
     }
     else {
-      requestProxyHandler.invalidate();
-      responseProxyHandler.invalidate();
+      requestProxyHandler.invalidate(null);
+      responseProxyHandler.invalidate(null);
     }
   }
 
@@ -78,20 +78,20 @@ public abstract class AbstractHttpServlet extends HttpServlet {
       asyncContext.addListener(new AsyncListener() {
         @Override
         public void onComplete(AsyncEvent event) {
-          requestProxyHandler.invalidate();
-          responseProxyHandler.invalidate();
+          requestProxyHandler.invalidate(event.getThrowable());
+          responseProxyHandler.invalidate(event.getThrowable());
         }
 
         @Override
         public void onTimeout(AsyncEvent event) {
-          requestProxyHandler.invalidate();
-          responseProxyHandler.invalidate();
+          requestProxyHandler.invalidate(event.getThrowable());
+          responseProxyHandler.invalidate(event.getThrowable());
         }
 
         @Override
         public void onError(AsyncEvent event) {
-          requestProxyHandler.invalidate();
-          responseProxyHandler.invalidate();
+          requestProxyHandler.invalidate(event.getThrowable());
+          responseProxyHandler.invalidate(event.getThrowable());
         }
 
         @Override
@@ -105,8 +105,8 @@ public abstract class AbstractHttpServlet extends HttpServlet {
     catch (IllegalStateException e) {
       LOG.debug("Error during async-listener registration; invalidating request and response", e);
       // exception may be thrown if async-context has already completed
-      requestProxyHandler.invalidate();
-      responseProxyHandler.invalidate();
+      requestProxyHandler.invalidate(e);
+      responseProxyHandler.invalidate(e);
     }
   }
 
@@ -114,19 +114,21 @@ public abstract class AbstractHttpServlet extends HttpServlet {
 
     private boolean m_valid = true;
     private final Object m_origin;
+    private Throwable m_error;
 
     public P_HttpInvocationHandler(Object origin) {
       m_origin = origin;
     }
 
-    private void invalidate() {
+    private void invalidate(Throwable error) {
+      m_error = error;
       m_valid = false;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
       if (!m_valid) {
-        throw new AlreadyInvalidatedException(method, m_origin);
+        throw new AlreadyInvalidatedException(method, m_origin, m_error);
       }
       return method.invoke(m_origin, args);
     }

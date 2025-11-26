@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.platform.util;
 
 import java.io.InterruptedIOException;
 import java.net.SocketException;
+import java.nio.channels.ClosedChannelException;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -24,18 +25,21 @@ public class ConnectionErrorDetector {
   }
 
   protected boolean isConnectionErrorThrowable(Throwable t) {
-    if (t instanceof SocketException || t instanceof InterruptedIOException) {
+    if (t instanceof SocketException || t instanceof InterruptedIOException || t instanceof ClosedChannelException) {
       return true;
     }
     String simpleName = t.getClass().getSimpleName();
     return "EofException".equalsIgnoreCase(simpleName)
         || "ClientAbortException".equalsIgnoreCase(simpleName)
-        || "IOException".equalsIgnoreCase(simpleName);
+        || "IOException".equalsIgnoreCase(simpleName)
+        || "H2StreamResetException".equalsIgnoreCase(simpleName)
+        || "ConnectionClosedException".equalsIgnoreCase(simpleName);
   }
 
   protected boolean isConnectionErrorMessage(Throwable t) {
     String message = t.getMessage();
-    return StringUtility.containsStringIgnoreCase(message, "Connection reset")
+    return message == null
+        || StringUtility.containsStringIgnoreCase(message, "reset")
         || StringUtility.containsStringIgnoreCase(message, "Closed")
         || StringUtility.containsStringIgnoreCase(message, "connection was aborted")
         || StringUtility.containsStringIgnoreCase(message, "cancel_stream_error")
