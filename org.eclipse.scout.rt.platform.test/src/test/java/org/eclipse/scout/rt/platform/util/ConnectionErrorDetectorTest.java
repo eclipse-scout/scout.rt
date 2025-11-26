@@ -14,10 +14,12 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.SocketException;
+import java.nio.channels.ClosedChannelException;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.AbstractScoutTestParameter;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedPlatformTestRunner;
@@ -44,6 +46,7 @@ public class ConnectionErrorDetectorTest {
     parametersList.add(new ExceptionTestParameter(new EofException(BROKEN_PIPE_MESSAGE), true));
     parametersList.add(new ExceptionTestParameter(new EofException("cancel_stream_error"), true));
     parametersList.add(new ExceptionTestParameter(new EofException("unknown error"), false));
+    parametersList.add(new ExceptionTestParameter(new EofException("reset"), true));
 
     parametersList.add(new ExceptionTestParameter(new ClientAbortException(CONNECTION_RESET_MESSAGE), true));
     parametersList.add(new ExceptionTestParameter(new ClientAbortException(BROKEN_PIPE_MESSAGE), true));
@@ -52,6 +55,8 @@ public class ConnectionErrorDetectorTest {
     parametersList.add(new ExceptionTestParameter(new InterruptedIOException(CONNECTION_RESET_MESSAGE), true));
     parametersList.add(new ExceptionTestParameter(new InterruptedIOException(BROKEN_PIPE_MESSAGE), true));
     parametersList.add(new ExceptionTestParameter(new InterruptedIOException("unknown error"), false));
+    parametersList.add(new ExceptionTestParameter(new InterruptedIOException(null), true));
+    parametersList.add(new ExceptionTestParameter(new InterruptedIOException(), true));
 
     parametersList.add(new ExceptionTestParameter(new IOException(CONNECTION_RESET_MESSAGE), true));
     parametersList.add(new ExceptionTestParameter(new IOException("Connection reset"), true));
@@ -62,6 +67,16 @@ public class ConnectionErrorDetectorTest {
     parametersList.add(new ExceptionTestParameter(new CustomException(CONNECTION_RESET_MESSAGE), false));
     parametersList.add(new ExceptionTestParameter(new CustomException(BROKEN_PIPE_MESSAGE), false));
     parametersList.add(new ExceptionTestParameter(new CustomException("unknown error"), false));
+
+    parametersList.add(new ExceptionTestParameter(new H2StreamResetException("Stream reset (8)"), true));
+
+    parametersList.add(new ExceptionTestParameter(new ClosedChannelException(), true));
+
+    // see org.eclipse.scout.rt.server.commons.servlet.AlreadyInvalidatedException
+    parametersList.add(new ExceptionTestParameter(new AlreadyInvalidatedException("Access to 'public abstract void jakarta.servlet.http.HttpServletResponse.setHeader(java.lang.String,java.lang.String)' ... is no longer valid (request has been completed)."), false));
+    parametersList.add(new ExceptionTestParameter(new AlreadyInvalidatedException("Access to 'public abstract void jakarta.servlet.http.HttpServletResponse.setHeader(java.lang.String,java.lang.String)' ... is no longer valid (request has been completed).", new EofException("cancel_stream_error")), true));
+
+    parametersList.add(new ExceptionTestParameter(new ConnectionClosedException("Connection is closed"), true));
 
     parametersList.add(new ExceptionTestParameter(createDetectedNestedException(), true));
     parametersList.add(new ExceptionTestParameter(createUndetectedNestedException(), false));
@@ -113,11 +128,41 @@ public class ConnectionErrorDetectorTest {
     }
   }
 
+  private static class ConnectionClosedException extends IOException {
+    private static final long serialVersionUID = 1L;
+
+    public ConnectionClosedException(String message) {
+      super(message);
+    }
+  }
+
   private static class EofException extends IOException {
 
     private static final long serialVersionUID = 1L;
 
     public EofException(String message) {
+      super(message);
+    }
+  }
+
+  private static class AlreadyInvalidatedException extends PlatformException {
+
+    private static final long serialVersionUID = 1L;
+
+    public AlreadyInvalidatedException(String message) {
+      this(message, null);
+    }
+
+    public AlreadyInvalidatedException(String message, Throwable cause) {
+      super(message, cause);
+    }
+  }
+
+  private static class H2StreamResetException extends IOException {
+
+    private static final long serialVersionUID = 1L;
+
+    public H2StreamResetException(String message) {
       super(message);
     }
   }

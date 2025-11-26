@@ -25,6 +25,10 @@ public class AlreadyInvalidatedException extends PlatformException {
   private static final long serialVersionUID = -1;
 
   public AlreadyInvalidatedException(Method method, Object origin) {
-    super("Access to '{}' is not allowed because {} is no longer valid (request has been completed).", method, origin != null ? origin.getClass() : null);
+    this(method, origin, null);
+  }
+
+  public AlreadyInvalidatedException(Method method, Object origin, Throwable cause) {
+    super("Access to '{}' is not allowed because {} is no longer valid (request has been completed).", method, origin != null ? origin.getClass() : null, cause);
   }
 }
