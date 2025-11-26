@@ -496,7 +496,10 @@ public class HttpProxy {
 
       @Override
       public void onError(AsyncEvent event) {
-        LOG.info("Error while forwarding servlet request to proxy, cancelling proxy request", event.getThrowable());
+        Throwable t = event.getThrowable();
+        boolean isConnectionError = m_connectionErrorDetector.get().isConnectionError(t);
+        Level level = isConnectionError ? Level.DEBUG : Level.INFO;
+        LOG.atLevel(level).log("Error while forwarding servlet request to proxy, cancelling proxy request.", t);
         future.cancel(true);
       }
 
@@ -674,7 +677,10 @@ public class HttpProxy {
 
         if (entityDetails != null) {
           log(Level.TRACE, m_correlationId, "Starting stream for entity (content-type: {})", entityDetails.getContentType());
-          m_dataConsumer.streamStart(entityDetails, resultCallback);
+          AsyncEntityConsumer<Boolean> consumer = m_dataConsumer;
+          if (consumer != null) { // consumer might already be released
+            consumer.streamStart(entityDetails, resultCallback);
+          }
         }
         else {
           log(Level.TRACE, m_correlationId, "No entity data for response");
@@ -700,25 +706,35 @@ public class HttpProxy {
 
       @Override
       public void updateCapacity(CapacityChannel capacityChannel) throws IOException {
-        m_dataConsumer.updateCapacity(capacityChannel);
+        AsyncEntityConsumer<Boolean> consumer = m_dataConsumer;
+        if (consumer != null) { // consumer might already be released
+          consumer.updateCapacity(capacityChannel);
+        }
       }
 
       @Override
       public void consume(ByteBuffer src) throws IOException {
-        m_dataConsumer.consume(src);
+        AsyncEntityConsumer<Boolean> consumer = m_dataConsumer;
+        if (consumer != null) { // consumer might already be released
+          consumer.consume(src);
+        }
       }
 
       @Override
       public void streamEnd(List<? extends Header> trailers) throws HttpException, IOException {
-        m_dataConsumer.streamEnd(trailers);
+        AsyncEntityConsumer<Boolean> consumer = m_dataConsumer;
+        if (consumer != null) { // consumer might already be released
+          consumer.streamEnd(trailers);
+        }
       }
 
       @Override
       public void releaseResources() {
-        if (m_dataConsumer != null) {
-          m_dataConsumer.releaseResources();
+        AsyncEntityConsumer<Boolean> consumer = m_dataConsumer;
+        if (consumer != null) { // consumer might already be released
+          consumer.releaseResources();
+          m_dataConsumer = null;
         }
-        m_dataConsumer = null;
       }
     };
 
