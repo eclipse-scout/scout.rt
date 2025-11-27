@@ -14,7 +14,7 @@ import {DateFormat, dates, Locale, objects, Session, strings} from '@eclipse-sco
 export const chartJsDateAdapter = {
   getAdapter(session: Session): Partial<DateAdapter> {
     return {
-      formats: (): { [key: string]: string } => _getFormats(session.locale),
+      formats: (): Record<TimeUnit | 'datetime', string> => _getFormats(session.locale),
 
       parse: (value: unknown, format?: TimeUnit): number | null => {
         if (objects.isNullOrUndefined(value)) {
@@ -158,7 +158,7 @@ export const chartJsDateAdapter = {
   }
 };
 
-function _getFormats(locale: Locale) {
+function _getFormats(locale: Locale): Record<TimeUnit | 'datetime', string> {
   return {
     datetime: locale.dateFormatPatternDefault + ' ' + locale.timeFormatPatternDefault,
     millisecond: 'HH:mm:ss.SSS',
