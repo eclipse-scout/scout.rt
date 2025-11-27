@@ -69,7 +69,7 @@ public class RestRequestCancellationRegistry {
     };
   }
 
-  public boolean cancel(String requestId, Object userId) {
+  public boolean cancel(String requestId, String userId) {
     return cancel(requestId, userId, this::handleCancellationInfoNotExists);
   }
 
@@ -88,7 +88,7 @@ public class RestRequestCancellationRegistry {
    *     handler that is executed in the case the request could not be found
    * @return {@code true} if the cancellation request was successful, {@code false} otherwise
    */
-  public boolean cancel(String requestId, Object userId, BiFunction<String, Object, Boolean> requestNotExistsHandler) {
+  public boolean cancel(String requestId, String userId, BiFunction<String, String, Boolean> requestNotExistsHandler) {
     if (requestId == null) {
       return false;
     }
@@ -122,7 +122,7 @@ public class RestRequestCancellationRegistry {
         || Objects.equals(cancellationInfo.getUserId(), requestingUserId);
   }
 
-  protected boolean handleCancellationInfoNotExists(String requestId, Object userId) {
+  protected boolean handleCancellationInfoNotExists(String requestId, String userId) {
     LOG.debug("Cancellation item does not exist [requestId={}]", requestId);
     return false;
   }

@@ -39,7 +39,7 @@ public class CancellationResource implements IRestResource {
   /**
    * Returns the user id of the current user. May be {@code null}.
    */
-  protected Object resolveCurrentUserId() {
+  protected String resolveCurrentUserId() {
     return BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
   }
 }
