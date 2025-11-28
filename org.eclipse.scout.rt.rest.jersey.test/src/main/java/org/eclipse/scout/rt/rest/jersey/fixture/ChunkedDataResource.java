@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.IntFunction;
 
@@ -27,7 +28,10 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureDateId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.rest.IRestResource;
@@ -145,6 +149,80 @@ public class ChunkedDataResource implements IRestResource {
   public Response getDataObjectsScoutDefaultDelimiterNull() {
     IChunkedDataWriter<FixtureDo> writer = IChunkedDataWriter.create(FixtureDo.class, null, 100);
     writeAsyncDataScout(writer, this::createFixtureDo);
+    return Response.ok(writer.toEntity()).build();
+  }
+
+  /**
+   * Synchronization helper for testing chunked request cancellation
+   */
+  @ApplicationScoped
+  public static class ChunkedDataCancellationSynchronizer {
+    protected CountDownLatch m_countDownLatchDataWritten = new CountDownLatch(1);
+    protected CountDownLatch m_countDownLatchWriterCancelled = new CountDownLatch(1);
+    protected CountDownLatch m_countDownLatchWriterFinished = new CountDownLatch(1);
+
+    public void awaitDataWritten() throws InterruptedException {
+      m_countDownLatchDataWritten.await();
+    }
+
+    protected void awaitWriterCancelled() throws InterruptedException {
+      m_countDownLatchWriterCancelled.await();
+    }
+
+    public void awaitWriterFinished() throws InterruptedException {
+      m_countDownLatchWriterFinished.await();
+    }
+
+    protected void signalDataWritten() {
+      m_countDownLatchDataWritten.countDown();
+    }
+
+    public void signalWriterCancelled() {
+      m_countDownLatchWriterCancelled.countDown();
+    }
+
+    protected void signalWriterFinished() {
+      m_countDownLatchWriterFinished.countDown();
+    }
+  }
+
+  /**
+   * Chunked request prepared to be cancelled by client.
+   */
+  @GET
+  @Path("dataobject-scout/cancellation")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response getDataObjectsScoutCancellation() {
+    LOG.debug("Server: Received request");
+
+    @SuppressWarnings("resource")
+    IChunkedDataWriter<FixtureDo> writer = IChunkedDataWriter.create(FixtureDo.class, null, 100);
+    Jobs.schedule(() -> {
+      LOG.debug("Server: Running job writing data.");
+
+      try (writer) {
+        assertFalse(RunMonitor.CURRENT.get().isCancelled());
+        writer.write(createFixtureDo(1));
+        LOG.debug("Server: Wrote 1 chunk of data.");
+
+        BEANS.get(ChunkedDataCancellationSynchronizer.class).signalDataWritten();
+        LOG.debug("Server: Signaled data written.");
+
+        try {
+          BEANS.get(ChunkedDataCancellationSynchronizer.class).awaitWriterCancelled();
+        } catch  (InterruptedException e) {
+          // ignore, waiting will be interrupted by run monitor cancellation
+        }
+        LOG.debug("Server: Received cancellation.");
+
+        assertTrue(RunMonitor.CURRENT.get().isCancelled());
+        LOG.debug("Server: Request cancelled.");
+      }
+      assertTrue(writer.isClosed());
+      LOG.debug("Server: Data write job terminated.");
+      BEANS.get(ChunkedDataCancellationSynchronizer.class).signalWriterFinished();
+    }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
+
     return Response.ok(writer.toEntity()).build();
   }
 

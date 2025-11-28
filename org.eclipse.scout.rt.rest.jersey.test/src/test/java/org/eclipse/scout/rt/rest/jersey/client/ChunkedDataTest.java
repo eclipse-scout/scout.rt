@@ -18,18 +18,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.rest.cancellation.RestRequestCancellationClientRequestFilter;
 import org.eclipse.scout.rt.rest.chunked.IChunkedDataWriter;
 import org.eclipse.scout.rt.rest.client.chunked.IChunkedDataReader;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestApplication;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestRestClientHelper;
 import org.eclipse.scout.rt.rest.jersey.fixture.ChunkedDataResource;
+import org.eclipse.scout.rt.rest.jersey.fixture.ChunkedDataResource.ChunkedDataCancellationSynchronizer;
 import org.eclipse.scout.rt.rest.jersey.fixture.FixtureDo;
 import org.glassfish.jersey.client.ChunkParser;
 import org.glassfish.jersey.client.ChunkedInput;
@@ -49,6 +57,34 @@ public class ChunkedDataTest {
 
   private WebTarget m_target;
 
+  /**
+   * Extended {@link JerseyTestRestClientHelper} including cancellation support for requests using async job.
+   */
+  public static class JerseyTestRestClientHelperWithCancellationSupport extends JerseyTestRestClientHelper {
+
+    @Override
+    protected List<ClientRequestFilter> getRequestFiltersToRegister() {
+      List<ClientRequestFilter> filters = super.getRequestFiltersToRegister();
+      filters.add(new RestRequestCancellationClientRequestFilter(this::cancelRequest));
+      return filters;
+    }
+
+    protected void cancelRequest(String requestId) {
+      // run cancellation request in job with separate run monitor to avoid cancellation of cancel request
+      Jobs.schedule(() -> {
+        LOG.debug("Cancelling request {}", requestId);
+        target("api/cancellation")
+            .path("{requestId}")
+            .resolveTemplate("requestId", requestId)
+            .request()
+            .put(Entity.json(""))
+            .close();
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.empty().withRunMonitor(BEANS.get(RunMonitor.class))))
+          .awaitDone();
+    }
+  }
+
   @BeforeClass
   public static void beforeClass() {
     BEANS.get(JerseyTestApplication.class).ensureStarted();
@@ -56,7 +92,7 @@ public class ChunkedDataTest {
 
   @Before
   public void before() {
-    m_target = BEANS.get(JerseyTestRestClientHelper.class).target("api/chunked");
+    m_target = BEANS.get(JerseyTestRestClientHelperWithCancellationSupport.class).target("api/chunked");
   }
 
   @Test
@@ -198,15 +234,15 @@ public class ChunkedDataTest {
 
   @Test
   public void testGetDataObjectsScout_defaultDelimiterEmptyString() {
-    testGetDataObjectsScout_defaultDelimiter( "default-delimiter-empty-string", response -> IChunkedDataReader.create(response, FixtureDo.class, ""));
+    testGetDataObjectsScout_defaultDelimiter("default-delimiter-empty-string", response -> IChunkedDataReader.create(response, FixtureDo.class, ""));
   }
 
   @Test
   public void testGetDataObjectsScout_defaultDelimiterNull() {
-    testGetDataObjectsScout_defaultDelimiter( "default-delimiter-null", response -> IChunkedDataReader.create(response, FixtureDo.class, null));
+    testGetDataObjectsScout_defaultDelimiter("default-delimiter-null", response -> IChunkedDataReader.create(response, FixtureDo.class, null));
   }
 
-  protected void testGetDataObjectsScout_defaultDelimiter( String contextPath, Function<Response, IChunkedDataReader<FixtureDo>> chunkedReaderCreator) {
+  protected void testGetDataObjectsScout_defaultDelimiter(String contextPath, Function<Response, IChunkedDataReader<FixtureDo>> chunkedReaderCreator) {
     Response response = m_target
         .path("dataobject-scout/" + contextPath)
         .request()
@@ -251,5 +287,41 @@ public class ChunkedDataTest {
     @SuppressWarnings("resource")
     IChunkedDataWriter<FixtureDo> writer = IChunkedDataWriter.create(FixtureDo.class, "", -1);
     assertThrows(AssertionException.class, () -> writer.init(FixtureDo.class, "", -1));
+  }
+
+  @Test
+  public void testCancellation() {
+    RunContexts.empty().run(() -> {
+      assertFalse(RunMonitor.CURRENT.get().isCancelled());
+
+      // (1) send request
+      LOG.debug("Client: Performing request.");
+      Response response = m_target
+          .path("dataobject-scout/cancellation")
+          .request()
+          .accept(MediaType.APPLICATION_JSON)
+          .get();
+      LOG.debug("Client: Performed request.");
+
+      IChunkedDataReader<FixtureDo> reader = IChunkedDataReader.create(response, FixtureDo.class, null);
+      assertFalse(reader.isClosed());
+
+      BEANS.get(ChunkedDataCancellationSynchronizer.class).awaitDataWritten();
+
+      FixtureDo chunk = reader.read();
+      assertEquals(FixtureStringId.of("1"), chunk.getId());
+      LOG.debug("Client: Read chunk {}.", chunk);
+
+      RunMonitor.CURRENT.get().cancel(false);
+      LOG.debug("Client: Cancelled request.");
+      BEANS.get(ChunkedDataCancellationSynchronizer.class).signalWriterCancelled();
+
+      LOG.debug("Client: Waiting for writer to finish.");
+      BEANS.get(ChunkedDataCancellationSynchronizer.class).awaitWriterFinished();
+
+      assertNull(reader.read());
+      assertTrue(reader.isClosed());
+      LOG.debug("Client: Terminated.");
+    });
   }
 }

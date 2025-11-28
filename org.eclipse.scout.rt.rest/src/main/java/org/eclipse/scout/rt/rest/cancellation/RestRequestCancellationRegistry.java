@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,27 +45,23 @@ public class RestRequestCancellationRegistry {
     return m_requestCancellationInfos;
   }
 
-  public IRegistrationHandle register(String requestId, Object userId, RunContext runContext) {
+  /**
+   * Register request with id {@code requestId} in registry using given {@code runContext} and {@code userId}.
+   * <b>Important:</b> Ensure that the request is unregistered after termination using {@link #unregister(String)}.
+   */
+  public void register(String requestId, Object userId, RunContext runContext) {
     assertNotNull(requestId, "requestId is required");
     assertNotNull(runContext, "runContext is required");
     assertNotNull(runContext.getRunMonitor(), "runMonitor is required");
     assertFalse(m_destroyed, "Registry not alive anymore");
 
+    LOG.debug("Register request id={} using run monitor={}, userId={}", requestId, runContext.getRunMonitor(), userId);
     final ConcurrentMap<String, RequestCancellationInfo> cancellationInfos = getRequestCancellationInfos();
 
     if (cancellationInfos.putIfAbsent(requestId, new RequestCancellationInfo(runContext, userId)) != null) {
       // request id is already in use
       LOG.warn("Duplicate request id. Ignoring this request: [requestId:{}]", requestId);
-      return null;
     }
-
-    return () -> {
-      RequestCancellationInfo info = cancellationInfos.remove(requestId);
-      if (info != null && info.getRunContext().getRunMonitor().isCancelled() && Thread.interrupted()) {
-        // as thread may be used by other operations as well; interrupted state must be reset after previous interruption
-        LOG.trace("Reset interrupted state for cancelled and interrupted request {}", requestId);
-      }
-    };
   }
 
   public boolean cancel(String requestId, String userId) {
@@ -106,9 +101,22 @@ public class RestRequestCancellationRegistry {
   }
 
   /**
+   * Unregister request with id {@code requestId} from registry.
+   */
+  public void unregister(String requestId) {
+    LOG.debug("Unregister request id={}", requestId);
+    RequestCancellationInfo info = getRequestCancellationInfos().remove(requestId);
+    if (info != null && info.getRunContext().getRunMonitor().isCancelled() && Thread.interrupted()) {
+      // as thread may be used by other operations as well; interrupted state must be reset after previous interruption
+      LOG.trace("Reset interrupted state for cancelled and interrupted request {}", requestId);
+    }
+  }
+
+  /**
    * Cancellation w/o further checks (e.g. forced).
    */
   protected boolean cancel(RequestCancellationInfo cancellationInfo) {
+    LOG.debug("Cancel request run monitor={}, userId={}", cancellationInfo.getRunContext().getRunMonitor(), cancellationInfo.getUserId());
     return cancellationInfo.getRunContext().getRunMonitor().cancel(true);
   }
 

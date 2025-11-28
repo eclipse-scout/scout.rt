@@ -32,6 +32,10 @@
       <artifactId>org.eclipse.scout.rt.rest.jersey.server</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.server.commons</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-servlet</artifactId>
     </dependency>
