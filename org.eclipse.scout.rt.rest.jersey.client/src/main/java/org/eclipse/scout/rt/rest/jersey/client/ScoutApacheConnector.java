@@ -159,6 +159,7 @@ public class ScoutApacheConnector implements Connector {
   /**
    * Creates a preconfigured Apache HTTP {@link HttpClientConnectionManager}
    */
+  @SuppressWarnings("deprecation")
   protected HttpClientConnectionManager createConnectionManager(Client client, Configuration config, SSLContext sslContext) {
     String[] sslProtocols = split(System.getProperty("https.protocols"));
     String[] sslCipherSuites = split(System.getProperty("https.cipherSuites"));
@@ -433,14 +434,11 @@ public class ScoutApacheConnector implements Connector {
           headers.add(HttpHeaders.CONTENT_ENCODING, contentEncoding);
         }
       }
-      responseContext.setEntityStream(getResponseInputStream(request, response));
+      responseContext.setEntityStream(getResponseInputStream(request, response, cancellableHandle));
       return responseContext;
     }
     catch (Exception e) { // NOSONAR findbugs:REC_CATCH_EXCEPTION
       throw new ProcessingException("Failed to execute request, message=" + e.getMessage(), e);
-    }
-    finally {
-      cancellableHandle.dispose();
     }
   }
 
@@ -628,7 +626,7 @@ public class ScoutApacheConnector implements Connector {
   }
 
   @SuppressWarnings("resource")
-  protected InputStream getResponseInputStream(HttpUriRequest httpUriRequest, ClassicHttpResponse response) throws IOException {
+  protected InputStream getResponseInputStream(HttpUriRequest httpUriRequest, ClassicHttpResponse response, IRegistrationHandle cancellableHandle) throws IOException {
     InputStream inputStream;
 
     if (response.getEntity() == null) {
@@ -643,7 +641,7 @@ public class ScoutApacheConnector implements Connector {
         inputStream = new BufferedInputStream(responseInputStream, ReaderWriter.BUFFER_SIZE);
       }
     }
-    return new ClosingInputStream(httpUriRequest, response, inputStream);
+    return new ClosingInputStream(httpUriRequest, response, inputStream, cancellableHandle);
   }
 
   @Override
@@ -734,11 +732,13 @@ public class ScoutApacheConnector implements Connector {
 
     protected final ClassicHttpResponse m_response;
     protected final HttpUriRequest m_httpUriRequest;
+    protected final IRegistrationHandle m_cancellableHandle;
 
-    protected ClosingInputStream(HttpUriRequest httpUriRequest, ClassicHttpResponse response, InputStream in) {
+    protected ClosingInputStream(HttpUriRequest httpUriRequest, ClassicHttpResponse response, InputStream in, IRegistrationHandle cancellableHandle) {
       super(in);
       m_response = response;
       m_httpUriRequest = httpUriRequest;
+      m_cancellableHandle = cancellableHandle;
     }
 
     @Override
@@ -755,8 +755,14 @@ public class ScoutApacheConnector implements Connector {
         // Ignore
       }
       finally {
-        // (3) close response
-        m_response.close();
+        try {
+          // (3) close response
+          m_response.close();
+        }
+        finally {
+          // (4) unregister cancellable
+          m_cancellableHandle.dispose();
+        }
       }
     }
   }

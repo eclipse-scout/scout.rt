@@ -52,10 +52,11 @@ public class RunMonitorCancellableProcessor implements ICallableDecorator {
       return null;
     }
 
+    // Register runMonitor as child cancellable of parentRunMonitor in order to be cancelled if parent run monitor gets cancelled.
     m_parentRunMonitor.registerCancellable(m_runMonitor);
 
     return () -> {
-      // setCleanupRunMonitor also checks itself if cleanup is already possible
+      // addCleanupRunMonitor also checks itself if cleanup is already possible
       m_runMonitor.addCleanupRunMonitor(m_parentRunMonitor);
     };
   }

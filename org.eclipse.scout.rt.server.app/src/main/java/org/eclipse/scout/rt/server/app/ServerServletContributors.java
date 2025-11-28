@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.rest.ApiRestApplication;
 import org.eclipse.scout.rt.rest.ServletConstants;
-import org.eclipse.scout.rt.rest.cancellation.RestRequestCancellationServletFilter;
 import org.eclipse.scout.rt.server.commons.healthcheck.HealthCheckServlet;
 import org.eclipse.scout.rt.server.context.ServerRunContextFilter;
 import org.glassfish.jersey.server.ServerProperties;
@@ -82,15 +81,6 @@ public final class ServerServletContributors {
     @Override
     public void contribute(ServletContextHandler handler) {
       handler.addFilter(ServerRunContextFilter.class, ServletConstants.API_PATH_WITH_WILDCARD, null);
-    }
-  }
-
-  @Order(8000)
-  public static class ApiCancellationFilterContributor implements IServletFilterContributor {
-
-    @Override
-    public void contribute(ServletContextHandler handler) {
-      handler.addFilter(RestRequestCancellationServletFilter.class, ServletConstants.API_PATH_WITH_WILDCARD, null);
     }
   }
 

@@ -77,6 +77,7 @@ public class RunMonitor implements ICancellable {
    */
   @Override
   public boolean cancel(final boolean interruptIfRunning) {
+    LOG.debug("Cancel run monitor {}", this);
     if (m_cancelled) {
       return false;
     }
@@ -93,6 +94,7 @@ public class RunMonitor implements ICancellable {
     boolean success = true;
     Set<ICancellable> processed = new HashSet<>();
     for (final ICancellable cancellable : getCancellables()) {
+      LOG.debug("Cancelling cancellable {} in run monitor {}", cancellable, this);
       if (!processed.add(cancellable)) {
         continue; // already cancelled this cancellable during this loop
       }
@@ -108,6 +110,7 @@ public class RunMonitor implements ICancellable {
    * cancelled, the given {@link ICancellable} is cancelled immediately with <code>interruptIfRunning=true</code>.
    */
   public void registerCancellable(final ICancellable cancellable) {
+    LOG.debug("Register cancellable {} for run monitor {}", cancellable, this);
     if (m_cancelled) {
       cancel(cancellable, true);
       return;
@@ -141,6 +144,7 @@ public class RunMonitor implements ICancellable {
    * Unregisters the given {@link ICancellable}.
    */
   public void unregisterCancellable(final ICancellable cancellable) {
+    LOG.debug("Unregister cancellable {} for run monitor {}", cancellable, this);
     m_registrationLock.writeLock().lock();
     try {
       m_cancellables.remove(cancellable);
@@ -154,6 +158,7 @@ public class RunMonitor implements ICancellable {
   /**
    * Add a cleanup run monitor to this method should unregister itself as a cancellable from as soon as this run monitor
    * does not have anymore cancellables. If this is already the case, this run monitor unregisters itself immediately.
+   * The cleanupRunMonitor is (was) the parent run monitor of this run monitor.
    */
   protected void addCleanupRunMonitor(RunMonitor cleanupRunMonitor) {
     m_registrationLock.writeLock().lock();
