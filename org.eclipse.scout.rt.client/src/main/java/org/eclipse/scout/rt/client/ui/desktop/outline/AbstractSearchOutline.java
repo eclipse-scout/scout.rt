@@ -9,17 +9,30 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
+import static java.util.Collections.emptyMap;
+import static org.eclipse.scout.rt.platform.util.ObjectUtility.nvl;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeUIFacade;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 
 @ClassId("57c90097-ba28-414c-8ce6-0ae32bfef803")
 public abstract class AbstractSearchOutline extends AbstractOutline implements ISearchOutline {
 
-  private int m_minSearchTokenLength;
+  private final FastListenerList<SearchOutlineEventListener> m_listeners = new FastListenerList<>();
 
   @Override
   protected String getConfiguredTitle() {
@@ -46,45 +59,90 @@ public abstract class AbstractSearchOutline extends AbstractOutline implements I
     super.initConfig();
     setMaxSearchQueryLength(getConfiguredMaxSearchQueryLength());
     setMinSearchTokenLength(getConfiguredMinSearchTokenLength());
+
+    addSearchStates(getRootPage().getChildPages().stream()
+        .filter(ISearchPage.class::isInstance)
+        .map(ISearchPage.class::cast)
+        .toList());
+    addTreeListener(new P_TreeNodesInsertedListener(), TreeEvent.TYPE_NODES_INSERTED);
+    addTreeListener(new P_TreeNodesDeletedListener(), TreeEvent.TYPE_NODES_DELETED, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED);
   }
 
   @Override
   public void setMinSearchTokenLength(int len) {
-    if (len > 0) {
-      m_minSearchTokenLength = len;
+    if (len <= 0) {
+      len = 2;
     }
+    propertySupport.setPropertyInt(PROP_MIN_SEARCH_TOKEN_LENGTH, len);
   }
 
   @Override
   public int getMinSearchTokenLength() {
-    if (m_minSearchTokenLength <= 0) {
-      return 2;
-    }
-    return m_minSearchTokenLength;
+    return propertySupport.getPropertyInt(PROP_MIN_SEARCH_TOKEN_LENGTH);
   }
 
   @Override
   public void setMaxSearchQueryLength(int len) {
-    if (len > 0) {
-      propertySupport.setPropertyInt(PROP_MAX_SEARCH_QUERY_LENGTH, len);
+    if (len <= 0) {
+      len = 200;
     }
+    propertySupport.setPropertyInt(PROP_MAX_SEARCH_QUERY_LENGTH, len);
   }
 
   @Override
   public int getMaxSearchQueryLength() {
-    int len = propertySupport.getPropertyInt(PROP_MAX_SEARCH_QUERY_LENGTH);
-    if (len <= 0) {
-      len = 200;
-    }
-    return len;
+    return propertySupport.getPropertyInt(PROP_MAX_SEARCH_QUERY_LENGTH);
   }
 
   @Override
   public void search() {
-    execSearch(getSearchQuery());
+    fireSearch();
+  }
+
+  protected void fireSearchOutlineEvent(SearchOutlineEvent event) {
+    m_listeners.list().forEach(listener -> listener.handle(event));
+  }
+
+  protected void fireSearch() {
+    fireSearchOutlineEvent(new SearchOutlineEvent(this, SearchOutlineEvent.TYPE_SEARCH_EVENT));
   }
 
   protected void execSearch(String query) {
+  }
+
+  protected void execResetSearch() {
+  }
+
+  protected void addSearchStates(Collection<ISearchPage> pages) {
+    Map<ISearchPage, ISearchState> result = new HashMap<>(getSearchStates());
+    pages.forEach(page -> {
+      ISearchState searchState = page.getSearchState();
+      if (searchState == null) {
+        throw new IllegalArgumentException("Page '" + page + "' has no search state.");
+      }
+      result.put(page, searchState);
+    });
+    setSearchStatesInternal(result);
+  }
+
+  protected void removeSearchStates(Collection<ISearchPage> pages) {
+    setSearchStatesInternal(getSearchStates().entrySet().stream()
+        .filter(entry -> !pages.contains(entry.getKey()))
+        .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+  }
+
+  protected void setSearchStatesInternal(Map<ISearchPage, ISearchState> searchStates) {
+    propertySupport.setProperty(PROP_SEARCH_STATES, searchStates);
+  }
+
+  @Override
+  public Map<ISearchPage, ISearchState> getSearchStates() {
+    return Collections.unmodifiableMap(nvl(getSearchStatesInternal(), emptyMap()));
+  }
+
+  protected Map<ISearchPage, ISearchState> getSearchStatesInternal() {
+    // noinspection unchecked
+    return (Map<ISearchPage, ISearchState>) propertySupport.getProperty(PROP_SEARCH_STATES, Map.class);
   }
 
   @Override
@@ -98,19 +156,19 @@ public abstract class AbstractSearchOutline extends AbstractOutline implements I
   }
 
   @Override
-  public void setSearchStatus(String searchStatus) {
-    propertySupport.setPropertyString(PROP_SEARCH_STATUS, searchStatus);
-  }
-
-  @Override
-  public String getSearchStatus() {
-    return propertySupport.getPropertyString(PROP_SEARCH_STATUS);
-  }
-
-  @Override
   public void requestFocusQueryField() {
-    // Always fire property change since it is used as an event. Therefore it does not have a value.
+    // Always fire property change since it is used as an event. Therefore, it does not have a value.
     propertySupport.setPropertyAlwaysFire(PROP_REQUEST_FOCUS_QUERY_FIELD, null);
+  }
+
+  @Override
+  public void addSearchOutlineEventListener(SearchOutlineEventListener listener) {
+    m_listeners.add(listener);
+  }
+
+  @Override
+  public void removeSearchOutlineEventListener(SearchOutlineEventListener listener) {
+    m_listeners.remove(listener);
   }
 
   @Override
@@ -126,15 +184,64 @@ public abstract class AbstractSearchOutline extends AbstractOutline implements I
   protected class P_UIFacade extends AbstractTree.P_UIFacade implements ISearchOutlineUiFacade {
 
     @Override
-    public void search(String query) {
+    public void setSearchQueryFromUI(String searchQuery) {
       try {
         pushUIProcessor();
-        setProperty(PROP_SEARCH_QUERY, query);
-        AbstractSearchOutline.this.search();
+        setSearchQuery(searchQuery);
       }
       finally {
         popUIProcessor();
       }
+    }
+
+    @Override
+    public void fireSearchFromUI() {
+      try {
+        pushUIProcessor();
+        execSearch(getSearchQuery());
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void fireResetSearchFromUI() {
+      try {
+        pushUIProcessor();
+        execResetSearch();
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+  }
+
+  protected class P_TreeNodesInsertedListener implements TreeListener {
+
+    @Override
+    public void treeChanged(TreeEvent e) {
+      if (e.getCommonParentNode() != getRootPage()) {
+        return;
+      }
+      addSearchStates(e.getNodes().stream()
+          .filter(ISearchPage.class::isInstance)
+          .map(ISearchPage.class::cast)
+          .toList());
+    }
+  }
+
+  protected class P_TreeNodesDeletedListener implements TreeListener {
+
+    @Override
+    public void treeChanged(TreeEvent e) {
+      if (e.getCommonParentNode() != getRootPage()) {
+        return;
+      }
+      removeSearchStates(e.getNodes().stream()
+          .filter(ISearchPage.class::isInstance)
+          .map(ISearchPage.class::cast)
+          .toList());
     }
   }
 }

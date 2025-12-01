@@ -7,7 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, InputFieldKeyStrokeContext, keys, KeyStrokeContext, keyStrokeModifier, Outline, scout, SearchOutlineDownKeyStroke, SearchOutlineEventMap, SearchOutlineLayout, SearchOutlineModel, SearchOutlineUpKeyStroke} from '../../index';
+import {
+  aria, Event, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, keyStrokeModifier, Outline, Page, PropertyChangeEvent, SearchOutlineDownKeyStroke, SearchOutlineEventMap, SearchOutlineLayout, SearchOutlineModel,
+  SearchOutlineUpKeyStroke, SearchState, TreeAllChildNodesDeletedEvent, TreeNodesDeletedEvent, TreeNodesInsertedEvent
+} from '../../index';
 import $ from 'jquery';
 
 export class SearchOutline extends Outline implements SearchOutlineModel {
@@ -15,22 +18,37 @@ export class SearchOutline extends Outline implements SearchOutlineModel {
   declare eventMap: SearchOutlineEventMap;
   declare self: SearchOutline;
 
-  hasText: boolean;
   searchQuery: string;
-  searchStatus: string;
+  maxSearchFieldLength = 60;
+  minSearchTokenLength = 2;
+
   searchFieldKeyStrokeContext: KeyStrokeContext;
+  searchStatus: string;
+
   $searchPanel: JQuery;
   $clearIcon: JQuery;
   $searchStatus: JQuery;
   $queryField: JQuery<HTMLInputElement>;
 
-  constructor() {
-    super();
-    this.hasText = false;
-    this.$searchPanel = null;
-    this.$clearIcon = null;
-    this.$searchStatus = null;
-    this.$queryField = null;
+  protected _searchQueryValid = true;
+  protected _searchStates = new Set<SearchState>();
+  protected _searchStateChangeHandler = this._onSearchStateChanged.bind(this);
+  protected _searchStateDestroyHandler = this._onSearchStateDestroy.bind(this);
+
+  protected override _init(model: InitModelOf<this>) {
+    super._init(model);
+
+    this.updateSearchStates();
+    this.on('nodesInserted nodesDeleted allChildNodesDeleted', event => {
+      if (!(event as unknown as TreeNodesInsertedEvent<SearchOutline> | TreeNodesDeletedEvent<SearchOutline> | TreeAllChildNodesDeletedEvent<SearchOutline>).parentNode) {
+        this.updateSearchStates();
+      }
+    });
+
+    this._setMaxSearchFieldLength(this.maxSearchFieldLength);
+    this._setMinSearchTokenLength(this.minSearchTokenLength);
+
+    this.search();
   }
 
   protected override _initKeyStrokeContext() {
@@ -78,7 +96,6 @@ export class SearchOutline extends Outline implements SearchOutlineModel {
     super._renderProperties();
     this._renderSearchQuery();
     this._renderSearchStatus();
-    this._updateHasText();
   }
 
   protected override _renderTitle() {
@@ -90,8 +107,38 @@ export class SearchOutline extends Outline implements SearchOutlineModel {
     }
   }
 
+  setSearchQuery(searchQuery: string) {
+    this.setProperty('searchQuery', searchQuery);
+  }
+
+  protected _setSearchQuery(searchQuery: string) {
+    this._setProperty('searchQuery', searchQuery);
+    this.search();
+  }
+
   protected _renderSearchQuery() {
     this.$queryField.val(this.searchQuery);
+    this._updateHasText();
+  }
+
+  protected _updateHasText() {
+    this.$queryField.toggleClass('has-text', !!this.$queryField.val());
+  }
+
+  setSearchStatus(searchStatus: string) {
+    this.setProperty('searchStatus', searchStatus);
+  }
+
+  protected _updateSearchStatus() {
+    if (!this._searchQueryValid) {
+      return;
+    }
+    if (this.pending) {
+      this.setSearchStatus(this.session.text('ui.SearchInProgressFor', this.searchQuery));
+      return;
+    }
+    const resultCount = this.resultCount;
+    this.setSearchStatus(this.session.text('ui.NumSearchResults', this.limited ? resultCount + '+' : resultCount, this.searchQuery));
   }
 
   protected _renderSearchStatus() {
@@ -120,29 +167,90 @@ export class SearchOutline extends Outline implements SearchOutlineModel {
     this.$searchPanel.toggleClass('has-status', !!this.searchStatus);
   }
 
-  focusQueryField() {
-    this.validateFocus();
+  setMaxSearchFieldLength(maxSearchFieldLength: number) {
+    this.setProperty('maxSearchFieldLength', maxSearchFieldLength);
+  }
+
+  protected _setMaxSearchFieldLength(maxSearchFieldLength: number) {
+    if (maxSearchFieldLength <= 0) {
+      maxSearchFieldLength = 200;
+    }
+    this._setProperty('maxSearchFieldLength', maxSearchFieldLength);
+  }
+
+  setMinSearchTokenLength(minSearchTokenLength: number) {
+    this.setProperty('minSearchTokenLength', minSearchTokenLength);
+  }
+
+  protected _setMinSearchTokenLength(minSearchTokenLength: number) {
+    if (minSearchTokenLength <= 0) {
+      minSearchTokenLength = 2;
+    }
+    this._setProperty('minSearchTokenLength', minSearchTokenLength);
+  }
+
+  search() {
+    this._searchStates.forEach(searchState => searchState.setPending(true));
+
+    this._validateSearchQuery();
+    if (!this._searchQueryValid) {
+      this.resetSearch();
+      return;
+    }
+
+    this._updateSearchStatus();
+    this._triggerSearch();
+  }
+
+  protected _validateSearchQuery() {
+    if (!this.searchQuery?.length) {
+      this.setSearchStatus(null);
+      this._searchQueryValid = false;
+      return;
+    }
+
+    if (this.searchQuery.length > this.maxSearchFieldLength) {
+      this.setSearchStatus(this.session.text('ui.SearchTermTooLong'));
+      this._searchQueryValid = false;
+      return;
+    }
+
+    // remove wildcards and split into tokens (i.e. non-empty strings without spaces)
+    const tokens = this.searchQuery.replaceAll(/\*/g, '').split(' ').filter(Boolean);
+
+    // at least one token must have min length
+    for (const token of tokens) {
+      if (token.length >= this.minSearchTokenLength) {
+        this._searchQueryValid = true;
+        return;
+      }
+    }
+    this.setSearchStatus(this.session.text('ui.SearchTermTooShort'));
+    this._searchQueryValid = false;
   }
 
   protected _triggerSearch() {
-    this.trigger('search', {
-      query: scout.nvl(this.searchQuery, '')
-    });
+    this.trigger('search');
+  }
+
+  resetSearch() {
+    this._triggerResetSearch();
+  }
+
+  protected _triggerResetSearch() {
+    this.trigger('resetSearch');
   }
 
   protected _createOnQueryFieldInputFunction(): (event: JQuery.TriggeredEvent) => void {
-    let debounceFunction = $.debounce(this._search.bind(this));
-    return function(event) {
+    return event => {
       this._updateHasText();
-      // debounced search
-      debounceFunction();
+      // debounced update search query
+      $.debounce(() => this.setSearchQuery(this.$queryField.val()))();
     };
   }
 
   protected _onClearIconMouseDown(event: JQuery.MouseDownEvent) {
-    this.$queryField.val('');
-    this._updateHasText();
-    this._search();
+    this.setSearchQuery('');
     // focus field if x is pressed when the field does not have the focus
     this.$queryField.focus();
     // stay in field when x is pressed
@@ -151,27 +259,12 @@ export class SearchOutline extends Outline implements SearchOutlineModel {
 
   protected _onQueryFieldKeyPress(event: JQuery.KeyPressEvent) {
     if (event.which === keys.ENTER) {
-      this._setSearchQuery(this.$queryField.val() as string);
-      this._triggerSearch();
+      this._setSearchQuery(this.$queryField.val());
     }
   }
 
-  protected _search() {
-    // Don't send query if value did not change (may happen when _createOnQueryFieldInputFunction is executed after _onQueryFieldKeyPress)
-    let searchQuery = this.$queryField.val() as string;
-    if (this.searchQuery !== searchQuery) {
-      // Store locally so that the value persists when changing the outline without performing the search
-      this._setSearchQuery(searchQuery);
-      this._triggerSearch();
-    }
-  }
-
-  protected _setSearchQuery(searchQuery: string) {
-    this.searchQuery = searchQuery;
-  }
-
-  protected _updateHasText() {
-    this.$queryField.toggleClass('has-text', !!this.$queryField.val());
+  focusQueryField() {
+    this.validateFocus();
   }
 
   /**
@@ -186,4 +279,97 @@ export class SearchOutline extends Outline implements SearchOutlineModel {
       elementToFocus.select();
     }
   }
+
+  updateSearchStates() {
+    const searchStates = new Set<SearchState>();
+
+    for (const page of this.nodes as SearchPage[]) {
+      if (page.searchState) {
+        searchStates.add(page.searchState);
+      }
+    }
+
+    this.setSearchStates(searchStates);
+  }
+
+  setSearchStates(searchStates: Set<SearchState>) {
+    searchStates ||= new Set();
+
+    const searchStatesToAdd = new Set<SearchState>();
+    for (const searchState of searchStates) {
+      if (this._searchStates.has(searchState)) {
+        continue;
+      }
+      searchStatesToAdd.add(searchState);
+    }
+
+    const searchStatesToRemove = new Set<SearchState>();
+    for (const searchState of this._searchStates) {
+      if (searchStates.has(searchState)) {
+        continue;
+      }
+      searchStatesToRemove.add(searchState);
+    }
+
+    if (!searchStatesToAdd.size && !searchStatesToRemove.size) {
+      return;
+    }
+
+    searchStatesToAdd.forEach(searchState => {
+      this._searchStates.add(searchState);
+      this._installSearchStateListeners(searchState);
+    });
+    searchStatesToRemove.forEach(searchState => {
+      this._searchStates.delete(searchState);
+      this._uninstallSearchStateListeners(searchState);
+    });
+
+    this._updateSearchStatus();
+  }
+
+  protected _installSearchStateListeners(searchState: SearchState) {
+    if (!searchState) {
+      return;
+    }
+    searchState.on('propertyChange:resultCount propertyChange:limited propertyChange:pending', this._searchStateChangeHandler);
+    searchState.one('destroy', this._searchStateDestroyHandler);
+  }
+
+  protected _uninstallSearchStateListeners(searchState: SearchState) {
+    if (!searchState) {
+      return;
+    }
+    searchState.off('propertyChange:resultCount propertyChange:limited propertyChange:pending', this._searchStateChangeHandler);
+    searchState.off('destroy', this._searchStateDestroyHandler);
+  }
+
+  protected _onSearchStateChanged(event: PropertyChangeEvent<number | boolean, SearchState>) {
+    this._updateSearchStatus();
+  }
+
+  protected _onSearchStateDestroy(event: Event<SearchState>) {
+    const searchStates = new Set(this._searchStates);
+    searchStates.delete(event.source);
+    this.setSearchStates(searchStates);
+  }
+
+  get resultCount(): number {
+    let resultCount = 0;
+    for (const searchState of this._searchStates) {
+      resultCount += searchState.resultCount;
+    }
+    return resultCount;
+  }
+
+  get limited(): boolean {
+    return Array.from(this._searchStates).some(state => state.limited);
+  }
+
+  get pending(): boolean {
+    return Array.from(this._searchStates).some(state => state.pending);
+  }
+}
+
+export interface SearchPage extends Page {
+  searchState?: SearchState;
 }

@@ -9,13 +9,10 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeUIFacade;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
-public interface ISearchOutlineUiFacade extends ITreeUIFacade {
+public interface ISearchPage<T extends ITable> extends IPage<T> {
 
-  void setSearchQueryFromUI(String searchQuery);
-
-  void fireSearchFromUI();
-
-  void fireResetSearchFromUI();
+  ISearchState getSearchState();
 }

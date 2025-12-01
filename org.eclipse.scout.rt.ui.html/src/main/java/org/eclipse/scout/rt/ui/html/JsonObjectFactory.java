@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -55,6 +55,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTileField;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchState;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormMenu;
@@ -147,6 +148,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutlineTileField;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutlineViewButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchOutline;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchState;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.hybrid.JsonHybridManager;
 import org.eclipse.scout.rt.ui.html.json.desktop.hybrid.uicallback.JsonUiCallbacks;
@@ -522,6 +524,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IToggleSwitch) {
       return new JsonToggleSwitch<>((IToggleSwitch) model, session, id, parent);
+    }
+    if (model instanceof ISearchState searchState) {
+      return new JsonSearchState<>(searchState, session, id, parent);
     }
     return null;
   }
