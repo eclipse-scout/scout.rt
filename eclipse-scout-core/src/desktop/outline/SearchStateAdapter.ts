@@ -7,15 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.client.ui.desktop.outline;
+import {ModelAdapter, SearchState} from '../../index';
 
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeUIFacade;
+export class SearchStateAdapter extends ModelAdapter {
+  declare widget: SearchState;
 
-public interface ISearchOutlineUiFacade extends ITreeUIFacade {
-
-  void setSearchQueryFromUI(String searchQuery);
-
-  void fireSearchFromUI();
-
-  void fireResetSearchFromUI();
+  constructor() {
+    super();
+    this._addRemoteProperties(['resultCount', 'limited', 'pending']);
+  }
 }

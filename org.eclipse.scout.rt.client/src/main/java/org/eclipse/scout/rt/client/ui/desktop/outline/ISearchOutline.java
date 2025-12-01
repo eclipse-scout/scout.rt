@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,16 +9,17 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
+import java.util.Map;
+
 /**
  * Outline with search capabilities.
  */
 public interface ISearchOutline extends IOutline {
 
-  String PROP_SEARCH_STATUS = "searchStatus";
-
+  String PROP_SEARCH_STATES = "searchStates";
   String PROP_SEARCH_QUERY = "searchQuery";
-
   String PROP_MAX_SEARCH_QUERY_LENGTH = "maxSearchFieldLength";
+  String PROP_MIN_SEARCH_TOKEN_LENGTH = "minSearchTokenLength";
 
   /**
    * Property to request the focus for a query field on a search outline.
@@ -27,13 +28,11 @@ public interface ISearchOutline extends IOutline {
 
   void search();
 
+  Map<ISearchPage, ISearchState> getSearchStates();
+
   String getSearchQuery();
 
   void setSearchQuery(String searchQuery);
-
-  String getSearchStatus();
-
-  void setSearchStatus(String searchStatus);
 
   int getMaxSearchQueryLength();
 
@@ -44,6 +43,10 @@ public interface ISearchOutline extends IOutline {
   void setMinSearchTokenLength(int len);
 
   void requestFocusQueryField();
+
+  void addSearchOutlineEventListener(SearchOutlineEventListener listener);
+
+  void removeSearchOutlineEventListener(SearchOutlineEventListener listener);
 
   @Override
   ISearchOutlineUiFacade getUIFacade();
