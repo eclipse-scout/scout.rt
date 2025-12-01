@@ -9,13 +9,11 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeUIFacade;
+public interface ISearchStateUiFacade {
 
-public interface ISearchOutlineUiFacade extends ITreeUIFacade {
+  void setResultCountFromUI(int resultCount);
 
-  void setSearchQueryFromUI(String searchQuery);
+  void setLimitedFromUI(boolean limited);
 
-  void fireSearchFromUI();
-
-  void fireResetSearchFromUI();
+  void setPendingFromUI(boolean pending);
 }

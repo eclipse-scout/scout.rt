@@ -1147,6 +1147,8 @@ export * from './desktop/outline/SearchOutlineModel';
 export * from './desktop/outline/SearchOutlineEventMap';
 export * from './desktop/outline/SearchOutlineAdapter';
 export * from './desktop/outline/SearchOutlineLayout';
+export * from './desktop/outline/SearchState';
+export * from './desktop/outline/SearchStateAdapter';
 export * from './desktop/outline/navigation/NavigateButton';
 export * from './desktop/outline/navigation/NavigateButtonModel';
 export * from './desktop/outline/navigation/NavigateDownButton';
