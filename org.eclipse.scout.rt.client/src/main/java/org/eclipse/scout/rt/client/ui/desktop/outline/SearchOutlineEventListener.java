@@ -9,13 +9,9 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeUIFacade;
+import java.util.EventListener;
 
-public interface ISearchOutlineUiFacade extends ITreeUIFacade {
-
-  void setSearchQueryFromUI(String searchQuery);
-
-  void fireSearchFromUI();
-
-  void fireResetSearchFromUI();
+@FunctionalInterface
+public interface SearchOutlineEventListener extends EventListener {
+  void handle(SearchOutlineEvent event);
 }
