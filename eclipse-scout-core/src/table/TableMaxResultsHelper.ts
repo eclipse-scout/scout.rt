@@ -55,7 +55,7 @@ export class TableMaxResultsHelper {
    * Gets the maximum number of rows for the given table.
    */
   getMaxTableRowCount(table: Table): number {
-    return table.maxRowCount;
+    return table?.maxRowCount;
   }
 }
 
