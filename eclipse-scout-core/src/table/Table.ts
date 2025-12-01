@@ -420,17 +420,19 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   protected _initRow(row: ObjectOrModel<TableRow>): TableRow {
-    let tableRow: TableRow;
-    if (row instanceof TableRow) {
-      tableRow = row;
-    } else {
-      tableRow = this._createRow(row);
-    }
+    let tableRow = this.ensureTableRow(row);
     this.rowsMap[tableRow.id] = tableRow;
     this.trigger('rowInit', {
       row: tableRow
     });
     return tableRow;
+  }
+
+  ensureTableRow(row: TableRowModel | TableRow): TableRow {
+    if (row instanceof TableRow) {
+      return row;
+    }
+    return this._createRow(row);
   }
 
   protected _createRow(rowModel?: TableRowModel): TableRow {

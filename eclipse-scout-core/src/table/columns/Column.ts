@@ -753,7 +753,10 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 
     // (then) promises always resolve asynchronously which means the text will always be set later after row is initialized and will generate an update row event.
     // To make sure not every cell update will render the viewport (which is an expensive operation), the update is buffered and done as soon as all promises resolve.
-    this.table.updateBuffer.pushPromise(promise);
+    // TODO CGU document add spec, maybe add dedicated format method and create formatter function as well
+    if (this.table?.hasRow(row)) {
+      this.table.updateBuffer.pushPromise(promise);
+    }
   }
 
   /**
