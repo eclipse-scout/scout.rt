@@ -185,6 +185,48 @@ export const dataObjects = {
       }
     }
     return removed;
+  },
+
+  async* fetchChunks(fetcher: () => Promise<Response>): AsyncGenerator<BaseDoEntity[]> {
+    const response = await fetcher();
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let lastLine = '';
+
+    while (true) {
+      // Read next physical chunk (value)
+      const {done, value} = await reader.read();
+      if (done) {
+        // There are no more physical chunks
+        break;
+      }
+
+      // Convert physical chunk to a text block.
+      // The size of the chunk depends on the network performance.
+      // With a fast connection, there are fewer but larger chunks. With a slow connection, there are more smaller chunks.
+      let chunk = decoder.decode(value, {stream: true});
+      const fullChunk = lastLine + chunk;
+
+      // Convert text block to logical chunks which are separated by newline (ndjson)
+      let lines = fullChunk.split('\n');
+
+      // Keep last line which is potentially incomplete, a physical chunk does not always end on a newline, especially when having many lines
+      lastLine = lines.pop();
+
+      // Convert each line containing JSON to an actual BaseDoEntity
+      let result = [];
+      for (const line of lines) {
+        if (line) {
+          result.push(dataObjects.parse(line));
+        }
+      }
+      yield result;
+    }
+
+    if (lastLine) {
+      yield [dataObjects.parse(lastLine)];
+    }
   }
 };
 
