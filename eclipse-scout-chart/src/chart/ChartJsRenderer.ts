@@ -2269,7 +2269,6 @@ export class ChartJsRenderer extends AbstractChartRenderer {
 
   protected _onClick(event: ChartEvent, items: ActiveElement[]) {
     if (!items.length) {
-      this.chart.handleNonValueClick(event.native);
       return;
     }
     let relevantItem = this._selectRelevantItem(items);
