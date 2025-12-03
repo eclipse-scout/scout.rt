@@ -119,7 +119,7 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
       return;
     }
 
-    // remove or unlink corresponding rows, otherwise e.g. double-clicking a row will lead to errors as the page was deleted
+    // unlink corresponding rows, otherwise e.g. double-clicking a row will lead to errors as the page was deleted
     if (this.page instanceof PageWithTable) {
       pages.forEach(page => page.row && page.unlinkWithRow(page.row));
     }
@@ -141,7 +141,7 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
       return;
     }
 
-    // remove or unlink all rows, otherwise e.g. double-clicking a row will lead to errors as the page was deleted
+    // unlink all rows, otherwise e.g. double-clicking a row will lead to errors as the page was deleted
     if (this.page instanceof PageWithTable) {
       this.page.detailTable.rows.forEach(row => row.page?.unlinkWithRow(row));
     }

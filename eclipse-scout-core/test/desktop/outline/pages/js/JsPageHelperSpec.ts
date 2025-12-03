@@ -193,10 +193,7 @@ describe('JsPageHelper', () => {
 
       await myPageWithTable.ensureLoadChildren();
 
-      const row1 = myPageWithTable.detailTable.rows[0];
-      const row2 = myPageWithTable.detailTable.rows[1];
-      const row3 = myPageWithTable.detailTable.rows[2];
-      const row4 = myPageWithTable.detailTable.rows[3];
+      const [row1, row2, row3, row4] = myPageWithTable.detailTable.rows;
 
       expect(myPageWithTable.childrenLoaded).toBeTrue();
       expect(myPageWithTable.childNodes.length).toBe(4);
@@ -251,8 +248,7 @@ describe('JsPageHelper', () => {
 
       await myPageWithNodes.ensureLoadChildren();
 
-      const row3 = myPageWithNodes.detailTable.rows[2];
-      const row4 = myPageWithNodes.detailTable.rows[3];
+      const [row1, row2, row3, row4] = myPageWithNodes.detailTable.rows;
 
       expect(myPageWithNodes.childrenLoaded).toBeTrue();
       expect(myPageWithNodes.childNodes.length).toBe(4);
@@ -266,7 +262,10 @@ describe('JsPageHelper', () => {
       expect(myPageWithNodes.childrenLoaded).toBeTrue();
       expect(myPageWithNodes.childNodes).toEqual([page3, page4]);
       expect(myPageWithNodes.detailTable.rows.length).toBe(2);
-      expect(myPageWithNodes.detailTable.rows).not.toEqual([row3, row4]);
+      expect(myPageWithNodes.detailTable.rows).not.toContain(row1);
+      expect(myPageWithNodes.detailTable.rows).not.toContain(row2);
+      expect(myPageWithNodes.detailTable.rows).not.toContain(row3);
+      expect(myPageWithNodes.detailTable.rows).not.toContain(row4);
       expect(page1.row).toBeFalsy();
       expect(page2.row).toBeFalsy();
       expect(page3.row).toBe(myPageWithNodes.detailTable.rows[0]);
@@ -307,10 +306,7 @@ describe('JsPageHelper', () => {
 
       await myPageWithTable.ensureLoadChildren();
 
-      const row1 = myPageWithTable.detailTable.rows[0];
-      const row2 = myPageWithTable.detailTable.rows[1];
-      const row3 = myPageWithTable.detailTable.rows[2];
-      const row4 = myPageWithTable.detailTable.rows[3];
+      const [row1, row2, row3, row4] = myPageWithTable.detailTable.rows;
 
       expect(myPageWithTable.childrenLoaded).toBeTrue();
       expect(myPageWithTable.childNodes.length).toBe(4);
