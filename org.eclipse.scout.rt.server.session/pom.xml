@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2025 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -14,11 +14,11 @@
   <parent>
     <groupId>org.eclipse.scout.rt</groupId>
     <artifactId>org.eclipse.scout.rt</artifactId>
-    <version>26.2-SNAPSHOT</version>
+    <version>26.1-SNAPSHOT</version>
     <relativePath>../org.eclipse.scout.rt</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.scout.rt.serverbridge</artifactId>
+  <artifactId>org.eclipse.scout.rt.server.session</artifactId>
   <packaging>jar</packaging>
   <name>${project.artifactId}</name>
 
@@ -26,15 +26,7 @@
     <!-- Build Dependencies -->
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.server</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.server.session</artifactId>
     </dependency>
   </dependencies>
 </project>

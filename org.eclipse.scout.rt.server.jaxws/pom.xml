@@ -29,6 +29,10 @@
       <artifactId>org.eclipse.scout.rt.server</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.server.session</artifactId>  <!-- FIXME PBZ SESSION check if mandatory for jaxws -> nur in com.bsiag.crm.server.jaxws genutzt, ggf. trennen? -->
+    </dependency>
+    <dependency>
       <groupId>jakarta.xml.ws</groupId>
       <artifactId>jakarta.xml.ws-api</artifactId>
     </dependency>

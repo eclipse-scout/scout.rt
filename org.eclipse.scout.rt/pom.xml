@@ -42,6 +42,7 @@
     <module>../org.eclipse.scout.rt.nls</module>
 
     <module>../org.eclipse.scout.rt.server</module>
+    <module>../org.eclipse.scout.rt.server.session</module>
     <module>../org.eclipse.scout.rt.server.app</module>
     <module>../org.eclipse.scout.rt.server.test</module>
     <module>../org.eclipse.scout.rt.server.jaxws</module>
@@ -429,6 +430,11 @@
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server</artifactId>
         <version>26.2-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.server.session</artifactId>
+        <version>26.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
