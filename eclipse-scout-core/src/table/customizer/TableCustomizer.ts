@@ -111,6 +111,11 @@ export abstract class TableCustomizer implements TableCustomizerModel, ObjectWit
    *
    * Depending on the implementation, the form may allow the user to create additional columns ("save and new"). This method
    * returns a list of all created columns when the form is finally closed.
+   *
+   * @param positionOrInsertAfterColumn Specifies the position for the new columns:
+   *  - If a number is provided, the columns are inserted at the specified index in {@link Table#columns}.
+   *  - If a {@link Column} is provided, the columns are inserted immediately after that column.
+   *  - Otherwise, the columns are appended to the end of the table.
    */
   abstract addCustomColumn(positionOrInsertAfterColumn?: number | Column<any>): Promise<Column<any>[]>;
 
@@ -192,15 +197,28 @@ export type TableCustomizerOrModel<TTableCustomizer extends TableCustomizer = Ta
 
 export interface TableCustomizerCreateColumnsOptions {
   /**
-   * default is false
+   * Whether to automatically insert the created columns into the table.
+   *
+   * Default is false.
    */
   insertIntoTable?: boolean;
   /**
-   * default is undefined (= insert at the end)
+   * Specifies the position for the new columns:
+   *  - If a number is provided, the columns are inserted at the specified index in {@link Table#columns}.
+   *  - If a {@link Column} is provided, the columns are inserted immediately after that column.
+   *  - Otherwise, the columns are appended to the end of the table.
+   *
+   * Only relevant if {@link insertIntoTable} is true.
+   *
+   * Default is undefined.
    */
   positionOrInsertAfterColumn?: number | Column<any>;
   /**
-   * default is false, only relevant if {@link insertIntoTable} is set
+   * Whether to automatically (re-)apply ui preferences to the table after inserting the columns.
+   *
+   * Only relevant if {@link insertIntoTable} is true.
+   *
+   * Default is false.
    */
   applyPreferences?: boolean;
 }
