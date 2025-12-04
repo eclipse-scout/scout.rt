@@ -14,6 +14,7 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import org.eclipse.scout.rt.api.data.code.CodeDo;
 import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
@@ -79,5 +80,54 @@ public class CodeResourceTest {
     assertEquals(Map.of("en", "t1.1", "de", "t1.1-de", "en-US", "t1.1-us"), code1Texts);
     Map<String, String> code2Texts = merged.getCodes().get(1).getTexts();
     assertEquals(Map.of("en", "t1.2-updated"), code2Texts);
+  }
+
+  @Test
+  public void testDuplicateCodeId() {
+    CodeTypeDo en = BEANS.get(CodeTypeDo.class).withId("1").withText("en", "en1").withTextPlural("enp1", "en1");
+    en.getCodes().add(BEANS.get(CodeDo.class).withId("2").withText("en", "en2"));
+    en.getCodes().add(BEANS.get(CodeDo.class).withId("3").withText("en", "en3"));
+    en.getCodes().add(BEANS.get(CodeDo.class).withId("2").withText("en", "en2"));
+
+    CodeTypeDo de = BEANS.get(CodeTypeDo.class).withId("1").withText("de", "de1").withTextPlural("dep1", "de1");
+    de.getCodes().add(BEANS.get(CodeDo.class).withId("2").withText("de", "de2"));
+    de.getCodes().add(BEANS.get(CodeDo.class).withId("3").withText("de", "de3"));
+    de.getCodes().add(BEANS.get(CodeDo.class).withId("2").withText("de", "de2"));
+
+    BEANS.get(CodeResource.class).mergeCodeTypeTexts(de, Map.of("1", en));
+  }
+
+  @Test(timeout = 10_000)
+  public void testMergeCodeTypeTextsLarge() {
+    CodeTypeDo en = createLargeCodeType("en");
+    CodeTypeDo de = createLargeCodeType("de");
+    Map<String, CodeTypeDo> map = BEANS.get(CodeResource.class).convertToMap(Arrays.asList(en));
+    for (int i = 0; i < 8; i++) {
+      BEANS.get(CodeResource.class).mergeCodeTypeTexts(de, map);
+    }
+  }
+
+  protected CodeTypeDo createLargeCodeType(String lang) {
+    CodeTypeDo largeCodeType = BEANS.get(CodeTypeDo.class)
+        .withId("1")
+        .withText(lang, lang + "1")
+        .withText(lang + "a", lang + "1")
+        .withText(lang + "b", lang + "1")
+        .withText(lang + "c", lang + "1")
+        .withText(lang + "d", lang + "1")
+        .withText(lang + "e", lang + "1")
+        .withText(lang + "f", lang + "1")
+        .withTextPlural(lang, lang + "p1")
+        .withTextPlural(lang + "a", lang + "1")
+        .withTextPlural(lang + "b", lang + "1")
+        .withTextPlural(lang + "c", lang + "1")
+        .withTextPlural(lang + "d", lang + "1")
+        .withTextPlural(lang + "e", lang + "1")
+        .withTextPlural(lang + "f", lang + "1");
+    IntStream.rangeClosed(2, 100_000)
+        .mapToObj(Integer::toString)
+        .map(id -> BEANS.get(CodeDo.class).withId(id).withText(lang, lang + "t" + id))
+        .forEach(c -> largeCodeType.getCodes().add(c));
+    return largeCodeType;
   }
 }

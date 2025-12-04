@@ -10,6 +10,8 @@
 package org.eclipse.scout.rt.api.code;
 
 import static java.util.Collections.emptySet;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -18,7 +20,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import jakarta.ws.rs.Consumes;
@@ -106,8 +107,7 @@ public class CodeResource implements IRestResource {
         // order by language tag, within a language, locales without country come first ([de, en_US, de_DE, en, en_GB] -> [de, de_DE, en, en_GB, en_US])
         .sorted(Comparator.comparing(Locale::toLanguageTag))
         .forEachOrdered(otherLanguage -> {
-          // switch locale without creating a new RunContext in order to share the current transaction, especially an
-          // already leased DB connection
+          // switch locale without creating a new RunContext in order to share the current transaction, especially an already leased DB connection
           final Locale backup = NlsLocale.get();
           NlsLocale.set(otherLanguage);
           try {
@@ -129,32 +129,31 @@ public class CodeResource implements IRestResource {
     }
     target.withTexts(NlsUtility.mergeTexts(from.getTexts(), target.getTexts()));
     target.withTextsPlural(NlsUtility.mergeTexts(from.getTextsPlural(), target.getTextsPlural()));
-    Collection<CodeDo> targetChildren = getChildCodes(target);
-    from.getCodes().forEach(code -> mergeCodeTexts(code, targetChildren));
+    Map<String, CodeDo> targetChildren = groupCodesById(target.getCodes(), target.getId());
+    from.getCodes().forEach(code -> mergeCodeTexts(code, targetChildren, target.getId()));
   }
 
-  protected void mergeCodeTexts(CodeDo from, Collection<CodeDo> targetList) {
+  protected void mergeCodeTexts(CodeDo from, Map<String, CodeDo> targetMap, String codeTypeId) {
     if (from == null) {
       return;
     }
     Object codeId = from.getId();
-    CodeDo target = targetList.stream()
-        .filter(code -> Objects.equals(code.getId(), codeId))
-        .findAny().orElse(null);
+    CodeDo target = targetMap.get(codeId);
     if (target == null) {
       return;
     }
+
     target.withTexts(NlsUtility.mergeTexts(from.getTexts(), target.getTexts()));
-    Collection<CodeDo> targetChildren = getChildCodes(target);
-    from.getChildren().forEach(code -> mergeCodeTexts(code, targetChildren));
+    Map<String, CodeDo> targetChildren = groupCodesById(target.getChildren(), codeTypeId);
+    from.getChildren().forEach(code -> mergeCodeTexts(code, targetChildren, codeTypeId));
   }
 
-  protected Collection<CodeDo> getChildCodes(CodeTypeDo parent) {
-    return parent.getCodes();
-  }
-
-  protected Collection<CodeDo> getChildCodes(CodeDo parent) {
-    return parent.getChildren();
+  protected Map<String, CodeDo> groupCodesById(Collection<CodeDo> codes, String codeTypeId) {
+    return codes.stream().collect(toMap(CodeDo::getId, identity(), (existing, replacement) -> {
+      // CodeType.ts stores all codes (recursively) in a Map having the Code id as key. Therefore, duplicate Code ids are not allowed.
+      LOG.warn("Code with duplicate id '{}' found in CodeType '{}'. Only keeping the first.", existing.getId(), codeTypeId);
+      return existing; // ignoring merger
+    }));
   }
 
   protected Collection<Locale> getApplicationLanguages() {
