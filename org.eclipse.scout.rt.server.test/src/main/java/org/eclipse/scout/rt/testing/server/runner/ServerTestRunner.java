@@ -15,7 +15,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.statement.ClientNotificationsStatement;
@@ -28,7 +27,7 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
 /**
- * Use this Runner to run tests which require a session and transaction context.
+ * Use this Runner to run tests which require a session and transaction context.    FIXME PBZ SESSION cleanup javadoc
  * <p/>
  * Use the following mandatory annotations to configure the Runner:
  * <ul>
@@ -53,7 +52,6 @@ import org.junit.runners.model.Statement;
  * <li>Each test-method is executed in a separate transaction - meaning that the transaction boundary starts before
  * executing the first 'before-method', and ends after executing the last 'after-method'.</li>
  * <li>By default, server sessions are shared among same users. This can be changed by setting the
- * {@link ServerSessionProvider} or a custom provider to {@link RunWithServerSession#provider()}.</li>
  * <li>'beforeClass' and 'afterClass' are executed in the same transaction.</li>
  * </ul>
  * <b>Note</b>: Usually, all {@link Before}, the {@link Test}-annotated method and all {@link After} methods are invoked

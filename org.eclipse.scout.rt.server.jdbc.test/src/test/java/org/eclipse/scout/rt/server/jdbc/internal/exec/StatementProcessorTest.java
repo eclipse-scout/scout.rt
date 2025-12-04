@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.holders.IntegerHolder;
 import org.eclipse.scout.rt.platform.holders.LongHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
-import org.eclipse.scout.rt.server.AbstractServerSession;
+import org.eclipse.scout.rt.server.session.AbstractServerSession;
 import org.eclipse.scout.rt.server.TestJdbcServerSession;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.IToken;

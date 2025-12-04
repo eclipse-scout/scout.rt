@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.rest.id.IdSignatureClientRequestFilter;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.context.HttpServerRunContextProducer;
@@ -135,17 +134,11 @@ public class ServiceTunnelService {
     String clientSessionId = req.getHeader(SessionId.HTTP_HEADER_NAME);
 
     // overwrite default settings from HTTP request with values from ServiceTunnelRequest
-    final ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
+    return ServerRunContexts.copyCurrent()
         .withLocale(serviceRequest.getLocale())
         .withUserAgent(UserAgents.createByIdentifier(serviceRequest.getUserAgent()))
         .withClientNodeId(serviceRequest.getClientNodeId())
         .withThreadLocal(SessionId.CURRENT, clientSessionId);
-
-    if (clientSessionId != null) {
-      final IServerSession session = m_serverRunContextProducer.get().getOrCreateScoutSession(req, serverRunContext, clientSessionId);
-      serverRunContext.withSession(session);
-    }
-    return serverRunContext;
   }
 
   // === MESSAGE UNMARSHALLING / MARSHALLING ===

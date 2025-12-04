@@ -11,29 +11,12 @@ package org.eclipse.scout.rt.server.context;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.security.IAccessControlService;
-import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ServerConfigProperties.ServerSessionCacheExpirationProperty;
-import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
-import org.eclipse.scout.rt.shared.user.UserId;
 
 /**
- * Producer for {@link ServerRunContext} objects having a userId based {@link IServerSession} cache that is <i>NOT</i>
- * bound to the HTTP session.
- * <p>
- * The default implementation creates a copy of the current calling {@link ServerRunContext} with transaction scope
- * {@link TransactionScope#REQUIRES_NEW}.
- * <p>
- * <b>Important: </b>If no session is associated yet, it is obtained by {@link ServerSessionProviderWithCache}. This
- * means the session is cached by userId (see {@link IAccessControlService#getUserId(Subject)}) and only removed from
- * the cache if the TTL expires (see {@link ServerSessionCacheExpirationProperty})! The {@link IServerSession} is not
- * bound to the HTTP session and therefore survives the HTTP session timeouts!
- *
- * @since 5.1
+ * FIXME PBZ SESSION update javadoc
  */
 public class ServerRunContextProducer extends RunContextProducer {
 
@@ -46,14 +29,6 @@ public class ServerRunContextProducer extends RunContextProducer {
         .withSubject(subject)
         .withThreadLocal(UserId.CURRENT, BEANS.get(IAccessControlService.class).getUserId(subject))
         .withTransactionScope(TransactionScope.REQUIRES_NEW);
-
-    // ensure that the session belongs to the specified subject
-    // use the current set subject as subject of the session, because if the session is not null it must be the current session
-    IServerSession session = serverRunContext.getSession();
-    if (session == null || ObjectUtility.notEquals(Subject.current(), subject)) {
-      serverRunContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
-    }
-
     return serverRunContext;
   }
 }

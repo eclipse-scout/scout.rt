@@ -39,7 +39,6 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.rest.id.IdSignatureClientRequestFilter;
 import org.eclipse.scout.rt.rest.jersey.TestingRestClientConfigFactory;
 import org.eclipse.scout.rt.rest.jersey.fixture.SingleIdDo;
-import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.commons.BufferedServletInputStream;
 import org.eclipse.scout.rt.server.commons.BufferedServletOutputStream;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
@@ -51,7 +50,6 @@ import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.TestHttpSession;
-import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.eclipse.scout.rt.testing.shared.services.lookup.IEchoService;
 import org.junit.AfterClass;
@@ -61,7 +59,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 @RunWith(ServerTestRunner.class)
-@RunWithServerSession(TestServerSession.class)
+//@RunWithServerSession(TestServerSession.class)  FIXME PBZ SESSION check if session is necessary for this test
 @RunWithSubject("default")
 public class ServiceTunnelIdSignatureTest {
 

@@ -17,7 +17,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
@@ -84,9 +83,7 @@ public class ServiceOperationInvokerTest {
   }
 
   private ServerRunContext createRunContextWithSession() {
-    return ServerRunContexts
-        .empty()
-        .withSession(new TestServerSession());
+    return ServerRunContexts.empty();
   }
 
   private ServiceTunnelResponse invokePingService(final ServerRunContext runcontext) {

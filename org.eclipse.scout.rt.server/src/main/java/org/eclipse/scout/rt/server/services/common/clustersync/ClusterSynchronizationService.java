@@ -43,7 +43,6 @@ import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.mom.IClusterMomDestinations;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
-import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
 import org.eclipse.scout.rt.shared.user.UserId;
 import org.slf4j.Logger;
@@ -220,11 +219,9 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   }
 
   protected ServerRunContext createRunContext() {
-    ServerRunContext serverRunContext = ServerRunContexts.empty()
-        .withSubject(m_subject)
-        .withThreadLocal(UserId.CURRENT, m_userId);
-    serverRunContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
-    return serverRunContext;
+    return ServerRunContexts.empty()
+        .withThreadLocal(UserId.CURRENT, m_userId)
+        .withSubject(m_subject);
   }
 
   /**

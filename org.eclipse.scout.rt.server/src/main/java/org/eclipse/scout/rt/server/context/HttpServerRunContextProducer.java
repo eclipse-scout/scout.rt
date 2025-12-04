@@ -16,13 +16,9 @@ import jakarta.servlet.http.HttpSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 import org.eclipse.scout.rt.server.commons.context.HttpRunContextProducer;
 import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
-import org.eclipse.scout.rt.server.session.IServerSessionLifecycleHandler;
-import org.eclipse.scout.rt.server.session.ServerSessionCache;
-import org.eclipse.scout.rt.server.session.ServerSessionLifecycleHandler;
 import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.session.Sessions;
 import org.slf4j.Logger;
@@ -31,14 +27,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Creates a {@link ServerRunContext} based on a {@link HttpServletRequest} and the current JAAS context.
  * <p>
- * The parameter "sessionSupport" (see {@link #withSessionSupport(boolean)}) specifies if an {@link IServerSession}
- * should be created. The default is {@code true}.<br>
- * If {@code true}, the Scout server session will be stored on the HTTP session and will be automatically stopped and
- * removed if the HTTP session is invalidated. This means if session support is enabled a cookie capable HTTP client is
- * required! Furthermore a class implementing {@link IServerSession} must be present on the class-path.
+ *   FIXME PBZ SESSION javadoc in class
  * <p>
- *
- * @since 9.0
  */
 @Bean
 public class HttpServerRunContextProducer {
@@ -46,12 +36,10 @@ public class HttpServerRunContextProducer {
   public static final String SCOUT_SESSION_ID_KEY = HttpServerRunContextProducer.class.getName() + ".SCOUT_SESSION_ID";
   private static final Logger LOG = LoggerFactory.getLogger(HttpServerRunContextProducer.class);
 
-  private final ServerSessionCache m_serverSessionCache;
   private final HttpRunContextProducer m_innerRunContextProducer;
   private boolean m_sessionSupport;
 
   public HttpServerRunContextProducer() {
-    m_serverSessionCache = createServerSessionCache();
     m_innerRunContextProducer = createRunContextProducer();
     m_sessionSupport = true;
   }
@@ -95,49 +83,11 @@ public class HttpServerRunContextProducer {
       return serverRunContext;
     }
 
-    final IServerSession session = getOrCreateScoutSession(req, serverRunContext, scoutSessionId);
-    return serverRunContext
-        .withSession(session);
-  }
-
-  /**
-   * Lookup (or create if not existing) an {@link IServerSession} on the {@link HttpServletRequest} specified. If a new
-   * session must be created, a random session id is used.
-   *
-   * @param serverRunContextForSessionStart
-   *     If no session is already available: the new session will be started using this {@link ServerRunContext}.
-   *     May not be {@code null}.
-   * @return the existing or newly created session or {@code null} if this producer has no session support (see
-   * {@link #withSessionSupport(boolean)}).
-   */
-  public IServerSession getOrCreateScoutSession(HttpServletRequest req, ServerRunContext serverRunContextForSessionStart) {
-    return getOrCreateScoutSession(req, serverRunContextForSessionStart, null);
-  }
-
-  /**
-   * Lookup (or create if not existing) an {@link IServerSession} on the {@link HttpServletRequest} specified. If a new
-   * session must be created, the given id is used.
-   *
-   * @param serverRunContextForSessionStart
-   *     If no session is already available: the new session will be started using this {@link ServerRunContext}.
-   *     May not be {@code null}.
-   * @return the existing or newly created session or {@code null} if this producer has no session support (see
-   * {@link #withSessionSupport(boolean)}).
-   */
-  public IServerSession getOrCreateScoutSession(HttpServletRequest req, ServerRunContext serverRunContextForSessionStart, String scoutSessionId) {
-    if (!hasSessionSupport()) {
-      return null;
-    }
-
-    final HttpSession httpSession = req.getSession();
-    final String sid = ensureScoutSessionId(scoutSessionId, httpSession);
-    final IServerSessionLifecycleHandler lifecycleHandler = new ServerSessionLifecycleHandler(sid, serverRunContextForSessionStart);
-    final IServerSession session = getServerSessionCache().getOrCreate(lifecycleHandler, httpSession);
-    if (session == null) {
-      LOG.warn("{} is configured to create a Scout session but no class implementing {} could be found. Consider disabling session support.",
-          HttpServerRunContextProducer.class.getName(), IServerSession.class.getName());
-    }
-    return session;
+    // FIXME PBZ SESSION cleanup both classes
+    throw new IllegalStateException("no session support not supported!");
+//    final IServerSession session = getOrCreateScoutSession(req, serverRunContext, scoutSessionId);
+//    return serverRunContext
+//        .withSession(session);
   }
 
   protected String ensureScoutSessionId(String scoutSessionId, HttpSession httpSession) {
@@ -179,13 +129,5 @@ public class HttpServerRunContextProducer {
    */
   public HttpRunContextProducer getInnerRunContextProducer() {
     return m_innerRunContextProducer;
-  }
-
-  protected ServerSessionCache createServerSessionCache() {
-    return BEANS.get(ServerSessionCache.class);
-  }
-
-  public ServerSessionCache getServerSessionCache() {
-    return m_serverSessionCache;
   }
 }

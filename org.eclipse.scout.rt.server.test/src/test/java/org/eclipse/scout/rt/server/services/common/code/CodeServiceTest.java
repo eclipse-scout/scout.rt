@@ -21,7 +21,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.cache.IRemoteCacheService;
@@ -34,7 +33,6 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,7 +43,7 @@ import org.mockito.ArgumentCaptor;
  * Test for {@link ICodeService}
  */
 @RunWith(ServerTestRunner.class)
-@RunWithServerSession(TestServerSession.class)
+//@RunWithServerSession(TestServerSession.class) FIXME PBZ SESSION check if session is necessary for this test
 @RunWithSubject("john")
 public class CodeServiceTest {
   @BeanMock
