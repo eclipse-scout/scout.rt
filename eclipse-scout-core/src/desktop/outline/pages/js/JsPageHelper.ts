@@ -221,6 +221,9 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
    * @param replace Whether existing child pages shall be replaced or reused. If not specified, the child pages will always be replaced except for the first call in order to keep existing child pages after a browser reload.
    */
   async callLoadChildPages(idsOrPageParams: (string | PageParamDo)[], replace?: boolean): Promise<void> {
+    if (this.page.leaf) {
+      return;
+    }
     // Ensure pageParams and collect them distinctly.
     // The given list may contain duplicate pageParams.
     // Sending these duplicates to the server would result in pages added multiple times to the outline which leads to unexpected behaviour.
