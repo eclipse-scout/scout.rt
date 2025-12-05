@@ -48,14 +48,12 @@ describe('TableUiPreferences', () => {
       expect(prefStore.preferences.tablePreferences[0].tablePreferenceProfiles.size).toBe(1);
       let profile = prefStore.preferences.tablePreferences[0].tablePreferenceProfiles.get(TableUiPreferences.PROFILE_ID_GLOBAL);
       expect(profile).toBeTruthy();
-      expect(profile.columns.length).toBe(6);
-      expect(profile.columns[0].columnId).toBe('c1');
-      expect(profile.columns[0].width).toBe(60);
-      expect(profile.columns[1].columnId).toBe('c2');
-      expect(profile.columns[1].width).toBe(202); // <--
-      expect(profile.columns[2].columnId).toBe('c3');
-      expect(profile.columns[2].width).toBe(103);
-      expect(profile.columns.map(c => c.columnId)).toEqual(['c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
+      expect(profile.columns.length).toBe(5);
+      expect(profile.columns[0].columnId).toBe('c2');
+      expect(profile.columns[0].width).toBe(202); // <--
+      expect(profile.columns[1].columnId).toBe('c3');
+      expect(profile.columns[1].width).toBe(103);
+      expect(profile.columns.map(c => c.columnId)).toEqual(['c2', 'c3', 'c4', 'c5', 'c6']);
 
       let c6 = table.columnById('c6');
       table.moveColumn(c6, 1);
@@ -68,8 +66,8 @@ describe('TableUiPreferences', () => {
       expect(prefStore.preferences.tablePreferences[0].tablePreferenceProfiles.size).toBe(1);
       profile = prefStore.preferences.tablePreferences[0].tablePreferenceProfiles.get(TableUiPreferences.PROFILE_ID_GLOBAL);
       expect(profile).toBeTruthy();
-      expect(profile.columns.length).toBe(6);
-      expect(profile.columns.map(c => c.columnId)).toEqual(['c1', 'c2', 'c6', 'c3', 'c4', 'c5']);
+      expect(profile.columns.length).toBe(5);
+      expect(profile.columns.map(c => c.columnId)).toEqual(['c2', 'c6', 'c3', 'c4', 'c5']);
 
       table.setTileMode(true);
 
@@ -315,7 +313,7 @@ describe('TableUiPreferences', () => {
         parent: session.desktop,
         id: 't1'
       });
-      table.setInitialUiPreferences(tableUiPreferences.createProfile(table));
+      table.saveInitialUiPreferences();
 
       let c2 = table.columnById('c2');
       let c3 = table.columnById('c3');
@@ -393,7 +391,7 @@ describe('TableUiPreferences', () => {
       expect(table.filterCount()).toBe(0);
     });
 
-    it('ignores guiOnly columns', () => {
+    it('ignores guiOnly and non-displayable columns', () => {
       let table = scout.create(SpecTable, {
         parent: session.desktop,
         id: 't1',
@@ -401,16 +399,17 @@ describe('TableUiPreferences', () => {
         rowIconVisible: true,
         rowIconColumnWidth: 96
       });
-      table.setInitialUiPreferences(tableUiPreferences.createProfile(table));
+      table.saveInitialUiPreferences();
       expect(table.columns.length).toBe(6 + 2);
       expect(table.columns.map(c => c.guiOnly ? null : c.id)).toEqual([null, null, 'c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
+      expect(table.visibleColumns().map(c => c.guiOnly ? null : c.id)).toEqual([null, null, 'c2', 'c3', 'c4', 'c5', 'c6']);
 
       let c2 = table.columnById('c2');
       c2.setWidth(202);
 
       let profile = tableUiPreferences.createProfile(table);
-      expect(profile.columns.length).toBe(6);
-      expect(profile.columns.map(c => c.columnId)).toEqual(['c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
+      expect(profile.columns.length).toBe(5);
+      expect(profile.columns.map(c => c.columnId)).toEqual(['c2', 'c3', 'c4', 'c5', 'c6']);
 
       table.resetToInitialUiPreferences();
       expect(table.columns.length).toBe(6 + 2);
@@ -420,6 +419,119 @@ describe('TableUiPreferences', () => {
       expect(table.columns.length).toBe(6 + 2);
       expect(table.columns.map(c => c.guiOnly ? null : c.id)).toEqual([null, null, 'c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
       expect(c2.width).toBe(202);
+
+      let c4 = table.columnById('c4');
+      c4.setDisplayable(false);
+      expect(table.visibleColumns().map(c => c.guiOnly ? null : c.id)).toEqual([null, null, 'c2', 'c3', 'c5', 'c6']);
+      table.moveColumn(c2, 5);
+      expect(table.visibleColumns().map(c => c.guiOnly ? null : c.id)).toEqual([null, null, 'c3', 'c5', 'c6', 'c2']);
+      let profile2 = tableUiPreferences.createProfile(table);
+      expect(profile2.columns.length).toBe(4);
+      expect(profile2.columns.map(c => c.columnId)).toEqual(['c3', 'c5', 'c6', 'c2']);
+
+      table.resetToInitialUiPreferences();
+      expect(table.columns.length).toBe(6 + 2);
+      expect(table.columns.map(c => c.guiOnly ? null : c.id)).toEqual([null, null, 'c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
+      expect(table.visibleColumns().map(c => c.guiOnly ? null : c.id)).toEqual([null, null, 'c2', 'c3', 'c5', 'c6']);
+      tableUiPreferences.applyProfile(table, profile2);
+      expect(table.columns.length).toBe(6 + 2);
+      expect(table.columns.map(c => c.guiOnly ? null : c.id)).toEqual([null, null, 'c1', 'c4', 'c3', 'c5', 'c6', 'c2']);
+      expect(table.visibleColumns().map(c => c.guiOnly ? null : c.id)).toEqual([null, null, 'c3', 'c5', 'c6', 'c2']);
+    });
+
+    it('places new columns at the end', () => {
+      let table = scout.create(Table, {
+        parent: session.desktop,
+        id: 't1',
+        columns: [{
+          id: 'c1',
+          objectType: Column,
+          width: 101
+        }, {
+          id: 'c2',
+          objectType: Column,
+          width: 102
+        }, {
+          id: 'c3',
+          objectType: Column,
+          displayable: false,
+          width: 103
+        }, {
+          id: 'c4',
+          objectType: Column,
+          width: 104
+        }, {
+          id: 'c5',
+          objectType: Column,
+          width: 105
+        }, {
+          id: 'c6',
+          objectType: Column,
+          displayable: false,
+          primaryKey: true,
+          width: 106
+        }, {
+          id: 'c7',
+          objectType: Column,
+          width: 107,
+          visible: false
+        }, {
+          id: 'c8',
+          objectType: Column,
+          width: 108,
+          visible: false
+        }]
+      });
+      table.saveInitialUiPreferences();
+
+      // Apply a profile without information about some columns:
+      let profile = scout.create(TableClientUiPreferenceProfileDo, {
+        columns: [
+          scout.create(TableColumnClientUiPreferenceDo, {
+            columnId: 'c4',
+            viewIndex: 444,
+            visible: true,
+            width: 204
+          }),
+          scout.create(TableColumnClientUiPreferenceDo, {
+            columnId: 'c6',
+            viewIndex: 666,
+            visible: true,
+            width: 206
+          }),
+          scout.create(TableColumnClientUiPreferenceDo, {
+            columnId: 'c8',
+            viewIndex: 8,
+            visible: true,
+            width: 208
+          })
+        ]
+      });
+      tableUiPreferences.applyProfile(table, profile);
+
+      // { c1 c2 c3? [c4] c5 [c6?] c7 [c8] } + { c4@444, c6@666, c8@8 } => { c6? c3? c1 c2 c8 c4 c5 c7 }
+      // expect:
+      // - non-displayable columns at front, pk column first
+      // - preferences ignored for non-displayable columns
+      // - columns without information are either before or after all other visible columns
+      expect(table.columns.map(c => c.id)).toEqual(['c6', 'c3', 'c1', 'c2', 'c8', 'c4', 'c5', 'c7']);
+      expect(table.visibleColumns().map(c => c.id)).toEqual(['c1', 'c2', 'c8', 'c4', 'c5']);
+      expect(table.columns.map(c => c.width)).toEqual([106, 103, 101, 102, 208, 204, 105, 107]);
+
+      table.resetToInitialUiPreferences();
+      expect(table.columns.map(c => c.id)).toEqual(['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8']);
+      expect(table.visibleColumns().map(c => c.id)).toEqual(['c1', 'c2', 'c4', 'c5']);
+      expect(table.columns.map(c => c.width)).toEqual([101, 102, 103, 104, 105, 106, 107, 108]);
+
+      // Apply the same profile again, but explicitly enable non-displayable columns
+      tableUiPreferences.applyProfile(table, profile, {applyNonDisplayableColumns: true});
+
+      // { c1 c2 c3? [c4] c5 [c6?] c7 [c8] } + { c4@444, c6@666, c8@8 } => { c1 c2 c3? c8 c4 c6? c5 c7 }
+      // expect:
+      // - non-displayable columns are handled like normal columns
+      expect(table.columns.map(c => c.id)).toEqual(['c1', 'c2', 'c3', 'c8', 'c4', 'c6', 'c5', 'c7']);
+      expect(table.visibleColumns().map(c => c.id)).toEqual(['c1', 'c2', 'c8', 'c4', 'c5']);
+      expect(table.columns.map(c => c.width)).toEqual([101, 102, 103, 208, 204, 206, 105, 107]);
     });
 
     it('ignores compact mode', () => {
@@ -443,10 +555,10 @@ describe('TableUiPreferences', () => {
       expect(table.columns.map(c => c.visibleIgnoreCompacted)).toEqual([false, true, false, true, true, true]);
       expect(table.columns.map(c => c.compacted)).toEqual([false, false, false, false, false, false]);
       let profile1 = tableUiPreferences.createProfile(table);
-      expect(profile1.columns.length).toBe(6);
-      expect(profile1.columns.map(c => c.columnId)).toEqual(['c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
-      expect(profile1.columns.map(c => c.visible)).toEqual([false, true, false, true, true, true]);
-      expect(profile1.columns.map(c => c.width)).toEqual([60, 102, 103, 104, 105, 106]);
+      expect(profile1.columns.length).toBe(5);
+      expect(profile1.columns.map(c => c.columnId)).toEqual(['c2', 'c3', 'c4', 'c5', 'c6']);
+      expect(profile1.columns.map(c => c.visible)).toEqual([true, false, true, true, true]);
+      expect(profile1.columns.map(c => c.width)).toEqual([102, 103, 104, 105, 106]);
 
       table.setCompact(true);
       expect(table.columns.length).toBe(7);
@@ -456,10 +568,10 @@ describe('TableUiPreferences', () => {
       expect(table.columns.map(c => c.visibleIgnoreCompacted)).toEqual([false, true, false, true, true, true, true]);
       expect(table.columns.map(c => c.compacted)).toEqual([false, true, true, true, true, true, false]);
       let profile2 = tableUiPreferences.createProfile(table);
-      expect(profile2.columns.length).toBe(6); // <--
-      expect(profile2.columns.map(c => c.columnId)).toEqual(['c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
-      expect(profile2.columns.map(c => c.visible)).toEqual([false, true, false, true, true, true]);
-      expect(profile2.columns.map(c => c.width)).toEqual([60, 102, 103, 104, 105, 106]);
+      expect(profile2.columns.length).toBe(5); // <--
+      expect(profile2.columns.map(c => c.columnId)).toEqual(['c2', 'c3', 'c4', 'c5', 'c6']);
+      expect(profile2.columns.map(c => c.visible)).toEqual([true, false, true, true, true]);
+      expect(profile2.columns.map(c => c.width)).toEqual([102, 103, 104, 105, 106]);
     });
 
     it('can ignore table events', () => {
@@ -479,7 +591,7 @@ describe('TableUiPreferences', () => {
       jasmine.clock().tick(1000);
       expect(prefStore.loadCount).toBe(0);
       expect(prefStore.storeCount).toBe(1);
-      expect(prefStore.preferences?.tablePreferences[0]?.tablePreferenceProfiles?.get(TableUiPreferences.PROFILE_ID_GLOBAL)?.columns[1]?.width).toBe(202);
+      expect(prefStore.preferences?.tablePreferences[0]?.tablePreferenceProfiles?.get(TableUiPreferences.PROFILE_ID_GLOBAL)?.columns[0]?.width).toBe(202);
 
       tableUiPreferences.withIgnoreTableEvents(() => {
         c2.setWidth(303);
@@ -488,14 +600,14 @@ describe('TableUiPreferences', () => {
       jasmine.clock().tick(1000);
       expect(prefStore.loadCount).toBe(0);
       expect(prefStore.storeCount).toBe(1);
-      expect(prefStore.preferences?.tablePreferences[0]?.tablePreferenceProfiles?.get(TableUiPreferences.PROFILE_ID_GLOBAL)?.columns[1]?.width).toBe(202);
+      expect(prefStore.preferences?.tablePreferences[0]?.tablePreferenceProfiles?.get(TableUiPreferences.PROFILE_ID_GLOBAL)?.columns[0]?.width).toBe(202);
 
       c2.setWidth(404);
 
       jasmine.clock().tick(1000);
       expect(prefStore.loadCount).toBe(0);
       expect(prefStore.storeCount).toBe(2);
-      expect(prefStore.preferences?.tablePreferences[0]?.tablePreferenceProfiles?.get(TableUiPreferences.PROFILE_ID_GLOBAL)?.columns[1]?.width).toBe(404);
+      expect(prefStore.preferences?.tablePreferences[0]?.tablePreferenceProfiles?.get(TableUiPreferences.PROFILE_ID_GLOBAL)?.columns[0]?.width).toBe(404);
     });
   });
 

@@ -491,8 +491,8 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     tableUiPreferences.applyProfile(table, profile, {applyUserFilters: true});
 
     if (saveState) {
-      // Set bookmarked profile as default preferences (no need to store the GLOBAL setting, but "reset to factory settings" should still be possible)
-      table.setInitialUiPreferences(profile || tableUiPreferences.createProfile(table));
+      // Save the current state as initial state so the user can revert the table to this state
+      table.saveInitialUiPreferences();
     } else {
       // Store applied settings as GLOBAL setting
       tableUiPreferences.storeGlobalProfile(table);
