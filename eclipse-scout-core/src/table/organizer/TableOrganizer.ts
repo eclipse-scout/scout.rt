@@ -267,7 +267,7 @@ export class TableOrganizer implements ObjectWithType {
       }
     });
     form.open();
-    await form.whenSave().then(() => {
+    return form.whenSave().then(() => {
       this.showColumns(form.data.columns, insertAfterColumn);
     });
   }
