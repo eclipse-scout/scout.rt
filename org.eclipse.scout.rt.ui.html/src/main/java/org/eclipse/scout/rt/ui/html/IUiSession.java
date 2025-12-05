@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
@@ -50,11 +51,16 @@ public interface IUiSession {
    */
   ReentrantLock uiSessionLock();
 
+  /**
+   * @return The {@link InspectorInfo} to be used for requests of this {@link IUiSession}. Never returns {@code null}.
+   */
+  InspectorInfo getInspectorInfo();
+
   void init(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq);
 
   /**
-   * @return <code>true</code> if {@link #init(HttpServletRequest, HttpServletResponse, JsonStartupRequest)} was been
-   * called. Note: This will also be <code>true</code> after the session has been disposed.
+   * @return {@code true} if {@link #init(HttpServletRequest, HttpServletResponse, JsonStartupRequest)} has been called.
+   * Note: This will also be {@code true} after the session has been disposed.
    */
   boolean isInitialized();
 
@@ -101,7 +107,7 @@ public interface IUiSession {
   void dispose();
 
   /**
-   * @return <code>true</code> if {@link #dispose()} has been called.
+   * @return {@code true} if {@link #dispose()} has been called.
    */
   boolean isDisposed();
 
@@ -199,8 +205,8 @@ public interface IUiSession {
   <M, A extends IJsonAdapter<M>> A getJsonAdapter(M model, IJsonAdapter<?> parent, boolean checkRoot);
 
   /**
-   * Creates a new initialized IJsonAdapter instance for the given model or returns an existing instance. As a
-   * side-effect a newly created adapter is added to the current JSON response.
+   * Creates a new initialized IJsonAdapter instance for the given model or returns an existing instance.
+   * As a side effect a newly created adapter is added to the current JSON response.
    */
   <M, A extends IJsonAdapter<M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent);
 

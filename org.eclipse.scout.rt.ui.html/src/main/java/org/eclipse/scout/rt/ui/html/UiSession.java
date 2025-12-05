@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -80,6 +80,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEventProcessor;
@@ -136,6 +137,7 @@ public class UiSession implements IUiSession {
   private final Object m_notificationToken = new Object();
   private final IHttpResourceCache m_httpResourceCache = BEANS.get(HttpResourceCache.class);
   private final UiSessionListeners m_listeners = new UiSessionListeners();
+  private final InspectorInfo m_inspectorInfo = BEANS.get(InspectorInfo.class);
 
   private volatile boolean m_initialized;
   private volatile ISessionStore m_sessionStore;
@@ -202,6 +204,11 @@ public class UiSession implements IUiSession {
 
   protected final RunMonitor pollerMonitor() {
     return m_pollerMonitor;
+  }
+
+  @Override
+  public InspectorInfo getInspectorInfo() {
+    return m_inspectorInfo;
   }
 
   @Override
@@ -1052,7 +1059,7 @@ public class UiSession implements IUiSession {
 
     JSONObject json = new JSONObject();
     if (links.size() == 1) {
-      json.put("link", links.get(0));
+      json.put("link", links.getFirst());
     }
     else {
       JSONArray array = new JSONArray();
