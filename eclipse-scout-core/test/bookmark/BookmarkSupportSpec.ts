@@ -212,17 +212,8 @@ describe('BookmarkSupport', () => {
       expect(bookmarkedTableProfile.tableCustomizerData).toBe(undefined);
       expect(bookmarkedTableProfile.columns).toEqual([
         scout.create(TableColumnClientUiPreferenceDo, {
-          columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, // KeyColumn
-          viewIndex: 0,
-          visible: false,
-          width: 60,
-          sortOrder: -1,
-          sortAscending: true,
-          groupingActive: false
-        }),
-        scout.create(TableColumnClientUiPreferenceDo, {
           columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, // HexColumn
-          viewIndex: 1,
+          viewIndex: 0,
           visible: true,
           width: 100,
           sortOrder: 0,
@@ -231,7 +222,7 @@ describe('BookmarkSupport', () => {
         }),
         scout.create(TableColumnClientUiPreferenceDo, {
           columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, // ColorColumn
-          viewIndex: 2,
+          viewIndex: 1,
           visible: true,
           width: 333,
           sortOrder: -1,
@@ -240,7 +231,7 @@ describe('BookmarkSupport', () => {
         }),
         scout.create(TableColumnClientUiPreferenceDo, {
           columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID, // PrimaryColumn
-          viewIndex: 3,
+          viewIndex: 2,
           visible: false,
           width: 77,
           sortOrder: -1,
@@ -249,7 +240,7 @@ describe('BookmarkSupport', () => {
         }),
         scout.create(TableColumnClientUiPreferenceDo, {
           columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, // UsageColumn
-          viewIndex: 4,
+          viewIndex: 3,
           visible: true,
           width: 60,
           sortOrder: -1,

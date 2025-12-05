@@ -103,7 +103,7 @@ export class TableUiPreferences implements ObjectWithType {
     scout.assertParameter('table', table, Table);
     if (table.uiPreferencesEnabled) {
       // Save current state as "factory defaults". User filters are not included.
-      table.setInitialUiPreferences(this.createProfile(table));
+      table.saveInitialUiPreferences();
 
       // If there is a stored GLOBAL profile, apply it now
       let prefs = this.get(table);
@@ -226,7 +226,7 @@ export class TableUiPreferences implements ObjectWithType {
    * Creates a new data object consisting of all profile-dependent preferences for the given table, according to its current state.
    */
   createProfile(table: Table, options?: CreateTablePreferenceProfileOptions): TableClientUiPreferenceProfileDo {
-    let columnPreferences = this.createColumnPreferences(table);
+    let columnPreferences = this.createColumnPreferences(table, options?.includeNonDisplayableColumns);
     let userFilters = options?.includeUserFilters ? this.createUserFilterStates(table) : null;
     let customizerData = this.createCustomizerData(table);
 
@@ -239,12 +239,14 @@ export class TableUiPreferences implements ObjectWithType {
 
   /**
    * Creates a list of new data objects consisting of the preferences for each column of the given table, according to their current state.
-   * The result is never `null`. Invisible columns are included, while `guiOnly` columns are ignored.
+   * The result is never `null`. Invisible columns are included, while `guiOnly` and `displayable=false` columns are ignored. Non-displayable
+   * columns can be included explicitly by setting the corresponding option.
    */
-  createColumnPreferences(table: Table): TableColumnClientUiPreferenceDo[] {
+  createColumnPreferences(table: Table, includeNonDisplayableColumns = false): TableColumnClientUiPreferenceDo[] {
     scout.assertParameter('table', table, Table);
     return table.columns
       .filter(column => !column.guiOnly)
+      .filter(column => column.displayable || includeNonDisplayableColumns)
       .map((column, index) => {
         return scout.create(TableColumnClientUiPreferenceDo, {
           columnId: column.buildUuid(),
@@ -450,13 +452,25 @@ export class TableUiPreferences implements ObjectWithType {
     let newColumns = table.columns
       .filter(c => !c.guiOnly) // will be recreated by _setColumns
       .sort((c1, c2) => { // reorder
+        if (!options?.applyNonDisplayableColumns) {
+          // Unless explicitly requested, non-displayable columns are always placed at the front, and their preferences are ignored.
+          if (!c1.displayable && !c2.displayable) {
+            return (c1.primaryKey === c2.primaryKey ? 0 : (c1.primaryKey ? -1 : 1)); // pk first
+          }
+          if (!c1.displayable || !c2.displayable) {
+            return !c1.displayable ? -1 : 1; // non-displayable first
+          }
+        }
+        // columns without preferences are placed at the end
         let viewIndex1 = columnPreferencesMap.get(c1.buildUuid())?.viewIndex ?? Infinity;
         let viewIndex2 = columnPreferencesMap.get(c2.buildUuid())?.viewIndex ?? Infinity;
         return viewIndex1 - viewIndex2;
       });
     // Apply preferences to existing columns. Columns without corresponding entry in the preferences are left
     // untouched, while preference entries without corresponding column are simply ignored.
-    newColumns.forEach(column => this._applyColumnPreferencesToColumn(column, columnPreferencesMap.get(column.buildUuid())));
+    newColumns
+      .filter(column => column.displayable || options?.applyNonDisplayableColumns)
+      .forEach(column => this._applyColumnPreferencesToColumn(column, columnPreferencesMap.get(column.buildUuid())));
 
     table.setColumns(newColumns);
   }
@@ -496,20 +510,40 @@ export class TableUiPreferences implements ObjectWithType {
 
 export interface CreateTablePreferenceProfileOptions {
   /**
-   * Specifies whether to include the state of user filters ({@link IUserFilterStateDo}) in the preference profile. Default is `false`.
+   * Specifies whether to include the state of user filters ({@link IUserFilterStateDo}) in the preference profile.
+   *
+   * Default is false.
    */
-  includeUserFilters: boolean;
+  includeUserFilters?: boolean;
+  /**
+   * Specifies whether information about columns with `displayable=false` should be included in the profile. Useful to save the
+   * initial state of a table. Not intended to be set when creating a profile that is to be persisted.
+   *
+   * Default is false.
+   */
+  includeNonDisplayableColumns?: boolean;
 }
 
 export interface ApplyTablePreferencesOptions {
   /**
-   * Specifies whether to apply customizer data from the preference profile to the table. Default is `true`.
+   * Specifies whether to apply customizer data from the preference profile to the table.
+   *
+   * Default is true.
    */
   applyCustomizerData?: boolean;
   /**
-   * Specifies whether to apply user filter states from the preference profile to the table. Default is `false`.
+   * Specifies whether to apply user filter states from the preference profile to the table.
+   *
+   * Default is false.
    */
   applyUserFilters?: boolean;
+  /**
+   * Specifies whether information about columns with `displayable=false` should be applied. Useful to restore the initial state
+   * of a table that was previously saved with {@link CreateTablePreferenceProfileOptions#includeNonDisplayableColumns}.
+   *
+   * Default is false.
+   */
+  applyNonDisplayableColumns?: boolean;
 }
 
 // --------------------------------------
