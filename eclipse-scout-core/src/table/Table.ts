@@ -6611,12 +6611,25 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     tableUiPreferences.updateUiPreferencesEnabled(this);
   }
 
+  /**
+   * Sets the initial ui preferences to the given value.
+   *
+   * To save the current state of the table as initial ui preferences, use {@link saveInitialUiPreferences} instead.
+   */
   setInitialUiPreferences(initialUiPreferences: TableClientUiPreferenceProfileDo) {
     this._initialUiPreferences = initialUiPreferences;
   }
 
   get initialUiPreferences(): TableClientUiPreferenceProfileDo {
     return this._initialUiPreferences;
+  }
+
+  /**
+   * Saves the current state of the table as {@link initialUiPreferences}, including non-displayable columns.
+   */
+  saveInitialUiPreferences() {
+    let profile = tableUiPreferences.createProfile(this, {includeNonDisplayableColumns: true});
+    this.setInitialUiPreferences(profile);
   }
 
   /**
@@ -6627,7 +6640,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     if (!this._initialUiPreferences) {
       return;
     }
-    tableUiPreferences.applyProfile(this, this._initialUiPreferences, {applyUserFilters: true});
+    tableUiPreferences.applyProfile(this, this._initialUiPreferences, {applyUserFilters: true, applyNonDisplayableColumns: true});
     if (this.uiPreferencesEnabled) {
       tableUiPreferences.clearGlobalProfile(this);
     }
