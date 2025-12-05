@@ -13,6 +13,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.internal.PlatformImplementor;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexInventoryBuilder.RebuildStrategy;
+import org.eclipse.scout.rt.platform.security.PasswordPolicy;
 import org.eclipse.scout.rt.platform.serialization.DefaultSerializerBlacklist;
 import org.eclipse.scout.rt.platform.serialization.DefaultSerializerWhitelist;
 
@@ -368,6 +369,27 @@ public final class PlatformConfigProperties {
     @Override
     public Integer getDefaultValue() {
       return 500;
+    }
+  }
+
+  /**
+   * @see PasswordPolicy
+   */
+  public static class PasswordPolicyMinLengthProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.passwordPolicy.minLength";
+    }
+
+    @Override
+    public String description() {
+      return String.format("Minimum length for passwords checked by %s", PasswordPolicy.class.getName());
+    }
+
+    @Override
+    public Integer getDefaultValue() {
+      return 12;
     }
   }
 }
