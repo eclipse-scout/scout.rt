@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.testing.server.runner.parameterized;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.IPlatform;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedFrameworkMethod;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedTestRunnerExtension;

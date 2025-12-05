@@ -22,7 +22,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.context.HttpRunContextFilter;
 import org.eclipse.scout.rt.server.commons.context.HttpRunContextProducer;
 
