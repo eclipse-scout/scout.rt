@@ -18,6 +18,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import org.eclipse.scout.rt.api.data.ApiExposed;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.IRestResource;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelConstants;
@@ -28,6 +29,7 @@ public class ProcessResource implements IRestResource {
   @POST
   @Consumes(MediaType.APPLICATION_OCTET_STREAM)
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
+  @ApiExposed(false)
   public Response process(InputStream in) throws Exception {
     return BEANS.get(ServiceTunnelService.class).incomingRequest(in);
   }

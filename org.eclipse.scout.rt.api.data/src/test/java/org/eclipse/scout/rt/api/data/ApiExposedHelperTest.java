@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,34 +18,34 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.security.ISecurityProvider;
 import org.junit.Test;
 
-public class ApiExposeHelperTest {
+public class ApiExposedHelperTest {
   @Test
-  public void testHasApiExposedAnnotation() {
-    ApiExposeHelper helper = BEANS.get(ApiExposeHelper.class);
+  public void testIsApiExposed() {
+    ApiExposedHelper helper = BEANS.get(ApiExposedHelper.class);
     IBean<ApiExposedBeanFixture> beanFixture = BEANS.getBeanManager().getBean(ApiExposedBeanFixture.class);
     ApiExposedFixture fixture = new ApiExposedFixture();
-    assertTrue(helper.hasApiExposedAnnotation(fixture));
-    assertTrue(helper.hasApiExposedAnnotation(beanFixture));
-    assertTrue(helper.hasApiExposedAnnotation(ApiExposedFixture.class));
+    assertTrue(helper.isApiExposed(fixture));
+    assertTrue(helper.isApiExposed(beanFixture));
+    assertTrue(helper.isApiExposed(ApiExposedFixture.class));
 
     IBean<ISecurityProvider> unexposedBean = BEANS.getBeanManager().getBean(ISecurityProvider.class);
-    assertFalse(helper.hasApiExposedAnnotation(unexposedBean));
-    assertFalse(helper.hasApiExposedAnnotation(new ApiExposeHelperTest()));
-    assertFalse(helper.hasApiExposedAnnotation(ApiExposeHelperTest.class));
-    assertFalse(helper.hasApiExposedAnnotation((IBean<?>) null));
-    assertFalse(helper.hasApiExposedAnnotation((Class<?>) null));
-    assertFalse(helper.hasApiExposedAnnotation((Object) null));
+    assertFalse(helper.isApiExposed(unexposedBean));
+    assertFalse(helper.isApiExposed(new ApiExposedHelperTest()));
+    assertFalse(helper.isApiExposed(ApiExposedHelperTest.class));
+    assertFalse(helper.isApiExposed((IBean<?>) null));
+    assertFalse(helper.isApiExposed((Class<?>) null));
+    assertFalse(helper.isApiExposed((Object) null));
   }
 
   @Test
   public void testObjectTypeOf() {
-    ApiExposeHelper helper = BEANS.get(ApiExposeHelper.class);
+    ApiExposedHelper helper = BEANS.get(ApiExposedHelper.class);
     ApiExposedFixture fixture = new ApiExposedFixture();
     assertEquals("test2", helper.objectTypeOf(fixture));
     assertEquals("test2", helper.objectTypeOf(ApiExposedFixture.class));
 
-    assertNull(helper.objectTypeOf(new ApiExposeHelperTest()));
-    assertNull(helper.objectTypeOf(ApiExposeHelperTest.class));
+    assertNull(helper.objectTypeOf(new ApiExposedHelperTest()));
+    assertNull(helper.objectTypeOf(ApiExposedHelperTest.class));
     assertNull(helper.objectTypeOf(null));
     assertNull(helper.objectTypeOf((Object) null));
     assertNull(helper.objectTypeOf(ApiExposedEmptyFixture.class));
@@ -53,13 +53,13 @@ public class ApiExposeHelperTest {
 
   @Test
   public void testFieldNameOf() {
-    ApiExposeHelper helper = BEANS.get(ApiExposeHelper.class);
+    ApiExposedHelper helper = BEANS.get(ApiExposedHelper.class);
     ApiExposedFixture fixture = new ApiExposedFixture();
     assertEquals("field2", helper.fieldNameOf(fixture));
     assertEquals("field2", helper.fieldNameOf(ApiExposedFixture.class));
 
-    assertNull(helper.fieldNameOf(new ApiExposeHelperTest()));
-    assertNull(helper.fieldNameOf(ApiExposeHelperTest.class));
+    assertNull(helper.fieldNameOf(new ApiExposedHelperTest()));
+    assertNull(helper.fieldNameOf(ApiExposedHelperTest.class));
     assertNull(helper.fieldNameOf(null));
     assertNull(helper.fieldNameOf((Object) null));
     assertNull(helper.fieldNameOf(ApiExposedEmptyFixture.class));
@@ -67,7 +67,7 @@ public class ApiExposeHelperTest {
 
   @Test
   public void testSetObjectTypeToDo() {
-    ApiExposeHelper helper = BEANS.get(ApiExposeHelper.class);
+    ApiExposedHelper helper = BEANS.get(ApiExposedHelper.class);
 
     // null safety
     helper.setObjectTypeToDo(null, null);
@@ -75,25 +75,25 @@ public class ApiExposeHelperTest {
 
     // nothing is transferred if no annotation present
     DoEntity emptyBean = BEANS.get(DoEntity.class);
-    helper.setObjectTypeToDo(new ApiExposeHelperTest(), emptyBean);
-    assertNull(emptyBean.get(ApiExposeHelper.OBJECT_TYPE_ATTRIBUTE_NAME, String.class));
+    helper.setObjectTypeToDo(new ApiExposedHelperTest(), emptyBean);
+    assertNull(emptyBean.get(ApiExposedHelper.OBJECT_TYPE_ATTRIBUTE_NAME, String.class));
 
     // value is transferred from annotation to DO
     emptyBean = BEANS.get(DoEntity.class);
     helper.setObjectTypeToDo(new ApiExposedFixture(), emptyBean);
-    assertEquals("test2", emptyBean.get(ApiExposeHelper.OBJECT_TYPE_ATTRIBUTE_NAME, String.class));
+    assertEquals("test2", emptyBean.get(ApiExposedHelper.OBJECT_TYPE_ATTRIBUTE_NAME, String.class));
 
     // empty value is ignored
     emptyBean = BEANS.get(DoEntity.class);
     helper.setObjectTypeToDo(ApiExposedEmptyFixture.class, emptyBean);
-    assertNull(emptyBean.get(ApiExposeHelper.OBJECT_TYPE_ATTRIBUTE_NAME, String.class));
+    assertNull(emptyBean.get(ApiExposedHelper.OBJECT_TYPE_ATTRIBUTE_NAME, String.class));
 
     // custom values are preserved
     DoEntity beanWithCustomValue = BEANS.get(DoEntity.class);
     String customValue = "customValue";
-    beanWithCustomValue.put(ApiExposeHelper.OBJECT_TYPE_ATTRIBUTE_NAME, customValue);
+    beanWithCustomValue.put(ApiExposedHelper.OBJECT_TYPE_ATTRIBUTE_NAME, customValue);
     helper.setObjectTypeToDo(ApiExposedFixture.class, beanWithCustomValue);
-    assertEquals(customValue, beanWithCustomValue.get(ApiExposeHelper.OBJECT_TYPE_ATTRIBUTE_NAME, String.class));
+    assertEquals(customValue, beanWithCustomValue.get(ApiExposedHelper.OBJECT_TYPE_ATTRIBUTE_NAME, String.class));
   }
 
   @Bean

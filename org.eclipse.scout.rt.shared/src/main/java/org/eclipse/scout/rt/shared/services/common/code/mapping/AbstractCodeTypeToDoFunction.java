@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.code.mapping;
 import java.util.List;
 import java.util.function.Function;
 
-import org.eclipse.scout.rt.api.data.ApiExposeHelper;
+import org.eclipse.scout.rt.api.data.ApiExposedHelper;
 import org.eclipse.scout.rt.api.data.code.CodeDo;
 import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
 import org.eclipse.scout.rt.dataobject.mapping.AbstractToDoFunction;
@@ -70,7 +70,7 @@ public abstract class AbstractCodeTypeToDoFunction<EXPLICIT_SOURCE extends ICode
     if (Platform.get().inDevelopmentMode()) {
       codeTypeDo.withModelClass(codeType.getClass().getName());
     }
-    BEANS.get(ApiExposeHelper.class).setObjectTypeToDo(codeType, codeTypeDo);
+    BEANS.get(ApiExposedHelper.class).setObjectTypeToDo(codeType, codeTypeDo);
   }
 
   protected List<? extends ICode<?>> getCodesToConvert(EXPLICIT_SOURCE codeType) {

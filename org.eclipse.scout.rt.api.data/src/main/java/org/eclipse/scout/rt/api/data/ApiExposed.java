@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -32,4 +32,6 @@ import java.lang.annotation.Target;
 @Target({TYPE, FIELD, METHOD})
 @Retention(RUNTIME)
 public @interface ApiExposed {
+
+  boolean value() default true;
 }

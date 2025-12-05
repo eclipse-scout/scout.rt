@@ -19,12 +19,16 @@ public class ExtRestApplication extends RestApplication {
 
   @Override
   protected boolean filterClass(Class<?> clazz) {
-    return !AntiCsrfContainerFilter.class.isAssignableFrom(clazz)
-        && (!IRestResource.class.isAssignableFrom(clazz) || isExtScope(clazz));
+    return !AntiCsrfContainerFilter.class.isAssignableFrom(clazz) && isExtScope(clazz);
   }
 
   protected boolean isExtScope(Class<?> clazz) {
     RestApplicationScope annotation = clazz.getAnnotation(RestApplicationScope.class);
-    return annotation != null && ObjectUtility.isOneOf(RestApplicationScopes.EXT, annotation.value());
+    if (annotation != null) {
+      // check matching scope
+      return ObjectUtility.isOneOf(RestApplicationScopes.EXT, annotation.value());
+    }
+    // include all non-IRestResource classes
+    return !IRestResource.class.isAssignableFrom(clazz);
   }
 }

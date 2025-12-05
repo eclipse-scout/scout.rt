@@ -24,6 +24,7 @@ import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 
+import org.eclipse.scout.rt.api.data.ApiExposed;
 import org.eclipse.scout.rt.api.data.uinotification.TopicDo;
 import org.eclipse.scout.rt.api.data.uinotification.UiNotificationDo;
 import org.eclipse.scout.rt.api.data.uinotification.UiNotificationRequest;
@@ -51,6 +52,7 @@ public class UiNotificationResource implements IRestResource {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
+  @ApiExposed
   public void get(UiNotificationRequest request, @Suspended AsyncResponse asyncResponse, @Context HttpServletRequest httpReq) {
     if (request == null) {
       throw new BadRequestException("Request must not be null");

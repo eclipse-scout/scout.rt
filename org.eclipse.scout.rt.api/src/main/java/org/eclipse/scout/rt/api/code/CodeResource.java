@@ -30,6 +30,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 
+import org.eclipse.scout.rt.api.data.ApiExposed;
 import org.eclipse.scout.rt.api.data.code.CodeDo;
 import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
 import org.eclipse.scout.rt.api.data.code.CodeTypeRequest;
@@ -59,6 +60,7 @@ public class CodeResource implements IRestResource {
   @PUT
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
+  @ApiExposed
   public Collection<CodeTypeDo> list(@QueryParam("allLanguages") @DefaultValue("true") boolean allLanguages, CodeTypeRequest request) {
     Set<String> ids = request == null ? null : request.getCodeTypeIds();
     Map<String, CodeTypeDo> codeTypeDos = getCodeTypesById(ids);
