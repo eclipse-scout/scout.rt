@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.platform.security;
 import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PasswordPolicyMinLengthProperty;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 
@@ -22,8 +24,6 @@ import org.eclipse.scout.rt.platform.text.TEXTS;
  */
 @Bean
 public class PasswordPolicy {
-
-  public static final int MIN_PASSWORD_LENGTH = 12;
 
   protected boolean containsUsername(char[] newPassword, String userName) {
     if (userName == null) {
@@ -49,7 +49,7 @@ public class PasswordPolicy {
    * @return a localized text that describes the policy to the user (may contain new lines)
    */
   public String getText() {
-    return TEXTS.get("DefaultPasswordPolicyText");
+    return TEXTS.get("DefaultPasswordPolicyText", "" + getMinPasswordLength());
   }
 
   /**
@@ -60,8 +60,8 @@ public class PasswordPolicy {
    *     if the password violates a rule. The exception message contains a human-readable text in the current locale.
    */
   public void check(String userName, char[] newPassword, int historyIndex) {
-    if (newPassword == null || newPassword.length < MIN_PASSWORD_LENGTH) {
-      throw new VetoException(TEXTS.get("PasswordMinLength"));
+    if (newPassword == null || newPassword.length < getMinPasswordLength()) {
+      throw new VetoException(TEXTS.get("PasswordMinLength", "" + getMinPasswordLength()));
     }
     if (historyIndex >= 0) {
       throw new VetoException(TEXTS.get("PasswordNotSameAsLasts"));
@@ -84,5 +84,9 @@ public class PasswordPolicy {
     if (containsUsername(newPassword, userName)) {
       throw new VetoException(TEXTS.get("PasswordUsernameNotPartOfPass"));
     }
+  }
+
+  protected Integer getMinPasswordLength() {
+    return CONFIG.getPropertyValue(PasswordPolicyMinLengthProperty.class);
   }
 }
