@@ -217,6 +217,26 @@ describe('ContextMenuPopup', () => {
       popup.remove();
     });
 
+    it('makes menus non-tabbable', () => {
+      menu0.tabbable = true; // <-- !
+      let menuItems = [menu0, menu1, menu2];
+      popup = scout.create(ContextMenuPopup, {
+        parent: session.desktop,
+        session: session,
+        menuItems: menuItems,
+        cloneMenuItems: false
+      });
+      popup.render();
+
+      expect(menu0.tabbable).toBe(false); // <-- !
+      expect(menu1.tabbable).toBe(false);
+      expect(menu2.tabbable).toBe(false);
+      expect(menu0.$container.attr('tabindex')).toBeUndefined(); // <-- !
+      expect(menu1.$container.attr('tabindex')).toBeUndefined();
+      expect(menu2.$container.attr('tabindex')).toBeUndefined();
+      popup.remove();
+    });
+
     it('makes cloned menus non-tabbable', () => {
       menu0.tabbable = true; // <-- !
       let menuItems = [menu0, menu1, menu2];

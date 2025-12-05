@@ -398,7 +398,6 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
           excludePropertiesToClone: ['uuid'],
           excludePropertiesToOriginal: ['selected', 'logicalGrid', 'tabbable']
         });
-        menu.setTabbable(false);
         // attach listener
         this._attachCloneMenuListeners(menu);
       }
@@ -407,6 +406,7 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
       if (!menu.__originalParent) {
         menu.__originalParent = originalParent;
       }
+      menu.setTabbable(false); // There are dedicated keystrokes to navigate between the menu items -> pressing tab must not focus an item
       menu.render(this.$body);
       menu.$container.removeClass('menu-button');
       this._attachMenuListeners(menu);
