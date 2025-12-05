@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonDataObjectHelper;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
@@ -131,11 +130,10 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   @Override
   protected void attachNodeInternal(ITreeNode node) {
-    if (!(node instanceof IPage)) {
+    if (!(node instanceof IPage<?> page)) {
       throw new IllegalArgumentException("Expected node to be a page. " + node);
     }
     super.attachNodeInternal(node);
-    IPage<?> page = (IPage<?>) node;
     if (hasDetailForm(page)) {
       attachGlobalAdapter(page.getDetailForm());
     }
@@ -188,10 +186,9 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   @Override
   protected JSONObject treeNodeToJson(ITreeNode node, IChildNodeIndexLookup childIndexes, Set<ITreeNode> acceptedNodes) {
-    if (!(node instanceof IPage)) {
+    if (!(node instanceof IPage<?> page)) {
       throw new IllegalArgumentException("Expected node to be a page. " + node);
     }
-    IPage<?> page = (IPage<?>) node;
     JSONObject json = super.treeNodeToJson(node, childIndexes, acceptedNodes);
     putNodeType(json, node);
     if (node instanceof IJsPage) {
@@ -204,7 +201,8 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       json.put(PROP_SHOW_TILE_OVERVIEW, page.isShowTileOverview());
       json.put(PROP_COMPACT_ROOT, page.isCompactRoot());
     }
-    BEANS.get(InspectorInfo.class).put(json, page, getUiSession());
+    IUiSession uiSession = getUiSession();
+    uiSession.getInspectorInfo().put(json, page, uiSession);
     BEANS.all(IPageToJsonContributor.class).forEach(c -> c.contribute(json, page));
     JsonObjectUtility.filterDefaultValues(json, "Page");
     return json;

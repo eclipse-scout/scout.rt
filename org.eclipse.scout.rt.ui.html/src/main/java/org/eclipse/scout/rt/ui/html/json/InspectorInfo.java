@@ -19,9 +19,10 @@ import java.util.regex.Pattern;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
-import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -33,7 +34,7 @@ import org.json.JSONObject;
  *
  * @since 5.2
  */
-@ApplicationScoped
+@Bean
 public class InspectorInfo {
 
   public static final String PROP_CLASS_ID = "classId";
@@ -47,7 +48,8 @@ public class InspectorInfo {
    * Pattern for concatenated classIds as e.g. created by {@link AbstractWidget#classId()}.
    */
   public static final Pattern CLASS_ID_WITH_UUID_PATTERN = Pattern.compile(UUID_PATTERN + "(?:" + ITypeWithClassId.ID_CONCAT_SYMBOL + UUID_PATTERN + ")*");
-  private static final MessageDigest SHA256 = createSha256Digest();
+
+  private final LazyValue<MessageDigest> m_sha256 = new LazyValue<>(InspectorInfo::createSha256Digest);
 
   private static MessageDigest createSha256Digest() {
     try {
@@ -77,9 +79,9 @@ public class InspectorInfo {
     String classId = null;
     if (model instanceof ITypeWithClassId) {
       classId = ((ITypeWithClassId) model).classId();
-    }
-    if (!StringUtility.isNullOrEmpty(classId)) {
-      json.put(PROP_CLASS_ID, prepareClassId(classId));
+      if (!StringUtility.isNullOrEmpty(classId)) {
+        json.put(PROP_CLASS_ID, prepareClassId(classId));
+      }
     }
     if (UrlHints.isInspectorHint(uiSession.currentHttpRequest())) {
       json.put(PROP_MODEL_CLASS, model.getClass().getName());
@@ -102,7 +104,7 @@ public class InspectorInfo {
 
     // Here the uuid may contain e.g. class names -> hide internal details from browser.
     // Use custom hash (and not SecurityUtility.hash and no encryption) to ensure the string gets not too long.
-    byte[] hashedId = SHA256.digest(classId.getBytes(StandardCharsets.UTF_8));
+    byte[] hashedId = m_sha256.get().digest(classId.getBytes(StandardCharsets.UTF_8));
     // use Base32 encoding because it is shorter than hex and does not include special characters and is case-insensitive (compared to Base64).
     return new BigInteger(1, hashedId).toString(32);
   }

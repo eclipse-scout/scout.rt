@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
@@ -142,15 +141,17 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     JSONObject json = new JSONObject();
     putProperty(json, "id", getId());
     putProperty(json, "objectType", getObjectTypeVariant());
-    BEANS.get(InspectorInfo.class).put(json, getModel(), getUiSession());
+    IUiSession uiSession = getUiSession();
+
+    uiSession.getInspectorInfo().put(json, getModel(), uiSession);
 
     // Mark the global adapters so the UI may use the root adapter as owner
-    if (getParent() == getUiSession().getRootJsonAdapter()) {
+    if (getParent() == uiSession.getRootJsonAdapter()) {
       putProperty(json, "global", true);
     }
     // The owner is not relevant for the UI, it always uses its creator as owner, or the root adapter if global is true
     // But other clients (like JMeter) may need this information to easier link the individual adapters
-    if (UrlHints.isInspectorHint(getUiSession().currentHttpRequest())) {
+    if (UrlHints.isInspectorHint(uiSession.currentHttpRequest())) {
       putProperty(json, "owner", getParent().getId());
     }
     return json;
