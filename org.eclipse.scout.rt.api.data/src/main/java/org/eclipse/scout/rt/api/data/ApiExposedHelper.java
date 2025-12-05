@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.api.data;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -21,33 +22,63 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * Helper class to access values of {@link ApiExposed},{@link ObjectType} and {@link FieldName} annotation values.
  */
 @ApplicationScoped
-public class ApiExposeHelper {
+public class ApiExposedHelper {
 
   public static final String OBJECT_TYPE_ATTRIBUTE_NAME = "objectType";
 
   /**
-   * @return if the given instance has the {@link ApiExposed} annotation set (directly or on one of its super classes).
+   * @return if the given instance has the {@link ApiExposed} annotation with {@link ApiExposed#value()} = {@code true} set (directly or on one of its super classes).
    */
-  public boolean hasApiExposedAnnotation(Object instance) {
+  public boolean isApiExposed(Object instance) {
     if (instance == null) {
       return false;
     }
-    return hasApiExposedAnnotation(instance.getClass());
+    return isApiExposed(instance.getClass());
   }
 
   /**
-   * @return if the given {@link IBean} has the {@link ApiExposed} annotation set (directly or on one of its super
+   * @return if the given {@link IBean} has the {@link ApiExposed} annotation with {@link ApiExposed#value()} = {@code true} set (directly or on one of its super
    * classes).
    */
-  public boolean hasApiExposedAnnotation(IBean<?> bean) {
-    return getAnnotation(bean, ApiExposed.class) != null;
+  public boolean isApiExposed(IBean<?> bean) {
+    ApiExposed ann = getAnnotation(bean, ApiExposed.class);
+    return ann != null && ann.value();
   }
 
   /**
-   * @return if the given class has the {@link ApiExposed} annotation set (directly or on one of its super classes).
+   * @return if the given class has the {@link ApiExposed} annotation with {@link ApiExposed#value()} = {@code true} set (directly or on one of its super classes).
    */
-  public boolean hasApiExposedAnnotation(Class<?> clazz) {
-    return getAnnotation(clazz, ApiExposed.class) != null;
+  public boolean isApiExposed(Class<?> clazz) {
+    ApiExposed ann = getApiExposedAnnotation(clazz);
+    return ann != null && ann.value();
+  }
+
+  /**
+   * @return if the given method has the {@link ApiExposed} annotation with {@link ApiExposed#value()} = {@code true} set (directly or its declaring class).
+   */
+  public boolean isApiExposed(Method method) {
+    ApiExposed ann = getApiExposedAnnotation(method);
+    return ann != null && ann.value();
+  }
+
+  /**
+   * @return the {@link ApiExposed} annotation if defined on the class (if available bean manager is used to determine the annotation otherwise the class itself is tested)
+   */
+  public ApiExposed getApiExposedAnnotation(Class<?> clazz) {
+    return getAnnotation(clazz, ApiExposed.class);
+  }
+
+  /**
+   * @return the {@link ApiExposed} annotation if defined for the method, if not the declaring class is checked using {@link #getApiExposedAnnotation(Class)}
+   */
+  public ApiExposed getApiExposedAnnotation(Method method) {
+    ApiExposed annotation = method.getAnnotation(ApiExposed.class);
+    if (annotation != null) {
+      return annotation;
+    }
+
+    Class<?> declaringClass = method.getDeclaringClass();
+    return getApiExposedAnnotation(declaringClass);
   }
 
   /**

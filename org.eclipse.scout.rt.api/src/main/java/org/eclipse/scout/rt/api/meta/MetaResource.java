@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,6 +26,7 @@ import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 
+import org.eclipse.scout.rt.api.data.ApiExposed;
 import org.eclipse.scout.rt.api.data.meta.MetaVersionInfoDo;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -54,6 +55,7 @@ public class MetaResource implements IRestResource {
   @Path("version")
   @Produces(MediaType.APPLICATION_JSON)
   @ApiDocDescription(text = "Returns the application version and application meta data in JSON format.")
+  @ApiExposed
   public MetaVersionInfoDo getMetaVersionInfo() {
     return BEANS.get(MetaVersionInfoDo.class)
         .withApplicationName(CONFIG.getPropertyValue(ApplicationNameProperty.class))
@@ -65,6 +67,7 @@ public class MetaResource implements IRestResource {
   @Path("version")
   @Produces(MediaType.TEXT_PLAIN)
   @ApiDocDescription(text = "Returns the application version in text format. If 'verbose' is true, the application name and module build date are returned as well.")
+  @ApiExposed
   public String getVersion(@QueryParam("verbose") boolean verbose) {
     if (verbose) {
       return StringUtility.join(" ",
@@ -86,6 +89,7 @@ public class MetaResource implements IRestResource {
   @GET
   @Path("ping")
   @Produces(MediaType.TEXT_PLAIN)
+  @ApiExposed
   public String ping() {
     return "Hello";
   }
@@ -93,6 +97,7 @@ public class MetaResource implements IRestResource {
   @GET
   @Path("echo{path: $|/.*}")
   @Produces(MediaType.TEXT_PLAIN + ";charset=utf-8")
+  @ApiExposed
   public String echo(@Context Request request, @Context UriInfo uriInfo) {
     Function<MultivaluedMap<String, String>, String> mapToString = (map) -> {
       if (map.isEmpty()) {
@@ -113,6 +118,7 @@ public class MetaResource implements IRestResource {
   @Path("whoami")
   @Produces(MediaType.TEXT_PLAIN)
   @ApiDocDescription(text = "Returns the principal name.")
+  @ApiExposed
   public String whoAmI() {
     Subject subject = RunContext.CURRENT.get().getSubject();
     return ObjectUtility.nvl(SecurityUtility.getPrincipalNames(subject), "(nobody)");
@@ -122,6 +128,7 @@ public class MetaResource implements IRestResource {
   @Path("locale")
   @Produces(MediaType.TEXT_PLAIN)
   @ApiDocDescription(text = "Returns the current locale.")
+  @ApiExposed
   public String locale() {
     return NlsLocale.get().toLanguageTag();
   }
@@ -129,6 +136,7 @@ public class MetaResource implements IRestResource {
   @GET
   @Path("doc")
   @ApiDocIgnore
+  @ApiExposed
   public Response getDocAsHtml(@QueryParam(ApiDocGenerator.STATIC_RESOURCE_PARAM) String staticResource, @QueryParam(ApiDocGenerator.SCOPE_PARAM) String scope) {
     return BEANS.get(ApiDocGenerator.class).getWebContent(staticResource, scope);
   }
@@ -137,6 +145,7 @@ public class MetaResource implements IRestResource {
   @Path("doc/csv")
   @ApiDocIgnore
   @Produces(MediaType.TEXT_PLAIN)
+  @ApiExposed
   public Response getDocAsText(@QueryParam(ApiDocGenerator.SCOPE_PARAM) String scope) {
     return BEANS.get(ApiDocGenerator.class).getTextContent(scope);
   }
@@ -145,6 +154,7 @@ public class MetaResource implements IRestResource {
   @Path("doc/json")
   @ApiDocIgnore
   @Produces(MediaType.APPLICATION_JSON)
+  @ApiExposed
   public Response getDocAsJson(@QueryParam(ApiDocGenerator.SCOPE_PARAM) String scope) {
     return BEANS.get(ApiDocGenerator.class).getJsonContent(scope);
   }

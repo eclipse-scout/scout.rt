@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
 /**
- * Specifies the {@value ApiExposeHelper#OBJECT_TYPE_ATTRIBUTE_NAME} for a Scout element. It is used when creating the
+ * Specifies the {@value ApiExposedHelper#OBJECT_TYPE_ATTRIBUTE_NAME} for a Scout element. It is used when creating the
  * corresponding element in the Scout TypeScript code on the browser. This allows to customize the class that will be
  * instantiated when creating the element in the Browser.
  * <p>
@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.dataobject.TypeName;
 @Retention(RUNTIME)
 public @interface ObjectType {
   /**
-   * @return The {@value ApiExposeHelper#OBJECT_TYPE_ATTRIBUTE_NAME} value.
+   * @return The {@value ApiExposedHelper#OBJECT_TYPE_ATTRIBUTE_NAME} value.
    */
   String value();
 }

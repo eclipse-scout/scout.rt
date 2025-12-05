@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.rt.api.data.ApiExposeHelper;
+import org.eclipse.scout.rt.api.data.ApiExposedHelper;
 import org.eclipse.scout.rt.api.data.code.CodeDo;
 import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
 import org.eclipse.scout.rt.dataobject.id.IId;
@@ -114,11 +114,11 @@ public abstract class AbstractCodeToDoFunction<EXPLICIT_SOURCE extends ICode<?>,
       //noinspection unchecked
       codeDo.withSortCode(codeType.getCodeIndex(code));
     }
-    BEANS.get(ApiExposeHelper.class).setObjectTypeToDo(code, codeDo);
+    BEANS.get(ApiExposedHelper.class).setObjectTypeToDo(code, codeDo);
   }
 
   protected String computeFieldName(EXPLICIT_SOURCE code) {
-    String fieldName = BEANS.get(ApiExposeHelper.class).fieldNameOf(code);
+    String fieldName = BEANS.get(ApiExposedHelper.class).fieldNameOf(code);
     if (fieldName != null) {
       return fieldName;
     }

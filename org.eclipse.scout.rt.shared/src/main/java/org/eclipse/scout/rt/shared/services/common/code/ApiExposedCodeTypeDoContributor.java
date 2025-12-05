@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,8 +11,8 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.util.Set;
 
-import org.eclipse.scout.rt.api.data.ApiExposeHelper;
 import org.eclipse.scout.rt.api.data.ApiExposed;
+import org.eclipse.scout.rt.api.data.ApiExposedHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.Order;
  */
 @Order(-5000) // this provider should come first so that custom providers can modify the result
 public class ApiExposedCodeTypeDoContributor implements IApiExposedCodeTypeContributor {
-  private final ApiExposeHelper m_apiExposeHelper = BEANS.get(ApiExposeHelper.class);
+  private final ApiExposedHelper m_apiExposedHelper = BEANS.get(ApiExposedHelper.class);
 
   @Override
   public void contribute(Set<ICodeType> codeTypes) {
@@ -34,6 +34,6 @@ public class ApiExposedCodeTypeDoContributor implements IApiExposedCodeTypeContr
   }
 
   protected boolean isApiExposedCodeType(IBean<ICodeType> codeTypeBean) {
-    return m_apiExposeHelper.hasApiExposedAnnotation(codeTypeBean);
+    return m_apiExposedHelper.isApiExposed(codeTypeBean);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.rest.resource.ApiExposedFilter;
 import org.eclipse.scout.rt.server.commons.servlet.HttpProxy;
 import org.eclipse.scout.rt.server.commons.servlet.HttpProxyRequestContext;
 import org.eclipse.scout.rt.server.commons.servlet.HttpProxyRequestOptions;
@@ -71,6 +72,7 @@ public abstract class AbstractRestProxyRequestHandler extends AbstractUiServletR
 
   protected void proxy(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     HttpProxyRequestOptions options = createHttpProxyRequestOptions(req, resp);
+    addProxiedRequestHeader(options);
     getProxy().proxy(req, resp, options);
   }
 
@@ -78,6 +80,10 @@ public abstract class AbstractRestProxyRequestHandler extends AbstractUiServletR
    * @return options to be used for an HTTP through the proxy
    */
   protected abstract HttpProxyRequestOptions createHttpProxyRequestOptions(HttpServletRequest req, HttpServletResponse resp);
+
+  protected void addProxiedRequestHeader(HttpProxyRequestOptions options) {
+    options.withCustomRequestHeader(ApiExposedFilter.HTTP_HEADER_NAME, "1");
+  }
 
   protected HttpProxyRequestContext createHttpProxyRequestContext(HttpServletRequest req) {
     return BEANS.get(HttpProxyRequestContext.class)

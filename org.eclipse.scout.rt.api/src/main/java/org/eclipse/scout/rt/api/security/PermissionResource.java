@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,7 @@ import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.RuntimeDelegate;
 
+import org.eclipse.scout.rt.api.data.ApiExposed;
 import org.eclipse.scout.rt.dataobject.mapping.ToDoFunctionHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.IRestResource;
@@ -29,6 +30,7 @@ import org.eclipse.scout.rt.security.mapping.IToPermissionCollectionDoFunction;
 public class PermissionResource implements IRestResource {
 
   @GET
+  @ApiExposed
   public Response getAllPermissions(@Context Request request) {
     var permissionCollection = BEANS.get(IAccessControlService.class).getPermissions();
     var permissionCollectionDo = BEANS.get(ToDoFunctionHelper.class).toDo(permissionCollection, IToPermissionCollectionDoFunction.class);

@@ -37,9 +37,10 @@ public class MaintenanceModeFeature implements DynamicFeature {
 
     // compute if operation is disabled for maintenance mode, register filter if disabled for maintenance mode
     if (annotation != null && annotation.disabled()) {
-      LOG.debug("Install {} for resource {}", getMaintenanceModeFilterClass().getSimpleName(), resourceInfo);
-      context.register(getMaintenanceModeFilterClass());
-      Assertions.assertNotNull(BEANS.opt(IMaintenanceModeService.class), "{} is installed for resource {} (by annotation); however no {} bean implementation is available", getMaintenanceModeFilterClass().getSimpleName(), resourceInfo, IMaintenanceModeService.class.getSimpleName());
+      Class<? extends MaintenanceModeFilter> filterClass = getMaintenanceModeFilterClass();
+      LOG.debug("Install {} for resource {}", filterClass.getSimpleName(), resourceInfo);
+      context.register(filterClass);
+      Assertions.assertNotNull(BEANS.opt(IMaintenanceModeService.class), "{} is installed for resource {} (by annotation); however no {} bean implementation is available", filterClass.getSimpleName(), resourceInfo, IMaintenanceModeService.class.getSimpleName());
     }
   }
 

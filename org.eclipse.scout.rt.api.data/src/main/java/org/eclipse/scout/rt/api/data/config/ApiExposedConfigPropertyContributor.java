@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,8 +13,8 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 
-import org.eclipse.scout.rt.api.data.ApiExposeHelper;
 import org.eclipse.scout.rt.api.data.ApiExposed;
+import org.eclipse.scout.rt.api.data.ApiExposedHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.config.IConfigProperty;
  */
 public class ApiExposedConfigPropertyContributor extends AbstractApiExposedConfigPropertyContributor {
 
-  private final ApiExposeHelper m_apiExposeHelper = BEANS.get(ApiExposeHelper.class);
+  private final ApiExposedHelper m_apiExposedHelper = BEANS.get(ApiExposedHelper.class);
 
   @Override
   protected Collection<? extends IConfigProperty<?>> getExposedProperties() {
@@ -36,6 +36,6 @@ public class ApiExposedConfigPropertyContributor extends AbstractApiExposedConfi
   }
 
   protected boolean isApiExposedConfigProperty(IBean<IConfigProperty> configPropertyBean) {
-    return m_apiExposeHelper.hasApiExposedAnnotation(configPropertyBean);
+    return m_apiExposedHelper.isApiExposed(configPropertyBean);
   }
 }

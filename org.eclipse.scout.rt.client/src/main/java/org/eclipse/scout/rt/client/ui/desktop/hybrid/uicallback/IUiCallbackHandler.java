@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.hybrid.uicallback;
 
-import org.eclipse.scout.rt.api.data.ApiExposeHelper;
+import org.eclipse.scout.rt.api.data.ApiExposedHelper;
 import org.eclipse.scout.rt.api.data.ObjectType;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridActionContextElements;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
@@ -40,7 +40,7 @@ public interface IUiCallbackHandler<DATA, RESULT> {
    */
   default String uiCallbackHandlerObjectType() {
     // use @ObjectType annotation by default
-    return BEANS.get(ApiExposeHelper.class).objectTypeOf(this);
+    return BEANS.get(ApiExposedHelper.class).objectTypeOf(this);
   }
 
   /**

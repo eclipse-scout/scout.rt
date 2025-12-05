@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
+import org.eclipse.scout.rt.api.data.ApiExposed;
 import org.eclipse.scout.rt.api.data.config.ConfigPropertyDo;
 import org.eclipse.scout.rt.api.data.config.IApiExposedConfigPropertyContributor;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -31,6 +32,7 @@ import org.eclipse.scout.rt.rest.IRestResource;
 public class ConfigPropertiesResource implements IRestResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
+  @ApiExposed
   public Collection<ConfigPropertyDo> list() {
     Set<ConfigPropertyDo> configProperties = new HashSet<>();
     BEANS.all(IApiExposedConfigPropertyContributor.class).forEach(contributor -> contributor.contribute(configProperties));

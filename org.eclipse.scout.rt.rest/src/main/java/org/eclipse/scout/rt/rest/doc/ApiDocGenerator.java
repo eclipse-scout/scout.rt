@@ -49,6 +49,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
+import org.eclipse.scout.rt.api.data.ApiExposedHelper;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
@@ -76,6 +77,8 @@ import org.eclipse.scout.rt.rest.IRestMediaType;
 import org.eclipse.scout.rt.rest.IRestResource;
 import org.eclipse.scout.rt.rest.RestApplicationScope;
 import org.eclipse.scout.rt.rest.RestApplicationScopes;
+import org.eclipse.scout.rt.security.ACCESS;
+import org.eclipse.scout.rt.security.IAccessControlService;
 
 /**
  * Usage in a REST resource:
@@ -121,6 +124,8 @@ public class ApiDocGenerator {
   protected static final String TEXT_ELEMENT_SEPARATOR = "\t";
   protected static final String TEXT_LINE_SEPARATOR = "\n";
 
+  private ApiExposedHelper m_apiExposedHelper = BEANS.get(ApiExposedHelper.class);
+
   public List<ResourceDescriptor> getResourceDescriptors() {
     return getResourceDescriptorsInternal(BEANS.all(IRestResource.class));
   }
@@ -150,16 +155,18 @@ public class ApiDocGenerator {
   }
 
   protected List<ResourceDescriptor> getResourceDescriptorsInternal(Collection<IRestResource> restResources) {
+    boolean readAllApiDocGranted = isReadAllApiDocGranted();
     return restResources.stream()
         .filter(this::acceptRestResource)
         .sorted(Comparator.comparing(res -> res.getClass().getSimpleName()))
         .sorted(Comparator.comparing(res -> "/" + getPath(res)))
-        .map(this::toResourceDescriptor)
+        .map(resource -> toResourceDescriptor(resource, readAllApiDocGranted))
         .filter(Objects::nonNull)
+        .filter(d -> CollectionUtility.hasElements(d.getMethods())) // at least one method is required
         .collect(Collectors.toList());
   }
 
-  protected ResourceDescriptor toResourceDescriptor(IRestResource resource) {
+  protected ResourceDescriptor toResourceDescriptor(IRestResource resource, boolean readAllApiDocGranted) {
     String resourcePath = "/" + getPath(resource);
     String basePath = resourcePath.replaceAll("(/[^/]+).*", "$1");
     String name = resource.getClass().getSimpleName();
@@ -172,6 +179,7 @@ public class ApiDocGenerator {
                 .orElseGet(() -> new String[]{RestApplicationScopes.API})) // default scope
         .filter(StringUtility::hasText)
         .collect(Collectors.toList());
+    boolean ignoreApiExposed = readAllApiDocGranted || !checkForApiExposed(collect);
 
     return new ResourceDescriptor()
         .withResource(resource)
@@ -182,7 +190,7 @@ public class ApiDocGenerator {
         .withDescription(description)
         .withScopes(collect)
         .withMethods(Stream.of(resource.getClass().getMethods())
-            .filter(this::acceptMethod)
+            .filter(m -> acceptMethod(m, ignoreApiExposed))
             .sorted(Comparator.comparing(this::generateMethodSignature)) // to make sure sorting is stable
             .sorted(this::compareMethods)
             .map(this::toMethodDescriptor)
@@ -236,9 +244,10 @@ public class ApiDocGenerator {
         !res.getClass().isAnnotationPresent(ApiDocIgnore.class);
   }
 
-  protected boolean acceptMethod(Method m) {
+  protected boolean acceptMethod(Method m, boolean ignoreApiExposed) {
     return Modifier.isPublic(m.getModifiers()) &&
-        !m.isAnnotationPresent(ApiDocIgnore.class);
+        !m.isAnnotationPresent(ApiDocIgnore.class) &&
+        (ignoreApiExposed || m_apiExposedHelper.isApiExposed(m));
   }
 
   protected int compareMethods(Method m1, Method m2) {
@@ -398,6 +407,14 @@ public class ApiDocGenerator {
     return title;
   }
 
+  protected boolean isReadAllApiDocGranted() {
+    return BEANS.opt(IAccessControlService.class) != null && ACCESS.check(new ReadAllApiDocPermission());
+  }
+
+  protected boolean checkForApiExposed(List<String> scopes) {
+    return scopes != null && scopes.contains(RestApplicationScopes.API);
+  }
+
   /**
    * Same as {@link #getWebContent(String, String)} without scope filter.
    */
@@ -489,23 +506,28 @@ public class ApiDocGenerator {
         elements.add(HTML.div(HTML.raw(r.getDescription().toHtml())).cssClass("resource-description"));
       }
 
-      r.getMethods().forEach(m -> elements.add(HTML.div(
-              HTML.div(
-                      HTML.div(m.getHttpMethod()).cssClass("http " + m.getHttpMethod().toLowerCase()),
-                      HTML.div(
-                          HTML.span("(" + CollectionUtility.format(r.getScopes()) + ")").cssClass("scope"),
-                          HTML.span(r.getPath()).cssClass("resource"),
-                          HTML.span(StringUtility.box("/", m.getPath(), "")).cssClass("method")).cssClass("path"))
-                  .cssClass("header"),
-              HTML.div(
-                      HTML.div(HTML.raw(m.getDescription().toHtml())).cssClass("description"),
-                      HTML.div(m.getSignature().toString()).cssClass("signature"),
-                      HTML.div(
-                              StringUtility.hasText(m.getConsumes()) ? HTML.div(HTML.span("Consumes ").cssClass("k"), HTML.span(m.getConsumes()).cssClass("v")).cssClass("line") : null,
-                              StringUtility.hasText(m.getProduces()) ? HTML.div(HTML.span("Produces ").cssClass("k"), HTML.span(m.getProduces()).cssClass("v")).cssClass("line") : null)
-                          .cssClass("consumes-produces"))
-                  .cssClass("body"))
-          .cssClass("operation")));
+      boolean ignoreApiExposed = !checkForApiExposed(r.getScopes());
+      boolean readAllApiDocGranted = isReadAllApiDocGranted();
+      r.getMethods().forEach(m -> {
+        boolean apiExposed = ignoreApiExposed || !readAllApiDocGranted || m_apiExposedHelper.isApiExposed(m.getMethod());
+        elements.add(HTML.div(
+                HTML.div(
+                        HTML.div(m.getHttpMethod()).cssClass("http " + m.getHttpMethod().toLowerCase()),
+                        HTML.div(
+                            HTML.span("(" + CollectionUtility.format(r.getScopes()) + ")").cssClass("scope"),
+                            HTML.span(r.getPath()).cssClass("resource"),
+                            HTML.span(StringUtility.box("/", m.getPath(), "")).cssClass("method")).cssClass("path").toggleCssClass("not-api-exposed", !apiExposed))
+                    .cssClass("header"),
+                HTML.div(
+                        HTML.div(HTML.raw(m.getDescription().toHtml())).cssClass("description"),
+                        HTML.div(m.getSignature().toString()).cssClass("signature"),
+                        HTML.div(
+                                StringUtility.hasText(m.getConsumes()) ? HTML.div(HTML.span("Consumes ").cssClass("k"), HTML.span(m.getConsumes()).cssClass("v")).cssClass("line") : null,
+                                StringUtility.hasText(m.getProduces()) ? HTML.div(HTML.span("Produces ").cssClass("k"), HTML.span(m.getProduces()).cssClass("v")).cssClass("line") : null)
+                            .cssClass("consumes-produces"))
+                    .cssClass("body"))
+            .cssClass("operation"));
+      });
     });
 
     final String title = generateTitle();
@@ -629,6 +651,7 @@ public class ApiDocGenerator {
   }
 
   protected String toText(List<ResourceDescriptor> resourceDescriptors) {
+    boolean readAllApiDocGranted = isReadAllApiDocGranted();
     final StringBuilder sb = new StringBuilder();
 
     // append header
@@ -645,29 +668,40 @@ public class ApiDocGenerator {
     sb.append("produces");
     sb.append(TEXT_ELEMENT_SEPARATOR);
     sb.append("description");
+    if (readAllApiDocGranted) {
+      sb.append(TEXT_ELEMENT_SEPARATOR);
+      sb.append("apiExposed");
+    }
     sb.append(TEXT_LINE_SEPARATOR);
 
     // append all resources and methods
-    resourceDescriptors.forEach(r -> r.getMethods().forEach(m -> {
-      sb.append(r.getName());
-      sb.append(TEXT_ELEMENT_SEPARATOR);
-      sb.append(m.getHttpMethod());
-      sb.append(TEXT_ELEMENT_SEPARATOR);
-      sb.append(r.getPath());
-      if (!StringUtility.isNullOrEmpty(m.getPath())) {
-        sb.append("/");
-        sb.append(m.getPath());
-      }
-      sb.append(TEXT_ELEMENT_SEPARATOR);
-      sb.append(CollectionUtility.format(r.getScopes()));
-      sb.append(TEXT_ELEMENT_SEPARATOR);
-      sb.append(StringUtility.emptyIfNull(m.getConsumes()));
-      sb.append(TEXT_ELEMENT_SEPARATOR);
-      sb.append(StringUtility.emptyIfNull(m.getProduces()));
-      sb.append(TEXT_ELEMENT_SEPARATOR);
-      sb.append(m.getDescription().toPlainText(true));
-      sb.append(TEXT_LINE_SEPARATOR);
-    }));
+    resourceDescriptors.forEach(r -> {
+      boolean ignoreApiExposed = !checkForApiExposed(r.getScopes());
+      r.getMethods().forEach(m -> {
+        sb.append(r.getName());
+        sb.append(TEXT_ELEMENT_SEPARATOR);
+        sb.append(m.getHttpMethod());
+        sb.append(TEXT_ELEMENT_SEPARATOR);
+        sb.append(r.getPath());
+        if (!StringUtility.isNullOrEmpty(m.getPath())) {
+          sb.append("/");
+          sb.append(m.getPath());
+        }
+        sb.append(TEXT_ELEMENT_SEPARATOR);
+        sb.append(CollectionUtility.format(r.getScopes()));
+        sb.append(TEXT_ELEMENT_SEPARATOR);
+        sb.append(StringUtility.emptyIfNull(m.getConsumes()));
+        sb.append(TEXT_ELEMENT_SEPARATOR);
+        sb.append(StringUtility.emptyIfNull(m.getProduces()));
+        sb.append(TEXT_ELEMENT_SEPARATOR);
+        sb.append(m.getDescription().toPlainText(true));
+        if (!ignoreApiExposed && readAllApiDocGranted) {
+          sb.append(TEXT_ELEMENT_SEPARATOR);
+          sb.append(m_apiExposedHelper.isApiExposed(m.getMethod()));
+        }
+        sb.append(TEXT_LINE_SEPARATOR);
+      });
+    });
     return sb.toString();
   }
 
@@ -716,6 +750,7 @@ public class ApiDocGenerator {
                 .put("signature", m.getSignature().toString())
                 .putIf("consumes", m.getConsumes(), Objects::nonNull)
                 .putIf("produces", m.getProduces(), Objects::nonNull)
+                .putIf("apiExposed", m_apiExposedHelper.isApiExposed(m.getMethod()), v -> !v)
                 .build()))
         .collect(Collectors.toList());
     return BEANS.get(IPrettyPrintDataObjectMapper.class).writeValue(jsonMethods);
@@ -994,8 +1029,7 @@ public class ApiDocGenerator {
       if (type instanceof Class<?>) {
         m_class = (Class<?>) type;
       }
-      else if (type instanceof ParameterizedType) {
-        ParameterizedType parameterizedType = (ParameterizedType) type;
+      else if (type instanceof ParameterizedType parameterizedType) {
         Type[] generics = parameterizedType.getActualTypeArguments();
         Class<?> rawClass = (Class<?>) parameterizedType.getRawType();
         m_class = rawClass;

@@ -15,6 +15,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 
+import org.eclipse.scout.rt.api.data.ApiExposed;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.IRestResource;
 import org.eclipse.scout.rt.security.IAccessControlService;
@@ -34,6 +35,7 @@ public class CancellationResource implements IRestResource {
 
   @PUT
   @Path("{requestId}")
+  @ApiExposed(false)
   public void cancel(@PathParam("requestId") String requestId) {
     BEANS.get(RestRequestCancellationRegistry.class).cancel(requestId, resolveCurrentUserId());
   }

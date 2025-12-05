@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.eclipse.scout.rt.server.commons.id.IdSignatureFilter.SignatureHttpServletRequestWrapper;
 import org.junit.Test;
 
 public class SignatureHttpServletRequestWrapperTest {
@@ -40,7 +39,7 @@ public class SignatureHttpServletRequestWrapperTest {
 
     assertEquals(Set.of(), set(req.getHeaderNames()));
 
-    HttpServletRequest wrapper = new SignatureHttpServletRequestWrapper(req);
+    HttpServletRequest wrapper = new IdSignatureFilter().createSignatureRequest(req);
 
     assertEquals(Boolean.TRUE.toString(), wrapper.getHeader(IdSignatureFilter.ID_SIGNATURE_HTTP_HEADER));
     assertEquals(Boolean.TRUE.toString(), wrapper.getHeader(lowercase(IdSignatureFilter.ID_SIGNATURE_HTTP_HEADER)));
@@ -63,7 +62,7 @@ public class SignatureHttpServletRequestWrapperTest {
 
     assertEquals(Set.of(IdSignatureFilter.ID_SIGNATURE_HTTP_HEADER), set(req.getHeaderNames()));
 
-    HttpServletRequest wrapper = new SignatureHttpServletRequestWrapper(req);
+    HttpServletRequest wrapper = new IdSignatureFilter().createSignatureRequest(req);
 
     assertEquals(Boolean.TRUE.toString(), wrapper.getHeader(IdSignatureFilter.ID_SIGNATURE_HTTP_HEADER));
     assertEquals(Boolean.TRUE.toString(), wrapper.getHeader(lowercase(IdSignatureFilter.ID_SIGNATURE_HTTP_HEADER)));
@@ -92,7 +91,7 @@ public class SignatureHttpServletRequestWrapperTest {
 
     assertEquals(Set.of("Dummy"), set(req.getHeaderNames()));
 
-    HttpServletRequest wrapper = new SignatureHttpServletRequestWrapper(req);
+    HttpServletRequest wrapper = new IdSignatureFilter().createSignatureRequest(req);
 
     assertEquals("42", wrapper.getHeader("Dummy"));
     assertEquals("42", wrapper.getHeader("dummy"));
