@@ -785,6 +785,17 @@ describe('JsPageHelper', () => {
 
       expect(helper._childPagesById.size).toBe(2);
     });
+
+    it('does nothing if page is a leaf', async () => {
+      page.setLeaf(true);
+      const helper = scout.create(SpecJsPageHelper, {page});
+
+      spyOn(hybridManager, 'callActionAndWaitWithContext').and.callThrough();
+
+      await helper.callLoadChildPages([scout.create(MyPageParamDo, {id: 'foo'})]);
+
+      expect(hybridManager.callActionAndWaitWithContext).not.toHaveBeenCalled();
+    });
   });
 
   describe('loadChildPages', () => {
