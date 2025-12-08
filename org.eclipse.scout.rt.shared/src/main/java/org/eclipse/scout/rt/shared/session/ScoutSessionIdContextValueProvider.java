@@ -23,6 +23,7 @@ import org.slf4j.MDC;
  * @see DiagnosticContextValueProcessor
  * @see MDC
  */
+// FIXME PBZ SESSION change to SessionId.Current
 @ApplicationScoped
 public class ScoutSessionIdContextValueProvider implements IDiagnosticContextValueProvider {
 

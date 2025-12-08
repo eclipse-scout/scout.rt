@@ -90,6 +90,7 @@ public class HttpServerRunContextProducer {
 //        .withSession(session);
   }
 
+  // FIXME PBZ SESSION cleanup both classes move
   protected String ensureScoutSessionId(String scoutSessionId, HttpSession httpSession) {
     if (StringUtility.hasText(scoutSessionId)) {
       return scoutSessionId;
@@ -97,6 +98,7 @@ public class HttpServerRunContextProducer {
     return computeSessionIdIfAbsent(httpSession);
   }
 
+  // FIXME PBZ SESSION cleanup both classes move
   protected String computeSessionIdIfAbsent(HttpSession httpSession) {
     synchronized (HttpSessionMutex.of(httpSession)) {
       String scoutSessionId = (String) httpSession.getAttribute(SCOUT_SESSION_ID_KEY);
