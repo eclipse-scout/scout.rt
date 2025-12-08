@@ -4509,8 +4509,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     let tableFilters = filters.map(filter => this._ensureFilter(filter));
     let result = this.filterSupport.setFilters(tableFilters, applyFilter);
 
-    result.filtersAdded.forEach(filter => this.trigger('filterAdded', {filter}));
     result.filtersRemoved.forEach(filter => this.trigger('filterRemoved', {filter}));
+    result.filtersAdded.forEach(filter => this.trigger('filterAdded', {filter}));
   }
 
   protected _ensureFilter<T extends Filter<TableRow>>(filter: TableUserFilterModel | FilterOrFunction<TableRow>): Filter<TableRow> {
