@@ -90,6 +90,7 @@ export * from './util/objects';
 export * from './util/PromiseCreator';
 export * from './util/promises';
 export * from './util/Range';
+export * from './util/ObjectRegistry';
 export * from './resizable/Resizable';
 export * from './resizable/ResizableModel';
 export * from './status/Status';
