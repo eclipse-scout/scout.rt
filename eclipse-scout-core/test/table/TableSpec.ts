@@ -4023,10 +4023,10 @@ describe('Table', () => {
       expect(table.filters.length).toBe(1);
       expect(table.filteredRows()).toEqual([row0, row3]);
       expect(eventCollector.length).toBe(2);
-      expect(eventCollector[0].type).toBe('filterAdded');
-      expect(eventCollector[0].filter).toBe(filter2);
-      expect(eventCollector[1].type).toBe('filterRemoved');
-      expect(eventCollector[1].filter).toBe(filter1);
+      expect(eventCollector[0].type).toBe('filterRemoved');
+      expect(eventCollector[0].filter).toBe(filter1);
+      expect(eventCollector[1].type).toBe('filterAdded');
+      expect(eventCollector[1].filter).toBe(filter2);
       eventCollector = [];
 
       table.setFilters([filter2, filter1]);
@@ -4111,10 +4111,10 @@ describe('Table', () => {
       expect(table.filters.length).toBe(1);
       expect(table.filteredRows()).toEqual([row0, row3]);
       expect(eventCollector.length).toBe(2);
-      expect(eventCollector[0].type).toBe('filterAdded');
-      expect(eventCollector[0].filter).toBe(filter2);
-      expect(eventCollector[1].type).toBe('filterRemoved');
-      expect(eventCollector[1].filter).toBe(filter1);
+      expect(eventCollector[0].type).toBe('filterRemoved');
+      expect(eventCollector[0].filter).toBe(filter1);
+      expect(eventCollector[1].type).toBe('filterAdded');
+      expect(eventCollector[1].filter).toBe(filter2);
       eventCollector = [];
 
       table.setFilters([filter2, filter3]);
@@ -4135,11 +4135,28 @@ describe('Table', () => {
       expect(table.filters.length).toBe(2);
       expect(table.filteredRows()).toEqual([]);
       expect(eventCollector.length).toBe(2);
-      expect(eventCollector[0].type).toBe('filterAdded');
-      expect(eventCollector[0].filter).toBe(filter1);
-      expect(eventCollector[1].type).toBe('filterRemoved');
-      expect(eventCollector[1].filter).toBe(filter2);
+      expect(eventCollector[0].type).toBe('filterRemoved');
+      expect(eventCollector[0].filter).toBe(filter2);
+      expect(eventCollector[1].type).toBe('filterAdded');
+      expect(eventCollector[1].filter).toBe(filter1);
       eventCollector = [];
+    });
+
+    it('does not accidentally remove user filters', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      table.render();
+      table.setFooterVisible(true);
+      table.addFilter(helper.createTableTextFilter(table, '0_0'));
+      expect(table.filters.length).toBe(1);
+      expect(table.filteredRows().length).toBe(1);
+
+      // Replace with a filter which does the same
+      let applyFilterSpy = spyOn(table.filterSupport, 'applyFilters').and.callThrough();
+      table.setFilters([helper.createTableTextFilter(table, '0_0')]);
+      expect(table.filters.length).toBe(1);
+      expect(table.filteredRows().length).toBe(1);
+      expect(applyFilterSpy).toHaveBeenCalledTimes(1);
     });
   });
 

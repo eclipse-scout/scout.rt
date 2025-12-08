@@ -850,7 +850,6 @@ export class TableFooter extends Widget implements TableFooterModel {
       if (currentText !== textFilter.text) {
         this._$textFilter.val(textFilter.text);
         this._updateHasFilterText();
-        this._applyFilter();
       }
     }
   }
@@ -861,7 +860,6 @@ export class TableFooter extends Widget implements TableFooterModel {
     if (event.filter instanceof TableUserFilter && event.filter.filterType === TableTextUserFilter.TYPE) {
       this._$textFilter.val('');
       this._updateHasFilterText();
-      this._applyFilter();
     }
   }
 
