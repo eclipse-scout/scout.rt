@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigPropert
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringListConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -166,15 +167,17 @@ public final class ApplicationProperties {
 
     @Override
     public Boolean getDefaultValue() {
-      return !Platform.get().inDevelopmentMode(); // except for dev mode, use secure = true
+      return !Platform.get().inDevelopmentMode() // use secure for prod by default
+          || CONFIG.getPropertyValue(ScoutApplicationUseTlsProperty.class); // use secure if Jetty is running with TLS by default
     }
 
     @Override
     public String description() {
       return "Specifies whether the HTTP session cookie created by the web application will be marked as secure. "
-          + "If true, the HTTP session cookie will be marked as secure even if the request initiated the corresponding session using plain HTTP instead of HTTPS (e.g. Scout application behind reverse proxy terminating SSL). "
-          + "If false, the HTTP session cookie will only be marked as secure if the request initiated the corresponding session is secure (using HTTPS). "
-          + "The default value is true for non-development mode.";
+          + "If true, the HTTP session cookie will be marked as secure even if the request initiated the corresponding session uses plain HTTP instead of HTTPS (e.g. Scout application behind reverse proxy terminating TLS). "
+          + "If false, the HTTP session cookie will not be marked as secure even if the request initiated the corresponding session is secure (using HTTPS). "
+          + "By default the cookie is secure for non-development code (property '" + BEANS.get(PlatformDevModeProperty.class).getKey() + "' is false) or "
+          + "if the value of the property '" + BEANS.get(ScoutApplicationUseTlsProperty.class).getKey() + "' is true.";
     }
   }
 
