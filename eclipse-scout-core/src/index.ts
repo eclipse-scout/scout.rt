@@ -32,6 +32,7 @@ export * from './TypeDescriptor';
 export * from './objectFactories';
 export * from './ObjectFactory';
 export * from './util/ObjectIdProvider';
+export * from './util/ObjectRegistry';
 export * from './widget/WidgetSupport';
 export * from './widget/WidgetSupportOptions';
 export * from './widget/LoadingSupport';
