@@ -37,6 +37,8 @@
     <module>../org.eclipse.scout.rt.platform.test</module>
     <module>../org.eclipse.scout.rt.shared</module>
     <module>../org.eclipse.scout.rt.shared.test</module>
+    <module>../org.eclipse.scout.rt.shared.session</module>
+    <module>../org.eclipse.scout.rt.shared.session.test</module>
     <module>../org.eclipse.scout.rt.server.commons</module>
     <module>../org.eclipse.scout.rt.server.commons.test</module>
     <module>../org.eclipse.scout.rt.nls</module>
@@ -413,6 +415,17 @@
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.shared.test</artifactId>
         <version>26.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.shared.session</artifactId>
+        <version>26.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.shared.session.test</artifactId>
+        <version>26.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>
