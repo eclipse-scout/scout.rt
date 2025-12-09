@@ -26,7 +26,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Test class for {@link MultiClientSessionCookieStore}
+ * Test class for {@link MultiSessionCookieStore}
  */
 public class MultiSessionCookieStoreTest {
 

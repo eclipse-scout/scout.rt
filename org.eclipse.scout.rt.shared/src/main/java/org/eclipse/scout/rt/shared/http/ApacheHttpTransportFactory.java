@@ -186,7 +186,8 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
    */
   protected void installMultiSessionCookieStore(HttpClientBuilder builder) {
     // see very similar code in org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager.installMultiSessionCookieStore(HttpAsyncClientBuilder), unfortunately there is no common interface
-    builder.setDefaultCookieStore(BEANS.get(ApacheMultiSessionCookieStore.class));
+    BEANS.optional(ICookieStoreProvider.class)
+        .ifPresent(provider -> builder.setDefaultCookieStore(provider.provideDefault()));
   }
 
   /**

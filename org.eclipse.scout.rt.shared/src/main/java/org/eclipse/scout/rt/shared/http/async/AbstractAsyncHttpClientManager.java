@@ -19,6 +19,7 @@ import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
@@ -27,7 +28,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.LazyValue;
-import org.eclipse.scout.rt.shared.http.ApacheMultiSessionCookieStore;
+import org.eclipse.scout.rt.shared.http.ICookieStoreProvider;
 
 /**
  * <p>
@@ -61,14 +62,18 @@ public abstract class AbstractAsyncHttpClientManager<BUILDER> implements IPlatfo
   /**
    *
    */
-  protected LazyValue<ApacheMultiSessionCookieStore> m_cookieStore = new LazyValue<>(ApacheMultiSessionCookieStore.class);
+  protected LazyValue<CookieStore> m_cookieStore = new LazyValue<>(this::initCookieStore);
+
+  protected CookieStore initCookieStore() {
+    return BEANS.optional(ICookieStoreProvider.class).map(ICookieStoreProvider::provideDefault).orElse(null);
+  }
 
   public CloseableHttpAsyncClient getClient() {
     init();
     return m_client;
   }
 
-  public ApacheMultiSessionCookieStore getCookieStore() {
+  public CookieStore getCookieStore() {
     return m_cookieStore.get();
   }
 
@@ -84,7 +89,7 @@ public abstract class AbstractAsyncHttpClientManager<BUILDER> implements IPlatfo
       return;
     }
 
-    ApacheMultiSessionCookieStore cookieStore = getCookieStore();
+    CookieStore cookieStore = getCookieStore();
     if (cookieStore == null) {
       return;
     }
