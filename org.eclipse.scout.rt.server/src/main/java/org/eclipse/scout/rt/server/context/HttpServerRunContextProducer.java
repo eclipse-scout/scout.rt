@@ -15,8 +15,6 @@ import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 import org.eclipse.scout.rt.server.commons.context.HttpRunContextProducer;
 import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.shared.session.SessionId;
@@ -88,28 +86,6 @@ public class HttpServerRunContextProducer {
 //    final IServerSession session = getOrCreateScoutSession(req, serverRunContext, scoutSessionId);
 //    return serverRunContext
 //        .withSession(session);
-  }
-
-  // FIXME PBZ SESSION cleanup both classes move
-  protected String ensureScoutSessionId(String scoutSessionId, HttpSession httpSession) {
-    if (StringUtility.hasText(scoutSessionId)) {
-      return scoutSessionId;
-    }
-    return computeSessionIdIfAbsent(httpSession);
-  }
-
-  // FIXME PBZ SESSION cleanup both classes move
-  protected String computeSessionIdIfAbsent(HttpSession httpSession) {
-    synchronized (HttpSessionMutex.of(httpSession)) {
-      String scoutSessionId = (String) httpSession.getAttribute(SCOUT_SESSION_ID_KEY);
-      if (StringUtility.hasText(scoutSessionId)) {
-        return scoutSessionId;
-      }
-
-      scoutSessionId = Sessions.randomSessionId();
-      httpSession.setAttribute(SCOUT_SESSION_ID_KEY, scoutSessionId);
-      return scoutSessionId;
-    }
   }
 
   public HttpServerRunContextProducer withSessionSupport(boolean sessionSupport) {

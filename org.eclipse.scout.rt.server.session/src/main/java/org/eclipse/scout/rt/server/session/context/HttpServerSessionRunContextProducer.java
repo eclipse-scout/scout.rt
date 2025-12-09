@@ -15,6 +15,8 @@ import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.server.context.HttpServerRunContextProducer;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
@@ -23,6 +25,7 @@ import org.eclipse.scout.rt.server.session.IServerSession;
 import org.eclipse.scout.rt.server.session.IServerSessionLifecycleHandler;
 import org.eclipse.scout.rt.server.session.ServerSessionCache;
 import org.eclipse.scout.rt.server.session.ServerSessionLifecycleHandler;
+import org.eclipse.scout.rt.shared.session.Sessions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,6 +110,26 @@ public class HttpServerSessionRunContextProducer extends HttpServerRunContextPro
           HttpServerRunContextProducer.class.getName(), IServerSession.class.getName());
     }
     return session;
+  }
+
+  protected String ensureScoutSessionId(String scoutSessionId, HttpSession httpSession) {
+    if (StringUtility.hasText(scoutSessionId)) {
+      return scoutSessionId;
+    }
+    return computeSessionIdIfAbsent(httpSession);
+  }
+
+  protected String computeSessionIdIfAbsent(HttpSession httpSession) {
+    synchronized (HttpSessionMutex.of(httpSession)) {
+      String scoutSessionId = (String) httpSession.getAttribute(SCOUT_SESSION_ID_KEY);
+      if (StringUtility.hasText(scoutSessionId)) {
+        return scoutSessionId;
+      }
+
+      scoutSessionId = Sessions.randomSessionId();
+      httpSession.setAttribute(SCOUT_SESSION_ID_KEY, scoutSessionId);
+      return scoutSessionId;
+    }
   }
 }
 
