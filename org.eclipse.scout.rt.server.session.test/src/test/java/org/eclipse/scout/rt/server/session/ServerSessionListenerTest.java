@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.server.session;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
+import org.eclipse.scout.rt.server.AbstractServerSession;
+import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.junit.After;

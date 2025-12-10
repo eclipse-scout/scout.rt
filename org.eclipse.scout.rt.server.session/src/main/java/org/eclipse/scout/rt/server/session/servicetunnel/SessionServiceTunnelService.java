@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.servicetunnel.ServiceTunnelService;
-import org.eclipse.scout.rt.server.session.IServerSession;
+import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.session.context.HttpServerSessionRunContextProducer;
 import org.eclipse.scout.rt.server.session.context.ServerSessionRunContext;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;

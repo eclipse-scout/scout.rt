@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.server.context.HttpServerRunContextProducer;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.session.IServerSession;
+import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.session.IServerSessionLifecycleHandler;
 import org.eclipse.scout.rt.server.session.ServerSessionCache;
 import org.eclipse.scout.rt.server.session.ServerSessionLifecycleHandler;

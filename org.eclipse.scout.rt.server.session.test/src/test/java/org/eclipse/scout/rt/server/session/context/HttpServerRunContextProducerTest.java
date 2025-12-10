@@ -20,8 +20,6 @@ import jakarta.servlet.http.HttpSession;
 import org.eclipse.scout.rt.server.context.HttpServerRunContextProducer;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.session.IServerSession;
-import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;

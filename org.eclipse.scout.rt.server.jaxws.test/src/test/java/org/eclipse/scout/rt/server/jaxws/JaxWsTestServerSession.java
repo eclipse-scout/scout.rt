@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.server.jaxws;
 
-import org.eclipse.scout.rt.server.session.AbstractServerSession;
+import org.eclipse.scout.rt.server.AbstractServerSession;
 
 public class JaxWsTestServerSession extends AbstractServerSession {
 

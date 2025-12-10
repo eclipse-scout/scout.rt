@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.util.FinalValue;
-import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.session.context.ServerSessionRunContexts;
 
 /**

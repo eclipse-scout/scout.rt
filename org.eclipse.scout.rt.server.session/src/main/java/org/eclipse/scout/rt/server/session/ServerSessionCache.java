@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.util.concurrent.GroupedSynchronizer;
+import org.eclipse.scout.rt.server.IServerSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

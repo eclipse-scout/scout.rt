@@ -16,8 +16,8 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
-import org.eclipse.scout.rt.server.session.AbstractServerSession;
-import org.eclipse.scout.rt.server.session.IServerSession;
+import org.eclipse.scout.rt.server.AbstractServerSession;
+import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.user.UserId;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;

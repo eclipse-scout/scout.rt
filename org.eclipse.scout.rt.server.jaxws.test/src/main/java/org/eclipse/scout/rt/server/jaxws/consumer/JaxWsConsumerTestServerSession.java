@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.server.jaxws.consumer;
 
-import org.eclipse.scout.rt.server.session.AbstractServerSession;
+import org.eclipse.scout.rt.server.AbstractServerSession;
 
 /**
  * Server session used in JAX-WS Consumer tests.

@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.rt.server;
 
-import org.eclipse.scout.rt.server.session.AbstractServerSession;
-
 /**
  * A test server session
  */

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.server.session;
+package org.eclipse.scout.rt.server;
 
 import org.eclipse.scout.rt.shared.ISession;
 

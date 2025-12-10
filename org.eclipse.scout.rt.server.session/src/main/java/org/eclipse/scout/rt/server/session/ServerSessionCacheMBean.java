@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.jmx.MBeanUtility;
+import org.eclipse.scout.rt.server.IServerSession;
 
 @ApplicationScoped
 @CreateImmediately

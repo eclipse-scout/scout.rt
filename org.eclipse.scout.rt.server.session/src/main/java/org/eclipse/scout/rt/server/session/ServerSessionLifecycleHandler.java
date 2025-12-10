@@ -13,6 +13,7 @@ import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.slf4j.Logger;

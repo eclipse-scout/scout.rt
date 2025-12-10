@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.server.session.extension;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.server.session.AbstractServerSession;
+import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
 public final class ServerSessionChains {

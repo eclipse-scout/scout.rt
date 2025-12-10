@@ -10,7 +10,7 @@
 package org.eclipse.scout.rt.server.session.extension;
 
 
-import org.eclipse.scout.rt.server.session.AbstractServerSession;
+import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.session.extension.ServerSessionChains.ServerSessionLoadSessionChain;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
