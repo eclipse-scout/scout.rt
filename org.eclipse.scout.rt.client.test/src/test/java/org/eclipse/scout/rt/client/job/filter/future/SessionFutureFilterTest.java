@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.filter.future.SessionFutureFilter;
+import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.junit.Test;
 
 public class SessionFutureFilterTest {

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.shared.filter.event;
+package org.eclipse.scout.rt.shared.job.filter.event;
 
 import java.util.function.Predicate;
 
@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.job.filter.event.FutureFilterWrapperJobEven
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.IAdaptable;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.filter.future.SessionFutureFilter;
+import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 
 /**
  * Filter to accept all events for jobs which have a specific {@link ISession} set in their running context.

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.shared.filter.future;
+package org.eclipse.scout.rt.shared.job.filter.future;
 
 import java.util.function.Predicate;
 

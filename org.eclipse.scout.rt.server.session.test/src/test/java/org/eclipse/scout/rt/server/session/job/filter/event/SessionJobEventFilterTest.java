@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.IServerSession;
 import org.eclipse.scout.rt.server.session.context.ServerSessionRunContexts;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.filter.event.SessionJobEventFilter;
+import org.eclipse.scout.rt.shared.job.filter.event.SessionJobEventFilter;
 import org.junit.Test;
 
 public class SessionJobEventFilterTest {
