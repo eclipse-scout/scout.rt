@@ -126,7 +126,7 @@
     <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
     <jetty.version>12.1.5</jetty.version>
     <slf4j.version>2.0.17</slf4j.version>
-    <logback.version>1.5.18</logback.version>
+    <logback.version>1.5.21</logback.version>
     <jackson.version>2.20.1</jackson.version>
     <io.netty-version>4.1.128.Final</io.netty-version>
     <apache.tika-version>3.0.0</apache.tika-version>
@@ -210,7 +210,7 @@
         <!-- Logstash encoder for logback.xml -->
         <groupId>net.logstash.logback</groupId>
         <artifactId>logstash-logback-encoder</artifactId>
-        <version>8.0</version>
+        <version>8.1</version>
       </dependency>
       <dependency>
         <groupId>org.quartz-scheduler</groupId>
