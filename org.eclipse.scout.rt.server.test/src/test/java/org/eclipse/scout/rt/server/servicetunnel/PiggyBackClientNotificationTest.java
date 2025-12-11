@@ -11,11 +11,17 @@ package org.eclipse.scout.rt.server.servicetunnel;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
+import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -25,6 +31,7 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
 /**
@@ -50,15 +57,25 @@ public class PiggyBackClientNotificationTest {
 
   @Test
   public void testPiggyBack() {
-    ServiceTunnelService s = new ServiceTunnelService();
-    Class[] parameterTypes = new Class[]{String.class};
-    Object[] args = new Object[]{"test"};
-    ServiceTunnelRequest req = new ServiceTunnelRequest(IPingService.class.getName(), "ping", parameterTypes, args);
-    req.setClientNodeId(NodeId.of("testNodeId"));
-    ServiceTunnelResponse res = s.evaluate(req);
-    assertEquals("pong", res.getData());
-    assertNull(res.getException());
-    assertEquals(1, res.getNotifications().size());
-    assertEquals("testNotification", res.getNotifications().get(0).getNotification());
+    HttpSession session = Mockito.mock(HttpSession.class);
+    HttpServletRequest req = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(req.getSession()).thenReturn(session);
+    Mockito.when(req.getSession(false)).thenReturn(session);
+
+    RunContexts.copyCurrent()
+        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
+        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, mock(HttpServletResponse.class))
+        .run(() -> {
+          ServiceTunnelService s = new ServiceTunnelService();
+          Class[] parameterTypes = new Class[]{String.class};
+          Object[] args = new Object[]{"test"};
+          ServiceTunnelRequest serviceTunnelRequest = new ServiceTunnelRequest(IPingService.class.getName(), "ping", parameterTypes, args);
+          serviceTunnelRequest.setClientNodeId(NodeId.of("testNodeId"));
+          ServiceTunnelResponse res = s.evaluate(serviceTunnelRequest);
+          assertEquals("pong", res.getData());
+          assertNull(res.getException());
+          assertEquals(1, res.getNotifications().size());
+          assertEquals("testNotification", res.getNotifications().get(0).getNotification());
+        });
   }
 }

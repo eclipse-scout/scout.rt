@@ -46,6 +46,7 @@ public class ScoutBackendRestClientHelper extends AbstractRestClientHelper {
     filters.add(new RestRequestCancellationClientRequestFilter(BEANS.get(CancellationResourceClient.class)::cancel));
     // no classic IdSignatureClientRequestFilter; process resource will determine on its own if header should be added
     filters.add(BEANS.get(ServiceTunnelIdSignatureClientRequestFilter.class));
+    filters.add(BEANS.get(SessionIdClientRequestFilter.class));
     return filters;
   }
 
@@ -60,7 +61,6 @@ public class ScoutBackendRestClientHelper extends AbstractRestClientHelper {
   protected RuntimeException transformException(RuntimeException e, Response response) {
     return BEANS.get(ErrorDoRestClientExceptionTransformer.class).transform(e, response);
   }
-
 
   @Bean
   public interface IScoutBackendRestClientBuilderContributor {

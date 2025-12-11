@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,6 @@ public class ServiceTunnelRequest implements Serializable {
    * @since 3.8
    */
   private final long m_requestSequence = REQUEST_SEQUENCE_GENERATOR.incrementAndGet();
-  private String m_sessionId;
   private final String m_serviceInterfaceClassName;
   private final String m_operation;
   private final Class[] m_parameterTypes;
@@ -52,21 +51,6 @@ public class ServiceTunnelRequest implements Serializable {
    */
   public long getRequestSequence() {
     return m_requestSequence;
-  }
-
-  /**
-   * @return Session id or <code>null</code>, if not defined
-   */
-  public String getSessionId() {
-    return m_sessionId;
-  }
-
-  /**
-   * @param sessionId
-   *     (<code>null</code>, if not defined)
-   */
-  public void setSessionId(String sessionId) {
-    m_sessionId = sessionId;
   }
 
   /**
@@ -127,7 +111,6 @@ public class ServiceTunnelRequest implements Serializable {
     StringBuilder buf = new StringBuilder();
     buf.append("Remote call [");
     buf.append("requestSequence='").append(m_requestSequence).append("', ");
-    buf.append("sessionId='").append(m_sessionId).append("'\n");
     buf.append(m_serviceInterfaceClassName).append(".").append(m_operation);
     if (m_args != null && m_args.length > 0) {
       for (int i = 0; i < m_args.length; i++) {

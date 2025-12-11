@@ -40,7 +40,6 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.opentelemetry.HttpServiceTunnelInstrumenterFactory;
 import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandler;
@@ -159,11 +158,6 @@ public class HttpServiceTunnel {
       userAgent = UserAgents.createDefault();
     }
     request.setUserAgent(userAgent.createIdentifier());
-
-    ISession session = ISession.CURRENT.get();
-    if (session != null) {
-      request.setSessionId(session.getId());
-    }
     request.setClientNodeId(NodeId.current());
   }
 

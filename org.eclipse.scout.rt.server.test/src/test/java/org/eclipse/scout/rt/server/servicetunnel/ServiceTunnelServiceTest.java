@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -54,6 +54,7 @@ import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -96,6 +97,7 @@ public class ServiceTunnelServiceTest {
     m_testHttpSession = mock(HttpSession.class);
     when(m_requestMock.getSession()).thenReturn(m_testHttpSession);
     when(m_requestMock.getSession(true)).thenReturn(m_testHttpSession);
+    when(m_requestMock.getHeader(SessionId.HTTP_HEADER_NAME)).thenReturn("testId");
   }
 
   @After
@@ -167,7 +169,7 @@ public class ServiceTunnelServiceTest {
 
   @Test
   public void testPostSuccessful() {
-    verifyTestResponse(new ServiceTunnelService().evaluate(prepareTestRequest()));
+    verifyTestResponse(createServletRunContext(m_requestMock, m_responseMock).call(() -> new ServiceTunnelService().evaluate(prepareTestRequest())));
   }
 
   @Test
@@ -187,6 +189,16 @@ public class ServiceTunnelServiceTest {
       IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.remove();
       IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.remove();
     }
+  }
+
+  @Test
+  public void testCreateServiceTunnelContext() {
+    createServletRunContext(m_requestMock, m_responseMock).run(() -> {
+      ServiceTunnelService s = BEANS.get(ServiceTunnelService.class);
+      ServiceTunnelRequest serviceRequest = prepareTestRequest();
+      ServerRunContext context = s.createServiceTunnelRunContext(serviceRequest);
+      assertEquals("testId", context.call(SessionId.CURRENT::get));
+    });
   }
 
   private ServiceTunnelRequest prepareTestRequest() {
