@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,8 +37,8 @@ public class JandexClassInventory implements IClassInventory {
     Collection<ClassInfo> subclasses1;
     Set<ClassInfo> subclasses2;
     if (queryClass.isInterface()) {
-      //'getAllKnownImplementors' returns all subclasses but not all subinterfaces. It ignores subinterfaces that have no implementor class at all.
-      subclasses1 = m_index.getAllKnownImplementors(DotName.createSimple(queryClass.getName()));
+      //'getAllKnownImplementations' returns all subclasses but not all subinterfaces. It ignores subinterfaces that have no implementor class at all.
+      subclasses1 = m_index.getAllKnownImplementations(DotName.createSimple(queryClass.getName()));
       subclasses2 = new HashSet<>();
       collectAllKnownSubinterfacesRecursive(DotName.createSimple(queryClass.getName()), subclasses2);
     }
@@ -55,8 +55,8 @@ public class JandexClassInventory implements IClassInventory {
     Collection<ClassInfo> subclasses1;
     Set<ClassInfo> subclasses2;
     if (queryClassInfo.isInterface()) {
-      //'getAllKnownImplementors' returns all subclasses but not all subinterfaces. It ignores subinterfaces that have no implementor class at all.
-      subclasses1 = m_index.getAllKnownImplementors(DotName.createSimple(queryClassInfo.name()));
+      //'getAllKnownImplementations' returns all subclasses but not all subinterfaces. It ignores subinterfaces that have no implementor class at all.
+      subclasses1 = m_index.getAllKnownImplementations(DotName.createSimple(queryClassInfo.name()));
       subclasses2 = new HashSet<>();
       collectAllKnownSubinterfacesRecursive(DotName.createSimple(queryClassInfo.name()), subclasses2);
     }
@@ -68,7 +68,7 @@ public class JandexClassInventory implements IClassInventory {
   }
 
   protected void collectAllKnownSubinterfacesRecursive(DotName queryName, Set<ClassInfo> collector) {
-    Collection<ClassInfo> subinterfaces = m_index.getKnownDirectImplementors(queryName);
+    Collection<ClassInfo> subinterfaces = m_index.getKnownDirectImplementations(queryName);
     if (!subinterfaces.isEmpty()) {
       for (ClassInfo ci : subinterfaces) {
         if (Modifier.isInterface(ci.flags()) && collector.add(ci)) {
