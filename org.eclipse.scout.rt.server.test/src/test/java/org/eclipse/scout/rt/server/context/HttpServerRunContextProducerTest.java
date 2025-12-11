@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +33,7 @@ public class HttpServerRunContextProducerTest {
     HttpServerRunContextProducer producer = new HttpServerRunContextProducer();
     assertTrue(producer.hasSessionSupport());
 
-    HttpServletRequest req = createRequestMock(null);
+    HttpServletRequest req = createRequestMock(null, null);
     HttpServletResponse resp = mock(HttpServletResponse.class);
 
     ServerRunContext serverRunContextForSessionStart = (ServerRunContext) producer.getInnerRunContextProducer().produce(req, resp);
@@ -52,7 +53,8 @@ public class HttpServerRunContextProducerTest {
     HttpServerRunContextProducer producer = new HttpServerRunContextProducer();
     assertTrue(producer.hasSessionSupport());
 
-    HttpServletRequest req = createRequestMock(null);
+    String clientSessionId = "testClientSessionId";
+    HttpServletRequest req = createRequestMock(null, clientSessionId);
     HttpServletResponse resp = mock(HttpServletResponse.class);
 
     ServerRunContext context = producer.produce(req, resp);
@@ -60,6 +62,7 @@ public class HttpServerRunContextProducerTest {
     try {
       assertNotNull(session);
       assertNotNull(session.getId());
+      assertEquals(clientSessionId, context.call(SessionId.CURRENT::get));
     }
     finally {
       session.stop();
@@ -71,29 +74,32 @@ public class HttpServerRunContextProducerTest {
     HttpServerRunContextProducer producer = new HttpServerRunContextProducer();
     assertTrue(producer.hasSessionSupport());
 
-    String existingScoutSessionId = "testId";
-    HttpServletRequest req = createRequestMock(existingScoutSessionId);
+    String existingServerSessionId = "testServerSessionId";
+    String clientSessionId = "testClientSessionId";
+    HttpServletRequest req = createRequestMock(existingServerSessionId, clientSessionId);
     HttpServletResponse resp = mock(HttpServletResponse.class);
 
     ServerRunContext context = producer.produce(req, resp);
     IServerSession session = context.getSession();
     try {
       assertNotNull(session);
-      assertEquals(existingScoutSessionId, session.getId());
+      assertEquals(existingServerSessionId, session.getId());
+      assertEquals(clientSessionId, context.call(SessionId.CURRENT::get));
     }
     finally {
       session.stop();
     }
   }
 
-  protected HttpServletRequest createRequestMock(String scoutSessionId) {
+  protected HttpServletRequest createRequestMock(String serverSessionId, String clientSessionId) {
     HttpSession httpSession = mock(HttpSession.class);
-    when(httpSession.getAttribute(eq(HttpServerRunContextProducer.SCOUT_SESSION_ID_KEY))).thenReturn(scoutSessionId);
+    when(httpSession.getAttribute(eq(HttpServerRunContextProducer.SCOUT_SESSION_ID_KEY))).thenReturn(serverSessionId);
 
     HttpServletRequest req = mock(HttpServletRequest.class);
     when(req.getHeader(eq("User-Agent"))).thenReturn(TEST_USER_AGENT_STRING);
     when(req.getSession()).thenReturn(httpSession);
     when(req.getSession(anyBoolean())).thenReturn(httpSession);
+    when(req.getHeader(SessionId.HTTP_HEADER_NAME)).thenReturn(clientSessionId);
     return req;
   }
 }

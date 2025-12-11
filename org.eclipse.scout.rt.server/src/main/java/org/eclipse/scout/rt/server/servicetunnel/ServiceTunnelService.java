@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandl
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelOptions;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,15 +131,18 @@ public class ServiceTunnelService {
   }
 
   protected ServerRunContext createServiceTunnelRunContext(ServiceTunnelRequest serviceRequest) {
+    final HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+    String clientSessionId = req.getHeader(SessionId.HTTP_HEADER_NAME);
+
     // overwrite default settings from HTTP request with values from ServiceTunnelRequest
     final ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
         .withLocale(serviceRequest.getLocale())
         .withUserAgent(UserAgents.createByIdentifier(serviceRequest.getUserAgent()))
-        .withClientNodeId(serviceRequest.getClientNodeId());
+        .withClientNodeId(serviceRequest.getClientNodeId())
+        .withThreadLocal(SessionId.CURRENT, clientSessionId);
 
-    if (serviceRequest.getSessionId() != null) {
-      final HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-      final IServerSession session = m_serverRunContextProducer.get().getOrCreateScoutSession(req, serverRunContext, serviceRequest.getSessionId());
+    if (clientSessionId != null) {
+      final IServerSession session = m_serverRunContextProducer.get().getOrCreateScoutSession(req, serverRunContext, clientSessionId);
       serverRunContext.withSession(session);
     }
     return serverRunContext;

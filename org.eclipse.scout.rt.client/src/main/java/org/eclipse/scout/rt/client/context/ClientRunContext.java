@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.logging.UserIdContextValueProvider;
 import org.eclipse.scout.rt.shared.opentelemetry.OpenTelemetrySpanAttributeProcessor;
 import org.eclipse.scout.rt.shared.session.ScoutSessionIdContextValueProvider;
+import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.user.UserId;
 
@@ -63,6 +64,7 @@ public class ClientRunContext extends RunContext {
   protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
     callableChain
         .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
+        .add(new ThreadLocalProcessor<>(SessionId.CURRENT, getSession() != null ? getSession().getId() : null))
         .add(new ThreadLocalProcessor<>(UserId.CURRENT, getSession() != null ? getSession().getUserId() : null))
         .add(new DiagnosticContextValueProcessor(BEANS.get(UserIdContextValueProvider.class)))
         .add(new DiagnosticContextValueProcessor(BEANS.get(ScoutSessionIdContextValueProvider.class)))

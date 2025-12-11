@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandl
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelOptions;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.TestHttpSession;
@@ -101,7 +102,6 @@ public class ServiceTunnelIdSignatureTest {
     // create service tunnel request
     var serviceTunnelRequest = new ServiceTunnelRequest(IEchoService.class.getName(), "echo", new Class[]{Object.class}, new Object[]{o});
     serviceTunnelRequest.setUserAgent("UNKNOWN|UNKNOWN|UNKNOWN|UNKNOWN|UNKNOWN");
-    serviceTunnelRequest.setSessionId("4242");
 
     var serviceTunnelContentHandler = BEANS.get(BinaryServiceTunnelContentHandler.class);
 
@@ -120,6 +120,7 @@ public class ServiceTunnelIdSignatureTest {
     Mockito.when(request.getSession()).thenReturn(httpSession);
     Mockito.when(request.getSession(false)).thenReturn(httpSession);
     Mockito.when(request.getHeader(IdSignatureClientRequestFilter.ID_SIGNATURE_HTTP_HEADER)).thenReturn("" + idSignature);
+    Mockito.when(request.getHeader(SessionId.HTTP_HEADER_NAME)).thenReturn("4242");
 
     // create servlet output stream and response to collect service tunnel response
     var servletOutputStream = new BufferedServletOutputStream();

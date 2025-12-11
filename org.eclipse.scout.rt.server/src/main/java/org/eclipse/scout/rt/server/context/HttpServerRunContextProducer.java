@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.server.session.IServerSessionLifecycleHandler;
 import org.eclipse.scout.rt.server.session.ServerSessionCache;
 import org.eclipse.scout.rt.server.session.ServerSessionLifecycleHandler;
+import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.session.Sessions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,8 +85,11 @@ public class HttpServerRunContextProducer {
       contextToFill = ServerRunContexts.copyCurrent(true);
     }
 
+    String clientSessionId = req.getHeader(SessionId.HTTP_HEADER_NAME);
+
     final ServerRunContext serverRunContext = (ServerRunContext) getInnerRunContextProducer().produce(req, resp, contextToFill);
     serverRunContext.withUserAgent(HttpClientInfo.get(req).toUserAgents().build());
+    serverRunContext.withThreadLocal(SessionId.CURRENT, clientSessionId);
     if (!hasSessionSupport()) {
       // don't touch the session
       return serverRunContext;
