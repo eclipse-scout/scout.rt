@@ -6625,10 +6625,14 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   /**
-   * Saves the current state of the table as {@link initialUiPreferences}, including non-displayable columns.
+   * Saves the current state of the table as {@link initialUiPreferences}, including user filters and
+   * non-displayable columns.
    */
   saveInitialUiPreferences() {
-    let profile = tableUiPreferences.createProfile(this, {includeNonDisplayableColumns: true});
+    let profile = tableUiPreferences.createProfile(this, {
+      includeUserFilters: true,
+      includeNonDisplayableColumns: true
+    });
     this.setInitialUiPreferences(profile);
   }
 

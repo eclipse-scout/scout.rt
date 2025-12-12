@@ -450,62 +450,88 @@ describe('TableUiPreferences', () => {
         }, {
           id: 'c2',
           objectType: Column,
-          displayable: false,
           width: 102
         }, {
           id: 'c3',
           objectType: Column,
+          displayable: false,
           width: 103
         }, {
           id: 'c4',
           objectType: Column,
-          displayable: false,
-          primaryKey: true,
           width: 104
         }, {
           id: 'c5',
           objectType: Column,
-          width: 105,
+          width: 105
+        }, {
+          id: 'c6',
+          objectType: Column,
+          displayable: false,
+          primaryKey: true,
+          width: 106
+        }, {
+          id: 'c7',
+          objectType: Column,
+          width: 107,
+          visible: false
+        }, {
+          id: 'c8',
+          objectType: Column,
+          width: 108,
           visible: false
         }]
       });
       table.saveInitialUiPreferences();
 
-      // Apply a profile without information about some columns
-      tableUiPreferences.applyProfile(table, scout.create(TableClientUiPreferenceProfileDo, {
+      // Apply a profile without information about some columns:
+      let profile = scout.create(TableClientUiPreferenceProfileDo, {
         columns: [
-          scout.create(TableColumnClientUiPreferenceDo, {
-            columnId: 'c3',
-            viewIndex: 333,
-            visible: true,
-            width: 200
-          }),
           scout.create(TableColumnClientUiPreferenceDo, {
             columnId: 'c4',
             viewIndex: 444,
             visible: true,
-            width: 400
+            width: 204
           }),
           scout.create(TableColumnClientUiPreferenceDo, {
-            columnId: 'c5',
-            viewIndex: 5,
+            columnId: 'c6',
+            viewIndex: 666,
             visible: true,
-            width: 500
+            width: 206
+          }),
+          scout.create(TableColumnClientUiPreferenceDo, {
+            columnId: 'c8',
+            viewIndex: 8,
+            visible: true,
+            width: 208
           })
         ]
-      }));
+      });
+      tableUiPreferences.applyProfile(table, profile);
 
+      // { c1 c2 c3? [c4] c5 [c6?] c7 [c8] } + { c4@444, c6@666, c8@8 } => { c6? c3? c1 c2 c8 c4 c5 c7 }
       // expect:
       // - non-displayable columns at front, pk column first
       // - preferences ignored for non-displayable columns
-      expect(table.columns.map(c => c.id)).toEqual(['c4', 'c2', 'c5', 'c3', 'c1']);
-      expect(table.visibleColumns().map(c => c.id)).toEqual(['c5', 'c3', 'c1']);
-      expect(table.columns.map(c => c.width)).toEqual([104, 102, 500, 200, 101]);
+      // - columns without information are either before or after all other visible columns
+      expect(table.columns.map(c => c.id)).toEqual(['c6', 'c3', 'c1', 'c2', 'c8', 'c4', 'c5', 'c7']);
+      expect(table.visibleColumns().map(c => c.id)).toEqual(['c1', 'c2', 'c8', 'c4', 'c5']);
+      expect(table.columns.map(c => c.width)).toEqual([106, 103, 101, 102, 208, 204, 105, 107]);
 
       table.resetToInitialUiPreferences();
-      expect(table.columns.map(c => c.id)).toEqual(['c1', 'c2', 'c3', 'c4', 'c5']);
-      expect(table.visibleColumns().map(c => c.id)).toEqual(['c1', 'c3']);
-      expect(table.columns.map(c => c.width)).toEqual([101, 102, 103, 104, 105]);
+      expect(table.columns.map(c => c.id)).toEqual(['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8']);
+      expect(table.visibleColumns().map(c => c.id)).toEqual(['c1', 'c2', 'c4', 'c5']);
+      expect(table.columns.map(c => c.width)).toEqual([101, 102, 103, 104, 105, 106, 107, 108]);
+
+      // Apply the same profile again, but explicitly enable non-displayable columns
+      tableUiPreferences.applyProfile(table, profile, {applyNonDisplayableColumns: true});
+
+      // { c1 c2 c3? [c4] c5 [c6?] c7 [c8] } + { c4@444, c6@666, c8@8 } => { c1 c2 c3? c8 c4 c6? c5 c7 }
+      // expect:
+      // - non-displayable columns are handled like normal columns
+      expect(table.columns.map(c => c.id)).toEqual(['c1', 'c2', 'c3', 'c8', 'c4', 'c6', 'c5', 'c7']);
+      expect(table.visibleColumns().map(c => c.id)).toEqual(['c1', 'c2', 'c8', 'c4', 'c5']);
+      expect(table.columns.map(c => c.width)).toEqual([101, 102, 103, 208, 204, 206, 105, 107]);
     });
 
     it('ignores compact mode', () => {

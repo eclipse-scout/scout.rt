@@ -102,7 +102,7 @@ export class TableUiPreferences implements ObjectWithType {
   updateUiPreferencesEnabled(table: Table) {
     scout.assertParameter('table', table, Table);
     if (table.uiPreferencesEnabled) {
-      // Save current state as "factory defaults". User filters are not included.
+      // Save current state as "factory defaults"
       table.saveInitialUiPreferences();
 
       // If there is a stored GLOBAL profile, apply it now
@@ -448,25 +448,36 @@ export class TableUiPreferences implements ObjectWithType {
   protected _applyColumnPreferences(table: Table, columnPreferences: TableColumnClientUiPreferenceDo[], options?: ApplyTablePreferencesOptions) {
     let columnPreferencesMap = new Map(arrays.ensure(columnPreferences).map(pref => [pref.columnId, pref]));
 
-    // Sort existing columns according to the order specified in the preferences
-    let newColumns = table.columns
-      .filter(c => !c.guiOnly) // will be recreated by _setColumns
-      .sort((c1, c2) => { // reorder
-        if (!options?.applyNonDisplayableColumns) {
-          // Unless explicitly requested, non-displayable columns are always placed at the front, and their preferences are ignored.
-          if (!c1.displayable && !c2.displayable) {
-            return (c1.primaryKey === c2.primaryKey ? 0 : (c1.primaryKey ? -1 : 1)); // pk first
-          }
-          if (!c1.displayable || !c2.displayable) {
-            return !c1.displayable ? -1 : 1; // non-displayable first
-          }
+    // Create a new list of columns (without guiOnly columns, they will be recreated by _setColumns)
+    let newColumns = table.columns.filter(c => !c.guiOnly);
+
+    // Sort columns according to the order specified in the preferences. Columns *without* preferences that
+    // appear before the first column *with* preferences are placed at the front, all others at the end.
+    let viewIndexMap = new Map<Column<any>, number>();
+    let defaultViewIndex = -Infinity;
+    newColumns.forEach(column => {
+      let viewIndex = columnPreferencesMap.get(column.buildUuid())?.viewIndex;
+      if (objects.isNullOrUndefined(viewIndex)) {
+        viewIndexMap.set(column, defaultViewIndex);
+      } else {
+        viewIndexMap.set(column, viewIndex);
+        defaultViewIndex = Infinity;
+      }
+    });
+    newColumns.sort((c1, c2) => {
+      if (!options?.applyNonDisplayableColumns) {
+        // Unless explicitly requested, non-displayable columns are always placed at the front, and their preferences are ignored.
+        if (!c1.displayable && !c2.displayable) {
+          return (c1.primaryKey === c2.primaryKey ? 0 : (c1.primaryKey ? -1 : 1)); // pk first
         }
-        // columns without preferences are placed at the end
-        let viewIndex1 = columnPreferencesMap.get(c1.buildUuid())?.viewIndex ?? Infinity;
-        let viewIndex2 = columnPreferencesMap.get(c2.buildUuid())?.viewIndex ?? Infinity;
-        return viewIndex1 - viewIndex2;
-      });
-    // Apply preferences to existing columns. Columns without corresponding entry in the preferences are left
+        if (!c1.displayable || !c2.displayable) {
+          return !c1.displayable ? -1 : 1; // non-displayable first
+        }
+      }
+      return viewIndexMap.get(c1) - viewIndexMap.get(c2);
+    });
+
+    // Apply column preferences. Columns without corresponding entry in the preferences are left
     // untouched, while preference entries without corresponding column are simply ignored.
     newColumns
       .filter(column => column.displayable || options?.applyNonDisplayableColumns)
