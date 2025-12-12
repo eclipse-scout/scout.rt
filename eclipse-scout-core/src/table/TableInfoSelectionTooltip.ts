@@ -18,6 +18,7 @@ export class TableInfoSelectionTooltip extends Tooltip implements TableInfoSelec
   protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this.tableFooter = options.tableFooter;
+    this.withFocusContext = true;
     let selectNoneMenu = scout.create(Menu, {
       parent: this,
       text: this.session.text('ui.SelectNone')

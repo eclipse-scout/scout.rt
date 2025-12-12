@@ -7,13 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Column, DoubleClickSupport, EventListener, EventSupport, Range, Status, Table, TableFooter, TableRow} from '../../index';
+import {Action, Column, DoubleClickSupport, EventListener, EventSupport, Range, Status, Table, TableFooter, TableRow} from '../../index';
 
 export class SpecTable extends Table {
   declare _filteredRows: TableRow[];
   declare _animationRowLimit: number;
   declare events: EventSupport & { _eventListeners: EventListener[] };
-  declare footer: TableFooter & { _$infoTableStatus: JQuery; _$infoTableStatusIcon: JQuery };
+  declare footer: TableFooter & { _infoTableStatusMenu: Action };
   declare _doubleClickSupport: DoubleClickSupport & { _lastTimestamp: number };
   declare _permanentHeadSortColumns: Column<any>[];
   declare _permanentTailSortColumns: Column<any>[];

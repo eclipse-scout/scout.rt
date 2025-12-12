@@ -18,6 +18,7 @@ export class TableInfoFilterTooltip extends Tooltip implements TableInfoFilterTo
   protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this.tableFooter = options.tableFooter;
+    this.withFocusContext = true;
     let removeFilterMenu = scout.create(Menu, {
       parent: this,
       text: this.session.text('ui.RemoveFilter')
