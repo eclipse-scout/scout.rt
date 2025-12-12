@@ -18,6 +18,7 @@ export class TableInfoLoadTooltip extends Tooltip implements TableInfoLoadToolti
   protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this.tableFooter = options.tableFooter;
+    this.withFocusContext = true;
     let reloadDataMenu = scout.create(Menu, {
       parent: this,
       text: this.session.text('ui.ReloadData')

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -124,10 +124,7 @@
   visibility: hidden;
 }
 
-.table-info-load,
-.table-info-status,
-.table-info-filter,
-.table-info-selection {
+.table-info-item {
   flex-shrink: 0;
   flex-grow: 0;
   color: @table-info-color;
@@ -135,17 +132,18 @@
   line-height: 19px;
   font-size: @font-size-smaller;
   #scout.overflow-nowrap();
-
-  /* margins are used instead of paddings for a better animation */
+  margin: 0 @table-info-margin-x - @table-info-inner-margin-x;
+  transition: margin 300ms;
 
   & > span {
     display: block;
-    margin: 0 @table-info-margin-x
+    margin: 0 @table-info-inner-margin-x;
   }
 
   &.disabled {
     cursor: default;
 
+    &:is(:hover, :active) > .table-info-button,
     & > .table-info-button {
       color: @table-info-color;
     }
@@ -166,12 +164,16 @@
   &:active > .table-info-button {
     color: @link-active-color;
   }
+
+  &:focus {
+    #scout.focus-box-shadow();
+    border-radius: @border-radius;
+  }
 }
 
 .table-info-status {
-  padding-top: 0;
-  line-height: @table-footer-height;
   color: @table-info-color;
+  margin: 0 @table-info-inner-margin-x;
 
   &:hover {
     color: @table-info-hover-color;
@@ -183,8 +185,8 @@
     display: inline-block;
     line-height: normal;
     vertical-align: middle;
-    padding-top: 8px; /* controls distance to tooltip */
-    padding-bottom: 11px; /* larger than padding-top, to move icon to optical middle */
+    padding: 8px 0;
+    margin: 0 @table-info-margin-x - @table-info-inner-margin-x;
 
     &::before {
       content: @icon-info;
@@ -196,7 +198,6 @@
   /* error */
 
   &.error > .font-icon::before {
-    #scout.animation(attention 5s linear infinite);
     content: @icon-exclamation-mark-circle;
   }
 

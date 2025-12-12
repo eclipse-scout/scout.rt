@@ -19,7 +19,7 @@ export class TableSelectAllKeyStroke extends KeyStroke {
     this.which = [keys.A];
     this.renderingHints.offset = 14;
     this.renderingHints.$drawingArea = ($drawingArea, event) => {
-      return this.field.footer?._$infoSelection.find('.table-info-button');
+      return this.field.footer?._infoSelectionAction.$container.find('.table-info-button');
     };
     this.inheritAccessibility = false;
   }
