@@ -187,7 +187,7 @@ export const dataObjects = {
     return removed;
   },
 
-  async* fetchChunks(fetcher: () => Promise<Response>): AsyncGenerator<BaseDoEntity[]> {
+  async* fetchChunks(fetcher: () => Promise<Response>): AsyncGenerator<BaseDoEntity> {
     const response = await fetcher();
 
     const reader = response.body.getReader();
@@ -215,17 +215,15 @@ export const dataObjects = {
       lastLine = lines.pop();
 
       // Convert each line containing JSON to an actual BaseDoEntity
-      let result = [];
       for (const line of lines) {
         if (line) {
-          result.push(dataObjects.parse(line));
+          yield dataObjects.parse(line);
         }
       }
-      yield result;
     }
 
     if (lastLine) {
-      yield [dataObjects.parse(lastLine)];
+      yield dataObjects.parse(lastLine);
     }
   }
 };
