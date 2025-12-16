@@ -58,7 +58,7 @@ export class FocusManager implements FocusManagerOptions {
 
   constructor(options: FocusManagerOptions) {
     let defaults: FocusManagerOptions = {
-      // Auto focusing of elements is bad with on screen keyboards -> deactivate to prevent unwanted popping up of the keyboard
+      // Autofocusing of elements is bad with on-screen keyboards -> deactivate to prevent unwanted popping up of the keyboard
       active: !Device.get().supportsOnlyTouch(),
       // Preventing blur is bad on touch devices because every touch on a non input field is supposed to close the keyboard which does not happen if preventDefault is used on mouse down
       restrictedFocusGain: !Device.get().supportsOnlyTouch(),
@@ -321,17 +321,19 @@ export class FocusManager implements FocusManagerOptions {
    * Finds the first focusable element of the given $container, or null if not found.
    */
   findFirstFocusableElement($container: JQuery, filter?: () => boolean): HTMLElement {
-    let firstElement, firstDefaultButton, firstButton, i, candidate, $candidate, $menuParents, $tabParents, $boxButtons,
-      $entryPoint = $container.entryPoint(),
-      $candidates = $container
-        .find(':focusable')
-        .addBack(':focusable') /* in some use cases, the container should be focusable as well, e.g. context menu without focusable children */
-        .not($entryPoint) /* $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext.validateAndSetFocus' focuses the $entryPoint as a fallback. */
-        .filter(filter || filters.returnTrue);
+    const candidates = $container
+      .find(':focusable')
+      .addBack(':focusable') // in some use cases, the container should be focusable as well, e.g. context menu without focusable children
+      .not($container.entryPoint()) // $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext.validateAndSetFocus' focuses the $entryPoint as a fallback.
+      .filter(filter || filters.returnTrue)
+      .toArray();
 
-    for (i = 0; i < $candidates.length; i++) {
-      candidate = $candidates[i];
-      $candidate = $(candidate);
+    let firstElement = null;
+    let firstButton = null;
+    let firstDefaultButton = null;
+
+    for (const candidate of candidates) {
+      const $candidate = $(candidate);
 
       // Check whether the candidate is accessible and not covert by a glass pane.
       if (this.isElementCovertByGlassPane(candidate)) {
@@ -342,7 +344,7 @@ export class FocusManager implements FocusManagerOptions {
         continue;
       }
 
-      if (!firstElement && !($candidate.hasClass('button') || $candidate.hasClass('menu-item'))) {
+      if (!firstElement && !$candidate.is('.button, .menu-item')) {
         firstElement = candidate;
       }
 
@@ -350,23 +352,25 @@ export class FocusManager implements FocusManagerOptions {
         firstDefaultButton = candidate;
       }
 
-      $menuParents = $candidate.parents('.menubar');
-      $tabParents = $candidate.parents('.tab-box-header');
-      $boxButtons = $candidate.parents('.box-buttons');
-      if (($menuParents.length > 0 || $tabParents.length > 0 || $boxButtons.length > 0) && !firstButton && ($candidate.hasClass('button') || $candidate.hasClass('menu-item'))) {
+      const $menuParents = $candidate.parents('.menubar');
+      const $tabParents = $candidate.parents('.tab-box-header');
+      const $boxButtons = $candidate.parents('.box-buttons');
+      if (($menuParents.length || $tabParents.length || $boxButtons.length) && !firstButton && $candidate.is('.button, .menu-item')) {
         firstButton = candidate;
       } else if (!$menuParents.length && !$tabParents.length && !$boxButtons.length && typeof candidate.focus === 'function') { // inline buttons and menus are selectable before choosing button or menu from bar
         return candidate;
       }
     }
+
     if (firstDefaultButton) {
       return firstDefaultButton;
-    } else if (firstButton) {
+    }
+    if (firstButton) {
       if (firstButton !== firstElement && firstElement) {
-        let $tabParentsButton = $(firstButton).parents('.tab-box-header'),
-          $firstItem = $(firstElement),
-          $tabParentsFirstElement = $(firstElement).parents('.tab-box-header');
-        if ($tabParentsFirstElement.length > 0 && $tabParentsButton.length > 0 && $firstItem.is('.tab-item')) {
+        const $tabParentsButton = $(firstButton).parents('.tab-box-header');
+        const $firstItem = $(firstElement);
+        const $tabParentsFirstElement = $(firstElement).parents('.tab-box-header');
+        if ($tabParentsFirstElement.length && $tabParentsButton.length && $firstItem.is('.tab-item')) {
           return firstElement;
         }
       }
