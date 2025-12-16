@@ -147,6 +147,7 @@ export class TableFooter extends Widget implements TableFooterModel {
     this._infoTableStatusMenu = scout.create(Menu, {
       parent: this,
       toggleAction: true,
+      preventInitialFocus: true,
       cssClass: 'table-info-item table-info-status'
     });
     this._infoTableStatusMenu.render(this._$info);
