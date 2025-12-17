@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -158,6 +158,10 @@ export class FormFieldLayout extends AbstractLayout {
           fieldWidth += formField.$mandatory.outerWidth(true);
         }
         formField.$label.cssWidth(fieldWidth);
+      }
+
+      if (formField.$maskedIndicator) {
+        this._layoutMaskedIndicator(formField, fieldBounds, right);
       }
     }
 
@@ -319,6 +323,26 @@ export class FormFieldLayout extends AbstractLayout {
     formField.$icon
       .cssRight(right)
       .cssTop(fieldBounds.y)
+      .cssHeight(height);
+  }
+
+  protected _layoutMaskedIndicator(formField: FormField, fieldBounds: Rectangle, right: number) {
+    const isMultiline = formField.gridData.h > 1 || formField.gridData.weightY > 0;
+
+    // If field is bigger than rowHeight (e.g. if used in desktop cell editor), make sure icon is as high as field
+    let height = Math.max(this.rowHeight, fieldBounds.height);
+    let top = fieldBounds.y;
+    if (isMultiline) {
+      height = this.rowHeight; // align icon at the top if field spans multiple grid lines
+      right += 11; // make room for scrollbar; magic number to align well with magnifying glass in LookupBoxes
+      top += 4; // more space from top in larger fields
+    }
+
+    // masked indicator is always right-aligned, because there's no value in the field when it's present, so it can't overlap with contents
+    formField.$maskedIndicator
+      .cssLeft('')
+      .cssRight(right)
+      .cssTop(top)
       .cssHeight(height);
   }
 

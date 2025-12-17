@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -45,6 +45,11 @@ export class ModeSelectorField<TValue> extends ValueField<TValue> implements Mod
   protected _removeModeSelector() {
     this.modeSelector.remove();
     this._removeField();
+  }
+
+  protected override _renderMaskedIndicator() {
+    super._renderMaskedIndicator();
+    this.invalidateLayoutTree(); // might change size --> invalidate parents
   }
 
   protected _onSelectedModeChange(event: PropertyChangeEvent<Mode<TValue>, ModeSelector<TValue>>) {
