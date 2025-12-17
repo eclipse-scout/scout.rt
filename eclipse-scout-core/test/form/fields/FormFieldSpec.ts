@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -181,6 +181,25 @@ describe('FormField', () => {
       expect(formField.$field.attr('class')).not.toContain('read-only');
     });
 
+  });
+
+  describe('disabled style masked', () => {
+    let formField;
+
+    beforeEach(() => {
+      formField = helper.createField('StringField', session.desktop);
+    });
+
+    it('creates masked indicator when field is disabled and setDisabledStyle have been called', () => {
+      formField.render();
+      formField.setDisabledStyle(Widget.DisabledStyle.MASKED);
+      formField.setEnabled(false);
+      expect(formField.$container.children('.masked-indicator').length).toBe(1);
+      expect(formField.$container.attr('class')).toContain('masked');
+      formField.setEnabled(true);
+      expect(formField.$container.children('.masked-indicator').length).toBe(0);
+      expect(formField.$container.attr('class')).not.toContain('masked');
+    });
   });
 
   describe('property tooltipText', () => {
@@ -864,6 +883,31 @@ describe('FormField', () => {
 
       formField.setMandatory(true);
       expect(formField.$field).toHaveAttr('aria-required', 'true');
+    });
+
+    it('adds aria-description when masked', () => {
+      formField.setEnabled(false);
+      formField.setDisabledStyle(Widget.DisabledStyle.MASKED);
+      formField.render();
+      expect(formField.$field.attr('aria-description')).toContain('YouAreNotAllowedToReadThisData');
+      expect(formField.$field.attr('aria-describedby')).toBeFalsy();
+
+      formField.setTooltipText('tooltip text');
+      expect(formField.$field.attr('aria-description')).toContain('YouAreNotAllowedToReadThisData');
+      expect(formField.$field.attr('aria-description')).toContain('tooltip text');
+
+      formField.setTooltipText(null);
+      formField.addErrorStatus(Status.ok('status message'));
+      expect(formField.$field.attr('aria-description')).toContain('YouAreNotAllowedToReadThisData');
+      expect(formField.$field.attr('aria-description')).toContain('status message');
+
+      formField.clearErrorStatus();
+      formField.setEnabled(true);
+      expect(formField.$field.attr('aria-description')).toBeFalsy();
+
+      formField.setEnabled(false);
+      formField.setDisabledStyle(Widget.DisabledStyle.DEFAULT);
+      expect(formField.$field.attr('aria-description')).toBeFalsy();
     });
 
     it('adds aria-description if there is a tooltip text', () => {

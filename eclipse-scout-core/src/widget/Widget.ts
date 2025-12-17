@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -180,7 +180,11 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
      *
      * Should in general only be used if the enabled state of the widget cannot change dynamically, because the style is too similar to the enabled style.
      */
-    READ_ONLY: 1
+    READ_ONLY: 1,
+    /**
+     * Indicates that the field might have a value which the user is not able to see due to permissions.
+     */
+    MASKED: 2
   } as const;
 
   /**

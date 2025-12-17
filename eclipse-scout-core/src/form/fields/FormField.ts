@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -85,6 +85,7 @@ export class FormField extends Widget implements FormFieldModel {
    */
   $status: JQuery;
   $mandatory: JQuery;
+  $maskedIndicator: JQuery;
   protected _menuPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Menu>>;
   protected _hierarchyChangeHandler: EventHandler<HierarchyChangeEvent>;
 
@@ -527,12 +528,14 @@ export class FormField extends Widget implements FormFieldModel {
 
   protected _updateAriaDescAndErrorMessageOnElement($field: JQuery) {
     let status = this._errorStatus();
-    let description = status?.message || this.tooltipText;
+    let maskedDescription = this.masked ? this.session.text('YouAreNotAllowedToReadThisData') : null;
     let errorSeverity = status?.severity === Status.Severity.ERROR;
+    // no status description when severity is ERROR, to make it consistent with the visual behavior
+    let statusMessageOrTooltip = errorSeverity ? null : status?.message || this.tooltipText;
+    let description = strings.join(' ', maskedDescription, statusMessageOrTooltip) || null;
     if (errorSeverity && this.fieldStatus.tooltip?.$content) {
       aria.invalid($field, true);
       aria.linkElementWithErrorMessage($field, this.fieldStatus.tooltip.$content);
-      description = null; // Also remove description to make it consistent with the visual behavior
     } else {
       aria.invalid($field, null);
       aria.removeErrorMessage($field);
@@ -791,11 +794,16 @@ export class FormField extends Widget implements FormFieldModel {
     this._installOrUninstallDragAndDropHandler();
   }
 
+  get masked(): boolean {
+    return !this.enabledComputed && this.disabledStyle === Widget.DisabledStyle.MASKED;
+  }
+
   protected override _renderDisabledStyle() {
     this._renderDisabledStyleInternal(this.$container);
     this._renderDisabledStyleInternal(this.$fieldContainer);
     this._renderDisabledStyleInternal(this.$field);
     this._renderDisabledStyleInternal(this.$mandatory);
+    this._renderMaskedIndicator();
   }
 
   /** @see FormFieldModel.font */
@@ -1190,6 +1198,38 @@ export class FormField extends Widget implements FormFieldModel {
     }
     this.$mandatory.remove();
     this.$mandatory = null;
+  }
+
+  protected _renderMaskedIndicator() {
+    if (this.masked) {
+      this._addMaskedIndicator();
+      this.$container.addClass('masked');
+    } else {
+      this._removeMaskedIndicator();
+      this.$container.removeClass('masked');
+    }
+    this.invalidateLayoutTree(false);
+    this._updateAriaDescAndErrorMessage();
+  }
+
+  protected _addMaskedIndicator() {
+    if (this.$maskedIndicator) {
+      return;
+    }
+    this.$maskedIndicator = fields.appendIcon(this.$container, 'masked-indicator');
+    tooltips.install(this.$maskedIndicator, {
+      parent: this,
+      text: this.session.text('YouAreNotAllowedToReadThisData')
+    });
+  }
+
+  protected _removeMaskedIndicator() {
+    if (!this.$maskedIndicator) {
+      return;
+    }
+    tooltips.uninstall(this.$maskedIndicator);
+    this.$maskedIndicator.remove();
+    this.$maskedIndicator = null;
   }
 
   /**
