@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,10 +30,20 @@ export interface DateFieldModel extends ValueFieldModel<Date, Date | string> {
    * If the list is empty or null, all dates are available again.
    */
   allowedDates?: (string | Date)[];
+  /**
+   * Configures whether a field to enter a date should be shown.
+   *
+   * Default is true.
+   */
   hasDate?: boolean;
   dateHasText?: boolean;
   dateFocused?: boolean;
   dateFormatPattern?: string;
+  /**
+   * Configures whether a field to enter a time should be shown.
+   *
+   * Default is false.
+   */
   hasTime?: boolean;
   timeHasText?: boolean;
   timeFocused?: boolean;

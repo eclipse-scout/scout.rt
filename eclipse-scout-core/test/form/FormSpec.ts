@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,7 @@
 import {FormSpecHelper, OutlineSpecHelper, SpecForm} from '../../src/testing/index';
 import {
   App, CancelMenu, CloseMenu, Dimension, fields, FileChooser, Form, FormFieldMenu, FormModel, InitModelOf, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Outline, Page, Popup, PopupBlockerHandler,
-  Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WrappedFormField
+  Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WidgetModel, WrappedFormField
 } from '../../src/index';
 import {DateField, GroupBox} from '../../src';
 
@@ -2406,6 +2406,117 @@ describe('Form', () => {
       form.show();
       form.hide();
       expect(form.rendered).toBe(false);
+    });
+  });
+
+  describe('reset', () => {
+    interface ExportableFormData {
+      strVal: string;
+      numVal: number;
+    }
+
+    class ExportableForm extends Form {
+      declare data: ExportableFormData;
+
+      protected override _jsonModel(): WidgetModel {
+        return {
+          rootGroupBox: {
+            objectType: GroupBox,
+            fields: [{
+              objectType: StringField,
+              label: 'str field'
+            }, {
+              objectType: NumberField,
+              label: 'num field'
+            }]
+          }
+        };
+      }
+
+      override importData() {
+        this.findChild(StringField).setValue(this.data.strVal);
+        this.findChild(NumberField).setValue(this.data.numVal);
+      }
+
+      override exportData(): any {
+        return {
+          strVal: this.findChild(StringField).value,
+          numVal: this.findChild(NumberField).value
+        } as ExportableFormData;
+      }
+    }
+
+    it('resets the values to their initial values', async () => {
+      let form = scout.create(ExportableForm, {
+        parent: session.desktop,
+        data: {
+          strVal: 'initial'
+        },
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [{
+            objectType: StringField,
+            id: 'StringField'
+          }, {
+            objectType: NumberField,
+            id: 'NumberField'
+          }]
+        }
+      });
+      await form.open();
+      let stringField = form.findChild(StringField);
+      let numberField = form.findChild(NumberField);
+      expect(stringField.value).toBe('initial');
+      expect(numberField.value).toBe(null);
+
+      stringField.setValue('asdf');
+      numberField.setValue(3);
+      expect(stringField.value).toBe('asdf');
+      expect(numberField.value).toBe(3);
+
+      form.reset();
+      expect(stringField.value).toBe('initial');
+      expect(numberField.value).toBe(null);
+    });
+
+    it('resets the data to its initial value', async () => {
+      let form = scout.create(ExportableForm, {
+        parent: session.desktop,
+        data: {
+          strVal: 'initial'
+        },
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [{
+            objectType: StringField,
+            id: 'StringField'
+          }, {
+            objectType: NumberField,
+            id: 'NumberField'
+          }]
+        }
+      });
+      await form.open();
+      let stringField = form.findChild(StringField);
+      let numberField = form.findChild(NumberField);
+      expect(form.data.strVal).toBe('initial');
+      expect(form.data.numVal).toBe(undefined);
+
+      stringField.setValue('asdf');
+      numberField.setValue(3);
+      expect(form.data.strVal).toBe('initial'); // Data has not been updated yet
+      expect(form.data.numVal).toBe(undefined);
+
+      form.setData({
+        strVal: 'asdf',
+        numVal: 10
+      } as ExportableFormData);
+      expect(form.data.strVal).toBe('asdf');
+      expect(form.data.numVal).toBe(10);
+
+      form.reset();
+      expect(stringField.value).toBe('initial');
+      expect(numberField.value).toBe(null);
     });
   });
 });

@@ -290,6 +290,13 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
     }
   }
 
+  protected override _formatValue(value: TValue): string | JQuery.Promise<string> {
+    if (value === null) {
+      return '';
+    }
+    return this.getButtonForRadioValue(value)?.label || '';
+  }
+
   selectFirstButton() {
     this.selectButtonByIndex(0);
   }

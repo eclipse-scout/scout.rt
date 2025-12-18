@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,38 +7,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Column, MaxRowCountContributionDo, NumberColumn, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, scout, SmartColumn, StaticLookupCall, Table, TableRow} from '../../../../src/index';
+import {
+  arrays, Column, Form, GroupBox, InitModelOf, MaxRowCountContributionDo, NumberColumn, NumberField, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, ResetMenu, scout, SearchFormTableControl, SearchMenu, SmartColumn,
+  StaticLookupCall, StringField, Table, TableRow, WidgetModel
+} from '../../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
 
 describe('PageWithTable', () => {
-
   let session: SandboxSession;
   let helper: OutlineSpecHelper;
   let outline: Outline;
   let page: SpecPageWithTable;
   let tableHelper: TableSpecHelper;
-
-  class SpecPageWithTable extends PageWithTable {
-    override _createSearchFilter(): any {
-      return super._createSearchFilter();
-    }
-
-    override _withMaxRowCountContribution(request: any): any {
-      return super._withMaxRowCountContribution(request);
-    }
-
-    override _transformTableDataToTableRows(tableData: any): ObjectOrModel<TableRow>[] {
-      return super._transformTableDataToTableRows(tableData);
-    }
-
-    override _loadTableData(searchFilter: any): JQuery.Promise<any> {
-      return super._loadTableData(searchFilter);
-    }
-
-    override _createChildPage(row: TableRow): Page {
-      return super._createChildPage(row);
-    }
-  }
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -64,6 +44,79 @@ describe('PageWithTable', () => {
   afterEach(() => {
     jasmine.clock().uninstall();
   });
+
+  class SpecPageWithTable extends PageWithTable {
+    override _createSearchFilter(): any {
+      return super._createSearchFilter();
+    }
+
+    override _withMaxRowCountContribution(request: any): any {
+      return super._withMaxRowCountContribution(request);
+    }
+
+    override _transformTableDataToTableRows(tableData: any): ObjectOrModel<TableRow>[] {
+      return super._transformTableDataToTableRows(tableData);
+    }
+
+    override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+      return super._loadTableData(searchFilter);
+    }
+
+    override _createChildPage(row: TableRow): Page {
+      return super._createChildPage(row);
+    }
+  }
+
+  interface SearchData {
+    strVal: string;
+    numVal: number;
+  }
+
+  class SearchForm extends Form {
+    declare data: SearchData;
+
+    protected override _jsonModel(): WidgetModel {
+      return {
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [{
+            objectType: StringField,
+            label: 'str field'
+          }, {
+            objectType: NumberField,
+            label: 'num field'
+          }],
+          menus: [
+            {
+              objectType: SearchMenu
+            },
+            {
+              objectType: ResetMenu
+            }
+          ]
+        }
+      };
+    }
+
+    override importData() {
+      this.findChild(StringField).setValue(this.data.strVal);
+      this.findChild(NumberField).setValue(this.data.numVal);
+    }
+
+    override exportData(): any {
+      return {
+        strVal: this.findChild(StringField).value,
+        numVal: this.findChild(NumberField).value
+      } as SearchData;
+    }
+  }
+
+  class SearchFormWithInitialValues extends SearchForm {
+    protected override _init(model: InitModelOf<this>) {
+      super._init(model);
+      this.findChild(StringField).setValue('initial');
+    }
+  }
 
   it('updates the page on table reload', () => {
     let counter = 0;
@@ -505,5 +558,80 @@ describe('PageWithTable', () => {
     expect(page.childNodes.length).toBe(3);
     expect(page.expanded).toBe(true);
     expect(page.expandedLazy).toBe(false);
+  });
+
+  describe('getSearchFilterText', () => {
+    it('only considers the texts of the actual search filter', async () => {
+      jasmine.clock().uninstall();
+      page.detailTable.setTableControls([{
+        objectType: SearchFormTableControl,
+        form: {
+          objectType: SearchForm
+        }
+      }]);
+      let searchForm = page.getSearchForm();
+      let stringField = searchForm.findChild(StringField);
+      let numberField = searchForm.findChild(NumberField);
+      stringField.setValue('str');
+      numberField.setValue(3);
+
+      let searchMenu = searchForm.findChild(SearchMenu);
+      searchMenu.doAction();
+      await page.getSearchForm().when('search');
+      expect(await page.getSearchFilterText()).toBe('str field: str\nnum field: 3');
+
+      stringField.setValue(null);
+      numberField.setValue(4);
+      expect(await page.getSearchFilterText()).toBe('str field: str\nnum field: 3'); // Still the same because user did not hit search yet
+
+      searchMenu.doAction();
+      await page.getSearchForm().when('search');
+      expect(await page.getSearchFilterText()).toBe('num field: 4');
+
+      let resetMenu = searchForm.findChild(ResetMenu);
+      resetMenu.doAction();
+      await page.getSearchForm().when('reset');
+      expect(await page.getSearchFilterText()).toBe('');
+    });
+  });
+
+  it('keeps the search form data and used search filter in sync', async () => {
+    jasmine.clock().uninstall();
+    page.detailTable.setTableControls([{
+      objectType: SearchFormTableControl,
+      form: {
+        objectType: SearchFormWithInitialValues
+      }
+    }]);
+    let usedFilter: SearchData;
+    page._loadTableData = (searchFilter: SearchData) => {
+      usedFilter = searchFilter;
+      return $.resolvedPromise();
+    };
+
+    page.loadTableData();
+    expect(usedFilter.strVal).toBe('initial');
+    expect(usedFilter.numVal).toBe(null);
+
+    let searchForm = page.getSearchForm();
+    let searchFormData = searchForm.data as SearchData;
+    expect(searchFormData.strVal).toBe('initial');
+    expect(searchFormData.numVal).toBe(null);
+
+    let stringField = searchForm.findChild(StringField);
+    let numberField = searchForm.findChild(NumberField);
+    stringField.setValue('new');
+    numberField.setValue(2);
+    expect(searchFormData.strVal).toBe('initial'); // Search not executed yet
+    expect(searchFormData.numVal).toBe(null);
+
+    let searchMenu = searchForm.findChild(SearchMenu);
+    searchMenu.doAction();
+    await page.getSearchForm().when('search');
+    searchFormData = searchForm.data as SearchData;
+    expect(usedFilter.strVal).toBe('new');
+    expect(usedFilter.numVal).toBe(2);
+    expect(searchFormData.strVal).toBe('new');
+    expect(searchFormData.numVal).toBe(2);
   });
 });

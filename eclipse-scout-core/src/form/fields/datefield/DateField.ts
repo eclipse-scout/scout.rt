@@ -196,6 +196,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     aria.required(this.$timeField, this.mandatory || null);
   }
 
+  /** @see DateFieldModel.hasDate */
   setHasDate(hasDate: boolean) {
     this.setProperty('hasDate', hasDate);
   }
@@ -250,6 +251,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     this.$container.toggleClass('has-date', this.hasDate);
   }
 
+  /** @see DateFieldModel.hasTime */
   setHasTime(hasTime: boolean) {
     this.setProperty('hasTime', hasTime);
   }

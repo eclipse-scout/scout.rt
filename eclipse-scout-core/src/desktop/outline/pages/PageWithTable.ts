@@ -9,8 +9,8 @@
  */
 import {
   arrays, AutoLeafPageWithNodes, BookmarkSupport, BookmarkTableRowIdentifierDo, dataObjects, DoEntity, Event, EventHandler, Form, InitModelOf, LimitedResultInfoContributionDo, ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel,
-  PropertyChangeEvent, scout, SearchFormTableControl, SearchRequiredTableStatus, Status, Table, TableAllRowsDeletedEvent, TableControl, TableMaxResultsHelper, TableOrganizerMenu, TableReloadEvent, TableReloadReason, TableRow,
-  TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
+  PropertyChangeEvent, scout, SearchFilterTextBuilder, SearchFormTableControl, SearchRequiredTableStatus, Status, Table, TableAllRowsDeletedEvent, TableControl, TableMaxResultsHelper, TableOrganizerMenu, TableReloadEvent, TableReloadReason,
+  TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
 } from '../../../index';
 import $ from 'jquery';
 
@@ -339,15 +339,10 @@ export class PageWithTable extends Page implements PageWithTableModel {
     if (!searchForm) {
       return;
     }
-    let oldData = searchForm.data;
     searchForm.setData(searchFilter);
     searchForm.importData();
     if (markAsSaved) {
       searchForm.markAsSaved();
-    } else {
-      // Because resetting the form not only resets every field but also loads the form again (see Lifecycle#reset),
-      // to 'data' attribute has to be reverted back to the previous value.
-      searchForm.setData(oldData);
     }
   }
 
@@ -356,6 +351,29 @@ export class PageWithTable extends Page implements PageWithTableModel {
    */
   resetSearchFilter() {
     this.getSearchForm()?.reset();
+  }
+
+  /**
+   * Uses {@link SearchFilterTextBuilder} to build a display text for the active search form.
+   *
+   * @returns the text for the active search form or null if there is no search form.
+   */
+  async getSearchFilterText(): Promise<string> {
+    let form = this.getSearchForm();
+    if (!form) {
+      return null;
+    }
+    // If the user modifies search fields but does not hit search, the search text would not reflect the used search filter to load the table.
+    // To circumvent this, the actual search filter needs to be imported before building the text.
+    let oldData = form.exportData();
+    form.importData();
+
+    let text = await scout.create(SearchFilterTextBuilder).build(form);
+
+    // Import the old data to restore the previous search form state.
+    form.setData(oldData);
+    form.importData();
+    return text;
   }
 
   /**
@@ -384,9 +402,18 @@ export class PageWithTable extends Page implements PageWithTableModel {
     this.ensureDetailTable();
     this.detailTable.setLoading(true);
     const restoreSelectionInfo = this._getRestoreSelectionInfo();
-    return this._loadTableData(this._createSearchFilter())
+    const searchFilter = this._createSearchFilter();
+
+    // Ensure the search form data is in sync with the search filter used to load the table data (e.g. required for getSearchFilterText())
+    this._updateSearchData(searchFilter);
+
+    return this._loadTableData(searchFilter)
       .then(data => this._onLoadTableDataDone(data, restoreSelectionInfo))
       .catch(error => this._onLoadTableDataFail(error, restoreSelectionInfo));
+  }
+
+  protected _updateSearchData(searchFilter: any) {
+    this.getSearchForm()?.setData(searchFilter);
   }
 
   /**
