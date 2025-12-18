@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,6 +36,9 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
         return TreeVisitResult.SKIP_SUBTREE;
       }
     });
+
+    // Reset data to its initial state (based on the initial values of the fields)
+    this.widget.setData(this.widget.exportData());
   }
 
   override invalidElements(): { missingElements: TValidationResult[]; invalidElements: TValidationResult[] } {

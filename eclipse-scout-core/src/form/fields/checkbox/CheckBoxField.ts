@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -108,6 +108,13 @@ export class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldM
       return false;
     }
     return super._ensureValue(value);
+  }
+
+  protected override _formatValue(value: boolean): string | JQuery.Promise<string> {
+    if (value === null) {
+      return '';
+    }
+    return value ? this.session.text('Yes') : this.session.text('No');
   }
 
   /**
