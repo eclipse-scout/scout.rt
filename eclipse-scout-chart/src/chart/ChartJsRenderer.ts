@@ -2930,8 +2930,8 @@ export class ChartJsRenderer extends AbstractChartRenderer {
 
     let yAxisType = (datasets[0].type || type),
       yAxisDiffTypeType = (datasetsDiffType[0].type || type),
-      yAxisTypeLabel = this.chart.session.text('ui.' + yAxisType),
-      yAxisDiffTypeTypeLabel = this.chart.session.text('ui.' + yAxisDiffTypeType),
+      yAxisTypeLabel = this._typeText(yAxisType),
+      yAxisDiffTypeTypeLabel = this._typeText(yAxisDiffTypeType),
       yAxisScaleLabel = options.scaleLabelByTypeMap ? options.scaleLabelByTypeMap[yAxisType] : null,
       yAxisDiffTypeScaleLabel = options.scaleLabelByTypeMap ? options.scaleLabelByTypeMap[yAxisDiffTypeType] : null;
 
@@ -2946,6 +2946,17 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     datasetsDiffType.forEach(dataset => {
       dataset.yAxisID = 'yDiffType';
     });
+  }
+
+  protected _typeText(chartType: ChartType) {
+    if (chartType === Chart.Type.BAR) {
+      return this.chart.session.text('ui.ChartTypeBar');
+    }
+    if (chartType === Chart.Type.LINE) {
+      return this.chart.session.text('ui.ChartTypeLine');
+    }
+    // Not relevant for other types because the text is only used for the COMBO_BAR_LINE chart
+    return '';
   }
 
   protected _adjustAxisMaxMin(axis: AxisWithMaxMin, maxTicks: number, maxMinValue: Boundary) {

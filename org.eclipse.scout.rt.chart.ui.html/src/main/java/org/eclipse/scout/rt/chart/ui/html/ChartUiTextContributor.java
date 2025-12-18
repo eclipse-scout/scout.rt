@@ -38,7 +38,6 @@ public class ChartUiTextContributor implements IUiTextContributor {
         "ui.groupedByWeekday",
         "ui.groupedByMonth",
         "ui.groupedByYear",
-        "ui.groupedByDate",
-        "ui.line"));
+        "ui.groupedByDate"));
   }
 }
