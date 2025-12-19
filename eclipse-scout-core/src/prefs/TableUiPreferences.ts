@@ -495,7 +495,9 @@ export class TableUiPreferences implements ObjectWithType {
     column.setVisible(columnPreferences.visible, false); // parameter 'false' skips call of onColumnVisibilityChanged()
 
     // Don't use setter for 'width' property to prevent unnecessarily redrawing the table (will be done again later in setColumns anyway)
-    column.width = columnPreferences.width;
+    if (!column.fixedWidth) {
+      column.width = columnPreferences.width;
+    }
 
     // Properties without setter (changes will be applied later by _setColumns)
     column.sortIndex = columnPreferences.sortOrder;

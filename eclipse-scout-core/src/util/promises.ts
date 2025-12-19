@@ -152,3 +152,50 @@ export class Deferred<T> {
     return this._promise;
   }
 }
+
+export class TaskQueue {
+
+  protected _queue: (() => Promise<any>)[] = [];
+
+  protected _resolve: () => void;
+  protected _reject: () => void;
+  protected _promise = Promise.resolve();
+
+  protected _resetPromise() {
+    console.log('-- reset promise --');
+    this._promise = new Promise<void>((resolve, reject) => {
+      this._resolve = resolve;
+      this._reject = reject;
+    });
+  }
+
+  allDone(): Promise<void> {
+    return this._promise;
+  }
+
+  addAsyncTask(task: () => Promise<any>) {
+    if (!task) {
+      return;
+    }
+    this._queue.push(task);
+    if (this._queue.length === 1) {
+      this._resetPromise();
+      this._nextTask().then(() => {
+        console.log('--- all done ---');
+        this._resolve();
+      });
+    }
+  }
+
+  protected async _nextTask(): Promise<any> {
+    let task = this._queue[0];
+    console.log('  (next task)');
+    await task();
+    this._queue.shift();
+    console.log('  (task done)');
+
+    if (this._queue.length) {
+      return this._nextTask();
+    }
+  }
+}
