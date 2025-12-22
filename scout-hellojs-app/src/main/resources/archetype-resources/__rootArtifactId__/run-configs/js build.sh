@@ -7,7 +7,7 @@
 # You need to rerun it if you update your JS dependencies (package.json).
 # Please see the Scout documentation for details about the available run scripts: https://eclipsescout.github.io/scout-docs/26.1/technical-guide/user-interface/build-stack.html#command-line-interface-cli
 #
-# To make this script work you need a current version of Node.js (>=22.12.0), npm (>=10.9.0) and pnpm (>=9.15.0).
+# To make this script work you need a current version of Node.js (>=24.12.0), npm (>=11.6.2) and pnpm (>=10.26.1).
 # Node.js (incl. npm) is available here: https://nodejs.org/.
 # pnpm is available here: https://pnpm.io/
 

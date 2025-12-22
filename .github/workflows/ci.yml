@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: bsisoftware/scout-maven-chrome:mvn-3.9.9-node-22.13.0-java-24
+    container: bsisoftware/scout-maven-chrome:mvn-3.9.11-node-24.12.0-java-25
     steps:
       - uses: actions/checkout@v4
       - name: Build with Maven
