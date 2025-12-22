@@ -1,7 +1,7 @@
 @echo off
 :: This script starts the testserver and executes all JavaScript tests. It expects that npm install has already been executed previously.
 ::
-:: To make this script work you need a current version of Node.js (>=22.12.0), npm (>=10.9.0) and pnpm (>=9.15.0).
+:: To make this script work you need a current version of Node.js (>=24.12.0), npm (>=11.6.2) and pnpm (>=10.26.1).
 :: Node.js (incl. npm) is available here: https://nodejs.org/.
 
 :: Check if npm is available
