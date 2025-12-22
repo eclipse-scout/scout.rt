@@ -188,7 +188,8 @@ module.exports = (env, args) => {
             lessOptions: {
               relativeUrls: false,
               rewriteUrls: 'off',
-              math: 'always'
+              math: 'always',
+              quiet: true // Disable deprecation warnings so they don't spam the log because of bug https://github.com/less/less.js/issues/4339
             }
           }
         }]
