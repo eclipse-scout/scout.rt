@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, aria, Device, InitModelOf, ModeModel} from '../index';
+import {Action, aria, Device, InitModelOf, ModeModel, tooltips} from '../index';
 
 export class Mode<TRef = any> extends Action implements ModeModel<TRef> {
   declare model: ModeModel<TRef>;
@@ -76,7 +76,11 @@ export class Mode<TRef = any> extends Action implements ModeModel<TRef> {
 
   protected override _renderText() {
     super._renderText();
-
+    if (this.$text) {
+      tooltips.installForEllipsis(this.$text, {
+        parent: this
+      });
+    }
     this._updateLabelAndIconStyle();
     // Invalidate layout because mode may now be longer or shorter
     this.invalidateLayoutTree();
