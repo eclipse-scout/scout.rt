@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -160,14 +160,12 @@ export const dragAndDrop = {
       target: target,
       supportedScoutTypes: DropType.FILE_TRANSFER,
       validateFiles: (files, defaultValidator) => defaultValidator(files),
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       onDrop: event => {
       },
       dropType: () => DropType.FILE_TRANSFER,
       dropMaximumSize: () => target.dropMaximumSize,
       doInstall: () => target.enabledComputed,
       container: () => target.$container,
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       additionalDropProperties: event => {
       }
     };

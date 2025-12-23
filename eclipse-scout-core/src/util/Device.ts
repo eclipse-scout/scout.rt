@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -113,7 +113,6 @@ export class Device implements DeviceModel, ObjectWithType {
    * To fix this we would have to work with a custom active class which will be toggled on touchstart/end
    */
   protected _installActiveHandler() {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     document.addEventListener('touchstart', () => {
     }, false);
   }

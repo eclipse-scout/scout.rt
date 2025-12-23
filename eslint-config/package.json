@@ -34,7 +34,7 @@
     "enforce",
     "hint"
   ],
-  "main": "src/index.js",
+  "main": "src/index.mjs",
   "files": [
     "src"
   ],
@@ -47,14 +47,15 @@
   },
   "devDependencies": {
     "@eclipse-scout/releng": "^25.1.0",
-    "eslint": "8.57.1"
+    "eslint": "9.39.2",
+    "@eslint/js": "9.39.2",
+    "globals": "16.5.0"
   },
   "dependencies": {
     "typescript": "5.9.3",
-    "@typescript-eslint/parser": "7.18.0",
-    "@typescript-eslint/eslint-plugin": "7.18.0"
+    "typescript-eslint": "8.50.1"
   },
   "peerDependencies": {
-    "eslint": ">=8.57.1"
+    "eslint": ">=9.39.2"
   }
 }

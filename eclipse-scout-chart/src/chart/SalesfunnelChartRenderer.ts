@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -368,12 +368,12 @@ export class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
 
   protected _analyzeData(valueGroups: ChartValueGroup[]): AnalyzedData {
     let result: AnalyzedData = {
-        labelCount: 0,
-        maxValue: null,
-        maxLengthFirstValueRow: 0,
-        maxLengthSecondValueRow: 0
-      },
-      labelClass = this._dynamicCssClass('salesfunnel-label');
+      labelCount: 0,
+      maxValue: null,
+      maxLengthFirstValueRow: 0,
+      maxLengthSecondValueRow: 0
+    };
+    let labelClass = this._dynamicCssClass('salesfunnel-label');
 
     for (let i = 0; i < valueGroups.length; i++) {
 

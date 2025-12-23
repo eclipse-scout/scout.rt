@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -327,7 +327,6 @@ describe('objects', () => {
       expect(objects.isString(String(null))).toBe(true);
       expect(objects.isString(JSON.stringify({a: 1}))).toBe(true);
 
-      /* eslint-disable no-new-wrappers */
       // noinspection JSPrimitiveTypeWrapperUsage
       expect(objects.isString(new String('foo'))).toBe(true); // typeof 'object'
     });

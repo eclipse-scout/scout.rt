@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,6 @@ export type SomeRequired<TObject, TKey extends keyof TObject> = Required<Pick<TO
 /**
  * Makes a property required but only if it is not of TType or a super class of TType.
  */
-// eslint-disable-next-line
 export type RequiredUnlessNotSubclass<TObject, TKey extends keyof TObject, TType> = (TType extends TObject[TKey] ? {} : Pick<TObject, TKey>);
 
 export type EnumObject<T> = T[keyof T];
