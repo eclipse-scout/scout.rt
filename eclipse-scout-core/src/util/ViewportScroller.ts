@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,7 +40,6 @@ export class ViewportScroller implements ViewportScrollerModel, ObjectWithType {
     this.f = -30;
     this.initialDelay = 500;
     this.active = () => true;
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     this.scroll = (dx: number, dy: number) => {
     };
 

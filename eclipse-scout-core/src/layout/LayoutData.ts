@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,7 @@
 
 // Extends Object is necessary to prevent weak type checking.
 // -> TS2559: Type 'xy' has no properties in common with type 'LayoutData' in implementing classes
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-wrapper-object-types
 export interface LayoutData extends Object {
   isValidateRoot?(): boolean;
 }

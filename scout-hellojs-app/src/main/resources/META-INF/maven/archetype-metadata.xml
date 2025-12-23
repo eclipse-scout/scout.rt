@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2026 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -43,8 +43,7 @@
       <includes>
         <include>**/*.yaml</include>
         <include>**/.editorconfig</include>
-        <include>**/.eslintignore</include>
-        <include>**/.eslintrc.js</include>
+        <include>**/eslint.config.mjs</include>
         <include>**/package.json</include>
         <include>**/tsconfig*.json</include>
       </includes>

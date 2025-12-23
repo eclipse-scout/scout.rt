@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -159,7 +159,6 @@ export class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel {
       if (cons.widthHint > 0) {
         // Use explicit width hint, if set
         size.width = cons.widthHint;
-        // eslint-disable-next-line brace-style
       } else if (cons.useUiWidth || !cons.fillHorizontal) {
         // Calculate preferred width otherwise
         // This size is needed by _initializeColumns

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-module.exports = {
+import {defineConfig} from 'eslint/config';
+
+export default defineConfig({
   rules: {
     'indent': ['warn', 2, {'SwitchCase': 1}],
     'no-extra-parens': ['off'],
@@ -51,7 +53,7 @@ module.exports = {
     'no-useless-return': 'error',
     'no-else-return': 'error',
     'max-len': ['warn', 240, 2, {ignoreUrls: true, ignorePattern: '^import .*'}],
-    'semi': ['error', 'always'],
+    'semi': ['warn', 'always'],
     'quotes': ['warn', 'single'],
     'comma-dangle': ['error', 'never'],
     'object-curly-spacing': ['error', 'never'],
@@ -87,4 +89,4 @@ module.exports = {
     'prefer-spread': 'warn',
     'max-classes-per-file': 'off'
   }
-};
+});
