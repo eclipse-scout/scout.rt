@@ -150,7 +150,7 @@ In order to run the TypeScript migration, do the following:
   },
   "pnpm": {
     "overrides": {
-      "typescript": "5.4.5"
+      "typescript": "5.9.3"
     }
   }
 }
