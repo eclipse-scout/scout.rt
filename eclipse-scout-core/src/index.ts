@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,6 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
+
+// Ensure types are imported for JQuery, also for projects using Scout.
+// Important: these directives must be on top of a file and can only be preceded by single or multi-line comments and empty lines.
+/// <reference types="jquery" preserve="true" />
 import 'reflect-metadata/lite';
 import {ObjectFactory} from './ObjectFactory';
 

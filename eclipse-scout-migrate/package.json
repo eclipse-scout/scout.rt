@@ -38,7 +38,7 @@
     "ts-migrate-server": "0.1.33",
     "yargs-parser": "22.0.0",
     "jscodeshift": "17.3.0",
-    "typescript": "5.4.5"
+    "typescript": "5.9.3"
   },
   "devDependencies": {
     "@types/jscodeshift": "^17.3.0",

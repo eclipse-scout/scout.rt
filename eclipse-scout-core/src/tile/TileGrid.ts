@@ -600,7 +600,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
 
     let placeholders = [];
     if (this.withPlaceholders) {
-      // Don't reorder placeholders -> remove them first, then sort and add them afterwards again
+      // Don't reorder placeholders -> remove them first, then sort and add them again afterward
       placeholders = this._deletePlaceholders(tiles);
     }
     tiles.sort(this.comparator);
@@ -1090,7 +1090,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   }
 
   /**
-   * Deselects every tile if all tiles are selected. Otherwise selects all tiles.
+   * Deselects every tile if all tiles are selected. Selects all tiles otherwise.
    */
   toggleSelection() {
     if (this.selectedTiles.length === this._filteredTiles.length) {
@@ -1367,7 +1367,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     considerPlaceholders = scout.nvl(considerPlaceholders, true);
     if (viewRange.equals(this.virtualScrolling.maxViewRange())) {
       // Directly return all tiles if max view range
-      return considerPlaceholders ? this._filteredTiles : this.filteredTiles as any;
+      return considerPlaceholders ? this._filteredTiles as any : this.filteredTiles;
     }
 
     let tiles = [];
@@ -1444,7 +1444,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
       }
     }
     if (!this.virtual) {
-      // Render all tiles (on toggle and initially) (_renderViewRange is not used in non virtual mode because filtered tiles need to be rendered as well)
+      // Render all tiles (on toggle and initially) (_renderViewRange is not used in non-virtual mode because filtered tiles need to be rendered as well)
       this._renderAllTiles();
     }
 
@@ -1625,7 +1625,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
 
     if (filterResult) {
       // Suppress because Tile.js would invalidate which leads to poor performance if grid is used in a Group.js and group is being expanded while tiles are shown
-      // invalidating will be done afterwards anyway so no need to do it for each tile
+      // invalidating will be done afterward anyway so no need to do it for each tile
       this.htmlComp.suppressInvalidate = true;
       filterResult.newlyShown.forEach(tile => {
         if (tile.rendered) {
@@ -1686,7 +1686,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
       if (prevTiles[i] !== tile || different) {
         // Start ordering as soon as the order of the arrays starts to differ
         if (this.virtual && !tile.rendered) {
-          // In non virtual mode, every tile is rendered, even the filtered one. So if a tile is not rendered ignore it in virtual, but fail in non virtual
+          // In non-virtual mode, every tile is rendered, even the filtered one. So if a tile is not rendered ignore it in virtual, but fail in non-virtual
           return;
         }
         different = true;
@@ -1784,7 +1784,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     }
     considerPlaceholders = scout.nvl(considerPlaceholders, false);
     if (!this.virtual) {
-      return considerPlaceholders ? this._filteredTiles : this.filteredTiles as any;
+      return considerPlaceholders ? this._filteredTiles as any : this.filteredTiles;
     }
     let tiles = [];
     this.$container.children('.tile').each((i, elem) => {
