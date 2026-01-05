@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, PromiseCreator, promises} from '../../src/index';
+import {arrays, PromiseCreator, promises, TaskQueue} from '../../src/index';
 
 describe('promises', () => {
 
@@ -139,4 +139,75 @@ describe('promises', () => {
     deferredArray[2].resolve('Bar', true);
   });
 
+  describe('TaskQueue', () => {
+
+    it('runs async tasks in scheduled order', async () => {
+      let taskQueue = new TaskQueue();
+      let result = [];
+
+      const sleep = async (delay: number) => {
+        return new Promise((resolve, reject) => setTimeout(resolve, delay));
+      };
+
+      let task1 = async () => {
+        result.push('1a');
+        await sleep(1);
+        result.push('1b');
+        await sleep(10);
+        result.push('1c');
+      };
+      let subtask = async () => {
+        result.push('sa');
+        await sleep(1);
+        result.push('sb');
+      };
+      let task2 = async () => {
+        result.push('2a');
+        await sleep(1);
+        result.push('2b');
+        taskQueue.addAsyncTask(subtask);
+        result.push('2c');
+        await sleep(1);
+        result.push('2d');
+      };
+      let task3 = async () => {
+        result.push('3a');
+        await sleep(10);
+        result.push('3b');
+      };
+
+      expect(taskQueue.length).toBe(0);
+      taskQueue.addAsyncTask(task1);
+      taskQueue.addAsyncTask(task2);
+      taskQueue.addAsyncTask(task3);
+      expect(taskQueue.length).toBe(3);
+
+      expect(result).toEqual([]);
+      await taskQueue.whenIdle();
+      expect(taskQueue.length).toBe(0);
+      expect(result).toEqual(['1a', '1b', '1c', '2a', '2b', '2c', '2d', '3a', '3b', 'sa', 'sb']);
+    });
+
+    it('creates a new promise when task is scheduled', async () => {
+      let taskQueue = new TaskQueue();
+
+      let p1 = taskQueue.whenIdle();
+      let p2 = taskQueue.whenIdle();
+      taskQueue.addAsyncTask(async () => {
+      });
+      let p3 = taskQueue.whenIdle();
+      taskQueue.addAsyncTask(async () => {
+      });
+      let p4 = taskQueue.whenIdle();
+      expect(p1).not.toBe(p2); // because no task was scheduled initially
+      expect(p1).not.toBe(p3);
+      expect(p3).toBe(p4);
+
+      await p4;
+      let p5 = taskQueue.whenIdle();
+      let p6 = taskQueue.whenIdle();
+      expect(p5).toBe(p4);
+      expect(p6).toBe(p5);
+    });
+  });
 });

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {PromiseCreator} from '../index';
+import {numbers, PromiseCreator} from '../index';
 import $ from 'jquery';
 
 export const promises = {
@@ -153,49 +153,51 @@ export class Deferred<T> {
   }
 }
 
+let COUNTER = 0;
+
 export class TaskQueue {
 
   protected _queue: (() => Promise<any>)[] = [];
+  protected _deferred: Deferred<void>;
 
-  protected _resolve: () => void;
-  protected _reject: () => void;
-  protected _promise = Promise.resolve();
-
-  protected _resetPromise() {
-    console.log('-- reset promise --');
-    this._promise = new Promise<void>((resolve, reject) => {
-      this._resolve = resolve;
-      this._reject = reject;
-    });
-  }
-
-  allDone(): Promise<void> {
-    return this._promise;
-  }
-
-  addAsyncTask(task: () => Promise<any>) {
+  addAsyncTask(task: () => Promise<any>, name?: string) {
     if (!task) {
       return;
     }
-    this._queue.push(task);
+    name = '#' + (COUNTER++) + ' - ' + (name || 'task ' + numbers.randomId());
+    console.log(name + ': schedule');
+    this._queue.push(() => {
+      console.log(name + ': start');
+      try {
+        return task();
+      } finally {
+        console.log(name + ': end');
+      }
+    });
+
     if (this._queue.length === 1) {
-      this._resetPromise();
-      this._nextTask().then(() => {
-        console.log('--- all done ---');
-        this._resolve();
-      });
+      this._deferred = new Deferred();
+      Promise.resolve() // execute first task asynchronously as well
+        .then(() => this._nextTask())
+        .then(() => this._deferred.resolve());
     }
   }
 
   protected async _nextTask(): Promise<any> {
     let task = this._queue[0];
-    console.log('  (next task)');
     await task();
     this._queue.shift();
-    console.log('  (task done)');
 
     if (this._queue.length) {
       return this._nextTask();
     }
+  }
+
+  whenIdle(): Promise<void> {
+    return this._deferred?.promise() || Promise.resolve();
+  }
+
+  get length(): number {
+    return this._queue.length;
   }
 }
