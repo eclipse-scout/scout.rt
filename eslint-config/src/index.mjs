@@ -14,6 +14,7 @@ import tseslint from 'typescript-eslint';
 import common from './common.mjs';
 
 export default defineConfig(
+  // Base config for JavaScript files
   {
     languageOptions: {
       globals: {
@@ -27,14 +28,16 @@ export default defineConfig(
     },
     extends: [eslint.configs.recommended, common]
   },
+  // Additional config for TypeScript files (extends the base config from above)
   {
-    extends: [tseslint.configs.recommended, common],
+    extends: [tseslint.configs.recommended],
     plugins: {
       '@typescript-eslint': tseslint.plugin
     },
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
       'spaced-comment': ['error', 'always', {'exceptions': ['*'], 'markers': ['/']}], // Allow triple slash directives
+      'prefer-const': 'off', // Enabled by TS ESLint, but we do not want to enforce it for now
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-inferrable-types': 'warn', // Changed from error to warn
       '@typescript-eslint/ban-ts-comment': 'off', // Allow ts-ignore

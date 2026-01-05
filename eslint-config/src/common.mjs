@@ -10,6 +10,9 @@
 import {defineConfig} from 'eslint/config';
 import stylistic from '@stylistic/eslint-plugin';
 
+/**
+ * Contains additional rules that are not part of the eslint recommended config and adjusts some of the rules.
+ */
 export default defineConfig({
   plugins: {
     '@stylistic': stylistic
@@ -17,56 +20,39 @@ export default defineConfig({
   rules: {
     'accessor-pairs': 'warn',
     'array-callback-return': 'error',
-    'guard-for-in': 'off',
     'no-alert': 'warn',
     'no-eval': 'error',
     'no-extra-bind': 'error',
     'no-extra-label': 'error',
-    'no-implicit-coercion': 'off',
     'no-implied-eval': 'error',
-    'no-invalid-this': 'off',
     'no-iterator': 'error',
     'no-caller': 'warn',
-    'no-console': 'off',
     'no-labels': 'error',
     'no-undef': 'off',
-    'no-throw-literal': 'off',
     'camelcase': ['error', {allow: ['^\\$', '_']}],
     'no-lone-blocks': 'error',
     'no-loop-func': 'error',
     'no-proto': 'error',
     'no-prototype-builtins': 'off',
     'no-return-assign': 'error',
-    'no-return-await': 'off',
     'no-self-compare': 'error',
     'no-label-var': 'error',
-    'no-shadow': 'off',
     'no-var': 'warn',
-    'require-unicode-regexp': 'off',
     'no-sequences': 'error',
     'no-unmodified-loop-condition': 'error',
     'no-useless-return': 'error',
     'no-else-return': 'error',
     'arrow-parens': ['error', 'as-needed'],
     'no-duplicate-imports': 'error',
-    'one-var': 'off',
     'prefer-arrow-callback': 'warn',
-    'prefer-template': 'off',
-    'no-lonely-if': 'off',
     'new-cap': ['error', {'capIsNewExceptions': ['Deferred', '$.Event'], 'capIsNewExceptionPattern': 'Model$'}],
     'no-multi-assign': 'error',
     'no-unused-vars': 'off',
-    'require-jsdoc': 'off',
-    'no-plusplus': 'off',
     'curly': ['error', 'all'],
     'eqeqeq': ['error', 'always', {'null': 'ignore'}],
-    'valid-jsdoc': 'off',
-    'prefer-const': 'off',
     'prefer-rest-params': 'warn',
     'prefer-spread': 'warn',
-    'max-classes-per-file': 'off',
     '@stylistic/no-multi-spaces': 'warn',
-    '@stylistic/func-call-spacing': 'off',
     '@stylistic/eol-last': ['warn', 'always'],
     '@stylistic/comma-spacing': ['warn', {'before': false, 'after': true}],
     '@stylistic/array-bracket-spacing': ['warn', 'never'],
@@ -77,12 +63,9 @@ export default defineConfig({
     '@stylistic/quotes': ['warn', 'single'],
     '@stylistic/comma-dangle': ['warn', 'never'],
     '@stylistic/object-curly-spacing': ['warn', 'never'],
-    '@stylistic/operator-linebreak': 'off',
     '@stylistic/arrow-spacing': 'warn',
-    '@stylistic/padded-blocks': 'off',
     '@stylistic/template-curly-spacing': ['warn', 'never'],
     '@stylistic/linebreak-style': ['warn', 'unix'],
-    '@stylistic/newline-per-chained-call': 'off',
     '@stylistic/no-trailing-spaces': 'warn',
     '@stylistic/space-before-function-paren': ['warn', {
       'anonymous': 'never',
@@ -90,7 +73,6 @@ export default defineConfig({
       'asyncArrow': 'always'
     }],
     '@stylistic/indent': ['warn', 2, {'SwitchCase': 1}],
-    '@stylistic/no-extra-parens': ['off'],
     '@stylistic/spaced-comment': ['warn', 'always', {'exceptions': ['*']}]
   }
 });
