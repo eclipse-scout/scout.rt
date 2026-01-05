@@ -165,9 +165,8 @@ public class ServiceTunnelService {
     // Otherwise, the stream gets silently corrupted, which triggers  a repetition of the current request by Java connection mechanism.
     IRestorer interruption = ThreadInterruption.clear();
     try {
-      HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
       HttpServletResponse resp = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
-      m_httpCacheControl.get().checkAndSetCacheHeaders(req, resp, null);
+      m_httpCacheControl.get().disableCaching(resp);
       m_contentHandler.writeResponse(out, serviceResponse);
     }
     finally {

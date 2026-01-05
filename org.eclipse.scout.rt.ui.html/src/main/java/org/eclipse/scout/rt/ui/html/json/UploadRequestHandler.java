@@ -110,8 +110,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       LOG.debug("File upload started");
     }
 
-    // disable caching
-    m_httpCacheControl.checkAndSetCacheHeaders(req, resp, null);
+    m_httpCacheControl.disableCaching(resp);
 
     try {
       // Get and validate existing UI session

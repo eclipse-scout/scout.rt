@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.server.commons.healthcheck.IHealthChecker.IHealthChe
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.commons.servlet.filter.LogFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,7 @@ public class HealthCheckServlet extends AbstractHttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     req.setAttribute(LogFilter.NO_LOG_REQUEST_ATTRIBUTE, "X"); // prevent logging of calls to health servlet in LogFilter
 
-    disableCaching(req, resp);
+    BEANS.get(HttpCacheControl.class).disableCaching(resp); // Never cache status requests.
     BEANS.get(HttpServletControl.class).doDefaults(this, req, resp);
 
     try {
@@ -68,13 +69,6 @@ public class HealthCheckServlet extends AbstractHttpServlet {
       LOG.error("HealthChecking crashed", t);
       throw BEANS.get(ServletExceptionTranslator.class).translate(t);
     }
-  }
-
-  protected void disableCaching(HttpServletRequest req, HttpServletResponse resp) {
-    // Never cache status requests.
-    resp.setHeader("Cache-Control", "private, no-store, no-cache, max-age=0"); // HTTP 1.1
-    resp.setHeader("Pragma", "no-cache"); // HTTP 1.0
-    resp.setDateHeader("Expires", 0); // prevents caching at the proxy server
   }
 
   protected void doChecks(HttpServletRequest req, HttpServletResponse resp) throws IOException {
