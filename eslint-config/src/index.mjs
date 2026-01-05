@@ -34,15 +34,17 @@ export default defineConfig(
     },
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
+      'spaced-comment': ['error', 'always', {'exceptions': ['*'], 'markers': ['/']}], // Allow triple slash directives
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-inferrable-types': 'warn', // Changed from error to warn
       '@typescript-eslint/ban-ts-comment': 'off', // Allow ts-ignore
       '@typescript-eslint/no-unused-vars': 'off', // Allow unused parameters
-      'spaced-comment': ['error', 'always', {'exceptions': ['*'], 'markers': ['/']}], // Allow triple slash directives
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-this-alias': 'off', // Allow assigment of this to a variable, e.g. for better readability. 'That' and 'self' are not used often anymore.
       '@typescript-eslint/prefer-ts-expect-error': 'warn',
-      '@typescript-eslint/no-unused-expressions': 'off' // Disabled to make log pattern work that is commonly used in scout ($.log.isTraceEnabled() && $.log.trace(msg));
+      '@typescript-eslint/no-unused-expressions': 'off', // Disabled to make log pattern work that is commonly used in scout ($.log.isTraceEnabled() && $.log.trace(msg));
+      '@stylistic/member-delimiter-style': 'warn', // Enforce semicolon for interface members for consistency
+      '@stylistic/object-curly-spacing': ['warn', 'never', {'overrides': {TSTypeLiteral: 'always', TSMappedType: 'always'}}]
     }
   }
 );

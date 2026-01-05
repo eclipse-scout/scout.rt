@@ -15,7 +15,7 @@ export default defineConfig([
   ]),
   {
     rules: {
-      'linebreak-style': 'off'
+      '@stylistic/linebreak-style': 'off'
     }
   }
 ]);
