@@ -29,6 +29,8 @@ import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.authentication.token.ITokenPrincipalProducer;
 import org.eclipse.scout.rt.server.commons.authentication.token.ITokenVerifier;
+import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,10 +73,7 @@ public class BearerAuthAccessController implements IAccessController {
    * producer is configured, the chain continues on behalf of a subject.
    */
   protected boolean handleInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain) throws IOException, ServletException {
-    // Never cache authentication requests.
-    response.setHeader("Cache-Control", "no-cache"); // HTTP 1.1
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
-    response.setDateHeader("Expires", 0); // prevents caching at the proxy server
+    setDefaultHeaders(request, response);
 
     final List<byte[]> bearerTokenParts = readBearerToken(request);
     if (CollectionUtility.isEmpty(bearerTokenParts)) {
@@ -96,6 +95,14 @@ public class BearerAuthAccessController implements IAccessController {
       chain.doFilter(request, response);
     }
     return true;
+  }
+
+  protected void setDefaultHeaders(HttpServletRequest request, HttpServletResponse response) {
+    // Never cache authentication requests.
+    BEANS.get(HttpCacheControl.class).disableCaching(response);
+
+    // requests on /auth should have the default headers as this might also be called using GET which returns a 404 html page (container dependent)
+    BEANS.get(HttpServletControl.class).doDefaults(null, request, response);
   }
 
   /**

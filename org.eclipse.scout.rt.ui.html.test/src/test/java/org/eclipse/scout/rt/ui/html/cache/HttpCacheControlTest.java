@@ -85,7 +85,7 @@ public class HttpCacheControlTest {
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
     Mockito.verify(req, ANY_TIMES).getAttribute("jakarta.servlet.forward.path_info");
-    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, no-store, no-cache, max-age=0");
+    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, HttpCacheControl.DISABLE_CACHE);
   }
 
   @Test
@@ -110,7 +110,7 @@ public class HttpCacheControlTest {
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
-    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, max-age=0, must-revalidate");
+    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, no-transform, max-age=0, must-revalidate");
     Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.ETAG, obj.createETag());
   }
 
@@ -137,7 +137,7 @@ public class HttpCacheControlTest {
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
-    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, max-age=3, s-maxage=3");
+    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, no-transform, max-age=3");
     Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.ETAG, obj.createETag());
   }
 
@@ -163,7 +163,7 @@ public class HttpCacheControlTest {
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
-    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, max-age=0, must-revalidate");
+    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, no-transform, max-age=0, must-revalidate");
     Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.ETAG, obj.createETag());
     Mockito.verify(resp, ONCE).setDateHeader(HttpCacheControl.LAST_MODIFIED, obj.getResource().getLastModified());
   }
@@ -190,7 +190,7 @@ public class HttpCacheControlTest {
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
-    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, max-age=0, must-revalidate");
+    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, no-transform, max-age=0, must-revalidate");
     Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.ETAG, obj.createETag());
     Mockito.verify(resp, ONCE).setDateHeader(HttpCacheControl.LAST_MODIFIED, obj.getResource().getLastModified());
   }
@@ -217,7 +217,7 @@ public class HttpCacheControlTest {
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
-    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, max-age=0, must-revalidate");
+    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, no-transform, max-age=0, must-revalidate");
     Mockito.verify(resp, ONCE).setStatus(HttpServletResponse.SC_NOT_MODIFIED);
   }
 
@@ -243,7 +243,7 @@ public class HttpCacheControlTest {
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
-    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, max-age=0, must-revalidate");
+    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, no-transform, max-age=0, must-revalidate");
     Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.ETAG, obj.createETag());
     Mockito.verify(resp, ONCE).setDateHeader(HttpCacheControl.LAST_MODIFIED, obj.getResource().getLastModified());
   }
@@ -270,7 +270,7 @@ public class HttpCacheControlTest {
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
-    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, max-age=0, must-revalidate");
+    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, no-transform, max-age=0, must-revalidate");
     Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.ETAG, obj.createETag());
     Mockito.verify(resp, ONCE).setDateHeader(HttpCacheControl.LAST_MODIFIED, obj.getResource().getLastModified());
   }
@@ -297,7 +297,7 @@ public class HttpCacheControlTest {
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
-    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, max-age=0, must-revalidate");
+    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, no-transform, max-age=0, must-revalidate");
     Mockito.verify(resp, ONCE).setStatus(HttpServletResponse.SC_NOT_MODIFIED);
   }
 
@@ -306,13 +306,13 @@ public class HttpCacheControlTest {
     Mockito.when(req.getPathInfo()).thenReturn("/");
     Mockito.when(req.getHeader(HttpCacheControl.ETAG)).thenReturn(null);
     Mockito.when(req.getHeader(HttpCacheControl.IF_NONE_MATCH)).thenReturn(null);
-    Mockito.when(req.getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE)).thenReturn(1000000L);
+    Mockito.when(req.getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE)).thenReturn(1000_000L);
 
     BinaryResource res = BinaryResources.create()
         .withFilename("a.html")
         .withContent("<html></html>".getBytes(StandardCharsets.UTF_8))
         .withCachingAllowed(true)
-        .withLastModified(900000L)
+        .withLastModified(900_000L)
         .build();
     HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
     boolean b = cc.checkAndSetCacheHeaders(req, resp, obj);
@@ -323,7 +323,7 @@ public class HttpCacheControlTest {
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
-    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, max-age=0, must-revalidate");
+    Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, no-transform, max-age=0, must-revalidate");
     Mockito.verify(resp, ONCE).setStatus(HttpServletResponse.SC_NOT_MODIFIED);
   }
 }

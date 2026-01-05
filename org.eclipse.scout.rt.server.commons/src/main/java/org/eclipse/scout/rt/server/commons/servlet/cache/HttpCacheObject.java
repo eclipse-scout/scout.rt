@@ -76,10 +76,8 @@ public class HttpCacheObject implements Serializable {
   }
 
   public void applyHttpResponseInterceptors(HttpServletRequest req, HttpServletResponse resp) {
-    if (resp != null) {
-      for (IHttpResponseInterceptor interceptor : m_httpResponseInterceptors) {
-        interceptor.intercept(req, resp);
-      }
+    for (IHttpResponseInterceptor interceptor : m_httpResponseInterceptors) {
+      interceptor.intercept(req, resp);
     }
   }
 }

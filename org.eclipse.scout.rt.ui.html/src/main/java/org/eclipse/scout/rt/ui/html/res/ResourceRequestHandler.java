@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -51,7 +50,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
   private final HttpCacheControl m_httpCacheControl = BEANS.get(HttpCacheControl.class);
 
   @Override
-  public boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     String pathInfoEx = resolvePathInfoEx(req);
 
     IResourceLoader resourceLoader = createLoaderFor(req, pathInfoEx);

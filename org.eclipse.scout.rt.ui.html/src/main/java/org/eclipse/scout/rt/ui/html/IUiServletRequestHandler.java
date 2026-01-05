@@ -22,17 +22,15 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 /**
  * Interface for handlers contributing to the {@link UiServlet}.
  * <p>
- * Make sure to call
- * {@link HttpCacheControl#checkAndSetCacheHeaders(HttpServletRequest, HttpServletResponse, HttpCacheObject)} on the
- * {@link HttpCacheControl} bean in the handling of the request. Otherwise cache response headers may be missing and
- * could lead to unexpected caching of sensitive information.
+ * Make sure to call {@link HttpCacheControl#disableCaching(HttpServletResponse)} or {@link HttpCacheControl#checkAndSetCacheHeaders(HttpServletRequest, HttpServletResponse, HttpCacheObject)} when handling the request.
+ * Otherwise, cache response headers may be missing and could lead to unexpected caching of sensitive information.
  */
 @ApplicationScoped
 public interface IUiServletRequestHandler {
 
   /**
-   * @return <code>true</code> if the request was consumed by the handler, no further action is then necessary. If
-   * <code>false</code> is returned, other handlers may handle the request afterwards.
+   * @return {@code true} if the request was consumed by the handler, no further action is then necessary.
+   * If {@code false} is returned, other handlers may handle the request afterward.
    */
   boolean handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 }
