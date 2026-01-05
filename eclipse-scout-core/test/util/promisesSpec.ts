@@ -141,13 +141,13 @@ describe('promises', () => {
 
   describe('TaskQueue', () => {
 
+    const sleep = async (delay: number) => {
+      return new Promise((resolve, reject) => setTimeout(resolve, delay));
+    };
+
     it('runs async tasks in scheduled order', async () => {
       let taskQueue = new TaskQueue();
-      let result = [];
-
-      const sleep = async (delay: number) => {
-        return new Promise((resolve, reject) => setTimeout(resolve, delay));
-      };
+      let result: string[] = [];
 
       let task1 = async () => {
         result.push('1a');
@@ -165,7 +165,7 @@ describe('promises', () => {
         result.push('2a');
         await sleep(1);
         result.push('2b');
-        taskQueue.addAsyncTask(subtask);
+        taskQueue.submit(subtask);
         result.push('2c');
         await sleep(1);
         result.push('2d');
@@ -177,9 +177,9 @@ describe('promises', () => {
       };
 
       expect(taskQueue.length).toBe(0);
-      taskQueue.addAsyncTask(task1);
-      taskQueue.addAsyncTask(task2);
-      taskQueue.addAsyncTask(task3);
+      taskQueue.submit(task1);
+      taskQueue.submit(task2);
+      taskQueue.submit(task3);
       expect(taskQueue.length).toBe(3);
 
       expect(result).toEqual([]);
@@ -193,10 +193,10 @@ describe('promises', () => {
 
       let p1 = taskQueue.whenIdle();
       let p2 = taskQueue.whenIdle();
-      taskQueue.addAsyncTask(async () => {
+      taskQueue.submit(async () => {
       });
       let p3 = taskQueue.whenIdle();
-      taskQueue.addAsyncTask(async () => {
+      taskQueue.submit(async () => {
       });
       let p4 = taskQueue.whenIdle();
       expect(p1).not.toBe(p2); // because no task was scheduled initially
@@ -208,6 +208,77 @@ describe('promises', () => {
       let p6 = taskQueue.whenIdle();
       expect(p5).toBe(p4);
       expect(p6).toBe(p5);
+    });
+
+    it('ignores failing tasks', async () => {
+      let taskQueue = new TaskQueue();
+      let result: string[] = [];
+
+      let task1 = async () => {
+        result.push('1a');
+        await sleep(1);
+        result.push('1b');
+      };
+      let task2 = async () => {
+        result.push('2a');
+        await sleep(1);
+        result.push('2b');
+        throw Error('Task failed');
+      };
+      let task3 = async () => {
+        result.push('3a');
+        await sleep(1);
+        result.push('3b');
+      };
+
+      expect(taskQueue.length).toBe(0);
+      taskQueue.submit(task1);
+      taskQueue.submit(task2);
+      taskQueue.submit(task3);
+      expect(taskQueue.length).toBe(3);
+
+      expect(result).toEqual([]);
+      await taskQueue.whenIdle();
+      expect(taskQueue.length).toBe(0);
+      expect(result).toEqual(['1a', '1b', '2a', '2b', '3a', '3b']);
+    });
+
+    it('can handle task errors explicitly', async () => {
+      let taskQueue = new TaskQueue();
+      let result: string[] = [];
+      let errors: any[] = [];
+
+      taskQueue.withErrorHandler(error => errors.push(error));
+
+      let task1 = async () => {
+        result.push('1a');
+        await sleep(1);
+        result.push('1b');
+      };
+      let task2 = async () => {
+        result.push('2a');
+        await sleep(1);
+        result.push('2b');
+        throw 'Task 2 failed';
+      };
+      let task3 = async () => {
+        result.push('3a');
+        await sleep(1);
+        result.push('3b');
+      };
+
+      expect(taskQueue.length).toBe(0);
+      taskQueue.submit(task1);
+      taskQueue.submit(task2);
+      taskQueue.submit(task3);
+      taskQueue.submit(task2);
+      expect(taskQueue.length).toBe(4);
+
+      expect(result).toEqual([]);
+      await taskQueue.whenIdle();
+      expect(taskQueue.length).toBe(0);
+      expect(result).toEqual(['1a', '1b', '2a', '2b', '3a', '3b', '2a', '2b']);
+      expect(errors).toEqual(['Task 2 failed', 'Task 2 failed']);
     });
   });
 });

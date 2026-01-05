@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {numbers, PromiseCreator} from '../index';
+import {PromiseCreator} from '../index';
 import $ from 'jquery';
 
 export const promises = {
@@ -153,31 +153,31 @@ export class Deferred<T> {
   }
 }
 
-let COUNTER = 0;
-
+/**
+ * A simple queue for asynchronous tasks (Promises). They are executed  strictly sequentially, i.e. a later task is
+ * only started when all previous tasks have been fully completed. A task is considered to be completed when the
+ * promise it returned has been resolved or rejected. Errors from failed tasks are passed to an optional error
+ * handler function.
+ */
 export class TaskQueue {
 
   protected _queue: (() => Promise<any>)[] = [];
   protected _deferred: Deferred<void>;
+  protected _errorHandler: (error: any) => void;
 
-  addAsyncTask(task: () => Promise<any>, name?: string) {
+  /**
+   * Submits an asynchronous task to the queue and starts processing if this the first task. Otherwise,
+   * the task will be executed after the existing tasks have been fully completed.
+   */
+  submit(task: () => Promise<any>) {
     if (!task) {
       return;
     }
-    name = '#' + (COUNTER++) + ' - ' + (name || 'task ' + numbers.randomId());
-    console.log(name + ': schedule');
-    this._queue.push(() => {
-      console.log(name + ': start');
-      try {
-        return task();
-      } finally {
-        console.log(name + ': end');
-      }
-    });
+    this._queue.push(task);
 
     if (this._queue.length === 1) {
       this._deferred = new Deferred();
-      Promise.resolve() // execute first task asynchronously as well
+      Promise.resolve()
         .then(() => this._nextTask())
         .then(() => this._deferred.resolve());
     }
@@ -185,7 +185,13 @@ export class TaskQueue {
 
   protected async _nextTask(): Promise<any> {
     let task = this._queue[0];
-    await task();
+    try {
+      await task();
+    } catch (error) {
+      if (this._errorHandler) {
+        this._errorHandler(error);
+      }
+    }
     this._queue.shift();
 
     if (this._queue.length) {
@@ -193,11 +199,22 @@ export class TaskQueue {
     }
   }
 
+  /**
+   * @returns A promise that is resolved when all tasks in the queue have been fully processed, i.e. the queue
+   * is now empty. This also works if new tasks are submitted while waiting for this promise.
+   */
   whenIdle(): Promise<void> {
     return this._deferred?.promise() || Promise.resolve();
   }
 
+  /**
+   * @returns The current number of pending tasks in the queue.
+   */
   get length(): number {
     return this._queue.length;
+  }
+
+  withErrorHandler(errorHandler: (error: any) => void) {
+    this._errorHandler = errorHandler;
   }
 }
