@@ -53,7 +53,8 @@
   },
   "dependencies": {
     "typescript": "5.9.3",
-    "typescript-eslint": "8.50.1"
+    "typescript-eslint": "8.50.1",
+    "@stylistic/eslint-plugin": "5.6.1"
   },
   "peerDependencies": {
     "eslint": ">=9.39.2"

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -259,7 +259,7 @@ describe('Action', () => {
     it('makeCompact() makes the action compact', () => {
       let action = scout.create(Action, {
         parent: session.desktop
-      }) as Action & {_compactOrig};
+      }) as Action & { _compactOrig };
       expect(action.compact).toBe(false);
       expect(action._compactOrig).toBe(undefined);
 
@@ -282,7 +282,7 @@ describe('Action', () => {
       let action = scout.create(Action, {
         parent: session.desktop,
         compact: true
-      }) as Action & {_compactOrig};
+      }) as Action & { _compactOrig };
       expect(action.compact).toBe(true);
       expect(action._compactOrig).toBe(undefined);
 
@@ -302,7 +302,7 @@ describe('Action', () => {
       let action = scout.create(Action, {
         parent: session.desktop,
         iconId: icons.WORLD
-      }) as Action & {_textVisibleOrig};
+      }) as Action & { _textVisibleOrig };
       expect(action.textVisible).toBe(true);
       expect(action._textVisibleOrig).toBe(undefined);
 
@@ -324,7 +324,7 @@ describe('Action', () => {
     it('shrink() does nothing if the action does not have an icon', () => {
       let action = scout.create(Action, {
         parent: session.desktop
-      }) as Action & {_textVisibleOrig};
+      }) as Action & { _textVisibleOrig };
       expect(action.textVisible).toBe(true);
       expect(action._textVisibleOrig).toBe(undefined);
 
@@ -342,7 +342,7 @@ describe('Action', () => {
         parent: session.desktop,
         iconId: icons.WORLD,
         textVisible: false
-      }) as Action & {_textVisibleOrig};
+      }) as Action & { _textVisibleOrig };
       expect(action.textVisible).toBe(false);
       expect(action._textVisibleOrig).toBe(undefined);
 
