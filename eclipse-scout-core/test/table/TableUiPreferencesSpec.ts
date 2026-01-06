@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -389,6 +389,47 @@ describe('TableUiPreferences', () => {
 
       tableUiPreferences.applyProfile(table, profile1);
       expect(table.filterCount()).toBe(0);
+    });
+
+    it('does not modify width of fixed width columns when applying a profile', () => {
+      let table = scout.create(Table, {
+        parent: session.desktop,
+        id: 't1',
+        columns: [{
+          id: 'c1',
+          objectType: Column,
+          fixedWidth: true,
+          width: 101
+        }, {
+          id: 'c2',
+          objectType: Column,
+          width: 102
+        }]
+      });
+      table.saveInitialUiPreferences();
+
+      let profile = scout.create(TableClientUiPreferenceProfileDo, {
+        columns: [
+          scout.create(TableColumnClientUiPreferenceDo, {
+            columnId: 'c1',
+            width: 201
+          }),
+          scout.create(TableColumnClientUiPreferenceDo, {
+            columnId: 'c2',
+            width: 202
+          })
+        ]
+      });
+      tableUiPreferences.applyProfile(table, profile);
+
+      expect(table.columns.map(c => c.id)).toEqual(['c1', 'c2']);
+      expect(table.columns.map(c => c.width)).toEqual([101, 202]);
+
+      table.columnById('c1').setWidth(301);
+
+      table.resetToInitialUiPreferences();
+      expect(table.columns.map(c => c.id)).toEqual(['c1', 'c2']);
+      expect(table.columns.map(c => c.width)).toEqual([301, 102]);
     });
 
     it('ignores guiOnly and non-displayable columns', () => {
