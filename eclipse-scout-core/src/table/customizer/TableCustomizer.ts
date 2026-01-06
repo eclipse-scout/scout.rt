@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -213,12 +213,4 @@ export interface TableCustomizerCreateColumnsOptions {
    * Default is undefined.
    */
   positionOrInsertAfterColumn?: number | Column<any>;
-  /**
-   * Whether to automatically (re-)apply ui preferences to the table after inserting the columns.
-   *
-   * Only relevant if {@link insertIntoTable} is true.
-   *
-   * Default is false.
-   */
-  applyPreferences?: boolean;
 }
