@@ -28,6 +28,8 @@ public class ClientSession extends AbstractClientSession {
 
   @Override
   protected void execLoadSession() {
+    loadInitialSharedVariables();
+
     //pre-load all known code types
     CODES.getAllCodeTypes("${package}.shared");
 
