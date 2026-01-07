@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,7 +43,7 @@ public class ApiExposedFilter implements ContainerRequestFilter {
 
   public static final String HTTP_HEADER_NAME = "X-Scout-Proxied-Request";
 
-  protected static final String DEFAULT_NOT_FOUND_MESSAGE = "Not found";
+  protected static final String DEFAULT_FORBIDDEN_MESSAGE = "Forbidden";
 
   private final boolean m_rejectRequests = CONFIG.getPropertyValue(RejectNonExposedRequestsWithNotFoundConfigProperty.class);
 
@@ -60,7 +60,7 @@ public class ApiExposedFilter implements ContainerRequestFilter {
     boolean increaseLogLevel = !m_rejectRequests || Platform.get().inDevelopmentMode();
     LOG.atLevel(increaseLogLevel ? Level.WARN : Level.DEBUG).log("External access to {} not allowed, reason: class/method is not marked with {}", getRequestPath(requestContext), ApiExposed.class.getSimpleName());
     if (m_rejectRequests) {
-      requestContext.abortWith(BEANS.get(ErrorResponseBuilder.class).withHttpStatus(Response.Status.NOT_FOUND).withMessage(getNotFoundMessage(requestContext)).build());
+      requestContext.abortWith(BEANS.get(ErrorResponseBuilder.class).withHttpStatus(Response.Status.FORBIDDEN).withMessage(getForbiddenMessage(requestContext)).build());
     }
   }
 
@@ -72,8 +72,8 @@ public class ApiExposedFilter implements ContainerRequestFilter {
   /**
    * Message for declined requests.
    */
-  public String getNotFoundMessage(ContainerRequestContext requestContext) {
-    return DEFAULT_NOT_FOUND_MESSAGE;
+  public String getForbiddenMessage(ContainerRequestContext requestContext) {
+    return DEFAULT_FORBIDDEN_MESSAGE;
   }
 
   /**
