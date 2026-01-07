@@ -16,6 +16,7 @@ fi
 JVM_ARGS="
 -Xms64m -Xmx512m
 -XX:-OmitStackTraceInFastThrow
+-XX:+UseCompactObjectHeaders
 -Djava.io.tmpdir=${symbol_dollar}APP_TMP
 -Dscout.app.port=8080
 "
