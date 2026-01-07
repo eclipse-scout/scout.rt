@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,12 +11,15 @@ package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
+import org.eclipse.scout.rt.security.csp.ConfigurableContentSecurityPolicy;
+import org.eclipse.scout.rt.security.csp.ContentSecurityPolicy;
 
 /**
  * This model represents a separate "website" inside the application.
@@ -65,6 +68,7 @@ public interface IBrowserField extends IFormField {
   String PROP_LOCATION = "location";
   String PROP_BINARY_RESOURCE = "binaryResource";
   String PROP_ATTACHMENTS = "attachments";
+  String PROP_CSP = "csp";
   String PROP_SCROLL_BAR_ENABLED = "scrollBarEnabled";
   String PROP_SANDBOX_ENABLED = "sandboxEnabled";
   String PROP_SANDBOX_PERMISSIONS = "sandboxPermissions";
@@ -125,6 +129,54 @@ public interface IBrowserField extends IFormField {
    * @see #setAttachments(Set)
    */
   Set<BinaryResource> getAttachments();
+
+  /**
+   * Configures the default Content Security Policy used for {@link BinaryResource BinaryResources} of this field (e.g. set using {@link #setBinaryResource(BinaryResource)} or {@link #setAttachments(Set)}).
+   * The default policy is used, if no specific policy is given for a {@link BinaryResource} using {@link #putContentSecurityPolicy(String, ContentSecurityPolicy)}.<br>
+   * If an absolute URL is set to this field (e.g. by using {@link #setLocation(String)}), the Content Security Policy served by this absolute URL is used instead and the policy given here has no effect.
+   *
+   * @param policy
+   *     The new default policy to use for {@link BinaryResource BinaryResources} of this field. If {@code null}, the default policy is removed. This means the application wide {@link ConfigurableContentSecurityPolicy} is used for all
+   *     resources not having a specific policy applied using {@link #putContentSecurityPolicy(String, ContentSecurityPolicy)}. The {@link ConfigurableContentSecurityPolicy} can be modified using the {@code config.properties} of the
+   *     application.
+   * @return The previous default {@link ContentSecurityPolicy} or {@code null} if no previous default policy was set.
+   * @see #putContentSecurityPolicy(String, ContentSecurityPolicy)
+   */
+  ContentSecurityPolicy setContentSecurityPolicy(ContentSecurityPolicy policy);
+
+  /**
+   * Configures the Content Security Policy for a specific {@link BinaryResource} of this field (e.g. set using {@link #setBinaryResource(BinaryResource)} or {@link #setAttachments(Set)}).
+   *
+   * @param binaryResourceFileName
+   *     The fileName of the {@link BinaryResource}. Must correspond to {@link BinaryResource#getFilename()}. If {@code null}, the provided policy represents the default policy (see {@link #setContentSecurityPolicy(ContentSecurityPolicy)}
+   *     for details).
+   * @param policy
+   *     The new policy to use for the given {@link BinaryResource} file name. If {@code null}, the policy for the given resource is removed (this means the default or application wide policy is used for this resource).
+   * @return The previous {@link ContentSecurityPolicy} or {@code null} if no previous policy was set for this resource.
+   * @see #setContentSecurityPolicy(ContentSecurityPolicy)
+   */
+  ContentSecurityPolicy putContentSecurityPolicy(String binaryResourceFileName, ContentSecurityPolicy policy);
+
+  /**
+   * @return The configured {@link ContentSecurityPolicy policies} for this field as modifiable {@link Map} copy. The key represents {@link BinaryResource#getFilename()}. If it is {@code null}, this represents the default policy to use for
+   * all resources not having a
+   * specific policy. The value is the configured policy (could be {@code null} in case the policy was removed). Never returns {@code null}.
+   * @see #setContentSecurityPolicy(ContentSecurityPolicy)
+   * @see #putContentSecurityPolicy(String, ContentSecurityPolicy)
+   */
+  Map<String, ContentSecurityPolicy> getContentSecurityPolicies();
+
+  /**
+   * Gets the {@link ContentSecurityPolicy} for the given {@link BinaryResource} file name (see {@link BinaryResource#getFilename()}).
+   *
+   * @param binaryResourceFileName
+   *     The file name of the {@link BinaryResource} (see {@link #putContentSecurityPolicy(String, ContentSecurityPolicy)}) or {@code null} to retrieve the default policy (see {@link #setContentSecurityPolicy(ContentSecurityPolicy)}).
+   * @return The {@link ContentSecurityPolicy} that corresponds to the given file name or {@code null} if no policy is configured. Only the policy directly matching the file name is returned. There is no fallback to e.g. the default policy
+   * or the application policy.
+   * @see #setContentSecurityPolicy(ContentSecurityPolicy)
+   * @see #putContentSecurityPolicy(String, ContentSecurityPolicy)
+   */
+  ContentSecurityPolicy getContentSecurityPolicy(String binaryResourceFileName);
 
   /**
    * Sends a message to the embedded web page ({@code iframe}).

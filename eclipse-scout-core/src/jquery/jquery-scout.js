@@ -11,7 +11,7 @@
  * jQuery plugin with scout extensions
  */
 import $ from 'jquery';
-import {aria, arrays, Device, Dimension, events, fields, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
+import {App, aria, arrays, Device, Dimension, events, fields, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
 
 // === internal methods ===
 
@@ -219,24 +219,28 @@ $.injectScript = (url, options) => {
   let deferred = $.Deferred();
 
   let myDocument = options.document || window.document;
-  let linkTag = myDocument.createElement('script');
-  $(linkTag)
+  let scriptTag = myDocument.createElement('script');
+  let $scriptTag = $(scriptTag)
     .attr('src', url)
     .attr('async', true)
     .on('load error', event => {
       if (options.removeTag) {
-        myDocument.head.removeChild(linkTag);
+        myDocument.head.removeChild(scriptTag);
       }
       if (event.type === 'error') {
-        deferred.reject($(linkTag));
+        deferred.reject($(scriptTag));
       } else {
-        deferred.resolve($(linkTag));
+        deferred.resolve($(scriptTag));
       }
     });
+  let nonce = App.get()?.nonce;
+  if (nonce) {
+    $scriptTag.attr('nonce', nonce);
+  }
   // Use raw JS function to append the <script> tag, because jQuery handles
   // script tags specially (see "domManip" function) and uses eval() which
   // is not CSP-safe.
-  myDocument.head.appendChild(linkTag);
+  myDocument.head.appendChild(scriptTag);
 
   return deferred.promise();
 };

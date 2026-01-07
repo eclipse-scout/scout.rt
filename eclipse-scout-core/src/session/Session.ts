@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -395,9 +395,10 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
    * Additionally, all query parameters from the URL are put in the resulting object.
    */
   protected _createSessionStartupParams(): SessionStartupParams {
-    let params = {
+    let params: SessionStartupParams = {
       url: this.url.baseUrlRaw,
-      geolocationServiceAvailable: Device.get().supportsGeolocation()
+      geolocationServiceAvailable: Device.get().supportsGeolocation(),
+      scoutNonce: App.get().nonce
     };
 
     // Extract query parameters from URL and put them in the resulting object
@@ -1685,6 +1686,7 @@ export interface SessionStartupResponse extends RemoteResponse {
 export interface SessionStartupParams {
   url?: string;
   geolocationServiceAvailable?: boolean;
+  scoutNonce?: string;
 
   [p: string]: any; // all URL parameters
 }

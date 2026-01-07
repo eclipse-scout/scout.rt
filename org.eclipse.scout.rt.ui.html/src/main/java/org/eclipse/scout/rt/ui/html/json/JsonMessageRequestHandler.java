@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -83,8 +83,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     IUiSession uiSession = null;
     JsonRequest jsonRequest = null;
     try {
-      // disable caching
-      m_httpCacheControl.checkAndSetCacheHeaders(req, resp, null);
+      m_httpCacheControl.disableCaching(resp);
 
       JSONObject jsonObject = m_jsonRequestHelper.readJsonRequest(req);
       jsonRequest = new JsonRequest(jsonObject);
@@ -101,6 +100,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
         if (!validateVersion(jsonStartupRequest, resp)) {
           return true;
         }
+        validateNonce(jsonStartupRequest);
         // Always create a new UI Session on startup
         uiSession = createUiSession(req, resp, jsonStartupRequest);
       }
@@ -420,6 +420,12 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
     // valid
     return true;
+  }
+
+  protected void validateNonce(JsonStartupRequest jsonStartupRequest) {
+    if (!StringUtility.hasText(jsonStartupRequest.getNonce())) {
+      LOG.warn("Nonce for async assets missing");
+    }
   }
 
   protected boolean validateVersion(JsonStartupRequest jsonStartupRequest, HttpServletResponse resp) throws IOException {

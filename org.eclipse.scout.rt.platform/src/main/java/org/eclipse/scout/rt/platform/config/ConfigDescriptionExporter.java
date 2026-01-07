@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -198,7 +198,7 @@ public class ConfigDescriptionExporter {
     }
 
     public AsciiDoctorTableBuilder withColumn(final String name, int width) {
-      assertTrue(m_content.length() < 1); // do not allow to add columns when content has been written
+      assertTrue(m_content.isEmpty()); // do not allow to add columns when content has been written
       m_columns.put(name, width);
       return this;
     }

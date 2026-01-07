@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -139,6 +139,7 @@ export class App extends EventEmitter {
   sessions: Session[];
   errorHandler: ErrorHandler;
   version: string;
+  nonce: string;
   bootstrappers: (() => JQuery.Promise<void>)[];
   protected _loadingTimeoutId: number;
 
@@ -170,6 +171,7 @@ export class App extends EventEmitter {
    */
   init(options?: InitModelOf<this>): JQuery.Promise<any> {
     options = options || {} as InitModelOf<this>;
+    this._initNonce(); // call before prepare as _prepareLogging already may require the nonce for log4javascript.
     return this._prepare(options)
       .then(this._bootstrap.bind(this, options.bootstrap))
       .then(this._init.bind(this, options))
@@ -423,10 +425,19 @@ export class App extends EventEmitter {
     } else {
       $loadingRoot.addClass('fadeout');
     }
-    if (!Device.get().supportsCssAnimation()) {
+    if (!Device.get()?.supportsCssAnimation()) { // Device.get() may be null in case there is an error during app bootstrap before the Device was initialized
       // fallback for old browsers that do not support the animation-end event
       $loadingRoot.remove();
     }
+  }
+
+  protected _initNonce() {
+    this.nonce = document.body?.dataset?.scoutNonce || '';
+
+    // tell webpack our nonce for all lazy loaded scripts later on
+    // see https://webpack.js.org/guides/csp/
+    // @ts-expect-error
+    __webpack_nonce__ = this.nonce;
   }
 
   protected _initVersion(options: AppModel) {

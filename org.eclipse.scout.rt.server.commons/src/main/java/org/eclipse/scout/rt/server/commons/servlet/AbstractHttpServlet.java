@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import jakarta.servlet.AsyncContext;
 import jakarta.servlet.AsyncEvent;
 import jakarta.servlet.AsyncListener;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -127,6 +128,10 @@ public abstract class AbstractHttpServlet extends HttpServlet {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+      if (method.getDeclaringClass() == ServletResponse.class && "isCommitted".equals(method.getName())) {
+        // at least allow to ask if the ressource is commited without throwing.
+        return !m_valid;
+      }
       if (!m_valid) {
         throw new AlreadyInvalidatedException(method, m_origin, m_error);
       }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -365,6 +365,13 @@ public class HTMLTest {
     assertEquals("<asdf>&lt;&#47;asdf&gt;</asdf>", HTML.tag("asdf", "</asdf>").toHtml());
     assertEquals("<asdf><p>test</p><b>important</b></asdf>", HTML.tag("asdf", HTML.p("test"), HTML.bold("important")).toHtml());
     assertEquals("<head><title lang=\"de\">xyz äöü </title></head>", HTML.head(HTML.tag("title", "xyz äöü ").addAttribute("lang", "de")).toHtml());
+  }
+
+  @Test
+  public void testTagWithOptionalEndTag() {
+    assertEquals("<asdf/>", HTML.tag("asdf").withRequireEndTag(false).toHtml());
+    assertEquals("<asdf>aa</asdf>", HTML.tag("asdf", "aa").withRequireEndTag(false).toHtml());
+    assertEquals("<asdf href=\"#\" />", HTML.tag("asdf").addAttribute("href", "#").withRequireEndTag(false).toHtml());
   }
 
   private String createTableString(String prefix) {

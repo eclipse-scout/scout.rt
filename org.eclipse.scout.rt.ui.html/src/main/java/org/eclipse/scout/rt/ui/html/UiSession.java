@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -142,6 +142,7 @@ public class UiSession implements IUiSession {
   private volatile boolean m_initialized;
   private volatile ISessionStore m_sessionStore;
   private volatile String m_uiSessionId;
+  private volatile String m_nonce;
   private volatile IClientSession m_clientSession;
   private volatile JsonResponse m_currentJsonResponse;
   private volatile JsonRequest m_currentJsonRequest;
@@ -241,6 +242,7 @@ public class UiSession implements IUiSession {
 
       // Remember the store here, because getting it from an invalidated httpSession does not work (there might even be deadlocks!)
       m_sessionStore = getHttpSessionHelper().getSessionStore(httpSession);
+      m_nonce = jsonStartupReq.getNonce();
 
       // Look up the requested client session (create and start a new one if necessary)
       m_clientSession = getOrCreateClientSession(httpSession, req, jsonStartupReq);
@@ -1481,6 +1483,11 @@ public class UiSession implements IUiSession {
     }
     ISessionStore sessionStore = getHttpSessionHelper().getSessionStore(httpSession);
     return sessionStore.getUiSession(uiSessionId);
+  }
+
+  @Override
+  public String getNonce() {
+    return m_nonce;
   }
 
   private static class P_RootAdapter extends AbstractJsonAdapter<Object> {

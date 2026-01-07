@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,9 +17,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.server.commons.servlet.ContentSecurityPolicy;
-import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.security.csp.ContentSecurityPolicy;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.json.JSONObject;
@@ -40,13 +39,13 @@ import org.slf4j.LoggerFactory;
 public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ContentSecurityPolicyReportHandler.class);
 
-  private static final String HANDLER_PATH = "/" + HttpServletControl.CSP_REPORT_URL;
-  private static final int MAX_CSP_REPORT_DATALENGTH = 4 * 1024;
+  private static final String HANDLER_PATH = "/" + ContentSecurityPolicy.REPORT_URL;
+  private static final int MAX_CSP_REPORT_DATA_LENGTH = 8 * 1024;
 
   @Override
   public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-    // serve only /csp-report
-    if (!ObjectUtility.equals(req.getPathInfo(), HANDLER_PATH)) {
+    // serve if ending with /csp-report (so that it automatically works in subfolders)
+    if (!StringUtility.endsWith(req.getPathInfo(), HANDLER_PATH)) {
       return false;
     }
     log(getReport(req));
@@ -55,9 +54,9 @@ public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequest
 
   protected String getReport(final HttpServletRequest req) throws IOException {
     try (Reader in = req.getReader()) {
-      String cspReportData = IOUtility.readString(in, MAX_CSP_REPORT_DATALENGTH);
+      String cspReportData = IOUtility.readString(in, MAX_CSP_REPORT_DATA_LENGTH);
       if (in.read() != -1) {
-        cspReportData += "... [only first " + MAX_CSP_REPORT_DATALENGTH + " bytes shown]";
+        cspReportData += "... [only first " + MAX_CSP_REPORT_DATA_LENGTH + " bytes shown]";
       }
       else {
         // Format JSON

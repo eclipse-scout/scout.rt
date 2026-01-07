@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -164,7 +164,7 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
   public BinaryResourceHolder provideBinaryResource(String filenameWithFingerprint) {
     BinaryResourceHolder holder = BinaryResourceUrlUtility.provideBinaryResource(filenameWithFingerprint, getModel().getUIFacade()::requestBinaryResourceFromUI);
     if (holder != null) {
-      holder.addHttpResponseInterceptor(new BrowserFieldContentHttpResponseInterceptor(getUiSession()));
+      holder.addHttpResponseInterceptor(new BrowserFieldContentHttpResponseInterceptor(getModel(), holder.get()));
     }
     return holder;
   }

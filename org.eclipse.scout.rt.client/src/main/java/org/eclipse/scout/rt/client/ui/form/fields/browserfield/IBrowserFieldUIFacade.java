@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.security.csp.ContentSecurityPolicy;
 
 public interface IBrowserFieldUIFacade {
 
@@ -20,4 +21,6 @@ public interface IBrowserFieldUIFacade {
   BinaryResource requestBinaryResourceFromUI(String filename);
 
   void setLocationFromUI(String location);
+
+  ContentSecurityPolicy getContentSecurityPolicy(String binaryResourceFileName);
 }

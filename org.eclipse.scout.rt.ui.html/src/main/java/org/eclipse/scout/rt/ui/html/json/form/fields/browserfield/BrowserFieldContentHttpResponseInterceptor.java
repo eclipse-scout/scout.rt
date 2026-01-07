@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,57 +9,54 @@
  */
 package org.eclipse.scout.rt.ui.html.json.form.fields.browserfield;
 
-import java.net.URI;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+
+import java.io.Serial;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
+import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserFieldUIFacade;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.UriUtility;
-import org.eclipse.scout.rt.server.commons.servlet.ContentSecurityPolicy;
-import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
-import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.security.csp.ConfigurableContentSecurityPolicy;
+import org.eclipse.scout.rt.security.csp.ContentSecurityPolicy;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResponseInterceptor;
-import org.eclipse.scout.rt.ui.html.IUiSession;
 
 public class BrowserFieldContentHttpResponseInterceptor implements IHttpResponseInterceptor {
+  @Serial
   private static final long serialVersionUID = 1L;
 
-  private final URI m_browserUri;
+  private final BinaryResource m_res;
+  private final IBrowserField m_browserField;
 
-  public BrowserFieldContentHttpResponseInterceptor(IUiSession uiSession) {
-    m_browserUri = uiSession.getClientSession().getBrowserURI();
+  public BrowserFieldContentHttpResponseInterceptor(IBrowserField browserField, BinaryResource res) {
+    m_res = assertNotNull(res);
+    m_browserField = assertNotNull(browserField);
   }
 
   @Override
   public void intercept(HttpServletRequest req, HttpServletResponse resp) {
-    String cspToken = getContentSecurityPolicy(req).toToken();
-
-    if (HttpClientInfo.get(req).isMshtml()) {
-      resp.setHeader(HttpServletControl.HTTP_HEADER_CSP_LEGACY, cspToken);
-    }
-    else {
-      resp.setHeader(HttpServletControl.HTTP_HEADER_CSP, cspToken);
-    }
+    ContentSecurityPolicy policy = getContentSecurityPolicy();
+    resp.setHeader(ContentSecurityPolicy.HTTP_HEADER, policy.toToken());
   }
 
-  protected ContentSecurityPolicy getContentSecurityPolicy(HttpServletRequest req) {
-    ContentSecurityPolicy csp = BEANS.get(ContentSecurityPolicy.class);
-
-    String baseUri = UriUtility.toBaseUri(m_browserUri);
-    if (baseUri != null) {
-      // Normally, the csp report url is relative. Because documents inside the browser field are
-      // loaded from a "/dynamic/..." URL, the relative url has to be converted to an absolute url.
-      csp.withReportUri(baseUri + HttpServletControl.CSP_REPORT_URL);
-
-      // Bug in Chrome: CSP 'self' is not interpreted correctly in sandboxed iframes, see https://bugs.chromium.org/p/chromium/issues/detail?id=443444
-      // Workaround: Add resolved URI to image and style CSP directive to allow loading of images and styles from same origin as nested iframe in browser field
-      if (HttpClientInfo.get(req).isWebkit()) {
-        csp.appendImgSrc(baseUri);
-        csp.appendStyleSrc(baseUri);
-      }
+  protected ContentSecurityPolicy getContentSecurityPolicy() {
+    // 1. use BinaryResource specific CSP if available
+    IBrowserFieldUIFacade uiFacade = m_browserField.getUIFacade();
+    ContentSecurityPolicy policy = uiFacade.getContentSecurityPolicy(m_res.getFilename());
+    if (policy != null) {
+      return policy;
     }
 
-    return csp;
+    // 2. use default policy of this BrowserField if available
+    policy = uiFacade.getContentSecurityPolicy(null /* customized default csp for all resources of this field */);
+    if (policy != null) {
+      return policy;
+    }
+
+    // 3. use application wide default
+    return BEANS.get(ConfigurableContentSecurityPolicy.class);
   }
 }

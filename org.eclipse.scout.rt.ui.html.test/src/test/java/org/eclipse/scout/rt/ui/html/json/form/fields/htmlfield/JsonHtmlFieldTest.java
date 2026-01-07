@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,8 +18,9 @@ import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonAdapterMock;
-import org.eclipse.scout.rt.ui.html.json.form.fields.BaseFormFieldTest;
+import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -32,15 +33,18 @@ import org.junit.runner.RunWith;
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
-public class JsonHtmlFieldTest extends BaseFormFieldTest {
+public class JsonHtmlFieldTest {
 
   private AbstractHtmlField m_model = new AbstractHtmlField() {
   };
 
-  private JsonHtmlField m_htmlField = new JsonHtmlField<IHtmlField>(m_model, m_session, m_session.createUniqueId(), new JsonAdapterMock());
+  private IUiSession m_session;
+  private JsonHtmlField m_htmlField;
 
   @Before
   public void setUp() {
+    m_session = new UiSessionMock();
+    m_htmlField = new JsonHtmlField<IHtmlField>(m_model, m_session, m_session.createUniqueId(), new JsonAdapterMock());
     m_htmlField.init();
   }
 

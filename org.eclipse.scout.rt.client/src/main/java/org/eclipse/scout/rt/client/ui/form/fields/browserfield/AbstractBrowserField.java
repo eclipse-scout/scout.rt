@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,8 +13,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -36,9 +39,11 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
+import org.eclipse.scout.rt.security.csp.ContentSecurityPolicy;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.browserfield.AbstractBrowserFieldData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -102,7 +107,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   }
 
   /**
-   * Configures the browser field general behavior. By default the content of the browser field is shown inline or in an
+   * Configures the browser field general behavior. By default, the content of the browser field is shown inline or in an
    * inline container (e.g. an &lt;iframe&gt; for the HTML5 UI layer), some very specific web pages (e.g. using
    * plug-ins, complex frames within the webpage) might not be displayed well or may even lead to a browser crash.
    * <p>
@@ -226,7 +231,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     Assertions.assertNotNull(source);
     AbstractBrowserFieldData fd = (AbstractBrowserFieldData) source;
 
-    if (source.isValueSet()) {
+    if (fd.isValueSet()) {
       try {
         if (!valueChangeTriggersEnabled) {
           setValueChangeTriggerEnabled(false);
@@ -235,6 +240,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
         setLocationInternal(fd.getLocation());
         setBinaryResourceInternal(fd.getBinaryResource());
         setAttachmentsInternal(fd.getAttachments());
+        setContentSecurityPoliciesInternal(fd.getContentSecurityPolicy());
         fireContentChanged();
       }
       finally {
@@ -284,9 +290,9 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   /**
    * If this method returns without throwing in exception, the location is considered a valid URI. By default,
    * {@link URI} is used to check the location for syntax errors. If no scheme is defined, a {@link RuntimeException} is
-   * thrown, <i>unless</i> the location starts with <code>//</code>. An URL starting with <code>//</code> is considered
+   * thrown, <i>unless</i> the location starts with <code>//</code>. A URL starting with <code>//</code> is considered
    * a "protocol relative URL", i.e. it re-uses the current scheme, without explicitly specifying it. See also:
-   * http://www.paulirish.com/2010/the-protocol-relative-url
+   * <a href="https://www.paulirish.com/2010/the-protocol-relative-url/">The Protocol-relative URL</a>
    */
   protected void validateLocation(String location) {
     try {
@@ -357,6 +363,64 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   @Override
   public Set<BinaryResource> getAttachments() {
     return (Set<BinaryResource>) propertySupport.getProperty(PROP_ATTACHMENTS);
+  }
+
+  @Override
+  public ContentSecurityPolicy setContentSecurityPolicy(ContentSecurityPolicy policy) {
+    return putContentSecurityPolicy(null /* default for all resources */, policy);
+  }
+
+  @Override
+  public ContentSecurityPolicy putContentSecurityPolicy(String binaryResourceFileName, ContentSecurityPolicy policy) {
+    //noinspection unchecked
+    Map<String, ContentSecurityPolicy> csp = getContentSecurityPoliciesInternal();
+    if (csp == null) {
+      csp = new HashMap<>();
+      setContentSecurityPoliciesInternal(csp);
+    }
+
+    ContentSecurityPolicy previous = csp.put(binaryResourceFileName, policy);
+    if (!hasContentSecurityPolicyToken()) {
+      // All tokens are null or no entries at all: use default for all resources.
+      // This is the same as no config at all. Therefore, the map can be removed.
+      setContentSecurityPoliciesInternal(null);
+    }
+    return previous;
+  }
+
+  @Override
+  public Map<String, ContentSecurityPolicy> getContentSecurityPolicies() {
+    Map<String, ContentSecurityPolicy> csp = getContentSecurityPoliciesInternal();
+    if (csp == null) {
+      return CollectionUtility.emptyHashMap();
+    }
+    return CollectionUtility.copyMap(csp);
+  }
+
+  protected boolean hasContentSecurityPolicyToken() {
+    // getContentSecurityPoliciesInternal() cannot return null here
+    return getContentSecurityPoliciesInternal().values().stream().anyMatch(Objects::nonNull);
+  }
+
+  @Override
+  public ContentSecurityPolicy getContentSecurityPolicy(String binaryResourceFileName) {
+    Map<String, ContentSecurityPolicy> csp = getContentSecurityPoliciesInternal();
+    if (csp == null) {
+      return null;
+    }
+    return csp.get(binaryResourceFileName);
+  }
+
+  /**
+   * @return modifiable {@link Map} or {@code null}.
+   */
+  protected Map<String, ContentSecurityPolicy> getContentSecurityPoliciesInternal() {
+    //noinspection unchecked
+    return (Map<String, ContentSecurityPolicy>) propertySupport.getProperty(PROP_CSP, Map.class);
+  }
+
+  protected boolean setContentSecurityPoliciesInternal(Map<String, ContentSecurityPolicy> csp) {
+    return propertySupport.setProperty(PROP_CSP, csp);
   }
 
   protected void firePostMessage(Object message, String targetOrigin) {
@@ -504,6 +568,11 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     @Override
     public void setLocationFromUI(String location) {
       setLocation(location);
+    }
+
+    @Override
+    public ContentSecurityPolicy getContentSecurityPolicy(String binaryResourceFileName) {
+      return AbstractBrowserField.this.getContentSecurityPolicy(binaryResourceFileName);
     }
   }
 

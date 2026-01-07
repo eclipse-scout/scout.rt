@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,6 +30,7 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
 
   private final List<IHtmlContent> m_attributes = new ArrayList<>();
   private final String m_tag;
+  private boolean m_requireEndTag = true;
 
   protected String getTag() {
     return m_tag;
@@ -49,18 +50,40 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
   }
 
   @Override
+  public IHtmlElement withRequireEndTag(boolean requireEndTag) {
+    m_requireEndTag = requireEndTag;
+    return this;
+  }
+
+  @Override
+  public boolean isRequireEndTag() {
+    return m_requireEndTag;
+  }
+
+  @Override
   public void build() {
     appendStartTag();
-    if (!getTexts().isEmpty()) {
-      appendText();
+    if (getTexts().isEmpty()) {
+      if (isRequireEndTag()) {
+        appendEndTag();
+      }
     }
-    appendEndTag();
+    else {
+      appendText();
+      appendEndTag();
+    }
   }
 
   protected void appendStartTag() {
     append("<", false);
     append(getTag(), true);
     appendAttributes();
+    if (getTexts().isEmpty() && !isRequireEndTag()) {
+      if (!m_attributes.isEmpty()) {
+        append(" ", false);
+      }
+      append("/", false);
+    }
     append(">", false);
   }
 
