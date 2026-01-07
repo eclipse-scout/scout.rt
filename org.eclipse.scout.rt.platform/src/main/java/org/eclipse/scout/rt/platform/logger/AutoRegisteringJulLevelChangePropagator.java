@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -48,17 +48,34 @@ public class AutoRegisteringJulLevelChangePropagator extends LevelChangePropagat
 
   @Override
   public void start() {
-    if (isRemoveRootHandlers()) {
-      addInfo("removing all handlers for java.util.logging root logger");
-      SLF4JBridgeHandler.removeHandlersForRootLogger();
+    if (isSlf4jBridgeAvailable()) {
+      if (isRemoveRootHandlers()) {
+        addInfo("removing all handlers for java.util.logging root logger");
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+      }
+      SLF4JBridgeHandler.install();
     }
-    SLF4JBridgeHandler.install();
     super.start();
   }
 
   @Override
   public void stop() {
     super.stop();
-    SLF4JBridgeHandler.uninstall();
+    if (isSlf4jBridgeAvailable()) {
+      SLF4JBridgeHandler.uninstall();
+    }
+  }
+
+  /**
+   * JUL to SLF4J bridge (jul-to-slf4j) is an optional dependency
+   */
+  protected boolean isSlf4jBridgeAvailable() {
+    try {
+      Class.forName("org.slf4j.bridge.SLF4JBridgeHandler", false, getClass().getClassLoader());
+    }
+    catch (ClassNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 }
