@@ -16,9 +16,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -254,5 +259,27 @@ public enum MimeType implements IMimeType {
       }
     }
     return false;
+  }
+
+  /**
+   * Converts a collection of {@link MimeType} to their respective file extensions.
+   */
+  public static List<String> toFileExtensions(Collection<MimeType> mimeTypes) {
+    return convertMimeTypes(mimeTypes, MimeType::getFileExtension);
+  }
+
+  /**
+   * Converts a collection of {@link MimeType} to their respective string representation of the MIME type.
+   */
+  public static List<String> toStringTypes(Collection<MimeType> mimeTypes) {
+    return convertMimeTypes(mimeTypes, MimeType::getType);
+  }
+
+  private static <S, T> List<T> convertMimeTypes(Collection<S> input, Function<S, T> mapper) {
+    return Optional.ofNullable(input).map(types ->
+            types.stream()
+                .map(mapper)
+                .collect(Collectors.toList()))
+        .orElse(CollectionUtility.emptyArrayList());
   }
 }
