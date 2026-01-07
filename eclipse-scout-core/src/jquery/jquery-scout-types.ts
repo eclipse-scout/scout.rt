@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -109,7 +109,7 @@ declare global {
      * A new <script> tag is added to the document's head element. The method returns
      * a promise which can be used to execute code after the loading has been completed.
      * A jQuery object referring to the new script tag is passed to the promise's
-     * callback functions.
+     * callback functions. A CSP nonce is automatically added if available.
      *
      *   $.injectScript('http://server/path/script.js')
      *     .done(function($scriptTag) { ... });

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,6 +16,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,12 +26,13 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.html.HtmlHelper;
+import org.eclipse.scout.rt.platform.html.IHtmlElement;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache;
-import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
+import org.eclipse.scout.rt.shared.session.Sessions;
 import org.eclipse.scout.rt.shared.ui.webresource.ScriptResourceIndexes;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResources;
@@ -57,31 +59,28 @@ public class HtmlDocumentParser {
   protected static final Pattern PATTERN_BASE_TAG = Pattern.compile("<scout:base\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_VERSION_TAG = Pattern.compile("<scout:version\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_UNKNOWN_TAG = Pattern.compile("<scout:(\"[^\"]*\"|[^>]*?)*>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-  protected static final Pattern PATTERN_KEY_VALUE = Pattern.compile("([^\\s]+)=\"([^\"]*)\"");
-  @SuppressWarnings("bsiRulesDefinition:htmlInString")
-  public static final String SCRIPT_TAG_PREFIX = "<script src=\"";
-  @SuppressWarnings("bsiRulesDefinition:htmlInString")
-  public static final String SCRIPT_TAG_SUFFIX = "\"></script>";
-  public static final String STYLESHEET_TAG_PREFIX = "<link rel=\"stylesheet\" type=\"text/css\" href=\"";
-  public static final String STYLESHEET_TAG_SUFFIX = "\">";
+  protected static final Pattern PATTERN_KEY_VALUE = Pattern.compile("(\\S+)=\"([^\"]*)\"");
+  protected static final Pattern PATTERN_BODY_TAG = Pattern.compile("<body\\s*([^>]*)>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  protected static final Pattern PATTERN_NONCE_ATTRIBUTE = Pattern.compile(Pattern.quote("nonce=\"scout:nonce\""));
 
   protected final HtmlDocumentParserParameters m_params;
-  protected final IHttpResourceCache m_cache;
+  protected String m_cspNonce;
   protected String m_workingContent;
 
   public HtmlDocumentParser(HtmlDocumentParserParameters params) {
+    m_cspNonce = "";
     m_params = params;
-    m_cache = BEANS.get(GlobalHttpResourceCache.class);
   }
 
   public byte[] parseDocument(byte[] document) {
-    // the order of calls is important: first we must resolve all includes
+    m_cspNonce = newNonce(); // create new nonce for each parse
     m_workingContent = new String(document, StandardCharsets.UTF_8);
     replaceAllTags();
     return m_workingContent.getBytes(StandardCharsets.UTF_8);
   }
 
   protected void replaceAllTags() {
+    // the order of calls is important: first we must resolve all includes
     replaceIncludeTags();
     replaceBaseTags();
     replaceVersionTags();
@@ -90,13 +89,37 @@ public class HtmlDocumentParser {
     replaceStylesheetTags();
     replaceScriptsTags();
     replaceScriptTags();
+    replaceNonceAttributes();
+    replaceBodyTag();
     stripUnknownTags();
   }
 
-  @SuppressWarnings("squid:S1149")
-  protected void replaceScriptTags(Pattern pattern, String tagPrefix, String tagSuffix) {
+  protected String newNonce() {
+    return Sessions.randomSessionId();
+  }
+
+  protected void replaceBodyTag() {
+    m_workingContent = PATTERN_BODY_TAG.matcher(m_workingContent).replaceAll(m -> {
+      String bodyTagContent = m.group(1);
+      if (!StringUtility.hasText(bodyTagContent)) {
+        return "<body data-scout-nonce=\"" + getCspNonce() + "\">";
+      }
+      return "<body " + bodyTagContent + " data-scout-nonce=\"" + getCspNonce() + "\">";
+    });
+  }
+
+  public String getCspNonce() {
+    return m_cspNonce;
+  }
+
+  protected void replaceNonceAttributes() {
+    String nonceAttribute = "nonce=\"" + getCspNonce() + "\"";
+    m_workingContent = PATTERN_NONCE_ATTRIBUTE.matcher(m_workingContent).replaceAll(nonceAttribute);
+  }
+
+  protected void replaceScriptTags(Pattern pattern, Supplier<IHtmlElement> tagFactory, String attributeName) {
     m_workingContent = pattern.matcher(m_workingContent)
-        .replaceAll(r -> tagPrefix + createExternalPath(r.group(1)) + tagSuffix);
+        .replaceAll(r -> getWebResourceElementHtml(tagFactory, r.group(1), attributeName));
   }
 
   /**
@@ -110,41 +133,57 @@ public class HtmlDocumentParser {
         .orElse(internalPath);
   }
 
-  protected void replaceStylesheetTags() {
-    // <scout:stylesheet src="scout-all-macro.css" />
-    replaceScriptTags(PATTERN_STYLESHEET_TAG, STYLESHEET_TAG_PREFIX, STYLESHEET_TAG_SUFFIX);
+  protected IHtmlElement createScriptTagBuilder() {
+    return HTML.tag("script")
+        .addAttribute("nonce", getCspNonce());
   }
 
-  @SuppressWarnings("bsiRulesDefinition:htmlInString")
+  protected IHtmlElement createStylesheetsTagBuilder() {
+    return HTML.tag("link")
+        .withRequireEndTag(false)
+        .addAttribute("rel", "stylesheet")
+        .addAttribute("type", "text/css");
+  }
+
+  protected void replaceStylesheetTags() {
+    // <scout:stylesheet src="scout-all-macro.css" />
+    replaceScriptTags(PATTERN_STYLESHEET_TAG, this::createStylesheetsTagBuilder, "href");
+  }
+
   protected void replaceScriptTags() {
     // <scout:script src="scout-all-macro.css" />
-    replaceScriptTags(PATTERN_SCRIPT_TAG, SCRIPT_TAG_PREFIX, SCRIPT_TAG_SUFFIX);
+    replaceScriptTags(PATTERN_SCRIPT_TAG, this::createScriptTagBuilder, "src");
   }
 
   protected void replaceScriptsTags() {
     // <scout:scripts entryPoint="entry-point-name"/>
     if (!m_params.isBrowserSupported()) {
-      m_workingContent = PATTERN_SCRIPTS_TAG.matcher(m_workingContent).replaceAll(SCRIPT_TAG_PREFIX + LegacyBrowserScriptLoader.LEGACY_BROWSERS_SCRIPT + SCRIPT_TAG_SUFFIX);
+      String unsupportedBrowserScriptTag = createScriptTagBuilder().addAttribute("src", LegacyBrowserScriptLoader.LEGACY_BROWSERS_SCRIPT).toHtml();
+      m_workingContent = PATTERN_SCRIPTS_TAG.matcher(m_workingContent).replaceAll(unsupportedBrowserScriptTag);
       return;
     }
-    replaceEntryPointTags(PATTERN_SCRIPTS_TAG, ".js", SCRIPT_TAG_PREFIX, SCRIPT_TAG_SUFFIX);
+    replaceEntryPointTags(PATTERN_SCRIPTS_TAG, ".js", this::createScriptTagBuilder, "src");
   }
 
   protected void replaceStylesheetsTags() {
     // <scout:stylesheets entrypoint="entry-point-name"/>
-    replaceEntryPointTags(PATTERN_STYLESHEETS_TAG, ".css", STYLESHEET_TAG_PREFIX, STYLESHEET_TAG_SUFFIX);
+    replaceEntryPointTags(PATTERN_STYLESHEETS_TAG, ".css", this::createStylesheetsTagBuilder, "href");
   }
 
-  protected void replaceEntryPointTags(Pattern pattern, String fileSuffixFilter, String tagPrefix, String tagSuffix) {
+  protected void replaceEntryPointTags(Pattern pattern, String fileSuffixFilter, Supplier<IHtmlElement> tagFactory, String attributeName) {
     m_workingContent = pattern.matcher(m_workingContent)
-        .replaceAll(r -> buildScriptTagsForEntryPoint(r.group(1), fileSuffixFilter, tagPrefix, tagSuffix));
+        .replaceAll(r -> buildScriptTagsForEntryPoint(r.group(1), fileSuffixFilter, tagFactory, attributeName));
   }
 
-  protected String buildScriptTagsForEntryPoint(String entryPoint, String fileSuffixFilter, String tagPrefix, String tagSuffix) {
+  protected String buildScriptTagsForEntryPoint(String entryPoint, String fileSuffixFilter, Supplier<IHtmlElement> tagFactory, String attributeName) {
     return getAssetsForEntryPoint(entryPoint)
-        .filter(script -> script.toLowerCase().endsWith(fileSuffixFilter))
-        .map(path -> tagPrefix + createExternalPath(path) + tagSuffix)
+        .filter(path -> path.toLowerCase().endsWith(fileSuffixFilter))
+        .map(path -> getWebResourceElementHtml(tagFactory, path, attributeName))
         .collect(joining("\n"));
+  }
+
+  protected String getWebResourceElementHtml(Supplier<IHtmlElement> tagFactory, String internalPath, String attributeName) {
+    return tagFactory.get().addAttribute(attributeName, createExternalPath(internalPath)).toHtml();
   }
 
   protected Stream<String> getAssetsForEntryPoint(String entryPoint) {
@@ -157,22 +196,27 @@ public class HtmlDocumentParser {
     if (StringUtility.isNullOrEmpty(basePath)) {
       basePath = "/";
     }
-    else if (basePath.lastIndexOf('/') != basePath.length() - 1) {
+    else if (basePath.charAt(basePath.length() - 1) != '/') {
       // add / at end of string (unless it already has a slash at the end)
       basePath += "/";
     }
-    String baseTag = "<base href=\"" + basePath + "\">";
+    String baseTag = HTML.tag("base")
+        .withRequireEndTag(false)
+        .addAttribute("href", basePath)
+        .toHtml();
     m_workingContent = PATTERN_BASE_TAG.matcher(m_workingContent).replaceAll(baseTag);
   }
 
   protected void replaceVersionTags() {
     // <scout:version />
     String version = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
-    String versionTag = "<scout-version data-value=\"" + version + "\"></scout-version>";
+    String versionTag = HTML.tag("scout-version")
+        .withRequireEndTag(false)
+        .addAttribute("data-value", version)
+        .toHtml();
     m_workingContent = PATTERN_VERSION_TAG.matcher(m_workingContent).replaceAll(versionTag);
   }
 
-  @SuppressWarnings("squid:S1149")
   protected void replaceIncludeTags() {
     // <scout:include template="no-script.html" />
     m_workingContent = PATTERN_INCLUDE_TAG.matcher(m_workingContent).replaceAll(r -> {
@@ -207,7 +251,6 @@ public class HtmlDocumentParser {
     m_workingContent = PATTERN_MESSAGE_TAG.matcher(m_workingContent).replaceAll(this::replaceMessageTag);
   }
 
-  @SuppressWarnings("squid:S1149")
   protected String replaceMessageTag(MatchResult r) {
     HtmlHelper htmlHelper = BEANS.get(HtmlHelper.class);
     Matcher m2 = PATTERN_KEY_VALUE.matcher(r.group(1));
@@ -242,19 +285,23 @@ public class HtmlDocumentParser {
           break;
         case "plain":
           // Plain normal replacement (only supports one key, because we don't know how to separate multiple keys)
-          text = TEXTS.get(keys.get(0));
+          text = TEXTS.get(keys.getFirst());
           break;
         case "tag":
           StringBuilder tags = new StringBuilder();
           for (String key : keys) {
-            tags.append("<scout-text data-key=\"").append(htmlHelper.escape(key)).append("\" ");
-            tags.append("data-value=\"").append(htmlHelper.escape(TEXTS.get(key))).append("\"></scout-text>");
+            String scoutText = HTML.tag("scout-text")
+                .withRequireEndTag(false)
+                .addAttribute("data-key", key)
+                .addAttribute("data-value", TEXTS.get(key))
+                .toHtml();
+            tags.append(scoutText).append("\n");
           }
           text = tags.toString();
           break;
         case "html":
         default:
-          text = htmlHelper.escape(TEXTS.get(keys.get(0)));
+          text = htmlHelper.escape(TEXTS.get(keys.getFirst()));
           break;
       }
     }
@@ -269,7 +316,6 @@ public class HtmlDocumentParser {
     return "'" + text + "'";
   }
 
-  @SuppressWarnings("squid:S1149")
   protected void stripUnknownTags() {
     m_workingContent = PATTERN_UNKNOWN_TAG.matcher(m_workingContent).replaceAll(r -> {
       LOG.warn("Removing unknown or improperly formatted scout tag from '{}': {}", m_params.getHtmlPath(), r.group());

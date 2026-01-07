@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,8 @@ import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.CspEnabledProperty;
+import org.eclipse.scout.rt.security.csp.ContentSecurityPolicy;
+import org.eclipse.scout.rt.security.csp.ContentSecurityPolicyConfigProperties.CspEnabledProperty;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -33,30 +34,29 @@ public class HttpServletControlTest {
   @Test
   public void testSetResponseHeaders() {
     // GET request with CSP enabled  -> expect CSP headers, expect other headers
-    runTestSetResponseHeader(true, true, "GET", true, true, true);
-    runTestSetResponseHeader(false, true, "GET", true, true, true);
+    runTestSetResponseHeader(true, "GET", true, true, true);
+    runTestSetResponseHeader(true, "GET", true, true, true);
 
     // GET request with CSP disabled -> do not expect CSP headers, expect other headers
-    runTestSetResponseHeader(true, false, "GET", false, true, true);
-    runTestSetResponseHeader(false, false, "GET", false, true, true);
+    runTestSetResponseHeader(false, "GET", false, true, true);
+    runTestSetResponseHeader(false, "GET", false, true, true);
 
     // POST request with CSP enabled -> do not expect CSP headers, do not expect other headers
-    runTestSetResponseHeader(true, true, "POST", false, false, true);
-    runTestSetResponseHeader(false, true, "POST", false, false, true);
+    runTestSetResponseHeader(true, "POST", false, false, true);
+    runTestSetResponseHeader(true, "POST", false, false, true);
 
     // POST request with CSP disabled -> do not expect CSP headers, do not expect other headers
-    runTestSetResponseHeader(true, false, "POST", false, false, true);
-    runTestSetResponseHeader(false, false, "POST", false, false, true);
+    runTestSetResponseHeader(false, "POST", false, false, true);
+    runTestSetResponseHeader(false, "POST", false, false, true);
   }
 
-  protected void runTestSetResponseHeader(boolean mshtml, boolean cspEnabled, String method, boolean expectCspHeader, boolean expectFrameOptions, boolean expectNoSniff) {
+  protected void runTestSetResponseHeader(boolean cspEnabled, String method, boolean expectCspHeader, boolean expectFrameOptions, boolean expectNoSniff) {
     CspEnabledProperty cspProperty = Mockito.mock(CspEnabledProperty.class);
     Mockito.when(cspProperty.getValue(ArgumentMatchers.any())).thenReturn(cspEnabled);
     IBean<?> bean = BeanTestingHelper.get().registerBean(new BeanMetaData(CspEnabledProperty.class, cspProperty));
 
     try {
       HttpClientInfo httpClientInfo = Mockito.mock(HttpClientInfo.class);
-      Mockito.when(httpClientInfo.isMshtml()).thenReturn(mshtml);
 
       HttpServletControl httpServletControl = new HttpServletControl();
       httpServletControl.setCspToken(TEST_CSP_TOKEN);
@@ -81,12 +81,7 @@ public class HttpServletControlTest {
           .setHeader(HttpServletControl.HTTP_HEADER_X_CONTENT_TYPE_OPTIONS, HttpServletControl.CONTENT_TYPE_OPTION_NO_SNIFF);
 
       if (expectCspHeader) {
-        if (mshtml) {
-          Mockito.verify(resp).setHeader(HttpServletControl.HTTP_HEADER_CSP_LEGACY, TEST_CSP_TOKEN);
-        }
-        else {
-          Mockito.verify(resp).setHeader(HttpServletControl.HTTP_HEADER_CSP, TEST_CSP_TOKEN);
-        }
+        Mockito.verify(resp).setHeader(ContentSecurityPolicy.HTTP_HEADER, TEST_CSP_TOKEN);
       }
     }
     finally {

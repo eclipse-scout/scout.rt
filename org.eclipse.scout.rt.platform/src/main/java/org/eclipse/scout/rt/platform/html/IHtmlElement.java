@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,23 @@ package org.eclipse.scout.rt.platform.html;
  * HTML element
  */
 public interface IHtmlElement extends IHtmlContent {
+
+  /**
+   * Specifies if the end tag is required. See {@link #isRequireEndTag()} for details.
+   *
+   * @param requireEndTag
+   *     The new value.
+   * @return this
+   */
+  IHtmlElement withRequireEndTag(boolean requireEndTag);
+
+  /**
+   * Specifies if this element requires an end tag.<br>
+   * If {@code true} (default), there will always be a pair: {@code <tag></tag>}. If {@code false}, the end tag may be ommitted if the tag has no content: {@code <br/>} instead of {@code <br></br>}.
+   *
+   * @return whether the end tag is required. Default is {@code true}.
+   */
+  boolean isRequireEndTag();
 
   /**
    * Sets the 'class' attribute (CSS).

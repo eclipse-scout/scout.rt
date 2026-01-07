@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2026 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -17,13 +17,13 @@
     $PROTECT-LINE-ENDING$
 <!-- INCLUDED RESOURCE -->
 
-    <link rel="stylesheet" type="text/css" href="myapp-login.css">
-    <script src="vendors.js"></script>
-    <script src="myapp-login.js"></script>
-    <script src="login.js"></script>
-    <script src="other-login.js"></script>
+    <link rel="stylesheet" type="text/css" href="myapp-login.css" />
+    <script nonce="test-nonce" src="vendors.js"></script>
+    <script nonce="test-nonce" src="myapp-login.js"></script>
+    <script nonce="test-nonce" src="login.js"></script>
+    <script nonce="test-nonce" src="other-login.js"></script>
   </head>
-  <body>
+  <body data-scout-nonce="test-nonce">
     <div class="page">
       $PROTECT-LINE-ENDING$
 <!-- INCLUDED RESOURCE -->
@@ -35,6 +35,15 @@
 <!-- INCLUDED RESOURCE -->
 
     </div>
-    <scout-text data-key="ui.Login" data-value="--ui.Login--"></scout-text><scout-text data-key="ui.LoginFailed" data-value="--ui.LoginFailed--"></scout-text><scout-text data-key="ui.User" data-value="--ui.User--"></scout-text><scout-text data-key="ui.Password" data-value="--ui.Password--"></scout-text><scout-text data-key="ui.Token" data-value="--ui.Token--"></scout-text><scout-text data-key="ui.Email" data-value="--ui.Email--"></scout-text><scout-text data-key="ui.NotYetRegistered" data-value="--ui.NotYetRegistered--"></scout-text><scout-text data-key="ui.PasswordForgotten" data-value="--ui.PasswordForgotten--"></scout-text><scout-text data-key="ui.FacebookLogin" data-value="--ui.FacebookLogin--"></scout-text>
+    <scout-text data-key="ui.Login" data-value="--ui.Login--" />
+<scout-text data-key="ui.LoginFailed" data-value="--ui.LoginFailed--" />
+<scout-text data-key="ui.User" data-value="--ui.User--" />
+<scout-text data-key="ui.Password" data-value="--ui.Password--" />
+<scout-text data-key="ui.Token" data-value="--ui.Token--" />
+<scout-text data-key="ui.Email" data-value="--ui.Email--" />
+<scout-text data-key="ui.NotYetRegistered" data-value="--ui.NotYetRegistered--" />
+<scout-text data-key="ui.PasswordForgotten" data-value="--ui.PasswordForgotten--" />
+<scout-text data-key="ui.FacebookLogin" data-value="--ui.FacebookLogin--" />
+
   </body>
 </html>

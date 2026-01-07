@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -180,6 +180,11 @@ public interface IUiSession {
    * @return the URL where to redirect the UI on logout
    */
   String getLogoutRedirectUrl();
+
+  /**
+   * @return The current Content Security Policy nonce used for scripts. Note: this value changes on each page reload. Do not store it on instances surviving page reloads (e.g. all connected to a {@link IClientSession})!
+   */
+  String getNonce();
 
   IJsonAdapter<?> getRootJsonAdapter();
 

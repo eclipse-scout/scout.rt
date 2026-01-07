@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2026 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -12,24 +12,24 @@
   <head>
     <meta charset="UTF-8">
     <title>My Application</title>
-    <base href="base-path/">
+    <base href="base-path/" />
     $PROTECT-LINE-ENDING$
 <!-- INCLUDED RESOURCE -->
 
-    <link rel="stylesheet" type="text/css" href="myapp.css">
-    <link rel="stylesheet" type="text/css" href="myapp-additional.css">
-    <link rel="stylesheet" type="text/css" href="../special/dir/12345/special.css">
-    <script src="vendors.js"></script>
-    <script src="myapp.js"></script>
-    <script src="index.js"></script>
+    <link rel="stylesheet" type="text/css" href="myapp.css" />
+    <link rel="stylesheet" type="text/css" href="myapp-additional.css" />
+    <link rel="stylesheet" type="text/css" href="../special/dir/12345/special.css" />
+    <script nonce="test-nonce" src="vendors.js"></script>
+    <script nonce="test-nonce" src="myapp.js"></script>
+    <script nonce="test-nonce" src="index.js"></script>
   </head>
-  <body>
+  <body data-custom-attribute="test" data-other-attribute="test2" data-scout-nonce="test-nonce">
     $PROTECT-LINE-ENDING$
 <!-- INCLUDED RESOURCE -->
 
     <div class="scout" data-partid="1"></div>
     --one--
     {'three': '--three--'}
-    <scout-version data-value="1.2.3.unit_test"></scout-version>
+    <scout-version data-value="1.2.3.unit_test" />
   </body>
 </html>

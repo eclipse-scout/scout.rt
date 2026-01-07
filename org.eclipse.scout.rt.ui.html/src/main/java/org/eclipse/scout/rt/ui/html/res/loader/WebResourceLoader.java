@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,8 +13,13 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -22,6 +27,9 @@ import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
+import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResponseInterceptor;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResources;
 
@@ -35,6 +43,20 @@ public class WebResourceLoader extends AbstractResourceLoader {
     m_minify = minify;
     m_cacheEnabled = cacheEnabled;
     m_theme = theme;
+  }
+
+  @Override
+  public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
+    HttpCacheObject httpCacheObject = super.loadResource(cacheKey);
+    if (httpCacheObject != null) {
+      BEANS.all(IWebResourceResponseInterceptorContributor.class).stream()
+          .map(contributor -> contributor.getInterceptors(httpCacheObject))
+          .filter(Objects::nonNull)
+          .flatMap(Collection::stream)
+          .filter(Objects::nonNull)
+          .forEach(httpCacheObject::addHttpResponseInterceptor);
+    }
+    return httpCacheObject;
   }
 
   @Override
@@ -87,5 +109,10 @@ public class WebResourceLoader extends AbstractResourceLoader {
     try (BufferedInputStream in = new BufferedInputStream(descriptor.getUrl().openConnection().getInputStream())) {
       return IOUtility.readBytes(in, -1);
     }
+  }
+
+  @Bean
+  public interface IWebResourceResponseInterceptorContributor {
+    List<IHttpResponseInterceptor> getInterceptors(HttpCacheObject responseObject);
   }
 }

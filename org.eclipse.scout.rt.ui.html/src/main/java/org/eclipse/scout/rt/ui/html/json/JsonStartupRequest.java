@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -38,6 +38,7 @@ public class JsonStartupRequest extends JsonRequest {
   public static final String PROP_USER_AGENT = "userAgent";
   public static final String PROP_SESSION_STARTUP_PARAMS = "sessionStartupParams";
   public static final String PROP_VERSION = "version";
+  public static final String PROP_NONCE = "scoutNonce";
 
   private final Map<String, String> m_sessionStartupParams;
 
@@ -72,6 +73,13 @@ public class JsonStartupRequest extends JsonRequest {
    */
   public String getVersion() {
     return getRequestObject().optString(PROP_VERSION, null);
+  }
+
+  /**
+   * @return The nonce for the current web page. Changes on each browser reload.
+   */
+  public String getNonce() {
+    return getSessionStartupParams().get(PROP_NONCE);
   }
 
   /**

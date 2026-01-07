@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.ui.html.res.loader;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -16,18 +18,17 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
+import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResponseHeaderContributor;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ExternalBaseUrlProperty;
 import org.eclipse.scout.rt.shared.ui.IUiEngineType;
 import org.eclipse.scout.rt.shared.ui.UiEngineType;
@@ -83,21 +84,7 @@ public class HtmlFileLoader extends AbstractResourceLoader {
     }
     // no cache-control, only E-Tag checks to make sure that a session with timeout is correctly
     // forwarded to the login using a GET request BEFORE the first json POST request
-    HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, content);
-    // Suppress automatic "compatibility mode" in IE in intranet zone
-    httpCacheObject.addHttpResponseInterceptor(new HttpResponseHeaderContributor("X-UA-Compatible", "IE=edge") {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void intercept(HttpServletRequest req, HttpServletResponse resp) {
-        HttpClientInfo httpClientInfo = HttpClientInfo.get(req);
-        if (httpClientInfo.isMshtml()) {
-          // Send headers only for IE
-          super.intercept(req, resp);
-        }
-      }
-    });
-    return httpCacheObject;
+    return new HttpCacheObject(cacheKey, content);
   }
 
   @Override
@@ -111,15 +98,17 @@ public class HtmlFileLoader extends AbstractResourceLoader {
       return null; // not handled here
     }
 
+    HttpServletResponse resp = assertNotNull(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
     HtmlDocumentParserParameters params = createHtmlDocumentParserParameters(pathInfo);
     HtmlDocumentParser parser = createHtmlDocumentParser(params);
     byte[] parsedDocument = parser.parseDocument(IOUtility.readFromUrl(url));
+    BEANS.get(HtmlContentSecurityPolicyApplier.class).applyCsp(pathInfo, parser.getCspNonce(), resp);
     return BinaryResources.create()
         .withFilename(pathInfo)
         .withCharset(StandardCharsets.UTF_8)
         .withContent(parsedDocument)
         .withLastModifiedNow()
-        .withCachingAllowed(true)
+        .withCachingAllowed(false /* nonces are present which must be new on every request -> no caching */)
         .build();
   }
 

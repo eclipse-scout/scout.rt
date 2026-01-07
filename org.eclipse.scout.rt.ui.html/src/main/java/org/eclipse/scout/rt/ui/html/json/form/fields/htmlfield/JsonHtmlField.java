@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,10 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.shared.ui.webresource.SessionNonce;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -27,8 +30,11 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
  */
 public class JsonHtmlField<HTML_FIELD extends IHtmlField> extends JsonValueField<HTML_FIELD> implements IBinaryResourceProvider {
 
+  private final String m_sessionNonce;
+
   public JsonHtmlField(HTML_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
+    m_sessionNonce = BEANS.get(SessionNonce.class).provide(uiSession.getClientSession());
   }
 
   @Override
@@ -50,7 +56,11 @@ public class JsonHtmlField<HTML_FIELD extends IHtmlField> extends JsonValueField
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        return BinaryResourceUrlUtility.replaceImageUrls(JsonHtmlField.this, (String) value);
+        String html = (String) value;
+        html = BinaryResourceUrlUtility.replaceImageUrls(JsonHtmlField.this, html);
+
+        // map from ClientSession nonce to UiSession nonce
+        return StringUtility.replace(html, m_sessionNonce, getUiSession().getNonce());
       }
     });
     putJsonProperty(new JsonProperty<IHtmlField>(IHtmlField.PROP_SELECTABLE, model) {
