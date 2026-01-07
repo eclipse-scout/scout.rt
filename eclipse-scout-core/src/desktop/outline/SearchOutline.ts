@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -242,10 +242,11 @@ export class SearchOutline extends Outline implements SearchOutlineModel {
   }
 
   protected _createOnQueryFieldInputFunction(): (event: JQuery.TriggeredEvent) => void {
+    let debounceFunction = $.debounce(() => this.setSearchQuery(this.$queryField.val()));
     return event => {
       this._updateHasText();
       // debounced update search query
-      $.debounce(() => this.setSearchQuery(this.$queryField.val()))();
+      debounceFunction();
     };
   }
 
