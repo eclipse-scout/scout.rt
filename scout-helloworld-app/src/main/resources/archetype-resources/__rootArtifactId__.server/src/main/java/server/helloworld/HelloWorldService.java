@@ -3,7 +3,8 @@
 #set( $symbol_escape = '\' )
 package ${package}.server.helloworld;
 
-import ${package}.server.ServerSession;
+import org.eclipse.scout.rt.shared.user.UserId;
+
 import ${package}.shared.helloworld.HelloWorldFormData;
 import ${package}.shared.helloworld.IHelloWorldService;
 
@@ -15,7 +16,7 @@ public class HelloWorldService implements IHelloWorldService {
   @Override
   public HelloWorldFormData load(HelloWorldFormData input) {
     StringBuilder msg = new StringBuilder();
-    msg.append("Hello ").append(ServerSession.get().getUserId()).append('!');
+    msg.append("Hello ").append(UserId.CURRENT.get()).append('!');
     input.getMessage().setValue(msg.toString());
     return input;
   }
