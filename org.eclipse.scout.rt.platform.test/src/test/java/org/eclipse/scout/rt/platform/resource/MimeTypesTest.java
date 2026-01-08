@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,8 @@
 package org.eclipse.scout.rt.platform.resource;
 
 import static org.eclipse.scout.rt.platform.resource.MimeTypes.verifyMagic;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -91,5 +93,23 @@ public class MimeTypesTest {
 
     BinaryResource binRes = BinaryResources.create().withContent(bytes).build();
     assertTrue(verifyMagic(binRes));
+  }
+
+  @Test
+  public void testWave() {
+    runWaveTest("5249 4646 2e2e 2e2e 5741 5645", true); // RIFF....WAVE
+    runWaveTest("5249 4646 3132 3334 5741 5645", true); // RIFF1234WAVE
+    runWaveTest("5249 4646 3536 3738 5741 5645", true); // RIFF5678WAVE
+    runWaveTest("3132 3334 3536 3738 4156 49", false); // 12345678WAVE
+    runWaveTest("5249 4646 3536 3738 4156 49", false); // RIFF5678AVI
+    runWaveTest("3132 3334 3536 3738 4156 49", false); // 12345678AVI
+  }
+
+  protected void runWaveTest(String content, boolean expectedValid) {
+    byte[] bytes = HexUtility.decode(content);
+    assertThat(MimeType.WAV.getMagic().matches(bytes), is(expectedValid));
+
+    BinaryResource binRes = BinaryResources.create().withContent(bytes).withFilename("foo.wav").build();
+    assertThat(verifyMagic(binRes), is(expectedValid));
   }
 }
