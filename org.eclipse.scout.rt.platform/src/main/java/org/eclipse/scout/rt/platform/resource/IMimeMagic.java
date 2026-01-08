@@ -36,6 +36,7 @@ public interface IMimeMagic {
   IMimeMagic PDF = createMagic(0, "25504446");
   IMimeMagic PNG = createMagic(0, "89504e470d0a1a0a");
   IMimeMagic TIF_TIFF = createMagic(0, "49492a00", "4d4d002a");
+  IMimeMagic WAV = createMagic(8, "57415645"); // The first 4 bytes have to be 'RIFF'. But `createMagic` doesn't support that yet.
   IMimeMagic WOFF = createMagic(0, "774f4646", "774f4632");
   IMimeMagic ZIP = createMagic(0, "504b0304", "504b0506", "504b0708");
 
