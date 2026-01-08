@@ -5,6 +5,7 @@ package ${package}.server;
 
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
+import org.eclipse.scout.rt.shared.user.UserId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,6 @@ public class ServerSession extends AbstractServerSession {
 
   @Override
   protected void execLoadSession() {
-    LOG.info("created a new session for {}", getUserId());
+    LOG.info("created a new session for {}", UserId.CURRENT.get());
   }
 }
