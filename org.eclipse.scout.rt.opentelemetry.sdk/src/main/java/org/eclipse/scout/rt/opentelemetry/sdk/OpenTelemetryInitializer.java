@@ -15,7 +15,6 @@ import java.util.Map;
 import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.opentelemetry.sdk.traces.ISamplerCustomizerProvider;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
@@ -58,6 +57,13 @@ public class OpenTelemetryInitializer implements IPlatformListener {
 
   private static final Logger LOG = LoggerFactory.getLogger(OpenTelemetryInitializer.class);
 
+  /**
+   * Order of the {@link IPlatformListener} that shuts down OpenTelemetry
+   *
+   * @see OpenTelemetryInitializer.PlatformListener
+   */
+  public static final int DESTROY_ORDER = 5_800;
+
   protected OpenTelemetrySdk m_openTelemetry;
 
   @Override
@@ -65,29 +71,6 @@ public class OpenTelemetryInitializer implements IPlatformListener {
     if (event.getState() == State.BeanManagerPrepared) {
       initOpenTelemetry();
     }
-  }
-
-  /**
-   * Registers an {@link IPlatformListener} that shutdown OpenTelemetry on an {@link IPlatform.State#PlatformStopping}
-   * event. It does nothing if this method is invoked when no platform is active (i.e. {@link Platform#peek()} returns
-   * {@code null}).
-   * <p>
-   * <b>Note:</b> We use a separate listener instead to provide OpenTelemetry functionality as long as possible during
-   * shutdown.
-   */
-  protected void registerShutdownListener() {
-    final IPlatform platform = Platform.peek();
-    if (platform == null) {
-      return;
-    }
-    platform.getBeanManager().registerBean(new BeanMetaData(IPlatformListener.class)
-        .withApplicationScoped(true)
-        .withOrder(5_999)
-        .withInitialInstance((IPlatformListener) event -> {
-          if (event.getState() == IPlatform.State.PlatformStopping) {
-            shutdownOpenTelemetry();
-          }
-        }));
   }
 
   protected void initOpenTelemetry() {
@@ -106,8 +89,6 @@ public class OpenTelemetryInitializer implements IPlatformListener {
             .setResultAsGlobal())
         .build()
         .getOpenTelemetrySdk();
-
-    registerShutdownListener();
 
     initMetrics();
   }
@@ -217,6 +198,24 @@ public class OpenTelemetryInitializer implements IPlatformListener {
         return "none"; // use no autoconfigured exporter
       }
       return "otlp";
+    }
+  }
+
+  /**
+   * Registers an {@link IPlatformListener} that shuts down OpenTelemetry on an {@link IPlatform.State#PlatformStopping}
+   * event.
+   * <p>
+   * <b>Note:</b> We use a separate listener instead to provide OpenTelemetry functionality as long as possible during
+   * shutdown.
+   */
+  @Order(DESTROY_ORDER)
+  public static class PlatformListener implements IPlatformListener {
+
+    @Override
+    public void stateChanged(final PlatformEvent event) {
+      if (event.getState() == State.PlatformStopping) {
+        BEANS.get(OpenTelemetryInitializer.class).shutdownOpenTelemetry();
+      }
     }
   }
 }
