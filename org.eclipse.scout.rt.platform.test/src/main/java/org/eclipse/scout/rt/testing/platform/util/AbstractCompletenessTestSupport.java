@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.dataobject.testing;
+package org.eclipse.scout.rt.testing.platform.util;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.junit.Assert;
 
 @ApplicationScoped
-public abstract class AbstractDataObjectTestSupport {
+public abstract class AbstractCompletenessTestSupport {
 
   protected Path m_root;
 
@@ -51,7 +51,7 @@ public abstract class AbstractDataObjectTestSupport {
   protected final List<Path> m_pathExclusions;
   protected final List<String> m_errMessages;
 
-  public AbstractDataObjectTestSupport() {
+  public AbstractCompletenessTestSupport() {
     m_root = Path.of("..").toAbsolutePath().normalize();
 
     m_filePattern = createFilePattern();
@@ -137,7 +137,7 @@ public abstract class AbstractDataObjectTestSupport {
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         Path fileName = file.getFileName();
         if (fileName != null && fileName.toString().toLowerCase().endsWith(".java") && !isExcluded(file)) {
-          AbstractDataObjectTestSupport.this.visitFile(file);
+          AbstractCompletenessTestSupport.this.visitFile(file);
         }
         return FileVisitResult.CONTINUE;
       }
@@ -195,7 +195,7 @@ public abstract class AbstractDataObjectTestSupport {
   protected void checkFiles() {
     m_files.forEach((filePath, packageName) -> {
       if (m_testFiles.values().stream().flatMap(Collection::stream).noneMatch(packageName::startsWith)) {
-        addErrorMessage(filePath.getFileName().toString());
+        addErrorMessage(filePath.toString());
       }
     });
   }
