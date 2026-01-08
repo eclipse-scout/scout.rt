@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -179,7 +179,7 @@ public class ApiDocGenerator {
                 .orElseGet(() -> new String[]{RestApplicationScopes.API})) // default scope
         .filter(StringUtility::hasText)
         .collect(Collectors.toList());
-    boolean ignoreApiExposed = readAllApiDocGranted || !checkForApiExposed(collect);
+    boolean ignoreApiExposed = !checkForApiExposed(collect);
 
     return new ResourceDescriptor()
         .withResource(resource)
@@ -190,15 +190,18 @@ public class ApiDocGenerator {
         .withDescription(description)
         .withScopes(collect)
         .withMethods(Stream.of(resource.getClass().getMethods())
-            .filter(m -> acceptMethod(m, ignoreApiExposed))
+            .filter(m -> acceptMethod(m))
             .sorted(Comparator.comparing(this::generateMethodSignature)) // to make sure sorting is stable
             .sorted(this::compareMethods)
-            .map(this::toMethodDescriptor)
+            .map(m -> {
+              boolean apiExposed = ignoreApiExposed || m_apiExposedHelper.isApiExposed(m); // method is api-exposed if it is either annotated with corresponding annotation or api-exposed check does not apply for whole scope
+              return apiExposed || readAllApiDocGranted ? toMethodDescriptor(m, apiExposed) : null; // method must either be api-exposed (see line above) or user must be allowed to read all methods (special permission)
+            })
             .filter(Objects::nonNull)
             .collect(Collectors.toList()));
   }
 
-  protected MethodDescriptor toMethodDescriptor(Method m) {
+  protected MethodDescriptor toMethodDescriptor(Method m, boolean apiExposed) {
     String httpMethod = getHttpMethod(m);
     if (httpMethod == null) {
       return null;
@@ -217,7 +220,8 @@ public class ApiDocGenerator {
         .withSignature(methodSignature)
         .withDescription(description)
         .withConsumes(consumes)
-        .withProduces(produces);
+        .withProduces(produces)
+        .withApiExposed(apiExposed);
   }
 
   protected DescriptionDescriptor toDescriptionDescriptor(ApiDocDescription desc) {
@@ -244,10 +248,9 @@ public class ApiDocGenerator {
         !res.getClass().isAnnotationPresent(ApiDocIgnore.class);
   }
 
-  protected boolean acceptMethod(Method m, boolean ignoreApiExposed) {
+  protected boolean acceptMethod(Method m) {
     return Modifier.isPublic(m.getModifiers()) &&
-        !m.isAnnotationPresent(ApiDocIgnore.class) &&
-        (ignoreApiExposed || m_apiExposedHelper.isApiExposed(m));
+        !m.isAnnotationPresent(ApiDocIgnore.class);
   }
 
   protected int compareMethods(Method m1, Method m2) {
@@ -453,6 +456,7 @@ public class ApiDocGenerator {
     final List<IHtmlElement> tocElements = new ArrayList<>();
     final List<IHtmlElement> elements = new ArrayList<>();
     final StringHolder currentBasePath = new StringHolder();
+    boolean readAllApiDocGranted = isReadAllApiDocGranted();
 
     String currentScope = ObjectUtility.nvl(scope, RestApplicationScopes.API); // default scope
     List<String> allScopes = new ArrayList<>();
@@ -506,28 +510,23 @@ public class ApiDocGenerator {
         elements.add(HTML.div(HTML.raw(r.getDescription().toHtml())).cssClass("resource-description"));
       }
 
-      boolean ignoreApiExposed = !checkForApiExposed(r.getScopes());
-      boolean readAllApiDocGranted = isReadAllApiDocGranted();
-      r.getMethods().forEach(m -> {
-        boolean apiExposed = ignoreApiExposed || !readAllApiDocGranted || m_apiExposedHelper.isApiExposed(m.getMethod());
-        elements.add(HTML.div(
-                HTML.div(
-                        HTML.div(m.getHttpMethod()).cssClass("http " + m.getHttpMethod().toLowerCase()),
-                        HTML.div(
-                            HTML.span("(" + CollectionUtility.format(r.getScopes()) + ")").cssClass("scope"),
-                            HTML.span(r.getPath()).cssClass("resource"),
-                            HTML.span(StringUtility.box("/", m.getPath(), "")).cssClass("method")).cssClass("path").toggleCssClass("not-api-exposed", !apiExposed))
-                    .cssClass("header"),
-                HTML.div(
-                        HTML.div(HTML.raw(m.getDescription().toHtml())).cssClass("description"),
-                        HTML.div(m.getSignature().toString()).cssClass("signature"),
-                        HTML.div(
-                                StringUtility.hasText(m.getConsumes()) ? HTML.div(HTML.span("Consumes ").cssClass("k"), HTML.span(m.getConsumes()).cssClass("v")).cssClass("line") : null,
-                                StringUtility.hasText(m.getProduces()) ? HTML.div(HTML.span("Produces ").cssClass("k"), HTML.span(m.getProduces()).cssClass("v")).cssClass("line") : null)
-                            .cssClass("consumes-produces"))
-                    .cssClass("body"))
-            .cssClass("operation"));
-      });
+      r.getMethods().forEach(m -> elements.add(HTML.div(
+              HTML.div(
+                      HTML.div(m.getHttpMethod()).cssClass("http " + m.getHttpMethod().toLowerCase()),
+                      HTML.div(
+                          HTML.span("(" + CollectionUtility.format(r.getScopes()) + ")").cssClass("scope"),
+                          HTML.span(r.getPath()).cssClass("resource"),
+                          HTML.span(StringUtility.box("/", m.getPath(), "")).cssClass("method")).cssClass("path").toggleCssClass("not-api-exposed", readAllApiDocGranted && !m.isApiExposed()))
+                  .cssClass("header"),
+              HTML.div(
+                      HTML.div(HTML.raw(m.getDescription().toHtml())).cssClass("description"),
+                      HTML.div(m.getSignature().toString()).cssClass("signature"),
+                      HTML.div(
+                              StringUtility.hasText(m.getConsumes()) ? HTML.div(HTML.span("Consumes ").cssClass("k"), HTML.span(m.getConsumes()).cssClass("v")).cssClass("line") : null,
+                              StringUtility.hasText(m.getProduces()) ? HTML.div(HTML.span("Produces ").cssClass("k"), HTML.span(m.getProduces()).cssClass("v")).cssClass("line") : null)
+                          .cssClass("consumes-produces"))
+                  .cssClass("body"))
+          .cssClass("operation")));
     });
 
     final String title = generateTitle();
@@ -695,9 +694,9 @@ public class ApiDocGenerator {
         sb.append(StringUtility.emptyIfNull(m.getProduces()));
         sb.append(TEXT_ELEMENT_SEPARATOR);
         sb.append(m.getDescription().toPlainText(true));
-        if (!ignoreApiExposed && readAllApiDocGranted) {
+        if (readAllApiDocGranted) {
           sb.append(TEXT_ELEMENT_SEPARATOR);
-          sb.append(m_apiExposedHelper.isApiExposed(m.getMethod()));
+          sb.append(m.isApiExposed());
         }
         sb.append(TEXT_LINE_SEPARATOR);
       });
@@ -750,7 +749,7 @@ public class ApiDocGenerator {
                 .put("signature", m.getSignature().toString())
                 .putIf("consumes", m.getConsumes(), Objects::nonNull)
                 .putIf("produces", m.getProduces(), Objects::nonNull)
-                .putIf("apiExposed", m_apiExposedHelper.isApiExposed(m.getMethod()), v -> !v)
+                .putIf("apiExposed", m.isApiExposed(), v -> !v)
                 .build()))
         .collect(Collectors.toList());
     return BEANS.get(IPrettyPrintDataObjectMapper.class).writeValue(jsonMethods);
@@ -855,6 +854,8 @@ public class ApiDocGenerator {
     private String m_consumes;
     private String m_produces;
 
+    private boolean m_apiExposed;
+
     public Method getMethod() {
       return m_method;
     }
@@ -915,6 +916,15 @@ public class ApiDocGenerator {
 
     public MethodDescriptor withProduces(String produces) {
       m_produces = produces;
+      return this;
+    }
+
+    public boolean isApiExposed() {
+      return m_apiExposed;
+    }
+
+    public MethodDescriptor withApiExposed(boolean apiExposed) {
+      m_apiExposed = apiExposed;
       return this;
     }
   }
