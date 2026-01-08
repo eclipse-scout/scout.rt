@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,10 +11,10 @@ package org.eclipse.scout.rt.dataobject.testing;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Test;
 
 public abstract class AbstractDataObjectTestCompletenessTest {
@@ -56,6 +56,6 @@ public abstract class AbstractDataObjectTestCompletenessTest {
   }
 
   protected List<Path> getPathExclusions() {
-    return CollectionUtility.arrayList();
+    return Collections.emptyList();
   }
 }

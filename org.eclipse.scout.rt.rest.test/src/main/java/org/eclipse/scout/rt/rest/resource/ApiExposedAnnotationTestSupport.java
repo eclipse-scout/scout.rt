@@ -7,40 +7,38 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.dataobject.testing;
+package org.eclipse.scout.rt.rest.resource;
 
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.rt.dataobject.IDoEntity;
-import org.eclipse.scout.rt.dataobject.TypeVersion;
-import org.eclipse.scout.rt.dataobject.testing.signature.AbstractDataObjectSignatureTest;
+import org.eclipse.scout.rt.rest.IRestResource;
 import org.eclipse.scout.rt.testing.platform.util.AbstractCompletenessTestSupport;
 
 /**
- * Checks for each {@link IDoEntity} with a {@link TypeVersion} if there exists a corresponding
- * {@link AbstractDataObjectSignatureTest}
+ * Checks for each {@link IRestResource} if there exists a corresponding {@link AbstractApiExposedAnnotationTest}
  */
-public class DataObjectSignatureTestSupport extends AbstractCompletenessTestSupport {
+public class ApiExposedAnnotationTestSupport extends AbstractCompletenessTestSupport {
 
   /**
-   * Pattern to detect data object files that require a {@link AbstractDataObjectSignatureTest}
+   * Pattern to detect {@link IRestResource}(s) files that require a {@link AbstractApiExposedAnnotationTest}
    */
   @Override
   protected Pattern createFilePattern() {
-    return Pattern.compile("@TypeVersion\\(");
+    // quick check if file is applicable, string check to quickly exclude EXT resources here already to avoid empty tests
+    return Pattern.compile("(?<!@RestApplicationScope\\(RestApplicationScopes\\.EXT\\)\\Rpublic )class (?!Abstract)\\w+ implements IRestResource[,\\s{]");
   }
 
   /**
-   * Pattern to detect {@link AbstractDataObjectSignatureTest} files
+   * Pattern to detect {@link AbstractApiExposedAnnotationTest} files
    */
   @Override
   protected Pattern createTestFilePattern() {
-    return Pattern.compile("extends \\w*DataObjectSignatureTest\\s+");
+    return Pattern.compile("extends \\w*ApiExposedAnnotationTest\\s+");
   }
 
   /**
-   * Pattern to extract the package name prefix from {@link AbstractDataObjectSignatureTest#getPackageNamePrefix()}
+   * Pattern to extract the package name prefix from {@link AbstractApiExposedAnnotationTest#getPackageNamePrefix()}
    */
   @Override
   protected Pattern createPackageNamePrefixPattern() {
@@ -54,11 +52,11 @@ public class DataObjectSignatureTestSupport extends AbstractCompletenessTestSupp
 
   @Override
   protected boolean acceptTestFile(Path path, String content) {
-    return path.getFileName().toString().endsWith("DataObjectSignatureTest.java") && getTestFilePattern().matcher(content).find();
+    return path.getFileName().toString().endsWith("ApiExposedAnnotationTest.java") && getTestFilePattern().matcher(content).find();
   }
 
   @Override
   protected String getErrorTitle() {
-    return "No DataObjectSignatureTest found for the following files";
+    return "No ApiExposedAnnotationTest found for the following files:";
   }
 }

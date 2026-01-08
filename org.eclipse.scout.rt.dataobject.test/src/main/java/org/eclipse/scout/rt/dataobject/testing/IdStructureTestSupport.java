@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,11 +16,12 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.testing.platform.util.AbstractCompletenessTestSupport;
 
 /**
  * Checks for each {@link IId} if there exists a corresponding {@link AbstractIdStructureTest}
  */
-public class IdStructureTestSupport extends AbstractDataObjectTestSupport {
+public class IdStructureTestSupport extends AbstractCompletenessTestSupport {
 
   /**
    * Pattern to detect {@link IId} files that require a {@link AbstractIdStructureTest}
