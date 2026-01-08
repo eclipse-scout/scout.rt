@@ -101,6 +101,7 @@ public enum MimeType implements IMimeType {
   VCARD("text/vcard", "vcard"),
   VCF("text/x-vcard", "vcf"),
   VCS("text/x-vcalendar", "vcs"),
+  WAV("audio/wav", "wav", IMimeMagic.WAV),
   WEBP("image/webp", "webp"),
   WEBM("video/webm", "webm"),
   WOFF("application/font-woff", "woff", IMimeMagic.WOFF),
