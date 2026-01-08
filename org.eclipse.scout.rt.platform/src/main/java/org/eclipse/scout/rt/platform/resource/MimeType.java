@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -102,6 +102,7 @@ public enum MimeType implements IMimeType {
   VCARD("text/vcard", "vcard"),
   VCF("text/x-vcard", "vcf"),
   VCS("text/x-vcalendar", "vcs"),
+  WAV("audio/wav", "wav", IMimeMagic.WAV),
   WEBP("image/webp", "webp"),
   WEBM("video/webm", "webm", IMimeMagic.MKV),
   WOFF("application/font-woff", "woff", IMimeMagic.WOFF),

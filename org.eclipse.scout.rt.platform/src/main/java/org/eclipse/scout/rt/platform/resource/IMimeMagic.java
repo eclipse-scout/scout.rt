@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,8 +9,11 @@
  */
 package org.eclipse.scout.rt.platform.resource;
 
+import java.util.Arrays;
+
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.security.MalwareScanner;
-import org.eclipse.scout.rt.platform.util.HexUtility;
+import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
  * Typically used in combination with {@link MalwareScanner}
@@ -21,34 +24,35 @@ import org.eclipse.scout.rt.platform.util.HexUtility;
  */
 public interface IMimeMagic {
   IMimeMagic AVIF = createMagic(4, "6674797061766966");
-  IMimeMagic DOC_XLS_PPT = createMagic(0, "d0cf11e0a1b11ae1");
-  IMimeMagic DOCX_XLSX_PPTX = createMagic(0, "d0cf11e0a1b11ae1", "504b0304", "504b0506", "504b0708"); // union of DOC_XLS_PPT (used for protected office files) and ZIP (used for non-protected office files)
-  IMimeMagic BMP = createMagic(0, "424d");
-  IMimeMagic EXE_DLL_SYS = createMagic(0, "4d5a", "5a4d");
-  IMimeMagic GIF = createMagic(0, "474946383761", "474946383961");
-  IMimeMagic GZ = createMagic(0, "1f8b");
-  IMimeMagic XZ = createMagic(0, "FD377A585A00");
-  IMimeMagic ICO = createMagic(0, "00000100");
-  IMimeMagic JPEG_JPG = createMagic(0, "ffd8ff");
-  IMimeMagic MKV = createMagic(0, "1a45dfa3");
-  IMimeMagic MP3 = createMagic(0, "494433", "fff2", "fff3", "fffb");
+  IMimeMagic DOC_XLS_PPT = createMagic("d0cf11e0a1b11ae1");
+  IMimeMagic DOCX_XLSX_PPTX = createMagic("d0cf11e0a1b11ae1", "504b0304", "504b0506", "504b0708"); // union of DOC_XLS_PPT (used for protected office files) and ZIP (used for non-protected office files)
+  IMimeMagic BMP = createMagic("424d");
+  IMimeMagic EXE_DLL_SYS = createMagic("4d5a", "5a4d");
+  IMimeMagic GIF = createMagic("474946383761", "474946383961");
+  IMimeMagic GZ = createMagic("1f8b");
+  IMimeMagic XZ = createMagic("FD377A585A00");
+  IMimeMagic ICO = createMagic("00000100");
+  IMimeMagic JPEG_JPG = createMagic("ffd8ff");
+  IMimeMagic MKV = createMagic("1a45dfa3");
+  IMimeMagic MP3 = createMagic("494433", "fff2", "fff3", "fffb");
   IMimeMagic MP4 = createMagic(4, "6674797069736f6d", "667479706D703432");
-  IMimeMagic MSG = createMagic(0, "2320637265617465", "6e616d6573706163", "d0cf11e0a1b11ae1");
-  IMimeMagic PDF = createMagic(0, "25504446");
-  IMimeMagic PNG = createMagic(0, "89504e470d0a1a0a");
-  IMimeMagic TIF_TIFF = createMagic(0, "49492a00", "4d4d002a");
-  IMimeMagic WOFF = createMagic(0, "774f4646", "774f4632");
-  IMimeMagic ZIP = createMagic(0, "504b0304", "504b0506", "504b0708");
-  IMimeMagic HEIC = createMagic(0, "6674797068656963", "667479706d");
-  IMimeMagic RAR = createMagic(0, "526172211A0700", "526172211A070100");
-  IMimeMagic CLASS = createMagic(0, "CAFEBABE");
-  IMimeMagic OGG = createMagic(0, "4F676753");
-  IMimeMagic EML = createMagic(0, "52656365697665643A");
-  IMimeMagic FLV = createMagic(0, "464C56");
-  IMimeMagic MPG = createMagic(0, "47", "000001BA", "000001B3");
-  IMimeMagic FLAC = createMagic(0, "664C6143");
+  IMimeMagic MSG = createMagic("2320637265617465", "6e616d6573706163", "d0cf11e0a1b11ae1");
+  IMimeMagic PDF = createMagic("25504446");
+  IMimeMagic PNG = createMagic("89504e470d0a1a0a");
+  IMimeMagic TIF_TIFF = createMagic("49492a00", "4d4d002a");
+  IMimeMagic WAV = createMagic("52494646XXXXXXXX57415645"); // The first 4 bytes have to be 'RIFF', then 4 bytes are skipped, then the 4 wav magic bytes are expected.
+  IMimeMagic WOFF = createMagic("774f4646", "774f4632");
+  IMimeMagic ZIP = createMagic("504b0304", "504b0506", "504b0708");
+  IMimeMagic HEIC = createMagic("6674797068656963", "667479706d");
+  IMimeMagic RAR = createMagic("526172211A0700", "526172211A070100");
+  IMimeMagic CLASS = createMagic("CAFEBABE");
+  IMimeMagic OGG = createMagic("4F676753");
+  IMimeMagic EML = createMagic("52656365697665643A");
+  IMimeMagic FLV = createMagic("464C56");
+  IMimeMagic MPG = createMagic("47", "000001BA", "000001B3");
+  IMimeMagic FLAC = createMagic("664C6143");
   IMimeMagic TAR = createMagic(257, "7573746172003030", "7573746172202000");
-  IMimeMagic SEVEN_ZIP = createMagic(0, "377ABCAF271C");
+  IMimeMagic SEVEN_ZIP = createMagic("377ABCAF271C");
 
   /**
    * @return The number of bytes of the longest magic number (including offset if present).
@@ -74,19 +78,37 @@ public interface IMimeMagic {
     return res != null && matches(res.getContent());
   }
 
+  /**
+   * @see MagicBytePattern for desciption of the hexMagics parameter.
+   */
+  static IMimeMagic createMagic(String... hexMagics) {
+    return createMagic(0, hexMagics);
+  }
+
+  /**
+   * @see MagicBytePattern for desciption of the hexMagics parameter.
+   */
   static IMimeMagic createMagic(int pos, String... hexMagics) {
-    byte[][] magics = new byte[hexMagics.length][];
-    int maxLen = 0; // longest magic marker
-    for (int i = 0; i < hexMagics.length; i++) {
-      magics[i] = HexUtility.decode(hexMagics[i]);
-      maxLen = Math.max(maxLen, magics[i].length);
-    }
-    int magicsMaxLen = maxLen;
+    return createMagic(Arrays.stream(hexMagics)
+        .map(hexMagic -> new MagicBytePattern(pos, hexMagic))
+        .toArray(MagicBytePattern[]::new));
+  }
+
+  /**
+   * @see MagicBytePattern for desciption of the hexMagics parameter.
+   */
+  static IMimeMagic createMagic(MagicBytePattern... patterns) {
+    Assertions.assertTrue(patterns.length > 0, "At least one pattern must be provided");
+
+    int length = Arrays.stream(patterns)
+        .mapToInt(bytePattern -> bytePattern.getPos() + bytePattern.getLength())
+        .max()
+        .orElseThrow(() -> new ProcessingException("Unreachable, as provided patterns must not be empty")); // longest magic marker
 
     return new IMimeMagic() {
       @Override
       public int length() {
-        return pos + magicsMaxLen;
+        return length;
       }
 
       @Override
@@ -94,25 +116,17 @@ public interface IMimeMagic {
         if (content == null || content.length == 0) {
           return false;
         }
-        for (byte[] magic : magics) {
-          if (content.length < pos + magic.length) {
+        for (MagicBytePattern pattern : patterns) {
+          if (content.length < pattern.getPos() + pattern.getLength()) {
             continue;
           }
-          if (matchesMagic(content, magic)) {
+          if (pattern.matches(content)) {
             return true;
           }
         }
         return false;
       }
-
-      private boolean matchesMagic(byte[] content, byte[] magic) {
-        for (int i = 0; i < magic.length; i++) {
-          if (content[pos + i] != magic[i]) {
-            return false;
-          }
-        }
-        return true;
-      }
     };
   }
 }
+
