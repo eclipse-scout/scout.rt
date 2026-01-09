@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -153,7 +153,7 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
   protected async _tablePageToTableBookmarkPage(page: PageWithTable, childPage?: Page): Promise<TableBookmarkPageDo> {
     let expandedChildRowIdentifier = this._createExpandedTableRowIdentifier(page, childPage);
     let selectedChildRowIdentifiers = this._createSelectedTableRowIdentifiers(page);
-    let searchFilterComplete = true;
+    let searchFilterComplete = !page.searchRequired || page.searchFilterCompleted;
     let searchData = await this._createSearchFilterForBookmark(page);
     let tablePreferences = await this._createTablePreferencesForBookmark(page);
     let chartTableControlConfig = await this._createChartTableControlConfigForBookmark(page);
