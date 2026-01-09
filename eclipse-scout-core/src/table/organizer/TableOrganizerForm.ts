@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, Cell, Column, Event, Form, InitModelOf, MoveTableRowMenuHelper, scout, ShowInvisibleColumnsForm, StringField, strings, Table, TableCompleteCellEditEvent, TableOrganizerFormWidgetMap, TableRow, TableRowModel,
-  TableRowsSelectedEvent, TableStartCellEditEvent, tableUiPreferences, TableUiPreferences, WidgetModel
+  Action, arrays, Cell, Column, Event, Form, InitModelOf, MoveTableRowMenuHelper, scout, ShowInvisibleColumnsForm, StringField, strings, Table, TableColumnStructureChangedEvent, TableCompleteCellEditEvent, TableOrganizerFormWidgetMap,
+  TableRow, TableRowModel, TableRowsSelectedEvent, TableStartCellEditEvent, tableUiPreferences, TableUiPreferences, WidgetModel
 } from '../../index';
 import TableOrganizerFormModel, {ColumnsTable0, ProfilesTable} from './TableOrganizerFormModel';
 
@@ -20,6 +20,8 @@ export class TableOrganizerForm extends Form {
   profilesTable: ProfilesTable;
   columnsTable: ColumnsTable0;
   keyColumn: Column<Column>;
+
+  protected _tableColumnStructureChangedHandler = this._onTableColumnStructureChanged.bind(this);
 
   protected override _jsonModel(): WidgetModel {
     return TableOrganizerFormModel();
@@ -52,6 +54,17 @@ export class TableOrganizerForm extends Form {
     if (strings.startsWith(this.table.userPreferenceContext, `${TableUiPreferences.PROFILE_ID_BOOKMARK}:`)) {
       this.widget('NewConfigMenu').setEnabled(false);
     }
+
+    this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
+  }
+
+  protected override _destroy() {
+    this.table.off('columnStructureChanged', this._tableColumnStructureChangedHandler);
+    super._destroy();
+  }
+
+  protected _onTableColumnStructureChanged(event: TableColumnStructureChangedEvent) {
+    this._reloadColumnsTable();
   }
 
   protected override _load(): JQuery.Promise<any> {
@@ -139,8 +152,6 @@ export class TableOrganizerForm extends Form {
       // Store activated profile as current state
       tableUiPreferences.storeGlobalProfile(this.table);
     }
-
-    this._reloadColumnsTable();
   }
 
   protected _updateConfig(row?: TableRow) {
@@ -253,7 +264,6 @@ export class TableOrganizerForm extends Form {
     let oldColumns = this.table.visibleColumns();
 
     await this.table.organizer.addColumn(arrays.last(this.keyColumn.selectedCellValues()));
-    this._reloadColumnsTable();
 
     // Select inserted columns
     let insertedColumns = arrays.diff(this.table.visibleColumns(), oldColumns);
@@ -263,12 +273,10 @@ export class TableOrganizerForm extends Form {
 
   protected async _onModifyColumnMenuAction(event: Event<Action>) {
     await this.table.organizer.modifyColumn(this.keyColumn.selectedCellValue());
-    this._reloadColumnsTable();
   }
 
   protected _onRemoveColumnMenuAction(event: Event<Action>) {
     this.table.organizer.removeColumns(this.keyColumn.selectedCellValues().filter(column => this._isColumnRemovable(column)));
-    this._reloadColumnsTable();
   }
 
   protected _onColumnsTableRowsSelected(event: TableRowsSelectedEvent) {
