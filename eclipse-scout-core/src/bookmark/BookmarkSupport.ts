@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -502,6 +502,10 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   protected _prepareSearchFilter(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveState: boolean) {
     // Import search data
     page.setSearchFilter(bookmarkPage.searchData, saveState);
+    page.setSearchFilterCompleted(bookmarkPage.searchFilterComplete);
+    if (page.searchFilterCompleted) {
+      page.setSearchRequired(false);
+    }
 
     // Mark page as dirty so ensureChildrenLoaded() will reload the data
     page.childrenLoaded = false;

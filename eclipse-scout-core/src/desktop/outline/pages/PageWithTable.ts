@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,8 +9,8 @@
  */
 import {
   arrays, AutoLeafPageWithNodes, BookmarkSupport, BookmarkTableRowIdentifierDo, dataObjects, DoEntity, Event, EventHandler, Form, InitModelOf, LimitedResultInfoContributionDo, ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel,
-  PropertyChangeEvent, scout, SearchFormTableControl, Status, Table, TableAllRowsDeletedEvent, TableControl, TableMaxResultsHelper, TableOrganizerMenu, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent,
-  TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
+  PropertyChangeEvent, scout, SearchFormTableControl, SearchRequiredTableStatus, Status, Table, TableAllRowsDeletedEvent, TableControl, TableMaxResultsHelper, TableOrganizerMenu, TableReloadEvent, TableReloadReason, TableRow,
+  TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
 } from '../../../index';
 import $ from 'jquery';
 
@@ -19,6 +19,8 @@ export class PageWithTable extends Page implements PageWithTableModel {
   declare eventMap: PageWithTableEventMap;
 
   alwaysCreateChildPage: boolean;
+  searchRequired = false;
+  searchFilterCompleted = false;
 
   protected _tableRowDeleteHandler: EventHandler<TableRowsDeletedEvent | TableAllRowsDeletedEvent>;
   protected _tableRowInsertHandler: EventHandler<TableRowsInsertedEvent>;
@@ -59,6 +61,14 @@ export class PageWithTable extends Page implements PageWithTableModel {
     this.alwaysCreateChildPage = alwaysCreateChildPage;
   }
 
+  setSearchRequired(searchRequired: boolean) {
+    this.searchRequired = searchRequired;
+  }
+
+  setSearchFilterCompleted(searchFilterCompleted: boolean) {
+    this.searchFilterCompleted = searchFilterCompleted;
+  }
+
   protected override _initDetailTable(table: Table) {
     super._initDetailTable(table);
 
@@ -96,12 +106,20 @@ export class PageWithTable extends Page implements PageWithTableModel {
     this.one('propertyChange:detailTable', event => {
       if (event.newValue === table) {
         this._initDetailTableUiPreferences(table);
+        this._initDetailTableSearchRequired();
       }
     });
   }
 
   protected _initDetailTableUiPreferences(table: Table) {
     table.setUiPreferencesEnabled(true);
+  }
+
+  protected _initDetailTableSearchRequired() {
+    if (this.searchRequired && !this.searchFilterCompleted) {
+      this.detailTable?.setTableStatus(SearchRequiredTableStatus.info(this.session.text('TooManyRows')));
+      this.getSearchFormTableControl()?.setSelected(true);
+    }
   }
 
   protected override _destroyDetailTable(table: Table) {
@@ -189,7 +207,8 @@ export class PageWithTable extends Page implements PageWithTableModel {
     searchFormTableControl?.off('reset', this._searchFormTableControlResetHandler);
   }
 
-  protected _onSearchFormTableControlSearch(e: Event<SearchFormTableControl>) {
+  protected _onSearchFormTableControlSearch(event: Event<SearchFormTableControl>) {
+    this.setSearchFilterCompleted(true);
     this.detailTable.reload(Table.ReloadReason.SEARCH);
 
     // close search table control after search if outline is compact, otherwise the search form covers the table
@@ -198,8 +217,19 @@ export class PageWithTable extends Page implements PageWithTableModel {
     }
   }
 
-  protected _onSearchFormTableControlReset(e: Event<SearchFormTableControl>) {
-    this.detailTable.reload(Table.ReloadReason.SEARCH);
+  protected _onSearchFormTableControlReset(event: Event<SearchFormTableControl>) {
+    this._resetTableData();
+  }
+
+  protected _resetTableData() {
+    if (this.searchRequired) {
+      this.detailTable.deleteAllRows();
+      this.setSearchFilterCompleted(false);
+      // Reset table status (otherwise, a previous message such as "limited result" message would remain visible)
+      this.detailTable.setTableStatus(SearchRequiredTableStatus.info(this.session.text('TooManyRows')));
+    } else {
+      this.detailTable.reload(Table.ReloadReason.SEARCH);
+    }
   }
 
   protected _createChildPageInternal(row: TableRow): Page {
@@ -237,6 +267,14 @@ export class PageWithTable extends Page implements PageWithTableModel {
       parent: this.outline,
       row: row
     });
+  }
+
+  override ensureLoadChildren(): JQuery.Promise<any> {
+    if (this.searchRequired && !this.searchFilterCompleted) {
+      this._resetTableData();
+      return $.resolvedPromise();
+    }
+    return super.ensureLoadChildren();
   }
 
   override loadChildren(): JQuery.Promise<any> {

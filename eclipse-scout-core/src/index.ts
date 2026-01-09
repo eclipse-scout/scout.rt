@@ -556,6 +556,7 @@ export * from './table/TableRowTileMappingModel';
 export * from './table/TableRowTileMappingAdapter';
 export * from './table/TableTooltip';
 export * from './table/LimitedResultTableStatus';
+export * from './table/SearchRequiredTableStatus';
 export * from './table/MoveTableRowMenuHelper';
 export * from './table/TableTooltipModel';
 export * from './table/TableUpdateBuffer';
