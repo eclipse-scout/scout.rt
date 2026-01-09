@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -69,6 +69,17 @@ describe('TableOrganizerForm', () => {
       table.columns[0].setHeaderTooltipText('tooltip');
       let form = await openOrganizerForm(table);
       expect(form.columnsTable.columnById('TitleColumn').cellValues()[0]).toBe('tooltip');
+    });
+
+    it('updates the columns table when the organized table is updated', async () => {
+      let table = createTable(3);
+      let form = await openOrganizerForm(table);
+      expect(form.columnsTable.columnById('TitleColumn').cellValues()).toEqual(['col0', 'col1', 'col2']);
+      table.setColumns([table.columns[0], table.columns[2]]);
+      expect(form.columnsTable.columnById('TitleColumn').cellValues()).toEqual(['col0', 'col2']);
+      table.columns[0].setText('foo');
+      table.setColumns([...table.columns]);
+      expect(form.columnsTable.columnById('TitleColumn').cellValues()).toEqual(['foo', 'col2']);
     });
   });
 
