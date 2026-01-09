@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -761,6 +761,12 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, nodeId);
     putCellProperties(jsonEvent, modelNode);
+
+    // do not send the event if it is empty (only contains the nodeId)
+    if (Set.of(PROP_NODE_ID).equals(jsonEvent.keySet())) {
+      return;
+    }
+
     addActionEvent(EVENT_NODE_CHANGED, jsonEvent);
   }
 
