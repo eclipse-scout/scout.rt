@@ -16,6 +16,7 @@ process.on('unhandledRejection', err => {
 });
 
 const yargs = require('yargs');
+const {hideBin} = require('yargs/helpers');
 
 const updateVersionSnapshotDependencies = args => {
   const updateVersion = require('../scripts/update-version');
@@ -76,7 +77,7 @@ const cleanupSnapshots = args => {
 };
 
 // noinspection BadExpressionStatementJS
-yargs
+yargs(hideBin(process.argv))
   .command('$0', 'default', () => {
   }, argv => {
     throw new Error(`Unknown script ${argv._[0]}`);
