@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -139,7 +139,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
   /**
    * Writes the static model to the page instance and initializes the {@link pageParam}.
    * This allows the {@link PageResolver} to find the correct page without having to initialize it completely.
-   *
+   * A page initialized with this method does not need to be destroyed.
    * **Important:** Always use {@link scout.create} to create and initialize page instances. This method is *only* intended to be used for page resolving!
    */
   minimalInit() {
