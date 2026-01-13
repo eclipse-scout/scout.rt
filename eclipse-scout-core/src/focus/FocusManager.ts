@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -77,8 +77,7 @@ export class FocusManager implements FocusManagerOptions {
 
     // Make $entryPoint focusable and install focus context.
     let $mainEntryPoint = this.session.$entryPoint;
-    let portletPartId = $mainEntryPoint.data('partid') || '0';
-    $mainEntryPoint.attr('tabindex', portletPartId);
+    $mainEntryPoint.setTabbable(true);
 
     // Restricted focus gain means that not every click outside of the active element necessarily focuses another element but the active element stays focused
     // See _acceptFocusChangeOnMouseDown for details
