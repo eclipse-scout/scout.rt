@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,6 +39,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HEAD;
 import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.OPTIONS;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -297,6 +298,9 @@ public class ApiDocGenerator {
     }
     if (m.getAnnotation(HEAD.class) != null) {
       return HttpMethod.HEAD;
+    }
+    if (m.getAnnotation(PATCH.class) != null) {
+      return HttpMethod.PATCH;
     }
     return null;
   }
