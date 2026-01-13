@@ -39,6 +39,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HEAD;
 import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.OPTIONS;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -309,6 +310,9 @@ public class ApiDocGenerator {
     }
     if (m.getAnnotation(HEAD.class) != null) {
       return HttpMethod.HEAD;
+    }
+    if (m.getAnnotation(PATCH.class) != null) {
+      return HttpMethod.PATCH;
     }
     return null;
   }
