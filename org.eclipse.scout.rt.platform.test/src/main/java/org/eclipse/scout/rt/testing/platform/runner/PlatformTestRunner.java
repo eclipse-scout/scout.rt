@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -27,7 +28,7 @@ import org.eclipse.scout.rt.testing.platform.runner.statement.ClearThreadInterru
 import org.eclipse.scout.rt.testing.platform.runner.statement.PlatformStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RunContextStatement;
-import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatementFactory;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExceptionStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.TimeoutRunContextStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.TimesStatement;
@@ -215,7 +216,7 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    * @return the head of the chain to be invoked first.
    */
   protected Statement interceptClassLevelStatement(final Statement next, final Class<?> testClass) {
-    final Statement s2 = new SubjectStatement(next, testClass.getAnnotation(RunWithSubject.class));
+    final Statement s2 = BEANS.get(SubjectStatementFactory.class).createSubjectStatement(next, testClass.getAnnotation(RunWithSubject.class));
     final Statement s1 = new RegisterBeanStatement(s2, new BeanMetaData(JUnitExceptionHandler.class).withReplace(true).withOrder(-1000)); // exception handler to not silently swallow handled exceptions.
 
     return s1;
@@ -254,7 +255,7 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    */
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
     final Statement s5 = new ClearThreadInterruptionStatusStatement(next);
-    final Statement s4 = new SubjectStatement(s5, ReflectionUtility.getAnnotation(RunWithSubject.class, testMethod, testClass));
+    final Statement s4 = BEANS.get(SubjectStatementFactory.class).createSubjectStatement(s5, ReflectionUtility.getAnnotation(RunWithSubject.class, testMethod, testClass));
     final Statement s3 = new RegisterBeanStatement(s4, new BeanMetaData(JUnitExceptionHandler.class).withReplace(true).withOrder(-1000)); // exception handler to not silently swallow handled exceptions.
     final Statement s2 = new AssertNoRunningJobsStatement(s3, "Test method");
     final Statement s1 = new TimesStatement(s2, ReflectionUtility.getAnnotation(Times.class, testMethod, testClass));
