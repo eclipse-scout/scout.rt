@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.testing.platform.runner.statement;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -51,6 +52,14 @@ public class SubjectStatement extends Statement {
     }
   }
 
+  protected Statement getNext() {
+    return m_next;
+  }
+
+  protected Subject getSubject() {
+    return m_subject;
+  }
+
   @Override
   public void evaluate() throws Throwable {
     if (m_subject == null) {
@@ -58,8 +67,12 @@ public class SubjectStatement extends Statement {
     }
     else {
       SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
-      RunContexts.copyCurrent().withSubject(m_subject).run(invoker);
+      createRunContext().run(invoker);
       invoker.throwOnError();
     }
+  }
+
+  protected RunContext createRunContext() {
+    return RunContexts.copyCurrent().withSubject(m_subject);
   }
 }
