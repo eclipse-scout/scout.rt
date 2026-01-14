@@ -10,15 +10,15 @@
 package org.eclipse.scout.rt.shared.ui.webresource;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.session.SessionId;
 
 @ApplicationScoped
 public class SessionNonce {
   public String provide() {
-    return provide(ISession.CURRENT.get());
+    return provide(SessionId.CURRENT.get());
   }
 
-  public String provide(ISession session) {
-    return "sessionNonce:" + session.getId();
+  public String provide(String sessionId) {
+    return "sessionNonce:" + sessionId;
   }
 }

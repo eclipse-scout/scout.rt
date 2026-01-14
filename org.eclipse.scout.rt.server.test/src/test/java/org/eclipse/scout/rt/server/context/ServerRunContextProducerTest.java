@@ -9,15 +9,15 @@
  */
 package org.eclipse.scout.rt.server.context;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.shared.user.UserId;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -13,13 +13,14 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.util.LazyValue;
+import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.servicetunnel.ServiceTunnelService;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.session.context.HttpServerSessionRunContextProducer;
 import org.eclipse.scout.rt.server.session.context.ServerSessionRunContext;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.session.SessionId;
 
 @Replace
 public class SessionServiceTunnelService extends ServiceTunnelService {
@@ -30,9 +31,10 @@ public class SessionServiceTunnelService extends ServiceTunnelService {
   protected ServerRunContext createServiceTunnelRunContext(ServiceTunnelRequest serviceRequest) {
     ServerSessionRunContext serverRunContext = (ServerSessionRunContext) super.createServiceTunnelRunContext(serviceRequest);
 
-    if (serviceRequest.getSessionId() != null) {
+    //if (serviceRequest.getSessionId() != null) { // FIXME PBZ SESSION cleanup
+    if (SessionId.CURRENT.get() != null) {
       final HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-      final IServerSession session = m_serverSessionRunContextProducer.get().getOrCreateScoutSession(req, serverRunContext, serviceRequest.getSessionId());
+      final IServerSession session = m_serverSessionRunContextProducer.get().getOrCreateScoutSession(req, serverRunContext, SessionId.CURRENT.get());
       serverRunContext.withSession(session);
     }
     return serverRunContext;

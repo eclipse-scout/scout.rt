@@ -11,14 +11,12 @@ package org.eclipse.scout.rt.testing.server.runner;
 
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.statement.ClientNotificationsStatement;
-import org.eclipse.scout.rt.testing.server.runner.statement.ServerRunContextStatementFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,8 +68,9 @@ public class ServerTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptClassLevelStatement(final Statement next, final Class<?> testClass) {
-    final Statement s3 = BEANS.get(ServerRunContextStatementFactory.class).createServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testClass));
-    final Statement s2 = new ClientNotificationsStatement(s3, ReflectionUtility.getAnnotation(RunWithClientNotifications.class, testClass));
+    //final Statement s3 = BEANS.get(ServerRunContextStatementFactory.class).createServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testClass));
+    // FIXME PBZ SESSION cleanup
+    final Statement s2 = new ClientNotificationsStatement(next, ReflectionUtility.getAnnotation(RunWithClientNotifications.class, testClass));
     final Statement s1 = super.interceptClassLevelStatement(s2, testClass);
 
     return s1;
@@ -83,8 +82,9 @@ public class ServerTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
-    final Statement s3 = BEANS.get(ServerRunContextStatementFactory.class).createServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testMethod, testClass));
-    final Statement s2 = new ClientNotificationsStatement(s3, ReflectionUtility.getAnnotation(RunWithClientNotifications.class, testClass));
+    //final Statement s3 = BEANS.get(ServerRunContextStatementFactory.class).createServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testMethod, testClass));
+    // FIXME PBZ SESSION cleanup
+    final Statement s2 = new ClientNotificationsStatement(next, ReflectionUtility.getAnnotation(RunWithClientNotifications.class, testClass));
     final Statement s1 = super.interceptMethodLevelStatement(s2, testClass, testMethod);
 
     return s1;

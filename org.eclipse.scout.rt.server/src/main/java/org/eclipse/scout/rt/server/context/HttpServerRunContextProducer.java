@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.server.commons.context.HttpRunContextProducer;
 import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.shared.session.SessionId;
-import org.eclipse.scout.rt.shared.session.Sessions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +42,9 @@ public class HttpServerRunContextProducer {
   }
 
   /**
+   * FIXME PBZ SESSION javadoc
    * @return A new {@link ServerRunContext} based on the {@link HttpServletRequest} specified.<br>
-   * If this producer is configured to create sessions, an {@link IServerSession} is created (if not already
+   * If this producer is configured to create sessions, an is created (if not already
    * present) using a new random session id and will be available on the {@link ServerRunContext}.
    */
   public ServerRunContext produce(HttpServletRequest req, HttpServletResponse resp) {
@@ -60,9 +60,9 @@ public class HttpServerRunContextProducer {
    *     The existing {@link ServerRunContext} that should be filled with the values from the
    *     {@link HttpServletRequest} specified. If {@code null}, a new context is created.
    * @return A new {@link ServerRunContext} based on the {@link HttpServletRequest} specified.<br>
-   * If this producer is configured to create sessions, an {@link IServerSession} is created (if not already
+   * If this producer is configured to create sessions, an {@link } is created (if not already
    * present) using the session id specified and will be available on the {@link ServerRunContext}. The created
-   * {@link IServerSession} is bound to the {@link HttpSession} and will be stopped and removed when the
+   * {@link } is bound to the {@link HttpSession} and will be stopped and removed when the
    * {@link HttpSession} is invalidated.
    */
   public ServerRunContext produce(HttpServletRequest req, HttpServletResponse resp, String scoutSessionId, ServerRunContext existingContext) {

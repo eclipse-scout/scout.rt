@@ -11,9 +11,11 @@ package org.eclipse.scout.rt.server.context;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.security.IAccessControlService;
+import org.eclipse.scout.rt.shared.user.UserId;
 
 /**
  * FIXME PBZ SESSION update javadoc
