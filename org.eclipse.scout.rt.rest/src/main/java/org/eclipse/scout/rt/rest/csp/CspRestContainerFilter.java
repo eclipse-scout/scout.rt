@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.security.csp.ContentSecurityPolicy;
 
 public class CspRestContainerFilter implements IRestContainerResponseFilter {
 
-  private final LazyValue<String> m_blockAllCsp = new LazyValue<>(() -> BEANS.get(BlockAllContentSecurityPolicy.class).toToken());
+  private final LazyValue<String> m_blockAllCsp = new LazyValue<>(() -> createRestPolicy().toToken());
 
   @Override
   public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
@@ -34,5 +34,9 @@ public class CspRestContainerFilter implements IRestContainerResponseFilter {
 
   protected boolean isCspHeaderPresent(ContainerResponseContext responseContext) {
     return responseContext.containsHeaderString(ContentSecurityPolicy.HTTP_HEADER, v -> true /* accept any value */);
+  }
+
+  protected ContentSecurityPolicy createRestPolicy() {
+    return BEANS.get(BlockAllContentSecurityPolicy.class);
   }
 }

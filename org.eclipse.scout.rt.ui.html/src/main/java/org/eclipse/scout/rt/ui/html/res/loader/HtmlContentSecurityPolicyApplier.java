@@ -25,6 +25,9 @@ public class HtmlContentSecurityPolicyApplier {
   private final Map<String /* pathInfo */, ContentSecurityPolicy> m_cspCache = new ConcurrentHashMap<>();
 
   public void applyCsp(String pathInfo, String nonce, HttpServletResponse response) {
+    if (response == null) {
+      return; // cannot set a CSP without response
+    }
     if (!BEANS.get(ContentSecurityPolicy.class).isEnabled(pathInfo)) {
       return;
     }

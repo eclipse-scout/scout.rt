@@ -80,6 +80,8 @@ import org.eclipse.scout.rt.rest.RestApplicationScope;
 import org.eclipse.scout.rt.rest.RestApplicationScopes;
 import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.security.IAccessControlService;
+import org.eclipse.scout.rt.security.csp.BlockAllContentSecurityPolicy;
+import org.eclipse.scout.rt.security.csp.ContentSecurityPolicy;
 
 /**
  * Usage in a REST resource:
@@ -451,6 +453,9 @@ public class ApiDocGenerator {
     // Main HTML content
     final IHtmlDocument html = toHtml(scope, getResourceDescriptors());
     return Response.ok()
+        .header(ContentSecurityPolicy.HTTP_HEADER, BEANS.get(BlockAllContentSecurityPolicy.class)
+            .withStyleSrc(ContentSecurityPolicy.EXPRESSION_SELF)
+            .toToken())
         .type(IRestMediaType.TEXT_HTML_UTF8)
         .entity(html.toHtml())
         .build();
@@ -567,8 +572,7 @@ public class ApiDocGenerator {
             HTML.tag("link")
                 .addAttribute("rel", "stylesheet")
                 .addAttribute("type", "text/css")
-                .addAttribute("href", "?" + STATIC_RESOURCE_PARAM + "=doc.css"),
-            HTML.tag("script").addAttribute("src", "?" + STATIC_RESOURCE_PARAM + "=doc.js")),
+                .addAttribute("href", "?" + STATIC_RESOURCE_PARAM + "=doc.css")),
         HTML.body(
             HTML.h1(title),
             scopeLinks,

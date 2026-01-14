@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
-
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -98,7 +96,7 @@ public class HtmlFileLoader extends AbstractResourceLoader {
       return null; // not handled here
     }
 
-    HttpServletResponse resp = assertNotNull(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
+    HttpServletResponse resp = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
     HtmlDocumentParserParameters params = createHtmlDocumentParserParameters(pathInfo);
     HtmlDocumentParser parser = createHtmlDocumentParser(params);
     byte[] parsedDocument = parser.parseDocument(IOUtility.readFromUrl(url));
