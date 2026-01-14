@@ -16,9 +16,11 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -26,8 +28,10 @@ import java.util.UUID;
 
 import org.eclipse.scout.rt.dataobject.fixture.CollectionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.EntityMapperFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ListEntityContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.OtherEntityMapperFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.SimpleFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.CustomerFixtureDo;
 import org.eclipse.scout.rt.dataobject.testing.TestingDataObjectHelper;
@@ -411,6 +415,46 @@ public class DataObjectHelperTest {
     assertFalse(testObj.otherEntities().get(1).id().exists());
     assertTrue(testObj.otherEntities().get(1).nestedOtherEntity().exists());
     assertFalse(testObj.otherEntities().get(1).nestedOtherEntity().get().id().exists());
+  }
+
+  @Test
+  public void testEqualityAfterCleaning_DoSet() {
+    EntityMapperFixtureDo testObj1 = BEANS.get(EntityMapperFixtureDo.class)
+        .withId("1")
+        .withEntitySet(BEANS.get(OtherEntityMapperFixtureDo.class).withId(null));
+
+    EntityMapperFixtureDo testObj2 = BEANS.get(EntityMapperFixtureDo.class)
+        .withId("1")
+        .withEntitySet(BEANS.get(OtherEntityMapperFixtureDo.class).withId(null));
+
+    assertEquals(testObj1, testObj2);
+    assertEquals(testObj1.getEntitySet(), testObj2.getEntitySet());
+    m_helper.clean(testObj1);
+    m_helper.clean(testObj2);
+    assertEquals(testObj1, testObj2);
+    assertEquals(testObj1.getEntitySet(), testObj2.getEntitySet());
+  }
+
+  @Test
+  public void testEqualityAfterCleaning_DoCollection() {
+    EntityMapperFixtureDo testObj1 = BEANS.get(EntityMapperFixtureDo.class);
+    // setup DoCollection attribute using a LinkedHashSet internally
+    Collection<OtherEntityMapperFixtureDo> col1 = new LinkedHashSet<>();
+    col1.add(BEANS.get(OtherEntityMapperFixtureDo.class).withId(null));
+    testObj1.putCollection(testObj1.entityCollection().getAttributeName(), col1);
+
+    EntityMapperFixtureDo testObj2 = BEANS.get(EntityMapperFixtureDo.class);
+    // setup DoCollection attribute using a LinkedHashSet internally
+    Collection<OtherEntityMapperFixtureDo> col2 = new LinkedHashSet<>();
+    col2.add(BEANS.get(OtherEntityMapperFixtureDo.class).withId(null));
+    testObj2.putCollection(testObj1.entityCollection().getAttributeName(), col2);
+
+    assertEquals(testObj1, testObj2);
+    assertEquals(testObj1.getEntityCollection(), testObj2.getEntityCollection());
+    m_helper.clean(testObj1);
+    m_helper.clean(testObj2);
+    assertEquals(testObj1, testObj2);
+    assertEquals(testObj1.getEntityCollection(), testObj2.getEntityCollection());
   }
 
   @Test

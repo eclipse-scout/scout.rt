@@ -23,6 +23,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.dataobject.DataObjectHelperTest.FixtureDoEntity;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
 import org.junit.Test;
@@ -434,6 +436,7 @@ public class DoCollectionTest {
 
     assertEquals(collection1, collection2); // order of elements is not relevant for equality
     assertEquals(collection2, collection1);
+    //noinspection EqualsWithItself
     assertEquals(collection1, collection1);
     assertEquals(collection1.hashCode(), collection2.hashCode());
 
@@ -445,7 +448,66 @@ public class DoCollectionTest {
     assertEquals(collection1.hashCode(), collection2.hashCode());
 
     assertNotEquals(null, collection1);
+    //noinspection MisorderedAssertEqualsArguments
     assertNotEquals(collection1, new Object());
+  }
+
+  @Test
+  public void testEqualsHashCode_manipulatedArrayList() {
+    DoCollection<FixtureDoEntity> col1 = DoCollection.of(new ArrayList<>());
+    col1.add(BEANS.get(FixtureDoEntity.class).withName("foo"));
+
+    DoCollection<FixtureDoEntity> col2 = DoCollection.of(new ArrayList<>());
+    col2.add(BEANS.get(FixtureDoEntity.class).withName("foo"));
+
+    assertEquals(col1, col2);
+    assertEquals(col1.hashCode(), col2.hashCode());
+    assertTrue(col1.contains(col2.iterator().next()));
+    assertTrue(col2.contains(col1.iterator().next()));
+
+    // manipulate nested dataobject, this causes the hashCode of nested object to change which corrupts internal LinkedHashSet structure
+    col1.iterator().next().withName(null);
+    col2.iterator().next().withName(null);
+
+    assertEquals(col1, col2);
+    assertEquals(col1.hashCode(), col2.hashCode());
+    assertTrue(col1.contains(col2.iterator().next()));
+    assertTrue(col2.contains(col1.iterator().next()));
+
+    // equality of internal LinkedHashSet is not given
+    assertEquals(col1.get(), col2.get());
+    assertEquals(col1.get().hashCode(), col2.get().hashCode());
+    assertTrue(col1.get().contains(col2.get().iterator().next()));
+    assertTrue(col2.get().contains(col1.get().iterator().next()));
+  }
+
+  @Test
+  public void testEqualsHashCode_manipulatedHashSet() {
+    DoCollection<FixtureDoEntity> col1 = DoCollection.of(new LinkedHashSet<>());
+    col1.add(BEANS.get(FixtureDoEntity.class).withName("foo"));
+
+    DoCollection<FixtureDoEntity> col2 = DoCollection.of(new LinkedHashSet<>());
+    col2.add(BEANS.get(FixtureDoEntity.class).withName("foo"));
+
+    assertEquals(col1, col2);
+    assertEquals(col1.hashCode(), col2.hashCode());
+    assertTrue(col1.contains(col2.iterator().next()));
+    assertTrue(col2.contains(col1.iterator().next()));
+
+    // manipulate nested dataobject, this causes the hashCode of nested object to change which corrupts internal LinkedHashSet structure
+    col1.iterator().next().withName(null);
+    col2.iterator().next().withName(null);
+
+    assertEquals(col1, col2);
+    assertEquals(col1.hashCode(), col2.hashCode());
+    assertTrue(col1.contains(col2.iterator().next()));
+    assertTrue(col2.contains(col1.iterator().next()));
+
+    // equality of internal LinkedHashSet is not given
+    assertNotEquals(col1.get(), col2.get());
+    assertEquals(col1.get().hashCode(), col2.get().hashCode());
+    assertFalse(col1.get().contains(col2.get().iterator().next()));
+    assertFalse(col2.get().contains(col1.get().iterator().next()));
   }
 
   @Test

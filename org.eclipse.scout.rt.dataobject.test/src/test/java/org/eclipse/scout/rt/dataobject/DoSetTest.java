@@ -21,6 +21,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.dataobject.DataObjectHelperTest.FixtureDoEntity;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
 import org.junit.Test;
@@ -371,6 +373,7 @@ public class DoSetTest {
 
     assertEquals(set1, set2); // order of elements is not relevant for equality
     assertEquals(set2, set1);
+    //noinspection EqualsWithItself
     assertEquals(set1, set1);
     assertEquals(set1.hashCode(), set2.hashCode());
 
@@ -382,7 +385,38 @@ public class DoSetTest {
     assertEquals(set1.hashCode(), set2.hashCode());
 
     assertNotEquals(null, set1);
+    //noinspection MisorderedAssertEqualsArguments
     assertNotEquals(set1, new Object());
+  }
+
+  @Test
+  public void testEqualsHashCode_manipulated() {
+    DoSet<FixtureDoEntity> set1 = new DoSet<>();
+    set1.add(BEANS.get(FixtureDoEntity.class).withName("foo"));
+
+    DoSet<FixtureDoEntity> set2 = new DoSet<>();
+    set2.add(BEANS.get(FixtureDoEntity.class).withName("foo"));
+
+    assertEquals(set1, set2);
+    assertEquals(set1.hashCode(), set2.hashCode());
+    assertTrue(set1.contains(set2.iterator().next()));
+    assertTrue(set2.contains(set1.iterator().next()));
+
+
+    // manipulate nested dataobject, this causes the hashCode of nested object to change which corrupts internal LinkedHashSet structure
+    set1.iterator().next().withName(null);
+    set2.iterator().next().withName(null);
+
+    assertEquals(set1, set2);
+    assertEquals(set1.hashCode(), set2.hashCode());
+    assertTrue(set1.contains(set2.iterator().next()));
+    assertTrue(set2.contains(set1.iterator().next()));
+
+    // equality of internal LinkedHashSet is not given
+    assertNotEquals(set1.get(), set2.get());
+    assertEquals(set1.get().hashCode(), set2.get().hashCode());
+    assertFalse(set1.get().contains(set2.get().iterator().next()));
+    assertFalse(set2.get().contains(set1.get().iterator().next()));
   }
 
   @Test

@@ -11,14 +11,24 @@ package org.eclipse.scout.rt.dataobject;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
  * Wrapper for a generic collection of values of type {@code V} inside a {@link DoEntity} object. As opposed to
  * {@link DoList}, no order is guaranteed here and as opposed to {@link DoSet} it may contain duplicates.
  * {@link DataObjectHelper#normalize(IDataObject)} may be used to apply a deterministic order to {@link DoCollection}.
+ *
+ * <p>Note: {@link DoCollection} is backed by a {@link Collection} instance. If a {@link Set} implementation
+ * is used as nested type, great care must be exercised if mutable objects are used as set elements.
+ * The behavior of a set is not specified if the value of an object is changed in a manner that affects {
+ * @code equals} comparisons while the object is an element in the set. See javadoc of {@link Set} for further details.<br>
+ * {@link DoCollection} guarantees correct equality {@link DoCollection#equals(Object)}),
+ * hashcode ({@link DoCollection#hashCode()}) and contains ({@link DoSet#contains(Object)}) operations
+ * if used as {@link DoCollection} wrapper and not using the wrapped {@link Collection} instance directly.
  *
  * @param <V>
  *     If instances within collection are {@link Comparable}, they must be mutually comparable (required for order
@@ -55,6 +65,14 @@ public final class DoCollection<V> extends AbstractDoCollection<V, Collection<V>
   @Override
   public void set(Collection<V> newValue) {
     super.set(emptyCollectionIfNull(newValue));
+  }
+
+  @Override
+  public boolean contains(V item) {
+    if (!exists()) {
+      return false;
+    }
+    return get().stream().anyMatch(i -> ObjectUtility.equals(i, item));
   }
 
   @Override
