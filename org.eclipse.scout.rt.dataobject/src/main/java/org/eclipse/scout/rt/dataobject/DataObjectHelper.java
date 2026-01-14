@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -324,6 +325,30 @@ public class DataObjectHelper {
       // (2) clean all contributions (i.e. itself implementations of DoEntity)
       //noinspection deprecation
       caseDoEntityContributions(entity.getAllContributions());
+    }
+
+    @Override
+    protected void caseDoSet(DoSet<?> doSet) {
+      super.caseDoSet(doSet);
+      cleanSet(doSet.get());
+    }
+
+    @Override
+    protected void caseDoCollection(DoCollection<?> doCollection) {
+      super.caseDoCollection(doCollection);
+      if (doCollection.get() instanceof Set<?> set) {
+        cleanSet(set);
+      }
+    }
+
+    /**
+     * Reset {@link Set} by clear and re-adding all elements to recreate internal {@link LinkedHashSet} structure
+     * after manipulating nested data objects (which corrupts internal hash-code based {@link LinkedHashSet}).
+     */
+    protected <V> void cleanSet(Set<V> set) {
+      Set<V> copy = new HashSet<>(set);
+      set.clear();
+      set.addAll(copy);
     }
   }
 

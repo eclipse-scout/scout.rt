@@ -9,13 +9,25 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
+
 /**
  * Wrapper for a generic set of values of type {@code V} inside a {@link DoEntity} object.
  * {@link DataObjectHelper#normalize(IDataObject)} may be used to apply a deterministic order to {@link DoSet}.
+ *
+ * <p>Note: {@link DoSet} is backed by a {@link Set}, therefore great care must be exercised if mutable objects
+ * are used as set elements. The behavior of a set is not specified if the value of an object is changed in
+ * a manner that affects {@code equals} comparisons while the object is an element in the set. See javadoc
+ * of {@link Set} for further details.<br>
+ * {@link DoSet} guarantees correct equality {@link DoSet#equals(Object)}), hashcode ({@link DoSet#hashCode()})
+ * and contains ({@link DoSet#contains(Object)}) operations if used as {@link DoSet} wrapper and not using the
+ * wrapped {@link Set} instance directly.
  *
  * @param <V>
  *     If instances within set are {@link Comparable}, they must be mutually comparable (required for order
@@ -53,7 +65,28 @@ public final class DoSet<V> extends AbstractDoCollection<V, Set<V>> {
     super.set(emptySetIfNull(newValue));
   }
 
-  // LinkedHashSet already implemented hashCode/equals without considering element position, thus no need to override valueHashCode/valueEquals.
+  @Override
+  public boolean contains(V item) {
+    if (!exists()) {
+      return false;
+    }
+    return get().stream().anyMatch(i -> ObjectUtility.equals(i, item));
+  }
+
+  // LinkedHashSet already implements hashCode without considering element position, thus no need to override valueHashCode.
+
+  /**
+   * Use CollectionUtility.equalsCollection which implements iterator-based equality, instead of {@link LinkedHashSet#equals(Object)}
+   * which uses containsAll-based equality based on hashCode of contained objects which may be corrupted by mutating nested data objects.
+   */
+  @Override
+  protected boolean valueEquals(DoNode other) {
+    if (!exists() && !other.exists()) {
+      return true;
+    }
+    //noinspection unchecked
+    return CollectionUtility.equalsCollection(get(), (Collection<V>) other.get(), false);
+  }
 
   @Override
   public String toString() {
