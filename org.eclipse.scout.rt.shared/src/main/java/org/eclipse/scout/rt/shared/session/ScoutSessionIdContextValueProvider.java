@@ -34,8 +34,6 @@ public class ScoutSessionIdContextValueProvider implements IDiagnosticContextVal
 
   @Override
   public String value() {
-    return "MOCK SESSION ID"; // FIXME PBZ SESSION change to SessionId.CURRENT.get()
-//    final ISession session = ISession.CURRENT.get();
-//    return session != null ? session.getId() : null;
+    return SessionId.CURRENT.get();
   }
 }
