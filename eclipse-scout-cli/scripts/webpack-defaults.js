@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,6 +16,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const {CycloneDxWebpackPlugin} = require('@cyclonedx/webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const AfterEmitWebpackPlugin = require('./AfterEmitWebpackPlugin');
+const KeepNonceVariablePlugin = require('./KeepNonceVariablePlugin');
 const {SourceMapDevToolPlugin, WatchIgnorePlugin, ProgressPlugin} = require('webpack');
 const ts = require('typescript');
 
@@ -410,6 +411,11 @@ function libraryConfig(config, options = {}) {
     }
     return plugin;
   });
+
+  // Do NOT replace '__webpack_nonce__' for libraries as it should only be replaced for browser builds.
+  // Otherwise, the final build targeting the browser cannot find '__webpack_nonce__' (as it has already been replaced in the first run).
+  // If it is not replaced in the final build, the nonce is set to the wrong '__webpack_require__' instance which lets all dynamic import() statements fail.
+  plugins.push(new KeepNonceVariablePlugin());
 
   return {
     ...config,
