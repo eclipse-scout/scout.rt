@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,7 @@ const jquery = require.resolve('jquery');
 const scoutBuildConstants = require('./constants');
 const {SourceMapDevToolPlugin} = require('webpack');
 const StatsExtractWebpackPlugin = require('./StatsExtractWebpackPlugin');
+const KeepNonceVariablePlugin = require('./KeepNonceVariablePlugin');
 
 module.exports = (config, specEntryPoint) => {
   const webpackConfigFilePath = path.resolve('webpack.config.js');
@@ -72,6 +73,9 @@ module.exports = (config, specEntryPoint) => {
     delete sourceMapPlugin.sourceMapFilename;
   }
   webpackConfig.plugins.push(new StatsExtractWebpackPlugin()); // used by scout-scripts to access the webpack build result.
+
+  // nonce-variable must always be processed as the build-output is used in the browser
+  webpackConfig.plugins = webpackConfig.plugins.filter(p => !(p instanceof KeepNonceVariablePlugin));
 
   const specIndex = searchSpecEntryPoint(specEntryPoint);
   const preprocessorObj = {};
