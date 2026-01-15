@@ -31,6 +31,7 @@
 *.psd binary
 *.ttf binary
 *.vsd binary
+*.wasm binary
 *.woff binary
 *.woff2 binary
 *.xls binary
