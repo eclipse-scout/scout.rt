@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -114,11 +114,25 @@ public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNE
     extensionRegistry.runInContext(m_extensionContext, runnable);
   }
 
-  private List<EXTENSION> loadExtensions(EXTENSION localExtension) {
+  protected List<EXTENSION> loadExtensions(EXTENSION localExtension) {
     List<EXTENSION> extensions = BEANS.get(IInternalExtensionRegistry.class).createExtensionsFor(m_owner);
     if (extensions.isEmpty()) {
       return Collections.singletonList(localExtension);
     }
+    // use size-dependent impl(s) to reduce heap size (especially List12 seems interesting but also ListN shows some minor improvement)
+    else if (extensions.size() == 1) {
+      return List.of(extensions.get(0), localExtension);
+    }
+    else if (extensions.size() == 2) {
+      return List.of(extensions.get(0), extensions.get(1), localExtension);
+    }
+    else if (extensions.size() == 3) {
+      return List.of(extensions.get(0), extensions.get(1), extensions.get(2), localExtension);
+    }
+    else if (extensions.size() == 4) {
+      return List.of(extensions.get(0), extensions.get(1), extensions.get(2), extensions.get(3), localExtension);
+    }
+    // for larger lists just make it unmodifiable
     extensions.add(localExtension);
     return Collections.unmodifiableList(extensions);
   }
