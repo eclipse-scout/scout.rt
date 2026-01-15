@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -667,7 +667,7 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
   public void pushExtensions(List<? extends IExtension<?>> extensions) {
     ExtensionStack extensionStack = m_extensionStack.get();
     if (extensionStack == null) {
-      extensionStack = new ExtensionStack();
+      extensionStack = createExtensionStack();
       m_extensionStack.set(extensionStack);
     }
     extensionStack.pushExtensions(extensions);
@@ -705,6 +705,10 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
     if (scopeStack.isEmpty()) {
       m_scopeStack.remove();
     }
+  }
+
+  protected ExtensionStack createExtensionStack() {
+    return new ExtensionStack();
   }
 
   @Override
