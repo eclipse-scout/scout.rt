@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.shared.extension;
 
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,10 +53,6 @@ public class ExtensionStack {
     return m_extensions.isEmpty();
   }
 
-  /**
-   * @param declaringClass
-   * @return
-   */
   public Object findContextObjectByClass(Class<?> declaringClass) {
     for (List<? extends IExtension<?>> segment : m_extensions) {
       for (IExtension<?> modelExtension : segment) {
@@ -69,7 +64,10 @@ public class ExtensionStack {
     return null;
   }
 
+  /**
+   * Create an unmodifiable snapshot of the current state which can be used to re-create an equal, modifiable {@link ExtensionStack} using {@link ExtensionStack#ExtensionStack(List)}.
+   */
   public List<List<? extends IExtension<?>>> snapshot() {
-    return new ArrayList<>(m_extensions);
+    return List.copyOf(m_extensions);
   }
 }
