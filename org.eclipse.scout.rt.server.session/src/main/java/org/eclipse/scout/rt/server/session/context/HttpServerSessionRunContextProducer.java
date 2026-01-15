@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,16 +16,16 @@ import jakarta.servlet.http.HttpSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.server.context.HttpServerRunContextProducer;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.session.IServerSessionLifecycleHandler;
 import org.eclipse.scout.rt.server.session.ServerSessionCache;
 import org.eclipse.scout.rt.server.session.ServerSessionLifecycleHandler;
-import org.eclipse.scout.rt.shared.session.Sessions;
+import org.eclipse.scout.rt.shared.session.SessionId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,7 +126,7 @@ public class HttpServerSessionRunContextProducer extends HttpServerRunContextPro
         return scoutSessionId;
       }
 
-      scoutSessionId = Sessions.randomSessionId();
+      scoutSessionId = SessionId.randomSessionId();
       httpSession.setAttribute(SCOUT_SESSION_ID_KEY, scoutSessionId);
       return scoutSessionId;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.session.context.ServerSessionRunContexts;
+import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.session.Sessions;
 
 /**
@@ -48,7 +49,7 @@ public class ServerSessionProvider {
    * Creates and initializes a new {@link IServerSession} with data as specified by the given {@link ServerRunContext}.
    *
    * @param sessionId
-   *     unique session ID, or <code>null</code> to use a random id (see {@link Sessions#randomSessionId()}).
+   *     unique session ID, or <code>null</code> to use a random id (see {@link SessionId#randomSessionId()}).
    * @param serverRunContext
    *     applied during session start.
    * @return the new session, is not <code>null</code>.
@@ -65,7 +66,7 @@ public class ServerSessionProvider {
    * Creates and initializes a new {@link IServerSession} with data as specified by the given {@link ServerRunContext}.
    *
    * @param sessionId
-   *     unique session ID, or <code>null</code> to use a random id (see {@link Sessions#randomSessionId()}).
+   *     unique session ID, or <code>null</code> to use a random id (see {@link SessionId#randomSessionId()}).
    * @param serverRunContext
    *     applied during session start.
    * @return the new session or {@code null} if no session class could be found.
@@ -73,7 +74,7 @@ public class ServerSessionProvider {
    *     if session creation failed.
    */
   public <SESSION extends IServerSession> SESSION opt(final String sessionId, final ServerRunContext serverRunContext) {
-    final String sid = sessionId != null ? sessionId : Sessions.randomSessionId();
+    final String sid = sessionId != null ? sessionId : SessionId.randomSessionId();
 
     // Create the session with the given context applied.
     return serverRunContext
