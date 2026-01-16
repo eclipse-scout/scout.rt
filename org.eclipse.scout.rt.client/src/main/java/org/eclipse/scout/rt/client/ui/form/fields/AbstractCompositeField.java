@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,6 +15,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -144,14 +145,18 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   @Override
   public void addField(IFormField f) {
-    CompositeFieldUtility.addField(f, this, getFieldsInternal());
+    List<IFormField> writableFields = new LinkedList<>(getFieldsInternal());
+    CompositeFieldUtility.addField(f, this, writableFields);
+    propertySupport.setPropertyNoFire(PROP_FIELDS, writableFields);
     addChildFieldPropertyChangeListener(f);
     handleFieldsChanged();
   }
 
   @Override
   public void removeField(IFormField f) {
-    CompositeFieldUtility.removeField(f, this, getFieldsInternal());
+    List<IFormField> writableFields = new LinkedList<>(getFieldsInternal());
+    CompositeFieldUtility.removeField(f, this, writableFields);
+    propertySupport.setPropertyNoFire(PROP_FIELDS, writableFields);
     removeChildFieldPropertyChangeListener(f);
     handleFieldsChanged();
   }
