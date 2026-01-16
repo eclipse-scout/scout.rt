@@ -63,6 +63,18 @@ public class MultipartMessage {
   protected String m_boundary; // cached boundary in case #toEntity is called multiple times
   protected MediaType m_mediaType = DEFAULT_MIME_TYPE;
 
+  public void ensureBoundary() {
+    if (m_boundary == null) {
+      // create a new unique boundary if it wasn't already cached before for this multipart message
+      m_boundary = BEANS.get(IUuidProvider.class).createUuid().toString().replace("-", "");
+    }
+  }
+
+  public String getBoundary() {
+    ensureBoundary();
+    return m_boundary;
+  }
+
   public MultipartMessage addPart(MultipartPart part) {
     m_parts.add(part);
     return this;
@@ -93,10 +105,7 @@ public class MultipartMessage {
   }
 
   protected MediaType createMultipartMediaType() {
-    if (m_boundary == null) {
-      // create a new unique boundary if it wasn't already cached before for this multipart message
-      m_boundary = BEANS.get(IUuidProvider.class).createUuid().toString().replace("-", "");
-    }
+    ensureBoundary();
     return new MediaType(getMediaType().getType(), getMediaType().getSubtype(), CollectionUtility.hashMap(ImmutablePair.of(BOUNDARY_PARAMETER, m_boundary)));
   }
 
