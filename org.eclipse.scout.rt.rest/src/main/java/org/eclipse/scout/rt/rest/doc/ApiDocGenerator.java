@@ -525,7 +525,7 @@ public class ApiDocGenerator {
                       HTML.div(
                           HTML.span("(" + CollectionUtility.format(r.getScopes()) + ")").cssClass("scope"),
                           HTML.span(r.getPath()).cssClass("resource"),
-                          HTML.span(StringUtility.box("/", m.getPath(), "")).cssClass("method")).cssClass("path").toggleCssClass("not-api-exposed", readAllApiDocGranted && !m.isApiExposed()))
+                          HTML.span(StringUtility.box("/", m.getPath(), "")).cssClass("method")).cssClass("path"))
                   .cssClass("header"),
               HTML.div(
                       HTML.div(HTML.raw(m.getDescription().toHtml())).cssClass("description"),
@@ -533,7 +533,8 @@ public class ApiDocGenerator {
                       HTML.div(
                               StringUtility.hasText(m.getConsumes()) ? HTML.div(HTML.span("Consumes ").cssClass("k"), HTML.span(m.getConsumes()).cssClass("v")).cssClass("line") : null,
                               StringUtility.hasText(m.getProduces()) ? HTML.div(HTML.span("Produces ").cssClass("k"), HTML.span(m.getProduces()).cssClass("v")).cssClass("line") : null)
-                          .cssClass("consumes-produces"))
+                          .cssClass("consumes-produces"),
+                      readAllApiDocGranted && !m.isApiExposed() ? HTML.div("Operation is not exposed (not external accessible).").cssClass("not-api-exposed") : null)
                   .cssClass("body"))
           .cssClass("operation")));
     });
@@ -746,6 +747,7 @@ public class ApiDocGenerator {
   }
 
   protected String toJsonString(List<ResourceDescriptor> resourceDescriptors) {
+    boolean readAllApiDocGranted = isReadAllApiDocGranted();
     List<IDoEntity> jsonMethods = resourceDescriptors.stream()
         .flatMap(r -> r.getMethods().stream()
             .map(m -> BEANS.get(DoEntityBuilder.class)
@@ -757,7 +759,7 @@ public class ApiDocGenerator {
                 .put("signature", m.getSignature().toString())
                 .putIf("consumes", m.getConsumes(), Objects::nonNull)
                 .putIf("produces", m.getProduces(), Objects::nonNull)
-                .putIf("apiExposed", m.isApiExposed(), v -> !v)
+                .putIf("apiExposed", m.isApiExposed(), v -> readAllApiDocGranted)
                 .build()))
         .collect(Collectors.toList());
     return BEANS.get(IPrettyPrintDataObjectMapper.class).writeValue(jsonMethods);
