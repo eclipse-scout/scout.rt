@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,6 +28,9 @@ public abstract class AbstractLookupRowDo<ID> extends DoEntity {
   public static final String ENABLED = "enabled";
   public static final String ACTIVE = "active";
   public static final String ICON_ID = "iconId";
+  public static final String CSS_CLASS = "cssClass";
+  public static final String TOOLTIP_TEXT = "tooltipText";
+  public static final String ADDITIONAL_TABLE_ROW_DATA = "additionalTableRowData";
 
   protected AbstractLookupRowDo() {
     withEnabled(true); // lookup rows are enabled by default
@@ -53,15 +56,15 @@ public abstract class AbstractLookupRowDo<ID> extends DoEntity {
   }
 
   public DoValue<String> cssClass() {
-    return doValue("cssClass");
+    return doValue(CSS_CLASS);
   }
 
   public DoValue<String> tooltipText() {
-    return doValue("tooltipText");
+    return doValue(TOOLTIP_TEXT);
   }
 
   public DoValue<IDoEntity> additionalTableRowData() {
-    return doValue("additionalTableRowData");
+    return doValue(ADDITIONAL_TABLE_ROW_DATA);
   }
 
   /* **************************************************************************
