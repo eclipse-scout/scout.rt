@@ -10,18 +10,17 @@
 package org.eclipse.scout.rt.ui.html.csp;
 
 import java.io.IOException;
-import java.io.Reader;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.security.csp.ContentSecurityPolicy;
+import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.UiServlet;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +39,6 @@ public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequest
   private static final Logger LOG = LoggerFactory.getLogger(ContentSecurityPolicyReportHandler.class);
 
   private static final String HANDLER_PATH = "/" + ContentSecurityPolicy.REPORT_URL;
-  private static final int MAX_CSP_REPORT_DATA_LENGTH = 8 * 1024;
 
   @Override
   public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
@@ -48,31 +46,17 @@ public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequest
     if (!StringUtility.endsWith(req.getPathInfo(), HANDLER_PATH)) {
       return false;
     }
-    log(getReport(req));
+    logReport(req);
     return true;
   }
 
-  protected String getReport(final HttpServletRequest req) throws IOException {
-    try (Reader in = req.getReader()) {
-      String cspReportData = IOUtility.readString(in, MAX_CSP_REPORT_DATA_LENGTH);
-      if (in.read() != -1) {
-        cspReportData += "... [only first " + MAX_CSP_REPORT_DATA_LENGTH + " bytes shown]";
-      }
-      else {
-        // Format JSON
-        try {
-          JSONObject json = new JSONObject(cspReportData);
-          cspReportData = json.toString(2);
-        }
-        catch (RuntimeException e) {
-          LOG.trace("Error while converting CSP report to JSON", e);
-        }
-      }
-      return cspReportData;
+  protected void logReport(HttpServletRequest req) throws IOException {
+    if (LOG.isInfoEnabled()) {
+      LOG.info("CSP-REPORT: {}", getReport(req));
     }
   }
 
-  protected void log(final String report) {
-    LOG.info("CSP-REPORT: {}", report);
+  protected String getReport(HttpServletRequest req) throws IOException {
+    return BEANS.get(HttpServletControl.class).getCspReport(req);
   }
 }

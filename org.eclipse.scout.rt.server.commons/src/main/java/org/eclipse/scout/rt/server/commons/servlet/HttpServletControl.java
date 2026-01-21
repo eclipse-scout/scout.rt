@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.io.Serializable;
 
 import jakarta.annotation.PostConstruct;
@@ -18,8 +20,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.security.csp.BlockAllContentSecurityPolicy;
 import org.eclipse.scout.rt.security.csp.ContentSecurityPolicy;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Add default (security) handling to servlets
@@ -33,9 +39,11 @@ import org.eclipse.scout.rt.security.csp.ContentSecurityPolicy;
 public class HttpServletControl implements Serializable {
 
   private static final long serialVersionUID = 1L;
+  private static final Logger LOG = LoggerFactory.getLogger(HttpServletControl.class);
 
   public static final String HTTP_HEADER_X_FRAME_OPTIONS = "X-Frame-Options";
   public static final String SAMEORIGIN = "SAMEORIGIN";
+  public static final int MAX_CSP_REPORT_DATA_LENGTH = 8 * 1024;
 
   /**
    * The X-Content-Type-Options response HTTP header is a marker used by the server to indicate that the MIME types
@@ -99,5 +107,43 @@ public class HttpServletControl implements Serializable {
   public boolean isCspEnabled(HttpServletRequest req) {
     String pathInfo = req.getPathInfo();
     return BEANS.get(ContentSecurityPolicy.class).isEnabled(pathInfo);
+  }
+
+  /**
+   * @see #getCspReport(HttpServletRequest, int)
+   */
+  public String getCspReport(HttpServletRequest req) throws IOException {
+    return getCspReport(req, MAX_CSP_REPORT_DATA_LENGTH);
+  }
+
+  /**
+   * Reads a CSP report JSON from the given {@link HttpServletRequest}.
+   *
+   * @param req
+   *     The request to read the JSON (sent by browsers using POST).
+   * @param maxLen
+   *     The max length of the data to read.
+   * @return The JSON sent by the browser.
+   * @throws IOException
+   *     In case there is an I/O error reading from the request.
+   */
+  public String getCspReport(HttpServletRequest req, int maxLen) throws IOException {
+    try (Reader in = req.getReader()) {
+      String cspReportData = IOUtility.readString(in, maxLen);
+      if (in.read() != -1) {
+        cspReportData += "... [only first " + maxLen + " bytes shown]";
+      }
+      else {
+        // Format JSON if json is complete
+        try {
+          JSONObject json = new JSONObject(cspReportData);
+          cspReportData = json.toString(2);
+        }
+        catch (RuntimeException e) {
+          LOG.trace("Error while converting CSP report to JSON", e);
+        }
+      }
+      return cspReportData;
+    }
   }
 }
