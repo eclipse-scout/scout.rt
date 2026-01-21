@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.Application
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformVersionProperty;
 import org.eclipse.scout.rt.platform.opentelemetry.IHistogramViewHintProvider;
 import org.eclipse.scout.rt.platform.opentelemetry.IMetricProvider;
+import org.eclipse.scout.rt.platform.opentelemetry.OpenTelemetryProperties.OpenTelemetryTracingEnabledProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +114,7 @@ public class OpenTelemetryInitializer implements IPlatformListener {
     defaultConfig.put("otel.exporter.otlp.protocol", "http/protobuf");
 
     // Traces
-    defaultConfig.put("otel.traces.exporter", defaultExporter);
+    defaultConfig.put("otel.traces.exporter", CONFIG.getPropertyValue(OpenTelemetryTracingEnabledProperty.class).booleanValue() ? defaultExporter : "none");
 
     // Metrics
     defaultConfig.put("otel.metrics.exporter", defaultExporter);
