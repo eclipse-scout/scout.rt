@@ -23,7 +23,7 @@ public class ProxyIgnoreProperty extends AbstractStringListConfigProperty {
     return "Configure the proxy ignore list for the ConfigurableProxySelector. If an URI matches the pattern no proxy connection is used.\n"
         + "By default no proxy is configured.\n"
         + "Example:\n"
-        + "scout.http.ignoreProxyPatterns[0]=https?://localhost(?::\\d+)?(?:/.*)?\n"
+        + "scout.http.ignoreProxyPatterns[0]=https?://localhost(?::\\\\d+)?(?:/.*)?\n"
         + "scout.http.ignoreProxyPatterns[1]=...";
   }
 }

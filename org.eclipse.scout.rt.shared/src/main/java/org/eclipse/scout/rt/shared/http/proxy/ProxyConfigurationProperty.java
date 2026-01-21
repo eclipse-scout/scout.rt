@@ -29,9 +29,9 @@ public class ProxyConfigurationProperty extends AbstractStringListConfigProperty
             The property value is of the format REGEXP_FOR_URI=PROXY_HOST:PROXY_PORT
             Alternatively also a proxy type can be defined (must be a type of the enum %s) using this format REGEXP_FOR_URI=PROXY_TYPE=PROXY_HOST:PROXY_PORT
             Example:
-            scout.http.proxyPatterns[0]=.*\\.example.com(:\\d+)?=127.0.0.1:8888
-            scout.http.proxyPatterns[1]=.*\\.example.org(:\\d+)?=proxy.example.com:8080\
-            scout.http.proxyPatterns[2]=.*\\.example.net(:\\d+)?=SOCKS=proxy.example.com:1080""",
+            scout.http.proxyPatterns[0]=.*\\\\.example\\\\.com(:\\\\d+)?=127.0.0.1:8888
+            scout.http.proxyPatterns[1]=.*\\\\.example\\\\.org(:\\\\d+)?=proxy.example.com:8080
+            scout.http.proxyPatterns[2]=.*\\\\.example\\\\.net(:\\\\d+)?=SOCKS=proxy.example.com:1080""",
         ConfigurableProxySelector.class.getSimpleName(),
         Proxy.Type.class.getName());
   }
