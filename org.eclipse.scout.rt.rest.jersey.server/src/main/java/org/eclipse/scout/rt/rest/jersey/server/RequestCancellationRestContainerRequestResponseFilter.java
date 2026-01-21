@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -111,6 +111,11 @@ public class RequestCancellationRestContainerRequestResponseFilter implements IR
 
     @Override
     public void close() throws IOException {
+      if (Thread.interrupted()) {
+        // even if our application did run interrupted we should return to normal operation now before close (required as application server session manager may need non-interrupted state)
+        LOG.debug("Reset interrupted state - {}", m_requestId);
+      }
+
       try {
         m_out.close();
       }
