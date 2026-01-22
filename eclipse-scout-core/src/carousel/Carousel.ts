@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -225,6 +225,10 @@ export class Carousel extends Widget implements CarouselModel {
       let minPositionX = this.$container.width() - this.$carouselFilmstrip.width();
       let containerWidth = this.$container.width();
       $window.on('mousemove.carouselDrag touchmove.carouselDrag', event => {
+        if (!this.rendered) {
+          return;
+        }
+
         let pageX = events.pageX(event);
         let moveX = pageX - origPageX;
         let positionX = origPosition + moveX;
@@ -240,6 +244,10 @@ export class Carousel extends Widget implements CarouselModel {
       });
       $window.on('mouseup.carouselDrag touchend.carouselDrag touchcancel.carouselDrag', e => {
         $window.off('.carouselDrag');
+        if (!this.rendered) {
+          return;
+        }
+
         // show only whole items
         let mod = this.positionX % containerWidth;
         let newCurrentItem = this.currentItem;
