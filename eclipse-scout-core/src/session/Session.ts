@@ -1287,16 +1287,27 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
   }
 
-  listen(): JQuery.Deferred<string[], never, never> {
+  listen(): JQuery.Promise<string[]> {
     if (!this._deferred) {
       this._deferred = $.Deferred();
       this._deferredEventTypes = [];
     }
-    return this._deferred;
+    return this._deferred.promise();
+  }
+
+  /**
+   * @returns a promise that is resolved when pending requests are finished or if there are no requests pending and no events queued.
+   */
+  whenRequestsDone(): JQuery.Promise<string[]> {
+    if (this.areRequestsPending() || this.areEventsQueued()) {
+      return this.listen();
+    }
+    return $.resolvedPromise([]);
   }
 
   /**
    * Executes the given callback when pending requests are finished, or immediately if there are no requests pending.
+   *
    * @param func callback function
    * @param vararg arguments to pass to the callback function
    */
