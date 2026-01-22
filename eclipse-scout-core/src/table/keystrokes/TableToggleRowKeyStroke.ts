@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -32,6 +32,6 @@ export class TableToggleRowKeyStroke extends KeyStroke {
     let selectedRows = this.field.selectedRows.filter(row => row.enabled);
     // Toggle checked state to 'true', except if every row is already checked
     let checked = selectedRows.some(row => !row.checked);
-    selectedRows.forEach(row => this.field.checkRow(row, checked));
+    this.field.checkRows(selectedRows, {checked});
   }
 }
