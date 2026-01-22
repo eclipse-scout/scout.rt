@@ -63,7 +63,7 @@ public class DataObjectMigrationHandlerCompletenessTestSupport extends AbstractC
   }
 
   @Override
-  protected String getErrorTitle() {
+  public String getErrorTitle() {
     return "No DoStructureMigrationHandlerCompletenessTest found for the following files";
   }
 }

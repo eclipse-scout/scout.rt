@@ -56,7 +56,7 @@ public class ApiExposedAnnotationTestSupport extends AbstractCompletenessTestSup
   }
 
   @Override
-  protected String getErrorTitle() {
+  public String getErrorTitle() {
     return "No ApiExposedAnnotationTest found for the following files:";
   }
 }
