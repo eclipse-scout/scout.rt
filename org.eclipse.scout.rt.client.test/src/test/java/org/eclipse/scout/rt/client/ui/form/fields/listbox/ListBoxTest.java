@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,11 +12,13 @@ package org.eclipse.scout.rt.client.ui.form.fields.listbox;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
+import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.LongStream;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -55,7 +57,7 @@ public class ListBoxTest extends AbstractListBox<Long> {
 
   @BeforeClass
   public static void beforeClass() {
-    m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(ListBoxLookupCall.class));
+    m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(ListBoxLookupCall.class), new BeanMetaData(LargeSetLookupCall.class));
   }
 
   @AfterClass
@@ -175,6 +177,17 @@ public class ListBoxTest extends AbstractListBox<Long> {
     assertEquals("a", listBox.getCheckedRowsString());
   }
 
+  @Test(timeout = 5_000)
+  public void testSetLargeSet() {
+    LargeSetListBox listBox = new LargeSetListBox();
+    listBox.init();
+
+    Set<Long> largeSet = LongStream
+        .rangeClosed(1, 10_000)
+        .collect(HashSet::new, HashSet::add, AbstractCollection::addAll);
+    listBox.setValue(largeSet);
+  }
+
   public class ValidatingListBox extends AbstractListBox<String> {
 
     @Override
@@ -258,6 +271,26 @@ public class ListBoxTest extends AbstractListBox<Long> {
       result.add(new LookupRow<>("f", "F"));
       result.add(new LookupRow<>("g", "G"));
       return result;
+    }
+  }
+
+  public static class LargeSetListBox extends AbstractListBox<Long> {
+
+    @Override
+    protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
+      return LargeSetLookupCall.class;
+    }
+  }
+
+  public static class LargeSetLookupCall extends LocalLookupCall<Long> {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    protected List<? extends ILookupRow<Long>> execCreateLookupRows() {
+      return LongStream
+          .rangeClosed(1, 10_000)
+          .mapToObj(v -> new LookupRow<>(v, String.valueOf(v)))
+          .collect(() -> new ArrayList<LookupRow<Long>>(), ArrayList::add, AbstractCollection::addAll);
     }
   }
 }
