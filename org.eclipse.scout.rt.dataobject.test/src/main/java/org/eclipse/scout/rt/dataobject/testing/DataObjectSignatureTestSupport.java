@@ -58,7 +58,7 @@ public class DataObjectSignatureTestSupport extends AbstractCompletenessTestSupp
   }
 
   @Override
-  protected String getErrorTitle() {
+  public String getErrorTitle() {
     return "No DataObjectSignatureTest found for the following files";
   }
 }

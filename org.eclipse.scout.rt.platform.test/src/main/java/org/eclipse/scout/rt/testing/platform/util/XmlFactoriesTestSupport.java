@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.util.XmlUtility;
-import org.junit.Assert;
 
 /**
  * Testing helper class to detect XXE vulnerabilities because of direct use of the corresponding JRE factories instead
@@ -32,7 +31,7 @@ import org.junit.Assert;
  * @see <a href="https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html">XML
  * External Entity Prevention Cheat Sheet</a>
  */
-public class XmlFactoriesTestSupport {
+public class XmlFactoriesTestSupport implements ITestSupportFailOnError {
 
   private final List<Pattern> m_searchPatterns;
   private final List<Pattern> m_pathExclusions;
@@ -91,22 +90,9 @@ public class XmlFactoriesTestSupport {
     });
   }
 
+  @Override
   public List<String> getErrorMessages() {
     return Collections.unmodifiableList(m_errMessages);
-  }
-
-  public void failOnError() {
-    List<String> err = getErrorMessages();
-    if (err.isEmpty()) {
-      return;
-    }
-    StringBuilder sb = new StringBuilder();
-    sb.append(err.get(0));
-    for (int i = 1; i < err.size(); i++) {
-      sb.append("\n").append(err.get(i));
-    }
-    String message = sb.toString();
-    Assert.fail(message);
   }
 
   private void checkFile(Path path) throws IOException {

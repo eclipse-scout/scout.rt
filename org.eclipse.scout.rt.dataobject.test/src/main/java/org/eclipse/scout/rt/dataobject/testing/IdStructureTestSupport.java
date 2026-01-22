@@ -62,7 +62,7 @@ public class IdStructureTestSupport extends AbstractCompletenessTestSupport {
   }
 
   @Override
-  protected String getErrorTitle() {
+  public String getErrorTitle() {
     return "No IdStructureTest found for the following files:";
   }
 }

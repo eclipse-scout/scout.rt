@@ -24,11 +24,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.junit.Assert;
+import org.eclipse.scout.rt.platform.Bean;
 
-@ApplicationScoped
-public abstract class AbstractCompletenessTestSupport {
+@Bean
+public abstract class AbstractCompletenessTestSupport implements ITestSupportIsExcluded, ITestSupportFailOnError {
 
   protected Path m_root;
 
@@ -67,6 +66,7 @@ public abstract class AbstractCompletenessTestSupport {
     m_errMessages = new ArrayList<>();
   }
 
+  @Override
   public Path getRoot() {
     return m_root;
   }
@@ -93,6 +93,11 @@ public abstract class AbstractCompletenessTestSupport {
 
   public void addPathExclusion(Path path) {
     m_pathExclusions.add(path);
+  }
+
+  @Override
+  public List<Path> getPathExclusions() {
+    return m_pathExclusions;
   }
 
   /**
@@ -204,40 +209,14 @@ public abstract class AbstractCompletenessTestSupport {
     m_errMessages.add(message);
   }
 
-  protected boolean isExcluded(Path path) {
-    if (getRoot().getNameCount() >= path.getNameCount()) {
-      return false;
-    }
-    Path subpath = path.subpath(getRoot().getNameCount(), path.getNameCount());
-    for (Path pathExclusion : m_pathExclusions) {
-      if (subpath.endsWith(pathExclusion)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
+  @Override
   public List<String> getErrorMessages() {
     return Collections.unmodifiableList(m_errMessages);
-  }
-
-  public void failOnError() {
-    List<String> err = getErrorMessages();
-    if (err.isEmpty()) {
-      return;
-    }
-    StringBuilder sb = new StringBuilder();
-    sb.append(getErrorTitle()).append("\n");
-    sb.append(err.get(0));
-    for (int i = 1; i < err.size(); i++) {
-      sb.append("\n").append(err.get(i));
-    }
-    String message = sb.toString();
-    Assert.fail(message);
   }
 
   /**
    * Title text for the error message when the test fails
    */
-  protected abstract String getErrorTitle();
+  @Override
+  public abstract String getErrorTitle();
 }
