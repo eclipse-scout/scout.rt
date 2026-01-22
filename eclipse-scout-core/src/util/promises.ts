@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -140,11 +140,11 @@ export class Deferred<T> {
     this._reject = reject;
   });
 
-  resolve(value: T) {
+  resolve(value?: T) {
     this._resolve(value);
   }
 
-  reject(reason: any) {
+  reject(reason?: any) {
     this._reject(reason);
   }
 
