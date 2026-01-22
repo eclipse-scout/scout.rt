@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnCompleteEditChain;
@@ -1437,24 +1438,25 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public List<ITableRow> findRows(Collection<? extends VALUE> values) {
-    if (values != null) {
-      List<ITableRow> foundRows = new ArrayList<>();
-      for (int i = 0; i < m_table.getRowCount(); i++) {
-        ITableRow row = m_table.getRow(i);
-        if (ObjectUtility.isOneOf(getValue(row), values)) {
-          foundRows.add(row);
-        }
-      }
-      return foundRows;
+    if (values == null) {
+      return CollectionUtility.emptyArrayList();
     }
-    return CollectionUtility.emptyArrayList();
+
+    Set<VALUE> valueSet = new HashSet<>(values);
+    List<ITableRow> foundRows = new ArrayList<>();
+
+    for (ITableRow row : m_table.getRows()) {
+      if (valueSet.contains(getValue(row))) {
+        foundRows.add(row);
+      }
+    }
+    return foundRows;
   }
 
   @Override
   public List<ITableRow> findRows(VALUE value) {
     List<ITableRow> foundRows = new ArrayList<>();
-    for (int i = 0; i < m_table.getRowCount(); i++) {
-      ITableRow row = m_table.getRow(i);
+    for (ITableRow row : m_table.getRows()) {
       if (ObjectUtility.equals(value, getValue(row))) {
         foundRows.add(row);
       }
@@ -1464,8 +1466,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public ITableRow findRow(VALUE value) {
-    for (int i = 0, ni = m_table.getRowCount(); i < ni; i++) {
-      ITableRow row = m_table.getRow(i);
+    for (ITableRow row : m_table.getRows()) {
       if (ObjectUtility.equals(value, getValue(row))) {
         return row;
       }
@@ -1475,11 +1476,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public boolean contains(VALUE value) {
-    for (int i = 0, ni = m_table.getRowCount(); i < ni; i++) {
-      ITableRow row = m_table.getRow(i);
-      if (ObjectUtility.equals(value, getValue(row))) {
-        return true;
-      }
+    if (findRow(value) != null) {
+      return true;
     }
     return false;
   }
@@ -1491,12 +1489,13 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public boolean isEmpty() {
-    if (m_table != null) {
-      for (int i = 0, ni = m_table.getRowCount(); i < ni; i++) {
-        Object value = getValue(m_table.getRow(i));
-        if (value != null) {
-          return false;
-        }
+    if (m_table == null) {
+      return true;
+    }
+    for (ITableRow row : m_table.getRows()) {
+      Object value = getValue(row);
+      if (value != null) {
+        return false;
       }
     }
     return true;
