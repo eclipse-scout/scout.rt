@@ -225,12 +225,12 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * @param param Specifies the starting point and the page path to activate from there
    * @param options Optional settings to change the behavior of this method
    */
-  activateBookmarkPath(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): JQuery.Promise<void> {
+  activateBookmarkPath(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): JQuery.Promise<ActivateBookmarkPathResult> {
     return $.when(this._activateBookmarkPathAsync(param, options));
   }
 
   // Native-promise version of activateBookmarkPath()
-  protected async _activateBookmarkPathAsync(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): Promise<void> {
+  protected async _activateBookmarkPathAsync(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): Promise<ActivateBookmarkPathResult> {
     try {
       if (this.loading) {
         // noinspection ExceptionCaughtLocallyJS
@@ -238,7 +238,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       }
       this.setLoading(true);
       try {
-        await this._activateBookmarkPath(param, options);
+        return this._activateBookmarkPath(param, options);
       } finally {
         this.setLoading(false);
       }
@@ -250,7 +250,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
   }
 
-  protected async _activateBookmarkPath(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): Promise<void> {
+  protected async _activateBookmarkPath(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): Promise<ActivateBookmarkPathResult> {
     // Check if we are already on the correct outline
     let outline = param.parentOutline || param.parentPage?.outline;
     if (!outline || !outline.visible || !outline.enabled) {
@@ -286,28 +286,37 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       this._applyBookmarkPage(parentPage, parentBookmarkPage, false);
     }
 
-    if (arrays.empty(param.pagePath)) {
-      this._revealPage(parentPage);
-      return; // done!
-    }
+    let pagePath = param.pagePath;
+    if (arrays.hasElements(pagePath)) {
+      pagePath = pagePath.slice(); // create copy because array is altered
 
-    let pagePath = param.pagePath.slice(); // create copy because array is altered
-    while (arrays.hasElements(pagePath)) {
-      let bookmarkPage = pagePath[0];
-      let page = await this._resolvePage(outline, parentPage, parentBookmarkPage, bookmarkPage, options);
+      while (arrays.hasElements(pagePath)) {
+        let bookmarkPage = pagePath[0];
+        let page = await this._resolvePage(outline, parentPage, parentBookmarkPage, bookmarkPage, options);
 
-      if (!page) {
-        break; // no child page found matching the given bookmarkPage
+        if (!page) {
+          break; // no child page found matching the given bookmarkPage
+        }
+        if (!(page instanceof PageWithTable || page instanceof PageWithNodes) && options?.hybridActivation) {
+          // child page is a remote page -> return early, without revealing the page and marking it as an error -> caller will handle the rest
+          return {
+            targetOutline: outline,
+            targetPage: page,
+            targetBookmarkPage: bookmarkPage,
+            remainingPagePath: pagePath.slice(1)
+          };
+        }
+
+        await this._applyBookmarkPageAndReload(page, bookmarkPage, false);
+
+        parentPage = page;
+        parentBookmarkPage = bookmarkPage;
+        pagePath.shift();
       }
-
-      await this._applyBookmarkPageAndReload(page, bookmarkPage, false);
-
-      parentPage = page;
-      parentBookmarkPage = bookmarkPage;
-      pagePath.shift();
     }
 
-    if (!parentPage) {
+    if (!parentPage && arrays.hasElements(pagePath)) {
+      // No page was found
       throw BookmarkSupport.ERROR_PAGE_NOT_FOUND;
     }
 
@@ -315,14 +324,24 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
     if (arrays.hasElements(pagePath) && scout.nvl(options?.resetViewAndWarnOnFail, true)) {
       // Path not fully restored
-      parentPage.detailTable.setTableStatus(Status.error(this.session.text('BookmarkResolutionCanceled')));
+      parentPage?.detailTable?.setTableStatus(Status.error(this.session.text('BookmarkResolutionCanceled')));
     }
+
+    return {
+      targetOutline: outline,
+      targetPage: parentPage,
+      targetBookmarkPage: parentBookmarkPage,
+      remainingPagePath: pagePath
+    };
   }
 
   protected async _resolvePage(outline: Outline, parentPage: Page, parentBookmarkPage: IBookmarkPageDo, bookmarkPage: IBookmarkPageDo, options?: ActivateBookmarkOptions): Promise<Page> {
     if (!parentPage) {
       // Lookup top-level page by page param
       return outline.nodes.find(node => node.matchesPageParam(bookmarkPage.pageParam));
+    }
+    if (!(parentPage instanceof PageWithTable || parentPage instanceof PageWithNodes)) {
+      return null; // remote page -> cannot be handled in ui
     }
 
     await parentPage.ensureLoadChildren();
@@ -450,6 +469,10 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   protected async _applyBookmarkPageAndReload(page: Page, bookmarkPage: IBookmarkPageDo, saveState = true): Promise<void> {
+    if (!(page instanceof PageWithTable || page instanceof PageWithNodes)) {
+      return; // remote page -> cannot be handled in ui
+    }
+
     this._applyBookmarkPage(page, bookmarkPage, saveState);
 
     await page.ensureLoadChildren();
@@ -569,17 +592,40 @@ export interface ActivateBookmarkPathParam {
 
 export interface ActivateBookmarkOptions {
   /**
-   * Specifies whether the target outline should be activated. The default value is `true`.
+   * Specifies whether the target outline should be activated.
+   *
+   * Default is true.
    */
   activateOutline?: boolean;
   /**
    * If `true`, the user is warned when the bookmark could not be opened. Useful when a persisted bookmark is activated.
-   * The default value is `true`.
+   *
+   * Default is true.
    */
   resetViewAndWarnOnFail?: boolean;
   /**
    * Specifies whether runtime errors should be handled (e.g. by showing a message). The promise will still be rejected.
-   * The default value is `true`.
+   *
+   * Default is true.
    */
   handleErrors?: boolean;
+  /**
+   * Specifies whether the bookmark activation was triggered from the UI server. In that case, the activation stops
+   * when a remote page is encountered (i.e. one that is only a "Page", not a PageWithTable or a PageWithNodes) and
+   * the remaining page path is returned as a result, so the activation can continue on the UI server.
+   *
+   * Default is false.
+   */
+  hybridActivation?: boolean;
+}
+
+/**
+ * The result of a bookmark path activation. Contains the last page that was successfully resolved. If the path could
+ * not be fully resolved, the remaining page datas are returned as well.
+ */
+export interface ActivateBookmarkPathResult {
+  targetOutline?: Outline;
+  targetPage?: Page;
+  targetBookmarkPage?: IBookmarkPageDo;
+  remainingPagePath?: IBookmarkPageDo[];
 }
