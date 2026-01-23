@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -81,7 +81,6 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   nodeWidth: number;
   maxNodeWidth: number;
   nodeWidthDirty: boolean;
-  requestFocusOnNodeControlMouseDown: boolean;
   initialTraversing: boolean;
   defaultMenuTypes: string[];
   $data: JQuery;
@@ -173,7 +172,6 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     this.nodeWidthDirty = false;
     this.$data = null;
     this._scrollDirections = 'both';
-    this.requestFocusOnNodeControlMouseDown = true;
     this.defaultMenuTypes = [Tree.MenuType.EmptySpace];
     this._$mouseDownNode = null;
   }
@@ -441,10 +439,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       .on('focus', this._onFocus.bind(this))
       .on('mousedown', '.tree-node', this._onNodeMouseDown.bind(this))
       .on('mouseup', '.tree-node', this._onNodeMouseUp.bind(this))
-      .on('dblclick', '.tree-node', this._onNodeDoubleClick.bind(this))
-      .on('mousedown', '.tree-node-control', this._onNodeControlMouseDown.bind(this))
-      .on('mouseup', '.tree-node-control', this._onNodeControlMouseUp.bind(this))
-      .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this));
+      .on('dblclick', '.tree-node', this._onNodeDoubleClick.bind(this));
     aria.role(this.$data, 'tree');
     HtmlComponent.install(this.$data, this.session);
 
@@ -2904,6 +2899,12 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       // if node does not belong to this tree, do nothing (may happen if another tree is embedded inside the node)
       return;
     }
+
+    if (this._isNodeControl($(event.target))) {
+      this._onNodeControlMouseDown(event);
+      return;
+    }
+
     this._$mouseDownNode = $node;
     $node.window().one('mouseup', () => {
       this._$mouseDownNode = null;
@@ -2918,7 +2919,6 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       }
       this.checkNode(node, !node.checked);
     }
-    return true;
   }
 
   /** @internal */
@@ -2938,7 +2938,6 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     this.trigger('nodeClick', {
       node: node
     });
-    return true;
   }
 
   protected _isCheckboxClicked(event: JQuery.MouseDownEvent): boolean {
@@ -3458,7 +3457,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   }
 
   protected _onNodeDoubleClick(event: JQuery.DoubleClickEvent) {
-    if (this.isBreadcrumbStyleActive()) {
+    if (this.isBreadcrumbStyleActive() || this._isNodeControl($(event.target))) {
       return;
     }
 
@@ -3481,14 +3480,12 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     }
   }
 
-  protected _onNodeControlMouseDown(event: JQuery.MouseDownEvent): boolean {
-    this._doubleClickSupport.mousedown(event);
-    if (this._doubleClickSupport.doubleClicked()) {
-      // don't execute on double click events
-      return false;
-    }
+  protected _isNodeControl($target: JQuery): boolean {
+    return $target.hasClass('tree-node-control');
+  }
 
-    let $node = $(event.currentTarget).parent();
+  protected _onNodeControlMouseDown(event: JQuery.MouseDownEvent): boolean {
+    let $node = $(event.currentTarget);
     let node = $node.data('node') as TreeNode;
     let expanded = !$node.hasClass('expanded');
     let expansionOpts: TreeNodeExpandOptions = {
@@ -3507,27 +3504,8 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
         return false;
       }
     }
-    // Because we suppress handling by browser we have to set focus manually
-    if (this.requestFocusOnNodeControlMouseDown) {
-      this.focus();
-    }
     this.selectNodes(node); // <---- ### 1
     this.setNodeExpanded(node, expanded, expansionOpts); // <---- ### 2
-    // prevent bubbling to _onNodeMouseDown()
-    $.suppressEvent(event);
-
-    // ...but return true, so Outline.js can override this method and check if selection has been changed or not
-    return true;
-  }
-
-  protected _onNodeControlMouseUp(event: JQuery.MouseUpEvent): boolean {
-    // prevent bubbling to _onNodeMouseUp()
-    return false;
-  }
-
-  protected _onNodeControlDoubleClick(event: JQuery.DoubleClickEvent): boolean {
-    // prevent bubbling to _onNodeDoubleClick()
-    return false;
   }
 
   protected _onContextMenu(event: JQuery.ContextMenuEvent) {
