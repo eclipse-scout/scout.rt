@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1849,6 +1849,52 @@ describe('Tree', () => {
     });
   });
 
+  describe('node control mouse down', () => {
+    beforeEach(() => {
+      $('<style>' +
+        '.tree-node {position: relative;}' +
+        '.tree-node-control {position: absolute; height: 100%; width: 4px;}' +
+        '</style>').appendTo($('#sandbox'));
+    });
+
+    it('expands or collapses the node', () => {
+      let model = helper.createModelFixture(1, 1, false);
+      let tree = helper.createTree(model);
+      tree.render();
+
+      let $nodeControl = tree.$container.find('.tree-node-control:first');
+      let $node = $nodeControl.parent();
+      expect($node).not.toHaveClass('expanded');
+
+      JQueryTesting.triggerMouseDown($nodeControl);
+      expect($node).toHaveClass('expanded');
+
+      JQueryTesting.triggerMouseDown($nodeControl);
+      expect($node).toHaveClass('expanded'); // Double click support prevents immediate second execution
+
+      tree._doubleClickSupport._lastTimestamp -= 5000; // simulate last click 5 seconds ago
+
+      JQueryTesting.triggerMouseDown($nodeControl);
+      expect($node).not.toHaveClass('expanded');
+    });
+
+    it('does not stop event propagation', () => {
+      session.$entryPoint[0].focus();
+      expect(session.$entryPoint).toBeFocused();
+
+      let model = helper.createModelFixture(1, 1, false);
+      let tree = helper.createTree(model);
+      tree.render();
+
+      let bubbled = false;
+      session.$entryPoint.one('mousedown', () => bubbled = true);
+
+      let $nodeControl = tree.nodes[0].$node.children('.tree-node-control');
+      JQueryTesting.triggerMouseDown($nodeControl);
+      expect(bubbled).toBe(true);
+    });
+  });
+
   describe('node control double click', () => {
     it('does the same as control single click (does NOT expand and immediately collapse again)', () => {
       let model = helper.createModelFixture(1, 1, false);
@@ -1862,7 +1908,6 @@ describe('Tree', () => {
       JQueryTesting.triggerDoubleClick($nodeControl);
       expect($node).toHaveClass('expanded');
 
-      // Reset internal state because there is no "sleep" in JS
       tree._doubleClickSupport._lastTimestamp -= 5000; // simulate last click 5 seconds ago
 
       JQueryTesting.triggerDoubleClick($nodeControl);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,7 +14,6 @@ export class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, P
   protected override _createContent(): Tree {
     let tree = scout.create(Tree, {
       parent: this,
-      requestFocusOnNodeControlMouseDown: false,
       scrollToSelection: true,
       textFilterEnabled: false
     });

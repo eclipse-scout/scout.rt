@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -859,9 +859,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   protected _onRowDoubleClick(event: JQuery.DoubleClickEvent) {
-    let $row = $(event.currentTarget),
-      column = this._columnAtX(event.pageX);
-
+    let $row = $(event.currentTarget);
+    let column = this._columnAtX(event.pageX);
     this.doRowAction($row.data('row'), column);
   }
 
