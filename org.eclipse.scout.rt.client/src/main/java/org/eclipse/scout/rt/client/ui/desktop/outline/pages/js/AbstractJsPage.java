@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.api.data.page.IPageParamDo;
 import org.eclipse.scout.rt.api.data.page.IdPageParamDo;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
@@ -106,27 +107,31 @@ public abstract class AbstractJsPage extends AbstractPage<ITable> implements IJs
 
   @Override
   public void loadChildPages(List<IPageParamDo> pageParams, boolean replace) {
+    IOutline outline = getOutline();
+    if (outline == null) {
+      return;
+    }
     try {
-      getOutline().setTreeChanging(true);
+      outline.setTreeChanging(true);
       setChildrenLoaded(false);
       fireBeforeDataLoaded();
       try {
         if (replace) {
-          getOutline().removeAllChildNodes(this);
-          getOutline().addChildNodes(this, createChildPages(pageParams));
+          outline.removeAllChildNodes(this);
+          outline.addChildNodes(this, createChildPages(pageParams));
         }
         else {
           List<IPage<?>> childPages = createChildPages(pageParams);
 
           List<IPage<?>> childPagesToRemove = getChildPages();
           childPagesToRemove.removeAll(childPages);
-          getOutline().removeChildNodes(this, childPagesToRemove);
+          outline.removeChildNodes(this, childPagesToRemove);
 
           List<IPage<?>> childPagesToAdd = CollectionUtility.arrayList(childPages);
           childPagesToAdd.removeAll(getChildPages());
-          getOutline().addChildNodes(this, childPagesToAdd);
+          outline.addChildNodes(this, childPagesToAdd);
 
-          getOutline().updateChildNodeOrder(this, childPages);
+          outline.updateChildNodeOrder(this, childPages);
         }
       }
       finally {
@@ -136,7 +141,7 @@ public abstract class AbstractJsPage extends AbstractPage<ITable> implements IJs
       setChildrenDirty(false);
     }
     finally {
-      getOutline().setTreeChanging(false);
+      outline.setTreeChanging(false);
     }
   }
 
