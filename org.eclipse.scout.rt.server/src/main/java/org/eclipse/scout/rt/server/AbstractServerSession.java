@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import java.util.concurrent.Callable;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
@@ -202,9 +203,10 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   protected void cancelRunningJobs() {
+    RunContext currentRunContext = RunContext.CURRENT.get();
     // cancel requests of this session.
     BEANS.get(RestRequestCancellationRegistry.class)
-        .cancel(runContext -> runContext instanceof ServerRunContext && ((ServerRunContext) runContext).getSession() == AbstractServerSession.this);
+        .cancel(runContext -> runContext != currentRunContext && runContext instanceof ServerRunContext && ((ServerRunContext) runContext).getSession() == AbstractServerSession.this);
 
     // cancel running jobs of this session.
     Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
