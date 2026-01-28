@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -649,10 +649,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Subclasses can override this method. Default is {@link TriState#UNDEFINED}
    *
    * @return <ul>
-   *         <li>{@link TriState#TRUE} if the tooltip should always be shown if the cell content is truncated</li>
-   *         <li>{@link TriState#FALSE} if the tooltip should never be shown</li>
-   *         <li>{@link TriState#UNDEFINED} cell tooltip is only shown if it is not possible to resize the column</li>
-   *         </ul>
+   * <li>{@link TriState#TRUE} if the tooltip should always be shown if the cell content is truncated</li>
+   * <li>{@link TriState#FALSE} if the tooltip should never be shown</li>
+   * <li>{@link TriState#UNDEFINED} cell tooltip is only shown if it is not possible to resize the column</li>
+   * </ul>
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
@@ -3250,13 +3250,18 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   private void rebuildTreeStructureInternal() {
     List<ITableRow> rootNodes = new ArrayList<>();
+    Set<ITableRow> orphanRows = new HashSet<>();
     Map<ITableRow/*parent*/, List<ITableRow> /*child rows*/> parentToChildren = new HashMap<>();
     m_rows.forEach(row -> {
       List<Object> parentRowKeys = getParentRowKeys(row);
       if (parentRowKeys.stream().filter(Objects::nonNull).findAny().orElse(null) != null) {
         ITableRow parentRow = getRowByKey(parentRowKeys);
         if (parentRow == null) {
-          throw new IllegalArgumentException("Could not find the parent row of '" + row + "'. parent keys are defined.");
+          LOG.warn("Ignoring row with key {} because its parent key {} could not be found. {}", row.getKeyValues(), row.getParentKeyValues(), row);
+          row.setParentRowInternal(null);
+          rootNodes.add(row);
+          orphanRows.add(row);
+          return;
         }
         parentToChildren.computeIfAbsent(parentRow, children -> new ArrayList<>())
             .add(row);
@@ -3266,6 +3271,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         rootNodes.add(row);
       }
     });
+    getRowFilters().stream().filter(f -> f instanceof P_OrphanRowFilter).forEach(this::removeRowFilter);
+    if (!orphanRows.isEmpty()) {
+      addRowFilter(new P_OrphanRowFilter(orphanRows));
+    }
 
     m_rootRows = Collections.synchronizedList(rootNodes);
     boolean hierarchical = !parentToChildren.isEmpty();
@@ -5114,6 +5123,32 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
     public IFormField getFormField() {
       return m_formField;
+    }
+  }
+
+  /**
+   * Filter that hides orphaned rows, i.e. rows that have a non-null {@link ITableRow#getParentKeyValues() parent key},
+   * but no such parent row exists. This can happen for example due to a row limit.
+   */
+  protected static class P_OrphanRowFilter implements ITableRowFilter {
+
+    protected final Set<ITableRow> m_orphanRows;
+
+    /**
+     * @param orphanRows
+     *     set of orphaned rows (rows with non-existing parent) that are to be filtered by this filter
+     */
+    public P_OrphanRowFilter(Set<ITableRow> orphanRows) {
+      m_orphanRows = Assertions.assertNotNull(orphanRows);
+    }
+
+    public Set<ITableRow> getOrphanRows() {
+      return m_orphanRows;
+    }
+
+    @Override
+    public boolean accept(ITableRow row) {
+      return !m_orphanRows.contains(row);
     }
   }
 
