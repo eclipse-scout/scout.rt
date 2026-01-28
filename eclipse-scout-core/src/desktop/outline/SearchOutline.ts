@@ -284,13 +284,23 @@ export class SearchOutline extends Outline implements SearchOutlineModel {
   updateSearchStates() {
     const searchStates = new Set<SearchState>();
 
-    for (const page of this.nodes as SearchPage[]) {
+    for (const page of this._getRelevantSearchPages()) {
       if (page.searchState) {
         searchStates.add(page.searchState);
       }
     }
 
     this.setSearchStates(searchStates);
+  }
+
+  protected _getRelevantSearchPages(): SearchPage[] {
+    if (this.compact) {
+      const compactRootNode = this.compactRootNode();
+      if (compactRootNode) {
+        return compactRootNode.childNodes;
+      }
+    }
+    return this.nodes;
   }
 
   setSearchStates(searchStates: Set<SearchState>) {
