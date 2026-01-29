@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DoubleClickSupport, Range, Tree, TreeNode} from '../../index';
+import {DoubleClickSupport, Range, Tree, TreeCheckNodesResult, TreeNode} from '../../index';
 
 export class SpecTree extends Tree {
   declare _doubleClickSupport: DoubleClickSupport & { _lastTimestamp: number };
@@ -39,5 +39,9 @@ export class SpecTree extends Tree {
 
   override _isGroupingEnd(node: TreeNode): boolean {
     return super._isGroupingEnd(node);
+  }
+
+  override _checkParentsRecursive(node: TreeNode): TreeCheckNodesResult {
+    return super._checkParentsRecursive(node);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, TreeNode} from './../index';
+import {TreeNode} from './../index';
 
 /**
  * This object is needed during an update in the tree. It
@@ -18,44 +18,29 @@ import {arrays, TreeNode} from './../index';
  * - TreeNodes which triggered an update event
  */
 export class TreeCheckNodesResult {
-  protected _requireRenderTreeNodes: TreeNode[];
-  protected _requireTriggerEventNodes: TreeNode[];
+  requireRenderTreeNodes: Set<TreeNode>;
+  requireTriggerEventNodes: Set<TreeNode>;
 
   constructor() {
-    this._requireRenderTreeNodes = [];
-    this._requireTriggerEventNodes = [];
+    this.requireRenderTreeNodes = new Set();
+    this.requireTriggerEventNodes = new Set();
   }
 
-  addNodeForRendering(...nodes: TreeNode[]) {
-    arrays.removeAll(nodes, this._requireRenderTreeNodes);
-    this._requireRenderTreeNodes.push(...nodes);
+  addNodeForRendering(node: TreeNode) {
+    this.requireRenderTreeNodes.add(node);
   }
 
-  addNodeForEventTrigger(...nodes: TreeNode[]) {
-    arrays.removeAll(nodes, this._requireTriggerEventNodes);
-    this._requireTriggerEventNodes.push(...nodes);
+  addNodeForEventTrigger(node: TreeNode) {
+    this.requireTriggerEventNodes.add(node);
   }
 
-  addNodeForRenderingAndEventTrigger(...nodes: TreeNode[]) {
-    this.addNodeForRendering(...nodes);
-    this.addNodeForEventTrigger(...nodes);
-  }
-
-  getNodesForRendering(): TreeNode[] {
-    return this._requireRenderTreeNodes;
-  }
-
-  getNodesForEventTrigger(): TreeNode[] {
-    return this._requireTriggerEventNodes;
-  }
-
-  removeNode(node: TreeNode) {
-    arrays.remove(this._requireRenderTreeNodes, node);
-    arrays.remove(this._requireTriggerEventNodes, node);
+  addNodeForRenderingAndEventTrigger(node: TreeNode) {
+    this.addNodeForRendering(node);
+    this.addNodeForEventTrigger(node);
   }
 
   add(treeNodeUpdate: TreeCheckNodesResult) {
-    this.addNodeForRendering(...treeNodeUpdate.getNodesForRendering());
-    this.addNodeForEventTrigger(...treeNodeUpdate.getNodesForEventTrigger());
+    treeNodeUpdate.requireRenderTreeNodes.forEach(node => this.requireRenderTreeNodes.add(node));
+    treeNodeUpdate.requireTriggerEventNodes.forEach(node => this.requireTriggerEventNodes.add(node));
   }
 }
