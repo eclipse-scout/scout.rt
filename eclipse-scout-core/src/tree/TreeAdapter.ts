@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -322,13 +322,13 @@ export class TreeAdapter extends ModelAdapter {
     return 'TreeNode';
   }
 
-  protected static _updateMarkChildrenCheckedRemote(this: Tree & { modelAdapter: TreeAdapter; _updateMarkChildrenCheckedOrig }, node: TreeNode) {
+  protected static _updateChildrenCheckedRemote(this: Tree & { modelAdapter: TreeAdapter; _updateChildrenCheckedOrig }, nodes: TreeNode[]) {
     // In autoCheckChildren mode, don't change the checked state of parent nodes while the tree is initializing if nodes come from Java.
     // This is necessary to set the checked state of the child nodes correctly, see _autoCheckChildNodes.
     if (this.modelAdapter && this.autoCheckChildren && !this.initialized) {
       return;
     }
-    return this._updateMarkChildrenCheckedOrig(node);
+    return this._updateChildrenCheckedOrig(nodes);
   }
 
   /**
@@ -350,7 +350,7 @@ export class TreeAdapter extends ModelAdapter {
     }
 
     objects.replacePrototypeFunction(Tree, '_createTreeNode', TreeAdapter._createTreeNodeRemote, true);
-    objects.replacePrototypeFunction(Tree, '_updateMarkChildrenChecked', TreeAdapter._updateMarkChildrenCheckedRemote, true);
+    objects.replacePrototypeFunction(Tree, '_updateChildrenChecked', TreeAdapter._updateChildrenCheckedRemote, true);
   }
 
   static isRemote(node: AdapterTreeNode, includeHybrid = true): boolean {
