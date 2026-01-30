@@ -240,6 +240,9 @@ public class JSONStringerTest extends TestCase {
     assertEscapedAllWays("\\u0000", "\0");
     assertEscapedAllWays("\\u0019", "\u0019");
     assertEscapedAllWays(" ", " ");
+    assertEscapedAllWays("a/", "a/");
+    assertEscapedAllWays("/", "/");
+    assertEscapedAllWays("</b>", "</b>");
   }
 
   private void assertEscapedAllWays(String escaped, String original) throws JSONException {
