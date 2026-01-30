@@ -220,13 +220,26 @@ export const objects = {
    */
   valueCopy<T>(val: T): T {
     if (objects.isPojo(val)) {
-      const pojoCopy = {};
-      for (const [k, v] of Object.entries(val)) {
-        pojoCopy[k] = objects.valueCopy(v);
-      }
-      return pojoCopy as T;
+      return objects.copyPropertiesRecursive(val, {}) as T;
+    }
+    if (objects.isArray(val)) {
+      return val.map(e => objects.valueCopy(e)) as T;
     }
     return deepCloneClass(val); // handles all class types
+  },
+
+  /**
+   * Recursively copies all the properties from source to destination (deep clone).
+   *
+   * All properties are recursively cloned using {@link objects#valueCopy}. Therefore, only properties of types supported by {@link objects#valueCopy} must be present.
+   * @param source Where to get the properties to copy.
+   * @param destination Where to store the cloned properties.
+   */
+  copyPropertiesRecursive<T>(source: T, destination: T): T {
+    for (const [k, v] of Object.entries(source)) {
+      destination[k] = objects.valueCopy(v);
+    }
+    return destination;
   },
 
   /**
@@ -854,11 +867,6 @@ export const objects = {
 function deepCloneClass(val: any): any {
   if (!val) {
     return val;
-  }
-
-  // Array
-  if (objects.isArray(val)) {
-    return val.map(e => objects.valueCopy(e));
   }
 
   // Date
