@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -38,7 +38,7 @@ public class ChunkedDataWriter<T> implements IChunkedDataWriter<T> {
     // See https://stackoverflow.com/questions/40429196/chunkedoutput-response-from-jersey-rest-services
     byte[] delimiterBytes = (StringUtility.isNullOrEmpty(delimiter) ? "\r\n" : delimiter).getBytes();
 
-    m_output = ChunkedOutput.<T>builder(type)
+    m_output = ChunkedOutput.<T> builder(type)
         .chunkDelimiter(delimiterBytes)
         .queueCapacity(queueCapacity)
         .build();
