@@ -132,9 +132,9 @@ public class JSONObject {
    * Creates a new {@code JSONObject} by copying all name/value mappings from the given map.
    *
    * @param copyFrom
-   *          a map whose keys are of type {@link String} and whose values are of supported types.
+   *     a map whose keys are of type {@link String} and whose values are of supported types.
    * @throws NullPointerException
-   *           if any of the map's keys are null.
+   *     if any of the map's keys are null.
    */
   @SuppressWarnings("squid:S1695")
   public JSONObject(Map<?, ?> copyFrom) {
@@ -156,9 +156,9 @@ public class JSONObject {
    * Creates a new {@code JSONObject} with name/value mappings from the next object in the tokener.
    *
    * @param readFrom
-   *          a tokener whose nextValue() method will yield a {@code JSONObject}.
+   *     a tokener whose nextValue() method will yield a {@code JSONObject}.
    * @throws JSONException
-   *           if the parse fails or doesn't yield a {@code JSONObject}.
+   *     if the parse fails or doesn't yield a {@code JSONObject}.
    */
   public JSONObject(JSONTokener readFrom) {
     /*
@@ -179,9 +179,9 @@ public class JSONObject {
    * Creates a new {@code JSONObject} with name/value mappings from the JSON string.
    *
    * @param json
-   *          a JSON-encoded string containing an object.
+   *     a JSON-encoded string containing an object.
    * @throws JSONException
-   *           if the parse fails or doesn't yield a {@code JSONObject}.
+   *     if the parse fails or doesn't yield a {@code JSONObject}.
    */
   public JSONObject(String json) {
     this(new JSONTokener(json));
@@ -222,7 +222,7 @@ public class JSONObject {
    * Maps {@code name} to {@code value}, clobbering any existing name/value mapping with the same name.
    *
    * @param value
-   *          a finite value. May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
+   *     a finite value. May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
    * @return this object.
    */
   public JSONObject put(String name, double value) {
@@ -255,8 +255,8 @@ public class JSONObject {
    * {@code null}, any existing mapping for {@code name} is removed.
    *
    * @param value
-   *          a {@link JSONObject}, {@link JSONArray}, String, Boolean, Integer, Long, Double, {@link #NULL}, or
-   *          {@code null}. May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
+   *     a {@link JSONObject}, {@link JSONArray}, String, Boolean, Integer, Long, Double, {@link #NULL}, or
+   *     {@code null}. May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
    * @return this object.
    */
   public JSONObject put(String name, Object value) {
@@ -293,8 +293,8 @@ public class JSONObject {
    * mapping whose type is the type of {@code value} depending on the number of calls to it.
    *
    * @param value
-   *          a {@link JSONObject}, {@link JSONArray}, String, Boolean, Integer, Long, Double, {@link #NULL} or null.
-   *          May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
+   *     a {@link JSONObject}, {@link JSONArray}, String, Boolean, Integer, Long, Double, {@link #NULL} or null.
+   *     May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
    */
   // TO.DO Change {@code append) to {@link #append} when append is
   // unhidden.
@@ -323,8 +323,8 @@ public class JSONObject {
    * {@link JSONException} will be thrown.
    *
    * @throws JSONException
-   *           if {@code name} is {@code null} or if the mapping for {@code name} is non-null and is not a
-   *           {@link JSONArray}.
+   *     if {@code name} is {@code null} or if the mapping for {@code name} is non-null and is not a
+   *     {@link JSONArray}.
    */
   public JSONObject append(String name, Object value) {
     Object current = m_nameValuePairs.get(checkName(name));
@@ -382,7 +382,7 @@ public class JSONObject {
    * Returns the value mapped by {@code name}, or throws if no such mapping exists.
    *
    * @throws JSONException
-   *           if no such mapping exists.
+   *     if no such mapping exists.
    */
   public Object get(String name) {
     Object result = m_nameValuePairs.get(name);
@@ -404,7 +404,7 @@ public class JSONObject {
    * otherwise.
    *
    * @throws JSONException
-   *           if the mapping doesn't exist or cannot be coerced to a boolean.
+   *     if the mapping doesn't exist or cannot be coerced to a boolean.
    */
   public boolean getBoolean(String name) {
     Object object = get(name);
@@ -438,7 +438,7 @@ public class JSONObject {
    * otherwise.
    *
    * @throws JSONException
-   *           if the mapping doesn't exist or cannot be coerced to a double.
+   *     if the mapping doesn't exist or cannot be coerced to a double.
    */
   public double getDouble(String name) {
     Object object = get(name);
@@ -472,7 +472,7 @@ public class JSONObject {
    * otherwise.
    *
    * @throws JSONException
-   *           if the mapping doesn't exist or cannot be coerced to an int.
+   *     if the mapping doesn't exist or cannot be coerced to an int.
    */
   public int getInt(String name) {
     Object object = get(name);
@@ -506,7 +506,7 @@ public class JSONObject {
    * transfer numbers via JSON.
    *
    * @throws JSONException
-   *           if the mapping doesn't exist or cannot be coerced to a long.
+   *     if the mapping doesn't exist or cannot be coerced to a long.
    */
   public long getLong(String name) {
     Object object = get(name);
@@ -542,7 +542,7 @@ public class JSONObject {
    * exists.
    *
    * @throws JSONException
-   *           if no such mapping exists.
+   *     if no such mapping exists.
    */
   public String getString(String name) {
     Object object = get(name);
@@ -575,7 +575,7 @@ public class JSONObject {
    * Returns the value mapped by {@code name} if it exists and is a {@code JSONArray}, or throws otherwise.
    *
    * @throws JSONException
-   *           if the mapping doesn't exist or is not a {@code JSONArray}.
+   *     if the mapping doesn't exist or is not a {@code JSONArray}.
    */
   public JSONArray getJSONArray(String name) {
     Object object = get(name);
@@ -599,7 +599,7 @@ public class JSONObject {
    * Returns the value mapped by {@code name} if it exists and is a {@code JSONObject}, or throws otherwise.
    *
    * @throws JSONException
-   *           if the mapping doesn't exist or is not a {@code JSONObject}.
+   *     if the mapping doesn't exist or is not a {@code JSONObject}.
    */
   public JSONObject getJSONObject(String name) {
     Object object = get(name);
@@ -701,7 +701,7 @@ public class JSONObject {
    * </pre>
    *
    * @param indentSpaces
-   *          the number of spaces to indent for each level of nesting.
+   *     the number of spaces to indent for each level of nesting.
    */
   public String toString(int indentSpaces) {
     JSONStringer stringer = new JSONStringer(indentSpaces);
@@ -721,7 +721,7 @@ public class JSONObject {
    * Encodes the number as a JSON string.
    *
    * @param number
-   *          a finite value. May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
+   *     a finite value. May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
    */
   @SuppressWarnings("squid:S1244")
   public static String numberToString(Number number) {
@@ -749,7 +749,7 @@ public class JSONObject {
    * Encodes {@code data} as a JSON string. This applies quotes and any necessary character escaping.
    *
    * @param data
-   *          the string to encode. Null will be interpreted as an empty string.
+   *     the string to encode. Null will be interpreted as an empty string.
    */
   public static String quote(String data) {
     if (data == null) {

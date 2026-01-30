@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,8 +16,8 @@ import java.security.Permissions;
 
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.server.servicetunnel.ServiceOperationInvoker;
 import org.eclipse.scout.rt.server.services.common.ping.PingService;
+import org.eclipse.scout.rt.server.servicetunnel.ServiceOperationInvoker;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;

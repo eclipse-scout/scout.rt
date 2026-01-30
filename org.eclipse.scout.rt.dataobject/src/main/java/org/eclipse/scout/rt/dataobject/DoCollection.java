@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,8 +24,7 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
  *
  * <p>Note: {@link DoCollection} is backed by a {@link Collection} instance. If a {@link Set} implementation
  * is used as nested type, great care must be exercised if mutable objects are used as set elements.
- * The behavior of a set is not specified if the value of an object is changed in a manner that affects {
- * @code equals} comparisons while the object is an element in the set. See javadoc of {@link Set} for further details.<br>
+ * The behavior of a set is not specified if the value of an object is changed in a manner that affects {@code equals} comparisons while the object is an element in the set. See javadoc of {@link Set} for further details.<br>
  * {@link DoCollection} guarantees correct equality {@link DoCollection#equals(Object)}),
  * hashcode ({@link DoCollection#hashCode()}) and contains ({@link DoSet#contains(Object)}) operations
  * if used as {@link DoCollection} wrapper and not using the wrapped {@link Collection} instance directly.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -97,9 +97,8 @@ public final class XmlUtility {
 
   /**
    * @param namespaceAware
-   *        If set to {@code true}, the parser used to parse the input will provide support for XML namespaces,
-   *        {@code false} otherwise
-   *
+   *     If set to {@code true}, the parser used to parse the input will provide support for XML namespaces,
+   *     {@code false} otherwise
    * @return a new secure {@link DocumentBuilder} with disabled xml-external-entity
    * @throws ParserConfigurationException
    */
