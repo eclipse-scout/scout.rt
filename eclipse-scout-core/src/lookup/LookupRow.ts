@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,18 +8,20 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import $ from 'jquery';
-import {InitModelOf, LookupRowModel, objects, SomeRequired} from '../index';
+import {Constructor, InitModelOf, LookupRowModel, objects, ObjectWithType, SomeRequired} from '../index';
 
-export class LookupRow<TKey> implements LookupRowModel<TKey> {
+export class LookupRow<TKey> implements LookupRowModel<TKey>, ObjectWithType {
   declare model: LookupRowModel<TKey>;
   declare initModel: SomeRequired<this['model'], 'key' | 'text'>;
 
+  id: string;
+  objectType: string;
   key: TKey;
   text: string;
   parentKey: TKey;
   enabled: boolean;
   active: boolean;
-  additionalTableRowData: any;
+  additionalTableRowData: Record<string, any>;
   cssClass: string;
   iconId: string;
   tooltipText: string;
@@ -40,6 +42,13 @@ export class LookupRow<TKey> implements LookupRowModel<TKey> {
     this.backgroundColor = null;
     this.foregroundColor = null;
     this.font = null;
+  }
+
+  /**
+   * @returns a deep clone of this LookupRow instance. E.g. called when using {@link objects#valueCopy}.
+   */
+  clone(): this {
+    return objects.copyPropertiesRecursive(this, new (this.constructor as Constructor<this>)());
   }
 
   init(model?: InitModelOf<this>) {
@@ -66,7 +75,7 @@ export class LookupRow<TKey> implements LookupRowModel<TKey> {
     this.cssClass = cssClass;
   }
 
-  setAdditionalTableRowData(additionalTableRowData: any) {
+  setAdditionalTableRowData(additionalTableRowData: Record<string, any>) {
     this.additionalTableRowData = additionalTableRowData;
   }
 

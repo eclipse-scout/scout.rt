@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -79,6 +79,8 @@ public class JsonLookupRow<T> implements IJsonObject {
     if (tableRowData == null) {
       return null;
     }
+
+    // calls JsonBean#toJson creating a JSONObject holding values for public fields and bean-getters (according to FastBeanInfo) of the passed AbstractTableRowData.
     return MainJsonObjectFactory.get().createJsonObject(tableRowData).toJson();
   }
 
