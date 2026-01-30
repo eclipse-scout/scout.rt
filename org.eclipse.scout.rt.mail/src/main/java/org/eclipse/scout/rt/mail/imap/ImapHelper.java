@@ -57,7 +57,7 @@ public class ImapHelper {
       return store;
     }
     catch (AuthenticationFailedException e) { // NOSONAR
-      throw new ProcessingException("IMAP-Authentication failed on {}@{}:{}", config.getUsername(), config.getHost(), config.getPort());
+      throw new ProcessingException("IMAP-Authentication failed on {}@{}:{} - Message: {}", config.getUsername(), config.getHost(), config.getPort(), e.getLocalizedMessage());
     }
     catch (MessagingException e) {
       throw new ProcessingException("Failed to connect to imap server {}@{}:{}", config.getUsername(), config.getHost(), config.getPort(), e);
