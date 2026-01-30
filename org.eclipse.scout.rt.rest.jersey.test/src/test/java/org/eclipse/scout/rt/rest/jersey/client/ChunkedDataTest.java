@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -198,15 +198,15 @@ public class ChunkedDataTest {
 
   @Test
   public void testGetDataObjectsScout_defaultDelimiterEmptyString() {
-    testGetDataObjectsScout_defaultDelimiter( "default-delimiter-empty-string", response -> IChunkedDataReader.create(response, FixtureDo.class, ""));
+    testGetDataObjectsScout_defaultDelimiter("default-delimiter-empty-string", response -> IChunkedDataReader.create(response, FixtureDo.class, ""));
   }
 
   @Test
   public void testGetDataObjectsScout_defaultDelimiterNull() {
-    testGetDataObjectsScout_defaultDelimiter( "default-delimiter-null", response -> IChunkedDataReader.create(response, FixtureDo.class, null));
+    testGetDataObjectsScout_defaultDelimiter("default-delimiter-null", response -> IChunkedDataReader.create(response, FixtureDo.class, null));
   }
 
-  protected void testGetDataObjectsScout_defaultDelimiter( String contextPath, Function<Response, IChunkedDataReader<FixtureDo>> chunkedReaderCreator) {
+  protected void testGetDataObjectsScout_defaultDelimiter(String contextPath, Function<Response, IChunkedDataReader<FixtureDo>> chunkedReaderCreator) {
     Response response = m_target
         .path("dataobject-scout/" + contextPath)
         .request()

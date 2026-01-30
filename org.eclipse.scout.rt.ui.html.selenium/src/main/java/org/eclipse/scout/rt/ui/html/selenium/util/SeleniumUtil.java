@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -88,7 +88,7 @@ public final class SeleniumUtil {
    * This query solves the problem that we don't want to find partial matches for a CSS class-name when we query 'class'
    * attribute in the DOM. See
    * <a href="https://stackoverflow.com/questions/1604471/how-can-i-find-an-element-by-css-class-with-xpath">
-   *   how-can-i-find-an-element-by-css-class-with-xpath</a>
+   * how-can-i-find-an-element-by-css-class-with-xpath</a>
    */
   private static String cssClassQuery(String cssClass) {
     return "contains(concat(' ', normalize-space(@class), ' '), ' " + cssClass + " ')";

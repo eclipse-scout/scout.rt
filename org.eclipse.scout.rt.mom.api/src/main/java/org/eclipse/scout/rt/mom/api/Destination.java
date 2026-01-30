@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,7 +14,6 @@ import static org.eclipse.scout.rt.platform.util.Assertions.*;
 import java.util.Collections;
 import java.util.Map;
 
-import org.eclipse.scout.rt.platform.util.Assertions.*;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
 /**
@@ -35,7 +34,7 @@ class Destination<REQUEST, REPLY> implements IBiDestination<REQUEST, REPLY> {
   /**
    * @param name
    *     the symbolic name for the destination
-   * @param destinationType
+   * @param type
    *     the type of the resource that this destination represents, e.g. {@link DestinationType#QUEUE}
    * @param resolveMethod
    *     the method how to resolve the actual destination, e.g. {@link ResolveMethod#JNDI}
