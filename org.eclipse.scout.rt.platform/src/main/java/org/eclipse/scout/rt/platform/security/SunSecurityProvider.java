@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -635,7 +635,7 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
               List<String> sans = x.getSubjectAlternativeNames().stream()
                   .flatMap(List::stream)
                   .filter(san -> san instanceof String)
-                  .map(san -> (String)san)
+                  .map(san -> (String) san)
                   .collect(Collectors.toList());
               out.println("  subjectAlternativeNames:" + sans);
             }

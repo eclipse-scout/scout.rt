@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,6 @@ package org.eclipse.scout.rt.client.ui.desktop.datachange;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
 
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -36,7 +35,7 @@ public class ActiveFormDataChangeManagerTest {
   private static final String TEST_DATA_TYPE = "testDataType";
 
   @Test
-  public void testActiveFormDataChangeManager(){
+  public void testActiveFormDataChangeManager() {
     IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
 
     IDataChangeListener formOneChangeListenerMock = Mockito.mock(IDataChangeListener.class);

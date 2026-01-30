@@ -145,10 +145,10 @@ public class ParsingTest extends TestCase {
   // This test is ignored, as apparently it reveals a bug in the code that is not yet fixed
   // (and is also present in the original org.json implementation of Douglas Crockford).
   // See: https://code.google.com/p/android/issues/detail?id=63295
-//    public void test64BitHexValues() throws JSONException {
-//        assertParsed("Large hex longs shouldn't be yield ints or strings",
-//                -1L, "0xFFFFFFFFFFFFFFFF");
-//    }
+  //    public void test64BitHexValues() throws JSONException {
+  //        assertParsed("Large hex longs shouldn't be yield ints or strings",
+  //                -1L, "0xFFFFFFFFFFFFFFFF");
+  //    }
   // </BSI>
 
   public void testParsingWithCommentsAndWhitespace() throws JSONException {
@@ -277,7 +277,7 @@ public class ParsingTest extends TestCase {
     else if (input instanceof JSONObject) {
       JSONObject object = (JSONObject) input;
       Map<String, Object> result = new HashMap<>();
-      for (Iterator<?> i = object.keys(); i.hasNext();) {
+      for (Iterator<?> i = object.keys(); i.hasNext(); ) {
         String key = (String) i.next();
         result.put(key, canonicalize(object.get(key)));
       }

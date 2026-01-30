@@ -67,7 +67,9 @@ import java.util.List;
  */
 public class JSONStringer {
 
-  /** The output data, containing at most one top-level array or object. */
+  /**
+   * The output data, containing at most one top-level array or object.
+   */
   @SuppressWarnings("squid:S00116")
   final StringBuilder out = new StringBuilder();
 
@@ -216,8 +218,8 @@ public class JSONStringer {
    * Encodes {@code value}.
    *
    * @param value
-   *          a {@link JSONObject}, {@link JSONArray}, String, Boolean, Integer, Long, Double or null. May not be
-   *          {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
+   *     a {@link JSONObject}, {@link JSONArray}, String, Boolean, Integer, Long, Double or null. May not be
+   *     {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
    * @return this stringer.
    */
   public JSONStringer value(Object value) {
@@ -228,7 +230,6 @@ public class JSONStringer {
     if (value instanceof JSONArray) {
       ((JSONArray) value).writeTo(this);
       return this;
-
     }
     else if (value instanceof JSONObject) {
       ((JSONObject) value).writeTo(this);
@@ -241,11 +242,9 @@ public class JSONStringer {
         || value instanceof Boolean
         || value == JSONObject.NULL) {
       out.append(value);
-
     }
     else if (value instanceof Number) {
       out.append(JSONObject.numberToString((Number) value));
-
     }
     else {
       string(value.toString());
@@ -272,7 +271,7 @@ public class JSONStringer {
    * Encodes {@code value} to this stringer.
    *
    * @param value
-   *          a finite value. May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
+   *     a finite value. May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
    * @return this stringer.
    */
   public JSONStringer value(double value) {
@@ -345,7 +344,6 @@ public class JSONStringer {
           }
           break;
       }
-
     }
     out.append("\"");
   }
@@ -365,7 +363,7 @@ public class JSONStringer {
    * Encodes the key (property name) to this stringer.
    *
    * @param name
-   *          the name of the forthcoming value. May not be null.
+   *     the name of the forthcoming value. May not be null.
    * @return this stringer.
    */
   public JSONStringer key(String name) {
