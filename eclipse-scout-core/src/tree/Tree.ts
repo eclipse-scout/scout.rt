@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1555,7 +1555,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       return;
     }
     if (node.expanded || node.expandedLazy) {
-      this._addChildrenToFlatList(node, null, true, null, true /* required so that double-clicking a table-page-row expands the clicked child row */);
+      this._addChildrenToFlatList(node, null, scout.nvl(opts.renderAnimated, true), null, true /* required so that double-clicking a table-page-row expands the clicked child row */);
     } else {
       this._removeChildrenFromFlatList(node, false);
     }
