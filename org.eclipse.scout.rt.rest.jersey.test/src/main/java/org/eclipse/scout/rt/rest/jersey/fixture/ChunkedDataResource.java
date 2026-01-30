@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -210,7 +210,8 @@ public class ChunkedDataResource implements IRestResource {
 
         try {
           BEANS.get(ChunkedDataCancellationSynchronizer.class).awaitWriterCancelled();
-        } catch  (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
           // ignore, waiting will be interrupted by run monitor cancellation
         }
         LOG.debug("Server: Received cancellation.");

@@ -1071,7 +1071,7 @@ public class JSONObjectTest extends TestCase {
     assertTrue(JSONObject.wrap(Double.valueOf(0)) instanceof Double);
     assertTrue(JSONObject.wrap("hello") instanceof String);
     // <BSI>
-//    assertTrue(JSONObject.wrap(java.nio.channels.Selector.open()) instanceof String);
+    //    assertTrue(JSONObject.wrap(java.nio.channels.Selector.open()) instanceof String);
     assertTrue(JSONObject.wrap(new BigDecimal("0.1")) instanceof String);
     // </BSI>
   }

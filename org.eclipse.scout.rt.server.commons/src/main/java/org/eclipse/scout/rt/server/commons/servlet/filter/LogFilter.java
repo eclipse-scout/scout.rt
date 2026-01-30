@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -38,7 +38,6 @@ public class LogFilter implements Filter {
    * <b>Note:</b> Keep in sync with {@link org.eclipse.scout.rt.rest.log.NoLogFilter#NO_LOG_REQUEST_ATTRIBUTE}
    */
   public static final String NO_LOG_REQUEST_ATTRIBUTE = "scout.noLog";
-
 
   @Override
   public void init(FilterConfig filterConfig) {

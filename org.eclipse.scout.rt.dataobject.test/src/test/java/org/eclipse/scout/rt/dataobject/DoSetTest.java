@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -401,7 +401,6 @@ public class DoSetTest {
     assertEquals(set1.hashCode(), set2.hashCode());
     assertTrue(set1.contains(set2.iterator().next()));
     assertTrue(set2.contains(set1.iterator().next()));
-
 
     // manipulate nested dataobject, this causes the hashCode of nested object to change which corrupts internal LinkedHashSet structure
     set1.iterator().next().withName(null);

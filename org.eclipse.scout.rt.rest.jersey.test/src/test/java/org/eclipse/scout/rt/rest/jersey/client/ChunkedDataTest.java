@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -72,15 +72,15 @@ public class ChunkedDataTest {
     protected void cancelRequest(String requestId) {
       // run cancellation request in job with separate run monitor to avoid cancellation of cancel request
       Jobs.schedule(() -> {
-        LOG.debug("Cancelling request {}", requestId);
-        target("api/cancellation")
-            .path("{requestId}")
-            .resolveTemplate("requestId", requestId)
-            .request()
-            .put(Entity.json(""))
-            .close();
-      }, Jobs.newInput()
-          .withRunContext(RunContexts.empty().withRunMonitor(BEANS.get(RunMonitor.class))))
+            LOG.debug("Cancelling request {}", requestId);
+            target("api/cancellation")
+                .path("{requestId}")
+                .resolveTemplate("requestId", requestId)
+                .request()
+                .put(Entity.json(""))
+                .close();
+          }, Jobs.newInput()
+              .withRunContext(RunContexts.empty().withRunMonitor(BEANS.get(RunMonitor.class))))
           .awaitDone();
     }
   }
