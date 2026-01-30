@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -649,10 +649,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Subclasses can override this method. Default is {@link TriState#UNDEFINED}
    *
    * @return <ul>
-   *         <li>{@link TriState#TRUE} if the tooltip should always be shown if the cell content is truncated</li>
-   *         <li>{@link TriState#FALSE} if the tooltip should never be shown</li>
-   *         <li>{@link TriState#UNDEFINED} cell tooltip is only shown if it is not possible to resize the column</li>
-   *         </ul>
+   * <li>{@link TriState#TRUE} if the tooltip should always be shown if the cell content is truncated</li>
+   * <li>{@link TriState#FALSE} if the tooltip should never be shown</li>
+   * <li>{@link TriState#UNDEFINED} cell tooltip is only shown if it is not possible to resize the column</li>
+   * </ul>
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
