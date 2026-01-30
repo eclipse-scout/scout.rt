@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, arrays, dataObjects, dates, FormField, Menu, ObjectFactory, objects, Point, scout, Widget} from '../../src/index';
+import {Action, arrays, dataObjects, dates, FormField, LookupRow, Menu, NullLayout, ObjectFactory, objects, Point, scout, Widget} from '../../src/index';
 
 describe('objects', () => {
 
@@ -184,6 +184,44 @@ describe('objects', () => {
   });
 
   describe('valueCopy', () => {
+
+    it('copies primitives', () => {
+      expect(objects.valueCopy(1)).toBe(1);
+      expect(objects.valueCopy(0)).toBe(0);
+      expect(objects.valueCopy('')).toBe('');
+      expect(objects.valueCopy('aa')).toBe('aa');
+      expect(objects.valueCopy(null)).toBeNull();
+      expect(objects.valueCopy(undefined)).toBeUndefined();
+      expect(objects.valueCopy(true)).toBeTrue();
+      expect(objects.valueCopy(false)).toBeFalse();
+    });
+
+    it('returns the input if class cannot be copied', () => {
+      const toClone = new NullLayout();
+      expect(objects.valueCopy(toClone)).toBe(toClone);
+    });
+
+    it('deep copies arrays', () => {
+      const orig = [{a: true}, {b: false}];
+      const copy = objects.valueCopy(orig);
+      expect(copy).not.toBe(orig);
+      expect(copy).toEqual(orig);
+
+      copy[0].a = false;
+      copy[1].b = true;
+      expect(copy[0].a).toBe(false);
+      expect(copy[1].b).toBe(true);
+
+      expect(orig[0].a).toBe(true);
+      expect(orig[1].b).toBe(false);
+    });
+
+    it('should make a deep copy for LookupRow', () => {
+      let lookupRow = scout.create(LookupRow, {key: '123', text: 'abc'});
+      let orig = [lookupRow];
+      let copy = objects.valueCopy(orig);
+      expect(orig[0]).not.toBe(copy[0]);
+    });
 
     it('copies an object by value', () => {
       let o: any = {
