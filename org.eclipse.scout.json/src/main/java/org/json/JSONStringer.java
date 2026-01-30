@@ -30,6 +30,7 @@ import java.util.List;
  * Changes to the original code:
  * -----------------------------
  * - Applied Scout code formatting rules
+ * - Prevent unnecessary escaping of '/'
  *
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  */
@@ -311,7 +312,6 @@ public class JSONStringer {
       switch (c) {
         case '"':
         case '\\':
-        case '/':
           out.append('\\').append(c);
           break;
 
