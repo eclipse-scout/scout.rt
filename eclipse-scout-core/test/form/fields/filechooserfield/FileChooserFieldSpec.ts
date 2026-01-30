@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -63,6 +63,85 @@ describe('FileChooserField', () => {
     });
   });
 
+  describe('acceptTypes', () => {
+
+    it('is propagated to fileInput', () => {
+      const field = scout.create(FileChooserField, {
+        parent: session.desktop,
+        acceptTypes: '.png,.jpg'
+      });
+
+      expect(field.fileInput.acceptTypes).toBe('.png,.jpg');
+
+      field.setAcceptTypes('.pdf');
+      expect(field.fileInput.acceptTypes).toBe('.pdf');
+
+      field.setAcceptTypes(null);
+      expect(field.fileInput.acceptTypes).toBeNull();
+
+      field.setAcceptTypes('.csv');
+      expect(field.fileInput.acceptTypes).toBe('.csv');
+    });
+  });
+
+  describe('displayText', () => {
+
+    it('is propagated to fileInput', () => {
+      const field = scout.create(FileChooserField, {
+        parent: session.desktop,
+        displayText: 'Foo.png'
+      });
+
+      expect(field.fileInput.text).toBe('Foo.png');
+
+      field.setDisplayText('Bar.pdf');
+      expect(field.fileInput.text).toBe('Bar.pdf');
+
+      field.setDisplayText(null);
+      expect(field.fileInput.text).toBeNull();
+
+      field.setDisplayText('test.csv');
+      expect(field.fileInput.text).toBe('test.csv');
+    });
+
+    it('updates hasText', () => {
+      const field = scout.create(FileChooserField, {
+        parent: session.desktop,
+        displayText: 'Foo.png'
+      });
+      field.render();
+
+      expect(field.hasText).toBeTrue();
+
+      field.setDisplayText('Bar.pdf');
+      expect(field.hasText).toBeTrue();
+
+      field.setDisplayText(null);
+      expect(field.hasText).toBeFalse();
+
+      field.setDisplayText('test.csv');
+      expect(field.hasText).toBeTrue();
+
+      field.remove();
+      expect(field.hasText).toBeTrue();
+
+      field.setDisplayText(null);
+      expect(field.hasText).toBeTrue();
+
+      field.render();
+      expect(field.hasText).toBeFalse();
+
+      field.remove();
+      expect(field.hasText).toBeFalse();
+
+      field.setDisplayText('test.csv');
+      expect(field.hasText).toBeFalse();
+
+      field.render();
+      expect(field.hasText).toBeTrue();
+    });
+  });
+
   describe('maximumUploadSize', () => {
 
     it('is validated when setting new value', () => {
@@ -103,6 +182,24 @@ describe('FileChooserField', () => {
       field.setMaximumUploadSize(10);
       expect(field.errorStatus).toBe(null);
       expect(field.value).toBe(largeFile);
+    });
+
+    it('is propagated to fileInput', () => {
+      const field = scout.create(FileChooserField, {
+        parent: session.desktop,
+        maximumUploadSize: 42
+      });
+
+      expect(field.fileInput.maximumUploadSize).toBe(42);
+
+      field.setMaximumUploadSize(13);
+      expect(field.fileInput.maximumUploadSize).toBe(13);
+
+      field.setMaximumUploadSize(null);
+      expect(field.fileInput.maximumUploadSize).toBeNull();
+
+      field.setMaximumUploadSize(7);
+      expect(field.fileInput.maximumUploadSize).toBe(7);
     });
   });
 
