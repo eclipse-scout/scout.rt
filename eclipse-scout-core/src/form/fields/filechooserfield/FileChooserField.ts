@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,12 +30,17 @@ export class FileChooserField extends ValueField<File> implements FileChooserFie
     super._init(model);
 
     this.fileInput.on('change', this._onFileChange.bind(this));
-    this.on('propertyChange', event => {
-      if (event.propertyName === 'enabledComputed') {
-        // Propagate "enabledComputed" to inner widget
-        this.fileInput.setEnabled(event.newValue);
+    // Propagate properties "acceptTypes", "displayText", "enabledComputed" and "maximumUploadSize" to inner widget
+    this.on('propertyChange:acceptTypes', event => this.fileInput.setAcceptTypes(event.newValue));
+    this.on('propertyChange:displayText', event => {
+      const text = event.newValue;
+      this.fileInput.setText(text);
+      if (!text) {
+        this.fileInput.clear();
       }
     });
+    this.on('propertyChange:enabledComputed', event => this.fileInput.setEnabled(event.newValue));
+    this.on('propertyChange:maximumUploadSize', event => this.fileInput.setMaximumUploadSize(event.newValue));
   }
 
   /**
@@ -75,21 +80,12 @@ export class FileChooserField extends ValueField<File> implements FileChooserFie
     this.addField(this.fileInput.$container);
   }
 
-  override setDisplayText(text: string) {
-    super.setDisplayText(text);
-    this.fileInput.setText(text);
-    if (!text) {
-      this.fileInput.clear();
-    }
-  }
-
   protected override _readDisplayText(): string {
     return this.fileInput.text;
   }
 
   setAcceptTypes(acceptTypes: string) {
     this.setProperty('acceptTypes', acceptTypes);
-    this.fileInput.setAcceptTypes(acceptTypes);
   }
 
   protected override _renderEnabled() {
@@ -113,7 +109,6 @@ export class FileChooserField extends ValueField<File> implements FileChooserFie
 
   setMaximumUploadSize(maximumUploadSize: number) {
     this.setProperty('maximumUploadSize', maximumUploadSize);
-    this.fileInput.setMaximumUploadSize(maximumUploadSize);
   }
 
   protected override _clear() {
