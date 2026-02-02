@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -106,7 +106,10 @@ export const arrays = {
   },
 
   /**
-   * Inserts all elements of the given array at the specified index.
+   * Inserts all elements of the `source` at the specified index into the `target`.
+   *
+   * If many elements are passed, they are inserted as chunks of 100'000 to prevent maximum call stack errors.
+   * (Chrome throws a Maximum call stack size exceeded when using spread operator at around 125'000 items, Firefox can handle around 500'000).
    *
    * This function is based on Array.prototype.splice().
    * Thus, if the 'index' is greater than the length of the array, 'elements' will be added to the end of the array 'arr'.
@@ -114,9 +117,22 @@ export const arrays = {
    *
    * The caller must ensure the size of the array.
    */
-  insertAll<T>(arr: T[], elements: T | T[], index: number) {
-    let elementsArr = arrays.ensure(elements);
-    arr.splice(index, 0, ...elementsArr);
+  insertAll<T>(target: T[], source: T | T[], index: number) {
+    source = arrays.ensure(source);
+
+    if (source === target) {
+      // If both arrays are the same instance, copy the source array so it won't be modified during iteration
+      // Use pushAll to make it work for many elements
+      let newSource = [];
+      arrays.pushAll(newSource, source);
+      source = newSource;
+    }
+
+    const chunkSize = 100_000;
+    for (let i = source.length; i > 0; i -= chunkSize) {
+      let chunk = source.slice(Math.max(0, i - chunkSize), i);
+      target.splice(index, 0, ...chunk);
+    }
   },
 
   /**
@@ -308,9 +324,20 @@ export const arrays = {
     return 0;
   },
 
-  pushAll<T>(arr: T[], arr2: T | T[]) {
-    let a = arrays.ensure(arr2);
-    arr.push(...a);
+  /**
+   * Pushes all elements of `source` to `target`.
+   *
+   * The implementation uses a loop to push the elements rather than `Array.apply` or the spread operator so it can handle very large arrays
+   * (Chrome throws a Maximum call stack size exceeded when using spread operator at around 125'000 items, Firefox can handle around 500'000).
+   *
+   * In terms of performance, using a loop is about the same as with the spread operator.
+   */
+  pushAll<T>(target: T[], source: T | T[]) {
+    source = arrays.ensure(source);
+    let length = source.length; // Save length so it won't change during the iteration if source === target
+    for (let i = 0; i < length; i++) {
+      target.push(source[i]);
+    }
   },
 
   /**

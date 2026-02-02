@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -159,6 +159,45 @@ describe('arrays', () => {
       expect(arr).toEqual(['x', 'a', 'b', 'c', 'd']);
     });
 
+    it('can insert many elements without error', () => {
+      let target = [];
+      let source = [];
+      for (let i = 0; i < 1_000_000; i++) {
+        target.push('a' + i);
+        source.push('b' + i);
+      }
+
+      arrays.insertAll(target, source, 0);
+      expect(target.length).toEqual(2_000_000);
+      expect(target[0]).toBe('b0');
+      expect(target[999_999]).toBe('b999999');
+      expect(target[1_000_000]).toBe('a0');
+      expect(target[1_999_999]).toBe('a999999');
+      // Check chunk start points
+      for (let i = 0; i < 1_000_000; i += 100_000) {
+        expect(target[i]).toBe('b' + i);
+      }
+      for (let i = 0; i < 1_000_000; i += 100_000) {
+        expect(target[i + 1_000_000]).toBe('a' + i);
+      }
+    });
+
+    it('works even if both arrays are the same instance', () => {
+      let target = ['a', 'b', 'c'];
+      arrays.insertAll(target, target, 0);
+      expect(target).toEqual(['a', 'b', 'c', 'a', 'b', 'c']);
+
+      target = [];
+      for (let i = 0; i < 1_000_000; i++) {
+        target.push('a' + i);
+      }
+      arrays.insertAll(target, target, 0);
+      expect(target.length).toEqual(2_000_000);
+      expect(target[0]).toBe('a0');
+      expect(target[999_999]).toBe('a999999');
+      expect(target[1_000_000]).toBe('a0');
+      expect(target[1_999_999]).toBe('a999999');
+    });
   });
 
   describe('insertSorted', () => {
@@ -795,6 +834,80 @@ describe('arrays', () => {
       expect(arrays.last(['a', 'b', ''])).toBe('');
     });
 
+  });
+
+  describe('pushAll', () => {
+    it('pushes the elements of the source array into the target array', () => {
+      let target = ['a', 'b', 'c'];
+      let source = ['d', 'e', 'f'];
+      arrays.pushAll(target, source);
+      expect(target).toEqual(['a', 'b', 'c', 'd', 'e', 'f']);
+
+      target = ['a', 'b', 'c'];
+      source = [];
+      arrays.pushAll(target, source);
+      expect(target).toEqual(['a', 'b', 'c']);
+
+      target = [];
+      source = ['d', 'e', 'f'];
+      arrays.pushAll(target, source);
+      expect(target).toEqual(['d', 'e', 'f']);
+
+      target = ['a', 'b', 'c'];
+      source = [];
+      arrays.pushAll(target, source);
+      expect(target).toEqual(['a', 'b', 'c']);
+
+      target = ['a', 'b', 'c'];
+      source = null;
+      arrays.pushAll(target, source);
+      expect(target).toEqual(['a', 'b', 'c']);
+
+      target = [];
+      source = [];
+      arrays.pushAll(target, source);
+      expect(target).toEqual([]);
+    });
+
+    it('can insert many elements without error', () => {
+      let target = [];
+      let source = [];
+      for (let i = 0; i < 1_000_000; i++) {
+        target.push('a' + i);
+        source.push('b' + i);
+      }
+
+      arrays.pushAll(target, source);
+      expect(target.length).toEqual(2_000_000);
+      expect(target[0]).toBe('a0');
+      expect(target[999_999]).toBe('a999999');
+      expect(target[1_000_000]).toBe('b0');
+      expect(target[1_999_999]).toBe('b999999');
+      // Check chunk start points
+      for (let i = 0; i < 1_000_000; i += 100_000) {
+        expect(target[i]).toBe('a' + i);
+      }
+      for (let i = 0; i < 1_000_000; i += 100_000) {
+        expect(target[i + 1_000_000]).toBe('b' + i);
+      }
+    });
+
+    it('works even if both arrays are the same instance', () => {
+      let target = ['a', 'b', 'c'];
+      arrays.pushAll(target, target);
+      expect(target).toEqual(['a', 'b', 'c', 'a', 'b', 'c']);
+
+      target = [];
+      for (let i = 0; i < 1_000_000; i++) {
+        target.push('a' + i);
+      }
+      arrays.pushAll(target, target);
+      expect(target.length).toEqual(2_000_000);
+      expect(target[0]).toBe('a0');
+      expect(target[999_999]).toBe('a999999');
+      expect(target[1_000_000]).toBe('a0');
+      expect(target[1_999_999]).toBe('a999999');
+    });
   });
 
   describe('pushIfDefined', () => {
