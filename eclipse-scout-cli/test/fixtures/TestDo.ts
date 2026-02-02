@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,15 +12,15 @@ import {Test2Do} from './Test2Do'; // reference to class in own module
 
 @typeName('test.Test')
 export class TestDo extends BaseDoEntity {
-  num?: number;
-  id?: string;
-  bool?: boolean;
-  arr1?: string[];
-  arr2?: Array<Array<number>>;
-  stringLiteralType?: 'stringLiteral';
-  secondInSameFileDo?: SecondInSameFileDo<Array<boolean>>;
-  set?: Set<string>;
-  map?: Map<string, number>;
+  num: number;
+  id: string;
+  bool: boolean;
+  arr1: string[];
+  arr2: Array<Array<number>>;
+  stringLiteralType: 'stringLiteral';
+  secondInSameFileDo: SecondInSameFileDo<Array<boolean>>;
+  set: Set<string>;
+  map: Map<string, number>;
   noType;
   anyType: any;
   unknownType: unknown;

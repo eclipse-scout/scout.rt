@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -49,20 +49,20 @@ export interface IBookmarkPageDo extends BaseDoEntity {
 
 @typeName('scout.NodeBookmarkPage')
 export class NodeBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo {
-  pageParam?: PageParamDo;
-  displayText?: string;
+  pageParam: PageParamDo;
+  displayText: string;
 }
 
 @typeName('scout.TableBookmarkPage')
 export class TableBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo {
-  pageParam?: PageParamDo;
-  displayText?: string;
-  expandedChildRow?: BookmarkTableRowIdentifierDo;
-  selectedChildRows?: BookmarkTableRowIdentifierDo[];
-  searchFilterComplete?: boolean;
-  searchData?: ISearchDo;
-  tablePreferences?: TableClientUiPreferencesDo;
-  chartTableControlConfig?: IChartTableControlConfigDo;
+  pageParam: PageParamDo;
+  displayText: string;
+  expandedChildRow: BookmarkTableRowIdentifierDo;
+  selectedChildRows: BookmarkTableRowIdentifierDo[];
+  searchFilterComplete: boolean;
+  searchData: ISearchDo;
+  tablePreferences: TableClientUiPreferencesDo;
+  chartTableControlConfig: IChartTableControlConfigDo;
 }
 
 export interface IChartTableControlConfigDo extends BaseDoEntity {
@@ -116,31 +116,31 @@ export class BookmarkTableRowIdentifierLongComponentDo extends BaseDoEntity impl
 
 @typeName('scout.TableClientUiPreferences')
 export class TableClientUiPreferencesDo extends BaseDoEntity {
-  tableId?: string;
-  userPreferenceContext?: string;
-  tileMode?: boolean;
-  tileGlobalKey?: string;
-  tablePreferenceProfiles?: Map<string, TableClientUiPreferenceProfileDo>;
+  tableId: string;
+  userPreferenceContext: string;
+  tileMode: boolean;
+  tileGlobalKey: string;
+  tablePreferenceProfiles: Map<string, TableClientUiPreferenceProfileDo>;
 }
 
 @typeName('scout.TableClientUiPreferenceProfile')
 export class TableClientUiPreferenceProfileDo extends BaseDoEntity {
-  columns?: TableColumnClientUiPreferenceDo[];
-  userFilters?: IUserFilterStateDo[];
-  tableCustomizerData?: ITableCustomizerDo;
+  columns: TableColumnClientUiPreferenceDo[];
+  userFilters: IUserFilterStateDo[];
+  tableCustomizerData: ITableCustomizerDo;
 }
 
 @typeName('scout.TableColumnClientUiPreference')
 export class TableColumnClientUiPreferenceDo extends BaseDoEntity {
-  columnId?: string;
-  viewIndex?: number;
-  visible?: boolean;
-  width?: number;
-  sortOrder?: number;
-  sortAscending?: boolean;
-  groupingActive?: boolean;
-  aggregationFunctionId?: string;
-  backgroundEffectId?: string;
+  columnId: string;
+  viewIndex: number;
+  visible: boolean;
+  width: number;
+  sortOrder: number;
+  sortAscending: boolean;
+  groupingActive: boolean;
+  aggregationFunctionId: string;
+  backgroundEffectId: string;
 }
 
 export interface IUserFilterStateDo extends BaseDoEntity {
@@ -148,42 +148,42 @@ export interface IUserFilterStateDo extends BaseDoEntity {
 
 @typeName('scout.BooleanColumnUserFilterState')
 export class BooleanColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  columnId?: string;
-  selectedValues?: Set<boolean>;
+  columnId: string;
+  selectedValues: Set<boolean>;
 }
 
 @typeName('scout.ColumnUserFilterState')
 export class ColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  columnId?: string;
-  selectedValues?: Set<string>;
+  columnId: string;
+  selectedValues: Set<string>;
 }
 
 @typeName('scout.DateColumnUserFilterState')
 export class DateColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  columnId?: string;
-  selectedValues?: Set<number>;
-  dateFrom?: Date;
-  dateTo?: Date;
+  columnId: string;
+  selectedValues: Set<number>;
+  dateFrom: Date;
+  dateTo: Date;
 }
 
 @typeName('scout.NumberColumnUserFilterState')
 export class NumberColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  columnId?: string;
-  selectedValues?: Set<number>;
-  numberFrom?: number;
-  numberTo?: number;
+  columnId: string;
+  selectedValues: Set<number>;
+  numberFrom: number;
+  numberTo: number;
 }
 
 @typeName('scout.TableTextUserFilterState')
 export class TableTextUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  text?: string;
+  text: string;
 }
 
 @typeName('scout.TextColumnUserFilterState')
 export class TextColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
-  columnId?: string;
-  selectedValues?: Set<string>;
-  textFilter?: string;
+  columnId: string;
+  selectedValues: Set<string>;
+  textFilter: string;
 }
 
 export interface ITableCustomizerDo extends BaseDoEntity {
@@ -193,10 +193,10 @@ export interface ITableCustomizerDo extends BaseDoEntity {
 
 @typeName('scout.UiPreferences')
 export class UiPreferencesDo extends BaseDoEntity {
-  tablePreferences?: TableClientUiPreferencesDo[];
+  tablePreferences: TableClientUiPreferencesDo[];
 }
 
 @typeName('scout.UiPreferencesUpdate')
 export class UiPreferencesUpdateDo extends BaseDoEntity {
-  preferences?: UiPreferencesDo;
+  preferences: UiPreferencesDo;
 }

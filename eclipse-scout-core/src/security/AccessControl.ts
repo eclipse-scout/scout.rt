@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -141,13 +141,13 @@ export class PermissionUpdateMessageDo extends BaseDoEntity {
 
 @typeName('scout.Permission')
 export class PermissionDo extends BaseDoEntity implements PermissionModel {
-  id?: string;
-  objectType?: string;
-  level?: PermissionLevel;
+  id: string;
+  objectType: string;
+  level: PermissionLevel;
 }
 
 @typeName('scout.PermissionCollection')
 export class PermissionCollectionDo extends BaseDoEntity implements PermissionCollectionModel {
-  permissions?: Record<string, PermissionDo[]>;
-  type?: PermissionCollectionType;
+  permissions: Record<string, PermissionDo[]>;
+  type: PermissionCollectionType;
 }
