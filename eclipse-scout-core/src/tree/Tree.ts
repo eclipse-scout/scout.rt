@@ -3082,8 +3082,8 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     // Filter nodes
     this.nodes.forEach(node => {
       let result = this.applyFiltersForNode(node, false, this.filterAnimated);
-      newlyHidden.push(...result.newlyHidden);
-      newlyShown.push(...result.newlyShown);
+      arrays.pushAll(newlyHidden, result.newlyHidden);
+      arrays.pushAll(newlyShown, result.newlyShown);
     });
     return {
       newlyHidden: newlyHidden,
@@ -3139,8 +3139,8 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     let parent = node.parentNode;
     while (parent) {
       let parentResult = this._applyFiltersForNodeRec(parent, false, animated);
-      result.newlyHidden.unshift(...parentResult.newlyHidden);
-      result.newlyShown.unshift(...parentResult.newlyShown);
+      arrays.insertAll(result.newlyHidden, parentResult.newlyHidden, 0);
+      arrays.insertAll(result.newlyShown, parentResult.newlyShown, 0);
       parent = parent.parentNode;
     }
     this._nodesFiltered(result.newlyHidden);
@@ -3162,8 +3162,8 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       if (recursive) {
         node.childNodes.forEach(childNode => {
           let result = this._applyFiltersForNodeRec(childNode, true, animated);
-          newlyHidden.push(...result.newlyHidden);
-          newlyShown.push(...result.newlyShown);
+          arrays.pushAll(newlyHidden, result.newlyHidden);
+          arrays.pushAll(newlyShown, result.newlyShown);
           hasChildrenWithFilterAccepted = hasChildrenWithFilterAccepted || childNode.filterAccepted;
         });
       } else if (!node.filterAccepted) {
