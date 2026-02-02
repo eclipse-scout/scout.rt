@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.status.Status;
  * @see AbstractValueField#parseValueInternal(String)
  */
 @Order(10)
-public final class ParsingFailedStatus extends Status {
+public class ParsingFailedStatus extends Status {
   private static final long serialVersionUID = 1L;
   private final String m_parseInputString;
 
