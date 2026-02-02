@@ -60,11 +60,6 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   rebuildSuppressed: boolean;
   breadcrumbFilter: TreeBreadcrumbFilter;
   dragAndDropHandler: DragAndDropHandler;
-  /**
-   * performance optimization: E.g. rather than iterating over the whole tree when unchecking all nodes,
-   * we explicitly keep track of nodes to uncheck (useful e.g. for single-check mode in very large trees).
-   */
-  checkedNodes: TreeNode[];
   groupedNodes: Record<string, boolean>;
   visibleNodesFlat: TreeNode[];
   visibleNodesMap: Record<string, boolean>;
@@ -136,7 +131,6 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     this.filterSupport = this._createFilterSupport();
     this.filteredElementsDirty = false;
     this.filterAnimated = true;
-    this.checkedNodes = [];
     this.groupedNodes = {};
     this.visibleNodesFlat = [];
     this.visibleNodesMap = {};
@@ -358,9 +352,6 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     if (parentNode) {
       node.parentNode = parentNode;
       node.level = node.parentNode.level + 1;
-    }
-    if (node.checked) {
-      this.checkedNodes.push(node);
     }
     this._initTreeNodeInternal(node, parentNode);
     node.initialized = true;
@@ -2575,6 +2566,19 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     });
   }
 
+  /**
+   * @returns all checked nodes
+   */
+  get checkedNodes(): TreeNode[] {
+    let checkedNodes: TreeNode[] = [];
+    this.visitNodes(node => {
+      if (node.checked) {
+        checkedNodes.push(node);
+      }
+    });
+    return checkedNodes;
+  }
+
   checkNode(node: TreeNode, checked?: boolean, options?: TreeNodeCheckOptions) {
     let opts = $.extend(options, {
       checked: checked
@@ -2747,24 +2751,18 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     }
     node.checked = check;
     update.addNodeForRenderingAndEventTrigger(node);
-    if (check) {
-      this.checkedNodes.push(node);
-    } else {
-      arrays.remove(this.checkedNodes, node);
-    }
     return update;
   }
 
   protected _uncheckAll(): TreeCheckNodesResult {
     let updatedNodes = new TreeCheckNodesResult();
-    let checkedNodes = [...this.checkedNodes]; // Create copy, array may be modified
+    let checkedNodes = this.checkedNodes;
     for (const node of checkedNodes) {
       node.checked = false;
       node.childrenChecked = false;
       updatedNodes.add(this._checkParentsRecursive(node.parentNode));
       updatedNodes.addNodeForRenderingAndEventTrigger(node);
     }
-    this.checkedNodes = [];
     return updatedNodes;
   }
 
