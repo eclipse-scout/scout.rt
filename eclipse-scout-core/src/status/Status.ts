@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, DefaultStatus, EnumObject, FullModelOf, InitModelOf, NotificationBadgeStatus, ObjectOrModel, objects, ObjectWithType, ParsingFailedStatus, Predicate, scout, StatusModel, strings, ValidationFailedStatus} from '../index';
+import {
+  arrays, Constructor, DefaultStatus, EnumObject, FullModelOf, InitModelOf, NotificationBadgeStatus, ObjectOrModel, objects, ObjectWithType, ParsingFailedStatus, Predicate, scout, StatusModel, strings, ValidationFailedStatus
+} from '../index';
 import $ from 'jquery';
 
 export class Status implements StatusModel, ObjectWithType {
@@ -87,21 +89,20 @@ export class Status implements StatusModel, ObjectWithType {
   }
 
   /**
-   * @returns a clone of this Status instance.
+   * @returns a deep clone of this Status instance.
    */
-  clone(): Status {
-    let modelClone = $.extend({}, this);
-    return new Status(modelClone);
+  clone(): this {
+    return objects.copyPropertiesRecursive(this, new (this.constructor as Constructor<this>)());
   }
 
   equals(o: any): boolean {
-    if (!(o instanceof Status)) {
+    if (this.constructor !== o?.constructor) {
       return false;
     }
     if (!objects.equalsRecursive(this.children, o.children)) {
       return false;
     }
-    return objects.propertiesEquals(this, o, ['severity', 'message', 'invalidDate', 'invalidTime']);
+    return objects.propertiesEquals(this, o, ['severity', 'message', 'invalidDate'/* used by DateField */, 'invalidTime'/* used by DateField */]);
   }
 
   /**

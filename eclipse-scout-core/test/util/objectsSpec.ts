@@ -196,9 +196,8 @@ describe('objects', () => {
       expect(objects.valueCopy(false)).toBeFalse();
     });
 
-    it('returns the input if class cannot be copied', () => {
-      const toClone = new NullLayout();
-      expect(objects.valueCopy(toClone)).toBe(toClone);
+    it('throws if class cannot be copied', () => {
+      expect(() => objects.valueCopy(new NullLayout())).toThrow();
     });
 
     it('deep copies arrays', () => {
