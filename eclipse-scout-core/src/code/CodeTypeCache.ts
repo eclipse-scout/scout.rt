@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -180,14 +180,14 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
 
 @typeName('scout.CodeTypeUpdateMessage')
 export class CodeTypeUpdateMessageDo extends BaseDoEntity {
-  codeTypes?: CodeTypeDo[];
-  codeTypeIds?: string[];
-  reloadDelayWindow?: number;
+  codeTypes: CodeTypeDo[];
+  codeTypeIds: string[];
+  reloadDelayWindow: number;
 }
 
 @typeName('scout.CodeTypeRequest')
 export class CodeTypeRequest extends BaseDoEntity {
-  codeTypeIds?: string[];
+  codeTypeIds: string[];
 }
 
 export const codes: CodeTypeCache = objects.createSingletonProxy(CodeTypeCache);

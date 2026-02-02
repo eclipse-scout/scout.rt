@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,13 +11,13 @@ import {BaseDoEntity, CodeDo, CodeTypeModel, typeName} from '../index';
 
 @typeName('scout.CodeType')
 export class CodeTypeDo extends BaseDoEntity implements CodeTypeModel {
-  id?: string;
-  objectType?: string;
-  modelClass?: string;
-  iconId?: string;
-  hierarchical?: boolean;
-  maxLevel?: number;
-  texts?: Record<string, string>;
-  textsPlural?: Record<string, string>;
-  codes?: CodeDo[];
+  id: string;
+  objectType: string;
+  modelClass: string;
+  iconId: string;
+  hierarchical: boolean;
+  maxLevel: number;
+  texts: Record<string, string>;
+  textsPlural: Record<string, string>;
+  codes: CodeDo[];
 }
