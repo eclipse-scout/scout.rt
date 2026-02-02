@@ -217,6 +217,7 @@ export const objects = {
    * * All objects (except Widget) having a `clone` function (expected to create a deep clone without taking any arguments). These are classes like `BaseDoEntity`, `Dimension`, `GridData`, `Insets`, `Point`, `Status`, `URL`, ...
    * @param val The value to deep clone.
    * @returns The deep clone if supported, the input value otherwise.
+   * @throws Error if the given value cannot be cloned.
    */
   valueCopy<T>(val: T): T {
     if (objects.isPojo(val)) {
@@ -224,6 +225,9 @@ export const objects = {
     }
     if (objects.isArray(val)) {
       return val.map(e => objects.valueCopy(e)) as T;
+    }
+    if (!objects.isObject(val)) {
+      return val; // primitives, null, undefined
     }
     return deepCloneClass(val); // handles all class types
   },
@@ -234,6 +238,7 @@ export const objects = {
    * All properties are recursively cloned using {@link objects#valueCopy}. Therefore, only properties of types supported by {@link objects#valueCopy} must be present.
    * @param source Where to get the properties to copy.
    * @param destination Where to store the cloned properties.
+   * @throws Error if a property cannot be cloned (see {@link objects#valueCopy} for details).
    */
   copyPropertiesRecursive<T>(source: T, destination: T): T {
     for (const [k, v] of Object.entries(source)) {
@@ -900,7 +905,7 @@ function deepCloneClass(val: any): any {
     }
   }
 
-  return val;
+  throw new Error(val.constructor + ' is not cloneable'); // clone not supported: a widget or no 'clone' function available
 }
 
 function equalsImpl(objA: any, objB: any, useEqualsFunc = true): boolean | null {

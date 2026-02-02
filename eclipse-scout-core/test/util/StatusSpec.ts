@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,9 +7,47 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DefaultStatus, NotificationBadgeStatus, ParsingFailedStatus, Status} from '../../src/index';
+import {DefaultStatus, NotificationBadgeStatus, ParsingFailedStatus, scout, Status, ValidationFailedStatus} from '../../src/index';
 
 describe('Status', () => {
+
+  describe('clone', () => {
+    it('creates the correct instance', () => {
+      const orig = scout.create(NotificationBadgeStatus, {
+        severity: Status.Severity.WARNING,
+        message: 'test'
+      });
+      const copy = orig.clone();
+      expect(copy).not.toBe(orig);
+      expect(copy).toBeInstanceOf(NotificationBadgeStatus);
+      expect(copy.severity).toEqual(Status.Severity.WARNING);
+      expect(copy.message).toEqual('test');
+    });
+
+    it('creates a deep copy', () => {
+      const orig = scout.create({
+        objectType: ValidationFailedStatus,
+        severity: Status.Severity.WARNING,
+        message: 'deep-test'
+      });
+      orig.children = [scout.create(ParsingFailedStatus, {severity: Status.Severity.INFO, message: 'nested-test'})];
+      expect(orig).toBeInstanceOf(ValidationFailedStatus);
+      expect(orig.children[0]).toBeInstanceOf(ParsingFailedStatus);
+
+      const copy = orig.clone();
+      expect(copy).not.toBe(orig);
+      expect(copy).toBeInstanceOf(ValidationFailedStatus);
+
+      const childCopy = copy.children[0];
+      expect(childCopy).toBeInstanceOf(ParsingFailedStatus);
+      expect(childCopy.severity).toBe(Status.Severity.INFO);
+      expect(childCopy.message).toBe('nested-test');
+
+      childCopy.severity = Status.Severity.WARNING;
+      expect(orig.children[0].severity).toBe(Status.Severity.INFO);
+      expect(copy.children[0].severity).toBe(Status.Severity.WARNING);
+    });
+  });
 
   describe('convenience functions', () => {
 
