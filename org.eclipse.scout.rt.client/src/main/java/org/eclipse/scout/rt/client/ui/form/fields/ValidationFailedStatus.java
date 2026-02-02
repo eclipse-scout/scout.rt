@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.status.Status;
  * @see AbstractValueField#validateValueInternal(Object)
  */
 @Order(20)
-public final class ValidationFailedStatus<VALUE> extends Status {
+public class ValidationFailedStatus<VALUE> extends Status {
 
   private static final long serialVersionUID = 1L;
   private final VALUE m_invalidValue;
@@ -37,7 +37,11 @@ public final class ValidationFailedStatus<VALUE> extends Status {
   }
 
   public ValidationFailedStatus(String message, int severity, int code, VALUE invalidValue) {
-    super(message, severity, code);
+    this(message, severity, code, invalidValue, null);
+  }
+
+  public ValidationFailedStatus(String message, int severity, int code, VALUE invalidValue, String iconId) {
+    super(message, severity, code, iconId);
     m_invalidValue = invalidValue;
   }
 
