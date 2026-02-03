@@ -9,11 +9,10 @@
  */
 package org.eclipse.scout.rt.ui.html.json.basic.filechooser;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.resource.MimeType;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,74 +20,98 @@ public class JsonFileChooserAcceptAttributeBuilderTest {
 
   @Test
   public void testNop() {
-    Assert.assertEquals(setOf(), new JsonFileChooserAcceptAttributeBuilder()
+    Assert.assertEquals(Set.of(), new JsonFileChooserAcceptAttributeBuilder()
         .build());
   }
 
   @Test
   public void testNull() {
-    Assert.assertEquals(setOf(), new JsonFileChooserAcceptAttributeBuilder()
+    Assert.assertEquals(Set.of(), new JsonFileChooserAcceptAttributeBuilder()
         .withType(null)
         .build());
   }
 
   @Test
   public void testNulls() {
-    Assert.assertEquals(setOf(), new JsonFileChooserAcceptAttributeBuilder()
+    Assert.assertEquals(Set.of(), new JsonFileChooserAcceptAttributeBuilder()
         .withTypes(null)
         .build());
   }
 
   @Test
   public void testExt1() {
-    Assert.assertEquals(setOf("text/plain"), new JsonFileChooserAcceptAttributeBuilder()
+    Assert.assertEquals(Set.of("text/plain"), new JsonFileChooserAcceptAttributeBuilder()
         .withType("txt")
         .build());
   }
 
   @Test
   public void testExt2() {
-    Assert.assertEquals(setOf("text/plain"), new JsonFileChooserAcceptAttributeBuilder()
+    Assert.assertEquals(Set.of("text/plain"), new JsonFileChooserAcceptAttributeBuilder()
         .withType(".txt")
         .build());
   }
 
   @Test
   public void testExt3() {
-    Assert.assertEquals(setOf("text/plain"), new JsonFileChooserAcceptAttributeBuilder()
+    Assert.assertEquals(Set.of("text/plain"), new JsonFileChooserAcceptAttributeBuilder()
         .withType("*.txt")
         .build());
   }
 
   @Test
   public void testMime() {
-    Assert.assertEquals(setOf("text/plain"), new JsonFileChooserAcceptAttributeBuilder()
+    Assert.assertEquals(Set.of("text/plain"), new JsonFileChooserAcceptAttributeBuilder()
         .withType(MimeType.TXT.getType())
         .build());
   }
 
   @Test
   public void testExtWithCsv() {
-    Assert.assertEquals(setOf(".csv"), new JsonFileChooserAcceptAttributeBuilder()
+    Assert.assertEquals(Set.of(".csv"), new JsonFileChooserAcceptAttributeBuilder()
         .withType("csv")
         .build());
   }
 
   @Test
   public void testMimeWithCsv() {
-    Assert.assertEquals(setOf(".csv"), new JsonFileChooserAcceptAttributeBuilder()
+    Assert.assertEquals(Set.of(".csv"), new JsonFileChooserAcceptAttributeBuilder()
         .withType(MimeType.CSV.getType())
         .build());
   }
 
   @Test
+  public void testMimeWithJs() {
+    Assert.assertEquals(Set.of(".js", ".mjs"), new JsonFileChooserAcceptAttributeBuilder()
+        .withType(MimeType.JS.getType())
+        .build());
+  }
+
+  @Test
+  public void testExtWithJs() {
+    Assert.assertEquals(Set.of(".js", ".mjs"), new JsonFileChooserAcceptAttributeBuilder()
+        .withType("js")
+        .build());
+  }
+
+  @Test
+  public void testExtWithMjs() {
+    Assert.assertEquals(Set.of(".js", ".mjs"), new JsonFileChooserAcceptAttributeBuilder()
+        .withType("mjs")
+        .build());
+  }
+
+  @Test
   public void testUnknownMime() {
-    Assert.assertEquals(setOf("foo/bar"), new JsonFileChooserAcceptAttributeBuilder()
+    Assert.assertEquals(Set.of("foo/bar"), new JsonFileChooserAcceptAttributeBuilder()
         .withType("foo/bar")
         .build());
   }
 
-  private static Set<String> setOf(String... elements) {
-    return new HashSet<>(Arrays.asList(elements));
+  @Test
+  public void testMultiple() {
+    Assert.assertEquals(Set.of(".js", ".mjs", "image/png", "video/avi"), new JsonFileChooserAcceptAttributeBuilder()
+        .withTypes(CollectionUtility.arrayList(MimeType.JS.getType(), MimeType.PNG.getType(), MimeType.AVI.getType()))
+        .build());
   }
 }
