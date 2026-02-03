@@ -1798,7 +1798,7 @@ describe('Tree', () => {
 
         let eventCount = 0;
         tree.on('nodesChecked', event => {
-          expect(event.nodes).toEqual([child, ...child.childNodes, parent]); // Order is not important
+          expect(event.nodes).toEqual([...child.childNodes, child, parent]);
           eventCount++;
         });
         tree.uncheckNode(child);
@@ -1911,6 +1911,97 @@ describe('Tree', () => {
       expect(checkedNodes.length).toBe(1);
     });
 
+  });
+
+  describe('toggleChecked', () => {
+    it('checks the nodes if no nodes are checked', () => {
+      let model = helper.createModelFixture(2, 2);
+      let tree = helper.createTree({...model, checkable: true});
+      tree.render();
+      expect(tree.nodes[0].checked).toBe(false);
+      expect(tree.nodes[1].checked).toBe(false);
+
+      tree.toggleChecked(tree.nodes);
+      expect(tree.nodes[0].checked).toBe(true);
+      expect(tree.nodes[1].checked).toBe(true);
+    });
+
+    it('checks the nodes if some nodes are checked', () => {
+      let model = helper.createModelFixture(2, 2);
+      let tree = helper.createTree({...model, checkable: true});
+      tree.render();
+      tree.checkNode(tree.nodes[0]);
+      expect(tree.nodes[0].checked).toBe(true);
+      expect(tree.nodes[1].checked).toBe(false);
+
+      tree.toggleChecked(tree.nodes);
+      expect(tree.nodes[0].checked).toBe(true);
+      expect(tree.nodes[1].checked).toBe(true);
+    });
+
+    it('unchecks the nodes if all nodes are checked', () => {
+      let model = helper.createModelFixture(2, 2);
+      let tree = helper.createTree({...model, checkable: true});
+      tree.render();
+      tree.checkNodes(tree.nodes);
+      expect(tree.nodes[0].checked).toBe(true);
+      expect(tree.nodes[1].checked).toBe(true);
+
+      tree.toggleChecked(tree.nodes);
+      expect(tree.nodes[0].checked).toBe(false);
+      expect(tree.nodes[1].checked).toBe(false);
+    });
+
+    it('checks the nodes if some are partly-checked', () => {
+      let model = helper.createModelFixture(2, 2);
+      let tree = helper.createTree({...model, checkable: true});
+      tree.render();
+      tree.checkNodes(tree.nodes[0].childNodes);
+      expect(tree.nodes[0].childrenChecked).toBe(true);
+      expect(tree.nodes[0].checked).toBe(false);
+      expect(tree.nodes[1].checked).toBe(false);
+
+      tree.toggleChecked(tree.nodes);
+      expect(tree.nodes[0].checked).toBe(true);
+      expect(tree.nodes[1].checked).toBe(true);
+    });
+
+    it('checks the nodes if some are partly-checked in autoCheckChildren mode', () => {
+      let model = helper.createModelFixture(2, 2);
+      let tree = helper.createTree({...model, checkable: true, autoCheckChildren: true});
+      tree.render();
+      tree.checkNode(tree.nodes[0].childNodes[0]);
+      expect(tree.nodes[0].childrenChecked).toBe(true);
+      expect(tree.nodes[0].checked).toBe(false);
+      expect(tree.nodes[1].checked).toBe(false);
+
+      tree.toggleChecked(tree.nodes);
+      expect(tree.nodes[0].checked).toBe(true);
+      expect(tree.nodes[1].checked).toBe(true);
+    });
+
+    it('unchecks the nodes in autoCheckChildren mode if some are partly-checked and nodes could not be checked', () => {
+      let model = helper.createModelFixture(2, 1);
+      let tree = helper.createTree({...model, checkable: true, autoCheckChildren: true});
+      tree.render();
+      tree.nodes[0].childNodes[0].setEnabled(false);
+      tree.checkNode(tree.nodes[0]);
+      expect(tree.nodes[0].childrenChecked).toBe(true);
+      expect(tree.nodes[0].checked).toBe(false);
+      expect(tree.nodes[1].checked).toBe(false);
+
+      // Second node could be checked
+      tree.toggleChecked(tree.nodes);
+      expect(tree.nodes[0].childrenChecked).toBe(true);
+      expect(tree.nodes[0].checked).toBe(false);
+      expect(tree.nodes[1].checked).toBe(true);
+
+      // No node could be checked -> Uncheck all
+      tree.toggleChecked(tree.nodes);
+      expect(tree.nodes[0].childrenChecked).toBe(false);
+      expect(tree.nodes[0].checked).toBe(false);
+      expect(tree.nodes[1].checked).toBe(false);
+    });
   });
 
   describe('node click', () => {

@@ -379,7 +379,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   }
 
   protected _destroyTreeNode(node: TreeNode) {
-    this._checkNode(node, false, false); // deleted = unchecked
+    this._checkNode(node, {checked: false, checkOnlyEnabled: false}); // deleted = unchecked
     delete this.nodesMap[node.id];
     this._removeFromFlatList(node, false); // ensure node is not longer in visible nodes list.
     node.destroy();
@@ -2591,17 +2591,48 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     return checkedNodes;
   }
 
-  checkNode(node: TreeNode, checked?: boolean, options?: TreeNodeCheckOptions) {
+  /**
+   * Checks all nodes if no or some nodes are checked.
+   * Unchecks all nodes if all nodes are checked.
+   */
+  toggleChecked(nodes: TreeNode | TreeNode[]) {
+    nodes = arrays.ensure(nodes).filter(node => node.enabled);
+    if (!nodes.length) {
+      return;
+    }
+
+    // Toggle checked state to 'true', except if every node is already checked
+    let checked = nodes.some(node => !node.checked);
+
+    // Remember the partly checked state in autoCheckChildren mode (see below)
+    let hadPartlyCheckedNodes = this.autoCheckChildren && checked ? nodes.some(node => node.childrenChecked) : false;
+
+    let changed = this.checkNodes(nodes, {checked});
+
+    // If autoCheckChildren is true, checking a node may be prevented if a child node is disabled and the node stays in partly-checked state
+    // So if checking the nodes did nothing, try again with checked = false.
+    if (!changed && hadPartlyCheckedNodes) {
+      this.checkNodes(nodes, {checked: false});
+    }
+  }
+
+  /**
+   * @returns true if the node changed its state, false otherwise.
+   */
+  checkNode(node: TreeNode, checked?: boolean, options?: TreeNodeCheckOptions): boolean {
     let opts = $.extend(options, {
       checked: checked
     });
-    this.checkNodes([node], opts);
+    return this.checkNodes([node], opts);
   }
 
-  checkNodes(nodes: TreeNode | TreeNode[], options?: TreeNodeCheckOptions) {
+  /**
+   * @returns true if any node changed its state, false otherwise.
+   */
+  checkNodes(nodes: TreeNode | TreeNode[], options?: TreeNodeCheckOptions): boolean {
     nodes = arrays.ensure(nodes).filter(e => !!e); // Filter empty array elements
     if (!nodes.length) {
-      return;
+      return false;
     }
 
     // Build options
@@ -2615,7 +2646,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
 
     // use enabled computed because when the parent of the table is disabled, it should not be allowed to check rows
     if (!this.checkable || !this.enabledComputed && opts.checkOnlyEnabled) {
-      return;
+      return false;
     }
 
     let updatedNodes = new TreeCheckNodesResult();
@@ -2636,7 +2667,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     let parentNodes = new Set<TreeNode>();
     for (const node of nodes) {
       // Update this node, if possible
-      updatedNodes.add(this._checkNode(node, opts.checked, opts.checkOnlyEnabled));
+      updatedNodes.add(this._checkNode(node, opts));
 
       // Update child nodes when necessary
       if (opts.checkChildren && this.multiCheck) {
@@ -2656,6 +2687,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
 
     // Trigger events and render
     this._processTreeCheckNodesResult(updatedNodes, opts.triggerNodesChecked);
+    return updatedNodes.requireRenderTreeNodes.size > 0;
   }
 
   protected _checkChildrenRecursive(parentNode: TreeNode, opts: TreeNodeCheckOptions): TreeCheckNodesResult {
@@ -2666,8 +2698,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
 
     for (const node of parentNode.childNodes) {
       // Update node if possible
-      let update = this._checkNode(node, opts.checked, opts.checkOnlyEnabled);
-      updatedNodes.add(update);
+      updatedNodes.add(this._checkNode(node, opts));
 
       // Remove children checked status
       let editable = this._isNodeEditable(node, opts.checkOnlyEnabled);
@@ -2719,6 +2750,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       let someChildNodesChecked = someChildrenChecked();
       if (someChildNodesChecked !== node.childrenChecked) {
         node.childrenChecked = someChildNodesChecked;
+        updatedNodes.addNodeForRendering(node);
         stateChanged = true;
       }
     } else {
@@ -2727,7 +2759,8 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       // Parent is not checked if no child is checked
       let allChildNodesFullyChecked = node.childNodes.length > 0 && node.childNodes.every(childNode => childNode.checked);
       if (allChildNodesFullyChecked !== node.checked) {
-        updatedNodes.add(this._checkNode(node, allChildNodesFullyChecked, false));
+        updatedNodes.add(this._checkNode(node, {checked: allChildNodesFullyChecked, checkOnlyEnabled: false}));
+        updatedNodes.addNodeForRenderingAndEventTrigger(node);
         stateChanged = true;
       }
 
@@ -2737,15 +2770,13 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       let someChildNodesChecked = !allChildNodesFullyChecked && someChildrenChecked();
       if (someChildNodesChecked !== node.childrenChecked) {
         node.childrenChecked = someChildNodesChecked;
+        updatedNodes.addNodeForRendering(node);
         stateChanged = true;
       }
     }
 
-    if (stateChanged) {
-      updatedNodes.addNodeForRendering(node);
-      if (node.parentNode) {
-        updatedNodes.add(this._checkParentsRecursive(node.parentNode));
-      }
+    if (stateChanged && node.parentNode) {
+      updatedNodes.add(this._checkParentsRecursive(node.parentNode));
     }
 
     function someChildrenChecked(): boolean {
@@ -2755,13 +2786,21 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     return updatedNodes;
   }
 
-  protected _checkNode(node: TreeNode, check: boolean, checkOnlyEnabledNodes = true): TreeCheckNodesResult {
+  protected _checkNode(node: TreeNode, opts: TreeNodeCheckOptions): TreeCheckNodesResult {
     let update = new TreeCheckNodesResult();
-    // Do nothing when node is already checked or is not editable
-    if (node.checked === check || !this._isNodeEditable(node, checkOnlyEnabledNodes)) {
+    if (opts.checkChildren && node.childNodes.length > 0) {
+      // Don't check if node has child nodes as they determine the checked state in autoCheckChildren mode (see checkParentsRecursive)
+      // This ensures the node is only added to the TreeCheckNodesResult if really necessary
       return update;
     }
-    node.checked = check;
+
+    // Do nothing when node is already checked or is not editable
+    let checkOnlyEnabled = scout.nvl(opts.checkOnlyEnabled, true);
+    if (node.checked === opts.checked || !this._isNodeEditable(node, checkOnlyEnabled)) {
+      return update;
+    }
+
+    node.checked = opts.checked;
     update.addNodeForRenderingAndEventTrigger(node);
     return update;
   }
@@ -2782,6 +2821,9 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     return (checkOnlyEnabled ? node.enabled : true) && node.filterAccepted;
   }
 
+  /**
+   * @returns true if the node changed its state, false otherwise.
+   */
   uncheckNode(node: TreeNode, options?: TreeNodeUncheckOptions) {
     let opts = $.extend({checkOnlyEnabled: true}, options);
     this.uncheckNodes([node], opts);
@@ -2789,8 +2831,9 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
 
   /**
    * @param nodes the nodes to uncheck
+   * @returns true if any node changed its state, false otherwise.
    */
-  uncheckNodes(nodes: TreeNode[], options?: TreeNodeUncheckOptions) {
+  uncheckNodes(nodes: TreeNode[], options?: TreeNodeUncheckOptions): boolean {
     let opts: TreeNodeUncheckOptions = {
       checked: false,
       collectChildren: false
@@ -2799,7 +2842,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     if (opts.collectChildren) {
       nodes = nodes.concat(this._collectNodesIfDescendants(nodes, this.checkedNodes));
     }
-    this.checkNodes(nodes, opts);
+    return this.checkNodes(nodes, opts);
   }
 
   protected _triggerNodesSelected(debounce?: boolean) {
@@ -2864,7 +2907,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       if (Device.get().loosesFocusIfPseudoElementIsRemoved()) {
         this.focusAndPreventDefault(event);
       }
-      this.checkNode(node, !node.checked);
+      this.toggleChecked(node);
     }
     return true;
   }
