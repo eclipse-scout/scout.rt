@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPortConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringListConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -631,6 +632,42 @@ public final class ApplicationProperties {
     @Override
     public String description() {
       return "Enables monitoring for low resources of the Jetty server. Default value is " + getDefaultValue() + ".";
+    }
+  }
+
+  public static class ScoutApplicationGracefulShutdownProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.gracefulShutdown";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return Boolean.TRUE;
+    }
+
+    @Override
+    public String description() {
+      return "Enables graceful shutdown of the Jetty server (allowing active requests to terminate). Default value is " + getDefaultValue() + ".";
+    }
+  }
+
+  public static class ScoutApplicationStopTimeoutProperty extends AbstractPositiveLongConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.stopTimeout";
+    }
+
+    @Override
+    public Long getDefaultValue() {
+      return TimeUnit.SECONDS.toMillis(20);
+    }
+
+    @Override
+    public String description() {
+      return "The server stop timeout in milliseconds to allow a proper shutdown. Default value is " + getDefaultValue() + ".";
     }
   }
 }
