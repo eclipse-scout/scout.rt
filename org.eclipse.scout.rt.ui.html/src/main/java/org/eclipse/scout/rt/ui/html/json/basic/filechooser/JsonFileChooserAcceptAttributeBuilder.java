@@ -17,14 +17,25 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.FileUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
- * Microsoft internet explorer is not correctly handlig mime types in the 'accept' atttribute.
- * <p>
- * For example valid text/csv is not recognized.
- * <p>
- * Therefore as a fallback for IE only we use file extensions for selected white-listed types.
- * <p>
+ * In this class we correct for browser-side bugs such as:
+ * <ul>
+ *   <li>
+ *     Microsoft Internet Explorer is not correctly handling mime types in the 'accept' attribute.
+ *     <p>
+ *     For example valid text/csv is not recognized.
+ *     <p>
+ *     Therefore as a fallback for IE only we use file extensions for selected white-listed types.
+ *   </li>
+ *   <li>
+ *     Mozilla Firefox has a bug (Bugzilla 201480) with the MIME type text/javascript.
+ *     <p>
+ *     As a fallback we also use the file extensions defined in RFC 9239 for this MIME type.
+ *   </li>
+ * </ul>
+ *
  * This bean builds the content of the accept attribute in
  * <code>&lt;input accept="file_extension|audio/*|video/*|image/*|media_type"&gt;</code>
  *
@@ -103,11 +114,17 @@ public class JsonFileChooserAcceptAttributeBuilder {
       case "text/csv":
       case "text/comma-separated-values":
         return ".csv";
+      case "text/javascript":
+        return StringUtility.join(",", ".js", ".mjs");
     }
     if (ext != null) {
       switch (ext) {
         case "csv":
           return ".csv";
+        case "js":
+          return ".js";
+        case "mjs":
+          return ".mjs";
       }
     }
     return mimeType;
