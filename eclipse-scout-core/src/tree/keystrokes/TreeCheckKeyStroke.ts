@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,9 +25,6 @@ export class TreeCheckKeyStroke extends KeyStroke {
   }
 
   override handle(event: JQuery.KeyboardEventBase) {
-    let selectedNodes = this.field.selectedNodes.filter(node => node.enabled);
-    // Toggle checked state to 'true', except if every node is already checked
-    let checked = selectedNodes.some(node => !node.checked);
-    this.field.checkNodes(selectedNodes, {checked});
+    this.field.toggleChecked(this.field.selectedNodes);
   }
 }
