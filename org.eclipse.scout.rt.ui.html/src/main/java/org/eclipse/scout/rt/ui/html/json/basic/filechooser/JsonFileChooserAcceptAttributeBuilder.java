@@ -11,28 +11,35 @@ package org.eclipse.scout.rt.ui.html.json.basic.filechooser;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 
 /**
- * Microsoft internet explorer is not correctly handlig mime types in the 'accept' atttribute.
- * <p>
- * For example valid text/csv is not recognized.
- * <p>
- * Therefore as a fallback for IE only we use file extensions for selected white-listed types.
- * <p>
  * This bean builds the content of the accept attribute in
  * <code>&lt;input accept="file_extension|audio/*|video/*|image/*|media_type"&gt;</code>
+ * In this class we correct for browser-side bugs such as:
+ * <ul>
+ *   <li>
+ *     Microsoft Internet Explorer is not correctly handling mime types in the 'accept' attribute. <br/>
+ *     For example valid text/csv is not recognized. <br/>
+ *     Therefore as a fallback for IE only we use file extensions for selected white-listed types.
+ *   </li>
+ *   <li>
+ *     Mozilla Firefox has a bug (Bugzilla 201480) with the MIME type text/javascript. <br/>
+ *     As a fallback we also use the file extensions defined in RFC 9239 for this MIME type.
+ *   </li>
+ * </ul>
  *
  * @since 5.2
  */
 @Bean
 public class JsonFileChooserAcceptAttributeBuilder {
-  private final Map<String, String> m_mimeTypeToAcceptType = new HashMap<>();
+  private final Map<String, Set<String>> m_mimeTypeToAcceptType = new HashMap<>();
 
   /**
    * append the collection of media types to the list
@@ -86,7 +93,9 @@ public class JsonFileChooserAcceptAttributeBuilder {
    * @return the completed set of accept types
    */
   public Set<String> build() {
-    return new HashSet<>(m_mimeTypeToAcceptType.values());
+    return m_mimeTypeToAcceptType.values().stream()
+        .flatMap(s -> s.stream())
+        .collect(Collectors.toSet());
   }
 
   /**
@@ -98,18 +107,24 @@ public class JsonFileChooserAcceptAttributeBuilder {
    * <p>
    * typically this is the mime type or the file extension with a leading '.'
    */
-  protected String convertToAcceptType(String mimeType, String ext) {
+  protected Set<String> convertToAcceptType(String mimeType, String ext) {
     switch (mimeType) {
       case "text/csv":
       case "text/comma-separated-values":
-        return ".csv";
+        return CollectionUtility.hashSet(".csv");
+      case "text/javascript":
+        return CollectionUtility.hashSet(".js", ".mjs");
     }
     if (ext != null) {
       switch (ext) {
         case "csv":
-          return ".csv";
+          return CollectionUtility.hashSet(".csv");
+        case "js":
+          return CollectionUtility.hashSet(".js");
+        case "mjs":
+          return CollectionUtility.hashSet(".mjs");
       }
     }
-    return mimeType;
+    return CollectionUtility.hashSet(mimeType);
   }
 }
