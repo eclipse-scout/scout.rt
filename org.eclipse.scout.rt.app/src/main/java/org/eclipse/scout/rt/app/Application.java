@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -50,6 +50,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.GracefulHandler;
 import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -58,6 +59,7 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationCertificat
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationConsoleInputHandlerEnabledProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationContextHandlerExtendedResourceLookup;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationContextPathProperty;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGracefulShutdownProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipEnabled;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipExcludedInflatePaths;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipExcludedMethods;
@@ -83,6 +85,7 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCoo
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigSameSiteProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigSecureProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionTimeoutProperty;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationStopTimeoutProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationThreadPoolMaxSizeProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationUseTlsProperty;
 import org.eclipse.scout.rt.app.handler.ScoutJettyErrorHandler;
@@ -215,6 +218,8 @@ public class Application {
 
     Handler handler = createHandler();
     server.setHandler(handler);
+
+    server.setStopTimeout(CONFIG.getPropertyValue(ScoutApplicationStopTimeoutProperty.class));
 
     return server;
   }
@@ -425,6 +430,7 @@ public class Application {
     String contextPath = CONFIG.getPropertyValue(ScoutApplicationContextPathProperty.class);
     handler.setContextPath(contextPath);
 
+    Handler returnHandler = handler;
     if (!"/".equals(contextPath)) {
       /*
        * Wraps the given <code>webAppContext</code> in a {@link P_RedirectToContextPathHandler} which redirects all GET
@@ -435,13 +441,18 @@ public class Application {
        * required when multiple Scout UI servers are run in parallel with different ports, because otherwise they would
        * destroy each other's HTTP session (cookies are not specific to the port, only to the host and context path).
        */
-      return new P_RedirectToContextPathHandler(handler);
+      returnHandler = new P_RedirectToContextPathHandler(handler);
     }
 
-    if (BooleanUtility.nvl(CONFIG.getPropertyValue(ScoutApplicationGzipEnabled.class), true)) {
-      return createCompressionHandler(handler);
+    if (CONFIG.getPropertyValue(ScoutApplicationGzipEnabled.class)) {
+      returnHandler = createCompressionHandler(returnHandler);
     }
-    return handler;
+
+    if (CONFIG.getPropertyValue(ScoutApplicationGracefulShutdownProperty.class)) {
+      returnHandler = createGracefulHandler(returnHandler);
+    }
+
+    return returnHandler;
   }
 
   /**
@@ -483,6 +494,10 @@ public class Application {
     // wrap the original handler
     compressionHandler.setHandler(handler);
     return compressionHandler;
+  }
+
+  protected Handler createGracefulHandler(Handler handler) {
+    return new GracefulHandler(handler);
   }
 
   protected void setStringPropertyValueIfFilled(Class<? extends IConfigProperty<List<String>>> propertyClass, Consumer<String> setter) {
