@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.mom.api;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
  * Keeps a list of {@link ISubscription}s that are registered during {@link #subscribe()}. All registered subscriptions
@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.Bean;
  *
  * @since 6.1
  */
-@Bean
+@ApplicationScoped
 public abstract class AbstractMomSubscriber {
 
   private final List<ISubscription> m_subscriptions = new ArrayList<>();
