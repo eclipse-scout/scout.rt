@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -147,10 +147,11 @@ public class ClientSessionStopHelper {
       }
     }
 
-    if (Jobs.getJobManager().getFutures(runningJobsFilter).isEmpty()) {
+    Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(runningJobsFilter);
+    if (futures.isEmpty()) {
       return true;
     }
-    LOG.warn("Client session {} did not stop within {} seconds. Stopping will continue.", session, seconds);
+    LOG.warn("Client session {} did not stop within {} seconds. Stopping will continue. Running futures: {}", session, seconds, futures);
     return false;
   }
 
