@@ -1,24 +1,30 @@
 /*
- * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * https://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.mail.smtp;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.net.SocketException;
+
+import jakarta.mail.Address;
+import jakarta.mail.MessagingException;
 import jakarta.mail.NoSuchProviderException;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
+import jakarta.mail.internet.MimeMessage;
 
+import org.eclipse.angus.mail.smtp.SMTPSendFailedException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -33,6 +39,7 @@ import org.mockito.MockMakers;
 public class SmtpConnectionPoolTest {
 
   protected SmtpHelper m_mockSmtpHelper;
+  private Transport m_mockTransport;
 
   @Rule
   public final RegisterBeanTestRule<SmtpHelper> m_smtpHelperBeanTestRule = new RegisterBeanTestRule<SmtpHelper>(SmtpHelper.class, () -> m_mockSmtpHelper = createMockSmtpHelper());
@@ -41,13 +48,62 @@ public class SmtpConnectionPoolTest {
     SmtpHelper mock = mock(SmtpHelper.class);
     Session session = mock(Session.class, withSettings().mockMaker(MockMakers.INLINE));
     try {
-      when(session.getTransport()).thenReturn(mock(Transport.class));
+      Transport transport = mock(Transport.class);
+      when(session.getTransport()).thenReturn(transport);
+      m_mockTransport = transport;
     }
     catch (NoSuchProviderException e) {
       throw new ProcessingException("Mocking error", e);
     }
     when(mock.createSession(any())).thenReturn(session);
     return mock;
+  }
+
+  @Test
+  public void testSendMessage() throws MessagingException {
+    SmtpServerConfig config = createDefaultServerConfig();
+    SmtpConnectionPool pool = createDefaultSmtpConnectionPool();
+
+    // successful message
+    pool.sendMessage(config, mock(MimeMessage.class), new Address[]{mock(Address.class)});
+
+    // failed message
+    doThrow(MessagingException.class).when(m_mockTransport).sendMessage(any(), any());
+    assertThrows(MessagingException.class, () -> pool.sendMessage(config, mock(MimeMessage.class), new Address[]{mock(Address.class)}));
+
+    // failed message / connection error
+    BooleanHolder firstFailed = new BooleanHolder(false);
+    BooleanHolder messageSent = new BooleanHolder(false);
+    doAnswer(invocation -> {
+      if (firstFailed.getValue()) {
+        messageSent.setValue(true);
+        return null;
+      }
+      else {
+        firstFailed.setValue(true);
+        throw new MessagingException("Socket error", new SocketException());
+      }
+    }).when(m_mockTransport).sendMessage(any(), any());
+    pool.sendMessage(config, mock(MimeMessage.class), new Address[]{mock(Address.class)});
+    assertTrue(messageSent.getValue());
+  }
+
+  @Test
+  public void testIsConnectionFailure() {
+    SmtpConnectionPool pool = createDefaultSmtpConnectionPool();
+
+    assertFalse(pool.isConnectionFailure(null));
+
+    assertFalse(pool.isConnectionFailure(new MessagingException()));
+    assertFalse(pool.isConnectionFailure(new MessagingException("Foo")));
+    assertFalse(pool.isConnectionFailure(new MessagingException("", new NullPointerException())));
+    assertTrue(pool.isConnectionFailure(new MessagingException("", new SocketException())));
+
+    assertFalse(pool.isConnectionFailure(new SMTPSendFailedException(null, -1, "Foo", null, null, null, null)));
+    assertTrue(pool.isConnectionFailure(new SMTPSendFailedException(null, -1, "[EOF]", null, null, null, null)));
+    assertFalse(pool.isConnectionFailure(new SMTPSendFailedException(null, 400, "Foo", null, null, null, null)));
+    assertTrue(pool.isConnectionFailure(new SMTPSendFailedException(null, 421, "Foo", null, null, null, null)));
+    assertTrue(pool.isConnectionFailure(new SMTPSendFailedException(null, 451, "Foo", null, null, null, null)));
   }
 
   @Test(timeout = 15000)
