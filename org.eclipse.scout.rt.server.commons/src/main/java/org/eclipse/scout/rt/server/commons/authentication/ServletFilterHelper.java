@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -372,8 +372,15 @@ public class ServletFilterHelper {
   public void doLogout(HttpServletRequest req) {
     HttpSession session = req.getSession(false);
     if (session != null) {
-      LOG.info("Invalidating HTTP session with ID {}", session.getId());
-      session.invalidate();
+      try {
+        session.getCreationTime(); // check whether session is already invalidated; supress the following log line in this case
+        LOG.info("Invalidating HTTP session with ID {}", session.getId());
+        session.invalidate();
+      }
+      catch (IllegalStateException e) {
+        // session is already invalidated, no more action necessary
+        LOG.debug("Session was already invalidated", e);
+      }
     }
   }
 
