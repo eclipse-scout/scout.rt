@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -476,11 +476,6 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
     }
     if (event.propertyName === 'selectedTiles') {
       this._syncSelectionFromTileGridToTable(event.source.getSelectedTiles());
-      if (this.tileAccordion.rendered) {
-        // Depending on the tiles content, selecting tiles with shift can lead to a mix of selecting the tiles content
-        // and the tiles itself, which doesn't look nice. Remove the text selection when selection tiles to avoid this.
-        this.tileAccordion.$container.document(true).getSelection().removeAllRanges();
-      }
     } else if (event.propertyName === 'filteredTiles') {
       this._updateGroupVisibility();
     }
