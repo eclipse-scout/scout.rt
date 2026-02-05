@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,6 +21,7 @@ export class PopupWindow extends EventEmitter {
   session: Session;
   initialized: boolean;
   resizeToPrefSize: boolean;
+  nonce: string;
   htmlComp: HtmlComponent;
   $container: JQuery;
 
@@ -31,6 +32,7 @@ export class PopupWindow extends EventEmitter {
     this.form = form;
     this.session = form.session;
     this.initialized = false;
+    this.nonce = null;
     this.$container = null;
     this.htmlComp = null;
 
@@ -63,6 +65,9 @@ export class PopupWindow extends EventEmitter {
     // Establish the link again, as Chrome removes this property after a page load.
     // (page load is made by design in PopupBlockerHandler.openWindow)
     this.myWindow[PopupWindow.PROP_POPUP_WINDOW] = this;
+
+    // store nonce of the popup-window before removing from the DOM
+    this.nonce = myDocument.body?.dataset?.scoutNonce || '';
 
     scout.prepareDOM(myDocument);
 
