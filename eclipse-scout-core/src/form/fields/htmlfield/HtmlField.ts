@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AppLinkKeyStroke, events, HtmlFieldEventMap, HtmlFieldModel, scrollbars, SelectAllTextInFieldKeyStroke, ValueField} from '../../../index';
+import {App, AppLinkKeyStroke, events, HtmlFieldEventMap, HtmlFieldModel, scrollbars, SelectAllTextInFieldKeyStroke, ValueField} from '../../../index';
 
 export class HtmlField extends ValueField<string> implements HtmlFieldModel {
   declare model: HtmlFieldModel;
@@ -48,12 +48,27 @@ export class HtmlField extends ValueField<string> implements HtmlFieldModel {
     this._renderEmpty();
   }
 
+  protected _prepareDisplayText(displayText: string): string {
+    const popupWindowNonce = this.findNonWrappedForm()?.popupWindow?.nonce;
+    if (!popupWindowNonce) {
+      return displayText;
+    }
+
+    // In case this HtmlField belongs to a form running in a popup-window (see PopupWindow.ts).
+    // The popup-window gets its own CSP nonce which is different from the main window opening the popup.
+    // If the HtmlField's displayText contains inline scripts having a nonce (see SessionNonce.java and JsonHtmlField#initJsonProperties), this is the nonce of the main window (as returned from the UI backend).
+    // To allow the script to be executed, the nonce must be switched to the one of the popup-window.
+    // This is safe to do with a simple replace as the nonce is a 256bit secure random (collisions almost impossible).
+    return displayText.replaceAll(`nonce="${App.get().nonce}"`, `nonce="${popupWindowNonce}"`);
+  }
+
   protected override _renderDisplayText() {
     if (!this.displayText) {
       this.$field.empty();
       return;
     }
-    this.$field.html(this.displayText);
+
+    this.$field.html(this._prepareDisplayText(this.displayText));
 
     // Add action to app-links
     this.$field.find('.app-link')
