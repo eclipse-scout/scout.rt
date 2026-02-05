@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -364,12 +364,13 @@ public class SmtpConnectionPool {
   }
 
   protected void startCloseIdleConnectionsJob() {
+    long closeIdleConnectionsJobScheduleInSeconds = CONFIG.getPropertyValue(CloseIdleConnectionsJobScheduleProperty.class);
     Jobs.schedule(this::closeIdleConnections, Jobs.newInput()
         .withName(JOB_NAME_CLOSE_IDLE_CONNECTIONS)
         .withExecutionHint(m_jobExecutionHint)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
-            .withStartIn(1, TimeUnit.MINUTES)
-            .withSchedule(FixedDelayScheduleBuilder.repeatForever(1, TimeUnit.MINUTES))));
+            .withStartIn(closeIdleConnectionsJobScheduleInSeconds, TimeUnit.SECONDS)
+            .withSchedule(FixedDelayScheduleBuilder.repeatForever(closeIdleConnectionsJobScheduleInSeconds, TimeUnit.SECONDS))));
   }
 
   /**
@@ -453,11 +454,39 @@ public class SmtpConnectionPool {
   }
 
   protected boolean isConnectionFailure(MessagingException e) {
-    // when trying to send an e-mail using a broken exception there seem to be two variants of exceptions being thrown:
+    if (e == null) {
+      return false;
+    }
+
+    // when trying to send an e-mail using a broken exception there seem to be the following variants of exceptions being thrown:
     // 1. MessagingException with a next SocketException as next exception
-    // 2. SMTPSendFailedException with "[EOF]" as message
-    return e != null && (e.getNextException() instanceof SocketException ||
-                             (e instanceof SMTPSendFailedException && "[EOF]".equals(e.getMessage())));
+    if (e.getNextException() instanceof SocketException) {
+      return true;
+    }
+
+    if (e instanceof SMTPSendFailedException) {
+      SMTPSendFailedException smtpSendFailedException = (SMTPSendFailedException) e;
+
+      // 2. SMTPSendFailedException with "[EOF]" as message
+      if ("[EOF]".equals(e.getMessage())) {
+        return true;
+      }
+
+      // 3. A connection explicitly sending an error code
+      // - 421 indicating a server shutdown (might lead to an exchanged connection which just fails again)
+      // - 451 arbitrary error code which according to RFC should be treated the same way a connection failure would be treated
+      //
+      // See also:
+      // * https://datatracker.ietf.org/doc/html/rfc5321#section-3.8
+      // * https://datatracker.ietf.org/doc/html/rfc5321#section-4.2.3
+      // * https://github.com/eclipse-ee4j/angus-mail/blob/eca8e08baa56a83ab68ae3faaca25d8ca3c0e5ee/providers/smtp/src/main/java/org/eclipse/angus/mail/smtp/SMTPTransport.java#L1453-L1457
+      int returnCode = smtpSendFailedException.getReturnCode();
+      if (returnCode == 421 || returnCode == 451) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   protected void closeIdleConnections() {
@@ -576,7 +605,7 @@ public class SmtpConnectionPool {
   public static class SmtpPoolMaxIdleTimeProperty extends AbstractPositiveIntegerConfigProperty {
     @Override
     public Integer getDefaultValue() {
-      return 60; // 1 minute
+      return 20; // 20 seconds
     }
 
     @Override
@@ -621,6 +650,23 @@ public class SmtpConnectionPool {
     @Override
     public String description() {
       return "Max. wait time for SMTP connection in seconds. If the value is 0, callers will wait infinitely long for SMTP connections.";
+    }
+  }
+
+  public static class CloseIdleConnectionsJobScheduleProperty extends AbstractPositiveIntegerConfigProperty {
+    @Override
+    public Integer getDefaultValue() {
+      return 20; // 20 seconds
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.smtp.pool.closeIdleConnectionsJobSchedule";
+    }
+
+    @Override
+    public String description() {
+      return "Repetition schedule for the close idle connections job in seconds (run if at least one connection is currently open). Must be a positive number. If set to a greater number than the maximum idle timeout, then connections may exceed their maximum idle timeout. Default value: " + getDefaultValue() + ".";
     }
   }
 
