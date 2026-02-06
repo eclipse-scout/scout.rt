@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,24 +43,28 @@
   }
 
   & > .form-field {
-    padding: 16px @tile-field-padding @tile-field-padding;
+    --padding-top-reduce: 0px;
+    --padding-bottom-reduce: 0px;
+    --padding-left-reduce: 0px;
+    --padding-right-reduce: 0px;
+    padding: 16px calc(@tile-field-padding - var(--padding-right-reduce)) calc(@tile-field-padding - var(--padding-bottom-reduce)) calc(@tile-field-padding - var(--padding-left-reduce));
     border-radius: inherit;
     overflow: hidden;
 
     &.label-hidden {
-      padding-top: @tile-field-padding;
+      padding-top: calc(@tile-field-padding - var(--padding-top-reduce));
 
       .compact& {
         // reduce padding-top only if there is no label
         // the padding with label is already fine
-        padding-top: @tile-field-compact-padding-y;
+        padding-top: calc(@tile-field-compact-padding-y - var(--padding-top-reduce));
       }
     }
 
     .compact& {
-      padding-bottom: @tile-field-compact-padding-y;
-      padding-left: @tile-field-compact-padding-x;
-      padding-right: @tile-field-compact-padding-x;
+      padding-bottom: calc(@tile-field-compact-padding-y - var(--padding-bottom-reduce));
+      padding-left: calc(@tile-field-compact-padding-x - var(--padding-left-reduce));
+      padding-right: calc(@tile-field-compact-padding-x - var(--padding-right-reduce));
     }
 
     &.no-padding {
@@ -77,9 +81,8 @@
       margin: 0;
       font-size: 12px;
       font-weight: bold;
-      padding-top: 0;
-      padding-bottom: @dashboard-tile-label-padding-bottom;
-      padding-right: 0;
+      // To ensure the label is aligned with the label from other tiles the left padding of the label is increased if the tile padding should be reduced
+      padding: 0 0 calc(@dashboard-tile-label-padding-bottom - var(--padding-top-reduce)) var(--padding-left-reduce);
     }
 
     & > .field {
