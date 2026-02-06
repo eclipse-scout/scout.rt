@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -88,6 +88,9 @@ public abstract class AbstractDoStructureMigrationHandlerTest {
     boolean changed = BEANS.get(DataObjectMigrator.class).applyStructureMigration(ctx, actual, toVersion);
 
     assertTrue("Data object was not changed by migration", changed);
+
+    // write and read the migrated data object again as raw, so that any type information possibly added by the migration is removed
+    actual = (IDoEntity) dataObjectMapper.readValueRaw(dataObjectMapper.writeValue(actual));
 
     IDoEntity expected = null; // from toVersion -> expected data object (according to .json file)
     String filename = getFilename(filenamePrefix, toVersion.unwrap());
