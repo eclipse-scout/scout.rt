@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, HorizontalGrid, PlaceholderTile, Tile, TileGrid} from '../index';
+import {arrays, events, HorizontalGrid, PlaceholderTile, Tile, TileGrid} from '../index';
 import $ from 'jquery';
 
 export interface TileGridSelectionInstruction {
@@ -61,6 +61,10 @@ export class TileGridSelectionHandler {
       if (!this.isHorizontalGridActive()) {
         return;
       }
+
+      // Prevent text from being selected while selecting multiple tiles
+      events.preventSelectionStartUntilMouseUp(this.tileGrid.$container);
+
       let tiles = this.getVisibleTiles();
       let focusedTile = this.getFocusedTile();
       if (!focusedTile) {
