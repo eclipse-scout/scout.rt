@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -61,6 +61,10 @@ export class TileGridSelectionHandler {
       if (!this.isHorizontalGridActive()) {
         return;
       }
+
+      // Prevent text from being selected while selecting multiple tiles
+      this._preventSelectionStartUntilMouseUp();
+
       let tiles = this.getVisibleTiles();
       let focusedTile = this.getFocusedTile();
       if (!focusedTile) {
@@ -450,5 +454,15 @@ export class TileGridSelectionHandler {
       tile = tiles[tiles.length - 1];
     }
     return tile;
+  }
+
+  /**
+   * Prevents text selection on tiles until a mouse up occurs anywhere on the window.
+   */
+  protected _preventSelectionStartUntilMouseUp() {
+    const preventSelectionHandler = event => event.preventDefault();
+    this.tileGrid.$container
+      .on('selectstart', preventSelectionHandler)
+      .window().one('mouseup', () => this.tileGrid.$container?.off('selectstart', preventSelectionHandler));
   }
 }
