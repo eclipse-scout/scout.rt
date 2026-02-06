@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, dataObjects, DoEntity, scout, Table, typeName} from '../index';
+import {BaseDoEntity, dataObjects, DoEntity, scout, Table, TableReloadReason, typeName} from '../index';
 
 export class TableMaxResultsHelper {
 
@@ -25,10 +25,11 @@ export class TableMaxResultsHelper {
   /**
    * Adds a DataObject contribution of type {@link MaxRowCountContributionDo} to the given dataObject if necessary, removes an existing contribution otherwise.
    * @param dataObject The DataObject to which the contribution should be added.
-   * @param table The table to read the maxRowCount property that should be used in the contribution.
+   * @param table The table for which the {@link MaxRowCountContributionDo} should be added.
+   * @param reloadReason The reason of the reload for which the {@link MaxRowCountContributionDo} should be added.
    */
-  withMaxRowCountContribution<T extends { _contributions?: DoEntity[] }>(dataObject: T, table: Table): T {
-    const maxRowCountContribution = this.buildMaxRowCountContribution(table);
+  withMaxRowCountContribution<T extends { _contributions?: DoEntity[] }>(dataObject: T, table: Table, reloadReason?: TableReloadReason): T {
+    const maxRowCountContribution = this.buildMaxRowCountContribution(table, reloadReason);
     if (maxRowCountContribution) {
       dataObject = dataObject || {} as T;
       // see ScoutDataObjectModule.DEFAULT_CONTRIBUTIONS_ATTRIBUTE_NAME
@@ -40,11 +41,13 @@ export class TableMaxResultsHelper {
   }
 
   /**
-   * Reads the maximum number of rows for the given table and converts it to a {@link MaxRowCountContributionDo}.
+   * Reads the maximum number of rows for the given table and reason and converts it to a {@link MaxRowCountContributionDo}.
+   * @param table The table for which the {@link MaxRowCountContributionDo} should be returned.
+   * @param reloadReason The reason of the reload for which the {@link MaxRowCountContributionDo} should be added.
    * @returns the {@link MaxRowCountContributionDo} if there is a valid maxRowCount for the given table or null if no row count constraint is used.
    */
-  buildMaxRowCountContribution(table: Table): MaxRowCountContributionDo {
-    const maxOutlineRowCount = this.getMaxTableRowCount(table);
+  buildMaxRowCountContribution(table: Table, reloadReason: TableReloadReason): MaxRowCountContributionDo {
+    const maxOutlineRowCount = this.getMaxTableRowCount(table, reloadReason);
     if (maxOutlineRowCount > 0) {
       return scout.create(MaxRowCountContributionDo, {hint: maxOutlineRowCount});
     }
@@ -52,9 +55,11 @@ export class TableMaxResultsHelper {
   }
 
   /**
-   * Gets the maximum number of rows for the given table.
+   * @param table The table for which the max table row count should be returned.
+   * @param reloadReason The reason of the reload for which the max table row count should be returned.
+   * @returns the maximum number of rows for the given table and reload reason.
    */
-  getMaxTableRowCount(table: Table): number {
+  getMaxTableRowCount(table: Table, reloadReason: TableReloadReason): number {
     return table?.maxRowCount;
   }
 }

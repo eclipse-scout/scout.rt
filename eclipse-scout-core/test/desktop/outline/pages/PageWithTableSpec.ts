@@ -9,7 +9,7 @@
  */
 import {
   arrays, Column, Form, GroupBox, InitModelOf, MaxRowCountContributionDo, NumberColumn, NumberField, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, ResetMenu, scout, SearchFormTableControl, SearchMenu, SmartColumn,
-  StaticLookupCall, StringField, Table, TableRow, WidgetModel
+  StaticLookupCall, StringField, Table, TableReloadReason, TableRow, WidgetModel
 } from '../../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
 
@@ -46,6 +46,8 @@ describe('PageWithTable', () => {
   });
 
   class SpecPageWithTable extends PageWithTable {
+    override _reloadReason: TableReloadReason = null;
+
     override _createSearchFilter(): any {
       return super._createSearchFilter();
     }
@@ -161,6 +163,31 @@ describe('PageWithTable', () => {
     expect(page.detailTable.maxRowCount).toBe(456);
     expect(page.detailTable.estimatedRowCount).toBe(1111);
     expect(page.detailTable.tableStatus.message).toBe('[undefined text: MaxOutlineRowWarningWithEstimatedRowCount]');
+  });
+
+  it('stores reload reason', () => {
+    page._loadTableData = searchFilter => {
+      return $.resolvedPromise({
+        _contributions: [{
+          _type: 'scout.LimitedResultInfoContribution',
+          limitedResult: true,
+          maxRowCount: 456,
+          estimatedRowCount: 1111
+        }]
+      });
+    };
+    page._transformTableDataToTableRows = data => undefined;
+    page.detailTable.reload();
+    jasmine.clock().tick(10);
+    page.detailTable.footer._compactStyle = false;
+    page.detailTable.footer._infoLoadAction.doAction();
+    jasmine.clock().tick(10);
+    expect(page._reloadReason).toEqual(Table.ReloadReason.OVERRIDE_ROW_LIMIT);
+
+    // reload reason must stay on next reloads. otherwise the override gets lost. Keep it until a new reason is provided.
+    page.detailTable.reload();
+    jasmine.clock().tick(10);
+    expect(page._reloadReason).toEqual(Table.ReloadReason.OVERRIDE_ROW_LIMIT);
   });
 
   it('should handle errors in _onLoadTableDataDone', () => {

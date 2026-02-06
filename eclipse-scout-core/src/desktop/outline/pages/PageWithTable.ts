@@ -22,6 +22,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
   searchRequired = false;
   searchFilterCompleted = false;
 
+  protected _reloadReason: TableReloadReason;
   protected _tableRowDeleteHandler: EventHandler<TableRowsDeletedEvent | TableAllRowsDeletedEvent>;
   protected _tableRowInsertHandler: EventHandler<TableRowsInsertedEvent>;
   protected _tableRowUpdateHandler: EventHandler<TableRowsUpdatedEvent>;
@@ -39,6 +40,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
     this.inheritMenusFromParentTablePage = false;
     this.alwaysCreateChildPage = false;
 
+    this._reloadReason = null;
     this._tableRowDeleteHandler = this._onTableRowsDeleted.bind(this);
     this._tableRowInsertHandler = this._onTableRowsInserted.bind(this);
     this._tableRowUpdateHandler = this._onTableRowsUpdated.bind(this);
@@ -392,7 +394,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
    * @returns the resulting request with the added contribution.
    */
   protected _withMaxRowCountContribution<T>(dataObject: T): T {
-    return scout.create(TableMaxResultsHelper).withMaxRowCountContribution(dataObject, this.detailTable);
+    return scout.create(TableMaxResultsHelper).withMaxRowCountContribution(dataObject, this.detailTable, this._reloadReason);
   }
 
   /**
@@ -401,6 +403,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
   loadTableData(reloadReason?: TableReloadReason): JQuery.Promise<any> {
     this.ensureDetailTable();
     this.detailTable.setLoading(true);
+    this._reloadReason = reloadReason || this._reloadReason;
     const restoreSelectionInfo = this._getRestoreSelectionInfo();
     const searchFilter = this._createSearchFilter();
 
