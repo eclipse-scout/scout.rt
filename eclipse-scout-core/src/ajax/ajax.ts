@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxCall, AjaxCallModel, AjaxError, BaseDoEntity, dataObjects, objects, scout} from '../index';
+import {AjaxCall, AjaxCallModel, AjaxError, BaseDoEntity, DataObjectDeserializerModel, dataObjects, objects, scout} from '../index';
 import $ from 'jquery';
 
 /**
@@ -236,17 +236,19 @@ export const ajax = {
    * @param url The URL of the request.
    * @param options additional settings for the request.
    *        Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.
-   * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @param ajaxCallModel additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @param deserializerModel Optional configuration for the {@link DataObjectDeserializer} used to deserialize the response.
+   *       May be handy to set e.g. {@link DataObjectDeserializerModel.createPojoIfDoIsUnknown} in situations where {@link ajax.callJson} is mixed with {@link ajax.callDataObject}.
    * @returns A promise which is resolved when the request succeeds.
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  getDataObject(url: string, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  getDataObject(url: string, options?: AjaxSettings, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'GET'
     }, options);
-    return ajax.callDataObject(opts, null, model);
+    return ajax.callDataObject(opts, null, ajaxCallModel, deserializerModel);
   },
 
   /**
@@ -258,17 +260,19 @@ export const ajax = {
    *        If it is a {@link BaseDoEntity} it will automatically be converted to a string using {@link dataObjects.stringify}.
    * @param options additional settings for the request.
    *        Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.
-   * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @param ajaxCallModel additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @param deserializerModel Optional configuration for the {@link DataObjectDeserializer} used to deserialize the response.
+   *       May be handy to set e.g. {@link DataObjectDeserializerModel.createPojoIfDoIsUnknown} in situations where {@link ajax.callJson} is mixed with {@link ajax.callDataObject}.
    * @returns A promise which is resolved when the request succeeds.
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  postDataObject(url: string, dataObject?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  postDataObject(url: string, dataObject?: any, options?: AjaxSettings, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'POST'
     }, options);
-    return ajax.callDataObject(opts, dataObject, model);
+    return ajax.callDataObject(opts, dataObject, ajaxCallModel, deserializerModel);
   },
 
   /**
@@ -280,17 +284,19 @@ export const ajax = {
    *        If it is a {@link BaseDoEntity} it will automatically be converted to a string using {@link dataObjects.stringify}.
    * @param options additional settings for the request.
    *        Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.
-   * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @param ajaxCallModel additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @param deserializerModel Optional configuration for the {@link DataObjectDeserializer} used to deserialize the response.
+   *       May be handy to set e.g. {@link DataObjectDeserializerModel.createPojoIfDoIsUnknown} in situations where {@link ajax.callJson} is mixed with {@link ajax.callDataObject}.
    * @returns A promise which is resolved when the request succeeds.
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  putDataObject(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  putDataObject(url: string, data?: any, options?: AjaxSettings, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'PUT'
     }, options);
-    return ajax.callDataObject(opts, data, model);
+    return ajax.callDataObject(opts, data, ajaxCallModel, deserializerModel);
   },
 
   /**
@@ -302,17 +308,19 @@ export const ajax = {
    *        If it is a {@link BaseDoEntity} it will automatically be converted to a string using {@link dataObjects.stringify}.
    * @param options additional settings for the request.
    *        Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.
-   * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @param ajaxCallModel additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @param deserializerModel Optional configuration for the {@link DataObjectDeserializer} used to deserialize the response.
+   *       May be handy to set e.g. {@link DataObjectDeserializerModel.createPojoIfDoIsUnknown} in situations where {@link ajax.callJson} is mixed with {@link ajax.callDataObject}.
    * @returns A promise which is resolved when the request succeeds.
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  removeDataObject(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  removeDataObject(url: string, data?: any, options?: AjaxSettings, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'DELETE'
     }, options);
-    return ajax.callDataObject(opts, data, model);
+    return ajax.callDataObject(opts, data, ajaxCallModel, deserializerModel);
   },
 
   /**
@@ -323,13 +331,15 @@ export const ajax = {
    *        Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.
    * @param data The data to be sent or `null`.
    *        If it is a {@link BaseDoEntity} it will automatically be converted to a string using {@link dataObjects.stringify}.
-   * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @param ajaxCallModel additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @param deserializerModel Optional configuration for the {@link DataObjectDeserializer} used to deserialize the response.
+   *       May be handy to set e.g. {@link DataObjectDeserializerModel.createPojoIfDoIsUnknown} in situations where {@link ajax.callJson} is mixed with {@link ajax.callDataObject}.
    * @returns A promise which is resolved when the request succeeds.
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  callDataObject(options: UrlAjaxSettings, data?: any, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
-    return ajax.createCallDataObject(options, data, model).call();
+  callDataObject(options: UrlAjaxSettings, data?: any, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
+    return ajax.createCallDataObject(options, data, ajaxCallModel, deserializerModel).call();
   },
 
   /**
@@ -340,19 +350,21 @@ export const ajax = {
    *        Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.
    * @param data The data to be sent or `null`.
    *        If it is a {@link BaseDoEntity} it will automatically be converted to a string using {@link dataObjects.stringify}.
-   * @param model Properties for the {@link AjaxCall} which is created.
+   * @param ajaxCallModel Properties for the {@link AjaxCall} which is created.
+   * @param deserializerModel Optional configuration for the {@link DataObjectDeserializer} used to deserialize the response.
+   *       May be handy to set e.g. {@link DataObjectDeserializerModel.createPojoIfDoIsUnknown} in situations where {@link ajax.callJson} is mixed with {@link ajax.callDataObject}.
    * @returns an {@link AjaxCall} which sends the given data, pre-configured using the given options and model.
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    */
-  createCallDataObject(options: UrlAjaxSettings, data?: any, model?: AjaxCallModel): AjaxCall {
+  createCallDataObject(options: UrlAjaxSettings, data?: any, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): AjaxCall {
     const json = data && dataObjects.stringify(data);
     const opts: AjaxSettings = $.extend({}, {
       converters: {
-        'text json': data => dataObjects.parse(data)
+        'text json': data => dataObjects.parse(data, null, deserializerModel)
       },
       data: json || undefined
     }, options);
-    return this.createCallJson(opts, model);
+    return this.createCallJson(opts, ajaxCallModel);
   }
 };
 
