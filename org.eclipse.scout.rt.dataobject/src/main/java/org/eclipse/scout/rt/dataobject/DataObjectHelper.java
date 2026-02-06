@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -414,7 +414,7 @@ public class DataObjectHelper {
 
   /**
    * Applies all attribute values from the {@code template} entity to the {@code target} entity, overriding existing
-   * values in @code target} entity. The operation is not recursive.
+   * values in {@code target} entity. The operation is not recursive.
    *
    * @param target
    *     target entity where attributes from the {@code template} are applied. Must not be {@code null}.
