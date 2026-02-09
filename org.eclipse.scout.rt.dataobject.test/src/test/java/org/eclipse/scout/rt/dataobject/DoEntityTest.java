@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,16 +25,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import org.eclipse.scout.rt.dataobject.fixture.CollectionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.FirstSimpleContributionFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.Lorem1FixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.SecondSimpleContributionFixtureDo;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobState;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.junit.Test;
@@ -865,6 +873,7 @@ public class DoEntityTest {
   public void testDoList() {
     DoEntity entity = BEANS.get(DoEntity.class);
     DoList<String> doList = entity.doList("attribute");
+    assertSame(doList, entity.doList("attribute"));
     assertEquals(CollectionUtility.emptyArrayList(), doList.get());
 
     List<String> values = Arrays.asList("value");
@@ -893,6 +902,7 @@ public class DoEntityTest {
   public void testDoSet() {
     DoEntity entity = BEANS.get(DoEntity.class);
     DoSet<String> doSet = entity.doSet("attribute");
+    assertSame(doSet, entity.doSet("attribute"));
     assertEquals(CollectionUtility.emptyHashSet(), doSet.get());
 
     Set<String> value = Collections.singleton("foo");
@@ -921,6 +931,7 @@ public class DoEntityTest {
   public void testDoCollection() {
     DoEntity entity = BEANS.get(DoEntity.class);
     DoCollection<String> doCollection = entity.doCollection("attribute");
+    assertSame(doCollection, entity.doCollection("attribute"));
     assertEquals(CollectionUtility.emptyArrayList(), doCollection.get());
 
     Collection<String> value = Arrays.asList("foo");
@@ -943,5 +954,48 @@ public class DoEntityTest {
     assertThrows(AssertionException.class, () -> entity.getListNode("attribute"));
     assertThrows(AssertionException.class, () -> entity.getValueNode("attribute"));
     assertThrows(AssertionException.class, () -> entity.getSetNode("attribute"));
+  }
+
+  @Test
+  public void testConcurrentGetCollection() {
+    testConcurrentGet_internal(BEANS.get(CollectionFixtureDo.class), CollectionFixtureDo::getSimpleDoCollection);
+  }
+
+  @Test
+  public void testConcurrentGetList() {
+    testConcurrentGet_internal(BEANS.get(EntityFixtureDo.class), EntityFixtureDo::getOtherEntities);
+  }
+
+  @Test
+  public void testConcurrentGetSet() {
+    testConcurrentGet_internal(BEANS.get(CollectionFixtureDo.class), CollectionFixtureDo::getSimpleDoSet);
+  }
+
+  @Test
+  public void testConcurrentGetValue() {
+    testConcurrentGet_internal(BEANS.get(Lorem1FixtureDo.class), Lorem1FixtureDo::getValue1);
+  }
+
+  protected <E extends IDoEntity, R> void testConcurrentGet_internal(E entity, Function<E, R> getFunction) {
+    CountDownLatch latch = new CountDownLatch(1);
+    List<IFuture<R>> jobs = new ArrayList<>();
+
+    // a lot of jobs to test thread-safety of get calls
+    for (int i = 0; i < 1000; i++) {
+      jobs.add(Jobs.schedule(() -> {
+        latch.await();
+        return getFunction.apply(entity);
+      }, Jobs.newInput()));
+    }
+
+    // wait for all jobs to be running
+    while (!jobs.stream().map(IFuture::getState).allMatch(JobState.RUNNING::equals)) {
+      SleepUtil.sleepSafe(10, TimeUnit.MILLISECONDS);
+    }
+    latch.countDown();
+
+    // all objects must be the same (equality is not enough), hence compare all other objects with the first object
+    R firstElement = jobs.iterator().next().awaitDoneAndGet(); // get the first element
+    assertTrue(jobs.stream().map(IFuture::awaitDoneAndGet).allMatch(o -> firstElement == o));
   }
 }
