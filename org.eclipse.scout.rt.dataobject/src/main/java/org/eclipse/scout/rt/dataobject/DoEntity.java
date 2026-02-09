@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,9 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -62,7 +63,20 @@ public class DoEntity implements IDoEntity {
    */
   @Override
   public DoNode<?> getNode(String attributeName) {
-    return m_attributes.get(attributeName);
+    return getNode(attributeName, false);
+  }
+
+  /**
+   * @param includeFutureAttributes
+   *     see {@link FutureAttribute}
+   * @see #getNode(String)
+   */
+  protected DoNode<?> getNode(String attributeName, boolean includeFutureAttributes) {
+    DoNode<?> doNode = m_attributes.get(attributeName);
+    if (!includeFutureAttributes && doNode instanceof FutureAttribute<?>) {
+      return null;
+    }
+    return doNode;
   }
 
   /**
@@ -71,7 +85,16 @@ public class DoEntity implements IDoEntity {
    */
   @Override
   public boolean has(String attributeName) {
-    return m_attributes.containsKey(attributeName);
+    return has(attributeName, false);
+  }
+
+  /**
+   * @param includeFutureAttributes
+   *     see {@link FutureAttribute}
+   * @see #has(String)
+   */
+  protected boolean has(String attributeName, boolean includeFutureAttributes) {
+    return m_attributes.containsKey(attributeName) && (includeFutureAttributes || !(m_attributes.get(attributeName) instanceof FutureAttribute));
   }
 
   /**
@@ -105,7 +128,7 @@ public class DoEntity implements IDoEntity {
    */
   @Override
   public <V> void putList(String attributeName, List<V> value) {
-    if (has(attributeName)) {
+    if (has(attributeName, true)) {
       DoList<V> node = getListNode(attributeName);
       node.set(value);
     }
@@ -121,7 +144,7 @@ public class DoEntity implements IDoEntity {
    */
   @Override
   public <V> void putSet(String attributeName, Set<V> value) {
-    if (has(attributeName)) {
+    if (has(attributeName, true)) {
       DoSet<V> node = getSetNode(attributeName);
       node.set(value);
     }
@@ -137,7 +160,7 @@ public class DoEntity implements IDoEntity {
    */
   @Override
   public <V> void putCollection(String attributeName, Collection<V> value) {
-    if (has(attributeName)) {
+    if (has(attributeName, true)) {
       DoCollection<V> node = getCollectionNode(attributeName);
       node.set(value);
     }
@@ -151,7 +174,12 @@ public class DoEntity implements IDoEntity {
    */
   @Override
   public boolean remove(String attributeName) {
-    return m_attributes.remove(attributeName) != null;
+    if (!has(attributeName)) {
+      // do not remove future attributes (contract: we can only remove attributes which are also contained in the allNodes list)
+      return false;
+    }
+    DoNode<?> removed = m_attributes.remove(attributeName);
+    return removed != null;
   }
 
   /**
@@ -161,12 +189,24 @@ public class DoEntity implements IDoEntity {
    */
   @Override
   public boolean removeIf(Predicate<? super DoNode<?>> filter) {
-    return m_attributes.values().removeIf(filter);
+    return m_attributes.values().removeIf(v -> !(v instanceof FutureAttribute<?>) && filter.test(v));
   }
 
   @Override
   public Map<String, DoNode<?>> allNodes() {
-    return Collections.unmodifiableMap(m_attributes);
+    return Collections.unmodifiableMap(streamAllNodes(false).collect(StreamUtility.toLinkedHashMap(Entry::getKey, Entry::getValue)));
+  }
+
+  /**
+   * @param includeFutureAttributes
+   *     see {@link FutureAttribute}
+   */
+  protected Stream<Entry<String, DoNode<?>>> streamAllNodes(boolean includeFutureAttributes) {
+    Stream<Entry<String, DoNode<?>>> stream = m_attributes.entrySet().stream();
+    if (!includeFutureAttributes) {
+      stream = stream.filter(e -> !(e.getValue() instanceof FutureAttribute<?>));
+    }
+    return stream;
   }
 
   @Override
@@ -184,7 +224,7 @@ public class DoEntity implements IDoEntity {
     return getAllContributions().stream()
         .filter(IDoEntityContribution.class::isInstance)
         .map(IDoEntityContribution.class::cast)
-        .collect(Collectors.toUnmodifiableList());
+        .toList();
   }
 
   @Override
@@ -208,7 +248,7 @@ public class DoEntity implements IDoEntity {
 
     DoEntity doEntity = (DoEntity) o;
 
-    if (!m_attributes.equals(doEntity.m_attributes)) {
+    if (!allNodes().equals(doEntity.allNodes())) {
       return false;
     }
 
@@ -224,7 +264,7 @@ public class DoEntity implements IDoEntity {
 
   @Override
   public int hashCode() {
-    int result = m_attributes.hashCode();
+    int result = allNodes().hashCode();
     Collection<? extends IDoEntity> contributions = hasContributions() ? m_contributions : null; // handle null and empty contributions the same way (lazy init of m_contributions)
     result = 31 * result + CollectionUtility.hashCodeCollection(contributions); // element order is not relevant
     return result;
@@ -255,12 +295,7 @@ public class DoEntity implements IDoEntity {
    * entity does not already contain a node for the given {@code attributeName}.
    */
   protected <V> DoList<V> doList(String attributeName) {
-    if (has(attributeName)) {
-      return getListNode(attributeName);
-    }
-    else {
-      return newListNode(attributeName, null);
-    }
+    return getOrSynchronizedCreate(attributeName, this::getListNode, this::newListNode);
   }
 
   /**
@@ -268,12 +303,7 @@ public class DoEntity implements IDoEntity {
    * entity does not already contain a node for the given {@code attributeName}.
    */
   protected <V> DoSet<V> doSet(String attributeName) {
-    if (has(attributeName)) {
-      return getSetNode(attributeName);
-    }
-    else {
-      return newSetNode(attributeName, null);
-    }
+    return getOrSynchronizedCreate(attributeName, this::getSetNode, this::newSetNode);
   }
 
   /**
@@ -281,11 +311,26 @@ public class DoEntity implements IDoEntity {
    * created, if this entity does not already contain a node for the given {@code attributeName}.
    */
   protected <V> DoCollection<V> doCollection(String attributeName) {
-    if (has(attributeName)) {
-      return getCollectionNode(attributeName);
+    return getOrSynchronizedCreate(attributeName, this::getCollectionNode, this::newCollectionNode);
+  }
+
+  /**
+   * If attribute is set, get it (not-synchronized); otherwise synchronized re-check, get if set now or create if still not set.
+   * The <i>createFunction</i> is responsible to add the attribute immediately (maybe as {@link FutureAttribute) }using {@link #putNode(String, DoNode)} to ensure consistent behavior if the object is requested multiple times.
+   */
+  protected <NODE extends DoNode<T>, T> NODE getOrSynchronizedCreate(String attributeName, Function<String, NODE> getFunction, BiFunction<String, T, NODE> createFunction) {
+    if (has(attributeName, true)) {
+      return getFunction.apply(attributeName);
     }
     else {
-      return newCollectionNode(attributeName, null);
+      synchronized (this) {
+        if (has(attributeName, true)) {
+          return getFunction.apply(attributeName);
+        }
+        else {
+          return createFunction.apply(attributeName, null);
+        }
+      }
     }
   }
 
@@ -297,16 +342,25 @@ public class DoEntity implements IDoEntity {
    * @return the map of all attribute values mapped using specified {@code mapper} function.
    */
   protected <T> Map<String, T> all(Function<Object, T> mapper) {
-    return allNodes().entrySet().stream()
-        .collect(StreamUtility.toLinkedHashMap(Entry::getKey, entry -> mapper.apply(entry.getValue().get())));
+    return streamAllNodes(false).collect(StreamUtility.toLinkedHashMap(Entry::getKey, entry -> mapper.apply(entry.getValue().get())));
   }
 
   /**
+   * @param includeFutureAttributes
+   *     see {@link FutureAttribute}
    * @return DoNode for given {@code attributeName} having given {@code clazz} type.
    */
-  <V, NODE extends DoNode<V>> NODE getNode(String attributeName, Class<NODE> clazz) {
+  <V, NODE extends DoNode<V>> NODE getNode(String attributeName, Class<NODE> clazz, boolean includeFutureAttributes) {
     assertNotNull(attributeName, "attribute name cannot be null");
-    DoNode<?> node = getNode(attributeName);
+    DoNode<?> node = getNode(attributeName, true);
+    if (node instanceof FutureAttribute<?>) {
+      if (includeFutureAttributes) {
+        node = ((FutureAttribute<?>) node).get();
+      }
+      else {
+        node = null;
+      }
+    }
     assertInstance(node, clazz, "Node {} is null or not of type {}", node, clazz);
     //noinspection unchecked
     return (NODE) node;
@@ -317,7 +371,7 @@ public class DoEntity implements IDoEntity {
    */
   <V> DoValue<V> getValueNode(String attributeName) {
     //noinspection unchecked
-    return getNode(attributeName, DoValue.class);
+    return getNode(attributeName, DoValue.class, false);
   }
 
   /**
@@ -325,7 +379,7 @@ public class DoEntity implements IDoEntity {
    */
   <V> DoList<V> getListNode(String attributeName) {
     //noinspection unchecked
-    return getNode(attributeName, DoList.class);
+    return getNode(attributeName, DoList.class, true);
   }
 
   /**
@@ -333,7 +387,7 @@ public class DoEntity implements IDoEntity {
    */
   <V> DoSet<V> getSetNode(String attributeName) {
     //noinspection unchecked
-    return getNode(attributeName, DoSet.class);
+    return getNode(attributeName, DoSet.class, true);
   }
 
   /**
@@ -341,7 +395,7 @@ public class DoEntity implements IDoEntity {
    */
   <V> DoCollection<V> getCollectionNode(String attributeName) {
     //noinspection unchecked
-    return getNode(attributeName, DoCollection.class);
+    return getNode(attributeName, DoCollection.class, true);
   }
 
   /**
@@ -353,22 +407,58 @@ public class DoEntity implements IDoEntity {
 
   /**
    * Creates a new {@code DoCollection} node using the given {@code initialValue}.
+   * The {@link DoCollection} will be stored as {@link FutureAttribute} in the attribute list, it will be changed to the actual object with its lazy creation function.
    */
   <V> DoCollection<V> newCollectionNode(String attributeName, Collection<V> initialValue) {
-    return new DoCollection<>(attributeName, attribute -> putNode(attributeName, attribute), initialValue);
+    DoCollection<V> r = new DoCollection<>(attributeName, attribute -> {
+      synchronized (DoEntity.this) {
+        // overwrite the FutureAttribute
+        m_attributes.put(attributeName, attribute);
+      }
+    }, initialValue);
+    putNode(attributeName, new FutureAttribute<>(r));
+    return r;
   }
 
   /**
    * Creates a new {@code DoList} node using the given {@code initialValue}.
+   * The {@link DoList} will be stored as {@link FutureAttribute} in the attribute list, it will be changed to the actual object with its lazy creation function.
    */
   <V> DoList<V> newListNode(String attributeName, List<V> initialValue) {
-    return new DoList<>(attributeName, attribute -> putNode(attributeName, attribute), initialValue);
+    DoList<V> r = new DoList<>(attributeName, attribute -> {
+      synchronized (DoEntity.this) {
+        // overwrite the FutureAttribute
+        m_attributes.put(attributeName, attribute);
+      }
+    }, initialValue);
+    putNode(attributeName, new FutureAttribute<>(r));
+    return r;
   }
 
   /**
    * Creates a new {@code DoSet} node using the given {@code initialValue}.
+   * The {@link DoSet} will be stored as {@link FutureAttribute} in the attribute list, it will be changed to the actual object with its lazy creation function.
    */
   <V> DoSet<V> newSetNode(String attributeName, Set<V> initialValue) {
-    return new DoSet<>(attributeName, attribute -> putNode(attributeName, attribute), initialValue);
+    DoSet<V> r = new DoSet<>(attributeName, attribute -> {
+      synchronized (DoEntity.this) {
+        // overwrite the FutureAttribute
+        m_attributes.put(attributeName, attribute);
+      }
+    }, initialValue);
+    putNode(attributeName, new FutureAttribute<>(r));
+    return r;
+  }
+
+  /**
+   * Internal wrapper class for attributes which are not yet visible in the attribute list, should never be used/visible outside this class (or subclasses).
+   * They might be unwrapped (= made visible) using a lazy creation function of the inner {@link DoNode}.
+   * However, it is necessary to store them immediately (invisible) already to avoid concurrency issues (e.g. getter operations for collections shall always return the same object).
+   */
+  protected class FutureAttribute<T extends DoNode<?>> extends DoNode<T> {
+
+    public FutureAttribute(T value) {
+      super(value.getAttributeName(), null, value);
+    }
   }
 }
