@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -286,11 +286,6 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
 
   /** @internal */
   _renderChecked() {
-    // if node is not rendered, do nothing
-    if (!this.rendered) {
-      return;
-    }
-
     this.$node
       .children('.tree-node-checkbox')
       .children('.check-box')
@@ -342,11 +337,6 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
 
   /** @internal */
   _renderChildrenChecked() {
-    // if node is not rendered, do nothing
-    if (!this.$node) {
-      return;
-    }
-
     this.$node.children('.tree-node-checkbox')
       .children('.check-box')
       .toggleClass('children-checked', !!this.childrenChecked);
