@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1396,7 +1396,35 @@ describe('Tree', () => {
 
         // Assert
         expect(parent.childrenChecked).toBe(true);
+        expect(parent.checked).toBe(false);
         expect(parent2.childrenChecked).toBe(true);
+        expect(parent2.checked).toBe(false);
+      });
+
+      it('partly-checks all parent nodes when child is unchecked', () => {
+        let model = helper.createModelFixture(4, 4);
+        tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.setAutoCheckChildren(true);
+        tree.render();
+
+        // Arrange
+        let parent = tree.nodes[0];
+        let parent2 = parent.childNodes[0];
+        let childNode = parent2.childNodes[0];
+        tree.checkNode(parent, true);
+
+        // Act
+        tree.checkNode(childNode, false);
+
+        // Assert
+        expect(parent.childrenChecked).toBe(true);
+        expect(parent.checked).toBe(false);
+        expect(parent2.childrenChecked).toBe(true);
+        expect(parent2.checked).toBe(false);
+        expect(childNode.childrenChecked).toBe(false);
+        expect(childNode.checked).toBe(false);
       });
 
       it('does not check disabled nodes when no children are present', () => {
@@ -1418,7 +1446,34 @@ describe('Tree', () => {
 
         // Assert
         expect(nodeLevel1.childrenChecked).toBe(true);
+        expect(nodeLevel1.checked).toBe(false);
         expect(nodeLevel2.childrenChecked).toBe(true);
+        expect(nodeLevel2.checked).toBe(false);
+        expect(nodeLevel3.checked).toBe(false);
+      });
+
+      it('does not check disabled nodes when no children are present (2)', () => {
+        let model = helper.createModelFixture(4, 2);
+        tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.setAutoCheckChildren(true);
+        tree.render();
+
+        // Arrange
+        let nodeLevel1 = tree.nodes[0];
+        let nodeLevel2 = nodeLevel1.childNodes[0];
+        let nodeLevel3 = nodeLevel2.childNodes[1]; // Different to test 1
+
+        // Act
+        nodeLevel3.enabled = false;
+        tree.checkNode(nodeLevel1, true);
+
+        // Assert
+        expect(nodeLevel1.childrenChecked).toBe(true);
+        expect(nodeLevel1.checked).toBe(false);
+        expect(nodeLevel2.childrenChecked).toBe(true);
+        expect(nodeLevel2.checked).toBe(false);
         expect(nodeLevel3.checked).toBe(false);
       });
 
@@ -1443,6 +1498,37 @@ describe('Tree', () => {
         expect(nodeLevel1.checked).toBe(true);
         expect(nodeLevel2.checked).toBe(true);
         expect(nodeLevel3.checked).toBe(true);
+      });
+
+      it('unchecks all nodes if a partly-checked node is clicked with disabled children', () => {
+        let model = helper.createModelFixture(4, 2);
+        tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.setAutoCheckChildren(true);
+        tree.render();
+
+        // Arrange
+        let nodeLevel1 = tree.nodes[0];
+        let nodeLevel2 = nodeLevel1.childNodes[0];
+        let nodeLevel3 = nodeLevel2.childNodes[1]; // Different to test 1
+
+        // Act
+        nodeLevel3.enabled = false;
+        tree.checkNode(nodeLevel1, true);
+        expect(nodeLevel1.childrenChecked).toBe(true);
+        expect(nodeLevel1.checked).toBe(false);
+        expect(nodeLevel2.childrenChecked).toBe(true);
+        expect(nodeLevel2.checked).toBe(false);
+        expect(nodeLevel3.checked).toBe(false);
+
+        // Assert
+        tree.uncheckNode(nodeLevel1);
+        expect(nodeLevel1.childrenChecked).toBe(false);
+        expect(nodeLevel1.checked).toBe(false);
+        expect(nodeLevel2.childrenChecked).toBe(false);
+        expect(nodeLevel2.checked).toBe(false);
+        expect(nodeLevel3.checked).toBe(false);
       });
 
       it('does not check new inserted nodes on top level', () => {
@@ -1487,7 +1573,7 @@ describe('Tree', () => {
         expect(tree.checkedNodes).toEqual(jasmine.arrayWithExactContents([parentNode, childNode, childNode2]));
       });
 
-      it('unchecks parent node, when not all children are selected', () => {
+      it('unchecks parent node, when not all children are checked', () => {
         let model = helper.createModelFixture(2, 1);
         tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1556,6 +1642,7 @@ describe('Tree', () => {
         tree.checkNode(parent1);
         tree.uncheckNode(child11);
         tree.checkNode(parent2);
+        let spy = spyOn(tree, '_checkParentsRecursive').and.callThrough();
 
         // Act
         tree._initNodes(tree.nodes);
@@ -1568,6 +1655,7 @@ describe('Tree', () => {
         expect(parent2.checked).toBe(true);
         expect(parent2.childrenChecked).toBe(false);
         expect(child21.checked).toBe(true);
+        expect(spy.calls.count()).toBe(6); // 6 parent nodes
       });
 
       it('updates parent nodes when child is deleted', () => {
@@ -1592,6 +1680,63 @@ describe('Tree', () => {
         expect(parent.checked).toBe(true);
         expect(child2.checked).toBe(true);
         expect(tree.checkedNodes).toEqual(jasmine.arrayWithExactContents([parent, child2]));
+
+        // Act
+        tree.deleteNode(child2);
+
+        // Assert
+        expect(parent.checked).toBe(false);
+        expect(tree.checkedNodes).toEqual([]);
+      });
+
+      it('updates parent nodes when children are deleted', () => {
+        let model = helper.createModelFixture(3, 1);
+        tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.setAutoCheckChildren(true);
+        tree.render();
+
+        // Arrange
+        let parent = tree.nodes[0];
+        let child1 = parent.childNodes[0];
+        let child2 = parent.childNodes[1];
+        tree.checkNodes([child1, child2]);
+        let spy = spyOn(tree, '_checkParentsRecursive').and.callThrough();
+        expect(parent.childrenChecked).toBe(true);
+
+        // Act
+        tree.deleteNodes([child1, child2]);
+
+        // Assert
+        expect(parent.checked).toBe(false);
+        expect(parent.childrenChecked).toBe(false);
+        expect(tree.checkedNodes).toEqual([]);
+        expect(spy.calls.count()).toBe(1);
+      });
+
+      it('updates parent nodes when all children are deleted', () => {
+        let model = helper.createModelFixture(3, 1);
+        tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.setAutoCheckChildren(true);
+        tree.render();
+
+        // Arrange
+        let parent = tree.nodes[0];
+        tree.checkNode(parent);
+        let spy = spyOn(tree, '_checkParentsRecursive').and.callThrough();
+        expect(parent.checked).toBe(true);
+
+        // Act
+        tree.deleteAllChildNodes(parent);
+
+        // Assert
+        expect(parent.checked).toBe(false);
+        expect(parent.childrenChecked).toBe(false);
+        expect(tree.checkedNodes).toEqual([]);
+        expect(spy.calls.count()).toBe(1);
       });
 
       it('unchecks parent when new unchecked child is inserted', () => {
@@ -1637,6 +1782,67 @@ describe('Tree', () => {
         expect(node.childrenChecked).toBe(true);
         expect(childNode.checked).toBe(true);
         expect(insertedNode.checked).toBe(false);
+      });
+
+      it('triggers a checked event for the parent if necessary', () => {
+        let model = helper.createModelFixture(2, 2);
+        tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.setAutoCheckChildren(true);
+        tree.render();
+
+        let parent = tree.nodes[0];
+        let child = parent.childNodes[1];
+        tree.checkNode(parent);
+
+        let eventCount = 0;
+        tree.on('nodesChecked', event => {
+          expect(event.nodes).toEqual([child, ...child.childNodes, parent]); // Order is not important
+          eventCount++;
+        });
+        tree.uncheckNode(child);
+        expect(eventCount).toBe(1);
+
+        tree.checkNode(child);
+        expect(eventCount).toBe(2);
+      });
+
+      it('re-computes the states if toggled dynamically', () => {
+        let model = helper.createModelFixture(2, 3);
+        tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.setAutoCheckChildren(true);
+        tree.render();
+
+        let parent = tree.nodes[0];
+        let child1 = parent.childNodes[1];
+        tree.checkNode(parent);
+
+        expect(parent.checked).toBe(true);
+        expect(child1.checked).toBe(true);
+
+        tree.setAutoCheckChildren(false);
+        expect(parent.checked).toBe(true);
+        expect(child1.checked).toBe(true);
+
+        tree.uncheckNode(parent);
+        expect(parent.checked).toBe(false);
+        expect(parent.childrenChecked).toBe(true);
+
+        tree.setAutoCheckChildren(true);
+        expect(parent.checked).toBe(true);
+
+        tree.setAutoCheckChildren(false);
+        tree.insertNode(helper.createModelNode(), parent);
+        expect(parent.checked).toBe(true);
+        expect(parent.childNodes[2].checked).toBe(false);
+
+        tree.setAutoCheckChildren(true);
+        expect(parent.checked).toBe(false);
+        expect(parent.childrenChecked).toBe(true);
+        expect(parent.childNodes[2].checked).toBe(false);
       });
 
       const ensureRenderedCorrectly = (nodes: TreeNode[]) => {
