@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -227,6 +227,9 @@ public class MailHelper {
   protected Object getPartContent(Part part) throws MessagingException, IOException {
     if (part == null) {
       return null;
+    }
+    if (part.getContentType().startsWith(CONTENT_TYPE_IMAGE_PREFIX)) {
+      return part.getInputStream();
     }
     if (part instanceof MimePart) {
       autoFixEncoding((MimePart) part);
