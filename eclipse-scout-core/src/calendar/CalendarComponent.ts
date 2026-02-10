@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, Calendar, CalendarComponentEventMap, CalendarComponentModel, DateRange, dates, icons, InitModelOf, JsonDateRange, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
+import {aria, Calendar, CalendarComponentEventMap, CalendarComponentModel, CalendarComponentPopup, DateRange, dates, icons, InitModelOf, JsonDateRange, Range, scout, strings, Widget} from '../index';
 import $ from 'jquery';
 
 export class CalendarComponent extends Widget implements CalendarComponentModel {
@@ -28,6 +28,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
 
   /** @internal */
   _$parts: JQuery[];
+  protected _popup: CalendarComponentPopup;
 
   constructor() {
     super();
@@ -36,6 +37,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     this.fullDayIndex = -1;
     this.item = null;
     this._$parts = [];
+    this._popup = null;
   }
 
   /**
@@ -322,10 +324,14 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
   }
 
   protected _onMouseDown(event: JQuery.MouseDownEvent) {
-    this.applySelection($(event.delegateTarget), event.button === 0, event.originalEvent.clientY);
+    let $target = $(event.delegateTarget);
+    this.applySelection($target);
+    if (event.button === 0) {
+      this.openPopup($target, event.originalEvent.clientY);
+    }
   }
 
-  applySelection($part: JQuery, openPopup: boolean, popupY: number) {
+  applySelection($part: JQuery) {
     // don't show popup if dragging is in process
     if (this.parent._moveData && this.parent._moveData.moving) {
       return;
@@ -339,38 +345,30 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     this.updateSelectedComponent($part, false);
 
     this.parent.setSelectedRange(null);
+  }
 
-    if (openPopup) {
-      let popup = scout.create((WidgetPopup<Label>), {
-        parent: this.parent,
-        $anchor: $part,
-        closeOnAnchorMouseDown: true,
-        closeOnMouseDownOutside: true,
-        closeOnOtherPopupOpen: true,
-        horizontalAlignment: Popup.Alignment.LEFT,
-        verticalAlignment: Popup.Alignment.CENTER,
-        trimWidth: false,
-        trimHeight: true,
-        horizontalSwitch: true,
-        verticalSwitch: false,
-        withArrow: true,
-        cssClass: 'popup',
-        scrollType: 'remove',
-        location: {
-          y: popupY
-        },
-        content: {
-          objectType: Label,
-          htmlEnabled: true,
-          scrollable: true,
-          cssClass: 'calendar-component-tooltip-content tooltip-content',
-          value: this.description(true)
-        }
-      });
-      popup.open();
-      popup.$container.find('.app-link')
-        .on('click', this._onAppLinkAction.bind(this));
+  openPopup($anchor: JQuery, popupY: number) {
+    if (this._popup?.isOpen()) {
+      return;
     }
+    this._popup = scout.create(CalendarComponentPopup, {
+      parent: this,
+      $anchor: $anchor,
+      location: {
+        y: popupY
+      }
+    });
+    this._popup.setLabel(this.description(true));
+    this._popup.open();
+    this._popup.on('appLinkAction', e => this.triggerAppLinkAction(e.ref));
+  }
+
+  closePopup() {
+    if (this._popup?.isOpen()) {
+      this._popup.close();
+    }
+    // Reset property
+    this._popup = null;
   }
 
   /** @internal */
@@ -464,12 +462,6 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     this.trigger('appLinkAction', {
       ref: ref
     });
-  }
-
-  _onAppLinkAction(event: JQuery.ClickEvent) {
-    let $target = $(event.delegateTarget);
-    let ref = $target.data('ref') as string;
-    this.triggerAppLinkAction(ref);
   }
 }
 
