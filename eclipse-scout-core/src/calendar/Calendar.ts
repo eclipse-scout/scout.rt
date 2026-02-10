@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -826,7 +826,8 @@ export class Calendar extends Widget implements CalendarModel {
       let $part = $(componentPartElement as HTMLElement);
       let component = $part.data('component') as CalendarComponent;
       if (component) {
-        component.applySelection($part, true, event.originalEvent.clientY);
+        component.applySelection($part);
+        component.openPopup($part, event.originalEvent.clientY);
         return;
       }
     }
@@ -1666,7 +1667,7 @@ export class Calendar extends Widget implements CalendarModel {
         $scrollableContainer.remove();
       }
 
-      if (this.isMonth() && $allChildren.length > 0) {
+      if (this.isMonth()) {
         $scrollableContainer = $defaultColumn.appendDiv('calendar-scrollable-components');
 
         for (j = 0; j < $allChildren.length; j++) {
@@ -1946,6 +1947,8 @@ export class Calendar extends Widget implements CalendarModel {
     this._moveData.component = component;
 
     let $firstPart = component._$parts[0];
+    this._moveData.$movePart?.remove();
+    this._moveData.$movePart = $firstPart.clone().addClass('dragged');
     this._moveData.logicalX = $firstPart.closest('.calendar-day').data().day;
     this._moveData.logicalY = Math.round($firstPart.position().top) / this.heightPerDivision;
     if (this.isMonth()) {
@@ -1964,6 +1967,7 @@ export class Calendar extends Widget implements CalendarModel {
     if (!this._moveData.rafId) {
       this._moveData.rafId = requestAnimationFrame(this._whileComponentMove.bind(this));
     }
+    this._moveData.component?.closePopup();
   }
 
   protected _onComponentMouseUp(event: JQuery.MouseUpEvent) {
@@ -2028,6 +2032,7 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     let component = this._moveData.component;
+    this._moveData.$movePart?.remove();
 
     if (this._moveData.distance) {
       let moved = false;
@@ -2070,7 +2075,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _setComponentLogicalPosition(component: CalendarComponent, logicalPosition: Point) {
-    let $firstPart = component._$parts[0];
+    let $firstPart = this._moveData.$movePart;
     let currDay = $firstPart.closest('.calendar-day').data('day');
     let currWeek = $firstPart.closest('.calendar-day').data('week');
 

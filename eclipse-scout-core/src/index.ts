@@ -430,6 +430,8 @@ export * from './calendar/CalendarComponent';
 export * from './calendar/CalendarComponentModel';
 export * from './calendar/CalendarComponentEventMap';
 export * from './calendar/CalendarComponentAdapter';
+export * from './calendar/CalendarComponentPopup';
+export * from './calendar/CalendarComponentPopupEventMap';
 export * from './calendar/CalendarListComponent';
 export * from './calendar/CalendarLayout';
 export * from './calendar/CalendarModeMenu';
