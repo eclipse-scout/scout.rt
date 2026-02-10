@@ -9,8 +9,8 @@
  */
 import {
   arrays, CalendarComponent, CalendarDirection, CalendarDisplayMode, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarMoveData, CalendarResourceDo, CalendarSidebar, ContextMenuPopup,
-  DateRange, dates, Device, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, ResourcePanel, RoundingMode, scout, scrollbars, strings,
-  UuidPool, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
+  DateRange, dates, Device, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, objects, Point, PropertyChangeEvent, ResourcePanel, scout, scrollbars, strings, UuidPool,
+  ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
 
@@ -522,25 +522,35 @@ export class Calendar extends Widget implements CalendarModel {
     $fullDay.find('.resource-column').remove();
     $day.find('.resource-column').remove();
 
+    let resourceColumnMouseOverCallback = this._onResourceColumnMouseOver.bind(this);
+
     // Add default resource columns
-    $dayName.appendDiv('resource-column')
+    $dayName.appendDiv('resource-column default')
       .data('resourceId', this.defaultResource.resourceId);
-    $fullDay.appendDiv('resource-column')
+    $fullDay.appendDiv('resource-column default')
       .data('resourceId', this.defaultResource.resourceId)
-      .addClass('calendar-scrollable-components');
-    $day.appendDiv('resource-column')
-      .data('resourceId', this.defaultResource.resourceId);
+      .addClass('calendar-scrollable-components')
+      .on('mouseover', resourceColumnMouseOverCallback);
+    $day.appendDiv('resource-column default')
+      .data('resourceId', this.defaultResource.resourceId)
+      .on('mouseover', resourceColumnMouseOverCallback);
 
     // Add new resources columns
-    this._leafResources.forEach(resources => {
+    this._leafResources.forEach(resource => {
       $dayName.appendDiv('resource-column')
-        .data('resourceId', resources.resourceId)
-        .attr('data-resource-name', resources.name);
-      $fullDay.appendDiv('resource-column')
-        .data('resourceId', resources.resourceId)
+        .data('resourceId', resource.resourceId)
+        .attr('data-resource-name', resource.name);
+      let $fullDayColumn = $fullDay.appendDiv('resource-column')
+        .data('resourceId', resource.resourceId)
         .addClass('calendar-scrollable-components');
-      $day.appendDiv('resource-column')
-        .data('resourceId', resources.resourceId);
+      let $dayColumn = $day.appendDiv('resource-column')
+        .data('resourceId', resource.resourceId);
+      if (resource.selectable) {
+        // Only add event listener to selectable columns. This prevents components to be moved to
+        // a resource that is not selectable
+        $fullDayColumn.on('mouseover', resourceColumnMouseOverCallback);
+        $dayColumn.on('mouseover', resourceColumnMouseOverCallback);
+      }
     });
 
     // click event on all day and children elements
@@ -826,7 +836,8 @@ export class Calendar extends Widget implements CalendarModel {
       let $part = $(componentPartElement as HTMLElement);
       let component = $part.data('component') as CalendarComponent;
       if (component) {
-        component.applySelection($part, true, event.originalEvent.clientY);
+        component.applySelection($part);
+        component.openPopup($part, event.originalEvent.clientY);
         return;
       }
     }
@@ -1671,7 +1682,7 @@ export class Calendar extends Widget implements CalendarModel {
         $scrollableContainer.remove();
       }
 
-      if (this.isMonth() && $allChildren.length > 0) {
+      if (this.isMonth()) {
         $scrollableContainer = $defaultColumn.appendDiv('calendar-scrollable-components');
 
         for (j = 0; j < $allChildren.length; j++) {
@@ -1899,6 +1910,7 @@ export class Calendar extends Widget implements CalendarModel {
       event.pageY - this._moveData.containerOffset.top + this._moveData.containerScrollPosition.y
     );
 
+    this._captureVirtualPositionByCursor(event.pageY);
     this._scrollViewportWhileDragging(event);
 
     if (this._moveData.onMove && !this._moveData.cancelled) {
@@ -1906,8 +1918,14 @@ export class Calendar extends Widget implements CalendarModel {
     }
   }
 
+  protected _onResourceColumnMouseOver(event: JQuery.MouseEnterEvent) {
+    if (this._moveData?.moving) {
+      this._captureVirtualPositionByContainer($(event.currentTarget));
+    }
+  }
+
   protected _scrollViewportWhileDragging(event: JQuery.MouseMoveEvent) {
-    if (!this._moveData || this._moveData.mode === 'pan' || this._moveData.cancelled) {
+    if (!this._moveData || this._moveData.cancelled) {
       return;
     }
 
@@ -1951,10 +1969,15 @@ export class Calendar extends Widget implements CalendarModel {
     this._moveData.component = component;
 
     let $firstPart = component._$parts[0];
-    this._moveData.logicalX = $firstPart.closest('.calendar-day').data().day;
-    this._moveData.logicalY = Math.round($firstPart.position().top) / this.heightPerDivision;
-    if (this.isMonth()) {
-      this._moveData.logicalY = $firstPart.closest('.calendar-day').data().week;
+    this._moveData.$movePart?.remove();
+    this._moveData.$movePart = $firstPart.clone()
+      .addClass('dragged') // reduce opacity
+      .width('').cssLeft(''); // remove style attribute -> full width
+    this._captureVirtualPositionByContainer($firstPart.closest('.resource-column'));
+    this._captureVirtualPositionByCursor(event.pageY);
+    if (!this.isMonth()) {
+      this._moveData.virtualOffset = (this._calculateDateForComponentPart($firstPart).getTime() - dates.parseJsonDate(this._moveData.component.fromDate).getTime()) / (60 * 1000) // offset in minutes
+        + this._moveData.virtualY; // Add offset from top
     }
 
     // Prevent scrolling on touch devices (like "touch-action: none" but with better browser support).
@@ -1978,52 +2001,63 @@ export class Calendar extends Widget implements CalendarModel {
   protected _whileComponentMove() {
     this._moveData.rafId = null;
 
-    let pixelDistance = new Point(
-      this._moveData.currentCursorPosition.x - this._moveData.startCursorPosition.x,
-      this._moveData.currentCursorPosition.y - this._moveData.startCursorPosition.y);
-
     // Ignore small mouse movements
     if (!this._moveData.moving) {
-      if (Math.abs(pixelDistance.x) < 7 && Math.abs(pixelDistance.y) < 7) {
+      let pixelDistance = new Point(
+        this._moveData.currentCursorPosition.x - this._moveData.startCursorPosition.x,
+        this._moveData.currentCursorPosition.y - this._moveData.startCursorPosition.y);
+
+      if (Math.abs(pixelDistance.x) < 10 && Math.abs(pixelDistance.y) < 10) {
         return;
       }
       this._moveData.moving = true;
+      this._moveData.component?.closePopup();
     }
 
-    // Snap to grid
-    let logicalDistance = this.toLogicalPosition(pixelDistance);
+    this._updateComponentVirtualPosition(this._moveData.component);
+  }
 
-    // Limit logical distance
-    let minX = 1;
-    let minY = this.isMonth() ? 1 : 0;
-    let maxX = this.isWorkWeek() ? this.workDayIndices.length : 7;
-    let maxY = this.isMonth() ?
-      this.monthViewNumberOfWeeks :
-      (24 * this.numberOfHourDivisions) - Math.ceil(this._moveData.component.getLengthInHoursDecimal() * this.numberOfHourDivisions);
+  protected _updateComponentVirtualPosition(component: CalendarComponent) {
+    let $part = this._moveData.$movePart;
+    let currDay = $part.closest('.calendar-day').data('day');
+    let currWeek = $part.closest('.calendar-day').data('week');
 
-    function limitDistance(newPosition: Point) {
-      let newX = newPosition.x;
-      let newY = newPosition.y;
-      if (newX < minX) {
-        logicalDistance.x -= (newX - minX);
-      } else if (newX > maxX) {
-        logicalDistance.x -= (newX - maxX);
-      }
-      if (newY < minY) {
-        logicalDistance.y -= (newY - minY);
-      } else if (newY > maxY) {
-        logicalDistance.y -= (newY - maxY);
+    if (component.rendered && (currDay !== this._moveData.virtualX || currWeek !== this._moveData.virtualY)) {
+      let newContainer = this._calculateVirtualComponentContainer();
+      $part.detach().appendTo(newContainer);
+
+      if (!this.isMonth()) {
+        let topPercentage = (this._moveData.virtualY - this._moveData.virtualOffset) * 100 / 1440;
+        $part.css('top', topPercentage + '%');
       }
     }
+  }
 
-    limitDistance(new Point(this._moveData.logicalX, this._moveData.logicalY).add(logicalDistance));
+  protected _calculateVirtualComponentContainer(): JQuery {
+    let baseQuery = $('.calendar-week:not(.hidden) > .calendar-day');
+    let moveData = this._moveData;
 
-    this._moveData.distance = logicalDistance;
+    if (this.isMonth()) {
+      // Filter calendar days by correct x / y position
+      return baseQuery.filter(function() {
+        return $(this).data('day') === moveData.virtualX &&
+          $(this).data('week') === moveData.virtualY;
+      }).find('.resource-column.default > .calendar-scrollable-components');
+    }
 
-    // Update logical position
-    let newLogicalPosition = new Point(this._moveData.logicalX, this._moveData.logicalY).add(this._moveData.distance);
+    if (this.isDay()) {
+      return baseQuery
+        .filter('.selected')
+        .children('.resource-column')
+        .filter(function() {
+          return $(this).data('resourceId') === moveData.virtualResourceId;
+        });
+    }
 
-    this._setComponentLogicalPosition(this._moveData.component, newLogicalPosition);
+    // When on work week or week, return default resource column
+    return baseQuery.filter(function() {
+      return $(this).data('day') === moveData.virtualX;
+    }).children('.resource-column.default');
   }
 
   protected _endComponentMove() {
@@ -2033,77 +2067,61 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     let component = this._moveData.component;
+    let appointmentFromDate = dates.parseJsonDate(component.fromDate);
+    let appointmentToDate = dates.parseJsonDate(component.toDate);
 
-    if (this._moveData.distance) {
-      let moved = false;
-      // Move pixel position by distance
-      let logicalPosition = new Point(this._moveData.logicalX, this._moveData.logicalY).add(this._moveData.distance);
-
-      // Logical position
-      let diffX = logicalPosition.x - this._moveData.logicalX;
-      let diffY = logicalPosition.y - this._moveData.logicalY;
-
-      moved = moved || !!diffX || !!diffY;
-
-      if (moved) {
-        let appointmentToDate = dates.parseJsonDate(component.toDate);
-        let appointmentFromDate = dates.parseJsonDate(component.fromDate);
-
-        let daysShift = diffX;
-        if (this.isMonth()) {
-          // in month mode the y-axis is a shit in weeks
-          daysShift += diffY * 7;
-        } else {
-          // time difference (y-axis) only if we are not in month mode
-          let timeDiff = this._hourMinuteByDivision(diffY);
-          appointmentFromDate = dates.shiftTime(appointmentFromDate, timeDiff.hour, timeDiff.minute);
-          appointmentToDate = dates.shiftTime(appointmentToDate, timeDiff.hour, timeDiff.minute);
-        }
-        appointmentFromDate = dates.shift(appointmentFromDate, 0, 0, daysShift);
-        appointmentToDate = dates.shift(appointmentToDate, 0, 0, daysShift);
-
-        component.fromDate = this._format(appointmentFromDate, 'yyyy-MM-dd HH:mm:ss.SSS');
-        component.toDate = this._format(appointmentToDate, 'yyyy-MM-dd HH:mm:ss.SSS');
-        component.coveredDaysRange = new DateRange(dates.trunc(appointmentFromDate), dates.trunc(appointmentToDate));
-        this._renderComponents();
-
-        this.trigger('componentMove', {
-          component: component
-        });
-      }
+    let newDay = this._calculateDateForComponentPart(this._moveData.$movePart);
+    this._moveData.$movePart?.remove();
+    this._moveData.$movePart = null;
+    if (!newDay) {
+      // Component has not been moved
+      return;
     }
-  }
 
-  protected _setComponentLogicalPosition(component: CalendarComponent, logicalPosition: Point) {
-    let $firstPart = component._$parts[0];
-    let currDay = $firstPart.closest('.calendar-day').data('day');
-    let currWeek = $firstPart.closest('.calendar-day').data('week');
+    let newTime = this.isMonth()
+      ? this._getTotalMinutesInDay(appointmentFromDate)
+      : this._moveData.virtualY - this._moveData.virtualOffset;
+    let newResourceId = this._moveData.virtualResourceId;
 
-    if (component.rendered) {
-      if (this.isMonth()) {
-        if (currDay !== logicalPosition.x || currWeek !== logicalPosition.y) {
-          let newContainer =
-            $('.calendar-week:not(.hidden) > .calendar-day')
-              .filter(function() {
-                return $(this).data('day') === logicalPosition.x &&
-                  $(this).data('week') === logicalPosition.y;
-              });
-          let csc = newContainer.find('.calendar-scrollable-components');
-          newContainer = csc.length > 0 ? csc : newContainer;
-          $firstPart.detach().appendTo(newContainer);
-        }
-      } else {
-        if (currDay !== logicalPosition.x) {
-          $firstPart.detach().appendTo($('.calendar-week:not(.hidden) > .calendar-day')
-            .filter(function() {
-              return $(this).data('day') === logicalPosition.x;
-            }));
-        }
-
-        let pos = this._dayPositionByDivision(logicalPosition.y) + '%';
-        $firstPart.css('top', pos);
-      }
+    let dateShift = dates.compareDays(newDay, dates.trunc(appointmentFromDate));
+    let timeShiftMinutes = newTime - this._getTotalMinutesInDay(appointmentFromDate);
+    if (!dateShift && !timeShiftMinutes && component.item.resourceId === newResourceId) {
+      // Nothing to shift
+      return;
     }
+
+    if (!this.findResourceForId(newResourceId).selectable) {
+      // Not allowed to move a component to a calendar that is not selectable
+      return;
+    }
+
+    if (component.item && this.isDay()) {
+      component.item.resourceId = this._moveData.virtualResourceId;
+    }
+
+    if (dateShift) {
+      appointmentFromDate = dates.shift(appointmentFromDate, 0, 0, dateShift);
+      appointmentToDate = dates.shift(appointmentToDate, 0, 0, dateShift);
+    }
+
+    if (timeShiftMinutes) {
+      let hourShift = Math.trunc(timeShiftMinutes / 60);
+
+      let minuteShift = Math.round(timeShiftMinutes % 60);
+      appointmentFromDate = dates.shiftTime(appointmentFromDate, hourShift, minuteShift);
+      appointmentToDate = dates.shiftTime(appointmentToDate, hourShift, minuteShift);
+    }
+
+    component.fromDate = this._format(appointmentFromDate, 'yyyy-MM-dd HH:mm:ss.SSS');
+    component.toDate = this._format(appointmentToDate, 'yyyy-MM-dd HH:mm:ss.SSS');
+    component.coveredDaysRange = new DateRange(dates.trunc(appointmentFromDate), dates.trunc(appointmentToDate));
+
+    this._renderComponents();
+    component.applySelection(component._$parts[0]); // Select component after move
+
+    this.trigger('componentMove', {
+      component: component
+    });
   }
 
   protected _getCalendarComponentForMouseEvent(event: JQuery.MouseDownEvent): CalendarComponent {
@@ -2132,12 +2150,6 @@ export class Calendar extends Widget implements CalendarModel {
       moveData.cancelled = true;
     };
 
-    moveData.unitX = this.widthPerDivision;
-    moveData.unitY = this.heightPerDivision;
-    if (this.isMonth()) {
-      moveData.unitY = $(event.target).closest('.calendar-day').height();
-    }
-
     moveData.containerOffset = this.$grid.offset();
     moveData.containerScrollPosition = new Point(this.get$Scrollable().scrollLeft(), this.get$Scrollable().scrollTop());
 
@@ -2150,51 +2162,7 @@ export class Calendar extends Widget implements CalendarModel {
     return moveData;
   }
 
-  toLogicalPosition(point: Point, roundingMode?: RoundingMode): Point;
-  toLogicalPosition(x: number, y: number, roundingMode?: RoundingMode): Point;
-  toLogicalPosition(vararg: Point | number, y?: number | RoundingMode, roundingMode?: RoundingMode): Point {
-    let pixelPosition;
-    if (vararg instanceof Point) {
-      pixelPosition = vararg;
-      roundingMode = y as RoundingMode;
-    } else {
-      pixelPosition = new Point(vararg, y as number);
-    }
-
-    if (this.isDay()) {
-      pixelPosition.x = 0;
-    }
-
-    return new Point(
-      numbers.round(pixelPosition.x / this._moveData.unitX, roundingMode),
-      numbers.round(pixelPosition.y / this._moveData.unitY, roundingMode)
-    );
-  }
-
   /* -- helper ---------------------------------------------------- */
-
-  protected _hourMinuteByDivision(number: number): { hour: number; minute: number } {
-    // from division number to decimal hour.min
-    number /= this.numberOfHourDivisions;
-    // Separate the int from the decimal part
-    let hour = Math.floor(number);
-    let decPart = number - hour;
-
-    let min = 1 / 60;
-    // Round to nearest minute
-    decPart = min * Math.round(decPart / min);
-
-    let minute = Math.floor(decPart * 60);
-    return {
-      hour: hour,
-      minute: minute
-    };
-  }
-
-  protected _dayPositionByDivision(number: number): number {
-    let hourMin = this._hourMinuteByDivision(number);
-    return this._dayPosition(hourMin.hour, hourMin.minute);
-  }
 
   /** @internal */
   _dayPosition(hour: number, minutes: number): number {
@@ -2402,5 +2370,51 @@ export class Calendar extends Widget implements CalendarModel {
       this.selectedRange = null;
     }
     this.trigger('selectedRangeChange');
+  }
+
+  protected _captureVirtualPositionByContainer($resourceColumn: JQuery) {
+    if (this.isDay()) {
+      this._moveData.virtualResourceId = $resourceColumn.data('resourceId');
+    }
+
+    let $calendarDay = $resourceColumn.closest('.calendar-day');
+    this._moveData.virtualX = $calendarDay.data('day');
+    if (this.isMonth()) {
+      this._moveData.virtualY = $calendarDay.data('week');
+    }
+  }
+
+  protected _captureVirtualPositionByCursor(cursorY: number) {
+    if (!this.isMonth()) {
+      // calculate current cursor time
+      let pxFromTopOfDay = cursorY - this._moveData.containerOffset.top + this._moveData.containerScrollPosition.y;
+      let divisionFromTop = Math.floor(pxFromTopOfDay / this.heightPerDivision);
+      this._moveData.virtualY = Math.round((60 / this.numberOfHourDivisions) * divisionFromTop);
+    }
+  }
+
+  protected _calculateDateForComponentPart($part: JQuery): Date {
+    let $calendarDay = $part.closest('.calendar-day');
+    if ($calendarDay.length === 0) {
+      // Component is not attached to div
+      return null;
+    }
+    let dayShift = null;
+    let startDate = this._exactRange.from;
+    if (this.isDay()) {
+      dayShift = 0;
+    } else {
+      dayShift = $calendarDay.data('day') - 1; // -1 because view range starts at first day
+      if (this.isMonth()) {
+        startDate = this.viewRange.from; // When on month, more days are shown than the exact range contains
+        let week = $calendarDay.data('week') - 1; // -1 because week starts at 1
+        dayShift += week * 7;
+      }
+    }
+    return dates.trunc(dates.shift(startDate, 0, 0, dayShift));
+  }
+
+  protected _getTotalMinutesInDay(date: Date) {
+    return date.getHours() * 60 + date.getMinutes();
   }
 }
