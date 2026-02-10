@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -88,11 +88,15 @@ export class LoginBox extends Box {
         .html(strings.nl2br(this.texts.get(this.messageKey)))
         .appendTo(this.$form);
     }
+    const userText = this.texts.get('ui.User');
     this.$user = $('<input>')
       .attr('type', 'text')
+      .attr('autocomplete', 'username')
       .attr('autocapitalize', 'off')
       .attr('autocorrect', 'off')
-      .placeholder(this.texts.get('ui.User'))
+      .attr('spellcheck', 'false')
+      .attr('aria-label', userText)
+      .placeholder(userText)
       .appendTo(this.$form);
     this.$password = this._createPasswortField()
       .appendTo(this.$form);
@@ -101,14 +105,17 @@ export class LoginBox extends Box {
       .addClass('login-button button default')
       .text(this.texts.get('ui.Login'))
       .appendTo(this.$form);
-
-    this.$user.focus();
+    this.$user[0].focus();
   }
 
   protected _createPasswortField() {
+    const passwordText = this.texts.get('ui.Password');
     return $('<input>')
       .attr('type', 'password')
-      .placeholder(this.texts.get('ui.Password'));
+      .attr('autocomplete', 'current-password')
+      .attr('spellcheck', 'false')
+      .attr('aria-label', passwordText)
+      .placeholder(passwordText);
   }
 
   protected _resetButtonText() {
@@ -175,13 +182,17 @@ export class LoginBox extends Box {
       .text(this.texts.get('ui.Login'));
     this.$user
       .setEnabled(false);
+    const tokenText = this.texts.get('ui.Token');
     this.$token = $('<input>')
       .attr('type', 'password')
-      .placeholder(this.texts.get('ui.Token'));
+      .attr('autocomplete', 'one-time-code')
+      .attr('spellcheck', 'false')
+      .attr('aria-label', tokenText)
+      .placeholder(tokenText);
     this.$password
       .replaceWith(this.$token);
     this.$password = null;
-    this.$token.focus();
+    this.$token[0].focus();
   }
 
   redirect(data: Record<string, any>) {
@@ -237,15 +248,11 @@ export class LoginBox extends Box {
       .addClass('login-error');
     this.$user
       .setEnabled(true)
-      .val('')
-      .focus();
-    this.$password
       .val('');
-
-    this.$user
-      .one('input.resetLoginError', this._resetButtonText.bind(this));
-    this.$password
-      .one('input.resetLoginError', this._resetButtonText.bind(this));
+    this.$user[0].focus();
+    this.$password.val('');
+    this.$user.one('input.resetLoginError', this._resetButtonText.bind(this));
+    this.$password.one('input.resetLoginError', this._resetButtonText.bind(this));
   }
 
   // ----- Helper functions -----
