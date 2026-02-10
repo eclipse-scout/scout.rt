@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -244,7 +244,10 @@ export class StringField extends BasicField<string> implements StringFieldModel 
     if (this.multilineText) {
       return;
     }
-    this.$field.attr('type', this.inputMasked ? 'password' : 'text');
+
+    this.$field
+      .toggleAttr('spellcheck', this.inputMasked, 'false')
+      .attr('type', this.inputMasked ? 'password' : 'text');
   }
 
   protected _renderInputObfuscated() {
