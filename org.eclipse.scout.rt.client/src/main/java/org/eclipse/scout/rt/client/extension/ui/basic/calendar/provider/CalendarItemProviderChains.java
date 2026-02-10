@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -87,11 +87,11 @@ public final class CalendarItemProviderChains {
       super(extensions);
     }
 
-    public void execItemMoved(final ICalendarItem item, final Date fromDate, final Date toDate) {
+    public void execItemMoved(final ICalendarItem item, final Date fromDate, final Date toDate, final String resourceId) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider> next) {
-          next.execItemMoved(CalendarItemProviderItemMovedChain.this, item, fromDate, toDate);
+          next.execItemMoved(CalendarItemProviderItemMovedChain.this, item, fromDate, toDate, resourceId);
         }
       };
       callChain(methodInvocation);

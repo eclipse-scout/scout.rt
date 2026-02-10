@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -337,10 +337,11 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
     Date fromDate = toJavaDate(data, "fromDate");
     Date toDate = toJavaDate(data, "toDate");
     String componentId = data.optString("componentId", null);
+    String resourceId = data.optString("resourceId", null);
 
     JsonCalendarComponent<CalendarComponent> component = resolveCalendarComponent(componentId);
     if (component != null) {
-      getModel().getUIFacade().fireComponentMoveFromUI(component.getModel(), fromDate, toDate);
+      getModel().getUIFacade().fireComponentMoveFromUI(component.getModel(), fromDate, toDate, resourceId);
     }
     else if (componentId != null) {
       LOG.info("Unkown component with ID {} [event='{}']", componentId, EVENT_COMPONENT_MOVE);

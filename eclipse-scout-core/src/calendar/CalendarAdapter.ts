@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -91,10 +91,17 @@ export class CalendarAdapter extends ModelAdapter {
   }
 
   protected _sendComponentMove(event: CalendarComponentMoveEvent) {
+    let resourceId = event.component.getResourceId();
+    if (resourceId === this.widget.defaultResource.resourceId) {
+      // Do not send the default resource to java, because it's not known there
+      resourceId = null;
+    }
+
     this._send('componentMove', {
       componentId: event.component.id,
       fromDate: event.component.fromDate,
-      toDate: event.component.toDate
+      toDate: event.component.toDate,
+      resourceId: resourceId
     });
   }
 
@@ -110,7 +117,7 @@ export class CalendarAdapter extends ModelAdapter {
 
     // Do not send the default resource to java, because it's not known there
     if (event.resourceId === this.widget.defaultResource.resourceId) {
-      resourceId = null;
+      return;
     }
 
     this._send('selectedResourceChange', {
