@@ -1398,6 +1398,9 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     $nodes.each((index: number, element: HTMLElement) => {
       let $node = $(element);
       let node = $node.data('node') as TreeNode;
+      if (node?.destroyed) {
+        return;
+      }
       let paddingLeft = this._computeNodePaddingLeft(node);
       $node.cssPaddingLeft(objects.isNullOrUndefined(paddingLeft) ? '' : paddingLeft);
       node._updateControl($node.children('.tree-node-control'));

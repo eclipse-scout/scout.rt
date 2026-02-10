@@ -1018,14 +1018,14 @@ describe('Tree', () => {
   });
 
   describe('deleteAllChildNodes', () => {
-    let model;
-    let tree;
-    let node0;
-    let node1;
-    let node2;
-    let node1Child0;
-    let node1Child1;
-    let node1Child2;
+    let model: TreeModel;
+    let tree: SpecTree;
+    let node0: TreeNode;
+    let node1: TreeNode;
+    let node2: TreeNode;
+    let node1Child0: TreeNode;
+    let node1Child1: TreeNode;
+    let node1Child2: TreeNode;
 
     beforeEach(() => {
       model = helper.createModelFixture(3, 1, true);
@@ -1080,6 +1080,20 @@ describe('Tree', () => {
       expect(node1Child2.$node).toBe(null);
     });
 
+    it('does not fail when deleting nodes that are being collapsed', () => {
+      // Ensure _computeNodePaddingLeftForLevel() is called which happens because the selection needs to be re-rendered if a selected node is deleted
+      node1.iconId = 'my-icon';
+      tree.nodePaddingLevelDiffParentHasIcon = 10;
+      tree.selectNode(node1Child0);
+      tree.render();
+
+      // Ensure collapse animation runs
+      $.fx.off = false;
+      jasmine.clock().uninstall();
+
+      tree.collapseNode(node1);
+      tree.deleteAllChildNodes(node1);
+    });
   });
 
   describe('checkNodes', () => {
