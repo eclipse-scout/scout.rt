@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,7 @@ import java.net.SocketException;
 import java.nio.channels.ClosedChannelException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -77,6 +78,11 @@ public class ConnectionErrorDetectorTest {
     parametersList.add(new ExceptionTestParameter(new AlreadyInvalidatedException("Access to 'public abstract void jakarta.servlet.http.HttpServletResponse.setHeader(java.lang.String,java.lang.String)' ... is no longer valid (request has been completed).", new EofException("cancel_stream_error")), true));
 
     parametersList.add(new ExceptionTestParameter(new ConnectionClosedException("Connection is closed"), true));
+
+    parametersList.add(new ExceptionTestParameter(new TimeoutException("Idle timeout 30 ms elapsed"), true));
+    parametersList.add(new ExceptionTestParameter(new TimeoutException("Idle timeout 60 ms elapsed"), true));
+    parametersList.add(new ExceptionTestParameter(new TimeoutException(), true));
+    parametersList.add(new ExceptionTestParameter(new TimeoutException("unknown error"), false));
 
     parametersList.add(new ExceptionTestParameter(createDetectedNestedException(), true));
     parametersList.add(new ExceptionTestParameter(createUndetectedNestedException(), false));

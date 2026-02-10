@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.util;
 import java.io.InterruptedIOException;
 import java.net.SocketException;
 import java.nio.channels.ClosedChannelException;
+import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -25,7 +26,7 @@ public class ConnectionErrorDetector {
   }
 
   protected boolean isConnectionErrorThrowable(Throwable t) {
-    if (t instanceof SocketException || t instanceof InterruptedIOException || t instanceof ClosedChannelException) {
+    if (t instanceof SocketException || t instanceof InterruptedIOException || t instanceof ClosedChannelException || t instanceof TimeoutException) {
       return true;
     }
     String simpleName = t.getClass().getSimpleName();
@@ -43,6 +44,7 @@ public class ConnectionErrorDetector {
         || StringUtility.containsStringIgnoreCase(message, "Closed")
         || StringUtility.containsStringIgnoreCase(message, "connection was aborted")
         || StringUtility.containsStringIgnoreCase(message, "cancel_stream_error")
-        || StringUtility.containsStringIgnoreCase(message, "Broken pipe");
+        || StringUtility.containsStringIgnoreCase(message, "Broken pipe")
+        || StringUtility.matches(message, "Idle timeout \\d+ ms elapsed");
   }
 }
