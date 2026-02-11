@@ -16,21 +16,38 @@ export type CalendarMoveData = {
   event?: JQuery.MouseEventBase;
   cancel?: () => void;
   cancelled?: boolean;
-  unitX?: number;
-  unitY?: number;
-  logicalX?: number;
-  logicalY?: number;
-  mode?: string;
   moving?: boolean;
   $movePart?: JQuery;
   component?: CalendarComponent;
   containerOffset?: JQuery.Coordinates;
   containerScrollPosition?: Point;
-  distance?: Point;
   startCursorPosition?: Point;
   currentCursorPosition?: Point;
   viewportScroller?: ViewportScroller;
   rafId?: number;
   onMove?: (event: JQuery.MouseMoveEvent) => void;
   onUp?: (event: JQuery.MouseUpEvent) => void;
+  /**
+   * Describes the X position of the virtual (preview) component when dragging.
+   * X means the x-th day of the week, starting on Monday.
+   * This means when `x = 3`, Wednesday is referenced.
+   */
+  virtualX?: number;
+  /**
+   * Describes the Y position of the virtual component when dragging.
+   * Be aware that Y describes different properties, depending on the view mode.
+   *
+   * - MONTH: Y refers to the y-th week of the month
+   * - WEEK, WORK_WEEK, DAY: Y refers to the y-th minute in the day.
+   */
+  virtualY?: number;
+  /**
+   * The virtual resource does only come into play when on day. This allows dragging the component between resources.
+   */
+  virtualResourceId?: string;
+  /**
+   * The virtual offset stores the distance between the cursor and the top of the appointment.
+   * This allows to drag a larger component in the middle.
+   */
+  virtualOffset: number;
 };
