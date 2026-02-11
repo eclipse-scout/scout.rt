@@ -256,8 +256,16 @@ export class TableUiPreferences implements ObjectWithType {
           sortOrder: column.sortIndex,
           sortAscending: column.sortAscending,
           groupingActive: column.grouped,
-          aggregationFunctionId: column instanceof NumberColumn ? column.aggregationFunction : undefined,
-          backgroundEffectId: column instanceof NumberColumn ? column.backgroundEffect : undefined
+          aggregationFunctionId: column instanceof NumberColumn
+            ? column.aggregationFunction
+            : this.isColumnPreferencesColumn(column)
+              ? column.getColumnPreferences()?.aggregationFunctionId
+              : undefined,
+          backgroundEffectId: column instanceof NumberColumn
+            ? column.backgroundEffect
+            : this.isColumnPreferencesColumn(column)
+              ? column.getColumnPreferences()?.backgroundEffectId
+              : undefined
         });
       });
   }
@@ -510,12 +518,20 @@ export class TableUiPreferences implements ObjectWithType {
       column.setAggregationFunction(columnPreferences.aggregationFunctionId as NumberColumnAggregationFunction);
       column.setBackgroundEffect(columnPreferences.backgroundEffectId as NumberColumnBackgroundEffect, false); // false = don't redraw
     }
+
+    if (this.isColumnPreferencesColumn(column)) {
+      column.setColumnPreferences(columnPreferences);
+    }
   }
 
   protected _applyUserFilterStates(table: Table, userFilterStates: IUserFilterStateDo[], options?: ApplyTablePreferencesOptions) {
     if (options?.applyUserFilters) { // true when showing a bookmark
       table.applyUserFilterStates(userFilterStates);
     }
+  }
+
+  isColumnPreferencesColumn<TValue>(column: Column<TValue> & Partial<Omit<ColumnPreferencesColumn<TValue>, keyof Column<TValue>>>): column is ColumnPreferencesColumn<TValue> {
+    return objects.isFunction(column?.getColumnPreferences) && objects.isFunction(column.setColumnPreferences);
   }
 }
 
@@ -571,3 +587,16 @@ UiPreferences.registerHandler(TableUiPreferences, {
     preferences.tablePreferences = tableUiPreferences._exportTablePreferences();
   }
 });
+
+/**
+ * Interface for {@link Column}s containing a getter and a setter for {@link TableColumnClientUiPreferenceDo}.
+ * When preferences are applied to such a {@link Column} the whole {@link TableColumnClientUiPreferenceDo} is passed to the setter.
+ * Later on these preferences are used as a fallback for preference values that can only be extracted from
+ * specific column types (e.g. {@link NumberColumn#aggregationFunction} or {@link NumberColumn#backgroundEffect}) when the preferences are stored.
+ *
+ * With this one can e.g. implement placeholder columns that cache the preferences while the real columns are created asynchronously.
+ */
+export interface ColumnPreferencesColumn<TValue = any> extends Column<TValue> {
+  getColumnPreferences: () => TableColumnClientUiPreferenceDo;
+  setColumnPreferences: (columnPreferences: TableColumnClientUiPreferenceDo) => void;
+}
