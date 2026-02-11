@@ -518,6 +518,7 @@ export * from './table/TableEventMap';
 export * from './table/TableAdapter';
 export * from './table/TableCompactHandler';
 export * from './table/TableCompactHandlerModel';
+export * from './table/TableDefaultRowActionKeyStroke';
 export * from './table/TableRow';
 export * from './table/TableMaxResultsHelper';
 export * from './table/TableRowModel';

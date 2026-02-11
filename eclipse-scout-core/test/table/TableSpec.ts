@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, BeanColumn, BooleanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, SmartColumn, StaticLookupCall,
-  Status, strings, Table, TableAdapter, TableField, TableRow, TableRowModel, TableUserFilter, Tooltip
+  Action, arrays, BeanColumn, BooleanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, keys, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, SmartColumn,
+  StaticLookupCall, Status, strings, Table, TableAdapter, TableField, TableRow, TableRowModel, TableUserFilter, Tooltip
 } from '../../src/index';
 import {JQueryTesting, LocaleSpecHelper, SpecTable, SpecTableModel, TableSpecHelper} from '../../src/testing/index';
 import $ from 'jquery';
@@ -1094,6 +1094,56 @@ describe('Table', () => {
 
       table.doRowAction(row);
       expect(count).toBe(1);
+    });
+  });
+
+  describe('defaultRowAction', () => {
+
+    it('is executed when ENTER is pressed', () => {
+      const table = helper.createTable({
+        ...helper.createModelFixture(2, 5),
+        defaultRowAction: '42',
+        menus: [{
+          id: '42',
+          objectType: Menu
+        }]
+      });
+      table.render();
+
+      const row = table.rows[0];
+      table.selectRows(row);
+
+      const menu = table.menus[0];
+      expect(menu).toBe(table.defaultRowAction as Menu);
+
+      // when ENTER executes the defaultRowAction, the event propagation is stopped
+      let desktopEnterCount = 0;
+      const desktopEnterListener = (event: JQuery.KeyboardEventBase) => {
+        if (event.which === keys.ENTER) {
+          desktopEnterCount++;
+        }
+      };
+      session.desktop.$container.on('keydown', desktopEnterListener);
+
+      let menuActionCount = 0;
+      menu.on('action', () => menuActionCount++);
+
+      expect(desktopEnterCount).toBe(0);
+      expect(menuActionCount).toBe(0);
+
+      JQueryTesting.triggerKeyDownCapture(table.$container, keys.ENTER);
+      JQueryTesting.triggerKeyUpCapture(table.$container, keys.ENTER);
+      expect(desktopEnterCount).toBe(0);
+      expect(menuActionCount).toBe(1);
+
+      table.setDefaultRowAction(null);
+
+      JQueryTesting.triggerKeyDownCapture(table.$container, keys.ENTER);
+      JQueryTesting.triggerKeyUpCapture(table.$container, keys.ENTER);
+      expect(desktopEnterCount).toBe(1);
+      expect(menuActionCount).toBe(1);
+
+      session.desktop.$container.off('keydown', desktopEnterListener);
     });
   });
 

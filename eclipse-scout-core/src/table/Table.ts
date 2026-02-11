@@ -12,8 +12,8 @@ import {
   DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, ErrorHandler, EventHandler, events, Filter, Filterable, FilterOrFunction, FilterResult, FilterSupport, FullModelOf,
   graphics, GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, menus,
   NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToAlignment, ScrollToOptions, Status, StatusOrModel,
-  strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
-  TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke,
+  strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer, TableDefaultRowActionKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout,
+  TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke,
   TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableSelectKeyStroke, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator,
   TableToggleRowKeyStroke, TableTooltip, TableUiPreferences, tableUiPreferences, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences,
   UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
@@ -555,7 +555,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       new TableToggleRowKeyStroke(this),
       new TableCopyKeyStroke(this),
       new ContextMenuKeyStroke(this, this.showContextMenu, this),
-      new AppLinkKeyStroke(this, this.handleAppLinkAction)
+      new AppLinkKeyStroke(this, this.handleAppLinkAction),
+      new TableDefaultRowActionKeyStroke(this)
     ]);
   }
 
