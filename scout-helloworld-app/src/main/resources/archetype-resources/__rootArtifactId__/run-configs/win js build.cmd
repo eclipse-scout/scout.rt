@@ -5,7 +5,7 @@
 ::
 :: It has to be run once before the UI server is started.
 :: You need to rerun it if you update your JS dependencies (package.json).
-:: Please see the Scout documentation for details about the available run scripts: https://eclipsescout.github.io/scout-docs/26.1/technical-guide/user-interface/build-stack.html#command-line-interface-cli
+:: Please see the Scout documentation for details about the available run scripts: https://eclipsescout.github.io/scout-docs/26.2/technical-guide/user-interface/build-stack.html#command-line-interface-cli
 ::
 :: To make this script work you need a current version of Node.js (>=24.12.0), npm (>=11.6.2) and pnpm (>=10.26.1).
 :: Node.js (incl. npm) is available here: https://nodejs.org/.

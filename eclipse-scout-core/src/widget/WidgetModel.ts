@@ -20,7 +20,7 @@ export interface WidgetModel extends ObjectModelWithUuid<Widget>, ObjectModelWit
    * *Example*: {@link ViewMenuPopup} uses the {@link ViewButton}s as menu items. These view buttons are owned by the desktop and must therefore not be destroyed
    * when the popup closes, otherwise they could not be reused the second time the popup opens.
    *
-   * @see https://eclipsescout.github.io/scout-docs/26.1/technical-guide/user-interface/widget.html#parent-and-owner
+   * @see https://eclipsescout.github.io/scout-docs/26.2/technical-guide/user-interface/widget.html#parent-and-owner
    */
   parent?: Widget;
   /**
@@ -29,7 +29,7 @@ export interface WidgetModel extends ObjectModelWithUuid<Widget>, ObjectModelWit
    *
    * By default, the owner is derived from the {@link parent}, so it does not need to be set explicitly.
    *
-   * @see https://eclipsescout.github.io/scout-docs/26.1/technical-guide/user-interface/widget.html#parent-and-owner
+   * @see https://eclipsescout.github.io/scout-docs/26.2/technical-guide/user-interface/widget.html#parent-and-owner
    */
   owner?: Widget;
   /**
