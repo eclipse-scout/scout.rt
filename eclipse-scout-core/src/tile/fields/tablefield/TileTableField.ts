@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,28 +7,34 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EventHandler, FormFieldTile, MenuBar, PropertyChangeEvent, TableField} from '../../../index';
+import {EventHandler, focusUtils, FormFieldTile, MenuBar, PropertyChangeEvent, TableField} from '../../../index';
 import $ from 'jquery';
 
 export class TileTableField extends TableField {
-  protected _tableBlurHandler: (event: JQuery.BlurEvent) => void;
-  protected _tableFocusHandler: (event: JQuery.FocusEvent) => void;
   protected _menuBarPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, MenuBar>>;
   protected _documentMouseDownHandler: (event: MouseEvent) => void;
 
   constructor() {
     super();
 
-    this._tableBlurHandler = this._onTableBlur.bind(this);
-    this._tableFocusHandler = this._onTableFocus.bind(this);
     this._menuBarPropertyChangeHandler = this._onMenuBarPropertyChange.bind(this);
     this._documentMouseDownHandler = this._onDocumentMouseDown.bind(this);
   }
 
   protected override _render() {
     super._render();
+    if ((this.parent as FormFieldTile).displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
+      return;
+    }
+
     if (!this.session.focusManager.restrictedFocusGain) {
       this.$container.document(true).addEventListener('mousedown', this._documentMouseDownHandler, true);
+    }
+    this.$container
+      .on('focusout', this._onTileFocusOut.bind(this))
+      .on('focusin', this._onTileFocusIn.bind(this));
+    if (!focusUtils.isOrHasActiveElement(this.$container)) {
+      this._hideMenuBar(true);
     }
   }
 
@@ -43,14 +49,8 @@ export class TileTableField extends TableField {
       return;
     }
     if (this.table) {
-      this.table.$container
-        .on('blur', this._tableBlurHandler)
-        .on('focus', this._tableFocusHandler);
       this.table.menuBar.on('propertyChange', this._menuBarPropertyChangeHandler);
       this._toggleHasMenuBar();
-      if (document.activeElement !== this.table.$container[0]) {
-        this._hideMenuBar(true);
-      }
     }
   }
 
@@ -59,28 +59,39 @@ export class TileTableField extends TableField {
       return;
     }
     if (this.table) {
-      this.table.$container
-        .off('blur', this._tableBlurHandler)
-        .off('focus', this._tableFocusHandler);
       this.table.menuBar.off('propertyChange', this._menuBarPropertyChangeHandler);
     }
     super._removeTable();
   }
 
-  protected _onTableBlur(event: JQuery.BlurEvent) {
+  protected _onTileFocusOut(event: JQuery.FocusOutEvent) {
+    if (this.$container.isOrHas(event.relatedTarget as Element)) {
+      // If focus stays in tile, don't remove menubar
+      return;
+    }
     let popup = $('.popup').data('widget');
 
-    // hide menu bar if context menu popup is not attached to TileTableField
-    if (!this.has(popup)) {
-      this._hideMenuBar(true);
-    }
+    // Hide menu bar when focus leaves tile, but only if there is no popup open that belongs to the table (e.g. context menu or table header popup)
+    // If a popup is open, the focus is on the popup but the menubar should still be visible
+    requestAnimationFrame(() => {
+      if (!this.rendered) {
+        return;
+      }
+
+      if (!this.has(popup)) {
+        this._hideMenuBar(true);
+      }
+    });
   }
 
-  protected _onTableFocus(event: JQuery.FocusEvent) {
+  protected _onTileFocusIn(event: JQuery.FocusInEvent) {
     this._hideMenuBar(false);
   }
 
   protected _hideMenuBar(hiddenByUi: boolean) {
+    if (!this.table) {
+      return;
+    }
     this.table.menuBar.hiddenByUi = hiddenByUi;
     this.table.menuBar.updateVisibility();
   }

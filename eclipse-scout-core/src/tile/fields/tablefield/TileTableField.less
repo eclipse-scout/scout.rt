@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -42,9 +42,8 @@
     border-radius: 0;
     background-color: transparent;
 
-    &:focus,
-    &.focused {
-      box-shadow: none;
+    &:has(.table-data:is(:focus, .focused)) {
+      box-shadow: none !important;
     }
 
     & > .table-header {
@@ -86,19 +85,19 @@
       }
     }
 
-    &:not(:focus):not(.focused) > .table-data > .table-row.selected {
-      /* No selection color for non-focused table tiles */
-      background-color: transparent;
-
-      &::after {
-        border: 0;
-      }
-    }
-
     & > .table-data {
       & + .scroll-shadow {
         .scroll-shadow.gradient();
         --scroll-shadow-color: var(--tile-background-color);
+      }
+
+      &:not(:is(:focus, .focused)) > .table-row.selected {
+        /* No selection color for non-focused table tiles */
+        background-color: transparent;
+
+        &::after {
+          border: 0;
+        }
       }
 
       & > .table-row {
