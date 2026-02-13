@@ -8,9 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, BaseDoEntity, BookmarkDo, BookmarkDoBuilderModel, BookmarkSupport, BookmarkTableRowIdentifierDo, ChartTableControlConfigHelper, Desktop, Form, IBookmarkDefinitionDo, IBookmarkDo, IBookmarkPageDo, IChartTableControlConfigDo,
-  InitModelOf, NodeBookmarkPageDo, objects, ObjectWithType, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, strings, TableBookmarkPageDo, TableClientUiPreferencesDo, TableUiPreferences,
-  tableUiPreferences
+  arrays, BookmarkDo, BookmarkDoBuilderModel, BookmarkSupport, BookmarkTableRowIdentifierDo, ChartTableControlConfigHelper, Desktop, Form, IBookmarkDefinitionDo, IBookmarkDo, IBookmarkPageDo, IChartTableControlConfigDo, InitModelOf,
+  NodeBookmarkPageDo, ObjectWithType, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageWithTable, scout, Session, strings, TableBookmarkPageDo, TableClientUiPreferencesDo, TableUiPreferences, tableUiPreferences
 } from '../index';
 
 export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel {
@@ -35,6 +34,9 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
   createDescription: boolean;
   createTablePreferences: boolean;
   createTableRowSelections: boolean;
+
+  // Map to store texts computed by _tablePageToTableBookmarkPage() for later use in _createBookmarkDescription()
+  protected _searchFilterTexts = new Map<TableBookmarkPageDo, string>();
 
   // --------------------------------------
 
@@ -163,7 +165,7 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
       throw BookmarkDoBuilder.ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER;
     }
 
-    return scout.create(TableBookmarkPageDo, {
+    let bookmarkPage = scout.create(TableBookmarkPageDo, {
       pageParam: page.pageParam,
       displayText: page.getDisplayText(),
       expandedChildRow: expandedChildRowIdentifier,
@@ -173,6 +175,16 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
       tablePreferences: tablePreferences,
       chartTableControlConfig: chartTableControlConfig
     });
+
+    // Compute search filter text and put it into a map for later use in _createBookmarkDescription()
+    if (this.createDescription && searchData) {
+      let searchFilterText = await page.getSearchFilterText();
+      if (searchFilterText) {
+        this._searchFilterTexts.set(bookmarkPage, searchFilterText);
+      }
+    }
+
+    return bookmarkPage;
   }
 
   protected _createExpandedTableRowIdentifier(page: PageWithTable, childPage: Page): BookmarkTableRowIdentifierDo {
@@ -275,18 +287,19 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
 
     let lines = [];
     pagePath.forEach((bookmarkPage, index) => {
-      let prefix = strings.repeat('  ', index);
+      let indent = '  ';
+      let prefix = strings.repeat(indent, index);
 
       let displayText = bookmarkPage.displayText || this.session.text('Node');
       lines.push(prefix + displayText);
 
-      if (bookmarkPage instanceof TableBookmarkPageDo && bookmarkPage.searchData) {
-        let searchData = bookmarkPage.searchData instanceof BaseDoEntity ? bookmarkPage.searchData.toPojo() : bookmarkPage.searchData;
-        Object.keys(searchData)
-          .filter(key => !strings.startsWith(key, '_'))
-          .filter(key => !objects.isNullOrUndefinedOrEmpty(searchData[key]))
-          .map(key => key + ': ' + JSON.stringify((searchData)[key]))
-          .forEach(searchLine => lines.push(prefix + '  ' + searchLine));
+      if (bookmarkPage instanceof TableBookmarkPageDo) {
+        // Get search filter text added by _tablePageToTableBookmarkPage()
+        let searchFilterText = this._searchFilterTexts.get(bookmarkPage);
+        // Split search filter text into lines and add them to the description (with additional indentation)
+        if (searchFilterText) {
+          lines.push(...searchFilterText.split('\n').map(s => prefix + indent + s));
+        }
       }
     });
     return lines.join('\n');
