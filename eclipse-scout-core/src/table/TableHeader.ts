@@ -670,6 +670,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
     if (scout.isOneOf(event.which, keys.ENTER, keys.SPACE)) {
       this._doHeaderItemAction($(event.currentTarget));
       event.stopPropagation();
+      event.preventDefault(); // Don't scroll when pressing space
     }
   }
 
