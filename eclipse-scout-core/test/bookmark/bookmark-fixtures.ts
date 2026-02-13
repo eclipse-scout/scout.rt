@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,9 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BaseDoEntity, BooleanColumn, Column, Desktop, DesktopModel, Form, FormModel, GroupBox, NumberColumn, ObjectOrModel, Outline, OutlineViewButton, Page, PageParamDo, PageWithNodes, PageWithTable, ResetMenu, scout, SearchFormTableControl,
-  SearchMenu, StringField, strings, Table, TableRow, Tree, typeName
+  BaseDoEntity, BooleanColumn, CheckBoxField, Column, DateField, Desktop, DesktopModel, Form, FormModel, GroupBox, ListBox, NumberColumn, ObjectOrModel, Outline, OutlineViewButton, Page, PageParamDo, PageWithNodes, PageWithTable, ResetMenu,
+  scout, SearchFormTableControl, SearchMenu, StringField, strings, Table, TableRow, Tree, typeName
 } from '../../src';
+import {LanguageDummyLookupCall} from '../../src/testing';
 
 // ---------------------------------------------------------------
 //
@@ -146,6 +147,9 @@ export class SpecPageParamDo extends PageParamDo {
 @typeName('SpecSearch')
 export class SpecSearchDo extends BaseDoEntity {
   text: string;
+  showHiddenValues: boolean;
+  languages: number[];
+  creationDate: Date;
 }
 
 export class SpecNodePage1 extends PageWithNodes {
@@ -422,6 +426,9 @@ export class SpecSearchForm extends Form {
   declare data: SpecSearchDo;
   declare widgetMap: {
     'TextField': StringField;
+    'ShowHiddenValuesField': CheckBoxField;
+    'LanguagesField': ListBox<number>;
+    'CreationDateField': DateField;
     'SearchMenu': SearchMenu;
     'ResetMenu': ResetMenu;
   };
@@ -435,6 +442,19 @@ export class SpecSearchForm extends Form {
           id: 'TextField',
           objectType: StringField,
           label: 'Text'
+        }, {
+          id: 'ShowHiddenValuesField',
+          objectType: CheckBoxField,
+          label: 'Show hidden values'
+        }, {
+          id: 'LanguagesField',
+          objectType: ListBox<number>,
+          label: 'Languages',
+          lookupCall: LanguageDummyLookupCall
+        }, {
+          id: 'CreationDateField',
+          objectType: DateField,
+          label: 'Creation date'
         }],
         menus: [{
           id: 'SearchMenu',
@@ -452,11 +472,17 @@ export class SpecSearchForm extends Form {
       return;
     }
     this.widget('TextField').setValue(this.data.text);
+    this.widget('ShowHiddenValuesField').setValue(this.data.showHiddenValues);
+    this.widget('LanguagesField').setValue(this.data.languages);
+    this.widget('CreationDateField').setValue(this.data.creationDate);
   }
 
   override exportData(): any {
     return scout.create(SpecSearchDo, {
-      text: this.widget('TextField').value
+      text: this.widget('TextField').value,
+      showHiddenValues: this.widget('ShowHiddenValuesField').value,
+      languages: this.widget('LanguagesField').value,
+      creationDate: this.widget('CreationDateField').value
     });
   }
 }
