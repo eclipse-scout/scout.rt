@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 
 import {
-  ActivateBookmarkPathParam, BaseDoEntity, BookmarkDo, BookmarkDoBuilder, BookmarkSupport, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierStringComponentDo, BooleanColumn, Column, Desktop, NodeBookmarkPageDo, NumberColumn,
+  ActivateBookmarkPathParam, BaseDoEntity, BookmarkDo, BookmarkDoBuilder, BookmarkSupport, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierStringComponentDo, BooleanColumn, Column, dates, Desktop, NodeBookmarkPageDo, NumberColumn,
   NumberColumnUserFilter, NumberColumnUserFilterStateDo, Outline, OutlineBookmarkDefinitionDo, PageBookmarkDefinitionDo, PageIdDummyPageParamDo, ResetMenu, scout, SearchMenu, Table, TableBookmarkPageDo, TableClientUiPreferenceProfileDo,
   TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableTextUserFilter, TableTextUserFilterStateDo, TableUiPreferences, UuidPool
 } from '../../src/index';
@@ -33,6 +33,9 @@ describe('BookmarkSupport', () => {
     });
     desktop = session.desktop;
     bookmarkSupport = BookmarkSupport.get(session);
+
+    session.textMap.add('Yes', 'Yes');
+    session.textMap.add('No', 'No');
   });
 
   // ---------------------------------------------------------------
@@ -187,7 +190,7 @@ describe('BookmarkSupport', () => {
       expect(bookmark).toBeInstanceOf(BookmarkDo);
       expect(bookmark.id).toBeUndefined();
       expect(bookmark.title).toBe('Outline 1 - Table Page 3');
-      expect(bookmark.description).toBe('Table Page 3\n  text: "n"');
+      expect(bookmark.description).toBe('Table Page 3\n  Text: n\n  Show hidden values: No');
       expect(bookmark.definition).toBeInstanceOf(OutlineBookmarkDefinitionDo);
       let bookmarkDefinition = bookmark.definition as OutlineBookmarkDefinitionDo;
       expect(bookmarkDefinition.outlineId).toBe(SPEC_OUTLINE_1_UUID);
@@ -198,7 +201,9 @@ describe('BookmarkSupport', () => {
       expect(bookmarkedPage.pageParam).toBeInstanceOf(PageIdDummyPageParamDo);
       expect((bookmarkedPage.pageParam as PageIdDummyPageParamDo).pageId).toBe(SPEC_TABLE_PAGE_3_UUID);
       expect(bookmarkedPage.searchData).toBeInstanceOf(BaseDoEntity);
-      expect((bookmarkedPage.searchData as BaseDoEntity).toPojo()).toEqual(scout.create(SpecSearchDo, {text: 'n'}).toPojo());
+      expect((bookmarkedPage.searchData as BaseDoEntity).toPojo()).toEqual(scout.create(SpecSearchDo, {
+        text: 'n', showHiddenValues: false, languages: [], creationDate: null
+      }).toPojo());
 
       expect(bookmarkedPage.tablePreferences).toBeTruthy();
       expect(bookmarkedPage.tablePreferences.tableId).toBe(`${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`);
@@ -322,7 +327,7 @@ describe('BookmarkSupport', () => {
       outline.drillDown(page2);
       await page2.ensureLoadChildren();
       expect(page2.detailTable.rows.length).toBe(5);
-      page2.setSearchFilter(scout.create(SpecSearchDo, {text: 'i'})); // Matches 'Pineapple' and 'Kiwi'
+      page2.setSearchFilter(scout.create(SpecSearchDo, {text: 'i', showHiddenValues: true})); // Matches 'Pineapple' and 'Kiwi'
       page2.reloadPage();
       await page2.ensureLoadChildren();
       expect(page2.detailTable.rows.length).toBe(2);
@@ -355,7 +360,10 @@ describe('BookmarkSupport', () => {
       outline.drillDown(page4);
       await page4.ensureLoadChildren();
       expect(page4.detailTable.rows.length).toBe(5);
-      page4.setSearchFilter(scout.create(SpecSearchDo, {text: 'n'})); // Matches 'Banana', 'Pineapple' and 'Lemon'
+      jasmine.clock().install();
+      page4.setSearchFilter(scout.create(SpecSearchDo, {text: 'n', languages: [100, 300], creationDate: dates.create('1999-12-31')})); // Matches 'Banana', 'Pineapple' and 'Lemon'
+      jasmine.clock().tick(300); // wait for list box update the display text
+      jasmine.clock().uninstall();
       page4.reloadPage();
       await page4.ensureLoadChildren();
       expect(page4.detailTable.rows.length).toBe(3);
@@ -372,7 +380,17 @@ describe('BookmarkSupport', () => {
       expect(bookmark).toBeInstanceOf(BookmarkDo);
       expect(bookmark.id).toBeUndefined();
       expect(bookmark.title).toBe('Outline 2 - Node Page 3 - Table Page 2 - Kiwi - Table Page 2');
-      expect(bookmark.description).toBe('Node Page 3\n  Table Page 2\n    text: "i"\n    Kiwi\n      Table Page 2\n        text: "n"');
+      expect(bookmark.description).toBe('' +
+        'Node Page 3\n' +
+        '  Table Page 2\n' +
+        '    Text: i\n' +
+        '    Show hidden values: Yes\n' +
+        '    Kiwi\n' +
+        '      Table Page 2\n' +
+        '        Text: n\n' +
+        '        Show hidden values: No\n' +
+        '        Languages: English, Italian\n' +
+        '        Creation date: 31.12.1999');
       expect(bookmark.definition).toBeInstanceOf(OutlineBookmarkDefinitionDo);
       let bookmarkDefinition = bookmark.definition as OutlineBookmarkDefinitionDo;
       expect(bookmarkDefinition.outlineId).toBe(SPEC_OUTLINE_2_UUID);
@@ -390,7 +408,9 @@ describe('BookmarkSupport', () => {
       expect((pagePathElement2.pageParam as PageIdDummyPageParamDo).pageId).toBe(SPEC_TABLE_PAGE_2_UUID);
       expect(pagePathElement2.searchFilterComplete).toBe(true);
       expect(pagePathElement2.searchData).toBeInstanceOf(BaseDoEntity);
-      expect((pagePathElement2.searchData as BaseDoEntity).toPojo()).toEqual(scout.create(SpecSearchDo, {text: 'i'}).toPojo());
+      expect((pagePathElement2.searchData as BaseDoEntity).toPojo()).toEqual(scout.create(SpecSearchDo, {
+        text: 'i', showHiddenValues: true, languages: [], creationDate: null
+      }).toPojo());
       expect(pagePathElement2.expandedChildRow).toBeInstanceOf(BookmarkTableRowIdentifierDo);
       expect(pagePathElement2.expandedChildRow.toPojo()).toEqual(scout.create(BookmarkTableRowIdentifierDo, {
         keyComponents: [scout.create(BookmarkTableRowIdentifierStringComponentDo, {key: FRUIT_5_KEY})]
@@ -408,7 +428,9 @@ describe('BookmarkSupport', () => {
       expect(bookmarkedPage.pageParam).toBeInstanceOf(PageIdDummyPageParamDo);
       expect((bookmarkedPage.pageParam as PageIdDummyPageParamDo).pageId).toBe(SPEC_TABLE_PAGE_2_UUID);
       expect(bookmarkedPage.searchData).toBeInstanceOf(BaseDoEntity);
-      expect((bookmarkedPage.searchData as BaseDoEntity).toPojo()).toEqual(scout.create(SpecSearchDo, {text: 'n'}).toPojo());
+      expect((bookmarkedPage.searchData as BaseDoEntity).toPojo()).toEqual(scout.create(SpecSearchDo, {
+        text: 'n', showHiddenValues: false, languages: [100, 300], creationDate: dates.create('1999-12-31')
+      }).toPojo());
       expect(bookmarkedPage.expandedChildRow).toBe(null);
       expect(bookmarkedPage.selectedChildRows.length).toBe(0); // selected rows are not exported by default
     });
@@ -482,7 +504,7 @@ describe('BookmarkSupport', () => {
       expect(bookmark).toBeInstanceOf(BookmarkDo);
       expect(bookmark.id).toBeUndefined();
       expect(bookmark.title).toBe('Outline 3 - Table Page 2 - Kiwi');
-      expect(bookmark.description).toBe('Table Page 2\n  text: "i"\n  Kiwi');
+      expect(bookmark.description).toBe('Table Page 2\n  Text: i\n  Show hidden values: No\n  Kiwi');
       expect(bookmark.definition).toBeInstanceOf(OutlineBookmarkDefinitionDo);
       let bookmarkDefinition = bookmark.definition as OutlineBookmarkDefinitionDo;
       expect(bookmarkDefinition.outlineId).toBe(SPEC_OUTLINE_3_UUID);
@@ -495,7 +517,9 @@ describe('BookmarkSupport', () => {
       expect((pagePathElement1.pageParam as PageIdDummyPageParamDo).pageId).toBe(SPEC_TABLE_PAGE_2_UUID);
       expect(pagePathElement1.searchFilterComplete).toBe(true);
       expect(pagePathElement1.searchData).toBeInstanceOf(BaseDoEntity);
-      expect((pagePathElement1.searchData as BaseDoEntity).toPojo()).toEqual(scout.create(SpecSearchDo, {text: 'i'}).toPojo());
+      expect((pagePathElement1.searchData as BaseDoEntity).toPojo()).toEqual(scout.create(SpecSearchDo, {
+        text: 'i', showHiddenValues: false, languages: [], creationDate: null
+      }).toPojo());
       expect(pagePathElement1.expandedChildRow).toBeInstanceOf(BookmarkTableRowIdentifierDo);
       expect(pagePathElement1.expandedChildRow.toPojo()).toEqual(scout.create(BookmarkTableRowIdentifierDo, {
         keyComponents: [scout.create(BookmarkTableRowIdentifierStringComponentDo, {key: FRUIT_5_KEY})]
