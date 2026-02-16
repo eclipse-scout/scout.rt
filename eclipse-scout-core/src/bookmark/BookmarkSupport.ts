@@ -121,6 +121,13 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     return scout.create(BookmarkTableRowIdentifierDoFactory).createTableRowIdentifier(page, row, allowObjectFallback);
   }
 
+  /**
+   * @return true if the given page can be bookmarked, false otherwise.
+   */
+  isBookmarkable(page: Page): boolean {
+    return !!page;
+  }
+
   // --------------------------------------
 
   /**
@@ -129,6 +136,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    *
    * @param param Optional parameters to {@link BookmarkDoBuilder}, can be used to override the defaults.
    * @param options Optional settings to change the behavior of this method.
+   * @return the created bookmark, or `null` if bookmark creation failed and the error was already handled by this method
    */
   createBookmark(param?: CreateBookmarkParam, options?: CreateBookmarkOptions): JQuery.Promise<IBookmarkDo> {
     let builder = scout.create(BookmarkDoBuilder, $.extend({
@@ -138,7 +146,8 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     return builder.build()
       .catch(error => {
         if (scout.nvl(options?.handleErrors, true)) {
-          return this.handleCreateBookmarkError(error);
+          return this.handleCreateBookmarkError(error)
+            .then(() => null);
         }
         throw error;
       });
@@ -224,6 +233,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    *
    * @param param Specifies the starting point and the page path to activate from there
    * @param options Optional settings to change the behavior of this method
+   * @return the result of the activation, or `null` if activation failed and the error was already handled by this method
    */
   activateBookmarkPath(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): JQuery.Promise<ActivateBookmarkPathResult> {
     return $.when(this._activateBookmarkPathAsync(param, options));
@@ -244,7 +254,8 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       }
     } catch (error) {
       if (scout.nvl(options?.handleErrors, true)) {
-        return this.handleActivateBookmarkError(error);
+        return this.handleActivateBookmarkError(error)
+          .then(() => null);
       }
       throw error;
     }
@@ -400,7 +411,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   /**
    * Handles errors that occurred during bookmark creation.
    */
-  handleCreateBookmarkError(error: any): JQuery.Promise<any> {
+  handleCreateBookmarkError(error: any): JQuery.Promise<void> {
     if (scout.isOneOf(error,
       BookmarkDoBuilder.ERROR_MISSING_OUTLINE,
       BookmarkDoBuilder.ERROR_MISSING_PAGE_PARAM,
@@ -408,29 +419,35 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       BookmarkDoBuilder.ERROR_PAGE_PATH_NOT_BOOKMARKABLE,
       BookmarkDoBuilder.ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER
     )) {
-      return MessageBoxes.openOk(this.desktop, this.session.text('CannotCreateBookmarkAtThisLocation'), Status.Severity.ERROR);
+      return MessageBoxes.openOk(this.desktop, this.session.text('CannotCreateBookmarkAtThisLocation'), Status.Severity.ERROR)
+        .then(() => undefined);
     }
-    return App.get().errorHandler.handle(error);
+    return App.get().errorHandler.handle(error)
+      .then(() => undefined);
   }
 
   /**
    * Handles errors that occurred during bookmark activation.
    */
-  handleActivateBookmarkError(error: any): JQuery.Promise<any> {
+  handleActivateBookmarkError(error: any): JQuery.Promise<void> {
     if (error === BookmarkSupport.ERROR_ALREADY_LOADING) {
       $.log.error('Another bookmark is currently loading');
       return; // ignore silently
     }
     if (error === BookmarkSupport.ERROR_WRONG_DEFINITION_TYPE) {
-      return MessageBoxes.openOk(this.desktop, this.session.text('BookmarkWrongDefinitionType'), Status.Severity.ERROR);
+      return MessageBoxes.openOk(this.desktop, this.session.text('BookmarkWrongDefinitionType'), Status.Severity.ERROR)
+        .then(() => undefined);
     }
     if (error === BookmarkSupport.ERROR_OUTLINE_NOT_FOUND) {
-      return MessageBoxes.openOk(this.desktop, this.session.text('BookmarkOutlineNotFound'), Status.Severity.ERROR);
+      return MessageBoxes.openOk(this.desktop, this.session.text('BookmarkOutlineNotFound'), Status.Severity.ERROR)
+        .then(() => undefined);
     }
     if (error === BookmarkSupport.ERROR_PAGE_NOT_FOUND) {
-      return MessageBoxes.openOk(this.desktop, this.session.text('BookmarkResolvingFailed'), Status.Severity.ERROR);
+      return MessageBoxes.openOk(this.desktop, this.session.text('BookmarkResolvingFailed'), Status.Severity.ERROR)
+        .then(() => undefined);
     }
-    return App.get().errorHandler.handle(error);
+    return App.get().errorHandler.handle(error)
+      .then(() => undefined);
   }
 
   // --------------------------------------
@@ -564,8 +581,9 @@ export type CreateBookmarkParam = Omit<BookmarkDoBuilderModel, 'desktop'>;
 
 export interface CreateBookmarkOptions {
   /**
-   * Specifies whether runtime errors should be handled (e.g. by showing a message). The promise will still be rejected.
-   * The default value is `true`.
+   * Specifies whether runtime errors are handled (e.g. by showing a message and returning `null`) or the promise is rejected.
+   *
+   * Default is true.
    */
   handleErrors?: boolean;
 }
@@ -604,7 +622,7 @@ export interface ActivateBookmarkOptions {
    */
   resetViewAndWarnOnFail?: boolean;
   /**
-   * Specifies whether runtime errors should be handled (e.g. by showing a message). The promise will still be rejected.
+   * Specifies whether runtime errors are handled (e.g. by showing a message and returning `null`) or the promise is rejected.
    *
    * Default is true.
    */
