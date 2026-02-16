@@ -9,8 +9,8 @@
  */
 import {FormSpecHelper, OutlineSpecHelper, SpecForm} from '../../src/testing/index';
 import {
-  App, CancelMenu, CloseMenu, Dimension, fields, FileChooser, Form, FormFieldMenu, FormModel, InitModelOf, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Outline, Page, Popup, PopupBlockerHandler,
-  Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WidgetModel, WrappedFormField
+  App, CancelMenu, CloseMenu, Dimension, fields, FileChooser, Form, FormFieldMenu, FormLifecycle, FormModel, InitModelOf, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Outline, Page, Popup,
+  PopupBlockerHandler, Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WidgetModel, WrappedFormField
 } from '../../src/index';
 import {DateField, GroupBox} from '../../src';
 
@@ -32,6 +32,10 @@ describe('Form', () => {
     helper = new FormSpecHelper(session);
     outlineHelper = new OutlineSpecHelper(session);
     uninstallUnloadHandlers(session);
+    session.textMap.add('FormSaveChangesQuestion', 'Do you want to save the changes?');
+    session.textMap.add('FormEmptyMandatoryFieldsMessage', 'The following fields must be filled in:');
+    session.textMap.add('FormInvalidFieldsMessage', 'The following fields are invalid:');
+    session.textMap.add('FormInvalidFieldsWarningMessage', 'The following fields have a warning:');
   });
 
   afterEach(() => {
@@ -2519,4 +2523,109 @@ describe('Form', () => {
       expect(numberField.value).toBe(null);
     });
   });
+
+  describe('lifecycle', () => {
+
+    it('is a FormLifecycle by default', () => {
+      let form = scout.create(Form, {parent: session.desktop});
+
+      expect(form.lifecycle).toBeInstanceOf(FormLifecycle);
+      expect(form.lifecycle.widget).toBe(form);
+      expect(form.lifecycle.askIfNeedSave).toBeTrue();
+      expect(form.lifecycle.askIfNeedSaveText).toBe('Do you want to save the changes?');
+      expect(form.lifecycle.emptyMandatoryElementsText).toBe('The following fields must be filled in:');
+      expect(form.lifecycle.invalidElementsErrorText).toBe('The following fields are invalid:');
+      expect(form.lifecycle.invalidElementsWarningText).toBe('The following fields have a warning:');
+
+      form = scout.create(Form, {
+        parent: session.desktop,
+        askIfNeedSave: false,
+        askIfNeedSaveText: 'lorem',
+        emptyMandatoryElementsText: 'ipsum',
+        invalidElementsErrorText: 'dolor',
+        invalidElementsWarningText: 'sit'
+      });
+
+      expect(form.lifecycle).toBeInstanceOf(FormLifecycle);
+      expect(form.lifecycle.widget).toBe(form);
+      expect(form.lifecycle.askIfNeedSave).toBeFalse();
+      expect(form.lifecycle.askIfNeedSaveText).toBe('lorem');
+      expect(form.lifecycle.emptyMandatoryElementsText).toBe('ipsum');
+      expect(form.lifecycle.invalidElementsErrorText).toBe('dolor');
+      expect(form.lifecycle.invalidElementsWarningText).toBe('sit');
+    });
+
+    it('can be passed in model as objectType', () => {
+      let form = scout.create(Form, {
+        parent: session.desktop,
+        lifecycle: SpecLifecycle
+      });
+
+      expect(form.lifecycle).toBeInstanceOf(SpecLifecycle);
+      expect(form.lifecycle.widget).toBe(form);
+      expect(form.lifecycle.askIfNeedSave).toBeTrue();
+      expect(form.lifecycle.askIfNeedSaveText).toBe('Do you want to save the changes?');
+      expect(form.lifecycle.emptyMandatoryElementsText).toBe('The following fields must be filled in:');
+      expect(form.lifecycle.invalidElementsErrorText).toBe('The following fields are invalid:');
+      expect(form.lifecycle.invalidElementsWarningText).toBe('The following fields have a warning:');
+
+      form = scout.create(Form, {
+        parent: session.desktop,
+        lifecycle: SpecLifecycle,
+        askIfNeedSave: false,
+        askIfNeedSaveText: 'lorem',
+        emptyMandatoryElementsText: 'ipsum',
+        invalidElementsErrorText: 'dolor',
+        invalidElementsWarningText: 'sit'
+      });
+
+      expect(form.lifecycle).toBeInstanceOf(SpecLifecycle);
+      expect(form.lifecycle.widget).toBe(form);
+      expect(form.lifecycle.askIfNeedSave).toBeFalse();
+      expect(form.lifecycle.askIfNeedSaveText).toBe('lorem');
+      expect(form.lifecycle.emptyMandatoryElementsText).toBe('ipsum');
+      expect(form.lifecycle.invalidElementsErrorText).toBe('dolor');
+      expect(form.lifecycle.invalidElementsWarningText).toBe('sit');
+    });
+
+    it('can be passed in model as child model', () => {
+      let form = scout.create(Form, {
+        parent: session.desktop,
+        lifecycle: {
+          objectType: SpecLifecycle
+        }
+      });
+
+      expect(form.lifecycle).toBeInstanceOf(SpecLifecycle);
+      expect(form.lifecycle.widget).toBe(form);
+      expect(form.lifecycle.askIfNeedSave).toBeTrue();
+      expect(form.lifecycle.askIfNeedSaveText).toBe('Do you want to save the changes?');
+      expect(form.lifecycle.emptyMandatoryElementsText).toBe('The following fields must be filled in:');
+      expect(form.lifecycle.invalidElementsErrorText).toBe('The following fields are invalid:');
+      expect(form.lifecycle.invalidElementsWarningText).toBe('The following fields have a warning:');
+
+      form = scout.create(Form, {
+        parent: session.desktop,
+        lifecycle: {
+          objectType: SpecLifecycle,
+          askIfNeedSave: false,
+          askIfNeedSaveText: 'lorem',
+          emptyMandatoryElementsText: 'ipsum',
+          invalidElementsErrorText: 'dolor',
+          invalidElementsWarningText: 'sit'
+        }
+      });
+
+      expect(form.lifecycle).toBeInstanceOf(SpecLifecycle);
+      expect(form.lifecycle.widget).toBe(form);
+      expect(form.lifecycle.askIfNeedSave).toBeFalse();
+      expect(form.lifecycle.askIfNeedSaveText).toBe('lorem');
+      expect(form.lifecycle.emptyMandatoryElementsText).toBe('ipsum');
+      expect(form.lifecycle.invalidElementsErrorText).toBe('dolor');
+      expect(form.lifecycle.invalidElementsWarningText).toBe('sit');
+    });
+  });
+
+  class SpecLifecycle extends FormLifecycle {
+  }
 });

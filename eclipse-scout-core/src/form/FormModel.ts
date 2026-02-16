@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DisplayHint, DisplayParent, DisplayParentModel, DisplayViewId, Form, FormValidator, GroupBox, ObjectOrChildModel, StatusOrModel, Widget, WidgetModel} from '../index';
+import {ChildModelOf, DisplayHint, DisplayParent, DisplayParentModel, DisplayViewId, Form, FormLifecycle, FormValidator, GroupBox, ObjectOrChildModel, ObjectType, StatusOrModel, Widget, WidgetModel} from '../index';
 
 export interface FormModel extends WidgetModel, DisplayParentModel {
   /**
@@ -230,4 +230,8 @@ export interface FormModel extends WidgetModel, DisplayParentModel {
    * By default, the list is empty.
    */
   validators?: FormValidator[];
+  /**
+   * Defines the {@link FormLifecycle} for this form.
+   */
+  lifecycle?: ObjectType<FormLifecycle> | ChildModelOf<FormLifecycle>;
 }

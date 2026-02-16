@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbortKeyStroke, App, aria, AriaLabelledByInsertPosition, arrays, BusyIndicatorOptions, Button, ButtonSystemType, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, ErrorHandler, Event, EventHandler, FileChooser,
-  FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormInvalidEvent, FormLayout, FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke,
-  KeyStrokeContext, MessageBox, MessageBoxController, MessageBoxes, NotificationBadgeStatus, ObjectOrChildModel, objects, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status, StatusOrModel, strings, tooltips, TreeVisitResult,
-  ValidationResult, webstorage, Widget, WrappedFormField
+  AbortKeyStroke, App, aria, AriaLabelledByInsertPosition, arrays, BusyIndicatorOptions, Button, ButtonSystemType, ChildModelOf, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, ErrorHandler, Event, EventHandler,
+  FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormInvalidEvent, FormLayout, FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf,
+  KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, MessageBoxes, ModelOf, NotificationBadgeStatus, ObjectOrChildModel, objects, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status, StatusOrModel, strings,
+  tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
 
@@ -321,13 +321,40 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   protected _createLifecycle(): FormLifecycle {
-    return scout.create(FormLifecycle, {
-      widget: this,
+    // already created
+    if (this.lifecycle instanceof FormLifecycle) {
+      return this.lifecycle;
+    }
+
+    const defaultModel: ModelOf<FormLifecycle> = {
       askIfNeedSave: this.askIfNeedSave,
+      askIfNeedSaveText: this.askIfNeedSaveText,
       emptyMandatoryElementsText: this.emptyMandatoryElementsText,
       invalidElementsErrorText: this.invalidElementsErrorText,
-      invalidElementsWarningText: this.invalidElementsWarningText,
-      askIfNeedSaveText: this.askIfNeedSaveText
+      invalidElementsWarningText: this.invalidElementsWarningText
+    };
+
+    // object type
+    if (typeof this.lifecycle === 'string' || typeof this.lifecycle === 'function') {
+      return scout.create(this.lifecycle, {
+        ...defaultModel,
+        widget: this
+      });
+    }
+
+    // child model
+    if (objects.isPojo(this.lifecycle)) {
+      return scout.create({
+        objectType: FormLifecycle,
+        ...defaultModel,
+        ...this.lifecycle as ChildModelOf<FormLifecycle>,
+        widget: this
+      }) as FormLifecycle;
+    }
+
+    return scout.create(FormLifecycle, {
+      ...defaultModel,
+      widget: this
     });
   }
 
