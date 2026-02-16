@@ -7,7 +7,7 @@ describe('PersonDo', () => {
     let person = scout.create(PersonDo, {
       id: values[0],
       firstName: values[1],
-      lastName: values[2],
+      lastName: values[2]
     });
 
     expect(person.id).toBe(values[0]);

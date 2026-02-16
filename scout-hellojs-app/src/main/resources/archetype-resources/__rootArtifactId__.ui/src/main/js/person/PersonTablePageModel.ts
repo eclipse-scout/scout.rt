@@ -37,7 +37,7 @@ export default (): PageWithTableModel => ({
         id: 'PersonIdColumn',
         objectType: Column,
         displayable: false
-      },
+      }
     ],
     menus: [
       {
