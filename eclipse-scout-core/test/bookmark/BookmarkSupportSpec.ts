@@ -442,8 +442,9 @@ describe('BookmarkSupport', () => {
       let spy = spyOn(bookmarkSupport, 'handleCreateBookmarkError').and.returnValue($.resolvedPromise());
 
       // a) handleError=true (default) --> error should be handled internally
-      await bookmarkSupport.createBookmark();
+      let bookmark = await bookmarkSupport.createBookmark();
       expect(bookmarkSupport.handleCreateBookmarkError).toHaveBeenCalledWith(BookmarkDoBuilder.ERROR_MISSING_OUTLINE);
+      expect(bookmark).toBe(null);
       spy.calls.reset();
 
       // b) handleError=false (default) --> error should be thrown

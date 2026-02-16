@@ -92,7 +92,8 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
       let parentPage = page.parentNode;
       let childPage = page;
       while (parentPage && !parentPage.compactRoot) {
-        let pathEntry = await this._pageToBookmarkPage(parentPage, childPage);
+        let pathEntry = await this._pageToBookmarkPage(parentPage, childPage)
+          .catch(error => undefined); // silently ignore errors, handle as 'non-bookmarkable page'
         if (!pathEntry) {
           // non-bookmarkable page
           if (this.fallbackAllowed) {
@@ -126,6 +127,9 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
   // This method is called multiple times from bottom to top. On the first invocation, the childPage is not set,
   // but later calls pass the childPage for resolving the corresponding row of a table page.
   protected async _pageToBookmarkPage(page: Page, childPage: Page): Promise<IBookmarkPageDo> {
+    if (this.persistableRequired && !this._isPageBookmarkable(page)) {
+      throw BookmarkDoBuilder.ERROR_PAGE_NOT_BOOKMARKABLE;
+    }
     if (!page.pageParam) {
       throw BookmarkDoBuilder.ERROR_MISSING_PAGE_PARAM;
     }
@@ -136,6 +140,10 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
       return this._pageToTableBookmarkPage(page, childPage);
     }
     throw BookmarkDoBuilder.ERROR_UNSUPPORTED_NODE_TYPE;
+  }
+
+  protected _isPageBookmarkable(page: Page): boolean {
+    return BookmarkSupport.get(this.session).isBookmarkable(page);
   }
 
   protected async _pageToNodeBookmarkPage(page: Page, childPage?: Page): Promise<NodeBookmarkPageDo> {
