@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.mom.api;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -17,15 +18,13 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 /**
  * Keeps a list of {@link ISubscription}s that are registered during {@link #subscribe()}. All registered subscriptions
  * are disposed when {@link #dispose()} is called.
- * <p>
- * This class is not thread-safe.
  *
  * @since 6.1
  */
 @ApplicationScoped
 public abstract class AbstractMomSubscriber {
 
-  private final List<ISubscription> m_subscriptions = new ArrayList<>();
+  private final List<ISubscription> m_subscriptions = Collections.synchronizedList(new ArrayList<>());
 
   public abstract void subscribe();
 
@@ -37,8 +36,10 @@ public abstract class AbstractMomSubscriber {
   }
 
   public void dispose() {
-    for (ISubscription subscription : m_subscriptions) {
-      subscription.dispose();
+    synchronized (m_subscriptions) {
+      for (ISubscription subscription : m_subscriptions) {
+        subscription.dispose();
+      }
     }
   }
 }
