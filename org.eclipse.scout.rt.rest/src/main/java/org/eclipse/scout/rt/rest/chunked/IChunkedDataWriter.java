@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.rest.chunked;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Iterator;
 
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
@@ -18,6 +19,7 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.rest.IRestResource;
 
 /**
@@ -89,4 +91,22 @@ public interface IChunkedDataWriter<T> extends Closeable {
    * @return {@code true} if stream was closed, otherwise {@code false}.
    */
   boolean isClosed();
+
+  /**
+   * Schedules a new job to write data asynchronously. The provided runnable calls {@link #write} on this object.<br/>
+   * Scheduled job copies current run context.
+   */
+  void writeAsync(IRunnable runnable);
+
+  /**
+   * Schedules job which consumes given iterator and returns response created by {@link #toEntity()}.
+   */
+  default Response toResponse(Iterator<T> iterator) {
+    writeAsync(() -> {
+      while (iterator.hasNext()) {
+        write(iterator.next());
+      }
+    });
+    return Response.ok(toEntity()).build();
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,6 +16,7 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.CloseableIterator;
 import org.eclipse.scout.rt.rest.client.IRestClientHelper;
 
 /**
@@ -78,4 +79,9 @@ public interface IChunkedDataReader<T> extends Closeable {
    * @return {@code true} if stream was closed, otherwise {@code false}.
    */
   boolean isClosed();
+
+  /**
+   * @return new iterator consuming reader
+   */
+  CloseableIterator<T> iterator();
 }
