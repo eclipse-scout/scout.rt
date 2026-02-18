@@ -14,10 +14,14 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertNull;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.NoSuchElementException;
 
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.util.CloseableIterator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.rest.client.chunked.IChunkedDataReader;
 import org.glassfish.jersey.client.ChunkedInput;
@@ -73,5 +77,48 @@ public class ChunkedDataReader<T> implements IChunkedDataReader<T> {
   @Override
   public void close() throws IOException {
     m_input.close();
+  }
+
+  @Override
+  public CloseableIterator<T> iterator() {
+    return new ChunkedDataReaderIterator();
+  }
+
+  private final class ChunkedDataReaderIterator implements CloseableIterator<T> {
+
+    private T m_next;
+
+    private ChunkedDataReaderIterator() {
+      advance();
+    }
+
+    @Override
+    public boolean hasNext() {
+      return m_next != null;
+    }
+
+    @Override
+    public T next() {
+      if (m_next == null) {
+        throw new NoSuchElementException();
+      }
+      T next = m_next;
+      advance();
+      return next;
+    }
+
+    private void advance() {
+      m_next = read(); // simple - as soon as null is returned we are done - throws if closed - this is ok
+    }
+
+    @Override
+    public void close() {
+      try {
+        ChunkedDataReader.this.close();
+      }
+      catch (IOException e) {
+        throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+      }
+    }
   }
 }
