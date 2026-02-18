@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -128,9 +128,11 @@ export const strings = {
   },
 
   /**
-   * Returns the HTML encoded text. Example: 'Foo<br>Bar' returns 'Foo&amp;lt;br&amp;gt;Bar'.
-   * If the argument is or undefined, the same value is returned.
-   * @param text plain text to encode
+   * Returns the HTML encoded text. If the text is falsy, the input value is returned.
+   *
+   * Example: 'Foo&lt;br&gt;Bar' returns 'Foo&amp;lt;br&amp;gt;Bar'.
+   *
+   * @param text text to encode
    * @returns HTML encoded text
    */
   encode(text: string): string {
