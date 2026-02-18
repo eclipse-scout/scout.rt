@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1560,6 +1560,11 @@ export class Calendar extends Widget implements CalendarModel {
 
     let func = function func(event: JQuery.ContextMenuEvent, allowedType: string) {
       if (!this.rendered || !this.attached || !this._calculateContextMenuVisible(event)) { // check needed because function is called asynchronously
+        return;
+      }
+      if (allowedType === Calendar.MenuType.CalendarComponent && !this.selectedComponent) {
+        // When right click is started outside the component and released on the component,
+        // no component is selected -> no context menu is opened
         return;
       }
       let filteredMenus = menus.filter(this.menus, [allowedType], {
