@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -681,7 +681,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected void handleUiColumnOrganizeAction(JsonEvent event) {
     JSONObject data = event.getData();
     String action = data.getString("action");
-    IColumn<?> column = extractColumn(data);
+    String columnId = data.optString(PROP_COLUMN_ID, null);
+    IColumn<?> column = optColumn(columnId);
+    if (column == null) {
+      LOG.info("Requested column with ID {} doesn't exist. Skip columnOrganizeAction event. [action={}]", columnId, action);
+      return;
+    }
     switch (action) {
       case "add":
         getModel().getUIFacade().fireOrganizeColumnAddFromUI(column);
