@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,9 +26,13 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
+import org.eclipse.scout.rt.client.ui.basic.table.TableOrganizer;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizer;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
+import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -1621,6 +1625,93 @@ public class JsonTableTest {
         .anyMatch(p -> "columnStructureChanged".equals(p.getType())));
   }
 
+  @Test
+  public void testColumnOrganizeAction() {
+    List<Pair<String, IColumn>> organizeActions = new ArrayList<>();
+    Table table = new Table() {
+      @Override
+      protected ITableOrganizer createTableOrganizer() {
+        return new TableOrganizer(this) {
+
+          @Override
+          public void addColumn(IColumn column) {
+            organizeActions.add(ImmutablePair.of("add", column));
+          }
+
+          @Override
+          public void removeColumn(IColumn column) {
+            organizeActions.add(ImmutablePair.of("remove", column));
+          }
+
+          @Override
+          public void modifyColumn(IColumn column) {
+            organizeActions.add(ImmutablePair.of("modify", column));
+          }
+        };
+      }
+    };
+    table.init();
+
+    IColumn col = table.getColumns().getFirst();
+
+    JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, new JsonAdapterMock());
+    jsonTable.toJson();
+
+    String validColumnId = jsonTable.getColumnId(col);
+    assertNotNull(validColumnId);
+    assertEquals(0, organizeActions.size());
+
+    // ----------
+
+    JsonEvent addValidColumnEvent = createJsonColumnOrganizeActionEvent("add", validColumnId);
+    jsonTable.handleUiEvent(addValidColumnEvent);
+
+    assertEquals(1, organizeActions.size());
+    assertEquals("add", organizeActions.getFirst().getLeft());
+    assertSame(col, organizeActions.getFirst().getRight());
+    organizeActions.clear();
+
+    JsonEvent addInvalidColumnEvent = createJsonColumnOrganizeActionEvent("add", "INVALID_COLUM_ID");
+    jsonTable.handleUiEvent(addInvalidColumnEvent);
+
+    assertEquals(0, organizeActions.size());
+
+    // ----------
+
+    JsonEvent removeValidColumnEvent = createJsonColumnOrganizeActionEvent("remove", validColumnId);
+    jsonTable.handleUiEvent(removeValidColumnEvent);
+
+    assertEquals(1, organizeActions.size());
+    assertEquals("remove", organizeActions.getFirst().getLeft());
+    assertSame(col, organizeActions.getFirst().getRight());
+    organizeActions.clear();
+
+    JsonEvent removeInvalidColumnEvent = createJsonColumnOrganizeActionEvent("remove", "INVALID_COLUM_ID");
+    jsonTable.handleUiEvent(removeInvalidColumnEvent);
+
+    assertEquals(0, organizeActions.size());
+
+    // ----------
+
+    JsonEvent modifyValidColumnEvent = createJsonColumnOrganizeActionEvent("modify", validColumnId);
+    jsonTable.handleUiEvent(modifyValidColumnEvent);
+
+    assertEquals(1, organizeActions.size());
+    assertEquals("modify", organizeActions.getFirst().getLeft());
+    assertSame(col, organizeActions.getFirst().getRight());
+    organizeActions.clear();
+
+    JsonEvent modifyInvalidColumnEvent = createJsonColumnOrganizeActionEvent("modify", "INVALID_COLUM_ID");
+    jsonTable.handleUiEvent(modifyInvalidColumnEvent);
+
+    assertEquals(0, organizeActions.size());
+
+    // ----------
+
+    JsonEvent invalidActionEvent = createJsonColumnOrganizeActionEvent("INVALID_ACTION", validColumnId);
+    assertThrows(IllegalArgumentException.class, () -> jsonTable.handleUiEvent(invalidActionEvent));
+  }
+
   public static Table createTableFixture(int numRows) {
     Table table = new Table();
     table.fill(numRows);
@@ -1666,5 +1757,13 @@ public class JsonTableTest {
     data.put(JsonTable.PROP_COLUMN_ID, columnId);
     data.put("index", index);
     return new JsonEvent(tableId, JsonTable.EVENT_COLUMN_MOVED, data);
+  }
+
+  public static JsonEvent createJsonColumnOrganizeActionEvent(String actionId, String columnId) throws JSONException {
+    String tableId = "x"; // never used
+    JSONObject data = new JSONObject();
+    data.put("action", actionId);
+    data.put("columnId", columnId);
+    return new JsonEvent(tableId, JsonTable.EVENT_COLUMN_ORGANIZE_ACTION, data);
   }
 }
