@@ -420,12 +420,12 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.shared.session</artifactId>
-        <version>26.1-SNAPSHOT</version>
+        <version>26.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.shared.session.test</artifactId>
-        <version>26.1-SNAPSHOT</version>
+        <version>26.2-SNAPSHOT</version>
       </dependency>
 
       <dependency>
@@ -448,7 +448,7 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.session</artifactId>
-        <version>26.1-SNAPSHOT</version>
+        <version>26.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
@@ -463,7 +463,7 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.session.test</artifactId>
-        <version>26.1-SNAPSHOT</version>
+        <version>26.2-SNAPSHOT</version>
       </dependency>
 
       <dependency>
