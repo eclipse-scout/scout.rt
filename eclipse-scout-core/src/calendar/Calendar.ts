@@ -2132,7 +2132,6 @@ export class Calendar extends Widget implements CalendarModel {
     if (dateShift) {
       appointmentFromDate = dates.shift(appointmentFromDate, 0, 0, dateShift);
       appointmentToDate = dates.shift(appointmentToDate, 0, 0, dateShift);
-
     }
 
     if (timeShiftMinutes) {
