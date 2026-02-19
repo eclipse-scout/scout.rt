@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -174,7 +174,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
    */
   @ConfigOperation
   @Order(20)
-  protected void execItemMoved(ICalendarItem item, Date fromDate, Date toDate) {
+  protected void execItemMoved(ICalendarItem item, Date fromDate, Date toDate, String resourceId) {
   }
 
   @ConfigOperation
@@ -362,8 +362,8 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   @Override
-  public void onItemMoved(ICalendarItem item, Date fromDate, Date toDate) {
-    interceptItemMoved(item, fromDate, toDate);
+  public void onItemMoved(ICalendarItem item, Date fromDate, Date toDate, String resourceId) {
+    interceptItemMoved(item, fromDate, toDate, resourceId);
   }
 
   private void ensureItemsLoadedInternal(Date minDate, Date maxDate) {
@@ -483,8 +483,8 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     }
 
     @Override
-    public void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date fromDate, Date toDate) {
-      getOwner().execItemMoved(item, fromDate, toDate);
+    public void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date fromDate, Date toDate, String resourceId) {
+      getOwner().execItemMoved(item, fromDate, toDate, resourceId);
     }
 
     @Override
@@ -511,10 +511,10 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     chain.execLoadItemsInBackground(session, minDate, maxDate, result);
   }
 
-  protected final void interceptItemMoved(ICalendarItem item, Date fromDate, Date toDate) {
+  protected final void interceptItemMoved(ICalendarItem item, Date fromDate, Date toDate, String resourceId) {
     List<? extends ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>> extensions = getAllExtensions();
     CalendarItemProviderItemMovedChain chain = new CalendarItemProviderItemMovedChain(extensions);
-    chain.execItemMoved(item, fromDate, toDate);
+    chain.execItemMoved(item, fromDate, toDate, resourceId);
   }
 
   protected final void interceptAutoAssignCalendarItems(Set<ICalendarItem> item) {
