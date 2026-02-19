@@ -155,6 +155,15 @@ describe('PlainTextEncoder', () => {
     htmlText = '<span\nclass="font-icon xy-icon"></span>\n<span class="text">Text</span>';
     expect(encoder.encode(htmlText)).toBe('\nText');
     expect(encoder.encode(htmlText, {removeFontIcons: true})).toBe('\nText');
-  });
 
+    // Other attributes before class attribute
+    htmlText = '<span\n aria-hidden="false" class="font-icon xy-icon"></span>\n<span class="text">Text</span>';
+    expect(encoder.encode(htmlText)).toBe('\nText');
+    expect(encoder.encode(htmlText, {removeFontIcons: true})).toBe('\nText');
+
+    // Other attributes after class attribute
+    htmlText = '<span\n class="font-icon xy-icon" aria-hidden="false"></span>\n<span class="text">Text</span>';
+    expect(encoder.encode(htmlText)).toBe('\nText');
+    expect(encoder.encode(htmlText, {removeFontIcons: true})).toBe('\nText');
+  });
 });

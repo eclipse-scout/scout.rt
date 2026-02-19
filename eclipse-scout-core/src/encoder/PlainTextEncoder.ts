@@ -55,7 +55,7 @@ export class PlainTextEncoder {
     text = text.replace(/<\/td>/gi, ' ');
 
     if (options.removeFontIcons) {
-      text = text.replace(/<span\s+class="[^"]*font-icon[^"]*">[^<]*<\/span>/gmi, '');
+      text = text.replace(/<span\s+[^>]*class="[^"]*font-icon[^"]*"[^>]*>[^<]*<\/span>/gmi, '');
     }
 
     // Remove script and style contents
