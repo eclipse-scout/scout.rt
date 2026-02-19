@@ -21,18 +21,18 @@ import org.junit.Test;
 /**
  * Completeness test which scans all folders of this project (string matching), see {@link AbstractCompletenessTestSupport#AbstractCompletenessTestSupport()} for details.
  */
-public abstract class AbstractApiExposedAnnotationTestCompletenessTest {
+public abstract class AbstractRestResourceAnnotationTestCompletenessTest {
 
   @Test
-  public void testApiExposedAnnotationTestCompleteness() throws IOException {
-    ApiExposedAnnotationTestSupport support = createApiExposedAnnotationTestSupport();
+  public void testRestResourceAnnotationTestCompleteness() throws IOException {
+    RestResourceAnnotationTestSupport support = createRestResourceAnnotationTestSupport();
     getPathExclusions().forEach(support::addPathExclusion);
     support.doTest();
     support.failOnError();
   }
 
-  protected ApiExposedAnnotationTestSupport createApiExposedAnnotationTestSupport() {
-    return BEANS.get(ApiExposedAnnotationTestSupport.class);
+  protected RestResourceAnnotationTestSupport createRestResourceAnnotationTestSupport() {
+    return BEANS.get(RestResourceAnnotationTestSupport.class);
   }
 
   protected List<Path> getPathExclusions() {

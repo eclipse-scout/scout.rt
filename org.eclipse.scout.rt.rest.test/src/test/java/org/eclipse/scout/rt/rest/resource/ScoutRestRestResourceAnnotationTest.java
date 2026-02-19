@@ -7,14 +7,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.server;
+package org.eclipse.scout.rt.rest.resource;
 
-import org.eclipse.scout.rt.rest.resource.AbstractApiExposedAnnotationTest;
-
-public class ScoutServerApiExposedAnnotationTest extends AbstractApiExposedAnnotationTest {
+public class ScoutRestRestResourceAnnotationTest extends AbstractRestResourceAnnotationTest {
 
   @Override
   protected String getPackageNamePrefix() {
-    return "org.eclipse.scout.rt.server";
+    return "org.eclipse.scout.rt.rest";
   }
 }

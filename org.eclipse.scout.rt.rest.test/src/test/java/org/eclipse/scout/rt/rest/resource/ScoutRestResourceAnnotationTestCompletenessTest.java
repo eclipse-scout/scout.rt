@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.rest.resource;
 import java.nio.file.Path;
 import java.util.List;
 
-public class ScoutApiExposedAnnotationCompletenessTest extends AbstractApiExposedAnnotationTestCompletenessTest {
+public class ScoutRestResourceAnnotationTestCompletenessTest extends AbstractRestResourceAnnotationTestCompletenessTest {
 
   @Override
   protected List<Path> getPathExclusions() {

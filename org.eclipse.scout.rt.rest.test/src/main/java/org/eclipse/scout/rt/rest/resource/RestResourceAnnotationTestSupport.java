@@ -16,12 +16,12 @@ import org.eclipse.scout.rt.rest.IRestResource;
 import org.eclipse.scout.rt.testing.platform.util.AbstractCompletenessTestSupport;
 
 /**
- * Checks for each {@link IRestResource} if there exists a corresponding {@link AbstractApiExposedAnnotationTest}
+ * Checks for each {@link IRestResource} if there exists a corresponding {@link AbstractRestResourceAnnotationTest}
  */
-public class ApiExposedAnnotationTestSupport extends AbstractCompletenessTestSupport {
+public class RestResourceAnnotationTestSupport extends AbstractCompletenessTestSupport {
 
   /**
-   * Pattern to detect {@link IRestResource}(s) files that require a {@link AbstractApiExposedAnnotationTest}
+   * Pattern to detect {@link IRestResource}(s) files that require a {@link AbstractRestResourceAnnotationTest}
    */
   @Override
   protected Pattern createFilePattern() {
@@ -30,15 +30,15 @@ public class ApiExposedAnnotationTestSupport extends AbstractCompletenessTestSup
   }
 
   /**
-   * Pattern to detect {@link AbstractApiExposedAnnotationTest} files
+   * Pattern to detect {@link AbstractRestResourceAnnotationTest} files
    */
   @Override
   protected Pattern createTestFilePattern() {
-    return Pattern.compile("extends \\w*ApiExposedAnnotationTest\\s+");
+    return Pattern.compile("extends \\w*RestResourceAnnotationTest\\s+");
   }
 
   /**
-   * Pattern to extract the package name prefix from {@link AbstractApiExposedAnnotationTest#getPackageNamePrefix()}
+   * Pattern to extract the package name prefix from {@link AbstractRestResourceAnnotationTest#getPackageNamePrefix()}
    */
   @Override
   protected Pattern createPackageNamePrefixPattern() {
@@ -52,11 +52,11 @@ public class ApiExposedAnnotationTestSupport extends AbstractCompletenessTestSup
 
   @Override
   protected boolean acceptTestFile(Path path, String content) {
-    return path.getFileName().toString().endsWith("ApiExposedAnnotationTest.java") && getTestFilePattern().matcher(content).find();
+    return path.getFileName().toString().endsWith("RestResourceAnnotationTest.java") && getTestFilePattern().matcher(content).find();
   }
 
   @Override
   public String getErrorTitle() {
-    return "No ApiExposedAnnotationTest found for the following files:";
+    return "No RestResourceAnnotationTest found for the following files:";
   }
 }
