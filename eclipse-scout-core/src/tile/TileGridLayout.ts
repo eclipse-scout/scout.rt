@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -250,6 +250,11 @@ export class TileGridLayout extends LogicalGridLayout {
   protected _onAnimationDone() {
     this._updateScrollbar();
     this.widget.trigger('layoutAnimationDone');
+
+    // tiles may be the anchors of popups, reposition popups after all tiles are at their final position
+    for (const popup of this.widget.findDesktop().getPopupsFor(this.widget)) {
+      popup.position();
+    }
   }
 
   protected _animateTileBounds(tile: Tile, fromBounds: Rectangle, bounds: Rectangle): JQuery.Promise<JQuery> {
