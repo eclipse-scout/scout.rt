@@ -16,7 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HEAD;
 import jakarta.ws.rs.HttpMethod;
@@ -24,6 +26,9 @@ import jakarta.ws.rs.OPTIONS;
 import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
 
 import org.eclipse.scout.rt.api.data.ApiExposed;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -38,44 +43,74 @@ import org.junit.rules.ErrorCollector;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
-public abstract class AbstractApiExposedAnnotationTest {
+public abstract class AbstractRestResourceAnnotationTest {
 
   @Rule
   public ErrorCollector m_errorCollector = new ErrorCollector();
 
   @Test
-  public void testAllOperationsAnnotated() {
+  public void testApiExposedAnnotation() {
     List<IRestResource> resources = BEANS.all(IRestResource.class);
     resources.stream()
         .map(IRestResource::getClass)
-        .filter(this::acceptResource)
+        .filter(this::acceptResourceForApiExposedAnnotationCheck)
         .forEach(resourceClass -> Stream.of(resourceClass.getMethods())
-            .filter(this::acceptMethod)
-            .forEach(this::testMethod));
+            .forEach(this::testMethodForApiExposedAnnotation));
   }
 
-  protected void testMethod(Method m) {
+  protected void testMethodForApiExposedAnnotation(Method m) {
+    if (!Modifier.isPublic(m.getModifiers())) {
+      return;
+    }
+
+    if (getHttpMethodAnnotations().noneMatch(m::isAnnotationPresent)) {
+      return;
+    }
+
     m_errorCollector.checkThat(m.getDeclaringClass().getName() + "#" + m.getName() + " is missing an " + ApiExposed.class.getSimpleName() + " annotation", m.getAnnotation(ApiExposed.class) != null, CoreMatchers.is(true));
   }
 
-  protected boolean acceptResource(Class<? extends IRestResource> resource) {
+  protected boolean acceptResourceForApiExposedAnnotationCheck(Class<? extends IRestResource> resource) {
     RestApplicationScope applicationScope = resource.getAnnotation(RestApplicationScope.class);
     return (applicationScope == null || Arrays.asList(applicationScope.value()).contains(RestApplicationScopes.API)) && resource.getName().startsWith(getPackageNamePrefix());
   }
 
-  protected abstract String getPackageNamePrefix();
-
-  protected boolean acceptMethod(Method m) {
-    if (!Modifier.isPublic(m.getModifiers())) {
-      return false;
-    }
-
-    if (getHttpMethodAnnotations().anyMatch(m::isAnnotationPresent)) {
-      return true;
-    }
-
-    return false;
+  @Test
+  public void testConsumesAnnotation() {
+    List<IRestResource> resources = BEANS.all(IRestResource.class);
+    resources.stream()
+        .map(IRestResource::getClass)
+        .filter(this::acceptResourceForConsumesAnnotationCheck)
+        .forEach(resourceClass -> Stream.of(resourceClass.getMethods())
+            .forEach(this::testMethodForConsumesAnnotation));
   }
+
+  protected void testMethodForConsumesAnnotation(Method m) {
+    if (!Modifier.isPublic(m.getModifiers())) {
+      return;
+    }
+
+    if (getHttpMethodAnnotations().noneMatch(m::isAnnotationPresent)) {
+      return;
+    }
+
+    boolean hasParametersWithoutIgnoredAnnotations = Arrays.stream(m.getParameters()).anyMatch(p -> getParameterIgnoreAnnotationsForConsumesAnnotationCheck().noneMatch(p::isAnnotationPresent));
+    if (!hasParametersWithoutIgnoredAnnotations) {
+      return;
+    }
+
+    m_errorCollector.checkThat(m.getDeclaringClass().getName() + "#" + m.getName() + " is missing an " + Consumes.class.getSimpleName() + " annotation", m.getAnnotation(Consumes.class) != null, CoreMatchers.is(true));
+  }
+
+  protected boolean acceptResourceForConsumesAnnotationCheck(Class<? extends IRestResource> resource) {
+    return resource.getName().startsWith(getPackageNamePrefix());
+  }
+
+  protected Stream<Class<? extends Annotation>> getParameterIgnoreAnnotationsForConsumesAnnotationCheck() {
+    return Stream.of(PathParam.class, FormParam.class, QueryParam.class, Context.class);
+  }
+
+  protected abstract String getPackageNamePrefix();
 
   protected Stream<Class<? extends Annotation>> getHttpMethodAnnotations() {
     return Stream.of(HttpMethod.class, GET.class, POST.class, PUT.class, DELETE.class, OPTIONS.class, HEAD.class, PATCH.class);
