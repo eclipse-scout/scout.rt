@@ -26,8 +26,8 @@ export class CalendarComponentPopup extends WidgetPopup<Label> {
     this._attachAppLinkHandler();
   }
 
-  protected override _render() {
-    super._render();
+  protected override _open($parent: JQuery) {
+    super._open($parent);
     this._attachAppLinkHandler();
   }
 
