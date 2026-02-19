@@ -56,6 +56,7 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
@@ -248,12 +249,44 @@ public class ApiDocGenerator {
 
   protected boolean acceptRestResource(IRestResource res) {
     return res.getClass().isAnnotationPresent(Path.class) &&
-        !res.getClass().isAnnotationPresent(ApiDocIgnore.class);
+        !isApiDocIgnore(res.getClass());
   }
 
   protected boolean acceptMethod(Method m) {
     return Modifier.isPublic(m.getModifiers()) &&
-        !m.isAnnotationPresent(ApiDocIgnore.class);
+        !isApiDocIgnore(m);
+  }
+
+  protected boolean isApiDocIgnore(Class<?> clazz) {
+    ApiDocIgnore ann = getApiDocIgnoreAnnotation(clazz);
+    return ann != null && ann.value();
+  }
+
+  protected boolean isApiDocIgnore(Method method) {
+    ApiDocIgnore ann = getApiDocIgnoreAnnotation(method);
+    return ann != null && ann.value();
+  }
+
+  protected ApiDocIgnore getApiDocIgnoreAnnotation(Class<?> clazz) {
+    // ask bean first: is faster and supports more features (inherited annotations from interfaces)
+    IBean<?> bean = BEANS.getBeanManager().optBean(clazz);
+    if (bean != null) {
+      ApiDocIgnore ann = bean.getBeanAnnotation(ApiDocIgnore.class);
+      if (ann != null) {
+        return ann;
+      }
+    }
+    return clazz.getAnnotation(ApiDocIgnore.class);
+  }
+
+  protected ApiDocIgnore getApiDocIgnoreAnnotation(Method method) {
+    ApiDocIgnore annotation = method.getAnnotation(ApiDocIgnore.class);
+    if (annotation != null) {
+      return annotation;
+    }
+
+    Class<?> declaringClass = method.getDeclaringClass();
+    return getApiDocIgnoreAnnotation(declaringClass);
   }
 
   protected int compareMethods(Method m1, Method m2) {
