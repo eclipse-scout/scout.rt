@@ -2002,7 +2002,7 @@ export class Calendar extends Widget implements CalendarModel {
     this._captureVirtualPositionByContainer($firstPart.closest('.resource-column'));
     this._captureVirtualPositionByCursor(event.pageY);
     if (!this.isMonth()) {
-      this._moveData.virtualOffset = (this._calculateDateForCalendarDay($firstPart.closest('.calendar-day')).getTime() - dates.parseJsonDate(this._moveData.component.fromDate).getTime()) / (60 * 1000) // offset in minutes
+      this._moveData.virtualOffset = (this._calculateDateForComponentPart($firstPart).getTime() - dates.parseJsonDate(this._moveData.component.fromDate).getTime()) / (60 * 1000) // offset in minutes
         + this._moveData.virtualY; // Add offset from top
     }
 
@@ -2040,10 +2040,10 @@ export class Calendar extends Widget implements CalendarModel {
       this._moveData.component?.closePopup();
     }
 
-    this._setComponentVirtualPosition(this._moveData.component);
+    this._updateComponentVirtualPosition(this._moveData.component);
   }
 
-  protected _setComponentVirtualPosition(component: CalendarComponent) {
+  protected _updateComponentVirtualPosition(component: CalendarComponent) {
     let $part = this._moveData.$movePart;
     let currDay = $part.closest('.calendar-day').data('day');
     let currWeek = $part.closest('.calendar-day').data('week');
@@ -2100,7 +2100,14 @@ export class Calendar extends Widget implements CalendarModel {
     let appointmentFromDate = dates.parseJsonDate(component.fromDate);
     let appointmentToDate = dates.parseJsonDate(component.toDate);
 
-    let newDay = this._calculateDateForCalendarDay(this._moveData.$movePart.closest('.calendar-day'));
+    let newDay = this._calculateDateForComponentPart(this._moveData.$movePart);
+    this._moveData.$movePart?.remove();
+    this._moveData.$movePart = null;
+    if (!newDay) {
+      // Component has not been moved
+      return;
+    }
+
     let newTime = this.isMonth()
       ? this._getTotalMinutesInDay(appointmentFromDate)
       : this._moveData.virtualY - this._moveData.virtualOffset;
@@ -2108,8 +2115,6 @@ export class Calendar extends Widget implements CalendarModel {
 
     let dateShift = dates.compareDays(newDay, dates.trunc(appointmentFromDate));
     let timeShiftMinutes = newTime - this._getTotalMinutesInDay(appointmentFromDate);
-
-    this._moveData.$movePart?.remove();
     if (!dateShift && !timeShiftMinutes && component.item.resourceId === newResourceId) {
       // Nothing to shift
       return;
@@ -2419,7 +2424,12 @@ export class Calendar extends Widget implements CalendarModel {
     }
   }
 
-  protected _calculateDateForCalendarDay($calendarDay: JQuery): Date {
+  protected _calculateDateForComponentPart($part: JQuery): Date {
+    let $calendarDay = $part.closest('.calendar-day');
+    if ($calendarDay.length == 0) {
+      // Component is not attached to div
+      return null;
+    }
     let dayShift = null;
     let startDate = this._exactRange.from;
     if (this.isDay()) {
