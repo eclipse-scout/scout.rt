@@ -26,6 +26,7 @@ import jakarta.ws.rs.OPTIONS;
 import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
@@ -47,6 +48,8 @@ public abstract class AbstractRestResourceAnnotationTest {
 
   @Rule
   public ErrorCollector m_errorCollector = new ErrorCollector();
+
+  protected abstract String getPackageNamePrefix();
 
   @Test
   public void testApiExposedAnnotation() {
@@ -110,9 +113,24 @@ public abstract class AbstractRestResourceAnnotationTest {
     return Stream.of(PathParam.class, FormParam.class, QueryParam.class, Context.class);
   }
 
-  protected abstract String getPackageNamePrefix();
-
   protected Stream<Class<? extends Annotation>> getHttpMethodAnnotations() {
     return Stream.of(HttpMethod.class, GET.class, POST.class, PUT.class, DELETE.class, OPTIONS.class, HEAD.class, PATCH.class);
+  }
+
+  @Test
+  public void testPathAnnotation() {
+    List<IRestResource> resources = BEANS.all(IRestResource.class);
+    resources.stream()
+        .map(IRestResource::getClass)
+        .filter(this::acceptResourceForPathAnnotationCheck)
+        .forEach(this::testPathAnnotation);
+  }
+
+  protected boolean acceptResourceForPathAnnotationCheck(Class<? extends IRestResource> resource) {
+    return resource.getName().startsWith(getPackageNamePrefix());
+  }
+
+  protected void testPathAnnotation(Class<? extends IRestResource> resource) {
+    m_errorCollector.checkThat(resource.getName() + " is missing a " + Path.class.getSimpleName() + " annotation", resource.getAnnotation(Path.class) != null, CoreMatchers.is(true));
   }
 }
