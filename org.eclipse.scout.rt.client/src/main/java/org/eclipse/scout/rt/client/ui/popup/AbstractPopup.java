@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,6 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.client.ui.popup;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -24,6 +27,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 public abstract class AbstractPopup extends AbstractWidget implements IPopup {
 
   private IPopupUIFacade m_uiFacade;
+  private P_AnchorDisposeListener m_anchorDisposeListener;
 
   public AbstractPopup() {
     this(true);
@@ -247,6 +251,15 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
   protected void initConfig() {
     super.initConfig();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
+    m_anchorDisposeListener = createAnchorDisposeListener();
+    addPropertyChangeListener(IPopup.PROP_ANCHOR, event -> {
+      if (event.getOldValue() instanceof IWidget) {
+        ((IWidget) event.getOldValue()).removePropertyChangeListener(IWidget.PROP_DISPOSE_DONE, getAnchorDisposeListener());
+      }
+      if (event.getNewValue() instanceof IWidget) {
+        ((IWidget) event.getNewValue()).addPropertyChangeListener(IWidget.PROP_DISPOSE_DONE, getAnchorDisposeListener());
+      }
+    });
 
     setAnchor(getConfiguredAnchor());
     setAnimateOpening(getConfiguredAnimateOpening());
@@ -290,5 +303,21 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
   public void close() {
     getPopupManager().close(this);
     dispose();
+  }
+
+  protected P_AnchorDisposeListener getAnchorDisposeListener() {
+    return m_anchorDisposeListener;
+  }
+
+  protected P_AnchorDisposeListener createAnchorDisposeListener() {
+    return new P_AnchorDisposeListener();
+  }
+
+  protected class P_AnchorDisposeListener implements PropertyChangeListener {
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+      close();
+    }
   }
 }
