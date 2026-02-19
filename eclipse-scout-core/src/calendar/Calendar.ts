@@ -536,17 +536,21 @@ export class Calendar extends Widget implements CalendarModel {
       .on('mouseover', resourceColumnMouseOverCallback);
 
     // Add new resources columns
-    this._leafResources.forEach(resources => {
+    this._leafResources.forEach(resource => {
       $dayName.appendDiv('resource-column')
-        .data('resourceId', resources.resourceId)
-        .attr('data-resource-name', resources.name);
-      $fullDay.appendDiv('resource-column')
-        .data('resourceId', resources.resourceId)
-        .addClass('calendar-scrollable-components')
-        .on('mouseover', resourceColumnMouseOverCallback);
-      $day.appendDiv('resource-column')
-        .data('resourceId', resources.resourceId)
-        .on('mouseover', resourceColumnMouseOverCallback);
+        .data('resourceId', resource.resourceId)
+        .attr('data-resource-name', resource.name);
+      let $fullDayColumn = $fullDay.appendDiv('resource-column')
+        .data('resourceId', resource.resourceId)
+        .addClass('calendar-scrollable-components');
+      let $dayColumn = $day.appendDiv('resource-column')
+        .data('resourceId', resource.resourceId);
+      if (resource.selectable) {
+        // Only add event listener to selectable columns. This prevents components to be moved to
+        // a resource that is not selectable
+        $fullDayColumn.on('mouseover', resourceColumnMouseOverCallback);
+        $dayColumn.on('mouseover', resourceColumnMouseOverCallback);
+      }
     });
 
     // click event on all day and children elements
@@ -2037,10 +2041,6 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     if (this.isDay()) {
-      // When on day, return correct resource column
-      if (!this.findResourceForId(moveData.virtualResourceId).selectable) {
-        return $().empty();
-      }
       return baseQuery
         .filter('.selected')
         .children('.resource-column')
