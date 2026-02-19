@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+# Copyright (c) 2010, 2026 BSI Business Systems Integration AG
 #
 # This program and the accompanying materials are made
 # available under the terms of the Eclipse Public License 2.0
@@ -49,7 +49,6 @@ function checkJs() {
   rm -r -d -f node_modules
   pnpm install --ignore-scripts --force >/dev/null
   pnpm list -P -depth=1000 --parseable | grep -Po "[^\\\\]+@[^\\\\]+" | sort | uniq |
-    grep -v $name | grep -v "chartjs-plugin-datalabels@2.2.0" | # don't report as there is a CQ available: https://dev.eclipse.org/ipzilla/show_bug.cgi?id=22596
     java -jar $HOME/.m2/repository/org/eclipse/dash/org.eclipse.dash.licenses/$DASH_VERSION/org.eclipse.dash.licenses-$DASH_VERSION.jar - $REVIEW
   echo "--------------------------------------"
   cd ..
