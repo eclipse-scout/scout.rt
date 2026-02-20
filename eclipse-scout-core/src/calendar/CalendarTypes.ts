@@ -49,5 +49,5 @@ export type CalendarMoveData = {
    * The virtual offset stores the distance between the cursor and the top of the appointment.
    * This allows to drag a larger component in the middle.
    */
-  virtualOffset: number;
+  virtualOffset?: number;
 };

@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CalendarComponent, CalendarComponentPopupEventMap, Label, WidgetModel, WidgetPopup} from "../index";
+import {CalendarComponent, CalendarComponentPopupEventMap, Label, WidgetModel, WidgetPopup} from '../index';
 import CalendarComponentPopupModel, {CalendarComponentPopupWidgetMap} from './CalendarComponentPopupModel';
-import $ from "jquery";
+import $ from 'jquery';
 
 export class CalendarComponentPopup extends WidgetPopup<Label> {
   declare widgetMap: CalendarComponentPopupWidgetMap;
@@ -52,7 +52,7 @@ export class CalendarComponentPopup extends WidgetPopup<Label> {
   protected override _onMouseDownOutside(event: MouseEvent) {
     let $target = $(event.target);
     let yPosChanged = Math.abs(this.anchorBounds.y - event.y) > 10; // Close popup when mose is moved more than 10px
-    if (!yPosChanged && this.parent._$parts.find($element => $element.isOrHas($target))) {
+    if (!yPosChanged && this.parent._$parts.find($element => $element.isOrHas($target as JQuery<HTMLElement>))) {
       // Do not close popup when mouse is not moved and clicked on the same component
       return;
     }

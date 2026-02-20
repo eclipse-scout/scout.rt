@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Label, Popup, WidgetPopup, WidgetPopupModel} from "../index";
+import {Label, Popup, WidgetPopup, WidgetPopupModel} from '../index';
 
 export default (): WidgetPopupModel<Label> => ({
   objectType: WidgetPopup<Label>,

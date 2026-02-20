@@ -2390,7 +2390,7 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _calculateDateForComponentPart($part: JQuery): Date {
     let $calendarDay = $part.closest('.calendar-day');
-    if ($calendarDay.length == 0) {
+    if ($calendarDay.length === 0) {
       // Component is not attached to div
       return null;
     }
@@ -2402,7 +2402,7 @@ export class Calendar extends Widget implements CalendarModel {
       dayShift = $calendarDay.data('day') - 1; // -1 because view range starts at first day
       if (this.isMonth()) {
         startDate = this.viewRange.from; // When on month, more days are shown than the exact range contains
-        let week = $calendarDay.data('week') - 1;  // -1 because week starts at 1
+        let week = $calendarDay.data('week') - 1; // -1 because week starts at 1
         dayShift += week * 7;
       }
     }
