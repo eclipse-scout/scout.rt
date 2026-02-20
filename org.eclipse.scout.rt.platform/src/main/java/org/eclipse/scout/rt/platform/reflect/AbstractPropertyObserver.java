@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,15 @@ public abstract class AbstractPropertyObserver implements IPropertyObserver {
   private static final LazyValue<Boolean> STORE_CONFIG_VALUES = new LazyValue<>(() -> CONFIG.getPropertyValue(StoreConfigValuesConfigProperty.class));
 
   @SuppressWarnings("squid:S00116")
-  protected final BasicPropertySupport propertySupport = new BasicPropertySupport(this);
+  protected final BasicPropertySupport propertySupport;
+
+  public AbstractPropertyObserver() {
+    propertySupport = createPropertySupport();
+  }
+
+  protected BasicPropertySupport createPropertySupport() {
+    return new BasicPropertySupport(this);
+  }
 
   @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {

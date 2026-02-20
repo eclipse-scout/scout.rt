@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,6 +15,9 @@ import static org.mockito.Mockito.mock;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.beans.fixture.WeakPropertyChangeListener;
@@ -178,6 +181,17 @@ public class BasicPropertySupportTest {
       specificListeners.remove(testPropertyListener);
       checkExpectedListeners(propertySupport, specificListeners);
     }
+  }
+
+  @Test
+  public void testPreFilledFromMap() {
+    HashMap<String, Object> providedMap = new HashMap<>(Map.of("A", "B"));
+    BasicPropertySupport basicPropertySupport = new BasicPropertySupport(null, providedMap);
+    assertEquals(Map.of("A", "B"), basicPropertySupport.getPropertiesMap());
+
+    // ensure Map is not copied by constructor, the input Map must be used directly
+    basicPropertySupport.clearProperties();
+    assertEquals(Collections.emptyMap(), providedMap);
   }
 
   private void checkExpectedListeners(BasicPropertySupport propertySupport, ArrayList<PropertyChangeListener> specificListeners, PropertyChangeListener... pcl) {
