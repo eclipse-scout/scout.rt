@@ -13,7 +13,7 @@
   <parent>
     <groupId>org.eclipse.scout.rt</groupId>
     <artifactId>org.eclipse.scout.rt</artifactId>
-    <version>26.1-SNAPSHOT</version>
+    <version>26.1.0</version>
     <relativePath>../org.eclipse.scout.rt</relativePath>
   </parent>
 
