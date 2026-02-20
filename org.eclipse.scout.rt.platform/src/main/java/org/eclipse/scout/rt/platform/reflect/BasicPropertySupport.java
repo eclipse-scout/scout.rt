@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,7 +47,7 @@ public class BasicPropertySupport implements IListenerListWithManagement {
   public static final long DEFAULT_LONG_VALUE = DEFAULT_INT_VALUE;
   public static final Long DEFAULT_LONG = DEFAULT_LONG_VALUE;
   private static final Boolean DEFAULT_BOOL = Boolean.FALSE;
-  private final Map<String, Object> m_props = new HashMap<>();
+  private final Map<String, Object> m_props;
   private final Object m_source;
   // observer
   private final Object m_listenerLock = new Object();
@@ -57,7 +57,17 @@ public class BasicPropertySupport implements IListenerListWithManagement {
   private List<PropertyChangeEvent> m_propertyEventBuffer;
 
   public BasicPropertySupport(Object sourceBean) {
+    this(sourceBean, new HashMap<>());
+  }
+
+  /**
+   *
+   * @param propertyMap
+   *     either pre-filled or empty
+   */
+  public BasicPropertySupport(Object sourceBean, Map<String, Object> propertyMap) {
     m_source = sourceBean;
+    m_props = propertyMap;
     ListenerListRegistry.globalInstance().registerAsWeakReference(this);
   }
 
@@ -564,7 +574,7 @@ public class BasicPropertySupport implements IListenerListWithManagement {
       // reverse traversal
       for (int i = a.length - 1; i >= 0; i--) {
         if (!names.contains(a[i].getPropertyName())) {
-          coalesceList.add(0, a[i]);
+          coalesceList.addFirst(a[i]);
           names.add(a[i].getPropertyName());
         }
       }
