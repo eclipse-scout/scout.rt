@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -129,7 +129,7 @@ public class TextsLoader extends AbstractResourceLoader {
         languages.put(locale.getLanguage(), localesForLanguage);
 
         // Always add language itself, without any country
-        localesForLanguage.add(new Locale(locale.getLanguage()));
+        localesForLanguage.add(Locale.of(locale.getLanguage()));
       }
       localesForLanguage.add(locale);
     }
@@ -138,7 +138,7 @@ public class TextsLoader extends AbstractResourceLoader {
     List<Locale> locales = languages.values().stream().flatMap(Set::stream).collect(Collectors.toList());
 
     // add default language
-    locales.add(0, Locale.ROOT);
+    locales.addFirst(Locale.ROOT);
     return locales;
   }
 

@@ -41,6 +41,7 @@ export class Status implements StatusModel, ObjectWithType {
     // children
     if (model && model.children && Array.isArray(model.children)) {
       this.children = model.children.map(child => Status.ensure(child));
+      this._updateProperties();
     }
   }
 
@@ -119,6 +120,31 @@ export class Status implements StatusModel, ObjectWithType {
     return this.asFlatList().some(predicate);
   }
 
+  /**
+   * Adds the given statuses as children to this status.
+   *
+   * Message, severity and code of this root status are automatically updated with the ones from the child having the highest severity.
+   * @param statuses The statuses to add. May be null but must not contain null elements.
+   */
+  addStatuses(...statuses: Status[]): this {
+    if (!statuses?.length) {
+      return;
+    }
+    if (this.hasChildren()) {
+      statuses.forEach(s => this.children.push(s));
+    } else {
+      this.children = [...statuses];
+    }
+    this._updateProperties();
+    return this;
+  }
+
+  /**
+   * Adds the given status to the children of this status.
+   *
+   * Message, severity and code of this root status are automatically updated with the ones from the child having the highest severity.
+   * @param status The status to add. Must not be null.
+   */
   addStatus(status: Status) {
     if (this.hasChildren()) {
       this.children.push(status);
@@ -152,29 +178,41 @@ export class Status implements StatusModel, ObjectWithType {
   }
 
   protected _updateProperties() {
-    if (!this.hasChildren()) {
+    if (this.hasChildren()) {
+      let firstStatus = this._findMostImportantChildStatus();
+      this.message = firstStatus.message;
+      this.severity = firstStatus.severity;
+      this.code = firstStatus.code;
+    } else {
       this.message = null;
       this.severity = Status.Severity.OK;
       this.code = 0;
-      return;
+    }
+  }
+
+  protected _findMostImportantChildStatus(): Status {
+    function calcPriority(status) {
+      let multiplier = 1;
+      if (status instanceof ParsingFailedStatus) {
+        multiplier = 4;
+      } else if (status instanceof ValidationFailedStatus) {
+        multiplier = 2;
+      }
+      return multiplier * status.severity;
     }
 
-    let firstStatus = this.asFlatList().sort((a, b) => {
-      return calcPriority(b) - calcPriority(a);
-
-      function calcPriority(status) {
-        let multiplier = 1;
-        if (status instanceof ParsingFailedStatus) {
-          multiplier = 4;
-        } else if (status instanceof ValidationFailedStatus) {
-          multiplier = 2;
-        }
-        return multiplier * status.severity;
+    const all = this.asFlatList();
+    let importantStatus = all[0];
+    let highestPrio = calcPriority(importantStatus);
+    for (let i = 1; i < all.length; i++) {
+      const curStatus = all[i];
+      const curPrio = calcPriority(curStatus);
+      if (curPrio > highestPrio) {
+        importantStatus = curStatus;
+        highestPrio = curPrio;
       }
-    })[0];
-    this.message = firstStatus.message;
-    this.severity = firstStatus.severity;
-    this.code = firstStatus.code;
+    }
+    return importantStatus;
   }
 
   /**

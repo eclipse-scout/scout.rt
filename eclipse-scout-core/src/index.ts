@@ -446,6 +446,8 @@ export * from './calendar/YearPanelEventMap';
 export * from './lifecycle/Lifecycle';
 export * from './lifecycle/LifecycleModel';
 export * from './lifecycle/LifecycleEventMap';
+export * from './lifecycle/ElementsValidationStatus';
+export * from './lifecycle/ElementsValidationStatusModel';
 export * from './planner/Planner';
 export * from './planner/PlannerModel';
 export * from './planner/PlannerEventMap';

@@ -35,6 +35,34 @@ export const arrays = {
   },
 
   /**
+   * Groups the given elements using the values returned by a provided grouping function.
+   * The returned Map can be used to get the array of elements in each group.
+   * @param elements The elements to group. May be null/undefined/empty.
+   * @param groupingFunc A mandatory grouping function to compute the group of each element in the given array.
+   * @returns A Map having an entry for each group that exists in the given elements array. The map is empty if the input elements are falsy or empty.
+   */
+  groupBy<K, E>(elements: E[], groupingFunc: (e: E) => K): Map<K, E[]> {
+    // can be migrated to Map.groupBy as soon as available by all supported browsers.
+    // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/groupBy#browser_compatibility
+    const map = new Map<K, E[]>();
+    if (!elements?.length) {
+      return map;
+    }
+
+    elements.reduce((m, e) => {
+      const group = groupingFunc(e);
+      const existing = map.get(group);
+      if (existing) {
+        existing.push(e);
+      } else {
+        map.set(group, [e]);
+      }
+      return m;
+    }, map);
+    return map;
+  },
+
+  /**
    * Removes the first occurrence of the specified element from the array.
    * If the array does not contain the element, it stays unchanged.
    *
