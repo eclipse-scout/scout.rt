@@ -111,6 +111,10 @@ describe('Status', () => {
       status = Status.ok('Okay');
       expect(status.severity).toBe(Status.Severity.OK);
       expect(status.message).toBe('Okay');
+
+      status = new Status({children: [Status.error('error')]});
+      expect(status.severity).toBe(Status.Severity.ERROR);
+      expect(status.message).toBe('error');
     });
 
   });
@@ -122,6 +126,23 @@ describe('Status', () => {
     expect(status.hasChildren()).toBe(true);
     status.removeAllStatus(Status);
     expect(status.hasChildren()).toBe(false);
+  });
+
+  it('addStatuses', () => {
+    let status = Status.error('root').addStatuses(Status.info('info'), Status.warning('warning'));
+    expect(status.severity).toBe(Status.Severity.WARNING);
+
+    status.addStatuses(Status.info('info'), Status.error({severity: Status.Severity.ERROR, message: 'error', code: 100}), Status.warning('warning'));
+    expect(status.severity).toBe(Status.Severity.ERROR);
+    expect(status.children.length).toBe(5);
+    expect(status.message).toBe('error');
+    expect(status.code).toBe(100);
+
+    status.addStatuses();
+    expect(status.children.length).toBe(5);
+
+    status = Status.ok().addStatuses(Status.warning().addStatuses(Status.error('error'), Status.warning('warning')));
+    expect(status.severity).toBe(Status.Severity.ERROR);
   });
 
   it('removeAllStatus', () => {

@@ -10,8 +10,8 @@
 import {
   AbortKeyStroke, App, aria, AriaLabelledByInsertPosition, arrays, BusyIndicatorOptions, Button, ButtonSystemType, ChildModelOf, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, ErrorHandler, Event, EventHandler,
   FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormInvalidEvent, FormLayout, FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf,
-  KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, MessageBoxes, ModelOf, NotificationBadgeStatus, ObjectOrChildModel, objects, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status, StatusOrModel, strings,
-  tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
+  KeyStroke, KeyStrokeContext, Lifecycle, MessageBox, MessageBoxController, MessageBoxes, ModelOf, NotificationBadgeStatus, ObjectOrChildModel, objects, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status, StatusOrModel,
+  strings, TextListWithTitle, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
 
@@ -679,12 +679,6 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * Do not override this method, use {@link _validate} instead.
    */
   _lifecycleValidate(): Status | JQuery.Promise<Status> {
-    const combineStatuses = (statuses: Status[]) => {
-      const status = Status.ok();
-      statuses.forEach(s => status.addStatus(s));
-      return status;
-    };
-
     // separate statuses from promises
     const statuses: Status[] = [];
     const promises: JQuery.Promise<Status>[] = [];
@@ -697,14 +691,14 @@ export class Form extends Widget implements FormModel, DisplayParent {
     }
 
     // return combined status if there are no promises
-    const status = combineStatuses(statuses);
+    const status = Status.ok().addStatuses(...statuses);
     if (!promises.length) {
       return status;
     }
 
     // wait for promises and combine results
     return $.promiseAll([$.resolvedPromise(status), ...promises])
-      .then((...statusArr: Status[]) => combineStatuses(statusArr));
+      .then((...statusArr: Status[]) => Status.ok().addStatuses(...statusArr));
   }
 
   /** @see FormModel.validators */
@@ -751,6 +745,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     }
     return this._createStatusMessageBox(status).buildAndOpen().then(option => {
       if (!status.isError() && option === MessageBox.Buttons.YES) {
+        // proceed anyway
         return $.resolvedPromise(Status.ok(status.message));
       }
       return $.resolvedPromise(status);
@@ -761,13 +756,38 @@ export class Form extends Widget implements FormModel, DisplayParent {
     let messageBoxes = MessageBoxes.createOk(this)
       .withSeverity(status.severity)
       .withHeader(this.validationFailedText)
-      .withBody(status.message, true);
+      .withBody(this._createStatusMessageBoxBodyHtml(status), true);
     if (!status.isError()) {
       messageBoxes = messageBoxes
         .withYes(this.session.text('ProceedAnyway'))
         .withNo(this.session.text('Cancel'));
     }
     return messageBoxes;
+  }
+
+  protected _createStatusMessageBoxBodyHtml(status: Status): string {
+    if (!status.hasChildren()) {
+      return status.message;
+    }
+
+    // multiple statuses: collect messages to lists by severity
+    const groupedBySeverity = arrays.groupBy(status.asFlatList(), s => s.severity);
+    const errors = groupedBySeverity.get(Status.Severity.ERROR);
+    const warnings = groupedBySeverity.get(Status.Severity.WARNING);
+    const hasErrorAndWarning = !!(errors?.length && warnings?.length);
+    return Lifecycle.createUnorderedListsWithTitle(this._createMultiStatusMessageBoxListGroups(errors, warnings, hasErrorAndWarning), hasErrorAndWarning);
+  }
+
+  protected _createMultiStatusMessageBoxListGroups(errors: Status[], warnings: Status[], hasErrorAndWarning: boolean): TextListWithTitle[] {
+    return [{
+      title: hasErrorAndWarning ? this.session.text('FormValidationErrorMessage') : '',
+      elements: errors?.map(e => e.message),
+      html: true
+    }, {
+      title: hasErrorAndWarning ? this.session.text('FormValidationWarningMessage') : '',
+      elements: warnings?.map(e => e.message),
+      html: true
+    }];
   }
 
   /**

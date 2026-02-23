@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -362,6 +362,62 @@ describe('FormLifecycle', () => {
   });
 
   describe('validation result', () => {
+
+    it('has widget status if element status is only warning', async () => {
+      jasmine.clock().uninstall();
+      const form = scout.create(SpecForm, {
+        parent: session.desktop,
+        rootGroupBox: {
+          id: 'MainBox',
+          objectType: GroupBox,
+          mainBox: true,
+          fields: [{
+            id: 'GroupBox',
+            objectType: GroupBox,
+            fields: [{
+              id: 'Field1',
+              objectType: StringField
+            }]
+          }]
+        }
+      });
+      const strField = form.widget('Field1') as StringField;
+      strField.setErrorStatus(Status.warning('field warning'));
+      form.addValidator(f => Status.warning('form warning'));
+      let status = await form.lifecycle._validate();
+      expect(status.severity).toBe(Status.Severity.WARNING);
+      expect(status.message).toContainText('field warning');
+      let messageBoxBody = form._createStatusMessageBox(status).bodyText;
+      expect(messageBoxBody).toContainText('field warning');
+      expect(messageBoxBody).toContainText('form warning');
+      expect(messageBoxBody).not.toContainText('FormValidationErrorMessage');
+      expect(messageBoxBody).not.toContainText('FormValidationWarningMessage');
+
+      form.addValidator(f => Status.error('form error'));
+
+      // element status is warning while widget status is error
+      status = await form.lifecycle._validate();
+      expect(status.severity).toBe(Status.Severity.ERROR);
+      expect(status.message).toBe('form error');
+      messageBoxBody = form._createStatusMessageBox(status).bodyText;
+      expect(messageBoxBody).toContainText('field warning');
+      expect(messageBoxBody).toContainText('form error');
+      expect(messageBoxBody).toContainText('form warning');
+      expect(messageBoxBody).toContainText('FormValidationErrorMessage');
+      expect(messageBoxBody).toContainText('FormValidationWarningMessage');
+
+      // element status and widget status are error
+      strField.setErrorStatus(Status.error('field error'));
+      status = await form.lifecycle._validate();
+      expect(status.severity).toBe(Status.Severity.ERROR);
+      expect(status.message).toContainText('field error');
+      messageBoxBody = form._createStatusMessageBox(status).bodyText;
+      expect(messageBoxBody).not.toContainText('field warning');
+      expect(messageBoxBody).not.toContainText('form error');
+      expect(messageBoxBody).not.toContainText('form warning');
+      expect(messageBoxBody).not.toContainText('FormValidationErrorMessage');
+      expect(messageBoxBody).not.toContainText('FormValidationWarningMessage');
+    });
 
     it('should visit all fields recursively by default', () => {
       let form = scout.create(SpecForm, {

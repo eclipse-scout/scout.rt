@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, arrays, EventEmitter, InitModelOf, LifecycleEventMap, LifecycleModel, LifecycleValidateEvent, MessageBox, MessageBoxes, objects, ObjectWithType, scout, Session, SomeRequired, Status, StatusSeverity, Widget} from '../index';
+import {
+  App, arrays, ElementsValidationStatus, EventEmitter, InitModelOf, LifecycleEventMap, LifecycleModel, LifecycleValidateEvent, MessageBox, MessageBoxes, objects, ObjectWithType, scout, Session, SomeRequired, Status, StatusSeverity, Widget
+} from '../index';
 import $ from 'jquery';
 
 /**
@@ -203,22 +205,30 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
 
   protected _validateAndHandle(): JQuery.Promise<Status> {
     return this._validate()
-      .then(status => {
-        const event = this.trigger('validate', {status}) as LifecycleValidateEvent<TValidationResult>;
-        return event.status;
-      })
-      .then(status => {
-        if (!status || status.isValid()) {
-          return $.resolvedPromise(status || Status.ok());
-        }
-        return this._handleInvalid(status);
-      })
+      .then(status => this._handleValidationResult(status))
       .catch(error => {
         const errorHandler = App.get().errorHandler;
         return errorHandler.analyzeError(error)
           .then(errorInfo => errorHandler.errorInfoToStatus(this.session(), errorInfo))
           .then(status => this._handleInvalid(status));
       });
+  }
+
+  protected _handleValidationResult(status: Status): JQuery.Promise<Status> {
+    // 1. reveal first invalid element
+    if (status instanceof ElementsValidationStatus && (status.elementsValidationResult.missingElements.length || status.elementsValidationResult.invalidElements.length)) {
+      this._revealInvalidElement(arrays.first(status.elementsValidationResult.missingElements) || arrays.first(status.elementsValidationResult.invalidElements));
+    }
+
+    // 2. trigger event (allow modification of status)
+    const event = this.trigger('validate', {status}) as LifecycleValidateEvent<TValidationResult>;
+    status = event.status || Status.ok();
+    if (status.isValid()) {
+      return $.resolvedPromise(status);
+    }
+
+    // 3. handle if warning or error
+    return this._handleInvalid(status);
   }
 
   protected _handleInvalid(status: Status): JQuery.Promise<Status> {
@@ -233,31 +243,36 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
   }
 
   protected _validate(): JQuery.Promise<Status> {
-    let status = this._validateElements();
-    if (!status.isValid()) {
-      return $.resolvedPromise(status);
+    let elementStatus = this._validateElements();
+    if (elementStatus.isError()) {
+      return $.resolvedPromise(elementStatus);
     }
-    let statusOrPromise = this._validateWidget();
-    if (objects.isPromise(statusOrPromise)) {
-      return statusOrPromise;
-    }
-    return $.resolvedPromise(statusOrPromise);
+
+    const widgetValidation = this._validateWidget();
+    const promise = objects.isPromise(widgetValidation) ? widgetValidation : $.resolvedPromise(widgetValidation);
+    return promise.then(widgetStatus => this._combineValidationStatuses(elementStatus, widgetStatus));
+  }
+
+  protected _combineValidationStatuses(elementStatus: Status, widgetStatus: Status): Status {
+    return Status.ok().addStatuses(elementStatus, widgetStatus); // returned root status has severity of worst child status (max severity).
   }
 
   /**
    * Validates all elements (i.e. form-fields) covered by the lifecycle and checks for missing or invalid elements.
    */
   protected _validateElements(): Status {
-    let elements = this.invalidElements();
-    if (elements.missingElements.length === 0 && elements.invalidElements.length === 0) {
-      return Status.ok();
-    }
-    const severity = elements.missingElements.length
+    const elementsValidationResult = this.invalidElements();
+    let severity: StatusSeverity;
+    let message: string;
+    if (elementsValidationResult.missingElements.length === 0 && elementsValidationResult.invalidElements.length === 0) {
+      severity = Status.Severity.OK;
+    } else {
+      severity = elementsValidationResult.missingElements.length
         ? Status.Severity.ERROR
-        : arrays.max(elements.invalidElements.map(e => e.errorStatus ? e.errorStatus.severity : 0)) as StatusSeverity,
-      message = this._createInvalidElementsMessageHtml(elements.missingElements, elements.invalidElements);
-    this._revealInvalidElement(arrays.first(elements.missingElements) || arrays.first(elements.invalidElements));
-    return Status.ensure({severity, message});
+        : arrays.max(elementsValidationResult.invalidElements.map(e => e.errorStatus ? e.errorStatus.severity : 0)) as StatusSeverity;
+      message = this._createInvalidElementsMessageHtml(elementsValidationResult.missingElements, elementsValidationResult.invalidElements);
+    }
+    return scout.create(ElementsValidationStatus<TValidationResult>, {severity, message, elementsValidationResult});
   }
 
   protected _revealInvalidElement(invalidElement: TValidationResult) {
@@ -277,7 +292,7 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
   /**
    * Override this function to check for invalid elements on the parent which prevent saving of the parent (e.g. check if all mandatory elements contain a value).
    */
-  protected invalidElements(): { missingElements: TValidationResult[]; invalidElements: TValidationResult[] } {
+  invalidElements(): ElementsValidationResult<TValidationResult> {
     return {
       missingElements: [],
       invalidElements: []
@@ -288,55 +303,55 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
    * Creates an HTML message used to display missing and invalid fields in a message box.
    */
   protected _createInvalidElementsMessageHtml(missing: TValidationResult[], invalid: TValidationResult[]): string {
-    const $div = $('<div>'),
-      hasMissing = missing.length > 0,
-      invalidError = [], invalidWarning = [];
-
-    invalid.forEach(e => {
-      if (!e.errorStatus) {
-        return;
+    const groupedBySeverity = arrays.groupBy(invalid, e => e.errorStatus?.severity);
+    const invalidError = groupedBySeverity.get(Status.Severity.ERROR);
+    const invalidWarning = groupedBySeverity.get(Status.Severity.WARNING);
+    const messageGroups = [
+      {
+        title: this.emptyMandatoryElementsText,
+        elements: missing?.map(m => this._missingElementText.call(this, m))
+      }, {
+        title: this.invalidElementsErrorText,
+        elements: invalidError?.map(m => this._invalidElementErrorText.call(this, m))
+      }, {
+        title: this.invalidElementsWarningText,
+        elements: invalidWarning?.map(m => this._invalidElementWarningText.call(this, m))
       }
-      if (e.errorStatus.isError()) {
-        invalidError.push(e);
-      } else if (e.errorStatus.isWarning()) {
-        invalidWarning.push(e);
-      }
-    });
+    ];
+    return Lifecycle.createUnorderedListsWithTitle(messageGroups);
+  }
 
-    const hasInvalidError = invalidError.length > 0,
-      hasInvalidWarning = invalidWarning.length > 0;
-
+  /**
+   * @param lists The text list to render. Includes the title of the list and if html should be allowed in title and texts. Must be an array.
+   * @param createBulletsOnSingleElement Optional flag to indicate if a bullet list should also be created if there is only one text element in a list. Default is true.
+   */
+  static createUnorderedListsWithTitle(lists: TextListWithTitle[], createBulletsOnSingleElement = true): string {
+    const $div = $('<div>');
     let appendBr = false;
+    for (const list of lists) {
+      const elements = list.elements?.filter(e => !!e);
+      if (!elements?.length) {
+        continue; // skip empty lists
+      }
 
-    if (hasMissing) {
-      appendTitleAndList.call(this, $div, this.emptyMandatoryElementsText, missing, this._missingElementText);
-      appendBr = true;
-    }
-    if (hasInvalidError) {
       if (appendBr) {
         $div.appendElement('<br>');
       }
-      appendTitleAndList.call(this, $div, this.invalidElementsErrorText, invalidError, this._invalidElementErrorText);
-      appendBr = true;
-    }
-    if (hasInvalidWarning) {
-      if (appendBr) {
-        $div.appendElement('<br>');
+      const applyText: ($e: JQuery, s: string) => JQuery = list.html ? ($e, s) => $e.html(s) : ($e, s) => $e.text(s);
+      if (list.title) {
+        applyText($div.appendDiv(), list.title);
       }
-      appendTitleAndList.call(this, $div, this.invalidElementsWarningText, invalidWarning, this._invalidElementWarningText);
+
+      if (!createBulletsOnSingleElement && elements.length === 1) {
+        applyText($div.appendDiv(), elements[0]);
+      } else {
+        let $ul = $div.appendElement('<ul>');
+        elements.forEach(e => applyText($ul.appendElement('<li>'), e));
+      }
+
       appendBr = true;
     }
     return $div.html();
-
-    // ----- Helper function -----
-
-    function appendTitleAndList($div: JQuery, title: string, elements: TValidationResult[], elementTextFunc: (element: TValidationResult) => string) {
-      $div.appendDiv().text(title);
-      let $ul = $div.appendElement('<ul>');
-      elements.forEach(element => {
-        $ul.appendElement('<li>').text(elementTextFunc.call(this, element));
-      });
-    }
   }
 
   /**
@@ -379,3 +394,6 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
     this.handlers[type] = func;
   }
 }
+
+export type ElementsValidationResult<TValidationResult extends { errorStatus?: Status }> = { missingElements: TValidationResult[]; invalidElements: TValidationResult[] };
+export type TextListWithTitle = { title: string; elements: string[]; html?: boolean };

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Form, FormField, FormLifecycleModel, InitModelOf, Lifecycle, scout, Status, strings, TreeVisitResult, ValidationResult, ValueField} from '../../index';
+import {ElementsValidationResult, Form, FormField, FormLifecycleModel, InitModelOf, Lifecycle, scout, Status, strings, TreeVisitResult, ValidationResult, ValueField} from '../../index';
 
 export class FormLifecycle<TValidationResult extends ValidationResult = ValidationResult> extends Lifecycle<TValidationResult> implements FormLifecycleModel {
   declare model: FormLifecycleModel;
@@ -41,11 +41,15 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
     this.widget.setData(this.widget.exportData());
   }
 
-  override invalidElements(): { missingElements: TValidationResult[]; invalidElements: TValidationResult[] } {
-    const missingElements = [],
-      invalidElements = [];
+  override invalidElements(): ElementsValidationResult<TValidationResult> {
+    return FormLifecycle.validateFormFields(this.widget);
+  }
 
-    this.widget.visitFields((field: FormField) => {
+  static validateFormFields<TValidationResult extends ValidationResult = ValidationResult>(widget: Form | FormField): ElementsValidationResult<TValidationResult> {
+    const missingElements = [];
+    const invalidElements = [];
+
+    widget.visitFields((field: FormField) => {
       let result = field.getValidationResult();
       if (!result.valid) {
         // error status has priority over mandatory

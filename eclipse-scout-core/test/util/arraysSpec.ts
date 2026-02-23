@@ -20,7 +20,6 @@ describe('arrays', () => {
         expect(arr[i]).toBe('foo');
       }
     });
-
   });
 
   describe('ensure', () => {
@@ -73,7 +72,6 @@ describe('arrays', () => {
       expect(arrays.remove(arr)).toBe(true);
       expect(arr).toEqual(['b', 'c', undefined, 'd']);
     });
-
   });
 
   describe('removeAll', () => {
@@ -105,7 +103,6 @@ describe('arrays', () => {
       expect(arrays.removeAll([], [])).toBe(false);
       expect(arrays.removeAll([], ['x'])).toBe(false);
     });
-
   });
 
   describe('replace', () => {
@@ -136,7 +133,6 @@ describe('arrays', () => {
       arrays.insert(arr, 'e', 10);
       expect(arr).toEqual(['a', 'b', 'c', 'd', 'e']);
     });
-
   });
 
   describe('insertAll', () => {
@@ -236,7 +232,6 @@ describe('arrays', () => {
       arrays.insertSorted(arr, {order: 11, text: 'Z'}, compareOrdered);
       expect(flat(arr)).toBe('X, Y, Z');
     });
-
   });
 
   describe('insertBefore', () => {
@@ -258,7 +253,6 @@ describe('arrays', () => {
       arrays.insertBefore(arr, {id: 5, text: 'E'}, el => el.id === 4);
       expect(flat(arr)).toBe('E, D, C, D2, B, A'); // inserted before first element that matches
     });
-
   });
 
   describe('insertAfter', () => {
@@ -280,7 +274,6 @@ describe('arrays', () => {
       arrays.insertAfter(arr, {id: 5, text: 'E'}, el => el.id === 4);
       expect(flat(arr)).toBe('A, C, B, D2, E, D'); // inserted after first element that matches
     });
-
   });
 
   describe('contains', () => {
@@ -303,7 +296,6 @@ describe('arrays', () => {
       // @ts-expect-error
       expect(arrays.contains(['a', 'b', 'c', '1', '2', '3'], 2)).toBe(false);
     });
-
   });
 
   describe('max', () => {
@@ -361,7 +353,6 @@ describe('arrays', () => {
       arrays.move(arr, 10, 0);
       expect(arr).toEqual([undefined, 'a', 'b', 'c', 'd']);
     });
-
   });
 
   describe('moveAfter', () => {
@@ -577,7 +568,6 @@ describe('arrays', () => {
       arr2 = null;
       expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
     });
-
   });
 
   describe('findIndex', () => {
@@ -600,7 +590,6 @@ describe('arrays', () => {
       });
       expect(index).toBe(-1);
     });
-
   });
 
   describe('find', () => {
@@ -623,7 +612,6 @@ describe('arrays', () => {
       });
       expect(element).toBeFalsy();
     });
-
   });
 
   describe('findFrom', () => {
@@ -694,7 +682,6 @@ describe('arrays', () => {
       }, true);
       expect(element).toBeFalsy();
     });
-
   });
 
   describe('format', () => {
@@ -719,7 +706,6 @@ describe('arrays', () => {
       // @ts-expect-error
       expect(arrays.format()).toBe('');
     });
-
   });
 
   describe('formatEncoded', () => {
@@ -738,7 +724,6 @@ describe('arrays', () => {
       expect(arrays.formatEncoded(arr)).toBe('&lt;p&gt;abc');
       expect(arrays.formatEncoded(arr, '<br>')).toBe('&lt;p&gt;abc');
     });
-
   });
 
   describe('empty', () => {
@@ -755,7 +740,6 @@ describe('arrays', () => {
       expect(arrays.empty([0])).toBe(false);
       expect(arrays.empty([null])).toBe(false);
     });
-
   });
 
   describe('hasElements', () => {
@@ -772,7 +756,6 @@ describe('arrays', () => {
       expect(arrays.hasElements([0])).toBe(true);
       expect(arrays.hasElements([null])).toBe(true);
     });
-
   });
 
   describe('length', () => {
@@ -789,7 +772,6 @@ describe('arrays', () => {
       expect(arrays.length([0])).toBe(1);
       expect(arrays.length([null])).toBe(1);
     });
-
   });
 
   describe('first', () => {
@@ -811,7 +793,6 @@ describe('arrays', () => {
       expect(arrays.first([null, undefined, 123])).toBe(null);
       expect(arrays.first(['', 'b', 'c'])).toBe('');
     });
-
   });
 
   describe('last', () => {
@@ -833,7 +814,6 @@ describe('arrays', () => {
       expect(arrays.last([123, undefined, null])).toBe(null);
       expect(arrays.last(['a', 'b', ''])).toBe('');
     });
-
   });
 
   describe('pushAll', () => {
@@ -947,7 +927,6 @@ describe('arrays', () => {
       arrays.pushIfDefined(arr, [1, 2]);
       expect(arr).toEqual([[], [1, 2]]);
     });
-
   });
 
   describe('pushSet', () => {
@@ -965,7 +944,6 @@ describe('arrays', () => {
       arrays.pushSet(arr, 4);
       expect(arr).toEqual([1, 2, 3, 4]);
     });
-
   });
 
   describe('diff', () => {
@@ -977,7 +955,6 @@ describe('arrays', () => {
       expect(arrays.diff(arr1, arr2)).toEqual(['a', 'b1']);
       expect(arrays.diff(arr2, arr1)).toEqual(['c1', 'd']);
     });
-
   });
 
   describe('flatMap', () => {
@@ -999,7 +976,6 @@ describe('arrays', () => {
       let result = arrays.flatMap(arr, s => s.split(' '));
       expect(result).toEqual(['a', 'b', 'c', '1', '2', 'x']);
     });
-
   });
 
   describe('flattenRec', () => {
@@ -1108,7 +1084,6 @@ describe('arrays', () => {
         expect(index >= 0 && index < arr.length).toBeTrue();
       }
     });
-
   });
 
   describe('toMap', () => {
@@ -1222,6 +1197,26 @@ describe('arrays', () => {
       expect(arrays.sortBy(undefined, [])).toEqual([]);
       expect(arrays.sortBy(null, [1, 2])).toEqual([]);
       expect(arrays.sortBy([], [])).toEqual([]);
+    });
+  });
+
+  describe('groupBy', () => {
+    it('can handle null and empty arrays', () => {
+      expect(arrays.groupBy(null, null).size).toBe(0);
+      expect(arrays.groupBy(undefined, undefined).size).toBe(0);
+      expect(arrays.groupBy([], undefined).size).toBe(0);
+    });
+
+    it('correctly creates groups', () => {
+      const data = [{t: 'a', n: 4}, {t: 'b', n: 6}, {t: 'c', n: 4}, {t: 'd', n: -3}, {t: 'e', n: null}];
+      let grouped = arrays.groupBy(data, d => d.n);
+      expect(grouped.size).toBe(4);
+      expect(grouped.get(2)).toBeUndefined();
+      expect(grouped.get(4).length).toBe(2);
+      expect(grouped.get(6).length).toBe(1);
+      expect(grouped.get(-3).length).toBe(1);
+      expect(grouped.get(null).length).toBe(1);
+      expect(grouped.get(null)[0].t).toBe('e');
     });
   });
 });
