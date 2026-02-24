@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -131,12 +131,22 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     }
   }
 
-  hideTooltip() {
-    if (this.tooltip) {
-      let event = this.trigger('hideTooltip');
-      if (!event.defaultPrevented) {
-        this.tooltip.destroy();
-        this._removeParentListeners();
+  /**
+   * Closes the open tooltip.
+   *
+   * @param immediately true, to immediately close it without waiting for the remove animation.
+   */
+  hideTooltip(immediately = false) {
+    if (!this.tooltip) {
+      return;
+    }
+
+    let event = this.trigger('hideTooltip');
+    if (!event.defaultPrevented) {
+      this.tooltip.destroy();
+      this._removeParentListeners();
+      if (immediately) {
+        this.tooltip.removeImmediately();
       }
     }
   }
@@ -175,11 +185,12 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     }
 
     this._updateParentListeners();
-    this.hideContextMenu();
+    this.hideContextMenu(true);
     if (this.tooltip && this.tooltip.autoRemove !== this.autoRemove) {
-      // close
+      // Close tooltip if the autoRemove property changes, the other properties can be updated even if the tooltip is open.
       this.hideTooltip();
     }
+
     if (this.tooltip) {
       // update existing tooltip
       this.tooltip.setText(this.status.message);
@@ -206,9 +217,19 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     }
   }
 
-  hideContextMenu() {
-    if (this.contextMenu) {
-      this.contextMenu.close();
+  /**
+   * Closes the open context menu.
+   *
+   * @param immediately true, to immediately close it without waiting for the remove animation.
+   */
+  hideContextMenu(immediately = false) {
+    if (!this.contextMenu) {
+      return;
+    }
+
+    this.contextMenu.close();
+    if (immediately) {
+      this.contextMenu.removeImmediately();
     }
   }
 
@@ -217,13 +238,8 @@ export class FieldStatus extends Widget implements FieldStatusModel {
       // at least one menu item must be visible
       return;
     }
-    // close both contextMenu and status tooltip
-    this.hidePopup();
 
-    // Context menu must be removed immediately before it can be opened because cloneMenuItems is false
-    if (this.contextMenu && this.contextMenu.isRemovalPending()) {
-      this.contextMenu.removeImmediately();
-    }
+    this.hidePopup(true);
 
     this.contextMenu = scout.create(ContextMenuPopup, {
       parent: this,
@@ -242,9 +258,14 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     });
   }
 
-  hidePopup() {
-    this.hideTooltip();
-    this.hideContextMenu();
+  /**
+   * Closes the open popup (tooltip or context menu).
+   *
+   * @param immediately true, to immediately close it without waiting for the remove animation.
+   */
+  hidePopup(immediately = false) {
+    this.hideTooltip(immediately);
+    this.hideContextMenu(immediately);
   }
 
   togglePopup() {
