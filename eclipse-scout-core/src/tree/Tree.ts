@@ -2534,6 +2534,11 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       Tree.visitNodes(this._destroyTreeNode.bind(this), node.childNodes);
     }
 
+    // remove nodes from html document
+    if (this.rendered) {
+      this._removeNodes(deletedNodes, parentNode || parentNodesToReindex);
+    }
+
     this._updateChildrenChecked(nodes);
 
     // update child node indices
@@ -2543,11 +2548,6 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     this.deselectNodes(deletedNodes, {collectChildren: true});
     if (deletedNodes.includes(this.focusedNode)) {
       this.setFocusedNode(null);
-    }
-
-    // remove node from html document
-    if (this.rendered) {
-      this._removeNodes(deletedNodes, parentNode || parentNodesToReindex);
     }
 
     arrays.ensure(parentNode || parentNodesToReindex).forEach(p => {
@@ -2584,15 +2584,16 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       this.nodes = [];
     }
     Tree.visitNodes(node => this._destroyTreeNode(node), nodes);
+
+    // remove nodes from html document
+    if (this.rendered) {
+      this._removeNodes(nodes, parentNode);
+    }
+
     this._updateChildrenChecked(nodes);
     this.deselectNodes(nodes, {collectChildren: true});
     if (!parentNode || parentNode.isAncestorOf(this.focusedNode)) {
       this.setFocusedNode(null);
-    }
-
-    // remove node from html document
-    if (this.rendered) {
-      this._removeNodes(nodes, parentNode);
     }
 
     if (parentNode?.expandedLazy) {
