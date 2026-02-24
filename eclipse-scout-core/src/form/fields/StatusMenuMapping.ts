@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,6 +9,14 @@
  */
 import {Menu, ObjectOrChildModel, SomeRequired, StatusMenuMappingModel, StatusSeverity, Widget} from '../../index';
 
+/**
+ * Defines which menu should be visible when the error status of a field is shown.
+ *
+ * In order to display the menu only when a certain status code or severity is active, use {@link StatusMenuMappingModel.codes} or
+ * {@link StatusMenuMappingModel.severities} to define the restriction.
+ *
+ * The menu has to be a menu of the form field, otherwise it won't be displayed.
+ */
 export class StatusMenuMapping extends Widget implements StatusMenuMappingModel {
   declare model: StatusMenuMappingModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'menu'>;
