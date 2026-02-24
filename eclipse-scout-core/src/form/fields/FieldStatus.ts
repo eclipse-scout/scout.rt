@@ -224,7 +224,6 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     let event = this.trigger('hideTooltip');
     if (!event.defaultPrevented) {
       this.tooltip.destroy();
-      this._removeParentListeners();
       if (immediately) {
         this.tooltip.removeImmediately();
       }
@@ -264,7 +263,6 @@ export class FieldStatus extends Widget implements FieldStatusModel {
       return;
     }
 
-    this._updateParentListeners();
     this.hideContextMenu(true);
     if (this.tooltip && this.tooltip.autoRemove !== this.autoRemove) {
       // Close tooltip if the autoRemove property changes, the other properties can be updated even if the tooltip is open.
@@ -290,8 +288,10 @@ export class FieldStatus extends Widget implements FieldStatusModel {
       this.$container.addClass('selected');
       aria.expanded(this.$container, true);
       aria.linkElementWithControls(this.$container, this.tooltip.$container);
+      this._updateParentListeners();
       this.tooltip.one('destroy', () => {
         this.tooltip = null;
+        this._removeParentListeners();
         if (this.$container) {
           this.$container.removeClass('selected');
           aria.expanded(this.$container, false);
