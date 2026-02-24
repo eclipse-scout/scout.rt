@@ -173,6 +173,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   protected _mouseDownColumn: Column<any>;
   protected _initialUiPreferences: TableClientUiPreferenceProfileDo;
   protected _rowsDraggableComputed: boolean;
+  protected _restoreScrollTopDeferred: JQueryDeferred<any>;
 
   constructor() {
     super();
@@ -266,6 +267,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._rerenderViewPortAfterAttach = false;
     this._renderViewPortAfterAttach = false;
     this._postAttachActions = [];
+    this._restoreScrollTopDeferred = null;
     this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
     this._menuInheritAccessibilityChangeHandler = this._updateMenusEnabled.bind(this);
     this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus', 'tileTableHeader', 'tableTileGridMediator', 'defaultRowAction']);
@@ -3299,23 +3301,49 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    */
   replaceRows(rows: ObjectOrModel<TableRow> | ObjectOrModel<TableRow>[]) {
     const selectedKeys = this.getSelectedKeys();
-    const scrollTop = this.scrollTop;
+    this._storeScrollTop();
     this.deleteAllRows();
     this.insertRows(rows);
     this.restoreSelection(selectedKeys);
-    this._restoreScrollTop(scrollTop);
+    this._restoreScrollTop();
   }
 
-  protected _restoreScrollTop(scrollTop: number) {
+  /**
+   * Stores the current scroll position and creates a deferred to restore the scroll position later by using {@link _restoreScrollTop}.
+   */
+  protected _storeScrollTop() {
+    let scrollTop = this.scrollTop;
+    let deferred = $.Deferred();
+    deferred.promise().then(() => {
+      // Cannot use setScrollTop because this.scrollTop may still have the old value so that _renderScrollTop would not been called
+      // This is because _onScroll is called asynchronously
+      this._setScrollTop(scrollTop);
+      if (this.rendered) {
+        this._renderScrollTop();
+      }
+    });
+    this._abortRestoreScrollTop();
+    this._restoreScrollTopDeferred = deferred;
+  }
+
+  /**
+   * Restores the previous scroll position, which was stored by {@link _storeScrollTop}.
+   */
+  protected _restoreScrollTop() {
     if (this.updateBuffer.isBuffering()) {
-      this.updateBuffer.one('complete', () => this._restoreScrollTop(scrollTop));
-      return;
+      this.updateBuffer.one('complete', () => this._restoreScrollTopDeferred?.resolve());
+    } else {
+      this._restoreScrollTopDeferred?.resolve();
     }
-    // Cannot use setScrollTop because this.scrollTop may still have the old value so that _renderScrollTop would not been called
-    // This is because _onScroll is called asynchronously
-    this._setScrollTop(scrollTop);
-    if (this.rendered) {
-      this._renderScrollTop();
+  }
+
+  /**
+   * Aborts the restoration of the scroll position.
+   */
+  protected _abortRestoreScrollTop() {
+    if (this._restoreScrollTopDeferred) {
+      this._restoreScrollTopDeferred.reject();
+      this._restoreScrollTopDeferred = null;
     }
   }
 
@@ -3862,6 +3890,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     }
 
     if (this.selectedRows.length > 0) {
+      this._abortRestoreScrollTop();
       this.scrollTo(this.selectedRows[0]);
     }
   }
