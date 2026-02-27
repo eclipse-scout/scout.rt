@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

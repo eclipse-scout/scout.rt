@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.jmx.MBeanUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 
 @ApplicationScoped

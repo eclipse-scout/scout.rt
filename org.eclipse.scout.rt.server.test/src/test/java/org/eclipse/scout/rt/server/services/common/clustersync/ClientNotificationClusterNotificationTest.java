@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Replace;
-import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationClusterNotification;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
@@ -36,7 +35,6 @@ import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -44,7 +42,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(ServerTestRunner.class)
-@RunWithServerSession(TestServerSession.class)
 @RunWithSubject("default")
 public class ClientNotificationClusterNotificationTest {
   private static final NodeId TEST_NODE = NodeId.of("node");

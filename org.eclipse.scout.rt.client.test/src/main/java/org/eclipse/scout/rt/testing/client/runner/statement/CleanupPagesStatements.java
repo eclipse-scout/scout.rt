@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.junit.runners.model.Statement;
 

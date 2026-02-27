@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
-import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
+import org.eclipse.scout.rt.shared.session.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiModelJobsAwaitTimeoutProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

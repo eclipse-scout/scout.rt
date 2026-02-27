@@ -70,9 +70,9 @@ import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
-import org.eclipse.scout.rt.shared.job.filter.event.SessionJobEventFilter;
+import org.eclipse.scout.rt.shared.session.job.filter.event.SessionJobEventFilter;
+import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.session.SessionMetricsHelper;
-import org.eclipse.scout.rt.shared.session.Sessions;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UiSystem;
@@ -301,7 +301,7 @@ public class UiSession implements IUiSession {
   }
 
   protected String createUiSessionId(JsonStartupRequest jsonStartupReq) {
-    return jsonStartupReq.getPartId() + ':' + Sessions.randomSessionId();
+    return jsonStartupReq.getPartId() + ':' + SessionId.randomSessionId();
   }
 
   protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest req, JsonStartupRequest jsonStartupReq) {

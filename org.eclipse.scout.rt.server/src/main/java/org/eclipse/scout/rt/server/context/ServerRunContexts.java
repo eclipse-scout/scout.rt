@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
  * ServerRunContexts.copyCurrent()
  *   .withLocale(Locale.US)
  *   .withSubject(...)
- *   .withSession(...)
  *   .withTransactionScope(TransactionScope.REQUIRES_NEW)
  *   .run(new IRunnable() {
  *

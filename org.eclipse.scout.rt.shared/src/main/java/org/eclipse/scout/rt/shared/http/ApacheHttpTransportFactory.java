@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.DefaultClientConnectionReuseStrategy;
 import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -182,11 +183,11 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
   }
 
   /**
-   * Install {@link ApacheMultiSessionCookieStore} to store cookies by session.
+   * Install {@link CookieStore} implementation capable to store cookies by session.
    */
   protected void installMultiSessionCookieStore(HttpClientBuilder builder) {
     // see very similar code in org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager.installMultiSessionCookieStore(HttpAsyncClientBuilder), unfortunately there is no common interface
-    builder.setDefaultCookieStore(BEANS.get(ApacheMultiSessionCookieStore.class));
+    builder.setDefaultCookieStore(BEANS.get(IMultiSessionCookieStoreProvider.class).provideDynamic());
   }
 
   /**

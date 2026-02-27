@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
-import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
+import org.eclipse.scout.rt.shared.session.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

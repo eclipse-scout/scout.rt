@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.context.RunWithRunContext;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -44,6 +43,7 @@ import org.eclipse.scout.rt.server.jaxws.consumer.IPortProvider.IPortInitializer
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.BasicAuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.WsseUsernameTokenAuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.consumer.pool.PooledPortProvider;
+import org.eclipse.scout.rt.server.jaxws.context.RunWithRunContext;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

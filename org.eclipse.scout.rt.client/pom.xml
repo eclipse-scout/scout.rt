@@ -36,6 +36,11 @@
 
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.shared.session</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.rest</artifactId>
     </dependency>
   </dependencies>

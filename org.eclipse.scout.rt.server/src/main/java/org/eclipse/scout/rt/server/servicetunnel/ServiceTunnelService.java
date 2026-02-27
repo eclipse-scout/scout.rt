@@ -31,17 +31,14 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.rest.id.IdSignatureClientRequestFilter;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
-import org.eclipse.scout.rt.server.context.HttpServerRunContextProducer;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelOptions;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
-import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +51,6 @@ public class ServiceTunnelService {
   private static final Logger LOG = LoggerFactory.getLogger(ServiceTunnelService.class);
 
   protected transient BinaryServiceTunnelContentHandler m_contentHandler;
-  protected transient LazyValue<HttpServerRunContextProducer> m_serverRunContextProducer = new LazyValue<>(HttpServerRunContextProducer.class);
   protected transient LazyValue<HttpCacheControl> m_httpCacheControl = new LazyValue<>(HttpCacheControl.class);
   protected transient LazyValue<ServiceOperationInvoker> m_svcInvoker = new LazyValue<>(ServiceOperationInvoker.class);
 
@@ -131,21 +127,11 @@ public class ServiceTunnelService {
   }
 
   protected ServerRunContext createServiceTunnelRunContext(ServiceTunnelRequest serviceRequest) {
-    final HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-    String clientSessionId = req.getHeader(SessionId.HTTP_HEADER_NAME);
-
     // overwrite default settings from HTTP request with values from ServiceTunnelRequest
-    final ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
+    return ServerRunContexts.copyCurrent()
         .withLocale(serviceRequest.getLocale())
         .withUserAgent(UserAgents.createByIdentifier(serviceRequest.getUserAgent()))
-        .withClientNodeId(serviceRequest.getClientNodeId())
-        .withThreadLocal(SessionId.CURRENT, clientSessionId);
-
-    if (clientSessionId != null) {
-      final IServerSession session = m_serverRunContextProducer.get().getOrCreateScoutSession(req, serverRunContext, clientSessionId);
-      serverRunContext.withSession(session);
-    }
-    return serverRunContext;
+        .withClientNodeId(serviceRequest.getClientNodeId());
   }
 
   // === MESSAGE UNMARSHALLING / MARSHALLING ===

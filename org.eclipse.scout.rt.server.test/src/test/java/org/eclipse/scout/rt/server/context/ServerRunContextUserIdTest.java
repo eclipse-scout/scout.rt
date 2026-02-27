@@ -11,17 +11,14 @@ package org.eclipse.scout.rt.server.context;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertEquals;
 
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.shared.user.UserId;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(ServerTestRunner.class)
 @RunWithSubject("john")
-@RunWithServerSession(IServerSession.class)
 public class ServerRunContextUserIdTest {
 
   @Test

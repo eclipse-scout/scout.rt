@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.testing.server.runner.parameterized;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.IPlatform;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedFrameworkMethod;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedTestRunnerExtension;
@@ -26,8 +25,7 @@ import org.junit.runners.model.Statement;
 
 /**
  * Parameterized form of {@link ServerTestRunner}. <br/>
- * <b>Note:</b> The shared {@link IPlatform} is available while invoking the {@link Parameters}-annotated method, but it
- * is no invoked within an {@link IServerSession} context.<br/>
+ * <b>Note:</b> The shared {@link IPlatform} is available while invoking the {@link Parameters}-annotated method.<br/>
  * <b>Example:</b>
  *
  * <pre>
@@ -74,7 +72,7 @@ import org.junit.runners.model.Statement;
  * }
  * </pre>
  *
- * @see ParameterizedClientTestRunner
+ * @see org.eclipse.scout.rt.testing.client.runner.parameterized.ParameterizedClientTestRunner
  * @see Parameterized
  * @see Parameters
  */

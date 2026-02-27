@@ -31,18 +31,14 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.jaxws.JaxWsTestServerSession;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
-import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.user.UserId;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
-import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -51,7 +47,6 @@ import org.junit.runner.RunWith;
 import org.mockito.stubbing.Answer;
 
 @RunWith(ServerTestRunner.class)
-@RunWithServerSession(JaxWsTestServerSession.class)
 @RunWithSubject("jaxws-user")
 public class InvocationContextTest {
 
@@ -85,7 +80,7 @@ public class InvocationContextTest {
   public void testWithSuccess() {
     final Holder<ITransaction> currentTransaction = new Holder<>();
     final Holder<ITransaction> invocationTransaction = new Holder<>();
-    final Holder<IServerSession> invocationServerSession = new Holder<>();
+    final Holder<String> invocationUserId = new Holder<>();
 
     ServerRunContexts.copyCurrent()
         .withCorrelationId(TESTING_CORRELATION_ID)
@@ -99,7 +94,7 @@ public class InvocationContextTest {
           invocationContext.whenRollback(m_rollbackListener);
           invocationContext.whenInvoke((proxy, method, args) -> {
             invocationTransaction.setValue(ITransaction.CURRENT.get());
-            invocationServerSession.setValue(ServerSessionProvider.currentSession());
+            invocationUserId.setValue(UserId.CURRENT.get());
 
             return method.invoke(proxy, args);
           });
@@ -109,7 +104,7 @@ public class InvocationContextTest {
         });
 
     assertSame(currentTransaction.getValue(), invocationTransaction.getValue());
-    assertSame(ISession.CURRENT.get(), invocationServerSession.getValue());
+    assertSame(UserId.CURRENT.get(), invocationUserId.getValue());
     assertEquals(TESTING_CORRELATION_ID, m_port.getRequestContext().get(MessageContexts.PROP_CORRELATION_ID));
 
     verify(m_port).webMethod();
@@ -125,7 +120,7 @@ public class InvocationContextTest {
 
     final Holder<ITransaction> currentTransaction = new Holder<>();
     final Holder<ITransaction> invocationTransaction = new Holder<>();
-    final Holder<IServerSession> invocationServerSession = new Holder<>();
+    final Holder<String> invocationUserId = new Holder<>();
     final Holder<Exception> callableException = new Holder<>();
     // simulate that 'webMethod' throws an exception.
     final RuntimeException exception = new RuntimeException();
@@ -145,7 +140,7 @@ public class InvocationContextTest {
             invocationContext.whenRollback(m_rollbackListener);
             invocationContext.whenInvoke((proxy, method, args) -> {
               invocationTransaction.setValue(ITransaction.CURRENT.get());
-              invocationServerSession.setValue(ServerSessionProvider.currentSession());
+              invocationUserId.setValue(UserId.CURRENT.get());
 
               return method.invoke(proxy, args);
             });
@@ -167,7 +162,7 @@ public class InvocationContextTest {
     }
 
     assertSame(currentTransaction.getValue(), invocationTransaction.getValue());
-    assertSame(ISession.CURRENT.get(), invocationServerSession.getValue());
+    assertSame(UserId.CURRENT.get(), invocationUserId.getValue());
     assertEquals(TESTING_CORRELATION_ID, m_port.getRequestContext().get(MessageContexts.PROP_CORRELATION_ID));
 
     verify(m_port).webMethod();

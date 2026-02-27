@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.IDispatchingNotificationHandler;
 import org.eclipse.scout.rt.shared.notification.INotificationListener;

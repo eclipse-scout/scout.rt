@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.session.Sessions;
 
 /**
@@ -56,7 +57,7 @@ public class ClientSessionProvider {
    *     if session creation failed.
    */
   public <SESSION extends IClientSession> SESSION provide(final String sessionId, final ClientRunContext clientRunContext) {
-    final String sid = sessionId != null ? sessionId : Sessions.randomSessionId();
+    final String sid = sessionId != null ? sessionId : SessionId.randomSessionId();
 
     // Create the session with the given context applied.
     return clientRunContext.call(() -> {

@@ -37,13 +37,17 @@
     <module>../org.eclipse.scout.rt.platform.test</module>
     <module>../org.eclipse.scout.rt.shared</module>
     <module>../org.eclipse.scout.rt.shared.test</module>
+    <module>../org.eclipse.scout.rt.shared.session</module>
+    <module>../org.eclipse.scout.rt.shared.session.test</module>
     <module>../org.eclipse.scout.rt.server.commons</module>
     <module>../org.eclipse.scout.rt.server.commons.test</module>
     <module>../org.eclipse.scout.rt.nls</module>
 
     <module>../org.eclipse.scout.rt.server</module>
+    <module>../org.eclipse.scout.rt.server.session</module>
     <module>../org.eclipse.scout.rt.server.app</module>
     <module>../org.eclipse.scout.rt.server.test</module>
+    <module>../org.eclipse.scout.rt.server.session.test</module>
     <module>../org.eclipse.scout.rt.server.jaxws</module>
     <module>../org.eclipse.scout.rt.server.jaxws.test</module>
     <module>../org.eclipse.scout.rt.server.jdbc</module>
@@ -415,6 +419,17 @@
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.shared.session</artifactId>
+        <version>26.2-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.shared.session.test</artifactId>
+        <version>26.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.nls</artifactId>
         <version>26.2-SNAPSHOT</version>
       </dependency>
@@ -432,12 +447,22 @@
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.server.session</artifactId>
+        <version>26.2-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.app</artifactId>
         <version>26.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.test</artifactId>
+        <version>26.2-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.server.session.test</artifactId>
         <version>26.2-SNAPSHOT</version>
       </dependency>
 

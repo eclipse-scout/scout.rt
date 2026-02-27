@@ -18,19 +18,19 @@ import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
-import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.session.IServerSession;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.server.session.context.ServerSessionRunContext;
+import org.eclipse.scout.rt.server.session.context.ServerSessionRunContexts;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
+import org.eclipse.scout.rt.shared.session.ISession;
 
 /**
  * Bean decorator that executes bean method invocations in a server run context.<br>
  * The decision if a bean already runs on the server is done using context identifiers.
  *
- * @see RunContextIdentifiers
  * @see ServerRunContext
  * @see BridgeToServerBeanDecorationFactory
  * @since 5.2
@@ -67,7 +67,7 @@ public class BridgeToServerBeanDecorator<T> implements IBeanDecorator<T> {
 
     // bridge to server scope
     ClientNotificationCollector collector = new ClientNotificationCollector();
-    ServerRunContext bridgeRunContext = ServerRunContexts
+    ServerSessionRunContext bridgeRunContext = ServerSessionRunContexts
         .copyCurrent()
         .withClientNotificationCollector(collector)
         .withClientNodeId(NodeId.current());

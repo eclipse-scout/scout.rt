@@ -19,7 +19,6 @@ import java.util.Set;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.runner.ServerTestRunnerSameSessionTest.JUnitServerSession;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -33,7 +32,6 @@ import org.junit.runner.RunWith;
  * @since 5.1
  */
 @RunWith(ServerTestRunner.class)
-@RunWithServerSession(JUnitServerSession.class)
 @RunWithSubject("anna")
 public class ServerTestRunnerTimeoutTransactionTest {
 
@@ -60,11 +58,7 @@ public class ServerTestRunnerTimeoutTransactionTest {
 
   protected void updateProtocol() {
     String testName = m_name.getMethodName();
-    Set<ITransaction> p = s_protocolByTestMethod.get(testName);
-    if (p == null) {
-      p = new HashSet<>(3);
-      s_protocolByTestMethod.put(testName, p);
-    }
+    Set<ITransaction> p = s_protocolByTestMethod.computeIfAbsent(testName, k -> new HashSet<>(3));
     p.add(ITransaction.CURRENT.get());
   }
 

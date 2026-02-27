@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.platform.opentelemetry.OpenTelemetryContextProcessor
 import org.eclipse.scout.rt.platform.security.SubjectProcessor;
 import org.eclipse.scout.rt.platform.transaction.TransactionProcessor;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.opentelemetry.OpenTelemetrySpanAttributeProcessor;
 import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.ui.UserAgent;

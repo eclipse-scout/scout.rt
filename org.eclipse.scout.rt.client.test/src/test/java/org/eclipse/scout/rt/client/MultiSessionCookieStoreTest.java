@@ -19,14 +19,14 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.servicetunnel.http.MultiSessionCookieStore;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.session.ISession;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Test class for {@link MultiClientSessionCookieStore}
+ * Test class for {@link MultiSessionCookieStore}
  */
 public class MultiSessionCookieStoreTest {
 
@@ -190,9 +190,6 @@ public class MultiSessionCookieStoreTest {
 
   /**
    * Checks if the expected cookie collection is a subset of the actual cookie collection.
-   *
-   * @param expectedCookies
-   * @param actualCookies
    */
   private void assertContainsCookies(List<HttpCookie> expectedCookies, List<HttpCookie> actualCookies) {
     for (HttpCookie cookie : expectedCookies) {
@@ -210,9 +207,6 @@ public class MultiSessionCookieStoreTest {
 
   /**
    * Checks for equality of the cookie (including its value).
-   *
-   * @param expected
-   * @param actual
    */
   private void assertCookieEquals(HttpCookie expected, HttpCookie actual) {
     assertEquals(expected, actual);

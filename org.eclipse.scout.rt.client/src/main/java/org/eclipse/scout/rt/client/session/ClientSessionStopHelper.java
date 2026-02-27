@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
-import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
+import org.eclipse.scout.rt.shared.session.job.filter.future.SessionFutureFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,11 +91,11 @@ public class ClientSessionStopHelper {
   }
 
   /**
-   * Schedule a repeated timer that watches until {@link #cancelRunningJobsExceptCurrentJob(IClientSession)} and then
+   * Schedule a repeated timer that watches until {@link #runJobTermination(IClientSession)} and then
    * checks if there are still running jobs and cancels them.
    *
    * @return the watcher job
-   * @see {@link JobCompletionDelayOnSessionShutdown}
+   * @see JobCompletionDelayOnSessionShutdown
    */
   public IFuture<?> scheduleJobTerminationLoop(final IClientSession session) {
     return Jobs.schedule(() -> {
@@ -109,7 +109,7 @@ public class ClientSessionStopHelper {
   }
 
   /**
-   * @see #scheduleJobTerminationWatcher(IClientSession), {@link JobCompletionDelayOnSessionShutdown}
+   * @see #awaitJobs(IClientSession, IFuture), {@link JobCompletionDelayOnSessionShutdown}
    */
   public void runJobTermination(IClientSession session) {
     IFuture<?> myself = IFuture.CURRENT.get();

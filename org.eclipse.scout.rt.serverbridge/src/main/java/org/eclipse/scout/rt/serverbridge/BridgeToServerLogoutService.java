@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.serverbridge;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.security.IAccessControlService;
-import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.session.IServerSession;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.slf4j.Logger;

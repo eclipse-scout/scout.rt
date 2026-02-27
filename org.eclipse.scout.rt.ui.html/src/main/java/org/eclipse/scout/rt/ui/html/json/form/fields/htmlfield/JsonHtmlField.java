@@ -34,7 +34,7 @@ public class JsonHtmlField<HTML_FIELD extends IHtmlField> extends JsonValueField
 
   public JsonHtmlField(HTML_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
-    m_sessionNonce = BEANS.get(SessionNonce.class).provide(uiSession.getClientSession());
+    m_sessionNonce = BEANS.get(SessionNonce.class).provide(uiSession.getClientSession().getId());
   }
 
   @Override

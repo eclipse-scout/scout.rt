@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
-import org.eclipse.scout.rt.shared.http.ApacheMultiSessionCookieStore;
 import org.eclipse.scout.rt.shared.http.HttpClientMetricsHelper;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportConnectionTimeToLiveProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportEvictExpiredConnectionsProperty;
@@ -39,6 +38,7 @@ import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTr
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsTotalProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRetryOnNoHttpResponseExceptionProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty;
+import org.eclipse.scout.rt.shared.http.IMultiSessionCookieStoreProvider;
 import org.eclipse.scout.rt.shared.http.proxy.ConfigurableProxySelector;
 import org.eclipse.scout.rt.shared.http.retry.CustomHttpRequestRetryStrategy;
 import org.slf4j.Logger;
@@ -59,7 +59,7 @@ import io.opentelemetry.api.metrics.Meter;
  * @see ApacheHttpTransportMaxConnectionsTotalProperty
  * @see ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty
  * @see ApacheHttpTransportRetryOnNoHttpResponseExceptionProperty
- * @see ApacheMultiSessionCookieStore
+ * @see IMultiSessionCookieStoreProvider
  * @see ConfigurableProxySelector
  */
 public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManager<HttpAsyncClientBuilder> {

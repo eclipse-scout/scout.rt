@@ -18,9 +18,9 @@ import java.lang.annotation.Target;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.context.RunContextProducer;
-import org.eclipse.scout.rt.platform.context.RunWithRunContext;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsHandlerSubjectProperty;
+import org.eclipse.scout.rt.server.jaxws.context.RunContextProducer;
+import org.eclipse.scout.rt.server.jaxws.context.RunWithRunContext;
 
 /**
  * Describes a JAX-WS handler to intercept webservice requests.

@@ -12,11 +12,6 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 public interface ServiceTunnelConstants {
 
   /**
-   * Marker header for session-less requests.
-   */
-  String WITHOUT_SESSION_HEADER = "X-WithoutSession";
-
-  /**
    * Path used for service tunnel
    */
   String PROCESS_PATH = "process";

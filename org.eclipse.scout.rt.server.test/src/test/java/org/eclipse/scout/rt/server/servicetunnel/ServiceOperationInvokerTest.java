@@ -17,7 +17,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
@@ -40,35 +39,19 @@ public class ServiceOperationInvokerTest {
   @BeanMock
   private IPingService m_pingSvc;
 
-  private String m_testData = "hello";
-
   @Test
-  public void testInvokeWithSession() {
-    when(m_pingSvc.ping(any(String.class))).thenReturn(m_testData);
-    ServiceTunnelResponse res = invokePingService(createRunContextWithSession());
-    assertValidResponse(res, m_testData);
+  public void testInvoke() {
+    String testData = "hello";
+    when(m_pingSvc.ping(any(String.class))).thenReturn(testData);
+    ServiceTunnelResponse res = invokePingService(createRunContext());
+    assertValidResponse(res, testData);
   }
 
   @Test(expected = ProcessingException.class) //exception is handled with JUnitExceptionHandler
-  public void testInvokeInvalidWithSession() {
+  public void testInvokeInvalid() {
     String exceptionMessage = "xxx";
     when(m_pingSvc.ping(any(String.class))).thenThrow(new ProcessingException(exceptionMessage));
-    ServiceTunnelResponse res = invokePingService(createRunContextWithSession());
-    assertProcessingException(res, exceptionMessage);
-  }
-
-  @Test
-  public void testInvokeWithoutSession() {
-    when(m_pingSvc.ping(any(String.class))).thenReturn(m_testData);
-    ServiceTunnelResponse res = invokePingService(ServerRunContexts.empty());
-    assertValidResponse(res, m_testData);
-  }
-
-  @Test(expected = ProcessingException.class) //exception is handled with JUnitExceptionHandler
-  public void testInvokeInvalidWithoutSession() {
-    String exceptionMessage = "xxx";
-    when(m_pingSvc.ping(any(String.class))).thenThrow(new ProcessingException(exceptionMessage));
-    ServiceTunnelResponse res = invokePingService(ServerRunContexts.empty());
+    ServiceTunnelResponse res = invokePingService(createRunContext());
     assertProcessingException(res, exceptionMessage);
   }
 
@@ -83,10 +66,8 @@ public class ServiceOperationInvokerTest {
     assertNotNull(res.getProcessingDuration());
   }
 
-  private ServerRunContext createRunContextWithSession() {
-    return ServerRunContexts
-        .empty()
-        .withSession(new TestServerSession());
+  private ServerRunContext createRunContext() {
+    return ServerRunContexts.empty();
   }
 
   private ServiceTunnelResponse invokePingService(final ServerRunContext runcontext) {
