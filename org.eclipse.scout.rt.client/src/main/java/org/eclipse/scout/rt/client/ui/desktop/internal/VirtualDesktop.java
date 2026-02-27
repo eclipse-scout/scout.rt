@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -258,16 +258,6 @@ public class VirtualDesktop implements IDesktop {
   /*
    * Not implemented methods (forward to real desktop if available)
    */
-
-  @Override
-  public boolean isAutoPrefixWildcardForTextSearch() {
-    return getFromRealDesktopOrThrow(d -> d.isAutoPrefixWildcardForTextSearch());
-  }
-
-  @Override
-  public void setAutoPrefixWildcardForTextSearch(boolean b) {
-    forwardToRealDesktopOrThrow(d -> d.setAutoPrefixWildcardForTextSearch(b));
-  }
 
   @Override
   public boolean isSelectViewTabsKeyStrokesEnabled() {
