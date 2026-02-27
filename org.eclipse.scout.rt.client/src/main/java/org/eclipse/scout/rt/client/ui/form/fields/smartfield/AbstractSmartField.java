@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,9 +39,7 @@ import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningServic
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallResult;
 import org.eclipse.scout.rt.client.services.lookup.IQueryParam;
 import org.eclipse.scout.rt.client.services.lookup.QueryParam;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
@@ -728,19 +726,11 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   @Override
   public void prepareTextLookup(ILookupCall<VALUE> call, String text) {
-    String textPattern = text;
-    if (textPattern == null) {
-      textPattern = "";
-    }
-    textPattern = textPattern.toLowerCase();
-    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-    if (desktop != null && desktop.isAutoPrefixWildcardForTextSearch()) {
-      textPattern = getWildcard() + textPattern;
-    }
+    String textPattern = text == null ? "" : text.toLowerCase();
     if (!textPattern.endsWith(getWildcard())) {
       textPattern = textPattern + getWildcard();
     }
-    //localLookupCalls should return hierarchical matches as well (children of exact matches), if field is configured accordingly
+    // localLookupCalls should return hierarchical matches as well (children of exact matches), if field is configured accordingly
     if (call instanceof LocalLookupCall) {
       ((LocalLookupCall) call).setHierarchicalLookup(isBrowseHierarchy());
     }
@@ -750,7 +740,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     call.setAll(null);
     call.setRec(null);
     call.setActive(isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE);
-    //when there is a master value defined in the original call, don't set it to null when no master value is available
+    // when there is a master value defined in the original call, don't set it to null when no master value is available
     if (getMasterValue() != null || getLookupCall() == null || getLookupCall().getMaster() == null) {
       call.setMaster(getMasterValue());
     }
@@ -779,7 +769,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     call.setText(null);
     call.setAll(null);
     call.setRec(parentKey);
-    //when there is a master value defined in the original call, don't set it to null when no master value is available
+    // when there is a master value defined in the original call, don't set it to null when no master value is available
     if (getMasterValue() != null || getLookupCall() == null || getLookupCall().getMaster() == null) {
       call.setMaster(getMasterValue());
     }
@@ -1179,7 +1169,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
       try {
         List<? extends ILookupRow<VALUE>> lookupRows = callKeyLookup(validKey);
         if (!lookupRows.isEmpty()) {
-          currentLookupRow = lookupRows.get(0);
+          currentLookupRow = lookupRows.getFirst();
           setLookupRow(currentLookupRow);
         }
       }

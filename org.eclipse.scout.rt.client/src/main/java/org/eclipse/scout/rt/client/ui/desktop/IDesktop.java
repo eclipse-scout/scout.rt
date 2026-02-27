@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -610,13 +610,6 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    *     {@link #isSelectViewTabsKeyStrokesEnabled()} is <code>true</code>).
    */
   void setSelectViewTabsKeyStrokeModifier(String selectViewTabsKeyStrokeModifier);
-
-  /**
-   * @return true: automatically prefix a * on any text field's search value
-   */
-  boolean isAutoPrefixWildcardForTextSearch();
-
-  void setAutoPrefixWildcardForTextSearch(boolean b);
 
   boolean isCacheSplitterPosition();
 

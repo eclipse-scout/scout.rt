@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -165,7 +165,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   private final Set<IDesktopNotification> m_notifications = new LinkedHashSet<>(); // LinkedHashSet to preserve insertion order
   private List<IMenu> m_menus;
   private List<IViewButton> m_viewButtons;
-  private boolean m_autoPrefixWildcardForTextSearch;
   private boolean m_isForcedClosing = false;
   private final List<Object> m_addOns;
   private IContributionOwner m_contributionHolder;
@@ -1716,16 +1715,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     Assertions.assertNotNull(res);
     Assertions.assertNotNull(openUriAction);
     fireOpenUri(res, openUriAction);
-  }
-
-  @Override
-  public boolean isAutoPrefixWildcardForTextSearch() {
-    return m_autoPrefixWildcardForTextSearch;
-  }
-
-  @Override
-  public void setAutoPrefixWildcardForTextSearch(boolean b) {
-    m_autoPrefixWildcardForTextSearch = b;
   }
 
   @Override
