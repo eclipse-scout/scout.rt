@@ -11,7 +11,7 @@ import org.eclipse.scout.rt.jetty.IServletFilterContributor;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.rest.RestApplication;
 import org.eclipse.scout.rt.rest.ServletConstants;
-import org.eclipse.scout.rt.server.context.HttpServerRunContextFilter;
+import org.eclipse.scout.rt.server.context.ServerHttpRunContextFilter;
 import org.eclipse.scout.rt.ui.html.app.UiServletContributors.UiServletContributor;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -46,8 +46,7 @@ public final class AppServletContributors {
 
     @Override
     public void contribute(ServletContextHandler handler) {
-      FilterHolder filter = handler.addFilter(HttpServerRunContextFilter.class, ServletConstants.API_PATH_WITH_WILDCARD, null);
-      filter.setInitParameter("session", "false");
+      handler.addFilter(ServerHttpRunContextFilter.class, ServletConstants.API_PATH_WITH_WILDCARD, null);
     }
   }
 

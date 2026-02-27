@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.session.ISession;
 
 /**
  * Registry to keep track of {@link IClientSession}s and its users in order to dispatch client notifications.

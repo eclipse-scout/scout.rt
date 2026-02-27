@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.platform.html.IHtmlElement;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.session.Sessions;
+import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.ui.webresource.ScriptResourceIndexes;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResources;
@@ -95,7 +95,7 @@ public class HtmlDocumentParser {
   }
 
   protected String newNonce() {
-    return Sessions.randomSessionId();
+    return SessionId.randomSessionId();
   }
 
   protected void replaceBodyTag() {

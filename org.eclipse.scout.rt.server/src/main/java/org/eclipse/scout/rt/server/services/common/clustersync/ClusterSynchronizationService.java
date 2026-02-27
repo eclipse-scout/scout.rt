@@ -43,7 +43,6 @@ import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.mom.IClusterMomDestinations;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
-import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
 import org.eclipse.scout.rt.shared.user.UserId;
 import org.slf4j.Logger;
@@ -220,21 +219,19 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   }
 
   protected ServerRunContext createRunContext() {
-    ServerRunContext serverRunContext = ServerRunContexts.empty()
+    return ServerRunContexts.empty()
         .withSubject(m_subject)
         .withThreadLocal(UserId.CURRENT, m_userId);
-    serverRunContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
-    return serverRunContext;
   }
 
   /**
    * @return transaction member for publishing messages within a transaction
    */
-  protected ClusterSynchTransactionMember getTransaction() {
+  protected ClusterSyncTransactionMember getTransaction() {
     ITransaction tx = Assertions.assertNotNull(ITransaction.CURRENT.get(), "Transaction required");
-    ClusterSynchTransactionMember m = (ClusterSynchTransactionMember) tx.getMember(TRANSACTION_MEMBER_ID);
+    ClusterSyncTransactionMember m = (ClusterSyncTransactionMember) tx.getMember(TRANSACTION_MEMBER_ID);
     if (m == null) {
-      m = new ClusterSynchTransactionMember(TRANSACTION_MEMBER_ID);
+      m = new ClusterSyncTransactionMember(TRANSACTION_MEMBER_ID);
       tx.registerMember(m);
     }
     return m;
@@ -244,10 +241,10 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
    * Transaction member that notifies other cluster nodes after the causing Scout transaction has been committed. This
    * ensures that other cluster nodes are not informed too early.
    */
-  private class ClusterSynchTransactionMember extends AbstractTransactionMember {
+  protected class ClusterSyncTransactionMember extends AbstractTransactionMember {
     private List<IClusterNotificationMessage> m_messageQueue;
 
-    public ClusterSynchTransactionMember(String transactionId) {
+    ClusterSyncTransactionMember(String transactionId) {
       super(transactionId);
       m_messageQueue = new LinkedList<>();
     }

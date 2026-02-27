@@ -19,7 +19,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunnerDifferentSessionTest.JUnitClientSession1;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.AfterClass;
@@ -32,15 +32,15 @@ import org.junit.runner.RunWith;
 @RunWithSubject("anna")
 public class ClientTestRunnerDifferentSessionTest {
 
-  private static Set<ISession> m_clientSessions;
+  private static Set<ISession> s_clientSessions;
 
   @BeforeClass
   public static void beforeClass() {
-    m_clientSessions = new HashSet<>();
+    s_clientSessions = new HashSet<>();
     ISession clientSession = IClientSession.CURRENT.get();
     assertTrue(clientSession instanceof JUnitClientSession1);
     assertEquals("anna", getCurrentUser());
-    m_clientSessions.add(clientSession);
+    s_clientSessions.add(clientSession);
   }
 
   @Test
@@ -48,7 +48,7 @@ public class ClientTestRunnerDifferentSessionTest {
     ISession clientSession = IClientSession.CURRENT.get();
     assertTrue(clientSession instanceof JUnitClientSession1);
     assertEquals("anna", getCurrentUser());
-    m_clientSessions.add(clientSession);
+    s_clientSessions.add(clientSession);
   }
 
   @Test
@@ -56,7 +56,7 @@ public class ClientTestRunnerDifferentSessionTest {
     ISession clientSession = IClientSession.CURRENT.get();
     assertTrue(clientSession instanceof JUnitClientSession1);
     assertEquals("anna", getCurrentUser());
-    m_clientSessions.add(clientSession);
+    s_clientSessions.add(clientSession);
   }
 
   @Test
@@ -65,7 +65,7 @@ public class ClientTestRunnerDifferentSessionTest {
     ISession clientSession = IClientSession.CURRENT.get();
     assertTrue(clientSession instanceof JUnitClientSession2);
     assertEquals("anna", getCurrentUser());
-    m_clientSessions.add(clientSession);
+    s_clientSessions.add(clientSession);
   }
 
   @AfterClass
@@ -73,9 +73,9 @@ public class ClientTestRunnerDifferentSessionTest {
     ISession clientSession = IClientSession.CURRENT.get();
     assertTrue(clientSession instanceof JUnitClientSession1);
     assertEquals("anna", getCurrentUser());
-    m_clientSessions.add(clientSession);
+    s_clientSessions.add(clientSession);
 
-    assertEquals(5, m_clientSessions.size());
+    assertEquals(5, s_clientSessions.size());
   }
 
   public static class JUnitClientSession1 extends AbstractClientSession {

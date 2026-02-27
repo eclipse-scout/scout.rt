@@ -17,8 +17,8 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.http.AbstractMultiSessionCookieStore;
+import org.eclipse.scout.rt.shared.session.ISession;
+import org.eclipse.scout.rt.shared.session.http.AbstractMultiSessionCookieStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

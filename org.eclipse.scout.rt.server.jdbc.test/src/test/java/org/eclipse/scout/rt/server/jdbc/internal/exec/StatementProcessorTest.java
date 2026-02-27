@@ -20,8 +20,6 @@ import org.eclipse.scout.rt.platform.holders.IntegerHolder;
 import org.eclipse.scout.rt.platform.holders.LongHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
-import org.eclipse.scout.rt.server.AbstractServerSession;
-import org.eclipse.scout.rt.server.TestJdbcServerSession;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.IToken;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueInputToken;
@@ -32,7 +30,6 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +38,6 @@ import org.junit.runner.RunWith;
  * Unit Test for {@link StatementProcessor}
  */
 @RunWith(ServerTestRunner.class)
-@RunWithServerSession(TestJdbcServerSession.class)
 @RunWithSubject("default")
 public class StatementProcessorTest {
 
@@ -289,11 +285,13 @@ public class StatementProcessorTest {
     }
   }
 
-  public class Session extends AbstractServerSession {
-    private static final long serialVersionUID = 1L;
+  public class MockBindBase {
 
-    public Session() {
-      super(false);
+    @SuppressWarnings("unused")
+    private volatile boolean m_active;
+
+    public boolean isActive() {
+      return m_active;
     }
   }
 
@@ -303,12 +301,12 @@ public class StatementProcessorTest {
     };
     BeanInstanceUtil.initializeBeanInstance(sqlService);
 
-    // The abstract server session contains active but without a setter and is thus not a valid bind
-    // In this test, the NVPair active should be used and there should be no exception throw
+    // The bind base mock contains 'boolean active' but without a setter and is thus not a valid bind
+    // In this test, the NVPair 'active' should be used and there should be no exception throw
     StatementProcessor sp = new StatementProcessor(
         sqlService,
         "SELECT 1 FROM DUAL INTO :active ",
-        new Object[]{new Session(), new NVPair("active", new IntegerHolder())});
+        new Object[]{new MockBindBase(), new NVPair("active", new IntegerHolder())});
     sp.simulate();
   }
 }

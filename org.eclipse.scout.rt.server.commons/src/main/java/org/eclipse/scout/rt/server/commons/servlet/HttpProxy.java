@@ -22,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +29,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -47,7 +45,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.hc.client5.http.ContextBuilder;
-import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
@@ -72,7 +69,6 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.CorrelationIdContextValueProvider;
-import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -81,10 +77,9 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.HttpProxyConfigProperties.HttpProxyAsyncHttpClientManagerConfigProperty;
 import org.eclipse.scout.rt.server.commons.servlet.HttpProxyConfigProperties.HttpProxyAsyncTimeoutConfigProperty;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.http.IMultiSessionCookieStoreProvider;
 import org.eclipse.scout.rt.shared.http.async.AbstractAsyncHttpClientManager;
 import org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager;
 import org.slf4j.Logger;
@@ -171,13 +166,6 @@ public class HttpProxy {
    */
   protected CookieStore initializeDefaultCookieStore() {
     return m_httpClientManager.getCookieStore();
-  }
-
-  /**
-   * @see SpecificSessionCookieStore
-   */
-  protected CookieStore createSpecificSessionCookieStore(ISession session) {
-    return new SpecificSessionCookieStore(session);
   }
 
   protected ExecutorService createBlockingOperationExecutor() {
@@ -275,15 +263,9 @@ public class HttpProxy {
     ContextBuilder contextBuilder = ContextBuilder.create();
 
     // cookie store
-    ISession currentSession = ISession.CURRENT.get();
     CookieStore defaultCookieStore = getDefaultCookieStore();
     if (defaultCookieStore != null) {
-      if (currentSession != null) {
-        contextBuilder.useCookieStore(createSpecificSessionCookieStore(currentSession));
-      }
-      else {
-        contextBuilder.useCookieStore(defaultCookieStore);
-      }
+      contextBuilder.useCookieStore(BEANS.get(IMultiSessionCookieStoreProvider.class).provideCurrentSession(defaultCookieStore));
     }
 
     // apply additional settings using interceptor
@@ -820,49 +802,6 @@ public class HttpProxy {
       try (MDCCloseable ignored = MDC.putCloseable(CorrelationIdContextValueProvider.KEY, correlationId)) {
         LOG.atLevel(level).log(msg, args);
       }
-    }
-  }
-
-  /**
-   * Cookie store which uses {@link #getDefaultCookieStore()} with all operations run for the specified
-   * {@link ISession}. May be used if async threads access the cookie store where {@link ISession#CURRENT} is not set
-   * correctly.
-   */
-  private class SpecificSessionCookieStore implements CookieStore {
-
-    private ISession m_session;
-
-    public SpecificSessionCookieStore(ISession session) {
-      m_session = session;
-    }
-
-    @Override
-    public void addCookie(Cookie cookie) {
-      runWithSession(() -> getDefaultCookieStore().addCookie(cookie));
-    }
-
-    @Override
-    public List<Cookie> getCookies() {
-      return callWithSession(getDefaultCookieStore()::getCookies);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public boolean clearExpired(Date date) {
-      return callWithSession(() -> getDefaultCookieStore().clearExpired(date));
-    }
-
-    @Override
-    public void clear() {
-      runWithSession(getDefaultCookieStore()::clear);
-    }
-
-    private void runWithSession(IRunnable runnable) {
-      RunContexts.copyCurrent(true).withThreadLocal(ISession.CURRENT, m_session).run(runnable);
-    }
-
-    private <R> R callWithSession(Callable<R> callable) {
-      return RunContexts.copyCurrent(true).withThreadLocal(ISession.CURRENT, m_session).call(callable);
     }
   }
 }

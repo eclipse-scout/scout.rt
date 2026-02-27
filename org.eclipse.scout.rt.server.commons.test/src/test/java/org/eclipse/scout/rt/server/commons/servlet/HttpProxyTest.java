@@ -34,7 +34,6 @@ import jakarta.servlet.AsyncContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.ConnectionClosedException;
 import org.apache.hc.core5.http.ContentType;
@@ -50,7 +49,6 @@ import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
 import org.apache.hc.core5.http.nio.support.classic.AbstractClassicEntityConsumer;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.http.support.BasicRequestBuilder;
-import org.eclipse.jetty.http.HttpCookie;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.server.Connector;
@@ -64,9 +62,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.Callback;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
-import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.platform.util.EnumerationUtility;
@@ -75,21 +71,17 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.BufferedServletOutputStream;
-import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.http.ApacheMultiSessionCookieStore;
 import org.eclipse.scout.rt.shared.http.async.AbstractAsyncHttpClientManager;
 import org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager;
 import org.eclipse.scout.rt.shared.http.async.ForceHttp2DefaultAsyncHttpClientManager;
 import org.eclipse.scout.rt.shared.http.async.H2AsyncHttpClientManager;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
-import org.eclipse.scout.rt.testing.platform.mock.RegisterBeanTestRule;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.NonParameterized;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedPlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -105,11 +97,6 @@ public class HttpProxyTest {
   private Handler.Collection m_handlerCollection;
 
   private HttpProxyTestParameter m_httpProxyTestParameter;
-
-  private static final TestApacheMultiSessionCookieStore COOKIE_STORE = spy(new TestApacheMultiSessionCookieStore());
-
-  @ClassRule // use a fixed cookie store for all tests (with accessible default cookie store)
-  public static final RegisterBeanTestRule<ApacheMultiSessionCookieStore> COOKIE_STORE_REGISTER_BEAN_TEST_RULE = new RegisterBeanTestRule<>(ApacheMultiSessionCookieStore.class, COOKIE_STORE);
 
   @Parameters
   public static List<IScoutTestParameter> getParameters() {
@@ -130,10 +117,6 @@ public class HttpProxyTest {
     if (m_httpProxyTestParameter != null) {
       m_proxy.withHttpClientManager(m_httpProxyTestParameter.getClientManager());
     }
-
-    // we use a static spy mocked bean, therefore reset it for each test
-    reset(COOKIE_STORE);
-    COOKIE_STORE.m_defaultCookieStore.clear();
   }
 
   @Before
@@ -577,44 +560,6 @@ public class HttpProxyTest {
     assertArrayEquals(expectedContent, ((BufferedServletOutputStream) resp.getOutputStream()).getContent());
   }
 
-  @Test
-  public void testProxyRequest_cookiesSessionBasedCookieStore() {
-    RunContexts.copyCurrent(true)
-        .withThreadLocal(ISession.CURRENT, mock(ISession.class))
-        .run(() -> testProxyRequest_cookiesInternal(false));
-  }
-
-  @Test
-  public void testProxyRequest_cookiesDefaultCookieStore() {
-    testProxyRequest_cookiesInternal(true);
-  }
-
-  protected void testProxyRequest_cookiesInternal(boolean expectDefaultCookieStore) {
-    CookieStore defaultCookieStore = COOKIE_STORE.m_defaultCookieStore;
-    int previousDefaultCount = defaultCookieStore.getCookies().size();
-
-    Handler.Abstract handler = new Handler.Abstract() {
-      @Override
-      public boolean handle(Request request, Response response, Callback callback) {
-        Response.addCookie(response, HttpCookie.from("snickers", "bar"));
-        response.write(true, null, callback); // flush buffer
-        return true;
-      }
-    };
-
-    // call the request
-    testProxyRequestInternal(handler, 1, "/");
-
-    // one cookie should have been added, check expectations
-    ArgumentCaptor<org.apache.hc.client5.http.cookie.Cookie> cookieCaptor = ArgumentCaptor.forClass(org.apache.hc.client5.http.cookie.Cookie.class);
-    verify(COOKIE_STORE, times(1)).addCookie(cookieCaptor.capture());
-    assertEquals("snickers", cookieCaptor.getValue().getName());
-    assertEquals("bar", cookieCaptor.getValue().getValue());
-
-    // never-ever add a cookie to the default store (session specific should have been used)
-    assertEquals(previousDefaultCount + (expectDefaultCookieStore ? 1 : 0), defaultCookieStore.getCookies().size());
-  }
-
   @Ignore // do not run this (long) test on CI (at least as long as we do not run tests in parallel), however can be used for testing locally
   @Test
   public void testProxyRequest_longDuration() throws IOException {
@@ -786,22 +731,6 @@ public class HttpProxyTest {
     @Override
     public String getName() {
       return m_clientManagerClazz.getSimpleName();
-    }
-  }
-
-  @IgnoreBean
-  public static class TestApacheMultiSessionCookieStore extends ApacheMultiSessionCookieStore {
-
-    private CookieStore m_defaultCookieStore;
-
-    @Override
-    protected CookieStore createDefaultCookieStore() {
-      m_defaultCookieStore = super.createDefaultCookieStore();
-      return m_defaultCookieStore;
-    }
-
-    public CookieStore getDefaultCookieStore() {
-      return m_defaultCookieStore;
     }
   }
 }

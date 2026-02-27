@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
@@ -27,7 +26,6 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.After;
 import org.junit.Assert;
@@ -39,7 +37,6 @@ import org.junit.runner.RunWith;
  * JUnit test for {@link ICodeService#invalidateCodeType(Class)}
  */
 @RunWith(ServerTestRunner.class)
-@RunWithServerSession(TestServerSession.class)
 @RunWithSubject("john")
 public class CodeServiceInvalidateTest {
 

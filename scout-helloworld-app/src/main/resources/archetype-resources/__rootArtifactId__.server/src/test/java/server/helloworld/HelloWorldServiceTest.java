@@ -5,13 +5,11 @@ package ${package}.server.helloworld;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import ${package}.server.ServerSession;
 import ${package}.shared.helloworld.HelloWorldFormData;
 import ${package}.shared.helloworld.IHelloWorldService;
 
@@ -20,7 +18,6 @@ import ${package}.shared.helloworld.IHelloWorldService;
  */
 @RunWith(ServerTestRunner.class)
 @RunWithSubject(HelloWorldServiceTest.SUBJECT_NAME)
-@RunWithServerSession(ServerSession.class)
 public class HelloWorldServiceTest {
   public static final String SUBJECT_NAME = "test_subject";
 

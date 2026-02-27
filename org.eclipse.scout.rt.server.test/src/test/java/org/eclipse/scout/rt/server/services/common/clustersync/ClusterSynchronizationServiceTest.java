@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.cache.AllCacheEntryFilter;
 import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
-import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.mom.IClusterMomDestinations;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
@@ -39,7 +38,6 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkChangedClien
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -51,7 +49,6 @@ import org.mockito.ArgumentCaptor;
  * Tests for {@link ClusterSynchronizationService} without transactions.
  */
 @RunWith(ServerTestRunner.class)
-@RunWithServerSession(TestServerSession.class)
 @RunWithSubject("default")
 public class ClusterSynchronizationServiceTest {
   private static final NodeId TEST_NODE = NodeId.of("node");

@@ -19,10 +19,9 @@ import java.lang.annotation.Target;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
 import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
-import org.eclipse.scout.rt.server.context.ServerRunContextProducer;
+import org.eclipse.scout.rt.server.jaxws.context.ServerRunContextProducer;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.AuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMethod;
-import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 
 /**
  * Indicates what authentication mechanism to install on a webservice endpoint, and in which {@link RunContext} to run
@@ -73,8 +72,7 @@ public @interface Authentication {
 
   /**
    * Indicates which {@link RunContext} to use to run authenticated webservice requests. By default,
-   * {@link ServerRunContextProducer} is used, which is based on a {@link ServerSessionProviderWithCache session cache},
-   * and enforces to run in a new transaction.
+   * {@link ServerRunContextProducer} is used and enforces to run in a new transaction.
    */
   Clazz runContextProducer() default @Clazz(ServerRunContextProducer.class);
 

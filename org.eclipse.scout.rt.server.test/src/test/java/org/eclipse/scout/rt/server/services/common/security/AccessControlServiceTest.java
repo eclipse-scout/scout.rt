@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.security.DefaultPermissionCollection;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.security.IPermissionCollection;
 import org.eclipse.scout.rt.security.PermissionLevel;
-import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.MaxNotificationBlockingTimeOut;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission1;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
@@ -36,7 +35,6 @@ import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -47,7 +45,6 @@ import org.junit.runner.RunWith;
  * Test for {@link AbstractAccessControlService}
  */
 @RunWith(ServerTestRunner.class)
-@RunWithServerSession(TestServerSession.class)
 @RunWithSubject("john")
 public class AccessControlServiceTest {
 

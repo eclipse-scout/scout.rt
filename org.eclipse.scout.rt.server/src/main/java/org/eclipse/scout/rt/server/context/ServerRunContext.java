@@ -28,12 +28,9 @@ import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.servicetunnel.ServiceTunnelService;
-import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.logging.UserIdContextValueProvider;
 import org.eclipse.scout.rt.shared.opentelemetry.OpenTelemetrySpanAttributeProcessor;
 import org.eclipse.scout.rt.shared.session.ScoutSessionIdContextValueProvider;
@@ -56,7 +53,6 @@ import io.opentelemetry.context.Context;
  */
 public class ServerRunContext extends RunContext {
 
-  protected IServerSession m_session;
   protected UserAgent m_userAgent;
   protected NodeId m_clientNodeId;
   protected ClientNotificationCollector m_clientNotificationCollector = new ClientNotificationCollector();
@@ -64,7 +60,6 @@ public class ServerRunContext extends RunContext {
   @Override
   protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
     callableChain
-        .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
         .add(new DiagnosticContextValueProcessor(BEANS.get(UserIdContextValueProvider.class)))
         .add(new DiagnosticContextValueProcessor(BEANS.get(ScoutSessionIdContextValueProvider.class)))
         .add(new OpenTelemetrySpanAttributeProcessor())
@@ -158,22 +153,6 @@ public class ServerRunContext extends RunContext {
   }
 
   /**
-   * @see #withSession(IServerSession)
-   */
-  public IServerSession getSession() {
-    return m_session;
-  }
-
-  /**
-   * Associates this context with the given {@link IServerSession}, meaning that any code running on behalf of this
-   * context has that {@link ISession} set in {@link ISession#CURRENT} thread-local.
-   */
-  public ServerRunContext withSession(final IServerSession session) {
-    m_session = session;
-    return this;
-  }
-
-  /**
    * @see #withUserAgent(UserAgent)
    */
   public UserAgent getUserAgent() {
@@ -252,7 +231,6 @@ public class ServerRunContext extends RunContext {
   @Override
   protected void interceptToStringBuilder(final ToStringBuilder builder) {
     super.interceptToStringBuilder(builder
-        .ref("session", getSession())
         .attr("userAgent", getUserAgent())
         .attr("clientNodeId", getClientNodeId())
         .ref("transactionalClientNotificationCollector", getClientNotificationCollector()));
@@ -263,7 +241,6 @@ public class ServerRunContext extends RunContext {
     super.copyValues(runContext);
 
     final ServerRunContext origin = (ServerRunContext) runContext;
-    m_session = origin.m_session;
     m_userAgent = origin.m_userAgent;
     m_clientNotificationCollector = origin.m_clientNotificationCollector;
     m_clientNodeId = origin.m_clientNodeId;
@@ -274,7 +251,6 @@ public class ServerRunContext extends RunContext {
     super.fillCurrentValues();
 
     m_userAgent = UserAgent.CURRENT.get();
-    m_session = ServerSessionProvider.currentSession();
     m_clientNotificationCollector = ClientNotificationCollector.CURRENT.get();
     m_clientNodeId = IClientNodeId.CURRENT.get();
   }
@@ -284,14 +260,5 @@ public class ServerRunContext extends RunContext {
     final ServerRunContext copy = BEANS.get(ServerRunContext.class);
     copy.copyValues(this);
     return copy;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> T getAdapter(final Class<T> type) {
-    if (ISession.class.isAssignableFrom(type)) {
-      return (T) m_session;
-    }
-    return null;
   }
 }

@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.platform.holders.BeanArrayHolder;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.holders.ITableBeanHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
-import org.eclipse.scout.rt.server.TestJdbcServerSession;
 import org.eclipse.scout.rt.server.jdbc.fixture.ContainerBean;
 import org.eclipse.scout.rt.server.jdbc.fixture.FormDataWithArray;
 import org.eclipse.scout.rt.server.jdbc.fixture.FormDataWithSet;
@@ -30,7 +29,6 @@ import org.eclipse.scout.rt.server.jdbc.fixture.TableFieldBeanData.TableFieldBea
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +39,6 @@ import org.junit.runner.RunWith;
  * types of arrays used as output bind.
  */
 @RunWith(ServerTestRunner.class)
-@RunWithServerSession(TestJdbcServerSession.class)
 @RunWithSubject("default")
 public class SelectIntoArrayTest {
 

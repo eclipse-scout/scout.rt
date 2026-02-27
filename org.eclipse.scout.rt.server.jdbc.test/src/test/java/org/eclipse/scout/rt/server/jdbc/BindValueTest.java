@@ -18,11 +18,9 @@ import java.sql.Types;
 
 import org.eclipse.scout.rt.platform.holders.LongHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
-import org.eclipse.scout.rt.server.TestJdbcServerSession;
 import org.eclipse.scout.rt.server.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.jdbc.fixture.VerboseMock;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +31,6 @@ import org.junit.runner.RunWith;
  * configuration of binds.
  */
 @RunWith(ServerTestRunner.class)
-@RunWithServerSession(TestJdbcServerSession.class)
 @RunWithSubject("default")
 public class BindValueTest {
   private SqlServiceMock m_sqlService;

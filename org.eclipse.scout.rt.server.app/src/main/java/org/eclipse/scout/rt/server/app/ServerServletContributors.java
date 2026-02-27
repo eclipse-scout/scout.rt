@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.rest.ApiRestApplication;
 import org.eclipse.scout.rt.rest.ServletConstants;
 import org.eclipse.scout.rt.server.commons.healthcheck.HealthCheckServlet;
-import org.eclipse.scout.rt.server.context.ServerRunContextFilter;
+import org.eclipse.scout.rt.server.context.ServerHttpRunContextFilter;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.glassfish.jersey.servlet.ServletProperties;
@@ -80,7 +80,7 @@ public final class ServerServletContributors {
 
     @Override
     public void contribute(ServletContextHandler handler) {
-      handler.addFilter(ServerRunContextFilter.class, ServletConstants.API_PATH_WITH_WILDCARD, null);
+      handler.addFilter(ServerHttpRunContextFilter.class, ServletConstants.API_PATH_WITH_WILDCARD, null);
     }
   }
 

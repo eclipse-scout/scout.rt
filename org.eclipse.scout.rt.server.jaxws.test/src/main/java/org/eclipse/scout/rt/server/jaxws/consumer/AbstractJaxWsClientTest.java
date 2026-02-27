@@ -41,7 +41,6 @@ import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -55,7 +54,6 @@ import org.junit.runner.RunWith;
  * @since 6.0.300
  */
 @RunWith(ServerTestRunner.class)
-@RunWithServerSession(JaxWsConsumerTestServerSession.class)
 @RunWithSubject("default")
 public abstract class AbstractJaxWsClientTest {
 

@@ -10,7 +10,6 @@
 package org.eclipse.scout.rt.testing.server.runner;
 
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.runner.ServerTestRunnerSameSessionTest.JUnitServerSession;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +19,6 @@ import org.junit.runner.RunWith;
  */
 @Ignore("this is only a test fixture for the ServerTestRunnerTimeoutTest")
 @RunWith(ServerTestRunner.class)
-@RunWithServerSession(JUnitServerSession.class)
 @RunWithSubject("anna")
 public class ServerTestRunnerTimeoutTestFixture {
 
