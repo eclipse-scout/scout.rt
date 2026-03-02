@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 
 /**
@@ -38,7 +39,7 @@ public class MaxResultsHelper {
    * the given {@link IDoEntity}. If no limit is given, the {@link #DEFAULT_MAX_RESULTS} is used.
    */
   public ResultLimiter limiter(IDoEntity dataObject) {
-    return limiter(getMaxResultsHintFromContribution(dataObject));
+    return limiter(getMaxResultsHintFromContribution(dataObject), getEstimateRowCountHintFromContribution(dataObject));
   }
 
   /**
@@ -63,6 +64,24 @@ public class MaxResultsHelper {
   }
 
   /**
+   * Extracts the {@link MaxRowCountContributionDo#getEstimateRowCountHint()} from the given {@link IDoEntity}.
+   *
+   * @param dataObject
+   *     The {@link IDoEntity} in which the {@link MaxRowCountContributionDo} should be searched.
+   * @return The value of {@link MaxRowCountContributionDo#getEstimateRowCountHint()} attached to ghe given
+   * {@link IDoEntity} as contribution.
+   */
+  public Boolean getEstimateRowCountHintFromContribution(IDoEntity dataObject) {
+    if (dataObject != null) {
+      MaxRowCountContributionDo maxRowCountContributionDo = dataObject.getContribution(MaxRowCountContributionDo.class);
+      if (maxRowCountContributionDo != null) {
+        return maxRowCountContributionDo.getEstimateRowCountHint();
+      }
+    }
+    return null;
+  }
+
+  /**
    * Creates a {@link ResultLimiter} that limits to the requested limit or to {@link #getMaxResultLimit()} if it is
    * smaller that the requested value.
    *
@@ -72,11 +91,27 @@ public class MaxResultsHelper {
    * @return The created {@link ResultLimiter}
    */
   public ResultLimiter limiter(Integer requestedMaxResults) {
-    return createResultLimiter(getMaxResultLimit(), NumberUtility.nvl(requestedMaxResults, -1));
+    return createResultLimiter(getMaxResultLimit(), NumberUtility.nvl(requestedMaxResults, -1), isEstimateRowCountEnabled());
   }
 
-  protected ResultLimiter createResultLimiter(int maxResultsLimit, int requestedMaxResults) {
-    return new ResultLimiter(maxResultsLimit, requestedMaxResults);
+  /**
+   * Creates a {@link ResultLimiter} that limits to the requested limit or to {@link #getMaxResultLimit()} if it is
+   * smaller that the requested value.
+   *
+   * @param requestedMaxResults
+   *     The maximum number of rows as requested by the client. {@code null} or <= 0 means no limit. In that case
+   *     the limit is given by {@link #getMaxResultLimit()}.
+   * @param estimateRowCountHint
+   *     Set to false if the server should not try to estimate the actual row count (if the result is limited). If the
+   *     value is true or not set, then the server <em>tries</em> to estimate the value.
+   * @return The created {@link ResultLimiter}
+   */
+  public ResultLimiter limiter(Integer requestedMaxResults, Boolean estimateRowCountHint) {
+    return createResultLimiter(getMaxResultLimit(), NumberUtility.nvl(requestedMaxResults, -1), BooleanUtility.nvl(estimateRowCountHint, isEstimateRowCountEnabled()));
+  }
+
+  protected ResultLimiter createResultLimiter(int maxResultsLimit, int requestedMaxResults, boolean estimateRowCountEnabled) {
+    return new ResultLimiter(maxResultsLimit, requestedMaxResults, estimateRowCountEnabled);
   }
 
   /**
@@ -87,10 +122,15 @@ public class MaxResultsHelper {
     return DEFAULT_MAX_RESULTS;
   }
 
+  protected boolean isEstimateRowCountEnabled() {
+    return true; // method hook
+  }
+
   public static class ResultLimiter {
 
     private int m_maxResultsLimit; // always > 0
     private int m_requestedMaxResults; // <= 0 if not specified
+    private boolean m_estimateRowCountEnabled;
     private int m_estimatedRowCount; // <= 0 if not specified
 
     /**
@@ -109,7 +149,7 @@ public class MaxResultsHelper {
      *     no preference.
      */
     public ResultLimiter(int maxResultsLimit, int requestedMaxResults) {
-      this(maxResultsLimit, requestedMaxResults, -1);
+      this(maxResultsLimit, requestedMaxResults, true, -1);
     }
 
     /**
@@ -118,12 +158,28 @@ public class MaxResultsHelper {
      * @param requestedMaxResults
      *     The maximum number of results as requested by the client (client limit). May be <= 0 if the client has
      *     no preference.
+     * @param estimateRowCountEnabled
+     *     true if the server should try to estimate row count
+     */
+    public ResultLimiter(int maxResultsLimit, int requestedMaxResults, boolean estimateRowCountEnabled) {
+      this(maxResultsLimit, requestedMaxResults, estimateRowCountEnabled, -1);
+    }
+
+    /**
+     * @param maxResultsLimit
+     *     The maximum number of results (hard limit). Must be > 0.
+     * @param requestedMaxResults
+     *     The maximum number of results as requested by the client (client limit). May be <= 0 if the client has
+     *     no preference.
+     * @param estimateRowCountEnabled
+     *     true if the server should try to estimate row count
      * @param estimatedRowCount
      *     The estimated number of results that would be available in total. May be <= 0 in case it is unknown.
      */
-    public ResultLimiter(int maxResultsLimit, int requestedMaxResults, int estimatedRowCount) {
+    public ResultLimiter(int maxResultsLimit, int requestedMaxResults, boolean estimateRowCountEnabled, int estimatedRowCount) {
       setMaxResultsLimit(maxResultsLimit);
       setRequestedMaxResults(requestedMaxResults);
+      setEstimateRowCountEnabled(estimateRowCountEnabled);
       setEstimatedRowCount(estimatedRowCount);
     }
 
@@ -245,6 +301,21 @@ public class MaxResultsHelper {
      */
     public void setRequestedMaxResults(int requestedMaxResults) {
       m_requestedMaxResults = requestedMaxResults;
+    }
+
+    /**
+     * @return true if the server should try to estimate row count
+     */
+    public boolean isEstimateRowCountEnabled() {
+      return m_estimateRowCountEnabled;
+    }
+
+    /**
+     * @param estimateRowCountEnabled
+     *     If the server should try to estimate row count.
+     */
+    public void setEstimateRowCountEnabled(boolean estimateRowCountEnabled) {
+      m_estimateRowCountEnabled = estimateRowCountEnabled;
     }
 
     /**

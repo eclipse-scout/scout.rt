@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -32,9 +32,17 @@ public class MaxResultsHelperTest {
     var helper = new MaxResultsHelper();
     var dataObject = new DoEntity();
     dataObject.contribution(MaxRowCountContributionDo.class).withHint(1234);
-    var limiter = helper.limiter(dataObject);
-    assertEquals(1234, limiter.getMaxResults());
-    assertEquals(1235, limiter.getQueryLimit());
+    {
+      var limiter = helper.limiter(dataObject);
+      assertEquals(1234, limiter.getMaxResults());
+      assertEquals(1235, limiter.getQueryLimit());
+      assertTrue(limiter.isEstimateRowCountEnabled());
+    }
+    {
+      dataObject.getContribution(MaxRowCountContributionDo.class).withEstimateRowCountHint(false);
+      var limiter = helper.limiter(dataObject);
+      assertFalse(limiter.isEstimateRowCountEnabled());
+    }
   }
 
   @Test
@@ -60,7 +68,7 @@ public class MaxResultsHelperTest {
 
   @Test
   public void testLimiterSetters() {
-    var limiter = new ResultLimiter(10, 4, 100);
+    var limiter = new ResultLimiter(10, 4, true, 100);
     limiter.setRequestedMaxResults(3);
     limiter.setEstimatedRowCount(200);
     assertEquals(3, limiter.getRequestedMaxResults());
