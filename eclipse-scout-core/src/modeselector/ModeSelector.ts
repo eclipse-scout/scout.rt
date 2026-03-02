@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,7 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
    * Setting a new mode should not trigger two change events.
    */
   protected _isModeChanging: boolean;
-  protected _modePropertyChangeHandler: EventHandler<PropertyChangeEvent<any>>;
+  protected _modePropertyChangeHandler: EventHandler<PropertyChangeEvent>;
 
   constructor() {
     super();
@@ -233,7 +233,7 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
 
   protected _registerDragHandlers($mode: JQuery) {
     let className = 'mode-selector-dragging';
-    let onDown = (e: SwipeCallbackEvent) => this.enabledComputed && this.selectedMode && this.selectedMode.$container === $mode && this.modes.filter(m => m.isVisible() && m.enabled).length > 1;
+    let onDown = (e: SwipeCallbackEvent) => this.enabledComputed && this.selectedMode && this.selectedMode.$container === $mode && this.modes.filter(m => m.visible && m.enabled).length > 1;
     let onMove = (e: SwipeCallbackEvent) => {
       let maxX = this.$container.width() - $mode.outerWidth();
       let minX = 0;

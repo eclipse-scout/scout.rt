@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -208,14 +208,6 @@ public class TrivialAccessController implements IAccessController {
     public TrivialAuthConfig withPrincipalVerifier(final IPrincipalVerifier principalVerifier) {
       m_principalVerifier = principalVerifier;
       return this;
-    }
-
-    /**
-     * @deprecated use {@link #getExclusionFilter()}
-     */
-    @Deprecated
-    public PathInfoFilter getPathInfoFilter() {
-      return getExclusionFilter();
     }
 
     public PathInfoFilter getExclusionFilter() {

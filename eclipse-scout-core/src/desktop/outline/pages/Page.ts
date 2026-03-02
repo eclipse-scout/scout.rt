@@ -12,7 +12,6 @@ import {
   EventSupport, Form, HtmlComponent, InitModelOf, inspector, Menu, MenuBar, MenuOwner, ObjectIdProvider, ObjectOrType, ObjectWithUuid, Outline, PageDetailMenuContributor, PageEventMap, PageModel, ParentTablePageMenuContributor,
   PropertyChangeEvent, RequiredUnlessNotSubclass, scout, SomeRequired, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, typeName, UuidPathOptions, Widget
 } from '../../../index';
-import $ from 'jquery';
 
 /**
  * This class is used differently in online and JS-only case. In the online case we only have instances
@@ -420,13 +419,6 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
   }
 
   /**
-   * @deprecated use {@link outline} instead
-   */
-  getOutline(): Outline {
-    return this.parent;
-  }
-
-  /**
    * @returns the tree / outline / parent instance. it's all the same,
    *     but it's more intuitive to work with the 'outline' when we deal with pages.
    */
@@ -587,20 +579,6 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
       return strings.plainText(this.text);
     }
     return this.text;
-  }
-
-  /**
-   * @returns a page parameter object used to pass to newly created child pages. Sets the parent
-   *     to our outline instance and adds optional other properties. Typically, you'll pass an
-   *     object (entity-key or arbitrary data) to a child page.
-   * @deprecated either add the parent by yourself or return a page model instead of a page when creating child pages
-   */
-  protected _pageParam<T extends object>(paramProperties?: T): T & { parent: Outline } {
-    let param = {
-      parent: this.outline
-    };
-    $.extend(param, paramProperties);
-    return param as T & { parent: Outline };
   }
 
   reloadPage() {

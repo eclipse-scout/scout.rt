@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,8 +23,6 @@ body {
   color: @text-color;
   letter-spacing: @letter-spacing;
   #scout.user-select(none);
-  //noinspection CssInvalidPropertyValue
-  -moz-user-select: -moz-none;
   /* Prevent mobile safari from adjusting text, due to our dynamic layouting it will be always wrong */
   -webkit-text-size-adjust: none;
   /* Disable highlight color. May be enabled for specific elements if required */
@@ -40,11 +38,6 @@ body {
   }
 }
 
-/* -moz variant is required, see https://bugzilla.mozilla.org/show_bug.cgi?id=509958 */
-::-moz-selection {
-  #scout.text-selection();
-}
-
 ::selection {
   #scout.text-selection();
 }
@@ -53,34 +46,8 @@ body {
   #scout.placeholder();
 }
 
-:-moz-placeholder { /* older versions of firefox */
-  #scout.placeholder();
-}
-
-::-moz-placeholder {
-  #scout.placeholder();
-}
-
-:-ms-input-placeholder {
-  #scout.placeholder();
-}
-
 ::placeholder { /* Most modern browsers */
   #scout.placeholder();
-}
-
-/* Hide IE decorations for text input fields: */
-/* - Clear button ("X"): https://msdn.microsoft.com/en-us/library/windows/apps/hh465740.aspx */
-/* - Password reveal button: https://msdn.microsoft.com/en-us/library/windows/apps/hh465773.aspx */
-/* Note: Set width/height to 0 instead of "display: none", because of http://stackoverflow.com/a/17986002 */
-::-ms-clear {
-  width: 0;
-  height: 0;
-}
-
-::-ms-reveal {
-  width: 0;
-  height: 0;
 }
 
 // Hide the default user-agent style for all focused elements. Instead, each focusable widget provides
@@ -94,10 +61,6 @@ body {
 }
 
 .disabled {
-  &::-moz-selection {
-    #scout.text-selection-disabled();
-  }
-
   &::selection {
     #scout.text-selection-disabled();
   }
@@ -106,18 +69,6 @@ body {
     #scout.placeholder-disabled();
     /* Fill color is inherited, make sure it is ignored and the current color is used instead. Needed for iOS, see usage of -webkit-text-fill-color below*/
     -webkit-text-fill-color: currentcolor;
-  }
-
-  &:-moz-placeholder { /* older versions of firefox */
-    #scout.placeholder-disabled();
-  }
-
-  &::-moz-placeholder {
-    #scout.placeholder-disabled();
-  }
-
-  &:-ms-input-placeholder {
-    #scout.placeholder-disabled();
   }
 }
 
@@ -135,20 +86,6 @@ body {
 
 *, *::before, *::after { /* NOSONAR (universal selector is okay here) */
   box-sizing: border-box;
-}
-
-/* Workaround for firefox bug https://bugzilla.mozilla.org/show_bug.cgi?id=648624 */
-/* use -moz-none to allow child element to set -moz-user-select: text */
-/* See also: focusUtil.js, isSelectableText() */
-.table-cell,
-.table-header-item,
-.tree-node,
-.table-footer,
-.table-control,
-.table-info-item,
-.table-header-menu-group-text {
-  //noinspection CssInvalidPropertyValue
-  -moz-user-select: -moz-none;
 }
 
 input,
@@ -249,10 +186,8 @@ input {
   padding: 0 @text-field-padding-x;
 
   /* remove platform specific styling, mainly used to remove shadow on iOS Safari */
-
   &:not([type=checkbox]):not([type=radio]) {
-    -webkit-appearance: none;
-    -moz-appearance: none;
+    appearance: none;
   }
 
   /* text inputs on Safari have 2px top and bottom margin -> remove*/
@@ -305,13 +240,8 @@ textarea {
   /* Override default overflow value 'scroll' */
   overflow: auto;
 
-  /* IE/Edge: show scrollbars on textarea if the content is too big to fit */
-  /* overflow:auto alone is not sufficient because -ms-overflow-style could be set on a parent element and textarea inherits this property */
-  -ms-overflow-style: auto;
-
   /* remove platform specific styling, mainly used to remove shadow on ios safari */
-  -webkit-appearance: none;
-  -moz-appearance: none;
+  appearance: none;
 
   &.alternative {
     border-radius: @control-alternative-border-radius;
@@ -345,11 +275,6 @@ button {
 /* Used to temporarily disable pointer events on iframes while dragging elements */
 .dragging-in-progress {
   pointer-events: none;
-}
-
-/* remove the dotted border in firefox */
-button::-moz-focus-inner {
-  border: 0;
 }
 
 .drag-handle {
@@ -415,7 +340,7 @@ button::-moz-focus-inner {
   pointer-events: none;
 
   &.fadeout {
-    #scout.animation(application-loading-fade-out @loading-fade-duration linear 1 forwards);
+    animation: application-loading-fade-out @loading-fade-duration linear 1 forwards;
   }
 }
 
@@ -423,10 +348,6 @@ button::-moz-focus-inner {
   to {
     opacity: 0;
   }
-}
-
-@-webkit-keyframes application-loading-fade-out {
-  .keyframes-application-loading-fade-out();
 }
 
 @keyframes application-loading-fade-out {
@@ -448,7 +369,7 @@ button::-moz-focus-inner {
     height: 100%;
     border-radius: 50%;
     box-shadow: 0 0 6px 3px @application-loading01-color;
-    #scout.animation(pulsate 2s ease-out infinite);
+    animation: pulsate 2s ease-out infinite;
   }
 }
 
@@ -467,7 +388,7 @@ button::-moz-focus-inner {
     height: 100%;
     border-radius: 50%;
     box-shadow: inset 0 0 4px 2px @application-loading02-color;
-    #scout.animation(pulsate 2.84s ease-out infinite);
+    animation: pulsate 2.84s ease-out infinite;
   }
 }
 
@@ -544,15 +465,6 @@ noscript {
   & > .wrapper > .box-content > h1 {
     #scout.font-text-normal(bold);
   }
-}
-
-/* Internet explorer applies the -ms-user-select setting: none (inherited from body) also to iframe contents.
- * Other browsers do not, websites within an iframe should decide on their own if they are selectable (or not).
- * Reset to default.
- */
-iframe {
-  //noinspection CssInvalidPropertyValue
-  -ms-user-select: element;
 }
 
 .error-popup-correlation-id {

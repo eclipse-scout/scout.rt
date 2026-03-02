@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,15 +18,6 @@ export interface ObjectFactoryOptions extends TypeDescriptorOptions {
    * Model object to be passed to the constructor or create function.
    */
   model?: object;
-
-  /**
-   * Controls if the resulting object should be assigned the attribute "id" if it is not defined.
-   * If the created object has an init() function, we also set the property 'id' on the model object to allow the init() function to copy the attribute from the model to the scoutObject.
-   * Default is true.
-   *
-   * @deprecated will be removed in a future release, use {@link objectFactoryHints} instead
-   */
-  ensureUniqueId?: boolean;
 }
 
 export interface RegisterNamespaceOptions {
@@ -203,14 +194,7 @@ export class ObjectFactory {
 
   protected _ensureUniqueId(scoutObject: any, options?: ObjectFactoryOptions): boolean {
     let hints = Reflect.getMetadata(ObjectFactory.HINTS_META_DATA_KEY, scoutObject) as ObjectFactoryHints;
-    return scout.nvl(options?.ensureUniqueId, scout.nvl(hints?.ensureId, false));
-  }
-
-  /**
-   * @deprecated Use {@link ObjectIdProvider.createUiSeqId} instead.
-   */
-  createUniqueId(): string {
-    return ObjectIdProvider.get().createUiSeqId();
+    return scout.nvl(hints?.ensureId, false);
   }
 
   resolveTypedObjectType<T>(objectType: ObjectType<T>): ObjectType<T> {

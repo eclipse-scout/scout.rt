@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter;
 
 /**
  * Holder for URL param hints for servlets.
@@ -32,8 +31,6 @@ import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter
  * <ul>
  * <li><b><code>?cache=(true|false)</code></b>: Enable/disable HTTP caching of resources. Default value is
  * <code>true</code> (<code>false</code> in development mode).
- * <li><b><code>?compress=(true|false)</code></b>: Enable/disable GZIP compression (if client supports it). Default
- * value is <code>true</code>. <b>Note</b>: The hint only has an effect if the deprecated {@link GzipServletFilter} is used.
  * <li><b><code>?minify=(true|false)</code></b>: Enable/disable "minification" of JS/CSS files. Default value is
  * <code>true</code> (<code>false</code> in development mode).
  * <li><b><code>?inspector=(true|false)</code></b>: Enable/disable inspector attributes in DOM ("modelClass",
@@ -43,7 +40,7 @@ import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter
  * </ul>
  * <p>
  * The state of all URL hints is stored as a cookie to make it available in subsequent requests without the need to
- * create a HTTP session.
+ * create an HTTP session.
  *
  * @see UrlHintsHelper
  */
@@ -56,14 +53,12 @@ public class UrlHints implements Serializable {
 
   private static final String URL_PARAM_DEBUG = "debug";
   private static final String URL_PARAM_CACHE_HINT = "cache";
-  private static final String URL_PARAM_COMPRESS_HINT = "compress";
   private static final String URL_PARAM_MINIFY_HINT = "minify";
   private static final String URL_PARAM_INSPECTOR_HINT = "inspector";
 
-  private static final Pattern COOKIE_STRING_PATTERN = Pattern.compile("C([01])Z([01])M([01])I([01])");
+  private static final Pattern COOKIE_STRING_PATTERN = Pattern.compile("C([01])Z?([01])?M([01])I([01])");
 
   private boolean m_cache;
-  private boolean m_compress;
   private boolean m_minify;
   private boolean m_inspector;
 
@@ -73,7 +68,6 @@ public class UrlHints implements Serializable {
   @PostConstruct
   protected void initDefaults() {
     m_cache = !Platform.get().inDevelopmentMode();
-    m_compress = true;
     m_minify = !Platform.get().inDevelopmentMode();
     m_inspector = Platform.get().inDevelopmentMode();
   }
@@ -86,27 +80,6 @@ public class UrlHints implements Serializable {
     assertWritable();
     if (m_cache != cache) {
       m_cache = cache;
-      m_changed = true;
-    }
-  }
-
-  /**
-   * @deprecated The hint only has an effect if the deprecated {@link GzipServletFilter} is used and will be removed together with the filter in the future.
-   */
-  @Deprecated
-  public boolean isCompress() {
-    return m_compress;
-  }
-
-  /**
-   * @deprecated The hint only has an effect if the deprecated {@link GzipServletFilter} is used and will be removed together with the filter in the future.
-   */
-  @SuppressWarnings("DeprecatedIsStillUsed")
-  @Deprecated
-  public void setCompress(boolean compress) {
-    assertWritable();
-    if (m_compress != compress) {
-      m_compress = compress;
       m_changed = true;
     }
   }
@@ -159,21 +132,16 @@ public class UrlHints implements Serializable {
   public void setFromUrlParams(HttpServletRequest req) {
     Boolean paramDebug = getRequestParameterBoolean(req, URL_PARAM_DEBUG);
     Boolean paramCache = getRequestParameterBoolean(req, URL_PARAM_CACHE_HINT);
-    Boolean paramCompress = getRequestParameterBoolean(req, URL_PARAM_COMPRESS_HINT);
     Boolean paramMinify = getRequestParameterBoolean(req, URL_PARAM_MINIFY_HINT);
     Boolean paramInspector = getRequestParameterBoolean(req, URL_PARAM_INSPECTOR_HINT);
 
     if (paramDebug != null) {
       setCache(!paramDebug.booleanValue());
-      setCompress(!paramDebug.booleanValue());
       setMinify(!paramDebug.booleanValue());
       setInspector(paramDebug.booleanValue());
     }
     if (paramCache != null) {
       setCache(paramCache.booleanValue());
-    }
-    if (paramCompress != null) {
-      setCompress(paramCompress.booleanValue());
     }
     if (paramMinify != null) {
       setMinify(paramMinify.booleanValue());
@@ -198,26 +166,25 @@ public class UrlHints implements Serializable {
 
   public String toCookieString() {
     return "C" + (m_cache ? "1" : "0")
-        + "Z" + (m_compress ? "1" : "0")
         + "M" + (m_minify ? "1" : "0")
         + "I" + (m_inspector ? "1" : "0");
   }
 
-  public void setFromCookieString(String cookieString) {
+  public UrlHints setFromCookieString(String cookieString) {
     if (cookieString == null) {
-      return;
+      return this;
     }
     Matcher m = COOKIE_STRING_PATTERN.matcher(cookieString);
     if (m.matches()) {
       setCache("1".equals(m.group(1)));
-      setCompress("1".equals(m.group(2)));
       setMinify("1".equals(m.group(3)));
       setInspector("1".equals(m.group(4)));
     }
+    return this;
   }
 
   public String toHumanReadableString() {
-    return "cache=" + m_cache + ", compress=" + m_compress + ", minify=" + m_minify + ", inspector=" + m_inspector;
+    return "cache=" + m_cache + ", minify=" + m_minify + ", inspector=" + m_inspector;
   }
 
   @Override
@@ -225,7 +192,6 @@ public class UrlHints implements Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + (m_cache ? 1231 : 1237);
-    result = prime * result + (m_compress ? 1231 : 1237);
     result = prime * result + (m_minify ? 1231 : 1237);
     result = prime * result + (m_inspector ? 1231 : 1237);
     return result;
@@ -244,9 +210,6 @@ public class UrlHints implements Serializable {
     }
     UrlHints other = (UrlHints) obj;
     if (m_cache != other.m_cache) {
-      return false;
-    }
-    if (m_compress != other.m_compress) {
       return false;
     }
     if (m_minify != other.m_minify) {
@@ -268,7 +231,6 @@ public class UrlHints implements Serializable {
   protected void interceptToStringBuilder(ToStringBuilder builder) {
     builder
         .attr("cache", m_cache)
-        .attr("compress", m_compress)
         .attr("minify", m_minify)
         .attr("inspector", m_inspector)
         .attr("changed", m_changed)
@@ -288,16 +250,6 @@ public class UrlHints implements Serializable {
    */
   public static boolean isCacheHint(HttpServletRequest req) {
     return URL_HINTS_HELPER.get().isCacheHint(req);
-  }
-
-  /**
-   * Static convenience method delegating to {@link UrlHintsHelper#isCompressHint(HttpServletRequest)}.
-   *
-   * @deprecated The hint only has an effect if the deprecated {@link GzipServletFilter} is used and will be removed together with the filter in the future.
-   */
-  @Deprecated
-  public static boolean isCompressHint(HttpServletRequest req) {
-    return URL_HINTS_HELPER.get().isCompressHint(req);
   }
 
   /**

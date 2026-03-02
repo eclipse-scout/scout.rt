@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -186,62 +184,6 @@ public final class FileUtility {
     long time = entry.getTime();
     if (time >= 0) {
       Files.setLastModifiedTime(targetFile, FileTime.fromMillis(time));
-    }
-  }
-
-  /**
-   * Extracts a zip archive to a target directory.
-   * <p>
-   * If the zip contains a root folder with the same name as the target directory, the content of this root folder is directly extracted to the target.
-   * So there will no subfolder be created having the same name as the target directory!
-   * This is mainly for zips having a single root folder. It may fail if the zip contains various items on top-level including a folder with the target name.
-   * If this behavior is not required {@link #extractZip(Path, Path)} should be preferred.
-   *
-   * @param archiveFile
-   *     The zip file to extract. Must be an existing zip file.
-   * @param targetDir
-   *     The target directory in which the zip will be extracted. Must not be {@code null}. The directory will be created if not existing yet.
-   * @deprecated This method uses a dangerous special handling for zip directories with the same name as the target directory and will be removed in Scout 26.2. Use {@link #extractZip(File, File)} instead. If top-level directories exist,
-   * they should be removed manually afterward.
-   */
-  @Deprecated
-  @SuppressWarnings({"ResultOfMethodCallIgnored", "DeprecatedIsStillUsed" /* tests only */})
-  public static void extractArchive(File archiveFile, File targetDir) throws IOException {
-    File destinationDir = targetDir.getCanonicalFile();
-    Path destinationPath = destinationDir.toPath();
-    destinationDir.mkdirs();
-    destinationDir.setLastModified(archiveFile.lastModified());
-    String localFile = destinationDir.getName();
-    try (JarFile jar = new JarFile(archiveFile)) {
-      Enumeration<JarEntry> entries = jar.entries();
-      while (entries.hasMoreElements()) {
-        JarEntry file = entries.nextElement();
-        String name = file.getName();
-        if (name.startsWith(localFile)) {
-          name = name.substring(localFile.length());
-        }
-        while (name.startsWith("/") || name.startsWith("\\")) {
-          name = name.substring(1);
-        }
-        File f = new File(destinationDir, name).getCanonicalFile();
-        if (!f.toPath().startsWith(destinationPath)) {
-          // security check (see https://github.com/snyk/zip-slip-vulnerability)
-          throw new IllegalArgumentException("Entry is outside of the target dir: " + name);
-        }
-
-        if (file.isDirectory()) { // if it's a directory, create it
-          f.mkdirs();
-        }
-        else {
-          f.getParentFile().mkdirs();
-          try (InputStream is = jar.getInputStream(file); FileOutputStream fos = new FileOutputStream(f)) {
-            is.transferTo(fos);
-          }
-        }
-        if (file.getTime() >= 0) {
-          f.setLastModified(file.getTime());
-        }
-      }
     }
   }
 

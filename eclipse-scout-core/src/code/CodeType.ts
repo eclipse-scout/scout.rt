@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -121,20 +121,10 @@ export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCode
 
   /**
    * Gets the codes of this CodeType.
-   * @param rootOnly true if only the root Codes should be returned. The default value is false.
-   * @returns the root Codes of this CodeType if rootOnly is true and all Codes recursively otherwise.
+   * @param options Optional {@link CodeTypeCodesOptions} to control which codes that should be returned. By default, all active codes are returned recursively (in case the CodeType is hierarchical).
+   * @returns the {@link Code} instances of this CodeType according to the provided options.
    */
-  codes(): TCode[];
-  /** @deprecated use {@link CodeTypeCodesOptions} instead */
-  codes(rootOnly?: boolean): TCode[];
-  codes(options: CodeTypeCodesOptions): TCode[];
-  codes(options: boolean | CodeTypeCodesOptions = {}): TCode[] {
-    if (typeof options === 'boolean') { // legacy support
-      options = {
-        rootOnly: options
-      };
-    }
-
+  codes(options: CodeTypeCodesOptions = {}): TCode[] {
     let codes = [...this.codeMap.values()];
     if (options.rootOnly) {
       codes = codes.filter(code => !code.parent);
@@ -195,6 +185,12 @@ export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCode
 }
 
 export type CodeTypeCodesOptions = {
+  /**
+   * Default value is false.
+   */
   rootOnly?: boolean;
+  /**
+   * Default value is true.
+   */
   activeOnly?: boolean;
 };

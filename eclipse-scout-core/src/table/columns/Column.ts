@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1039,13 +1039,6 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     let valueA = this.cellValueOrText(row1);
     let valueB = this.cellValueOrText(row2);
     return this.comparator.compare(valueA, valueB);
-  }
-
-  /**
-   * @deprecated use {@link visible} directly. Will be removed in an upcoming release.
-   */
-  isVisible(): boolean {
-    return this.visible;
   }
 
   /**

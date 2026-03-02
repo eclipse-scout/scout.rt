@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -234,7 +234,7 @@ describe('TableHeaderMenu', () => {
         expect(table.header.tableHeaderMenu._groupColumnCount()).toBe(0);
         table.header.closeHeaderMenu();
 
-        table.groupColumn(column, false, 'asc');
+        table.group(column, 'asc', false);
         table.header.openHeaderMenu(column);
         expect(table.header.tableHeaderMenu._groupColumnCount()).toBe(1);
         table.header.closeHeaderMenu();

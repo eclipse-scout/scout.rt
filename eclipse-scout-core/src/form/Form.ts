@@ -436,13 +436,6 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
-   * @deprecated use {@link withBusyHandling}.
-   */
-  protected _withBusyHandling<T>(action: () => JQuery.Promise<T>, opts?: Pick<BusyIndicatorOptions, 'renderDelay'>): JQuery.Promise<T> {
-    return this.withBusyHandling(action, opts);
-  }
-
-  /**
    * @returns promise which is resolved when the form is loaded, respectively when the 'load' event is triggered.
    */
   whenLoad(): JQuery.Promise<Event<Form>> {

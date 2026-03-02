@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -48,16 +48,16 @@
   }
 
   &.animate-open {
-    #scout.transform(scaleY(0.5));
-    #scout.animation-name(grow-y);
-    #scout.animation-duration(0.125s);
+    transform: scaleY(0.5);
+    animation-name: grow-y;
+    animation-duration: 0.125s;
 
     &.bottom {
-      #scout.transform-origin(top);
+      transform-origin: top;
     }
 
     &.top {
-      #scout.transform-origin(bottom);
+      transform-origin: bottom;
     }
   }
 }
