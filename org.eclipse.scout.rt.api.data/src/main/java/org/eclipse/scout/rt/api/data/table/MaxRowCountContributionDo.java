@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,6 +43,14 @@ public class MaxRowCountContributionDo extends DoEntity implements IDoEntityCont
     return doValue("hint");
   }
 
+  /**
+   * Set to false if the server should not try to estimate the actual row count (if the result is limited). If the value
+   * is true or not set, then the server <em>tries</em> to estimate the value.
+   */
+  public DoValue<Boolean> estimateRowCountHint() {
+    return doValue("estimateRowCountHint");
+  }
+
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
@@ -79,5 +87,30 @@ public class MaxRowCountContributionDo extends DoEntity implements IDoEntityCont
   @Generated("DoConvenienceMethodsGenerator")
   public Integer getHint() {
     return hint().get();
+  }
+
+  /**
+   * See {@link #estimateRowCountHint()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public MaxRowCountContributionDo withEstimateRowCountHint(Boolean estimateRowCountHint) {
+    estimateRowCountHint().set(estimateRowCountHint);
+    return this;
+  }
+
+  /**
+   * See {@link #estimateRowCountHint()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public Boolean getEstimateRowCountHint() {
+    return estimateRowCountHint().get();
+  }
+
+  /**
+   * See {@link #estimateRowCountHint()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public boolean isEstimateRowCountHint() {
+    return nvl(getEstimateRowCountHint());
   }
 }
