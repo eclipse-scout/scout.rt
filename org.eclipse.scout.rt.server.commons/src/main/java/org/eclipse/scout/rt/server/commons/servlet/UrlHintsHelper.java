@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.UrlHintsEnabledProperty;
-import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,15 +126,5 @@ public class UrlHintsHelper {
 
   public boolean isMinifyHint(HttpServletRequest req) {
     return getUrlHints(req).isMinify();
-  }
-
-  /**
-   * @deprecated The hint only has an effect if the deprecated {@link GzipServletFilter} is used and will be removed together with the filter in the future.
-   */
-  @SuppressWarnings("DeprecatedIsStillUsed")
-  @Deprecated
-  public boolean isCompressHint(HttpServletRequest req) {
-    //noinspection deprecation
-    return getUrlHints(req).isCompress();
   }
 }

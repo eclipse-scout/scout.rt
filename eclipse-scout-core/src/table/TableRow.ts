@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -86,7 +86,7 @@ export class TableRow implements TableRowModel, ObjectWithType, FilterElement {
   }
 
   protected _initCells() {
-    this.getTable().columns.forEach(column => {
+    this.parent.columns.forEach(column => {
       if (!column.guiOnly) {
         let cell = this.cells[column.index];
         cell = column.initCell(cell, this);
@@ -112,12 +112,6 @@ export class TableRow implements TableRowModel, ObjectWithType, FilterElement {
     return this.childRows.some(childRow => childRow.filterAccepted || childRow.hasFilterAcceptedChildren());
   }
 
-  /**
-   * @deprecated use {@link table} instead.
-   */
-  getTable(): Table {
-    return this.parent;
-  }
 
   get table(): Table {
     return this.parent;

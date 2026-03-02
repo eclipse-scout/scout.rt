@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,15 +47,6 @@ public class BasicCache<K, V> implements ICache<K, V> {
 
   protected final AbstractTransactionalMap<K, ?> m_transactionalMap; // is null if not transactional cache
 
-  /**
-   * @deprecated Use constructor including label supplier as second argument. Label supplier can be retrieved via
-   * {@link CacheBuilder#getLabelSupplier()}.
-   */
-  @Deprecated(forRemoval = true)
-  public BasicCache(String cacheId, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap) {
-    this(cacheId, null, resolver, cacheMap, findTransactionalMap(cacheMap));
-  }
-
   public BasicCache(String cacheId, Supplier<String> labelSupplier, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap) {
     this(cacheId, labelSupplier, resolver, cacheMap, findTransactionalMap(cacheMap));
   }
@@ -70,15 +61,6 @@ public class BasicCache<K, V> implements ICache<K, V> {
       return (AbstractTransactionalMap<K, ?>) innerMap;
     }
     return null;
-  }
-
-  /**
-   * @deprecated Use constructor including label supplier as second argument. Label supplier can be retrieved via
-   * {@link CacheBuilder#getLabelSupplier()}.
-   */
-  @Deprecated(forRemoval = true)
-  public BasicCache(String cacheId, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap, AbstractTransactionalMap<K, ?> transactionalMap) {
-    this(cacheId, null, resolver, cacheMap, transactionalMap);
   }
 
   public BasicCache(String cacheId, Supplier<String> labelSupplier, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap, AbstractTransactionalMap<K, ?> transactionalMap) {
@@ -182,8 +164,7 @@ public class BasicCache<K, V> implements ICache<K, V> {
     if (filter instanceof AllCacheEntryFilter) {
       m_cacheMap.clear();
     }
-    else if (filter instanceof KeyCacheEntryFilter) {
-      KeyCacheEntryFilter<K, V> keyCacheEntryFilter = (KeyCacheEntryFilter<K, V>) filter;
+    else if (filter instanceof KeyCacheEntryFilter<K, V> keyCacheEntryFilter) {
       for (K key : keyCacheEntryFilter.getKeys()) {
         m_cacheMap.remove(key);
       }

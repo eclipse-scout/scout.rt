@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,25 +19,25 @@
   }
 
   &.animate-visible {
-    #scout.animation-name(fadein-grow);
-    #scout.animation-duration(0.4s);
+    animation-name: fadein-grow;
+    animation-duration: 0.4s;
   }
 
   &.animate-invisible {
-    #scout.animation-name(fadeout-shrink);
-    #scout.animation-duration(0.3s);
-    #scout.animation-fill-mode(forwards);
+    animation-name: fadeout-shrink;
+    animation-duration: 0.3s;
+    animation-fill-mode: forwards;
   }
 
   &.animate-insert {
-    #scout.animation-name(fadein-zoom-bounce);
-    #scout.animation-duration(0.4s);
+    animation-name: fadein-zoom-bounce;
+    animation-duration: 0.4s;
   }
 
   &.animate-remove {
-    #scout.animation-name(fadeout-shrink-blur);
-    #scout.animation-duration(0.2s);
-    #scout.animation-fill-mode(forwards);
+    animation-name: fadeout-shrink-blur;
+    animation-duration: 0.2s;
+    animation-fill-mode: forwards;
   }
 
   #scout.move-support();

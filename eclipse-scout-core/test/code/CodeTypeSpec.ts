@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -213,7 +213,7 @@ describe('CodeType', () => {
 
       it('returns active root codes when rootOnly=true', () => {
         let codeType = codes.get('codeType0');
-        let codeArr = codeType.codes(true);
+        let codeArr = codeType.codes({rootOnly: true});
         expect(codeArr.length).toBe(2);
         expect(codeArr[0]).toBe(codeType.get('code0'));
         expect(codeArr[1]).toBe(codeType.get('code1'));
@@ -221,7 +221,7 @@ describe('CodeType', () => {
 
       it('returns all active codes when rootOnly=false', () => {
         let codeType = codes.get('codeType0');
-        let codeArr = codeType.codes(false);
+        let codeArr = codeType.codes();
         expect(codeArr.length).toBe(7);
       });
     });

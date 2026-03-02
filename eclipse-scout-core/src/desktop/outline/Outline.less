@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -347,9 +347,9 @@
       }
 
       &.child-of-selected.animate-prev-selected {
-        #scout.animation-name(tree-node-prev-selection);
-        #scout.animation-duration(0.6s);
-        #scout.animation-timing-function(ease-in);
+        animation-name: tree-node-prev-selection;
+        animation-duration: 0.6s;
+        animation-timing-function: ease-in;
       }
 
       &.compact-root:not(.selected) {
@@ -416,13 +416,6 @@
   }
 }
 
-@-webkit-keyframes tree-node-prev-selection {
-  .keyframes-tree-node-prev-selection();
-}
-
-/* NOSONAR */
 @keyframes tree-node-prev-selection {
   .keyframes-tree-node-prev-selection();
 }
-
-/* NOSONAR */

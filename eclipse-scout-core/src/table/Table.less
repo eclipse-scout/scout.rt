@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -390,7 +390,7 @@
         .expanded& {
           /* This "imprecise" angle is a workround for firefox to prevent shifting the div a little when the animation finishes. */
           /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
-          #scout.transform(rotate(89.99deg));
+          transform: rotate(89.99deg);
         }
       }
 
@@ -601,28 +601,24 @@
 
 /*** Animation: rotate from 0 -> 90 deg ***/
 
-@-webkit-keyframes expand-rotate {
-  .keyframes-expand-rotate();
-}
-
 @keyframes expand-rotate {
   .keyframes-expand-rotate();
 }
 
 .keyframes-expand-rotate() {
   00% { /* see comment on top */
-    #scout.transform(rotate(0deg));
+    transform: rotate(0deg);
   }
   100% {
-    #scout.transform(rotate(89.99deg));
+    transform: rotate(89.99deg);
   }
 }
 
 .animation-expand-rotate() {
-  #scout.animation-name(expand-rotate);
-  #scout.animation-duration(0.3s);
-  #scout.animation-iteration-count(1);
-  #scout.animation-timing-function(ease-out);
+  animation-name: expand-rotate;
+  animation-duration: 0.3s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-out;
 }
 
 .expand-rotate {
@@ -635,28 +631,24 @@
 
 /*** Animation: rotate collapse  90 -> 0 deg ***/
 
-@-webkit-keyframes collapse-rotate {
-  .keyframes-collapse-rotate();
-}
-
 @keyframes collapse-rotate {
   .keyframes-collapse-rotate();
 }
 
 .keyframes-collapse-rotate() {
   00% { /* see comment on top */
-    #scout.transform(rotate(89.99deg));
+    transform: rotate(89.99deg);
   }
   100% {
-    #scout.transform(rotate(0deg));
+    transform: rotate(0deg);
   }
 }
 
 .animation-collapse-rotate() {
-  #scout.animation-name(collapse-rotate);
-  #scout.animation-duration(0.3s);
-  #scout.animation-iteration-count(1);
-  #scout.animation-timing-function(ease-out);
+  animation-name: collapse-rotate;
+  animation-duration: 0.3s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-out;
 }
 
 .collapse-rotate {

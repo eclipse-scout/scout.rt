@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,29 +13,29 @@
      * the proposal-chooser popup produced an accidental flickering animation where the proposal table
      * jumped a few pixels to the left. With 0.5 this does not happen - only god knows why. See #241249.
      */
-    #scout.transform(scaleY(0.5));
-    #scout.animation-name(grow-y);
-    #scout.animation-duration(0.125s);
+    transform: scaleY(0.5);
+    animation-name: grow-y;
+    animation-duration: 0.125s;
 
     &.bottom {
-      #scout.transform-origin(top);
+      transform-origin: top;
     }
 
     &.top {
-      #scout.transform-origin(bottom);
+      transform-origin: bottom;
     }
   }
 
   &.animate-remove {
-    #scout.animation-name(shrink-y);
-    #scout.animation-duration(0.125s);
+    animation-name: shrink-y;
+    animation-duration: 0.125s;
 
     &.bottom {
-      #scout.transform-origin(top);
+      transform-origin: top;
     }
 
     &.top {
-      #scout.transform-origin(bottom);
+      transform-origin: bottom;
     }
   }
 }

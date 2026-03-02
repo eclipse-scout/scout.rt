@@ -2223,13 +2223,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     }
   }
 
-  /**
-   * @deprecated use {@link _removeAllRows} to only remove DOM elements, otherwise use {@link deleteAllRows}
-   */
-  removeAllRows() {
-    this._removeAllRows();
-  }
-
   protected _removeAllRows() {
     if (this._isDataRendered()) {
       this.$rows().each((i, elem) => {
@@ -2882,13 +2875,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   /**
-   * @deprecated use {@link group} instead.
-   */
-  groupColumn(column: Column<any>, multiGroup?: boolean, direction?: 'asc' | 'desc', remove?: boolean) {
-    this.group(column, direction, multiGroup);
-  }
-
-  /**
    * @param column
    *          the column to group by.
    * @param direction
@@ -2939,20 +2925,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       this._animateAggregateRows = true;
     }
     this.trigger('group', data);
-  }
-
-  /**
-   * @deprecated use removeGroupColumn
-   */
-  removeColumnGrouping(column: Column<any>) {
-    this.removeGroupColumn(column);
-  }
-
-  /**
-   * @deprecated use removeGroupColumn
-   */
-  removeAllColumnGroupings() {
-    this.removeAllGroupColumns();
   }
 
   /**
@@ -3601,13 +3573,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
   protected _sortAfterUpdate() {
     this._sort();
-  }
-
-  /**
-   * @deprecated use {@link hierarchical} instead
-   */
-  isHierarchical(): boolean {
-    return this.hierarchical;
   }
 
   protected _setHierarchical(hierarchical: boolean) {
@@ -4291,13 +4256,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
   columnsByIds<TId extends string & keyof ColumnMapOf<this>>(columnIds: TId[]): ColumnMapOf<this>[TId][] {
     return columnIds.map(id => this.columnById(id));
-  }
-
-  /**
-   * @deprecated use {@link visibleRows} instead.
-   */
-  getVisibleRows(): TableRow[] {
-    return this.visibleRows;
   }
 
   protected _updateRowStructure(options: UpdateTableRowStructureOptions) {

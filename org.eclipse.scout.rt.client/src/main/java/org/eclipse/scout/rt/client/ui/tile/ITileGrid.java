@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,22 +47,6 @@ public interface ITileGrid<T extends ITile> extends IWidget, IExtensibleObject, 
   String ASYNC_LOAD_IDENTIFIER_PREFIX = "tileAsyncDataLoadIdentifier";
   String WINDOW_IDENTIFIER_PREFIX = "tileDataLoadWindowsIdentifier";
   String RUN_CONTEXT_TILE_LOAD_CANCELLABLE = "tileDataLoadCancellable";
-
-  /**
-   * @deprecated use {@link #ASYNC_LOAD_JOBNAME_PREFIX}
-   */
-  @Deprecated
-  String PROP_ASYNC_LOAD_JOBNAME_PREFIX = ASYNC_LOAD_JOBNAME_PREFIX;
-  /**
-   * @deprecated use {@link #ASYNC_LOAD_IDENTIFIER_PREFIX}
-   */
-  @Deprecated
-  String PROP_ASYNC_LOAD_IDENTIFIER_PREFIX = ASYNC_LOAD_IDENTIFIER_PREFIX;
-  /**
-   * @deprecated use {@link #WINDOW_IDENTIFIER_PREFIX}
-   */
-  @Deprecated
-  String PROP_WINDOW_IDENTIFIER_PREFIX = WINDOW_IDENTIFIER_PREFIX;
 
   String LOGICAL_GRID_HORIZONTAL = "HorizontalGrid";
   String LOGICAL_GRID_VERTICAL_SMART = "VerticalSmartGrid";

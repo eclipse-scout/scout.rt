@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -68,9 +67,9 @@ public class FileUtilityTest {
     try (InputStream in = new BufferedInputStream(Files.newInputStream(zipFile))) {
       FileUtility.extractZip(in, targetDir);
       try (Stream<Path> files = Files.list(targetDir)) {
-        List<Path> fileList = files.collect(Collectors.toList());
+        List<Path> fileList = files.toList();
         assertEquals(1, fileList.size());
-        assertEquals("testdata", fileList.get(0).getFileName().toString());
+        assertEquals("testdata", fileList.getFirst().getFileName().toString());
       }
     }
     finally {
@@ -86,9 +85,9 @@ public class FileUtilityTest {
     try {
       FileUtility.extractZip(zipFile, targetDir);
       try (Stream<Path> files = Files.list(targetDir)) {
-        List<Path> fileList = files.collect(Collectors.toList());
+        List<Path> fileList = files.toList();
         assertEquals(1, fileList.size());
-        assertEquals("testdata", fileList.get(0).getFileName().toString());
+        assertEquals("testdata", fileList.getFirst().getFileName().toString());
       }
     }
     finally {
@@ -115,53 +114,6 @@ public class FileUtilityTest {
       return "zip-slip.zip";
     }
     return "zip-slip-win.zip";
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testExtractArchiveNested() throws IOException {
-    Path root = Files.createTempDirectory("scoutExtractArchiveTest");
-    Path target = root.resolve("testdata");
-    Files.createDirectories(target);
-    File zipFile = createTempFile("testdata_nested.zip");
-    try {
-      FileUtility.extractArchive(zipFile, target.toFile());
-      try (Stream<Path> targetList = Files.list(target)) {
-        List<Path> files = targetList.collect(Collectors.toList());
-        assertEquals(1, files.size());
-        assertEquals("testdata.txt", files.get(0).getFileName().toString());
-      }
-    }
-    finally {
-      IOUtility.deleteFile(zipFile);
-      IOUtility.deleteDirectory(root.toFile());
-    }
-  }
-
-  @Test
-  public void testExtractArchive() throws IOException {
-    extractArchiveToDir("zip.zip");
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testExtractArchiveZipSlip() throws IOException {
-    extractArchiveToDir(getZipSlipSampleFileName());
-  }
-
-  @SuppressWarnings("deprecation")
-  private void extractArchiveToDir(String zipName) throws IOException {
-    Path target = Files.createTempDirectory("scoutExtractArchiveTest");
-    File zipFile = createTempFile(zipName);
-    try {
-      FileUtility.extractArchive(zipFile, target.toFile());
-      try (Stream<Path> targetList = Files.list(target)) {
-        assertEquals(1, targetList.count());
-      }
-    }
-    finally {
-      IOUtility.deleteFile(zipFile);
-      IOUtility.deleteDirectory(target.toFile());
-    }
   }
 
   private File createTempFile(String name) throws IOException {

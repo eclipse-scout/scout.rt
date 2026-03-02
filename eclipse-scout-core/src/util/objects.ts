@@ -385,13 +385,6 @@ export const objects = {
   },
 
   /**
-   * @deprecated The method was renamed to {@link isObject}. Use the new name or consider using {@link isPojo} instead.
-   */
-  isPlainObject<T>(obj: T): obj is Exclude<typeof obj, Primitive | undefined | null | T[]> {
-    return objects.isObject(obj);
-  },
-
-  /**
    * @returns true if the given object is an object: no primitive type (number, string, boolean, bigint, symbol), no array, not null and not undefined.
    */
   isObject<T>(obj: T): obj is Exclude<typeof obj, Primitive | undefined | null | T[]> {

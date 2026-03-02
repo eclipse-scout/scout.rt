@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -70,15 +70,6 @@ export class SplitBox extends CompositeField {
     ABSOLUTE_FIRST: 'absoluteFirst',
     ABSOLUTE_SECOND: 'absoluteSecond'
   } as const;
-
-  /** @deprecated use SplitBox.SplitterPositionType instead */
-  static SPLITTER_POSITION_TYPE_RELATIVE_FIRST = SplitBox.SplitterPositionType.RELATIVE_FIRST;
-  /** @deprecated use SplitBox.SplitterPositionType instead */
-  static SPLITTER_POSITION_TYPE_RELATIVE_SECOND = SplitBox.SplitterPositionType.RELATIVE_SECOND;
-  /** @deprecated use SplitBox.SplitterPositionType instead */
-  static SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST = SplitBox.SplitterPositionType.ABSOLUTE_FIRST;
-  /** @deprecated use SplitBox.SplitterPositionType instead */
-  static SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND = SplitBox.SplitterPositionType.ABSOLUTE_SECOND;
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
@@ -425,7 +416,7 @@ export class SplitBox extends CompositeField {
   }
 
   protected _updateCollapseHandle() {
-    // always unregister key stroke first (although it may have been added by _setToggleCollapseKeyStroke before)
+    // always unregister keystroke first (although it may have been added by _setToggleCollapseKeyStroke before)
     if (this.toggleCollapseKeyStroke) {
       this.unregisterKeyStrokes(this.toggleCollapseKeyStroke);
     }

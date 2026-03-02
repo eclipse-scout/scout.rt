@@ -141,7 +141,7 @@
 
   &.loading {
     & > .icon {
-      #scout.animation(pulsate-in-out 2.2s ease-in-out infinite);
+      animation: pulsate-in-out 2.2s ease-in-out infinite;
     }
   }
 
@@ -317,19 +317,19 @@
 
 .animate-dot {
   position: relative;
-  #scout.animation-name(animateDot);
-  #scout.animation-duration(1650ms);
-  #scout.animation-iteration-count(infinite);
+  animation-name: animateDot;
+  animation-duration: 1650ms;
+  animation-iteration-count: infinite;
 }
 
 .delay-0 {
-  #scout.animation-delay(0ms);
+  animation-delay: 0ms;
 }
 
 .delay-1 {
-  #scout.animation-delay(200ms);
+  animation-delay: 200ms;
 }
 
 .delay-2 {
-  #scout.animation-delay(400ms);
+  animation-delay: 400ms;
 }

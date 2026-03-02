@@ -23,8 +23,6 @@ import org.eclipse.scout.rt.api.data.ApiExposed;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
-import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.rest.error.ErrorResponseBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +43,6 @@ public class ApiExposedFilter implements ContainerRequestFilter {
 
   protected static final String DEFAULT_FORBIDDEN_MESSAGE = "Forbidden";
 
-  private final boolean m_rejectRequests = CONFIG.getPropertyValue(RejectNonExposedRequestsWithNotFoundConfigProperty.class);
-
   @Override
   public void filter(ContainerRequestContext requestContext) throws IOException {
     String proxiedRequestHeader = requestContext.getHeaderString(HTTP_HEADER_NAME);
@@ -57,11 +53,8 @@ public class ApiExposedFilter implements ContainerRequestFilter {
     }
 
     // not allowed
-    boolean increaseLogLevel = !m_rejectRequests || Platform.get().inDevelopmentMode();
-    LOG.atLevel(increaseLogLevel ? Level.WARN : Level.DEBUG).log("External access to {} not allowed, reason: class/method is not marked with {}", getRequestPath(requestContext), ApiExposed.class.getSimpleName());
-    if (m_rejectRequests) {
-      requestContext.abortWith(BEANS.get(ErrorResponseBuilder.class).withHttpStatus(Response.Status.FORBIDDEN).withMessage(getForbiddenMessage(requestContext)).build());
-    }
+    LOG.atLevel(Platform.get().inDevelopmentMode() ? Level.WARN : Level.DEBUG).log("External access to {} not allowed, reason: class/method is not marked with {}", getRequestPath(requestContext), ApiExposed.class.getSimpleName());
+    requestContext.abortWith(BEANS.get(ErrorResponseBuilder.class).withHttpStatus(Response.Status.FORBIDDEN).withMessage(getForbiddenMessage(requestContext)).build());
   }
 
   protected URI getRequestPath(ContainerRequestContext requestContext) {
@@ -74,28 +67,5 @@ public class ApiExposedFilter implements ContainerRequestFilter {
    */
   public String getForbiddenMessage(ContainerRequestContext requestContext) {
     return DEFAULT_FORBIDDEN_MESSAGE;
-  }
-
-  /**
-   * @deprecated Internal config property, will be removed with 26/2 (or a future release)
-   */
-  @SuppressWarnings("DeprecatedIsStillUsed")
-  @Deprecated
-  public static class RejectNonExposedRequestsWithNotFoundConfigProperty extends AbstractBooleanConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.rest.api.exposed.enforce";
-    }
-
-    @Override
-    public String description() {
-      return "Set to true to reject non api-exposed operations with a not found error (404), no warning will be logged in this case (just for development mode); if set to false only a warning will be logged but requests are not rejected (default value: " + getDefaultValue() + ")";
-    }
-
-    @Override
-    public Boolean getDefaultValue() {
-      return true;
-    }
   }
 }

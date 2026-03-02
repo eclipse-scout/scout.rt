@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,14 +22,6 @@ public class EncryptionKey {
   private final Key m_key;
   private final AlgorithmParameterSpec m_params;
   private final byte[] m_compatibilityHeader;
-
-  /**
-   * @deprecated use {@link #EncryptionKey(Key, AlgorithmParameterSpec, byte[])} instead
-   */
-  @Deprecated
-  public EncryptionKey(Key key, AlgorithmParameterSpec params) {
-    this(key, params, null);
-  }
 
   public EncryptionKey(Key key, AlgorithmParameterSpec params, byte[] compatibilityHeader) {
     m_key = key;

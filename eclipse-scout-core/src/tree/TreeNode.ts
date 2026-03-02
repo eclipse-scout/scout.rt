@@ -119,13 +119,6 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
     // NOP
   }
 
-  /**
-   * @deprecated use {@link tree} instead.
-   */
-  getTree(): Tree {
-    return this.tree;
-  }
-
   get tree(): Tree {
     return this.parent;
   }

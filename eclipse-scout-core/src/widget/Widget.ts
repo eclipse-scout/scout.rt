@@ -1010,13 +1010,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     return this.getProperty('visibleGranted');
   }
 
-  /**
-   * @deprecated use {@link visible} directly. Will be removed in an upcoming release.
-   */
-  isVisible(): boolean {
-    return this.visible;
-  }
-
   protected _renderVisible() {
     if (!this.$container) {
       return;
@@ -2238,19 +2231,12 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * @deprecated use {@link get$Focusable} instead
-   */
-  getFocusableElement(): HTMLElement | JQuery {
-    return this.$container;
-  }
-
-  /**
    * Returns the {@link JQuery} element to be used when {@link focus} is called.
    *
    * In case another element than {@link $container} should be used, this method can be overridden.
    */
   get$Focusable(): JQuery {
-    return $.ensure(this.getFocusableElement());
+    return $.ensure(this.$container); // $.ensure required so that it never returns null.
   }
 
   protected _installScrollbars(options?: ScrollbarInstallOptions) {

@@ -185,17 +185,9 @@
     color: @tile-default-inverted-color;
 
     &.disabled:not(.read-only) {
-      & ::-moz-selection {
-        #scout.text-selection();
-      }
-
       & ::selection {
         #scout.text-selection();
       }
-    }
-
-    & ::-moz-selection {
-      background: darken(@text-selection-background-color, 10);
     }
 
     & ::selection {
@@ -301,10 +293,6 @@
   &.inverted.color-alternative {
     --tile-background-color: @tile-alternative-inverted-background-color;
     color: @tile-alternative-inverted-color;
-
-    & ::-moz-selection {
-      #scout.text-selection();
-    }
 
     & ::selection {
       #scout.text-selection();
