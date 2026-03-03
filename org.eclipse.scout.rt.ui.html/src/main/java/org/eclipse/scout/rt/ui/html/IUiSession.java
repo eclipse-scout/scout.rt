@@ -47,6 +47,11 @@ public interface IUiSession {
   String PREFERRED_LOCALE_COOKIE_NAME = "scout.preferredLocale";
 
   /**
+   * Name of the HTTP header to transport the ID of the {@link IUiSession}.
+   */
+  String ID_HTTP_HEADER_NAME = "X-Scout-Ui-Session-Id";
+
+  /**
    * Returns a reentrant lock that can be used to synchronize on the {@link IUiSession}.
    */
   ReentrantLock uiSessionLock();
