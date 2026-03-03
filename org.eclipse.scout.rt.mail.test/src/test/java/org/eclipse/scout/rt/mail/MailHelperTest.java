@@ -10,6 +10,8 @@
 package org.eclipse.scout.rt.mail;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,25 +43,60 @@ import jakarta.mail.internet.MimeUtility;
 import jakarta.mail.util.ByteArrayDataSource;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.security.MalwareScanner;
+import org.eclipse.scout.rt.platform.security.UnsafeResourceException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 
 /**
  * JUnit tests for {@link MailHelper}
  */
 public class MailHelperTest {
 
+  private static final byte[] NORMAL_DATA = new byte[]{0xA};
+  private static final byte[] MALICIOUS_DATA = new byte[]{0xB};
+
+  private static List<IBean<Object>> s_beans = new ArrayList<>();
+
   /**
    * Very rare, unknown character set. Currently, UTF-7, by default Oracle JDK does not support it.
    */
   @SuppressWarnings("InjectedReferences")
   private static final String RARE_UNKNOWN_CHARSET = "unicode-1-1-utf-7";
+
+  @BeforeClass
+  public static void beforeClass() {
+    final BeanTestingHelper testingHelper = BeanTestingHelper.get();
+
+    MalwareScanner malwareScannerMock = mock(MalwareScanner.class);
+
+    Mockito.doAnswer((Answer<Void>) invocation -> {
+      BinaryResource binaryResource = invocation.getArgument(0);
+      if (Arrays.equals(MALICIOUS_DATA, binaryResource.getContent())) {
+        throw new UnsafeResourceException("MALICIOUS_DATA");
+      }
+      return null;
+    }).when(malwareScannerMock).scan(any(BinaryResource.class));
+    s_beans.add(testingHelper.registerBean(new BeanMetaData(MalwareScanner.class).withInitialInstance(malwareScannerMock)));
+  }
+
+  @AfterClass
+  public static void afterClass() {
+    BeanTestingHelper.get().unregisterBeans(s_beans);
+  }
 
   /**
    * Message without sender can be created
@@ -831,5 +869,33 @@ public class MailHelperTest {
       participants.add(new MailParticipant().withEmail(email));
     }
     return participants;
+  }
+
+  @Test
+  public void testRemoveMaliciousAttachments() throws MessagingException {
+    final String plainText = "plain text";
+    MailMessage definition = new MailMessage().withBodyPlainText(plainText);
+
+    definition.withAttachment(new MailAttachment(BEANS.get(MailHelper.class).createDataSource(new ByteArrayInputStream(NORMAL_DATA), "normal.dat", null)));
+    definition.withAttachment(new MailAttachment(BEANS.get(MailHelper.class).createDataSource(new ByteArrayInputStream(MALICIOUS_DATA), "malicious.dat", null)));
+
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(definition);
+
+    assertTrue(BEANS.get(MailHelper.class).removeMaliciousAttachments(message));
+
+    message.saveChanges();
+    List<Part> attachmentParts = BEANS.get(MailHelper.class).getAttachmentParts(message);
+    assertEquals(2, attachmentParts.size());
+    assertTrue(attachmentParts.stream().anyMatch(part -> partMatches(part, "normal.dat", NORMAL_DATA)));
+    assertTrue(attachmentParts.stream().anyMatch(part -> partMatches(part, "malicious.dat.txt", MailHelper.UNSAFE_ATTACHMENT_TEXT.getBytes())));
+  }
+
+  protected boolean partMatches(Part part, String filename, byte[] content) {
+    try (InputStream inputStream = part.getInputStream()) {
+      return filename.equals(part.getFileName()) && Arrays.equals(content, inputStream.readAllBytes());
+    }
+    catch (MessagingException | IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
