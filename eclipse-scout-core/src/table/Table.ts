@@ -5209,8 +5209,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   createTiles(rows: TableRow[]): Tile[] {
     return rows.map(row => {
       let tile = this.createTileForRow(row);
-      this._adaptTile(tile);
-      tile.rowId = row.id;
+      if (tile) {
+        this._adaptTile(tile);
+        tile.rowId = row.id;
+      }
       return tile;
     });
   }
