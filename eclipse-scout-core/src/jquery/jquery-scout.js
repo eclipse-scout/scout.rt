@@ -1449,23 +1449,82 @@ $.fn.unfocusable = function() {
 };
 
 $.fn.selectAllText = function() {
-  let range,
-    myDocument = this.document(true),
-    myWindow = this.window(true),
-    element = this[0];
+  let element = this[0];
+  let document = this.document(true);
 
-  if (!myDocument || !myDocument.body || !myWindow || !element) {
+  if (!element || !document) {
     return this;
   }
 
-  if (myWindow.getSelection) {
-    range = myDocument.createRange();
-    range.selectNodeContents(element);
-    myWindow.getSelection().removeAllRanges();
-    myWindow.getSelection().addRange(range);
+  if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+    element.select();
+    return this;
   }
 
+  let selection = document.getSelection();
+  if (selection) {
+    let range = document.createRange();
+    range.selectNodeContents(element);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
   return this;
+};
+
+$.fn.selectedText = function() {
+  let element = this[0];
+  let document = this.document(true);
+
+  if (!element || !document || !document.body) {
+    return ''; // empty or detached element
+  }
+
+  // Special handling for <input> and <textarea>, because getSelection() does not work for such
+  // elements in Firefox (see https://developer.mozilla.org/en-US/docs/Web/API/Document/getSelection)
+  if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+    return element.value ? element.value.substring(element.selectionStart, element.selectionEnd) : '';
+  }
+
+  // Get DOM selection
+  let selection = document.getSelection();
+  if (!selection?.rangeCount) {
+    return ''; // no selection
+  }
+  let selectedRange = selection.getRangeAt(0);
+
+  // Ignore selection if it is completely outside the element
+  let elementRange = document.createRange();
+  elementRange.selectNodeContents(element);
+  if (selectedRange.compareBoundaryPoints(Range.END_TO_START, elementRange) > 0) {
+    return ''; // end of selectedRange is before start of elementRange
+  }
+  if (selectedRange.compareBoundaryPoints(Range.START_TO_END, elementRange) < 0) {
+    return ''; // start of selectedRange is after end of elementRange
+  }
+
+  // Build a new range consisting of only the selected part within the element
+  let selectedElementRange = selectedRange.cloneRange();
+  if (selectedRange.compareBoundaryPoints(Range.START_TO_START, elementRange) < 0) {
+    // start of selectedRange is before start of elementRange -> truncate to elementRange
+    selectedElementRange.setStart(elementRange.startContainer, elementRange.startOffset);
+  }
+  if (selectedRange.compareBoundaryPoints(Range.END_TO_END, elementRange) > 0) {
+    // end of selectedRange is after end of elementRange -> truncate to elementRange
+    selectedElementRange.setEnd(elementRange.endContainer, elementRange.endOffset);
+  }
+
+  // Range#toString only returns the content of text nodes, therefore newlines represented by <br> are missing,
+  // see https://dom.spec.whatwg.org/#dom-range-stringifier. To retain the newline characters, we create a temporary
+  // element with the cloned content and use to 'innerText' property to convert it to plain text. Because <br> only
+  // has an effect when rendered, we have to insert the temporary element in the DOM tree. Hiding the element is
+  // not necessary, since we remove it again immediately.
+  let tmp = document.createElement('div');
+  tmp.appendChild(selectedElementRange.cloneContents());
+  document.body.appendChild(tmp);
+  let text = tmp.innerText;
+  tmp.remove();
+
+  return text;
 };
 
 $.fn._getClientAndScrollWidthRounded = function() {
