@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,8 +23,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
+import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,9 +69,16 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
         }
         if (userSessions.isEmpty()) {
           m_userToSessions.remove(userId);
+          execAllUserSessionsStopped(userId);
         }
       }
     }
+  }
+
+  /**
+   * Called when all client sessions of a user have been stopped.
+   */
+  protected void execAllUserSessionsStopped(String userId) {
   }
 
   /**
