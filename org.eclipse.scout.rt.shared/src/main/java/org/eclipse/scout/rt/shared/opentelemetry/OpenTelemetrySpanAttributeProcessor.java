@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.opentelemetry.OpenTelemetryProperties.OpenTelemetrySpanAttributeProcessorEnabledProperty;
 import org.eclipse.scout.rt.platform.opentelemetry.OpenTelemetryProperties.OpenTelemetryTracingEnabledProperty;
-import org.eclipse.scout.rt.shared.user.UserId;
+import org.eclipse.scout.rt.platform.security.User;
 
 import io.opentelemetry.api.trace.Span;
 
@@ -52,6 +52,6 @@ public class OpenTelemetrySpanAttributeProcessor implements ICallableDecorator {
   }
 
   protected String getUserIdValue() {
-    return UserId.CURRENT.get();
+    return User.currentUserId();
   }
 }

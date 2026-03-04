@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,18 +28,18 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
-import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.logging.UserIdContextValueProvider;
 import org.eclipse.scout.rt.shared.opentelemetry.OpenTelemetrySpanAttributeProcessor;
+import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.session.ScoutSessionIdContextValueProvider;
 import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.rt.shared.user.UserId;
 
 /**
  * Use this class to propagate client-side context.
@@ -65,7 +65,6 @@ public class ClientRunContext extends RunContext {
     callableChain
         .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
         .add(new ThreadLocalProcessor<>(SessionId.CURRENT, getSession() != null ? getSession().getId() : null))
-        .add(new ThreadLocalProcessor<>(UserId.CURRENT, getSession() != null ? getSession().getUserId() : null))
         .add(new DiagnosticContextValueProcessor(BEANS.get(UserIdContextValueProvider.class)))
         .add(new DiagnosticContextValueProcessor(BEANS.get(ScoutSessionIdContextValueProvider.class)))
         .add(new OpenTelemetrySpanAttributeProcessor())
@@ -84,6 +83,12 @@ public class ClientRunContext extends RunContext {
   @Override
   public ClientRunContext withSubject(final Subject subject) {
     super.withSubject(subject);
+    return this;
+  }
+
+  @Override
+  public ClientRunContext withUser(final User user) {
+    super.withUser(user);
     return this;
   }
 
@@ -187,6 +192,7 @@ public class ClientRunContext extends RunContext {
       m_locale = (session != null ? session.getLocale() : null);
       m_userAgent = (session != null ? session.getUserAgent() : null);
       m_subject = (session != null ? session.getSubject() : null);
+      m_user = (session != null ? session.getUser() : null);
       m_desktop = (session != null ? session.getDesktopElseVirtualDesktop() : null);
     }
     return this;

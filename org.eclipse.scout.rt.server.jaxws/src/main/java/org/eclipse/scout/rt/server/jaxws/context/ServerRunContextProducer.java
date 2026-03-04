@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.shared.user.UserId;
 
 /**
  * Producer for {@link RunContext} objects.
@@ -37,7 +36,7 @@ public class ServerRunContextProducer extends RunContextProducer {
   public ServerRunContext produce(final Subject subject) {
     return ServerRunContexts.copyCurrent(true)
         .withSubject(subject)
-        .withThreadLocal(UserId.CURRENT, BEANS.get(IAccessControlService.class).getUserId(subject))
+        .withUser(BEANS.get(IAccessControlService.class).getUser(subject))
         .withTransactionScope(TransactionScope.REQUIRES_NEW);
   }
 }

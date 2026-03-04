@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,10 +27,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -91,9 +93,10 @@ public class ServerSessionProviderWithCacheTest {
   public void testNewSessionCacheKey() {
     ServerSessionProviderWithCache sessionProvider = createAndRegisterDefaultSessionProviderWithCache();
     Subject subject = createSubject("anna");
+    User user = BEANS.get(IAccessControlService.class).getUser(subject);
     assertNull(sessionProvider.newSessionCacheKey(null, null));
     assertEquals(new CompositeObject("sessionId"), sessionProvider.newSessionCacheKey("sessionId", null));
-    assertEquals(new CompositeObject("anna"), sessionProvider.newSessionCacheKey(null, subject));
+    assertEquals(new CompositeObject(user), sessionProvider.newSessionCacheKey(null, subject));
     assertEquals(new CompositeObject("sessionId"), sessionProvider.newSessionCacheKey("sessionId", subject));
   }
 
@@ -214,7 +217,10 @@ public class ServerSessionProviderWithCacheTest {
   }
 
   private FixtureServerSession provideSession(String sessionId, String userId) {
-    IServerSession s = m_sessionProviderBean.getInstance().provide(sessionId, ServerRunContexts.empty().withSubject(createSubject(userId)));
+    Subject subject = createSubject(userId);
+    IServerSession s = m_sessionProviderBean.getInstance().provide(sessionId, ServerRunContexts.empty()
+        .withSubject(subject)
+        .withUser(BEANS.get(IAccessControlService.class).getUser(subject)));
     return Assertions.assertInstance(s, FixtureServerSession.class);
   }
 

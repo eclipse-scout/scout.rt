@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.logging.ServletDiagnosticsProviderFactory;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
@@ -64,6 +65,7 @@ public class JaxWsRunContextLookup {
 
     return runContext
         .withSubject(subject)
+        .withUser(BEANS.get(IAccessControlService.class).getUser(subject))
         .withCorrelationId(cid)
         .withThreadLocal(IWebServiceContext.CURRENT, webServiceContext)
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, request)

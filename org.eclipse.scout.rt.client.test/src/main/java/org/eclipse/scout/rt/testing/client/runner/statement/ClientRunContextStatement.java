@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -63,7 +64,9 @@ public class ClientRunContextStatement extends Statement {
     final IBean clientSessionBean = BEANS.getBeanManager().registerBean(new BeanMetaData(sessionClass).withOrder(-Long.MAX_VALUE));
     try {
       // Obtain the client session for the given subject. Depending on the session provider, a new session is created or a cached session returned.
-      final IClientSession clientSession = BEANS.get(m_clientSessionAnnotation.provider()).provide(ClientRunContexts.copyCurrent().withSubject(currentSubject));
+      final IClientSession clientSession = BEANS.get(m_clientSessionAnnotation.provider()).provide(ClientRunContexts.copyCurrent()
+          .withSubject(currentSubject)
+          .withUser(BEANS.get(IAccessControlService.class).getUser(currentSubject)));
 
       // Run the test on behalf of a ClientRunContext.
       final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,6 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.security;
+
+import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
 
 import java.security.PermissionCollection;
 import java.security.Principal;
@@ -32,7 +34,7 @@ import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
 import org.eclipse.scout.rt.platform.cache.ICacheInvalidationListener;
 import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
 import org.eclipse.scout.rt.platform.cache.KeyCacheEntryFilter;
-import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.slf4j.Logger;
@@ -40,27 +42,25 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Common logic for an {@link IAccessControlService} implementation. An Implementation has to override
- * {@link #getCurrentUserCacheKey()} and {@link #execLoadPermissions(Object)}. For example use as generic key type
- * String and simply return as cache key the current userId in {@link #getCurrentUserCacheKey()}.
+ * {@link #execLoadPermissions(User)}. The method {{@link #getUser(Subject)}} creates the {@link User} object for the
+ * given {@link Subject} that is used to load the permissions and is also used as cache key.
  * <p>
- * <b>Note</b> that the method {@link #execLoadPermissions(Object)} must not have a valid implementation in the client,
+ * <b>Note</b> that the method {@link #execLoadPermissions(User)} must not have a valid implementation in the client,
  * as a client will always get the value from the server. Therefore, consider two implementations like
  * <tt>'CustomAccessControlService'</tt> and <tt>'CustomServerAccessControlService'</tt>.
  * <p>
  * This class caches permission collections. As default, the cache is transactional and with a time to live duration of
  * one hour. To change any of these properties override {@link #createCacheBuilder()}.
  *
- * @param <K>
- *     the type of keys maintained the cache
  * @since 4.3.0 (Mars-M5)
  */
-public abstract class AbstractAccessControlService<K> implements IAccessControlService {
+public abstract class AbstractAccessControlService implements IAccessControlService {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractAccessControlService.class);
   public static final String ACCESS_CONTROL_SERVICE_CACHE_ID = AbstractAccessControlService.class.getName();
 
   private volatile Pattern[] m_userIdSearchPatterns;
-  private volatile ICache<K, IPermissionCollection> m_cache;
-  private volatile IFastListenerList<ICacheInvalidationListener<Object, IPermissionCollection>> m_invalidationListeners;
+  private volatile ICache<User, IPermissionCollection> m_cache;
+  private volatile IFastListenerList<ICacheInvalidationListener<User, IPermissionCollection>> m_invalidationListeners;
 
   public AbstractAccessControlService() {
     m_userIdSearchPatterns = new Pattern[]{
@@ -114,9 +114,9 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
    *
    * @return {@link ICacheBuilder} for the internal cache
    */
-  protected ICacheBuilder<K, IPermissionCollection> createCacheBuilder() {
+  protected ICacheBuilder<User, IPermissionCollection> createCacheBuilder() {
     @SuppressWarnings("unchecked")
-    ICacheBuilder<K, IPermissionCollection> cacheBuilder = BEANS.get(ICacheBuilder.class);
+    ICacheBuilder<User, IPermissionCollection> cacheBuilder = BEANS.get(ICacheBuilder.class);
     return cacheBuilder.withCacheId(ACCESS_CONTROL_SERVICE_CACHE_ID).withValueResolver(createCacheValueResolver())
         .withShared(true)
         .withClusterEnabled(true)
@@ -126,53 +126,48 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
         .withTimeToLive(1L, TimeUnit.HOURS, false);
   }
 
-  protected static class InvalidationListenerWrapper extends AbstractCacheWrapper<Object, IPermissionCollection> {
+  protected static class InvalidationListenerWrapper extends AbstractCacheWrapper<User, IPermissionCollection> {
 
-    public InvalidationListenerWrapper(ICache<Object, IPermissionCollection> delegate) {
+    public InvalidationListenerWrapper(ICache<User, IPermissionCollection> delegate) {
       super(delegate);
     }
 
     @Override
-    public void invalidate(ICacheEntryFilter<Object, IPermissionCollection> filter, boolean propagate) {
+    public void invalidate(ICacheEntryFilter<User, IPermissionCollection> filter, boolean propagate) {
       super.invalidate(filter, propagate);
       BEANS.get(IAccessControlService.class).getInvalidationListeners().forEach(l -> l.invalidated(filter, propagate));
     }
   }
 
   @Override
-  public void addInvalidationListener(ICacheInvalidationListener<Object, IPermissionCollection> listener) {
+  public void addInvalidationListener(ICacheInvalidationListener<User, IPermissionCollection> listener) {
     if (listener != null) {
       m_invalidationListeners.add(listener);
     }
   }
 
   @Override
-  public void removeInvalidationListener(ICacheInvalidationListener<Object, IPermissionCollection> listener) {
+  public void removeInvalidationListener(ICacheInvalidationListener<User, IPermissionCollection> listener) {
     if (listener != null) {
       m_invalidationListeners.remove(listener);
     }
   }
 
   @Override
-  public List<ICacheInvalidationListener<Object, IPermissionCollection>> getInvalidationListeners() {
+  public List<ICacheInvalidationListener<User, IPermissionCollection>> getInvalidationListeners() {
     return m_invalidationListeners.list();
   }
 
-  protected ICacheValueResolver<K, IPermissionCollection> createCacheValueResolver() {
-    return this::execLoadPermissions;
+  protected ICacheValueResolver<User, IPermissionCollection> createCacheValueResolver() {
+    return user -> {
+      assertTrue(user.isReadOnly(), "User must be read only before accessing the permission cache");
+      return execLoadPermissions(user);
+    };
   }
 
-  protected ICache<K, IPermissionCollection> getCache() {
+  protected ICache<User, IPermissionCollection> getCache() {
     return m_cache;
   }
-
-  /**
-   * Implement this method to get the cache key of the current user. Extract it from the current session or any other
-   * property in the current {@link RunContext}.
-   *
-   * @return cache key of the current user or null if the current context has no user assigned to it.
-   */
-  protected abstract K getCurrentUserCacheKey();
 
   /**
    * Implement this method to load a {@link PermissionCollection} for a given cache key. This method must be valid
@@ -180,27 +175,21 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
    *
    * @return new PermissionCollection for the given cache key
    */
-  protected abstract IPermissionCollection execLoadPermissions(K cacheKey);
+  protected abstract IPermissionCollection execLoadPermissions(User user);
 
   @Override
-  public String getUserIdOfCurrentSubject() {
-    return getUserId(Subject.current());
-  }
-
-  @Override
-  public String getUserIdForCacheKey(Object cacheKey) {
-    if (cacheKey instanceof String) {
-      // default implementation where the userId itself is the cache key
-      return (String) cacheKey;
+  public User getUser(Subject subject) {
+    if (subject == null) {
+      return null;
     }
-
-    // if another cache-key is used, subclasses must implement their own mapping
-    LOG.error("By default only userId cacheKeys are supported. Overwrite this method for custom cacheKeys.");
-    return null;
+    User user = BEANS.get(User.class)
+        .withUserId(extractUserId(subject));
+    initUser(user, subject);
+    return user.setReadOnly();
   }
 
   @Override
-  public String getUserId(Subject subject) {
+  public String extractUserId(Subject subject) {
     if (subject == null) {
       return null;
     }
@@ -216,13 +205,20 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
     return null;
   }
 
+  /**
+   * Load additional data using given {@code subject} to {@link User}.
+   */
+  protected void initUser(User user, Subject subject) {
+    // NOP
+  }
+
   @Override
   public IPermissionCollection getPermissions() {
-    K currentUserCacheKey = getCurrentUserCacheKey();
-    IPermissionCollection permissions = getCache().get(currentUserCacheKey);
-    LOG.trace("getPermissions() called for {}, returned {}", currentUserCacheKey, permissions);
+    User user = User.current();
+    IPermissionCollection permissions = getCache().get(user);
+    LOG.trace("getPermissions() called for {}, returned {}", user, permissions);
     if (permissions == null) {
-      LOG.error("getPermissions() called for {}, returned {}", currentUserCacheKey, permissions);
+      LOG.error("getPermissions() called for {}, returned {}", user, permissions);
     }
     return permissions == null ? BEANS.get(NonePermissionCollection.class) : permissions;
   }
@@ -234,14 +230,14 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
 
   @Override
   public void clearCacheOfCurrentUser() {
-    clearCache(Collections.singleton(getCurrentUserCacheKey()));
+    clearCache(Collections.singleton(User.current()));
   }
 
-  protected void clearCache(Collection<? extends K> cacheKeys) {
+  protected void clearCache(Collection<User> cacheKeys) {
     if (cacheKeys == null) {
       return;
     }
-    KeyCacheEntryFilter<K, IPermissionCollection> filter = new KeyCacheEntryFilter<>(cacheKeys);
+    KeyCacheEntryFilter<User, IPermissionCollection> filter = new KeyCacheEntryFilter<>(cacheKeys);
     if (filter.getKeys().isEmpty()) {
       return;
     }

@@ -13,11 +13,11 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
-import org.eclipse.scout.rt.shared.user.UserId;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
 import org.junit.runners.model.Statement;
@@ -25,7 +25,7 @@ import org.junit.runners.model.Statement;
 /**
  * Statement to execute the following statements under a particular user given by a {@link Subject}.
  * <p>
- * Additionally sets the {@link UserId} for the given subject, defines a
+ * Additionally sets the {@link User} for the given subject, defines a
  * random {@link SessionId} and sets the default user agent.
  *
  * @see RunWithSubject
@@ -38,13 +38,15 @@ public class ServerSubjectStatement extends SubjectStatement {
 
   @Override
   protected RunContext createRunContext() {
-    String userId = BEANS.get(IAccessControlService.class).getUserId(getSubject());
-
     ServerRunContext context = ((ServerRunContext) super.createRunContext())
-        .withThreadLocal(UserId.CURRENT, userId)
         .withThreadLocal(SessionId.CURRENT, SessionId.randomSessionId()) // set random session id so that server tests trying to access session id can run without a client session
         .withUserAgent(UserAgents.createDefault());
     return initRunContext(context);
+  }
+
+  @Override
+  protected User createUser() {
+    return BEANS.get(IAccessControlService.class).getUser(getSubject());
   }
 
   protected ServerRunContext initRunContext(ServerRunContext runContext) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,12 +29,12 @@ import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
-import org.eclipse.scout.rt.shared.user.UserId;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -94,7 +94,7 @@ public class InvocationContextTest {
           invocationContext.whenRollback(m_rollbackListener);
           invocationContext.whenInvoke((proxy, method, args) -> {
             invocationTransaction.setValue(ITransaction.CURRENT.get());
-            invocationUserId.setValue(UserId.CURRENT.get());
+            invocationUserId.setValue(User.currentUserId());
 
             return method.invoke(proxy, args);
           });
@@ -104,7 +104,7 @@ public class InvocationContextTest {
         });
 
     assertSame(currentTransaction.getValue(), invocationTransaction.getValue());
-    assertSame(UserId.CURRENT.get(), invocationUserId.getValue());
+    assertSame(User.currentUserId(), invocationUserId.getValue());
     assertEquals(TESTING_CORRELATION_ID, m_port.getRequestContext().get(MessageContexts.PROP_CORRELATION_ID));
 
     verify(m_port).webMethod();
@@ -140,7 +140,7 @@ public class InvocationContextTest {
             invocationContext.whenRollback(m_rollbackListener);
             invocationContext.whenInvoke((proxy, method, args) -> {
               invocationTransaction.setValue(ITransaction.CURRENT.get());
-              invocationUserId.setValue(UserId.CURRENT.get());
+              invocationUserId.setValue(User.currentUserId());
 
               return method.invoke(proxy, args);
             });
@@ -162,7 +162,7 @@ public class InvocationContextTest {
     }
 
     assertSame(currentTransaction.getValue(), invocationTransaction.getValue());
-    assertSame(UserId.CURRENT.get(), invocationUserId.getValue());
+    assertSame(User.currentUserId(), invocationUserId.getValue());
     assertEquals(TESTING_CORRELATION_ID, m_port.getRequestContext().get(MessageContexts.PROP_CORRELATION_ID));
 
     verify(m_port).webMethod();

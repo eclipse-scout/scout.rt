@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.server.session;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +18,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 import org.eclipse.scout.rt.security.IAccessControlService;
@@ -152,7 +153,9 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
       return new CompositeObject(sessionId);
     }
     if (subject != null) {
-      return new CompositeObject(BEANS.get(IAccessControlService.class).getUserId(subject));
+      User user = BEANS.get(IAccessControlService.class).getUser(subject);
+      assertTrue(user.isReadOnly(), "User must be read only before using it as cache key");
+      return new CompositeObject(user);
     }
     return null;
   }

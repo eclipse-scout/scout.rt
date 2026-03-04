@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.holders.StringHolder;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.rest.RestHttpHeaders;
@@ -37,8 +38,8 @@ public class RestRequestCancellationClientRequestFilterTest {
   public void testSubjectSameRunContext() {
     Subject subject = mock(Subject.class);
     RunContext runContext = RunContexts.empty().withSubject(subject);
-    
-    RunContext cancellationRunContext = testCancellationSubject(runContext, runContext);
+
+    RunContext cancellationRunContext = testCancellation(runContext, runContext);
     assertEquals(subject, cancellationRunContext.getSubject());
   }
 
@@ -48,8 +49,18 @@ public class RestRequestCancellationClientRequestFilterTest {
     RunContext runContext = RunContexts.empty().withSubject(subject);
 
     // if context calling the cancellation does not include a Subject, the Subject of the original request should be used
-    RunContext cancellationRunContext = testCancellationSubject(runContext, RunContexts.empty());
+    RunContext cancellationRunContext = testCancellation(runContext, RunContexts.empty());
     assertEquals(subject, cancellationRunContext.getSubject());
+  }
+
+  @Test
+  public void testUserFallback() {
+    User user = createUserMock();
+    RunContext runContext = RunContexts.empty().withUser(user);
+
+    // if context calling the cancellation does not include a User, the User of the original request should be used
+    RunContext cancellationRunContext = testCancellation(runContext, RunContexts.empty());
+    assertEquals(user, cancellationRunContext.getUser());
   }
 
   @Test
@@ -58,18 +69,41 @@ public class RestRequestCancellationClientRequestFilterTest {
     Subject subject2 = mock(Subject.class);
 
     // normally the Subject of the context calling the cancellation should be used for cancel call
-    RunContext cancellationRunContext = testCancellationSubject(RunContexts.empty().withSubject(subject1), RunContexts.empty().withSubject(subject2));
+    RunContext cancellationRunContext = testCancellation(RunContexts.empty().withSubject(subject1), RunContexts.empty().withSubject(subject2));
     assertEquals(subject2, cancellationRunContext.getSubject());
+  }
+
+  @Test
+  public void testUserDifferent() {
+    User user1 = createUserMock();
+    User user2 = createUserMock();
+
+    // normally the User of the context calling the cancellation should be used for cancel call
+    RunContext cancellationRunContext = testCancellation(RunContexts.empty().withUser(user1), RunContexts.empty().withUser(user2));
+    assertEquals(user2, cancellationRunContext.getUser());
   }
 
   @Test
   public void testSubjectNone() {
     // if original request and context calling the cancellation does not include a Subject there is not much we can do, we try to run cancellation also without Subject (which might fail though)
-    RunContext cancellationRunContext = testCancellationSubject(RunContexts.empty(), RunContexts.empty());
+    RunContext cancellationRunContext = testCancellation(RunContexts.empty(), RunContexts.empty());
     assertNull(cancellationRunContext.getSubject());
   }
 
-  protected RunContext testCancellationSubject(RunContext requestRunContext, RunContext cancellationRunContext) {
+  @Test
+  public void testUserNone() {
+    // if original request and context calling the cancellation does not include a User there is not much we can do, we try to run cancellation also without User (which might fail though)
+    RunContext cancellationRunContext = testCancellation(RunContexts.empty(), RunContexts.empty());
+    assertNull(cancellationRunContext.getUser());
+  }
+
+  protected User createUserMock() {
+    User user = mock(User.class);
+    when(user.isReadOnly()).thenReturn(true);
+    return user;
+  }
+
+  protected RunContext testCancellation(RunContext requestRunContext, RunContext cancellationRunContext) {
     Holder<RunContext> cancellationRunContextHolder = new Holder<>();
     StringHolder cancellationRequestIdHolder = new StringHolder();
 

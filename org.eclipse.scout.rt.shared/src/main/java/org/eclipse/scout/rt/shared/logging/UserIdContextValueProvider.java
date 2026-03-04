@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.shared.logging;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
-import org.eclipse.scout.rt.shared.user.UserId;
+import org.eclipse.scout.rt.platform.security.User;
 import org.slf4j.MDC;
 
 /**
- * This class provides the {@link UserId#CURRENT} to be set into the <code>diagnostic context map</code> for
+ * This class provides the {@link User#getUserId()} to be set into the <code>diagnostic context map</code> for
  * logging purpose.
  *
  * @see #KEY
@@ -35,6 +35,6 @@ public class UserIdContextValueProvider implements IDiagnosticContextValueProvid
 
   @Override
   public String value() {
-    return UserId.CURRENT.get();
+    return User.currentUserId();
   }
 }

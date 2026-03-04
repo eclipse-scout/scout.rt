@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,6 +16,8 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.platform.cache.ICache;
 import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
 import org.eclipse.scout.rt.platform.cache.ICacheInvalidationListener;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
@@ -24,14 +26,14 @@ import org.eclipse.scout.rt.platform.service.IService;
 public interface IAccessControlService extends IService {
 
   /**
-   * @return current UserId extracted from current {@link Subject}
+   * @return {@link User} object for the provided {@link Subject}
    */
-  String getUserIdOfCurrentSubject();
+  User getUser(Subject subject);
 
   /**
-   * @return current UserId extracted from the provided {@link Subject}
+   * <b>Caution</b> Use carefully only in cases where there is no {@link RunContext} providing {@link User} in context.
    */
-  String getUserId(Subject subject);
+  String extractUserId(Subject subject);
 
   /**
    * Returns the {@link IPermissionCollection} for the current user.
@@ -62,22 +64,15 @@ public interface IAccessControlService extends IService {
    *     The listener to add. The {@link ICacheEntryFilter} given to the listener is the filter passed to
    *     {@link ICache#invalidate(ICacheEntryFilter, boolean)}.
    */
-  void addInvalidationListener(ICacheInvalidationListener<Object, IPermissionCollection> listener);
+  void addInvalidationListener(ICacheInvalidationListener<User, IPermissionCollection> listener);
 
   /**
    * Removes the given listener.
    */
-  void removeInvalidationListener(ICacheInvalidationListener<Object, IPermissionCollection> listener);
+  void removeInvalidationListener(ICacheInvalidationListener<User, IPermissionCollection> listener);
 
   /**
    * @return All registered invalidation listeners.
    */
-  List<ICacheInvalidationListener<Object, IPermissionCollection>> getInvalidationListeners();
-
-  /**
-   * @param cacheKey
-   *     A cacheKey used by the internal cache of this service.
-   * @return The userId (username) of the given cacheKey.
-   */
-  String getUserIdForCacheKey(Object cacheKey);
+  List<ICacheInvalidationListener<User, IPermissionCollection>> getInvalidationListeners();
 }

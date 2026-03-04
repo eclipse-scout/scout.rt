@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.server.session.context.ServerSessionRunContexts;
 import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
-import org.eclipse.scout.rt.shared.user.UserId;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.eclipse.scout.rt.testing.server.session.runner.RunWithServerSession;
@@ -81,6 +80,7 @@ public class ServerSessionRunContextStatement extends Statement {
       final IServerSession serverSession = BEANS.get(m_serverSessionAnnotation.provider()).provide(
           ServerRunContexts.copyCurrent()
               .withSubject(currentSubject)
+              .withUser(BEANS.get(IAccessControlService.class).getUser(currentSubject))
               .withUserAgent(userAgent));
 
       // Run the test on behalf of a ServerRunContext.
@@ -88,7 +88,6 @@ public class ServerSessionRunContextStatement extends Statement {
       ServerSessionRunContexts.copyCurrent()
           .withSession(serverSession)
           .withSubject(currentSubject) // set the test subject explicitly in case it is different to the session subject
-          .withThreadLocal(UserId.CURRENT, BEANS.get(IAccessControlService.class).getUserId(currentSubject))
           .withUserAgent(userAgent)
           .run(invoker);
       invoker.throwOnError();

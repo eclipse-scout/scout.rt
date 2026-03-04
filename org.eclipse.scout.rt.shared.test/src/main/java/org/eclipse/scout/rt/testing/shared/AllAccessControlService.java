@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,22 +13,17 @@ import java.security.AllPermission;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.security.AllPermissionCollection;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.security.IPermissionCollection;
-import org.eclipse.scout.rt.shared.user.UserId;
 
 /**
  * {@link IAccessControlService} service for testing using {@link AllPermission}
  */
 @Order(4500)
-public class AllAccessControlService extends AbstractAccessControlService<String> {
-
-  @Override
-  protected String getCurrentUserCacheKey() {
-    return UserId.CURRENT.get();
-  }
+public class AllAccessControlService extends AbstractAccessControlService {
 
   @Override
   public IPermissionCollection getPermissions() {
@@ -36,7 +31,7 @@ public class AllAccessControlService extends AbstractAccessControlService<String
   }
 
   @Override
-  protected IPermissionCollection execLoadPermissions(String userId) {
+  protected IPermissionCollection execLoadPermissions(User user) {
     throw new UnsupportedOperationException();
   }
 }

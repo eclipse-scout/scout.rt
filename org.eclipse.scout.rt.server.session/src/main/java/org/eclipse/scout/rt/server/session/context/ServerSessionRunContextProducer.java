@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.session.IServerSession;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
-import org.eclipse.scout.rt.shared.user.UserId;
 
 /**
  * Producer for {@link ServerSessionRunContext} based on {@link Subject}.
@@ -29,7 +28,7 @@ public class ServerSessionRunContextProducer {
   public ServerSessionRunContext produce(Subject subject) {
     final ServerSessionRunContext serverRunContext = ServerSessionRunContexts.copyCurrent(true)
         .withSubject(subject)
-        .withThreadLocal(UserId.CURRENT, BEANS.get(IAccessControlService.class).getUserId(subject))
+        .withUser(BEANS.get(IAccessControlService.class).getUser(subject))
         .withTransactionScope(TransactionScope.REQUIRES_NEW);
 
     // ensure that the session belongs to the specified subject

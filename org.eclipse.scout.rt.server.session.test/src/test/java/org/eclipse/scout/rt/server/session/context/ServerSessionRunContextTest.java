@@ -20,9 +20,11 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.server.session.IServerSession;
@@ -51,6 +53,7 @@ public class ServerSessionRunContextTest {
     ServerSessionRunContext runContext = ServerSessionRunContexts.empty();
     runContext.getPropertyMap().put("A", "B");
     runContext.withSubject(new Subject());
+    runContext.withUser(BEANS.get(User.class).withUserId("alice").setReadOnly());
     runContext.withSession(mock(IServerSession.class));
     runContext.withUserAgent(UserAgents.create().build());
     runContext.withLocale(Locale.CANADA_FRENCH);
@@ -60,6 +63,7 @@ public class ServerSessionRunContextTest {
 
     assertEquals(toSet(runContext.getPropertyMap().iterator()), toSet(copy.getPropertyMap().iterator()));
     assertSame(runContext.getSubject(), copy.getSubject());
+    assertSame(runContext.getUser(), copy.getUser());
     assertSame(runContext.getUserAgent(), copy.getUserAgent());
     assertSame(runContext.getLocale(), copy.getLocale());
     assertEquals(TransactionScope.MANDATORY, runContext.getTransactionScope());
@@ -83,6 +87,7 @@ public class ServerSessionRunContextTest {
     final UserAgent userAgent = UserAgents.create().build();
     final Locale locale = Locale.CANADA_FRENCH;
     final Subject subject = new Subject();
+    final User user = BEANS.get(User.class).withUserId("alice").setReadOnly();
 
     ServerSessionRunContexts
         .empty()
@@ -90,6 +95,7 @@ public class ServerSessionRunContextTest {
         .withUserAgent(userAgent)
         .withLocale(locale)
         .withSubject(subject)
+        .withUser(user)
         .run(() -> {
           RunContext runContext = RunContexts.copyCurrent();
           assertThat(runContext, CoreMatchers.instanceOf(ServerSessionRunContext.class));
@@ -99,6 +105,7 @@ public class ServerSessionRunContextTest {
           assertSame(userAgent, serverCtx.getUserAgent());
           assertSame(locale, serverCtx.getLocale());
           assertSame(subject, serverCtx.getSubject());
+          assertSame(user, serverCtx.getUser());
         });
   }
 

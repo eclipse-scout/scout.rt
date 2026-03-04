@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.commons.authentication.ServletFilterHelper;
@@ -48,7 +49,7 @@ public class HttpRunContextProducerTest {
 
   @Before
   public void before() {
-    when(m_mockAccessControlService.getUserIdOfCurrentSubject()).thenReturn(TEST_SUBJECT_NAME);
+    when(m_mockAccessControlService.getUser(TEST_SUBJECT)).thenReturn(BEANS.get(User.class).withUserId(TEST_SUBJECT_NAME).setReadOnly());
   }
 
   @Test
@@ -59,6 +60,7 @@ public class HttpRunContextProducerTest {
 
     RunContext context = producer.produce(req, resp);
     assertEquals(TEST_SUBJECT.getPrincipals(), context.getSubject().getPrincipals());
+    assertEquals(TEST_SUBJECT_NAME, context.getUser().getUserId());
     assertEquals(TEST_CID, context.getCorrelationId());
     assertSame(req, context.getThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST));
     assertSame(resp, context.getThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE));

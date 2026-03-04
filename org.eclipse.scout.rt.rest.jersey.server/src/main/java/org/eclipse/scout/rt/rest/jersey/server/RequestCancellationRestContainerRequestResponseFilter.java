@@ -18,12 +18,12 @@ import jakarta.ws.rs.container.ContainerResponseContext;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.ConnectionErrorDetector;
 import org.eclipse.scout.rt.rest.RestHttpHeaders;
 import org.eclipse.scout.rt.rest.cancellation.RestRequestCancellationRegistry;
 import org.eclipse.scout.rt.rest.container.IRestContainerRequestFilter;
 import org.eclipse.scout.rt.rest.container.IRestContainerResponseFilter;
-import org.eclipse.scout.rt.security.IAccessControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +68,7 @@ public class RequestCancellationRestContainerRequestResponseFilter implements IR
    * Returns the user id of the given request. May be {@code null}.
    */
   protected Object resolveUserId(ContainerRequestContext request) {
-    return BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
+    return User.currentUserId();
   }
 
   /**

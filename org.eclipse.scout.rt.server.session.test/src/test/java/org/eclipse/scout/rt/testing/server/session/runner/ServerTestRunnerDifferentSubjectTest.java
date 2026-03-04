@@ -15,13 +15,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.server.session.AbstractServerSession;
 import org.eclipse.scout.rt.server.session.IServerSession;
-import org.eclipse.scout.rt.testing.server.session.runner.ServerTestRunnerDifferentSubjectTest.JUnitServerSession;
 import org.eclipse.scout.rt.shared.session.ISession;
-import org.eclipse.scout.rt.shared.user.UserId;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.server.session.runner.ServerTestRunnerDifferentSubjectTest.JUnitServerSession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,7 +40,7 @@ public class ServerTestRunnerDifferentSubjectTest {
     s_serverSessions = new HashSet<>();
     ISession serverSession = IServerSession.CURRENT.get();
     assertTrue(serverSession instanceof JUnitServerSession);
-    assertEquals("anna", UserId.CURRENT.get());
+    assertEquals("anna", User.currentUserId());
     s_serverSessions.add(serverSession);
 
     s_transactions = new HashSet<>();
@@ -53,7 +53,7 @@ public class ServerTestRunnerDifferentSubjectTest {
   public void test1() {
     ISession serverSession = IServerSession.CURRENT.get();
     assertTrue(serverSession instanceof JUnitServerSession);
-    assertEquals("anna", UserId.CURRENT.get());
+    assertEquals("anna", User.currentUserId());
     s_serverSessions.add(serverSession);
 
     ITransaction transaction = ITransaction.CURRENT.get();
@@ -66,7 +66,7 @@ public class ServerTestRunnerDifferentSubjectTest {
   public void test2() {
     ISession serverSession = IServerSession.CURRENT.get();
     assertTrue(serverSession instanceof JUnitServerSession);
-    assertEquals("john", UserId.CURRENT.get());
+    assertEquals("john", User.currentUserId());
     s_serverSessions.add(serverSession);
 
     ITransaction transaction = ITransaction.CURRENT.get();
@@ -78,7 +78,7 @@ public class ServerTestRunnerDifferentSubjectTest {
   public static void afterClass() {
     ISession serverSession = IServerSession.CURRENT.get();
     assertTrue(serverSession instanceof JUnitServerSession);
-    assertEquals("anna", UserId.CURRENT.get());
+    assertEquals("anna", User.currentUserId());
     s_serverSessions.add(serverSession);
 
     ITransaction transaction = ITransaction.CURRENT.get();

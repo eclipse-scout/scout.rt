@@ -30,11 +30,11 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
 import org.eclipse.scout.rt.platform.cache.ICacheInvalidationListener;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
-import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.services.common.code.ApiExposedCodeTypeDoProvider;
 import org.eclipse.scout.rt.shared.services.common.code.CodeService;
@@ -160,7 +160,7 @@ public class CodeTypeInvalidationNotificationListener implements ICacheInvalidat
     }
 
     protected String getUserId() {
-      return BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
+      return User.currentUserId();
     }
   }
 }

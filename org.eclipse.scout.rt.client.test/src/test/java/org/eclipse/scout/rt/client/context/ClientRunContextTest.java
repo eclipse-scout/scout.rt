@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,10 +22,12 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.shared.session.ISession;
@@ -54,6 +56,7 @@ public class ClientRunContextTest {
     ClientRunContext runContext = ClientRunContexts.empty();
     runContext.getPropertyMap().put("A", "B");
     runContext.withSubject(new Subject());
+    runContext.withUser(BEANS.get(User.class).withUserId("alice").setReadOnly());
     runContext.withSession(mock(IClientSession.class), true);
     runContext.withUserAgent(UserAgents.create().build());
     runContext.withLocale(Locale.CANADA_FRENCH);
@@ -62,6 +65,7 @@ public class ClientRunContextTest {
 
     assertEquals(toSet(runContext.getPropertyMap().iterator()), toSet(copy.getPropertyMap().iterator()));
     assertSame(runContext.getSubject(), copy.getSubject());
+    assertSame(runContext.getUser(), copy.getUser());
     assertSame(runContext.getUserAgent(), copy.getUserAgent());
     assertSame(runContext.getLocale(), copy.getLocale());
     assertSame(runContext.getLocale(), copy.getLocale());
@@ -85,11 +89,13 @@ public class ClientRunContextTest {
     final UserAgent sessionUserAgent = UserAgents.create().build();
     final Locale sessionLocale = Locale.CANADA_FRENCH;
     final Subject sessionSubject = new Subject();
+    final User sessionUser = BEANS.get(User.class).withUserId("alice").setReadOnly();
     final IDesktop sessionDesktop = mock(IDesktop.class);
 
     when(session.getUserAgent()).thenReturn(sessionUserAgent);
     when(session.getLocale()).thenReturn(sessionLocale);
     when(session.getSubject()).thenReturn(sessionSubject);
+    when(session.getUser()).thenReturn(sessionUser);
     when(session.getDesktopElseVirtualDesktop()).thenReturn(sessionDesktop);
 
     ClientRunContexts.empty().withSession(session, true).run(() -> {
@@ -99,6 +105,8 @@ public class ClientRunContextTest {
 
       assertSame(session, clientCtx.getSession());
       assertSame(sessionLocale, clientCtx.getLocale());
+      assertSame(sessionSubject, clientCtx.getSubject());
+      assertSame(sessionUser, clientCtx.getUser());
       assertSame(sessionUserAgent, clientCtx.getUserAgent());
       assertSame(sessionDesktop, clientCtx.getDesktop());
     });
@@ -110,20 +118,26 @@ public class ClientRunContextTest {
     final UserAgent sessionUserAgent = UserAgents.create().build();
     final Locale sessionLocale = Locale.CANADA_FRENCH;
     final Subject sessionSubject = new Subject();
+    final User sessionUser = BEANS.get(User.class).withUserId("alice").setReadOnly();
     final IDesktop sessionDesktop = mock(IDesktop.class);
 
     when(session.getUserAgent()).thenReturn(sessionUserAgent);
     when(session.getLocale()).thenReturn(sessionLocale);
     when(session.getSubject()).thenReturn(sessionSubject);
+    when(session.getUser()).thenReturn(sessionUser);
     when(session.getDesktopElseVirtualDesktop()).thenReturn(sessionDesktop);
 
     ClientRunContexts.empty().withSession(null, false).run(() -> {
       assertNull(ISession.CURRENT.get());
+      assertNull(Subject.current());
+      assertNull(User.current());
       assertNull(NlsLocale.CURRENT.get());
       assertNull(UserAgent.CURRENT.get());
       assertNull(IDesktop.CURRENT.get());
 
       assertNull(ClientRunContexts.copyCurrent().getSession());
+      assertNull(ClientRunContexts.copyCurrent().getSubject());
+      assertNull(ClientRunContexts.copyCurrent().getUser());
       assertNull(ClientRunContexts.copyCurrent().getLocale());
       assertNull(ClientRunContexts.copyCurrent().getUserAgent());
       assertNull(ClientRunContexts.copyCurrent().getDesktop());
@@ -131,11 +145,15 @@ public class ClientRunContextTest {
 
     ClientRunContexts.empty().withSession(session, false).run(() -> {
       assertSame(session, ISession.CURRENT.get());
+      assertNull(Subject.current());
+      assertNull(User.current());
       assertNull(NlsLocale.CURRENT.get());
       assertNull(UserAgent.CURRENT.get());
       assertNull(IDesktop.CURRENT.get());
 
       assertSame(session, ClientRunContexts.copyCurrent().getSession());
+      assertNull(ClientRunContexts.copyCurrent().getSubject());
+      assertNull(ClientRunContexts.copyCurrent().getUser());
       assertNull(ClientRunContexts.copyCurrent().getLocale());
       assertNull(ClientRunContexts.copyCurrent().getUserAgent());
       assertNull(ClientRunContexts.copyCurrent().getDesktop());
@@ -148,14 +166,24 @@ public class ClientRunContextTest {
 
     ClientRunContexts.empty().withSession(session, true).run(() -> {
       assertSame(session, ISession.CURRENT.get());
+      assertSame(sessionSubject, Subject.current());
+      assertSame(sessionUser, User.current());
       assertSame(sessionLocale, NlsLocale.CURRENT.get());
       assertSame(sessionUserAgent, UserAgent.CURRENT.get());
       assertSame(sessionDesktop, IDesktop.CURRENT.get());
 
       assertSame(session, ClientRunContexts.copyCurrent().getSession());
+      assertSame(sessionSubject, ClientRunContexts.copyCurrent().getSubject());
+      assertSame(sessionUser, ClientRunContexts.copyCurrent().getUser());
       assertSame(sessionLocale, ClientRunContexts.copyCurrent().getLocale());
       assertSame(sessionUserAgent, ClientRunContexts.copyCurrent().getUserAgent());
       assertSame(sessionDesktop, ClientRunContexts.copyCurrent().getDesktop());
+
+      final Subject customSubject = new Subject();
+      assertSame(customSubject, ClientRunContexts.copyCurrent().withSubject(customSubject).getSubject());
+
+      final User customUser = BEANS.get(User.class).withUserId("bob").setReadOnly();
+      assertSame(customUser, ClientRunContexts.copyCurrent().withUser(customUser).getUser());
 
       final UserAgent customUserAgent = UserAgents.create().build();
       assertSame(customUserAgent, ClientRunContexts.copyCurrent().withUserAgent(customUserAgent).getUserAgent());

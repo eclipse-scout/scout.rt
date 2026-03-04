@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
-import org.eclipse.scout.rt.security.IAccessControlService;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
@@ -98,7 +98,14 @@ public interface IClientSession extends ISession, IPropertyObserver {
   void setSubject(Subject subject);
 
   /**
-   * Authenticated userId, extracted by {@link IAccessControlService#getUserIdOfCurrentSubject()} on server
+   * Consumers can query for the {@link User} of a {@link IClientSession}
+   * <p>
+   * The user is set when this object is created from {@link User#current()}
+   */
+  User getUser();
+
+  /**
+   * Authenticated userId, provided by {@link User#getUserId()}}
    */
   String getUserId();
 

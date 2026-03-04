@@ -149,7 +149,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
       return new CompositeObject(BEANS.get(IClientSession.class).getClass(), sessionId);
     }
     else if (subject != null) {
-      return new CompositeObject(BEANS.get(IClientSession.class).getClass(), BEANS.get(IAccessControlService.class).getUserId(subject));
+      return new CompositeObject(BEANS.get(IClientSession.class).getClass(), BEANS.get(IAccessControlService.class).getUser(subject));
     }
     else {
       return null;

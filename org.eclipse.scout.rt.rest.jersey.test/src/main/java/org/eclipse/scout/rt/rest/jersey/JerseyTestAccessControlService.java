@@ -10,28 +10,19 @@
 package org.eclipse.scout.rt.rest.jersey;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.security.AllPermissionCollection;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.security.IPermissionCollection;
 
 /**
- * Test implementation of {@link IAccessControlService} providing fixed subject.
+ * Test implementation of {@link IAccessControlService}.
  */
-public class JerseyTestAccessControlService extends AbstractAccessControlService<String> {
+public class JerseyTestAccessControlService extends AbstractAccessControlService {
 
   @Override
-  protected String getCurrentUserCacheKey() {
-    return "user.mock";
-  }
-
-  @Override
-  public String getUserIdOfCurrentSubject() {
-    return "user.mock";
-  }
-
-  @Override
-  protected IPermissionCollection execLoadPermissions(String cacheKey) {
+  protected IPermissionCollection execLoadPermissions(User user) {
     return BEANS.get(AllPermissionCollection.class);
   }
 }
