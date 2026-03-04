@@ -26,7 +26,7 @@ public class RestResourceAnnotationTestSupport extends AbstractCompletenessTestS
   @Override
   protected Pattern createFilePattern() {
     // quick check if file is applicable, string check to quickly exclude EXT resources here already to avoid empty tests
-    return Pattern.compile("(?<!@RestApplicationScope\\(RestApplicationScopes\\.EXT\\)\\Rpublic )class (?!Abstract)\\w+ implements IRestResource[,\\s{]");
+    return Pattern.compile("(?<!@RestApplicationScope\\(RestApplicationScopes\\.EXT\\)\\Rpublic )class (?!Abstract)\\w+(?: extends \\w+)? implements IRestResource[,\\s{]");
   }
 
   /**
