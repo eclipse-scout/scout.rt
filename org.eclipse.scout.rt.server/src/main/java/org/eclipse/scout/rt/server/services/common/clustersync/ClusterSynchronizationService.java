@@ -31,10 +31,12 @@ import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ClusterSyncUserProperty;
@@ -44,7 +46,6 @@ import org.eclipse.scout.rt.server.mom.IClusterMomDestinations;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
-import org.eclipse.scout.rt.shared.user.UserId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   private final ConcurrentMap<Class<? extends Serializable>, ClusterNodeStatusInfo> m_messageStatusMap = new ConcurrentHashMap<>();
 
   private final Subject m_subject;
-  private final String m_userId;
+  private final LazyValue<User> m_user = new LazyValue<>(this::createUser);
 
   private volatile ISubscription m_subscription;
   private final Object m_subscriptionLock = new Object();
@@ -66,15 +67,18 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
 
   public ClusterSynchronizationService() {
     m_subject = CONFIG.getPropertyValue(ClusterSyncUserProperty.class);
-    m_userId = BEANS.get(IAccessControlService.class).getUserId(m_subject);
   }
 
-  public String getUserId() {
-    return m_userId;
+  public User getUser() {
+    return m_user.get();
   }
 
   public Subject getSubject() {
     return m_subject;
+  }
+
+  protected User createUser() {
+    return BEANS.get(IAccessControlService.class).getUser(getSubject());
   }
 
   @Override
@@ -190,7 +194,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
 
   @Override
   public IClusterNotificationProperties getNotificationProperties() {
-    String userId = StringUtility.emptyIfNull(UserId.CURRENT.get());
+    String userId = StringUtility.emptyIfNull(User.currentUserId());
     return new ClusterNotificationProperties(m_nodeId, userId);
   }
 
@@ -220,8 +224,8 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
 
   protected ServerRunContext createRunContext() {
     return ServerRunContexts.empty()
-        .withSubject(m_subject)
-        .withThreadLocal(UserId.CURRENT, m_userId);
+        .withSubject(getSubject())
+        .withUser(getUser());
   }
 
   /**

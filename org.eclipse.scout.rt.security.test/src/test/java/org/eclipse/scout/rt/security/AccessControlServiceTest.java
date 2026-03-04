@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,9 +25,12 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.security.User;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -42,7 +45,7 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 @RunWithSubject("john")
 public class AccessControlServiceTest {
-  private static final String TEST_USER = "john";
+  private static final User TEST_USER = BEANS.get(User.class).withUserId("john").setReadOnly();
   private P_SharedAccessControlService m_accessControlService;
   private List<IBean<?>> m_registerServices;
 
@@ -64,29 +67,29 @@ public class AccessControlServiceTest {
   }
 
   @Test
-  public void testGetUserId() {
-    assertNull(m_accessControlService.getUserId(null));
+  public void testGetUser() {
+    assertNull(m_accessControlService.getUser(null));
 
     Subject s = new Subject();
-    assertNull(m_accessControlService.getUserId(s));
+    assertNull(m_accessControlService.getUser(s).getUserId());
 
     s.getPrincipals().add(new DummyPrincipal());
-    assertEquals("dummy", m_accessControlService.getUserId(s));
+    assertEquals("dummy", m_accessControlService.getUser(s).getUserId());
 
     // first principal wins
     s.getPrincipals().add(new SimplePrincipal("simple"));
-    assertEquals("dummy", m_accessControlService.getUserId(s));
+    assertEquals("dummy", m_accessControlService.getUser(s).getUserId());
 
     s = new Subject();
     s.getPrincipals().add(new SimplePrincipal("simple"));
     s.getPrincipals().add(new SimplePrincipal("other"));
     s.getPrincipals().add(new DummyPrincipal());
-    assertEquals("simple", m_accessControlService.getUserId(s));
+    assertEquals("simple", m_accessControlService.getUser(s).getUserId());
   }
 
   @Test
   public void testGetUserIdOfCurrentSubjectNoSubject() {
-    assertNull(Subject.doAs(null, (PrivilegedAction<String>) () -> m_accessControlService.getUserIdOfCurrentSubject()));
+    assertNull(Subject.doAs(null, (PrivilegedAction<String>) () -> m_accessControlService.extractUserId(Subject.current())));
   }
 
   @Test
@@ -94,7 +97,7 @@ public class AccessControlServiceTest {
     Subject subject = new Subject();
     subject.getPrincipals().add(new SimplePrincipal("username"));
 
-    assertEquals("username", Subject.doAs(subject, (PrivilegedAction<String>) () -> m_accessControlService.getUserIdOfCurrentSubject()));
+    assertEquals("username", Subject.doAs(subject, (PrivilegedAction<String>) () -> m_accessControlService.extractUserId(Subject.current())));
   }
 
   /**
@@ -104,6 +107,14 @@ public class AccessControlServiceTest {
   public void testGetPermissions() {
     IPermissionCollection permissions = m_accessControlService.getPermissions();
     assertNotNull(permissions);
+  }
+
+  @Test
+  public void testGetPermissions_userMustBeReadOnly() {
+    RunContexts.empty()
+        // directly set thread local because withUser already enforces that the user is read-only
+        .withThreadLocal(User.CURRENT, BEANS.get(User.class).withUserId("alice"))
+        .run(() -> assertThrows(AssertionException.class, () -> m_accessControlService.getPermissions()));
   }
 
   /**
@@ -142,15 +153,10 @@ public class AccessControlServiceTest {
   }
 
   @IgnoreBean
-  private static class P_SharedAccessControlService extends AbstractAccessControlService<String> {
+  private static class P_SharedAccessControlService extends AbstractAccessControlService {
 
     @Override
-    protected String getCurrentUserCacheKey() {
-      return getUserIdOfCurrentSubject();
-    }
-
-    @Override
-    protected IPermissionCollection execLoadPermissions(String userId) {
+    protected IPermissionCollection execLoadPermissions(User user) {
       DefaultPermissionCollection permissions = BEANS.get(DefaultPermissionCollection.class);
       permissions.add(new SomePermission1(), PermissionLevel.ALL);
       permissions.setReadOnly();
@@ -158,7 +164,7 @@ public class AccessControlServiceTest {
     }
 
     @Override
-    protected ICacheBuilder<String, IPermissionCollection> createCacheBuilder() {
+    protected ICacheBuilder<User, IPermissionCollection> createCacheBuilder() {
       return super.createCacheBuilder()
           .withCacheId(ACCESS_CONTROL_SERVICE_CACHE_ID + ".for.test")
           .withReplaceIfExists(true);

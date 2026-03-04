@@ -101,7 +101,7 @@ public class Desktop extends AbstractDesktop {
 
     @Override
     protected String getConfiguredText() {
-      String userId = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
+      String userId = User.currentUserId();
       return StringUtility.uppercaseFirst(userId);
     }
 

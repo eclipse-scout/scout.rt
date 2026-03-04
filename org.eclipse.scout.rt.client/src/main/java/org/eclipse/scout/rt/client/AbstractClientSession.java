@@ -10,7 +10,6 @@
 package org.eclipse.scout.rt.client;
 
 import static java.util.Collections.*;
-import static org.eclipse.scout.rt.shared.ISessionVariable.SHARED_CONTEXT_USER_ID;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -44,6 +43,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -91,6 +91,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private IDesktop m_desktop;
   private VirtualDesktop m_virtualDesktop;
   private volatile Subject m_subject;
+  private final User m_user;
 
   private final SharedVariableMap m_sharedVariableMap;
   private Set<String> m_exposedSharedVariables;
@@ -107,6 +108,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_stateLock = new Object();
     m_userAgent = UserAgent.get();
     m_subject = Subject.current();
+    m_user = User.current();
     m_objectExtensions = new ObjectExtensions<>(this, true);
     m_sharedVariableMap = new SharedVariableMap();
     m_exposedSharedVariables = null;
@@ -166,7 +168,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    */
   @Override
   public String getUserId() {
-    return getSharedContextVariable(SHARED_CONTEXT_USER_ID, String.class);
+    return m_user != null ? m_user.getUserId() : null;
   }
 
   @Override
@@ -499,6 +501,11 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   @Override
   public void setSubject(Subject subject) {
     m_subject = subject;
+  }
+
+  @Override
+  public User getUser() {
+    return m_user;
   }
 
   @Override

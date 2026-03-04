@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.text.TEXTS;
@@ -35,7 +36,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceWithoutAuthorization;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
-import org.eclipse.scout.rt.shared.user.UserId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +80,7 @@ public class ServiceOperationInvoker {
 
   protected ServiceTunnelResponse invokeInternal(ServiceTunnelRequest serviceReq) throws ClassNotFoundException {
     if (LOG.isDebugEnabled()) {
-      String userId = StringUtility.emptyIfNull(UserId.CURRENT.get());
+      String userId = StringUtility.emptyIfNull(User.currentUserId());
       LOG.debug("started {}.{} by {} at {}", serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), userId, new Date());
     }
     ServiceTunnelResponse serviceRes = null;

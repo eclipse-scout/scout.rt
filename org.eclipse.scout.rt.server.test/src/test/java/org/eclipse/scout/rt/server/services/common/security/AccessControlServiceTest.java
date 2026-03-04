@@ -9,9 +9,12 @@
  */
 package org.eclipse.scout.rt.server.services.common.security;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.regex.Pattern;
+
+import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -22,6 +25,8 @@ import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
 import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
+import org.eclipse.scout.rt.platform.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.security.DefaultPermissionCollection;
@@ -71,6 +76,41 @@ public class AccessControlServiceTest {
     BeanTestingHelper.get().unregisterBeans(m_registerServices);
   }
 
+  @Test
+  public void testGetUser_null() {
+    assertNull(m_accessControlService.getUser(null));
+  }
+
+  @Test
+  public void testGetUser_empty() {
+    User user = m_accessControlService.getUser(new Subject());
+    assertNull(user.getUserId());
+  }
+
+  @Test
+  public void testGetUser_subject() {
+    Subject subject = new Subject();
+    subject.getPrincipals().add(new SimplePrincipal("john"));
+    User user = m_accessControlService.getUser(subject);
+    assertEquals("john", user.getUserId());
+    assertTrue(user.isReadOnly());
+  }
+
+  @Test
+  public void testGetUser_subjectUserIdPattern() {
+    Subject subject = new Subject();
+    subject.getPrincipals().add(new SimplePrincipal("john@foo.bar"));
+    try {
+      m_accessControlService.setUserIdSearchPatterns(Pattern.compile("(.*)@foo.bar"));
+      User user = m_accessControlService.getUser(subject);
+      assertEquals("john", user.getUserId());
+      assertTrue(user.isReadOnly());
+    }
+    finally {
+      m_accessControlService.setUserIdSearchPatterns((Pattern[]) null);
+    }
+  }
+
   /**
    * Tests that a client notification of {@link InvalidateCacheNotification} is sent when the cache is cleared:
    * {@link IAccessControlService#clearCache()}
@@ -115,15 +155,10 @@ public class AccessControlServiceTest {
    * An access control service with {@link TestPermission1} for testing
    */
   @IgnoreBean
-  private static class TestAccessControlService extends AbstractAccessControlService<String> {
+  private static class TestAccessControlService extends AbstractAccessControlService {
 
     @Override
-    protected String getCurrentUserCacheKey() {
-      return getUserIdOfCurrentSubject();
-    }
-
-    @Override
-    protected IPermissionCollection execLoadPermissions(String userId) {
+    protected IPermissionCollection execLoadPermissions(User user) {
       DefaultPermissionCollection permissions = BEANS.get(DefaultPermissionCollection.class);
       permissions.add(new TestPermission1(), PermissionLevel.ALL);
       permissions.add(new RemoteServiceAccessPermission("*.shared.*", "*"), PermissionLevel.ALL);
@@ -132,10 +167,15 @@ public class AccessControlServiceTest {
     }
 
     @Override
-    protected ICacheBuilder<String, IPermissionCollection> createCacheBuilder() {
+    protected ICacheBuilder<User, IPermissionCollection> createCacheBuilder() {
       return super.createCacheBuilder()
           .withCacheId(ACCESS_CONTROL_SERVICE_CACHE_ID + ".for.test")
           .withReplaceIfExists(true);
+    }
+
+    @Override
+    protected void setUserIdSearchPatterns(Pattern... patterns) {
+      super.setUserIdSearchPatterns(patterns);
     }
   }
 

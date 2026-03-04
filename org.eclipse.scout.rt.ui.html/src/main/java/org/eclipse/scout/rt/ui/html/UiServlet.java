@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -68,9 +68,12 @@ public class UiServlet extends AbstractHttpServlet {
   private final HttpServletControl m_httpServletControl;
   private final UiThreadInterruption m_uiThreadInterruption;
 
+  protected ServletFilterHelper m_filterHelper;
+
   public UiServlet() {
     m_httpServletControl = BEANS.get(HttpServletControl.class);
     m_uiThreadInterruption = BEANS.get(UiThreadInterruption.class);
+    m_filterHelper = BEANS.get(ServletFilterHelper.class);
   }
 
   protected boolean isHttpMethodSupportedByJakartaHttpServlet(String method) {
@@ -82,6 +85,7 @@ public class UiServlet extends AbstractHttpServlet {
     final UserAgent userAgent = HttpClientInfo.get(req).toUserAgents().build();
     return ClientRunContexts.copyCurrent(true)
         .withSubject(Subject.current())
+        .withUser(m_filterHelper.getUserOnSession(req))
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
         .withDiagnostics(BEANS.get(ServletDiagnosticsProviderFactory.class).getProviders(req, resp))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
@@ -56,6 +57,7 @@ public class RunContextTest {
   public void testEmpty() {
     RunContext runContext = RunContexts.empty();
     assertNull(runContext.getSubject());
+    assertNull(runContext.getUser());
     assertNull(runContext.getLocale());
     assertTrue(toSet(runContext.getPropertyMap().iterator()).isEmpty());
     assertNull(runContext.getCorrelationId());
@@ -74,6 +76,7 @@ public class RunContextTest {
   @Test
   public void testCopy() {
     final Subject subject = newSubject("john");
+    final User user = newUser("john");
     final ITransaction tx = mock(ITransaction.class);
     final ITransactionMember txMember1 = mock(ITransactionMember.class);
     when(txMember1.getMemberId()).thenReturn("txMember1");
@@ -85,6 +88,7 @@ public class RunContextTest {
     RunContext runContext = RunContexts.empty()
         .withProperty("key", "value")
         .withSubject(subject)
+        .withUser(user)
         .withLocale(Locale.CANADA_FRENCH)
         .withRunMonitor(monitor)
         .withCorrelationId("cid")
@@ -98,6 +102,7 @@ public class RunContextTest {
     // verify
     assertEquals(toSet(runContext.getPropertyMap().iterator()), toSet(copy.getPropertyMap().iterator()));
     assertSame(runContext.getSubject(), copy.getSubject());
+    assertSame(runContext.getUser(), copy.getUser());
     assertSame(runContext.getLocale(), copy.getLocale());
     assertSame(runContext.getRunMonitor(), copy.getRunMonitor());
     assertEquals("cid", runContext.getCorrelationId());
@@ -110,6 +115,7 @@ public class RunContextTest {
         .run(() -> {
           assertEquals("value", PropertyMap.CURRENT.get().get("key"));
           assertSame(subject, Subject.current());
+          assertSame(user, User.current());
           assertEquals(Locale.CANADA_FRENCH, NlsLocale.CURRENT.get());
           assertSame(monitor, RunMonitor.CURRENT.get());
           assertEquals("cid", CorrelationId.CURRENT.get());
@@ -119,6 +125,7 @@ public class RunContextTest {
           RunContexts.copyCurrent().run(() -> {
             assertEquals("value", PropertyMap.CURRENT.get().get("key"));
             assertSame(subject, Subject.current());
+            assertSame(user, User.current());
             assertEquals(Locale.CANADA_FRENCH, NlsLocale.CURRENT.get());
             assertNotSame(monitor, RunMonitor.CURRENT.get());
             assertEquals("cid", CorrelationId.CURRENT.get());
@@ -129,6 +136,7 @@ public class RunContextTest {
           RunContexts.empty().run(() -> {
             assertNull(PropertyMap.CURRENT.get().get("key"));
             assertNull(Subject.current());
+            assertNull(User.current());
             assertNull(NlsLocale.CURRENT.get());
             assertNotSame(monitor, RunMonitor.CURRENT.get());
             assertNull(CorrelationId.CURRENT.get());
@@ -191,6 +199,50 @@ public class RunContextTest {
     RunContexts.empty().withSubject(null).run(() -> {
       assertNull(RunContexts.copyCurrent().getSubject());
       assertNull(Subject.current());
+    });
+  }
+
+  @Test
+  public void testCopyUser() {
+    RunContexts.empty().run(() -> {
+      assertNull(RunContexts.copyCurrent().getUser());
+      assertNull(User.current());
+    });
+
+    final User john = newUser("john");
+    RunContexts.empty().withUser(john).run(() -> {
+      assertSame(john, RunContexts.copyCurrent().getUser());
+      assertSame(User.current(), RunContexts.copyCurrent().getUser());
+
+      // Change User
+      final User anna = newUser("anna");
+      RunContexts.copyCurrent().withUser(anna).run(() -> {
+        // Test copy via 'RunContexts.copyCurrent'
+        assertSame(anna, RunContexts.copyCurrent().getUser());
+        RunContexts.copyCurrent().run(() -> {
+          assertSame(anna, RunContexts.copyCurrent().getUser());
+          assertSame(anna, User.current());
+        });
+
+        RunContext.CURRENT.get().run(() -> {
+          assertSame(anna, RunContexts.copyCurrent().getUser());
+          assertSame(anna, User.current());
+        });
+
+        // Test copy via direct 'RunContext.copy'
+        assertEquals(anna, RunContext.CURRENT.get().copy().getUser());
+        Jobs.schedule(() -> {
+              assertSame(anna, RunContexts.copyCurrent().getUser());
+              assertSame(anna, User.current());
+            }, Jobs.newInput()
+                .withRunContext(RunContext.CURRENT.get().copy()))
+            .awaitDoneAndGet();
+      });
+    });
+
+    RunContexts.empty().withUser(null).run(() -> {
+      assertNull(RunContexts.copyCurrent().getUser());
+      assertNull(User.current());
     });
   }
 
@@ -813,6 +865,10 @@ public class RunContextTest {
     subject.getPrincipals().add(new SimplePrincipal(principal));
     subject.setReadOnly();
     return subject;
+  }
+
+  private static User newUser(String userId) {
+    return BEANS.get(User.class).withUserId(userId).setReadOnly();
   }
 
   private static class RunMonitorEx extends RunMonitor {

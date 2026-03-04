@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,17 +21,21 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.security.JwtPrincipal;
 import org.eclipse.scout.rt.platform.security.SamlPrincipal;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLiveProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used to sign authentication tokens and may fill default values.
  */
 @ApplicationScoped
 public class DefaultAuthTokenSigner {
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultAuthTokenSigner.class);
+
   public static final String JWT_IDENTIFIER = "jwt";
   public static final String SAML_IDENTIFIER = "saml";
 
@@ -44,7 +48,7 @@ public class DefaultAuthTokenSigner {
   }
 
   protected String getDefaultUserId() {
-    return BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
+    return User.currentUserId();
   }
 
   /**
@@ -67,6 +71,7 @@ public class DefaultAuthTokenSigner {
     }
     String userId = getDefaultUserId();
     if (StringUtility.isNullOrEmpty(userId)) {
+      LOG.warn("No user id could be determined, check user in current run context. A null-token is returned.");
       return null;
     }
     T token = BEANS.get(tokenClazz);

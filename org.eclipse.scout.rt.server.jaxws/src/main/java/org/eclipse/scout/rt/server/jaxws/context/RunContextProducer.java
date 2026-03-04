@@ -12,8 +12,10 @@ package org.eclipse.scout.rt.server.jaxws.context;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.security.IAccessControlService;
 
 /**
  * Producer for {@link RunContext} objects.
@@ -29,6 +31,8 @@ public class RunContextProducer {
    * Produces a {@link RunContext} for the given {@link Subject}.
    */
   public RunContext produce(final Subject subject) {
-    return RunContexts.copyCurrent(true).withSubject(subject);
+    return RunContexts.copyCurrent(true)
+        .withSubject(subject)
+        .withUser(BEANS.get(IAccessControlService.class).getUser(subject));
   }
 }

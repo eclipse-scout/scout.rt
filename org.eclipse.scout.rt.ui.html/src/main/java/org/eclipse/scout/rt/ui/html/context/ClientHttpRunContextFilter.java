@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.server.context;
+package org.eclipse.scout.rt.ui.html.context;
 
 import jakarta.servlet.Filter;
 
@@ -16,12 +16,12 @@ import org.eclipse.scout.rt.server.commons.context.HttpRunContextFilter;
 import org.eclipse.scout.rt.server.commons.context.HttpRunContextProducer;
 
 /**
- * Default servlet {@link Filter} implementation providing {@link ServerHttpRunContextProducer} creating HTTP run context instances for server.
+ * Default servlet {@link Filter} implementation providing {@link ClientHttpRunContextProducer} creating HTTP run context instances for client.
  */
-public class ServerHttpRunContextFilter extends HttpRunContextFilter {
+public class ClientHttpRunContextFilter extends HttpRunContextFilter {
 
   @Override
   protected HttpRunContextProducer createRunContextProducer() {
-    return BEANS.get(ServerHttpRunContextProducer.class);
+    return BEANS.get(ClientHttpRunContextProducer.class);
   }
 }

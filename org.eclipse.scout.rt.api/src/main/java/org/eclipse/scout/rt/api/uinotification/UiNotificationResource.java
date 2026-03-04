@@ -30,8 +30,8 @@ import org.eclipse.scout.rt.api.data.uinotification.UiNotificationDo;
 import org.eclipse.scout.rt.api.data.uinotification.UiNotificationRequest;
 import org.eclipse.scout.rt.api.data.uinotification.UiNotificationResponse;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.rest.IRestResource;
-import org.eclipse.scout.rt.security.IAccessControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +104,6 @@ public class UiNotificationResource implements IRestResource {
   }
 
   protected String getUserId() {
-    return BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
+    return User.currentUserId();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,13 +27,13 @@ import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.opentelemetry.OpenTelemetryContextProcessor;
 import org.eclipse.scout.rt.platform.security.SubjectProcessor;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.TransactionProcessor;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
-import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.opentelemetry.OpenTelemetrySpanAttributeProcessor;
+import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.rt.shared.user.UserId;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -84,45 +84,45 @@ public class ClientRunContextChainTest {
     c = chainIterator.next();
     assertEquals(SubjectProcessor.class, c.getClass());
 
-    // 7. DiagnosticContextValueProcessor
+    // 7. ThreadLocalProcessor for User.CURRENT
     c = chainIterator.next();
-    assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
-    assertEquals("subject.principal.name", ((DiagnosticContextValueProcessor) c).getMdcKey());
+    assertEquals(ThreadLocalProcessor.class, c.getClass());
+    assertSame(User.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
     // 8. DiagnosticContextValueProcessor
     c = chainIterator.next();
     assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
-    assertEquals("opentelemetry.trace.id", ((DiagnosticContextValueProcessor) c).getMdcKey());
+    assertEquals("subject.principal.name", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
     // 9. DiagnosticContextValueProcessor
     c = chainIterator.next();
     assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
+    assertEquals("opentelemetry.trace.id", ((DiagnosticContextValueProcessor) c).getMdcKey());
+
+    // 10. DiagnosticContextValueProcessor
+    c = chainIterator.next();
+    assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
     assertEquals("scout.correlation.id", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
-    // 10. ThreadLocalProcessor for NlsLocale.CURRENT
+    // 11. ThreadLocalProcessor for NlsLocale.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(NlsLocale.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 11. ThreadLocalProcessor for PropertyMap.CURRENT
+    // 12. ThreadLocalProcessor for PropertyMap.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(PropertyMap.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 12. ThreadLocalProcessor for ISession.CURRENT
+    // 13. ThreadLocalProcessor for ISession.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(ISession.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 13. ThreadLocalProcessor for SessionId.CURRENT
+    // 14. ThreadLocalProcessor for SessionId.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(SessionId.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
-
-    // 14. ThreadLocalProcessor for Users.CURRENT
-    c = chainIterator.next();
-    assertEquals(ThreadLocalProcessor.class, c.getClass());
-    assertSame(UserId.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
     // 15. DiagnosticContextValueProcessor
     c = chainIterator.next();

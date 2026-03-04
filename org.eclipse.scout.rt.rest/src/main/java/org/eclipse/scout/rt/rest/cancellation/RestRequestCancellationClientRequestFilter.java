@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.rest.RestHttpHeaders;
 import org.eclipse.scout.rt.rest.client.RestClientProperties;
@@ -61,6 +62,7 @@ public class RestRequestCancellationClientRequestFilter implements ClientRequest
 
     private final String m_requestId;
     private final Subject m_subject;
+    private final User m_user;
     private final ClientRequestContext m_clientRequestContext;
     private final AtomicBoolean m_cancelled;
     private final Consumer<String> m_requestCanceller;
@@ -68,6 +70,7 @@ public class RestRequestCancellationClientRequestFilter implements ClientRequest
     public ScoutRestRequestCancellable(String requestId, ClientRequestContext requestContext, Consumer<String> requestCanceller) {
       m_requestId = requestId;
       m_subject = Subject.current();
+      m_user = User.current();
       m_clientRequestContext = requestContext;
       m_requestCanceller = requestCanceller;
       m_cancelled = new AtomicBoolean();
@@ -91,6 +94,10 @@ public class RestRequestCancellationClientRequestFilter implements ClientRequest
           if (m_subject != null && runContext.getSubject() == null) {
             LOG.trace("No subject set: Using subject {} for cancellation", m_subject);
             runContext.withSubject(m_subject);
+          }
+          if (m_user != null && runContext.getUser() == null) {
+            LOG.trace("No user set: Using user {} for cancellation", m_user);
+            runContext.withUser(m_user);
           }
           runContext
               .withRunMonitor(BEANS.get(RunMonitor.class)) // execute with a new RunMonitor

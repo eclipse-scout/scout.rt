@@ -29,8 +29,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.text.TEXTS;
-import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 
 @ClassId("5bcb48f0-9b72-4f28-9c08-038cd5d9a1c4")
@@ -208,7 +208,7 @@ public class DefaultPasswordForm extends AbstractForm {
   protected void resetSessionsIfCurrentUser(IPasswordManagementService svc) {
     //owasp: reset session
     if (isCurrentUser()) {
-      String currentUserId = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
+      String currentUserId = User.currentUserId();
       IClientSession currentSession = ClientSessionProvider.currentSession();
 
       // for security reasons force stop all other of the user's sessions in case an attacker is controlling it
@@ -225,7 +225,7 @@ public class DefaultPasswordForm extends AbstractForm {
 
   protected boolean isCurrentUser() {
     String userName = BEANS.get(IPasswordManagementService.class).getUsernameFor(getUserId());
-    String currentUserId = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
+    String currentUserId = User.currentUserId();
     return currentUserId.equals(userName);
   }
 }

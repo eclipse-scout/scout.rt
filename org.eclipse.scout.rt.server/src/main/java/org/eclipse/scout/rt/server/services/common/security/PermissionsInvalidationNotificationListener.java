@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,12 +25,12 @@ import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
 import org.eclipse.scout.rt.platform.cache.ICacheInvalidationListener;
 import org.eclipse.scout.rt.platform.cache.KeyCacheEntryFilter;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.security.IPermissionCollection;
-import org.eclipse.scout.rt.server.context.ServerRunContexts;
 
 /**
  * Listens for permission cache invalidation and notifies the UI to update its cache.
@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.server.context.ServerRunContexts;
 @ApplicationScoped
 @CreateImmediately
 @SuppressWarnings("unchecked")
-public class PermissionsInvalidationNotificationListener implements ICacheInvalidationListener<Object, IPermissionCollection> {
+public class PermissionsInvalidationNotificationListener implements ICacheInvalidationListener<User, IPermissionCollection> {
 
   @PostConstruct
   protected void init() {
@@ -51,7 +51,7 @@ public class PermissionsInvalidationNotificationListener implements ICacheInvali
   }
 
   @Override
-  public void invalidated(ICacheEntryFilter<Object, IPermissionCollection> filter, boolean propagate) {
+  public void invalidated(ICacheEntryFilter<User, IPermissionCollection> filter, boolean propagate) {
     if (filter == null) {
       return; // nothing has been invalidated
     }
@@ -62,7 +62,7 @@ public class PermissionsInvalidationNotificationListener implements ICacheInvali
     transaction.registerMemberIfAbsentAndNotCancelled(PermissionsUiNotificationTransactionMember.TRANSACTION_MEMBER_ID, id -> createTransactionMember(filter));
   }
 
-  protected PermissionsUiNotificationTransactionMember createTransactionMember(ICacheEntryFilter<Object, IPermissionCollection> filter) {
+  protected PermissionsUiNotificationTransactionMember createTransactionMember(ICacheEntryFilter<User, IPermissionCollection> filter) {
     return new PermissionsUiNotificationTransactionMember(filter);
   }
 
@@ -75,9 +75,9 @@ public class PermissionsInvalidationNotificationListener implements ICacheInvali
 
     public static final String TOPIC = "permissionsUpdate";
     public static final String TRANSACTION_MEMBER_ID = "permissionsUiNotification.transactionMemberId";
-    private final ICacheEntryFilter<Object, IPermissionCollection> m_filter;
+    private final ICacheEntryFilter<User, IPermissionCollection> m_filter;
 
-    public PermissionsUiNotificationTransactionMember(ICacheEntryFilter<Object, IPermissionCollection> filter) {
+    public PermissionsUiNotificationTransactionMember(ICacheEntryFilter<User, IPermissionCollection> filter) {
       super(TRANSACTION_MEMBER_ID);
       m_filter = filter;
     }
@@ -87,22 +87,27 @@ public class PermissionsInvalidationNotificationListener implements ICacheInvali
       return true;
     }
 
+    protected ICacheEntryFilter<User, IPermissionCollection> getFilter() {
+      return m_filter;
+    }
+
     @Override
     public void commitPhase2() {
       UiNotificationRegistry uiNotificationRegistry = BEANS.get(UiNotificationRegistry.class);
       long reloadDelayWindow = uiNotificationRegistry.computeNotificationHandlerDelayWindow(TOPIC);
       PermissionUpdateMessageDo updateDo = BEANS.get(PermissionUpdateMessageDo.class).withReloadDelayWindow(reloadDelayWindow);
-      if (m_filter instanceof KeyCacheEntryFilter) {
-        IAccessControlService accessControlService = BEANS.get(IAccessControlService.class);
-        // only Permissions of specific users are invalidated: only inform the affected clients
-        Set<Object> cacheKeys = ((KeyCacheEntryFilter<Object, IPermissionCollection>) m_filter).getKeys();
+      sendUiNotification(uiNotificationRegistry, updateDo);
+    }
 
-        // create new run context to ensure new transaction is available in case getUserIdForCacheKey requires one to map the cacheKey to the userId
-        ServerRunContexts.copyCurrent()
-            .run(() -> cacheKeys.stream()
-                .map(accessControlService::getUserIdForCacheKey)
-                .filter(Objects::nonNull)
-                .forEach(userId -> uiNotificationRegistry.put(TOPIC, userId, updateDo, noTransaction().withPublishOverCluster(false))));
+    protected void sendUiNotification(UiNotificationRegistry uiNotificationRegistry, PermissionUpdateMessageDo updateDo) {
+      if (m_filter instanceof KeyCacheEntryFilter) {
+        // only Permissions of specific users are invalidated: only inform the affected clients
+        Set<User> cacheKeys = ((KeyCacheEntryFilter<User, IPermissionCollection>) m_filter).getKeys();
+
+        cacheKeys.stream()
+            .map(User::getUserId)
+            .filter(Objects::nonNull)
+            .forEach(userId -> uiNotificationRegistry.put(TOPIC, userId, updateDo, noTransaction().withPublishOverCluster(false)));
       }
       else {
         // update for all clients

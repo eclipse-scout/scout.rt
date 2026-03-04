@@ -26,6 +26,7 @@ import jakarta.ws.rs.core.StreamingOutput;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
@@ -110,6 +111,7 @@ public class ServiceTunnelServiceTest {
   private static RunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
     return RunContexts.copyCurrent(true)
         .withSubject(Subject.current())
+        .withUser(User.current())
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
         .withThreadLocal(SessionId.CURRENT, req.getHeader(SessionId.HTTP_HEADER_NAME))

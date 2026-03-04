@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 import org.eclipse.scout.rt.server.commons.healthcheck.HealthCheckServlet;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.app.filter.UiServletMultipartConfigFilter;
+import org.eclipse.scout.rt.ui.html.filter.UiServletUserBootstrapFilter;
 
 /**
  * {@link IServletContributor} and {@link IServletFilterContributor} for UI server.
@@ -101,6 +102,15 @@ public final class UiServletContributors {
       return CollectionUtility.arrayList(
           "/status" // see StatusServletContributor
       );
+    }
+  }
+
+  @Order(2200)
+  public static class UiServletUserBootstrapFilterContributor implements IServletFilterContributor {
+
+    @Override
+    public void contribute(ServletContextHandler handler) {
+      handler.addFilter(UiServletUserBootstrapFilter.class, "/*", null);
     }
   }
 

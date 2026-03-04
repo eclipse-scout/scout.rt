@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,8 @@ package org.eclipse.scout.rt.server.context;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertEquals;
 
-import org.eclipse.scout.rt.shared.user.UserId;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Test;
@@ -19,7 +20,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(ServerTestRunner.class)
 @RunWithSubject("john")
-public class ServerRunContextUserIdTest {
+public class ServerRunContextUserTest {
 
   @Test
   public void testBasic() {
@@ -36,7 +37,7 @@ public class ServerRunContextUserIdTest {
   public void testChangingUser() {
     String otherUserId = "anna";
     ServerRunContexts.copyCurrent()
-        .withThreadLocal(UserId.CURRENT, otherUserId)
+        .withUser(BEANS.get(User.class).withUserId(otherUserId).setReadOnly())
         .run(() -> assertUserId(otherUserId));
   }
 
@@ -44,12 +45,12 @@ public class ServerRunContextUserIdTest {
   public void testChangingUserNested() {
     String otherUserId = "anna";
     ServerRunContexts.copyCurrent()
-        .withThreadLocal(UserId.CURRENT, otherUserId)
+        .withUser(BEANS.get(User.class).withUserId(otherUserId).setReadOnly())
         .run(() -> ServerRunContexts.copyCurrent()
             .run(() -> assertUserId(otherUserId)));
   }
 
   protected void assertUserId(String expectedUserId) {
-    assertEquals(expectedUserId, UserId.CURRENT.get());
+    assertEquals(expectedUserId, User.currentUserId());
   }
 }

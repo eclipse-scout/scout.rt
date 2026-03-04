@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,21 +9,19 @@
  */
 package org.eclipse.scout.rt.rest.cancellation;
 
-import javax.security.auth.Subject;
-
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 
 import org.eclipse.scout.rt.api.data.ApiExposed;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.rest.IRestResource;
-import org.eclipse.scout.rt.security.IAccessControlService;
 
 /**
  * REST resource providing cancellation support.
  * <p>
- * The {@link IAccessControlService#getUserId(Subject)} method is used to identify users, subclasses may overwrite the {@link #resolveCurrentUserId()} method to provide a different identifier.
+ * The {@link User#currentUserId()} method is used to identify users, subclasses may overwrite the {@link #resolveCurrentUserId()} method to provide a different identifier.
  *
  * @see RestRequestCancellationRegistry
  * @see RestRequestCancellationClientRequestFilter
@@ -44,6 +42,6 @@ public class CancellationResource implements IRestResource {
    * Returns the user id of the current user. May be {@code null}.
    */
   protected String resolveCurrentUserId() {
-    return BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
+    return User.currentUserId();
   }
 }

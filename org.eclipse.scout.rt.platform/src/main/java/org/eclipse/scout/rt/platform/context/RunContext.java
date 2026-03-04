@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.opentelemetry.OpenTelemetryContextProcessor;
 import org.eclipse.scout.rt.platform.opentelemetry.OpenTelemetryTraceIdContextValueProvider;
 import org.eclipse.scout.rt.platform.security.SubjectProcessor;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionProcessor;
@@ -75,6 +76,7 @@ public class RunContext implements IAdaptable {
   protected RunMonitor m_runMonitor = BEANS.get(RunMonitor.class);
   protected RunMonitor m_parentRunMonitor;
   protected Subject m_subject;
+  protected User m_user;
   protected Locale m_locale;
   protected String m_correlationId;
   protected PropertyMap m_propertyMap = new PropertyMap();
@@ -193,6 +195,7 @@ public class RunContext implements IAdaptable {
         .add(new ThreadLocalProcessor<>(CorrelationId.CURRENT, m_correlationId))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, Assertions.assertNotNull(m_runMonitor)))
         .add(new SubjectProcessor<>(m_subject))
+        .add(new ThreadLocalProcessor<>(User.CURRENT, m_user))
         .add(new DiagnosticContextValueProcessor(BEANS.get(PrincipalContextValueProvider.class)))
         .add(new DiagnosticContextValueProcessor(BEANS.get(OpenTelemetryTraceIdContextValueProvider.class)))
         .add(new DiagnosticContextValueProcessor(BEANS.get(CorrelationIdContextValueProvider.class)))
@@ -280,6 +283,22 @@ public class RunContext implements IAdaptable {
    */
   public RunContext withSubject(final Subject subject) {
     m_subject = subject;
+    return this;
+  }
+
+  /**
+   * @see #withUser(User)
+   */
+  public User getUser() {
+    return m_user;
+  }
+
+  /**
+   * Associates this context with the given {@link User}.
+   */
+  public RunContext withUser(final User user) {
+    Assertions.assertTrue(user == null || user.isReadOnly(), "User must be read only before using it in a run context");
+    m_user = user;
     return this;
   }
 
@@ -527,6 +546,7 @@ public class RunContext implements IAdaptable {
   protected void interceptToStringBuilder(final ToStringBuilder builder) {
     builder
         .attr("subject", getSubject())
+        .attr("user", getUser())
         .attr("locale", getLocale())
         .attr("cid", getCorrelationId())
         .attr("transactionScope", getTransactionScope())
@@ -544,6 +564,7 @@ public class RunContext implements IAdaptable {
     m_runMonitor = origin.m_runMonitor;
     m_parentRunMonitor = origin.m_parentRunMonitor;
     m_subject = origin.m_subject;
+    m_user = origin.m_user;
     m_locale = origin.m_locale;
     m_correlationId = origin.m_correlationId;
     m_propertyMap = new PropertyMap(origin.m_propertyMap);
@@ -566,6 +587,7 @@ public class RunContext implements IAdaptable {
 
     m_runMonitor = RunMonitor.CURRENT.get();
     m_subject = Subject.current();
+    m_user = User.current();
     m_locale = NlsLocale.CURRENT.get();
     m_correlationId = CorrelationId.CURRENT.get();
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());

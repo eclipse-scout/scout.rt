@@ -3,19 +3,14 @@
 #set( $symbol_escape = '\' )
 package ${package}.core;
 
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.security.IPermissionCollection;
-import org.eclipse.scout.rt.shared.user.UserId;
 
-public class AccessControlService extends AbstractAccessControlService<String> {
-
-  @Override
-  protected String getCurrentUserCacheKey() {
-    return UserId.CURRENT.get();
-  }
+public class AccessControlService extends AbstractAccessControlService {
 
   @Override
-  protected IPermissionCollection execLoadPermissions(String userId) {
+  protected IPermissionCollection execLoadPermissions(User user) {
     return null;
   }
 }

@@ -17,10 +17,10 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.session.IServerSession;
-import org.eclipse.scout.rt.shared.user.UserId;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +34,7 @@ public class ServerSessionRunContextProducerTest {
     assertNull((((ServerSessionRunContext) RunContext.CURRENT.get()).getSession())); // ensure no previous session
     ServerSessionRunContextProducer producer = BEANS.get(ServerSessionRunContextProducer.class);
     ServerRunContext context = producer.produce(getSubjectForPrincipalName(username));
-    assertEquals(username, context.call(UserId.CURRENT::get));
+    assertEquals(username, context.call(User::currentUserId));
   }
 
   @Test
@@ -48,7 +48,7 @@ public class ServerSessionRunContextProducerTest {
       ServerSessionRunContext context = producer.produce(getSubjectForPrincipalName(secondUsername));
       IServerSession session = context.getSession();
       assertNotEquals(previousSession, session);
-      assertEquals(secondUsername, context.call(UserId.CURRENT::get));
+      assertEquals(secondUsername, context.call(User::currentUserId));
     });
   }
 
@@ -63,7 +63,7 @@ public class ServerSessionRunContextProducerTest {
       ServerSessionRunContext context = producer.produce(getSubjectForPrincipalName(secondUsername));
       IServerSession session = context.getSession();
       assertEquals(previousSession, session);
-      assertEquals(secondUsername, context.call(UserId.CURRENT::get));
+      assertEquals(secondUsername, context.call(User::currentUserId));
     });
   }
 
@@ -71,7 +71,7 @@ public class ServerSessionRunContextProducerTest {
     assertNull((((ServerSessionRunContext) RunContext.CURRENT.get()).getSession())); // ensure no previous session
     ServerSessionRunContextProducer producer = BEANS.get(ServerSessionRunContextProducer.class);
     ServerSessionRunContext context = producer.produce(getSubjectForPrincipalName(principalName));
-    assertEquals(principalName, context.call(UserId.CURRENT::get));
+    assertEquals(principalName, context.call(User::currentUserId));
     Jobs.schedule(runnable, Jobs.newInput().withRunContext(context)).awaitDoneAndGet();
   }
 

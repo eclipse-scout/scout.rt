@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.rest.cancellation.RestRequestCancellationRegistry;
@@ -31,14 +32,13 @@ import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.session.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionData;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.eclipse.scout.rt.shared.session.SessionMetricsHelper;
-import org.eclipse.scout.rt.shared.user.UserId;
+import org.eclipse.scout.rt.shared.session.job.filter.future.SessionFutureFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,7 +137,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     m_active = true;
 
     fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STARTED));
-    LOG.info("Server session started [session={}, user={}]", this, UserId.CURRENT.get());
+    LOG.info("Server session started [session={}, user={}]", this, User.currentUserId());
   }
 
   /**
@@ -223,7 +223,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
       m_stopping = false;
       fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPED));
       m_sessionMetrics.sessionDestroyed(SESSION_TYPE);
-      LOG.info("Server session stopped [session={}, user={}]", this, UserId.CURRENT.get());
+      LOG.info("Server session stopped [session={}, user={}]", this, User.currentUserId());
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.client.clientnotification;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.security.auth.Subject;
 
 import jakarta.annotation.PostConstruct;
 
@@ -36,12 +38,14 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectProperty;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
@@ -101,8 +105,10 @@ public class ClientNotificationPoller {
   }
 
   protected RunContext createRunContext() {
+    final Subject subject = BEANS.get(NotificationSubjectProperty.class).getValue();
     return ClientRunContexts.empty()
-        .withSubject(BEANS.get(NotificationSubjectProperty.class).getValue())
+        .withSubject(subject)
+        .withUser(BEANS.get(User.class).withUserId(BEANS.get(IAccessControlService.class).extractUserId(subject)).setReadOnly())
         .withUserAgent(UserAgents.createDefault())
         .withSession(null, false);
   }

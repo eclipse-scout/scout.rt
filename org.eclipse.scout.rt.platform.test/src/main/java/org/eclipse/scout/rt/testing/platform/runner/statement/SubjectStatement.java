@@ -11,9 +11,11 @@ package org.eclipse.scout.rt.testing.platform.runner.statement;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
@@ -28,6 +30,7 @@ import org.junit.runners.model.Statement;
 public class SubjectStatement extends Statement {
 
   private final Statement m_next;
+  private final String m_principal;
   private final Subject m_subject;
 
   /**
@@ -43,17 +46,23 @@ public class SubjectStatement extends Statement {
 
     final String principal = (annotation != null ? annotation.value() : null);
     if (principal != null) {
+      m_principal = principal;
       m_subject = new Subject();
       m_subject.getPrincipals().add(new SimplePrincipal(principal));
       m_subject.setReadOnly();
     }
     else {
+      m_principal = null;
       m_subject = null;
     }
   }
 
   protected Statement getNext() {
     return m_next;
+  }
+
+  protected String getPrincipal() {
+    return m_principal;
   }
 
   protected Subject getSubject() {
@@ -73,6 +82,12 @@ public class SubjectStatement extends Statement {
   }
 
   protected RunContext createRunContext() {
-    return RunContexts.copyCurrent().withSubject(m_subject);
+    return RunContexts.copyCurrent()
+        .withSubject(m_subject)
+        .withUser(createUser());
+  }
+
+  protected User createUser() {
+    return BEANS.get(User.class).withUserId(m_principal).setReadOnly();
   }
 }

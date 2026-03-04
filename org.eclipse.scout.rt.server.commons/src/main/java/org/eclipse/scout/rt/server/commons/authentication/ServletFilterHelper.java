@@ -33,6 +33,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -50,6 +51,7 @@ public class ServletFilterHelper {
   public static final String SESSION_ATTRIBUTE_FOR_PRINCIPAL = ServletFilterHelper.class.getName() + ".PRINCIPAL";
   public static final String SESSION_ATTRIBUTE_FOR_LOGIN_REDIRECT = ServletFilterHelper.class.getName() + ".LOGIN_REDIRECT";
   public static final String SESSION_ATTRIBUTE_FOR_2FA_PRINCIPAL = ServletFilterHelper.class.getName() + ".2FA_PRINCIPAL";
+  public static final String SESSION_ATTRIBUTE_FOR_USER = ServletFilterHelper.class.getName() + ".USER";
   public static final String HTTP_HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
   public static final String HTTP_HEADER_AUTHORIZATION = "Authorization";
   public static final String HTTP_HEADER_AUTHORIZED = "Authorized";
@@ -104,10 +106,7 @@ public class ServletFilterHelper {
   public Principal getPrincipalOnSession(HttpServletRequest req) {
     final HttpSession session = req.getSession(false);
     if (session != null) {
-      Principal principal = (Principal) session.getAttribute(SESSION_ATTRIBUTE_FOR_PRINCIPAL);
-      if (principal != null) {
-        return principal;
-      }
+      return (Principal) session.getAttribute(SESSION_ATTRIBUTE_FOR_PRINCIPAL);
     }
     return null;
   }
@@ -123,6 +122,30 @@ public class ServletFilterHelper {
   public void putPrincipalOnSession(HttpServletRequest req, Principal principal) {
     HttpSession session = req.getSession();
     session.setAttribute(SESSION_ATTRIBUTE_FOR_PRINCIPAL, principal);
+  }
+
+  /**
+   * get a cached {@link User} from the {@link HttpSession} as {@link #SESSION_ATTRIBUTE_FOR_USER}
+   */
+  public User getUserOnSession(HttpServletRequest req) {
+    final HttpSession session = req.getSession(false);
+    if (session != null) {
+      return (User) session.getAttribute(SESSION_ATTRIBUTE_FOR_USER);
+    }
+    return null;
+  }
+
+  /**
+   * put a {@link User} to the {@link HttpSession} as {@link #SESSION_ATTRIBUTE_FOR_USER}
+   *
+   * @param req
+   *     The request holding the {@link HttpSession} on which the principal should be stored.
+   * @param user
+   *     The user to put on the session of the given request.
+   */
+  public void putUserOnSession(HttpServletRequest req, User user) {
+    HttpSession session = req.getSession();
+    session.setAttribute(SESSION_ATTRIBUTE_FOR_USER, user);
   }
 
   /**
