@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,16 +15,17 @@ import java.util.List;
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
-import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.CancelButton;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.ClipboardField;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.ClipboardLabel;
+import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.CopyAndCloseButton;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.OkButton;
+import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.clipboardfield.AbstractClipboardField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
@@ -47,6 +48,11 @@ public class ClipboardForm extends AbstractForm {
     super(callInitializer);
   }
 
+  @Override
+  protected boolean getConfiguredInheritAccessibility() {
+    return false;
+  }
+
   public MimeType[] getMimeTypes() {
     return m_mimeTypes;
   }
@@ -65,7 +71,8 @@ public class ClipboardForm extends AbstractForm {
 
   protected void checkOkButtonEnabled() {
     boolean okButtonEnabled = getHandler() instanceof CopyHandler || getClipboardField().getValue() != null && !getClipboardField().getValue().isEmpty();
-    getOkButton().setEnabled(okButtonEnabled, true);
+    IButton okButton = getCopyAndCloseButton().isVisible() ? getCopyAndCloseButton() : getOkButton();
+    okButton.setEnabled(okButtonEnabled);
   }
 
   @Override
@@ -83,12 +90,20 @@ public class ClipboardForm extends AbstractForm {
     start();
   }
 
+  public MainBox getMainBox() {
+    return getFieldByClass(MainBox.class);
+  }
+
   public ClipboardLabel getClipboardLabel() {
     return getFieldByClass(ClipboardLabel.class);
   }
 
   public ClipboardField getClipboardField() {
     return getFieldByClass(ClipboardField.class);
+  }
+
+  public CopyAndCloseButton getCopyAndCloseButton() {
+    return getFieldByClass(CopyAndCloseButton.class);
   }
 
   public OkButton getOkButton() {
@@ -110,6 +125,16 @@ public class ClipboardForm extends AbstractForm {
     @Override
     protected String getConfiguredBorderDecoration() {
       return BORDER_DECORATION_EMPTY;
+    }
+
+    @Override
+    protected int getConfiguredHeightInPixel() {
+      return 340;
+    }
+
+    @Override
+    protected int getConfiguredWidthInPixel() {
+      return 730;
     }
 
     @Order(10)
@@ -140,21 +165,16 @@ public class ClipboardForm extends AbstractForm {
       protected boolean getConfiguredWrapText() {
         return true;
       }
+
+      @Override
+      protected boolean getConfiguredSelectable() {
+        return false;
+      }
     }
 
     @Order(20)
     @ClassId("5c81521d-f16d-411a-85f1-c349d8b71a28")
     public class ClipboardField extends AbstractClipboardField {
-
-      @Override
-      protected int getConfiguredHeightInPixel() {
-        return 190;
-      }
-
-      @Override
-      protected int getConfiguredWidthInPixel() {
-        return 705;
-      }
 
       @Override
       protected double getConfiguredGridWeightX() {
@@ -187,6 +207,22 @@ public class ClipboardForm extends AbstractForm {
       }
     }
 
+    @Order(29)
+    @ClassId("f869f3c0-02cf-4eaf-9369-36f0b72b6d2a")
+    @ModelVariant("ClipboardFormCopyAndClose")
+    public class CopyAndCloseButton extends AbstractOkButton {
+
+      @Override
+      protected void execInitField() {
+        setVisibleGranted(false); // only visible in "copy" mode (instead of the OkButton)
+      }
+
+      @Override
+      protected String getConfiguredLabel() {
+        return TEXTS.get("Copy");
+      }
+    }
+
     @Order(30)
     @ClassId("818d7930-126e-481e-ac47-b7e8654e8060")
     public class OkButton extends AbstractOkButton {
@@ -196,38 +232,21 @@ public class ClipboardForm extends AbstractForm {
     @ClassId("a54fc3fc-ee5a-4351-b82f-3168e96c2f34")
     public class CancelButton extends AbstractCancelButton {
     }
-
-    /**
-     * Escape keyStroke is required in CopyHandler case, when form has no cancel-button but user should be able to close
-     * form with ESC anyway.
-     */
-    @Order(50)
-    @ClassId("18fc9914-495f-4523-b75c-41259de828db")
-    public class EscapeKeyStroke extends AbstractKeyStroke {
-
-      @Override
-      protected String getConfiguredKeyStroke() {
-        return IKeyStroke.ESCAPE;
-      }
-
-      @Override
-      protected void execAction() {
-        doClose();
-      }
-    }
   }
 
   public class CopyHandler extends AbstractFormHandler {
 
     @Override
     protected void execLoad() {
-      // use setVisibleGranted here because we don't want to send the cancel-button (incl. ESC keyStroke) to the UI
-      super.execLoad();
+      setTitle(TEXTS.get("CopyToClipboard"));
       getClipboardLabel().setValue(TEXTS.get("CopyToClipboardFromFieldBelow"));
-      getCancelButton().setVisibleGranted(false);
-      getOkButton().setLabel(TEXTS.get("CloseButton"));
-      checkOkButtonEnabled();
+      getClipboardLabel().setVisibleGranted(false);
+      // Switch to "copy" mode
       getClipboardField().setReadOnly(true);
+      // Show copy button (with model variant) instead of normal ok button
+      getOkButton().setVisibleGranted(false);
+      getCopyAndCloseButton().setVisibleGranted(true);
+      checkOkButtonEnabled();
     }
   }
 
@@ -235,7 +254,7 @@ public class ClipboardForm extends AbstractForm {
 
     @Override
     protected void execLoad() {
-      super.execLoad();
+      setTitle(TEXTS.get("InsertFromClipboard"));
       getClipboardLabel().setValue(TEXTS.get("PasteClipboardContentsInFieldBelow"));
       checkOkButtonEnabled();
     }

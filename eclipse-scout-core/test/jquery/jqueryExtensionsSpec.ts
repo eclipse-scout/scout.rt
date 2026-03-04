@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -695,6 +695,105 @@ describe('jquery-scout', () => {
       expect($e5_scrollParent.scrollParents(true).toArray()).toEqual([$e5_scrollParent[0], $e3_scrollParent[0], $e2_pseudoScrollParent[0]]);
       expect($e6_pseudoScrollParent.scrollParents(true).toArray()).toEqual([$e6_pseudoScrollParent[0], $e5_scrollParent[0], $e3_scrollParent[0], $e2_pseudoScrollParent[0]]);
       expect($e7.scrollParents(true).toArray()).toEqual([$e6_pseudoScrollParent[0], $e5_scrollParent[0], $e3_scrollParent[0], $e2_pseudoScrollParent[0]]);
+    });
+  });
+
+  describe('selectedText', () => {
+    let $document, $outer, $inner1, $inner2, $textInput, $textArea, $contentEditable;
+
+    beforeEach(() => {
+      $document = $(document);
+      $outer = $('#sandbox').appendDiv();
+      $outer.text('aaa');
+
+      $inner1 = $outer.appendDiv('outer');
+      $inner1.appendDiv('b').text('bbb bbb');
+      $inner1.appendDiv('c').html('ccc<br>ccc');
+      $inner1.appendDiv('d').text('ddd');
+
+      $inner2 = $outer.appendDiv('e').html('eee<br>eee');
+      $inner2.appendDiv('f').text('fff');
+
+      $textInput = $('<input type="text">')
+        .val('ggg ggg ggg')
+        .appendTo($inner2);
+
+      $textArea = $('<textarea></textarea>')
+        .val('hhh\nhhh\nhhh')
+        .appendTo($inner2);
+
+      $contentEditable = $('<div contentEditable="true"></div>"')
+        .html('iii<br>iii<br>iii')
+        .appendTo($inner2);
+
+      $inner2.appendDiv('j').text('jjj');
+    });
+
+    it('returns empty string if no text is selected', () => {
+      expect($().selectedText()).toBe('');
+      expect($('no-such-element').selectedText()).toBe('');
+      expect($document.selectedText()).toBe('');
+      expect($outer.selectedText()).toBe('');
+      expect($inner2.selectedText()).toBe('');
+      expect($textInput.selectedText()).toBe('');
+      expect($textArea.selectedText()).toBe('');
+      expect($contentEditable.selectedText()).toBe('');
+    });
+
+    it('returns only text from divs or input fields, not both, if all text is selected', () => {
+      $outer.selectAllText();
+      expect($document.selectedText()).toBe('aaa\nbbb bbb\nccc\nccc\nddd\neee\neee\nfff\niii\niii\niii\njjj');
+      expect($outer.selectedText()).toBe('aaa\nbbb bbb\nccc\nccc\nddd\neee\neee\nfff\niii\niii\niii\njjj');
+      expect($inner1.selectedText()).toBe('bbb bbb\nccc\nccc\nddd');
+      expect($inner2.selectedText()).toBe('eee\neee\nfff\niii\niii\niii\njjj');
+      expect($textInput.selectedText()).toBe('');
+      expect($textArea.selectedText()).toBe('');
+      expect($contentEditable.selectedText()).toBe('iii\niii\niii');
+
+      $inner2.selectAllText();
+      expect($document.selectedText()).toBe('eee\neee\nfff\niii\niii\niii\njjj');
+      expect($outer.selectedText()).toBe('eee\neee\nfff\niii\niii\niii\njjj');
+      expect($inner1.selectedText()).toBe('');
+      expect($inner2.selectedText()).toBe('eee\neee\nfff\niii\niii\niii\njjj');
+      expect($textInput.selectedText()).toBe('');
+      expect($textArea.selectedText()).toBe('');
+      expect($contentEditable.selectedText()).toBe('iii\niii\niii');
+
+      $textInput.selectAllText();
+      expect($document.selectedText()).toBe('');
+      expect($outer.selectedText()).toBe('');
+      expect($inner1.selectedText()).toBe('');
+      expect($inner2.selectedText()).toBe('');
+      expect($textInput.selectedText()).toBe('ggg ggg ggg');
+      expect($textArea.selectedText()).toBe('');
+      expect($contentEditable.selectedText()).toBe('');
+
+      $textArea.selectAllText();
+      expect($document.selectedText()).toBe('');
+      expect($outer.selectedText()).toBe('');
+      expect($inner1.selectedText()).toBe('');
+      expect($inner2.selectedText()).toBe('');
+      expect($textInput.selectedText()).toBe('ggg ggg ggg'); // selectionStart and selectionEnd are preserved even when the focus is lost
+      expect($textArea.selectedText()).toBe('hhh\nhhh\nhhh');
+      expect($contentEditable.selectedText()).toBe('');
+    });
+
+    it('returns only the selected text part', () => {
+      // select from last 'c' to first 'j'
+      let range = document.createRange();
+      range.setStart($outer.find('.c').get(0).lastChild, 2);
+      range.setEnd($outer.find('.j').get(0).firstChild, 1);
+      let selection = document.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      expect($document.selectedText()).toBe('c\nddd\neee\neee\nfff\niii\niii\niii\nj');
+      expect($outer.selectedText()).toBe('c\nddd\neee\neee\nfff\niii\niii\niii\nj');
+      expect($inner1.selectedText()).toBe('c\nddd');
+      expect($inner2.selectedText()).toBe('eee\neee\nfff\niii\niii\niii\nj');
+      expect($textInput.selectedText()).toBe('');
+      expect($textArea.selectedText()).toBe('');
+      expect($contentEditable.selectedText()).toBe('iii\niii\niii');
     });
   });
 });

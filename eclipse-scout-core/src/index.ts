@@ -789,6 +789,7 @@ export * from './form/fields/checkbox/CheckBoxToggleKeyStroke';
 export * from './form/fields/clipboardfield/ClipboardField';
 export * from './form/fields/clipboardfield/ClipboardFieldModel';
 export * from './form/fields/clipboardfield/ClipboardFieldAdapter';
+export * from './form/fields/clipboardfield/ClipboardFormCopyAndCloseButton';
 export * from './form/fields/colorfield/ColorField';
 export * from './form/fields/colorfield/ColorFieldAdapter';
 export * from './form/fields/datefield/DatePredictionFailedStatus';

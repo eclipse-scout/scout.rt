@@ -1201,6 +1201,17 @@ declare global {
     selectAllText(): this;
 
     /**
+     * Returns the plain text that is currently selected within this element, including newlines.
+     *
+     * If the selection starts or ends outside the element, only the part contained within the element is returned.
+     * If called directly on a native input field (`<input>`, `<textarea>`), the selection is taken from `selectionStart`
+     * and `selectionEnd`. Otherwise, the text is extracted from the DOM using `document.getSelection()`.
+     *
+     * If the element is not rendered or does not contain a selection, an empty string is returned instead.
+     */
+    selectedText(): string;
+
+    /**
      * Checks if content is truncated.
      */
     isContentTruncated(): boolean;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, BlobWithName, ClipboardFieldModel, Device, DragAndDropOptions, FatalMessageOptions, InputFieldKeyStrokeContext, keys, KeyStrokeContext, mimeTypes, scout, Session, strings, ValueField} from '../../../index';
+import {arrays, BlobWithName, ClipboardFieldModel, Device, DragAndDropOptions, FatalMessageOptions, keys, mimeTypes, scout, Session, strings, ValueField} from '../../../index';
 import $ from 'jquery';
 
 export class ClipboardField extends ValueField<string> implements ClipboardFieldModel {
@@ -32,7 +32,6 @@ export class ClipboardField extends ValueField<string> implements ClipboardField
   static NON_DESTRUCTIVE_KEYS = [
     // Default form handling
     keys.ESC,
-    keys.ENTER,
     keys.TAB,
     // Navigate and mark text
     keys.PAGE_UP,
@@ -58,15 +57,11 @@ export class ClipboardField extends ValueField<string> implements ClipboardField
     keys.F12
   ];
 
-  // Keys that always alter the content of a text field, independent from the modifier keys
+  // Keys that always alter the content of a text field, independent of the modifier keys
   static ALWAYS_DESTRUCTIVE_KEYS = [
     keys.BACKSPACE,
     keys.DELETE
   ];
-
-  protected override _createKeyStrokeContext(): KeyStrokeContext {
-    return new InputFieldKeyStrokeContext();
-  }
 
   protected override _render() {
     // We don't use makeDiv() here intentionally because the DIV created must
@@ -137,19 +132,28 @@ export class ClipboardField extends ValueField<string> implements ClipboardField
     return selection;
   }
 
-  protected _onKeyDown(event: JQuery.KeyDownEvent): boolean {
+  protected _onKeyDown(event: JQuery.KeyDownEvent) {
+    if (this._isDestructiveKey(event)) {
+      // do not allow to enter something manually, but allow the event to bubble up to the form
+      event.preventDefault();
+    }
+  }
+
+  /**
+   * Returns true if the given keystroke would change the value of the field, false otherwise.
+   */
+  protected _isDestructiveKey(event: JQuery.KeyboardEventBase): boolean {
     if (scout.isOneOf(event.which, ClipboardField.ALWAYS_DESTRUCTIVE_KEYS)) {
-      return false; // never allowed
+      return true;
     }
     if (event.ctrlKey || event.altKey || event.metaKey || scout.isOneOf(event.which, ClipboardField.NON_DESTRUCTIVE_KEYS)) {
-      return; // allow bubble to other event handlers
+      return false;
     }
-    // do not allow to enter something manually
-    return false;
+    return true;
   }
 
   protected _onInput(event: JQuery.TriggeredEvent): boolean {
-    // if the user somehow managed to fire to input something (e.g. "delete" menu in FF & IE), just reset the value to the previous content
+    // if the user somehow managed to fire to input something (e.g. "delete" action in context menu or touch bar actions in safari), just reset the value to the previous content
     this._renderDisplayText();
     return false;
   }
