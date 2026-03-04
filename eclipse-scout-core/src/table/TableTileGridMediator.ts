@@ -190,6 +190,7 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
   }
 
   setTiles(tiles: ObjectOrChildModel<Tile>[]) {
+    tiles = [...new Set(tiles)].filter(Boolean); // remove duplicates and nulls
     this.setProperty('tiles', tiles);
   }
 
@@ -435,7 +436,7 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
     this.table.loadingSupport.renderLoading(true);
   }
 
-  override destroy() {
+  protected override _destroy() {
     // destroy tiles manually since owner is the mediator thus the tileGrid can't destroy them
     this.tiles.forEach(tile => tile.destroy());
     this.tileAccordion.destroy();
@@ -528,7 +529,7 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
     if (!this.table.tileMode || $.isEmptyObject(this.tilesMap)) {
       return;
     }
-    this.tiles = this.table.rows.map(row => this.tilesMap[row.id]);
+    this.tiles = [...new Set(this.table.rows.map(row => this.tilesMap[row.id]))].filter(Boolean); // remove duplicates and nulls
     this.tileAccordion.setTiles(this.tiles);
   }
 
