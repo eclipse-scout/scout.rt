@@ -12,12 +12,8 @@ package org.eclipse.scout.rt.app;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.jetty.compression.gzip.GzipCompression;
-import org.eclipse.jetty.compression.gzip.GzipDecoderConfig;
-import org.eclipse.jetty.compression.gzip.GzipEncoderConfig;
-import org.eclipse.jetty.compression.server.CompressionConfig;
-import org.eclipse.jetty.compression.server.CompressionHandler;
 import org.eclipse.jetty.http.HttpCookie.SameSite;
+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
@@ -393,7 +389,7 @@ public final class ApplicationProperties {
   }
 
   /**
-   * @see CompressionHandler
+   * @see GzipHandler
    */
   public static class ScoutApplicationGzipEnabled extends AbstractBooleanConfigProperty {
 
@@ -404,7 +400,7 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Specifies whether " + CompressionHandler.class.getName() + " is used. Default value is " + getDefaultValue() + ".";
+      return "Specifies whether " + GzipHandler.class.getName() + " is used. Default value is " + getDefaultValue() + ".";
     }
 
     @Override
@@ -414,7 +410,7 @@ public final class ApplicationProperties {
   }
 
   /**
-   * @see CompressionConfig.Builder#decompressExcludePath(String)
+   * @see GzipHandler#setExcludedInflatePaths(String...)
    */
   public static class ScoutApplicationGzipExcludedInflatePaths extends AbstractStringListConfigProperty {
 
@@ -425,12 +421,12 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Excluded inflate paths for " + CompressionHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+      return "Excluded inflate paths for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
     }
   }
 
   /**
-   * @see CompressionConfig.Builder#compressExcludeMethod(String)
+   * @see GzipHandler#setExcludedMethods(String...)
    */
   public static class ScoutApplicationGzipExcludedMethods extends AbstractStringListConfigProperty {
 
@@ -441,12 +437,12 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Excluded methods for " + CompressionHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+      return "Excluded methods for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
     }
   }
 
   /**
-   * @see CompressionConfig.Builder#compressExcludeMimeType(String)
+   * @see GzipHandler#setExcludedMimeTypes(String...)
    */
   public static class ScoutApplicationGzipExcludedMimeTypes extends AbstractStringListConfigProperty {
 
@@ -457,12 +453,12 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Excluded MIME types for " + CompressionHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+      return "Excluded MIME types for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
     }
   }
 
   /**
-   * @see CompressionConfig.Builder#compressExcludePath(String)
+   * @see GzipHandler#setExcludedPaths(String...)
    */
   public static class ScoutApplicationGzipExcludedPaths extends AbstractStringListConfigProperty {
 
@@ -473,12 +469,12 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Excluded paths for " + CompressionHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+      return "Excluded paths for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
     }
   }
 
   /**
-   * @see CompressionConfig.Builder#decompressIncludePath(String)
+   * @see GzipHandler#setIncludedInflatePaths(String...)
    */
   public static class ScoutApplicationGzipIncludedInflatePaths extends AbstractStringListConfigProperty {
 
@@ -489,12 +485,12 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Included inflate paths for " + CompressionHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+      return "Included inflate paths for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
     }
   }
 
   /**
-   * @see CompressionConfig.Builder#compressIncludeMethod(String)
+   * @see GzipHandler#setIncludedMethods(String...)
    */
   public static class ScoutApplicationGzipIncludedMethods extends AbstractStringListConfigProperty {
 
@@ -505,12 +501,12 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Included methods for " + CompressionHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+      return "Included methods for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
     }
   }
 
   /**
-   * @see CompressionConfig.Builder#compressIncludeMimeType(String)
+   * @see GzipHandler#setIncludedMimeTypes(String...)
    */
   public static class ScoutApplicationGzipIncludedMimeTypes extends AbstractStringListConfigProperty {
 
@@ -521,12 +517,12 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Included MIME types for " + CompressionHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+      return "Included MIME types for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
     }
   }
 
   /**
-   * @see CompressionConfig.Builder#compressIncludePath(String)
+   * @see GzipHandler#setIncludedPaths(String...)
    */
   public static class ScoutApplicationGzipIncludedPaths extends AbstractStringListConfigProperty {
 
@@ -537,12 +533,12 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Included paths for " + CompressionHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+      return "Included paths for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
     }
   }
 
   /**
-   * @see GzipCompression#setMinCompressSize(int)
+   * @see GzipHandler#setMinGzipSize(int)
    */
   public static class ScoutApplicationGzipMinSize extends AbstractPositiveIntegerConfigProperty {
 
@@ -553,12 +549,12 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Minimum size to trigger compression for " + CompressionHandler.class.getName() + ". If not set Jetty default value will be used.";
+      return "Minimum size to trigger compression for " + GzipHandler.class.getName() + ". If not set Jetty default value will be used.";
     }
   }
 
   /**
-   * @see GzipDecoderConfig#setBufferSize(int)
+   * @see GzipHandler#setInflateBufferSize(int)
    */
   public static class ScoutApplicationGzipInflateBufferSize extends AbstractPositiveIntegerConfigProperty {
 
@@ -569,7 +565,7 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Inflater buffer size for " + CompressionHandler.class.getName() + " to enable compressed requests. Default value: " + getDefaultValue();
+      return "Inflater buffer size for " + GzipHandler.class.getName() + " to enable compressed requests. Default value: " + getDefaultValue();
     }
 
     @Override
@@ -579,7 +575,7 @@ public final class ApplicationProperties {
   }
 
   /**
-   * @see GzipEncoderConfig#setSyncFlush(boolean)
+   * @see GzipHandler#setSyncFlush(boolean)
    */
   public static class ScoutApplicationGzipSyncFlush extends AbstractBooleanConfigProperty {
 
@@ -590,7 +586,7 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Enables sync flush for " + CompressionHandler.class.getName() + ". Default value is " + getDefaultValue() + ".";
+      return "Enables sync flush for " + GzipHandler.class.getName() + ". Default value is " + getDefaultValue() + ".";
     }
 
     @Override
