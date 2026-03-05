@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.client.services.lookup;
+package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -30,10 +30,6 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
  * IMPORTANT: If you use subclasses of this lookup call in a smart column, make sure to use an

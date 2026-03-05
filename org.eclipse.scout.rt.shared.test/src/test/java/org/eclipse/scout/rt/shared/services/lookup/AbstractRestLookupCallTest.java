@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.client.services.lookup;
+package org.eclipse.scout.rt.shared.services.lookup;
 
 import static org.junit.Assert.*;
 
@@ -20,8 +20,9 @@ import org.eclipse.scout.rt.dataobject.lookup.LookupResponse;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.shared.services.lookup.FixtureUuIdLookupRestrictionDo;
+import org.eclipse.scout.rt.testing.shared.services.lookup.FixtureUuIdLookupRowDo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
