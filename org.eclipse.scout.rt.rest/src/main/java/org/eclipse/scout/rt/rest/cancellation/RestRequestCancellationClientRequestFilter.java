@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,6 +14,8 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+import javax.security.auth.Subject;
+
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.ClientRequestFilter;
 
@@ -24,6 +26,8 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.rest.RestHttpHeaders;
 import org.eclipse.scout.rt.rest.client.RestClientProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * REST client request filter that sets a random request ID (UUID) HTTP header and puts an {@link ICancellable} to the
@@ -53,12 +57,16 @@ public class RestRequestCancellationClientRequestFilter implements ClientRequest
 
   public static class ScoutRestRequestCancellable implements ICancellable {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ScoutRestRequestCancellable.class);
+
     private final String m_requestId;
+    private final Subject m_subject;
     private final AtomicBoolean m_cancelled;
     private final Consumer<String> m_requestCanceller;
 
     public ScoutRestRequestCancellable(String requestId, Consumer<String> requestCanceller) {
       m_requestId = requestId;
+      m_subject = Subject.current();
       m_requestCanceller = requestCanceller;
       m_cancelled = new AtomicBoolean();
     }
@@ -74,7 +82,12 @@ public class RestRequestCancellationClientRequestFilter implements ClientRequest
         return false;
       }
 
-      RunContexts.copyCurrent()
+      RunContext runContext = RunContexts.copyCurrent(true);
+      if (m_subject != null && runContext.getSubject() == null) {
+        LOG.trace("No subject set: Using subject {} for cancellation", m_subject);
+        runContext.withSubject(m_subject);
+      }
+      runContext
           .withRunMonitor(BEANS.get(RunMonitor.class)) // execute with a new RunMonitor
           .run(() -> m_requestCanceller.accept(m_requestId));
 
