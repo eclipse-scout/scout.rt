@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,8 +17,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -26,6 +28,8 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.holders.Holder;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -772,6 +776,19 @@ public class TransactionProcessorTest {
     BasicTransaction t = new BasicTransaction();
     t.cancel(false);
     t.registerMemberIfAbsent("123", memberId -> new TestTransactionMember(null));
+  }
+
+  @Test
+  public void testAddFailureThreadSafe() {
+    BasicTransaction basicTransaction = new BasicTransaction();
+    CountDownLatch startLatch = new CountDownLatch(1);
+    List<IFuture<Void>> futures = IntStream.range(0, 100).mapToObj(i -> Jobs.schedule(() -> {
+      startLatch.await();
+      basicTransaction.addFailure(new RuntimeException(Integer.toString(i)));
+    }, Jobs.newInput())).toList();
+    startLatch.countDown();
+    futures.forEach(IFuture::awaitDoneAndGet); // all futures must be finished
+    assertEquals(futures.size(), basicTransaction.getFailures().length);
   }
 
   public static class TestTransactionMember implements ITransactionMember {
