@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+
+import javax.security.auth.Subject;
 
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.ClientRequestFilter;
@@ -58,12 +60,14 @@ public class RestRequestCancellationClientRequestFilter implements ClientRequest
     private static final Logger LOG = LoggerFactory.getLogger(ScoutRestRequestCancellable.class);
 
     private final String m_requestId;
+    private final Subject m_subject;
     private final ClientRequestContext m_clientRequestContext;
     private final AtomicBoolean m_cancelled;
     private final Consumer<String> m_requestCanceller;
 
     public ScoutRestRequestCancellable(String requestId, ClientRequestContext requestContext, Consumer<String> requestCanceller) {
       m_requestId = requestId;
+      m_subject = Subject.current();
       m_clientRequestContext = requestContext;
       m_requestCanceller = requestCanceller;
       m_cancelled = new AtomicBoolean();
@@ -83,7 +87,12 @@ public class RestRequestCancellationClientRequestFilter implements ClientRequest
       try {
         if (m_requestId != null) { // should not be null (is added as header when cancellable is registered however we never know what might happen/if header is removed again)
           LOG.trace("Running canceller for request {}", m_requestId);
-          RunContexts.copyCurrent()
+          RunContext runContext = RunContexts.copyCurrent(true);
+          if (m_subject != null && runContext.getSubject() == null) {
+            LOG.trace("No subject set: Using subject {} for cancellation", m_subject);
+            runContext.withSubject(m_subject);
+          }
+          runContext
               .withRunMonitor(BEANS.get(RunMonitor.class)) // execute with a new RunMonitor
               .run(() -> m_requestCanceller.accept(m_requestId));
         }
