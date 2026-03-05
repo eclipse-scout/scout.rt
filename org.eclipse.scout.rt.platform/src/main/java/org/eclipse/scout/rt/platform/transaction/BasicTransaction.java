@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.platform.transaction;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class BasicTransaction implements ITransaction {
 
   private final Object m_memberMapLock = new Object();
   private final Map<String, ITransactionMember> m_memberMap = new LinkedHashMap<>();
-  private final List<Throwable> m_failures = new ArrayList<>();
+  private final List<Throwable> m_failures = Collections.synchronizedList(new ArrayList<>());
   private boolean m_commitPhase;
   private boolean m_cancelled;
 
@@ -202,8 +203,19 @@ public class BasicTransaction implements ITransaction {
 
   @Override
   public void addFailure(Throwable t) {
-    if (!m_failures.contains(t)) {
-      m_failures.add(t);
+    try {
+      if (!m_failures.contains(t)) {
+        synchronized (m_failures) {
+          // double check contains as list might have been changed after previous contains call
+          if (!m_failures.contains(t)) {
+            m_failures.add(t);
+          }
+        }
+      }
+    }
+    catch (Throwable t1) {
+      t1.addSuppressed(t);
+      throw t1;
     }
   }
 
