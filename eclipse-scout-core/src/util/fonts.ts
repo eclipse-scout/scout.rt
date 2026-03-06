@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,12 +25,12 @@ export interface FontPreloadOptions {
    * Alternatively, the style can be specified in the string after the font name, separated by a pipe character ('|').
    * The property {@link testString} (or a third component in a '|' separated string) may be specified to set the characters to measure for this specific font (can be useful for icon fonts).
    */
-  fonts: string | string[] | FontDescriptor | FontDescriptor[];
+  fonts?: string | string[] | FontDescriptor | FontDescriptor[];
 
   /**
-   * Mandatory function to be called when all of the specified fonts have been loaded or if a timeout occurs. If this option is omitted, the call to this method returns immediately.
+   * Mandatory function to be called when all the specified fonts have been loaded or if a timeout occurs. If this option is omitted, the call to this method returns immediately.
    * @param success indicate whether loading was completed successfully or execution was interrupted by a timeout.
-   * @param badFonts The bad fonts
+   * @param badFonts A textual description of the bad fonts
    */
   onComplete?: (success: boolean, badFonts: string[]) => void;
 
@@ -98,10 +98,11 @@ export const fonts = {
   },
 
   /**
-   * @returns  a promise object that is notified when the font preloading was completed.
-   *          Important: Before waiting for this promise, always check that value of
-   *          loadingComplete first! Do not wait for the promise when loadingComplete
-   *          is true, because the promise will never be resolved.
+   * Returns a promise object that is notified when the font preloading was completed.
+   *
+   * *Important:* Before waiting for this promise, always check that value of
+   * loadingComplete first! Do not wait for the promise when loadingComplete
+   * is true, because the promise will never be resolved.
    */
   preloader(): JQuery.Promise<void> {
     return fonts._deferred.promise();
@@ -128,7 +129,9 @@ export const fonts = {
 
   /**
    * Loads the specified fonts in a hidden div, forcing the browser to load them.
+   *
    * Examples:
+   * ```
    *   preload({fonts: 'Sauna Pro'});
    *   preload({fonts: 'Sauna Pro|font-style:italic'});
    *   preload({fonts: 'Sauna Pro|font-style:italic|The quick brown fox jumps over the lazy dog'});
@@ -137,11 +140,12 @@ export const fonts = {
    *   preload({fonts: ['Sauna Pro', 'Dolly Pro']});
    *   preload({fonts: {family:'Sauna', style: 'font-style:italic; font-weight:700', testString: 'MyString012345'}, timeout: 999});
    *   preload({fonts: ['Fakir-Black', {family:'Fakir-Italic', style:'font-style:italic'}], timeout: 2500, onComplete: function() { setCookie('fakir','loaded') }});
+   * ```
    *
    * Inspired by Zenfonts (https://github.com/zengabor/zenfonts, public domain).
    */
   preload(options?: FontPreloadOptions) {
-    options = options || {fonts: null};
+    options = options || {};
     let fontArr = arrays.ensure(options.fonts);
     if (!options.onComplete) {
       // preloading is not useful, because there is no callback on success
@@ -150,7 +154,7 @@ export const fonts = {
 
     // Create a DIV for each font
     let divs = [];
-    fontArr.forEach(font => {
+    fontArr.forEach((font: FontDescriptor) => {
       // Convert to object
       if (typeof font === 'string') {
         let fontParts = strings.splitMax(font, '|', 3).map(s => {
@@ -172,6 +176,7 @@ export const fonts = {
       // Create DIV with default fonts
       // (Because preloader functionality should not depend on a CSS style sheet we set the required properties programmatically.)
       let $div = $('body').appendDiv('font-preloader')
+        .attr('aria-hidden', 'true')
         .text(font.testString)
         .css('display', 'block')
         .css('visibility', 'hidden')
@@ -184,22 +189,24 @@ export const fonts = {
         .css('padding', 0)
         .css('white-space', 'nowrap')
         .css('line-height', 'normal')
+        .css('font-family', testFonts)
         .css('font-variant', 'normal')
-        .css('font-size', '20em')
-        .css('font-family', testFonts);
+        .css('font-size', '20em');
 
       // Remember size, set new font, and then measure again
       let originalSize = fonts.measureSize($div);
       $div.data('original-size', originalSize);
       $div.data('font-family', font.family);
-      $div.css('font-family', '\'' + font.family + '\',' + testFonts);
+      $div.data('font-style', font.style);
+      $div.css('font-family', `'${font.family}', ${testFonts}`);
       if (font.style) {
         let style = ($div.attr('style') || '').trim();
-        let sep = (style.substr(-1) === ';' ? '' : ';') + (style ? ' ' : '');
+        let sep = style ? (style.endsWith(';') ? ' ' : '; ') : '';
         $div.attr('style', style + sep + font.style);
       }
 
-      if (fonts.measureSize($div) !== originalSize) {
+      let currentSize = fonts.measureSize($div);
+      if (currentSize !== originalSize) {
         // Font already loaded, nothing to do
         $div.remove();
       } else {
@@ -215,10 +222,10 @@ export const fonts = {
 
     let onFinished = complete;
     let timeout = scout.nvl(options.timeout, fonts.TEST_TIMEOUT);
-    let watchTimerId, timeoutTimerId;
+    let watchTimerId;
     if (timeout && timeout >= 0) {
       // Add timeout
-      timeoutTimerId = setTimeout(() => {
+      let timeoutTimerId = setTimeout(() => {
         clearTimeout(watchTimerId);
         complete(false);
       }, timeout);
@@ -238,7 +245,9 @@ export const fonts = {
       let i = divs.length;
       while (i--) {
         let $div = divs[i];
-        if (fonts.measureSize($div) !== $div.data('original-size')) {
+        let originalSize = $div.data('original-size');
+        let currentSize = fonts.measureSize($div);
+        if (currentSize !== originalSize) {
           divs.splice(i, 1);
           $div.remove();
         }
@@ -260,9 +269,7 @@ export const fonts = {
     }
 
     function complete(success) {
-      options.onComplete(success, divs.map($div => {
-        return $div.data('font-family');
-      }));
+      options.onComplete(success, divs.map($div => strings.join(' | ', $div.data('font-family'), $div.data('font-style'))));
     }
   },
 
@@ -278,7 +285,7 @@ export const fonts = {
    * font definition objects, suitable for passing to the preload() function (see above).
    */
   autoDetectFonts(): FontDescriptor[] {
-    let fontArr = [];
+    let fontArr: FontDescriptor[] = [];
     // Implementation note: "styleSheets" and "cssRules" are not arrays (they only look like arrays)
     let styleSheets = document.styleSheets;
     for (let i = 0; i < styleSheets.length; i++) {
@@ -295,8 +302,7 @@ export const fonts = {
       }
       for (let j = 0; j < styleSheet.cssRules.length; j++) {
         let cssRule = styleSheet.cssRules[j];
-        if (cssRule.type === window.CSSRule.FONT_FACE_RULE) {
-          // @ts-expect-error
+        if (cssRule instanceof CSSFontFaceRule) {
           let style = cssRule.style;
           let ff = style.getPropertyValue('font-family');
           let fw = style.getPropertyValue('font-weight');
@@ -305,25 +311,23 @@ export const fonts = {
           let ft = style.getPropertyValue('font-stretch');
           if (ff) {
             ff = ff.replace(/^["']|["']$/g, ''); // Unquote strings, they will be quoted again automatically
-            let s = [];
+            let st = [];
             if (fw && fw !== 'normal') {
-              s.push('font-weight:' + fw);
+              st.push('font-weight: ' + fw + ';');
             }
             if (fs && fs !== 'normal') {
-              s.push('font-style:' + fs);
+              st.push('font-style: ' + fs + ';');
             }
             if (fv && fv !== 'normal') {
-              s.push('font-variant:' + fv);
+              st.push('font-variant: ' + fv + ';');
             }
             if (ft && ft !== 'normal') {
-              s.push('font-stretch:' + ft);
+              st.push('font-stretch: ' + ft + ';');
             }
             let font: FontDescriptor = {
-              family: ff
+              family: ff,
+              style: st.join(' ')
             };
-            if (s.length) {
-              font.style = s.join(';');
-            }
             fontArr.push(font);
           }
         }
