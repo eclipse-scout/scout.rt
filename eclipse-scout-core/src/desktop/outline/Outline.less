@@ -419,3 +419,28 @@
 @keyframes tree-node-prev-selection {
   .keyframes-tree-node-prev-selection();
 }
+
+// FIXME bsh [js-page] DO NOT PUSH
+.tree-node[data-js-only] > .text > .count-indicator-container > .text::after,
+.tree-node[data-js-only] > .text > .hybrid-type-indicator > .text::after,
+.tree-node[data-js-only] > .text:not(:has(.count-indicator-container)):not(:has(.hybrid-type-indicator))::after {
+  content: 'JS';
+  font-size: 10px;
+  padding: 2px 5px;
+  margin-left: 10px;
+  position: absolute;
+  pointer-events: none;
+  border-radius: 3px;
+  color: @highlight-inverted-background-color;
+  background-color: @text-inverted-color;
+  border: 1px solid @highlight-inverted-background-color;
+}
+
+.tree-node[data-js-only=hybrid] > .text > .count-indicator-container > .text::after,
+.tree-node[data-js-only=hybrid] > .text > .hybrid-type-indicator > .text::after,
+.tree-node[data-js-only=hybrid] > .text:not(:has(.count-indicator-container)):not(:has(.hybrid-type-indicator))::after {
+  content: 'HY';
+  color: @text-inverted-color;
+  background-color: @highlight-inverted-background-color;
+  border: 1px solid transparent;
+}
