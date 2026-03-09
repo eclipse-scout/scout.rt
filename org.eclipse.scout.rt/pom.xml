@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2026 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -124,7 +124,7 @@
     <scout.base.version>25.2.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
-    <jetty.version>12.0.31</jetty.version>
+    <jetty.version>12.0.33</jetty.version>
     <slf4j.version>2.0.17</slf4j.version>
     <logback.version>1.5.18</logback.version>
     <jackson.version>2.18.2</jackson.version>
