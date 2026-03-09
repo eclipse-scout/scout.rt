@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,21 +12,17 @@ package org.eclipse.scout.rt.client.ui.form.js;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import static org.eclipse.scout.rt.platform.util.TypeCastUtility.getGenericsParameterClass;
 
-import org.eclipse.scout.rt.client.ModelContextProxy;
-import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.client.ui.form.IFormUIFacade;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("371cbcfe-b79b-4d20-acfb-2a1b5ca375bf")
 public abstract class AbstractJsForm<IN extends IDataObject, OUT extends IDataObject> extends AbstractForm implements IJsForm<IN, OUT> {
-
-  private IJsFormUIFacade<OUT> m_uiFacade;
 
   private final Class<IN> m_inputDataType;
   private final Class<OUT> m_outputDataType;
@@ -56,7 +52,6 @@ public abstract class AbstractJsForm<IN extends IDataObject, OUT extends IDataOb
     super.initConfig();
     setJsFormObjectType(getConfiguredJsFormObjectType());
     setJsFormModel(getConfiguredJsFormModel());
-    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
   }
 
   /**
@@ -83,8 +78,14 @@ public abstract class AbstractJsForm<IN extends IDataObject, OUT extends IDataOb
   }
 
   @Override
+  protected IFormUIFacade createUIFacade() {
+    return new P_UIFacade();
+  }
+
+  @Override
   public IJsFormUIFacade<OUT> getUIFacade() {
-    return m_uiFacade;
+    //noinspection unchecked
+    return (IJsFormUIFacade<OUT>) super.getUIFacade();
   }
 
   @Override
