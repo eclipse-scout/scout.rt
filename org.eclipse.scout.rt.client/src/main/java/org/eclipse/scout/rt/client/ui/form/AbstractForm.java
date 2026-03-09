@@ -676,7 +676,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent().withForm(this));
+    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent().withForm(this));
     m_timerFutureMap = new HashMap<>();
     setShowOnStart(getConfiguredShowOnStart());
     m_contributionHolder = new ContributionComposite(this);
@@ -2835,6 +2835,10 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   @Override
   public String toString() {
     return "Form " + getFormId();
+  }
+
+  protected IFormUIFacade createUIFacade() {
+    return new P_UIFacade();
   }
 
   @Override
