@@ -55,7 +55,10 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.resource.MimeType;
+import org.eclipse.scout.rt.platform.security.MalwareScanner;
+import org.eclipse.scout.rt.platform.security.UnsafeResourceException;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FileUtility;
@@ -95,6 +98,8 @@ public class MailHelper {
   public static final String CONTENT_TYPE_MULTIPART_PREFIX = "multipart/";
 
   public static final String HEADER_IN_REPLY_TO = "In-Reply-To";
+
+  public static final String UNSAFE_ATTACHMENT_TEXT = "This attachment has been removed by the malware scanner.";
 
   /**
    * Returns a list of body parts.
@@ -1209,5 +1214,65 @@ public class MailHelper {
     String baseType = ct.getBaseType();
     MimeType mimeType = MimeType.convertToMimeType(baseType);
     return mimeType == null ? null : mimeType.getFileExtension();
+  }
+
+  /**
+   * <p>
+   * Scan all attachments (also inline) of the specific part using {@link MalwareScanner}. If an exception occurs
+   * (possibly {@link UnsafeResourceException )} the attachment is considered unsafe and is replaced by a text file with
+   * the contents of {@link #getUnsafeAttachmentText()}.
+   * </p>
+   * <p>
+   * If the message has been changed {@link MimeMessage#saveChanges()} should be called to reflect the actual changes in
+   * the message itself, this method should be used with care for remote message (e.g. {@code IMAPMessage}) as it may
+   * change remote messages.
+   * </p>
+   *
+   * @param part
+   *     part to be scanned
+   * @return if an attachment has been changed
+   */
+  public boolean removeMaliciousAttachments(Part part) {
+    List<Part> attachmentCollector = new ArrayList<>();
+    collectMailParts(part, null, attachmentCollector, attachmentCollector);
+
+    boolean changed = false;
+    for (Part attachment : attachmentCollector) {
+      try {
+        if (isSafePart(attachment)) {
+          continue;
+        }
+
+        String fileName = attachment.getFileName();
+        if (fileName != null) {
+          // actually changes the file-name, may break inline images; however content was changed as well to text, so they would be broken anyways
+          attachment.setFileName(fileName + ".txt");
+        }
+        attachment.setText(getUnsafeAttachmentText());
+        changed = true;
+      }
+      catch (MessagingException e) {
+        throw new ProcessingException("Exception while checking for potential malicious attachments", e);
+      }
+    }
+    return changed;
+  }
+
+  protected boolean isSafePart(Part attachment) throws MessagingException {
+    try {
+      BEANS.get(MalwareScanner.class).scan(BinaryResources.create().withContent(IOUtility.readBytes(attachment.getInputStream())).build());
+      return true;
+    }
+    catch (IOException e) {
+      LOG.error("I/O error while reading message part, considering attachment as unsafe", e);
+    }
+    catch (UnsafeResourceException e) {
+      LOG.debug("Unsafe attachment found: {}", attachment.getFileName(), e);
+    }
+    return false;
+  }
+
+  protected String getUnsafeAttachmentText() {
+    return UNSAFE_ATTACHMENT_TEXT;
   }
 }
