@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Form, FormAdapter, HybridActionContextElements, HybridManager, HybridManagerAdapter, LabelField, NumberField, scout, StringField, Tree, TreeAdapter, TreeNode, UuidPool, Widget} from '../../../src';
-import {FormSpecHelper, TreeSpecHelper} from '../../../src/testing';
+import {
+  Deferred, DisposeWidgetsHybridActionDo, Form, FormAdapter, HybridActionContextElements, HybridActionEvent, HybridManager, HybridManagerAdapter, LabelField, NumberField, scout, StringField, Tree, TreeAdapter, TreeNode, UuidPool, Widget
+} from '../../../src';
+import {FormSpecHelper, JasmineScoutUtil, TreeSpecHelper} from '../../../src/testing';
 
 describe('HybridManager', () => {
   let session: SandboxSession, formHelper: FormSpecHelper;
@@ -161,6 +163,154 @@ describe('HybridManager', () => {
       expect(labelField.destroyed).toBeTrue();
       expect(stringField.destroyed).toBeTrue();
       expect(numberField.destroyed).toBeFalse();
+    });
+
+    it('removes widgets, cancels destroy and sends \'scout.DisposeWidgets\' if widgets are destroyed', async () => {
+      const hybridManager = HybridManager.get(session);
+      expect(Object.entries(hybridManager.widgets).length).toBe(0);
+
+      session._processSuccessResponse({
+        adapterData: mapAdapterData([
+          {id: 'ebe86dba-ac69-4176-8f4d-e0a60e8821dd', objectType: 'StringField'},
+          {id: 'bbe0a00d-1f4a-4804-a0ac-20b50a40a206', objectType: 'StringField'},
+          {id: '7b7e2da6-e43d-43d6-b83d-c252cb1c07f8', objectType: 'StringField'},
+          {id: '451a8fae-eca3-4d2f-ae17-612fdbf59546', objectType: 'StringField'}
+        ]),
+        events: [createPropertyChangeEvent(hybridManager, {
+          widgets: {
+            field1: 'ebe86dba-ac69-4176-8f4d-e0a60e8821dd',
+            field2: 'bbe0a00d-1f4a-4804-a0ac-20b50a40a206',
+            field3: '7b7e2da6-e43d-43d6-b83d-c252cb1c07f8',
+            field4: '451a8fae-eca3-4d2f-ae17-612fdbf59546'
+          }
+        })]
+      });
+
+      const {field1, field2, field3, field4} = hybridManager.widgets;
+
+      expect(Object.entries(hybridManager.widgets).length).toBe(4);
+      expect(field1).toBeInstanceOf(StringField);
+      expect(field1.destroyed).toBeFalse();
+      expect(field1.destroying).toBeFalse();
+      expect(field2).toBeInstanceOf(StringField);
+      expect(field2.destroyed).toBeFalse();
+      expect(field2.destroying).toBeFalse();
+      expect(field3).toBeInstanceOf(StringField);
+      expect(field3.destroyed).toBeFalse();
+      expect(field3.destroying).toBeFalse();
+      expect(field4).toBeInstanceOf(StringField);
+      expect(field4.destroyed).toBeFalse();
+      expect(field4.destroying).toBeFalse();
+
+      let disposeWidgetsCalled = false;
+      const disposedWidgetIdsDeferred = new Deferred<string[]>();
+      JasmineScoutUtil.mockHybridAction(session, 'scout.DisposeWidgets', (event: HybridActionEvent<DisposeWidgetsHybridActionDo>) => {
+        disposeWidgetsCalled = true;
+        disposedWidgetIdsDeferred.resolve(event.data.data.ids);
+        return null;
+      });
+
+      field2.destroy();
+
+      expect(field1.destroyed).toBeFalse();
+      expect(field1.destroying).toBeFalse();
+      expect(field2.destroyed).toBeFalse();
+      expect(field2.destroying).toBeTrue();
+      expect(field3.destroyed).toBeFalse();
+      expect(field3.destroying).toBeFalse();
+      expect(field4.destroyed).toBeFalse();
+      expect(field4.destroying).toBeFalse();
+      expect(disposeWidgetsCalled).toBeFalse();
+
+      field3.destroy();
+
+      expect(field1.destroyed).toBeFalse();
+      expect(field1.destroying).toBeFalse();
+      expect(field2.destroyed).toBeFalse();
+      expect(field2.destroying).toBeTrue();
+      expect(field3.destroyed).toBeFalse();
+      expect(field3.destroying).toBeTrue();
+      expect(field4.destroyed).toBeFalse();
+      expect(field4.destroying).toBeFalse();
+      expect(disposeWidgetsCalled).toBeFalse();
+
+      hybridManager.disposeWidgets(field4);
+
+      expect(field1.destroyed).toBeFalse();
+      expect(field1.destroying).toBeFalse();
+      expect(field2.destroyed).toBeFalse();
+      expect(field2.destroying).toBeTrue();
+      expect(field3.destroyed).toBeFalse();
+      expect(field3.destroying).toBeTrue();
+      expect(field4.destroyed).toBeFalse(); // scheduling a widget disposal does not destroy the widget immediately in Scout JS
+      expect(field4.destroying).toBeFalse(); // scheduling a widget disposal does not destroy the widget immediately in Scout JS
+      expect(disposeWidgetsCalled).toBeFalse();
+
+      const disposedWidgetIds = await disposedWidgetIdsDeferred.promise();
+
+      expect(disposeWidgetsCalled).toBeTrue();
+      expect(disposedWidgetIds).toEqual(['field2', 'field3', 'field4']);
+    });
+
+    it('widgets for which \'scout.DisposeWidgets\' was sent are ignored on property change events', async () => {
+      const hybridManager = HybridManager.get(session);
+      expect(Object.entries(hybridManager.widgets).length).toBe(0);
+
+      session._processSuccessResponse({
+        adapterData: mapAdapterData([
+          {id: 'b531e00b-a42e-4ac9-b023-262bf3d62e8e', objectType: 'StringField'},
+          {id: '3c4b64d0-145f-4ef9-951d-7fbbfda4e219', objectType: 'StringField'},
+          {id: '8ae24bcb-edd5-4f73-bb0d-0c119a052893', objectType: 'StringField'},
+          {id: '4788f1bd-eca0-4f3c-a4d2-be6707819b97', objectType: 'StringField'}
+        ]),
+        events: [createPropertyChangeEvent(hybridManager, {
+          widgets: {
+            field1: 'b531e00b-a42e-4ac9-b023-262bf3d62e8e',
+            field2: '3c4b64d0-145f-4ef9-951d-7fbbfda4e219',
+            field3: '8ae24bcb-edd5-4f73-bb0d-0c119a052893',
+            field4: '4788f1bd-eca0-4f3c-a4d2-be6707819b97'
+          }
+        })]
+      });
+
+      expect(Object.entries(hybridManager.widgets).length).toBe(4);
+      expect(hybridManager.widgets['field1']).toBeDefined();
+      expect(hybridManager.widgets['field2']).toBeDefined();
+      expect(hybridManager.widgets['field3']).toBeDefined();
+      expect(hybridManager.widgets['field4']).toBeDefined();
+      expect(hybridManager.widgets['field5']).not.toBeDefined();
+
+      const disposedWidgetIdsDeferred = new Deferred<void>();
+      JasmineScoutUtil.mockHybridAction(session, 'scout.DisposeWidgets', (event: HybridActionEvent<DisposeWidgetsHybridActionDo>) => {
+        disposedWidgetIdsDeferred.resolve();
+        return null;
+      });
+
+      hybridManager.disposeWidgets([hybridManager.widgets['field3'], hybridManager.widgets['field4']]);
+      await disposedWidgetIdsDeferred.promise();
+
+      session._processSuccessResponse({
+        adapterData: mapAdapterData([
+          {id: '0a1fbfb5-ad5f-4f1e-92b5-1781e8b5b319', objectType: 'StringField'}
+        ]),
+        events: [createPropertyChangeEvent(hybridManager, {
+          widgets: {
+            field1: 'b531e00b-a42e-4ac9-b023-262bf3d62e8e',
+            field2: '3c4b64d0-145f-4ef9-951d-7fbbfda4e219',
+            field3: '8ae24bcb-edd5-4f73-bb0d-0c119a052893',
+            field4: '4788f1bd-eca0-4f3c-a4d2-be6707819b97',
+            field5: '0a1fbfb5-ad5f-4f1e-92b5-1781e8b5b319'
+          }
+        })]
+      });
+
+      // disposed widgets field3 and field4 are removed from hybridManager.widgets on property change event from server
+      expect(Object.entries(hybridManager.widgets).length).toBe(3);
+      expect(hybridManager.widgets['field1']).toBeDefined();
+      expect(hybridManager.widgets['field2']).toBeDefined();
+      expect(hybridManager.widgets['field3']).not.toBeDefined();
+      expect(hybridManager.widgets['field4']).not.toBeDefined();
+      expect(hybridManager.widgets['field5']).toBeDefined();
     });
   });
 

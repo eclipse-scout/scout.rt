@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AnyDoEntity, App, Event, EventHandler, EventListener, EventMapOf, Form, HybridActionContextElements, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent, HybridManagerWidgetRemoveEvent, InitModelOf, ObjectOrChildModel,
-  scout, Session, UuidPool, Widget
+  AnyDoEntity, App, arrays, DisposeWidgetsHybridActionDo, Event, EventHandler, EventListener, EventMapOf, Extension, Form, HybridActionContextElements, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent,
+  HybridManagerWidgetRemoveEvent, InitModelOf, ObjectOrChildModel, objects, scout, Session, strings, UuidPool, Widget
 } from '../../index';
 
 /**
@@ -21,6 +21,17 @@ export class HybridManager extends Widget {
   declare self: HybridManager;
 
   widgets: Record<string, Widget>;
+
+  /**
+   * Set of {@link HybridManagerWidget}s that will be disposed in the next batch.
+   * See {@link #_callDisposeWidgets} for more information.
+   */
+  protected _widgetsToBeDisposed: Set<HybridManagerWidget> = null;
+  /**
+   * Set of ids that were scheduled in former batches.
+   * See {@link #_callDisposeWidgets} for more information.
+   */
+  protected _widgetIdsBeingDisposed = new Set<string>();
 
   constructor() {
     super();
@@ -61,26 +72,61 @@ export class HybridManager extends Widget {
   // widgets
 
   protected _setWidgets(widgets: Record<string, ObjectOrChildModel<Widget>>) {
+    const presentWidgetIds = new Set<string>();
+    for (const [id, widgetOrModel] of Object.entries(widgets)) {
+      let widgetId: string;
+      if (typeof widgetOrModel === 'string') {
+        widgetId = widgetOrModel;
+      } else if (objects.isObject(widgetOrModel)) {
+        widgetId = widgetOrModel.id;
+      }
+
+      if (!widgetId?.length) {
+        continue;
+      }
+
+      // collect widget id
+      presentWidgetIds.add(widgetId);
+
+      if (this._widgetIdsBeingDisposed.has(widgetId)) {
+        // do not accept disposed widgets
+        delete widgets[id];
+      }
+    }
+
+    for (const id of this._widgetIdsBeingDisposed) {
+      if (!presentWidgetIds.has(id)) {
+        // widget is no longer present -> no need to remember id any longer
+        this._widgetIdsBeingDisposed.delete(id);
+      }
+    }
+
     widgets = this._ensureWidgets(widgets);
 
-    const removedWidgets: Record<string, Widget> = {};
+    const removedWidgets: Record<string, HybridManagerWidget> = {};
     for (const [id, widget] of Object.entries(this.widgets)) {
       if (!widgets[id] || widgets[id] !== widget) {
         removedWidgets[id] = widget;
+        this._uninstallHybridManagerWidget(widget);
       }
     }
-    const addedWidgets: Record<string, Widget> = {};
+    const addedWidgets: Record<string, HybridManagerWidget> = {};
     for (const [id, widget] of Object.entries(widgets as Record<string, Widget>)) {
       if (!this.widgets[id] || this.widgets[id] !== widget) {
         addedWidgets[id] = widget;
+        this._installHybridManagerWidget(widget, id);
       }
     }
     this._destroyOrUnlinkChildren(Object.values(removedWidgets));
 
     this._setProperty('widgets', widgets);
 
-    Object.entries(addedWidgets).forEach(([id, widget]) => this._triggerWidgetAdd(id, widget));
-    Object.entries(removedWidgets).forEach(([id, widget]) => this._triggerWidgetRemove(id, widget));
+    Object.entries(addedWidgets).forEach(([id, widget]) => {
+      this._triggerWidgetAdd(id, widget);
+    });
+    Object.entries(removedWidgets).forEach(([id, widget]) => {
+      this._triggerWidgetRemove(id, widget);
+    });
   }
 
   protected _ensureWidgets(modelsOrWidgets: Record<string, ObjectOrChildModel<Widget>>): Record<string, Widget> {
@@ -90,6 +136,19 @@ export class HybridManager extends Widget {
       result[id] = this._createChildren(modelsOrWidgets[id]);
     });
     return result;
+  }
+
+  protected _installHybridManagerWidget(widget: HybridManagerWidget, remoteId: string) {
+    scout.assertParameter('widget', widget);
+    scout.assertParameter('remoteId', strings.nullIfEmpty(remoteId));
+
+    // mark widget with remote id
+    widget.__remoteId = remoteId;
+  }
+
+  protected _uninstallHybridManagerWidget(widget: HybridManagerWidget) {
+    // clear remote id marker
+    delete widget?.__remoteId;
   }
 
   protected _triggerWidgetAdd(id: string, widget: Widget) {
@@ -221,6 +280,58 @@ export class HybridManager extends Widget {
     return form;
   }
 
+  /**
+   * Calls the hybrid action with the action type 'scout.DisposeWidgets' to dispose the given widgets on the UI server.
+   */
+  disposeWidgets(widgets: Widget | Widget[]) {
+    this._callDisposeWidgets(widgets);
+  }
+
+  /**
+   * Calls the hybrid action with the action type 'scout.DisposeWidgets' to dispose the given widgets on the UI server.
+   * The given widgets are collected in {@link #_widgetsToBeDisposed} and sent in one hybrid action.
+   * After the hybrid action is called the ids of the {@link HybridManagerWidget}s in {@link #_widgetsToBeDisposed} are transferred to {@link #_widgetIdsBeingDisposed} and {@link #_widgetsToBeDisposed} is reset.
+   */
+  protected _callDisposeWidgets(widgets: HybridManagerWidget | HybridManagerWidget[]) {
+    // filter remote widgets that are not being disposed already
+    widgets = arrays.ensure(widgets).filter(widget => !!widget.__remoteId && !this._widgetIdsBeingDisposed.has(widget.__remoteId));
+
+    // nothing to dispose
+    if (!widgets.length) {
+      return;
+    }
+
+    // if next batch was not created already, create it and queue microtask to sent hybrid action
+    if (!this._widgetsToBeDisposed) {
+      this._widgetsToBeDisposed = new Set<HybridManagerWidget>();
+      queueMicrotask(() => {
+        // collect remote ids, transfer widget ids to this._widgetsToBeDisposed and reset next batch
+        const remoteIds: string[] = [];
+        for (const widget of [...this._widgetsToBeDisposed]) {
+          if (!widget.__remoteId) {
+            continue;
+          }
+          remoteIds.push(widget.__remoteId);
+          this._widgetIdsBeingDisposed.add(widget.id);
+        }
+        this._widgetsToBeDisposed = null;
+
+        // no widgets to dispose
+        if (!remoteIds.length) {
+          return;
+        }
+
+        // call hybrid action
+        this.callAction('scout.DisposeWidgets', scout.create(DisposeWidgetsHybridActionDo, {ids: remoteIds}));
+      });
+    }
+
+    // add remote id to next batch
+    for (const widget of widgets) {
+      this._widgetsToBeDisposed.add(widget);
+    }
+  }
+
   // event support
 
   override one<K extends string & keyof EventMapOf<this['self']>>(type: K | `${K}:${string}`, handler: EventHandler<EventMapOf<this>[K] & Event<this>>) {
@@ -251,3 +362,27 @@ interface HybridManagerForm extends Form {
    */
   __closeTriggered?: boolean;
 }
+
+export interface HybridManagerWidget extends Widget {
+  __remoteId?: string;
+}
+
+export class HybridManagerWidgetExtension extends Extension<HybridManagerWidget> {
+
+  init() {
+    this.extend(Widget.prototype, 'destroy');
+  }
+
+  destroy() {
+    if (this.extended.__remoteId) {
+      this.extended.destroying = true;
+      HybridManager.get(this.extended.session).disposeWidgets(this.extended);
+      return;
+    }
+    this.next();
+  }
+}
+
+App.addListener('installExtensions', () => {
+  Extension.install(HybridManagerWidgetExtension);
+});

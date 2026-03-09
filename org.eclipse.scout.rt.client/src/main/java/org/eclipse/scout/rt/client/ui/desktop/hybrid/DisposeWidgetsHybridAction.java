@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.desktop.hybrid;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.slf4j.Logger;
@@ -30,13 +31,24 @@ public class DisposeWidgetsHybridAction extends AbstractHybridAction<DisposeWidg
 
   @Override
   public void execute(DisposeWidgetsHybridActionDo data) {
-    for (String id : data.getIds()) {
-      IWidget widget = hybridManager().getWidgetById(id);
-      if (widget != null) {
-        widget.dispose();
-        LOG.debug("Disposed hybrid widget with id {}", id);
-      }
-    }
+    // get all widgets that need to be disposed
+    Map<String, IWidget> widgets = data.getIds().stream()
+        .map(id -> new IdWidgetTuple(id, hybridManager().getWidgetById(id)))
+        .filter(idWidgetTuple -> idWidgetTuple.widget() != null)
+        .collect(Collectors.toMap(IdWidgetTuple::id, IdWidgetTuple::widget));
+
+    // remove widgets from hybrid manager before disposing the widgets to reduce the update count of the hybrid managers widgets property
+    hybridManager().removeWidgetsById(widgets.keySet());
+
+    // dispose widgets
+    widgets.forEach((id, widget) -> {
+      widget.dispose();
+      LOG.debug("Disposed hybrid widget with id {}", id);
+    });
+
     fireHybridActionEndEvent();
+  }
+
+  protected record IdWidgetTuple(String id, IWidget widget) {
   }
 }
