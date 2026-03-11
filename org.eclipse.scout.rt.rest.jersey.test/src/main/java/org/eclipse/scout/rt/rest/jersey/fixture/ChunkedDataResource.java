@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.IntFunction;
+import java.util.stream.Stream;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -150,6 +151,15 @@ public class ChunkedDataResource implements IRestResource {
     IChunkedDataWriter<FixtureDo> writer = IChunkedDataWriter.create(FixtureDo.class, null, 100);
     writeAsyncDataScout(writer, this::createFixtureDo);
     return Response.ok(writer.toEntity()).build();
+  }
+
+  @GET
+  @Path("dataobject-scout/iterator")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response getDataObjectsScoutIterator() {
+    @SuppressWarnings("resource")
+    IChunkedDataWriter<FixtureDo> writer = IChunkedDataWriter.create(FixtureDo.class, "\n\n", 100);
+    return writer.toResponse(Stream.of(1, 2, 3).map(this::createFixtureDo).iterator());
   }
 
   /**
