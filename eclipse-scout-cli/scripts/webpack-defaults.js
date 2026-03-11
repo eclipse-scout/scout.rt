@@ -329,7 +329,7 @@ module.exports = (env, args) => {
     if (!cyclonedxSkip) {
       /** @type {import('@cyclonedx/webpack-plugin').CycloneDxWebpackPluginOptions} */
       const cycloneDxWebpackPluginOptions = {
-        specVersion: nvl(args.cyclonedxVersion, '1.5'),
+        specVersion: nvl(args.cyclonedxVersion, '1.6'),
         collectEvidence: true,
         rootComponentType: 'application',
         validateResults: false,
