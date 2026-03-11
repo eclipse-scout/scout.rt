@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
@@ -55,7 +56,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   private static final String TRANSACTION_MEMBER_ID = ClusterSynchronizationService.class.getName();
 
   private final ClusterNodeStatusInfo m_statusInfo = new ClusterNodeStatusInfo();
-  private final ConcurrentMap<Class<? extends Serializable>, ClusterNodeStatusInfo> m_messageStatusMap = new ConcurrentHashMap<>();
+  private final ConcurrentMap<MessageStatusMapKey, ClusterNodeStatusInfo> m_messageStatusMap = new ConcurrentHashMap<>();
 
   private final Subject m_subject;
   private final LazyValue<User> m_user = new LazyValue<>(this::createUser);
@@ -90,9 +91,8 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
     return m_statusInfo;
   }
 
-  protected ClusterNodeStatusInfo getStatusInfoInternal(Class<? extends Serializable> messageType) {
-    m_messageStatusMap.putIfAbsent(messageType, new ClusterNodeStatusInfo());
-    return m_messageStatusMap.get(messageType);
+  protected ClusterNodeStatusInfo getStatusInfoInternal(MessageStatusMapKey key) {
+    return m_messageStatusMap.computeIfAbsent(key, k -> new ClusterNodeStatusInfo());
   }
 
   public NodeId getNodeId() {
@@ -185,11 +185,27 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
     for (IClusterNotificationMessage message : messages) {
       LOG.trace("Publishing {}", message);
       MOM.publish(ClusterMom.class, IClusterMomDestinations.CLUSTER_NOTIFICATION_TOPIC, message);
+      updateSentStatusInfo(message);
     }
-    for (IClusterNotificationMessage im : messages) {
-      getStatusInfoInternal().updateSentStatus(im);
-      getStatusInfoInternal(im.getNotification().getClass()).updateReceiveStatus(im);
+  }
+
+  protected void updateSentStatusInfo(IClusterNotificationMessage message) {
+    getStatusInfoInternal().updateSentStatus(message);
+    getStatusInfoInternal(createStatusInfoMapKey(message)).updateSentStatus(message);
+  }
+
+  protected void updateReceiveStatusInfo(IClusterNotificationMessage message) {
+    getStatusInfoInternal().updateReceiveStatus(message);
+    getStatusInfoInternal(createStatusInfoMapKey(message)).updateReceiveStatus(message);
+  }
+
+  protected MessageStatusMapKey createStatusInfoMapKey(IClusterNotificationMessage message) {
+    Serializable notification = message.getNotification();
+    String identifier = null;
+    if (notification instanceof InvalidateCacheNotification invalidateCacheNotification) {
+      identifier = invalidateCacheNotification.getCacheId();
     }
+    return new MessageStatusMapKey(notification.getClass(), identifier);
   }
 
   @Override
@@ -211,15 +227,17 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
       }
 
       LOG.trace("Handling {}", notificationMessage);
-
-      getStatusInfoInternal().updateReceiveStatus(notificationMessage);
-      getStatusInfoInternal(notificationMessage.getNotification().getClass()).updateReceiveStatus(notificationMessage);
-
-      createRunContext().run(() -> {
-        NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
-        reg.notifyNotificationHandlers(notificationMessage.getNotification());
-      });
+      handleMessage(notificationMessage);
     }
+  }
+
+  protected void handleMessage(IClusterNotificationMessage notificationMessage) {
+    updateReceiveStatusInfo(notificationMessage);
+
+    createRunContext().run(() -> {
+      NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
+      reg.notifyNotificationHandlers(notificationMessage.getNotification());
+    });
   }
 
   protected ServerRunContext createRunContext() {
@@ -276,7 +294,26 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
 
   @Override
   public IClusterNodeStatusInfo getStatusInfo(Class<? extends Serializable> messageType) {
-    return getStatusInfoInternal(messageType).getStatus();
+    return getStatusInfoInternal(new MessageStatusMapKey(messageType)).getStatus();
+  }
+
+  @Override
+  public IClusterNodeStatusInfo getCacheInvalidationStatusInfo(String cacheId) {
+    return getStatusInfoInternal(new MessageStatusMapKey(InvalidateCacheNotification.class, cacheId)).getStatus();
+  }
+
+  protected record MessageStatusMapKey(Class<? extends Serializable> messageType, String identifier) {
+
+    public MessageStatusMapKey {
+      if (identifier == null && InvalidateCacheNotification.class.isAssignableFrom(messageType)) {
+        //noinspection LoggingPlaceholderCountMatchesArgumentCount
+        LOG.warn("For {} the cacheId is required as identifier", InvalidateCacheNotification.class.getSimpleName(), LOG.isDebugEnabled() ? new Exception("stacktrace") : null);
+      }
+    }
+
+    public MessageStatusMapKey(Class<? extends Serializable> messageType) {
+      this(messageType, null);
+    }
   }
 
   /**
