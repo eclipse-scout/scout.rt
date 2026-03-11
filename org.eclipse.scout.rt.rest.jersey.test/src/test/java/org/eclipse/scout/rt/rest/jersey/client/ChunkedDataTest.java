@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.CloseableIterator;
 import org.eclipse.scout.rt.rest.cancellation.RestRequestCancellationClientRequestFilter;
 import org.eclipse.scout.rt.rest.chunked.IChunkedDataWriter;
 import org.eclipse.scout.rt.rest.client.chunked.IChunkedDataReader;
@@ -323,5 +324,50 @@ public class ChunkedDataTest {
       assertTrue(reader.isClosed());
       LOG.debug("Client: Terminated.");
     });
+  }
+
+  @Test
+  public void testIterator() {
+    Response response = m_target
+        .path("dataobject-scout/iterator")
+        .request()
+        .accept(MediaType.APPLICATION_JSON)
+        .get();
+
+    IChunkedDataReader<FixtureDo> reader = IChunkedDataReader.create(response, FixtureDo.class, "\n\n");
+    assertFalse(reader.isClosed());
+
+    try (CloseableIterator<FixtureDo> iterator = reader.iterator()) {
+      List<FixtureDo> chunks = new ArrayList<>();
+      iterator.forEachRemaining(chunks::add);
+      assertChunks(chunks);
+    }
+    assertTrue(reader.isClosed());
+  }
+
+  @Test
+  public void testIteratorPartialRead() {
+    Response response = m_target
+        .path("dataobject-scout/iterator")
+        .request()
+        .accept(MediaType.APPLICATION_JSON)
+        .get();
+
+    IChunkedDataReader<FixtureDo> reader = IChunkedDataReader.create(response, FixtureDo.class, "\n\n");
+    assertFalse(reader.isClosed());
+
+    List<FixtureDo> chunks = new ArrayList<>();
+
+    // read first chunk directly from underlying reader
+    chunks.add(reader.read());
+
+    // read other chunks using iterator
+    try (CloseableIterator<FixtureDo> iterator = reader.iterator()) {
+      while (iterator.hasNext()) {
+        chunks.add(iterator.next());
+      }
+      assertChunks(chunks);
+    }
+    assertTrue(reader.isClosed());
   }
 }
