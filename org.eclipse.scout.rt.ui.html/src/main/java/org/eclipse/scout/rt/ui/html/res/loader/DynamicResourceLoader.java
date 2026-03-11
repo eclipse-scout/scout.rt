@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,10 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.security.csp.ConfigurableContentSecurityPolicy;
+import org.eclipse.scout.rt.security.csp.ContentSecurityPolicy;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
@@ -69,6 +72,9 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
     BinaryResource localResource = localResourceHolder.get();
     BinaryResource httpResource = localResource.createAlias(cacheKey.getResourcePath());
     HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, httpResource);
+
+    // use configured CSP for dynamic resources to e.g. allow videos to be played
+    httpCacheObject.addHttpResponseInterceptor((req, resp) -> resp.setHeader(ContentSecurityPolicy.HTTP_HEADER, BEANS.get(ConfigurableContentSecurityPolicy.class).toToken()));
     for (IHttpResponseInterceptor interceptor : localResourceHolder.getHttpResponseInterceptors()) {
       httpCacheObject.addHttpResponseInterceptor(interceptor);
     }
