@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,8 +10,9 @@
 package org.eclipse.scout.rt.client.ui.form.useradmin;
 
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.client.clientnotification.IClientSessionRegistry;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.session.ClientSessionStopHelper;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
@@ -23,14 +24,13 @@ import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox.GroupBox.OldPasswordField;
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox.GroupBox.RepeatPasswordField;
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox.OkButton;
+import org.eclipse.scout.rt.client.ui.notification.Notification;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.text.TEXTS;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.security.IAccessControlService;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 
 @ClassId("5bcb48f0-9b72-4f28-9c08-038cd5d9a1c4")
@@ -89,6 +89,13 @@ public class DefaultPasswordForm extends AbstractForm {
     @Order(10)
     @ClassId("b44b8225-ce40-448c-a908-4ef8dc4df876")
     public class GroupBox extends AbstractGroupBox {
+
+      @Override
+      protected void execInitField() {
+        if (isCurrentUser()) {
+          setNotification(new Notification(TEXTS.get("ChangePasswordLogoutInfo")));
+        }
+      }
 
       @Order(10)
       @ClassId("b27cada2-acb5-4702-a2c5-87e529fb26bc")
@@ -182,7 +189,7 @@ public class DefaultPasswordForm extends AbstractForm {
       }
       IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
       svc.resetPassword(getUserId(), getNewPasswordField().getValue().toCharArray());
-      resetSessionIfCurrentUser(svc);
+      resetSessionsIfCurrentUser(svc);
     }
   }
 
@@ -194,17 +201,31 @@ public class DefaultPasswordForm extends AbstractForm {
       }
       IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
       svc.changePassword(getUserId(), getOldPasswordField().getValue().toCharArray(), getNewPasswordField().getValue().toCharArray());
-      resetSessionIfCurrentUser(svc);
+      resetSessionsIfCurrentUser(svc);
     }
   }
 
-  protected void resetSessionIfCurrentUser(IPasswordManagementService svc) {
+  protected void resetSessionsIfCurrentUser(IPasswordManagementService svc) {
     //owasp: reset session
-    IClientSession session = (IClientSession) ISession.CURRENT.get();
-    String userName = svc.getUsernameFor(getUserId());
-    String myNameIs = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
-    if (myNameIs.equals(userName)) {
-      ModelJobs.schedule((IRunnable) session::stop, ModelJobs.newInput(ClientRunContexts.empty().withSession(session, false)));
+    if (isCurrentUser()) {
+      String currentUserId = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
+      IClientSession currentSession = ClientSessionProvider.currentSession();
+
+      // for security reasons force stop all other of the user's sessions in case an attacker is controlling it
+      ClientSessionStopHelper clientSessionStopHelper = BEANS.get(ClientSessionStopHelper.class);
+      BEANS.get(IClientSessionRegistry.class).getClientSessionsForUser(currentUserId).stream()
+          .filter(session -> !session.equals(currentSession))
+          .forEach(session -> clientSessionStopHelper.scheduleStop(session, true, "Password changed"));
+
+      // then stop current session
+      markSaved(); // mark form as saved so that it does not show as unsaved form when the session is stopped
+      currentSession.stop();
     }
+  }
+
+  protected boolean isCurrentUser() {
+    String userName = BEANS.get(IPasswordManagementService.class).getUsernameFor(getUserId());
+    String currentUserId = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
+    return currentUserId.equals(userName);
   }
 }
