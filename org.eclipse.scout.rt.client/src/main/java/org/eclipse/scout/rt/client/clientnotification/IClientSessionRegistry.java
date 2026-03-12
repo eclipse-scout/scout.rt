@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,15 +33,15 @@ public interface IClientSessionRegistry {
   void register(IClientSession session, String sessionId);
 
   /**
-   * @param sessionid
+   * @param sessionId
    *     the id of the session, see {@link ISession#getId()}
    * @return the session for a given id
    */
-  IClientSession getClientSession(String sessionid);
+  IClientSession getClientSession(String sessionId);
 
   /**
    * @param userId
-   *     the user of the session, see {@link ISession#getUserId()}
+   *     the user of the session, see {@link IClientSession#getUserId()}
    * @return the session for a given userid
    */
   List<IClientSession> getClientSessionsForUser(String userId);
