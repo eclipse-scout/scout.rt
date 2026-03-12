@@ -177,7 +177,9 @@ public class HttpProxy {
    * @see SpecificSessionCookieStore
    */
   protected CookieStore createSpecificSessionCookieStore(ISession session) {
-    return new SpecificSessionCookieStore(session);
+    return BEANS.get(SpecificSessionCookieStore.class)
+        .withDefaultCookieStore(getDefaultCookieStore())
+        .withSession(session);
   }
 
   protected ExecutorService createBlockingOperationExecutor() {
@@ -828,12 +830,28 @@ public class HttpProxy {
    * {@link ISession}. May be used if async threads access the cookie store where {@link ISession#CURRENT} is not set
    * correctly.
    */
-  private class SpecificSessionCookieStore implements CookieStore {
+  @Bean
+  public static class SpecificSessionCookieStore implements CookieStore {
 
-    private ISession m_session;
+    protected ISession m_session;
+    protected CookieStore m_defaultCookieStore;
 
-    public SpecificSessionCookieStore(ISession session) {
+    public ISession getSession() {
+      return m_session;
+    }
+
+    public SpecificSessionCookieStore withSession(ISession session) {
       m_session = session;
+      return this;
+    }
+
+    public CookieStore getDefaultCookieStore() {
+      return m_defaultCookieStore;
+    }
+
+    public SpecificSessionCookieStore withDefaultCookieStore(CookieStore defaultCookieStore) {
+      m_defaultCookieStore = defaultCookieStore;
+      return this;
     }
 
     @Override
@@ -857,12 +875,15 @@ public class HttpProxy {
       runWithSession(getDefaultCookieStore()::clear);
     }
 
-    private void runWithSession(IRunnable runnable) {
-      RunContexts.copyCurrent(true).withThreadLocal(ISession.CURRENT, m_session).run(runnable);
+    protected void runWithSession(IRunnable runnable) {
+      callWithSession(() -> {
+        runnable.run();
+        return null;
+      });
     }
 
-    private <R> R callWithSession(Callable<R> callable) {
-      return RunContexts.copyCurrent(true).withThreadLocal(ISession.CURRENT, m_session).call(callable);
+    protected <R> R callWithSession(Callable<R> callable) {
+      return RunContexts.copyCurrent(true).withThreadLocal(ISession.CURRENT, getSession()).call(callable);
     }
   }
 }
