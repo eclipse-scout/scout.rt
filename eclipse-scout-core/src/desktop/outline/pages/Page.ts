@@ -427,11 +427,14 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
   }
 
   /**
-   * Returns an array of pages linked with the given rows. The order of the returned pages corresponds to the
-   * order of the rows. Rows that are not linked to a page are ignored.
+   * Returns an array of pages linked with the given rows.
+   * The order of the returned pages corresponds to the order of the rows.
+   * Rows that are not linked to a page are ignored.
+   * Each page is only returned once even if it is linked with multiple rows.
    */
   pagesForTableRows(rows: TableRow[]): Page[] {
-    return rows.map(row => row.page).filter(Boolean);
+    return rows.map(row => row.page)
+      .filter((value, index, array) => value && array.indexOf(value) === index); // remove duplicates
   }
 
   /**
