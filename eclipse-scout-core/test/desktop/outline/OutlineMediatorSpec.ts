@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, Outline, PageWithNodes, PageWithTable, scout, Table, TableModel, TableTextUserFilter} from '../../../src/index';
+import {Action, Outline, Page, PageWithNodes, PageWithTable, scout, Table, TableModel, TableRow, TableTextUserFilter} from '../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../src/testing/index';
 
 describe('OutlineMediator', () => {
@@ -107,6 +107,44 @@ describe('OutlineMediator', () => {
     detailTable.sort(firstColumn, 'asc');
     expect(page.childNodes[0].text).toBe('Bar');
     expect(page.childNodes[1].text).toBe('Foo');
+
+    tableModel = tableHelper.createModelFixture(1, 0);
+    detailTable = tableHelper.createTable(tableModel);
+    firstColumn = detailTable.columns[0];
+
+    const childPages = new Map<string, Page>([
+      ['foo', scout.create(PageWithNodes, {parent: outline})],
+      ['bar', scout.create(PageWithNodes, {parent: outline})]
+    ]);
+
+    class MyPage extends PageWithTable {
+
+      protected override _createChildPage(row: TableRow): Page {
+        return childPages.get(firstColumn.cellValue(row));
+      }
+    }
+
+    page = scout.create(MyPage, {
+      childrenLoaded: true, // <-- this flag is important, otherwise this page would try to load children on doRowAction
+      parent: outline,
+      detailTable
+    });
+
+    outline.insertNodes([page], null);
+    outline.insertNodes([childPages.get('foo'), childPages.get('bar')], page);
+
+    detailTable.insertRows([
+      tableHelper.createModelRow('0', ['foo']),
+      tableHelper.createModelRow('1', ['foo']),
+      tableHelper.createModelRow('2', ['bar']),
+      tableHelper.createModelRow('3', ['bar'])
+    ]);
+    expect(page.childNodes[0].text).toBe('foo');
+    expect(page.childNodes[1].text).toBe('bar');
+
+    detailTable.sort(firstColumn, 'asc');
+    expect(page.childNodes[0].text).toBe('bar');
+    expect(page.childNodes[1].text).toBe('foo');
   });
 
   it('tableRowsFiltered', () => {
