@@ -25,6 +25,12 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("squid:S1181")
 public class BasicTransaction implements ITransaction {
   private static final Logger LOG = LoggerFactory.getLogger(BasicTransaction.class);
+  private static final FutureCancelledError FUTURE_CANCELLED_ERROR;
+
+  static {
+    FUTURE_CANCELLED_ERROR = new FutureCancelledError("Transaction cancelled");
+    FUTURE_CANCELLED_ERROR.setStackTrace(new StackTraceElement[0]);
+  }
 
   private final Object m_memberMapLock = new Object();
   private final Map<String, ITransactionMember> m_memberMap = new LinkedHashMap<>();
@@ -50,7 +56,7 @@ public class BasicTransaction implements ITransaction {
       m_memberMap.put(memberId, member);
       //throw AFTER registering the resource in order to correctly release it later-on, bug 383736.
       if (m_cancelled) {
-        throw new FutureCancelledError("Transaction cancelled");
+        throw FUTURE_CANCELLED_ERROR;
       }
     }
   }
@@ -124,7 +130,7 @@ public class BasicTransaction implements ITransaction {
   public boolean commitPhase1() {
     synchronized (m_memberMapLock) {
       if (m_cancelled) {
-        throw new FutureCancelledError("Transaction cancelled");
+        throw FUTURE_CANCELLED_ERROR;
       }
       m_commitPhase = true;
     }
@@ -229,7 +235,7 @@ public class BasicTransaction implements ITransaction {
         return true;
       }
       m_cancelled = true;
-      addFailure(new FutureCancelledError("Transaction cancelled"));
+      addFailure(FUTURE_CANCELLED_ERROR);
     }
     for (ITransactionMember mem : getMembers()) {
       try {
