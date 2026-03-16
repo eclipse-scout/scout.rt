@@ -25,8 +25,7 @@ public class CharlieCustomerFixtureTargetContextData implements IDoStructureMigr
 
   @Override
   public boolean initialize(DataObjectMigrationContext ctx, IDoEntity doEntity) {
-    if (doEntity instanceof CharlieCustomerFixtureDo) {
-      CharlieCustomerFixtureDo house = (CharlieCustomerFixtureDo) doEntity;
+    if (doEntity instanceof CharlieCustomerFixtureDo house) {
       m_emailAddress = house.getEmailAddress();
       return true;
     }

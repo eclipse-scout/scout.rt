@@ -60,8 +60,7 @@ public final class SeleniumJavaScript {
   }
 
   public static Object executeScript(AbstractSeleniumTest test, String javaScript, Object... param) {
-    if (test.getDriver() instanceof JavascriptExecutor) {
-      JavascriptExecutor executor = (JavascriptExecutor) test.getDriver();
+    if (test.getDriver() instanceof JavascriptExecutor executor) {
       return executor.executeScript(javaScript, param);
     }
     throw new UnsupportedOperationException();

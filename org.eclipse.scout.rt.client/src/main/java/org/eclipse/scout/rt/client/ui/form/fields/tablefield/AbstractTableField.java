@@ -259,8 +259,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
 
   @Override
   public void exportFormFieldData(AbstractFormFieldData target) {
-    if (m_table != null && target instanceof AbstractTableFieldBeanData) {
-      AbstractTableFieldBeanData tableBeanData = (AbstractTableFieldBeanData) target;
+    if (m_table != null && target instanceof AbstractTableFieldBeanData tableBeanData) {
       m_table.exportToTableBeanData(tableBeanData);
       target.setValueSet(true);
     }
@@ -274,8 +273,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         if (!valueChangeTriggersEnabled) {
           setValueChangeTriggerEnabled(false);
         }
-        if (source instanceof AbstractTableFieldBeanData) {
-          AbstractTableFieldBeanData tableBeanData = (AbstractTableFieldBeanData) source;
+        if (source instanceof AbstractTableFieldBeanData tableBeanData) {
           m_table.importFromTableBeanData(tableBeanData);
         }
         if (m_table.isCheckable() && m_table.getCheckableColumn() != null) {

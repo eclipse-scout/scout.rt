@@ -508,8 +508,7 @@ public class StatementProcessor implements IStatementProcessor {
   @Override
   public String createPlainText() {
     for (IToken t : m_ioTokens) {
-      if (t instanceof ValueInputToken) {
-        ValueInputToken vt = (ValueInputToken) t;
+      if (t instanceof ValueInputToken vt) {
         if (vt.isPlainSql()) {
           // ok
         }
@@ -520,8 +519,7 @@ public class StatementProcessor implements IStatementProcessor {
           vt.setPlainValue(true);
         }
       }
-      else if (t instanceof FunctionInputToken) {
-        FunctionInputToken ft = (FunctionInputToken) t;
+      else if (t instanceof FunctionInputToken ft) {
         ft.setPlainValue(true);
       }
     }
@@ -871,8 +869,7 @@ public class StatementProcessor implements IStatementProcessor {
   }
 
   private IBindInput createInput(IToken bindToken, Object[] bindBases) {
-    if (bindToken instanceof ValueInputToken) {
-      final ValueInputToken valueInputToken = (ValueInputToken) bindToken;
+    if (bindToken instanceof ValueInputToken valueInputToken) {
       final String[] path = REGEX_DOT.split(valueInputToken.getName());
 
       IBindInput result = null;
@@ -989,9 +986,8 @@ public class StatementProcessor implements IStatementProcessor {
         }
       }
     }
-    else if (bindBase instanceof ITableBeanHolder) {
+    else if (bindBase instanceof ITableBeanHolder table) {
       // handle all terminal cases for table holder
-      ITableBeanHolder table = (ITableBeanHolder) bindBase;
       try {
         Method m = table.getRowType().getMethod("get" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1));
         if (m != null) {
@@ -1004,9 +1000,8 @@ public class StatementProcessor implements IStatementProcessor {
         // nop
       }
     }
-    else if (bindBase instanceof TableBeanHolderFilter) {
+    else if (bindBase instanceof TableBeanHolderFilter filter) {
       // handle all terminal cases for table holder filter
-      TableBeanHolderFilter filter = (TableBeanHolderFilter) bindBase;
       ITableBeanHolder table = filter.getTableBeanHolder();
       try {
         Method m = table.getRowType().getMethod("get" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1));
@@ -1044,9 +1039,8 @@ public class StatementProcessor implements IStatementProcessor {
         }
       }
     }
-    else if (bindBase instanceof BeanArrayHolderFilter) {
+    else if (bindBase instanceof BeanArrayHolderFilter filter) {
       // handle all terminal cases for table holder filter
-      BeanArrayHolderFilter filter = (BeanArrayHolderFilter) bindBase;
       IBeanArrayHolder<?> holder = filter.getBeanArrayHolder();
       try {
         Method m = holder.getHolderType().getMethod("get" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1));
@@ -1135,9 +1129,8 @@ public class StatementProcessor implements IStatementProcessor {
 
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
   private IBindOutput createOutput(IToken bindToken, Object[] bindBases) {
-    if (bindToken instanceof ValueOutputToken) {
+    if (bindToken instanceof ValueOutputToken valueOutputToken) {
       IBindOutput result = null;
-      ValueOutputToken valueOutputToken = (ValueOutputToken) bindToken;
       String[] path = REGEX_DOT.split(valueOutputToken.getName());
       for (Object bindBase : bindBases) {
         IBindOutput out = createOutputRec(valueOutputToken, path, bindBase);
@@ -1183,12 +1176,10 @@ public class StatementProcessor implements IStatementProcessor {
         found = true;
       }
       if (found) {
-        if (o instanceof ITableBeanHolder) {
-          ITableBeanHolder table = (ITableBeanHolder) o;
+        if (o instanceof ITableBeanHolder table) {
           return new TableBeanHolderOutput(table, path[1], bindToken);
         }
-        else if (o instanceof IBeanArrayHolder) {
-          IBeanArrayHolder holder = (IBeanArrayHolder) o;
+        else if (o instanceof IBeanArrayHolder holder) {
           return new BeanArrayHolderOutput(holder, path[1], bindToken);
         }
         else if (o instanceof IHolder) {
@@ -1219,12 +1210,10 @@ public class StatementProcessor implements IStatementProcessor {
       if (((NVPair) bindBase).getName().equals(path[0])) {
         o = ((NVPair) bindBase).getValue();
         found = true;
-        if (o instanceof ITableBeanHolder) {
-          ITableBeanHolder table = (ITableBeanHolder) o;
+        if (o instanceof ITableBeanHolder table) {
           return new TableBeanHolderOutput(table, path[1], bindToken);
         }
-        else if (o instanceof IBeanArrayHolder) {
-          IBeanArrayHolder holder = (IBeanArrayHolder) o;
+        else if (o instanceof IBeanArrayHolder holder) {
           return new BeanArrayHolderOutput(holder, path[1], bindToken);
         }
         else if (o instanceof IHolder) {
@@ -1245,9 +1234,8 @@ public class StatementProcessor implements IStatementProcessor {
         }
       }
     }
-    else if (bindBase instanceof ITableBeanHolder) {
+    else if (bindBase instanceof ITableBeanHolder table) {
       // handle all terminal cases for table holder
-      ITableBeanHolder table = (ITableBeanHolder) bindBase;
       try {
         Method m = table.getRowType().getMethod("get" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1));
         if (m != null) {
@@ -1260,9 +1248,8 @@ public class StatementProcessor implements IStatementProcessor {
         found = false;
       }
     }
-    else if (bindBase instanceof IBeanArrayHolder) {
+    else if (bindBase instanceof IBeanArrayHolder holder) {
       // handle all terminal cases for BeanArrayHolder
-      IBeanArrayHolder holder = (IBeanArrayHolder) bindBase;
       try {
         Method m = holder.getHolderType().getMethod("get" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1));
         if (m != null) {

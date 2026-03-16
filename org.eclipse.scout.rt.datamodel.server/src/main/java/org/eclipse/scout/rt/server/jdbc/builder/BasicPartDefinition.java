@@ -183,16 +183,14 @@ public class BasicPartDefinition implements DataModelConstants {
     if (getValueTypeClassIdentifiers().length > 0) {
       for (ClassIdentifier valueType : getValueTypeClassIdentifiers()) {
         Object dataObject = formData.findFieldByClass(fieldsBreathFirstMap, valueType);
-        if (dataObject instanceof AbstractFormFieldData) {
+        if (dataObject instanceof AbstractFormFieldData f) {
           AbstractValueFieldData<?> v = (dataObject instanceof AbstractValueFieldData<?> ? (AbstractValueFieldData<?>) dataObject : null);
-          AbstractFormFieldData f = (AbstractFormFieldData) dataObject;
           if (f.isValueSet() && (v == null || v.getValue() != null)) {
             return true;
           }
         }
         dataObject = formData.findPropertyByClass(propertiesBreathFirstMap, valueType);
-        if (dataObject instanceof AbstractPropertyData<?>) {
-          AbstractPropertyData<?> p = (AbstractPropertyData<?>) dataObject;
+        if (dataObject instanceof AbstractPropertyData<?> p) {
           if (p.isValueSet() && p.getValue() != null) {
             return true;
           }

@@ -54,8 +54,7 @@ public final class MenuUtility {
     if (menu.hasChildActions()) {
       boolean visible = false;
       for (Object o : menu.getChildActions()) {
-        if (o instanceof IActionNode<?>) {
-          IActionNode<?> m = (IActionNode<?>) o;
+        if (o instanceof IActionNode<?> m) {
           if (!m.isSeparator() && m.isVisible()) {
             visible = true;
             break;

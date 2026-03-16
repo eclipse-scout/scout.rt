@@ -142,16 +142,14 @@ public final class FormDataUtility {
       return;
     }
     DataNode n = parent.addChild();
-    if (field instanceof AbstractValueFieldData<?>) {
-      AbstractValueFieldData<?> valueField = (AbstractValueFieldData<?>) field;
+    if (field instanceof AbstractValueFieldData<?> valueField) {
       n.prefix = field.getClass().getSimpleName() + ": " + toLogText(valueField.getValue());
       if (!valueField.isValueSet()) {
         n.prefix += " (valueSet=false)";
       }
       n.hasContent = (valueField.getValue() != null);
     }
-    else if (field instanceof AbstractTableFieldBeanData) {
-      AbstractTableFieldBeanData tableData = (AbstractTableFieldBeanData) field;
+    else if (field instanceof AbstractTableFieldBeanData tableData) {
       FastBeanInfo fastBeanInfo = BeanUtility.getFastBeanInfo(tableData.getRowType(), AbstractTableFieldBeanData.class);
       int rows = tableData.getRowCount();
       int cols = fastBeanInfo.getPropertyDescriptors().length;

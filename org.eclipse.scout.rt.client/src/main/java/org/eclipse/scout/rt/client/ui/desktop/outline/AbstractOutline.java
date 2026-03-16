@@ -694,16 +694,14 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    */
   protected List<IMenu> computeInheritedMenusOfPage(IPage<?> activePage) {
     List<IMenu> menus = new ArrayList<>();
-    if (activePage instanceof IPageWithTable<?>) {
+    if (activePage instanceof IPageWithTable<?> pageWithTable) {
       // in case of a page with table the empty space actions of the table will be added to the context menu of the tree.
-      IPageWithTable<?> pageWithTable = (IPageWithTable<?>) activePage;
       menus.addAll(pageWithTable.computeTableEmptySpaceMenus());
     }
 
     // in case of a page with nodes add the single selection menus of its parent table for the current node/row.
     IPage<?> parentPage = activePage.getParentPage();
-    if (parentPage instanceof IPageWithTable<?>) {
-      IPageWithTable<?> parentTablePage = (IPageWithTable<?>) parentPage;
+    if (parentPage instanceof IPageWithTable<?> parentTablePage) {
       menus.addAll(activePage.computeParentTablePageMenus(parentTablePage));
     }
 
@@ -931,10 +929,9 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         node.setRejectedByUser(parentNode.isRejectedByUser());
         return false;
       }
-      if (!(parentNode instanceof IPage<?>)) {
+      if (!(parentNode instanceof IPage<?> parentPage)) {
         return true;
       }
-      IPage<?> parentPage = (IPage<?>) parentNode;
       ITableRow tableRow = parentPage.getTableRowFor(node);
       if (tableRow == null) {
         return true;

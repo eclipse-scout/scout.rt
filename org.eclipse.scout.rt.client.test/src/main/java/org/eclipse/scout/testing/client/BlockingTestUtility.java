@@ -234,10 +234,9 @@ public final class BlockingTestUtility {
         return;
       }
       RunContext runContext = event.getData().getFuture().getJobInput().getRunContext();
-      if (!(runContext instanceof ClientRunContext)) {
+      if (!(runContext instanceof ClientRunContext clientRunContext)) {
         return;
       }
-      ClientRunContext clientRunContext = (ClientRunContext) runContext;
       if (clientRunContext.getSession() != m_session) {
         return;
       }

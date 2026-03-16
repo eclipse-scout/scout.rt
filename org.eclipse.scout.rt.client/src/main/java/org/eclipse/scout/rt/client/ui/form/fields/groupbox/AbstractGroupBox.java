@@ -405,14 +405,13 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
         groupList.add((IGroupBox) field);
         controlList.add(field);
       }
-      else if (field instanceof IButton) {
-        IButton b = (IButton) field;
+      else if (field instanceof IButton b) {
         if (b.isProcessButton()) {
           if (b.getSystemType() != IButton.SYSTEM_TYPE_NONE) {
-            systemButtonList.add((IButton) field);
+            systemButtonList.add(b);
           }
           else {
-            customButtonList.add((IButton) field);
+            customButtonList.add(b);
           }
         }
         else {

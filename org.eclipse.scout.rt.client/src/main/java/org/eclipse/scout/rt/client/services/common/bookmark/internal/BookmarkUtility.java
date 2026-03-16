@@ -314,17 +314,13 @@ public final class BookmarkUtility {
         // try to find correct child page (next parentPage)
         IPage<?> childPage = null;
         AbstractPageState childState = path.get(i);
-        if (parentPageState instanceof TablePageState) {
-          TablePageState tablePageState = (TablePageState) parentPageState;
-          if (parentPage instanceof IPageWithTable) {
-            IPageWithTable tablePage = (IPageWithTable) parentPage;
+        if (parentPageState instanceof TablePageState tablePageState) {
+          if (parentPage instanceof IPageWithTable tablePage) {
             childPage = bmLoadTablePage(tablePage, tablePageState, false, resetViewAndWarnOnFail);
           }
         }
-        else if (parentPageState instanceof NodePageState) {
-          NodePageState nodePageState = (NodePageState) parentPageState;
-          if (parentPage instanceof IPageWithNodes) {
-            IPageWithNodes nodePage = (IPageWithNodes) parentPage;
+        else if (parentPageState instanceof NodePageState nodePageState) {
+          if (parentPage instanceof IPageWithNodes nodePage) {
             childPage = bmLoadNodePage(nodePage, nodePageState, childState, resetViewAndWarnOnFail);
           }
         }
@@ -615,8 +611,7 @@ public final class BookmarkUtility {
       if (i > 0 || outline.isRootNodeVisible()) {
         text.append(prefix).append(currentBookmarkAdapter.getText());
         text.append("\n");
-        if (page instanceof IPageWithTable) {
-          IPageWithTable tablePage = (IPageWithTable) page;
+        if (page instanceof IPageWithTable tablePage) {
           SearchFilter search = tablePage.getSearchFilter();
           if (search != null) {
             for (String s : search.getDisplayTexts()) {
@@ -638,16 +633,14 @@ public final class BookmarkUtility {
     // path
     for (int i = 0; i < path.size(); i++) {
       page = path.get(i);
-      if (page instanceof IPageWithTable) {
-        IPageWithTable tablePage = (IPageWithTable) page;
+      if (page instanceof IPageWithTable tablePage) {
         IPage<?> childPage = null;
         if (i + 1 < path.size()) {
           childPage = path.get(i + 1);
         }
         b.addPathElement(bmStoreTablePage(tablePage, childPage));
       }
-      else if (page instanceof IPageWithNodes) {
-        IPageWithNodes nodePage = (IPageWithNodes) page;
+      else if (page instanceof IPageWithNodes nodePage) {
         b.addPathElement(bmStoreNodePage(nodePage));
       }
     }

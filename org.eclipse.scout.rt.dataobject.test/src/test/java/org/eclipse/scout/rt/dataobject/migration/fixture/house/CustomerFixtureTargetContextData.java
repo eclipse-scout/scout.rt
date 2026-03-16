@@ -25,8 +25,7 @@ public class CustomerFixtureTargetContextData implements IDoStructureMigrationTa
 
   @Override
   public boolean initialize(DataObjectMigrationContext ctx, IDoEntity doEntity) {
-    if (doEntity instanceof CustomerFixtureDo) {
-      CustomerFixtureDo house = (CustomerFixtureDo) doEntity;
+    if (doEntity instanceof CustomerFixtureDo house) {
       m_firstName = house.getFirstName();
       return true;
     }

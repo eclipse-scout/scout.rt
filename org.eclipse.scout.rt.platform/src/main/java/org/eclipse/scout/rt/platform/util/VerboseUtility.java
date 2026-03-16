@@ -70,24 +70,20 @@ public final class VerboseUtility {
     if (type == null) {
       shortText = "null";
     }
-    else if (type instanceof Class) {
-      Class<?> c = (Class<?>) type;
+    else if (type instanceof Class<?> c) {
       shortText = "Class[" + c.getSimpleName() + "]";
     }
-    else if (type instanceof GenericArrayType) {
-      GenericArrayType g = (GenericArrayType) type;
+    else if (type instanceof GenericArrayType g) {
       shortText = "GenericArrayType[" + dumpGenericsRec(shortDecl, longDecl, g.getGenericComponentType()) + "]";
     }
-    else if (type instanceof ParameterizedType) {
-      ParameterizedType p = (ParameterizedType) type;
+    else if (type instanceof ParameterizedType p) {
       shortText = "ParameterizedType[" + dumpGenericsRec(shortDecl, longDecl, p.getActualTypeArguments()) + "]";
     }
     else if (type instanceof TypeVariable<?>) {
       TypeVariable v = (TypeVariable) type;
       shortText = "TypeVariable[" + v.getName() + "]";
     }
-    else if (type instanceof WildcardType) {
-      WildcardType w = (WildcardType) type;
+    else if (type instanceof WildcardType w) {
       shortText = "WildcardType[" + dumpGenericsRec(shortDecl, longDecl, w.getLowerBounds()) + ", " + dumpGenericsRec(shortDecl, longDecl, w.getUpperBounds()) + "]";
     }
     else {
@@ -99,8 +95,7 @@ public final class VerboseUtility {
     if (type == null) {
       //nop
     }
-    else if (type instanceof Class) {
-      Class<?> c = (Class<?>) type;
+    else if (type instanceof Class<?> c) {
       longText = "Class[name=" + c.getName() + ", typeParameters=" + dumpGenericsRec(shortDecl, longDecl, c.getTypeParameters()) + "]";
     }
     else if (type instanceof GenericArrayType) {
@@ -112,8 +107,7 @@ public final class VerboseUtility {
     else if (type instanceof TypeVariable<?>) {
       //nop
     }
-    else if (type instanceof WildcardType) {
-      WildcardType w = (WildcardType) type;
+    else if (type instanceof WildcardType w) {
       longText = "WildcardType[lowerBounds=" + dumpGenericsRec(shortDecl, longDecl, w.getLowerBounds()) + ", upperBounds=" + dumpGenericsRec(shortDecl, longDecl, w.getUpperBounds()) + "]";
     }
     if (longText != null) {
@@ -172,8 +166,7 @@ public final class VerboseUtility {
       }
       return s;
     }
-    else if (o instanceof Subject) {
-      Subject s = (Subject) o;
+    else if (o instanceof Subject s) {
       Set<Principal> set = s.getPrincipals();
       if (!set.isEmpty()) {
         return set.iterator().next().getName();

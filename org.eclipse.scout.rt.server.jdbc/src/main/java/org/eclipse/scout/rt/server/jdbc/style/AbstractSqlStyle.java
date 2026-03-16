@@ -68,16 +68,13 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     if (value == null) {
       return "null";
     }
-    else if (value instanceof Boolean) {
-      Boolean b = (Boolean) value;
+    else if (value instanceof Boolean b) {
       return b ? "1" : "0";
     }
-    else if (value instanceof TriState) {
-      TriState t = (TriState) value;
+    else if (value instanceof TriState t) {
       return "" + t.toString();
     }
-    else if (value instanceof String) {
-      String s = (String) value;
+    else if (value instanceof String s) {
       if (s.length() > MAX_SQL_STRING_LENGTH) {
         s = s.substring(0, MAX_SQL_STRING_LENGTH);
         LOG.warn("toPlainText of a String with more than {} characters failed; truncated to '{}'", MAX_SQL_STRING_LENGTH, s);
@@ -98,8 +95,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
       LOG.warn("toPlainText of a BLOB failed; using NULL");
       return "NULL";
     }
-    else if (value instanceof Date) {
-      Date d = (Date) value;
+    else if (value instanceof Date d) {
       SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
       return "to_date('" + fmt.format(d) + "','dd.mm.yyyy hh24:mi:ss')";
     }
@@ -165,8 +161,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
 
   @Override
   public SqlBind buildBindFor(Object o, Class nullType) {
-    if (o instanceof IHolder) {
-      IHolder h = (IHolder) o;
+    if (o instanceof IHolder h) {
       o = h.getValue();
       nullType = h.getHolderType();
     }

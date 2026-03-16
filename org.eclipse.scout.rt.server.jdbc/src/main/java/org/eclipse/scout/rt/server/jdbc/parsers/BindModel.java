@@ -48,8 +48,7 @@ public class BindModel {
   public String getFilteredStatement() {
     StringBuilder b = new StringBuilder();
     for (IToken m_allToken : m_allTokens) {
-      if (m_allToken instanceof ValueInputToken) {
-        ValueInputToken valueInputToken = (ValueInputToken) m_allToken;
+      if (m_allToken instanceof ValueInputToken valueInputToken) {
         if (valueInputToken.getParsedAttribute() != null) {
           b.append(valueInputToken.getParsedAttribute());
           b.append(" ");

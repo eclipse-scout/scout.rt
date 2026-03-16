@@ -245,9 +245,8 @@ public class RestClientProxyFactory {
       if (result instanceof AsyncInvoker) {
         return createAsyncInvokerProxy((AsyncInvoker) result, getExceptionTransformer());
       }
-      if (result instanceof Response) {
+      if (result instanceof Response response) {
         // check status
-        Response response = (Response) result;
         WebApplicationException webAppException = convertToWebAppException(response);
         if (webAppException == null) {
           return response;
@@ -258,18 +257,15 @@ public class RestClientProxyFactory {
     }
 
     protected Throwable transformException(Throwable t) {
-      if (t instanceof WebApplicationException) {
-        WebApplicationException e = (WebApplicationException) t;
+      if (t instanceof WebApplicationException e) {
         return getExceptionTransformer().transform(e, e.getResponse());
       }
 
-      if (t instanceof ResponseProcessingException) {
-        ResponseProcessingException e = (ResponseProcessingException) t;
+      if (t instanceof ResponseProcessingException e) {
         return getExceptionTransformer().transform(e, e.getResponse());
       }
 
-      if (t instanceof jakarta.ws.rs.ProcessingException) {
-        jakarta.ws.rs.ProcessingException e = (jakarta.ws.rs.ProcessingException) t;
+      if (t instanceof jakarta.ws.rs.ProcessingException e) {
         return getExceptionTransformer().transform(e, null);
       }
 

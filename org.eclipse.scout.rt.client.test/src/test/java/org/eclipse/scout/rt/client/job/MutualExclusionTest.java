@@ -625,8 +625,7 @@ public class MutualExclusionTest {
         final Runnable runnable = (Runnable) invocation.getArguments()[0];
 
         // Reject job-2 from being scheduled
-        if (runnable instanceof JobFutureTask) {
-          JobFutureTask<?> futureTask = (JobFutureTask<?>) runnable;
+        if (runnable instanceof JobFutureTask<?> futureTask) {
           if ("job-2".equals(futureTask.getJobInput().getName())) {
             futureTask.reject();
             return null;
@@ -692,8 +691,7 @@ public class MutualExclusionTest {
         final Runnable runnable = (Runnable) invocation.getArguments()[0];
 
         // Reject job-2 from being scheduled
-        if (runnable instanceof JobFutureTask) {
-          JobFutureTask<?> futureTask = (JobFutureTask<?>) runnable;
+        if (runnable instanceof JobFutureTask<?> futureTask) {
           if ("job-2".equals(futureTask.getJobInput().getName())) {
             futureTask.reject();
             return null;

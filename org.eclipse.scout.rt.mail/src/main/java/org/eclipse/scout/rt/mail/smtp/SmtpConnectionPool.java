@@ -464,8 +464,7 @@ public class SmtpConnectionPool {
       return true;
     }
 
-    if (e instanceof SMTPSendFailedException) {
-      SMTPSendFailedException smtpSendFailedException = (SMTPSendFailedException) e;
+    if (e instanceof SMTPSendFailedException smtpSendFailedException) {
 
       // 2. SMTPSendFailedException with "[EOF]" as message
       if ("[EOF]".equals(e.getMessage())) {

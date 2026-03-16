@@ -2735,10 +2735,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   private void checkRowImpl(ITableRow row, boolean value) {
-    if (!(row instanceof InternalTableRow)) {
+    if (!(row instanceof InternalTableRow internalRow)) {
       return;
     }
-    InternalTableRow internalRow = (InternalTableRow) row;
     if (value) {
       m_checkedRows.add(internalRow);
     }
@@ -3477,10 +3476,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   private void deleteRowImpl(ITableRow row) {
-    if (!(row instanceof InternalTableRow)) {
+    if (!(row instanceof InternalTableRow internalRow)) {
       return;
     }
-    InternalTableRow internalRow = (InternalTableRow) row;
     if (isAutoDiscardOnDelete()) {
       internalRow.setTableInternal(null);
       // don't manage deleted rows any further
@@ -4027,8 +4025,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     if (!m_rowFilters.isEmpty()) {
       boolean filterChanged = false;
       for (ITableRow row : set) {
-        if (row.getTable() == AbstractTable.this && row instanceof InternalTableRow) {
-          InternalTableRow internalRow = (InternalTableRow) row;
+        if (row.getTable() == AbstractTable.this && row instanceof InternalTableRow internalRow) {
           boolean oldFlag = internalRow.isFilterAccepted();
           applyRowFiltersInternal(internalRow);
           boolean newFlag = internalRow.isFilterAccepted();
@@ -4390,8 +4387,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       if (ctxCol instanceof IBooleanColumn) {
         //editable boolean columns consume this click
         IFormField field = ctxCol.prepareEdit(row);
-        if (field instanceof IBooleanField) {
-          IBooleanField booleanField = (IBooleanField) field;
+        if (field instanceof IBooleanField booleanField) {
           booleanField.toggleValue();
           ctxCol.completeEdit(row, field);
         }

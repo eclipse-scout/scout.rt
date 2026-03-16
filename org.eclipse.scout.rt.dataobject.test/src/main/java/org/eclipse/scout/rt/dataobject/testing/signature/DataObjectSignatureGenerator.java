@@ -328,12 +328,10 @@ public class DataObjectSignatureGenerator {
   protected AttributeDataObjectSignatureDo processAttribute(Class<? extends IDoEntity> doEntityClass, DataObjectAttributeDescriptor attributeDescriptor) {
     ParameterizedType attributeType = attributeDescriptor.getType();
 
-    if (!(attributeType.getRawType() instanceof Class)) {
+    if (!(attributeType.getRawType() instanceof Class<?> rawType)) {
       m_errors.add(String.format("Raw type must be a class (referenced in '%s')", getContextText(attributeDescriptor.getName(), doEntityClass)));
       return null;
     }
-
-    Class<?> rawType = (Class<?>) attributeType.getRawType();
 
     Type type;
     boolean list;

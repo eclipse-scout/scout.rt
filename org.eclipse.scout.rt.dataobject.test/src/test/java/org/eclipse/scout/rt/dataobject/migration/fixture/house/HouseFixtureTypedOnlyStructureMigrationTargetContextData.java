@@ -25,8 +25,7 @@ public class HouseFixtureTypedOnlyStructureMigrationTargetContextData implements
 
   @Override
   public boolean initialize(DataObjectMigrationContext ctx, IDoEntity doEntity) {
-    if (doEntity instanceof HouseFixtureDo) {
-      HouseFixtureDo house = (HouseFixtureDo) doEntity;
+    if (doEntity instanceof HouseFixtureDo house) {
       m_name = house.getName();
       return true;
     }

@@ -253,8 +253,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     ArrayList<IValueField> valueFieldList = new ArrayList<>();
     Class<?> sharedType = null;
     for (IFormField f : getFields()) {
-      if (f instanceof IValueField) {
-        IValueField v = (IValueField) f;
+      if (f instanceof IValueField v) {
         Class<?> valueType = v.getHolderType();
         if (Comparable.class.isAssignableFrom(valueType)
             && (sharedType == null || valueType == sharedType)) {

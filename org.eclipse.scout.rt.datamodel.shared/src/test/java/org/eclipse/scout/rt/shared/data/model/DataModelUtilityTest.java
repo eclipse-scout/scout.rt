@@ -43,12 +43,10 @@ public class DataModelUtilityTest {
       if (o instanceof IDataModel) {
         buf.append("DataModel");
       }
-      else if (o instanceof IDataModelAttribute) {
-        IDataModelAttribute x = (IDataModelAttribute) o;
+      else if (o instanceof IDataModelAttribute x) {
         buf.append(x.getText() + " (type-" + x.getType() + ") " + DataModelUtility.attributePathToExternalId(m, ePath.addToEnd(x)));
       }
-      else if (o instanceof IDataModelEntity) {
-        IDataModelEntity x = (IDataModelEntity) o;
+      else if (o instanceof IDataModelEntity x) {
         buf.append(x.getText() + " " + DataModelUtility.entityPathToExternalId(m, ePath));
       }
       buf.append("\n");
@@ -77,9 +75,8 @@ public class DataModelUtilityTest {
     IDataModelVisitor v = (m, ePath, o, prefix, buf) -> {
       if (o instanceof IDataModel) {
       }
-      else if (o instanceof IDataModelAttribute) {
+      else if (o instanceof IDataModelAttribute x) {
         counter.incrementAndGet();
-        IDataModelAttribute x = (IDataModelAttribute) o;
         refSet.add(x);
         AttributePath aPath = ePath.addToEnd(x);
         String extId = DataModelUtility.attributePathToExternalId(m, aPath);
@@ -88,9 +85,8 @@ public class DataModelUtilityTest {
         assertEquals(aPath, aPath2);
         assertSame(x, aPath2.getAttribute());
       }
-      else if (o instanceof IDataModelEntity) {
+      else if (o instanceof IDataModelEntity x) {
         counter.incrementAndGet();
-        IDataModelEntity x = (IDataModelEntity) o;
         refSet.add(x);
         String extId = DataModelUtility.entityPathToExternalId(m, ePath);
         externaIdSet.add(extId);
@@ -122,8 +118,7 @@ public class DataModelUtilityTest {
       return;
     }
     v.visit(m, ePath, o, prefix, buf);
-    if (o instanceof IDataModel) {
-      IDataModel x = (IDataModel) o;
+    if (o instanceof IDataModel x) {
       for (IDataModelAttribute child : x.getAttributes()) {
         visitRec(reverseLevel - 1, m, ePath, child, prefix + " ", buf, v);
       }
@@ -132,8 +127,7 @@ public class DataModelUtilityTest {
       }
       return;
     }
-    if (o instanceof IDataModelEntity) {
-      IDataModelEntity x = (IDataModelEntity) o;
+    if (o instanceof IDataModelEntity x) {
       for (IDataModelAttribute child : x.getAttributes()) {
         visitRec(reverseLevel - 1, m, ePath, child, prefix + " ", buf, v);
       }

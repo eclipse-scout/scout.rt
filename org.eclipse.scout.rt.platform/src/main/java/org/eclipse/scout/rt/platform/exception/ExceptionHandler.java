@@ -42,8 +42,7 @@ public class ExceptionHandler {
     else if (t instanceof FutureCancelledError) {
       handleCancelledException((FutureCancelledError) t);
     }
-    else if (t instanceof PlatformException) {
-      final PlatformException pe = (PlatformException) t;
+    else if (t instanceof PlatformException pe) {
       if (!pe.isConsumed()) {
         try {
           handlePlatformException(pe);

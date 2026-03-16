@@ -56,8 +56,7 @@ public class JarManifestHelper {
       // (2) Read manifest of defining JAR
       URL url = new URL(jarClasspath);
       URLConnection conn = url.openConnection();
-      if (conn instanceof JarURLConnection) {
-        JarURLConnection jarConn = (JarURLConnection) conn;
+      if (conn instanceof JarURLConnection jarConn) {
         // read all main attributes
         Map<String, String> attributes = new HashMap<>(extractAttributes(jarConn.getManifest().getMainAttributes()));
         // read all other attributes

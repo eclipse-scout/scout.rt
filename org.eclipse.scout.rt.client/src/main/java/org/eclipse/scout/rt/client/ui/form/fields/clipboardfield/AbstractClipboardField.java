@@ -131,8 +131,7 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
   @ConfigOperation
   @Order(80)
   protected void execDropRequest(TransferObject transferObject) {
-    if (transferObject instanceof ResourceListTransferObject) {
-      ResourceListTransferObject resourceListTransferObject = (ResourceListTransferObject) transferObject;
+    if (transferObject instanceof ResourceListTransferObject resourceListTransferObject) {
       setValue(resourceListTransferObject.getResources());
     }
   }

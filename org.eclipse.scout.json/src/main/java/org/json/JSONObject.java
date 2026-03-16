@@ -166,8 +166,7 @@ public class JSONObject {
      * parse to temporary JSONObject and then steal the data from that.
      */
     Object object = readFrom.nextValue();
-    if (object instanceof JSONObject) {
-      JSONObject jsonObject = (JSONObject) object;
+    if (object instanceof JSONObject jsonObject) {
       this.m_nameValuePairs = jsonObject.m_nameValuePairs;
     }
     else {
@@ -304,8 +303,7 @@ public class JSONObject {
       return put(name, value);
     }
 
-    if (current instanceof JSONArray) {
-      JSONArray array = (JSONArray) current;
+    if (current instanceof JSONArray array) {
       array.checkedPut(value);
     }
     else {

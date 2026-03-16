@@ -246,10 +246,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
   @Override
   public IJsonAdapter<?> createJsonAdapter(Object model, IUiSession session, String id, IJsonAdapter<?> parent) {
     // --- form fields ----
-    if (model instanceof IGroupBox) {
+    if (model instanceof IGroupBox groupBox) {
       // we must distinct between normal group-boxes and group-boxes in tab-boxes
       // the use the same model, but we need different adapters
-      IGroupBox groupBox = (IGroupBox) model;
       if (groupBox.getParentField() instanceof ITabBox) {
         return new JsonTabItem<>(groupBox, session, id, parent);
       }
@@ -421,8 +420,7 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     if (model instanceof ITree) {
       return new JsonTree<>((ITree) model, session, id, parent);
     }
-    if (model instanceof ITable) {
-      ITable table = (ITable) model;
+    if (model instanceof ITable table) {
       IPage<?> page = (IPage<?>) table.getProperty(JsonOutlineTable.PROP_PAGE);
       if (page != null) {
         return new JsonOutlineTable<>(table, session, id, parent, page);

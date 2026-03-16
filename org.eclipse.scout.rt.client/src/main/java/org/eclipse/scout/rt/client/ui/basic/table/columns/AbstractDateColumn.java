@@ -212,10 +212,9 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
 
   @Override
   protected void cellTextToEditField(String cellText, IFormField editorField) {
-    if (!(editorField instanceof IDateField)) {
+    if (!(editorField instanceof IDateField field)) {
       throw new ProcessingException("Expected a date field.");
     }
-    IDateField field = (IDateField) editorField;
     field.setDisplayText(cellText);
   }
 

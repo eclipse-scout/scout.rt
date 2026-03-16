@@ -186,10 +186,9 @@ public final class EntityPath implements IDataModelPath {
     if (obj == this) {
       return true;
     }
-    if (!(obj instanceof EntityPath)) {
+    if (!(obj instanceof EntityPath other)) {
       return false;
     }
-    EntityPath other = (EntityPath) obj;
     return this.m_entityPath.equals(other.m_entityPath);
   }
 

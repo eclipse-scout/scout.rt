@@ -21,10 +21,9 @@ public class DelegationCredentialLifetimeVerifier implements IPrincipalVerifier 
 
   @Override
   public boolean verify(Principal principal0) {
-    if (!(principal0 instanceof SimplePrincipalWithDelegation)) {
+    if (!(principal0 instanceof SimplePrincipalWithDelegation principal)) {
       return true;
     }
-    SimplePrincipalWithDelegation principal = (SimplePrincipalWithDelegation) principal0;
     if (principal.getDelegatedCred() == null) {
       return true;
     }

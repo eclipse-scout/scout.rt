@@ -148,8 +148,7 @@ public class CharsetSafeMimeMessage extends MimeMessage {
   }
 
   private Address encodeAddress(Address address) throws MessagingException {
-    if (address instanceof InternetAddress) {
-      InternetAddress inet = (InternetAddress) address;
+    if (address instanceof InternetAddress inet) {
       if (inet.getPersonal() != null && !inet.getPersonal().isEmpty()) {
         try {
           inet.setPersonal(inet.getPersonal(), m_charset);

@@ -156,8 +156,7 @@ public class EitherOrNode extends AbstractComposerNode {
     @Override
     protected void execAction() {
       ITreeNode next = getSiblingAfter();
-      if (isBeginOfEitherOr() && next instanceof EitherOrNode) {
-        final EitherOrNode eitherOrNode = (EitherOrNode) next;
+      if (isBeginOfEitherOr() && next instanceof EitherOrNode eitherOrNode) {
         if (!eitherOrNode.isBeginOfEitherOr()) {
           eitherOrNode.setBeginOfEitherOr(true);
           eitherOrNode.update();

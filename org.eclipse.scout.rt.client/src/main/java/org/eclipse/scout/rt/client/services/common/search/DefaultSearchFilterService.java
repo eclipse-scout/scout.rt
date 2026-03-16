@@ -38,8 +38,7 @@ public class DefaultSearchFilterService implements ISearchFilterService {
   @Override
   public void applySearchDelegate(IFormField field, SearchFilter search, boolean includeChildren) {
     String label = field.getLabel();
-    if (field.getParentField() instanceof ISequenceBox && field.getParentField() instanceof AbstractFormField) {
-      AbstractFormField range = (AbstractFormField) field.getParentField();
+    if (field.getParentField() instanceof ISequenceBox && field.getParentField() instanceof AbstractFormField range) {
       if (range.getInitialLabel() != null) {
         label = range.getInitialLabel() + (StringUtility.isNullOrEmpty(label) ? "" : " " + label);
       }
@@ -47,16 +46,14 @@ public class DefaultSearchFilterService implements ISearchFilterService {
     label = StringUtility.nullIfEmpty(label);
 
     //list box
-    if (field instanceof AbstractListBox<?>) {
-      AbstractListBox<?> valueField = (AbstractListBox<?>) field;
+    if (field instanceof AbstractListBox<?> valueField) {
       if (!valueField.getValue().isEmpty()) {
         search.addDisplayText(StringUtility.box("", label, " " + TEXTS.get("LogicIn") + " ") + valueField.getDisplayText());
       }
       return;
     }
     //tree box
-    if (field instanceof AbstractTreeBox<?>) {
-      AbstractTreeBox<?> valueField = (AbstractTreeBox<?>) field;
+    if (field instanceof AbstractTreeBox<?> valueField) {
       if (!valueField.getValue().isEmpty()) {
         search.addDisplayText(StringUtility.box("", label, " " + TEXTS.get("LogicIn") + " ") + valueField.getDisplayText());
       }
@@ -71,16 +68,14 @@ public class DefaultSearchFilterService implements ISearchFilterService {
       return;
     }
     //boolean field
-    if (field instanceof AbstractBooleanField) {
-      AbstractBooleanField valueField = (AbstractBooleanField) field;
+    if (field instanceof AbstractBooleanField valueField) {
       if (valueField.getValue() != null && valueField.getValue() && label != null) {
         search.addDisplayText(label);
       }
       return;
     }
     //radiobuttongroup field
-    if (field instanceof AbstractRadioButtonGroup<?>) {
-      AbstractRadioButtonGroup<?> valueField = (AbstractRadioButtonGroup<?>) field;
+    if (field instanceof AbstractRadioButtonGroup<?> valueField) {
       if (valueField.getValue() != null) {
         IRadioButton<?> selectedButton = valueField.getSelectedButton();
         String valueLabel = (selectedButton != null ? selectedButton.getLabel() : null);
@@ -96,8 +91,7 @@ public class DefaultSearchFilterService implements ISearchFilterService {
       return;
     }
     //value field
-    if (field instanceof AbstractValueField<?>) {
-      AbstractValueField<?> valueField = (AbstractValueField<?>) field;
+    if (field instanceof AbstractValueField<?> valueField) {
       if (valueField.getValue() != null) {
         search.addDisplayText(StringUtility.box("", label, " " + TEXTS.get("LogicEQ") + " ") + valueField.getDisplayText());
       }

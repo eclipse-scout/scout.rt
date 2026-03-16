@@ -44,8 +44,7 @@ public class JavaTransferObject extends TransferObject {
       if (type.isInstance(localObject)) {
         result.add((T) localObject);
       }
-      else if (localObject instanceof Collection) {
-        Collection c = (Collection) localObject;
+      else if (localObject instanceof Collection c) {
         if (CollectionUtility.hasElements(c)) {
           for (Object o : c) {
             if (type.isInstance(o)) {

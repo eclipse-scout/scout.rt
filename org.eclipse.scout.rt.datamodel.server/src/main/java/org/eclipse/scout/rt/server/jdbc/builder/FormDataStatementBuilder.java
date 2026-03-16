@@ -701,11 +701,10 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   public AttributeKind getAttributeKind(TreeNodeData node) {
-    if (!(node instanceof ComposerAttributeNodeData)) {
+    if (!(node instanceof ComposerAttributeNodeData attributeNode)) {
       return AttributeKind.Undefined;
     }
     //
-    ComposerAttributeNodeData attributeNode = (ComposerAttributeNodeData) node;
     Integer agg = attributeNode.getAggregationType();
     if (agg == null || agg == AGGREGATION_NONE) {
       if (!isZeroTraversingAttribute(attributeNode.getOperator(), attributeNode.getValues().toArray())) {
@@ -879,8 +878,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     List<TreeNodeData> otherParts = new ArrayList<>();
     List<ComposerEitherOrNodeData> currentOrBlock = new ArrayList<>();
     for (TreeNodeData ch : childParts) {
-      if (ch instanceof ComposerEitherOrNodeData) {
-        ComposerEitherOrNodeData orData = (ComposerEitherOrNodeData) ch;
+      if (ch instanceof ComposerEitherOrNodeData orData) {
         if (orData.isBeginOfEitherOr()) {
           if (!currentOrBlock.isEmpty()) {
             orBlocks.add(new ArrayList<>(currentOrBlock));
@@ -1473,8 +1471,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
             IToken[] tokens = m.getIOTokens();
             if (tokens != null) {
               for (IToken iToken : tokens) {
-                if (iToken instanceof ValueInputToken) {
-                  ValueInputToken t = (ValueInputToken) iToken;
+                if (iToken instanceof ValueInputToken t) {
                   t.setPlainValue(true);
                   t.setReplaceToken(tokenValue.get(t.getName()));
                 }

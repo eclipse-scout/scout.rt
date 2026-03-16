@@ -1023,8 +1023,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
         PlatformException pe = BEANS.get(PlatformExceptionTranslator.class).translate(e)
             .withContextInfo("form", AbstractForm.this.getClass().getName());
-        if (pe instanceof VetoException) {
-          VetoException ve = (VetoException) pe;
+        if (pe instanceof VetoException ve) {
           interceptOnVetoException(ve, ve.getStatus().getCode());
         }
         throw pe;
@@ -1061,8 +1060,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     final String systemButtonHiddenInWizard = "systemButtonHiddenInWizard";
     // hide top level process buttons with a system type
     for (IFormField f : getRootGroupBox().getFields()) {
-      if (f instanceof IButton) {
-        IButton b = (IButton) f;
+      if (f instanceof IButton b) {
         if (b.getSystemType() != IButton.SYSTEM_TYPE_NONE) {
           // hide
           b.setVisible(false, systemButtonHiddenInWizard);
@@ -1214,8 +1212,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     List<Object> allContributions = source.getAllContributions();
     if (!allContributions.isEmpty()) {
       for (Object con : allContributions) {
-        if (con instanceof IPropertyHolder) {
-          IPropertyHolder data = (IPropertyHolder) con;
+        if (con instanceof IPropertyHolder data) {
           Map<String, Object> extensionProperties = BeanUtility.getProperties(data, stopClass, filter);
           if (!extensionProperties.isEmpty()) {
             Object clientPart = getClientPartOfExtensionOrContributionRec(data, target);
@@ -1233,8 +1230,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   private Object getClientPartOfExtensionOrContribution(Object extToSearch, Object owner) {
-    if (owner instanceof IExtensibleObject) {
-      IExtensibleObject exOwner = (IExtensibleObject) owner;
+    if (owner instanceof IExtensibleObject exOwner) {
       for (IExtension<?> ex : exOwner.getAllExtensions()) {
         Class<?> dto = getDataAnnotationValue(ex.getClass());
         if (extToSearch.getClass().equals(dto)) {
@@ -1242,8 +1238,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         }
       }
     }
-    if (owner instanceof IContributionOwner) {
-      IContributionOwner compOwner = (IContributionOwner) owner;
+    if (owner instanceof IContributionOwner compOwner) {
       for (Object o : compOwner.getAllContributions()) {
         FormData annotation = o.getClass().getAnnotation(FormData.class);
         if (annotation != null && annotation.value().equals(extToSearch.getClass())) {
@@ -1718,8 +1713,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   protected void throwVetoExceptionInternal(final RuntimeException e) {
     PlatformException pe = BEANS.get(PlatformExceptionTranslator.class).translate(e)
         .withContextInfo("form", getClass().getName());
-    if (pe instanceof VetoException && !pe.isConsumed()) {
-      VetoException ve = (VetoException) pe;
+    if (pe instanceof VetoException ve && !pe.isConsumed()) {
       interceptOnVetoException(ve, ve.getStatus().getCode());
       ve.consume(); // if it was not re-thrown it is assumed to be consumed
     }
@@ -1932,8 +1926,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     setFormLoading(true);
     // reset values
     Consumer<IFormField> v = field -> {
-      if (field instanceof IResettableFormField) {
-        IResettableFormField f = (IResettableFormField) field;
+      if (field instanceof IResettableFormField f) {
         f.resetValue();
       }
     };

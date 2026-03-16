@@ -238,8 +238,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     // It is important to only remove outline wrapper menus which are defined on the parent table because the menu could be defined on a page and therefore needs to be displayed
     List<IMenu> newMenus = new ArrayList<>();
     for (IMenu menu : table.getMenus()) {
-      if ((menu instanceof OutlineMenuWrapper)) {
-        OutlineMenuWrapper menuWrapper = (OutlineMenuWrapper) menu;
+      if ((menu instanceof OutlineMenuWrapper menuWrapper)) {
         IMenu originalMenu = unwrapOutlineWrapperMenu(menuWrapper);
         if (menuWrapper.getMenuTypes().contains(TableMenuType.EmptySpace)
             && originalMenu.getMenuTypes().contains(TableMenuType.SingleSelection)
