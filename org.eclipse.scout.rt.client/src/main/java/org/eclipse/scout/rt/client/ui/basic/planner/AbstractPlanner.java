@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -195,32 +195,28 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     DateUtility.truncCalendar(from);
     DateUtility.truncCalendar(to);
     switch (displayMode) {
-      case IPlannerDisplayMode.DAY:
-        to.add(Calendar.DAY_OF_WEEK, 1);
-        break;
-      case IPlannerDisplayMode.WEEK:
+      case IPlannerDisplayMode.DAY -> to.add(Calendar.DAY_OF_WEEK, 1);
+      case IPlannerDisplayMode.WEEK -> {
         from.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.add(Calendar.DAY_OF_WEEK, 7);
-        break;
-      case IPlannerDisplayMode.WORK_WEEK:
+      }
+      case IPlannerDisplayMode.WORK_WEEK -> {
         from.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.add(Calendar.DAY_OF_WEEK, 5);
-        break;
-      case IPlannerDisplayMode.MONTH:
+      }
+      case IPlannerDisplayMode.MONTH -> {
         from.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.add(Calendar.MONTH, 2);
-        break;
-      case IPlannerDisplayMode.CALENDAR_WEEK:
+      }
+      case IPlannerDisplayMode.CALENDAR_WEEK -> {
         from.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.add(Calendar.MONTH, 9);
-        break;
-      case IPlannerDisplayMode.YEAR:
-        to.add(Calendar.YEAR, 2);
-        break;
+      }
+      case IPlannerDisplayMode.YEAR -> to.add(Calendar.YEAR, 2);
     }
     setViewRange(from.getTime(), to.getTime());
   }
@@ -322,31 +318,31 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     });
     addPropertyChangeListener(e -> {
       switch (e.getPropertyName()) {
-        case PROP_DISPLAY_MODE:
+        case PROP_DISPLAY_MODE -> {
           try {
             interceptDisplayModeChanged((int) e.getNewValue());
           }
           catch (Exception t) {
             BEANS.get(ExceptionHandler.class).handle(t);
           }
-          break;
-        case PROP_VIEW_RANGE:
+        }
+        case PROP_VIEW_RANGE -> {
           try {
             interceptViewRangeChanged((Range<Date>) e.getNewValue());
           }
           catch (Exception t) {
             BEANS.get(ExceptionHandler.class).handle(t);
           }
-          break;
-        case PROP_SELECTION_RANGE:
+        }
+        case PROP_SELECTION_RANGE -> {
           try {
             interceptSelectionRangeChanged((Range<Date>) e.getNewValue());
           }
           catch (Exception t) {
             BEANS.get(ExceptionHandler.class).handle(t);
           }
-          break;
-        case PROP_SELECTED_ACTIVITY:
+        }
+        case PROP_SELECTED_ACTIVITY -> {
           Activity<RI, AI> cell = (Activity<RI, AI>) e.getNewValue();
           if (cell != null) {
             try {
@@ -356,7 +352,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
               BEANS.get(ExceptionHandler.class).handle(t);
             }
           }
-          break;
+        }
       }
     });
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -181,9 +181,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
     // Adds a DesktopListener to automatically cancel all message boxes.
     ClientRunContexts.copyCurrent().getDesktop().addDesktopListener(e -> {
       switch (e.getType()) {
-        case DesktopEvent.TYPE_MESSAGE_BOX_SHOW:
-          handleMessageBox(e.getMessageBox());
-          break;
+        case DesktopEvent.TYPE_MESSAGE_BOX_SHOW -> handleMessageBox(e.getMessageBox());
       }
     });
   }

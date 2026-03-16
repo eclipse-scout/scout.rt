@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -334,16 +334,15 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
   @SuppressWarnings("squid:S1193")
   public void writeBind(PreparedStatement ps, int jdbcBindIndex, SqlBind bind) throws SQLException {
     switch (bind.getSqlType()) {
-      case Types.NULL: {
+      case Types.NULL -> {
         try {
           ps.setNull(jdbcBindIndex, Types.NULL);
         }
         catch (SQLException e) { // NOSONAR
           ps.setNull(jdbcBindIndex, Types.VARCHAR);
         }
-        break;
       }
-      case Types.CLOB: {
+      case Types.CLOB -> {
         if (bind.getValue() instanceof Clob || bind.getValue() == null) {
           ps.setClob(jdbcBindIndex, (Clob) bind.getValue());
         }
@@ -351,9 +350,8 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
           String s = (String) bind.getValue();
           ps.setCharacterStream(jdbcBindIndex, new StringReader(s), s.length());
         }
-        break;
       }
-      case Types.BLOB: {
+      case Types.BLOB -> {
         if (bind.getValue() instanceof Blob || bind.getValue() == null) {
           ps.setBlob(jdbcBindIndex, (Blob) bind.getValue());
         }
@@ -361,9 +359,8 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
           byte[] data = (byte[]) bind.getValue();
           ps.setBinaryStream(jdbcBindIndex, new ByteArrayInputStream(data), data.length);
         }
-        break;
       }
-      case Types.LONGVARCHAR: {
+      case Types.LONGVARCHAR -> {
         String s = (String) bind.getValue();
         if (s != null) {
           ps.setCharacterStream(jdbcBindIndex, new StringReader(s), s.length());
@@ -371,9 +368,8 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         else {
           ps.setNull(jdbcBindIndex, Types.LONGVARCHAR);
         }
-        break;
       }
-      case Types.LONGVARBINARY: {
+      case Types.LONGVARBINARY -> {
         byte[] data = (byte[]) bind.getValue();
         try {
           // try using setBytes()
@@ -394,10 +390,8 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
             }
           }
         }
-        break;
       }
-      case Types.DECIMAL:
-      case Types.NUMERIC: {
+      case Types.DECIMAL, Types.NUMERIC -> {
         if (bind.getValue() instanceof BigDecimal) {
           int scale = ((BigDecimal) bind.getValue()).scale();
           ps.setObject(jdbcBindIndex, bind.getValue(), bind.getSqlType(), scale);
@@ -405,11 +399,8 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         else {
           writeDefaultBind(ps, jdbcBindIndex, bind);
         }
-        break;
       }
-      default: {
-        writeDefaultBind(ps, jdbcBindIndex, bind);
-      }
+      default -> writeDefaultBind(ps, jdbcBindIndex, bind);
     }
   }
 
@@ -422,63 +413,33 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     Object o = null;
     switch (type) {
       // General Number
-      case Types.DECIMAL:
-      case Types.NUMERIC: {
-        o = getConfiguredDecimalConversionStrategy().convertDecimalType(rs.getBigDecimal(jdbcBindIndex));
-        break;
-      }
+      case Types.DECIMAL, Types.NUMERIC -> o = getConfiguredDecimalConversionStrategy().convertDecimalType(rs.getBigDecimal(jdbcBindIndex));
+
       // Long
-      case Types.BIT:
-      case Types.BIGINT:
-      case Types.SMALLINT:
-      case Types.INTEGER:
-      case Types.TINYINT: {
-        o = rs.getLong(jdbcBindIndex);
-        break;
-      }
+      case Types.BIT, Types.BIGINT, Types.SMALLINT, Types.INTEGER, Types.TINYINT -> o = rs.getLong(jdbcBindIndex);
+
       // Double
-      case Types.DOUBLE:
-      case Types.FLOAT:
-      case Types.REAL: {
-        o = rs.getDouble(jdbcBindIndex);
-        break;
-      }
+      case Types.DOUBLE, Types.FLOAT, Types.REAL -> o = rs.getDouble(jdbcBindIndex);
+
       // String
-      case Types.VARCHAR:
-      case Types.CHAR: {
-        o = rs.getString(jdbcBindIndex);
-        break;
-      }
+      case Types.VARCHAR, Types.CHAR -> o = rs.getString(jdbcBindIndex);
+
       // Date
-      case Types.DATE: {
-        o = rs.getTimestamp(jdbcBindIndex);
-        break;
-      }
-      case Types.TIME: {
-        o = rs.getTime(jdbcBindIndex);
-        break;
-      }
-      case Types.TIMESTAMP: {
-        o = rs.getTimestamp(jdbcBindIndex);
-        break;
-      }
+      case Types.DATE -> o = rs.getTimestamp(jdbcBindIndex);
+      case Types.TIME -> o = rs.getTime(jdbcBindIndex);
+      case Types.TIMESTAMP -> o = rs.getTimestamp(jdbcBindIndex);
+
       // Raw
-      case Types.LONGVARCHAR: {
+      case Types.LONGVARCHAR -> {
         try {
           o = rs.getString(jdbcBindIndex);
         }
         catch (SQLException e) {
           throw e;
         }
-        break;
       }
-      case Types.LONGVARBINARY:
-      case Types.VARBINARY:
-      case Types.BINARY: {
-        o = rs.getBytes(jdbcBindIndex);
-        break;
-      }
-      case Types.CLOB: {
+      case Types.LONGVARBINARY, Types.VARBINARY, Types.BINARY -> o = rs.getBytes(jdbcBindIndex);
+      case Types.CLOB -> {
         Clob c = rs.getClob(jdbcBindIndex);
         if (c == null) {
           o = null;
@@ -504,9 +465,8 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
             throw sqe;
           }
         }
-        break;
       }
-      case Types.BLOB: {
+      case Types.BLOB -> {
         Blob b = rs.getBlob(jdbcBindIndex);
         if (b == null) {
           o = null;
@@ -514,11 +474,8 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         else {
           o = b.getBytes(1, (int) b.length());
         }
-        break;
       }
-      default: {
-        o = rs.getObject(jdbcBindIndex);
-      }
+      default -> o = rs.getObject(jdbcBindIndex);
     }
     // set to null if necessary
     if (rs.wasNull()) {

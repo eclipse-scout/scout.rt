@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   @SuppressWarnings("squid:S138")
   public void injectOperators(IDataModelAttribute attribute, List<IDataModelAttributeOp> operatorList) {
     switch (attribute.getType()) {
-      case TYPE_SMART: {
+      case TYPE_SMART -> {
         operatorList.add(DataModelAttributeOp.create(OPERATOR_EQ, TEXTS.get("LogicIn"), TEXTS.get("LogicIn")));
         if (attribute.isNotOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NEQ, TEXTS.get("LogicNotIn"), TEXTS.get("LogicNotIn")));
@@ -34,10 +34,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
         if (attribute.isNotOperatorEnabled() && attribute.isNullOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NUMBER_NOT_NULL));
         }
-        break;
       }
-      case TYPE_LIST:
-      case TYPE_TREE: {
+      case TYPE_LIST, TYPE_TREE -> {
         operatorList.add(DataModelAttributeOp.create(OPERATOR_IN));
         if (attribute.isNotOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NOT_IN));
@@ -48,9 +46,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
         if (attribute.isNotOperatorEnabled() && attribute.isNullOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NUMBER_NOT_NULL));
         }
-        break;
       }
-      case TYPE_TIME: {
+      case TYPE_TIME -> {
         operatorList.add(DataModelAttributeOp.create(OPERATOR_EQ));
         if (attribute.isNotOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NEQ));
@@ -66,9 +63,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
         if (attribute.isNotOperatorEnabled() && attribute.isNullOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NOT_NULL));
         }
-        break;
       }
-      case TYPE_DATE: {
+      case TYPE_DATE -> {
         operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_EQ));
         if (attribute.isNotOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_NEQ));
@@ -99,9 +95,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
         if (attribute.isNotOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_IS_NOT_TODAY));
         }
-        break;
       }
-      case TYPE_DATE_TIME: {
+      case TYPE_DATE_TIME -> {
         operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_TIME_EQ));
         if (attribute.isNotOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_TIME_NEQ));
@@ -137,15 +132,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
         if (attribute.isNotOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_IS_NOT_TODAY));
         }
-        break;
       }
-      case TYPE_INTEGER:
-      case TYPE_LONG:
-      case TYPE_BIG_DECIMAL:
-      case TYPE_PLAIN_INTEGER:
-      case TYPE_PLAIN_LONG:
-      case TYPE_PLAIN_BIG_DECIMAL:
-      case TYPE_PERCENT: {
+      case TYPE_INTEGER, TYPE_LONG, TYPE_BIG_DECIMAL, TYPE_PLAIN_INTEGER, TYPE_PLAIN_LONG, TYPE_PLAIN_BIG_DECIMAL, TYPE_PERCENT -> {
         operatorList.add(DataModelAttributeOp.create(OPERATOR_EQ));
         if (attribute.isNotOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NEQ));
@@ -161,9 +149,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
         if (attribute.isNotOperatorEnabled() && attribute.isNullOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NOT_NULL));
         }
-        break;
       }
-      case TYPE_AGGREGATE_COUNT: {
+      case TYPE_AGGREGATE_COUNT -> {
         operatorList.add(DataModelAttributeOp.create(OPERATOR_EQ));
         if (attribute.isNotOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NEQ));
@@ -173,9 +160,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
         operatorList.add(DataModelAttributeOp.create(OPERATOR_LE));
         operatorList.add(DataModelAttributeOp.create(OPERATOR_GT));
         operatorList.add(DataModelAttributeOp.create(OPERATOR_GE));
-        break;
       }
-      case TYPE_STRING: {
+      case TYPE_STRING -> {
         operatorList.add(DataModelAttributeOp.create(OPERATOR_LIKE));
         if (attribute.isNotOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NOT_LIKE));
@@ -198,11 +184,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
         if (attribute.isNotOperatorEnabled() && attribute.isNullOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NOT_NULL));
         }
-        break;
       }
-      case TYPE_RICH_TEXT:
-      case TYPE_HTML:
-      case TYPE_FULL_TEXT: {
+      case TYPE_RICH_TEXT, TYPE_HTML, TYPE_FULL_TEXT -> {
         operatorList.add(DataModelAttributeOp.create(OPERATOR_CONTAINS));
         if (attribute.isNotOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NOT_CONTAINS));
@@ -213,125 +196,81 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
         if (attribute.isNotOperatorEnabled() && attribute.isNullOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NOT_NULL));
         }
-        break;
       }
     }
   }
 
   @Override
   public IDataModelAttributeOp createOperator(int operator, String shortText, String text, String explanationText) {
-    switch (operator) {
-      case OPERATOR_BETWEEN:
-        return new Between(OPERATOR_BETWEEN, (shortText == null) ? TEXTS.get("LogicBetweenShort") : shortText, (text == null) ? TEXTS.get("LogicBetween") : text, explanationText);
-      case OPERATOR_DATE_BETWEEN:
-        return new Between(OPERATOR_DATE_BETWEEN, (shortText == null) ? TEXTS.get("LogicBetweenShort") : shortText, (text == null) ? TEXTS.get("LogicBetween") : text, explanationText);
-      case OPERATOR_DATE_TIME_BETWEEN:
-        return new Between(OPERATOR_DATE_TIME_BETWEEN, (shortText == null) ? TEXTS.get("LogicBetweenShort") : shortText, (text == null) ? TEXTS.get("LogicBetween") : text, explanationText);
-      case OPERATOR_NEQ:
-        return new NEQ(OPERATOR_NEQ, (shortText == null) ? TEXTS.get("LogicNEQ") : shortText, (text == null) ? TEXTS.get("LogicNEQ") : text, explanationText);
-      case OPERATOR_DATE_NEQ:
-        return new NEQ(OPERATOR_DATE_NEQ, (shortText == null) ? TEXTS.get("LogicNEQ") : shortText, (text == null) ? TEXTS.get("LogicNEQ") : text, explanationText);
-      case OPERATOR_DATE_TIME_NEQ:
-        return new NEQ(OPERATOR_DATE_TIME_NEQ, (shortText == null) ? TEXTS.get("LogicNEQ") : shortText, (text == null) ? TEXTS.get("LogicNEQ") : text, explanationText);
-      case OPERATOR_LT:
-        return new LT(OPERATOR_LT, (shortText == null) ? TEXTS.get("LogicLT") : shortText, (text == null) ? TEXTS.get("LogicLT") : text, explanationText);
-      case OPERATOR_DATE_LT:
-        return new LT(OPERATOR_DATE_LT, (shortText == null) ? TEXTS.get("LogicLT") : shortText, (text == null) ? TEXTS.get("LogicLT") : text, explanationText);
-      case OPERATOR_DATE_TIME_LT:
-        return new LT(OPERATOR_DATE_TIME_LT, (shortText == null) ? TEXTS.get("LogicLT") : shortText, (text == null) ? TEXTS.get("LogicLT") : text, explanationText);
-      case OPERATOR_LE:
-        return new LE(OPERATOR_LE, (shortText == null) ? TEXTS.get("LogicLE") : shortText, (text == null) ? TEXTS.get("LogicLE") : text, explanationText);
-      case OPERATOR_DATE_LE:
-        return new LE(OPERATOR_DATE_LE, (shortText == null) ? TEXTS.get("LogicLE") : shortText, (text == null) ? TEXTS.get("LogicLE") : text, explanationText);
-      case OPERATOR_DATE_TIME_LE:
-        return new LE(OPERATOR_DATE_TIME_LE, (shortText == null) ? TEXTS.get("LogicLE") : shortText, (text == null) ? TEXTS.get("LogicLE") : text, explanationText);
-      case OPERATOR_EQ:
-        return new EQ(OPERATOR_EQ, (shortText == null) ? TEXTS.get("LogicEQ") : shortText, (text == null) ? TEXTS.get("LogicEQ") : text, explanationText);
-      case OPERATOR_DATE_EQ:
-        return new EQ(OPERATOR_DATE_EQ, (shortText == null) ? TEXTS.get("LogicEQ") : shortText, (text == null) ? TEXTS.get("LogicEQ") : text, explanationText);
-      case OPERATOR_DATE_TIME_EQ:
-        return new EQ(OPERATOR_DATE_TIME_EQ, (shortText == null) ? TEXTS.get("LogicEQ") : shortText, (text == null) ? TEXTS.get("LogicEQ") : text, explanationText);
-      case OPERATOR_GT:
-        return new GT(OPERATOR_GT, (shortText == null) ? TEXTS.get("LogicGT") : shortText, (text == null) ? TEXTS.get("LogicGT") : text, explanationText);
-      case OPERATOR_DATE_GT:
-        return new GT(OPERATOR_DATE_GT, (shortText == null) ? TEXTS.get("LogicGT") : shortText, (text == null) ? TEXTS.get("LogicGT") : text, explanationText);
-      case OPERATOR_DATE_TIME_GT:
-        return new GT(OPERATOR_DATE_TIME_GT, (shortText == null) ? TEXTS.get("LogicGT") : shortText, (text == null) ? TEXTS.get("LogicGT") : text, explanationText);
-      case OPERATOR_GE:
-        return new GE(OPERATOR_GE, (shortText == null) ? TEXTS.get("LogicGE") : shortText, (text == null) ? TEXTS.get("LogicGE") : text, explanationText);
-      case OPERATOR_DATE_GE:
-        return new GE(OPERATOR_DATE_GE, (shortText == null) ? TEXTS.get("LogicGE") : shortText, (text == null) ? TEXTS.get("LogicGE") : text, explanationText);
-      case OPERATOR_DATE_TIME_GE:
-        return new GE(OPERATOR_DATE_TIME_GE, (shortText == null) ? TEXTS.get("LogicGE") : shortText, (text == null) ? TEXTS.get("LogicGE") : text, explanationText);
-      case OPERATOR_DATE_IS_IN_DAYS:
-        return new DateIsInDays(OPERATOR_DATE_IS_IN_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInDays") : text, explanationText);
-      case OPERATOR_DATE_IS_IN_GE_DAYS:
-        return new DateIsInGEDays(OPERATOR_DATE_IS_IN_GE_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInGEDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInGEDays") : text, explanationText);
-      case OPERATOR_DATE_IS_IN_GE_MONTHS:
-        return new DateIsInGEMonths(OPERATOR_DATE_IS_IN_GE_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInGEMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInGEMonths") : text, explanationText);
-      case OPERATOR_DATE_IS_IN_LE_DAYS:
-        return new DateIsInLEDays(OPERATOR_DATE_IS_IN_LE_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInLEDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInLEDays") : text, explanationText);
-      case OPERATOR_DATE_IS_IN_LE_MONTHS:
-        return new DateIsInLEMonths(OPERATOR_DATE_IS_IN_LE_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInLEMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInLEMonths") : text, explanationText);
-      case OPERATOR_DATE_IS_IN_LAST_DAYS:
-        return new DateIsInLastDays(OPERATOR_DATE_IS_IN_LAST_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInLastDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInLastDays") : text, explanationText);
-      case OPERATOR_DATE_IS_IN_LAST_MONTHS:
-        return new DateIsInLastMonths(OPERATOR_DATE_IS_IN_LAST_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInLastMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInLastMonths") : text, explanationText);
-      case OPERATOR_DATE_IS_IN_MONTHS:
-        return new DateIsInMonths(OPERATOR_DATE_IS_IN_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInMonths") : text, explanationText);
-      case OPERATOR_DATE_IS_IN_NEXT_DAYS:
-        return new DateIsInNextDays(OPERATOR_DATE_IS_IN_NEXT_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInNextDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInNextDays") : text, explanationText);
-      case OPERATOR_DATE_IS_IN_NEXT_MONTHS:
-        return new DateIsInNextMonths(OPERATOR_DATE_IS_IN_NEXT_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInNextMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInNextMonths") : text, explanationText);
-      case OPERATOR_DATE_IS_NOT_TODAY:
-        return new DateIsNotToday(OPERATOR_DATE_IS_NOT_TODAY, (shortText == null) ? TEXTS.get("LogicDateIsNotToday") : shortText, (text == null) ? TEXTS.get("LogicDateIsNotToday") : text, explanationText);
-      case OPERATOR_DATE_IS_TODAY:
-        return new DateIsToday(OPERATOR_DATE_IS_TODAY, (shortText == null) ? TEXTS.get("LogicDateIsToday") : shortText, (text == null) ? TEXTS.get("LogicDateIsToday") : text, explanationText);
-      case OPERATOR_YEAR_TO_DATE:
-        return new YearToDate(OPERATOR_YEAR_TO_DATE, (shortText == null) ? TEXTS.get("LogicYearToDateShort") : shortText, (text == null) ? TEXTS.get("LogicYearToDate") : text,
-            (explanationText == null) ? TEXTS.get("LogicYearToDateExplanation") : explanationText);
-      case OPERATOR_DATE_TIME_IS_IN_GE_HOURS:
-        return new DateTimeIsInGEHours(OPERATOR_DATE_TIME_IS_IN_GE_HOURS, (shortText == null) ? TEXTS.get("LogicDateTimeIsInGEHours") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsInGEHours") : text, explanationText);
-      case OPERATOR_DATE_TIME_IS_IN_GE_MINUTES:
-        return new DateTimeIsInGEMinutes(OPERATOR_DATE_TIME_IS_IN_GE_MINUTES, (shortText == null) ? TEXTS.get("LogicDateTimeIsInGEMinutes") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsInGEMinutes") : text, explanationText);
-      case OPERATOR_DATE_TIME_IS_IN_LE_HOURS:
-        return new DateTimeIsInLEHours(OPERATOR_DATE_TIME_IS_IN_LE_HOURS, (shortText == null) ? TEXTS.get("LogicDateTimeIsInLEHours") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsInLEHours") : text, explanationText);
-      case OPERATOR_DATE_TIME_IS_IN_LE_MINUTES:
-        return new DateTimeIsInLEMinutes(OPERATOR_DATE_TIME_IS_IN_LE_MINUTES, (shortText == null) ? TEXTS.get("LogicDateTimeIsInLEMinutes") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsInLEMinutes") : text, explanationText);
-      case OPERATOR_DATE_TIME_IS_NOT_NOW:
-        return new DateTimeIsNotNow(OPERATOR_DATE_TIME_IS_NOT_NOW, (shortText == null) ? TEXTS.get("LogicDateTimeIsNotNow") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsNotNow") : text, explanationText);
-      case OPERATOR_DATE_TIME_IS_NOW:
-        return new DateTimeIsNow(OPERATOR_DATE_TIME_IS_NOW, (shortText == null) ? TEXTS.get("LogicDateTimeIsNow") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsNow") : text, explanationText);
-      case OPERATOR_ENDS_WITH:
-        return new EndsWith(OPERATOR_ENDS_WITH, (shortText == null) ? TEXTS.get("LogicEndsWith") : shortText, (text == null) ? TEXTS.get("LogicEndsWith") : text, explanationText);
-      case OPERATOR_NOT_ENDS_WITH:
-        return new NotEndsWith(OPERATOR_NOT_ENDS_WITH, (shortText == null) ? TEXTS.get("LogicNotEndsWith") : shortText, (text == null) ? TEXTS.get("LogicNotEndsWith") : text, explanationText);
-      case OPERATOR_IN:
-        return new In(OPERATOR_IN, (shortText == null) ? TEXTS.get("LogicIn") : shortText, (text == null) ? TEXTS.get("LogicIn") : text, explanationText);
-      case OPERATOR_CONTAINS:
-        return new Contains(OPERATOR_CONTAINS, (shortText == null) ? TEXTS.get("LogicLike") : shortText, (text == null) ? TEXTS.get("LogicLike") : text, explanationText);
-      case OPERATOR_LIKE:
-        return new Like(OPERATOR_LIKE, (shortText == null) ? TEXTS.get("LogicEQ") : shortText, (text == null) ? TEXTS.get("LogicEQ") : text, explanationText);
-      case OPERATOR_NOT_LIKE:
-        return new Like(OPERATOR_NOT_LIKE, (shortText == null) ? TEXTS.get("LogicNEQ") : shortText, (text == null) ? TEXTS.get("LogicNEQ") : text, explanationText);
-      case OPERATOR_NOT_IN:
-        return new NotIn(OPERATOR_NOT_IN, (shortText == null) ? TEXTS.get("LogicNotIn") : shortText, (text == null) ? TEXTS.get("LogicNotIn") : text, explanationText);
-      case OPERATOR_NOT_CONTAINS:
-        return new NotContains(OPERATOR_NOT_CONTAINS, (shortText == null) ? TEXTS.get("LogicNotLike") : shortText, (text == null) ? TEXTS.get("LogicNotLike") : text, explanationText);
-      case OPERATOR_NOT_NULL:
-        return new NotNull(OPERATOR_NOT_NULL, (shortText == null) ? TEXTS.get("LogicNotNull") : shortText, (text == null) ? TEXTS.get("LogicNotNull") : text, explanationText);
-      case OPERATOR_NUMBER_NOT_NULL:
-        return new NumberNotNull(OPERATOR_NUMBER_NOT_NULL, (shortText == null) ? TEXTS.get("LogicNotNull") : shortText, (text == null) ? TEXTS.get("LogicNotNull") : text, explanationText);
-      case OPERATOR_NULL:
-        return new Null(OPERATOR_NULL, (shortText == null) ? TEXTS.get("LogicNull") : shortText, (text == null) ? TEXTS.get("LogicNull") : text, explanationText);
-      case OPERATOR_NUMBER_NULL:
-        return new NumberNull(OPERATOR_NUMBER_NULL, (shortText == null) ? TEXTS.get("LogicNull") : shortText, (text == null) ? TEXTS.get("LogicNull") : text, explanationText);
-      case OPERATOR_STARTS_WITH:
-        return new StartsWith(OPERATOR_STARTS_WITH, (shortText == null) ? TEXTS.get("LogicStartsWith") : shortText, (text == null) ? TEXTS.get("LogicStartsWith") : text, explanationText);
-      case OPERATOR_NOT_STARTS_WITH:
-        return new NotStartsWith(OPERATOR_NOT_STARTS_WITH, (shortText == null) ? TEXTS.get("LogicNotStartsWith") : shortText, (text == null) ? TEXTS.get("LogicNotStartsWith") : text, explanationText);
-    }
-    return null;
+    return switch (operator) {
+      case OPERATOR_BETWEEN -> new Between(OPERATOR_BETWEEN, (shortText == null) ? TEXTS.get("LogicBetweenShort") : shortText, (text == null) ? TEXTS.get("LogicBetween") : text, explanationText);
+      case OPERATOR_DATE_BETWEEN -> new Between(OPERATOR_DATE_BETWEEN, (shortText == null) ? TEXTS.get("LogicBetweenShort") : shortText, (text == null) ? TEXTS.get("LogicBetween") : text, explanationText);
+      case OPERATOR_DATE_TIME_BETWEEN -> new Between(OPERATOR_DATE_TIME_BETWEEN, (shortText == null) ? TEXTS.get("LogicBetweenShort") : shortText, (text == null) ? TEXTS.get("LogicBetween") : text, explanationText);
+      case OPERATOR_NEQ -> new NEQ(OPERATOR_NEQ, (shortText == null) ? TEXTS.get("LogicNEQ") : shortText, (text == null) ? TEXTS.get("LogicNEQ") : text, explanationText);
+      case OPERATOR_DATE_NEQ -> new NEQ(OPERATOR_DATE_NEQ, (shortText == null) ? TEXTS.get("LogicNEQ") : shortText, (text == null) ? TEXTS.get("LogicNEQ") : text, explanationText);
+      case OPERATOR_DATE_TIME_NEQ -> new NEQ(OPERATOR_DATE_TIME_NEQ, (shortText == null) ? TEXTS.get("LogicNEQ") : shortText, (text == null) ? TEXTS.get("LogicNEQ") : text, explanationText);
+      case OPERATOR_LT -> new LT(OPERATOR_LT, (shortText == null) ? TEXTS.get("LogicLT") : shortText, (text == null) ? TEXTS.get("LogicLT") : text, explanationText);
+      case OPERATOR_DATE_LT -> new LT(OPERATOR_DATE_LT, (shortText == null) ? TEXTS.get("LogicLT") : shortText, (text == null) ? TEXTS.get("LogicLT") : text, explanationText);
+      case OPERATOR_DATE_TIME_LT -> new LT(OPERATOR_DATE_TIME_LT, (shortText == null) ? TEXTS.get("LogicLT") : shortText, (text == null) ? TEXTS.get("LogicLT") : text, explanationText);
+      case OPERATOR_LE -> new LE(OPERATOR_LE, (shortText == null) ? TEXTS.get("LogicLE") : shortText, (text == null) ? TEXTS.get("LogicLE") : text, explanationText);
+      case OPERATOR_DATE_LE -> new LE(OPERATOR_DATE_LE, (shortText == null) ? TEXTS.get("LogicLE") : shortText, (text == null) ? TEXTS.get("LogicLE") : text, explanationText);
+      case OPERATOR_DATE_TIME_LE -> new LE(OPERATOR_DATE_TIME_LE, (shortText == null) ? TEXTS.get("LogicLE") : shortText, (text == null) ? TEXTS.get("LogicLE") : text, explanationText);
+      case OPERATOR_EQ -> new EQ(OPERATOR_EQ, (shortText == null) ? TEXTS.get("LogicEQ") : shortText, (text == null) ? TEXTS.get("LogicEQ") : text, explanationText);
+      case OPERATOR_DATE_EQ -> new EQ(OPERATOR_DATE_EQ, (shortText == null) ? TEXTS.get("LogicEQ") : shortText, (text == null) ? TEXTS.get("LogicEQ") : text, explanationText);
+      case OPERATOR_DATE_TIME_EQ -> new EQ(OPERATOR_DATE_TIME_EQ, (shortText == null) ? TEXTS.get("LogicEQ") : shortText, (text == null) ? TEXTS.get("LogicEQ") : text, explanationText);
+      case OPERATOR_GT -> new GT(OPERATOR_GT, (shortText == null) ? TEXTS.get("LogicGT") : shortText, (text == null) ? TEXTS.get("LogicGT") : text, explanationText);
+      case OPERATOR_DATE_GT -> new GT(OPERATOR_DATE_GT, (shortText == null) ? TEXTS.get("LogicGT") : shortText, (text == null) ? TEXTS.get("LogicGT") : text, explanationText);
+      case OPERATOR_DATE_TIME_GT -> new GT(OPERATOR_DATE_TIME_GT, (shortText == null) ? TEXTS.get("LogicGT") : shortText, (text == null) ? TEXTS.get("LogicGT") : text, explanationText);
+      case OPERATOR_GE -> new GE(OPERATOR_GE, (shortText == null) ? TEXTS.get("LogicGE") : shortText, (text == null) ? TEXTS.get("LogicGE") : text, explanationText);
+      case OPERATOR_DATE_GE -> new GE(OPERATOR_DATE_GE, (shortText == null) ? TEXTS.get("LogicGE") : shortText, (text == null) ? TEXTS.get("LogicGE") : text, explanationText);
+      case OPERATOR_DATE_TIME_GE -> new GE(OPERATOR_DATE_TIME_GE, (shortText == null) ? TEXTS.get("LogicGE") : shortText, (text == null) ? TEXTS.get("LogicGE") : text, explanationText);
+      case OPERATOR_DATE_IS_IN_DAYS -> new DateIsInDays(OPERATOR_DATE_IS_IN_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInDays") : text, explanationText);
+      case OPERATOR_DATE_IS_IN_GE_DAYS -> new DateIsInGEDays(OPERATOR_DATE_IS_IN_GE_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInGEDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInGEDays") : text, explanationText);
+      case OPERATOR_DATE_IS_IN_GE_MONTHS ->
+          new DateIsInGEMonths(OPERATOR_DATE_IS_IN_GE_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInGEMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInGEMonths") : text, explanationText);
+      case OPERATOR_DATE_IS_IN_LE_DAYS -> new DateIsInLEDays(OPERATOR_DATE_IS_IN_LE_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInLEDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInLEDays") : text, explanationText);
+      case OPERATOR_DATE_IS_IN_LE_MONTHS ->
+          new DateIsInLEMonths(OPERATOR_DATE_IS_IN_LE_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInLEMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInLEMonths") : text, explanationText);
+      case OPERATOR_DATE_IS_IN_LAST_DAYS ->
+          new DateIsInLastDays(OPERATOR_DATE_IS_IN_LAST_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInLastDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInLastDays") : text, explanationText);
+      case OPERATOR_DATE_IS_IN_LAST_MONTHS ->
+          new DateIsInLastMonths(OPERATOR_DATE_IS_IN_LAST_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInLastMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInLastMonths") : text, explanationText);
+      case OPERATOR_DATE_IS_IN_MONTHS -> new DateIsInMonths(OPERATOR_DATE_IS_IN_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInMonths") : text, explanationText);
+      case OPERATOR_DATE_IS_IN_NEXT_DAYS ->
+          new DateIsInNextDays(OPERATOR_DATE_IS_IN_NEXT_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInNextDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInNextDays") : text, explanationText);
+      case OPERATOR_DATE_IS_IN_NEXT_MONTHS ->
+          new DateIsInNextMonths(OPERATOR_DATE_IS_IN_NEXT_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInNextMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInNextMonths") : text, explanationText);
+      case OPERATOR_DATE_IS_NOT_TODAY -> new DateIsNotToday(OPERATOR_DATE_IS_NOT_TODAY, (shortText == null) ? TEXTS.get("LogicDateIsNotToday") : shortText, (text == null) ? TEXTS.get("LogicDateIsNotToday") : text, explanationText);
+      case OPERATOR_DATE_IS_TODAY -> new DateIsToday(OPERATOR_DATE_IS_TODAY, (shortText == null) ? TEXTS.get("LogicDateIsToday") : shortText, (text == null) ? TEXTS.get("LogicDateIsToday") : text, explanationText);
+      case OPERATOR_YEAR_TO_DATE -> new YearToDate(OPERATOR_YEAR_TO_DATE, (shortText == null) ? TEXTS.get("LogicYearToDateShort") : shortText, (text == null) ? TEXTS.get("LogicYearToDate") : text,
+          (explanationText == null) ? TEXTS.get("LogicYearToDateExplanation") : explanationText);
+      case OPERATOR_DATE_TIME_IS_IN_GE_HOURS ->
+          new DateTimeIsInGEHours(OPERATOR_DATE_TIME_IS_IN_GE_HOURS, (shortText == null) ? TEXTS.get("LogicDateTimeIsInGEHours") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsInGEHours") : text, explanationText);
+      case OPERATOR_DATE_TIME_IS_IN_GE_MINUTES ->
+          new DateTimeIsInGEMinutes(OPERATOR_DATE_TIME_IS_IN_GE_MINUTES, (shortText == null) ? TEXTS.get("LogicDateTimeIsInGEMinutes") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsInGEMinutes") : text, explanationText);
+      case OPERATOR_DATE_TIME_IS_IN_LE_HOURS ->
+          new DateTimeIsInLEHours(OPERATOR_DATE_TIME_IS_IN_LE_HOURS, (shortText == null) ? TEXTS.get("LogicDateTimeIsInLEHours") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsInLEHours") : text, explanationText);
+      case OPERATOR_DATE_TIME_IS_IN_LE_MINUTES ->
+          new DateTimeIsInLEMinutes(OPERATOR_DATE_TIME_IS_IN_LE_MINUTES, (shortText == null) ? TEXTS.get("LogicDateTimeIsInLEMinutes") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsInLEMinutes") : text, explanationText);
+      case OPERATOR_DATE_TIME_IS_NOT_NOW ->
+          new DateTimeIsNotNow(OPERATOR_DATE_TIME_IS_NOT_NOW, (shortText == null) ? TEXTS.get("LogicDateTimeIsNotNow") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsNotNow") : text, explanationText);
+      case OPERATOR_DATE_TIME_IS_NOW -> new DateTimeIsNow(OPERATOR_DATE_TIME_IS_NOW, (shortText == null) ? TEXTS.get("LogicDateTimeIsNow") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsNow") : text, explanationText);
+      case OPERATOR_ENDS_WITH -> new EndsWith(OPERATOR_ENDS_WITH, (shortText == null) ? TEXTS.get("LogicEndsWith") : shortText, (text == null) ? TEXTS.get("LogicEndsWith") : text, explanationText);
+      case OPERATOR_NOT_ENDS_WITH -> new NotEndsWith(OPERATOR_NOT_ENDS_WITH, (shortText == null) ? TEXTS.get("LogicNotEndsWith") : shortText, (text == null) ? TEXTS.get("LogicNotEndsWith") : text, explanationText);
+      case OPERATOR_IN -> new In(OPERATOR_IN, (shortText == null) ? TEXTS.get("LogicIn") : shortText, (text == null) ? TEXTS.get("LogicIn") : text, explanationText);
+      case OPERATOR_CONTAINS -> new Contains(OPERATOR_CONTAINS, (shortText == null) ? TEXTS.get("LogicLike") : shortText, (text == null) ? TEXTS.get("LogicLike") : text, explanationText);
+      case OPERATOR_LIKE -> new Like(OPERATOR_LIKE, (shortText == null) ? TEXTS.get("LogicEQ") : shortText, (text == null) ? TEXTS.get("LogicEQ") : text, explanationText);
+      case OPERATOR_NOT_LIKE -> new Like(OPERATOR_NOT_LIKE, (shortText == null) ? TEXTS.get("LogicNEQ") : shortText, (text == null) ? TEXTS.get("LogicNEQ") : text, explanationText);
+      case OPERATOR_NOT_IN -> new NotIn(OPERATOR_NOT_IN, (shortText == null) ? TEXTS.get("LogicNotIn") : shortText, (text == null) ? TEXTS.get("LogicNotIn") : text, explanationText);
+      case OPERATOR_NOT_CONTAINS -> new NotContains(OPERATOR_NOT_CONTAINS, (shortText == null) ? TEXTS.get("LogicNotLike") : shortText, (text == null) ? TEXTS.get("LogicNotLike") : text, explanationText);
+      case OPERATOR_NOT_NULL -> new NotNull(OPERATOR_NOT_NULL, (shortText == null) ? TEXTS.get("LogicNotNull") : shortText, (text == null) ? TEXTS.get("LogicNotNull") : text, explanationText);
+      case OPERATOR_NUMBER_NOT_NULL -> new NumberNotNull(OPERATOR_NUMBER_NOT_NULL, (shortText == null) ? TEXTS.get("LogicNotNull") : shortText, (text == null) ? TEXTS.get("LogicNotNull") : text, explanationText);
+      case OPERATOR_NULL -> new Null(OPERATOR_NULL, (shortText == null) ? TEXTS.get("LogicNull") : shortText, (text == null) ? TEXTS.get("LogicNull") : text, explanationText);
+      case OPERATOR_NUMBER_NULL -> new NumberNull(OPERATOR_NUMBER_NULL, (shortText == null) ? TEXTS.get("LogicNull") : shortText, (text == null) ? TEXTS.get("LogicNull") : text, explanationText);
+      case OPERATOR_STARTS_WITH -> new StartsWith(OPERATOR_STARTS_WITH, (shortText == null) ? TEXTS.get("LogicStartsWith") : shortText, (text == null) ? TEXTS.get("LogicStartsWith") : text, explanationText);
+      case OPERATOR_NOT_STARTS_WITH -> new NotStartsWith(OPERATOR_NOT_STARTS_WITH, (shortText == null) ? TEXTS.get("LogicNotStartsWith") : shortText, (text == null) ? TEXTS.get("LogicNotStartsWith") : text, explanationText);
+      default -> null;
+    };
   }
 
   private static class NEQ extends AbstractDataModelOp {

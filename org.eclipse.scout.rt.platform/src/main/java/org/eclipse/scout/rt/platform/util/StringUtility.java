@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -105,36 +105,13 @@ public final class StringUtility {
     char[] ch = wildcardPattern.toCharArray();
     for (char aCh : ch) {
       switch (aCh) {
-        case ' ': {
-          buf.append(aCh);
-          break;
-        }
-        case '*':
-        case '%': {
-          buf.append(".*");
-          break;
-        }
-        case '_':
-        case '?': {
-          buf.append(".");
-          break;
-        }
-        case '$':
-        case '@': {
-          buf.append(".");
-          break;
-        }
-        case '<':
-        case '>':
-        case '=': {
-          buf.append(aCh);
-          break;
-        }
-        case '.': {
-          buf.append("\\.");
-          break;
-        }
-        default: {
+        case ' ' -> buf.append(aCh);
+        case '*', '%' -> buf.append(".*");
+        case '_', '?' -> buf.append(".");
+        case '$', '@' -> buf.append(".");
+        case '<', '>', '=' -> buf.append(aCh);
+        case '.' -> buf.append("\\.");
+        default -> {
           if (aCh >= 32 && (Character.isJavaIdentifierStart(aCh) || Character.isJavaIdentifierPart(aCh))) {
             buf.append(aCh);
           }
@@ -760,42 +737,40 @@ public final class StringUtility {
     for (int i = 0; i < len; i++) {
       char ch = s.charAt(i);
       switch (ch) {
-        case '\\':
-          buf.append("\\\\");
-          break;
-        case '\t':
+        case '\\' -> buf.append("\\\\");
+        case '\t' -> {
           if (escapeControlChars) {
             buf.append("\\t");
           }
           else {
             buf.append(ch);
           }
-          break;
-        case '\n':
+        }
+        case '\n' -> {
           if (escapeControlChars) {
             buf.append("\\n");
           }
           else {
             buf.append(ch);
           }
-          break;
-        case '\r':
+        }
+        case '\r' -> {
           if (escapeControlChars) {
             buf.append("\\r");
           }
           else {
             buf.append(ch);
           }
-          break;
-        case '\f':
+        }
+        case '\f' -> {
           if (escapeControlChars) {
             buf.append("\\f");
           }
           else {
             buf.append(ch);
           }
-          break;
-        default:
+        }
+        default -> {
           if ((ch < 0x0020) || (ch > 0x007e)) {
             buf.append('\\');
             buf.append('u');
@@ -807,6 +782,7 @@ public final class StringUtility {
           else {
             buf.append(ch);
           }
+        }
       }// end switch
     }// end for
     return buf.toString();
@@ -837,23 +813,12 @@ public final class StringUtility {
         }// end if u
         else {
           switch (ch) {
-            case '\\':
-              buf.append('\\');
-              break;
-            case 't':
-              buf.append('\t');
-              break;
-            case 'r':
-              buf.append('\r');
-              break;
-            case 'n':
-              buf.append('\n');
-              break;
-            case 'f':
-              buf.append('\f');
-              break;
-            default:
-              buf.append(ch);
+            case '\\' -> buf.append('\\');
+            case 't' -> buf.append('\t');
+            case 'r' -> buf.append('\r');
+            case 'n' -> buf.append('\n');
+            case 'f' -> buf.append('\f');
+            default -> buf.append(ch);
           }
         }// end else
       }// end if escape
@@ -1875,26 +1840,9 @@ public final class StringUtility {
     for (int i = 0; i < s.length(); i++) {
       char c = s.charAt(i);
       switch (c) {
-        case '^':
-        case '[':
-        case '.':
-        case '$':
-        case '{':
-        case '*':
-        case '(':
-        case '\\':
-        case '+':
-        case ')':
-        case '|':
-        case '?':
-        case '<':
-        case '>': {
-          sb.append('\\');
-          break;
-        }
-        default: {
+        case '^', '[', '.', '$', '{', '*', '(', '\\', '+', ')', '|', '?', '<', '>' -> sb.append('\\');
+        default -> {
           // nop
-          break;
         }
       }
       sb.append(c);

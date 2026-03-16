@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -237,15 +237,9 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
 
   protected void handlePageFormEvent(FormEvent e, String pageFormIdentifier) {
     switch (e.getType()) {
-      case FormEvent.TYPE_LOAD_COMPLETE: {
-        //store form state since it was probably reset
-        storeSearchFormState(e.getForm(), pageFormIdentifier);
-        break;
-      }
-      case FormEvent.TYPE_STORE_AFTER: {
-        storeSearchFormState(e.getForm(), pageFormIdentifier);
-        break;
-      }
+      case FormEvent.TYPE_LOAD_COMPLETE -> //store form state since it was probably reset
+          storeSearchFormState(e.getForm(), pageFormIdentifier);
+      case FormEvent.TYPE_STORE_AFTER -> storeSearchFormState(e.getForm(), pageFormIdentifier);
     }
   }
 
@@ -259,10 +253,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
 
   protected void handleTableFilterEvent(TableEvent e, String id) {
     switch (e.getType()) {
-      case TableEvent.TYPE_USER_FILTER_ADDED:
-      case TableEvent.TYPE_USER_FILTER_REMOVED:
-        storeUserFilterState(e.getTable(), id);
-        break;
+      case TableEvent.TYPE_USER_FILTER_ADDED, TableEvent.TYPE_USER_FILTER_REMOVED -> storeUserFilterState(e.getTable(), id);
     }
   }
 
@@ -321,11 +312,8 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   protected DesktopListener createDesktopListener() {
     return e -> {
       switch (e.getType()) {
-        case DesktopEvent.TYPE_OUTLINE_CHANGED: {
-          setActiveOutline(e.getOutline());
-          break;
-        }
-        case DesktopEvent.TYPE_DESKTOP_CLOSED: {
+        case DesktopEvent.TYPE_OUTLINE_CHANGED -> setActiveOutline(e.getOutline());
+        case DesktopEvent.TYPE_DESKTOP_CLOSED -> {
           if (e.getSource() instanceof IDesktop) {
             deregisterDesktop((IDesktop) e.getSource());
           }
@@ -343,31 +331,16 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
         if (e.getNode() instanceof IPage) {
           IPage<?> p = (IPage<?>) e.getNode();
           switch (e.getType()) {
-            case OutlineEvent.TYPE_PAGE_AFTER_PAGE_INIT: {
-              pageCreated(p);
-              break;
-            }
-            case OutlineEvent.TYPE_PAGE_AFTER_TABLE_INIT: {
-              pageTableCreated(p);
-              break;
-            }
+            case OutlineEvent.TYPE_PAGE_AFTER_PAGE_INIT -> pageCreated(p);
+            case OutlineEvent.TYPE_PAGE_AFTER_TABLE_INIT -> pageTableCreated(p);
           }
         }
         if (e.getNode() instanceof IPageWithTable) {
           IPageWithTable<?> p = (IPageWithTable<?>) e.getNode();
           switch (e.getType()) {
-            case OutlineEvent.TYPE_PAGE_BEFORE_DATA_LOADED: {
-              beforeTablePageLoadData(p);
-              break;
-            }
-            case OutlineEvent.TYPE_PAGE_AFTER_DATA_LOADED: {
-              afterTablePageLoadData(p);
-              break;
-            }
-            case OutlineEvent.TYPE_PAGE_AFTER_SEARCH_FORM_START: {
-              pageSearchFormStarted(p);
-              break;
-            }
+            case OutlineEvent.TYPE_PAGE_BEFORE_DATA_LOADED -> beforeTablePageLoadData(p);
+            case OutlineEvent.TYPE_PAGE_AFTER_DATA_LOADED -> afterTablePageLoadData(p);
+            case OutlineEvent.TYPE_PAGE_AFTER_SEARCH_FORM_START -> pageSearchFormStarted(p);
           }
         }
       }

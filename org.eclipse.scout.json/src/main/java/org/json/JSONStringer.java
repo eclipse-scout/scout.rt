@@ -310,39 +310,20 @@ public class JSONStringer {
        * (U+0000 through U+001F)."
        */
       switch (c) {
-        case '"':
-        case '\\':
-          out.append('\\').append(c);
-          break;
-
-        case '\t':
-          out.append("\\t");
-          break;
-
-        case '\b':
-          out.append("\\b");
-          break;
-
-        case '\n':
-          out.append("\\n");
-          break;
-
-        case '\r':
-          out.append("\\r");
-          break;
-
-        case '\f':
-          out.append("\\f");
-          break;
-
-        default:
+        case '"', '\\' -> out.append('\\').append(c);
+        case '\t' -> out.append("\\t");
+        case '\b' -> out.append("\\b");
+        case '\n' -> out.append("\\n");
+        case '\r' -> out.append("\\r");
+        case '\f' -> out.append("\\f");
+        default -> {
           if (c <= 0x1F) {
             out.append(String.format("\\u%04x", (int) c));
           }
           else {
             out.append(c);
           }
-          break;
+        }
       }
     }
     out.append("\"");

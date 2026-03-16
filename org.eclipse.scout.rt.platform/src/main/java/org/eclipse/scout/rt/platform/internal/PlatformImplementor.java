@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -299,21 +299,14 @@ public class PlatformImplementor implements IPlatform {
   }
 
   protected static EnumSet<State> getPreviousStates(State reference) {
-    switch (reference) {
-      case BeanManagerPrepared:
-        return EnumSet.of(State.PlatformStopped);
-      case BeanManagerValid:
-        return EnumSet.of(State.BeanManagerPrepared);
-      case PlatformStarted:
-        return EnumSet.of(State.BeanManagerValid);
-      case PlatformStopping:
-        return EnumSet.of(State.PlatformStarted);
-      case PlatformStopped:
-        return EnumSet.of(State.PlatformStopping);
-      case PlatformInvalid:
-        return EnumSet.of(State.BeanManagerPrepared, State.BeanManagerValid, State.PlatformStarted, State.PlatformStopping, State.PlatformStopped);
-    }
-    return EnumSet.noneOf(State.class);
+    return switch (reference) {
+      case BeanManagerPrepared -> EnumSet.of(State.PlatformStopped);
+      case BeanManagerValid -> EnumSet.of(State.BeanManagerPrepared);
+      case PlatformStarted -> EnumSet.of(State.BeanManagerValid);
+      case PlatformStopping -> EnumSet.of(State.PlatformStarted);
+      case PlatformStopped -> EnumSet.of(State.PlatformStopping);
+      case PlatformInvalid -> EnumSet.of(State.BeanManagerPrepared, State.BeanManagerValid, State.PlatformStarted, State.PlatformStopping, State.PlatformStopped);
+    };
   }
 
   @SuppressWarnings("squid:S1181")
@@ -335,13 +328,13 @@ public class PlatformImplementor implements IPlatform {
       catch (RuntimeException | Error e) {
         LOG.error("Error during event listener notification.", e);
         switch (newState) {
-          case PlatformStopping:
-          case PlatformStopped:
+          case PlatformStopping, PlatformStopped -> {
             //go on
-            break;
-          default:
+          }
+          default -> {
             changeState(State.PlatformInvalid, true);
             throw e;
+          }
         }
       }
     }

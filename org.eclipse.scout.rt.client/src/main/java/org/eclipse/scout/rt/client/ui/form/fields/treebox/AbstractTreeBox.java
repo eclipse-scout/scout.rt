@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -329,17 +329,15 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       m_tree.addTreeListener(
           e -> {
             switch (e.getType()) {
-              case TreeEvent.TYPE_NODES_SELECTED: {
+              case TreeEvent.TYPE_NODES_SELECTED -> {
                 if (!getTree().isCheckable()) {
                   syncTreeToValue();
                 }
-                break;
               }
-              case TreeEvent.TYPE_NODES_CHECKED: {
+              case TreeEvent.TYPE_NODES_CHECKED -> {
                 if (getTree().isCheckable()) {
                   syncTreeToValue();
                 }
-                break;
               }
             }
           },

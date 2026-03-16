@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -81,11 +81,10 @@ public abstract class AbstractEntityRestClientExceptionTransformer implements IR
    * exception
    */
   protected RuntimeException transformByResponseStatusFamily(Response.Status.Family family, RuntimeException e, Response response) {
-    switch (family) {
-      case SUCCESSFUL:
-        return e;
-    }
-    return null;
+    return switch (family) {
+      case SUCCESSFUL -> e;
+      default -> null;
+    };
   }
 
   /**

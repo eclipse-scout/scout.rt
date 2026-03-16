@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -49,13 +49,10 @@ public enum ColorMode {
    * Utility method returning the "opposite" color mode for this mode.
    */
   public ColorMode toggle() {
-    switch (this) {
-      case DATASET:
-        return DATA;
-      case DATA:
-        return DATASET;
-      default:
-        return this; // unknown mode cannot be toggled
-    }
+    return switch (this) {
+      case DATASET -> DATA;
+      case DATA -> DATASET;
+      default -> this; // unknown mode cannot be toggled
+    };
   }
 }

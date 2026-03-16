@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -558,13 +558,10 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
   @Override
   public boolean isMultiValued() {
-    switch (getType()) {
-      case TYPE_LIST:
-      case TYPE_TREE:
-        return true;
-      default:
-        return false;
-    }
+    return switch (getType()) {
+      case TYPE_LIST, TYPE_TREE -> true;
+      default -> false;
+    };
   }
 
   @Override
@@ -573,37 +570,21 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
       return formatNullValue();
     }
 
-    switch (getType()) {
-      case TYPE_LIST:
-      case TYPE_TREE:
-      case TYPE_SMART:
-        return formatSmart(rawValue, getCodeTypeClass(), getLookupCall());
-      case TYPE_DATE:
-        return formatDate(rawValue, true, false);
-      case TYPE_DATE_TIME:
-        return formatDate(rawValue, true, true);
-      case TYPE_TIME:
-        return formatDate(rawValue, false, true);
-      case TYPE_INTEGER:
-        return formatInteger(rawValue, true);
-      case TYPE_LONG:
-        return formatLong(rawValue, true);
-      case TYPE_BIG_DECIMAL:
-        return formatBigDecimal(rawValue, true, false);
-      case TYPE_PLAIN_INTEGER:
-        return formatInteger(rawValue, false);
-      case TYPE_PLAIN_LONG:
-        return formatLong(rawValue, false);
-      case TYPE_PLAIN_BIG_DECIMAL:
-        return formatBigDecimal(rawValue, false, false);
-      case TYPE_PERCENT:
-        return formatBigDecimal(rawValue, true, true);
-      case TYPE_STRING:
-      case TYPE_FULL_TEXT:
-        return formatString(rawValue);
-      default:
-        return formatObject(rawValue);
-    }
+    return switch (getType()) {
+      case TYPE_LIST, TYPE_TREE, TYPE_SMART -> formatSmart(rawValue, getCodeTypeClass(), getLookupCall());
+      case TYPE_DATE -> formatDate(rawValue, true, false);
+      case TYPE_DATE_TIME -> formatDate(rawValue, true, true);
+      case TYPE_TIME -> formatDate(rawValue, false, true);
+      case TYPE_INTEGER -> formatInteger(rawValue, true);
+      case TYPE_LONG -> formatLong(rawValue, true);
+      case TYPE_BIG_DECIMAL -> formatBigDecimal(rawValue, true, false);
+      case TYPE_PLAIN_INTEGER -> formatInteger(rawValue, false);
+      case TYPE_PLAIN_LONG -> formatLong(rawValue, false);
+      case TYPE_PLAIN_BIG_DECIMAL -> formatBigDecimal(rawValue, false, false);
+      case TYPE_PERCENT -> formatBigDecimal(rawValue, true, true);
+      case TYPE_STRING, TYPE_FULL_TEXT -> formatString(rawValue);
+      default -> formatObject(rawValue);
+    };
   }
 
   /**

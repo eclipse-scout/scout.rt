@@ -339,13 +339,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 String newValue = ((IStringField) editingField).getValue();
                 if (!StringUtility.isNullOrEmpty(newValue)) {
                   switch (getConfigTypeColumn().getValue(row)) {
-                    case CUSTOM:
+                    case CUSTOM -> {
                       ClientUIPreferences prefs = ClientUIPreferences.getInstance();
                       prefs.renameTableColumnsConfig(m_organizedTable, oldValue, newValue);
-                      break;
-                    case DEFAULT:
-                    default:
-                      throw new IllegalStateException("Rows of configType " + getConfigTypeColumn().getValue(row).name() + " should never be editable.");
+                    }
+                    default -> throw new IllegalStateException("Rows of configType " + getConfigTypeColumn().getValue(row).name() + " should never be editable.");
                   }
                 }
                 else {

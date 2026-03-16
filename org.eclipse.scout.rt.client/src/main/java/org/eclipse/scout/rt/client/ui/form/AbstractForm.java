@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -654,8 +654,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     for (IFormField f : getAllFields()) {
       if (f.isEnabled() && f.isVisible() && (f instanceof IButton)) {
         switch (((IButton) f).getSystemType()) {
-          case IButton.SYSTEM_TYPE_CLOSE:
-          case IButton.SYSTEM_TYPE_CANCEL: {
+          case IButton.SYSTEM_TYPE_CLOSE, IButton.SYSTEM_TYPE_CANCEL -> {
             return true;
           }
         }
@@ -2740,15 +2739,8 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     Assertions.assertFalse(getDesktop().isShowing(this), "Property 'displayHint' cannot be changed because Form is already showing [form={}]", this);
 
     switch (displayHint) {
-      case DISPLAY_HINT_DIALOG:
-      case DISPLAY_HINT_POPUP_WINDOW:
-      case DISPLAY_HINT_VIEW: {
-        m_displayHint = displayHint;
-        break;
-      }
-      default: {
-        throw new IllegalArgumentException("Unsupported displayHint " + displayHint);
-      }
+      case DISPLAY_HINT_DIALOG, DISPLAY_HINT_POPUP_WINDOW, DISPLAY_HINT_VIEW -> m_displayHint = displayHint;
+      default -> throw new IllegalArgumentException("Unsupported displayHint " + displayHint);
     }
 
     // Update modality hint if not explicitly set yet.
@@ -2859,37 +2851,19 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   protected void handleSystemButtonEventInternal(ButtonEvent e) {
     switch (e.getType()) {
-      case ButtonEvent.TYPE_CLICKED: {
+      case ButtonEvent.TYPE_CLICKED -> {
         // disable close timer
         setCloseTimerArmed(false);
         if (isButtonsArmed() && checkForVerifyingFields()) {
           try {
             IButton src = (IButton) e.getSource();
             switch (src.getSystemType()) {
-              case IButton.SYSTEM_TYPE_CANCEL: {
-                doCancel();
-                break;
-              }
-              case IButton.SYSTEM_TYPE_CLOSE: {
-                doClose();
-                break;
-              }
-              case IButton.SYSTEM_TYPE_OK: {
-                doOk();
-                break;
-              }
-              case IButton.SYSTEM_TYPE_RESET: {
-                doReset();
-                break;
-              }
-              case IButton.SYSTEM_TYPE_SAVE: {
-                doSave();
-                break;
-              }
-              case IButton.SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE: {
-                doSaveWithoutMarkerChange();
-                break;
-              }
+              case IButton.SYSTEM_TYPE_CANCEL -> doCancel();
+              case IButton.SYSTEM_TYPE_CLOSE -> doClose();
+              case IButton.SYSTEM_TYPE_OK -> doOk();
+              case IButton.SYSTEM_TYPE_RESET -> doReset();
+              case IButton.SYSTEM_TYPE_SAVE -> doSave();
+              case IButton.SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE -> doSaveWithoutMarkerChange();
             }
           }
           catch (RuntimeException | PlatformError ex) {
@@ -2897,7 +2871,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
                 .withContextInfo("button", e.getButton().getClass().getName()));
           }
         }
-        break;
       }
     }
   }

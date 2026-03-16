@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -262,22 +262,13 @@ public class DataObjectSignatureComparator {
       String type = matcher.group(1);
       String name = matcher.group(2);
 
-      switch (type) {
-        case DataObjectSignatureGenerator.VALUE_TYPE_DO_PREFIX:
-          name = m_typeNameRenamings.getOrDefault(name, name);
-          break;
-        case DataObjectSignatureGenerator.VALUE_TYPE_ENUM_PREFIX:
-          name = m_enumNameRenamings.getOrDefault(name, name);
-          break;
-        case DataObjectSignatureGenerator.VALUE_TYPE_ID_PREFIX:
-          name = m_typeIdRenamings.getOrDefault(name, name);
-          break;
-        case DataObjectSignatureGenerator.VALUE_TYPE_DO_INTERFACE_PREFIX:
-        case DataObjectSignatureGenerator.VALUE_TYPE_CLASS_PREFIX:
-        case DataObjectSignatureGenerator.VALUE_TYPE_ID_INTERFACE_PREFIX:
-          name = m_classNameRenamings.getOrDefault(name, name);
-          break;
-      }
+      name = switch (type) {
+        case DataObjectSignatureGenerator.VALUE_TYPE_DO_PREFIX -> m_typeNameRenamings.getOrDefault(name, name);
+        case DataObjectSignatureGenerator.VALUE_TYPE_ENUM_PREFIX -> m_enumNameRenamings.getOrDefault(name, name);
+        case DataObjectSignatureGenerator.VALUE_TYPE_ID_PREFIX -> m_typeIdRenamings.getOrDefault(name, name);
+        case DataObjectSignatureGenerator.VALUE_TYPE_DO_INTERFACE_PREFIX, DataObjectSignatureGenerator.VALUE_TYPE_CLASS_PREFIX, DataObjectSignatureGenerator.VALUE_TYPE_ID_INTERFACE_PREFIX -> m_classNameRenamings.getOrDefault(name, name);
+        default -> name;
+      };
 
       String replacement = DataObjectSignatureGenerator.box(type, name);
       matcher.appendReplacement(buffer, Matcher.quoteReplacement(replacement));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -712,16 +712,15 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   @SuppressWarnings("unchecked")
   protected void handleTileGridChanged(TileGridEvent e) {
     switch (e.getType()) {
-      case TileGridEvent.TYPE_TILE_CLICK:
+      case TileGridEvent.TYPE_TILE_CLICK -> {
         interceptTileClick((T) e.getTile(), e.getMouseButton());
         fireTileGridEventInternal(e);
-        break;
-      case TileGridEvent.TYPE_TILE_ACTION:
+      }
+      case TileGridEvent.TYPE_TILE_ACTION -> {
         interceptTileAction((T) e.getTile());
         fireTileGridEventInternal(e);
-        break;
-      default:
-        LOG.debug("Unhandled event from TileGrid received " + e);
+      }
+      default -> LOG.debug("Unhandled event from TileGrid received " + e);
     }
   }
 

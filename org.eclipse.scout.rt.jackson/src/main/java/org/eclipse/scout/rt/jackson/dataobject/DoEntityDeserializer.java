@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -78,15 +78,13 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   }
 
   protected IDoEntity deserializeDoEntity(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException {
-    switch (p.nextToken()) {
-      case FIELD_NAME:
-        return deserializeDoEntityAttributes(p, ctxt);
-      case END_OBJECT:
+    return switch (p.nextToken()) {
+      case FIELD_NAME -> deserializeDoEntityAttributes(p, ctxt);
+      case END_OBJECT ->
         // empty object without attributes consists only of START_OBJECT and END_OBJECT token, return empty entity object
-        return newObject(ctxt, m_handledClass);
-      default:
-        throw ctxt.wrongTokenException(p, m_handledType, JsonToken.FIELD_NAME, null);
-    }
+          newObject(ctxt, m_handledClass);
+      default -> throw ctxt.wrongTokenException(p, m_handledType, JsonToken.FIELD_NAME, null);
+    };
   }
 
   @SuppressWarnings({"resource", "squid:S2095"})

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -136,7 +136,7 @@ public class JandexInventoryBuilder {
       boolean canReadFromIndexFile = indexFile.exists();
       if (canReadFromIndexFile) {
         switch (m_rebuildStrategy) {
-          case IF_MODIFIED:
+          case IF_MODIFIED -> {
             newMeta = indexMetaData(classesFolder.toPath());
             //pass 1: check modified
             long oldModified = indexFile.lastModified();
@@ -158,12 +158,11 @@ public class JandexInventoryBuilder {
                 canReadFromIndexFile = false;
               }
             }
-            break;
-          case ALWAYS:
-            canReadFromIndexFile = false;
-            break;
-          default:
+          }
+          case ALWAYS -> canReadFromIndexFile = false;
+          default -> {
             //nop
+          }
         }
       }
 

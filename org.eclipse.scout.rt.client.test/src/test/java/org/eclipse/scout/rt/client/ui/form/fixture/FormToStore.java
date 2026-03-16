@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -87,22 +87,17 @@ public class FormToStore extends AbstractForm {
 
   private void doIt(MethodImplementation implementation) {
     switch (implementation) {
-      case MARK_NOT_STORED:
-        setFormStored(false);
-        break;
-      case MARK_STORED:
-        setFormStored(true);
-        break;
-      case VETO_EXCEPTION:
-        throw new VetoException(VETO_EXCEPTION_TEXT);
-      case CONSUMED_VETO_EXCEPTION:
+      case MARK_NOT_STORED -> setFormStored(false);
+      case MARK_STORED -> setFormStored(true);
+      case VETO_EXCEPTION -> throw new VetoException(VETO_EXCEPTION_TEXT);
+      case CONSUMED_VETO_EXCEPTION -> {
         VetoException vetoException = new VetoException("Implementation throws a consumed VetoException");
         vetoException.consume();
         throw vetoException;
-      case DO_NOTHING:
-      default:
-        //nothing to do
-        break;
+      }
+      default -> {
+      }
+      //nothing to do
     }
   }
 

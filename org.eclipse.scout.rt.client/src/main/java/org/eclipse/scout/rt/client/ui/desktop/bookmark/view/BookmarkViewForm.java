@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -328,10 +328,7 @@ public class BookmarkViewForm extends AbstractForm {
 
     private final BookmarkServiceListener m_bmListener = e -> {
       switch (e.getType()) {
-        case BookmarkServiceEvent.TYPE_CHANGED: {
-          refreshFormState();
-          break;
-        }
+        case BookmarkServiceEvent.TYPE_CHANGED -> refreshFormState();
       }
     };
 

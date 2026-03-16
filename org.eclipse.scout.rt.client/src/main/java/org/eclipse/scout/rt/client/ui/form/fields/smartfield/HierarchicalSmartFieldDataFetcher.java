@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -67,16 +67,9 @@ public class HierarchicalSmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmart
     }
     else if (e instanceof ProcessingException) {
       switch (((ProcessingException) e).getStatus().getSeverity()) {
-        case IProcessingStatus.INFO:
-        case IProcessingStatus.OK:
-          LOG.info("", e);
-          break;
-        case IProcessingStatus.WARNING:
-          LOG.warn("", e);
-          break;
-        default:
-          LOG.error("", e);
-          break;
+        case IProcessingStatus.INFO, IProcessingStatus.OK -> LOG.info("", e);
+        case IProcessingStatus.WARNING -> LOG.warn("", e);
+        default -> LOG.error("", e);
       }
     }
     else {

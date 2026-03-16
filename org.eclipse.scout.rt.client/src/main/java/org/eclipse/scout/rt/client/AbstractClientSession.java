@@ -281,14 +281,11 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * Returns the memory policy to be used.
    */
   protected IMemoryPolicy resolveMemoryPolicy() {
-    switch (CONFIG.getPropertyValue(MemoryPolicyProperty.class)) {
-      case "small":
-        return new SmallMemoryPolicy();
-      case "medium":
-        return new MediumMemoryPolicy();
-      default:
-        return new LargeMemoryPolicy();
-    }
+    return switch (CONFIG.getPropertyValue(MemoryPolicyProperty.class)) {
+      case "small" -> new SmallMemoryPolicy();
+      case "medium" -> new MediumMemoryPolicy();
+      default -> new LargeMemoryPolicy();
+    };
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,12 +37,8 @@ public class JaxWsPlatformListener implements IPlatformListener {
     IPlatform platform = event.getSource();
 
     switch (event.getState()) {
-      case BeanManagerPrepared:
-        installImplementorSpecifics(platform.getBeanManager());
-        break;
-      case BeanManagerValid:
-        logImplementorInfo(platform.getBeanManager());
-        break;
+      case BeanManagerPrepared -> installImplementorSpecifics(platform.getBeanManager());
+      case BeanManagerValid -> logImplementorInfo(platform.getBeanManager());
     }
   }
 

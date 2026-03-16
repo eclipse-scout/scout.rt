@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -627,7 +627,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
       //dnd
       switch (e.getType()) {
-        case TreeEvent.TYPE_NODES_DRAG_REQUEST: {
+        case TreeEvent.TYPE_NODES_DRAG_REQUEST -> {
           m_lastSeenDropNode = null;
           if (e.getDragObject() == null) {
             try {
@@ -641,9 +641,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
               LOG.error("Drag", t);
             }
           }
-          break;
         }
-        case TreeEvent.TYPE_NODE_DROP_ACTION: {
+        case TreeEvent.TYPE_NODE_DROP_ACTION -> {
           m_lastSeenDropNode = null;
           if (e.getDropObject() != null) {
             try {
@@ -653,22 +652,17 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
               LOG.error("Drop", t);
             }
           }
-          break;
         }
-        case TreeEvent.TYPE_NODES_SELECTED: {
-          rebuildKeyStrokesInternal();
-          break;
-        }
-        case TreeEvent.TYPE_NODES_CHECKED: {
+        case TreeEvent.TYPE_NODES_SELECTED -> rebuildKeyStrokesInternal();
+        case TreeEvent.TYPE_NODES_CHECKED -> {
           try {
             interceptNodesChecked(CollectionUtility.arrayList(e.getNodes()));
           }
           catch (RuntimeException ex) {
             BEANS.get(ExceptionHandler.class).handle(ex);
           }
-          break;
         }
-        case TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED: {
+        case TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED -> {
           try {
             if (m_lastSeenDropNode == null || m_lastSeenDropNode != e.getNode()) {
               m_lastSeenDropNode = e.getNode();
@@ -678,11 +672,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
           catch (RuntimeException ex) {
             LOG.error("DropTargetChanged", ex);
           }
-          break;
         }
-        case TreeEvent.TYPE_DRAG_FINISHED: {
-          m_lastSeenDropNode = null;
-        }
+        case TreeEvent.TYPE_DRAG_FINISHED -> m_lastSeenDropNode = null;
       }
     });
 

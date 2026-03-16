@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -692,23 +692,15 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
 
     IMessageListener<String> listener = message -> {
       switch (message.getTransferObject()) {
-        case "message-1":
+        case "message-1" -> {
           switch (messageCounter.incrementAndGet()) {
-            case 1:
-            case 2:
-            case 3:
-              ITransaction.CURRENT.get().rollback();
-              break;
-            default:
-              message1Latch.countDown();
-              break;
+            case 1, 2, 3 -> ITransaction.CURRENT.get().rollback();
+            default -> message1Latch.countDown();
           }
           return;
-        case "message-2":
-          message2Latch.countDown();
-          break;
-        default:
-          throw new IllegalArgumentException("illegal message");
+        }
+        case "message-2" -> message2Latch.countDown();
+        default -> throw new IllegalArgumentException("illegal message");
       }
     };
 

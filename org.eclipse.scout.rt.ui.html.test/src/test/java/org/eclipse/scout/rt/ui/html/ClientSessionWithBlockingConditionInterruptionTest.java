@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -294,7 +294,7 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
       FixtureDesktop desktop = new FixtureDesktop();
       setDesktop(desktop);
       switch (m_sessionBehaviour) {
-        case OPEN_MESSAGEBOX_IN_LOAD:
+        case OPEN_MESSAGEBOX_IN_LOAD -> {
           writeToProtocol("Before MessageBoxInLoad");
           try {
             int result = MessageBoxes.createOk().show();
@@ -304,8 +304,8 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
             writeToProtocol("Interrupted MessageBoxInLoad");
             throw e;
           }
-          break;
-        case OPEN_FORM_IN_LOAD:
+        }
+        case OPEN_FORM_IN_LOAD -> {
           FixtureForm f = new FixtureForm();
           writeToProtocol("Before Form.start");
           f.start();
@@ -318,14 +318,14 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
             writeToProtocol("Interrupted Form");
             throw e;
           }
-          break;
+        }
       }
     }
 
     @Override
     protected void execStoreSession() {
       switch (m_sessionBehaviour) {
-        case OPEN_MESSAGEBOX_IN_STORE:
+        case OPEN_MESSAGEBOX_IN_STORE -> {
           writeToProtocol("Before MessageBoxInStore");
           try {
             int result = MessageBoxes.createOk().show();
@@ -335,8 +335,8 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
             writeToProtocol("Interrupted MessageBoxInStore");
             throw e;
           }
-          break;
-        case OPEN_FORM_IN_STORE:
+        }
+        case OPEN_FORM_IN_STORE -> {
           FixtureForm f = new FixtureForm();
           writeToProtocol("Before Form.start");
           try {
@@ -349,7 +349,7 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
             writeToProtocol("Form error " + e.getClass().getSimpleName() + " " + e.getMessage());
             throw e;
           }
-          break;
+        }
       }
     }
   }
@@ -371,7 +371,7 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
     protected void execGuiAttached() {
       desktopFuture = IFuture.CURRENT.get();
       switch (m_desktopBehaviour) {
-        case OPEN_MESSAGEBOX_IN_GUI_ATTACHED:
+        case OPEN_MESSAGEBOX_IN_GUI_ATTACHED -> {
           IMessageBox messageBox = MessageBoxes.createOk().withBody("Test MessageBox");
           try {
             writeToProtocol("Before MessageBox");
@@ -382,7 +382,7 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
             writeToProtocol("Interrupted MessageBox");
             throw e;
           }
-          break;
+        }
       }
     }
   }

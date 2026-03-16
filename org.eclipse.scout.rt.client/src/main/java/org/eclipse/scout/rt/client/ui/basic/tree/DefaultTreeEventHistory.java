@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,13 +36,7 @@ public class DefaultTreeEventHistory extends AbstractEventHistory<TreeEvent> {
   @Override
   public void notifyEvent(TreeEvent event) {
     switch (event.getType()) {
-      case TreeEvent.TYPE_NODE_ENSURE_VISIBLE:
-      case TreeEvent.TYPE_NODE_REQUEST_FOCUS:
-      case TreeEvent.TYPE_REQUEST_FOCUS:
-      case TreeEvent.TYPE_SCROLL_TO_SELECTION: {
-        addToCache(event.getType(), event);
-        break;
-      }
+      case TreeEvent.TYPE_NODE_ENSURE_VISIBLE, TreeEvent.TYPE_NODE_REQUEST_FOCUS, TreeEvent.TYPE_REQUEST_FOCUS, TreeEvent.TYPE_SCROLL_TO_SELECTION -> addToCache(event.getType(), event);
     }
   }
 }

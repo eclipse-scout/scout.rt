@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -240,10 +240,12 @@ public final class BeanUtility {
 
     final Constructor<?>[] publicConstructors = c.getConstructors();
     switch (publicConstructors.length) {
-      case 0:
+      case 0 -> {
         return null;
-      case 1:
+      }
+      case 1 -> {
         return checkParameterTypesAndCast(publicConstructors[0], parameterTypes);
+      }
     }
 
     final List<Constructor<T>> candidates = Stream.of(publicConstructors)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -87,16 +87,12 @@ public class ErrorDo extends DoEntity {
     if (s == null) {
       return IStatus.ERROR;
     }
-    switch (s) {
-      case "ok":
-        return IStatus.OK;
-      case "info":
-        return IStatus.INFO;
-      case "warning":
-        return IStatus.WARNING;
-      default:
-        return IStatus.ERROR;
-    }
+    return switch (s) {
+      case "ok" -> IStatus.OK;
+      case "info" -> IStatus.INFO;
+      case "warning" -> IStatus.WARNING;
+      default -> IStatus.ERROR;
+    };
   }
 
   /* **************************************************************************

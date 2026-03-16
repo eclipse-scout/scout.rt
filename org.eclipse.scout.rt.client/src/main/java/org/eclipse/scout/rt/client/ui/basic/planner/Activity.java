@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -110,14 +110,14 @@ public class Activity<RESOURCE_ID, ACTIVITY_ID> extends MemoryOptimizedObject {
   /**
    * @param row
    *     <ul>
-   *              <li>resource of type RI
-   *              <li>activityId of type AI
-   *              <li>startTime of type {@link Date}
-   *              <li>endTime of type {@link Date}
-   *              <li>text of type {@link String}
-   *              <li>tooltipText of type {@link String}
-   *              <li>value of type {@link Number}
-   *              </ul>
+   *                  <li>resource of type RI
+   *                  <li>activityId of type AI
+   *                  <li>startTime of type {@link Date}
+   *                  <li>endTime of type {@link Date}
+   *                  <li>text of type {@link String}
+   *                  <li>tooltipText of type {@link String}
+   *                  <li>value of type {@link Number}
+   *                  </ul>
    */
   public Activity(Object[] row) {
     if (row == null || row.length < 2) {
@@ -132,34 +132,13 @@ public class Activity<RESOURCE_ID, ACTIVITY_ID> extends MemoryOptimizedObject {
     for (int i = 0; i < row.length; i++) {
       if (row[i] != null) {
         switch (i) {
-          case 0: {
-            setValueInternal(RESOURCE_ID_BIT, row[i]);
-            break;
-          }
-          case 1: {
-            setValueInternal(ID_BIT, row[i]);
-            break;
-          }
-          case 2: {
-            setValueInternal(BEGIN_TIME_BIT, row[i]);
-            break;
-          }
-          case 3: {
-            setValueInternal(END_TIME_BIT, row[i]);
-            break;
-          }
-          case 4: {
-            setText((String) row[i]);
-            break;
-          }
-          case 5: {
-            setTooltipText((String) row[i]);
-            break;
-          }
-          case 6: {
-            setLevel(((Number) row[i]).floatValue());
-            break;
-          }
+          case 0 -> setValueInternal(RESOURCE_ID_BIT, row[i]);
+          case 1 -> setValueInternal(ID_BIT, row[i]);
+          case 2 -> setValueInternal(BEGIN_TIME_BIT, row[i]);
+          case 3 -> setValueInternal(END_TIME_BIT, row[i]);
+          case 4 -> setText((String) row[i]);
+          case 5 -> setTooltipText((String) row[i]);
+          case 6 -> setLevel(((Number) row[i]).floatValue());
         }
       }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -38,17 +38,8 @@ public class DefaultDesktopEventHistory extends AbstractEventHistory<DesktopEven
   @Override
   public void notifyEvent(DesktopEvent event) {
     switch (event.getType()) {
-      case DesktopEvent.TYPE_OUTLINE_CONTENT_ACTIVATE:
-      case DesktopEvent.TYPE_FORM_ACTIVATE: {
-        addToCache(event.getType(), event);
-        break;
-      }
-      case DesktopEvent.TYPE_NOTIFICATION_ADDED:
-      case DesktopEvent.TYPE_NOTIFICATION_REMOVED:
-      case DesktopEvent.TYPE_OPEN_URI: {
-        addToCache(UUID.randomUUID().toString(), event);
-        break;
-      }
+      case DesktopEvent.TYPE_OUTLINE_CONTENT_ACTIVATE, DesktopEvent.TYPE_FORM_ACTIVATE -> addToCache(event.getType(), event);
+      case DesktopEvent.TYPE_NOTIFICATION_ADDED, DesktopEvent.TYPE_NOTIFICATION_REMOVED, DesktopEvent.TYPE_OPEN_URI -> addToCache(UUID.randomUUID().toString(), event);
     }
   }
 }

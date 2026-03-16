@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -48,14 +48,12 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
 
   protected void tableChanged(TableEvent e) {
     switch (e.getType()) {
-      case TableEvent.TYPE_ROWS_SELECTED:
-        handleOwnerValueChanged();
-        break;
-      case TableEvent.TYPE_ROWS_UPDATED:
+      case TableEvent.TYPE_ROWS_SELECTED -> handleOwnerValueChanged();
+      case TableEvent.TYPE_ROWS_UPDATED -> {
         if (CollectionUtility.containsAny(e.getRows(), m_currentSelection)) {
           handleOwnerValueChanged();
         }
-        break;
+      }
     }
   }
 

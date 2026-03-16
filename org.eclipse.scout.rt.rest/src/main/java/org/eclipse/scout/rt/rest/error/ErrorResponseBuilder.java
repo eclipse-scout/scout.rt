@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -71,14 +71,9 @@ public class ErrorResponseBuilder {
 
   public ErrorResponseBuilder withSeverity(int severity) {
     switch (severity) {
-      case IStatus.INFO:
-        withSeverity("info");
-        break;
-      case IStatus.WARNING:
-        withSeverity("warning");
-        break;
-      case IStatus.ERROR:
-        withSeverity("error");
+      case IStatus.INFO -> withSeverity("info");
+      case IStatus.WARNING -> withSeverity("warning");
+      case IStatus.ERROR -> withSeverity("error");
     }
     return this;
   }

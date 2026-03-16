@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -52,15 +52,13 @@ public class JobEventFilterBuilder {
    * joined by logical 'AND' operation.
    */
   public Predicate<JobEvent> toFilter() {
-    switch (m_andFilters.size()) {
-      case 0:
-        return future -> true;
-      case 1:
-        return m_andFilters.get(0);
-      default:
+    return switch (m_andFilters.size()) {
+      case 0 -> future -> true;
+      case 1 -> m_andFilters.get(0);
+      default ->
         // Use 'AdaptableAndFilter' instead of 'AndFilter' to help 'JobListeners' to reduce contention by registering job event listeners locally on the involved Futures.
-        return new AdaptableAndFilter(m_andFilters);
-    }
+          new AdaptableAndFilter(m_andFilters);
+    };
   }
 
   /**

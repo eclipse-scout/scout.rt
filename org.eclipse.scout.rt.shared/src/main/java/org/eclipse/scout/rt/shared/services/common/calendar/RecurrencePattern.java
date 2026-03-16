@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -287,30 +287,12 @@ public class RecurrencePattern implements Serializable {
       m_interval = 1;
     }
     switch (getType()) {
-      case TYPE_DAILY: {
-        createDailyStartDates(startRecCal, startDate, endDate, list);
-        break;
-      }
-      case TYPE_WEEKLY: {
-        createWeeklyStartDates(startRecCal, startDate, endDate, list);
-        break;
-      }
-      case TYPE_MONTHLY: {
-        createMonthlyStartDates(startRecCal, startDate, endDate, list);
-        break;
-      }
-      case TYPE_MONTHLY_SPEC: {
-        createMonthlySpecStartDates(startRecCal, startDate, endDate, list);
-        break;
-      }
-      case TYPE_YEARLY: {
-        createYearlyStartDates(startRecCal, startDate, endDate, list);
-        break;
-      }
-      case TYPE_YEARLY_SPEC: {
-        createYearlySpecStartDates(startRecCal, startDate, endDate, list);
-        break;
-      }
+      case TYPE_DAILY -> createDailyStartDates(startRecCal, startDate, endDate, list);
+      case TYPE_WEEKLY -> createWeeklyStartDates(startRecCal, startDate, endDate, list);
+      case TYPE_MONTHLY -> createMonthlyStartDates(startRecCal, startDate, endDate, list);
+      case TYPE_MONTHLY_SPEC -> createMonthlySpecStartDates(startRecCal, startDate, endDate, list);
+      case TYPE_YEARLY -> createYearlyStartDates(startRecCal, startDate, endDate, list);
+      case TYPE_YEARLY_SPEC -> createYearlySpecStartDates(startRecCal, startDate, endDate, list);
     }
     // remove exceptions
     for (RecurrenceException recEx : m_recurrenceExceptions) {
@@ -443,24 +425,14 @@ public class RecurrencePattern implements Serializable {
     // loop from beginning of series (not beginning of interval!)
     Date d = cal.getTime();
     int count = 0;// of occurences
-    int inst = 0;
-    switch (m_instance) {
-      case INST_FIRST:
-        inst = 1;
-        break;
-      case INST_SECOND:
-        inst = 2;
-        break;
-      case INST_THIRD:
-        inst = 3;
-        break;
-      case INST_FOURTH:
-        inst = 4;
-        break;
-      case INST_LAST:
-        inst = 1000000;
-        break;
-    }
+    int inst = switch (m_instance) {
+      case INST_FIRST -> 1;
+      case INST_SECOND -> 2;
+      case INST_THIRD -> 3;
+      case INST_FOURTH -> 4;
+      case INST_LAST -> 1000000;
+      default -> 0;
+    };
     while (d.compareTo(endDate) <= 0) {
       // check dayOfMonth
       Calendar monthCal = Calendar.getInstance();
@@ -538,24 +510,14 @@ public class RecurrencePattern implements Serializable {
     // loop from beginning of series (not beginning of interval!)
     Date d = cal.getTime();
     int count = 0;// of occurences
-    int inst = 0;
-    switch (m_instance) {
-      case INST_FIRST:
-        inst = 1;
-        break;
-      case INST_SECOND:
-        inst = 2;
-        break;
-      case INST_THIRD:
-        inst = 3;
-        break;
-      case INST_FOURTH:
-        inst = 4;
-        break;
-      case INST_LAST:
-        inst = 100000;
-        break;
-    }
+    int inst = switch (m_instance) {
+      case INST_FIRST -> 1;
+      case INST_SECOND -> 2;
+      case INST_THIRD -> 3;
+      case INST_FOURTH -> 4;
+      case INST_LAST -> 100000;
+      default -> 0;
+    };
     while (d.compareTo(endDate) <= 0) {
       // check monthOfYear
       Calendar monthCal = Calendar.getInstance();

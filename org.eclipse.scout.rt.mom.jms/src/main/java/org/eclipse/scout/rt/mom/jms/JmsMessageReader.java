@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -84,20 +84,12 @@ public class JmsMessageReader<DTO> {
       return null;
     }
 
-    Object transferData;
-    switch (m_marshaller.getMessageType()) {
-      case MESSAGE_TYPE_TEXT:
-        transferData = readTextMessage((TextMessage) m_message);
-        break;
-      case MESSAGE_TYPE_BYTES:
-        transferData = readBytesMessage((BytesMessage) m_message);
-        break;
-      case MESSAGE_TYPE_NO_PAYLOAD:
-        transferData = null;
-        break;
-      default:
-        throw new PlatformException("Unsupported message type '{}'", m_marshaller.getMessageType());
-    }
+    Object transferData = switch (m_marshaller.getMessageType()) {
+      case MESSAGE_TYPE_TEXT -> readTextMessage((TextMessage) m_message);
+      case MESSAGE_TYPE_BYTES -> readBytesMessage((BytesMessage) m_message);
+      case MESSAGE_TYPE_NO_PAYLOAD -> null;
+      default -> throw new PlatformException("Unsupported message type '{}'", m_marshaller.getMessageType());
+    };
 
     return (DTO) m_marshaller.unmarshall(transferData, m_marshallerContext);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -482,7 +482,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     // listen for search action
     m_searchFormListener = e -> {
       switch (e.getType()) {
-        case FormEvent.TYPE_RESET_COMPLETE: {
+        case FormEvent.TYPE_RESET_COMPLETE -> {
           // do page reload to execute search
           try {
             if (isSearchRequired()) {
@@ -498,9 +498,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           catch (RuntimeException | PlatformError ex) {
             BEANS.get(ExceptionHandler.class).handle(ex);
           }
-          break;
         }
-        case FormEvent.TYPE_STORE_AFTER: {
+        case FormEvent.TYPE_STORE_AFTER -> {
           // do page reload to execute search
           try {
             reloadPage(IReloadReason.SEARCH);
@@ -508,7 +507,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           catch (RuntimeException | PlatformError ex) {
             BEANS.get(ExceptionHandler.class).handle(ex);
           }
-          break;
         }
       }
     };
@@ -982,12 +980,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     @Override
     public void tableChanged(final TableEvent e) {
       switch (e.getType()) {
-        case TableEvent.TYPE_ROW_ACTION: {
-          getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowAction(e, AbstractPageWithTable.this));
-          break;
-        }
-        case TableEvent.TYPE_ALL_ROWS_DELETED:
-        case TableEvent.TYPE_ROWS_DELETED: {
+        case TableEvent.TYPE_ROW_ACTION -> getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowAction(e, AbstractPageWithTable.this));
+        case TableEvent.TYPE_ALL_ROWS_DELETED, TableEvent.TYPE_ROWS_DELETED -> {
           if (!isLeaf()) {
             List<ITableRow> tableRows = e.getRows();
             List<IPage<?>> childNodes = getChildPagesFor(e.getRows(), false);
@@ -996,26 +990,15 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
             }
             getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowsDeleted(childNodes, AbstractPageWithTable.this));
           }
-          break;
         }
-        case TableEvent.TYPE_ROWS_INSERTED: {
+        case TableEvent.TYPE_ROWS_INSERTED -> {
           if (!isLeaf()) {
             createDisplayParentRunContext().run(() -> onRowsInserted(e));
           }
-          break;
         }
-        case TableEvent.TYPE_ROWS_UPDATED: {
-          getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowsUpdated(e, AbstractPageWithTable.this));
-          break;
-        }
-        case TableEvent.TYPE_ROW_ORDER_CHANGED: {
-          getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowOrderChanged(e, AbstractPageWithTable.this));
-          break;
-        }
-        case TableEvent.TYPE_ROW_FILTER_CHANGED: {
-          getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowFilterChanged(AbstractPageWithTable.this));
-          break;
-        }
+        case TableEvent.TYPE_ROWS_UPDATED -> getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowsUpdated(e, AbstractPageWithTable.this));
+        case TableEvent.TYPE_ROW_ORDER_CHANGED -> getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowOrderChanged(e, AbstractPageWithTable.this));
+        case TableEvent.TYPE_ROW_FILTER_CHANGED -> getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowFilterChanged(AbstractPageWithTable.this));
       }// end switch
     }
   }

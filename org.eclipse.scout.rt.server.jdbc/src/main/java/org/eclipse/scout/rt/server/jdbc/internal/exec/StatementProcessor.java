@@ -660,12 +660,10 @@ public class StatementProcessor implements IStatementProcessor {
         debugBindBuf.append(" [");
         debugBindBuf.append(SqlBind.decodeJdbcType(bind.getSqlType()));
         switch (bind.getSqlType()) {
-          case Types.BLOB:
-          case Types.CLOB: {
+          case Types.BLOB, Types.CLOB -> {
             //nop
-            break;
           }
-          default: {
+          default -> {
             debugBindBuf.append(" ");
             debugBindBuf.append(bind.getValue());
           }
@@ -707,17 +705,9 @@ public class StatementProcessor implements IStatementProcessor {
         SqlBind bind = bindList.get(bindIndex);
         String replacement;
         switch (bind.getSqlType()) {
-          case Types.BLOB: {
-            replacement = "__BLOB__";
-            break;
-          }
-          case Types.CLOB: {
-            replacement = "__CLOB__";
-            break;
-          }
-          default: {
-            replacement = m_callerService.getSqlStyle().toPlainText(bind.getValue());
-          }
+          case Types.BLOB -> replacement = "__BLOB__";
+          case Types.CLOB -> replacement = "__CLOB__";
+          default -> replacement = m_callerService.getSqlStyle().toPlainText(bind.getValue());
         }
         if (replacement == null) {
           replacement = "NULL";

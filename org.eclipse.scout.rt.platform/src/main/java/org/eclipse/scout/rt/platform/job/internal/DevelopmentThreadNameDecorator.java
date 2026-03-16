@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -67,13 +67,10 @@ public class DevelopmentThreadNameDecorator extends ThreadNameDecorator {
   }
 
   protected String buildExecutionInfo(final IFuture<?> future) {
-    switch (future.getState()) {
-      case WAITING_FOR_BLOCKING_CONDITION:
-      case WAITING_FOR_PERMIT:
-        return String.format("(%s) %s", future.getState().name(), future.getJobInput().getName()); // include state information
-      default:
-        return future.getJobInput().getName();
-    }
+    return switch (future.getState()) {
+      case WAITING_FOR_BLOCKING_CONDITION, WAITING_FOR_PERMIT -> String.format("(%s) %s", future.getState().name(), future.getJobInput().getName()); // include state information
+      default -> future.getJobInput().getName();
+    };
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -45,38 +45,27 @@ public enum ColorScheme implements IColorScheme {
    * Utility method returning the inverted color scheme for this scheme.
    */
   public ColorScheme invert() {
-    switch (this) {
-      case DEFAULT:
-        return DEFAULT_INVERTED;
-      case DEFAULT_INVERTED:
-        return DEFAULT;
-      case ALTERNATIVE:
-        return ALTERNATIVE_INVERTED;
-      case ALTERNATIVE_INVERTED:
-        return ALTERNATIVE;
-      default:
-        return this; // unknown scheme cannot be inverted
-    }
+    return switch (this) {
+      case DEFAULT -> DEFAULT_INVERTED;
+      case DEFAULT_INVERTED -> DEFAULT;
+      case ALTERNATIVE -> ALTERNATIVE_INVERTED;
+      case ALTERNATIVE_INVERTED -> ALTERNATIVE;
+      default -> this; // unknown scheme cannot be inverted
+    };
   }
 
   /**
    * Utility method returning the "opposite" color scheme for this scheme.
    */
   public ColorScheme toggle() {
-    switch (this) {
-      case DEFAULT:
-        return ALTERNATIVE;
-      case DEFAULT_INVERTED:
-        return ALTERNATIVE_INVERTED;
-      case ALTERNATIVE:
-        return RAINBOW;
-      case ALTERNATIVE_INVERTED:
-        return RAINBOW;
-      case RAINBOW:
-        return DEFAULT;
-      default:
-        return this; // unknown scheme cannot be toggled
-    }
+    return switch (this) {
+      case DEFAULT -> ALTERNATIVE;
+      case DEFAULT_INVERTED -> ALTERNATIVE_INVERTED;
+      case ALTERNATIVE -> RAINBOW;
+      case ALTERNATIVE_INVERTED -> RAINBOW;
+      case RAINBOW -> DEFAULT;
+      default -> this; // unknown scheme cannot be toggled
+    };
   }
 
   // These constants need to correspond to the IDs defined in Tile.js

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -403,15 +403,12 @@ public class MessageBox extends AbstractWidget implements IMessageBox {
     @Override
     public void setResultFromUI(int option) {
       switch (option) {
-        case YES_OPTION:
-        case NO_OPTION:
-        case CANCEL_OPTION: {
+        case YES_OPTION, NO_OPTION, CANCEL_OPTION -> {
           if (!m_answerSet) {
             m_answerSet = true;
             m_answer = option;
           }
           closeMessageBox();
-          break;
         }
       }
     }

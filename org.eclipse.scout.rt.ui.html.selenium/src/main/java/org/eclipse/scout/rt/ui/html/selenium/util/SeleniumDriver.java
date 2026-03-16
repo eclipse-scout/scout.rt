@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -142,16 +142,12 @@ public class SeleniumDriver {
 
   protected MutableCapabilities getDriverOptions() {
     String driver = ObjectUtility.nvl(CONFIG.getPropertyValue(SeleniumDriverProperty.class), SeleniumProperties.DRIVER_CHROME);
-    switch (driver) {
-      case SeleniumProperties.DRIVER_CHROME:
-        return getChromeOptions();
-      case SeleniumProperties.DRIVER_FIREFOX:
-        return getFirefoxOptions();
-      case SeleniumProperties.DRIVER_EDGE:
-        return getEdgeOptions();
-      default:
-        throw new IllegalArgumentException("Unknown driver " + driver);
-    }
+    return switch (driver) {
+      case SeleniumProperties.DRIVER_CHROME -> getChromeOptions();
+      case SeleniumProperties.DRIVER_FIREFOX -> getFirefoxOptions();
+      case SeleniumProperties.DRIVER_EDGE -> getEdgeOptions();
+      default -> throw new IllegalArgumentException("Unknown driver " + driver);
+    };
   }
 
   protected ChromeOptions getChromeOptions() {

@@ -479,16 +479,13 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     CalendarEvent[] a = m_calendarEventBuffer.toArray(new CalendarEvent[0]);
     for (int i = a.length - 1; i >= 0; i--) {
       switch (a[i].getType()) {
-        case CalendarEvent.TYPE_COMPONENT_ACTION: {
+        case CalendarEvent.TYPE_COMPONENT_ACTION -> {
           if (!types.contains(a[i].getType())) {
             coalescedEvents.add(0, a[i]);
             types.add(a[i].getType());
           }
-          break;
         }
-        default: {
-          coalescedEvents.add(0, a[i]);
-        }
+        default -> coalescedEvents.add(0, a[i]);
       }
     }
     // fire the batch

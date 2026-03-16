@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -48,23 +48,15 @@ public class DataObjectDeserializer extends StdDeserializer<IDataObject> {
   }
 
   protected IDataObject deserializeDataObject(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException {
-    switch (p.currentToken()) {
-      case START_OBJECT:
-        return p.getCodec().readValue(p, IDoEntity.class); // delegate to DoEntityDeserializer for object-like structure
-      case START_ARRAY:
-        return p.getCodec().readValue(p, DoList.class); // delegate to DoCollectionDeserializer for collection-like structure (using DoList as generic structure instead of DoSet or DoCollection)
-      case VALUE_STRING:
-        return new StringDataObjectValue().withValue(p.getValueAsString());
-      case VALUE_NUMBER_INT:
-        return new LongDataObjectValue().withValue(p.getValueAsLong());
-      case VALUE_NUMBER_FLOAT:
-        return new BigDecimalDataObjectValue().withValue(p.getCodec().readValue(p, BigDecimal.class)); // deserialize floating point numbers as BigDecimal
-      case VALUE_TRUE:
-        return new BooleanDataObjectValue().withValue(true);
-      case VALUE_FALSE:
-        return new BooleanDataObjectValue().withValue(false);
-      default:
-        throw ctxt.wrongTokenException(p, handledType(), JsonToken.START_OBJECT, null);
-    }
+    return switch (p.currentToken()) {
+      case START_OBJECT -> p.getCodec().readValue(p, IDoEntity.class); // delegate to DoEntityDeserializer for object-like structure
+      case START_ARRAY -> p.getCodec().readValue(p, DoList.class); // delegate to DoCollectionDeserializer for collection-like structure (using DoList as generic structure instead of DoSet or DoCollection)
+      case VALUE_STRING -> new StringDataObjectValue().withValue(p.getValueAsString());
+      case VALUE_NUMBER_INT -> new LongDataObjectValue().withValue(p.getValueAsLong());
+      case VALUE_NUMBER_FLOAT -> new BigDecimalDataObjectValue().withValue(p.getCodec().readValue(p, BigDecimal.class)); // deserialize floating point numbers as BigDecimal
+      case VALUE_TRUE -> new BooleanDataObjectValue().withValue(true);
+      case VALUE_FALSE -> new BooleanDataObjectValue().withValue(false);
+      default -> throw ctxt.wrongTokenException(p, handledType(), JsonToken.START_OBJECT, null);
+    };
   }
 }

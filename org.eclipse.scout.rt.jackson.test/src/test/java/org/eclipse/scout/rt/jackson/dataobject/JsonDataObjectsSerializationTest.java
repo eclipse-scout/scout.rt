@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -2609,21 +2609,11 @@ public class JsonDataObjectsSerializationTest {
     // generate some complex, random JSON structure
     for (int i = 0; i < 1000; i++) {
       switch (i % 5) {
-        case 0:
-          entity.put("attribute" + i, createTestDo());
-          break;
-        case 1:
-          entity.put("attribute" + i, createTestCollectionsDo());
-          break;
-        case 2:
-          entity.put("attribute" + i, createTestPersonDo());
-          break;
-        case 3:
-          entity.put("attribute" + i, createTestItemDo("id" + i, "value" + i));
-          break;
-        case 4:
-          entity.putNode("attribute" + i, DoValue.of("simple-value" + i));
-          break;
+        case 0 -> entity.put("attribute" + i, createTestDo());
+        case 1 -> entity.put("attribute" + i, createTestCollectionsDo());
+        case 2 -> entity.put("attribute" + i, createTestPersonDo());
+        case 3 -> entity.put("attribute" + i, createTestItemDo("id" + i, "value" + i));
+        case 4 -> entity.putNode("attribute" + i, DoValue.of("simple-value" + i));
       }
     }
     String json = s_dataObjectMapper.writeValueAsString(entity);

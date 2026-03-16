@@ -79,7 +79,7 @@ public class TrivialAccessController implements IAccessController {
     }
 
     switch (ObjectUtility.nvl(request.getPathInfo(), "")) {
-      case "/login":
+      case "/login" -> {
         if (m_config.isHandleAuthentication()) {
           handleLoginRequest(request, response);
           return true;
@@ -87,7 +87,8 @@ public class TrivialAccessController implements IAccessController {
         else {
           return false;
         }
-      case "/logout":
+      }
+      case "/logout" -> {
         if (m_config.isHandleAuthentication()) {
           handleLogoutRequest(request, response);
           return true;
@@ -95,15 +96,17 @@ public class TrivialAccessController implements IAccessController {
         else {
           return false;
         }
-      case "/unsupported-browser.html":
-      case "/legacy-browsers.js": { // see LegacyBrowserScriptLoader
+      }
+      case "/unsupported-browser.html", "/legacy-browsers.js" -> { // see LegacyBrowserScriptLoader
         chain.doFilter(request, response);
         return true;
       }
-      case "/auth":
+      case "/auth" -> {
         return false;
-      default:
+      }
+      default -> {
         return handleRequest(request, authenticationStatus, response, chain);
+      }
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,32 +20,19 @@ public class DataModelAttributeAggregationTypeProvider implements IDataModelAttr
     }
 
     switch (attribute.getType()) {
-      case TYPE_DATE:
-      case TYPE_TIME:
-      case TYPE_DATE_TIME: {
+      case TYPE_DATE, TYPE_TIME, TYPE_DATE_TIME -> {
         aggregationTypeList.add(AGGREGATION_MIN);
         aggregationTypeList.add(AGGREGATION_MAX);
         aggregationTypeList.add(AGGREGATION_MEDIAN);
-        break;
       }
-      case TYPE_INTEGER:
-      case TYPE_LONG:
-      case TYPE_BIG_DECIMAL:
-      case TYPE_PLAIN_INTEGER:
-      case TYPE_PLAIN_LONG:
-      case TYPE_PLAIN_BIG_DECIMAL:
-      case TYPE_PERCENT: {
+      case TYPE_INTEGER, TYPE_LONG, TYPE_BIG_DECIMAL, TYPE_PLAIN_INTEGER, TYPE_PLAIN_LONG, TYPE_PLAIN_BIG_DECIMAL, TYPE_PERCENT -> {
         aggregationTypeList.add(AGGREGATION_SUM);
         aggregationTypeList.add(AGGREGATION_MIN);
         aggregationTypeList.add(AGGREGATION_MAX);
         aggregationTypeList.add(AGGREGATION_AVG);
         aggregationTypeList.add(AGGREGATION_MEDIAN);
-        break;
       }
-      case TYPE_AGGREGATE_COUNT: {
-        aggregationTypeList.add(AGGREGATION_COUNT);
-        break;
-      }
+      case TYPE_AGGREGATE_COUNT -> aggregationTypeList.add(AGGREGATION_COUNT);
     }
   }
 }

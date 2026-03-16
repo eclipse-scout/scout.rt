@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -543,43 +543,37 @@ public class FormDataStatementBuilder implements DataModelConstants {
     Number value1 = values != null && values.length > 0 && values[0] instanceof Number ? (Number) values[0] : null;
     Number value2 = values != null && values.length > 1 && values[1] instanceof Number ? (Number) values[1] : null;
     switch (operation) {
-      case OPERATOR_EQ: {
+      case OPERATOR_EQ -> {
         if (value1 != null) {
           return value1.longValue() == 0;
         }
-        break;
       }
-      case OPERATOR_GE: {
+      case OPERATOR_GE -> {
         if (value1 != null) {
           return value1.doubleValue() <= 0;
         }
-        break;
       }
-      case OPERATOR_GT: {
+      case OPERATOR_GT -> {
         if (value1 != null) {
           return value1.doubleValue() < 0;
         }
-        break;
       }
-      case OPERATOR_LE: {
+      case OPERATOR_LE -> {
         if (value1 != null) {
           return value1.doubleValue() >= 0;
         }
-        break;
       }
-      case OPERATOR_LT: {
+      case OPERATOR_LT -> {
         if (value1 != null) {
           return value1.doubleValue() > 0;
         }
-        break;
       }
-      case OPERATOR_NEQ: {
+      case OPERATOR_NEQ -> {
         if (value1 != null) {
           return value1.longValue() != 0;
         }
-        break;
       }
-      case OPERATOR_BETWEEN: {
+      case OPERATOR_BETWEEN -> {
         if (value1 != null && value2 != null) {
           return value1.doubleValue() <= 0 && value2.doubleValue() >= 0;
         }
@@ -589,7 +583,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
         else if (value2 != null) {
           return value2.doubleValue() >= 0;
         }
-        break;
       }
     }
     return false;
@@ -767,14 +760,13 @@ public class FormDataStatementBuilder implements DataModelConstants {
 
   protected void appendTreeSubContribution(EntityContribution parent, EntityContribution child, EntityStrategy entityStrategy) {
     switch (entityStrategy) {
-      case BuildConstraints: {
+      case BuildConstraints -> {
         EntityContribution whereConstraints = EntityContributionUtility.createConstraintsContribution(child);
         if (whereConstraints != null) {
           parent.add(whereConstraints);
         }
-        break;
       }
-      default: {
+      default -> {
         if (child != null && !child.isEmpty()) {
           parent.add(child);
         }
@@ -845,17 +837,9 @@ public class FormDataStatementBuilder implements DataModelConstants {
     Map<String, String> parentAliasMap = (parentEntityNode != null ? m_aliasMapper.getNodeAliases(parentEntityNode) : m_aliasMapper.getRootAliases());
     String baseStm;
     switch (entityStrategy) {
-      case BuildQuery: {
-        baseStm = def.getSelectClause();
-        break;
-      }
-      case BuildConstraints: {
-        baseStm = def.getWhereClause();
-        break;
-      }
-      default: {
-        baseStm = null;
-      }
+      case BuildQuery -> baseStm = def.getSelectClause();
+      case BuildConstraints -> baseStm = def.getWhereClause();
+      default -> baseStm = null;
     }
     String stm = null;
     if (baseStm != null) {
@@ -867,16 +851,16 @@ public class FormDataStatementBuilder implements DataModelConstants {
     m_aliasMapper.addAllNodeEntitiesFrom(node, stm);
     stm = m_aliasMapper.replaceMarkersByAliases(stm, m_aliasMapper.getNodeAliases(node), parentAliasMap);
     switch (entityStrategy) {
-      case BuildQuery: {
+      case BuildQuery -> {
         EntityContribution resultContrib = buildComposerEntityUnitContribution(node, entityStrategy, stm, node.getChildNodes(), isConsumeChildContributions(entityPath));
         return resultContrib;
       }
-      case BuildConstraints: {
+      case BuildConstraints -> {
         String s = buildComposerEntityEitherOrSplit(entityStrategy, stm, node.isNegative(), node.getChildNodes());
         EntityContribution resultContrib = (s != null ? EntityContribution.create(s) : new EntityContribution());
         return resultContrib;
       }
-      default: {
+      default -> {
         return null;
       }
     }
@@ -964,14 +948,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
     }
     List<TreeNodeData> nonZeroChildren = new ArrayList<>(2);
     for (TreeNodeData ch : childParts) {
-      switch (getAttributeKind(ch)) {
-        case Undefined:
-        case NonAggregation/*non-aggregations must not be handled as zero-traversal*/:
-        case NonAggregationNonZeroTraversing:
-        case AggregationNonZeroTraversing: {
-          nonZeroChildren.add(ch);
-          break;
-        }
+      switch (getAttributeKind(ch)) {/*non-aggregations must not be handled as zero-traversal*/
+        case Undefined, NonAggregation, NonAggregationNonZeroTraversing, AggregationNonZeroTraversing -> nonZeroChildren.add(ch);
       }
     }
     //
@@ -996,22 +974,13 @@ public class FormDataStatementBuilder implements DataModelConstants {
   protected EntityContribution buildComposerEntityUnitContribution(ComposerEntityNodeData node, EntityStrategy entityStrategy, String baseStm, List<TreeNodeData> childParts, boolean consumeChildContributions) {
     EntityContribution childContributions = new EntityContribution();
     switch (entityStrategy) {
-      case BuildConstraints: {
+      case BuildConstraints -> {
         List<TreeNodeData> nonAggregationParts = new ArrayList<>(childParts.size());
         List<TreeNodeData> aggregationParts = new ArrayList<>(2);
         for (TreeNodeData ch : childParts) {
           switch (getAttributeKind(ch)) {
-            case Undefined:
-            case NonAggregation:
-            case NonAggregationNonZeroTraversing: {
-              nonAggregationParts.add(ch);
-              break;
-            }
-            case Aggregation:
-            case AggregationNonZeroTraversing: {
-              aggregationParts.add(ch);
-              break;
-            }
+            case Undefined, NonAggregation, NonAggregationNonZeroTraversing -> nonAggregationParts.add(ch);
+            case Aggregation, AggregationNonZeroTraversing -> aggregationParts.add(ch);
           }
         }
         //
@@ -1023,12 +992,10 @@ public class FormDataStatementBuilder implements DataModelConstants {
         //
         subContrib = buildTreeNodes(aggregationParts, entityStrategy, AttributeStrategy.BuildConstraintOfAttribute);
         childContributions.add(subContrib);
-        break;
       }
-      case BuildQuery: {
+      case BuildQuery -> {
         EntityContribution subContrib = buildTreeNodes(childParts, entityStrategy, AttributeStrategy.BuildQueryOfAttributeAndConstraintOfContext);
         childContributions.add(subContrib);
-        break;
       }
     }
     //legacy: node may be null from legacy calls
@@ -1101,16 +1068,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
     Map<String, String> parentAliasMap = parentEntityNode != null ? aliasMap.getNodeAliases(parentEntityNode) : aliasMap.getRootAliases();
     String stm = null;
     switch (attributeStrategy) {
-      case BuildConstraintOfAttribute:
-      case BuildConstraintOfContext:
-      case BuildConstraintOfAttributeWithContext: {
-        stm = def.getWhereClause();
-        break;
-      }
-      case BuildQueryOfAttributeAndConstraintOfContext: {
-        stm = def.getSelectClause();
-        break;
-      }
+      case BuildConstraintOfAttribute, BuildConstraintOfContext, BuildConstraintOfAttributeWithContext -> stm = def.getWhereClause();
+      case BuildQueryOfAttributeAndConstraintOfContext -> stm = def.getSelectClause();
     }
     EntityContribution contrib = null;
     if (stm != null) {
@@ -1120,12 +1079,11 @@ public class FormDataStatementBuilder implements DataModelConstants {
       contrib = new EntityContribution();
     }
     switch (attributeStrategy) {
-      case BuildQueryOfAttributeAndConstraintOfContext: {
+      case BuildQueryOfAttributeAndConstraintOfContext -> {
         if (contrib.getSelectParts().isEmpty()) {
           contrib.getSelectParts().add("NULL");
           contrib.getGroupByParts().add("NULL");
         }
-        break;
       }
     }
     if (hasInjections()) {
@@ -1257,62 +1215,51 @@ public class FormDataStatementBuilder implements DataModelConstants {
     int positiveOperation;
     boolean negation;
     switch (operation) {
-      case OPERATOR_DATE_IS_NOT_TODAY: {
+      case OPERATOR_DATE_IS_NOT_TODAY -> {
         positiveOperation = OPERATOR_DATE_IS_TODAY;
         negation = true;
-        break;
       }
-      case OPERATOR_DATE_NEQ: {
+      case OPERATOR_DATE_NEQ -> {
         positiveOperation = OPERATOR_DATE_EQ;
         negation = true;
-        break;
       }
-      case OPERATOR_DATE_TIME_IS_NOT_NOW: {
+      case OPERATOR_DATE_TIME_IS_NOT_NOW -> {
         positiveOperation = OPERATOR_DATE_TIME_IS_NOW;
         negation = true;
-        break;
       }
-      case OPERATOR_DATE_TIME_NEQ: {
+      case OPERATOR_DATE_TIME_NEQ -> {
         positiveOperation = OPERATOR_DATE_TIME_EQ;
         negation = true;
-        break;
       }
-      case OPERATOR_NEQ: {
+      case OPERATOR_NEQ -> {
         positiveOperation = OPERATOR_EQ;
         negation = true;
-        break;
       }
-      case OPERATOR_NOT_CONTAINS: {
+      case OPERATOR_NOT_CONTAINS -> {
         positiveOperation = OPERATOR_CONTAINS;
         negation = true;
-        break;
       }
-      case OPERATOR_NOT_ENDS_WITH: {
+      case OPERATOR_NOT_ENDS_WITH -> {
         positiveOperation = OPERATOR_ENDS_WITH;
         negation = true;
-        break;
       }
-      case OPERATOR_NOT_IN: {
+      case OPERATOR_NOT_IN -> {
         positiveOperation = OPERATOR_IN;
         negation = true;
-        break;
       }
-      case OPERATOR_NOT_NULL: {
+      case OPERATOR_NOT_NULL -> {
         positiveOperation = OPERATOR_NULL;
         negation = true;
-        break;
       }
-      case OPERATOR_NOT_STARTS_WITH: {
+      case OPERATOR_NOT_STARTS_WITH -> {
         positiveOperation = OPERATOR_STARTS_WITH;
         negation = true;
-        break;
       }
-      case OPERATOR_NUMBER_NOT_NULL: {
+      case OPERATOR_NUMBER_NOT_NULL -> {
         positiveOperation = OPERATOR_NUMBER_NULL;
         negation = true;
-        break;
       }
-      default: {
+      default -> {
         positiveOperation = operation;
         negation = false;
       }
@@ -1347,7 +1294,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     }
     switch (attributeStrategy) {
       //select ... where
-      case BuildQueryOfAttributeAndConstraintOfContext: {
+      case BuildQueryOfAttributeAndConstraintOfContext -> {
         //select
         if (attPart != null) {
           String sql = createSqlPart(aggregationType, attPart, OPERATOR_NONE, bindNames, bindValues, plainBind, parentAliasMap);
@@ -1366,10 +1313,10 @@ public class FormDataStatementBuilder implements DataModelConstants {
             contrib.getWhereParts().add(sql);
           }
         }
-        break;
       }
+
       //where / having
-      case BuildConstraintOfAttribute: {
+      case BuildConstraintOfAttribute -> {
         if (attPart != null) {
           String sql = createSqlPart(aggregationType, attPart, positiveOperation, bindNames, bindValues, plainBind, parentAliasMap);
           if (sql != null) {
@@ -1384,9 +1331,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
             }
           }
         }
-        break;
       }
-      case BuildConstraintOfContext: {
+      case BuildConstraintOfContext -> {
         if (wherePart != null) {
           wherePart = StringUtility.replaceTags(wherePart, "attribute", "1=1").trim();
           String sql = createSqlPart(wherePart, bindNames, bindValues, plainBind, parentAliasMap);
@@ -1394,9 +1340,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
             contrib.getWhereParts().add(sql);
           }
         }
-        break;
       }
-      case BuildConstraintOfAttributeWithContext: {
+      case BuildConstraintOfAttributeWithContext -> {
         String whereAndAttPart = (wherePart != null ? wherePart : "") + (wherePart != null && attPart != null ? " AND " : "") + (attPart != null ? "<attribute>" + attPart + "</attribute>" : "");
         if (!whereAndAttPart.isEmpty()) {
           String sql = createSqlPart(aggregationType, whereAndAttPart, positiveOperation, bindNames, bindValues, plainBind, parentAliasMap);
@@ -1407,7 +1352,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
             contrib.getWhereParts().add(sql);
           }
         }
-        break;
       }
     }
     return contrib;
@@ -1505,30 +1449,12 @@ public class FormDataStatementBuilder implements DataModelConstants {
     //
     if (aggregationType != null && aggregationType != AGGREGATION_NONE) {
       switch (aggregationType) {
-        case AGGREGATION_COUNT: {
-          sql = m_sqlStyle.toAggregationCount(sql);
-          break;
-        }
-        case AGGREGATION_MIN: {
-          sql = m_sqlStyle.toAggregationMin(sql);
-          break;
-        }
-        case AGGREGATION_MAX: {
-          sql = m_sqlStyle.toAggregationMax(sql);
-          break;
-        }
-        case AGGREGATION_SUM: {
-          sql = m_sqlStyle.toAggregationSum(sql);
-          break;
-        }
-        case AGGREGATION_AVG: {
-          sql = m_sqlStyle.toAggregationAvg(sql);
-          break;
-        }
-        case AGGREGATION_MEDIAN: {
-          sql = m_sqlStyle.toAggregationMedian(sql);
-          break;
-        }
+        case AGGREGATION_COUNT -> sql = m_sqlStyle.toAggregationCount(sql);
+        case AGGREGATION_MIN -> sql = m_sqlStyle.toAggregationMin(sql);
+        case AGGREGATION_MAX -> sql = m_sqlStyle.toAggregationMax(sql);
+        case AGGREGATION_SUM -> sql = m_sqlStyle.toAggregationSum(sql);
+        case AGGREGATION_AVG -> sql = m_sqlStyle.toAggregationAvg(sql);
+        case AGGREGATION_MEDIAN -> sql = m_sqlStyle.toAggregationMedian(sql);
       }
     }
     else if (isZeroTraversingAttribute(operation, values)) {
@@ -1536,7 +1462,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     }
     //
     switch (operation) {
-      case OPERATOR_NONE: {
+      case OPERATOR_NONE -> {
         if (plainBind) {
           if (names != null) {
             Map<String, String> tokenValue = new HashMap<>();
@@ -1562,7 +1488,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
         }
         return sql;
       }
-      case OPERATOR_BETWEEN: {
+      case OPERATOR_BETWEEN -> {
         if (!plainBind) {
           addBinds(names, values);
         }
@@ -1576,7 +1502,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
           return m_sqlStyle.createBetween(sql, names[0], names[1]);
         }
       }
-      case OPERATOR_DATE_BETWEEN: {
+      case OPERATOR_DATE_BETWEEN -> {
         if (!plainBind) {
           addBinds(names, values);
         }
@@ -1590,7 +1516,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
           return m_sqlStyle.createDateBetween(sql, names[0], names[1]);
         }
       }
-      case OPERATOR_DATE_TIME_BETWEEN: {
+      case OPERATOR_DATE_TIME_BETWEEN -> {
         if (!plainBind) {
           addBinds(names, values);
         }
@@ -1604,293 +1530,291 @@ public class FormDataStatementBuilder implements DataModelConstants {
           return m_sqlStyle.createDateTimeBetween(sql, names[0], names[1]);
         }
       }
-      case OPERATOR_EQ: {
+      case OPERATOR_EQ -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createEQ(sql, names[0]);
       }
-      case OPERATOR_DATE_EQ: {
+      case OPERATOR_DATE_EQ -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateEQ(sql, names[0]);
       }
-      case OPERATOR_DATE_TIME_EQ: {
+      case OPERATOR_DATE_TIME_EQ -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateTimeEQ(sql, names[0]);
       }
-      case OPERATOR_GE: {
+      case OPERATOR_GE -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createGE(sql, names[0]);
       }
-      case OPERATOR_DATE_GE: {
+      case OPERATOR_DATE_GE -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateGE(sql, names[0]);
       }
-      case OPERATOR_DATE_TIME_GE: {
+      case OPERATOR_DATE_TIME_GE -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateTimeGE(sql, names[0]);
       }
-      case OPERATOR_GT: {
+      case OPERATOR_GT -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createGT(sql, names[0]);
       }
-      case OPERATOR_DATE_GT: {
+      case OPERATOR_DATE_GT -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateGT(sql, names[0]);
       }
-      case OPERATOR_DATE_TIME_GT: {
+      case OPERATOR_DATE_TIME_GT -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateTimeGT(sql, names[0]);
       }
-      case OPERATOR_LE: {
+      case OPERATOR_LE -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createLE(sql, names[0]);
       }
-      case OPERATOR_DATE_LE: {
+      case OPERATOR_DATE_LE -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateLE(sql, names[0]);
       }
-      case OPERATOR_DATE_TIME_LE: {
+      case OPERATOR_DATE_TIME_LE -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateTimeLE(sql, names[0]);
       }
-      case OPERATOR_LT: {
+      case OPERATOR_LT -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createLT(sql, names[0]);
       }
-      case OPERATOR_DATE_LT: {
+      case OPERATOR_DATE_LT -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateLT(sql, names[0]);
       }
-      case OPERATOR_DATE_TIME_LT: {
+      case OPERATOR_DATE_TIME_LT -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateTimeLT(sql, names[0]);
       }
-      case OPERATOR_NEQ: {
+      case OPERATOR_NEQ -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createNEQ(sql, names[0]);
       }
-      case OPERATOR_DATE_NEQ: {
+      case OPERATOR_DATE_NEQ -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateNEQ(sql, names[0]);
       }
-      case OPERATOR_DATE_TIME_NEQ: {
+      case OPERATOR_DATE_TIME_NEQ -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateTimeNEQ(sql, names[0]);
       }
-      case OPERATOR_DATE_IS_IN_DAYS: {
+      case OPERATOR_DATE_IS_IN_DAYS -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateIsInDays(sql, names[0]);
       }
-      case OPERATOR_DATE_IS_IN_GE_DAYS: {
+      case OPERATOR_DATE_IS_IN_GE_DAYS -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateIsInGEDays(sql, names[0]);
       }
-      case OPERATOR_DATE_IS_IN_GE_MONTHS: {
+      case OPERATOR_DATE_IS_IN_GE_MONTHS -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateIsInGEMonths(sql, names[0]);
       }
-      case OPERATOR_DATE_IS_IN_LE_DAYS: {
+      case OPERATOR_DATE_IS_IN_LE_DAYS -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateIsInLEDays(sql, names[0]);
       }
-      case OPERATOR_DATE_IS_IN_LE_MONTHS: {
+      case OPERATOR_DATE_IS_IN_LE_MONTHS -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateIsInLEMonths(sql, names[0]);
       }
-      case OPERATOR_DATE_IS_IN_LAST_DAYS: {
+      case OPERATOR_DATE_IS_IN_LAST_DAYS -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateIsInLastDays(sql, names[0]);
       }
-      case OPERATOR_DATE_IS_IN_LAST_MONTHS: {
+      case OPERATOR_DATE_IS_IN_LAST_MONTHS -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateIsInLastMonths(sql, names[0]);
       }
-      case OPERATOR_DATE_IS_IN_MONTHS: {
+      case OPERATOR_DATE_IS_IN_MONTHS -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateIsInMonths(sql, names[0]);
       }
-      case OPERATOR_DATE_IS_IN_NEXT_DAYS: {
+      case OPERATOR_DATE_IS_IN_NEXT_DAYS -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateIsInNextDays(sql, names[0]);
       }
-      case OPERATOR_DATE_IS_IN_NEXT_MONTHS: {
+      case OPERATOR_DATE_IS_IN_NEXT_MONTHS -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateIsInNextMonths(sql, names[0]);
       }
-      case OPERATOR_DATE_IS_NOT_TODAY: {
+      case OPERATOR_DATE_IS_NOT_TODAY -> {
         return m_sqlStyle.createDateIsNotToday(sql);
       }
-      case OPERATOR_DATE_IS_TODAY: {
+      case OPERATOR_DATE_IS_TODAY -> {
         return m_sqlStyle.createDateIsToday(sql);
       }
-      case OPERATOR_YEAR_TO_DATE: {
+      case OPERATOR_YEAR_TO_DATE -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createYearToDate(sql, names[0]);
       }
-      case OPERATOR_DATE_TIME_IS_IN_GE_HOURS: {
+      case OPERATOR_DATE_TIME_IS_IN_GE_HOURS -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateTimeIsInGEHours(sql, names[0]);
       }
-      case OPERATOR_DATE_TIME_IS_IN_GE_MINUTES: {
+      case OPERATOR_DATE_TIME_IS_IN_GE_MINUTES -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateTimeIsInGEMinutes(sql, names[0]);
       }
-      case OPERATOR_DATE_TIME_IS_IN_LE_HOURS: {
+      case OPERATOR_DATE_TIME_IS_IN_LE_HOURS -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateTimeIsInLEHours(sql, names[0]);
       }
-      case OPERATOR_DATE_TIME_IS_IN_LE_MINUTES: {
+      case OPERATOR_DATE_TIME_IS_IN_LE_MINUTES -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         return m_sqlStyle.createDateTimeIsInLEMinutes(sql, names[0]);
       }
-      case OPERATOR_DATE_TIME_IS_NOT_NOW: {
+      case OPERATOR_DATE_TIME_IS_NOT_NOW -> {
         return m_sqlStyle.createDateTimeIsNotNow(sql);
       }
-      case OPERATOR_DATE_TIME_IS_NOW: {
+      case OPERATOR_DATE_TIME_IS_NOW -> {
         return m_sqlStyle.createDateTimeIsNow(sql);
       }
-      case OPERATOR_ENDS_WITH: {
+      case OPERATOR_ENDS_WITH -> {
         if (!plainBind) {
           addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
         }
         return m_sqlStyle.createEndsWith(sql, names[0]);
       }
-      case OPERATOR_NOT_ENDS_WITH: {
+      case OPERATOR_NOT_ENDS_WITH -> {
         if (!plainBind) {
           addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
         }
         return m_sqlStyle.createNotEndsWith(sql, names[0]);
       }
-      case OPERATOR_IN: {
+      case OPERATOR_IN -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         //no support for plain bind in here. otherwise, ArrayInput gets confused.
         return m_sqlStyle.createInList(sql, true, values[0]);
       }
-      case OPERATOR_CONTAINS: {
+      case OPERATOR_CONTAINS -> {
         if (!plainBind) {
           addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
         }
         return m_sqlStyle.createContains(sql, names[0]);
       }
-      case OPERATOR_LIKE: {
+      case OPERATOR_LIKE -> {
         if (!plainBind) {
           addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
         }
         return m_sqlStyle.createLike(sql, names[0]);
       }
-      case OPERATOR_NOT_LIKE: {
+      case OPERATOR_NOT_LIKE -> {
         if (!plainBind) {
           addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
         }
         return m_sqlStyle.createNotLike(sql, names[0]);
       }
-      case OPERATOR_NOT_IN: {
+      case OPERATOR_NOT_IN -> {
         if (!plainBind) {
           addBinds(names, values);
         }
         //no support for plain bind in here. otherwise, ArrayInput gets confused.
         return m_sqlStyle.createNotInList(sql, true, values[0]);
       }
-      case OPERATOR_NOT_CONTAINS: {
+      case OPERATOR_NOT_CONTAINS -> {
         if (!plainBind) {
           addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
         }
         return m_sqlStyle.createNotContains(sql, names[0]);
       }
-      case OPERATOR_NOT_NULL: {
+      case OPERATOR_NOT_NULL -> {
         return m_sqlStyle.createNotNull(sql);
       }
-      case OPERATOR_NUMBER_NOT_NULL: {
+      case OPERATOR_NUMBER_NOT_NULL -> {
         return m_sqlStyle.createNumberNotNull(sql);
       }
-      case OPERATOR_NULL: {
+      case OPERATOR_NULL -> {
         return m_sqlStyle.createNull(sql);
       }
-      case OPERATOR_NUMBER_NULL: {
+      case OPERATOR_NUMBER_NULL -> {
         return m_sqlStyle.createNumberNull(sql);
       }
-      case OPERATOR_STARTS_WITH: {
+      case OPERATOR_STARTS_WITH -> {
         if (!plainBind) {
           addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
         }
         return m_sqlStyle.createStartsWith(sql, names[0]);
       }
-      case OPERATOR_NOT_STARTS_WITH: {
+      case OPERATOR_NOT_STARTS_WITH -> {
         if (!plainBind) {
           addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
         }
         return m_sqlStyle.createNotStartsWith(sql, names[0]);
       }
-      default: {
-        throw new IllegalArgumentException("invalid operator: " + operation);
-      }
+      default -> throw new IllegalArgumentException("invalid operator: " + operation);
     }
   }
 }

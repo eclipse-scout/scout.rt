@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -102,49 +102,37 @@ public class LogbackLoggerSupport extends AbstractLoggerSupport {
     if (level == null) {
       return null;
     }
-    switch (level.toInt()) {
-      case Level.ALL_INT:
-        return LogLevel.ALL;
-      case Level.TRACE_INT:
-        return LogLevel.TRACE;
-      case Level.DEBUG_INT:
-        return LogLevel.DEBUG;
-      case Level.INFO_INT:
-        return LogLevel.INFO;
-      case Level.WARN_INT:
-        return LogLevel.WARN;
-      case Level.ERROR_INT:
-        return LogLevel.ERROR;
-      case Level.OFF_INT:
-        return LogLevel.OFF;
-      default:
+    return switch (level.toInt()) {
+      case Level.ALL_INT -> LogLevel.ALL;
+      case Level.TRACE_INT -> LogLevel.TRACE;
+      case Level.DEBUG_INT -> LogLevel.DEBUG;
+      case Level.INFO_INT -> LogLevel.INFO;
+      case Level.WARN_INT -> LogLevel.WARN;
+      case Level.ERROR_INT -> LogLevel.ERROR;
+      case Level.OFF_INT -> LogLevel.OFF;
+      default -> {
         LOG.info("unknown logback level '{}'. Falling back to scout log level '{}'", level, LogLevel.WARN);
-        return LogLevel.WARN;
-    }
+        yield LogLevel.WARN;
+      }
+    };
   }
 
   protected Level scoutToLogbackLevel(LogLevel level) {
     if (level == null) {
       return null;
     }
-    switch (level) {
-      case ALL:
-      case TRACE:
-        return Level.TRACE;
-      case DEBUG:
-        return Level.DEBUG;
-      case INFO:
-        return Level.INFO;
-      case WARN:
-        return Level.WARN;
-      case ERROR:
-        return Level.ERROR;
-      case OFF:
-        return Level.OFF;
-      default:
+    return switch (level) {
+      case ALL, TRACE -> Level.TRACE;
+      case DEBUG -> Level.DEBUG;
+      case INFO -> Level.INFO;
+      case WARN -> Level.WARN;
+      case ERROR -> Level.ERROR;
+      case OFF -> Level.OFF;
+      default -> {
         LOG.info("unknown scout log level '{}'. Falling back to logback level '{}'", level, Level.WARN);
-        return Level.WARN;
-    }
+        yield Level.WARN;
+      }
+    };
   }
 
   @Override
