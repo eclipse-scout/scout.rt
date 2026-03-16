@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,14 +40,11 @@ public class FutureFilterBuilder {
    * joined by logical 'AND' operation.
    */
   public Predicate<IFuture<?>> toFilter() {
-    switch (m_andFilters.size()) {
-      case 0:
-        return f -> true;
-      case 1:
-        return m_andFilters.get(0);
-      default:
-        return new AndFilter<>(m_andFilters);
-    }
+    return switch (m_andFilters.size()) {
+      case 0 -> f -> true;
+      case 1 -> m_andFilters.get(0);
+      default -> new AndFilter<>(m_andFilters);
+    };
   }
 
   /**

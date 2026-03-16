@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -92,69 +92,40 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
       for (int index = 0; index < cells.length && index <= maxColumnIndex; index++) {
         if (cells[index] != null) {
           switch (index) {
-            case 0: {
+            case 0 -> {
               ID_TYPE key = TypeCastUtility.castValue(cells[index], aClazz);
               withKey(key);
-              break;
             }
-            case 1: {
-              withText(cells[index].toString());
-              break;
-            }
-            case 2: {
-              withIconId(cells[index].toString());
-              break;
-            }
-            case 3: {
-              withTooltipText(cells[index].toString());
-              break;
-            }
-            case 4: {
-              withBackgroundColor(cells[index].toString());
-              break;
-            }
-            case 5: {
-              withForegroundColor(cells[index].toString());
-              break;
-            }
-            case 6: {
-              withFont(FontSpec.parse(cells[index].toString()));
-              break;
-            }
-            case 7: {
+            case 1 -> withText(cells[index].toString());
+            case 2 -> withIconId(cells[index].toString());
+            case 3 -> withTooltipText(cells[index].toString());
+            case 4 -> withBackgroundColor(cells[index].toString());
+            case 5 -> withForegroundColor(cells[index].toString());
+            case 6 -> withFont(FontSpec.parse(cells[index].toString()));
+            case 7 -> {
               Boolean b = TypeCastUtility.castValue(cells[index], Boolean.class);
               withActive(b.booleanValue());
-              break;
             }
-            case 8: {
+            case 8 -> {
               ID_TYPE o = TypeCastUtility.castValue(cells[index], aClazz);
               if ((o instanceof Number) && ((Number) o).longValue() == 0) {
                 o = null;
               }
               withParentKey(o);
-              break;
             }
-            case 9: {
-              m_extKey = cells[index].toString();
-              break;
-            }
-            case 10: {
+            case 9 -> m_extKey = cells[index].toString();
+            case 10 -> {
               Object o = cells[index];
               if (o instanceof Number) {
                 m_value = (Number) o;
               }
-              break;
             }
-            case 11: {
+            case 11 -> {
               Boolean b = TypeCastUtility.castValue(cells[index], Boolean.class);
               withEnabled(b.booleanValue());
-              break;
             }
-            case 12: {
-              m_partitionId = ((Number) cells[index]).longValue();
-              break;
-            }
-            case 13:
+            case 12 -> m_partitionId = ((Number) cells[index]).longValue();
+            case 13 -> {
               Double val = TypeCastUtility.castValue(cells[index], Double.class);
               if (val != null) {
                 withOrder(val.doubleValue());
@@ -162,7 +133,7 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
               else {
                 withOrder(IOrdered.DEFAULT_ORDER);
               }
-              break;
+            }
           }
         }
       }

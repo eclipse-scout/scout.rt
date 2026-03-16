@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -331,23 +331,14 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
 
   protected void processEvent(PlannerEvent event) {
     switch (event.getType()) {
-      case PlannerEvent.TYPE_RESOURCES_INSERTED:
-        handleModelResourcesInserted(event.getResources());
-        break;
-      case PlannerEvent.TYPE_RESOURCES_UPDATED:
-        handleModelResourcesUpdated(event.getResources());
-        break;
-      case PlannerEvent.TYPE_RESOURCES_DELETED:
-        handleModelResourcesDeleted(event.getResources());
-        break;
-      case PlannerEvent.TYPE_RESOURCES_SELECTED:
-        handleModelResourcesSelected(event.getResources());
-        break;
-      case PlannerEvent.TYPE_ALL_RESOURCES_DELETED:
-        handleModelAllResourcesDeleted();
-        break;
-      default:
+      case PlannerEvent.TYPE_RESOURCES_INSERTED -> handleModelResourcesInserted(event.getResources());
+      case PlannerEvent.TYPE_RESOURCES_UPDATED -> handleModelResourcesUpdated(event.getResources());
+      case PlannerEvent.TYPE_RESOURCES_DELETED -> handleModelResourcesDeleted(event.getResources());
+      case PlannerEvent.TYPE_RESOURCES_SELECTED -> handleModelResourcesSelected(event.getResources());
+      case PlannerEvent.TYPE_ALL_RESOURCES_DELETED -> handleModelAllResourcesDeleted();
+      default -> {
         // NOP
+      }
     }
   }
 

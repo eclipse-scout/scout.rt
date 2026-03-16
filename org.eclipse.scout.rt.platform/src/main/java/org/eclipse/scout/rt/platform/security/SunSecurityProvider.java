@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -190,10 +190,12 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
         + "]";
     if ("PBKDF2WithHmacSHA256".equals(secretKeyAlgorithm) && "AES".equals(cipherAlgorithm) && "SunJCE".equals(cipherAlgorithmProvider) && 16 == gcmInitVecLen && 128 == gcmAuthTagBitLen) {
       switch (keyDerivationIterationCount) {
-        case 10000:
+        case 10000 -> {
           return ENCRYPTION_COMPATIBILITY_HEADER_2024_V1.getBytes(StandardCharsets.US_ASCII);
-        case 3557:
+        }
+        case 3557 -> {
           return ENCRYPTION_COMPATIBILITY_HEADER_2023_V1.getBytes(StandardCharsets.US_ASCII);
+        }
       }
     }
     Assertions.fail("Unknown key arguments, unable to create compatibility header (internal representation: {}). Hint: Might be necessary to define a new version.", headerStr);

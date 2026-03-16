@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -88,14 +88,9 @@ public class BlockingConditionInterruptionTest {
         protocol.add("beforeBlockingCondition");
 
         switch (waitForMethod) {
-          case WAIT_INTERRUPTIBLY:
-            bc.waitFor(HINT_BLOCKED);
-            break;
-          case WAIT_FOR_INTERRUPTIBLY_WITH_TIMEOUT:
-            bc.waitFor(0, TimeUnit.MILLISECONDS, HINT_BLOCKED);
-            break;
-          default:
-            throw new UnsupportedOperationException();
+          case WAIT_INTERRUPTIBLY -> bc.waitFor(HINT_BLOCKED);
+          case WAIT_FOR_INTERRUPTIBLY_WITH_TIMEOUT -> bc.waitFor(0, TimeUnit.MILLISECONDS, HINT_BLOCKED);
+          default -> throw new UnsupportedOperationException();
         }
 
         protocol.add("afterBlockingCondition");

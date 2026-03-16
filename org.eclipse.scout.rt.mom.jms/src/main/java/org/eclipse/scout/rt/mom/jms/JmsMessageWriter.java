@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -60,16 +60,12 @@ public class JmsMessageWriter {
    * Creates the message of the given type.
    */
   protected Message createMessage(final int messageType, final Session session) throws JMSException {
-    switch (messageType) {
-      case MESSAGE_TYPE_TEXT:
-        return session.createTextMessage();
-      case MESSAGE_TYPE_BYTES:
-        return session.createBytesMessage();
-      case MESSAGE_TYPE_NO_PAYLOAD:
-        return session.createMessage();
-      default:
-        throw new PlatformException("Unsupported message type '{}'", messageType);
-    }
+    return switch (messageType) {
+      case MESSAGE_TYPE_TEXT -> session.createTextMessage();
+      case MESSAGE_TYPE_BYTES -> session.createBytesMessage();
+      case MESSAGE_TYPE_NO_PAYLOAD -> session.createMessage();
+      default -> throw new PlatformException("Unsupported message type '{}'", messageType);
+    };
   }
 
   /**
@@ -90,16 +86,11 @@ public class JmsMessageWriter {
     m_marshallerContext.put(CTX_PROP_NULL_OBJECT, Boolean.valueOf(transferObject == null).toString());
 
     switch (m_marshaller.getMessageType()) {
-      case MESSAGE_TYPE_TEXT:
-        writeTextMessage((TextMessage) m_message, (String) transportObject);
-        break;
-      case MESSAGE_TYPE_BYTES:
-        writeBytesMessage((BytesMessage) m_message, (byte[]) transportObject);
-        break;
-      case MESSAGE_TYPE_NO_PAYLOAD:
-        break;
-      default:
-        throw new PlatformException("Unsupported transport type '{}'", m_marshaller.getMessageType());
+      case MESSAGE_TYPE_TEXT -> writeTextMessage((TextMessage) m_message, (String) transportObject);
+      case MESSAGE_TYPE_BYTES -> writeBytesMessage((BytesMessage) m_message, (byte[]) transportObject);
+      case MESSAGE_TYPE_NO_PAYLOAD -> {
+      }
+      default -> throw new PlatformException("Unsupported transport type '{}'", m_marshaller.getMessageType());
     }
 
     return this;

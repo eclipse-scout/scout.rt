@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -100,10 +100,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
       desktop.addDesktopListener(
           e -> {
             switch (e.getType()) {
-              case DesktopEvent.TYPE_OUTLINE_CHANGED: {
-                setSelected(e.getOutline() == m_outline);
-                break;
-              }
+              case DesktopEvent.TYPE_OUTLINE_CHANGED -> setSelected(e.getOutline() == m_outline);
             }
           });
       // add change listener
@@ -112,15 +109,9 @@ public abstract class AbstractOutlineButton extends AbstractButton {
             String n = e.getPropertyName();
             Object v = e.getNewValue();
             switch (n) {
-              case IOutline.PROP_VISIBLE:
-                setVisible((Boolean) v);
-                break;
-              case IOutline.PROP_TITLE:
-                setLabel((String) v);
-                break;
-              case IOutline.PROP_DEFAULT_ICON_ID:
-                setIconId((String) v);
-                break;
+              case IOutline.PROP_VISIBLE -> setVisible((Boolean) v);
+              case IOutline.PROP_TITLE -> setLabel((String) v);
+              case IOutline.PROP_DEFAULT_ICON_ID -> setIconId((String) v);
             }
           });
     }

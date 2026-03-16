@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,18 +20,13 @@ public abstract class AbstractUiServletRequestHandler implements IUiServletReque
   @Override
   public boolean handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String httpMethod = req.getMethod();
-    switch (httpMethod) {
-      case "GET":
-        return handleGet(req, resp);
-      case "POST":
-        return handlePost(req, resp);
-      case "PUT":
-        return handlePut(req, resp);
-      case "DELETE":
-        return handleDelete(req, resp);
-      default:
-        return false;
-    }
+    return switch (httpMethod) {
+      case "GET" -> handleGet(req, resp);
+      case "POST" -> handlePost(req, resp);
+      case "PUT" -> handlePut(req, resp);
+      case "DELETE" -> handleDelete(req, resp);
+      default -> false;
+    };
   }
 
   /**

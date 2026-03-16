@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -65,7 +65,7 @@ public class OracleSqlStyle extends AbstractSqlStyle {
   @Override
   public void writeBind(PreparedStatement ps, int jdbcBindIndex, SqlBind bind) throws SQLException {
     switch (bind.getSqlType()) {
-      case Types.BLOB: {
+      case Types.BLOB -> {
         if (bind.getValue() instanceof Blob) {
           ps.setBlob(jdbcBindIndex, (Blob) bind.getValue());
         }
@@ -78,9 +78,8 @@ public class OracleSqlStyle extends AbstractSqlStyle {
             ps.setNull(jdbcBindIndex, Types.BLOB);
           }
         }
-        break;
       }
-      case Types.CLOB: {
+      case Types.CLOB -> {
         if (bind.getValue() instanceof Clob) {
           ps.setClob(jdbcBindIndex, (Clob) bind.getValue());
         }
@@ -93,11 +92,8 @@ public class OracleSqlStyle extends AbstractSqlStyle {
             ps.setNull(jdbcBindIndex, Types.CLOB);
           }
         }
-        break;
       }
-      default: {
-        super.writeBind(ps, jdbcBindIndex, bind);
-      }
+      default -> super.writeBind(ps, jdbcBindIndex, bind);
     }
   }
 }

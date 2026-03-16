@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -110,13 +110,9 @@ public class Bookmark implements Serializable, IOrdered {
 
   public void setKind(int kind) {
     switch (kind) {
-      case USER_BOOKMARK:
-      case GLOBAL_BOOKMARK: {
-        break;
+      case USER_BOOKMARK, GLOBAL_BOOKMARK -> {
       }
-      default: {
-        throw new IllegalArgumentException("invalid kind: " + kind);
-      }
+      default -> throw new IllegalArgumentException("invalid kind: " + kind);
     }
     m_kind = kind;
     m_serializedData = null;

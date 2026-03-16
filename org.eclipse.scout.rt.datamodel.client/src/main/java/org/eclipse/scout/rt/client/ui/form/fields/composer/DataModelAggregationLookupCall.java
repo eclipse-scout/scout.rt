@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -67,35 +67,19 @@ public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
         for (int ag : ags) {
           String text = null;
           switch (ag) {
-            case DataModelConstants.AGGREGATION_AVG: {
-              text = TEXTS.get("ComposerFieldAggregationAvg", m_attribute.getText());
-              break;
-            }
-            case DataModelConstants.AGGREGATION_COUNT: {
+            case DataModelConstants.AGGREGATION_AVG -> text = TEXTS.get("ComposerFieldAggregationAvg", m_attribute.getText());
+            case DataModelConstants.AGGREGATION_COUNT -> {
               if (m_attribute.getType() == IDataModelAttribute.TYPE_AGGREGATE_COUNT) {
                 text = m_attribute.getText();
               }
               else {
                 text = TEXTS.get("ComposerFieldAggregationCount", m_attribute.getText());
               }
-              break;
             }
-            case DataModelConstants.AGGREGATION_MAX: {
-              text = TEXTS.get("ComposerFieldAggregationMax", m_attribute.getText());
-              break;
-            }
-            case DataModelConstants.AGGREGATION_MEDIAN: {
-              text = TEXTS.get("ComposerFieldAggregationMedian", m_attribute.getText());
-              break;
-            }
-            case DataModelConstants.AGGREGATION_MIN: {
-              text = TEXTS.get("ComposerFieldAggregationMin", m_attribute.getText());
-              break;
-            }
-            case DataModelConstants.AGGREGATION_SUM: {
-              text = TEXTS.get("ComposerFieldAggregationSum", m_attribute.getText());
-              break;
-            }
+            case DataModelConstants.AGGREGATION_MAX -> text = TEXTS.get("ComposerFieldAggregationMax", m_attribute.getText());
+            case DataModelConstants.AGGREGATION_MEDIAN -> text = TEXTS.get("ComposerFieldAggregationMedian", m_attribute.getText());
+            case DataModelConstants.AGGREGATION_MIN -> text = TEXTS.get("ComposerFieldAggregationMin", m_attribute.getText());
+            case DataModelConstants.AGGREGATION_SUM -> text = TEXTS.get("ComposerFieldAggregationSum", m_attribute.getText());
           }
           result.add(new LookupRow<>(ag, text));
         }

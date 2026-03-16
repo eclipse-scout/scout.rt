@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -719,18 +719,13 @@ public class TableTest {
   }
 
   private static String decodeStatus(int status) {
-    switch (status) {
-      case ITableRow.STATUS_DELETED:
-        return "ITableRow.STATUS_DELETED";
-      case ITableRow.STATUS_INSERTED:
-        return "ITableRow.STATUS_INSERTED";
-      case ITableRow.STATUS_NON_CHANGED:
-        return "ITableRow.STATUS_NON_CHANGED";
-      case ITableRow.STATUS_UPDATED:
-        return "ITableRow.STATUS_UPDATED";
-      default:
-        throw new IllegalArgumentException("Unexpected status parameter");
-    }
+    return switch (status) {
+      case ITableRow.STATUS_DELETED -> "ITableRow.STATUS_DELETED";
+      case ITableRow.STATUS_INSERTED -> "ITableRow.STATUS_INSERTED";
+      case ITableRow.STATUS_NON_CHANGED -> "ITableRow.STATUS_NON_CHANGED";
+      case ITableRow.STATUS_UPDATED -> "ITableRow.STATUS_UPDATED";
+      default -> throw new IllegalArgumentException("Unexpected status parameter");
+    };
   }
 
   private static void assertNoTable(ITableRow row) {

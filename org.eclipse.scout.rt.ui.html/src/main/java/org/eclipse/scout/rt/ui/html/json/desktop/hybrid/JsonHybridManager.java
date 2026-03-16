@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -130,14 +130,9 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
 
   protected void handleModelHybridEvent(HybridEvent event) {
     switch (event.getType()) {
-      case HybridEvent.TYPE_EVENT:
-        addActionEvent("hybridEvent", createJsonHybridEvent(event));
-        break;
-      case HybridEvent.TYPE_WIDGET_EVENT:
-        addActionEvent("hybridWidgetEvent", createJsonHybridEvent(event));
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported event type");
+      case HybridEvent.TYPE_EVENT -> addActionEvent("hybridEvent", createJsonHybridEvent(event));
+      case HybridEvent.TYPE_WIDGET_EVENT -> addActionEvent("hybridWidgetEvent", createJsonHybridEvent(event));
+      default -> throw new IllegalArgumentException("Unsupported event type");
     }
   }
 

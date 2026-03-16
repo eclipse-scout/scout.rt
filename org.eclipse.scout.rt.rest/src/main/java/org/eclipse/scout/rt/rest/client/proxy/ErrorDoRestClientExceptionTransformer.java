@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,26 +33,20 @@ public class ErrorDoRestClientExceptionTransformer extends AbstractEntityRestCli
 
   @Override
   protected RuntimeException transformByResponseStatus(Response.Status status, RuntimeException e, Response response) {
-    switch (status) {
-      case FORBIDDEN:
-        return transformClientError(e, response, AccessForbiddenException::new);
-      case NOT_FOUND:
-        return transformClientError(e, response, ResourceNotFoundException::new);
-      case BAD_GATEWAY:
-      case SERVICE_UNAVAILABLE:
-      case GATEWAY_TIMEOUT:
-        return transformUnavailableResponse(e, response);
-    }
-    return super.transformByResponseStatus(status, e, response);
+    return switch (status) {
+      case FORBIDDEN -> transformClientError(e, response, AccessForbiddenException::new);
+      case NOT_FOUND -> transformClientError(e, response, ResourceNotFoundException::new);
+      case BAD_GATEWAY, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT -> transformUnavailableResponse(e, response);
+      default -> super.transformByResponseStatus(status, e, response);
+    };
   }
 
   @Override
   protected RuntimeException transformByResponseStatusFamily(Response.Status.Family family, RuntimeException e, Response response) {
-    switch (family) {
-      case CLIENT_ERROR:
-        return transformClientError(e, response, VetoException::new);
-    }
-    return super.transformByResponseStatusFamily(family, e, response);
+    return switch (family) {
+      case CLIENT_ERROR -> transformClientError(e, response, VetoException::new);
+      default -> super.transformByResponseStatusFamily(family, e, response);
+    };
   }
 
   protected RuntimeException transformClientError(RuntimeException e, Response response, BiFunction<String, RuntimeException, VetoException> vetoExceptionFactory) {

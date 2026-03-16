@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -68,21 +68,17 @@ public class SessionStoreTestForm extends AbstractForm {
     m_doFinallyEntered.countDown();
     System.out.println("# " + getClass().getSimpleName() + ".doFinally  " + m_closeAction + "...");
     switch (m_closeAction) {
-      case WAIT_FOR_ANOTHER_FORM:
+      case WAIT_FOR_ANOTHER_FORM -> {
         SessionStoreTestForm form = new SessionStoreTestForm(CloseAction.DO_NOTHING);
         form.start();
         form.waitFor();
-        break;
-      case WAIT_FOR_MESSAGE_BOX:
-        MessageBoxes
-            .createOk()
-            .withHeader("Session Shutdown Test")
-            .show();
-        break;
-      case WAIT_FOR_JOB:
-        Jobs.schedule(() -> SleepUtil.sleepSafe(5, TimeUnit.SECONDS), Jobs.newInput()).awaitDone();
-        break;
-      case WAIT_FOR_LOOP:
+      }
+      case WAIT_FOR_MESSAGE_BOX -> MessageBoxes
+          .createOk()
+          .withHeader("Session Shutdown Test")
+          .show();
+      case WAIT_FOR_JOB -> Jobs.schedule(() -> SleepUtil.sleepSafe(5, TimeUnit.SECONDS), Jobs.newInput()).awaitDone();
+      case WAIT_FOR_LOOP -> {
         long runUntil = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
         int counter = 0;
         while (System.currentTimeMillis() <= runUntil) {
@@ -92,10 +88,10 @@ public class SessionStoreTestForm extends AbstractForm {
           }
           counter++;
         }
-        break;
-      case DO_NOTHING:
-      default:
+      }
+      default -> {
         // do nothing
+      }
     }
     m_doFinallyCompleted.countDown();
     System.out.println("# " + getClass().getSimpleName() + ".doFinally done.");

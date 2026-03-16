@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -82,11 +82,10 @@ public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends Abstract
   @SuppressWarnings("SwitchStatementWithTooFewBranches")
   protected void handleModelFileChooserEvent(FileChooserEvent event) {
     switch (event.getType()) {
-      case FileChooserEvent.TYPE_CLOSED:
-        handleModelClosed();
-        break;
-      default:
+      case FileChooserEvent.TYPE_CLOSED -> handleModelClosed();
+      default -> {
         // NOP
+      }
     }
   }
 

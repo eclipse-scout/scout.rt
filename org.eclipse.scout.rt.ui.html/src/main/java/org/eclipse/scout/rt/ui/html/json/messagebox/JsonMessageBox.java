@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -128,11 +128,10 @@ public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJso
 
   protected void handleModelMessageBoxChanged(MessageBoxEvent event) {
     switch (event.getType()) {
-      case MessageBoxEvent.TYPE_CLOSED:
-        handleModelClosed();
-        break;
-      default:
+      case MessageBoxEvent.TYPE_CLOSED -> handleModelClosed();
+      default -> {
         // NOP
+      }
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -73,42 +73,15 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
       for (int i = 0; i < data.length; i++) {
         if (data[i] != null) {
           switch (i) {
-            case 0: {
-              setItemId(data[i]);
-              break;
-            }
-            case 1: {
-              setPerson(data[i]);
-              break;
-            }
-            case 2: {
-              setStart((Date) data[i]);
-              break;
-            }
-            case 3: {
-              setEnd((Date) data[i]);
-              break;
-            }
-            case 4: {
-              setFullDay(TypeCastUtility.castValue(data[i], Boolean.class));
-              break;
-            }
-            case 5: {
-              setLocation((String) data[i]);
-              break;
-            }
-            case 6: {
-              setSubject((String) data[i]);
-              break;
-            }
-            case 7: {
-              setBody((String) data[i]);
-              break;
-            }
-            case 8: {
-              setCssClass((String) data[i]);
-              break;
-            }
+            case 0 -> setItemId(data[i]);
+            case 1 -> setPerson(data[i]);
+            case 2 -> setStart((Date) data[i]);
+            case 3 -> setEnd((Date) data[i]);
+            case 4 -> setFullDay(TypeCastUtility.castValue(data[i], Boolean.class));
+            case 5 -> setLocation((String) data[i]);
+            case 6 -> setSubject((String) data[i]);
+            case 7 -> setBody((String) data[i]);
+            case 8 -> setCssClass((String) data[i]);
           }
         }
       }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -252,14 +252,11 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
 
   protected MouseButton extractMouseButton(JSONObject json) {
     int mouseButton = json.getInt("mouseButton");
-    switch (mouseButton) {
-      case 1:
-        return MouseButton.Left;
-      case 3:
-        return MouseButton.Right;
-      default:
-        return MouseButton.Unknown;
-    }
+    return switch (mouseButton) {
+      case 1 -> MouseButton.Left;
+      case 3 -> MouseButton.Right;
+      default -> MouseButton.Unknown;
+    };
   }
 
   @SuppressWarnings("unchecked")

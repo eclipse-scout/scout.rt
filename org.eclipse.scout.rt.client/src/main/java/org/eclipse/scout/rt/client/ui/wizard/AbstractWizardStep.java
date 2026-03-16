@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -342,31 +342,21 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
         m_formListener = e -> {
           try {
             switch (e.getType()) {
-              case FormEvent.TYPE_STORE_AFTER: {
-                interceptFormStored(m_activationCounter > 0);
-                break;
-              }
-              case FormEvent.TYPE_DISCARDED: {
-                interceptFormDiscarded(m_activationCounter > 0);
-                break;
-              }
-              case FormEvent.TYPE_CLOSED: {
-                interceptFormClosed(m_activationCounter > 0);
-                break;
-              }
+              case FormEvent.TYPE_STORE_AFTER -> interceptFormStored(m_activationCounter > 0);
+              case FormEvent.TYPE_DISCARDED -> interceptFormDiscarded(m_activationCounter > 0);
+              case FormEvent.TYPE_CLOSED -> interceptFormClosed(m_activationCounter > 0);
             }
           }
           catch (Exception pe) {
             BEANS.get(ExceptionHandler.class).handle(pe);
           }
           switch (e.getType()) {
-            case FormEvent.TYPE_CLOSED: {
+            case FormEvent.TYPE_CLOSED -> {
               // Only reset form if it hasn't changed in the meantime.
               // This can happen when interceptFormClosed within this listener created a new form for the current step as fallback for an exception or similar.
               if (f == m_form) {
                 setForm(null);
               }
-              break;
             }
           }
         };

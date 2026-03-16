@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -283,22 +283,18 @@ public class FutureSet {
   protected Predicate<JobEvent> newSignalingFilter() {
     return event -> {
       switch (event.getType()) {
-        case JOB_EXECUTION_HINT_ADDED:
-        case JOB_EXECUTION_HINT_REMOVED:
+        case JOB_EXECUTION_HINT_ADDED, JOB_EXECUTION_HINT_REMOVED -> {
           return true; // manual signaling required
-        case JOB_STATE_CHANGED: // NOSONAR
-          switch (event.getData().getState()) {
-            case PENDING:
-            case RUNNING:
-            case WAITING_FOR_BLOCKING_CONDITION:
-            case WAITING_FOR_PERMIT:
-            case DONE:
-              return true; // manual signaling required
-            default:
-              return false; // signaling done by adding/removing the Future
-          }
-        default:
+        }
+        case JOB_STATE_CHANGED -> {
+          return switch (event.getData().getState()) {
+            case PENDING, RUNNING, WAITING_FOR_BLOCKING_CONDITION, WAITING_FOR_PERMIT, DONE -> true; // manual signaling required
+            default -> false; // signaling done by adding/removing the Future
+          }; // NOSONAR
+        }
+        default -> {
           return false;
+        }
       }
     };
   }

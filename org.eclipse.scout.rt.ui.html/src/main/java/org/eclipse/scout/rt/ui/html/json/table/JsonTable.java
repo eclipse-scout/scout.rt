@@ -688,17 +688,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       return;
     }
     switch (action) {
-      case "add":
-        getModel().getUIFacade().fireOrganizeColumnAddFromUI(column);
-        break;
-      case "remove":
-        getModel().getUIFacade().fireOrganizeColumnRemoveFromUI(column);
-        break;
-      case "modify":
-        getModel().getUIFacade().fireOrganizeColumnModifyFromUI(column);
-        break;
-      default:
-        throw new IllegalArgumentException();
+      case "add" -> getModel().getUIFacade().fireOrganizeColumnAddFromUI(column);
+      case "remove" -> getModel().getUIFacade().fireOrganizeColumnRemoveFromUI(column);
+      case "modify" -> getModel().getUIFacade().fireOrganizeColumnModifyFromUI(column);
+      default -> throw new IllegalArgumentException();
     }
   }
 
@@ -715,14 +708,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   @SuppressWarnings("DuplicatedCode")
   protected MouseButton extractMouseButton(JSONObject json) {
     int mouseButton = json.getInt("mouseButton");
-    switch (mouseButton) {
-      case 1:
-        return MouseButton.Left;
-      case 3:
-        return MouseButton.Right;
-      default:
-        return MouseButton.Unknown;
-    }
+    return switch (mouseButton) {
+      case 1 -> MouseButton.Left;
+      case 3 -> MouseButton.Right;
+      default -> MouseButton.Unknown;
+    };
   }
 
   protected void handleUiRowChecked(JsonEvent event) {
@@ -1243,17 +1233,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   @SuppressWarnings("SwitchStatementWithTooFewBranches")
   protected void bufferModelEvent(TableEvent event) {
     switch (event.getType()) {
-      case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
-        bufferColumnStructureChanged(event);
-        break;
-      }
-      case TableEvent.TYPE_COLUMN_HEADERS_UPDATED: {
-        bufferColumnHeadersUpdated(event);
-        break;
-      }
-      default: {
-        m_eventBuffer.add(event);
-      }
+      case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED -> bufferColumnStructureChanged(event);
+      case TableEvent.TYPE_COLUMN_HEADERS_UPDATED -> bufferColumnHeadersUpdated(event);
+      default -> m_eventBuffer.add(event);
     }
   }
 
@@ -1368,69 +1350,31 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   protected void processEvent(TableEvent event) {
     switch (event.getType()) {
-      case TableEvent.TYPE_ROWS_INSERTED:
-        handleModelRowsInserted(event.getRows());
-        break;
-      case TableEvent.TYPE_ROWS_UPDATED:
-        handleModelRowsUpdated(event.getRows());
-        break;
-      case TableEvent.TYPE_ROWS_DELETED:
-        handleModelRowsDeleted(event.getRows());
-        break;
-      case TableEvent.TYPE_ALL_ROWS_DELETED:
-        handleModelAllRowsDeleted();
-        break;
-      case TableEvent.TYPE_ROWS_SELECTED:
-        handleModelRowsSelected(event.getRows());
-        break;
-      case TableEvent.TYPE_ROW_ORDER_CHANGED:
-        handleModelRowOrderChanged(event.getRows());
-        break;
-      case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
-        handleModelColumnStructureChanged();
-        break;
-      case TableEvent.TYPE_COLUMN_ORDER_CHANGED:
-        handleModelColumnOrderChanged();
-        break;
-      case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
-        handleModelColumnHeadersUpdated(event.getColumns());
-        break;
-      case TableEvent.TYPE_ROWS_CHECKED:
-        handleModelRowsChecked(event.getRows());
-        break;
-      case TableEvent.TYPE_ROWS_EXPANDED:
-        handleModelRowsExpanded(event.getRows());
-        break;
-      case TableEvent.TYPE_ROW_FILTER_CHANGED:
+      case TableEvent.TYPE_ROWS_INSERTED -> handleModelRowsInserted(event.getRows());
+      case TableEvent.TYPE_ROWS_UPDATED -> handleModelRowsUpdated(event.getRows());
+      case TableEvent.TYPE_ROWS_DELETED -> handleModelRowsDeleted(event.getRows());
+      case TableEvent.TYPE_ALL_ROWS_DELETED -> handleModelAllRowsDeleted();
+      case TableEvent.TYPE_ROWS_SELECTED -> handleModelRowsSelected(event.getRows());
+      case TableEvent.TYPE_ROW_ORDER_CHANGED -> handleModelRowOrderChanged(event.getRows());
+      case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED -> handleModelColumnStructureChanged();
+      case TableEvent.TYPE_COLUMN_ORDER_CHANGED -> handleModelColumnOrderChanged();
+      case TableEvent.TYPE_COLUMN_HEADERS_UPDATED -> handleModelColumnHeadersUpdated(event.getColumns());
+      case TableEvent.TYPE_ROWS_CHECKED -> handleModelRowsChecked(event.getRows());
+      case TableEvent.TYPE_ROWS_EXPANDED -> handleModelRowsExpanded(event.getRows());
+      case TableEvent.TYPE_ROW_FILTER_CHANGED ->
         // See special handling in bufferModelEvent()
-        throw new IllegalStateException("Unsupported event type: " + event);
-      case TableEvent.TYPE_REQUEST_FOCUS:
-        handleModelRequestFocus(event);
-        break;
-      case TableEvent.TYPE_SCROLL_TO_SELECTION:
-        handleModelScrollToSelection(event);
-        break;
-      case TableEvent.TYPE_USER_FILTER_ADDED:
-      case TableEvent.TYPE_USER_FILTER_REMOVED:
-        handleModelUserFilterChange(event);
-        break;
-      case TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED:
-        handleModelColumnAggregationChanged(event);
-        break;
-      case TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED:
-        handleModelColumnBackgroundEffectChanged(event);
-        break;
-      case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL:
-        handleModelRequestFocusInCell(event);
-        break;
-      case TableEvent.TYPE_START_CELL_EDIT:
-        handleModelStartCellEdit(event);
-        break;
-      case TableEvent.TYPE_END_CELL_EDIT:
-        handleModelEndCellEdit(event);
-        break;
-      default:
+          throw new IllegalStateException("Unsupported event type: " + event);
+      case TableEvent.TYPE_REQUEST_FOCUS -> handleModelRequestFocus(event);
+      case TableEvent.TYPE_SCROLL_TO_SELECTION -> handleModelScrollToSelection(event);
+      case TableEvent.TYPE_USER_FILTER_ADDED, TableEvent.TYPE_USER_FILTER_REMOVED -> handleModelUserFilterChange(event);
+      case TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED -> handleModelColumnAggregationChanged(event);
+      case TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED -> handleModelColumnBackgroundEffectChanged(event);
+      case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL -> handleModelRequestFocusInCell(event);
+      case TableEvent.TYPE_START_CELL_EDIT -> handleModelStartCellEdit(event);
+      case TableEvent.TYPE_END_CELL_EDIT -> handleModelEndCellEdit(event);
+      default -> {
         // NOP
+      }
     }
   }
 

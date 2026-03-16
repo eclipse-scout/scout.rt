@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -35,12 +35,7 @@ public class DefaultTableEventHistory extends AbstractEventHistory<TableEvent> {
   @Override
   public void notifyEvent(TableEvent event) {
     switch (event.getType()) {
-      case TableEvent.TYPE_REQUEST_FOCUS:
-      case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL:
-      case TableEvent.TYPE_SCROLL_TO_SELECTION: {
-        addToCache(event.getType(), event);
-        break;
-      }
+      case TableEvent.TYPE_REQUEST_FOCUS, TableEvent.TYPE_REQUEST_FOCUS_IN_CELL, TableEvent.TYPE_SCROLL_TO_SELECTION -> addToCache(event.getType(), event);
     }
   }
 }

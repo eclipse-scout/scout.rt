@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -145,14 +145,11 @@ public class StatementProcessorCreateSqlDumpTest {
     }
 
     public String getDump(StatementType type) {
-      switch (type) {
-        case PLAIN_TEXT:
-          return createSqlDump(false, true);
-        case WITH_BINDS:
-          return createSqlDump(true, false);
-        default:
-          throw new IllegalStateException("unexpected StatementType:" + type);
-      }
+      return switch (type) {
+        case PLAIN_TEXT -> createSqlDump(false, true);
+        case WITH_BINDS -> createSqlDump(true, false);
+        default -> throw new IllegalStateException("unexpected StatementType:" + type);
+      };
     }
   }
 }

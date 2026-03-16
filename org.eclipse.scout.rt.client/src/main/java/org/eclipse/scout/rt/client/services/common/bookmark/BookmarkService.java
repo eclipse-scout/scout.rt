@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -62,7 +62,7 @@ public class BookmarkService implements IBookmarkService {
 
   protected void handleBookmarksChangedInternal(BookmarkServiceEvent e) {
     switch (e.getType()) {
-      case BookmarkServiceEvent.TYPE_CHANGED: {
+      case BookmarkServiceEvent.TYPE_CHANGED -> {
         //refresh global keystrokes
         final List<Bookmark> list = new ArrayList<>();
         IBookmarkVisitor visitor = new IBookmarkVisitor() {
@@ -98,7 +98,6 @@ public class BookmarkService implements IBookmarkService {
           }
           desktop.setKeyStrokes(newKeyStrokes);
         }
-        break;
       }
     }
   }

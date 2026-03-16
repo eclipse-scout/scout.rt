@@ -447,18 +447,13 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   @SuppressWarnings("SwitchStatementWithTooFewBranches")
   protected void bufferModelEvent(final TreeEvent event) {
     switch (event.getType()) {
-      case TreeEvent.TYPE_NODE_FILTER_CHANGED: {
-        // Convert the "filter changed" event to a NODES_DELETED and a NODES_INSERTED event. This prevents sending unnecessary
+      case TreeEvent.TYPE_NODE_FILTER_CHANGED -> // Convert the "filter changed" event to a NODES_DELETED and a NODES_INSERTED event. This prevents sending unnecessary
         // data to the UI. We convert the event before adding it to the event buffer to allow coalescing on UI-level.
         // NOTE: This may lead to a temporary inconsistent situation, where node events exist in the buffer after the
         // node itself is deleted. This is because the node is not really deleted from the model. However, when processing
         // the buffered events, the "wrong" events will be ignored and everything is fixed again.
-        applyFilterChangedEventToUiRec(Collections.singletonList(getModel().getRootNode()));
-        break;
-      }
-      default: {
-        m_eventBuffer.add(event);
-      }
+          applyFilterChangedEventToUiRec(Collections.singletonList(getModel().getRootNode()));
+      default -> m_eventBuffer.add(event);
     }
   }
 
@@ -536,26 +531,16 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
 
   protected void processBufferedEvent(TreeEvent event) {
     switch (event.getType()) {
-      case TreeEvent.TYPE_NODES_INSERTED:
-        handleModelNodesInserted(event);
-        break;
-      case TreeEvent.TYPE_NODES_UPDATED:
-        handleModelNodesUpdated(event);
-        break;
-      case TreeEvent.TYPE_NODES_DELETED:
-        handleModelNodesDeleted(event);
-        break;
-      case TreeEvent.TYPE_ALL_CHILD_NODES_DELETED:
-        handleModelAllChildNodesDeleted(event);
-        break;
-      case TreeEvent.TYPE_NODE_EXPANDED:
-      case TreeEvent.TYPE_NODE_COLLAPSED:
+      case TreeEvent.TYPE_NODES_INSERTED -> handleModelNodesInserted(event);
+      case TreeEvent.TYPE_NODES_UPDATED -> handleModelNodesUpdated(event);
+      case TreeEvent.TYPE_NODES_DELETED -> handleModelNodesDeleted(event);
+      case TreeEvent.TYPE_ALL_CHILD_NODES_DELETED -> handleModelAllChildNodesDeleted(event);
+      case TreeEvent.TYPE_NODE_EXPANDED, TreeEvent.TYPE_NODE_COLLAPSED -> {
         if (!isInvisibleRootNode(event.getNode())) { // Not necessary to send events for invisible root node
           handleModelNodeExpanded(event.getNode(), false);
         }
-        break;
-      case TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE:
-      case TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE:
+      }
+      case TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE, TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE -> {
         if (isInvisibleRootNode(event.getNode())) { // Send event for all child nodes
           for (ITreeNode childNode : event.getNode().getChildNodes()) {
             handleModelNodeExpanded(childNode, true);
@@ -564,31 +549,17 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
         else {
           handleModelNodeExpanded(event.getNode(), true);
         }
-        break;
-      case TreeEvent.TYPE_NODES_SELECTED:
-        handleModelNodesSelected(event.getNodes());
-        break;
-      case TreeEvent.TYPE_NODES_CHECKED:
-        handleModelNodesChecked(event.getNodes());
-        break;
-      case TreeEvent.TYPE_NODE_CHANGED:
-        handleModelNodeChanged(event.getNode());
-        break;
-      case TreeEvent.TYPE_NODE_FILTER_CHANGED:
+      }
+      case TreeEvent.TYPE_NODES_SELECTED -> handleModelNodesSelected(event.getNodes());
+      case TreeEvent.TYPE_NODES_CHECKED -> handleModelNodesChecked(event.getNodes());
+      case TreeEvent.TYPE_NODE_CHANGED -> handleModelNodeChanged(event.getNode());
+      case TreeEvent.TYPE_NODE_FILTER_CHANGED ->
         // See special handling in bufferModelEvent()
-        throw new IllegalStateException("Unsupported event type: " + event);
-      case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED:
-        handleModelChildNodeOrderChanged(event);
-        break;
-      case TreeEvent.TYPE_REQUEST_FOCUS:
-        handleModelRequestFocus(event);
-        break;
-      case TreeEvent.TYPE_SCROLL_TO_SELECTION:
-        handleModelScrollToSelection(event);
-        break;
-      default:
-        handleModelOtherTreeEvent(event);
-        break;
+          throw new IllegalStateException("Unsupported event type: " + event);
+      case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED -> handleModelChildNodeOrderChanged(event);
+      case TreeEvent.TYPE_REQUEST_FOCUS -> handleModelRequestFocus(event);
+      case TreeEvent.TYPE_SCROLL_TO_SELECTION -> handleModelScrollToSelection(event);
+      default -> handleModelOtherTreeEvent(event);
     }
     // TODO [7.0] bsh: Tree | Events not yet implemented:
     // - TYPE_NODE_REQUEST_FOCUS

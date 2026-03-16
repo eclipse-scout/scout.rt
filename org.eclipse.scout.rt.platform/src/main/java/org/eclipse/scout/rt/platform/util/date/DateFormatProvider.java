@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -79,16 +79,11 @@ public class DateFormatProvider {
   }
 
   public String getDateFormatPattern(int patternStyle, Locale locale) {
-    switch (patternStyle) {
-      case PATTERN_STYLE_ISOLATED_DATE:
-        return getIsolatedDateFormatPattern(locale);
-      case PATTERN_STYLE_ISOLATED_TIME:
-      case PATTERN_STYLE_ISOLATED_TIME_WITH_SECONDS:
-      case PATTERN_STYLE_ISOLATED_TIME_WITH_MILLISECONDS:
-        return getIsolatedTimeFormatPattern(patternStyle, locale);
-      default:
-        throw new IllegalArgumentException("Illegal patternStyle " + patternStyle);
-    }
+    return switch (patternStyle) {
+      case PATTERN_STYLE_ISOLATED_DATE -> getIsolatedDateFormatPattern(locale);
+      case PATTERN_STYLE_ISOLATED_TIME, PATTERN_STYLE_ISOLATED_TIME_WITH_SECONDS, PATTERN_STYLE_ISOLATED_TIME_WITH_MILLISECONDS -> getIsolatedTimeFormatPattern(patternStyle, locale);
+      default -> throw new IllegalArgumentException("Illegal patternStyle " + patternStyle);
+    };
   }
 
   /**

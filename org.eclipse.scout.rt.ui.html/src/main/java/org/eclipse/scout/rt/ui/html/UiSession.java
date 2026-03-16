@@ -70,9 +70,9 @@ import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
-import org.eclipse.scout.rt.shared.session.job.filter.event.SessionJobEventFilter;
 import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.session.SessionMetricsHelper;
+import org.eclipse.scout.rt.shared.session.job.filter.event.SessionJobEventFilter;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UiSystem;
@@ -1251,17 +1251,11 @@ public class UiSession implements IUiSession {
 
       @Override
       public boolean test(final JobEvent event) {
-        switch (event.getType()) {
-          case JOB_STATE_CHANGED: {
-            return isJobDone(event.getData().getState(), event.getData().getFuture());
-          }
-          case JOB_EXECUTION_HINT_ADDED: {
-            return ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED.equals(event.getData().getExecutionHint()); // UI data available because job was marked with 'UI_INTERACTION_REQUIRED'.
-          }
-          default: {
-            return false;
-          }
-        }
+        return switch (event.getType()) {
+          case JOB_STATE_CHANGED -> isJobDone(event.getData().getState(), event.getData().getFuture());
+          case JOB_EXECUTION_HINT_ADDED -> ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED.equals(event.getData().getExecutionHint()); // UI data available because job was marked with 'UI_INTERACTION_REQUIRED'.
+          default -> false;
+        };
       }
 
       @SuppressWarnings("RedundantIfStatement")

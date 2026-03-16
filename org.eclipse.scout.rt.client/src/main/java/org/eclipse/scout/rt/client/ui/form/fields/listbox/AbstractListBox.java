@@ -314,17 +314,15 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       m_table.addTableListener(
           e -> {
             switch (e.getType()) {
-              case TableEvent.TYPE_ROWS_SELECTED: {
+              case TableEvent.TYPE_ROWS_SELECTED -> {
                 if (!getTable().isCheckable()) {
                   syncTableToValue();
                 }
-                break;
               }
-              case TableEvent.TYPE_ROWS_CHECKED: {
+              case TableEvent.TYPE_ROWS_CHECKED -> {
                 if (getTable().isCheckable()) {
                   syncTableToValue();
                 }
-                break;
               }
             }
           },

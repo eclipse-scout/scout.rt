@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -212,18 +212,10 @@ public class ProcessingStatus extends Status implements IProcessingStatus {
    *     <code>CANCEL</code>
    */
   private static int checkSeverity(int severity) {
-    switch (severity) {
-      case INFO:
-      case WARNING:
-      case ERROR:
-      case FATAL:
-      case OK: {
-        return severity;
-      }
-      default: {
-        throw new IllegalArgumentException("illegal severity: " + severity);
-      }
-    }
+    return switch (severity) {
+      case INFO, WARNING, ERROR, FATAL, OK -> severity;
+      default -> throw new IllegalArgumentException("illegal severity: " + severity);
+    };
   }
 
   /**
@@ -245,13 +237,10 @@ public class ProcessingStatus extends Status implements IProcessingStatus {
    */
   @Override
   protected String getSeverityName() {
-    switch (getSeverity()) {
-      case FATAL: {
-        return "FATAL";
-      }
-      default:
-        return super.getSeverityName();
-    }
+    return switch (getSeverity()) {
+      case FATAL -> "FATAL";
+      default -> super.getSeverityName();
+    };
   }
 
   @Override

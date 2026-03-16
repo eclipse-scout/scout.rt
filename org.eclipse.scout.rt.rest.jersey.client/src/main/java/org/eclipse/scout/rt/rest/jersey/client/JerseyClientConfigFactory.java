@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -92,15 +92,11 @@ public class JerseyClientConfigFactory implements IRestClientConfigFactory {
 
   protected Verbosity getVerbosity(ClientConfig clientConfig) {
     LoggerVerbosity verbosity = Assertions.assertType(clientConfig.getProperty(RestClientProperties.LOGGING_LOGGER_VERBOSITY), LoggerVerbosity.class);
-    switch (verbosity) {
-      case HEADERS_ONLY:
-        return Verbosity.HEADERS_ONLY;
-      case PAYLOAD_ANY:
-        return Verbosity.PAYLOAD_ANY;
-      case PAYLOAD_TEXT:
-        return Verbosity.PAYLOAD_TEXT;
-      default:
-        return LoggingFeature.DEFAULT_VERBOSITY;
-    }
+    return switch (verbosity) {
+      case HEADERS_ONLY -> Verbosity.HEADERS_ONLY;
+      case PAYLOAD_ANY -> Verbosity.PAYLOAD_ANY;
+      case PAYLOAD_TEXT -> Verbosity.PAYLOAD_TEXT;
+      default -> LoggingFeature.DEFAULT_VERBOSITY;
+    };
   }
 }

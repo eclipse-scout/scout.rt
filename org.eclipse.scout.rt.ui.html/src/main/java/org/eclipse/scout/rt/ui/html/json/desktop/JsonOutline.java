@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -316,12 +316,12 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   @Override
   protected void handleModelOtherTreeEvent(TreeEvent event) {
     switch (event.getType()) {
-      case OutlineEvent.TYPE_PAGE_CHANGED:
-        handleModelPageChanged((OutlineEvent) event);
-        break;
+      case OutlineEvent.TYPE_PAGE_CHANGED -> handleModelPageChanged((OutlineEvent) event);
+
       // Note: Check acceptModelTreeEvent() before adding new cases here
-      default:
+      default -> {
         //NOP
+      }
     }
   }
 

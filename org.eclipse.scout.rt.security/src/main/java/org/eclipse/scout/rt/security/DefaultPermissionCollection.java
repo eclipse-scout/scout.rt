@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -113,16 +113,19 @@ public class DefaultPermissionCollection extends AbstractPermissionCollection {
         .collect(Collectors.toSet());
 
     switch (grantedLevels.size()) {
-      case 0:
+      case 0 -> {
         LOG.trace("getGrantedPermissionLevel({}): Not found", permission);
         return PermissionLevel.NONE; // no such permission was granted
-      case 1:
+      }
+      case 1 -> {
         PermissionLevel level = grantedLevels.iterator().next();
         LOG.trace("getGrantedPermissionLevel({}): Unique item found, returning level {}", permission, level);
         return level;
-      default:
+      }
+      default -> {
         LOG.trace("getGrantedPermissionLevel({}): Multiple levels found, data-depending - using undefined level", permission);
         return PermissionLevel.UNDEFINED; // there are multiple permissions matching - concrete level depends on a data
+      }
     }
   }
 

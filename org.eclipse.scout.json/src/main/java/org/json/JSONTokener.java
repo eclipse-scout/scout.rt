@@ -120,24 +120,16 @@ public class JSONTokener {
    */
   public Object nextValue() {
     int c = nextCleanInternal();
-    switch (c) {
-      case -1:
-        throw syntaxError("End of input");
-
-      case '{':
-        return readObject();
-
-      case '[':
-        return readArray();
-
-      case '\'':
-      case '"':
-        return nextString((char) c);
-
-      default:
+    return switch (c) {
+      case -1 -> throw syntaxError("End of input");
+      case '{' -> readObject();
+      case '[' -> readArray();
+      case '\'', '"' -> nextString((char) c);
+      default -> {
         m_pos--;
-        return readLiteral();
-    }
+        yield readLiteral();
+      }
+    };
   }
 
   @SuppressWarnings("squid:S128")
@@ -145,20 +137,17 @@ public class JSONTokener {
     while (m_pos < m_in.length()) {
       int c = m_in.charAt(m_pos++);
       switch (c) {
-        case '\t':
-        case ' ':
-        case '\n':
-        case '\r':
+        case '\t', ' ', '\n', '\r' -> {
           continue;
-
-        case '/':
+        }
+        case '/' -> {
           if (m_pos == m_in.length()) {
             return c;
           }
 
           char peek = m_in.charAt(m_pos);
           switch (peek) {
-            case '*':
+            case '*' -> {
               // skip a /* c-style comment */
               m_pos++;
               int commentEnd = m_in.indexOf("*/", m_pos);
@@ -167,18 +156,19 @@ public class JSONTokener {
               }
               m_pos = commentEnd + 2;
               continue;
-
-            case '/':
+            }
+            case '/' -> {
               // skip a // end-of-line comment
               m_pos++;
               skipToEndOfLine();
               continue;
-
-            default:
+            }
+            default -> {
               return c;
+            }
           }
-
-        case '#':
+        }
+        case '#' -> {
           /*
            * Skip a # hash end-of-line comment. The JSON RFC doesn't
            * specify this behavior, but it's required to parse
@@ -186,9 +176,10 @@ public class JSONTokener {
            */
           skipToEndOfLine();
           continue;
-
-        default:
+        }
+        default -> {
           return c;
+        }
       }
     }
 
@@ -266,7 +257,7 @@ public class JSONTokener {
   private char readEscapeCharacter() {
     char escaped = m_in.charAt(m_pos++);
     switch (escaped) {
-      case 'u':
+      case 'u' -> {
         if (m_pos + 4 > m_in.length()) {
           throw syntaxError("Unterminated escape sequence");
         }
@@ -278,27 +269,25 @@ public class JSONTokener {
         catch (NumberFormatException nfe) {
           throw syntaxError("Invalid escape sequence: " + hex);
         }
-
-      case 't':
+      }
+      case 't' -> {
         return '\t';
-
-      case 'b':
+      }
+      case 'b' -> {
         return '\b';
-
-      case 'n':
+      }
+      case 'n' -> {
         return '\n';
-
-      case 'r':
+      }
+      case 'r' -> {
         return '\r';
-
-      case 'f':
+      }
+      case 'f' -> {
         return '\f';
-
-      case '\'':
-      case '"':
-      case '\\':
-      default:
+      }
+      default -> {
         return escaped;
+      }
     }
   }
 
@@ -427,13 +416,13 @@ public class JSONTokener {
       result.put((String) name, nextValue());
 
       switch (nextCleanInternal()) {
-        case '}':
+        case '}' -> {
           return result;
-        case ';':
-        case ',': // NOSONAR
-          continue;
-        default:
-          throw syntaxError("Unterminated object");
+        }
+        case ';', ',' -> {
+          continue; // NOSONAR
+        }
+        default -> throw syntaxError("Unterminated object");
       }
     }
   }
@@ -451,34 +440,33 @@ public class JSONTokener {
 
     while (true) {
       switch (nextCleanInternal()) {
-        case -1:
-          throw syntaxError("Unterminated array");
-        case ']':
+        case -1 -> throw syntaxError("Unterminated array");
+        case ']' -> {
           if (hasTrailingSeparator) {
             result.put(null);
           }
           return result;
-        case ',':
-        case ';': // NOSONAR
+        }
+        case ',', ';' -> {
           /* A separator without a value first means "null". */
           result.put(null);
           hasTrailingSeparator = true;
           continue;
-        default:
-          m_pos--;
+        }
+        default -> m_pos--;
       }
 
       result.put(nextValue());
 
       switch (nextCleanInternal()) {
-        case ']':
+        case ']' -> {
           return result;
-        case ',':
-        case ';': // NOSONAR
+        }
+        case ',', ';' -> {
           hasTrailingSeparator = true;
           continue;
-        default:
-          throw syntaxError("Unterminated array");
+        }
+        default -> throw syntaxError("Unterminated array");
       }
     }
   }

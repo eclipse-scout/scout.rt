@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -242,35 +242,17 @@ public final class TypeCastUtility {
     if (fromId == 0) {
       throw new IllegalArgumentException(primitiveType + " no primitive type");
     }
-    switch (fromId) {
-      case BOOLEAN: {
-        return (T) Boolean.FALSE;
-      }
-      case BYTE: {
-        return (T) Byte.valueOf((byte) 0);
-      }
-      case CHARACTER: {
-        return (T) Character.valueOf('\u0000');
-      }
-      case SHORT: {
-        return (T) Short.valueOf((short) 0);
-      }
-      case INTEGER: {
-        return (T) Integer.valueOf(0);
-      }
-      case LONG: {
-        return (T) Long.valueOf(0L);
-      }
-      case FLOAT: {
-        return (T) Float.valueOf(0.0f);
-      }
-      case DOUBLE: {
-        return (T) Double.valueOf(0.0);
-      }
-      default: {
-        throw new IllegalArgumentException(primitiveType + " no primitive type");
-      }
-    }
+    return switch (fromId) {
+      case BOOLEAN -> (T) Boolean.FALSE;
+      case BYTE -> (T) Byte.valueOf((byte) 0);
+      case CHARACTER -> (T) Character.valueOf('\u0000');
+      case SHORT -> (T) Short.valueOf((short) 0);
+      case INTEGER -> (T) Integer.valueOf(0);
+      case LONG -> (T) Long.valueOf(0L);
+      case FLOAT -> (T) Float.valueOf(0.0f);
+      case DOUBLE -> (T) Double.valueOf(0.0);
+      default -> throw new IllegalArgumentException(primitiveType + " no primitive type");
+    };
   }
 
   /**
@@ -353,740 +335,721 @@ public final class TypeCastUtility {
       throw createException(o, fromType, toType, 3, "no to-mapping");
     }
     switch (fromId) {
-      case CHARACTER: {
+      case CHARACTER -> {
         switch (toId) {
-          case CHARACTER: {
+          case CHARACTER -> {
             return o;
           }
-          case BYTE: {
+          case BYTE -> {
             return txCharToByte(((Character) o).charValue());
           }
-          case BOOLEAN: {
+          case BOOLEAN -> {
             return txCharToBoolean(((Character) o).charValue());
           }
-          case TRISTATE: {
+          case TRISTATE -> {
             return txCharToTriState(((Character) o).charValue());
           }
-          case SHORT: {
+          case SHORT -> {
             return txCharToShort(((Character) o).charValue());
           }
-          case INTEGER: {
+          case INTEGER -> {
             return txCharToInt(((Character) o).charValue());
           }
-          case LONG: {
+          case LONG -> {
             return txCharToLong(((Character) o).charValue());
           }
-          case FLOAT: {
+          case FLOAT -> {
             return txCharToFloat(((Character) o).charValue());
           }
-          case DOUBLE: {
+          case DOUBLE -> {
             return txCharToDouble(((Character) o).charValue());
           }
-          case STRING: {
+          case STRING -> {
             return txCharToString(((Character) o).charValue());
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
-          case BIGINTEGER: {
+          case BIGINTEGER -> {
             return txCharToBigInteger(((Character) o).charValue());
           }
-          case BIGDECIMAL: {
+          case BIGDECIMAL -> {
             return txCharToBigDecimal(((Character) o).charValue());
           }
         }
-        break;
       }
-      case BYTE: {
+      case BYTE -> {
         switch (toId) {
-          case CHARACTER: {
+          case CHARACTER -> {
             return txByteToChar(((Byte) o).byteValue());
           }
-          case BYTE: {
+          case BYTE -> {
             return o;
           }
-          case BOOLEAN: {
+          case BOOLEAN -> {
             return txByteToBoolean(((Byte) o).byteValue());
           }
-          case TRISTATE: {
+          case TRISTATE -> {
             return txByteToTriState(((Byte) o).byteValue());
           }
-          case SHORT: {
+          case SHORT -> {
             return txByteToShort(((Byte) o).byteValue());
           }
-          case INTEGER: {
+          case INTEGER -> {
             return txByteToInt(((Byte) o).byteValue());
           }
-          case LONG: {
+          case LONG -> {
             return txByteToLong(((Byte) o).byteValue());
           }
-          case FLOAT: {
+          case FLOAT -> {
             return txByteToFloat(((Byte) o).byteValue());
           }
-          case DOUBLE: {
+          case DOUBLE -> {
             return txByteToDouble(((Byte) o).byteValue());
           }
-          case STRING: {
+          case STRING -> {
             return txByteToString(((Byte) o).byteValue());
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
-          case BIGINTEGER: {
+          case BIGINTEGER -> {
             return txByteToBigInteger(((Byte) o).byteValue());
           }
-          case BIGDECIMAL: {
+          case BIGDECIMAL -> {
             return txByteToBigDecimal(((Byte) o).byteValue());
           }
         }
-        break;
       }
-      case BOOLEAN: {
+      case BOOLEAN -> {
         switch (toId) {
-          case CHARACTER: {
+          case CHARACTER -> {
             return txBooleanToChar(((Boolean) o).booleanValue());
           }
-          case BYTE: {
+          case BYTE -> {
             return txBooleanToByte(((Boolean) o).booleanValue());
           }
-          case BOOLEAN: {
+          case BOOLEAN -> {
             return o;
           }
-          case TRISTATE: {
+          case TRISTATE -> {
             return txBooleanToTriState(((Boolean) o).booleanValue());
           }
-          case SHORT: {
+          case SHORT -> {
             return txBooleanToShort(((Boolean) o).booleanValue());
           }
-          case INTEGER: {
+          case INTEGER -> {
             return txBooleanToInt(((Boolean) o).booleanValue());
           }
-          case LONG: {
+          case LONG -> {
             return txBooleanToLong(((Boolean) o).booleanValue());
           }
-          case FLOAT: {
+          case FLOAT -> {
             return txBooleanToFloat(((Boolean) o).booleanValue());
           }
-          case DOUBLE: {
+          case DOUBLE -> {
             return txBooleanToDouble(((Boolean) o).booleanValue());
           }
-          case STRING: {
+          case STRING -> {
             return txBooleanToString(((Boolean) o).booleanValue());
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
-          case BIGINTEGER: {
+          case BIGINTEGER -> {
             return txBooleanToBigInteger(((Boolean) o).booleanValue());
           }
-          case BIGDECIMAL: {
+          case BIGDECIMAL -> {
             return txBooleanToBigDecimal(((Boolean) o).booleanValue());
           }
         }
-        break;
       }
-      case TRISTATE: {
+      case TRISTATE -> {
         switch (toId) {
-          case CHARACTER: {
+          case CHARACTER -> {
             return txTriStateToChar((TriState) o);
           }
-          case BYTE: {
+          case BYTE -> {
             return txTriStateToByte((TriState) o);
           }
-          case BOOLEAN: {
+          case BOOLEAN -> {
             return txTriStateToBoolean((TriState) o);
           }
-          case TRISTATE: {
+          case TRISTATE -> {
             return o;
           }
-          case SHORT: {
+          case SHORT -> {
             return txTriStateToShort((TriState) o);
           }
-          case INTEGER: {
+          case INTEGER -> {
             return txTriStateToInt((TriState) o);
           }
-          case LONG: {
+          case LONG -> {
             return txTriStateToLong((TriState) o);
           }
-          case FLOAT: {
+          case FLOAT -> {
             return txTriStateToFloat((TriState) o);
           }
-          case DOUBLE: {
+          case DOUBLE -> {
             return txTriStateToDouble((TriState) o);
           }
-          case STRING: {
+          case STRING -> {
             return txTriStateToString((TriState) o);
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
-          case BIGINTEGER: {
+          case BIGINTEGER -> {
             return txTriStateToBigInteger((TriState) o);
           }
-          case BIGDECIMAL: {
+          case BIGDECIMAL -> {
             return txTriStateToBigDecimal((TriState) o);
           }
         }
-        break;
       }
-      case SHORT: {
+      case SHORT -> {
         switch (toId) {
-          case CHARACTER: {
+          case CHARACTER -> {
             return txShortToChar(((Short) o).shortValue());
           }
-          case BYTE: {
+          case BYTE -> {
             return txShortToByte(((Short) o).shortValue());
           }
-          case BOOLEAN: {
+          case BOOLEAN -> {
             return txShortToBoolean(((Short) o).shortValue());
           }
-          case TRISTATE: {
+          case TRISTATE -> {
             return txShortToTriState(((Short) o).shortValue());
           }
-          case SHORT: {
+          case SHORT -> {
             return o;
           }
-          case INTEGER: {
+          case INTEGER -> {
             return txShortToInt(((Short) o).shortValue());
           }
-          case LONG: {
+          case LONG -> {
             return txShortToLong(((Short) o).shortValue());
           }
-          case FLOAT: {
+          case FLOAT -> {
             return txShortToFloat(((Short) o).shortValue());
           }
-          case DOUBLE: {
+          case DOUBLE -> {
             return txShortToDouble(((Short) o).shortValue());
           }
-          case STRING: {
+          case STRING -> {
             return txShortToString(((Short) o).shortValue());
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
-          case BIGINTEGER: {
+          case BIGINTEGER -> {
             return txShortToBigInteger(((Short) o).shortValue());
           }
-          case BIGDECIMAL: {
+          case BIGDECIMAL -> {
             return txShortToBigDecimal(((Short) o).shortValue());
           }
         }
-        break;
       }
-      case INTEGER: {
+      case INTEGER -> {
         switch (toId) {
-          case CHARACTER: {
+          case CHARACTER -> {
             return txIntToChar(((Integer) o).intValue());
           }
-          case BYTE: {
+          case BYTE -> {
             return txIntToByte(((Integer) o).intValue());
           }
-          case BOOLEAN: {
+          case BOOLEAN -> {
             return txIntToBoolean(((Integer) o).intValue());
           }
-          case TRISTATE: {
+          case TRISTATE -> {
             return txIntToTriState(((Integer) o).intValue());
           }
-          case SHORT: {
+          case SHORT -> {
             return txIntToShort(((Integer) o).intValue());
           }
-          case INTEGER: {
+          case INTEGER -> {
             return o;
           }
-          case LONG: {
+          case LONG -> {
             return txIntToLong(((Integer) o).intValue());
           }
-          case FLOAT: {
+          case FLOAT -> {
             return txIntToFloat(((Integer) o).intValue());
           }
-          case DOUBLE: {
+          case DOUBLE -> {
             return txIntToDouble(((Integer) o).intValue());
           }
-          case STRING: {
+          case STRING -> {
             return txIntToString(((Integer) o).intValue());
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
-          case BIGINTEGER: {
+          case BIGINTEGER -> {
             return txIntToBigInteger(((Integer) o).intValue());
           }
-          case BIGDECIMAL: {
+          case BIGDECIMAL -> {
             return txIntToBigDecimal(((Integer) o).intValue());
           }
         }
-        break;
       }
-      case LONG: {
+      case LONG -> {
         switch (toId) {
-          case CHARACTER: {
+          case CHARACTER -> {
             return txLongToChar(((Long) o).longValue());
           }
-          case BYTE: {
+          case BYTE -> {
             return txLongToByte(((Long) o).longValue());
           }
-          case BOOLEAN: {
+          case BOOLEAN -> {
             return txLongToBoolean(((Long) o).longValue());
           }
-          case TRISTATE: {
+          case TRISTATE -> {
             return txLongToTriState(((Long) o).longValue());
           }
-          case SHORT: {
+          case SHORT -> {
             return txLongToShort(((Long) o).longValue());
           }
-          case INTEGER: {
+          case INTEGER -> {
             return txLongToInt(((Long) o).longValue());
           }
-          case LONG: {
+          case LONG -> {
             return o;
           }
-          case FLOAT: {
+          case FLOAT -> {
             return txLongToFloat(((Long) o).longValue());
           }
-          case DOUBLE: {
+          case DOUBLE -> {
             return txLongToDouble(((Long) o).longValue());
           }
-          case STRING: {
+          case STRING -> {
             return txLongToString(((Long) o).longValue());
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
-          case BIGINTEGER: {
+          case BIGINTEGER -> {
             return txLongToBigInteger(((Long) o).longValue());
           }
-          case BIGDECIMAL: {
+          case BIGDECIMAL -> {
             return txLongToBigDecimal(((Long) o).longValue());
           }
         }
-        break;
       }
-      case FLOAT: {
+      case FLOAT -> {
         switch (toId) {
-          case CHARACTER: {
+          case CHARACTER -> {
             return txFloatToChar(((Float) o).floatValue());
           }
-          case BYTE: {
+          case BYTE -> {
             return txFloatToByte(((Float) o).floatValue());
           }
-          case BOOLEAN: {
+          case BOOLEAN -> {
             return txFloatToBoolean(((Float) o).floatValue());
           }
-          case TRISTATE: {
+          case TRISTATE -> {
             return txFloatToTriState(((Float) o).floatValue());
           }
-          case SHORT: {
+          case SHORT -> {
             return txFloatToShort(((Float) o).floatValue());
           }
-          case INTEGER: {
+          case INTEGER -> {
             return txFloatToInt(((Float) o).floatValue());
           }
-          case LONG: {
+          case LONG -> {
             return txFloatToLong(((Float) o).floatValue());
           }
-          case FLOAT: {
+          case FLOAT -> {
             return o;
           }
-          case DOUBLE: {
+          case DOUBLE -> {
             return txFloatToDouble(((Float) o).floatValue());
           }
-          case STRING: {
+          case STRING -> {
             return txFloatToString(((Float) o).floatValue());
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
-          case BIGINTEGER: {
+          case BIGINTEGER -> {
             return txFloatToBigInteger(((Float) o).floatValue());
           }
-          case BIGDECIMAL: {
+          case BIGDECIMAL -> {
             return txFloatToBigDecimal(((Float) o).floatValue());
           }
         }
-        break;
       }
-      case DOUBLE: {
+      case DOUBLE -> {
         switch (toId) {
-          case CHARACTER: {
+          case CHARACTER -> {
             return txDoubleToChar(((Double) o).doubleValue());
           }
-          case BYTE: {
+          case BYTE -> {
             return txDoubleToByte(((Double) o).doubleValue());
           }
-          case BOOLEAN: {
+          case BOOLEAN -> {
             return txDoubleToBoolean(((Double) o).doubleValue());
           }
-          case TRISTATE: {
+          case TRISTATE -> {
             return txDoubleToTriState(((Double) o).doubleValue());
           }
-          case SHORT: {
+          case SHORT -> {
             return txDoubleToShort(((Double) o).doubleValue());
           }
-          case INTEGER: {
+          case INTEGER -> {
             return txDoubleToInt(((Double) o).doubleValue());
           }
-          case LONG: {
+          case LONG -> {
             return txDoubleToLong(((Double) o).doubleValue());
           }
-          case FLOAT: {
+          case FLOAT -> {
             return txDoubleToFloat(((Double) o).doubleValue());
           }
-          case DOUBLE: {
+          case DOUBLE -> {
             return o;
           }
-          case STRING: {
+          case STRING -> {
             return txDoubleToString(((Double) o).doubleValue());
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
-          case BIGINTEGER: {
+          case BIGINTEGER -> {
             return txDoubleToBigInteger(((Double) o).doubleValue());
           }
-          case BIGDECIMAL: {
+          case BIGDECIMAL -> {
             return txDoubleToBigDecimal(((Double) o).doubleValue());
           }
         }
-        break;
       }
-      case STRING: {
+      case STRING -> {
         if (((String) o).isEmpty()) {
           return null;// special handling for empty
         }
         // strings
         switch (toId) {
-          case CHARACTER: {
+          case CHARACTER -> {
             return txStringToChar((String) o);
           }
-          case BYTE: {
+          case BYTE -> {
             return txStringToByte((String) o);
           }
-          case BOOLEAN: {
+          case BOOLEAN -> {
             return txStringToBoolean((String) o);
           }
-          case TRISTATE: {
+          case TRISTATE -> {
             return txStringToTriState((String) o);
           }
-          case SHORT: {
+          case SHORT -> {
             return txStringToShort((String) o);
           }
-          case INTEGER: {
+          case INTEGER -> {
             return txStringToInt((String) o);
           }
-          case LONG: {
+          case LONG -> {
             return txStringToLong((String) o);
           }
-          case FLOAT: {
+          case FLOAT -> {
             return txStringToFloat((String) o);
           }
-          case DOUBLE: {
+          case DOUBLE -> {
             return txStringToDouble((String) o);
           }
-          case STRING: {
+          case STRING -> {
             return o;
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
-          case DATE: {
+          case DATE -> {
             return txStringToDate((String) o);
           }
-          case UTCDATE: {
+          case UTCDATE -> {
             return txStringToUTCDate((String) o);
           }
-          case CALENDAR: {
+          case CALENDAR -> {
             return txStringToCalendar((String) o);
           }
-          case SQLDATE: {
+          case SQLDATE -> {
             return txStringToSqlDate((String) o);
           }
-          case SQLTIME: {
+          case SQLTIME -> {
             return txStringToSqlTime((String) o);
           }
-          case SQLTIMESTAMP: {
+          case SQLTIMESTAMP -> {
             return txStringToSqlTimestamp((String) o);
           }
-          case BIGINTEGER: {
+          case BIGINTEGER -> {
             return txStringToBigInteger((String) o);
           }
-          case BIGDECIMAL: {
+          case BIGDECIMAL -> {
             return txStringToBigDecimal((String) o);
           }
         }
-        break;
       }
-      case OBJECT: {
+      case OBJECT -> {
         switch (toId) {
-          case STRING: {
+          case STRING -> {
             return txObjectToString(o);
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
         }
-        break;
       }
-      case BIGINTEGER: {
+      case BIGINTEGER -> {
         switch (toId) {
-          case CHARACTER: {
+          case CHARACTER -> {
             return txBigIntegerToChar((BigInteger) o);
           }
-          case BYTE: {
+          case BYTE -> {
             return txBigIntegerToByte((BigInteger) o);
           }
-          case BOOLEAN: {
+          case BOOLEAN -> {
             return txBigIntegerToBoolean((BigInteger) o);
           }
-          case TRISTATE: {
+          case TRISTATE -> {
             return txBigIntegerToTriState((BigInteger) o);
           }
-          case SHORT: {
+          case SHORT -> {
             return txBigIntegerToShort((BigInteger) o);
           }
-          case INTEGER: {
+          case INTEGER -> {
             return txBigIntegerToInt((BigInteger) o);
           }
-          case LONG: {
+          case LONG -> {
             return txBigIntegerToLong((BigInteger) o);
           }
-          case FLOAT: {
+          case FLOAT -> {
             return txBigIntegerToFloat((BigInteger) o);
           }
-          case DOUBLE: {
+          case DOUBLE -> {
             return txBigIntegerToDouble((BigInteger) o);
           }
-          case STRING: {
+          case STRING -> {
             return txBigIntegerToString((BigInteger) o);
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
-          case BIGINTEGER: {
+          case BIGINTEGER -> {
             return o;
           }
-          case BIGDECIMAL: {
+          case BIGDECIMAL -> {
             return txBigIntegerToBigDecimal((BigInteger) o);
           }
         }
-        break;
       }
-      case BIGDECIMAL: {
+      case BIGDECIMAL -> {
         switch (toId) {
-          case CHARACTER: {
+          case CHARACTER -> {
             return txBigDecimalToChar((BigDecimal) o);
           }
-          case BYTE: {
+          case BYTE -> {
             return txBigDecimalToByte((BigDecimal) o);
           }
-          case BOOLEAN: {
+          case BOOLEAN -> {
             return txBigDecimalToBoolean((BigDecimal) o);
           }
-          case TRISTATE: {
+          case TRISTATE -> {
             return txBigDecimalToTriState((BigDecimal) o);
           }
-          case SHORT: {
+          case SHORT -> {
             return txBigDecimalToShort((BigDecimal) o);
           }
-          case INTEGER: {
+          case INTEGER -> {
             return txBigDecimalToInt((BigDecimal) o);
           }
-          case LONG: {
+          case LONG -> {
             return txBigDecimalToLong((BigDecimal) o);
           }
-          case FLOAT: {
+          case FLOAT -> {
             return txBigDecimalToFloat((BigDecimal) o);
           }
-          case DOUBLE: {
+          case DOUBLE -> {
             return txBigDecimalToDouble((BigDecimal) o);
           }
-          case STRING: {
+          case STRING -> {
             return txBigDecimalToString((BigDecimal) o);
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
-          case BIGDECIMAL: {
+          case BIGDECIMAL -> {
             return o;
           }
-          case BIGINTEGER: {
+          case BIGINTEGER -> {
             return txBigDecimalToBigInteger((BigDecimal) o);
           }
         }
-        break;
       }
-      case DATE: {
+      case DATE -> {
         switch (toId) {
-          case DATE: {
+          case DATE -> {
             return o;
           }
-          case UTCDATE: {
+          case UTCDATE -> {
             return txDateToUTCDate((Date) o);
           }
-          case CALENDAR: {
+          case CALENDAR -> {
             return txDateToCalendar((Date) o);
           }
-          case SQLDATE: {
+          case SQLDATE -> {
             return txDateToSqlDate((Date) o);
           }
-          case SQLTIME: {
+          case SQLTIME -> {
             return txDateToSqlTime((Date) o);
           }
-          case SQLTIMESTAMP: {
+          case SQLTIMESTAMP -> {
             return txDateToSqlTimestamp((Date) o);
           }
-          case STRING: {
+          case STRING -> {
             return txDateToString((Date) o);
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
         }
-        break;
       }
-      case UTCDATE: {
+      case UTCDATE -> {
         switch (toId) {
-          case UTCDATE: {
+          case UTCDATE -> {
             return o;
           }
-          case DATE: {
+          case DATE -> {
             return txUTCDateToDate((UTCDate) o);
           }
-          case CALENDAR: {
+          case CALENDAR -> {
             return txUTCDateToCalendar((UTCDate) o);
           }
-          case SQLDATE: {
+          case SQLDATE -> {
             return txUTCDateToSqlDate((UTCDate) o);
           }
-          case SQLTIME: {
+          case SQLTIME -> {
             return txUTCDateToSqlTime((UTCDate) o);
           }
-          case SQLTIMESTAMP: {
+          case SQLTIMESTAMP -> {
             return txUTCDateToSqlTimestamp((UTCDate) o);
           }
-          case STRING: {
+          case STRING -> {
             return txUTCDateToString((UTCDate) o);
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
         }
-        break;
       }
-      case CALENDAR: {
+      case CALENDAR -> {
         switch (toId) {
-          case DATE: {
+          case DATE -> {
             return txCalendarToDate((Calendar) o);
           }
-          case UTCDATE: {
+          case UTCDATE -> {
             return txCalendarToUTCDate((Calendar) o);
           }
-          case CALENDAR: {
+          case CALENDAR -> {
             return o;
           }
-          case SQLDATE: {
+          case SQLDATE -> {
             return txCalendarToSqlDate((Calendar) o);
           }
-          case SQLTIME: {
+          case SQLTIME -> {
             return txCalendarToSqlTime((Calendar) o);
           }
-          case SQLTIMESTAMP: {
+          case SQLTIMESTAMP -> {
             return txCalendarToSqlTimestamp((Calendar) o);
           }
-          case STRING: {
+          case STRING -> {
             return txCalendarToString((Calendar) o);
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
         }
-        break;
       }
-      case SQLDATE: {
+      case SQLDATE -> {
         switch (toId) {
-          case DATE: {
+          case DATE -> {
             return o;
           }
-          case UTCDATE: {
+          case UTCDATE -> {
             return txSqlDateToUTCDate((java.sql.Date) o);
           }
-          case CALENDAR: {
+          case CALENDAR -> {
             return txSqlDateToCalendar((java.sql.Date) o);
           }
-          case SQLDATE: {
+          case SQLDATE -> {
             return o;
           }
-          case SQLTIME: {
+          case SQLTIME -> {
             return txSqlDateToSqlTime((java.sql.Date) o);
           }
-          case SQLTIMESTAMP: {
+          case SQLTIMESTAMP -> {
             return txSqlDateToSqlTimestamp((java.sql.Date) o);
           }
-          case STRING: {
+          case STRING -> {
             return txSqlDateToString((java.sql.Date) o);
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
         }
-        break;
       }
-      case SQLTIME: {
+      case SQLTIME -> {
         switch (toId) {
-          case DATE: {
+          case DATE -> {
             return o;
           }
-          case UTCDATE: {
+          case UTCDATE -> {
             return txSqlTimeToUTCDate((Time) o);
           }
-          case CALENDAR: {
+          case CALENDAR -> {
             return txSqlTimeToCalendar((Time) o);
           }
-          case SQLDATE: {
+          case SQLDATE -> {
             return txSqlTimeToSqlDate((Time) o);
           }
-          case SQLTIME: {
+          case SQLTIME -> {
             return o;
           }
-          case SQLTIMESTAMP: {
+          case SQLTIMESTAMP -> {
             return txSqlTimeToSqlTimestamp((Time) o);
           }
-          case STRING: {
+          case STRING -> {
             return txSqlTimeToString((Time) o);
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
         }
-        break;
       }
-      case SQLTIMESTAMP: {
+      case SQLTIMESTAMP -> {
         switch (toId) {
-          case DATE: {
+          case DATE -> {
             return o;
           }
-          case UTCDATE: {
+          case UTCDATE -> {
             return txSqlTimestampToUTCDate((Timestamp) o);
           }
-          case CALENDAR: {
+          case CALENDAR -> {
             return txSqlTimestampToCalendar((Timestamp) o);
           }
-          case SQLDATE: {
+          case SQLDATE -> {
             return txSqlTimestampToSqlDate((Timestamp) o);
           }
-          case SQLTIME: {
+          case SQLTIME -> {
             return txSqlTimestampToSqlTime((Timestamp) o);
           }
-          case SQLTIMESTAMP: {
+          case SQLTIMESTAMP -> {
             return o;
           }
-          case STRING: {
+          case STRING -> {
             return txSqlTimestampToString((Timestamp) o);
           }
-          case OBJECT: {
+          case OBJECT -> {
             return o;
           }
         }
-        break;
       }
     }
     throw createException(o, fromType, toType, 4, "not implementated");

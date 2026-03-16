@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -64,34 +64,13 @@ public abstract class AbstractDataModelOp implements IDataModelAttributeOp, Data
     StringBuilder b = new StringBuilder();
     if (aggregationType != null) {
       switch (aggregationType.intValue()) {
-        case AGGREGATION_AVG: {
-          b.append(TEXTS.get("ComposerFieldAggregationAvg", attributeText));
-          break;
-        }
-        case AGGREGATION_COUNT: {
-          b.append(TEXTS.get("ComposerFieldAggregationCount", attributeText));
-          break;
-        }
-        case AGGREGATION_MAX: {
-          b.append(TEXTS.get("ComposerFieldAggregationMax", attributeText));
-          break;
-        }
-        case AGGREGATION_MEDIAN: {
-          b.append(TEXTS.get("ComposerFieldAggregationMedian", attributeText));
-          break;
-        }
-        case AGGREGATION_MIN: {
-          b.append(TEXTS.get("ComposerFieldAggregationMin", attributeText));
-          break;
-        }
-        case AGGREGATION_SUM: {
-          b.append(TEXTS.get("ComposerFieldAggregationSum", attributeText));
-          break;
-        }
-        default: {
-          b.append(attributeText);
-          break;
-        }
+        case AGGREGATION_AVG -> b.append(TEXTS.get("ComposerFieldAggregationAvg", attributeText));
+        case AGGREGATION_COUNT -> b.append(TEXTS.get("ComposerFieldAggregationCount", attributeText));
+        case AGGREGATION_MAX -> b.append(TEXTS.get("ComposerFieldAggregationMax", attributeText));
+        case AGGREGATION_MEDIAN -> b.append(TEXTS.get("ComposerFieldAggregationMedian", attributeText));
+        case AGGREGATION_MIN -> b.append(TEXTS.get("ComposerFieldAggregationMin", attributeText));
+        case AGGREGATION_SUM -> b.append(TEXTS.get("ComposerFieldAggregationSum", attributeText));
+        default -> b.append(attributeText);
       }
     }
     else {

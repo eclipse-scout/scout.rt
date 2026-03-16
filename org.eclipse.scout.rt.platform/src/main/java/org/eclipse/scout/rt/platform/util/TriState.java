@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -112,14 +112,11 @@ public enum TriState {
   }
 
   private static TriState parseInt(int i) {
-    switch (i) {
-      case 0:
-        return FALSE;
-      case 1:
-        return TRUE;
-      default:
-        return UNDEFINED;
-    }
+    return switch (i) {
+      case 0 -> FALSE;
+      case 1 -> TRUE;
+      default -> UNDEFINED;
+    };
   }
 
   private static TriState parseString(String value) {

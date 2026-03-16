@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -267,30 +267,22 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
   }
 
   protected String displayHintToJson(int displayHint) {
-    switch (displayHint) {
-      case IForm.DISPLAY_HINT_DIALOG:
-        return "dialog";
-      case IForm.DISPLAY_HINT_VIEW:
-        return "view";
-      case IForm.DISPLAY_HINT_POPUP_WINDOW:
-        return "popupWindow";
-      default:
-        return null;
-    }
+    return switch (displayHint) {
+      case IForm.DISPLAY_HINT_DIALOG -> "dialog";
+      case IForm.DISPLAY_HINT_VIEW -> "view";
+      case IForm.DISPLAY_HINT_POPUP_WINDOW -> "popupWindow";
+      default -> null;
+    };
   }
 
   // ==== FormListener ==== //
   protected void handleModelFormChanged(FormEvent event) {
     switch (event.getType()) {
-      case FormEvent.TYPE_CLOSED:
-        handleModelFormClosed(event.getForm());
-        break;
-      case FormEvent.TYPE_REQUEST_FOCUS:
-      case FormEvent.TYPE_REQUEST_INPUT:
-        handleModelRequestEvent(event, false);
-        break;
-      default:
+      case FormEvent.TYPE_CLOSED -> handleModelFormClosed(event.getForm());
+      case FormEvent.TYPE_REQUEST_FOCUS, FormEvent.TYPE_REQUEST_INPUT -> handleModelRequestEvent(event, false);
+      default -> {
         // NOP
+      }
     }
   }
 
@@ -324,14 +316,11 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
   }
 
   protected String getRequestEventName(int eventType) {
-    switch (eventType) {
-      case FormEvent.TYPE_REQUEST_FOCUS:
-        return EVENT_REQUEST_FOCUS;
-      case FormEvent.TYPE_REQUEST_INPUT:
-        return EVENT_REQUEST_INPUT;
-      default:
-        throw new IllegalArgumentException("Unsupported event type");
-    }
+    return switch (eventType) {
+      case FormEvent.TYPE_REQUEST_FOCUS -> EVENT_REQUEST_FOCUS;
+      case FormEvent.TYPE_REQUEST_INPUT -> EVENT_REQUEST_INPUT;
+      default -> throw new IllegalArgumentException("Unsupported event type");
+    };
   }
 
   @Override

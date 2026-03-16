@@ -155,24 +155,25 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     uiSession.confirmResponseProcessed(jsonRequest.getAckSequenceNo());
 
     switch (jsonRequest.getRequestType()) {
-      case LOG_REQUEST:
+      case LOG_REQUEST -> {
         handleLogRequest(httpServletResponse, uiSession, jsonRequest);
         return;
-      case CANCEL_REQUEST:
+      }
+      case CANCEL_REQUEST -> {
         handleCancelRequest(httpServletResponse, uiSession);
         return;
-      case UNLOAD_REQUEST:
+      }
+      case UNLOAD_REQUEST -> {
         handleUnloadRequest(httpServletResponse, uiSession, jsonRequest);
         return;
-      case SYNC_RESPONSE_QUEUE:
+      }
+      case SYNC_RESPONSE_QUEUE -> {
         handleSyncResponseQueueRequest(httpServletResponse, uiSession, jsonRequest);
         return;
-      case REQUEST:
-      case STARTUP_REQUEST:
-      case POLL_REQUEST:
-        break; // <-- !
-      default:
-        throw new IllegalStateException("Unexpected request type: " + jsonRequest.getRequestType());
+      }
+      case REQUEST, STARTUP_REQUEST, POLL_REQUEST -> {
+      }
+      default -> throw new IllegalStateException("Unexpected request type: " + jsonRequest.getRequestType());
     }
 
     // GUI requests for the same session must be processed consecutively, therefore acquire "UI session lock"
@@ -266,21 +267,11 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     }
     message = header + "\n" + message;
     switch (level) {
-      case "trace":
-        LOG.trace(message);
-        break;
-      case "debug":
-        LOG.debug(message);
-        break;
-      case "info":
-        LOG.info(message);
-        break;
-      case "warn":
-        LOG.warn(message);
-        break;
-      default:
-        LOG.error(message);
-        break;
+      case "trace" -> LOG.trace(message);
+      case "debug" -> LOG.debug(message);
+      case "info" -> LOG.info(message);
+      case "warn" -> LOG.warn(message);
+      default -> LOG.error(message);
     }
     writeJsonResponse(resp, m_jsonRequestHelper.createEmptyResponse());
   }

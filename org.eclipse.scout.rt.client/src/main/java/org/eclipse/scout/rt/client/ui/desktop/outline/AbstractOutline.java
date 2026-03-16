@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -896,18 +896,9 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
 
     switch (e.getType()) {
-      case TreeEvent.TYPE_NODE_ACTION: {
-        outlineMediator.mediateTreeNodeAction(e, pageWithTable);
-        break;
-      }
-      case TreeEvent.TYPE_NODES_DRAG_REQUEST: {
-        outlineMediator.mediateTreeNodesDragRequest(e, pageWithTable);
-        break;
-      }
-      case TreeEvent.TYPE_NODE_DROP_ACTION: {
-        outlineMediator.mediateTreeNodeDropAction(e, pageWithTable);
-        break;
-      }
+      case TreeEvent.TYPE_NODE_ACTION -> outlineMediator.mediateTreeNodeAction(e, pageWithTable);
+      case TreeEvent.TYPE_NODES_DRAG_REQUEST -> outlineMediator.mediateTreeNodesDragRequest(e, pageWithTable);
+      case TreeEvent.TYPE_NODE_DROP_ACTION -> outlineMediator.mediateTreeNodeDropAction(e, pageWithTable);
     }
   }
 
@@ -918,14 +909,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
 
     switch (e.getType()) {
-      case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED:
-      case TreeEvent.TYPE_NODES_DELETED:
-      case TreeEvent.TYPE_NODES_INSERTED:
-      case TreeEvent.TYPE_NODES_UPDATED:
-      case TreeEvent.TYPE_NODES_CHECKED: {
-        outlineMediator.mediateTreeNodesChanged(pageWithNodes);
-        break;
-      }
+      case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, TreeEvent.TYPE_NODES_DELETED, TreeEvent.TYPE_NODES_INSERTED, TreeEvent.TYPE_NODES_UPDATED, TreeEvent.TYPE_NODES_CHECKED -> outlineMediator.mediateTreeNodesChanged(pageWithNodes);
     }
   }
 

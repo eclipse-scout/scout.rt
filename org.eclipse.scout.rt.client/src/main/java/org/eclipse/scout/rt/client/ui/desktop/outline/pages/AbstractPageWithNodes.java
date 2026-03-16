@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -110,22 +110,10 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
             return;
           }
           switch (e.getType()) {
-            case TableEvent.TYPE_ROW_ACTION: {
-              outlineMediator.mediateTableRowAction(e, AbstractPageWithNodes.this);
-              break;
-            }
-            case TableEvent.TYPE_ROW_DROP_ACTION: {
-              outlineMediator.mediateTableRowDropAction(e, AbstractPageWithNodes.this);
-              break;
-            }
-            case TableEvent.TYPE_ROW_FILTER_CHANGED: {
-              outlineMediator.mediateTableRowFilterChanged(AbstractPageWithNodes.this);
-              break;
-            }
-            case TableEvent.TYPE_ROWS_SELECTED: {
-              updateContextMenusForSelection();
-              break;
-            }
+            case TableEvent.TYPE_ROW_ACTION -> outlineMediator.mediateTableRowAction(e, AbstractPageWithNodes.this);
+            case TableEvent.TYPE_ROW_DROP_ACTION -> outlineMediator.mediateTableRowDropAction(e, AbstractPageWithNodes.this);
+            case TableEvent.TYPE_ROW_FILTER_CHANGED -> outlineMediator.mediateTableRowFilterChanged(AbstractPageWithNodes.this);
+            case TableEvent.TYPE_ROWS_SELECTED -> updateContextMenusForSelection();
           }
         },
         TableEvent.TYPE_ROW_ACTION,

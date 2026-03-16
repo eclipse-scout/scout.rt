@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -70,16 +70,12 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
   public RESULT intercept(final Chain<RESULT> chain) throws Exception {
     assertTransactionMemberRegistration();
 
-    switch (m_transactionScope) {
-      case REQUIRES_NEW:
-        return runTxRequiresNew(chain);
-      case REQUIRED:
-        return runTxRequired(chain);
-      case MANDATORY:
-        return runTxMandatory(chain);
-      default:
-        return Assertions.fail("Unsupported transaction scope [{}]", m_transactionScope);
-    }
+    return switch (m_transactionScope) {
+      case REQUIRES_NEW -> runTxRequiresNew(chain);
+      case REQUIRED -> runTxRequired(chain);
+      case MANDATORY -> runTxMandatory(chain);
+      default -> Assertions.fail("Unsupported transaction scope [{}]", m_transactionScope);
+    };
   }
 
   @Override

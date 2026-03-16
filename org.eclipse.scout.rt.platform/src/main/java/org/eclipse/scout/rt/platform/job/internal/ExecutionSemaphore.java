@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -182,14 +182,9 @@ public class ExecutionSemaphore implements IExecutionSemaphore {
       }
       else {
         switch (queuePosition) {
-          case HEAD:
-            m_queue.offerFirst(new AcquisitionTask(task, permitAcquiredCallback));
-            break;
-          case TAIL:
-            m_queue.offerLast(new AcquisitionTask(task, permitAcquiredCallback));
-            break;
-          default:
-            throw new IllegalArgumentException("illegal queue position");
+          case HEAD -> m_queue.offerFirst(new AcquisitionTask(task, permitAcquiredCallback));
+          case TAIL -> m_queue.offerLast(new AcquisitionTask(task, permitAcquiredCallback));
+          default -> throw new IllegalArgumentException("illegal queue position");
         }
       }
     }

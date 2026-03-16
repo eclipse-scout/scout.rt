@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -65,10 +65,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
     m_desktop.addDesktopListener(
         e -> {
           switch (e.getType()) {
-            case DesktopEvent.TYPE_OUTLINE_CHANGED: {
-              setSelected(e.getOutline() == m_outline);
-              break;
-            }
+            case DesktopEvent.TYPE_OUTLINE_CHANGED -> setSelected(e.getOutline() == m_outline);
           }
         });
     // add change listener

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -35,13 +35,7 @@ public class DefaultFormEventHistory extends AbstractEventHistory<FormEvent> {
   @Override
   public void notifyEvent(FormEvent event) {
     switch (event.getType()) {
-      case FormEvent.TYPE_REQUEST_FOCUS:
-      case FormEvent.TYPE_REQUEST_INPUT:
-      case FormEvent.TYPE_TO_BACK:
-      case FormEvent.TYPE_TO_FRONT: {
-        addToCache(event.getType(), event);
-        break;
-      }
+      case FormEvent.TYPE_REQUEST_FOCUS, FormEvent.TYPE_REQUEST_INPUT, FormEvent.TYPE_TO_BACK, FormEvent.TYPE_TO_FRONT -> addToCache(event.getType(), event);
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -323,36 +323,41 @@ public class RestClientProxyFactory {
     final Response.Status status = Response.Status.fromStatusCode(response.getStatus());
     if (status != null) {
       switch (status) {
-        case BAD_REQUEST:
+        case BAD_REQUEST -> {
           return new BadRequestException(response);
-        case UNAUTHORIZED:
+        }
+        case UNAUTHORIZED -> {
           return new NotAuthorizedException(response);
-        case FORBIDDEN:
+        }
+        case FORBIDDEN -> {
           return new ForbiddenException(response);
-        case NOT_FOUND:
+        }
+        case NOT_FOUND -> {
           return new NotFoundException(response);
-        case METHOD_NOT_ALLOWED:
+        }
+        case METHOD_NOT_ALLOWED -> {
           return new NotAllowedException(response);
-        case NOT_ACCEPTABLE:
+        }
+        case NOT_ACCEPTABLE -> {
           return new NotAcceptableException(response);
-        case UNSUPPORTED_MEDIA_TYPE:
+        }
+        case UNSUPPORTED_MEDIA_TYPE -> {
           return new NotSupportedException(response);
-        case INTERNAL_SERVER_ERROR:
+        }
+        case INTERNAL_SERVER_ERROR -> {
           return new InternalServerErrorException(response);
-        case SERVICE_UNAVAILABLE:
+        }
+        case SERVICE_UNAVAILABLE -> {
           return new ServiceUnavailableException(response);
+        }
       }
     }
 
-    switch (response.getStatusInfo().getFamily()) {
-      case REDIRECTION:
-        return new RedirectionException(response);
-      case CLIENT_ERROR:
-        return new ClientErrorException(response);
-      case SERVER_ERROR:
-        return new ServerErrorException(response);
-      default:
-        return new WebApplicationException(response);
-    }
+    return switch (response.getStatusInfo().getFamily()) {
+      case REDIRECTION -> new RedirectionException(response);
+      case CLIENT_ERROR -> new ClientErrorException(response);
+      case SERVER_ERROR -> new ServerErrorException(response);
+      default -> new WebApplicationException(response);
+    };
   }
 }

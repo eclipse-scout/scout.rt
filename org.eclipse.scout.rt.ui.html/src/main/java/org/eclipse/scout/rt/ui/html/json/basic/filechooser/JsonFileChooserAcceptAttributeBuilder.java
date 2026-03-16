@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -109,20 +109,24 @@ public class JsonFileChooserAcceptAttributeBuilder {
    */
   protected Set<String> convertToAcceptType(String mimeType, String ext) {
     switch (mimeType) {
-      case "text/csv":
-      case "text/comma-separated-values":
+      case "text/csv", "text/comma-separated-values" -> {
         return CollectionUtility.hashSet(".csv");
-      case "text/javascript":
+      }
+      case "text/javascript" -> {
         return CollectionUtility.hashSet(".js", ".mjs");
+      }
     }
     if (ext != null) {
       switch (ext) {
-        case "csv":
+        case "csv" -> {
           return CollectionUtility.hashSet(".csv");
-        case "js":
+        }
+        case "js" -> {
           return CollectionUtility.hashSet(".js");
-        case "mjs":
+        }
+        case "mjs" -> {
           return CollectionUtility.hashSet(".mjs");
+        }
       }
     }
     return CollectionUtility.hashSet(mimeType);

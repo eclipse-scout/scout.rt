@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -265,27 +265,13 @@ public class UnfoldingReader extends BufferedReader {
           // the parameter values of the parameter "TYPE" are case-insensitive for all properties defined in RFC-2426
           v = v.toUpperCase();
           switch (v) {
-            case VCardProperties.PARAM_VALUE_CAR:
-              property.addParameters(VCardProperties.PARAM_CAR);
-              break;
-            case VCardProperties.PARAM_VALUE_CELL:
-              property.addParameters(VCardProperties.PARAM_CELL);
-              break;
-            case VCardProperties.PARAM_VALUE_FAX:
-              property.addParameters(VCardProperties.PARAM_FAX);
-              break;
-            case VCardProperties.PARAM_VALUE_HOME:
-              property.addParameters(VCardProperties.PARAM_HOME);
-              break;
-            case VCardProperties.PARAM_VALUE_INTERNET:
-              property.addParameters(VCardProperties.PARAM_INTERNET);
-              break;
-            case VCardProperties.PARAM_VALUE_VOICE:
-              property.addParameters(VCardProperties.PARAM_VOICE);
-              break;
-            case VCardProperties.PARAM_VALUE_WORK:
-              property.addParameters(VCardProperties.PARAM_WORK);
-              break;
+            case VCardProperties.PARAM_VALUE_CAR -> property.addParameters(VCardProperties.PARAM_CAR);
+            case VCardProperties.PARAM_VALUE_CELL -> property.addParameters(VCardProperties.PARAM_CELL);
+            case VCardProperties.PARAM_VALUE_FAX -> property.addParameters(VCardProperties.PARAM_FAX);
+            case VCardProperties.PARAM_VALUE_HOME -> property.addParameters(VCardProperties.PARAM_HOME);
+            case VCardProperties.PARAM_VALUE_INTERNET -> property.addParameters(VCardProperties.PARAM_INTERNET);
+            case VCardProperties.PARAM_VALUE_VOICE -> property.addParameters(VCardProperties.PARAM_VOICE);
+            case VCardProperties.PARAM_VALUE_WORK -> property.addParameters(VCardProperties.PARAM_WORK);
           }
         }
         property.addParameters(new PropertyParameter(VCardProperties.PARAM_NAME_TYPE, values.isEmpty() ? null : values.toArray(new String[0])));

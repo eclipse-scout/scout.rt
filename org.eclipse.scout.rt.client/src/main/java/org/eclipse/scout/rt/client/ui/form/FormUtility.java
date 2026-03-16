@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,22 +27,10 @@ public final class FormUtility {
     if (viewId == null) {
       return IForm.VIEW_ID_CENTER;
     }
-    switch (viewId) {
-      case IForm.VIEW_ID_NW:
-      case IForm.VIEW_ID_W:
-      case IForm.VIEW_ID_SW:
-
-      case IForm.VIEW_ID_N:
-      case IForm.VIEW_ID_CENTER:
-      case IForm.VIEW_ID_S:
-
-      case IForm.VIEW_ID_NE:
-      case IForm.VIEW_ID_E:
-      case IForm.VIEW_ID_SE:
-        return viewId;
-      default:
-        return IForm.VIEW_ID_CENTER;
-    }
+    return switch (viewId) {
+      case IForm.VIEW_ID_NW, IForm.VIEW_ID_W, IForm.VIEW_ID_SW, IForm.VIEW_ID_N, IForm.VIEW_ID_CENTER, IForm.VIEW_ID_S, IForm.VIEW_ID_NE, IForm.VIEW_ID_E, IForm.VIEW_ID_SE -> viewId;
+      default -> IForm.VIEW_ID_CENTER;
+    };
   }
 
   /**

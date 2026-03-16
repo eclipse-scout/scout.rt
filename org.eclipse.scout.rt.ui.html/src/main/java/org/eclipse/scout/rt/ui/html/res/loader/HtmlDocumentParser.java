@@ -270,7 +270,7 @@ public class HtmlDocumentParser {
     String text = "";
     if (!keys.isEmpty()) {
       switch (style) {
-        case "javascript":
+        case "javascript" -> {
           // JavaScript style replacement
           StringBuilder js = new StringBuilder("{");
           for (String key : keys) {
@@ -282,12 +282,11 @@ public class HtmlDocumentParser {
           js.delete(length - 2, length);
           js.append("}");
           text = js.toString();
-          break;
-        case "plain":
+        }
+        case "plain" ->
           // Plain normal replacement (only supports one key, because we don't know how to separate multiple keys)
-          text = TEXTS.get(keys.getFirst());
-          break;
-        case "tag":
+            text = TEXTS.get(keys.getFirst());
+        case "tag" -> {
           StringBuilder tags = new StringBuilder();
           for (String key : keys) {
             String scoutText = HTML.tag("scout-text")
@@ -298,11 +297,8 @@ public class HtmlDocumentParser {
             tags.append(scoutText).append("\n");
           }
           text = tags.toString();
-          break;
-        case "html":
-        default:
-          text = htmlHelper.escape(TEXTS.get(keys.getFirst()));
-          break;
+        }
+        default -> text = htmlHelper.escape(TEXTS.get(keys.getFirst()));
       }
     }
     return Matcher.quoteReplacement(text);

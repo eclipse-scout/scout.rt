@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -649,16 +649,11 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     @Override
     public void propertyChange(PropertyChangeEvent e) {
       switch (e.getPropertyName()) {
-        case IFormField.PROP_VISIBLE:
+        case IFormField.PROP_VISIBLE ->
           // fire group box visibility
-          handleFieldVisibilityChanged();
-          break;
-        case IFormField.PROP_SAVE_NEEDED:
-          checkSaveNeeded();
-          break;
-        case IFormField.PROP_EMPTY:
-          checkEmpty();
-          break;
+            handleFieldVisibilityChanged();
+        case IFormField.PROP_SAVE_NEEDED -> checkSaveNeeded();
+        case IFormField.PROP_EMPTY -> checkEmpty();
       }
     }
   }

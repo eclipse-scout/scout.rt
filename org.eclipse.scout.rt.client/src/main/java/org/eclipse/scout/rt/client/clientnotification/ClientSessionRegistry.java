@@ -202,14 +202,10 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
     ISession source = event.getSource();
     if (source instanceof IClientSession) {
       switch (event.getType()) {
-        case SessionEvent.TYPE_STARTED:
-          sessionStarted((IClientSession) source);
-          break;
-        case SessionEvent.TYPE_STOPPED:
-          sessionStopped((IClientSession) source);
-          break;
-        default:
-          break;
+        case SessionEvent.TYPE_STARTED -> sessionStarted((IClientSession) source);
+        case SessionEvent.TYPE_STOPPED -> sessionStopped((IClientSession) source);
+        default -> {
+        }
       }
     }
   }

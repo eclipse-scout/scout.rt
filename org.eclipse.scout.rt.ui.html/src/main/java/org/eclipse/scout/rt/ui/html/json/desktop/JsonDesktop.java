@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -427,55 +427,30 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
       return;
     }
     switch (event.getType()) {
-      case DesktopEvent.TYPE_OUTLINE_CHANGED:
-        handleModelOutlineChanged(event.getOutline());
-        break;
-      case DesktopEvent.TYPE_OUTLINE_CONTENT_ACTIVATE:
-        handleModelOutlineContentActivate();
-        break;
-      case DesktopEvent.TYPE_FORM_SHOW:
-        handleModelFormShow(event.getForm());
-        break;
-      case DesktopEvent.TYPE_FORM_HIDE:
-        handleModelFormHide(event.getForm());
-        break;
-      case DesktopEvent.TYPE_FORM_ACTIVATE:
-        handleModelFormActivate(event.getForm());
-        break;
-      case DesktopEvent.TYPE_MESSAGE_BOX_SHOW:
-        handleModelMessageBoxShow(event.getMessageBox());
-        break;
-      case DesktopEvent.TYPE_MESSAGE_BOX_HIDE:
-        handleModelMessageBoxHide(event.getMessageBox());
-        break;
-      case DesktopEvent.TYPE_FILE_CHOOSER_SHOW:
-        handleModelFileChooserShow(event.getFileChooser());
-        break;
-      case DesktopEvent.TYPE_FILE_CHOOSER_HIDE:
-        handleModelFileChooserHide(event.getFileChooser());
-        break;
-      case DesktopEvent.TYPE_OPEN_URI:
+      case DesktopEvent.TYPE_OUTLINE_CHANGED -> handleModelOutlineChanged(event.getOutline());
+      case DesktopEvent.TYPE_OUTLINE_CONTENT_ACTIVATE -> handleModelOutlineContentActivate();
+      case DesktopEvent.TYPE_FORM_SHOW -> handleModelFormShow(event.getForm());
+      case DesktopEvent.TYPE_FORM_HIDE -> handleModelFormHide(event.getForm());
+      case DesktopEvent.TYPE_FORM_ACTIVATE -> handleModelFormActivate(event.getForm());
+      case DesktopEvent.TYPE_MESSAGE_BOX_SHOW -> handleModelMessageBoxShow(event.getMessageBox());
+      case DesktopEvent.TYPE_MESSAGE_BOX_HIDE -> handleModelMessageBoxHide(event.getMessageBox());
+      case DesktopEvent.TYPE_FILE_CHOOSER_SHOW -> handleModelFileChooserShow(event.getFileChooser());
+      case DesktopEvent.TYPE_FILE_CHOOSER_HIDE -> handleModelFileChooserHide(event.getFileChooser());
+      case DesktopEvent.TYPE_OPEN_URI -> {
         if (event.getUri() != null) {
           handleModelOpenUri(event.getUri(), event.getOpenUriAction());
         }
         else if (event.getBinaryResource() != null) {
           handleModelOpenUri(event.getBinaryResource(), event.getOpenUriAction());
         }
-        break;
-      case DesktopEvent.TYPE_DESKTOP_CLOSED:
-        handleModelDesktopClosed();
-        break;
-      case DesktopEvent.TYPE_NOTIFICATION_ADDED:
-        handleModelNotificationAdded(event);
-        break;
-      case DesktopEvent.TYPE_NOTIFICATION_REMOVED:
-        handleModelNotificationRemoved(event);
-        break;
-      case DesktopEvent.TYPE_RELOAD_GUI:
-        handleModelReloadGui();
-        break;
-      default:
+      }
+      case DesktopEvent.TYPE_DESKTOP_CLOSED -> handleModelDesktopClosed();
+      case DesktopEvent.TYPE_NOTIFICATION_ADDED -> handleModelNotificationAdded(event);
+      case DesktopEvent.TYPE_NOTIFICATION_REMOVED -> handleModelNotificationRemoved(event);
+      case DesktopEvent.TYPE_RELOAD_GUI -> handleModelReloadGui();
+      default -> {
         // NOP
+      }
     }
   }
 

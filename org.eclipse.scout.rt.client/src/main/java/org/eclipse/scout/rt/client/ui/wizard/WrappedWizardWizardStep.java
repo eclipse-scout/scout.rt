@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,14 +37,13 @@ public class WrappedWizardWizardStep extends AbstractWizardStep<IForm> {
   protected void execActivate(int stepKind) {
     m_childWizard.addWizardListener(e -> {
       switch (e.getType()) {
-        case WizardEvent.TYPE_CLOSED: {
+        case WizardEvent.TYPE_CLOSED -> {
           try {
             m_parentWizard.doNextStep();
           }
           catch (RuntimeException | PlatformError t) {
             BEANS.get(ExceptionHandler.class).handle(t);
           }
-          break;
         }
       }
     });

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -437,20 +437,11 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    * @return <code>true</code>, if the event does not influence the row order.
    */
   protected boolean isRowOrderUnchanged(int type) {
-    switch (type) {
-      case TableEvent.TYPE_ROWS_SELECTED:
-      case TableEvent.TYPE_ROW_ACTION:
-      case TableEvent.TYPE_ROW_CLICK:
-      case TableEvent.TYPE_ROWS_UPDATED:
-      case TableEvent.TYPE_ROWS_CHECKED:
-      case TableEvent.TYPE_SCROLL_TO_SELECTION:
-      case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
-      case TableEvent.TYPE_COLUMN_ORDER_CHANGED:
-      case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
-        return true;
-      default:
-        return false;
-    }
+    return switch (type) {
+      case TableEvent.TYPE_ROWS_SELECTED, TableEvent.TYPE_ROW_ACTION, TableEvent.TYPE_ROW_CLICK, TableEvent.TYPE_ROWS_UPDATED, TableEvent.TYPE_ROWS_CHECKED, TableEvent.TYPE_SCROLL_TO_SELECTION, TableEvent.TYPE_COLUMN_HEADERS_UPDATED,
+           TableEvent.TYPE_COLUMN_ORDER_CHANGED, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED -> true;
+      default -> false;
+    };
   }
 
   protected Set<Integer> getRowRelatedEvents() {
@@ -467,61 +458,30 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    * @return true, if previous events of the same type can be ignored. false otherwise
    */
   protected boolean isIgnorePrevious(int type) {
-    switch (type) {
-      case TableEvent.TYPE_ROWS_SELECTED:
-      case TableEvent.TYPE_SCROLL_TO_SELECTION:
-      case TableEvent.TYPE_ROWS_DRAG_REQUEST:
-      case TableEvent.TYPE_ROW_ORDER_CHANGED:
-      case TableEvent.TYPE_COLUMN_ORDER_CHANGED:
-      case TableEvent.TYPE_ALL_ROWS_DELETED:
-      case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
-        return true;
-      }
-      default: {
-        return false;
-      }
-    }
+    return switch (type) {
+      case TableEvent.TYPE_ROWS_SELECTED, TableEvent.TYPE_SCROLL_TO_SELECTION, TableEvent.TYPE_ROWS_DRAG_REQUEST, TableEvent.TYPE_ROW_ORDER_CHANGED, TableEvent.TYPE_COLUMN_ORDER_CHANGED, TableEvent.TYPE_ALL_ROWS_DELETED,
+           TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED -> true;
+      default -> false;
+    };
   }
 
   /**
    * @return true, if previous consecutive events of the same type can be coalesced.
    */
   protected boolean isCoalesceConsecutivePrevious(int type) {
-    switch (type) {
-      case TableEvent.TYPE_ROWS_UPDATED:
-      case TableEvent.TYPE_ROWS_INSERTED:
-      case TableEvent.TYPE_ROWS_DELETED:
-      case TableEvent.TYPE_ROWS_CHECKED:
-      case TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED:
-      case TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED:
-      case TableEvent.TYPE_COLUMN_HEADERS_UPDATED: {
-        return true;
-      }
-      default: {
-        return false;
-      }
-    }
+    return switch (type) {
+      case TableEvent.TYPE_ROWS_UPDATED, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_DELETED, TableEvent.TYPE_ROWS_CHECKED, TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED, TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED,
+           TableEvent.TYPE_COLUMN_HEADERS_UPDATED -> true;
+      default -> false;
+    };
   }
 
   protected boolean isRowsRequired(int type) {
-    switch (type) {
-      case TableEvent.TYPE_ROW_ACTION:
-      case TableEvent.TYPE_ROW_CLICK:
-      case TableEvent.TYPE_ROW_DROP_ACTION:
-      case TableEvent.TYPE_ROW_ORDER_CHANGED:
-      case TableEvent.TYPE_ROWS_COPY_REQUEST:
-      case TableEvent.TYPE_ROWS_DELETED:
-      case TableEvent.TYPE_ROWS_DRAG_REQUEST:
-      case TableEvent.TYPE_ROWS_INSERTED:
-      case TableEvent.TYPE_ROWS_UPDATED:
-      case TableEvent.TYPE_ROWS_EXPANDED:
-      case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL: {
-        return true;
-      }
-      default: {
-        return false;
-      }
-    }
+    return switch (type) {
+      case TableEvent.TYPE_ROW_ACTION, TableEvent.TYPE_ROW_CLICK, TableEvent.TYPE_ROW_DROP_ACTION, TableEvent.TYPE_ROW_ORDER_CHANGED, TableEvent.TYPE_ROWS_COPY_REQUEST, TableEvent.TYPE_ROWS_DELETED, TableEvent.TYPE_ROWS_DRAG_REQUEST,
+           TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED, TableEvent.TYPE_ROWS_EXPANDED, TableEvent.TYPE_REQUEST_FOCUS_IN_CELL -> true;
+      default -> false;
+    };
   }
 
   /**

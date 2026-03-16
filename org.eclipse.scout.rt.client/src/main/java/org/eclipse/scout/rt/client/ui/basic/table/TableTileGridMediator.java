@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -70,26 +70,26 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
     if (m_table.isTileMode()) {
       List<ITableRowTileMapping> tileMappings = CollectionUtility.arrayList(getTileMappings());
       switch (e.getType()) {
-        case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
+        case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED -> {
           // when the column structure changes rows are not reloaded but retransmitted to the ui. Force a property change event for the tileMappings to ensure that the mapping is recreated on the clientside.
           setTileMappings(new ArrayList<>());
           setTileMappings(tileMappings);
-          break;
-        case TableEvent.TYPE_ROWS_INSERTED:
+        }
+        case TableEvent.TYPE_ROWS_INSERTED -> {
           tileMappings.addAll(m_table.createTiles(filterTopLevelTableRows(e.getRows())));
           setTileMappings(tileMappings);
-          break;
-        case TableEvent.TYPE_ROWS_DELETED:
+        }
+        case TableEvent.TYPE_ROWS_DELETED -> {
           Predicate<ITableRowTileMapping> p = m -> e.getRows().contains(m.getTableRow());
           tileMappings.stream().filter(p).forEach(m -> m.getTile().dispose());
           tileMappings.removeIf(p);
           setTileMappings(tileMappings);
-          break;
-        case TableEvent.TYPE_ALL_ROWS_DELETED:
+        }
+        case TableEvent.TYPE_ALL_ROWS_DELETED -> {
           tileMappings.forEach(tm -> tm.getTile().dispose());
           setTileMappings(new ArrayList<>());
-          break;
-        case TableEvent.TYPE_ROW_FILTER_CHANGED:
+        }
+        case TableEvent.TYPE_ROW_FILTER_CHANGED -> {
           List<ITableRow> filteredRows = m_table.getRows().stream()
               // Analogous to JsonTable.preprocessBufferedEvents() do not consider user filtered rows here, since these are handled directly by ui.
               .filter(row -> row.isFilterAccepted() || row.isRejectedByUser())
@@ -105,7 +105,7 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
           tileMappings.addAll(m_table.createTiles(filterTopLevelTableRows(filteredRows)));
 
           setTileMappings(tileMappings);
-          break;
+        }
       }
     }
   }

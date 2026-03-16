@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -298,13 +298,10 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
    * @return <code>true</code>, if the event does not influence the resource order.
    */
   protected boolean isResourceOrderUnchanged(int type) {
-    switch (type) {
-      case PlannerEvent.TYPE_RESOURCES_SELECTED:
-      case PlannerEvent.TYPE_RESOURCES_UPDATED:
-        return true;
-      default:
-        return false;
-    }
+    return switch (type) {
+      case PlannerEvent.TYPE_RESOURCES_SELECTED, PlannerEvent.TYPE_RESOURCES_UPDATED -> true;
+      default -> false;
+    };
   }
 
   protected Set<Integer> getResourceRelatedEvents() {
@@ -327,43 +324,26 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
    * @return true, if previous events of the same type can be ignored. false otherwise
    */
   protected boolean isIgnorePrevious(int type) {
-    switch (type) {
-      case PlannerEvent.TYPE_RESOURCES_SELECTED:
-      case PlannerEvent.TYPE_ALL_RESOURCES_DELETED: {
-        return true;
-      }
-      default: {
-        return false;
-      }
-    }
+    return switch (type) {
+      case PlannerEvent.TYPE_RESOURCES_SELECTED, PlannerEvent.TYPE_ALL_RESOURCES_DELETED -> true;
+      default -> false;
+    };
   }
 
   /**
    * @return true, if previous consecutive events of the same type can be coalesced.
    */
   protected boolean isCoalesceConsecutivePrevious(int type) {
-    switch (type) {
-      case PlannerEvent.TYPE_RESOURCES_UPDATED:
-      case PlannerEvent.TYPE_RESOURCES_INSERTED:
-      case PlannerEvent.TYPE_RESOURCES_DELETED: {
-        return true;
-      }
-      default: {
-        return false;
-      }
-    }
+    return switch (type) {
+      case PlannerEvent.TYPE_RESOURCES_UPDATED, PlannerEvent.TYPE_RESOURCES_INSERTED, PlannerEvent.TYPE_RESOURCES_DELETED -> true;
+      default -> false;
+    };
   }
 
   protected boolean isResourcesRequired(int type) {
-    switch (type) {
-      case PlannerEvent.TYPE_RESOURCES_DELETED:
-      case PlannerEvent.TYPE_RESOURCES_INSERTED:
-      case PlannerEvent.TYPE_RESOURCES_UPDATED: {
-        return true;
-      }
-      default: {
-        return false;
-      }
-    }
+    return switch (type) {
+      case PlannerEvent.TYPE_RESOURCES_DELETED, PlannerEvent.TYPE_RESOURCES_INSERTED, PlannerEvent.TYPE_RESOURCES_UPDATED -> true;
+      default -> false;
+    };
   }
 }

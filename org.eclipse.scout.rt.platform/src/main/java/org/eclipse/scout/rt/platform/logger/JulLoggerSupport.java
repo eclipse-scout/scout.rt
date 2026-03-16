@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -82,24 +82,18 @@ public class JulLoggerSupport extends AbstractLoggerSupport {
     if (level == null) {
       return null;
     }
-    switch (level) {
-      case ALL:
-        return Level.ALL;
-      case TRACE:
-        return Level.FINEST;
-      case DEBUG:
-        return Level.FINE;
-      case INFO:
-        return Level.INFO;
-      case WARN:
-        return Level.WARNING;
-      case ERROR:
-        return Level.SEVERE;
-      case OFF:
-        return Level.OFF;
-      default:
+    return switch (level) {
+      case ALL -> Level.ALL;
+      case TRACE -> Level.FINEST;
+      case DEBUG -> Level.FINE;
+      case INFO -> Level.INFO;
+      case WARN -> Level.WARNING;
+      case ERROR -> Level.SEVERE;
+      case OFF -> Level.OFF;
+      default -> {
         LOG.info("unknown scout log level '{}'. Falling back to jul level '{}'", level, Level.WARNING);
-        return Level.WARNING;
-    }
+        yield Level.WARNING;
+      }
+    };
   }
 }

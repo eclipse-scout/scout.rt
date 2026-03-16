@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -617,14 +617,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, List values) {
       switch (dataType) {
-        case IDataModelAttribute.TYPE_INTEGER: {
-          setGroupingUsed(true);
-          break;
-        }
-        case IDataModelAttribute.TYPE_PLAIN_INTEGER: {
-          setGroupingUsed(false);
-          break;
-        }
+        case IDataModelAttribute.TYPE_INTEGER -> setGroupingUsed(true);
+        case IDataModelAttribute.TYPE_PLAIN_INTEGER -> setGroupingUsed(false);
       }
       try {
         @SuppressWarnings("unchecked")
@@ -678,14 +672,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, List values) {
       switch (dataType) {
-        case IDataModelAttribute.TYPE_LONG: {
-          setGroupingUsed(true);
-          break;
-        }
-        case IDataModelAttribute.TYPE_PLAIN_LONG: {
-          setGroupingUsed(false);
-          break;
-        }
+        case IDataModelAttribute.TYPE_LONG -> setGroupingUsed(true);
+        case IDataModelAttribute.TYPE_PLAIN_LONG -> setGroupingUsed(false);
       }
       try {
         @SuppressWarnings("unchecked")
@@ -739,20 +727,17 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, List values) {
       switch (dataType) {
-        case IDataModelAttribute.TYPE_BIG_DECIMAL: {
+        case IDataModelAttribute.TYPE_BIG_DECIMAL -> {
           setGroupingUsed(true);
           setPercent(false);
-          break;
         }
-        case IDataModelAttribute.TYPE_PERCENT: {
+        case IDataModelAttribute.TYPE_PERCENT -> {
           setGroupingUsed(true);
           setPercent(true);
-          break;
         }
-        case IDataModelAttribute.TYPE_PLAIN_BIG_DECIMAL: {
+        case IDataModelAttribute.TYPE_PLAIN_BIG_DECIMAL -> {
           setGroupingUsed(false);
           setPercent(false);
-          break;
         }
       }
       try {
