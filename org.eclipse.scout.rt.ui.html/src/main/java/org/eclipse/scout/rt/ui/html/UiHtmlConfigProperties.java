@@ -78,9 +78,10 @@ public final class UiHtmlConfigProperties {
 
     @Override
     public String description() {
-      return "Contains a comma separated list of supported locales (e.g. en,en-US,de-CH). To support all locales, use the keyword 'all' instead.\n" +
-          "This is only relevant if locales.json and texts.json should be sent to the client, which is not the case for remote apps. So this property is only used for JS only apps.\n"
-          + "By default no locales are supported.";
+      return """
+          Contains a comma separated list of supported locales (e.g. en,en-US,de-CH). To support all locales, use the keyword 'all' instead.
+          This is only relevant if locales.json and texts.json should be sent to the client, which is not the case for remote apps. So this property is only used for JS only apps.
+          By default no locales are supported.""";
     }
 
     @Override
@@ -119,9 +120,10 @@ public final class UiHtmlConfigProperties {
     @Override
     @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
-      return String.format("The polling request (which waits for a background job to complete) stays open until a background job has completed or the specified number of seconds elapsed.\n"
-          + "This property must have a value between 3 and the value of property '%s'.\n"
-          + "By default this property is set to 1 minute.", BEANS.get(MaxUserIdleTimeProperty.class).getKey());
+      return String.format("""
+          The polling request (which waits for a background job to complete) stays open until a background job has completed or the specified number of seconds elapsed.
+          This property must have a value between 3 and the value of property '%s'.
+          By default this property is set to 1 minute.""", BEANS.get(MaxUserIdleTimeProperty.class).getKey());
     }
 
     @Override
@@ -204,12 +206,14 @@ public final class UiHtmlConfigProperties {
 
     @Override
     public String description() {
-      return String.format("Multipart configuration for inbound servlet.\n"
-              + "Map property with the keys as follows:\n"
-              + "- %s: the directory location where files will be stored temporarily (default: temp directory)\n"
-              + "- %s: the maximum size allowed in MB for uploaded files, -1 means unlimited (default: %d MB) \n"
-              + "- %s: the maximum size allowed in MB for multipart/form-data requests, -1 means unlimited (default: %d MB) \n"
-              + "- %s: the size threshold in MB after which files will written to disk (default: %d MB) \n",
+      return String.format("""
+              Multipart configuration for inbound servlet.
+              Map property with the keys as follows:
+              - %s: the directory location where files will be stored temporarily (default: temp directory)
+              - %s: the maximum size allowed in MB for uploaded files, -1 means unlimited (default: %d MB)\s
+              - %s: the maximum size allowed in MB for multipart/form-data requests, -1 means unlimited (default: %d MB)\s
+              - %s: the size threshold in MB after which files will written to disk (default: %d MB)\s
+              """,
           LOCATION,
           MAX_FILE_SIZE, getDefaultMaxFileSizeMB(),
           MAX_REQUEST_SIZE, getDefaultMaxRequestSizeMB(),

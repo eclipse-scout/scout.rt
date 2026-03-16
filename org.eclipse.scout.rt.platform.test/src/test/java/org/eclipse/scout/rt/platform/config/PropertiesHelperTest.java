@@ -816,16 +816,17 @@ public class PropertiesHelperTest {
   @Test
   public void testParseJsonJavadocExample() {
     PropertiesHelper propertiesHelper = new PropertiesHelper(mock(IPropertyProvider.class));
-    Map<String, String> decodedValue = propertiesHelper.parseJson("{\n"
-        + "  \"key1\": \"value1\",\n"
-        + "  \"key2\": null,\n"
-        + "  \"key3\": \"\",\n"
-        + "  \"key4\": 1,\n"
-        + "  \"key5\": \"1\",\n"
-        + "  \"key6\": true,\n"
-        + "  \"key7\": {\"key71\": \"value71\", \"key72\": \"value72\", \"key73\": \"value73\"},\n"
-        + "  \"key8\": [\"value81\", \"value82\", \"value83\"]\n"
-        + "}");
+    Map<String, String> decodedValue = propertiesHelper.parseJson("""
+        {
+          "key1": "value1",
+          "key2": null,
+          "key3": "",
+          "key4": 1,
+          "key5": "1",
+          "key6": true,
+          "key7": {"key71": "value71", "key72": "value72", "key73": "value73"},
+          "key8": ["value81", "value82", "value83"]
+        }""");
 
     HashMap<String, String> expectedMap = new HashMap<>();
     expectedMap.put("key1", "value1");

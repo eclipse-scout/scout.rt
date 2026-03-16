@@ -31,16 +31,18 @@ public class VCardBuilderTest {
         .withAddress(VCardProperties.PARAM_VALUE_HOME, "Bahnhofstrasse", "1234", "Entenhausen", "Schweiz")
         .build();
 
-    assertEquals("BEGIN:VCARD\r\n" +
-        "VERSION:3.0\r\n" +
-        "FN;CHARSET=utf-8:displayname\r\n" +
-        "N;CHARSET=utf-8:Mustermann;Tommy;middlename;Dr.;\r\n" +
-        "EMAIL;CHARSET=utf-8;TYPE=HOME:tommy@mustermann.de\r\n" +
-        "TITLE;CHARSET=utf-8:Software Engineer\r\n" +
-        "ORG;CHARSET=utf-8:Mustermann GmbH;mustermann.de\r\n" +
-        "PRODID;CHARSET=utf-8:productidentifiert\r\n" +
-        "TEL;CHARSET=utf-8;TYPE=WORK,CELL:0776665544\r\n" +
-        "ADR;CHARSET=utf-8;TYPE=HOME:;;Bahnhofstrasse;Entenhausen;;1234;Schweiz\r\n" +
-        "END:VCARD\r\n", new String(vcard.toBytes("utf-8")));
+    assertEquals("""
+        BEGIN:VCARD\r
+        VERSION:3.0\r
+        FN;CHARSET=utf-8:displayname\r
+        N;CHARSET=utf-8:Mustermann;Tommy;middlename;Dr.;\r
+        EMAIL;CHARSET=utf-8;TYPE=HOME:tommy@mustermann.de\r
+        TITLE;CHARSET=utf-8:Software Engineer\r
+        ORG;CHARSET=utf-8:Mustermann GmbH;mustermann.de\r
+        PRODID;CHARSET=utf-8:productidentifiert\r
+        TEL;CHARSET=utf-8;TYPE=WORK,CELL:0776665544\r
+        ADR;CHARSET=utf-8;TYPE=HOME:;;Bahnhofstrasse;Entenhausen;;1234;Schweiz\r
+        END:VCARD\r
+        """, new String(vcard.toBytes("utf-8")));
   }
 }

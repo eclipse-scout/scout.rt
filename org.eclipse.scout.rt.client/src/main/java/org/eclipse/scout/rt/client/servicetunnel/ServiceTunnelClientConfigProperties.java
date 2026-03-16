@@ -26,9 +26,10 @@ public class ServiceTunnelClientConfigProperties {
 
     @Override
     public String description() {
-      return String.format("The URL of the scout backend server (without any servlets).\n"
-          + "Example: %s=http://localhost:8080\n"
-          + "By default this property is null.", getKey());
+      return String.format("""
+          The URL of the scout backend server (without any servlets).
+          Example: %s=http://localhost:8080
+          By default this property is null.""", getKey());
     }
   }
 

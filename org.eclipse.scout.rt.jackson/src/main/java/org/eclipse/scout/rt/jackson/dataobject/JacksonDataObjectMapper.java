@@ -190,13 +190,15 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
 
     @Override
     public String description() {
-      return String.format("Jackson constraints to use for JSON reading.\n"
-              + "Map property with the keys as follows:\n"
-              + "- %s: Sets the maximum nesting depth. The depth is a count of objects and arrays that have not been closed, `{` and `[` respectively. (default: %d)\n"
-              + "- %s: Sets the maximum allowed document length (for positive values over 0) or indicate that any length is acceptable (0 or negative number). The length is in input units of the input source, that is, in bytes or chars. (default: %d)\n"
-              + "- %s: Sets the maximum name length (in chars or bytes, depending on input context). (default: %d)\n"
-              + "- %s: Sets the maximum number length (in chars or bytes, depending on input context). (default: %d)\n"
-              + "- %s: Sets the maximum string length for a single attribute value of type text (in chars or bytes, depending on input context). (default: %d)\n",
+      return String.format("""
+              Jackson constraints to use for JSON reading.
+              Map property with the keys as follows:
+              - %s: Sets the maximum nesting depth. The depth is a count of objects and arrays that have not been closed, `{` and `[` respectively. (default: %d)
+              - %s: Sets the maximum allowed document length (for positive values over 0) or indicate that any length is acceptable (0 or negative number). The length is in input units of the input source, that is, in bytes or chars. (default: %d)
+              - %s: Sets the maximum name length (in chars or bytes, depending on input context). (default: %d)
+              - %s: Sets the maximum number length (in chars or bytes, depending on input context). (default: %d)
+              - %s: Sets the maximum string length for a single attribute value of type text (in chars or bytes, depending on input context). (default: %d)
+              """,
           MAX_NESTING_DEPTH, StreamReadConstraints.DEFAULT_MAX_DEPTH,
           MAX_DOCUMENT_LENGTH, StreamReadConstraints.DEFAULT_MAX_DOC_LEN,
           MAX_NAME_LENGTH, StreamReadConstraints.DEFAULT_MAX_NAME_LEN,
@@ -245,9 +247,11 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
 
     @Override
     public String description() {
-      return String.format("Jackson constraints to use for JSON writing.\n"
-              + "Map property with the keys as follows:\n"
-              + "- %s: Sets the maximum nesting depth. The depth is a count of objects and arrays that have not been closed, `{` and `[` respectively. (default: %d)\n",
+      return String.format("""
+              Jackson constraints to use for JSON writing.
+              Map property with the keys as follows:
+              - %s: Sets the maximum nesting depth. The depth is a count of objects and arrays that have not been closed, `{` and `[` respectively. (default: %d)
+              """,
           MAX_NESTING_DEPTH, StreamWriteConstraints.DEFAULT_MAX_DEPTH);
     }
 
