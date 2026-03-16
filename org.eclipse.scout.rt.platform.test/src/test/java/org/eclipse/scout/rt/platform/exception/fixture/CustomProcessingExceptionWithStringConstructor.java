@@ -9,9 +9,12 @@
  */
 package org.eclipse.scout.rt.platform.exception.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 public class CustomProcessingExceptionWithStringConstructor extends ProcessingException {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public CustomProcessingExceptionWithStringConstructor(String message) {

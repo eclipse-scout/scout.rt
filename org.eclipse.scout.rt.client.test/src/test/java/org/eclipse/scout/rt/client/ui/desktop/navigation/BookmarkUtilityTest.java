@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.desktop.navigation;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
@@ -185,6 +186,7 @@ public class BookmarkUtilityTest {
   }
 
   private static class SerializablePrimaryKey implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")

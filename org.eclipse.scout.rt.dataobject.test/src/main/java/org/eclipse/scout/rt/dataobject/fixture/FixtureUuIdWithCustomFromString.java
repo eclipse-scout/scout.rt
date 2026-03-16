@@ -9,11 +9,13 @@
  */
 package org.eclipse.scout.rt.dataobject.fixture;
 
+import java.io.Serial;
 import java.util.UUID;
 
 import org.eclipse.scout.rt.dataobject.id.AbstractUuId;
 
 public final class FixtureUuIdWithCustomFromString extends AbstractUuId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private FixtureUuIdWithCustomFromString(UUID id) {

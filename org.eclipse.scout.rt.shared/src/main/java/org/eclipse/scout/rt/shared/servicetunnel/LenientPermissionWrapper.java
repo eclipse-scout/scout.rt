@@ -14,6 +14,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectInputStream.GetField;
 import java.io.ObjectOutputStream;
 import java.io.ObjectOutputStream.PutField;
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.Permission;
 
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * contain permissions not known by the consumer. This wrapper simply ignores those.
  */
 public class LenientPermissionWrapper implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(LenientPermissionWrapper.class);
 
@@ -50,6 +52,7 @@ public class LenientPermissionWrapper implements Serializable {
   /**
    * @serialData Default fields.
    */
+  @Serial
   private void writeObject(ObjectOutputStream out) throws IOException {
     //no call to defaultWriteObject
     byte[] data = SerializationUtility.createObjectSerializer().serialize(m_permission);
@@ -60,6 +63,7 @@ public class LenientPermissionWrapper implements Serializable {
     out.writeFields();
   }
 
+  @Serial
   @SuppressWarnings("squid:S1181")
   private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
     //no call to defaultReadObject

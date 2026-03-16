@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -50,6 +51,7 @@ public class ApiExposedCodeTypeDoProviderTest {
    */
   @ApiExposed
   public static class ApiExposedFixtureCodeType1 extends AbstractCodeType<Long, Long> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -63,6 +65,7 @@ public class ApiExposedCodeTypeDoProviderTest {
    */
   @ApiExposed
   public static class ApiExposedFixtureCodeType2 extends AbstractCodeType<Long, Long> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -81,6 +84,7 @@ public class ApiExposedCodeTypeDoProviderTest {
    */
   @ApiExposed
   public static class ApiExposedFixtureCodeType3 extends AbstractCodeType<Long, Long> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -94,6 +98,7 @@ public class ApiExposedCodeTypeDoProviderTest {
    */
   @ApiExposed
   public static class ApiExposedFixtureCodeType4 extends AbstractCodeType<Long, Long> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

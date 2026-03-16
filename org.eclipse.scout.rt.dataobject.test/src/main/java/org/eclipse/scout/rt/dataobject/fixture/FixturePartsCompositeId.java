@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.dataobject.fixture;
 
+import java.io.Serial;
 import java.util.Date;
 
 import org.eclipse.scout.rt.dataobject.id.AbstractCompositeId;
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.dataobject.id.RawTypes;
 
 @IdTypeName("scout.FixturePartsCompositeId")
 public final class FixturePartsCompositeId extends AbstractCompositeId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private FixturePartsCompositeId(IntegerCompositePartId p1, DateCompositePartId p2, LongCompositePartId p3, BooleanCompositePartId p4) {

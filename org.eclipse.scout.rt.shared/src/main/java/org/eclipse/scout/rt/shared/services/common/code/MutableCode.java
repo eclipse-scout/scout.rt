@@ -9,10 +9,13 @@
  */
 package org.eclipse.scout.rt.shared.services.common.code;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("7454507c-ec9f-4ba0-945b-2bd161b7ffb9")
 public class MutableCode<T> extends AbstractCode<T> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public MutableCode(ICodeRow<T> row) {

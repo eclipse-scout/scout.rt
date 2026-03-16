@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.Serial;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.Order;
@@ -136,6 +137,7 @@ public class CodeTypeWithAddRemoveCodeTest {
   }
 
   private static class TestCodeType extends AbstractCodeType<Long, Long> {
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final long ID = 123L;
 
@@ -146,6 +148,7 @@ public class CodeTypeWithAddRemoveCodeTest {
 
     @Order(10)
     public class RootCode extends AbstractCode<Long> {
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final long ID = 10L;
 
@@ -161,6 +164,7 @@ public class CodeTypeWithAddRemoveCodeTest {
 
       @Order(10)
       public class Test1Code extends AbstractCode<Long> {
+        @Serial
         private static final long serialVersionUID = 1L;
         public static final long ID = 11L;
 
@@ -177,6 +181,7 @@ public class CodeTypeWithAddRemoveCodeTest {
 
       @Order(20)
       public class Test2Code extends AbstractCode<Long> {
+        @Serial
         private static final long serialVersionUID = 1L;
         public static final long ID = 12L;
 

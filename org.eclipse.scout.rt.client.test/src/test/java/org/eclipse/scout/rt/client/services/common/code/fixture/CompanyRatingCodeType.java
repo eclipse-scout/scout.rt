@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.client.services.common.code.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
@@ -22,6 +24,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
  */
 public class CompanyRatingCodeType extends AbstractCodeTypeWithGeneric<Long, Long, ICode<Long>> {
 
+  @Serial
   private static final long serialVersionUID = 1L;
   public static final Long ID = 10100L;
 
@@ -47,6 +50,7 @@ public class CompanyRatingCodeType extends AbstractCodeTypeWithGeneric<Long, Lon
   @Order(10)
   public static class ACode extends AbstractCode<Long> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final Long ID = 10101L;
 
@@ -64,6 +68,7 @@ public class CompanyRatingCodeType extends AbstractCodeTypeWithGeneric<Long, Lon
   @Order(20)
   public static class BCode extends AbstractCode<Long> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final Long ID = 10102L;
 
@@ -81,6 +86,7 @@ public class CompanyRatingCodeType extends AbstractCodeTypeWithGeneric<Long, Lon
   @Order(30)
   public static class CCode extends AbstractCode<Long> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final Long ID = 10103L;
 
@@ -98,6 +104,7 @@ public class CompanyRatingCodeType extends AbstractCodeTypeWithGeneric<Long, Lon
   @Order(40)
   public static class DCode extends AbstractCode<Long> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final Long ID = 10104L;
 

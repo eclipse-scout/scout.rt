@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.dataobject.exception;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 
@@ -18,6 +20,7 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
  * May be used for HTTP 403 - "Forbidden"
  */
 public class AccessForbiddenException extends VetoException {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public AccessForbiddenException() {

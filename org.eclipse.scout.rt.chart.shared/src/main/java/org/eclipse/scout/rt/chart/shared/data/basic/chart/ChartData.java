@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.chart.shared.data.basic.chart;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
  * @since 5.2
  */
 public class ChartData implements IChartData {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final List<List<IChartAxisBean>> m_axes = new ArrayList<>();

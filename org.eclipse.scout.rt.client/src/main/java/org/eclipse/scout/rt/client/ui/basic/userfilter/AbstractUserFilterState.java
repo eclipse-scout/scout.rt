@@ -9,12 +9,15 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.userfilter;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.text.TEXTS;
 
 /**
  * @since 5.1
  */
 public abstract class AbstractUserFilterState implements IUserFilterState {
+  @Serial
   private static final long serialVersionUID = 1L;
   private String m_type;
 

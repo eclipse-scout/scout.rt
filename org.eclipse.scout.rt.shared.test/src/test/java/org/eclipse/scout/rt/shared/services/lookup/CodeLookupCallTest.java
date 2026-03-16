@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -187,6 +188,7 @@ public class CodeLookupCallTest {
       super(CodeLookupCallTestCodeType.class);
     }
 
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 
@@ -195,10 +197,12 @@ public class CodeLookupCallTest {
       super(CodeLookupCallTestCodeType.class);
     }
 
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 
   public static class CodeLookupCallTestCodeType extends AbstractCodeType<Long, Integer> {
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final Long ID = Long.valueOf(22);
 

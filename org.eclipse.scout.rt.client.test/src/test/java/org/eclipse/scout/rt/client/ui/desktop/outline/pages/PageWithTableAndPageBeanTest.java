@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.Collections;
 import java.util.List;
 
@@ -140,6 +141,7 @@ public class PageWithTableAndPageBeanTest {
   }
 
   public static class PageWithTableData extends AbstractTablePageData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public PageWithTableData() {
@@ -180,6 +182,7 @@ public class PageWithTableAndPageBeanTest {
     }
 
     public static class PageWithTableRowData extends AbstractTableRowData {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public PageWithTableRowData() {

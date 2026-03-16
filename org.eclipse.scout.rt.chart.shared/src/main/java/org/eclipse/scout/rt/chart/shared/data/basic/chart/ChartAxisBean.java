@@ -9,10 +9,13 @@
  */
 package org.eclipse.scout.rt.chart.shared.data.basic.chart;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.annotations.IgnoreProperty;
 
 public class ChartAxisBean implements IChartAxisBean {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private Object m_axisKey;

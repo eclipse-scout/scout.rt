@@ -10,11 +10,13 @@
 package org.eclipse.scout.rt.server.csv;
 
 import java.io.File;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
 
 public class CsvSettings implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
   private File m_file;
   private String m_encoding;

@@ -9,7 +9,10 @@
  */
 package org.eclipse.scout.rt.shared.extension;
 
+import java.io.Serial;
+
 public class IllegalExtensionException extends RuntimeException {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public IllegalExtensionException() {

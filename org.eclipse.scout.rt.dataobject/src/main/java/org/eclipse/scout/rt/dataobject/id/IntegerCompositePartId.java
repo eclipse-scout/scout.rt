@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.dataobject.id;
 
+import java.io.Serial;
+
 /**
  * Simple wrapper implementation wrapping a {@link Integer} value.
  * <p>
@@ -18,6 +20,7 @@ package org.eclipse.scout.rt.dataobject.id;
  */
 @IdSignature(false)
 public final class IntegerCompositePartId extends AbstractRootId<Integer> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private IntegerCompositePartId(Integer id) {

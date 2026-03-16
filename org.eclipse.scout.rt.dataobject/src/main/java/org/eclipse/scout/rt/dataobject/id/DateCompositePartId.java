@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.dataobject.id;
 
+import java.io.Serial;
 import java.util.Date;
 
 /**
@@ -20,6 +21,7 @@ import java.util.Date;
  */
 @IdSignature(false)
 public final class DateCompositePartId extends AbstractDateId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private DateCompositePartId(Date id) {

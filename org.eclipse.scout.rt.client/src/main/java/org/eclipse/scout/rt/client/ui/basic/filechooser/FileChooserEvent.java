@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.filechooser;
 
+import java.io.Serial;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.EventObject;
@@ -16,6 +17,7 @@ import java.util.EventObject;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 
 public class FileChooserEvent extends EventObject implements IModelEvent {
+  @Serial
   private static final long serialVersionUID = 1L;
   // state
   public static final int TYPE_CLOSED = 900;

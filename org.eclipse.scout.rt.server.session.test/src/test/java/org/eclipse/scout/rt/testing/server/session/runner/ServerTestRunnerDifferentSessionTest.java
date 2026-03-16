@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.testing.server.session.runner;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -105,6 +106,7 @@ public class ServerTestRunnerDifferentSessionTest {
   @IgnoreBean
   public static class JUnitServerSession1 extends AbstractServerSession {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public JUnitServerSession1() {
@@ -115,6 +117,7 @@ public class ServerTestRunnerDifferentSessionTest {
   @IgnoreBean
   public static class JUnitServerSession2 extends AbstractServerSession {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public JUnitServerSession2() {

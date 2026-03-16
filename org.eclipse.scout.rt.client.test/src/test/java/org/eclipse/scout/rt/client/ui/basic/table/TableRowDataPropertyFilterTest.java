@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +42,7 @@ public class TableRowDataPropertyFilterTest {
   }
 
   private static class P_TableRowData extends AbstractTableRowData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Object m_objectColumn;

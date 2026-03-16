@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.chart.client.ui.basic.chart;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.EventObject;
 
@@ -18,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.IModelEvent;
  * @since 5.2
  */
 public class ChartEvent extends EventObject implements IModelEvent {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static final int TYPE_VALUE_CLICK = 1;

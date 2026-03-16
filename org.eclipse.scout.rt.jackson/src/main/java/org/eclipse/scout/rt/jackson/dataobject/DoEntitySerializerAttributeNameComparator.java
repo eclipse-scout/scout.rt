@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 @Bean
 public class DoEntitySerializerAttributeNameComparator implements Comparator<String>, Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected Map<String, Integer> m_orders = new HashMap<>();

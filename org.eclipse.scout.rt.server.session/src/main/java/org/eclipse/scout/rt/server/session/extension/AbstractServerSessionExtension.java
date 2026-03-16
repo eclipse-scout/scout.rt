@@ -9,11 +9,14 @@
  */
 package org.eclipse.scout.rt.server.session.extension;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.server.session.AbstractServerSession;
 import org.eclipse.scout.rt.server.session.extension.ServerSessionChains.ServerSessionLoadSessionChain;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 
 public abstract class AbstractServerSessionExtension<OWNER extends AbstractServerSession> extends AbstractSerializableExtension<OWNER> implements IServerSessionExtension<OWNER> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public AbstractServerSessionExtension(OWNER owner) {

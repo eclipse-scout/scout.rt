@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.context;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * Property observer fires property "values" of data type Map<String,Object>
  */
 public class SharedVariableMap implements Serializable, Map<String, Object> {
+  @Serial
   private static final long serialVersionUID = 1L;
   public static final String PROP_VALUES = "values";
 
@@ -48,6 +50,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
     m_propertySupport = new BasicPropertySupport(this);
   }
 
+  @Serial
   private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
     ois.defaultReadObject();
     m_propertySupport = new BasicPropertySupport(this);

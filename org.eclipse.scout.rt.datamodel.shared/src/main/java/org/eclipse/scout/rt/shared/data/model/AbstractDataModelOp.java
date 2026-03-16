@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.data.model;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public abstract class AbstractDataModelOp implements IDataModelAttributeOp, DataModelConstants, Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
   private final int m_operator;
 

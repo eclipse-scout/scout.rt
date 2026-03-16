@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.session;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +32,7 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
  */
 public class SessionData implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final ConcurrentMap<String, Object> m_dataMap;

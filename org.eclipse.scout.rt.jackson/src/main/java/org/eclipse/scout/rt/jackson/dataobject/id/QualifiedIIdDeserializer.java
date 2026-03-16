@@ -13,6 +13,7 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertInstance;
 import static org.eclipse.scout.rt.platform.util.ObjectUtility.isOneOf;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
@@ -28,6 +29,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
  * serialization. It may be used as a replacement for {@link UnqualifiedIIdDeserializer}.
  */
 public class QualifiedIIdDeserializer extends AbstractIdCodecDeserializer<IId> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected final Class<? extends IId> m_idClass;

@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.shared.data.form;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
@@ -84,36 +86,44 @@ public class FormDataToStringTest {
 
   @IgnoreBean
   private static final class FormDataFixture extends AbstractFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public FormDataFixture() {
     }
 
     public class StringProperty extends AbstractPropertyData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class StringValue extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class FieldWithProperty extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public class InnerProperty extends AbstractPropertyData<String> {
+        @Serial
         private static final long serialVersionUID = 1L;
       }
     }
 
     public class IntArrayValue extends AbstractValueFieldData<int[]> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class IntIntArrayValue extends AbstractValueFieldData<int[][]> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class LongArrayValue extends AbstractValueFieldData<Long[]> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
   }

@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.security;
 
+import java.io.Serial;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * implied by another {@link IPermission} with the same name.
  */
 public class DefaultPermissionCollection extends AbstractPermissionCollection {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultPermissionCollection.class);

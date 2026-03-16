@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.data.form.fields.tablefield;
 
+import java.io.Serial;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
  * @since 3.8.2
  */
 public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData implements ITableBeanHolder {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final List<AbstractTableRowData> m_rowList = new ArrayList<>();

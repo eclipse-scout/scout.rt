@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.shared.prefs;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -18,6 +20,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  */
 @IdTypeName("scout.CustomClientPreferenceId")
 public final class CustomClientPreferenceId extends AbstractStringId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private CustomClientPreferenceId(String id) {

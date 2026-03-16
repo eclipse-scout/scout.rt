@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.data.model;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractDataModel implements IDataModel, Serializable, IContributionOwner {
+  @Serial
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDataModel.class);
 

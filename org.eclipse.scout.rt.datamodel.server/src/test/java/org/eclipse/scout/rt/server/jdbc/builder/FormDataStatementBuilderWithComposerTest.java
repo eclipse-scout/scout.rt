@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.server.jdbc.builder;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.Serial;
 import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.Order;
@@ -198,18 +199,22 @@ public class FormDataStatementBuilderWithComposerTest {
   }
 
   private static class TestDataModel extends AbstractDataModel {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Order(10)
     public class Entity extends AbstractDataModelEntity {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Order(10)
       public class SubEntity extends AbstractDataModelEntity {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         @Order(10)
         public class SubAttribute extends AbstractDataModelAttribute {
+          @Serial
           private static final long serialVersionUID = 1L;
 
           @Override
@@ -221,6 +226,7 @@ public class FormDataStatementBuilderWithComposerTest {
 
       @Order(10)
       public class Attribute extends AbstractDataModelAttribute {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         @Override

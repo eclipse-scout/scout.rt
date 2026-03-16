@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.server.cache;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -76,6 +77,7 @@ public class InvalidateCacheNotificationCoalescerTest {
   }
 
   class CodeType1 extends AbstractCodeType<Long, Long> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -85,6 +87,7 @@ public class InvalidateCacheNotificationCoalescerTest {
   }
 
   class CodeType2 extends AbstractCodeType<Long, Long> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

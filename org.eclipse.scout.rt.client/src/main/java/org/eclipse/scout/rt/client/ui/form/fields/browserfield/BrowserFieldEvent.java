@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
+import java.io.Serial;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.EventObject;
@@ -16,6 +17,7 @@ import java.util.EventObject;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 
 public class BrowserFieldEvent extends EventObject implements IModelEvent {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static final int TYPE_CONTENT_CHANGED = 900;

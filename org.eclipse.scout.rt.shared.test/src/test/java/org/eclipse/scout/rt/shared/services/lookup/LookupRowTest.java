@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.services.lookup;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
@@ -49,6 +50,7 @@ public class LookupRowTest {
   @Test
   public void testCreateNonEmpty() {
     AbstractTableRowData bean = new AbstractTableRowData() {
+      @Serial
       private static final long serialVersionUID = 1L;
     };
     ILookupRow<String> row = new LookupRow<>("key", "text")

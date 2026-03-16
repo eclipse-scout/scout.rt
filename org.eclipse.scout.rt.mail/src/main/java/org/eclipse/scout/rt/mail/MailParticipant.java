@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.mail;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.platform.Bean;
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 @Bean
 public class MailParticipant implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private String m_email;

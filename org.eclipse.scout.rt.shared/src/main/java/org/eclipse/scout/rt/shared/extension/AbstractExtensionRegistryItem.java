@@ -9,10 +9,12 @@
  */
 package org.eclipse.scout.rt.shared.extension;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public abstract class AbstractExtensionRegistryItem implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
   private final long m_order;
   private final Double m_newModelOrder;

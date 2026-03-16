@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.DoValue;
 
 import com.fasterxml.jackson.databind.BeanProperty;
@@ -22,6 +24,7 @@ import com.fasterxml.jackson.databind.util.NameTransformer;
  * Serializer for {@link DoValue} objects wrapping a value object.
  */
 public class DoValueSerializer extends ReferenceTypeSerializer<DoValue<?>> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public DoValueSerializer(ReferenceType fullType, boolean staticTyping, TypeSerializer vts, JsonSerializer<Object> ser) {

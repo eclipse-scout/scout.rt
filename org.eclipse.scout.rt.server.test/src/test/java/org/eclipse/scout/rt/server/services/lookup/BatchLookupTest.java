@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.server.services.lookup;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -149,6 +150,7 @@ public class BatchLookupTest {
   }
 
   public static class FlowerLookupCallNoMembersNoEqualsOverride extends LookupCall implements IFlowerLookupCall {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -173,6 +175,7 @@ public class BatchLookupTest {
   }
 
   public static class FlowerLookupCallNoMembersWithEqualsOverride extends LookupCall implements IFlowerLookupCall {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -197,6 +200,7 @@ public class BatchLookupTest {
   }
 
   public static class FlowerLookupCallWithMembersNoEqualsOverride extends LookupCall implements IFlowerLookupCall {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Long m_latinId;
@@ -218,6 +222,7 @@ public class BatchLookupTest {
   }
 
   public static class FlowerLookupCallWithMembersWithEqualsOverride extends LookupCall implements IFlowerLookupCall {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Long m_latinId;
@@ -248,14 +253,17 @@ public class BatchLookupTest {
   }
 
   public static class SubclassedFlowerLookupCallWithMembersNoEqualsOverride extends FlowerLookupCallWithMembersNoEqualsOverride implements IFlowerLookupCall {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 
   public static class SubclassedFlowerLookupCallWithMembersWithEqualsOverride extends FlowerLookupCallWithMembersWithEqualsOverride implements IFlowerLookupCall {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 
   public static class LocalFlowerLookupCallNoMembersNoEqualsOverride extends LocalLookupCall<Object> implements IFlowerLookupCall {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -281,6 +289,7 @@ public class BatchLookupTest {
   }
 
   public static class LocalFlowerLookupCallNoMembersWithEqualsOverride extends LocalLookupCall<Object> implements IFlowerLookupCall {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -306,6 +315,7 @@ public class BatchLookupTest {
   }
 
   public static class LocalFlowerLookupCallWithMembersNoEqualsOverride extends LocalLookupCall implements IFlowerLookupCall {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Long m_latinId;
@@ -328,6 +338,7 @@ public class BatchLookupTest {
   }
 
   public static class LocalFlowerLookupCallWithMembersWithEqualsOverride extends LocalLookupCall<Object> implements IFlowerLookupCall {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Long m_latinId;
@@ -359,10 +370,12 @@ public class BatchLookupTest {
   }
 
   public static class SubclassedLocalFlowerLookupCallWithMembersNoEqualsOverride extends LocalFlowerLookupCallWithMembersNoEqualsOverride implements IFlowerLookupCall {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 
   public static class SubclassedLocalFlowerLookupCallWithMembersWithEqualsOverride extends LocalFlowerLookupCallWithMembersWithEqualsOverride implements IFlowerLookupCall {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 

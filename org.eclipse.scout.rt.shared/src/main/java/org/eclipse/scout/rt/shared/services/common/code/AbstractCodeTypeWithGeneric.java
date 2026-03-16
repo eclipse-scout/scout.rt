@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.io.ObjectStreamException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -50,6 +51,7 @@ import org.slf4j.LoggerFactory;
 @ClassId("119a9156-45e7-4f32-9b55-01aa6b5283d7")
 public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE extends ICode<CODE_ID>> implements ICodeType<CODE_TYPE_ID, CODE_ID>, IContributionOwner, Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCodeTypeWithGeneric.class);
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private boolean m_initialized;
@@ -614,6 +616,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     return true;
   }
 
+  @Serial
   protected Object readResolve() throws ObjectStreamException {
     m_rootCodeMap = new HashMap<>();
     if (m_rootCodeList == null) {
@@ -647,6 +650,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    */
   protected static class LocalCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID, CODE extends ICode<CODE_ID>, OWNER extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>> extends AbstractSerializableExtension<OWNER>
       implements ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public LocalCodeTypeWithGenericExtension(OWNER owner) {

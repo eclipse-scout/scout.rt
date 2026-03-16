@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.shared.data.form.properties;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.regex.Pattern;
 
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 public abstract class AbstractPropertyData<T> implements IHolder<T>, Serializable {
 
   private static final Pattern PROPERTY_SUFFIX = Pattern.compile("Property$");
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private T m_value;
@@ -62,6 +64,7 @@ public abstract class AbstractPropertyData<T> implements IHolder<T>, Serializabl
   /**
    * readObject is implemented to validate potential security attacks that invalidated the value type
    */
+  @Serial
   private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
     s.defaultReadObject();
     //verify if valueSet and the type of the value are valid and consistent

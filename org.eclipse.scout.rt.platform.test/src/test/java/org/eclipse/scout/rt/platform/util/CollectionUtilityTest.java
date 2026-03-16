@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.platform.util;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -166,6 +167,7 @@ public class CollectionUtilityTest {
     assertNull(CollectionUtility.firstElement((new ArrayList<>())));
     // one element
     assertEquals((Long) 1L, CollectionUtility.firstElement(new ArrayList<Long>() {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       {
@@ -174,6 +176,7 @@ public class CollectionUtilityTest {
     }));
     // two elements
     assertEquals((Long) 1L, CollectionUtility.firstElement(new ArrayList<Long>() {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       {
@@ -183,6 +186,7 @@ public class CollectionUtilityTest {
     }));
     // many elements
     assertEquals((Long) 1L, CollectionUtility.firstElement(new ArrayList<Long>() {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       {
@@ -206,6 +210,7 @@ public class CollectionUtilityTest {
                                                    .unmodifiableSortedMap(new TreeMap<>()))));
     // one element
     assertEquals("ABC", CollectionUtility.firstElement(new TreeMap<Integer, String>() {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       {
@@ -215,6 +220,7 @@ public class CollectionUtilityTest {
     }));
     // many elements
     assertEquals("-1", CollectionUtility.firstElement(new TreeMap<Integer, String>() {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       {

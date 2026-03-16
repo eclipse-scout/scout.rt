@@ -9,9 +9,12 @@
  */
 package org.eclipse.scout.rt.shared.services.common.code.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.Replace;
 
 @Replace
 public class TestCodeType4 extends TestCodeType3 {
+  @Serial
   private static final long serialVersionUID = 1L;
 }

@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.server.jaxws.provider.auth.handler;
 
+import java.io.Serial;
+
 import jakarta.xml.ws.handler.Handler;
 import jakarta.xml.ws.http.HTTPException;
 
@@ -23,6 +25,7 @@ import jakarta.xml.ws.http.HTTPException;
  */
 public class WebServiceRequestRejectedException extends Exception {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final int m_httpStatusCode;

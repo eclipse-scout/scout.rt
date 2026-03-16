@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.server.commons.http;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
@@ -61,6 +62,7 @@ public class TestingHttpServer {
    * http://172.0.0.1:33xyz/servlet
    */
   public static class FixtureServlet extends AbstractHttpServlet {
+    @Serial
     private static final long serialVersionUID = 1L;
     public static IServletRequestHandler fixtureGet;
     public static IServletRequestHandler fixturePost;

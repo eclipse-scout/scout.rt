@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.dataobject.id;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.UUID;
 
@@ -178,6 +179,7 @@ public class IdFactoryTest {
    */
   @IgnoreBean
   public static final class FixtureStringId_RawTypesOf extends AbstractStringId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private FixtureStringId_RawTypesOf(String id) {
@@ -198,6 +200,7 @@ public class IdFactoryTest {
    */
   @IgnoreBean
   public static final class FixtureStringId_WrongRawTypesOfMethodName extends AbstractStringId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private FixtureStringId_WrongRawTypesOfMethodName(String id) {
@@ -218,6 +221,7 @@ public class IdFactoryTest {
    */
   @IgnoreBean
   public static final class FixtureStringId_NonStaticRawTypesOf extends AbstractStringId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private FixtureStringId_NonStaticRawTypesOf(String id) {
@@ -238,6 +242,7 @@ public class IdFactoryTest {
    */
   @IgnoreBean
   public static final class IllegalUuId1_MissingOf extends AbstractUuId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private IllegalUuId1_MissingOf(UUID id) {
@@ -250,6 +255,7 @@ public class IdFactoryTest {
    */
   @IgnoreBean
   public static final class IllegalUuId2_WrongOf extends AbstractUuId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public static IllegalUuId2_WrongOf of(UUID id, String anotherParam) {
@@ -266,6 +272,7 @@ public class IdFactoryTest {
    */
   @IgnoreBean
   public static final class FixtureCompositeId_NoRawTypes extends AbstractCompositeId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public static FixtureCompositeId_NoRawTypes of(FixtureStringId c1, FixtureUuId c2) {
@@ -286,6 +293,7 @@ public class IdFactoryTest {
    */
   @IgnoreBean
   public static final class FixtureCompositeId_CardinalityOne extends AbstractCompositeId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public static FixtureCompositeId_CardinalityOne of(FixtureStringId c1) {

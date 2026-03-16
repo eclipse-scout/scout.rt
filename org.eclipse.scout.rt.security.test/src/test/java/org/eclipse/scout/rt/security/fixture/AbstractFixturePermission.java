@@ -9,12 +9,15 @@
  */
 package org.eclipse.scout.rt.security.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.api.data.security.PermissionId;
 import org.eclipse.scout.rt.security.AbstractPermission;
 import org.eclipse.scout.rt.security.IPermission;
 import org.eclipse.scout.rt.security.PermissionLevel;
 
 public abstract class AbstractFixturePermission extends AbstractPermission {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public AbstractFixturePermission(PermissionId permissionId) {

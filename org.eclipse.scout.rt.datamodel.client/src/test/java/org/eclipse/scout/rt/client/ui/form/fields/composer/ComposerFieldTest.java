@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.List;
 
@@ -176,6 +177,7 @@ public class ComposerFieldTest {
     @Order(10)
     public class TimesheetEntry extends AbstractDataModelEntity {
 
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -186,6 +188,7 @@ public class ComposerFieldTest {
       @Order(20)
       public class PlannedEndAttribute extends AbstractDataModelAttribute {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         @Override
@@ -202,6 +205,7 @@ public class ComposerFieldTest {
   }
 
   public static class ComposerFieldData extends AbstractTreeFieldData {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 }

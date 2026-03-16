@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.job.listener;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -24,6 +25,7 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
  */
 public class JobEvent extends EventObject {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final JobEventType m_type;

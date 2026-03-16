@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,6 +18,7 @@ import java.util.Collection;
  * used in sorted maps and sets when dealing with composite sorting criteria
  */
 public class CompositeObject implements Comparable<CompositeObject>, Serializable {
+  @Serial
   private static final long serialVersionUID = 0L;
   private final Object[] m_value;
 

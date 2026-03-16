@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import java.io.Serial;
 import java.util.Currency;
 
 import com.fasterxml.jackson.databind.deser.std.StdKeyDeserializer;
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.databind.deser.std.StdKeyDeserializer;
  */
 public class CurrencyMapKeyDeserializer extends StdKeyDeserializer {
 
+  @Serial
   private static final long serialVersionUID = 0L;
 
   protected CurrencyMapKeyDeserializer() {

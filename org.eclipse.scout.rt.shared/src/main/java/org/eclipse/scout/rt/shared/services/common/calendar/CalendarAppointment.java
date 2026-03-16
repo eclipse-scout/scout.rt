@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
+import java.io.Serial;
 import java.util.AbstractCollection;
 import java.util.Date;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 
 public class CalendarAppointment extends AbstractCalendarItem implements ICalendarAppointment {
+  @Serial
   private static final long serialVersionUID = 1L;
   //
   private Object m_person;

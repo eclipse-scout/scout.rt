@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.platform.status;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
 import org.junit.Before;
@@ -44,11 +46,13 @@ public class StatusTest {
 
   @Order(10)
   class TestStatus extends Status {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 
   @Order(20)
   class TestStatus2 extends Status {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 }

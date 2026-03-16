@@ -32,6 +32,8 @@ package org.json;
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  */
 
+import java.io.Serial;
+
 /**
  * Thrown to indicate a problem with the JSON API. Such problems include:
  * <ul>
@@ -44,6 +46,7 @@ package org.json;
  * </ul>
  */
 public class JSONException extends RuntimeException { // BSI
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public JSONException(String s) {

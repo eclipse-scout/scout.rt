@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.extension.services.common.code;
 
+import java.io.Serial;
 import java.util.List;
 
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
@@ -23,6 +24,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
 public abstract class AbstractCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID, CODE extends ICode<CODE_ID>, OWNER extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>> extends AbstractSerializableExtension<OWNER>
     implements ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER> {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**

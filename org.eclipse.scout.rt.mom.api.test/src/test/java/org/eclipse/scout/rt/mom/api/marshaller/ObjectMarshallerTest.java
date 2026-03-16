@@ -15,6 +15,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.*;
 
 import java.io.NotSerializableException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,6 +74,7 @@ public class ObjectMarshallerTest {
 
   public static class TestObject implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public String m_field1;

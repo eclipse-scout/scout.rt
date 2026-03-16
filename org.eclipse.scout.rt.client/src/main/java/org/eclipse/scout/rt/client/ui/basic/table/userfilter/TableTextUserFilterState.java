@@ -9,12 +9,15 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.client.ui.basic.userfilter.AbstractUserFilterState;
 
 /**
  * @since 5.1
  */
 public class TableTextUserFilterState extends AbstractUserFilterState {
+  @Serial
   private static final long serialVersionUID = 1L;
   public static final String TYPE = "text";
   private String m_text;

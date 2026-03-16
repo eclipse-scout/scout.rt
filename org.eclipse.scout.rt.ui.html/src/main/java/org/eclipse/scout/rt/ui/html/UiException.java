@@ -9,10 +9,13 @@
  */
 package org.eclipse.scout.rt.ui.html;
 
+import java.io.Serial;
+
 /**
  * A runtime exception used by the Html UI.
  */
 public class UiException extends RuntimeException {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public UiException(String message) {

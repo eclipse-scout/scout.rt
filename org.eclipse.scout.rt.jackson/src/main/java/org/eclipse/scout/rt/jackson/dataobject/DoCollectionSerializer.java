@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -35,6 +36,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
  * {@link Collection}.
  */
 public class DoCollectionSerializer<COLLECTION extends Iterable<?>> extends StdSerializer<COLLECTION> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);

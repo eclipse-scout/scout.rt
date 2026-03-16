@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.util.concurrent;
 
+import java.io.Serial;
+
 /**
  * Indicates that a thread was interrupted while waiting for some condition to become <code>true</code>, e.g. while
  * waiting for a job to complete.
@@ -19,6 +21,7 @@ package org.eclipse.scout.rt.platform.util.concurrent;
  */
 public class ThreadInterruptedError extends AbstractInterruptionError {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**

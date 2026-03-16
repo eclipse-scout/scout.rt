@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.shared.data.form.properties;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -36,6 +38,7 @@ public class FormDataPropertyTest {
 
   public static class PropertyTestFormData extends AbstractFormData {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public NameProperty getNameProperty() {
@@ -63,10 +66,12 @@ public class FormDataPropertyTest {
     }
 
     public class NameProperty extends AbstractPropertyData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class CityProp extends AbstractPropertyData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
   }

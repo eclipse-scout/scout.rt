@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.server.jdbc.internal.exec;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -44,6 +45,7 @@ public class StatementProcessorTest {
   @Test
   public void testLookupCall() {
     LookupCall call = new LookupCall() {
+      @Serial
       private static final long serialVersionUID = 1L;
     };
 
@@ -192,6 +194,7 @@ public class StatementProcessorTest {
   }
 
   public static class PersonFormData extends AbstractFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public long getPersonId() {
@@ -212,16 +215,19 @@ public class StatementProcessorTest {
 
     public class Name extends AbstractValueFieldData<String> {
 
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class Birthdate extends AbstractValueFieldData<Date> {
 
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public static class AddressTable extends AbstractTableFieldBeanData {
 
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -260,6 +266,7 @@ public class StatementProcessorTest {
 
       public static class AddressTableRowData extends AbstractTableRowData {
 
+        @Serial
         private static final long serialVersionUID = 1L;
         public static final String addressId = "addressId";
         public static final String street = "street";

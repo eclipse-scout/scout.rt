@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.listbox;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
+import java.io.Serial;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -258,6 +259,7 @@ public class ListBoxTest extends AbstractListBox<Long> {
   }
 
   public static class ListBoxLookupCall extends LocalLookupCall<String> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -283,6 +285,7 @@ public class ListBoxTest extends AbstractListBox<Long> {
   }
 
   public static class LargeSetLookupCall extends LocalLookupCall<Long> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

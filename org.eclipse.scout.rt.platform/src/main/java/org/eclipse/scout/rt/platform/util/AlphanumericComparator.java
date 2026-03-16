@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Comparator;
@@ -34,6 +35,7 @@ import java.util.regex.Pattern;
  */
 public class AlphanumericComparator implements Comparator<String>, Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
   private final boolean m_ignoreCase;
 

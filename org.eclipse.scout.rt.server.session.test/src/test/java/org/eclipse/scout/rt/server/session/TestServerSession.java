@@ -9,7 +9,10 @@
  */
 package org.eclipse.scout.rt.server.session;
 
+import java.io.Serial;
+
 public class TestServerSession extends AbstractServerSession {
+  @Serial
   private static final long serialVersionUID = 782294551137415747L;
 
   public TestServerSession() {

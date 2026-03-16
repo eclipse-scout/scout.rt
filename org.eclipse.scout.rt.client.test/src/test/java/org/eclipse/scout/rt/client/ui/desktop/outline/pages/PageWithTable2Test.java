@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
@@ -115,6 +117,7 @@ public class PageWithTable2Test {
 
   public class SimpleTablePageData extends AbstractTablePageData {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public SimpleTablePageData() {
@@ -156,6 +159,7 @@ public class PageWithTable2Test {
 
     public class SimpleTablePageRowData extends AbstractTableRowData {
 
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final String i = "i";
       public static final String s = "s";

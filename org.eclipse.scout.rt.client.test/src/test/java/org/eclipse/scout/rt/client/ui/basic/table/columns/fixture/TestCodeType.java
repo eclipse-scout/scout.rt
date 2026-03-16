@@ -9,11 +9,14 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.columns.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 
 public class TestCodeType extends AbstractCodeType<Long, Long> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Override
@@ -23,6 +26,7 @@ public class TestCodeType extends AbstractCodeType<Long, Long> {
 
   @Order(20)
   public class TestCode extends AbstractCode<Long> {
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final long ID = 0L;
     public static final String TEXT = "Test";

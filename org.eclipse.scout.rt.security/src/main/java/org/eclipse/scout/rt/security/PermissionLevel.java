@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.security;
 
 import java.io.ObjectStreamException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
  * Levels of permissions.
  */
 public final class PermissionLevel implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**
@@ -152,6 +154,7 @@ public final class PermissionLevel implements Serializable {
     m_textSupplier = Assertions.assertNotNull(textSupplier);
   }
 
+  @Serial
   private Object readResolve() throws ObjectStreamException {
     PermissionLevel existing = opt(m_value);
     if (existing == null) {

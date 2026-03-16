@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.util;
 import static org.junit.Assert.*;
 
 import java.io.InputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.URL;
 
@@ -133,6 +134,7 @@ public class CloneUtilityTest {
    * ##########################################################################
    */
   public static class MyObject implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Class<?> m_type;

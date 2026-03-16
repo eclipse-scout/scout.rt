@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Locale;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer.Std;
  */
 public class DoLocaleDeserializer extends Std {
 
+  @Serial
   private static final long serialVersionUID = 2429460681017940619L;
   public static final String UNDETERMINED = "und"; // from sun.util.locale.LanguageTag.UNDETERMINED
 

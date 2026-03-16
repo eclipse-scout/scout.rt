@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 
 import static org.eclipse.scout.rt.shared.servicetunnel.DataObjectWrapperUtility.mapper;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.dataobject.DataObjectHolder;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.dataobject.IDataObject;
  */
 // Package-private because shouldn't be used except by ServiceTunnelObjectReplacer.
 class DataObjectHolderWrapper implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   // Not using transient DataObjectHolder along with writeObject/readObject like DataObjectHolder, because the string is read exactly once after deserialization.

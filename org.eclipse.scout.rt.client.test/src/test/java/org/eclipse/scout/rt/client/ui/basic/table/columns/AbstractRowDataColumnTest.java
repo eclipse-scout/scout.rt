@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -111,6 +113,7 @@ public class AbstractRowDataColumnTest {
 }
 
 class TestTableBean extends AbstractTableFieldBeanData {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public TestTableBean() {
@@ -151,6 +154,7 @@ class TestTableBean extends AbstractTableFieldBeanData {
   }
 
   public static class TableBeanRowData extends AbstractTableRowData {
+    @Serial
     private static final long serialVersionUID = 1L;
     private String m_stringTest;
     private String m_rowData;

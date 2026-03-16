@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.clientnotification;
 
+import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,6 +25,7 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
  * </ul>
  */
 public class ClientNotificationAddress implements IClientNotificationAddress {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final Set<String> m_sessionIds = new HashSet<>();

@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.common.bookmark;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 
 public class TablePageState extends AbstractPageState {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private CompositeObject m_expandedChildPrimaryKey;

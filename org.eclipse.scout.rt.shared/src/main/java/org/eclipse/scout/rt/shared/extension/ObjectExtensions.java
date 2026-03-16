@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.extension;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 
 public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNER>> implements IExtensibleObject, Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final OWNER m_owner;

@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.platform.namespace;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -565,6 +566,7 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
   }
 
   protected static class P_ByNameComparator implements Comparator<INamespaceVersioned>, Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final Map<String, Integer> m_ordering;

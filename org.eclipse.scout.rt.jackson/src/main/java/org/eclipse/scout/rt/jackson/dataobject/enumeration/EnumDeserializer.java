@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject.enumeration;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import org.eclipse.scout.rt.dataobject.enumeration.EnumResolver;
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
  * Custom deserializer for {@link IEnum} values.
  */
 public class EnumDeserializer extends StdDeserializer<IEnum> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected final Class<? extends IEnum> m_enumType;

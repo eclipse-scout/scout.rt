@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.data.basic.table;
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractContributionComposite;
  * @since 3.8.2
  */
 public abstract class AbstractTableRowData extends AbstractContributionComposite implements ITableBeanRowHolder {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private int m_rowState;

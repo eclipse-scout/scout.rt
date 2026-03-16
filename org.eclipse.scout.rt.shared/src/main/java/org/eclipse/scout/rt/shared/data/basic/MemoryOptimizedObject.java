@@ -9,11 +9,13 @@
  */
 package org.eclipse.scout.rt.shared.data.basic;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 public class MemoryOptimizedObject implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private short m_bits;

@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.shared.services.common.bookmark;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 public class Bookmark implements Serializable, IOrdered {
   private static final Logger LOG = LoggerFactory.getLogger(Bookmark.class);
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /*

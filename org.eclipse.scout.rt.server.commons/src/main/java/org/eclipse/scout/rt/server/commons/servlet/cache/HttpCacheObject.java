@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet.cache;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -23,6 +24,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
  * Used in {@link HttpCacheControl} in order to decide caching strategy and set caching headers
  */
 public class HttpCacheObject implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final HttpCacheKey m_cacheKey;

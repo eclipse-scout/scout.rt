@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.job;
 
+import java.io.Serial;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -355,6 +356,7 @@ public final class ModelJobs {
 
   public static class WrongThreadException extends AssertionException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public WrongThreadException(final String msg, final Object... msgArgs) {

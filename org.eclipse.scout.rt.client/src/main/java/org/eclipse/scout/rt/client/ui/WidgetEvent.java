@@ -9,10 +9,12 @@
  */
 package org.eclipse.scout.rt.client.ui;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 public class WidgetEvent extends EventObject implements IModelEvent {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static final int TYPE_SCROLL_TO_TOP = 100;

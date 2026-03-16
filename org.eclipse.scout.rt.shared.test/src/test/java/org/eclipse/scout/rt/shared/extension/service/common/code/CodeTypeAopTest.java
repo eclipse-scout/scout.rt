@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.extension.service.common.code;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -48,6 +49,7 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
 
   public static class CountryCodeType extends AbstractCodeType<Long, Long> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final Long ID = 20000L;
 
@@ -73,6 +75,7 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
     @Order(10)
     public static class USACode extends AbstractCode<Long> {
 
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final Long ID = 20001L;
 
@@ -90,6 +93,7 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
     @Order(20)
     public static class GreatBritainCode extends AbstractCode<Long> {
 
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final Long ID = 20002L;
 
@@ -107,6 +111,7 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
     @Order(30)
     public static class GermanyCode extends AbstractCode<Long> {
 
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final Long ID = 20003L;
 
@@ -124,6 +129,7 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
     @Order(40)
     public static class FranceCode extends AbstractCode<Long> {
 
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final Long ID = 20004L;
 
@@ -141,6 +147,7 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
     @Order(50)
     public static class SwitzerlandCode extends AbstractCode<Long> {
 
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final Long ID = 20005L;
 
@@ -163,6 +170,7 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
 
   public static class CodeTypeExtension extends AbstractCodeTypeExtension<Long, Long, CountryCodeType> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public CodeTypeExtension(CountryCodeType owner) {
@@ -173,6 +181,7 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
     public List<? extends ICode<Long>> execCreateCodes(CodeTypeWithGenericCreateCodesChain chain) {
       execCreateCodesCounter.incrementAndGet();
       AbstractCode<Long> burmaCode = new AbstractCode<>() {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         @Override

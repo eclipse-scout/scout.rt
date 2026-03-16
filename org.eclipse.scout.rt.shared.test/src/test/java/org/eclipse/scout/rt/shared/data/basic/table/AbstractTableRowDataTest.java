@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.shared.data.basic.table;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +55,7 @@ public class AbstractTableRowDataTest {
   }
 
   private static class TestingTableRowData extends AbstractTableRowData {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 }

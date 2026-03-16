@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.shared.data.model.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
@@ -17,6 +19,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Override
@@ -38,6 +41,7 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
 
   @Order(10)
   public class LastNameAttribute extends AbstractDataModelAttribute {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -53,6 +57,7 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
 
   @Order(10)
   public class FirstNameAttribute extends AbstractDataModelAttribute {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -68,6 +73,7 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
 
   @Order(10)
   public class BirthdateAttribute extends AbstractDataModelAttribute {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -83,6 +89,7 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
 
   @Order(10)
   public class PrimaryAddressEntity extends AbstractAddressEntity {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -98,6 +105,7 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
 
   @Order(10)
   public class LegalAddressEntity extends AbstractAddressEntity {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -109,6 +117,7 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
   @Order(10)
   public class AccountManagerEntity extends AbstractPersonEntity {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -124,6 +133,7 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
 
   @Order(10)
   public class CompanyEntity extends AbstractCompanyEntity {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

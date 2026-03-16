@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.mom.jms;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -165,6 +166,7 @@ public class JmsMomPubSemaphoreTest extends AbstractJmsMomTest {
   }
 
   protected static class SerializableObject implements Serializable {
+    @Serial
     private static final long serialVersionUID = 2903932396188258477L;
   }
 }

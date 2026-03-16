@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.api.data.uinotification;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.dataobject.TypeName;
 
 @TypeName("scout.UiNotification")
 public class UiNotificationDo extends DoEntity implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public DoValue<String> id() {

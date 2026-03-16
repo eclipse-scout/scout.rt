@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.id;
 
+import java.io.Serial;
 import java.util.Collections;
 import java.util.Set;
 
@@ -25,6 +26,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
  * information about the {@link IIdCodecFlag}s of the context.
  */
 public abstract class AbstractIdCodecDeserializer<T> extends StdDeserializer<T> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected final IdCodec m_idCodec = BEANS.get(IdCodec.class);

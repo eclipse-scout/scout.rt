@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
+import java.io.Serial;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
@@ -20,6 +21,7 @@ import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 public class ColumnUserFilterState extends AbstractUserFilterState implements IColumnAwareUserFilterState {
+  @Serial
   private static final long serialVersionUID = 1L;
   public static final String TYPE = "column";
 

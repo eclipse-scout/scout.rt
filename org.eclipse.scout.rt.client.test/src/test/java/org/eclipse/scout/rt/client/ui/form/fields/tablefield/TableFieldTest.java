@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.dto.FormData;
@@ -772,6 +773,7 @@ public class TableFieldTest {
    * Corresponding part as TableFieldBeanData of the formData:
    */
   private static class P_TableBean extends AbstractTableFieldBeanData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public P_TableBean() {
@@ -813,6 +815,7 @@ public class TableFieldTest {
 
     public static class TableBeanRowData extends AbstractTableRowData {
 
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final String KEY = "key";
       public static final String STRING = "string";
@@ -892,6 +895,7 @@ public class TableFieldTest {
   }
 
   private static class P_CheckableTableData extends AbstractTableFieldBeanData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -929,6 +933,7 @@ public class TableFieldTest {
     }
 
     public static class P_CheckableTableRowData extends AbstractTableRowData {
+      @Serial
       private static final long serialVersionUID = 1L;
       private Integer m_integer;
       private Boolean m_boolean;

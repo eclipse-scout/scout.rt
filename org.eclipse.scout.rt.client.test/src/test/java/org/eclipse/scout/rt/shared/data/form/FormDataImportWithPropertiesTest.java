@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.shared.data.form;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -133,17 +135,21 @@ public class FormDataImportWithPropertiesTest {
   }
 
   public static final class DynamicFormDataWithProperties extends AbstractFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public class PrimitiveBooleanProperty extends AbstractPropertyData<Boolean> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class PrimitiveIntegerProperty extends AbstractPropertyData<Integer> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class TextProperty extends AbstractPropertyData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 

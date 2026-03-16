@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -209,6 +210,7 @@ public class LocalLookupCallTest {
   }
 
   private class P_LocalLookupCall extends LocalLookupCall<Integer> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -227,6 +229,7 @@ public class LocalLookupCallTest {
   }
 
   private class P_LocalLookupCallHierarchic extends LocalLookupCall<String> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

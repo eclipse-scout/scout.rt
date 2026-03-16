@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -20,6 +21,7 @@ import java.io.Serializable;
 @SuppressWarnings("squid:S00118")
 public abstract class Pair<L, R> implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public abstract L getLeft();

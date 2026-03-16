@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.function.Function;
 
 import org.eclipse.scout.rt.dataobject.fixture.FixtureHierarchicalLookupRowDo;
@@ -124,6 +125,7 @@ public class AbstractRestLookupCallTest {
 
   @IgnoreBean
   static class P_FixtureUuIdLookupCall extends AbstractRestLookupCall<FixtureUuIdLookupRestrictionDo, FixtureUuId> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -135,6 +137,7 @@ public class AbstractRestLookupCallTest {
 
   @IgnoreBean
   static class P_FixtureUuIdHierachicalLookupCall extends AbstractRestLookupCall<FixtureUuIdLookupRestrictionDo, FixtureUuId> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

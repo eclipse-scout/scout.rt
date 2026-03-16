@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject.id;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.jackson.dataobject.ScoutDataObjectModuleContext;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  * Custom serializer for all {@link IId} instances.
  */
 public class UnqualifiedIIdSerializer extends AbstractIdCodecSerializer<IId> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public UnqualifiedIIdSerializer(ScoutDataObjectModuleContext moduleContext, JavaType type) {

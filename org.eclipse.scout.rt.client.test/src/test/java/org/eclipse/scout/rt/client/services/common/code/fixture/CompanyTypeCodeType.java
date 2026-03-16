@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.client.services.common.code.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
@@ -21,6 +23,7 @@ import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
  */
 public class CompanyTypeCodeType extends AbstractCodeType<Long, Long> {
 
+  @Serial
   private static final long serialVersionUID = 1L;
   public static final Long ID = 10000L;
 
@@ -46,6 +49,7 @@ public class CompanyTypeCodeType extends AbstractCodeType<Long, Long> {
   @Order(10)
   public static class CustomerCode extends AbstractCode<Long> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final Long ID = 10001L;
 
@@ -63,6 +67,7 @@ public class CompanyTypeCodeType extends AbstractCodeType<Long, Long> {
   @Order(20)
   public static class SupplierCode extends AbstractCode<Long> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final Long ID = 10002L;
 
@@ -80,6 +85,7 @@ public class CompanyTypeCodeType extends AbstractCodeType<Long, Long> {
   @Order(30)
   public static class OtherCode extends AbstractCode<Long> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final Long ID = 10003L;
 

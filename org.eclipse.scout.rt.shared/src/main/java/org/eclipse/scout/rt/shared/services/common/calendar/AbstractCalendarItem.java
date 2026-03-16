@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public abstract class AbstractCalendarItem implements ICalendarItem, Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static DateFormat getDumpDateFormat() {

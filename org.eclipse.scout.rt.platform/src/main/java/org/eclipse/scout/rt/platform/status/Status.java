@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.status;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.platform.IOrdered;
@@ -20,6 +21,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  */
 @Order(IOrdered.DEFAULT_ORDER)
 public class Status implements IStatus, Serializable {
+  @Serial
   private static final long serialVersionUID = 382223180907716448L;
 
   /**

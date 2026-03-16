@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.holders;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -18,6 +19,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
  */
 
 public class Holder<T> implements IHolder<T>, Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
   private volatile T m_value; // volatile because modified/read by different threads.
   private final Class<T> m_clazz;

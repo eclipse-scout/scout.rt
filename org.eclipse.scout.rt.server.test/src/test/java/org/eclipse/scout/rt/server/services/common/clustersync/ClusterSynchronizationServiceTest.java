@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -212,6 +213,7 @@ public class ClusterSynchronizationServiceTest {
 
   class TestCodeType extends AbstractCodeType<Long, Long> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

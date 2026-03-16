@@ -9,11 +9,14 @@
  */
 package org.eclipse.scout.rt.shared.data.model.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
 
 public abstract class AbstractAddressEntity extends AbstractDataModelEntity {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Override
@@ -23,6 +26,7 @@ public abstract class AbstractAddressEntity extends AbstractDataModelEntity {
 
   @Order(10)
   public class CityAttribute extends AbstractDataModelAttribute {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -38,6 +42,7 @@ public abstract class AbstractAddressEntity extends AbstractDataModelEntity {
 
   @Order(10)
   public class ZipCodeAttribute extends AbstractDataModelAttribute {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

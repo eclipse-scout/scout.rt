@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.util.concurrent;
 
+import java.io.Serial;
+
 /**
  * Indicates that the maximal wait time elapsed while waiting for some condition to become <code>true</code>, e.g. while
  * waiting a job to complete.
@@ -17,6 +19,7 @@ package org.eclipse.scout.rt.platform.util.concurrent;
  */
 public class TimedOutError extends AbstractInterruptionError {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public TimedOutError(final String message, final Object... args) {

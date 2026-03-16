@@ -9,10 +9,13 @@
  */
 package org.eclipse.scout.rt.rest.doc;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.api.data.security.PermissionId;
 import org.eclipse.scout.rt.security.AbstractPermission;
 
 public class ReadAllApiDocPermission extends AbstractPermission {
+  @Serial
   private static final long serialVersionUID = 1L;
   public static final PermissionId ID = PermissionId.of("scout.api.doc.read.all");
 

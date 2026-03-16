@@ -9,10 +9,13 @@
  */
 package org.eclipse.scout.rt.shared.data.form.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 
 public class TestFormData extends AbstractFormData {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public TestFormData() {
@@ -43,6 +46,7 @@ public class TestFormData extends AbstractFormData {
   }
 
   public static class G1Box extends AbstractTestGroupBoxData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public G1Box() {
@@ -50,6 +54,7 @@ public class TestFormData extends AbstractFormData {
   }
 
   public static class G2Box extends AbstractTestGroupBoxData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public G2Box() {
@@ -57,6 +62,7 @@ public class TestFormData extends AbstractFormData {
   }
 
   public static class Text1 extends AbstractValueFieldData<String> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Text1() {
@@ -64,6 +70,7 @@ public class TestFormData extends AbstractFormData {
   }
 
   public static class Text2 extends AbstractValueFieldData<String> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Text2() {
@@ -71,6 +78,7 @@ public class TestFormData extends AbstractFormData {
   }
 
   public static class Text3 extends AbstractValueFieldData<String> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Text3() {
@@ -78,6 +86,7 @@ public class TestFormData extends AbstractFormData {
   }
 
   public static class Text4 extends AbstractValueFieldData<String> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Text4() {

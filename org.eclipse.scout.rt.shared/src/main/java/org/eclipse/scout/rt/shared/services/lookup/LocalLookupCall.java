@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.lookup;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +36,7 @@ import org.eclipse.scout.rt.platform.util.TriState;
 @ClassId("6a7d238a-11ab-478b-a3fb-7a99494b711d")
 @SuppressWarnings("squid:S2057")
 public class LocalLookupCall<T> extends LookupCall<T> {
+  @Serial
   private static final long serialVersionUID = 0L;
 
   private boolean m_hierarchicalLookup;

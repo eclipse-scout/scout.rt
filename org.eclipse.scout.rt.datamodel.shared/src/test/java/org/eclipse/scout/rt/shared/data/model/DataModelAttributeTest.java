@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -392,6 +393,7 @@ public class DataModelAttributeTest {
   }
 
   public static class DynamicDataModelAttribute extends AbstractDataModelAttribute {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public DynamicDataModelAttribute(int type) {
@@ -401,6 +403,7 @@ public class DataModelAttributeTest {
   }
 
   public static class AttributeTestLookupCall extends LocalLookupCall<Long> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -415,6 +418,7 @@ public class DataModelAttributeTest {
   }
 
   public static class AttributeTestCodeType extends AbstractCodeType<Long, Long> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -429,6 +433,7 @@ public class DataModelAttributeTest {
 
     @Order(10)
     public class FirstCode extends AbstractCode<Long> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -444,6 +449,7 @@ public class DataModelAttributeTest {
 
     @Order(20)
     public class SecondCode extends AbstractCode<Long> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override

@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.dataobject.id;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureLongIdWithoutTypeName;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
@@ -77,6 +79,7 @@ public class IdInventoryTest {
 
   @IgnoreBean
   protected static final class FixtureMockId extends AbstractStringId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private FixtureMockId(String id) {
@@ -86,6 +89,7 @@ public class IdInventoryTest {
 
   @IdSignature
   protected abstract static class AbstractImplicitlySignedId extends AbstractStringId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected AbstractImplicitlySignedId(String id) {
@@ -95,6 +99,7 @@ public class IdInventoryTest {
 
   @IgnoreBean
   protected static class ImplicitlySignedId extends AbstractImplicitlySignedId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected ImplicitlySignedId(String id) {
@@ -105,6 +110,7 @@ public class IdInventoryTest {
   @IgnoreBean
   @IdSignature
   protected static class ExplicitlySignedId extends AbstractStringId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected ExplicitlySignedId(String id) {
@@ -114,6 +120,7 @@ public class IdInventoryTest {
 
   @IdSignature(false)
   protected abstract static class AbstractImplicitlyUnsignedId extends AbstractStringId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected AbstractImplicitlyUnsignedId(String id) {
@@ -123,6 +130,7 @@ public class IdInventoryTest {
 
   @IgnoreBean
   protected static class ImplicitlyUnsignedId extends AbstractImplicitlyUnsignedId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected ImplicitlyUnsignedId(String id) {
@@ -133,6 +141,7 @@ public class IdInventoryTest {
   @IgnoreBean
   @IdSignature(false)
   protected static class ExplicitlyUnsignedId extends AbstractStringId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected ExplicitlyUnsignedId(String id) {
@@ -142,6 +151,7 @@ public class IdInventoryTest {
 
   @IdSignature
   protected abstract static class AbstractImplicitlyOverriddenSignedId extends AbstractImplicitlyUnsignedId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected AbstractImplicitlyOverriddenSignedId(String id) {
@@ -151,6 +161,7 @@ public class IdInventoryTest {
 
   @IgnoreBean
   protected static class ImplicitlyOverriddenSignedId extends AbstractImplicitlyOverriddenSignedId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected ImplicitlyOverriddenSignedId(String id) {
@@ -161,6 +172,7 @@ public class IdInventoryTest {
   @IgnoreBean
   @IdSignature
   protected static class ExplicitlyOverriddenSignedId extends AbstractImplicitlyUnsignedId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected ExplicitlyOverriddenSignedId(String id) {
@@ -170,6 +182,7 @@ public class IdInventoryTest {
 
   @IdSignature(false)
   protected abstract static class AbstractImplicitlyOverriddenUnsignedId extends AbstractImplicitlySignedId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected AbstractImplicitlyOverriddenUnsignedId(String id) {
@@ -179,6 +192,7 @@ public class IdInventoryTest {
 
   @IgnoreBean
   protected static class ImplicitlyOverriddenUnsignedId extends AbstractImplicitlyOverriddenUnsignedId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected ImplicitlyOverriddenUnsignedId(String id) {
@@ -189,6 +203,7 @@ public class IdInventoryTest {
   @IgnoreBean
   @IdSignature(false)
   protected static class ExplicitlyOverriddenUnsignedId extends AbstractImplicitlySignedId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected ExplicitlyOverriddenUnsignedId(String id) {

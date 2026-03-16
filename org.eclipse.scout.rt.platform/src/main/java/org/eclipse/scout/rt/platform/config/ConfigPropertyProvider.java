@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.platform.config;
 
 import java.io.File;
+import java.io.Serial;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -92,6 +93,7 @@ public class ConfigPropertyProvider implements IPropertyProvider {
     List<Entry<String, String>> result = new ArrayList<>();
     IConfigFileLoader loader = getConfigFileLoader();
     Properties props = new Properties() {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override

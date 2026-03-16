@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -272,6 +273,7 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
 
   @ClassId("dbf260be-ee6c-4f6f-99c6-9b7bcbdf7d61")
   protected class P_GroupByLookupCall extends LocalLookupCall<IColumn> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -296,6 +298,7 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
 
   @ClassId("1f523a64-cfb9-434d-b47c-40cfc0aa6898")
   protected class P_SortByLookupCall extends LocalLookupCall<ImmutablePair<IColumn, Boolean>> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

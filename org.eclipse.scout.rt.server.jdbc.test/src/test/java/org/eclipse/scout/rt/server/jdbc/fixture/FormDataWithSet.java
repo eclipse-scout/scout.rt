@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.jdbc.fixture;
 
+import java.io.Serial;
 import java.util.Set;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -16,6 +17,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 
 public class FormDataWithSet extends AbstractFormData {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public FormDataWithSet() {
@@ -35,6 +37,7 @@ public class FormDataWithSet extends AbstractFormData {
 
   public static class PersonNr extends AbstractValueFieldData<Long> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public PersonNr() {
@@ -43,6 +46,7 @@ public class FormDataWithSet extends AbstractFormData {
 
   public static class Roles extends AbstractValueFieldData<Set<Long>> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Roles() {
@@ -51,6 +55,7 @@ public class FormDataWithSet extends AbstractFormData {
 
   public static class Value extends AbstractValueFieldData<String> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Value() {

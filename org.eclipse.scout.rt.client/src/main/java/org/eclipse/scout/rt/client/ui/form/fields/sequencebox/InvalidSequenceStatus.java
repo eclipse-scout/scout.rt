@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.status.Status;
 
@@ -19,6 +21,7 @@ import org.eclipse.scout.rt.platform.status.Status;
  */
 @Order(50)
 public class InvalidSequenceStatus extends Status {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public InvalidSequenceStatus(String message) {

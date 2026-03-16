@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.services.common.code;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -108,6 +109,7 @@ public class CodeServiceInvalidateTest {
 
   @IgnoreBean
   public static final class TestCodeType extends AbstractCodeType<Long, String> {
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final AtomicInteger INSTANCE_SEQ = new AtomicInteger();
 

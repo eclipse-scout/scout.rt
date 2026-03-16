@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.html.internal;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  */
 public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final List<IHtmlContent> m_attributes = new ArrayList<>();

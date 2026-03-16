@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -17,6 +18,7 @@ import java.io.Serializable;
 //SONAR:OFF
 @SuppressWarnings("FieldNamingConvention")
 public abstract class AbstractIcons implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected AbstractIcons() {

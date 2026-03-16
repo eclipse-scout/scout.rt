@@ -9,10 +9,13 @@
  */
 package org.eclipse.scout.rt.client.extension.ui;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 
 public class NotificationBadgeStatus extends Status {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public NotificationBadgeStatus(String notificationBadgeText) {

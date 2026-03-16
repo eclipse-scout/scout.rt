@@ -9,12 +9,15 @@
  */
 package org.eclipse.scout.rt.dataobject.id;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
  * Abstract base implementation for all {@link IId} classes. The wrapped id is guaranteed to be non-null.
  */
 public abstract class AbstractRootId<WRAPPED_TYPE> implements IRootId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final WRAPPED_TYPE m_id;

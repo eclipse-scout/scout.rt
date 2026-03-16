@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.holders;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator
  * @since 3.0
  */
 public class BeanArrayHolder<T> implements IBeanArrayHolder<T>, Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
   private final List<T> m_list;
   private final Map<T, State> m_stateList;

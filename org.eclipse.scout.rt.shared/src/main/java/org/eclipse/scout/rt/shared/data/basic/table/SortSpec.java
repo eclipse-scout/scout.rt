@@ -9,9 +9,11 @@
  */
 package org.eclipse.scout.rt.shared.data.basic.table;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class SortSpec implements Serializable {
+  @Serial
   private static final long serialVersionUID = 0L;
 
   private final int[] m_columns;

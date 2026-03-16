@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.html.internal;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.html.IStyleElement;
 
 /**
@@ -16,6 +18,7 @@ import org.eclipse.scout.rt.platform.html.IStyleElement;
  */
 public class StyleElementBuilder extends HtmlNodeBuilder implements IStyleElement {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public StyleElementBuilder(CharSequence... elements) {

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.util;
 import static org.eclipse.scout.rt.platform.util.CollectionUtility.*;
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 
@@ -44,6 +45,7 @@ public class ReflectionUtilityTest {
 
   public static class Middle extends Top implements Runnable, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -53,6 +55,7 @@ public class ReflectionUtilityTest {
 
   public static class Bottom extends Middle implements Callable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Bottom(String string, Integer integer) {

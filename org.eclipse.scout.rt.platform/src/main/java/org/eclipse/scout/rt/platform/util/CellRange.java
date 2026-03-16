@@ -9,9 +9,11 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class CellRange implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private int m_row1, m_col1, m_row2, m_col2;

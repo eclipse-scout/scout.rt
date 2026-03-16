@@ -9,9 +9,11 @@
  */
 package org.eclipse.scout.rt.client.services.common.bookmark;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 public class BookmarkServiceEvent extends EventObject {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final int m_type;

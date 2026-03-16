@@ -9,8 +9,11 @@
  */
 package org.eclipse.scout.rt.shared.data.form.fields;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.util.date.UTCDate;
 
 public abstract class AbstractUTCFieldData extends AbstractValueFieldData<UTCDate> {
+  @Serial
   private static final long serialVersionUID = 1L;
 }

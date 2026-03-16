@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.holders;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 /**
@@ -16,6 +18,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
  */
 
 public class LongArrayHolder extends Holder<Long[]> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public LongArrayHolder() {

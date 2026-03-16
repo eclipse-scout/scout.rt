@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.data.form.fields.browserfield;
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +19,7 @@ import org.eclipse.scout.rt.security.csp.ContentSecurityPolicy;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 
 public abstract class AbstractBrowserFieldData extends AbstractFormFieldData {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private String m_location;

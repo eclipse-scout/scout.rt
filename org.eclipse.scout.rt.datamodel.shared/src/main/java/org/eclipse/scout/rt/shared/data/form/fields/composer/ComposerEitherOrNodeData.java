@@ -9,12 +9,15 @@
  */
 package org.eclipse.scout.rt.shared.data.form.fields.composer;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
 
 /**
  * Data representation for a composer either/or value instance in a {@link AbstractComposerData}
  */
 public class ComposerEitherOrNodeData extends TreeNodeData {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private boolean m_beginOfEitherOr;

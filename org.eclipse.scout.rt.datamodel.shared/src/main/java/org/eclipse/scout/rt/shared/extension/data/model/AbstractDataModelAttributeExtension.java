@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.shared.extension.data.model;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.data.model.DataModelAttributeChains.DataModelAttributeInitAttributeChain;
@@ -16,6 +18,7 @@ import org.eclipse.scout.rt.shared.extension.data.model.DataModelAttributeChains
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 public abstract class AbstractDataModelAttributeExtension<OWNER extends AbstractDataModelAttribute> extends AbstractSerializableExtension<OWNER> implements IDataModelAttributeExtension<OWNER> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public AbstractDataModelAttributeExtension(OWNER owner) {

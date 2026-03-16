@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.jdbc.postgresql;
 
+import java.io.Serial;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PostgreSqlStyle extends AbstractSqlStyle {
+  @Serial
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(PostgreSqlStyle.class);
 

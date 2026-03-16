@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.bookmark;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  */
 @ClassId("a6df6454-6752-43ea-8624-26c691a1145b")
 public class BookmarkFolderLookupCall extends LocalLookupCall<BookmarkFolder> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private BookmarkFolder m_rootFolder;

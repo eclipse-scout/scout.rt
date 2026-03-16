@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.session;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import jakarta.servlet.http.HttpSessionBindingEvent;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
  * {@link HttpSessionListener} to call sessionDestroyer on valueUnbound
  */
 public class ScoutSessionBindingListener implements HttpSessionBindingListener, Serializable {
+  @Serial
   private static final long serialVersionUID = -7050061432903624702L;
   private static final Logger LOG = LoggerFactory.getLogger(ScoutSessionBindingListener.class);
   private final String m_scoutSessionId;

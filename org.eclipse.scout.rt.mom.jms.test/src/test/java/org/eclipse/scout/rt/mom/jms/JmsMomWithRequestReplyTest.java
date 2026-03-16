@@ -13,6 +13,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.reset;
 
+import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -718,6 +719,7 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
 
   private static class SomethingWrongException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")

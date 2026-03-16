@@ -9,12 +9,14 @@
  */
 package org.eclipse.scout.rt.server.jdbc.db2;
 
+import java.io.Serial;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DB2OracleModeSqlStyle extends DB2SqlStyle {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Override

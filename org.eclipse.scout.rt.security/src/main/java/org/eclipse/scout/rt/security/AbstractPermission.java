@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.security;
 
+import java.io.Serial;
 import java.security.Permission;
 
 import org.eclipse.scout.rt.api.data.security.PermissionId;
@@ -17,6 +18,7 @@ import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 
 public abstract class AbstractPermission extends Permission implements IPermission {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**

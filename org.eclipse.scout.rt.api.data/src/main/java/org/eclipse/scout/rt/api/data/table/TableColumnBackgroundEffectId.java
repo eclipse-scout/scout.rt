@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.api.data.table;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -18,6 +20,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  */
 @IdTypeName("scout.TableColumnBackgroundEffectId")
 public final class TableColumnBackgroundEffectId extends AbstractStringId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private TableColumnBackgroundEffectId(String id) {

@@ -9,12 +9,15 @@
  */
 package org.eclipse.scout.rt.dataobject.migration.fixture.house;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 @IdTypeName("charlieFixture.StreetNameStringId")
 public final class StreetNameStringId extends AbstractStringId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private StreetNameStringId(String id) {

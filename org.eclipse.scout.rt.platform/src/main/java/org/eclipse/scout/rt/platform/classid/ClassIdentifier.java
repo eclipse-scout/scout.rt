@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.classid;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +43,7 @@ import java.util.Arrays;
  * <code>new InnerClass(Foo.A.class, Template.InnerClass.class)</code>.
  */
 public class ClassIdentifier implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final Class<?>[] m_segments;

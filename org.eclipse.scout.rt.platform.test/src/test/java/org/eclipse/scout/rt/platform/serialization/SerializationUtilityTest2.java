@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.serialization;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 
@@ -38,10 +39,12 @@ public class SerializationUtilityTest2 {
   }
 
   private static final class Cat0 implements IAnimal0, Serializable {
+    @Serial
     private static final long serialVersionUID = 0x0123456789012345L;
   }
 
   private static final class Cat1 implements IAnimal1 {
+    @Serial
     private static final long serialVersionUID = 0x0123456789012345L;
 
     @Override
@@ -51,6 +54,7 @@ public class SerializationUtilityTest2 {
   }
 
   private static final class Cat2 implements IAnimal2 {
+    @Serial
     private static final long serialVersionUID = 0x0123456789012345L;
 
     @Override

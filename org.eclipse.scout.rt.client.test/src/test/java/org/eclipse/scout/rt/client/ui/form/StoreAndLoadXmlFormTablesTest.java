@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -45,6 +46,7 @@ public class StoreAndLoadXmlFormTablesTest {
   };
 
   public static class InnerClass implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_value = "Inner Level 1";
@@ -63,6 +65,7 @@ public class StoreAndLoadXmlFormTablesTest {
     }
 
     public static class InnerInnerClass implements Serializable {
+      @Serial
       private static final long serialVersionUID = 2L;
 
       private final String m_value = "Inner Level 2";

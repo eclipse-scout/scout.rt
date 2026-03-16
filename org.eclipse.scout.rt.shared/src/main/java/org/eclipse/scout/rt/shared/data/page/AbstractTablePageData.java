@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.shared.data.page;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.api.data.table.LimitedResultInfoContributionDo;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.Bean;
@@ -25,6 +27,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
  */
 @Bean
 public abstract class AbstractTablePageData extends AbstractTableFieldBeanData {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private boolean m_limitedResult;

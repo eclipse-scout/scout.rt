@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.bookmark;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 @ClassId("786fb2d7-5d48-4239-b267-bec20cca8a88")
 public class KeyStrokeLookupCall extends LocalLookupCall<String> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private String m_currentKeyStroke;

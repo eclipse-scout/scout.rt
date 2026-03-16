@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.util.concurrent;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
@@ -18,6 +20,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
  * @since 6.1
  */
 public class FutureCancelledError extends AbstractInterruptionError {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**

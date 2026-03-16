@@ -13,6 +13,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.reset;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -505,6 +506,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
 
   public static class Person implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private long m_id;

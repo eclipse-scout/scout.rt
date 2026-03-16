@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.exception;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -22,6 +23,7 @@ import org.slf4j.helpers.MessageFormatter;
  * Represents processing errors that occur during application execution.
  */
 public class ProcessingException extends PlatformException {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private ProcessingStatus m_status;

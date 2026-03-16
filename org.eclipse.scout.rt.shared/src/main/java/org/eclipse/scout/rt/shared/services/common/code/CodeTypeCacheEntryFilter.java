@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.common.code;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * @since 5.2
  */
 public class CodeTypeCacheEntryFilter implements ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>> {
+  @Serial
   private static final long serialVersionUID = 1L;
   private final Set<Class<? extends ICodeType<?, ?>>> m_codeTypeClasses;
 

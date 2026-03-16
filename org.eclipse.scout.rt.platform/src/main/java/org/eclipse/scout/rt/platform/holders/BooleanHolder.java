@@ -9,11 +9,14 @@
  */
 package org.eclipse.scout.rt.platform.holders;
 
+import java.io.Serial;
+
 /**
  * @since 3.0
  */
 
 public class BooleanHolder extends Holder<Boolean> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public BooleanHolder() {

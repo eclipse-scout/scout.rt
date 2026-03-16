@@ -9,12 +9,14 @@
  */
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
+import java.io.Serial;
 import java.util.Date;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 
 public class CalendarTask extends AbstractCalendarItem implements ICalendarTask {
+  @Serial
   private static final long serialVersionUID = 0L;
 
   private Object m_responsibleIdObject;

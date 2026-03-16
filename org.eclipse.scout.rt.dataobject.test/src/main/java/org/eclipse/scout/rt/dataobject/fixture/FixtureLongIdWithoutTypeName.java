@@ -9,9 +9,12 @@
  */
 package org.eclipse.scout.rt.dataobject.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.id.AbstractLongId;
 
 public final class FixtureLongIdWithoutTypeName extends AbstractLongId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private FixtureLongIdWithoutTypeName(Long id) {

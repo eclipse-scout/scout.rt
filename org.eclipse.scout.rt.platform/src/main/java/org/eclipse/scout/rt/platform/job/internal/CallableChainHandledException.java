@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.job.internal;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -18,6 +20,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
  * handled by the {@link ExceptionProcessor}.
  */
 public class CallableChainHandledException extends Exception {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public CallableChainHandledException(Throwable original) {

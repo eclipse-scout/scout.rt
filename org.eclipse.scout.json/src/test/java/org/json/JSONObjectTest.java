@@ -20,6 +20,7 @@
  */
 package org.json;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -367,6 +368,7 @@ public class JSONObjectTest extends TestCase {
 
   public void testOtherNumbers() throws JSONException {
     Number nan = new Number() {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override

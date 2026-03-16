@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.data.form.fields.composer;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
  * Data representation for a composer entity value instance in a {@link AbstractComposerData}
  */
 public class ComposerEntityNodeData extends TreeNodeData {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private String m_entityExternalId;

@@ -9,12 +9,14 @@
  */
 package org.eclipse.scout.rt.security;
 
+import java.io.Serial;
 import java.security.Permission;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.stream.Stream;
 
 public class NonePermissionCollection extends AbstractPermissionCollection {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Override

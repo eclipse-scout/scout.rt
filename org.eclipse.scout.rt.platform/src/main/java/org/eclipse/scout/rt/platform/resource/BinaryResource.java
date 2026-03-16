@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.platform.resource;
 
 import java.io.File;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +31,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * @since 5.0
  */
 public final class BinaryResource implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final String m_filename;

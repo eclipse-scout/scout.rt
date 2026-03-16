@@ -9,9 +9,11 @@
  */
 package org.eclipse.scout.rt.shared.services.common.bookmark;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public abstract class AbstractPageState implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private String m_bookmarkIdentifier;

@@ -9,11 +9,13 @@
  */
 package org.eclipse.scout.rt.dataformat.ical.model;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractEntity implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private List<Property> m_properties = new ArrayList<>();

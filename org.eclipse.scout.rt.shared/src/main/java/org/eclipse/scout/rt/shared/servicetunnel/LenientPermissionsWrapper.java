@@ -14,6 +14,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectInputStream.GetField;
 import java.io.ObjectOutputStream;
 import java.io.ObjectOutputStream.PutField;
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.Permission;
 import java.security.Permissions;
@@ -26,6 +27,7 @@ import java.util.List;
  * contain permissions not known by the consumer. This wrapper simply ignores those.
  */
 public class LenientPermissionsWrapper implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /*
@@ -44,6 +46,7 @@ public class LenientPermissionsWrapper implements Serializable {
   /**
    * @serialData Default fields.
    */
+  @Serial
   private void writeObject(ObjectOutputStream out) throws IOException {
     //no call to defaultWriteObject
     PutField pfields = out.putFields();
@@ -61,6 +64,7 @@ public class LenientPermissionsWrapper implements Serializable {
     out.writeFields();
   }
 
+  @Serial
   @SuppressWarnings("unchecked")
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
     //no call to defaultReadObject

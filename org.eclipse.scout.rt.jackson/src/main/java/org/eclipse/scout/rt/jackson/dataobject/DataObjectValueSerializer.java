@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import org.eclipse.scout.rt.dataobject.IDataObjectValue;
 
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
  * Serializer for {@link IDataObjectValue}.
  */
 public class DataObjectValueSerializer extends StdSerializer<IDataObjectValue> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public DataObjectValueSerializer(JavaType type) {

@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.server.commons.servlet;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Serial;
 import java.io.Serializable;
 
 import jakarta.annotation.PostConstruct;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class HttpServletControl implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(HttpServletControl.class);
 

@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.server.jdbc;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -292,6 +293,7 @@ public class SelectIntoArrayTest {
   }
 
   public static class MyFormData extends AbstractFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Active getActive() {
@@ -307,14 +309,17 @@ public class SelectIntoArrayTest {
     }
 
     public static class Active extends AbstractValueFieldData<Boolean> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public static class State extends AbstractValueFieldData<Integer> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public static class Name extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 

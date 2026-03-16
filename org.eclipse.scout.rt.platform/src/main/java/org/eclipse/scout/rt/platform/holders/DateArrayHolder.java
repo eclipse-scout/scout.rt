@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.holders;
 
+import java.io.Serial;
 import java.util.Date;
 
 /**
@@ -16,6 +17,7 @@ import java.util.Date;
  */
 
 public class DateArrayHolder extends Holder<Date[]> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public DateArrayHolder() {

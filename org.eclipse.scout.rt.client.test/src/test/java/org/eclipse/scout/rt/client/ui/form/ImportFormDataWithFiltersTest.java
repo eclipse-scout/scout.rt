@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.ImportFormDataWithFiltersTest.FilterImportTestForm.MainBox.SubBox.TestSubStringField;
 import org.eclipse.scout.rt.client.ui.form.ImportFormDataWithFiltersTest.FilterImportTestForm.MainBox.TestStringField;
@@ -145,6 +147,7 @@ public class ImportFormDataWithFiltersTest {
   }
 
   static class ImportTestFormData extends AbstractFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ImportTestFormData() {
@@ -159,6 +162,7 @@ public class ImportFormDataWithFiltersTest {
     }
 
     public static class TestString extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public TestString() {
@@ -166,6 +170,7 @@ public class ImportFormDataWithFiltersTest {
     }
 
     public static class TestSubString extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public TestSubString() {

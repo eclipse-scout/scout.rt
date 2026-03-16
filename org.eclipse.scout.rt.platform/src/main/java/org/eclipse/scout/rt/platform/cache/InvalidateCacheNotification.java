@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.cache;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -19,6 +20,7 @@ import java.io.Serializable;
  * @since 5.2
  */
 public class InvalidateCacheNotification implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final String m_cacheId;

@@ -9,10 +9,12 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Comparator;
 
 public class RowIndexComparator implements Comparator<ITableRow>, Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Override

@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.ui.html;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -57,6 +58,7 @@ import org.slf4j.LoggerFactory;
  * Ajax requests are processed as "/json" using HTTP POST, see {@link JsonMessageRequestHandler}.
  */
 public class UiServlet extends AbstractHttpServlet {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final Logger LOG = LoggerFactory.getLogger(UiServlet.class);

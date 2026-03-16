@@ -9,11 +9,13 @@
  */
 package org.eclipse.scout.rt.client.ui.notification;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 
 public class NotificationEvent extends EventObject implements IModelEvent {
+  @Serial
   private static final long serialVersionUID = 1L;
   // state
   public static final int TYPE_CLOSED = 900;

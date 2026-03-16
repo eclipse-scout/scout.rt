@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.server.jdbc.builder;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -223,6 +225,7 @@ public class FormDataStatementBuilderTest {
   }
 
   public static class AbstractMasterTemplateFieldData extends AbstractFormFieldData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public MasterTemplateText getMasterTemplateText() {
@@ -242,15 +245,18 @@ public class FormDataStatementBuilderTest {
     }
 
     public class MasterTemplateText extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class MasterTemplateProp extends AbstractPropertyData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
   }
 
   public static class AbstractTemplateFieldData extends AbstractFormFieldData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public TemplateText getText() {
@@ -274,19 +280,23 @@ public class FormDataStatementBuilderTest {
     }
 
     public class TemplateText extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class TemplateProp extends AbstractPropertyData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class MasterTemplateGroupBox extends AbstractMasterTemplateFieldData {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
   }
 
   public static class FormData extends AbstractFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Text getName() {
@@ -314,18 +324,22 @@ public class FormDataStatementBuilderTest {
     }
 
     public class Text extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class Template1GroupBox extends AbstractTemplateFieldData {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class Template2GroupBox extends AbstractTemplateFieldData {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class Prop extends AbstractPropertyData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
   }

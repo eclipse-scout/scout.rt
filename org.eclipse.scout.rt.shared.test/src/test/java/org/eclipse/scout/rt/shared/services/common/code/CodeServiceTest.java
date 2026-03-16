@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -296,6 +297,7 @@ public class CodeServiceTest {
 
   public static class AbcCodeType extends AbstractCodeType<Long, String> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -306,6 +308,7 @@ public class CodeServiceTest {
 
   public static class ZyxCodeType extends AbstractCodeType<Long, String> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -314,6 +317,7 @@ public class CodeServiceTest {
     }
 
     public static class DayCode extends AbstractCode<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final String ID = "day";
 
@@ -329,6 +333,7 @@ public class CodeServiceTest {
     }
 
     public static class MonthCode extends AbstractCode<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final String ID = "month";
 

@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.Collection;
 
@@ -43,6 +44,7 @@ import com.fasterxml.jackson.databind.util.TokenBuffer;
  * Deserializer for {@link DoEntity} and all sub-classes.
  */
 public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final Logger LOG = LoggerFactory.getLogger(DoEntityDeserializer.class);

@@ -9,10 +9,13 @@
  */
 package org.eclipse.scout.rt.platform.exception;
 
+import java.io.Serial;
+
 /**
  * Exception thrown in case of any error during the construction of a bean.
  */
 public class BeanCreationException extends PlatformException {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public BeanCreationException(String message, Object... args) {

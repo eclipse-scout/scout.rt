@@ -13,6 +13,7 @@ import static java.lang.String.valueOf;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -862,6 +863,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
 
   public static class DefaultComparator implements Comparator<IGroup>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

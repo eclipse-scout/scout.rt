@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.util.date;
 
+import java.io.Serial;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -81,6 +82,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * characters ({@code "Z"}, {@code "z"} or {@code "X"}), since the potential problem does not apply in this case.
  */
 public class StrictSimpleDateFormat extends SimpleDateFormat {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public StrictSimpleDateFormat() {

@@ -9,10 +9,12 @@
  */
 package org.eclipse.scout.rt.shared.services.common.context;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 
 public class SharedContextChangedNotification implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final Map<String, Object> m_sharedVariableMap;

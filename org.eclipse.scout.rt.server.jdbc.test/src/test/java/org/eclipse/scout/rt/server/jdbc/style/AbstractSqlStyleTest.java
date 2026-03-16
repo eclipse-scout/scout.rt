@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.server.jdbc.style;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -38,6 +39,7 @@ public class AbstractSqlStyleTest {
    * SQL style for testing.
    */
   AbstractSqlStyle sql = new AbstractSqlStyle() {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -258,6 +260,7 @@ public class AbstractSqlStyleTest {
    * SQL style decimal conversion with no conversion strategy
    */
   private static class SqlStyleDecimalConversionNone extends AbstractSqlStyle {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -294,6 +297,7 @@ public class AbstractSqlStyleTest {
    * SQL style decimal conversion with legacy strategy
    */
   private static class SqlStyleDecimalConversionLegacy extends AbstractSqlStyle {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

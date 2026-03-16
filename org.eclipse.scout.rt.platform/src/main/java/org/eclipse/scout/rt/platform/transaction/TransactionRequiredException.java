@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.transaction;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
@@ -20,6 +22,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
  */
 public class TransactionRequiredException extends PlatformException {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public TransactionRequiredException() {

@@ -9,11 +9,14 @@
  */
 package org.eclipse.scout.rt.shared.data.form.fields.composer;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 
 /**
  * Data representation for a composer tree field
  */
 public abstract class AbstractComposerData extends AbstractTreeFieldData {
+  @Serial
   private static final long serialVersionUID = 1L;
 }

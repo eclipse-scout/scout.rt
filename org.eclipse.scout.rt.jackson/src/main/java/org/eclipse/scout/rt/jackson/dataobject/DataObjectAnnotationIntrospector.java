@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
@@ -29,6 +31,7 @@ import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder;
 @Bean
 public class DataObjectAnnotationIntrospector extends JacksonAnnotationIntrospector {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected ScoutDataObjectModuleContext m_moduleContext;

@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.dataobject.id;
 
+import java.io.Serial;
 import java.util.Objects;
 
 import org.eclipse.scout.rt.dataobject.ILenientDataObjectMapper;
@@ -23,6 +24,7 @@ import org.eclipse.scout.rt.dataobject.ILenientDataObjectMapper;
  * @see ILenientDataObjectMapper
  */
 public final class UnknownId implements IId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final String m_idTypeName;

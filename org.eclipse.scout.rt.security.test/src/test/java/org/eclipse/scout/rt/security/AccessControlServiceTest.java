@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.security;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.security.Principal;
 import java.security.PrivilegedAction;
 import java.util.Collection;
@@ -172,6 +173,7 @@ public class AccessControlServiceTest {
   }
 
   private static class SomePermission1 extends AbstractPermission {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public SomePermission1() {

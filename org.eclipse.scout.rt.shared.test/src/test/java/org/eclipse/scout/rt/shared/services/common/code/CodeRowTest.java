@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.junit.Test;
 
@@ -60,6 +62,7 @@ public class CodeRowTest {
   @Test
   public void testCreateNonEmpty() {
     AbstractTableRowData bean = new AbstractTableRowData() {
+      @Serial
       private static final long serialVersionUID = 1L;
     };
     ICodeRow<String> row = new CodeRow<>(KEY, TEXT)
@@ -113,6 +116,7 @@ public class CodeRowTest {
   }
 
   private static class StringCodeRow extends CodeRow<String> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public StringCodeRow(Object[] cells) {

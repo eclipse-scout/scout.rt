@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serial;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -37,6 +38,7 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
  * war-path: Path to resource within war file. Normally starting with /WEB-INF
  */
 public class ResourceServlet extends HttpServlet {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private String m_warPath;

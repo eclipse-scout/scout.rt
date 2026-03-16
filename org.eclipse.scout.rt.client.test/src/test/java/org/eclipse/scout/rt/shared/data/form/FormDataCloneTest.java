@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.Serial;
 
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -86,6 +87,7 @@ public class FormDataCloneTest {
   }
 
   public static class CompanySearchFormData extends AbstractFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public CompanySearchFormData() {
@@ -126,6 +128,7 @@ public class FormDataCloneTest {
     }
 
     public class PersonIdProperty extends AbstractPropertyData<Long> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public PersonIdProperty() {
@@ -133,6 +136,7 @@ public class FormDataCloneTest {
     }
 
     public class Active extends AbstractValueFieldData<Boolean> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public Active() {
@@ -140,6 +144,7 @@ public class FormDataCloneTest {
     }
 
     public class City extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public City() {
@@ -147,6 +152,7 @@ public class FormDataCloneTest {
     }
 
     public class Currency extends AbstractValueFieldData<Long> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public Currency() {
@@ -155,6 +161,7 @@ public class FormDataCloneTest {
 
     public static class AddressTable extends AbstractTableFieldBeanData {
 
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -193,6 +200,7 @@ public class FormDataCloneTest {
 
       public static class AddressTableRowData extends AbstractTableRowData {
 
+        @Serial
         private static final long serialVersionUID = 1L;
         public static final String street = "street";
         public static final String poBox = "poBox";

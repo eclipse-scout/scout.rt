@@ -9,12 +9,14 @@
  */
 package org.eclipse.scout.rt.platform.util.date;
 
+import java.io.Serial;
 import java.util.Date;
 
 /**
  * UTC date marker subclass as an exception to StaticDate conversion in {@link ServiceTunnelObjectReplacer}.
  */
 public class UTCDate extends Date {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public UTCDate() {

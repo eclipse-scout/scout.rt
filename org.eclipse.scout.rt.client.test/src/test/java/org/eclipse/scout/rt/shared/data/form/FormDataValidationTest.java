@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.shared.data.form;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -110,48 +111,59 @@ public class FormDataValidationTest {
   }
 
   static class MyFormData extends AbstractFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public MyFormData() {
     }
 
     public class StringValue extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class IntegerValue extends AbstractValueFieldData<Integer> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class LongValue extends AbstractValueFieldData<Long> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class DoubleValue extends AbstractValueFieldData<Double> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class BigDecimalValue extends AbstractValueFieldData<BigDecimal> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class BooleanValue extends AbstractValueFieldData<Boolean> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class DateValue extends AbstractValueFieldData<Date> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class CharArrayValue extends AbstractValueFieldData<char[]> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class IntArrayValue extends AbstractValueFieldData<int[]> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     public class LongArrayValue extends AbstractValueFieldData<Long[]> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
   }

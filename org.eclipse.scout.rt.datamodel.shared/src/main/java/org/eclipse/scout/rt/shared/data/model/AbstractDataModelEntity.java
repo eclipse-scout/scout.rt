@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.data.model;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.Permission;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ import org.slf4j.LoggerFactory;
 @ClassId("d64571d4-5521-45c3-84c2-a22294542747")
 public abstract class AbstractDataModelEntity extends AbstractPropertyObserver implements IDataModelEntity, Serializable, IContributionOwner, IExtensibleObject {
 
+  @Serial
   private static final long serialVersionUID = 1L;
   private static final String INITIALIZED = "INITIALIZED";
   private static final String ONE_TO_MANY = "ONE_TO_MANY";
@@ -525,6 +527,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    * any further chain elements.
    */
   protected static class LocalDataModelEntityExtension<OWNER extends AbstractDataModelEntity> extends AbstractSerializableExtension<OWNER> implements IDataModelEntityExtension<OWNER> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public LocalDataModelEntityExtension(OWNER owner) {

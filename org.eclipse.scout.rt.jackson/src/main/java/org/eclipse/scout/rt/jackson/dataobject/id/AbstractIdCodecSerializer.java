@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.jackson.dataobject.id;
 
 import static java.util.Collections.unmodifiableSet;
 
+import java.io.Serial;
 import java.util.Set;
 
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
@@ -26,6 +27,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
  * information about the {@link IIdCodecFlag}s of the context.
  */
 public abstract class AbstractIdCodecSerializer<T> extends StdSerializer<T> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected final ScoutDataObjectModuleContext m_moduleContext;

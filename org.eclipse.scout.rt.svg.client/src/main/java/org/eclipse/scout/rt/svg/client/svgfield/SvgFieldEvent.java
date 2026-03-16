@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.svg.client.svgfield;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.EventObject;
 
@@ -16,6 +17,7 @@ import org.apache.batik.dom.svg.SVGOMPoint;
 import org.w3c.dom.svg.SVGPoint;
 
 public class SvgFieldEvent extends EventObject {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final int m_type;
@@ -65,6 +67,7 @@ public class SvgFieldEvent extends EventObject {
   }
 
   private static class Point implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final float m_x;

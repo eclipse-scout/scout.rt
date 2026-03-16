@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.dataobject.fixture;
 
+import java.io.Serial;
 import java.util.Date;
 
 import org.eclipse.scout.rt.dataobject.id.AbstractDateId;
@@ -16,6 +17,7 @@ import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 
 @IdTypeName("scout.FixtureDateId")
 public final class FixtureDateId extends AbstractDateId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private FixtureDateId(Date id) {

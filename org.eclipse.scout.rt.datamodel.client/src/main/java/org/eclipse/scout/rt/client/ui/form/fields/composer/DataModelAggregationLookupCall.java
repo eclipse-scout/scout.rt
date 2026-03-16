@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 @ClassId("d7a38deb-3d92-4bf2-853c-d3fda0219b7f")
 public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
+  @Serial
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(DataModelAggregationLookupCall.class);
 

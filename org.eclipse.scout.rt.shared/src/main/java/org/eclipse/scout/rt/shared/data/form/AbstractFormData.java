@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.data.form;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 @Bean
 public abstract class AbstractFormData extends AbstractContributionComposite implements IPropertyHolder {
   public static final char FIELD_PATH_DELIM = '/';
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private Map<Class<?>, Class<? extends AbstractFormFieldData>> m_fieldDataReplacements;

@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.exception;
 
+import java.io.Serial;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
  * stack trace of this class looks exactly the same as the stack trace of the replaced exception.
  */
 public class PlaceholderException extends Exception {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final String m_origThrowableClassName;

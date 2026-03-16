@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet.cache;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
  * the resourcePath constructor, to create a HttpCacheKey instance.
  */
 public final class HttpCacheKey implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final String m_resourcePath;

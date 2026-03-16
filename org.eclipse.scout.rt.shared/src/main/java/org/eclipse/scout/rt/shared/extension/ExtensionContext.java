@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.extension;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import java.util.List;
  */
 public class ExtensionContext implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final ExtensionScope<ExtensionRegistryItem> m_contributionScope;
