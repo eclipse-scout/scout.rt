@@ -485,8 +485,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     m_entities.addAll(entities.getOrderedList());
 
     for (IDataModelEntity e : m_entities) {
-      if (e instanceof AbstractDataModelEntity) {
-        AbstractDataModelEntity adme = (AbstractDataModelEntity) e;
+      if (e instanceof AbstractDataModelEntity adme) {
         if (adme.getParentEntity() != this) {
           adme.setParentEntity(this);
         }

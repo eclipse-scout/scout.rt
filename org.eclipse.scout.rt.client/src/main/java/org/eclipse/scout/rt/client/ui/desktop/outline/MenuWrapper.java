@@ -92,8 +92,7 @@ public class MenuWrapper {
    * menus.
    */
   public static boolean containsWrappedMenu(Collection<IMenu> menus, IMenu menu) {
-    if (menu instanceof IReadOnlyMenu) {
-      IReadOnlyMenu wrapper = (IReadOnlyMenu) menu;
+    if (menu instanceof IReadOnlyMenu wrapper) {
       return menus.contains(wrapper.getWrappedMenu()) || containsWrappedMenu(menus, wrapper.getWrappedMenu());
     }
     return false;

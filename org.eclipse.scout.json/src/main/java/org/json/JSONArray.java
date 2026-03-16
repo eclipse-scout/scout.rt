@@ -95,8 +95,7 @@ public class JSONArray {
      * parse to temporary JSONArray and then steal the data from that.
      */
     Object object = readFrom.nextValue();
-    if (object instanceof JSONArray) {
-      JSONArray jsonArray = (JSONArray) object;
+    if (object instanceof JSONArray jsonArray) {
       m_values = jsonArray.m_values;
     }
     else {

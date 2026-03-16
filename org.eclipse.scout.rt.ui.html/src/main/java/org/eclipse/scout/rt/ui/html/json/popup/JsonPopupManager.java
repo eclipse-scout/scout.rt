@@ -282,11 +282,10 @@ public class JsonPopupManager<T extends PopupManager> extends AbstractJsonProper
     @Override
     public void sessionChanged(UiSessionEvent e) {
       Object model = e.getJsonAdapter().getModel();
-      if (!(model instanceof IWidget)) {
+      if (!(model instanceof IWidget widget)) {
         return;
       }
 
-      IWidget widget = (IWidget) model;
       if (!removeAnchorWithoutJsonAdapter(widget)) {
         // anchor was not observed
         return;

@@ -528,10 +528,9 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
 
     @Override
     public boolean contains(Object o) {
-      if (!(o instanceof Entry)) {
+      if (!(o instanceof Entry<?, ?> e)) {
         return false;
       }
-      Entry<?, ?> e = (Entry<?, ?>) o;
       V currentValue = ConcurrentExpiringMap.this.get(e.getKey());
       Object value = e.getValue();
       return currentValue == value || (currentValue != null && currentValue.equals(value));
@@ -539,10 +538,9 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
 
     @Override
     public boolean remove(Object o) {
-      if (!(o instanceof Entry)) {
+      if (!(o instanceof Entry<?, ?> e)) {
         return false;
       }
-      Entry<?, ?> e = (Entry<?, ?>) o;
       return ConcurrentExpiringMap.this.remove(e.getKey()) != null;
     }
 

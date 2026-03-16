@@ -212,14 +212,12 @@ public class DefaultValuesFilter {
       return false;
     }
     if (defaultValue instanceof JSONObject) {
-      if (value instanceof JSONObject) {
-        JSONObject jsonValue = (JSONObject) value;
+      if (value instanceof JSONObject jsonValue) {
         JSONObject jsonDefaultValue = (JSONObject) defaultValue;
         // Special case: The property cannot be removed, but maybe  we can remove some of the objects attributes
         return filterDefaultObject(jsonValue, jsonDefaultValue, filterState);
       }
-      if (value instanceof JSONArray) {
-        JSONArray jsonValue = (JSONArray) value;
+      if (value instanceof JSONArray jsonValue) {
         JSONObject jsonDefaultValue = (JSONObject) defaultValue;
         // Special case: Apply default value object to each element in the array
         filterDefaultObject(jsonValue, jsonDefaultValue, filterState);
@@ -300,14 +298,12 @@ public class DefaultValuesFilter {
     for (int i = 0; i < valueArray.length(); i++) {
       Object value = valueArray.opt(i);
       // Can only filter
-      if (value instanceof JSONObject) {
-        JSONObject jsonValue = (JSONObject) value;
+      if (value instanceof JSONObject jsonValue) {
         // Filter, but ignore return value. Element in the array must never be removed,
         // otherwise we could not restore it later.
         filterDefaultObject(jsonValue, defaultValueObject, filterState);
       }
-      else if (value instanceof JSONArray) {
-        JSONArray jsonArray = (JSONArray) value;
+      else if (value instanceof JSONArray jsonArray) {
         filterDefaultObject(jsonArray, defaultValueObject, filterState);
       }
     }

@@ -502,10 +502,9 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
 
       @Override
       public boolean contains(Object o) {
-        if (!(o instanceof Entry)) {
+        if (!(o instanceof Entry<?, ?> e)) {
           return false;
         }
-        Entry<?, ?> e = (Entry<?, ?>) o;
         V v = AbstractMapTransactionMember.this.get(e.getKey());
         if (v == null) {
           return e.getValue() == null;
@@ -517,10 +516,9 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
 
       @Override
       public boolean remove(Object o) {
-        if (!(o instanceof Entry)) {
+        if (!(o instanceof Entry<?, ?> e)) {
           return false;
         }
-        Entry<?, ?> e = (Entry<?, ?>) o;
         return AbstractMapTransactionMember.this.remove(e.getKey()) != null;
       }
 

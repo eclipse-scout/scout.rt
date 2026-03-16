@@ -530,8 +530,7 @@ public final class SVGUtility {
     NamedNodeMap nnmap = aElem.getAttributes();
     for (int i = 0, n = nnmap.getLength(); i < n; i++) {
       Node node = nnmap.item(i);
-      if (node instanceof Attr) {
-        Attr a = (Attr) node;
+      if (node instanceof Attr a) {
         if (XLINK_NS.equals(a.getNamespaceURI()) && !"xlink".equals(a.getPrefix())) {
           nnmap.removeNamedItemNS(a.getNamespaceURI(), a.getLocalName());
           a.setPrefix("xlink");
@@ -541,8 +540,7 @@ public final class SVGUtility {
     }
     for (int i = 0, n = nnmap.getLength(); i < n; i++) {
       Node node = nnmap.item(i);
-      if (node instanceof Attr) {
-        Attr a = (Attr) node;
+      if (node instanceof Attr a) {
         if (javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(a.getNamespaceURI())) {
           nnmap.removeNamedItemNS(a.getNamespaceURI(), a.getLocalName());
         }

@@ -529,10 +529,9 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
 
     AtomicReference<Boolean> result = new AtomicReference<>(true);
     Predicate<IWidget> visitor = widget -> {
-      if (!(widget instanceof IActionNode)) {
+      if (!(widget instanceof IActionNode node)) {
         return false; // cancel traversal
       }
-      IActionNode node = (IActionNode) widget;
       if (!node.isVisible() && !(node instanceof IContextMenu)) {
         result.set(false);
         return false; // cancel traversal

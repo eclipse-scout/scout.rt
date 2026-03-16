@@ -50,11 +50,9 @@ public class UiServletMultipartConfigFilter implements Filter {
   }
 
   protected void addMultipartConfigIfRequired(ServletRequest req0) {
-    if (!(req0 instanceof HttpServletRequest)) {
+    if (!(req0 instanceof HttpServletRequest req)) {
       return;
     }
-
-    HttpServletRequest req = (HttpServletRequest) req0;
 
     if (isMultipartConfigRequired(req)) {
       req.setAttribute(ServletContextRequest.MULTIPART_CONFIG_ELEMENT, CONFIG.getPropertyValue(UiServletMultipartConfigProperty.class));

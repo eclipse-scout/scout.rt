@@ -240,10 +240,9 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
 
   protected void validateContributions(IDoEntity doEntity, Collection<IDoEntity> contributions) {
     for (IDoEntity contribution0 : contributions) {
-      if (!(contribution0 instanceof IDoEntityContribution)) {
+      if (!(contribution0 instanceof IDoEntityContribution contribution)) {
         continue; // Skip validation for unknown contributions
       }
-      IDoEntityContribution contribution = (IDoEntityContribution) contribution0;
       Set<Class<? extends IDoEntity>> containerClasses = m_dataObjectInventory.get().getContributionContainers(contribution.getClass());
       Class<? extends IDoEntityContribution> contributionClass = contribution.getClass();
       assertTrue(containerClasses.stream().anyMatch(containerClass -> containerClass.isInstance(doEntity)), "{} is not a valid container class of {}", doEntity.getClass().getSimpleName(), contributionClass.getSimpleName());

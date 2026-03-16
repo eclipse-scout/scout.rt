@@ -273,10 +273,9 @@ public class CompositeObjectTest {
       if (obj == null) {
         return false;
       }
-      if (!(obj instanceof A)) {
+      if (!(obj instanceof A other)) {
         return false;
       }
-      A other = (A) obj;
       if (m_value != other.m_value) {
         return false;
       }

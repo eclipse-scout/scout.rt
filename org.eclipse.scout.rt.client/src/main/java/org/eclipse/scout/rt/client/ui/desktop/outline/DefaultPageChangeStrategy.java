@@ -44,8 +44,7 @@ public class DefaultPageChangeStrategy implements IPageChangeStrategy {
       catch (RuntimeException | PlatformError e1) {
         BEANS.get(ExceptionHandler.class).handle(e1);
       }
-      if (activePage instanceof IPageWithTable) {
-        IPageWithTable tablePage = (IPageWithTable) activePage;
+      if (activePage instanceof IPageWithTable tablePage) {
         detailForm = activePage.getDetailForm();
         if (activePage.isTableVisible()) {
           detailTable = tablePage.getTable(false);
@@ -54,8 +53,7 @@ public class DefaultPageChangeStrategy implements IPageChangeStrategy {
           searchForm = tablePage.getSearchFormInternal();
         }
       }
-      else if (activePage instanceof IPageWithNodes) {
-        IPageWithNodes nodePage = (IPageWithNodes) activePage;
+      else if (activePage instanceof IPageWithNodes nodePage) {
         if (activePage.isDetailFormVisible()) {
           detailForm = activePage.getDetailForm();
         }

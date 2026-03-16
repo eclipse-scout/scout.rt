@@ -94,13 +94,11 @@ public final class AnnotationUtil {
     final Object _rawParamValue = _paramValue.getValue();
 
     // Class member type.
-    if (_rawParamValue instanceof TypeMirror) {
-      final TypeMirror _clazz = (TypeMirror) _rawParamValue;
+    if (_rawParamValue instanceof TypeMirror _clazz) {
       return JExpr.dotclass(model.ref(_clazz.toString()));
     }
     // Enum member type.
-    else if (_rawParamValue instanceof VariableElement) {
-      final VariableElement _enum = (VariableElement) _rawParamValue;
+    else if (_rawParamValue instanceof VariableElement _enum) {
       final JClass enumType = model.ref(_enum.asType().toString());
       final String enumValue = _enum.getSimpleName().toString();
 
@@ -113,8 +111,7 @@ public final class AnnotationUtil {
       };
     }
     // Annotation member type.
-    else if (_rawParamValue instanceof AnnotationMirror) {
-      final AnnotationMirror _refAnnotation = (AnnotationMirror) _rawParamValue;
+    else if (_rawParamValue instanceof AnnotationMirror _refAnnotation) {
 
       final JClass refAnnotationClazz = model.ref(_refAnnotation.getAnnotationType().toString());
       final P_AnnotationExpression refAnnotationExpression = new P_AnnotationExpression(refAnnotationClazz);

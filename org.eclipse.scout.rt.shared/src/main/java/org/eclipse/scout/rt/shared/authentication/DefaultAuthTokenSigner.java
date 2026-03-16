@@ -91,13 +91,11 @@ public class DefaultAuthTokenSigner {
    */
   protected void appendCustomArgs(DefaultAuthToken token) {
     Principal principal = selectUserPrincipal();
-    if (principal instanceof JwtPrincipal) {
-      JwtPrincipal jwt = (JwtPrincipal) principal;
+    if (principal instanceof JwtPrincipal jwt) {
       List<String> args = CollectionUtility.arrayList(JWT_IDENTIFIER, jwt.getJwtTokenString(), jwt.getAccessToken(), jwt.getRefreshToken(), jwt.getOid());
       token.withCustomArgs(args);
     }
-    else if (principal instanceof SamlPrincipal) {
-      SamlPrincipal saml = (SamlPrincipal) principal;
+    else if (principal instanceof SamlPrincipal saml) {
       token.withCustomArgs(SAML_IDENTIFIER, saml.getSessionIndex());
     }
   }

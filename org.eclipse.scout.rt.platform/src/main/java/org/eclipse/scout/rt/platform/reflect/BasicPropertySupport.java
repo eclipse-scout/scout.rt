@@ -330,8 +330,7 @@ public class BasicPropertySupport implements IListenerListWithManagement {
    */
 
   public void addPropertyChangeListener(PropertyChangeListener listener) {
-    if (listener instanceof PropertyChangeListenerProxy) {
-      PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy) listener;
+    if (listener instanceof PropertyChangeListenerProxy proxy) {
       // Call two argument add method.
       addPropertyChangeListener(proxy.getPropertyName(), proxy.getListener());
     }
@@ -351,8 +350,7 @@ public class BasicPropertySupport implements IListenerListWithManagement {
   }
 
   public void removePropertyChangeListener(PropertyChangeListener listener) {
-    if (listener instanceof PropertyChangeListenerProxy) {
-      PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy) listener;
+    if (listener instanceof PropertyChangeListenerProxy proxy) {
       // Call two argument remove method.
       removePropertyChangeListener(proxy.getPropertyName(), proxy.getListener());
     }

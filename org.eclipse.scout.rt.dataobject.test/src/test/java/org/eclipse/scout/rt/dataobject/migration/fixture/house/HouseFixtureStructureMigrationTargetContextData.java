@@ -32,8 +32,7 @@ public class HouseFixtureStructureMigrationTargetContextData implements IDoStruc
 
   @Override
   public boolean initialize(DataObjectMigrationContext ctx, IDoEntity doEntity) {
-    if (doEntity instanceof HouseFixtureDo) {
-      HouseFixtureDo house = (HouseFixtureDo) doEntity;
+    if (doEntity instanceof HouseFixtureDo house) {
       m_name = house.getName();
       m_numberOfRooms = house.rooms().exists() ? house.getRooms().size() : 0;
       return true;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,11 +26,11 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
-import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.IDispatchingNotificationHandler;
 import org.eclipse.scout.rt.shared.notification.INotificationListener;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
+import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,8 +166,7 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
    */
   protected void notifyListenersOfCurrentSession(final T notification) {
     ISession currentSession = IClientSession.CURRENT.get();
-    if (currentSession instanceof IClientSession) {
-      IClientSession session = (IClientSession) currentSession;
+    if (currentSession instanceof IClientSession session) {
       scheduleHandlingNotifications(notification, getListenerList(session), session);
     }
   }
@@ -193,8 +192,7 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
     if (event.getType() == SessionEvent.TYPE_STOPPED) {
       // only interested in session stopped
       ISession session = Assertions.assertNotNull(event.getSource());
-      if (session instanceof IClientSession) {
-        IClientSession clientSession = (IClientSession) session;
+      if (session instanceof IClientSession clientSession) {
         synchronized (m_listeners) {
           for (INotificationListener<T> notificationListener : getListeners(clientSession)) {
             removeListener(clientSession, notificationListener);

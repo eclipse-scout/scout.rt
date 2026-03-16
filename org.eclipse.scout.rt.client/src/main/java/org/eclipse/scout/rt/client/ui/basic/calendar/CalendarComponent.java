@@ -35,12 +35,10 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
     m_item = item;
     // cache FROM date
     Date d = null;
-    if (m_item instanceof ICalendarAppointment) {
-      ICalendarAppointment app = (ICalendarAppointment) m_item;
+    if (m_item instanceof ICalendarAppointment app) {
       d = DateUtility.min(app.getStart(), app.getEnd());
     }
-    if (m_item instanceof ICalendarTask) {
-      ICalendarTask task = (ICalendarTask) m_item;
+    if (m_item instanceof ICalendarTask task) {
       d = DateUtility.min(task.getStart(), task.getDue(), task.getComplete());
     }
     //
@@ -50,12 +48,10 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
     m_fromDate = d;
     // cache TO date
     d = null;
-    if (m_item instanceof ICalendarAppointment) {
-      ICalendarAppointment app = (ICalendarAppointment) m_item;
+    if (m_item instanceof ICalendarAppointment app) {
       d = DateUtility.max(app.getStart(), app.getEnd());
     }
-    if (m_item instanceof ICalendarTask) {
-      ICalendarTask task = (ICalendarTask) m_item;
+    if (m_item instanceof ICalendarTask task) {
       d = DateUtility.max(task.getStart(), task.getDue(), task.getComplete());
     }
     //

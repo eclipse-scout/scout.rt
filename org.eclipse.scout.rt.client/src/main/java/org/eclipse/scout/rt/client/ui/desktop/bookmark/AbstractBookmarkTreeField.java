@@ -899,8 +899,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           IForm searchForm = desktop.getPageSearchForm();
           if (searchForm != null) {
             for (AbstractPageState state : bm.getPath()) {
-              if (state instanceof TablePageState) {
-                TablePageState tablePageState = (TablePageState) state;
+              if (state instanceof TablePageState tablePageState) {
                 try {
                   searchForm.loadFromXmlString(tablePageState.getSearchFormState());
                   searchForm.doSaveWithoutMarkerChange();

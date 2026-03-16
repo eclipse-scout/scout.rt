@@ -140,8 +140,7 @@ public class LogbackLoggerSupport extends AbstractLoggerSupport {
     // similar to ch.qos.logback.classic.servlet.LogbackServletContextListener.contextDestroyed(ServletContextEvent)
     // however we explicitly want to decide in which order/when this code is run
     ILoggerFactory factory = LoggerFactory.getILoggerFactory();
-    if (factory instanceof LoggerContext) {
-      LoggerContext loggerContext = (LoggerContext) factory;
+    if (factory instanceof LoggerContext loggerContext) {
       LOG.info("About to stop {}", loggerContext);
       loggerContext.stop();
     }

@@ -129,11 +129,10 @@ public final class AnnotationFactory {
         if (obj == null) {
           return false;
         }
-        if (!(obj instanceof Order)) {
+        if (!(obj instanceof Order other)) {
           return false;
         }
 
-        Order other = (Order) obj;
         return Double.doubleToLongBits(value()) == Double.doubleToLongBits(other.value());
       }
     };

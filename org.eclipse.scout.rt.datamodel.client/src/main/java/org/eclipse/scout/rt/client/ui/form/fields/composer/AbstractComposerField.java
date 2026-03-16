@@ -574,8 +574,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   private void storeXMLRec(Element x, ITreeNode parent) {
     for (ITreeNode node : parent.getChildNodes()) {
-      if (node instanceof EntityNode) {
-        EntityNode entityNode = (EntityNode) node;
+      if (node instanceof EntityNode entityNode) {
         Element xEntity = x.getOwnerDocument().createElement("entity");
         xEntity.setAttribute("id", DataModelUtility.entityPathToExternalId(getDataModel(), interceptResolveEntityPath(entityNode)));
         xEntity.setAttribute("negated", (entityNode.isNegative() ? "true" : "false"));
@@ -585,8 +584,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         // recursion
         storeXMLRec(xEntity, node);
       }
-      else if (node instanceof AttributeNode) {
-        AttributeNode attNode = (AttributeNode) node;
+      else if (node instanceof AttributeNode attNode) {
         Element xAtt = x.getOwnerDocument().createElement("attribute");
         xAtt.setAttribute("id", DataModelUtility.attributePathToExternalId(getDataModel(), interceptResolveAttributePath(attNode)));
         IDataModelAttributeOp op = attNode.getOp();
@@ -625,8 +623,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         }
         x.appendChild(xAtt);
       }
-      else if (node instanceof EitherOrNode) {
-        EitherOrNode orNode = (EitherOrNode) node;
+      else if (node instanceof EitherOrNode orNode) {
         Element xOr = x.getOwnerDocument().createElement("or");
         xOr.setAttribute("begin", "" + orNode.isBeginOfEitherOr());
         xOr.setAttribute("negated", (orNode.isNegative() ? "true" : "false"));
@@ -804,8 +801,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
     @Override
     protected TreeNodeData exportTreeNodeData(ITreeNode node, AbstractTreeFieldData treeData) {
-      if (node instanceof EntityNode) {
-        EntityNode enode = (EntityNode) node;
+      if (node instanceof EntityNode enode) {
         String externalId = DataModelUtility.entityPathToExternalId(getDataModel(), interceptResolveEntityPath(enode));
         if (externalId == null) {
           if (LOG.isInfoEnabled()) {
@@ -818,8 +814,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         data.setNegative(enode.isNegative());
         return data;
       }
-      else if (node instanceof AttributeNode) {
-        AttributeNode anode = (AttributeNode) node;
+      else if (node instanceof AttributeNode anode) {
         String externalId = DataModelUtility.attributePathToExternalId(getDataModel(), interceptResolveAttributePath(anode));
         if (externalId == null) {
           if (LOG.isInfoEnabled()) {
@@ -836,8 +831,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         data.setTexts(anode.getTexts());
         return data;
       }
-      else if (node instanceof EitherOrNode) {
-        EitherOrNode eonode = (EitherOrNode) node;
+      else if (node instanceof EitherOrNode eonode) {
         ComposerEitherOrNodeData data = new ComposerEitherOrNodeData();
         data.setNegative(eonode.isNegative());
         data.setBeginOfEitherOr(eonode.isBeginOfEitherOr());
@@ -850,8 +844,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
     @Override
     protected ITreeNode importTreeNodeData(ITreeNode parentNode, AbstractTreeFieldData treeData, TreeNodeData nodeData) {
-      if (nodeData instanceof ComposerEntityNodeData) {
-        ComposerEntityNodeData enodeData = (ComposerEntityNodeData) nodeData;
+      if (nodeData instanceof ComposerEntityNodeData enodeData) {
         String externalId = enodeData.getEntityExternalId();
         EntityPath entityPath = DataModelUtility.externalIdToEntityPath(getDataModel(), externalId);
         IDataModelEntity e = (entityPath != null ? entityPath.lastElement() : null);
@@ -861,8 +854,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         }
         return addEntityNode(parentNode, e, enodeData.isNegative(), null, enodeData.getTexts());
       }
-      else if (nodeData instanceof ComposerAttributeNodeData) {
-        ComposerAttributeNodeData anodeData = (ComposerAttributeNodeData) nodeData;
+      else if (nodeData instanceof ComposerAttributeNodeData anodeData) {
         String externalId = anodeData.getAttributeExternalId();
         AttributePath attPath = DataModelUtility.externalIdToAttributePath(getDataModel(), externalId);
         IDataModelAttribute a = (attPath != null ? attPath.getAttribute() : null);
@@ -883,8 +875,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         }
         return addAttributeNode(parentNode, a, anodeData.getAggregationType(), op, anodeData.getValues(), anodeData.getTexts());
       }
-      else if (nodeData instanceof ComposerEitherOrNodeData) {
-        ComposerEitherOrNodeData eonodeData = (ComposerEitherOrNodeData) nodeData;
+      else if (nodeData instanceof ComposerEitherOrNodeData eonodeData) {
         if (eonodeData.isBeginOfEitherOr()) {
           return addEitherNode(parentNode, eonodeData.isNegative());
         }

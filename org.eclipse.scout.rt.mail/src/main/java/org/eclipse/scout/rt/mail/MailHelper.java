@@ -162,8 +162,7 @@ public class MailHelper {
           LOG.info("Unable to get mime part content due to {}: {}", e.getClass().getSimpleName(), e.getMessage(), exceptionForLog);
         }
 
-        if (content instanceof Multipart) {
-          Multipart multiPart = (Multipart) content;
+        if (content instanceof Multipart multiPart) {
           for (int i = 0; i < multiPart.getCount(); i++) {
             collectMailParts(multiPart.getBodyPart(i), bodyCollector, attachmentCollector, inlineAttachmentCollector);
           }
@@ -742,9 +741,8 @@ public class MailHelper {
 
       multiPart.addBodyPart(multiPartBody);
     }
-    else if (messageContent instanceof String) {
+    else if (messageContent instanceof String message) {
       MimeBodyPart multiPartBody = new MimeBodyPart();
-      String message = (String) messageContent;
 
       String contentTypeHeader = StringUtility.join(" ", msg.getHeader(CONTENT_TYPE_ID));
       if (StringUtility.containsStringIgnoreCase(contentTypeHeader, "html")) {
@@ -1044,8 +1042,7 @@ public class MailHelper {
     if (replyToHeaders == null || replyToHeaders.length == 0) {
       try {
         Object object = getPartContent(mimeMessage);
-        if (object instanceof Multipart) {
-          Multipart content = (Multipart) object;
+        if (object instanceof Multipart content) {
           if (content.getCount() >= 3) {
             // Try third part of the message, contains details of the DSN (https://tools.ietf.org/html/rfc3461#section-6.2).
             BodyPart part = content.getBodyPart(2);

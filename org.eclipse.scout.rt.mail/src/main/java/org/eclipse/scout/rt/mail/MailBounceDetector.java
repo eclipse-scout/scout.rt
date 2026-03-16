@@ -83,8 +83,7 @@ public class MailBounceDetector implements IMailBounceDetector {
       }
 
       Object content = mimeMessage.getContent();
-      if (content instanceof MimeMultipart) {
-        MimeMultipart mp = (MimeMultipart) content;
+      if (content instanceof MimeMultipart mp) {
         for (int i = 0; i < mp.getCount(); i++) {
           BodyPart part = mp.getBodyPart(i);
           if (StringUtility.equalsIgnoreCase(CONTENT_TYPE_DELIVERY_STATUS, part.getContentType())) {
@@ -169,8 +168,7 @@ public class MailBounceDetector implements IMailBounceDetector {
       for (Address a : addresses) {
         String sender = a.toString().toLowerCase();
 
-        if (a instanceof InternetAddress) {
-          InternetAddress internetAddress = (InternetAddress) a;
+        if (a instanceof InternetAddress internetAddress) {
           if (StringUtility.hasText(internetAddress.getAddress())) {
             sender = StringUtility.lowercase(internetAddress.getAddress());
           }

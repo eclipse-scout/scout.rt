@@ -1945,8 +1945,7 @@ public final class TypeCastUtility {
     if (loopDetector.contains(type)) {
       return false;
     }
-    if (type instanceof Class) {
-      Class c = (Class) type;
+    if (type instanceof Class c) {
       if (c == stopType) {
         //stop class, set generics index
         desc.parameterizedTypeIndex = stopTypeGenericsParameterIndex;
@@ -2008,8 +2007,7 @@ public final class TypeCastUtility {
       return false;
     }
     //
-    if (type instanceof ParameterizedType) {
-      ParameterizedType pt = (ParameterizedType) type;
+    if (type instanceof ParameterizedType pt) {
       Type rawType = pt.getRawType();
       try {
         loopDetector.add(pt);

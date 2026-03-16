@@ -132,8 +132,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
 
   @Override
   public void pageTableCreated(IPage<?> p) {
-    if (p instanceof IPageWithTable) {
-      IPageWithTable<? extends ITable> pt = (IPageWithTable<?>) p;
+    if (p instanceof IPageWithTable<?> pt) {
       ITable table = pt.getTable(false);
       if (table != null) {
         String pageTableIdentifier = registerPageTable(pt, table);
@@ -328,15 +327,13 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
         if (e.getType() == TreeEvent.TYPE_NODES_SELECTED && e.getSource() == getActiveOutline()) {
           afterOutlineSelectionChanged(ClientSessionProvider.currentSession().getDesktop());
         }
-        if (e.getNode() instanceof IPage) {
-          IPage<?> p = (IPage<?>) e.getNode();
+        if (e.getNode() instanceof IPage<?> p) {
           switch (e.getType()) {
             case OutlineEvent.TYPE_PAGE_AFTER_PAGE_INIT -> pageCreated(p);
             case OutlineEvent.TYPE_PAGE_AFTER_TABLE_INIT -> pageTableCreated(p);
           }
         }
-        if (e.getNode() instanceof IPageWithTable) {
-          IPageWithTable<?> p = (IPageWithTable<?>) e.getNode();
+        if (e.getNode() instanceof IPageWithTable<?> p) {
           switch (e.getType()) {
             case OutlineEvent.TYPE_PAGE_BEFORE_DATA_LOADED -> beforeTablePageLoadData(p);
             case OutlineEvent.TYPE_PAGE_AFTER_DATA_LOADED -> afterTablePageLoadData(p);

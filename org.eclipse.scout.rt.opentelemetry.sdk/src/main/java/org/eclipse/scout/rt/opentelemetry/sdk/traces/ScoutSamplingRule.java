@@ -31,10 +31,9 @@ public final class ScoutSamplingRule {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof ScoutSamplingRule)) {
+    if (!(o instanceof ScoutSamplingRule that)) {
       return false;
     }
-    ScoutSamplingRule that = (ScoutSamplingRule) o;
     return Objects.equals(delegate, that.delegate) && Objects.equals(conditions, that.conditions);
   }
 

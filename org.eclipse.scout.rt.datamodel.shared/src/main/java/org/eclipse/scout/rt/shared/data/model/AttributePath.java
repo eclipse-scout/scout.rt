@@ -62,10 +62,9 @@ public final class AttributePath implements IDataModelPath {
     if (obj == this) {
       return true;
     }
-    if (!(obj instanceof AttributePath)) {
+    if (!(obj instanceof AttributePath other)) {
       return false;
     }
-    AttributePath other = (AttributePath) obj;
     return this.m_entityPath.equals(other.m_entityPath) && this.m_attribute == other.m_attribute;
   }
 

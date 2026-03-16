@@ -49,11 +49,10 @@ public final class CompositeFieldUtility {
 
   static void selectIfIsTab(IGroupBox groupBox) {
     ICompositeField parentField = groupBox.getParentField();
-    if (!(parentField instanceof ITabBox)) {
+    if (!(parentField instanceof ITabBox t)) {
       return;
     }
 
-    ITabBox t = (ITabBox) parentField;
     if (t.getSelectedTab() != groupBox) {
       t.setSelectedTab(groupBox);
     }

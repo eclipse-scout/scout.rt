@@ -321,8 +321,7 @@ public final class JsonObjectUtility {
       return (T) jval;
     }
     //array
-    if (jval instanceof JSONArray) {
-      JSONArray jarray = (JSONArray) jval;
+    if (jval instanceof JSONArray jarray) {
       int n = jarray.length();
       T array = (T) Array.newInstance(type.getComponentType(), n);
       for (int i = 0; i < n; i++) {

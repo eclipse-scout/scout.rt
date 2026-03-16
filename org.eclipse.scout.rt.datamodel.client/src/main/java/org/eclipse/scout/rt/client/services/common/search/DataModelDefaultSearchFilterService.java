@@ -30,8 +30,7 @@ public class DataModelDefaultSearchFilterService extends DefaultSearchFilterServ
     super.applySearchDelegate(field, search, includeChildren);
 
     //composer
-    if (field instanceof AbstractComposerField) {
-      AbstractComposerField composerField = (AbstractComposerField) field;
+    if (field instanceof AbstractComposerField composerField) {
       ITreeNode rootNode = composerField.getTree().getRootNode();
       if (rootNode != null) {
         StringBuilder buf = new StringBuilder();

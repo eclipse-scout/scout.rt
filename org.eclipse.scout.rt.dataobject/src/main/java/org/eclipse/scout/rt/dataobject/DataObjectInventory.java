@@ -410,8 +410,7 @@ public class DataObjectInventory {
       // consider only attribute accessor methods
       if (method.getParameterCount() == 0 && !Modifier.isStatic(method.getModifiers())) {
         Type returnType = method.getGenericReturnType();
-        if (returnType instanceof ParameterizedType) {
-          ParameterizedType pt = (ParameterizedType) returnType;
+        if (returnType instanceof ParameterizedType pt) {
           // return type must be DoList, DoValue, DoSet or DoCollection
           if (ObjectUtility.isOneOf(pt.getRawType(), DoValue.class, DoList.class, DoSet.class, DoCollection.class)) {
             addAttribute(attributes, pt, method);
