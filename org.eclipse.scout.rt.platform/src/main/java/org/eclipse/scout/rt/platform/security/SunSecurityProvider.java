@@ -46,7 +46,6 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -658,7 +657,7 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
                   .flatMap(List::stream)
                   .filter(san -> san instanceof String)
                   .map(san -> (String) san)
-                  .collect(Collectors.toList());
+                  .toList();
               out.println("  subjectAlternativeNames:" + sans);
             }
             out.println(" PublicKey");

@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -190,7 +189,7 @@ public class FixedPatternLogbackLayout extends LayoutBase<ILoggingEvent> {
       List<String> mdcKeys = mdcPropertyMap.keySet().stream()
           .filter(mdc -> !m_mdcExclusions.contains(mdc)) // omit excluded MDC keys
           .sorted(Comparator.comparing(mdcKey -> m_mdcOrders.getOrDefault((String) mdcKey, Integer.MAX_VALUE)).thenComparing(mdcKey -> (String) mdcKey))
-          .collect(Collectors.toList());
+          .toList();
 
       StringBuilder mdcBuilder = new StringBuilder();
       for (String mdcKey : mdcKeys) {

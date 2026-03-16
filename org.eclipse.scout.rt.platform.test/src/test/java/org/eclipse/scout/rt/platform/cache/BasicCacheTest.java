@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -685,7 +684,7 @@ public class BasicCacheTest {
       for (int i = 0; i < runs; i++) {
         List<IFuture<Void>> futures = IntStream.range(0, 3)
             .mapToObj(ff -> Jobs.schedule(() -> data.assertCacheValue(cache, CACHE_KEY, "T3"), Jobs.newInput().withThreadName("T3").withName("T3").withRunContext(RunContexts.empty())))
-            .collect(Collectors.toList());
+            .toList();
         futures.forEach(IFuture::awaitDoneAndGet);
       }
     }, Jobs.newInput().withRunContext(RunContexts.empty()));

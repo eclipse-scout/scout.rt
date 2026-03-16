@@ -101,7 +101,7 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
           tileMappings.removeIf(filteredOutPredicate);
 
           // insert non-existing tiles
-          filteredRows.removeAll(tileMappings.stream().map(ITableRowTileMapping::getTableRow).collect(Collectors.toList()));
+          filteredRows.removeAll(tileMappings.stream().map(ITableRowTileMapping::getTableRow).toList());
           tileMappings.addAll(m_table.createTiles(filterTopLevelTableRows(filteredRows)));
 
           setTileMappings(tileMappings);

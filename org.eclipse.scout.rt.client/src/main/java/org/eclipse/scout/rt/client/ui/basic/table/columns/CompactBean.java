@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -149,7 +149,7 @@ public class CompactBean {
 
     List<CompactLine> contentLines = getContentLines();
     if (removeEmptyContentLines) {
-      contentLines = contentLines.stream().filter(line -> !StringUtility.isNullOrEmpty(line.build())).collect(Collectors.toList());
+      contentLines = contentLines.stream().filter(line -> !StringUtility.isNullOrEmpty(line.build())).toList();
     }
     if (moreLinkAvailable && maxContentLines + 1 == contentLines.size()) {
       // Don't show more link if it would only reveal one element

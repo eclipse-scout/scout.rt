@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -97,7 +97,7 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
 
     Set<String> seenNames = new HashSet<>();
     List<String> duplicateNames = item.getDependencies().stream()
-        .map(NamespaceVersion::getNamespace).filter(n -> !seenNames.add(n)).collect(Collectors.toList());
+        .map(NamespaceVersion::getNamespace).filter(n -> !seenNames.add(n)).toList();
     assertTrue(duplicateNames.isEmpty(), "{} has multiple dependencies with the same name", item);
     assertFalse(seenNames.stream().anyMatch(n -> !knownNames.contains(n)), "{} declares dependency to unknown name", item);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,7 +33,7 @@ public class HierarchicalTableTest {
   private void expectRowOrder(Integer[] primaryKeys, List<ITableRow> rows) {
     assertArrayEquals(primaryKeys, rows.stream()
         .map(row -> (Integer) row.getCellValue(0))
-        .collect(Collectors.toList())
+        .toList()
         .toArray(new Integer[primaryKeys.length]));
   }
 

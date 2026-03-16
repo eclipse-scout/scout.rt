@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -230,7 +230,7 @@ public class TableCompactHandler implements ITableCompactHandler {
     // Provided title columns
     List<IColumn<?>> titleColumns = columns.stream()
         .filter(column -> getTitleBuilder().accept(column) || getTitleSuffixBuilder().accept(column) || getSubtitleBuilder().accept(column))
-        .collect(Collectors.toList());
+        .toList();
 
     // Provided content columns
     List<IColumn<?>> contentBuilderColumns = getLinkedAndAcceptedCompactBuilderColumns(getContentBuilders());
@@ -495,7 +495,7 @@ public class TableCompactHandler implements ITableCompactHandler {
   protected IColumn<?> getColumnAt(int index) {
     List<IColumn<?>> columns = getTable().getColumnSet().getColumns();
     // Stream columns rather than using columnSet.getVisibleColumn(index) because we want the original order (defined visible) and not the order configured by the user
-    columns = columns.stream().filter(this::acceptColumn).collect(Collectors.toList());
+    columns = columns.stream().filter(this::acceptColumn).toList();
     if (columns.size() < index + 1) {
       return null;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -89,7 +89,7 @@ public class AssertNoRunningJobsStatement extends Statement {
       final List<String> runningJobs = futures.stream()
           .filter(f -> !f.isDone()) // because of the TimedOutError there could still be done jobs in the list
           .map(f -> f.getJobInput().getName())
-          .collect(Collectors.toList());
+          .toList();
       if (!runningJobs.isEmpty()) {
         // thread-dump
         System.err.println("Test will fail because some jobs did not complete yet, creating thread dump for debugging purposes:");

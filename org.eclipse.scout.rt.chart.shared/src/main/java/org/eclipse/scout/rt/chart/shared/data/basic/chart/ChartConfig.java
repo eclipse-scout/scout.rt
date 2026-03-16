@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -270,7 +270,7 @@ public class ChartConfig implements IChartConfig {
           if (l.size() < nameIndexPair.getRight() + 1) {
             l.addAll(Stream.generate(HashMap<String, Object>::new)
                 .limit(nameIndexPair.getRight() + 1 - l.size())
-                .collect(Collectors.toList()));
+                .toList());
           }
           atomicMap.set(l.get(nameIndexPair.getRight()));
         }

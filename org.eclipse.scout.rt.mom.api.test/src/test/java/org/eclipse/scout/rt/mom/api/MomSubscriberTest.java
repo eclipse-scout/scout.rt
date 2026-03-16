@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.mom.api;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -39,7 +38,7 @@ public class MomSubscriberTest {
   public void testConcurrentSubscriptions() {
     List<ISubscription> subscriptionMocks = Stream.generate(() -> mock(ISubscription.class))
         .limit(10000)
-        .collect(Collectors.toList());
+        .toList();
 
     AbstractMomSubscriber subscriber = new AbstractMomSubscriber() {
       @Override
@@ -59,7 +58,7 @@ public class MomSubscriberTest {
   public void testConcurrentModification() {
     List<ISubscription> subscriptionMocks = Stream.generate(() -> mock(ISubscription.class))
         .limit(100_000)
-        .collect(Collectors.toList());
+        .toList();
 
     AbstractMomSubscriber subscriber = new AbstractMomSubscriber() {
       @Override
