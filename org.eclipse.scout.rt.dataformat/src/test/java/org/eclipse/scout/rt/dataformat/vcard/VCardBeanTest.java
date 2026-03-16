@@ -45,33 +45,36 @@ public class VCardBeanTest {
     vcard.write(w, "utf-8");
     String writtenVCard = w.toString();
 
-    assertEquals("BEGIN:VCARD\r\n" +
-        "VERSION:3.0\r\n" +
-        "PRODID;CHARSET=utf-8:PRODID\r\n" +
-        "FN;CHARSET=utf-8:John Doe\r\n" +
-        "N;CHARSET=utf-8:Doe;John;Hannes;Dr.;\r\n" +
-        "TEL;CHARSET=utf-8;TYPE=VOICE,WORK:0998887766\r\n" +
-        "TITLE;CHARSET=utf-8:Software Engineer\r\n" +
-        "EMAIL;CHARSET=utf-8;TYPE=WORK:john.doe@email.com\r\n" +
-        "ORG;CHARSET=utf-8:Doe Corporation\r\n" +
-        "ADR;CHARSET=utf-8;TYPE=HOME:;;Bahnhofweg;Zurich;;8000;Switzerland\r\n" +
-        "END:VCARD\r\n" +
-        "", writtenVCard);
+    assertEquals("""
+        BEGIN:VCARD\r
+        VERSION:3.0\r
+        PRODID;CHARSET=utf-8:PRODID\r
+        FN;CHARSET=utf-8:John Doe\r
+        N;CHARSET=utf-8:Doe;John;Hannes;Dr.;\r
+        TEL;CHARSET=utf-8;TYPE=VOICE,WORK:0998887766\r
+        TITLE;CHARSET=utf-8:Software Engineer\r
+        EMAIL;CHARSET=utf-8;TYPE=WORK:john.doe@email.com\r
+        ORG;CHARSET=utf-8:Doe Corporation\r
+        ADR;CHARSET=utf-8;TYPE=HOME:;;Bahnhofweg;Zurich;;8000;Switzerland\r
+        END:VCARD\r
+        """, writtenVCard);
   }
 
   @Test
   public void testParse() {
-    final String vcard = "BEGIN:VCARD\r\n" +
-        "VERSION:3.0\r\n" +
-        "PRODID:PRODID\r\n" +
-        "FN:John Doe\r\n" +
-        "N:Doe;John;Hannes;Dr.;\r\n" +
-        "TEL;TYPE=VOICE,WORK:0998887766\r\n" +
-        "TITLE:Software Engineer\r\n" +
-        "EMAIL;TYPE=WORK:john.doe@email.com\r\n" +
-        "ORG:Doe Corporation\r\n" +
-        "ADR;TYPE=HOME:;;Bahnhofweg;Zurich;;8000;Switzerland\r\n" +
-        "END:VCARD\r\n";
+    final String vcard = """
+        BEGIN:VCARD\r
+        VERSION:3.0\r
+        PRODID:PRODID\r
+        FN:John Doe\r
+        N:Doe;John;Hannes;Dr.;\r
+        TEL;TYPE=VOICE,WORK:0998887766\r
+        TITLE:Software Engineer\r
+        EMAIL;TYPE=WORK:john.doe@email.com\r
+        ORG:Doe Corporation\r
+        ADR;TYPE=HOME:;;Bahnhofweg;Zurich;;8000;Switzerland\r
+        END:VCARD\r
+        """;
 
     ICalBean bean = ICalBean.parse(new StringReader(vcard), "utf-8");
 

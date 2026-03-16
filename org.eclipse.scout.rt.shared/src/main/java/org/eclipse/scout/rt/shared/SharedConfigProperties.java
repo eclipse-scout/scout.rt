@@ -108,9 +108,10 @@ public final class SharedConfigProperties {
 
     @Override
     public String description() {
-      return String.format("Absolute URL to the deployed http(s):// base of the web-application. The URL should include proxies, redirects, etc.\n" +
-          "Example: %s=https://www.my-company.com/my-scout-application/.\n" +
-          "This URL is used to replace '<scout:base />' tags.", getKey());
+      return String.format("""
+          Absolute URL to the deployed http(s):// base of the web-application. The URL should include proxies, redirects, etc.
+          Example: %s=https://www.my-company.com/my-scout-application/.
+          This URL is used to replace '<scout:base />' tags.""", getKey());
     }
 
     @Override
@@ -158,9 +159,10 @@ public final class SharedConfigProperties {
     @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format(
-          "If this property is set to true, the '%s' will be registered with high priority, and each call to %s.get() will return the given text key instead of the translation.\n"
-              + "This is useful for debug/testing purposes or exporting forms to JSON.\n"
-              + "By default this property is false.",
+          """
+              If this property is set to true, the '%s' will be registered with high priority, and each call to %s.get() will return the given text key instead of the translation.
+              This is useful for debug/testing purposes or exporting forms to JSON.
+              By default this property is false.""",
           TextKeyTextProviderService.class.getSimpleName(), TEXTS.class.getSimpleName());
     }
 

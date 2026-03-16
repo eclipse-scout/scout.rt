@@ -94,11 +94,12 @@ public final class UiNotificationConfigProperties {
 
     @Override
     public String description() {
-      return "Specifies how many requests of browser side UI notification handlers can be processed per second.\n"
-          + "The value is used to delay requests from the UI notification handlers to the server.\n"
-          + "Use a high value for fast servers. Then the refresh on the browser will be very soon, but peak load on the server is increased.\n"
-          + "Use smaller values to reduce server load but increase the delay between the reload on the server and the refresh on the browser.\n"
-          + "The default is 30 requests per second.";
+      return """
+          Specifies how many requests of browser side UI notification handlers can be processed per second.
+          The value is used to delay requests from the UI notification handlers to the server.
+          Use a high value for fast servers. Then the refresh on the browser will be very soon, but peak load on the server is increased.
+          Use smaller values to reduce server load but increase the delay between the reload on the server and the refresh on the browser.
+          The default is 30 requests per second.""";
     }
   }
 }

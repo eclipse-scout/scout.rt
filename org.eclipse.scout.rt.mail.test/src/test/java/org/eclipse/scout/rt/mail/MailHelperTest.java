@@ -746,15 +746,15 @@ public class MailHelperTest {
 
   @Test
   public void testEmptyContentDisposition() {
-    String eml = ""
-        + "To: lorem@exampleorg\n"
-        + "From: ipsum@example.org\n"
-        + "MIME-Version: 1.0\n"
-        + "Content-Type: text/plain; charset=utf-8\n"
-        + "Content-Disposition: \n"
-        + "Content-Transfer-Encoding: 7bit\n"
-        + "\n"
-        + "Lorem";
+    String eml = """
+        To: lorem@exampleorg
+        From: ipsum@example.org
+        MIME-Version: 1.0
+        Content-Type: text/plain; charset=utf-8
+        Content-Disposition:\s
+        Content-Transfer-Encoding: 7bit
+
+        Lorem""";
 
     MailHelper helper = BEANS.get(MailHelper.class);
     MimeMessage message = helper.createMessageFromBytes(eml.getBytes(StandardCharsets.UTF_8));

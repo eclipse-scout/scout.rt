@@ -176,14 +176,16 @@ public class SelectInputBindTest {
     return sql;
   }
 
-  private static final String EXPECTED_PROTOCOL = "Connection.prepareStatement(UDPATE my_table SET a = ?, s = ? where n = ?)\n"
-      + "PreparedStatement.setObject(1, 1, 4)\n"
-      + "PreparedStatement.setObject(2, 3, 4)\n"
-      + "PreparedStatement.setObject(3, lorem, 12)\n"
-      + "Connection.prepareStatement(UDPATE my_table SET a = ?, s = ? where n = ?)\n"
-      + "PreparedStatement.setObject(1, 0, 4)\n"
-      + "PreparedStatement.setObject(2, 6, 4)\n"
-      + "PreparedStatement.setObject(3, ipsum, 12)\n";
+  private static final String EXPECTED_PROTOCOL = """
+      Connection.prepareStatement(UDPATE my_table SET a = ?, s = ? where n = ?)
+      PreparedStatement.setObject(1, 1, 4)
+      PreparedStatement.setObject(2, 3, 4)
+      PreparedStatement.setObject(3, lorem, 12)
+      Connection.prepareStatement(UDPATE my_table SET a = ?, s = ? where n = ?)
+      PreparedStatement.setObject(1, 0, 4)
+      PreparedStatement.setObject(2, 6, 4)
+      PreparedStatement.setObject(3, ipsum, 12)
+      """;
 
   private static void assertExpectedProtocol(SqlServiceMock sql) {
     assertEquals(EXPECTED_PROTOCOL, sql.getProtocol().toString());
@@ -309,12 +311,16 @@ public class SelectInputBindTest {
   }
 
   private static final String PREPARE_STATEMENT = "Connection.prepareStatement(UDPATE this_table SET v = ? where r = ? and p = ?)\n";
-  private static final String OBJECTS_RECORD_1 = "PreparedStatement.setObject(1, lorem, 12)\n"
-      + "PreparedStatement.setObject(2, 5, -5)\n"
-      + "PreparedStatement.setObject(3, 9, -5)\n";
-  private static final String OBJECTS_RECORD_2 = "PreparedStatement.setObject(1, lorem, 12)\n"
-      + "PreparedStatement.setObject(2, 6, -5)\n"
-      + "PreparedStatement.setObject(3, 9, -5)\n";
+  private static final String OBJECTS_RECORD_1 = """
+      PreparedStatement.setObject(1, lorem, 12)
+      PreparedStatement.setObject(2, 5, -5)
+      PreparedStatement.setObject(3, 9, -5)
+      """;
+  private static final String OBJECTS_RECORD_2 = """
+      PreparedStatement.setObject(1, lorem, 12)
+      PreparedStatement.setObject(2, 6, -5)
+      PreparedStatement.setObject(3, 9, -5)
+      """;
 
   private static final String EXPECTED_PROTOCOL_2_V1 = PREPARE_STATEMENT + OBJECTS_RECORD_1 + PREPARE_STATEMENT + OBJECTS_RECORD_2;
   private static final String EXPECTED_PROTOCOL_2_V2 = PREPARE_STATEMENT + OBJECTS_RECORD_2 + PREPARE_STATEMENT + OBJECTS_RECORD_1;

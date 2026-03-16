@@ -21,10 +21,11 @@ public class DataObjectSerializationTestHelperTest {
 
   protected static DataObjectSerializationTestHelper s_testHelper;
 
-  protected static final String JSON = "{\n" +
-      "  \"_type\" : \"foo\",\n" +
-      "  \"attribute\" : \"bar\"\n" +
-      "}";
+  protected static final String JSON = """
+      {
+        "_type" : "foo",
+        "attribute" : "bar"
+      }""";
 
   protected static IDoEntity s_entity;
 

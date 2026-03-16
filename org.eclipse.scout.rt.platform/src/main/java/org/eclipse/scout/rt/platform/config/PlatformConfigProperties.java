@@ -282,9 +282,12 @@ public final class PlatformConfigProperties {
 
     @Override
     public String description() {
-      return "Specifies a blacklist regex for fully qualified class names that are blocked in object serialization."
-          + "\nThese rules are appended to the existing built-in blacklist (recommended)."
-          + "\nComma separated list of regular expressions (regex).";
+      return """
+          Specifies a blacklist regex for fully qualified class names that are blocked in object serialization.\
+
+          These rules are appended to the existing built-in blacklist (recommended).\
+
+          Comma separated list of regular expressions (regex).""";
     }
   }
 
@@ -302,9 +305,12 @@ public final class PlatformConfigProperties {
 
     @Override
     public String description() {
-      return "Specifies a blacklist regex for fully qualified class names that are blocked in object serialization."
-          + "\nThese rules replace the existing built-in blacklist (not recommended)."
-          + "\nComma separated list of regular expressions (regex).";
+      return """
+          Specifies a blacklist regex for fully qualified class names that are blocked in object serialization.\
+
+          These rules replace the existing built-in blacklist (not recommended).\
+
+          Comma separated list of regular expressions (regex).""";
     }
   }
 
@@ -327,10 +333,14 @@ public final class PlatformConfigProperties {
 
     @Override
     public String description() {
-      return "Specifies the secure whitelist of fully qualified class names that are allowed to be used in object serialization."
-          + "\nComma separated list of regular expressions (regex)."
-          + "\nThe default regex .* is used for back compatibility only, this is unsafe."
-          + "\nMake sure to define the property 'scout.serial.whitelist' in the config.properties";
+      return """
+          Specifies the secure whitelist of fully qualified class names that are allowed to be used in object serialization.\
+
+          Comma separated list of regular expressions (regex).\
+
+          The default regex .* is used for back compatibility only, this is unsafe.\
+
+          Make sure to define the property 'scout.serial.whitelist' in the config.properties""";
     }
   }
 

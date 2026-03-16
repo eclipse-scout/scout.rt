@@ -82,9 +82,10 @@ public final class ClientNotificationProperties {
 
     @Override
     public String description() {
-      return "If no message is consumed for the specified number of milliseconds, client notification queues (with possibly pending notifications) are removed.\n"
-          + "This avoids overflows and unnecessary memory consumption. Old queues may exist if a node does not properly unregister (e.g. due to a crash).\n"
-          + "The default value is 10 minutes.";
+      return """
+          If no message is consumed for the specified number of milliseconds, client notification queues (with possibly pending notifications) are removed.
+          This avoids overflows and unnecessary memory consumption. Old queues may exist if a node does not properly unregister (e.g. due to a crash).
+          The default value is 10 minutes.""";
     }
 
     @Override

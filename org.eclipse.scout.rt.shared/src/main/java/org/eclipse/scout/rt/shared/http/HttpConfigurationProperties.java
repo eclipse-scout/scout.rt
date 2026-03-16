@@ -116,9 +116,10 @@ public final class HttpConfigurationProperties {
     @Override
     @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
-      return "Enable retry of request (includes non-idempotent requests) on NoHttpResponseException\n"
-          + "Assuming that the cause of the exception was most probably a stale socket channel on the server side.\n"
-          + "The default value is true";
+      return """
+          Enable retry of request (includes non-idempotent requests) on NoHttpResponseException
+          Assuming that the cause of the exception was most probably a stale socket channel on the server side.
+          The default value is true""";
     }
 
     @Override
@@ -145,9 +146,10 @@ public final class HttpConfigurationProperties {
     @Override
     @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
-      return "Enable retry of request (includes non-idempotent requests) on {@link SocketException} with message 'Connection reset'\n"
-          + "Assuming that the cause of the exception was most probably a stale socket channel on the server side.\n"
-          + "The default value is true";
+      return """
+          Enable retry of request (includes non-idempotent requests) on {@link SocketException} with message 'Connection reset'
+          Assuming that the cause of the exception was most probably a stale socket channel on the server side.
+          The default value is true""";
     }
 
     @Override

@@ -175,16 +175,17 @@ public class FormDataStatementBuilderCheck {
         parentSqlPKName = toSqlPrimaryKey(parentName);
       }
       String sqlTemplate =
-          "\"EXISTS ( SELECT 1 \"+\n"
-              + "\"FROM ${sqlTableName} @${name}@ \"+\n"
-              + "\"WHERE @${name}@.${parentSqlPKName}=@parent.${parentName}@.${parentSqlPKName} \"+\n"
-              + "\"<whereParts/> \"+\n"
-              + "\"<groupBy> \"+\n"
-              + "\"  GROUP BY @${name}@.${parentSqlPKName} \"+\n"
-              + "\"  HAVING 1=1 \"+\n"
-              + "\"  <havingParts/> \"+\n"
-              + "\"</groupBy> \"+\n"
-              + "\")\"";
+          """
+              "EXISTS ( SELECT 1 "+
+              "FROM ${sqlTableName} @${name}@ "+
+              "WHERE @${name}@.${parentSqlPKName}=@parent.${parentName}@.${parentSqlPKName} "+
+              "<whereParts/> "+
+              "<groupBy> "+
+              "  GROUP BY @${name}@.${parentSqlPKName} "+
+              "  HAVING 1=1 "+
+              "  <havingParts/> "+
+              "</groupBy> "+
+              ")\"""";
       String sql = sqlTemplate.replace("${name}", name).replace("${parentName}", parentName).replace("${sqlTableName}", sqlTableName).replace("${parentSqlPKName}", parentSqlPKName);
       addBodyLine("//entity " + e.getClass().getSimpleName());
       addBodyLine("setComposerEntityDefinition(" + resolveImport(e.getClass()) + ".class," + sql + ");");

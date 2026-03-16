@@ -941,20 +941,22 @@ public class JSONObjectTest extends TestCase {
     JSONObject object = new JSONObject();
     object.put("foo", new JSONArray(Arrays.asList(5, 6)));
     object.put("bar", new JSONObject());
-    String foobar = "{\n" +
-        "     \"foo\": [\n" +
-        "          5,\n" +
-        "          6\n" +
-        "     ],\n" +
-        "     \"bar\": {}\n" +
-        "}";
-    String barfoo = "{\n" +
-        "     \"bar\": {},\n" +
-        "     \"foo\": [\n" +
-        "          5,\n" +
-        "          6\n" +
-        "     ]\n" +
-        "}";
+    String foobar = """
+        {
+             "foo": [
+                  5,
+                  6
+             ],
+             "bar": {}
+        }""";
+    String barfoo = """
+        {
+             "bar": {},
+             "foo": [
+                  5,
+                  6
+             ]
+        }""";
     String string = object.toString(5);
     assertTrue(string, foobar.equals(string) || barfoo.equals(string));
   }
