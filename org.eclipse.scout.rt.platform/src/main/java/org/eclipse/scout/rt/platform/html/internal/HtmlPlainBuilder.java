@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.html.internal;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 public class HtmlPlainBuilder extends AbstractExpressionBuilder {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final List<? extends CharSequence> m_texts;

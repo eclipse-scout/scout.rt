@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.status.Status;
@@ -21,6 +23,7 @@ import org.eclipse.scout.rt.platform.status.Status;
 @Order(20)
 public class ValidationFailedStatus<VALUE> extends Status {
 
+  @Serial
   private static final long serialVersionUID = 1L;
   private final VALUE m_invalidValue;
 

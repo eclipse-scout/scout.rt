@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.session;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 /**
@@ -17,6 +18,7 @@ import java.util.EventObject;
  * @since 5.1
  */
 public class SessionEvent extends EventObject {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static final int TYPE_STARTED = 100;

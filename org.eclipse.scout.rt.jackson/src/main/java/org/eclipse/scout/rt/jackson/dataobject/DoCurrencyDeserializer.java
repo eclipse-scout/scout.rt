@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Currency;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer.Std;
  */
 public class DoCurrencyDeserializer extends Std {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected DoCurrencyDeserializer() {

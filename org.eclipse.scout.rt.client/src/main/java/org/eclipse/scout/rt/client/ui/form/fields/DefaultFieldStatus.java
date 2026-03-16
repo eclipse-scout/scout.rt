@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 
@@ -16,6 +18,7 @@ import org.eclipse.scout.rt.platform.status.Status;
  * Marker for field status
  */
 public class DefaultFieldStatus extends Status {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public DefaultFieldStatus(String message) {

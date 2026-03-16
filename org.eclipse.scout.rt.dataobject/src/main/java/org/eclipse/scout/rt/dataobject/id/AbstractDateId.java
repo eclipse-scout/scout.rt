@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.dataobject.id;
 
+import java.io.Serial;
 import java.util.Date;
 
 /**
@@ -18,6 +19,7 @@ import java.util.Date;
  * For details, see {@link IDateId}.
  */
 public abstract class AbstractDateId extends AbstractRootId<Date> implements IDateId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected AbstractDateId(Date id) {

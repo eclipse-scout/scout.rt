@@ -14,6 +14,7 @@ import static org.eclipse.scout.rt.platform.util.Assertions.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -178,6 +179,7 @@ public class ServiceTunnelIdSignatureTest {
   }
 
   protected static class EchoBean implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final IDoEntity m_doEntity;

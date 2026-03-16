@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.lookup;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class BatchLookupCall implements Serializable {
+  @Serial
   private static final long serialVersionUID = 0L;
 
   private final List<ILookupCall<?>> m_calls;

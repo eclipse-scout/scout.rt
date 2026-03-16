@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.security.mapping;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.Set;
 
 import org.eclipse.scout.rt.api.data.security.PermissionCollectionDo;
@@ -62,6 +63,7 @@ public class ToPermissionCollectionDoFunctionTest {
 
   protected IPermission permission(PermissionId id) {
     return new AbstractPermission(id) {
+      @Serial
       private static final long serialVersionUID = 1L;
     };
   }

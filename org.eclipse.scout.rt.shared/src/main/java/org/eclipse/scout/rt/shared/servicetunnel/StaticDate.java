@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.servicetunnel;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,6 +21,7 @@ import java.util.GregorianCalendar;
  * {@link ServiceTunnelObjectReplacer}
  */
 public class StaticDate implements Serializable {
+  @Serial
   private static final long serialVersionUID = -3278051886953717195L;
 
   private final long m_textAsLong;

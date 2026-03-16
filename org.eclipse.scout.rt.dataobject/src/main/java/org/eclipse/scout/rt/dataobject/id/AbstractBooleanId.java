@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.dataobject.id;
 
+import java.io.Serial;
+
 /**
  * Abstract base implementation for all {@link Boolean} based {@link IId} classes. The wrapped id is guaranteed to be
  * non-null.
@@ -16,6 +18,7 @@ package org.eclipse.scout.rt.dataobject.id;
  * For details, see {@link IBooleanId}.
  */
 public abstract class AbstractBooleanId extends AbstractRootId<Boolean> implements IBooleanId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected AbstractBooleanId(Boolean id) {

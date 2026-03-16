@@ -9,9 +9,11 @@
  */
 package org.eclipse.scout.rt.shared.extension;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public abstract class AbstractSerializableExtension<OWNER extends IExtensibleObject & Serializable> implements IExtension<OWNER>, Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final OWNER m_owner;

@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.dataobject.id;
 
+import java.io.Serial;
 import java.util.UUID;
 
 /**
@@ -21,6 +22,7 @@ import java.util.UUID;
  */
 @IdSignature(false)
 public abstract class AbstractUuId extends AbstractRootId<UUID> implements IUuId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected AbstractUuId(UUID id) {

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,6 +45,7 @@ import com.fasterxml.jackson.databind.type.MapType;
  * Serializer for {@link IDoEntity} and all sub-classes.
  */
 public class DoEntitySerializer extends StdSerializer<IDoEntity> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);

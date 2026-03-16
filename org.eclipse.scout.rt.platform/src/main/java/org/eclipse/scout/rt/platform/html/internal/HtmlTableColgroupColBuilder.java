@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.html.internal;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.html.IHtmlTableColgroupCol;
 
 /**
@@ -16,6 +18,7 @@ import org.eclipse.scout.rt.platform.html.IHtmlTableColgroupCol;
  */
 public class HtmlTableColgroupColBuilder extends EmptyHtmlNodeBuilder implements IHtmlTableColgroupCol {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public HtmlTableColgroupColBuilder() {

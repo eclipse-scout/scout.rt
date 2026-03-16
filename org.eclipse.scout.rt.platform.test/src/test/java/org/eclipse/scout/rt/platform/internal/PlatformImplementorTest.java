@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.platform.internal;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -181,6 +182,7 @@ public class PlatformImplementorTest {
   }
 
   private static class TestingPlatformStartupException extends RuntimeException {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 }

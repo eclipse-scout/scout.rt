@@ -9,9 +9,11 @@
  */
 package org.eclipse.scout.rt.shared.data.basic.graph;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class GraphEdge implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private GraphNode m_source;

@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.data.model;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.security.Permission;
@@ -56,6 +57,7 @@ import org.slf4j.LoggerFactory;
 @ClassId("350b5965-e92d-4f7e-b7b7-7135a572ff91")
 public abstract class AbstractDataModelAttribute extends AbstractPropertyObserver implements IDataModelAttribute, Serializable, IExtensibleObject {
 
+  @Serial
   private static final long serialVersionUID = 1L;
   private static final String ALLOW_NULL_OPERATOR = "ALLOW_NULL_OPERATOR";
   private static final String ALLOW_NOT_OPERATOR = "ALLOW_NOT_OPERATOR";
@@ -809,6 +811,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * any further chain elements.
    */
   protected static class LocalDataModelAttributeExtension<OWNER extends AbstractDataModelAttribute> extends AbstractSerializableExtension<OWNER> implements IDataModelAttributeExtension<OWNER> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public LocalDataModelAttributeExtension(OWNER owner) {

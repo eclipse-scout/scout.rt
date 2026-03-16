@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
@@ -949,6 +951,7 @@ public final class Assertions {
    */
   public static class AssertionException extends PlatformException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public AssertionException(final String msg) {

@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.server.services.lookup;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -182,6 +183,7 @@ public class BatchNormalizerTest {
   }
 
   public static class FruitLookupCall extends LookupCall {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -194,6 +196,7 @@ public class BatchNormalizerTest {
    * not cacheable since there is a member but no equals override, see {@link BatchLookupResultCache#isCacheable(Class)}
    */
   public static class FruitLookupCallNonCacheable extends LookupCall {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private String m_meta;

@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -248,6 +249,7 @@ public class ProposalFieldTest {
   @ClassId("ad1b3fc1-4b33-4c7d-9506-a6e36618f77f")
   public static class P_LookupCall extends LookupCall<Long> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

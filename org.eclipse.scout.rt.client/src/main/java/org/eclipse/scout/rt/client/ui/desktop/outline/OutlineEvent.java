@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -38,6 +40,7 @@ public class OutlineEvent extends TreeEvent {
 
   public static final int TYPE_PAGE_ACTIVATED = 1008;
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private boolean m_buffered;

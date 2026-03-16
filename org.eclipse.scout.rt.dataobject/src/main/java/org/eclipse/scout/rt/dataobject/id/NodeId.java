@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.dataobject.id;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.NodeIdentifier;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -20,6 +22,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  */
 @IdTypeName("scout.NodeId")
 public final class NodeId extends AbstractStringId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private NodeId(String id) {

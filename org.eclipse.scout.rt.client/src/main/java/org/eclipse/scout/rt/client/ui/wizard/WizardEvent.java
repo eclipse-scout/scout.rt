@@ -9,11 +9,13 @@
  */
 package org.eclipse.scout.rt.client.ui.wizard;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 
 public class WizardEvent extends EventObject implements IModelEvent {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**

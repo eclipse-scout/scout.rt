@@ -9,11 +9,14 @@
  */
 package org.eclipse.scout.rt.platform.html.internal;
 
+import java.io.Serial;
+
 /**
  * Builder for a HTML link (&lt;a href="..."&gt;text&lt;/a&gt;).
  */
 public class HtmlLinkBuilder extends HtmlNodeBuilder {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public HtmlLinkBuilder(CharSequence url, CharSequence text, boolean preserveOpener) {

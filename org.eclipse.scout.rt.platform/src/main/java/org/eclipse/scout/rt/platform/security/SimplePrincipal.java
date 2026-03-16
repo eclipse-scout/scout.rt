@@ -9,10 +9,12 @@
  */
 package org.eclipse.scout.rt.platform.security;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.Principal;
 
 public class SimplePrincipal implements Principal, Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final String m_name;

@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.server.session;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -44,6 +45,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractServerSession implements IServerSession, Serializable, IExtensibleObject {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractServerSession.class);
@@ -163,6 +165,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
    * any further chain elements.
    */
   protected static class LocalServerSessionExtension<OWNER extends AbstractServerSession> extends AbstractSerializableExtension<OWNER> implements IServerSessionExtension<OWNER> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public LocalServerSessionExtension(OWNER owner) {

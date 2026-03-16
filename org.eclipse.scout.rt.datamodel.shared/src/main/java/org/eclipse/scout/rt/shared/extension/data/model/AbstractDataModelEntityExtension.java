@@ -9,11 +9,14 @@
  */
 package org.eclipse.scout.rt.shared.extension.data.model;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.data.model.DataModelEntityChains.DataModelEntityInitEntityChain;
 
 public abstract class AbstractDataModelEntityExtension<OWNER extends AbstractDataModelEntity> extends AbstractSerializableExtension<OWNER> implements IDataModelEntityExtension<OWNER> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public AbstractDataModelEntityExtension(OWNER owner) {

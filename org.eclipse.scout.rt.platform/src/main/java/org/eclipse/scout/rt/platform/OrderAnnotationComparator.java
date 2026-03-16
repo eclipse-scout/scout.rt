@@ -9,10 +9,12 @@
  */
 package org.eclipse.scout.rt.platform;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Comparator;
 
 public final class OrderAnnotationComparator implements Comparator<Object>, Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static final OrderAnnotationComparator INSTANCE = new OrderAnnotationComparator();

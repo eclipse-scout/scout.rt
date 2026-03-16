@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.server.commons.healthcheck;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.healthcheck.IHealthChecker.IHealthCheckCategory;
@@ -20,6 +22,7 @@ import org.eclipse.scout.rt.server.commons.healthcheck.IHealthChecker.IHealthChe
  */
 public final class HealthCheckCategoryId extends AbstractStringId {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private HealthCheckCategoryId(String id) {

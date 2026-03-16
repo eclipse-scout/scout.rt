@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.jdbc.mysql;
 
+import java.io.Serial;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MySqlSqlStyle extends AbstractSqlStyle {
+  @Serial
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(MySqlSqlStyle.class);
 

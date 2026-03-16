@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
  * Custom serializer writing completely empty object
  */
 class TestEmptyObjectSerializer extends StdScalarSerializer<TestEmptyObject> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public TestEmptyObjectSerializer() {

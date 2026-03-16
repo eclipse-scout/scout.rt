@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.platform.util.NumberUtility;
  * @since 6.1
  */
 public class Coordinates implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final String m_latitude;

@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.api.data.page;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -22,6 +24,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  */
 @IdTypeName("scout.PageId")
 public final class PageId extends AbstractStringId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static final PageId WILDCARD = PageId.of("*");

@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.data.model;
 
+import java.io.Serial;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -274,6 +275,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class NEQ extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
     private final String m_shortText;
     private final String m_text;
@@ -316,6 +318,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class LT extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
     private final String m_shortText;
     private final String m_text;
@@ -358,6 +361,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class LE extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -401,6 +405,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class EQ extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -444,6 +449,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class GT extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -487,6 +493,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class GE extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -530,6 +537,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateIsInDays extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -573,6 +581,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateIsInGEDays extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -616,6 +625,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateIsInGEMonths extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -659,6 +669,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateIsInLEDays extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -702,6 +713,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateIsInLEMonths extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -745,6 +757,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateIsInLastDays extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -788,6 +801,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateIsInLastMonths extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -831,6 +845,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateIsInMonths extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -874,6 +889,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateIsInNextDays extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -917,6 +933,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateIsInNextMonths extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -960,6 +977,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateIsNotToday extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1003,6 +1021,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateIsToday extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1046,6 +1065,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class YearToDate extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1094,6 +1114,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateTimeIsInGEHours extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1137,6 +1158,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateTimeIsInGEMinutes extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1180,6 +1202,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateTimeIsInLEHours extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1223,6 +1246,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateTimeIsInLEMinutes extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1266,6 +1290,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateTimeIsNotNow extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1309,6 +1334,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class DateTimeIsNow extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1352,6 +1378,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class EndsWith extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1395,6 +1422,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class NotEndsWith extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1438,6 +1466,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class In extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1481,6 +1510,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class Contains extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1524,6 +1554,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class NotIn extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1567,6 +1598,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class NotContains extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1610,6 +1642,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class NotNull extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1656,6 +1689,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
    * nvl(x,0)<>0
    */
   private static class NumberNotNull extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1699,6 +1733,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class Null extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1745,6 +1780,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
    * nvl(x,0)==0
    */
   private static class NumberNull extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1788,6 +1824,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class StartsWith extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1831,6 +1868,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class NotStartsWith extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1874,6 +1912,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class TimeIsInGEHours extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1917,6 +1956,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class TimeIsInGEMinutes extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -1960,6 +2000,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class TimeIsInHours extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -2003,6 +2044,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class TimeIsInLEHours extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -2046,6 +2088,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class TimeIsInLEMinutes extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -2089,6 +2132,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class TimeIsInMinutes extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -2132,6 +2176,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class TimeIsNow extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -2175,6 +2220,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class TimeIsNotNow extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;
@@ -2218,6 +2264,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class Between extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
     private final String m_shortText;
     private final String m_text;
@@ -2268,6 +2315,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   private static class Like extends AbstractDataModelOp {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String m_shortText;

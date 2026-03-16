@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.client.deeplink;
 
+import java.io.Serial;
+
 /**
  * A checked exception which indicates that a deep-link URL could not be processed for some (business logic) reason.
  * There are several cases:
@@ -22,6 +24,7 @@ package org.eclipse.scout.rt.client.deeplink;
  */
 public class DeepLinkException extends Exception {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public DeepLinkException() {

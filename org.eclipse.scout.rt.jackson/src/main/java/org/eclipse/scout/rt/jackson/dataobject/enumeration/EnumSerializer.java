@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject.enumeration;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
  * Custom serializer for all {@link IEnum} instances.
  */
 public class EnumSerializer extends StdSerializer<IEnum> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public EnumSerializer(JavaType type) {

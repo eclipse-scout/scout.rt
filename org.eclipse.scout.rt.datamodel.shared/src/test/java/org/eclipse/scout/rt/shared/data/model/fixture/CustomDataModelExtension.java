@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.data.model.fixture;
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,6 +77,7 @@ public final class CustomDataModelExtension {
   }
 
   public static class ExtendedFolderEntity extends AbstractDataModelEntity {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final Long m_id;
@@ -122,6 +124,7 @@ public final class CustomDataModelExtension {
   }
 
   public static class ExtendedFieldAttribute extends AbstractDataModelAttribute {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final Long m_id;

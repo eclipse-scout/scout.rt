@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.exception;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import org.slf4j.helpers.MessageFormatter;
  */
 public class PlatformException extends RuntimeException implements IThrowableWithContextInfo {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private transient boolean m_consumed;

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.rest.jersey;
 import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.*;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RestClientTestEchoServlet extends HttpServlet {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final Logger LOG = LoggerFactory.getLogger(RestClientTestEchoServlet.class);

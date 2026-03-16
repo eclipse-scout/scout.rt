@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.jdbc.db2;
 
+import java.io.Serial;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,6 +19,7 @@ import org.eclipse.scout.rt.server.jdbc.style.AbstractSqlStyle;
 
 public class DB2SqlStyle extends AbstractSqlStyle {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Override

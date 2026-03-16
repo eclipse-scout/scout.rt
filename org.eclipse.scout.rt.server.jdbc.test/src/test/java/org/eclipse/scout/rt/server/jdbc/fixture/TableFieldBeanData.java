@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.server.jdbc.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
@@ -17,6 +19,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
  */
 public class TableFieldBeanData extends AbstractTableFieldBeanData {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public TableFieldBeanData() {
@@ -58,6 +61,7 @@ public class TableFieldBeanData extends AbstractTableFieldBeanData {
 
   public static class TableFieldBeanDataRowData extends AbstractTableRowData {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final String active = "active";
     public static final String state = "state";

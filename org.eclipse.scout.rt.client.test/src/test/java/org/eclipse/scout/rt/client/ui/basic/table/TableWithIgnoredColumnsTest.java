@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.client.dto.ColumnData;
 import org.eclipse.scout.rt.client.dto.ColumnData.SdkColumnCommand;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -165,6 +167,7 @@ public class TableWithIgnoredColumnsTest {
   }
 
   private static class P_TableBean extends AbstractTableFieldBeanData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public P_TableBean() {
@@ -206,6 +209,7 @@ public class TableWithIgnoredColumnsTest {
 
     public static class TableBeanRowData extends AbstractTableRowData {
 
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final String DEFAULT = "default";
       public static final String CREATE = "create";
@@ -253,6 +257,7 @@ public class TableWithIgnoredColumnsTest {
   }
 
   private static class P_TableDefaultBean extends P_TableBean {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public P_TableDefaultBean() {
@@ -294,6 +299,7 @@ public class TableWithIgnoredColumnsTest {
 
     public static class TableDefaultBeanRowData extends TableBeanRowData {
 
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public TableDefaultBeanRowData() {
@@ -323,6 +329,7 @@ public class TableWithIgnoredColumnsTest {
   }
 
   private static class P_TableCreateBean extends P_TableBean {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public P_TableCreateBean() {
@@ -364,6 +371,7 @@ public class TableWithIgnoredColumnsTest {
 
     public static class TableCreateBeanRowData extends TableBeanRowData {
 
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final String IGNORE = "ignore";
       private String m_ignore;
@@ -403,6 +411,7 @@ public class TableWithIgnoredColumnsTest {
   }
 
   private static class P_TableIgnoreBean extends P_TableBean {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public P_TableIgnoreBean() {
@@ -444,6 +453,7 @@ public class TableWithIgnoredColumnsTest {
 
     public static class TableIgnoreBeanRowData extends TableBeanRowData {
 
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public TableIgnoreBeanRowData() {

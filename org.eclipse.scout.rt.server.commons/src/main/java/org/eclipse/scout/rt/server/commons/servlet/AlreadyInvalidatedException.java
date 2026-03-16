@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet;
 
+import java.io.Serial;
 import java.lang.reflect.Method;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
  */
 public class AlreadyInvalidatedException extends PlatformException {
 
+  @Serial
   private static final long serialVersionUID = -1;
 
   public AlreadyInvalidatedException(Method method, Object origin) {

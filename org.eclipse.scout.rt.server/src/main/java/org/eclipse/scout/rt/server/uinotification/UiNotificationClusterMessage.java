@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.uinotification;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.api.uinotification.UiNotificationMessageDo;
@@ -16,6 +17,7 @@ import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
 
 public class UiNotificationClusterMessage implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
   private String m_json;
 

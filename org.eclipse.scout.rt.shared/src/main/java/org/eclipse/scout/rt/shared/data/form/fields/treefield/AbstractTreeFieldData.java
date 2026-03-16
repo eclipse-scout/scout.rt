@@ -9,12 +9,14 @@
  */
 package org.eclipse.scout.rt.shared.data.form.fields.treefield;
 
+import java.io.Serial;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 
 public abstract class AbstractTreeFieldData extends AbstractFormFieldData {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private List<TreeNodeData> m_rootList;

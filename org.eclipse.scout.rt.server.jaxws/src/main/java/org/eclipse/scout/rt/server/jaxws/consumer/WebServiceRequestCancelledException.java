@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.server.jaxws.consumer;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
@@ -18,6 +20,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
  */
 public class WebServiceRequestCancelledException extends PlatformException {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**

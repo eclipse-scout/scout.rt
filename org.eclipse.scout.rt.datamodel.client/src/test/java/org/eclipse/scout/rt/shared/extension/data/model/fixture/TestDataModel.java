@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.shared.extension.data.model.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModel;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
@@ -16,65 +18,78 @@ import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
 
 public class TestDataModel extends AbstractDataModel {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Order(10)
   public class Top1Entity extends AbstractDataModelEntity {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Order(10)
     public class Sub1Top1Entity extends AbstractDataModelEntity {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     @Order(20)
     public class Sub2Top1Entity extends AbstractDataModelEntity {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     @Order(30)
     public class Sub3Top1Entity extends AbstractDataModelEntity {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     @Order(10)
     public class Sub1Top1Attribute extends AbstractDataModelAttribute {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     @Order(20)
     public class Sub2Top1Attribute extends AbstractDataModelAttribute {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
 
     @Order(30)
     public class Sub3Top1Attribute extends AbstractDataModelAttribute {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
   }
 
   @Order(20)
   public class Top2Entity extends AbstractDataModelEntity {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 
   @Order(30)
   public class Top3Entity extends AbstractDataModelEntity {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 
   @Order(10)
   public class Top1Attribute extends AbstractDataModelAttribute {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 
   @Order(20)
   public class Top2Attribute extends AbstractDataModelAttribute {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 
   @Order(30)
   public class Top3Attribute extends AbstractDataModelAttribute {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 }

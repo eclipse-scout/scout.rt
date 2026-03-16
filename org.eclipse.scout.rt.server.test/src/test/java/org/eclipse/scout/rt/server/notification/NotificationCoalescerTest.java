@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.server.notification;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -110,6 +111,7 @@ public class NotificationCoalescerTest {
   }
 
   private static class P_TestNotification implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final Set<String> m_testIds;

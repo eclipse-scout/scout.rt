@@ -9,10 +9,13 @@
  */
 package org.eclipse.scout.rt.server.services.common.security.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.api.data.security.PermissionId;
 import org.eclipse.scout.rt.security.AbstractPermission;
 
 public class TestPermission1 extends AbstractPermission {
+  @Serial
   private static final long serialVersionUID = 1L;
   public static final PermissionId ID = PermissionId.of("scout.test.permission.1");
 

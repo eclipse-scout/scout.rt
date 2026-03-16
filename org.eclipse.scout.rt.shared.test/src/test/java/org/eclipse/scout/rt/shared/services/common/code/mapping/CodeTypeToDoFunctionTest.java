@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.shared.services.common.code.mapping;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.api.data.FieldName;
 import org.eclipse.scout.rt.api.data.ObjectType;
 import org.eclipse.scout.rt.api.data.code.CodeDo;
@@ -96,6 +98,7 @@ public class CodeTypeToDoFunctionTest {
 
   @ObjectType("TestFixture")
   private static final class ConvertTestCodeType extends AbstractCodeType<Long, Long> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final Long m_id;
@@ -138,6 +141,7 @@ public class CodeTypeToDoFunctionTest {
     @FieldName("testFieldName")
     @ObjectType("testObjectType")
     public static class ConvertTestCode extends AbstractCode<Long> {
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final long ID = 10L;
 
@@ -198,6 +202,7 @@ public class CodeTypeToDoFunctionTest {
 
       @Order(1000)
       public static class ConvertTestChildCode extends AbstractCode<Long> {
+        @Serial
         private static final long serialVersionUID = 1L;
         public static final long ID = 101L;
 
@@ -210,6 +215,7 @@ public class CodeTypeToDoFunctionTest {
 
     @Order(2000)
     public static class ConvertTestCodeWithoutId extends AbstractCode<Long> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -220,6 +226,7 @@ public class CodeTypeToDoFunctionTest {
 
     @Order(3000)
     public static class ConvertTestCodeWithChildCodes extends AbstractCode<Long> {
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final long ID = 20L;
 
@@ -230,6 +237,7 @@ public class CodeTypeToDoFunctionTest {
 
       @Order(1000)
       public static class InactiveConvertTestCode extends AbstractCode<Long> {
+        @Serial
         private static final long serialVersionUID = 1L;
         public static final long ID = 201L;
 
@@ -247,6 +255,7 @@ public class CodeTypeToDoFunctionTest {
 
     @Order(4000)
     public static class InactiveConvertTestCodeWithChildCodes extends AbstractCode<Long> {
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final long ID = 30L;
 
@@ -262,6 +271,7 @@ public class CodeTypeToDoFunctionTest {
 
       @Order(1000)
       public static class ConvertTestChildCode extends AbstractCode<Long> {
+        @Serial
         private static final long serialVersionUID = 1L;
         public static final long ID = 301L;
 

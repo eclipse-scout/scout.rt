@@ -9,11 +9,13 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.planner;
 
+import java.io.Serial;
 import java.util.Date;
 
 import org.eclipse.scout.rt.shared.data.basic.MemoryOptimizedObject;
 
 public class Activity<RESOURCE_ID, ACTIVITY_ID> extends MemoryOptimizedObject {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static final int OBSERVER_BIT = 0;

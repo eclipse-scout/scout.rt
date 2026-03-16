@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.dataformat.ical;
 
 import java.io.Reader;
+import java.io.Serial;
 import java.io.Writer;
 
 import org.eclipse.scout.rt.dataformat.ical.model.AbstractEntity;
@@ -19,6 +20,7 @@ import org.eclipse.scout.rt.platform.Bean;
 
 @Bean
 public class ICalBean extends AbstractEntity {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static ICalBean parse(Reader r, String characterSet) {

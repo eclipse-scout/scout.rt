@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,6 +67,7 @@ public class CodeTypeTest {
   }
 
   private static class TestCodeType extends AbstractCodeType<String, String> {
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final String ID = "2";
 
@@ -187,6 +189,7 @@ public class CodeTypeTest {
 
     @Order(10)
     public class RootCode extends AbstractCode<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final String ID = "dynamicParentKey";
 
@@ -202,6 +205,7 @@ public class CodeTypeTest {
 
       @Order(10)
       public class ChildCode extends AbstractCode<String> {
+        @Serial
         private static final long serialVersionUID = 1L;
         public static final String ID = "75b3ede5-065a-4869-a4a7-c477af43abce";
 
@@ -219,6 +223,7 @@ public class CodeTypeTest {
 
     @Order(10)
     public class Test1Code extends AbstractCode<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final String ID = "Test1Code";
 
@@ -285,6 +290,7 @@ public class CodeTypeTest {
 
     @Order(20)
     public class Test2Code extends AbstractCode<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
       public static final String ID = "Test2Code";
 

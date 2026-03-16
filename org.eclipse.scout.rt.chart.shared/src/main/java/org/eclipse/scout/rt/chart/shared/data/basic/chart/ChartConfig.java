@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.chart.shared.data.basic.chart;
 
 import static org.eclipse.scout.rt.platform.util.StringUtility.*;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import org.eclipse.scout.rt.shared.data.colorscheme.IColorScheme;
 
 public class ChartConfig implements IChartConfig {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected static final String DELIMITER = ".";

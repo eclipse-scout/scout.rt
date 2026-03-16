@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.html.internal;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
  */
 public class EmptyHtmlNodeBuilder extends HtmlNodeBuilder {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public EmptyHtmlNodeBuilder(String tag, CharSequence... texts) {

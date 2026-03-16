@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.services.common.search;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -91,6 +92,7 @@ public class DataModelDefaultSearchFilterServiceTest {
   public class MyComposerField extends AbstractComposerField {
     @Order(80)
     public class CarEntity extends AbstractDataModelEntity {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -100,6 +102,7 @@ public class DataModelDefaultSearchFilterServiceTest {
 
       @Order(10)
       public class ColorAttribute extends AbstractDataModelAttribute {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         @Override

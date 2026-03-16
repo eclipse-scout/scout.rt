@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.dataobject.id;
 
+import java.io.Serial;
+
 /**
  * Abstract base implementation for all {@link Long} based {@link IId} classes. The wrapped id is guaranteed to be
  * non-null.
@@ -16,6 +18,7 @@ package org.eclipse.scout.rt.dataobject.id;
  * For details, see {@link ILongId}.
  */
 public abstract class AbstractLongId extends AbstractRootId<Long> implements ILongId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected AbstractLongId(Long id) {

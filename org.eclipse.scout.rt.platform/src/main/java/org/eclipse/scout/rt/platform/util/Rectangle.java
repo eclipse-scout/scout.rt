@@ -9,10 +9,12 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class Rectangle implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final int m_x;

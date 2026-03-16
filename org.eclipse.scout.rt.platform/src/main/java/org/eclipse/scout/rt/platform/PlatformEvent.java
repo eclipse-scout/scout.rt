@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 import org.eclipse.scout.rt.platform.IPlatform.State;
@@ -19,6 +20,7 @@ import org.eclipse.scout.rt.platform.IPlatform.State;
  * @since 5.2
  */
 public class PlatformEvent extends EventObject {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final State m_state;

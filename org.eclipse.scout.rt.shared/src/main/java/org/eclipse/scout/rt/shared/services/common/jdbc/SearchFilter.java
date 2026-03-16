@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.common.jdbc;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
  * Search model that contains a form data, verbose search texts and a valid status
  */
 public class SearchFilter implements Serializable {
+  @Serial
   private static final long serialVersionUID = 0L;
 
   private boolean m_completed;

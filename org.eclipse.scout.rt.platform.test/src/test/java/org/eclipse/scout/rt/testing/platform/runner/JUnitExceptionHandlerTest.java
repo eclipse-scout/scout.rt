@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.testing.platform.runner;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -113,6 +115,7 @@ public class JUnitExceptionHandlerTest {
 
   private static class TestException1 extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     TestException1() {
@@ -122,6 +125,7 @@ public class JUnitExceptionHandlerTest {
 
   private static class TestException2 extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     TestException2() {
@@ -131,6 +135,7 @@ public class JUnitExceptionHandlerTest {
 
   private static class TestProcessingException3 extends ProcessingException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     TestProcessingException3() {

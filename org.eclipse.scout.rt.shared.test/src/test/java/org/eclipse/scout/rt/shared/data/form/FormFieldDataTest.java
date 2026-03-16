@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.shared.data.form;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -34,19 +36,23 @@ public class FormFieldDataTest {
   }
 
   public static class BaseFormFieldData extends AbstractFormFieldData {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 
   @Replace
   public static class ExtendedFormFieldData extends BaseFormFieldData {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 
   public static class ExtendedFormFieldDataWithoutReplace extends BaseFormFieldData {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 
   public static class BaseFormFieldDataWithCustomId extends AbstractFormFieldData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -57,6 +63,7 @@ public class FormFieldDataTest {
 
   @Replace
   public static class ExtendedFormFieldDataWithCustomId extends BaseFormFieldDataWithCustomId {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 }

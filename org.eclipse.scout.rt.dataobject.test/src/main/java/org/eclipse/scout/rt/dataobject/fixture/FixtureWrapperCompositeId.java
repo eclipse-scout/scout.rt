@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.dataobject.fixture;
 
+import java.io.Serial;
 import java.util.UUID;
 
 import org.eclipse.scout.rt.dataobject.id.AbstractCompositeId;
@@ -18,6 +19,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 
 @IdTypeName("scout.FixtureWrapperCompositeId")
 public final class FixtureWrapperCompositeId extends AbstractCompositeId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private FixtureWrapperCompositeId(FixtureCompositeId c1, FixtureStringId c2) {

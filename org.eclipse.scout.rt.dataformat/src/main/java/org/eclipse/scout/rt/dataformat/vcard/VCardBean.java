@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.dataformat.vcard;
 
 import java.io.Reader;
+import java.io.Serial;
 import java.io.Writer;
 
 import org.eclipse.scout.rt.dataformat.ical.model.AbstractEntity;
@@ -19,6 +20,7 @@ import org.eclipse.scout.rt.platform.Bean;
 
 @Bean
 public class VCardBean extends AbstractEntity {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static VCardBean parse(Reader r, String charset) {

@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.rest.param;
 
+import java.io.Serial;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -159,6 +160,7 @@ public class IIdParamConverterProvider implements ParamConverterProvider {
    * Holder to inject a {@link Set} of {@link IIdCodecFlag}s into a local {@link Provider} at runtime.
    */
   public static class IdCodecFlags extends AtomicReference<Set<IIdCodecFlag>> {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 }

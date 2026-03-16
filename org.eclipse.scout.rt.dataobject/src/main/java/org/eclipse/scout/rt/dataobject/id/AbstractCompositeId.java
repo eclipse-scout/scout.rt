@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.dataobject.id;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
  */
 @IdSignature
 public abstract class AbstractCompositeId implements ICompositeId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final List<? extends IId> m_idComponents;

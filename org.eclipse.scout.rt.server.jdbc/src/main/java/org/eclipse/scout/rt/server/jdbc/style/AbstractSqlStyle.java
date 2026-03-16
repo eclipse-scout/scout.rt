@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.server.jdbc.style;
 
 import java.io.ByteArrayInputStream;
+import java.io.Serial;
 import java.io.StringReader;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
@@ -37,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractSqlStyle implements ISqlStyle {
+  @Serial
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(AbstractSqlStyle.class);
 

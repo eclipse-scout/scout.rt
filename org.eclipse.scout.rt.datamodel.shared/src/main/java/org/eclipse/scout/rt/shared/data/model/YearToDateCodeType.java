@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.shared.data.model;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.text.TEXTS;
@@ -24,6 +26,7 @@ import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 @ClassId("343e6146-7bc0-49c7-9da2-cdd56dbd1676")
 public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
 
+  @Serial
   private static final long serialVersionUID = 1L;
   public static final long ID = 170873L;
 
@@ -54,6 +57,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
   @ClassId("5767462c-fc9c-43b3-bb01-0f9ef708bab4")
   public static class ThreeYearsBeforeCode extends AbstractCode<Integer> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final Integer ID = -3;
 
@@ -72,6 +76,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
   @ClassId("eba3b867-9036-4963-9209-24ca9d77be7e")
   public static class TwoYearsBeforeCode extends AbstractCode<Integer> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final Integer ID = -2;
 
@@ -90,6 +95,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
   @ClassId("abd8f2d8-b1ad-4850-91e6-0633274825f6")
   public static class OneYearBeforeCode extends AbstractCode<Integer> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final Integer ID = -1;
 
@@ -108,6 +114,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
   @ClassId("74b3ca8b-d33a-4668-95f3-168456d61bf5")
   public static class ThisYearCode extends AbstractCode<Integer> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final Integer ID = 0;
 
@@ -126,6 +133,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
   @ClassId("3058dc55-c1dc-42fe-8ed0-287f4dc5f171")
   public static class NextYearCode extends AbstractCode<Integer> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final Integer ID = 1;
 

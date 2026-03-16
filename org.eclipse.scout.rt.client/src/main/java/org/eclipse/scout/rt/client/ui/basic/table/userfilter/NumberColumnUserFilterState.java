@@ -9,11 +9,13 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
 public class NumberColumnUserFilterState extends ColumnUserFilterState {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private BigDecimal m_numberFrom;

@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.util.concurrent;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MessageFormatter;
@@ -19,6 +21,7 @@ import org.slf4j.helpers.MessageFormatter;
  * @since 6.1
  */
 public abstract class AbstractInterruptionError extends PlatformError {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public AbstractInterruptionError(final String message, final Object... args) {

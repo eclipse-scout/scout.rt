@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.html.internal;
 
+import java.io.Serial;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.html.IHtmlTableCell;
@@ -18,6 +19,7 @@ import org.eclipse.scout.rt.platform.html.IHtmlTableCell;
  */
 public class HtmlTableDataBuilder extends HtmlNodeBuilder implements IHtmlTableCell {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public HtmlTableDataBuilder(List<? extends CharSequence> text) {

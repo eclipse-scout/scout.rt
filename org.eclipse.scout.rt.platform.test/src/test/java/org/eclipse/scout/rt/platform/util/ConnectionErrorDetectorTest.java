@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.io.Serial;
 import java.net.SocketException;
 import java.nio.channels.ClosedChannelException;
 import java.util.LinkedList;
@@ -127,6 +128,7 @@ public class ConnectionErrorDetectorTest {
 
   private static class ClientAbortException extends IOException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ClientAbortException(String message) {
@@ -135,6 +137,7 @@ public class ConnectionErrorDetectorTest {
   }
 
   private static class ConnectionClosedException extends IOException {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ConnectionClosedException(String message) {
@@ -144,6 +147,7 @@ public class ConnectionErrorDetectorTest {
 
   private static class EofException extends IOException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public EofException(String message) {
@@ -153,6 +157,7 @@ public class ConnectionErrorDetectorTest {
 
   private static class AlreadyInvalidatedException extends PlatformException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public AlreadyInvalidatedException(String message) {
@@ -166,6 +171,7 @@ public class ConnectionErrorDetectorTest {
 
   private static class H2StreamResetException extends IOException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public H2StreamResetException(String message) {
@@ -175,6 +181,7 @@ public class ConnectionErrorDetectorTest {
 
   private static class CustomException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public CustomException(String message) {
@@ -188,6 +195,7 @@ public class ConnectionErrorDetectorTest {
 
   private static class CycledCauseException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public CycledCauseException(String message) {

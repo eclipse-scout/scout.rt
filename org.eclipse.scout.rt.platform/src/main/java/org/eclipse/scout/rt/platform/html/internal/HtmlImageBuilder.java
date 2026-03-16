@@ -9,11 +9,14 @@
  */
 package org.eclipse.scout.rt.platform.html.internal;
 
+import java.io.Serial;
+
 /**
  * Builder for a HTML image element (&lt;img&gt;).
  */
 public class HtmlImageBuilder extends EmptyHtmlNodeBuilder {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public HtmlImageBuilder(CharSequence path) {

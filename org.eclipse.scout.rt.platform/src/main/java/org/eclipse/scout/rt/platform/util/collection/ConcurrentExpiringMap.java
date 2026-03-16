@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.util.collection;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.AbstractMap;
@@ -489,6 +490,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
   }
 
   private static class StableTimestampComparator<K, V> implements Comparator<Entry<K, ExpiringElement<V>>>, Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -618,6 +620,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
   }
 
   private final class WriteThroughEntry extends SimpleEntry<K, V> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     WriteThroughEntry(K k, V v) {

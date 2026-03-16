@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.holders;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 
 /**
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
  */
 
 public class BigDecimalHolder extends Holder<BigDecimal> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public BigDecimalHolder() {

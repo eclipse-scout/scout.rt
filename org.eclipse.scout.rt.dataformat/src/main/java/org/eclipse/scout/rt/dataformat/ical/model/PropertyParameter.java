@@ -9,12 +9,14 @@
  */
 package org.eclipse.scout.rt.dataformat.ical.model;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
 
 public class PropertyParameter implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static final String PARAM_CHARSET = "CHARSET";

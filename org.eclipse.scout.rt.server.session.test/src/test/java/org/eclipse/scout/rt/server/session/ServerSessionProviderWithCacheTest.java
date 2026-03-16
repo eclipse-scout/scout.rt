@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.server.session;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -235,6 +236,7 @@ public class ServerSessionProviderWithCacheTest {
   }
 
   private static class FixtureServerSession extends AbstractServerSession {
+    @Serial
     private static final long serialVersionUID = 1L;
     private volatile boolean m_started;
     private volatile boolean m_stopped;

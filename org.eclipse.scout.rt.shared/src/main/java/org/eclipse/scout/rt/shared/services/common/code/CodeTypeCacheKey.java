@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.common.code;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Locale;
 
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
  * @since 5.2
  */
 public class CodeTypeCacheKey implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final Locale m_locale;

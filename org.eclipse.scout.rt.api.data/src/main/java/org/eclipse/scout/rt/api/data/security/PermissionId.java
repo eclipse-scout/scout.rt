@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.api.data.security;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNullOrEmpty;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -18,6 +20,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 @IdTypeName("scout.PermissionId")
 public final class PermissionId extends AbstractStringId {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private PermissionId(String id) {

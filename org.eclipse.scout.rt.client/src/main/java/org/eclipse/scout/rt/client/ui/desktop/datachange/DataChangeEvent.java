@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.datachange;
 
+import java.io.Serial;
 import java.util.EventObject;
 import java.util.Objects;
 
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.platform.util.ChangeStatus;
  * @since 8.0
  */
 public class DataChangeEvent extends EventObject {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static final Object DEFAULT_SOURCE = new Object();

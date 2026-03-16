@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.clientnotification;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -16,6 +17,7 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 public class ClientNotificationClusterNotification implements Serializable {
+  @Serial
   private static final long serialVersionUID = -8513131031858145786L;
   private final Collection<? extends ClientNotificationMessage> m_cnMessages;
 

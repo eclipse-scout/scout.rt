@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.chart.ui.html.json.basic.table.userfilter;
 
+import java.io.Serial;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
@@ -19,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.basic.userfilter.IColumnAwareUserFilterSta
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 public class ChartTableUserFilterState extends AbstractUserFilterState implements IColumnAwareUserFilterState {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static final String TYPE = "CHART";

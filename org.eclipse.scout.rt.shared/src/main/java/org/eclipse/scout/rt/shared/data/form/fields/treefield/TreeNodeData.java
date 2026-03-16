@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.data.form.fields.treefield;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * Transfer object representing a node in a tree, used with a {@link AbstractTreeFieldData}
  */
 public class TreeNodeData implements Serializable, Cloneable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private TreeNodeData m_parentNode;

@@ -9,12 +9,15 @@
  */
 package org.eclipse.scout.rt.dataobject.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 @IdTypeName("scout.FixtureString2Id")
 public final class FixtureString2Id extends AbstractStringId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private FixtureString2Id(String id) {

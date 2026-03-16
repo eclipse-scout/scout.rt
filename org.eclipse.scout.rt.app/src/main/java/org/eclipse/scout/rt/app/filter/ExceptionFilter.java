@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.app.filter;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -86,6 +87,7 @@ public class ExceptionFilter implements Filter {
    * {@link QuietException}s are not logged by Jetty unless the log level of {@link HttpChannel} is DEBUG.
    */
   public static class JettyQuietExceptionWrapper extends RuntimeException implements QuietException {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public JettyQuietExceptionWrapper(Throwable cause) {

@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.shared.data.form.fields.composer;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 
@@ -16,6 +18,7 @@ import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
  * Data representation for a composer attribute value instance in a {@link AbstractComposerData}
  */
 public class ComposerAttributeNodeData extends TreeNodeData implements DataModelConstants {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private String m_attributeExternalId;

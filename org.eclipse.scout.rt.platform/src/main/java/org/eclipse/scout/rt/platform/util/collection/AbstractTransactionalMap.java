@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.util.collection;
 
+import java.io.Serial;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.ArrayList;
@@ -609,6 +610,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
     }
 
     private final class TransactionalWriteEntry extends SimpleEntry<K, V> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       TransactionalWriteEntry(K k, V v) {

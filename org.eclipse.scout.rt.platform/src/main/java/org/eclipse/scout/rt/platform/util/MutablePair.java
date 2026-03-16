@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import java.io.Serial;
 import java.util.Map;
 
 /**
@@ -23,6 +24,7 @@ import java.util.Map;
 @SuppressWarnings("squid:S2160")
 public class MutablePair<L, R> extends Pair<L, R> {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private L m_left;

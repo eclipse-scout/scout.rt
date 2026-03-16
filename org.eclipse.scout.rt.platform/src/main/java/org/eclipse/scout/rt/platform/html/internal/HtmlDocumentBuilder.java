@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.html.internal;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.html.IHtmlDocument;
 
 /**
@@ -16,6 +18,7 @@ import org.eclipse.scout.rt.platform.html.IHtmlDocument;
  */
 public class HtmlDocumentBuilder extends HtmlNodeBuilder implements IHtmlDocument {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private String m_docType;

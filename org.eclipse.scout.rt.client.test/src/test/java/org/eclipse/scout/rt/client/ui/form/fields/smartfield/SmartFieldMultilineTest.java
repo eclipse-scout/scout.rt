@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -150,6 +151,7 @@ public class SmartFieldMultilineTest {
 
   @ClassId("43949094-ddb9-47f2-9bdf-4f208e1ed499")
   public static class P_SingleLookupCall extends LookupCall<Long> {
+    @Serial
     private static final long serialVersionUID = -7536271824820806283L;
 
     @Override
@@ -160,6 +162,7 @@ public class SmartFieldMultilineTest {
 
   @ClassId("93091218-02e3-4cfa-996d-2b2a1fa97495")
   public static class P_MultiLookupCall extends LookupCall<Long> {
+    @Serial
     private static final long serialVersionUID = -7536271824820806283L;
 
     @Override

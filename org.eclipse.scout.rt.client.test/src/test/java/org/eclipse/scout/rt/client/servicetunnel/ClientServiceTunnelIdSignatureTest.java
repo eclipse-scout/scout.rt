@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThrows;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -134,6 +135,7 @@ public class ClientServiceTunnelIdSignatureTest {
   }
 
   protected static class EchoBean implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final IDoEntity m_doEntity;

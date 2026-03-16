@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.platform.util.collection;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Iterator;
@@ -28,6 +29,7 @@ import java.util.Set;
 @SuppressWarnings("squid:S2160") // 'Subclasses that add fields should override "equals"' not necessary. implementation of AbstractSet is sufficient.
 public class TransformingSet<F, T> extends AbstractSet<T> implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 0;
 
   private final Set<F> m_wrappedSet;

@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.extension;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +24,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public abstract class AbstractContributionComposite implements IContributionOwner, Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private Map<Class<?> /* concrete contribution class */, Object /* contribution instance */> m_contributionsByClass;

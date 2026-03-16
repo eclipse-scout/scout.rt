@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.Serial;
 import java.io.Serializable;
 import java.io.Writer;
 import java.net.URL;
@@ -50,6 +51,7 @@ public class RemoteFile implements Serializable {
   private static final int ONE_HUNDRED_KILO_BYTE = 102400;
   public static final long DEFAULT_MAX_BLOCK_SIZE = 20000000; // 20MB
   private static final String DEFAULT_CHARSET_NAME = StandardCharsets.UTF_8.name();
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private String m_dir;

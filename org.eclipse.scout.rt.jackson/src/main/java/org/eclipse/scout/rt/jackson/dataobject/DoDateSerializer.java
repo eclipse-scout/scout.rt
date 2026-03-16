@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,6 +28,7 @@ import com.fasterxml.jackson.databind.ser.std.DateSerializer;
  * {@link ValueFormat} format.
  */
 public class DoDateSerializer extends DateSerializer {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected final LazyValue<DoDateSerializationHelper> m_helper = new LazyValue<>(DoDateSerializationHelper.class);

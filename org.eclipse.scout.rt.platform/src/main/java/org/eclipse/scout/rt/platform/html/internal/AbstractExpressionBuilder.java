@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.html.internal;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
@@ -19,6 +21,7 @@ import org.eclipse.scout.rt.platform.html.IHtmlContent;
  */
 public abstract class AbstractExpressionBuilder implements IHtmlContent {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private StringBuilder m_buf;

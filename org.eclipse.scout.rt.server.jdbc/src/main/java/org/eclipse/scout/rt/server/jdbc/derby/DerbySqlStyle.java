@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.jdbc.derby;
 
+import java.io.Serial;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -19,6 +20,7 @@ import org.eclipse.scout.rt.server.jdbc.style.AbstractSqlStyle;
  * Note: This class is mostly untested.
  */
 public class DerbySqlStyle extends AbstractSqlStyle {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final String CAST_SQL_METHOD = "CAST(";

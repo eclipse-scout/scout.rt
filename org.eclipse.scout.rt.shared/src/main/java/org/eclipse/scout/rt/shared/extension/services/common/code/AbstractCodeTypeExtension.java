@@ -9,12 +9,15 @@
  */
 package org.eclipse.scout.rt.shared.extension.services.common.code;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
 public abstract class AbstractCodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER extends AbstractCodeType<CODE_TYPE_ID, CODE_ID>>
     extends AbstractCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID, ICode<CODE_ID>, OWNER> {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**

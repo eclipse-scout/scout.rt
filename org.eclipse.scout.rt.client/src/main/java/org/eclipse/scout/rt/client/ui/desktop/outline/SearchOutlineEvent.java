@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
+import java.io.Serial;
 import java.util.EventObject;
 import java.util.Objects;
 
@@ -16,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.IModelEvent;
 
 public class SearchOutlineEvent extends EventObject implements IModelEvent {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static final int TYPE_SEARCH_EVENT = 7;

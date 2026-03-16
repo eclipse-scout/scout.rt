@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -254,6 +255,7 @@ public class SmartFieldTest {
   }
 
   public static class StyleLookupCall extends LookupCall<Long> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -482,6 +484,7 @@ public class SmartFieldTest {
     ISmartField<Long> field = new AbstractSmartField<Long>() {
     };
     field.setLookupCall(new LocalLookupCall<Long>() {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override

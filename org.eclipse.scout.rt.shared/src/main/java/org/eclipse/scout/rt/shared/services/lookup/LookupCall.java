@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.lookup;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -57,6 +58,7 @@ import org.eclipse.scout.rt.platform.util.TriState;
 @ClassId("0f461d52-9712-494f-9748-8016e5f4ca5a")
 public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, ITypeWithClassId {
 
+  @Serial
   private static final long serialVersionUID = 0L;
 
   private KEY_TYPE m_key;

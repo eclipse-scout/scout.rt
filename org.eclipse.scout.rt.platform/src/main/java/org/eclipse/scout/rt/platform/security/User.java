@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.security;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 @Bean
 public class User implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static final ThreadLocal<User> CURRENT = new ThreadLocal<>();

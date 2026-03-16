@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -46,6 +47,7 @@ public class ServerSessionCacheTest {
   private String testSessionId = "testId";
 
   private IServerSession m_testScoutSession = new AbstractServerSession(true) {
+    @Serial
     private static final long serialVersionUID = 1L;
   };
 
@@ -277,6 +279,7 @@ public class ServerSessionCacheTest {
       @Override
       public IServerSession create() {
         return new AbstractServerSession(true) {
+          @Serial
           private static final long serialVersionUID = 1L;
         };
       }
@@ -296,6 +299,7 @@ public class ServerSessionCacheTest {
       @Override
       public IServerSession create() {
         return new AbstractServerSession(true) {
+          @Serial
           private static final long serialVersionUID = 1L;
         };
       }
@@ -337,6 +341,7 @@ public class ServerSessionCacheTest {
     @Override
     public IServerSession create() {
       return new AbstractServerSession(true) {
+        @Serial
         private static final long serialVersionUID = 1L;
       };
     }

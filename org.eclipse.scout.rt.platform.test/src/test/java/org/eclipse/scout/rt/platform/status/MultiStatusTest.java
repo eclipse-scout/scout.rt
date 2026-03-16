@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.status;
 import static org.eclipse.scout.rt.platform.util.StringUtility.startsWith;
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -269,6 +270,7 @@ public class MultiStatusTest {
 
   @Order(10)
   class TestStatus extends Status {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public TestStatus() {
@@ -279,6 +281,7 @@ public class MultiStatusTest {
 
   @Order(20)
   class TestStatus2 extends Status {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public TestStatus2() {

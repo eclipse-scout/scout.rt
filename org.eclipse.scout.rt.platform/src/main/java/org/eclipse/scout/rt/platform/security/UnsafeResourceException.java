@@ -9,10 +9,13 @@
  */
 package org.eclipse.scout.rt.platform.security;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 public class UnsafeResourceException extends PlatformException {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public UnsafeResourceException(String message, Object... args) {

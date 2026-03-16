@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.server.commons.servlet;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
  * this behavior for all containers.
  */
 public abstract class AbstractHttpServlet extends HttpServlet {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractHttpServlet.class);

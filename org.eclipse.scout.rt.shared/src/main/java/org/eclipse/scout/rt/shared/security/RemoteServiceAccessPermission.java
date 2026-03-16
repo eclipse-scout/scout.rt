@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.security;
 
+import java.io.Serial;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.api.data.security.PermissionId;
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.security.IPermissionCollection;
  * Permission to grant remote access to a service interface. It is checked in scouts ServiceOperationInvoker.
  */
 public class RemoteServiceAccessPermission extends AbstractPermission {
+  @Serial
   private static final long serialVersionUID = 1L;
   public static final PermissionId ID = PermissionId.of("scout.remote.service.access");
 

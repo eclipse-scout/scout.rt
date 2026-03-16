@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.ui;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -32,6 +33,7 @@ public final class UserAgent implements Serializable {
    */
   public static final ThreadLocal<UserAgent> CURRENT = new ThreadLocal<>();
 
+  @Serial
   private static final long serialVersionUID = 6194949468393137650L;
 
   private final IUiLayer m_uiLayer;

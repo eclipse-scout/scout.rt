@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.jdbc.mssql;
 
+import java.io.Serial;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -19,6 +20,7 @@ import org.eclipse.scout.rt.server.jdbc.style.AbstractSqlStyle;
  * @since Build 206
  */
 public class MSSQLSqlStyle extends AbstractSqlStyle {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Override

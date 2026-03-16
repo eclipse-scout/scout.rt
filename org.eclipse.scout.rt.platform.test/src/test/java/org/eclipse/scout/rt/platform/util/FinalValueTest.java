@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.platform.util;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -163,6 +164,7 @@ public class FinalValueTest {
       super("expected JUnit test exception");
     }
 
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 }

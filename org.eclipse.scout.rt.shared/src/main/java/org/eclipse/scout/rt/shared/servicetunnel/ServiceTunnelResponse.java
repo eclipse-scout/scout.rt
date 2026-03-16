@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.servicetunnel;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 public class ServiceTunnelResponse implements Serializable {
+  @Serial
   private static final long serialVersionUID = 0L;
 
   private final Object m_data;

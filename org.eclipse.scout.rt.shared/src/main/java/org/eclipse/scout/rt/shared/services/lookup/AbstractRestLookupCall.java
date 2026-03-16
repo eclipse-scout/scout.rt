@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.lookup;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
  * performed via service tunnel instead of calling a REST service.
  */
 public abstract class AbstractRestLookupCall<RESTRICTION extends AbstractLookupRestrictionDo<ID>, ID> implements ILookupCall<ID> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected RESTRICTION m_restrictionDo;

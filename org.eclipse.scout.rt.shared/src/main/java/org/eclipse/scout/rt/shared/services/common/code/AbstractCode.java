@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.io.ObjectStreamException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ import org.eclipse.scout.rt.shared.services.common.code.mapping.ICodeToDoFunctio
 
 @ClassId("8a1ed7c8-14e0-42ba-a275-258a3c2c4a51")
 public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContributionOwner, IExtensibleObject {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private transient ICodeType<?, T> m_codeType;
@@ -533,6 +535,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
     return true;
   }
 
+  @Serial
   protected Object readResolve() throws ObjectStreamException {
     m_codeMap = new HashMap<>();
     if (m_codeList == null) {
@@ -567,6 +570,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
    * any further chain elements.
    */
   protected static class LocalCodeExtension<T, OWNER extends AbstractCode<T>> extends AbstractSerializableExtension<OWNER> implements ICodeExtension<T, OWNER> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public LocalCodeExtension(OWNER owner) {

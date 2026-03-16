@@ -9,12 +9,15 @@
  */
 package org.eclipse.scout.rt.platform.transaction;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
 
 /**
  * @since 16.1
  */
 public class TransactionCancelledError extends AbstractInterruptionError {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public TransactionCancelledError() {

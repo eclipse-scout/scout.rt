@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.services.common.prefs;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -59,6 +60,7 @@ public class Preferences implements IPreferences {
   public static final int EVENT_KIND_REMOVE = 1 << 3;
 
   private static final Logger LOG = LoggerFactory.getLogger(Preferences.class);
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final String m_name;
@@ -83,6 +85,7 @@ public class Preferences implements IPreferences {
     m_dirty = dirty;
   }
 
+  @Serial
   private Object readResolve() {
     return new Preferences(this);
   }

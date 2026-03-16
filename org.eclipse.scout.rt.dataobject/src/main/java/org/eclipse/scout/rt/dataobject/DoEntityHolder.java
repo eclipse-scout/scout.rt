@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.holders.IHolder;
 
 /**
@@ -20,6 +22,7 @@ import org.eclipse.scout.rt.platform.holders.IHolder;
  */
 public class DoEntityHolder<T extends IDoEntity> extends DataObjectHolder<T> {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public DoEntityHolder() {

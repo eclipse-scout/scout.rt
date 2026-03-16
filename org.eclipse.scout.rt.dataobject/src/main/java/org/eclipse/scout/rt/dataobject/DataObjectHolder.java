@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.dataobject;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
  */
 public class DataObjectHolder<T extends IDataObject> implements IHolder<T>, Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private T m_value;
@@ -68,6 +70,7 @@ public class DataObjectHolder<T extends IDataObject> implements IHolder<T>, Seri
    * value instead of relying on default java object serialization (which would require {@link IDataObject} to implement
    * the {@link Serializable} interface).
    */
+  @Serial
   private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
     String text = (String) stream.readObject();
     @SuppressWarnings("unchecked")
@@ -78,6 +81,7 @@ public class DataObjectHolder<T extends IDataObject> implements IHolder<T>, Seri
   /**
    * Custom java serialization method based on {@link IDataObjectMapper} instead of default java object serialization.
    */
+  @Serial
   private void writeObject(java.io.ObjectOutputStream stream) throws IOException {
     String text = BEANS.get(IDataObjectMapper.class).writeValue(getValue());
     stream.writeObject(text);

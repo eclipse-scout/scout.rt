@@ -9,12 +9,14 @@
  */
 package org.eclipse.scout.rt.server.services.common.clustersync.internal;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationProperties;
 
 public class ClusterNotificationMessage implements IClusterNotificationMessage {
+  @Serial
   private static final long serialVersionUID = -4471640837086802256L;
   private final Serializable m_notification;
   private final IClusterNotificationProperties m_props;

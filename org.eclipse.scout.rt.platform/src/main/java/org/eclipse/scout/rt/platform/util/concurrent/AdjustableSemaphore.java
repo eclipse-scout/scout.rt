@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util.concurrent;
 
+import java.io.Serial;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -22,6 +23,7 @@ import java.util.concurrent.Semaphore;
  */
 public final class AdjustableSemaphore extends Semaphore {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**

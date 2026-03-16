@@ -9,11 +9,13 @@
  */
 package org.eclipse.scout.rt.shared.clientnotification;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
 public class ClientNotificationMessage implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final IClientNotificationAddress m_address;

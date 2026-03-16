@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.lookup.fixture;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  */
 @IgnoreBean // constructor with arguments
 public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_TYPE> implements Serializable {
+  @Serial
   private static final long serialVersionUID = 0L;
 
   private Class<? extends ICodeType<?, CODE_ID_TYPE>> m_codeTypeClass;

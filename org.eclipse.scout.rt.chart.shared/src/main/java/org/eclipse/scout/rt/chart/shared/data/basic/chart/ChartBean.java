@@ -9,9 +9,12 @@
  */
 package org.eclipse.scout.rt.chart.shared.data.basic.chart;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.BEANS;
 
 public class ChartBean implements IChartBean {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final IChartData m_data;

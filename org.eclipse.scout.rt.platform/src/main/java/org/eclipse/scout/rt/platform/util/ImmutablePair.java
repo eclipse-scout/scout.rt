@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import java.io.Serial;
+
 /**
  * A simple pair class, having two immutable final properties <code>left</code> and <code>right</code> with different
  * generic types.
@@ -18,6 +20,7 @@ package org.eclipse.scout.rt.platform.util;
 @SuppressWarnings("squid:S2160")
 public class ImmutablePair<L, R> extends Pair<L, R> {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final L m_left;

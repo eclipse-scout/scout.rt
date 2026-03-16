@@ -9,11 +9,14 @@
  */
 package org.eclipse.scout.rt.dataobject.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.id.AbstractBooleanId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 
 @IdTypeName("scout.FixtureBooleanId")
 public final class FixtureBooleanId extends AbstractBooleanId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private FixtureBooleanId(Boolean id) {

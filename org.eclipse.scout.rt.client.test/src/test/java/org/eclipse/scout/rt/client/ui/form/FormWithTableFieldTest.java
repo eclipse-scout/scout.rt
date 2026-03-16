@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -167,6 +169,7 @@ public class FormWithTableFieldTest {
 
   public static class TableFormData extends AbstractFormData {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public TableFormData() {
@@ -178,6 +181,7 @@ public class FormWithTableFieldTest {
 
     public static class Lorem extends AbstractTableFieldBeanData {
 
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -216,6 +220,7 @@ public class FormWithTableFieldTest {
 
       public static class LoremRowData extends AbstractTableRowData {
 
+        @Serial
         private static final long serialVersionUID = 1L;
         public static final String name = "name";
         private String m_name;

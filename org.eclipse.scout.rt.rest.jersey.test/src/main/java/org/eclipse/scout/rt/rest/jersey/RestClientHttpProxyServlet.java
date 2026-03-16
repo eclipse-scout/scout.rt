@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.rest.jersey;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 public class RestClientHttpProxyServlet extends HttpServlet {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final Logger LOG = LoggerFactory.getLogger(RestClientHttpProxyServlet.class);

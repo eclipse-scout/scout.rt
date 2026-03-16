@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.platform;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -398,6 +399,7 @@ public class BeanCreationWithExceptionsTest {
 
   private static class TestBeanException extends PlatformException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     private final boolean m_fromConstructor;
 

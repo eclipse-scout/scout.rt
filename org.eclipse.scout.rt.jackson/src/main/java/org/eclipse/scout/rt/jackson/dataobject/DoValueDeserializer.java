@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.DoValue;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -22,6 +24,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
  * Deserializer for {@link DoValue} objects unwrapping the contained value object.
  */
 public class DoValueDeserializer extends ReferenceTypeDeserializer<DoValue<?>> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public DoValueDeserializer(JavaType fullType, ValueInstantiator inst, TypeDeserializer typeDeser, JsonDeserializer<?> deser) {

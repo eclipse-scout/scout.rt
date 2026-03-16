@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.server.commons.healthcheck;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Objects;
 
 import jakarta.servlet.ServletException;
@@ -49,6 +50,7 @@ import org.slf4j.event.Level;
  * @since 6.1
  */
 public class HealthCheckServlet extends AbstractHttpServlet {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);

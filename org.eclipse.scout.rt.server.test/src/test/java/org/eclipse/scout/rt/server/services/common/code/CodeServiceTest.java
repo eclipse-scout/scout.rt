@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.verify;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -186,6 +187,7 @@ public class CodeServiceTest {
 
   public static class SomeCodeType extends AbstractCodeType<Long, String> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final AtomicBoolean EXEC_LOAD_CODES_INVOKED = new AtomicBoolean();
 
@@ -205,6 +207,7 @@ public class CodeServiceTest {
 
     public static final long ID = 500;
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

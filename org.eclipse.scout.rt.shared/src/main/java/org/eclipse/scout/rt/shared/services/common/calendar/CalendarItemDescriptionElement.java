@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -16,6 +17,7 @@ import org.eclipse.scout.rt.platform.Bean;
 
 @Bean
 public class CalendarItemDescriptionElement implements ICalendarItemDescriptionElement, Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private String m_text;

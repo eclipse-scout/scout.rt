@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet.cache;
 
+import java.io.Serial;
 import java.util.Map;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +25,7 @@ import org.eclipse.scout.rt.platform.util.DownloadResponseHelper;
  * @see DownloadResponseHelper
  */
 public class DownloadHttpResponseInterceptor implements IHttpResponseInterceptor {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final Map<String, String> m_downloadHeaders;

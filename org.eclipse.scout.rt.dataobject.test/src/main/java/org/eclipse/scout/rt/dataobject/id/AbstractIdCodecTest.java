@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.dataobject.id;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashSet;
@@ -876,6 +877,7 @@ public abstract class AbstractIdCodecTest {
 
   @IdTypeName("scout.FixtureCompositeWithNullStringValuesId")
   protected static final class FixtureCompositeWithNullStringValuesId extends AbstractCompositeId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private FixtureCompositeWithNullStringValuesId(FixtureStringId c1, FixtureStringId c2) {
@@ -900,6 +902,7 @@ public abstract class AbstractIdCodecTest {
 
   @IdTypeName("scout.FixtureCompositeWithNullValuesId")
   protected static final class FixtureCompositeWithNullValuesId extends AbstractCompositeId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private FixtureCompositeWithNullValuesId(FixtureStringId c1, FixtureUuId c2) {
@@ -924,6 +927,7 @@ public abstract class AbstractIdCodecTest {
 
   @IdTypeName("scout.FixtureCompositeWithAllTypesId")
   protected static final class FixtureCompositeWithAllTypesId extends AbstractCompositeId {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private FixtureCompositeWithAllTypesId(FixtureStringId c1, FixtureUuId c2, FixtureLongId c3, FixtureIntegerId c4, FixtureDateId c5, FixtureLocaleId c6, FixtureBooleanId c7) {
@@ -948,6 +952,7 @@ public abstract class AbstractIdCodecTest {
 
   @IdTypeName("scout.FixtureLocaleId")
   protected static final class FixtureLocaleId extends AbstractRootId<Locale> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private FixtureLocaleId(Locale id) {
@@ -1003,6 +1008,7 @@ public abstract class AbstractIdCodecTest {
 
   @IdTypeName("scout.FixtureCustomComparableRawDataId")
   protected static final class FixtureCustomComparableRawDataId extends AbstractRootId<CustomComparableRawDataType> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private FixtureCustomComparableRawDataId(CustomComparableRawDataType id) {

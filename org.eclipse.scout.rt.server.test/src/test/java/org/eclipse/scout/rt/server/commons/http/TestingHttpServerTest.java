@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.server.commons.http;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 import org.junit.Test;
 
@@ -35,6 +37,7 @@ public class TestingHttpServerTest {
    * http://172.0.0.1:33xyz/test
    */
   public static class Servlet extends AbstractHttpServlet {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 }

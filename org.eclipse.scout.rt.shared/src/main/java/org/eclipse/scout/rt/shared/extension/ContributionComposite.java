@@ -9,8 +9,11 @@
  */
 package org.eclipse.scout.rt.shared.extension;
 
+import java.io.Serial;
+
 public final class ContributionComposite extends AbstractContributionComposite {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public ContributionComposite(Object o) {

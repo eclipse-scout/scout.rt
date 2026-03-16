@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.dataformat.ical.model;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,6 +21,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 public class Property implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final String m_name;

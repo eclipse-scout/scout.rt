@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.function.Supplier;
@@ -35,6 +36,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
  */
 public class DoCollectionDeserializer<COLLECTION_NODE extends IDoCollection<?, ?>> extends StdDeserializer<COLLECTION_NODE> {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final JavaType m_collectionType;

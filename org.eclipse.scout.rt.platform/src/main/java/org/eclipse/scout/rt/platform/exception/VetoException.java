@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.exception;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.slf4j.Logger;
 import org.slf4j.helpers.MessageFormatter;
@@ -19,6 +21,7 @@ import org.slf4j.helpers.MessageFormatter;
  */
 public class VetoException extends ProcessingException {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**

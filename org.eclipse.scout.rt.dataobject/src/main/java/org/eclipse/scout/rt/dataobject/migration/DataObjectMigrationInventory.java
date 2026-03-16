@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.dataobject.migration;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -653,6 +654,7 @@ public class DataObjectMigrationInventory {
    */
   protected static class ByNamespaceVersionComparator implements Comparator<NamespaceVersion>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final Map<NamespaceVersion, Integer> m_ordering;

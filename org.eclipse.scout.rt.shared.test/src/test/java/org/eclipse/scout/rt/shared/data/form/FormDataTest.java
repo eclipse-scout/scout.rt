@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.shared.data.form;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -36,6 +38,7 @@ public class FormDataTest {
   }
 
   public abstract static class AbstractTestBoxData extends AbstractFormFieldData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public AbstractTestBoxData() {
@@ -46,6 +49,7 @@ public class FormDataTest {
     }
 
     public class TestProperty extends AbstractPropertyData<Long> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public TestProperty() {
@@ -54,6 +58,7 @@ public class FormDataTest {
   }
 
   public static class TestFormData extends AbstractFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public TestFormData() {
@@ -68,6 +73,7 @@ public class FormDataTest {
     }
 
     final class NonPublicBoxData extends AbstractTestBoxData {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public NonPublicBoxData() {
@@ -75,6 +81,7 @@ public class FormDataTest {
     }
 
     public class PublicBoxData extends AbstractTestBoxData {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public PublicBoxData() {

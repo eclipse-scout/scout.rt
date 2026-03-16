@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.services.common.notifications;
 
 import static org.mockito.Mockito.mock;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
@@ -127,6 +128,7 @@ public class NotificationDispatcherTest {
 
   private static final class Notification01 implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 
@@ -136,6 +138,7 @@ public class NotificationDispatcherTest {
 
   private static final class Notification02 implements INotificationGroup {
 
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 }

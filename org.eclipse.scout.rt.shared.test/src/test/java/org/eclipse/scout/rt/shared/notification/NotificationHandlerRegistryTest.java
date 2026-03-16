@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.notification;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -91,6 +92,7 @@ public class NotificationHandlerRegistryTest {
 
   private static final class Notification01 implements INotificationGroup {
 
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 }

@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.chart.shared.data.basic.chart;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StreamUtility;
 
 public class NTupleChartValueGroupBean extends AbstractChartValueGroupBean implements INTupleChartValueGroupBean {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final List<Map<String, BigDecimal>> m_values = new ArrayList<>();

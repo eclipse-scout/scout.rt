@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.shared.data.model.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
@@ -17,6 +19,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 public abstract class AbstractCompanyEntity extends AbstractDataModelEntity {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Override
@@ -38,6 +41,7 @@ public abstract class AbstractCompanyEntity extends AbstractDataModelEntity {
 
   @Order(10)
   public class NameAttribute extends AbstractDataModelAttribute {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -53,6 +57,7 @@ public abstract class AbstractCompanyEntity extends AbstractDataModelEntity {
 
   @Order(10)
   public class PrimaryAddressEntity extends AbstractAddressEntity {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -68,6 +73,7 @@ public abstract class AbstractCompanyEntity extends AbstractDataModelEntity {
 
   @Order(10)
   public class LegalAddressEntity extends AbstractAddressEntity {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -83,6 +89,7 @@ public abstract class AbstractCompanyEntity extends AbstractDataModelEntity {
 
   @Order(10)
   public class AccountManagerEntity extends AbstractPersonEntity {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -98,6 +105,7 @@ public abstract class AbstractCompanyEntity extends AbstractDataModelEntity {
 
   @Order(20)
   public class EmployeeEntity extends AbstractPersonEntity {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

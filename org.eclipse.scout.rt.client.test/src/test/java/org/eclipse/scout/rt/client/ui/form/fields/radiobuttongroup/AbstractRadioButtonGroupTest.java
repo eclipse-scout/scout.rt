@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.beans.PropertyChangeListener;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -357,6 +358,7 @@ public class AbstractRadioButtonGroupTest {
 
   public static class P_CompanyLookupCall extends LocalLookupCall<Long> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

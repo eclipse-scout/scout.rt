@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.client.servicetunnel;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
 
 /**
@@ -17,6 +19,7 @@ import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
  */
 public class HttpServiceTunnelException extends RemoteSystemUnavailableException {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**

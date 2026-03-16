@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
+import java.io.Serial;
 import java.security.BasicPermission;
 import java.security.Permission;
 import java.security.Permissions;
@@ -85,6 +86,7 @@ public class LenientPermissionWrapperTest {
   }
 
   public static class A extends BasicPermission {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public A() {
@@ -93,6 +95,7 @@ public class LenientPermissionWrapperTest {
   }
 
   public static class B_YYY extends BasicPermission {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public B_YYY() {
@@ -101,6 +104,7 @@ public class LenientPermissionWrapperTest {
   }
 
   public static class C extends BasicPermission {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public C() {

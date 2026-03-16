@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.dataobject;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.junit.Test;
@@ -28,6 +30,7 @@ public class DoEntityHolderTest {
   }
 
   static class P_FixtureDoEntityHolder extends DoEntityHolder<EntityFixtureDo> {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 

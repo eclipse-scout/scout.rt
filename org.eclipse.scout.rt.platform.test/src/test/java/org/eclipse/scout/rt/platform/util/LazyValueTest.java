@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.platform.util;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -103,6 +104,7 @@ public class LazyValueTest {
   }
 
   private class P_MyRuntimException extends RuntimeException {
+    @Serial
     private static final long serialVersionUID = 1L;
   }
 

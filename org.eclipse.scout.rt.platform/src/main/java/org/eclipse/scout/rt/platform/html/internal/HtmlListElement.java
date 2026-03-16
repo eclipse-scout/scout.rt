@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.html.internal;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.html.IHtmlListElement;
 
 /**
@@ -16,6 +18,7 @@ import org.eclipse.scout.rt.platform.html.IHtmlListElement;
  */
 public class HtmlListElement extends HtmlNodeBuilder implements IHtmlListElement {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public HtmlListElement(CharSequence text) {

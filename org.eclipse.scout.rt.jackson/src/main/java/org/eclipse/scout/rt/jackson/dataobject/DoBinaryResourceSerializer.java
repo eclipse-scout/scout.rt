@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 public class DoBinaryResourceSerializer extends StdSerializer<BinaryResource> {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected DoBinaryResourceSerializer() {

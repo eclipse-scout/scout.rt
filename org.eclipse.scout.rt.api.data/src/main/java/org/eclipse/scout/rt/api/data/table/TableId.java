@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.api.data.table;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -20,6 +22,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  */
 @IdTypeName("scout.TableId")
 public final class TableId extends AbstractStringId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private TableId(String id) {

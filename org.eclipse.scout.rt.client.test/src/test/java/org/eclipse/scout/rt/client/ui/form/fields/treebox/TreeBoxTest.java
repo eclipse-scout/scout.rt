@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.treebox;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -367,6 +368,7 @@ public class TreeBoxTest {
 
   public static class TreeBoxLookupCall extends LocalLookupCall<Long> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

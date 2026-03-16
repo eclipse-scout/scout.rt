@@ -9,10 +9,12 @@
  */
 package org.eclipse.scout.rt.shared.data.basic;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.StringTokenizer;
 
 public class FontSpec implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
   public static final int STYLE_PLAIN = 0x00;
   public static final int STYLE_BOLD = 0x01;

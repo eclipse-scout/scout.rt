@@ -9,11 +9,13 @@
  */
 package org.eclipse.scout.rt.api.uinotification;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 import org.eclipse.scout.rt.api.data.uinotification.UiNotificationDo;
 
 public class UiNotificationAddedEvent extends EventObject {
+  @Serial
   private static final long serialVersionUID = 1L;
   private UiNotificationDo m_notification;
 

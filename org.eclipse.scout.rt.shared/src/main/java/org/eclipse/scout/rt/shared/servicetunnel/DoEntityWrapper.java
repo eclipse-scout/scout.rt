@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 
 import static org.eclipse.scout.rt.shared.servicetunnel.DataObjectWrapperUtility.mapper;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.dataobject.IDoEntity;
@@ -24,6 +25,7 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
  */
 // Package-private because shouldn't be used except by ServiceTunnelObjectReplacer.
 class DoEntityWrapper implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   // Not using transient IDoEntity along with writeObject/readObject like DoEntityHolder, because the string is read exactly once after deserialization.

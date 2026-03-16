@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.shared.services.lookup;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -24,6 +26,7 @@ import org.slf4j.LoggerFactory;
  *     type of the lookup key
  */
 public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookupRow<ID_TYPE> {
+  @Serial
   private static final long serialVersionUID = 0L;
   private static final Logger LOG = LoggerFactory.getLogger(LookupRow.class);
 

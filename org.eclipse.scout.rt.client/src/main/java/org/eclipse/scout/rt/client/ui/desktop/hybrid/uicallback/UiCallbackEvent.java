@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.desktop.hybrid.uicallback;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
  */
 public class UiCallbackEvent extends EventObject {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final String m_callbackId;

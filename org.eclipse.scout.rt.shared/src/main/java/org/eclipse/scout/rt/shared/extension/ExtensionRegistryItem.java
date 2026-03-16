@@ -9,12 +9,15 @@
  */
 package org.eclipse.scout.rt.shared.extension;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
 
 public class ExtensionRegistryItem extends AbstractExtensionRegistryItem {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final ClassIdentifier m_ownerClass;

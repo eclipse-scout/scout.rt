@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  */
 @ClassId("5692346e-a059-45ff-a287-781319c00d6a")
 public class DataModelOperatorLookupCall extends LocalLookupCall<IDataModelAttributeOp> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private IDataModelAttribute m_attribute;

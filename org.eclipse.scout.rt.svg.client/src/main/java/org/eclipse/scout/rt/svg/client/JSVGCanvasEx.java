@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.svg.client;
 
 import java.awt.*;
+import java.io.Serial;
 
 import org.apache.batik.css.engine.CSSEngine;
 import org.apache.batik.swing.JSVGCanvas;
@@ -26,6 +27,7 @@ import org.w3c.dom.events.MouseEvent;
  */
 public class JSVGCanvasEx extends JSVGCanvas {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public JSVGCanvasEx(SVGUserAgent ua, boolean eventsEnabled, boolean selectableText) {

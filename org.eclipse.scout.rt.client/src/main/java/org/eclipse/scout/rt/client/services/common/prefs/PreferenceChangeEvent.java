@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.services.common.prefs;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 /**
@@ -20,6 +21,7 @@ import java.util.EventObject;
  */
 public class PreferenceChangeEvent extends EventObject {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final int m_kind;

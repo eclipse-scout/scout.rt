@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -144,6 +145,7 @@ public class AbstractRestLookupSmartColumnTest {
 
   @IgnoreBean
   static class P_FixtureUuIdLookupCall extends AbstractRestLookupCall<FixtureUuIdLookupRestrictionDo, FixtureUuId> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

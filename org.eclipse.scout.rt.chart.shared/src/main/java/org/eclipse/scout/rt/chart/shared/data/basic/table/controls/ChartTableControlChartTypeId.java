@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.chart.shared.data.basic.table.controls;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.chart.shared.data.basic.chart.IChartType;
 import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
@@ -19,6 +21,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  */
 @IdTypeName("scout.ChartTableControlChartTypeId")
 public final class ChartTableControlChartTypeId extends AbstractStringId {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private ChartTableControlChartTypeId(String id) {

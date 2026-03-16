@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import java.io.Serial;
 import java.util.Locale;
 
 import com.fasterxml.jackson.databind.deser.std.StdKeyDeserializer;
@@ -18,6 +19,7 @@ import com.fasterxml.jackson.databind.deser.std.StdKeyDeserializer;
  * the root locale correctly. TODO [23.0] pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600)
  */
 public class LocaleMapKeyDeserializer extends StdKeyDeserializer {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected LocaleMapKeyDeserializer() {

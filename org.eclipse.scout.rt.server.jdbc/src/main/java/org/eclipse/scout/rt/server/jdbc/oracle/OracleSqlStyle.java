@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.server.jdbc.oracle;
 
 import java.io.ByteArrayInputStream;
+import java.io.Serial;
 import java.io.StringReader;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -23,6 +24,7 @@ import org.eclipse.scout.rt.server.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.jdbc.style.AbstractSqlStyle;
 
 public class OracleSqlStyle extends AbstractSqlStyle {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Override

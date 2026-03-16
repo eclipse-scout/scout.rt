@@ -9,10 +9,13 @@
  */
 package org.eclipse.scout.rt.platform.exception;
 
+import java.io.Serial;
+
 /**
  * This exception is used for initialization errors.
  */
 public class InitializationException extends RuntimeException {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**

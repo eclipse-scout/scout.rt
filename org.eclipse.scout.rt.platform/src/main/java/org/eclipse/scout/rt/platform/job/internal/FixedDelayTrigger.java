@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.job.internal;
 
+import java.io.Serial;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -28,6 +29,7 @@ import org.quartz.impl.triggers.AbstractTrigger;
 @SuppressWarnings("squid:S2160")
 public class FixedDelayTrigger extends AbstractTrigger<IFixedDelayTrigger> implements IFixedDelayTrigger {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final Date TIME_IN_FUTURE = new Date(Long.MAX_VALUE);

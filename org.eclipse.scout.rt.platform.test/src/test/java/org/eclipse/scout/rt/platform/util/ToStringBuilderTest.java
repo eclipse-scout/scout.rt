@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.platform.util;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -163,6 +164,7 @@ public class ToStringBuilderTest {
   @Test
   public void testAnonymousClass2() {
     ToStringBuilder builder = new ToStringBuilder(new Serializable() {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override

@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Locale;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -25,6 +26,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
  * @see <a href="https://github.com/FasterXML/jackson-databind/issues/1600">Issue</a>
  */
 public class DoLocaleSerializer extends ToStringSerializer {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public DoLocaleSerializer() {

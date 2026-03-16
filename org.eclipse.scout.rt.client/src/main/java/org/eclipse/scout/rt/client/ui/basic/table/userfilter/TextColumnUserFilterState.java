@@ -9,9 +9,12 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
 public class TextColumnUserFilterState extends ColumnUserFilterState {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private String m_freeText;

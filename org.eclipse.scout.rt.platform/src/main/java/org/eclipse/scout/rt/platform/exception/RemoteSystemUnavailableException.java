@@ -9,10 +9,13 @@
  */
 package org.eclipse.scout.rt.platform.exception;
 
+import java.io.Serial;
+
 /**
  * Exception thrown in case of any error during communication with a remote part of the system.
  */
 public class RemoteSystemUnavailableException extends PlatformException {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public RemoteSystemUnavailableException(String message, Object... args) {

@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.lookup;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeVisitor;
 @IgnoreBean
 @ClassId("bf3702b8-ee95-4c7b-870d-105b9d0deec2")
 public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> {
+  @Serial
   private static final long serialVersionUID = 0L;
 
   /**

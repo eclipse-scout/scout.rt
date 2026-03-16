@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.cache;
 
+import java.io.Serial;
+
 /**
  * Special filter that accepts all entries
  * <p>
@@ -17,6 +19,7 @@ package org.eclipse.scout.rt.platform.cache;
  * @since 5.2
  */
 public final class AllCacheEntryFilter<K, V> implements ICacheEntryFilter<K, V> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Override

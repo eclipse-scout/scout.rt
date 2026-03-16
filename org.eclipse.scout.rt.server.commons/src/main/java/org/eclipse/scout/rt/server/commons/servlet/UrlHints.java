@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,6 +48,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 @SuppressWarnings("deprecation")
 @Bean
 public class UrlHints implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final LazyValue<UrlHintsHelper> URL_HINTS_HELPER = new LazyValue<>(UrlHintsHelper.class);

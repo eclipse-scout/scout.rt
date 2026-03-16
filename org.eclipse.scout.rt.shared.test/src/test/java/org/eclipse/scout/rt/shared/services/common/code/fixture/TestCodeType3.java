@@ -9,9 +9,12 @@
  */
 package org.eclipse.scout.rt.shared.services.common.code.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 
 public class TestCodeType3 extends AbstractCodeType<Long, String> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static final Long ID = Long.valueOf(30);

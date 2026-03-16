@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.shared.data.model.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModel;
 
@@ -16,6 +18,7 @@ import org.eclipse.scout.rt.shared.data.model.AbstractDataModel;
  * https://bugs.eclipse.org/bugs/show_bug.cgi?id=373922
  */
 public class CustomDataModel extends AbstractDataModel {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public CustomDataModel() {
@@ -23,6 +26,7 @@ public class CustomDataModel extends AbstractDataModel {
 
   @Order(10)
   public class CompanyEntity extends AbstractCompanyEntity {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -33,6 +37,7 @@ public class CustomDataModel extends AbstractDataModel {
 
   @Order(20)
   public class PersonEntity extends AbstractPersonEntity {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -43,6 +48,7 @@ public class CustomDataModel extends AbstractDataModel {
 
   @Order(130)
   public class InternalPersonEntity extends AbstractInternalPersonEntity {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

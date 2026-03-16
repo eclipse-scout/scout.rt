@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.shared.data.form;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -128,6 +130,7 @@ public class FormDataInjectionTest {
   }
 
   public static class BaseFormData extends AbstractFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public BaseFormData() {
@@ -142,6 +145,7 @@ public class FormDataInjectionTest {
     }
 
     public static class Name extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public Name() {
@@ -149,6 +153,7 @@ public class FormDataInjectionTest {
     }
 
     public static class Second extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public Second() {
@@ -157,6 +162,7 @@ public class FormDataInjectionTest {
   }
 
   public static class ExtendedFormData extends BaseFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ExtendedFormData() {
@@ -171,6 +177,7 @@ public class FormDataInjectionTest {
     }
 
     public static class Salary extends AbstractValueFieldData<Double> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public Salary() {
@@ -178,6 +185,7 @@ public class FormDataInjectionTest {
     }
 
     public static class Age extends AbstractValueFieldData<Integer> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public Age() {
@@ -187,6 +195,7 @@ public class FormDataInjectionTest {
   }
 
   public static class ExtendedInjectedFieldFormData extends ExtendedFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ExtendedInjectedFieldFormData() {
@@ -197,6 +206,7 @@ public class FormDataInjectionTest {
     }
 
     public static class FirstName extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public FirstName() {
@@ -206,6 +216,7 @@ public class FormDataInjectionTest {
   }
 
   public static class ReplaceFieldFormData extends BaseFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ReplaceFieldFormData() {
@@ -217,6 +228,7 @@ public class FormDataInjectionTest {
 
     @Replace
     public static class NameEx extends BaseFormData.Name {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public NameEx() {
@@ -225,6 +237,7 @@ public class FormDataInjectionTest {
   }
 
   public static class Replace2FieldFormData extends ReplaceFieldFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Replace2FieldFormData() {
@@ -240,6 +253,7 @@ public class FormDataInjectionTest {
 
     @Replace
     public static class NameEx2 extends NameEx {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public NameEx2() {
@@ -247,6 +261,7 @@ public class FormDataInjectionTest {
     }
 
     public static class Injected extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public Injected() {
@@ -255,6 +270,7 @@ public class FormDataInjectionTest {
   }
 
   public static class Replace3FieldFormData extends Replace2FieldFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Replace3FieldFormData() {
@@ -270,6 +286,7 @@ public class FormDataInjectionTest {
 
     @Replace
     public static class NameEx3 extends NameEx2 {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public NameEx3() {
@@ -278,6 +295,7 @@ public class FormDataInjectionTest {
 
     @Replace
     public static class InjectedEx extends Replace2FieldFormData.Injected {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public InjectedEx() {
@@ -287,6 +305,7 @@ public class FormDataInjectionTest {
   }
 
   public static class TemplateFormData extends AbstractFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public TemplateFormData() {
@@ -297,11 +316,13 @@ public class FormDataInjectionTest {
     }
 
     public static class Box extends AbstractBoxData {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
   }
 
   public static class AbstractBoxData extends AbstractFormFieldData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Name getName() {
@@ -309,11 +330,13 @@ public class FormDataInjectionTest {
     }
 
     public static class Name extends AbstractValueFieldData<String> {
+      @Serial
       private static final long serialVersionUID = 1L;
     }
   }
 
   public static class TemplateExFormData extends TemplateFormData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public TemplateExFormData() {
@@ -325,6 +348,7 @@ public class FormDataInjectionTest {
 
     @Replace
     public static class BoxEx extends Box {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       public NameEx getNameEx() {
@@ -333,6 +357,7 @@ public class FormDataInjectionTest {
 
       @Replace
       public static class NameEx extends AbstractBoxData.Name {
+        @Serial
         private static final long serialVersionUID = 1L;
       }
     }

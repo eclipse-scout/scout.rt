@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.chart.shared.data.basic.chart;
 
+import java.io.Serial;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import org.eclipse.scout.rt.platform.annotations.IgnoreProperty;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public abstract class AbstractChartValueGroupBean implements IChartValueGroupBean {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private String m_type;

@@ -9,9 +9,11 @@
  */
 package org.eclipse.scout.rt.security.fixture;
 
+import java.io.Serial;
 import java.security.Permission;
 
 public class JFixturePermission extends Permission {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public JFixturePermission() {

@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.html.internal;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.platform.html.IHtmlInput;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -17,6 +19,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  */
 public class HtmlInputBuilder extends EmptyHtmlNodeBuilder implements IHtmlInput {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public HtmlInputBuilder() {

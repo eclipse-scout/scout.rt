@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.session;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import org.eclipse.scout.rt.platform.Bean;
 
 @Bean
 public class LoadInitialSharedVariablesResponse implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private Map<String, Object> m_variables;

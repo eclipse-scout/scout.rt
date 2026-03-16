@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import static org.junit.Assert.*;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.platform.Order;
@@ -121,6 +123,7 @@ public class TableImportTest {
   }
 
   private static class P_TableBean extends AbstractTableFieldBeanData {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public P_TableBean() {
@@ -162,6 +165,7 @@ public class TableImportTest {
     }
 
     public static class TableBeanRowData extends AbstractTableRowData {
+      @Serial
       private static final long serialVersionUID = 1L;
       private String m_default;
 

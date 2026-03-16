@@ -11,11 +11,13 @@ package org.eclipse.scout.rt.shared.data.form.fields;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 public abstract class AbstractValueFieldData<T> extends AbstractFormFieldData implements IHolder<T> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private T m_value;
@@ -45,6 +47,7 @@ public abstract class AbstractValueFieldData<T> extends AbstractFormFieldData im
   /**
    * readObject is implemented to validate potential security attacks that invalidated the value type
    */
+  @Serial
   private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
     s.defaultReadObject();
     //verify if valueSet and the type of the value are valid and consistent

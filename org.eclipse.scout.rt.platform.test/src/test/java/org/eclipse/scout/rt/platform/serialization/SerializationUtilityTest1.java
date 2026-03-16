@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.platform.serialization;
 
 import java.io.InvalidClassException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 
@@ -19,10 +20,12 @@ import org.junit.Test;
 public class SerializationUtilityTest1 {
 
   private static final class FixtureClassWithSerialVersionUID1 implements Serializable {
+    @Serial
     private static final long serialVersionUID = 0x1234567890123456L;
   }
 
   private static final class FixtureClassWithSerialVersionUID2 implements Serializable {
+    @Serial
     private static final long serialVersionUID = 0x1234567890123456L;
   }
 

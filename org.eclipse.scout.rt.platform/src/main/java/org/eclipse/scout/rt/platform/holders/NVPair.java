@@ -9,12 +9,14 @@
  */
 package org.eclipse.scout.rt.platform.holders;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * Name/Value pair used in sql bind base list for named binds
  */
 public class NVPair implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final String m_name;

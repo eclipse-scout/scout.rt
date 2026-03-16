@@ -9,9 +9,12 @@
  */
 package org.eclipse.scout.rt.security.fixture;
 
+import java.io.Serial;
+
 import org.eclipse.scout.rt.api.data.security.PermissionId;
 
 public class UFixturePermission extends AbstractFixturePermission {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public UFixturePermission() {

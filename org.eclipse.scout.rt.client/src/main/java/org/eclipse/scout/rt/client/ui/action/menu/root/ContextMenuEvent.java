@@ -9,11 +9,13 @@
  */
 package org.eclipse.scout.rt.client.ui.action.menu.root;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 
 public class ContextMenuEvent extends EventObject implements IModelEvent {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static final int TYPE_STRUCTURE_CHANGED = 1;

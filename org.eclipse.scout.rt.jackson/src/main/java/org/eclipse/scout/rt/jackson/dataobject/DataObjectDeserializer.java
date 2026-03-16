@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.dataobject.BigDecimalDataObjectValue;
@@ -31,6 +32,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
  * {@link DoCollectionDeserializer} according to content.
  */
 public class DataObjectDeserializer extends StdDeserializer<IDataObject> {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public DataObjectDeserializer(Class<?> type) {
