@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.dataobject.id.ICompositeId;
 import org.eclipse.scout.rt.dataobject.id.IId;
@@ -38,7 +37,7 @@ public class CompositeIdDataObjectVisitorExtension extends AbstractDataObjectVis
     List<IId> replacedComponents = value.unwrap().stream()
         .map(chain)
         .map(IId.class::cast)
-        .collect(Collectors.toList());
+        .toList();
 
     if (replacedComponents.equals(value.unwrap())) {
       return value;

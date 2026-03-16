@@ -25,7 +25,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.client.extension.ui.tile.ITileAccordionExtension;
@@ -281,7 +280,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     // Make sure that the all groups have the properties set as defined by the requiredGroups
     // Note: since we re-use existing groups we might throw away some groups returned by createGroups
     // Order of current groups is important here to make sure templates are applied to the correct groups
-    currentGroups = getGroupsInternal().stream().filter(g -> m_staticGroups.contains(g)).collect(Collectors.toList());
+    currentGroups = getGroupsInternal().stream().filter(g -> m_staticGroups.contains(g)).toList();
     for (int i = 0; i < requiredSize; i++) {
       IGroup group = currentGroups.get(i);
       GroupTemplate groupTemplate = requiredGroups.get(i);

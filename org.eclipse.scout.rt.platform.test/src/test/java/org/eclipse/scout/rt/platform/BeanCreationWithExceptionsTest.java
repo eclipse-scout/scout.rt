@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,7 +14,6 @@ import static org.junit.Assert.*;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import jakarta.annotation.PostConstruct;
@@ -299,7 +298,7 @@ public class BeanCreationWithExceptionsTest {
     // the exception w/o a cause is currently not further verified
     List<BeanCreationException> exceptionsWithCause = Stream.of(firstException, secondException)
         .filter(e -> e.getCause() != null)
-        .collect(Collectors.toList());
+        .toList();
     if (exceptionsWithCause.isEmpty()) {
       LOG.info("First exception", firstException);
       LOG.info("Second exception", secondException);

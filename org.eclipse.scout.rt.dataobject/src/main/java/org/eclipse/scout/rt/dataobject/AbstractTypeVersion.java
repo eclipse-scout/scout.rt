@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
@@ -94,6 +93,6 @@ public abstract class AbstractTypeVersion implements ITypeVersion {
   }
 
   static List<NamespaceVersion> resolveDependencies(Collection<Class<? extends ITypeVersion>> dependencyClasses) {
-    return dependencyClasses.stream().map(dependencyClass -> BEANS.get(dependencyClass).getVersion()).collect(Collectors.toUnmodifiableList());
+    return dependencyClasses.stream().map(dependencyClass -> BEANS.get(dependencyClass).getVersion()).toList();
   }
 }

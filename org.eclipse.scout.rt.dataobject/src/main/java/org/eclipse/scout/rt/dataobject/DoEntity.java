@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,7 +21,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -184,7 +183,7 @@ public class DoEntity implements IDoEntity {
     return getAllContributions().stream()
         .filter(IDoEntityContribution.class::isInstance)
         .map(IDoEntityContribution.class::cast)
-        .collect(Collectors.toUnmodifiableList());
+        .toList();
   }
 
   @Override

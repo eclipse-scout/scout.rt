@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,7 +26,7 @@ public class NaturalCollatorProviderConcurrencyTest {
   public void testParallel() {
     List<IFuture<Void>> futures = IntStream.range(0, 10)
         .mapToObj(i -> Jobs.schedule(NaturalCollatorProviderConcurrencyTest::run, Jobs.newInput().withName("Job " + i)))
-        .collect(Collectors.toList());
+        .toList();
     futures.forEach(IFuture::awaitDone);
   }
 

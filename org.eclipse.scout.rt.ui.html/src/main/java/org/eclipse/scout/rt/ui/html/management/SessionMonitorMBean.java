@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -140,7 +140,6 @@ public class SessionMonitorMBean implements ISessionMonitorMBean {
     //add client sessions that are not referenced by any uiSession
     clients
         .values()
-        .stream()
         .forEach(clientSession -> clientToUis.computeIfAbsent(clientSession.getId(), clientSessionId -> Collections.singletonList(null)));
 
     ArrayList<SessionDetail> list = new ArrayList<>();
