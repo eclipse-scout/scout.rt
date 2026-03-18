@@ -326,6 +326,16 @@
     } ],
     "typeName" : "scout.TextColumnUserFilterState",
     "typeVersion" : "scout-25.2.001"
+  }, {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "list" : true,
+      "name" : "tablePreferences",
+      "valueType" : "DO[scout.TableClientUiPreferences]"
+    } ],
+    "typeName" : "scout.UiPreferences",
+    "typeVersion" : "scout-25.2.002"
   } ],
   "enums" : [ ]
 }
