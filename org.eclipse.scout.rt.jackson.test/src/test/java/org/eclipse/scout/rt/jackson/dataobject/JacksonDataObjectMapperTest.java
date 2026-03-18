@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -245,11 +245,13 @@ public class JacksonDataObjectMapperTest {
    */
   @Test
   public void testStreamReadConstraints_maxDocumentLength() {
-    // Jackson does not check document length for very short input streams
-    assertEquals("12345", runTestStreamReadConstraints(b -> b.maxDocumentLength(3), "{\"attribute\" : \"12345\"}").get("attribute"));
+    String shortJson = "{\"attribute\" : \"12345\"}";
+    assertThrows(PlatformException.class, () -> runTestStreamReadConstraints(b -> b.maxDocumentLength(shortJson.length() - 10), shortJson).get("attribute"));
+    assertEquals("12345", runTestStreamReadConstraints(b -> b.maxDocumentLength(shortJson.length()), shortJson).get("attribute"));
 
-    // Jackson checks document length correctly only for longer input streams
-    assertThrows(PlatformException.class, () -> runTestStreamReadConstraints(b -> b.maxDocumentLength(3), "{\"attribute\" : \"" + m_longStringValue + "\"}"));
+    String longJson = "{\"attribute\" : \"" + m_longStringValue + "\"}";
+    assertThrows(PlatformException.class, () -> runTestStreamReadConstraints(b -> b.maxDocumentLength(3), longJson));
+    assertEquals(m_longStringValue, runTestStreamReadConstraints(b -> b.maxDocumentLength(m_longStringValue.length()), longJson).get("attribute"));
   }
 
   /**
