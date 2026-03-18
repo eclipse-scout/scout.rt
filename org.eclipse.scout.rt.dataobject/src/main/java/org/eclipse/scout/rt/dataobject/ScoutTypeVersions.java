@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -60,6 +60,9 @@ public class ScoutTypeVersions {
    * providing a suffix.
    */
   public static final class Scout_25_2_001 extends AbstractTypeVersion {
+  }
+
+  public static final class Scout_25_2_002__uiPreferences extends AbstractTypeVersion {
   }
 
   //   ___   __  __
