@@ -47,6 +47,7 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.GracefulHandler;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.util.Callback;
+import org.eclipse.jetty.util.Uptime;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationAutoCreateSelfSignedCertificateProperty;
@@ -122,12 +123,13 @@ public class Application {
     LOG.info("Starting platform");
     IPlatform platform = Platform.get();
     platform.awaitPlatformStarted();
-    LOG.info("Platform start took {} ms", StringUtility.formatNanos(System.nanoTime() - t0));
+    long t1 = System.nanoTime();
+    LOG.info("Platform start took {} ms", StringUtility.formatNanos(t1 - t0));
 
     LOG.info("Starting application");
-    long t1 = System.nanoTime();
+    long t2 = System.nanoTime();
     INSTANCE.get().start();
-    LOG.info("Application start took {} ms, total startup (platform/application) took {} ms", StringUtility.formatNanos(System.nanoTime() - t1), StringUtility.formatNanos(System.nanoTime() - t0));
+    LOG.info("Total startup took {} ms, platform startup took {} ms, application startup took {} ms", INSTANCE.get().getUptime(), StringUtility.formatNanos(t1 - t0), StringUtility.formatNanos(System.nanoTime() - t2));
   }
 
   protected void start() {
@@ -564,6 +566,13 @@ public class Application {
     else {
       LOG.debug("Shutdown already in progress");
     }
+  }
+
+  /**
+   * @return Uptime milliseconds since start of {@link Application}.
+   */
+  public long getUptime() {
+    return Uptime.getUptime();
   }
 
   /**
