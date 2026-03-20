@@ -123,13 +123,10 @@ public class Application {
     LOG.info("Starting platform");
     IPlatform platform = Platform.get();
     platform.awaitPlatformStarted();
+    LOG.info("Platform started, starting application");
     long t1 = System.nanoTime();
-    LOG.info("Platform start took {} ms", StringUtility.formatNanos(t1 - t0));
-
-    LOG.info("Starting application");
-    long t2 = System.nanoTime();
     INSTANCE.get().start();
-    LOG.info("Total startup took {} ms, platform startup took {} ms, application startup took {} ms", INSTANCE.get().getUptime(), StringUtility.formatNanos(t1 - t0), StringUtility.formatNanos(System.nanoTime() - t2));
+    LOG.info("Total startup took {} ms, platform startup took {} ms, application startup took {} ms", INSTANCE.get().getUptime(), StringUtility.formatNanos(t1 - t0), StringUtility.formatNanos(System.nanoTime() - t1));
   }
 
   protected void start() {
