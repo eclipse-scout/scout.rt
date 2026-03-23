@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -48,6 +48,8 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
   nodePaddingLevelHierarchyRow: number;
   detailMenuBarVisible: boolean;
   selectedViewTabs: Map<DisplayViewId, Form>;
+  /** Keystroke context with the scope desktop so these keystrokes can be used from anywhere not only if the outline is focused */
+  outlineKeyStrokeContext: OutlineKeyStrokeContext;
 
   views: Form[];
   dialogs: Form[];
@@ -102,6 +104,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.messageBoxes = [];
     this.fileChoosers = [];
     this.selectedViewTabs = new Map();
+    this.outlineKeyStrokeContext = this._createOutlineKeyStrokeContext();
     this.formController = null;
     this.messageBoxController = null;
     this.fileChooserController = null;
@@ -218,11 +221,19 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
 
   protected override _initTreeKeyStrokeContext() {
     super._initTreeKeyStrokeContext();
+    this._initOutlineKeyStrokeContext();
+  }
 
-    // Create an outline keystroke context with the scope desktop so these keystrokes can be used from anywhere not only if the outline is focused
-    let modifierBitMask = keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT; // NOSONAR
-    let outlineKeyStrokeContext = new OutlineKeyStrokeContext(this);
-    outlineKeyStrokeContext.registerKeyStrokes([
+  protected _createOutlineKeyStrokeContext(): OutlineKeyStrokeContext {
+    return new OutlineKeyStrokeContext(this);
+  }
+
+  protected _initOutlineKeyStrokeContext() {
+    this.outlineKeyStrokeContext.$scopeTarget = () => this.$container;
+    this.outlineKeyStrokeContext.$bindTarget = () => this.session.$entryPoint;
+
+    const modifierBitMask = keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT; // NOSONAR
+    this.outlineKeyStrokeContext.registerKeyStrokes([
       new OutlineNavigateToTopKeyStroke(this, modifierBitMask),
       new TreeNavigationUpKeyStroke(this, modifierBitMask),
       new TreeNavigationDownKeyStroke(this, modifierBitMask),
@@ -232,16 +243,12 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
       new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask, keys.RIGHT, '→'),
       new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask, keys.ADD)
     ]);
-    outlineKeyStrokeContext.$scopeTarget = () => this.$container;
-    outlineKeyStrokeContext.$bindTarget = () => this.session.$entryPoint;
-    for (const keyStroke of outlineKeyStrokeContext.keyStrokes) {
+    for (const keyStroke of this.outlineKeyStrokeContext.keyStrokes) {
       if (keyStroke instanceof AbstractTreeNavigationKeyStroke) {
         // Don't focus the tree when using these keystrokes to not visualize the focused node because the selection will be moved.
         keyStroke.setFocusTree(false);
       }
     }
-    this.on('render', () => this.session.keyStrokeManager.installKeyStrokeContext(outlineKeyStrokeContext));
-    this.on('remove', () => this.session.keyStrokeManager.uninstallKeyStrokeContext(outlineKeyStrokeContext));
 
     // Remove the keystrokes which are replaced by outline specific ones
     this.keyStrokeContext.unregisterKeyStroke(this.keyStrokeContext.keyStrokes.find(keystroke => keystroke instanceof TreeCollapseAllKeyStroke || keystroke instanceof TreeSelectKeyStroke));
@@ -250,6 +257,8 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
 
   protected override _render() {
     super._render();
+
+    this.session.keyStrokeManager.installKeyStrokeContext(this.outlineKeyStrokeContext);
 
     // Override layout
     this.htmlComp.setLayout(new OutlineLayout(this));
@@ -282,6 +291,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     super._remove();
     this._removeTitle();
     this._removeIcon();
+    this.session.keyStrokeManager.uninstallKeyStrokeContext(this.outlineKeyStrokeContext);
   }
 
   protected _renderTitle() {

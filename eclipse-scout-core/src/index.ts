@@ -1182,6 +1182,7 @@ export * from './desktop/outline/navigation/NavigateUpButton';
 export * from './desktop/outline/keystrokes/OutlineKeyStrokeContext';
 export * from './desktop/outline/keystrokes/OutlineNavigateToTopKeyStroke';
 export * from './desktop/outline/keystrokes/OutlineSelectKeyStroke';
+export * from './desktop/outline/keystrokes/OutlineReloadKeyStroke';
 export * from './desktop/outline/overview/OutlineOverview';
 export * from './desktop/outline/overview/OutlineOverviewModel';
 export * from './desktop/outline/overview/TileOutlineOverview';

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, ChildModelOf, dataObjects, ErrorHandler, EventHandler, Form, icons, objects, Outline, Page, PageModel, PageParamDo, PageResolver, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent,
-  TableRowsInsertedEvent, TreeAdapter, TreeNodeModel
+  App, ChildModelOf, dataObjects, ErrorHandler, EventHandler, Form, icons, objects, Outline, OutlineReloadKeyStroke, Page, PageModel, PageParamDo, PageResolver, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow,
+  TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter, TreeNodeModel
 } from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
@@ -174,6 +174,7 @@ export class OutlineAdapter extends TreeAdapter {
     objects.replacePrototypeFunction(Outline, 'updateDetailMenus', OutlineAdapter.updateDetailMenusRemote, true);
     objects.replacePrototypeFunction(Outline, '_initTreeNodeInternal', OutlineAdapter._initTreeNodeInternalRemote, true);
     objects.replacePrototypeFunction(Outline, '_createTreeNode', OutlineAdapter._createTreeNodeRemote, true);
+    objects.replacePrototypeFunction(Outline, '_initOutlineKeyStrokeContext', OutlineAdapter._initOutlineKeyStrokeContextRemote, true);
     objects.replacePrototypeFunction(Page, '_updateDetailFormMenus', OutlineAdapter._updateDetailFormMenus, true);
     objects.replacePrototypeFunction(Page, '_updateDetailTableMenus', OutlineAdapter._updateDetailTableMenus, true);
     objects.replacePrototypeFunction(Page, 'linkWithRow', OutlineAdapter.linkWithRow, true);
@@ -274,6 +275,13 @@ export class OutlineAdapter extends TreeAdapter {
     }
 
     return this._createTreeNodeOrig(pageModel);
+  }
+
+  protected static _initOutlineKeyStrokeContextRemote(this: Outline & { modelAdapter: OutlineAdapter; _initOutlineKeyStrokeContextOrig }) {
+    this._initOutlineKeyStrokeContextOrig();
+    if (this.modelAdapter) {
+      this.outlineKeyStrokeContext.registerKeyStroke(new OutlineReloadKeyStroke(this));
+    }
   }
 
   protected _createJsPage(pageModel: PageModel, createPage: (pageModel: PageModel) => Page): Page {
