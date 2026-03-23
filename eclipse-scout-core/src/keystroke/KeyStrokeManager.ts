@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -73,12 +73,13 @@ export class KeyStrokeManager extends EventEmitter implements KeyStrokeManagerMo
       return; // context already installed
     }
 
-    if (!keyStrokeContext.$getBindTarget()) {
+    let $bindTarget = keyStrokeContext.$getBindTarget();
+    if (!$bindTarget) {
       throw new Error('missing bind-target for KeyStrokeContext: ' + keyStrokeContext);
     }
 
     handler = this._onKeyEvent.bind(this, keyStrokeContext);
-    handler.$target = keyStrokeContext.$getBindTarget();
+    handler.$target = $bindTarget;
     handler.$target.on('keydown', handler);
     handler.$target.on('keyup', handler);
 
