@@ -14,10 +14,12 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -58,6 +60,7 @@ import org.junit.Test;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamReadConstraints.Builder;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
@@ -245,11 +248,55 @@ public class JacksonDataObjectMapperTest {
    */
   @Test
   public void testStreamReadConstraints_maxDocumentLength() {
-    // Jackson does not check document length for very short input streams
-    assertEquals("12345", runTestStreamReadConstraints(b -> b.maxDocumentLength(3), "{\"attribute\" : \"12345\"}").get("attribute"));
+    String shortJson = "{\"attribute\" : \"12345\"}";
+    assertThrows(PlatformException.class, () -> runTestStreamReadConstraints(b -> b.maxDocumentLength(shortJson.length() - 10), shortJson).get("attribute"));
+    assertEquals("12345", runTestStreamReadConstraints(b -> b.maxDocumentLength(shortJson.length()), shortJson).get("attribute"));
 
-    // Jackson checks document length correctly only for longer input streams
-    assertThrows(PlatformException.class, () -> runTestStreamReadConstraints(b -> b.maxDocumentLength(3), "{\"attribute\" : \"" + m_longStringValue + "\"}"));
+    String longJson = "{\"attribute\" : \"" + m_longStringValue + "\"}";
+    assertThrows(PlatformException.class, () -> runTestStreamReadConstraints(b -> b.maxDocumentLength(3), longJson));
+    assertEquals(m_longStringValue, runTestStreamReadConstraints(b -> b.maxDocumentLength(m_longStringValue.length()), longJson).get("attribute"));
+  }
+
+  @Test
+  public void testWriteAndReadUnicodeValue() throws IOException {
+    testWriteAndReadValueImpl(Map.of("x", "😃"), false, false);
+    testWriteAndReadValueImpl(Map.of("😃", "x"), false, false);
+
+    testWriteAndReadValueImpl(Map.of("x", "😃"), true, false);
+    testWriteAndReadValueImpl(Map.of("😃", "x"), true, false);
+
+    testWriteAndReadValueImpl(Map.of("x", "😃"), false, true);
+    testWriteAndReadValueImpl(Map.of("😃", "x"), false, true);
+
+    testWriteAndReadValueImpl(Map.of("x", "😃"), true, true);
+    testWriteAndReadValueImpl(Map.of("😃", "x"), true, true);
+  }
+
+  protected void testWriteAndReadValueImpl(Map map, boolean writeAsStream, boolean readAsStream) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+
+    // Serialize
+    String output;
+    if (writeAsStream) {
+      ByteArrayOutputStream os = new ByteArrayOutputStream();
+      mapper.writeValue(os, map);
+      output = os.toString(StandardCharsets.UTF_8);
+    }
+    else {
+      output = mapper.writeValueAsString(map);
+    }
+
+    // Deserialize
+    Map input;
+    if (readAsStream) {
+      input = mapper.readValue(new ByteArrayInputStream(output.getBytes(StandardCharsets.UTF_8)), Map.class);
+    }
+    else {
+      input = mapper.readValue(output, Map.class);
+    }
+
+    // Expect that the new map is equal to the original map
+    assertEquals(map, input);
   }
 
   /**
