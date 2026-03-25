@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.shared.services.common.file;
 
-import java.io.FilenameFilter;
 import java.io.OutputStream;
 
 import org.eclipse.scout.rt.platform.service.IService;
@@ -45,13 +44,6 @@ public interface IRemoteFileService extends IService {
 
   @RemoteServiceAccessDenied
   void putRemoteFile(RemoteFile spec);
-
-  /**
-   * @return all files specified in foldePath and filter including existingFileInfoOnClient <br>
-   * Note: existing files that have not changed, are returned without content <br>
-   * spec normally doesn't contain any content
-   */
-  RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient);
 
   /**
    * The file is not returned but immediately streamed from the original location to the destination. <br>

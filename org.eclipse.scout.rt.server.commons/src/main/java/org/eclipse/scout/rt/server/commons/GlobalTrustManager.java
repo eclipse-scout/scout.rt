@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,6 @@
 package org.eclipse.scout.rt.server.commons;
 
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -49,7 +48,6 @@ import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.TrustedCertificatesProperty;
-import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,10 +176,7 @@ public class GlobalTrustManager {
   }
 
   protected List<X509Certificate> getAllTrustedCertificates() {
-    List<X509Certificate> trustedCerts = new ArrayList<>();
-    trustedCerts.addAll(getTrustedCertificatesInRemoteFiles());
-    trustedCerts.addAll(getConfiguredTrustedCertificates());
-    return trustedCerts;
+    return new ArrayList<>(getConfiguredTrustedCertificates());
   }
 
   protected List<X509Certificate> getConfiguredTrustedCertificates() {
@@ -210,28 +205,6 @@ public class GlobalTrustManager {
       }
     }
     return trustedCerts;
-  }
-
-  protected List<X509Certificate> getTrustedCertificatesInRemoteFiles() {
-    FilenameFilter certFilter = (file, name) -> name.toLowerCase().endsWith(".der");
-    try {
-      IRemoteFileService remoteFileService = BEANS.opt(IRemoteFileService.class);
-      if (remoteFileService == null) {
-        LOG.info("No instance of {} available, skip loading certificates from remote file service.", IRemoteFileService.class.getName());
-        return Collections.emptyList();
-      }
-      RemoteFile[] certRemoteFiles = remoteFileService.getRemoteFiles(PATH_CERTS, certFilter, null);
-      if (certRemoteFiles == null || certRemoteFiles.length < 1) {
-        LOG.info("No certificates to trust in folder '{}' could be found.", PATH_CERTS);
-        return Collections.emptyList();
-      }
-      return remoteFilesToCertificates(certRemoteFiles);
-    }
-    catch (RuntimeException e) {
-      RuntimeException e0 = LOG.isDebugEnabled() ? e : null;
-      LOG.info("Unable to import trusted certificates from remote folder '{}'.", PATH_CERTS, e0);
-      return Collections.emptyList();
-    }
   }
 
   protected List<X509Certificate> remoteFilesToCertificates(RemoteFile[] certRemoteFiles) {

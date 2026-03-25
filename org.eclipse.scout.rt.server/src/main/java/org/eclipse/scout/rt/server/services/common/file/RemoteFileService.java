@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,16 +13,10 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -127,104 +121,16 @@ public class RemoteFileService implements IRemoteFileService {
     return result;
   }
 
-  private String[][] getFiles(String folderBase, FilenameFilter filter) {
-    File root = new File(getRootPath());
-    File path = null;
-    if (folderBase == null || folderBase.isEmpty()) {
-      path = new File(getRootPath());
-    }
-    else {
-      String tmp = folderBase;
-      tmp = tmp.replaceAll("\\\\", "/");
-      tmp = tmp.replaceAll("//", "/");
-      path = new File(getRootPath(), tmp);
-    }
-    String canonicalRoot;
-    String canonicalFolder;
-    try {
-      canonicalFolder = path.getCanonicalPath();
-      canonicalRoot = root.getCanonicalPath();
-    }
-    catch (IOException e) {
-      throw new ProcessingException("invalid path for file service for file: '" + folderBase + "'", e);
-    }
-    if (canonicalFolder == null || !canonicalFolder.startsWith(canonicalRoot)) {
-      throw new SecurityException("invalid path for file service: path outside root-path");
-    }
-
-    List<String> dirList = new ArrayList<>();
-    List<String> fileList = new ArrayList<>();
-    String[] dir = path.list(filter);
-    if (dir != null) {
-      for (String aDir : dir) {
-        try {
-          File file = new File(path.getCanonicalPath() + "/" + aDir);
-          if (!file.isHidden()) {
-            if (file.exists() && file.isDirectory()) {
-              String[][] tmp = getFiles((folderBase == null ? aDir : folderBase + "/" + aDir), filter);
-              for (String[] f : tmp) {
-                dirList.add(f[0]);
-                fileList.add(f[1]);
-              }
-            }
-            else {
-              dirList.add(folderBase);
-              fileList.add(aDir);
-            }
-          }
-        }
-        catch (IOException e) {
-          throw new ProcessingException("FileService.getFiles:", e);
-        }
-      }
-    }
-    String[][] retVal = new String[dirList.size()][2];
-    for (int i = 0; i < dirList.size(); i++) {
-      retVal[i][0] = dirList.get(i);
-      retVal[i][1] = fileList.get(i);
-    }
-    return retVal;
-  }
-
-  @Override
-  public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient) {
-    return getRemoteFiles(folderPath, filter, existingFileInfoOnClient, StandardCharsets.UTF_8.name());
-  }
-
-  public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient, String charsetName) {
-    return getRemoteFiles(folderPath, filter, existingFileInfoOnClient, charsetName, RemoteFile.DEFAULT_MAX_BLOCK_SIZE);
-  }
-
-  public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient, String charsetName, long maxBlockSize) {
-    Map<String, RemoteFile> fileList = new HashMap<>();
-    if (existingFileInfoOnClient != null) {
-      for (RemoteFile rf : existingFileInfoOnClient) {
-        fileList.put((rf.getDirectory().endsWith("/") ? rf.getDirectory() : rf.getDirectory() + "/") + rf.getName(), rf);
-      }
-    }
-    String[][] files = getFiles(folderPath, filter);
-    for (String[] file : files) {
-      if (!fileList.containsKey((file[0].endsWith("/") ? file[0] : file[0] + "/") + file[1])) {
-        fileList.put((file[0].endsWith("/") ? file[0] : file[0] + "/") + file[1], new RemoteFile(file[0], file[1], 0L, charsetName));
-      }
-    }
-    RemoteFile[] retVal = new RemoteFile[fileList.size()];
-    int i = 0;
-    for (RemoteFile rf : fileList.values()) {
-      retVal[i] = getRemoteFile(rf, maxBlockSize);
-      i++;
-    }
-    return retVal;
-  }
-
   @Override
   @RemoteServiceAccessDenied
   @SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
   public void putRemoteFile(RemoteFile spec) {
     File file = getFileInternal(spec);
+    //noinspection ResultOfMethodCallIgnored
     file.getParentFile().mkdirs();
     try (FileOutputStream out = new FileOutputStream(file)) {
       spec.writeData(out);
+      //noinspection ResultOfMethodCallIgnored
       file.setLastModified(file.lastModified());
     }
     catch (Exception e) {
@@ -302,7 +208,7 @@ public class RemoteFileService implements IRemoteFileService {
     String extendedFilename = prefix + localeText + suffix;
     File test = new File(canonicalFolder, extendedFilename);
     while (!fileExistsPredicate.test(test)) {
-      if (localeText.indexOf(LOCALE_DELIMITER) == -1) {
+      if (!localeText.contains(LOCALE_DELIMITER)) {
         extendedFilename = filename;
         break;
       }
