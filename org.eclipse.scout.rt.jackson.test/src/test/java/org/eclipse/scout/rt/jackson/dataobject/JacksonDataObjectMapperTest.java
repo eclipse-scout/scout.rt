@@ -14,7 +14,6 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -60,7 +59,6 @@ import org.junit.Test;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamReadConstraints.Builder;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
@@ -258,7 +256,7 @@ public class JacksonDataObjectMapperTest {
   }
 
   @Test
-  public void testWriteAndReadUnicodeValue() throws IOException {
+  public void testWriteAndReadUnicodeValue() {
     testWriteAndReadValueImpl(Map.of("x", "😃"), false, false);
     testWriteAndReadValueImpl(Map.of("😃", "x"), false, false);
 
@@ -272,27 +270,25 @@ public class JacksonDataObjectMapperTest {
     testWriteAndReadValueImpl(Map.of("😃", "x"), true, true);
   }
 
-  protected void testWriteAndReadValueImpl(Map map, boolean writeAsStream, boolean readAsStream) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-
+  protected void testWriteAndReadValueImpl(Map map, boolean writeAsStream, boolean readAsStream) {
     // Serialize
     String output;
     if (writeAsStream) {
       ByteArrayOutputStream os = new ByteArrayOutputStream();
-      mapper.writeValue(os, map);
+      m_mapper.writeValue(os, map);
       output = os.toString(StandardCharsets.UTF_8);
     }
     else {
-      output = mapper.writeValueAsString(map);
+      output = m_mapper.writeValue(map);
     }
 
     // Deserialize
     Map input;
     if (readAsStream) {
-      input = mapper.readValue(new ByteArrayInputStream(output.getBytes(StandardCharsets.UTF_8)), Map.class);
+      input = m_mapper.readValue(new ByteArrayInputStream(output.getBytes(StandardCharsets.UTF_8)), Map.class);
     }
     else {
-      input = mapper.readValue(output, Map.class);
+      input = m_mapper.readValue(output, Map.class);
     }
 
     // Expect that the new map is equal to the original map
