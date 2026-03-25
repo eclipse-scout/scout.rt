@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,14 +10,9 @@
 package org.eclipse.scout.rt.client.services.common.file;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -83,6 +78,7 @@ public class FileService implements IFileService {
           if (locale != null && f.getName().length() > spec.getName().length()) {
             // if local file has longer name (including locale), this means that
             // this file was deleted on the server
+            //noinspection ResultOfMethodCallIgnored
             f.delete();
           }
           f = getFileLocation(spec.getDirectory(), spec.getName(), false);
@@ -91,9 +87,11 @@ public class FileService implements IFileService {
           try (OutputStream out = new FileOutputStream(f)) {
             spec.writeData(out);
           }
+          //noinspection ResultOfMethodCallIgnored
           f.setLastModified(spec.getLastModified());
         }
         else if (!spec.exists()) {
+          //noinspection ResultOfMethodCallIgnored
           f.delete();
         }
       }
@@ -102,136 +100,6 @@ public class FileService implements IFileService {
       }
     }
     return f;
-  }
-
-  private String[][] getFiles(String folderBase, FilenameFilter filter, boolean useServerFolderStructureOnClient) {
-    File path = getFileLocation(useServerFolderStructureOnClient ? folderBase : "", null, false);
-    String[] dirs = path.list(filter);
-    if (dirs == null || dirs.length < 1) {
-      return new String[][]{};
-    }
-
-    List<String> dirList = new ArrayList<>();
-    List<String> fileList = new ArrayList<>();
-    for (String dir : dirs) {
-      try {
-        File file = new File(path.getCanonicalPath() + "/" + dir);
-        if (file.isDirectory()) {
-          String[][] tmp = getFiles((folderBase == null ? dir : folderBase + "/" + dir), filter, true);
-          for (String[] f : tmp) {
-            dirList.add(f[0]);
-            fileList.add(f[1]);
-          }
-        }
-        else {
-          dirList.add(folderBase);
-          fileList.add(dir);
-        }
-      }
-      catch (IOException e) {
-        throw new ProcessingException("FileService.getFiles:", e);
-      }
-    }
-    String[][] retVal = new String[dirList.size()][2];
-    for (int i = 0; i < dirList.size(); i++) {
-      retVal[i][0] = dirList.get(i);
-      retVal[i][1] = fileList.get(i);
-    }
-    return retVal;
-  }
-
-  @Override
-  public void syncRemoteFilesToPath(String clientFolderPath, String serverFolderPath, FilenameFilter filter) {
-    setDirectPath(clientFolderPath);
-    syncRemoteFilesInternal(serverFolderPath, filter, false);
-    setDirectPath(null);
-  }
-
-  @Override
-  public void syncRemoteFiles(String serverFolderPath, FilenameFilter filter) {
-    syncRemoteFilesInternal(serverFolderPath, filter, true);
-  }
-
-  private void syncRemoteFilesInternal(String serverFolderPath, FilenameFilter filter, boolean useServerFolderStructureOnClient) {
-    IRemoteFileService svc = BEANS.get(IRemoteFileService.class);
-    String[][] realFiles = getFiles(serverFolderPath, filter, useServerFolderStructureOnClient);
-    RemoteFile[] existingFileInfoOnClient = new RemoteFile[realFiles.length];
-    for (int i = 0; i < realFiles.length; i++) {
-      RemoteFile rf = new RemoteFile(realFiles[i][0], realFiles[i][1], 0);
-      String dir = m_rootPath == null ? realFiles[i][0] : "";
-      File f = getFileLocation(dir, realFiles[i][1], false);
-      if (f.exists()) {
-        rf.setLastModified(f.lastModified());
-      }
-      existingFileInfoOnClient[i] = rf;
-    }
-    existingFileInfoOnClient = svc.getRemoteFiles(serverFolderPath, filter, existingFileInfoOnClient);
-    for (RemoteFile spec : existingFileInfoOnClient) {
-      String fileDirectory = useServerFolderStructureOnClient ? spec.getDirectory() : null;
-      File f = getFileLocation(fileDirectory, spec.getName(), false);
-      if (spec.exists() && spec.hasContent()) {
-        try {
-          if (spec.hasMoreParts()) {
-            // file is splitted - get all parts
-            int counter = 0;
-            long fileDate = spec.getLastModified();
-            File part = getFileLocation(fileDirectory, spec.getName() + "." + counter, false);
-            try (OutputStream out = new FileOutputStream(part)) {
-              spec.writeData(out);
-            }
-            part.setLastModified(fileDate);
-            RemoteFile specPart = spec;
-            while (specPart.hasMoreParts()) {
-              counter++;
-              part = getFileLocation(fileDirectory, spec.getName() + "." + counter, false);
-              if (!part.exists() || fileDate != part.lastModified()) {
-                specPart = svc.getRemoteFilePart(spec, counter);
-                try (OutputStream out = new FileOutputStream(part)) {
-                  specPart.writeData(out);
-                }
-                part.setLastModified(fileDate);
-              }
-              else {
-                // resuming canceled part: nothing to do
-              }
-            }
-            // put together
-            counter = 0;
-            f = getFileLocation(fileDirectory, spec.getName(), false);
-            try (OutputStream out = new FileOutputStream(f)) {
-              part = getFileLocation(fileDirectory, spec.getName() + "." + counter, false);
-              while (part.exists()) {
-                try (InputStream in = new FileInputStream(part)) {
-                  byte[] buf = new byte[102400];
-                  int len;
-                  while ((len = in.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-                  }
-                  out.flush();
-                }
-                part.delete();
-                counter++;
-                part = getFileLocation(fileDirectory, spec.getName() + "." + counter, false);
-              }
-            }
-            f.setLastModified(fileDate);
-          }
-          else {
-            // normal files
-            try (OutputStream out = new FileOutputStream(f)) {
-              spec.writeData(out);
-            }
-            f.setLastModified(spec.getLastModified());
-          }
-        }
-        catch (IOException e) {
-          throw new ProcessingException("error writing remote file in local store", e);
-        }
-      }
-      else if (!spec.exists()) {
-        f.delete();
-      }
-    }
   }
 
   /**
@@ -276,15 +144,12 @@ public class FileService implements IFileService {
     }
     File file = new File(path);
     if (!file.exists()) {
+      //noinspection ResultOfMethodCallIgnored
       file.mkdirs();
     }
     if (name != null) {
       file = new File(path + name);
     }
     return file;
-  }
-
-  private void setDirectPath(String rootPath) {
-    m_rootPath = rootPath;
   }
 }
