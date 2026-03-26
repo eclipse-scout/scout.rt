@@ -789,7 +789,7 @@ public class ScoutApacheConnector implements Connector {
 
     @Override
     public Integer getDefaultValue() {
-      return 32;
+      return 128;
     }
 
     @Override
@@ -807,7 +807,7 @@ public class ScoutApacheConnector implements Connector {
 
     @Override
     public Integer getDefaultValue() {
-      return 128;
+      return 512;
     }
 
     @Override

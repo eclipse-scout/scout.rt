@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -462,7 +462,7 @@ public class ScoutApacheConnectorTest {
   public void testHttpTransportProperties_defaultValues() {
     Client client = Mockito.mock(Client.class);
     Configuration config = Mockito.mock(Configuration.class);
-    assertConnectionManager(client, config, 32, 128);
+    assertConnectionManager(client, config, 128, 512);
   }
 
   @Test
