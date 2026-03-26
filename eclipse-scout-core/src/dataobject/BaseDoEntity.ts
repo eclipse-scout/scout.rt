@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {dataObjects, DeepPartial, DoContributionClassOrType, InitModelOf, objectFactoryHints, objects, ObjectType} from '../index';
+import {Constructor, dataObjects, DeepPartial, DoContributionClassOrType, InitModelOf, objectFactoryHints, objects, ObjectType} from '../index';
 import $ from 'jquery';
 
 /**
@@ -53,6 +53,13 @@ export class BaseDoEntity {
    */
   removeContribution<TContributionDo extends BaseDoEntity>(contributionClassOrType: DoContributionClassOrType<TContributionDo>): boolean {
     return dataObjects.removeContribution(contributionClassOrType, this);
+  }
+
+  /**
+   * @see dataObjects.contribution
+   */
+  contribution<TContributionDo extends BaseDoEntity>(contributionClass: Constructor<TContributionDo>, model?: InitModelOf<TContributionDo>): TContributionDo {
+    return dataObjects.contribution(contributionClass, this, model);
   }
 
   /**
