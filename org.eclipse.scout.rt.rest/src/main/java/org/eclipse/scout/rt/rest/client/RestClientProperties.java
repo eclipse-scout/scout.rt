@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -248,7 +248,7 @@ public final class RestClientProperties {
    * The value MUST be an instance convertible to {@link java.lang.Integer}.
    * </p>
    * <p>
-   * The default value is 32.
+   * The default value is 128.
    * </p>
    */
   public static final String MAX_CONNECTIONS_PER_ROUTE = "scout.rest.client.http.maxConnectionsPerRoute";
@@ -259,7 +259,7 @@ public final class RestClientProperties {
    * The value MUST be an instance convertible to {@link java.lang.Integer}.
    * </p>
    * <p>
-   * The default value is 128.
+   * The default value is 512.
    * </p>
    */
   public static final String MAX_CONNECTIONS_TOTAL = "scout.rest.client.http.maxConnectionsTotal";
