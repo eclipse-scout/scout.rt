@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, dataObjects, DoEntity} from '../../src/index';
+import {BaseDoEntity, dataObjects, DoEntity, DoEntityWithContributions, scout, typeName} from '../../src/index';
 
 describe('dataObjects', () => {
 
@@ -19,6 +19,21 @@ describe('dataObjects', () => {
   class AnotherDoContrib implements DoEntity {
     _type = 'AnotherDoContrib';
     prop: string;
+  }
+
+  @typeName('scout.BaseDoEntityFixture')
+  class BaseDoEntityFixtureDo extends BaseDoEntity {
+    prop: string;
+  }
+
+  @typeName('scout.BaseDoEntityContrib')
+  class BaseDoEntityContribDo extends BaseDoEntity {
+    contribProp: string;
+  }
+
+  @typeName('scout.AnotherBaseDoEntityContrib')
+  class AnotherBaseDoEntityContribDo extends BaseDoEntity {
+    contribProp2: string;
   }
 
   describe('addContribution', () => {
@@ -182,6 +197,31 @@ describe('dataObjects', () => {
     });
   });
 
+  describe('contribution', () => {
+    it('adds a new one or returns the existing contribution', () => {
+      const doEntity = scout.create(BaseDoEntityFixtureDo);
+      expect(doEntity.getContributions().length).toBe(0);
+
+      const contrib = dataObjects.contribution(BaseDoEntityContribDo, doEntity);
+      expect(contrib).toBeInstanceOf(BaseDoEntityContribDo);
+      expect(doEntity.getContributions()).toEqual([contrib]);
+
+      const contrib2 = dataObjects.contribution(BaseDoEntityContribDo, doEntity);
+      expect(contrib).toBe(contrib2);
+      expect(doEntity.getContributions()).toEqual([contrib]);
+
+      const anotherContrib = dataObjects.contribution(AnotherBaseDoEntityContribDo, doEntity, {contribProp2: 'hi'});
+      expect(anotherContrib).toBeInstanceOf(AnotherBaseDoEntityContribDo);
+      expect(anotherContrib.contribProp2).toBe('hi');
+      expect(doEntity.getContributions()).toEqual([contrib, anotherContrib]);
+
+      const anotherContrib2 = dataObjects.contribution(AnotherBaseDoEntityContribDo, doEntity, {contribProp2: 'hello'});
+      expect(anotherContrib).toBe(anotherContrib2);
+      expect(anotherContrib.contribProp2).toBe('hi');
+      expect(doEntity.getContributions()).toEqual([contrib, anotherContrib]);
+    });
+  });
+
   describe('stringify', () => {
     it('booleans', () => {
       expect(dataObjects.stringify(true)).toBe('true');
@@ -257,5 +297,3 @@ describe('dataObjects', () => {
     });
   });
 });
-
-type DoEntityWithContributions = DoEntity & { _contributions?: DoEntity[] };

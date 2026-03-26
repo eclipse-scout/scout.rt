@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 import {
   AnyDoEntity, ArrayDoNodeSerializer, arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectDeserializerModel, DataObjectSerializer, DateDoNodeSerializer, DefaultDoTypeResolver, DoEntity, DoNodeSerializer, DoTypeResolver,
-  doValueMetaData, MapDoNodeSerializer, NumberDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer
+  doValueMetaData, InitModelOf, MapDoNodeSerializer, NumberDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer
 } from '../index';
 
 /**
@@ -185,6 +185,21 @@ export const dataObjects = {
       }
     }
     return removed;
+  },
+
+  /**
+   * Returns the existing DO entity contribution for the given contribution class if available.
+   * Otherwise, creates a new DO entity contribution instance, adds it to the contributions and returns it.
+   *
+   * @param model will be used as initial model if a new instance of the given `contributionClass` needs to be created.
+   */
+  contribution<TContributionDo extends BaseDoEntity>(contributionClass: Constructor<TContributionDo>, doEntity: DoEntityWithContributions, model?: InitModelOf<TContributionDo>): TContributionDo {
+    let contribution = dataObjects.getContribution(contributionClass, doEntity);
+    if (!contribution) {
+      contribution = scout.create(contributionClass, model);
+      dataObjects.addContribution(contribution, doEntity);
+    }
+    return contribution;
   }
 };
 
