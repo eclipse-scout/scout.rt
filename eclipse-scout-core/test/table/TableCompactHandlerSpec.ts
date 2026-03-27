@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {CompactColumn} from '../../src';
+import {Column, CompactColumn, scout} from '../../src';
 import {TableSpecHelper} from '../../src/testing/index';
 
 describe('TableCompactHandler', () => {
@@ -18,10 +18,6 @@ describe('TableCompactHandler', () => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
-  });
-
-  afterEach(() => {
-    session = null;
   });
 
   describe('handle', () => {
@@ -54,6 +50,20 @@ describe('TableCompactHandler', () => {
         expect(table.columns[2].visible).toBe(false);
         expect(table.columns[3].visible).toBe(false);
         expect(table.compactColumn instanceof CompactColumn).toBe(true);
+      });
+
+      it('reacts to column structure changes', () => {
+        let table = helper.createTable(helper.createModelFixture(1, 1));
+        expect(table.columns[0].visible).toBe(true);
+        expect(table.compactColumn).toBe(null);
+
+        table.setCompact(true);
+        expect(table.columns[0].visible).toBe(false);
+        expect(table.compactColumn instanceof CompactColumn).toBe(true);
+
+        const newColumn = scout.create(Column, {parent: table, text: 'new column'});
+        table.insertColumn(newColumn);
+        expect(newColumn.visible).toBe(false);
       });
     });
 
@@ -191,6 +201,32 @@ describe('TableCompactHandler', () => {
       expect(row0.compactValue.indexOf(row0.cells[1].text) >= 0).toBe(true);
       expect(row1.compactValue.indexOf(row1.cells[0].text) >= 0).toBe(true);
       expect(row1.compactValue.indexOf(row1.cells[1].text) >= 0).toBe(true);
+    });
+  });
+
+  describe('columnFilters', () => {
+    it('can return false to not accept a column', () => {
+      let table = helper.createTable(helper.createModelFixture(2, 2));
+      const filter = column => column !== table.columns[0];
+      table.compactHandler.addColumnFilter(filter);
+      let row0 = table.rows[0];
+      let row1 = table.rows[1];
+      expect(row0.compactValue).toBe(null);
+      expect(row1.compactValue).toBe(null);
+
+      table.setCompact(true);
+      expect(row0.compactValue.includes(row0.cells[0].text)).toBe(false);
+      expect(row0.compactValue.includes(row0.cells[1].text)).toBe(true);
+      expect(row1.compactValue.includes(row1.cells[0].text)).toBe(false);
+      expect(row1.compactValue.includes(row1.cells[1].text)).toBe(true);
+
+      table.compactHandler.removeColumnFilter(filter);
+      table.setCompact(false);
+      table.setCompact(true);
+      expect(row0.compactValue.includes(row0.cells[0].text)).toBe(true);
+      expect(row0.compactValue.includes(row0.cells[1].text)).toBe(true);
+      expect(row1.compactValue.includes(row1.cells[0].text)).toBe(true);
+      expect(row1.compactValue.includes(row1.cells[1].text)).toBe(true);
     });
   });
 });
