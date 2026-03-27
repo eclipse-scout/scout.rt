@@ -43,7 +43,8 @@ public class MaxResultsHelper {
   }
 
   /**
-   * Extracts the {@link MaxRowCountContributionDo#getHint()} from the given {@link IDoEntity}.
+   * Extracts and returns the {@link MaxRowCountContributionDo#getHint()} from the given {@link IDoEntity}.
+   * If {@link MaxRowCountContributionDo#getOverride()} is set and greater than 0, it will be returned instead.
    *
    * @param dataObject
    *     The {@link IDoEntity} in which the {@link MaxRowCountContributionDo} should be searched.
@@ -51,15 +52,23 @@ public class MaxResultsHelper {
    * contribution or -1 if no such contribution is present.
    */
   public int getMaxResultsHintFromContribution(IDoEntity dataObject) {
-    if (dataObject != null) {
-      MaxRowCountContributionDo maxRowCountContributionDo = dataObject.getContribution(MaxRowCountContributionDo.class);
-      if (maxRowCountContributionDo != null) {
-        Integer maxRowCount = maxRowCountContributionDo.getHint();
-        if (maxRowCount != null && maxRowCount > 0) {
-          return maxRowCount;
-        }
+    if (dataObject == null) {
+      return -1;
+    }
+
+    MaxRowCountContributionDo maxRowCountContributionDo = dataObject.getContribution(MaxRowCountContributionDo.class);
+    if (maxRowCountContributionDo != null) {
+      Integer maxRowCountOverride = maxRowCountContributionDo.getOverride();
+      if (maxRowCountOverride != null && maxRowCountOverride > 0) {
+        return maxRowCountOverride;
+      }
+
+      Integer maxRowCount = maxRowCountContributionDo.getHint();
+      if (maxRowCount != null && maxRowCount > 0) {
+        return maxRowCount;
       }
     }
+
     return -1;
   }
 
