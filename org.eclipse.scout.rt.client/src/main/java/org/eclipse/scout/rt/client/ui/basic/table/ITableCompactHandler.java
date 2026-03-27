@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,7 +26,7 @@ public interface ITableCompactHandler {
    * <ul>
    * <li>Adjusts some properties of the table itself (e.g. header visible = false)</li>
    * <li>Marks all columns as compacted so they won't be sent to ui.</li>
-   * <li>Computes the compact value for each row and and updates the property {@link ITableRow#getCompactValue()}.</li>
+   * <li>Computes the compact value for each row and updates the property {@link ITableRow#getCompactValue()}.</li>
    * <li>Adds listeners to the table to update the computed value on relevant table changes.</li>
    * </ul>
    * The ui itself will add a separate compact column that displays the compacted values.
@@ -77,7 +77,7 @@ public interface ITableCompactHandler {
   /**
    * The more link is shown if there are more content lines than {@link #getMaxContentLines()}. Clicking on the more
    * link will reveal the other lines.<br>
-   * Set this flag to false to never show a more link.
+   * Set this flag to <code>false</code> to never show a more link.
    */
   ITableCompactHandler withMoreLinkAvailable(boolean moreLinkAvailable);
 
@@ -85,9 +85,9 @@ public interface ITableCompactHandler {
 
   /**
    * The default bean builder will process every column and fill the bean based on the given line builders (e.g.
-   * {@link #getTitleBuilder()}. The creation of the bean can be influenced by using custom line builders. But since
+   * {@link #getTitleBuilder()}). The creation of the bean can be influenced by using custom line builders. But since
    * each line builder processes only one column they may not be sufficient. To have more control a custom bean builder
-   * may be used instead which will turn off the line builders and you need to create the whole bean by yourself.
+   * may be used instead which will turn off the line builders, and you need to create the whole bean by yourself.
    */
   ITableCompactHandler withBeanBuilder(CompactBeanBuilder builder);
 
@@ -142,11 +142,11 @@ public interface ITableCompactHandler {
   List<CompactLineBuilder> getContentBuilders();
 
   /**
-   * The content line builder creates a line for {@link CompactBean#addContentLine(CompactLine)}. By default a line will
+   * The content line builder creates a line for {@link CompactBean#addContentLine(CompactLine)}. By default, a line will
    * be created for every column not processed by title, subtitle or title suffix builder. A label will always be
    * added.<br>
    * By adding a content line builder you can control the order and generation of content lines. Columns not explicitly
-   * handled by a provided content line builder will be be appended to the end and handled by
+   * handled by a provided content line builder will be appended to the end and handled by
    * {@link #getDefaultContentLineBuilder()}.<br>
    * Depending on the number of content line builders you may have to increase the max content lines using
    * {@link #withMaxContentLines(int)}

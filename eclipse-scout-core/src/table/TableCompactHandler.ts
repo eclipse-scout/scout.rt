@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BooleanColumn, Cell, Column, CompactBean, CompactLine, Event, EventHandler, InitModelOf, objects, ObjectWithType, SomeRequired, Table, TableCompactHandlerModel, TableRow, TableRowsInsertedEvent, TableRowsUpdatedEvent
+  BooleanColumn, Cell, Column, CompactBean, CompactLine, Event, EventHandler, InitModelOf, objects, ObjectWithType, Predicate, SomeRequired, Table, TableCompactHandlerModel, TableRow, TableRowsInsertedEvent, TableRowsUpdatedEvent
 } from '../index';
 
 export class TableCompactHandler implements TableCompactHandlerModel, ObjectWithType {
@@ -17,43 +17,58 @@ export class TableCompactHandler implements TableCompactHandlerModel, ObjectWith
 
   objectType: string;
   table: Table;
-  useOnlyVisibleColumns: boolean;
-  maxContentLines: number;
-  moreLinkAvailable: boolean;
+  useOnlyVisibleColumns = true;
+  maxContentLines = 3;
+  moreLinkAvailable = true;
   lineCustomizer: (line: CompactLine) => void;
-  protected _oldStates: Record<string, any>;
+  columnFilters: Set<Predicate<Column>> = new Set();
+  protected _oldStates: Record<string, any> = objects.createMap();
   protected _updateHandler: EventHandler<TableRowsInsertedEvent | TableRowsUpdatedEvent | Event<Table>>;
-
-  constructor() {
-    this.table = null;
-    this.useOnlyVisibleColumns = true;
-    this.maxContentLines = 3;
-    this.moreLinkAvailable = true;
-    this.lineCustomizer = null;
-    this._oldStates = objects.createMap();
-    this._updateHandler = null;
-  }
 
   init(model: InitModelOf<this>) {
     $.extend(this, model);
   }
 
+  /** @see TableCompactHandler.useOnlyVisibleColumns */
   setUseOnlyVisibleColumns(useOnlyVisibleColumns: boolean) {
     this.useOnlyVisibleColumns = useOnlyVisibleColumns;
   }
 
+  /** @see TableCompactHandler.maxContentLines */
   setMaxContentLines(maxContentLines: number) {
     this.maxContentLines = maxContentLines;
   }
 
+  /** @see TableCompactHandler.moreLinkAvailable */
   setMoreLinkAvailable(moreLinkAvailable: boolean) {
     this.moreLinkAvailable = moreLinkAvailable;
   }
 
+  /** @see TableCompactHandler.lineCustomizer */
   setLineCustomizer(lineCustomizer: (line: CompactLine) => void) {
     this.lineCustomizer = lineCustomizer;
   }
 
+  /** @see TableCompactHandler.columFilters */
+  addColumnFilter(filter: Predicate<Column>) {
+    this.columnFilters.add(filter);
+  }
+
+  /** @see TableCompactHandler.columFilters */
+  removeColumnFilter(filter: Predicate<Column>) {
+    this.columnFilters.delete(filter);
+  }
+
+  /**
+   * Transforms the table into compact state:
+   *
+   * * Adjusts some properties of the table itself ({@link Table.headerVisible} = false, {@link Table.autoResizeColumns} = true)</li>
+   * * Marks all columns as {@link Column.compacted} so they won't be visible.
+   * * Computes the compact value for each row and updates the property {@link TableRow.compactValue}.
+   * * Adds listeners to the table to update the computed value on relevant table changes.
+   *
+   * The table itself will add a separate {@link CompactColumn} that displays the compacted values.
+   */
   handle(compact: boolean) {
     if (compact) {
       this._compactColumns(true);
@@ -93,9 +108,19 @@ export class TableCompactHandler implements TableCompactHandlerModel, ObjectWith
     }
   }
 
-  protected _compactColumns(compact: boolean) {
-    this.table.displayableColumns(false).forEach(column => column.setCompacted(compact, false));
-    this.table.onColumnVisibilityChanged();
+  protected _compactColumns(compact: boolean): boolean {
+    let changed = false;
+    for (const column of this.table.displayableColumns(false)) {
+      const compacted = column.compacted;
+      column.setCompacted(compact, false);
+      if (compacted !== column.compacted) {
+        changed = true;
+      }
+    }
+    if (changed) {
+      this.table.onColumnVisibilityChanged();
+    }
+    return changed;
   }
 
   protected _attachTableHandler() {
@@ -124,10 +149,18 @@ export class TableCompactHandler implements TableCompactHandlerModel, ObjectWith
     row.setCompactValue(this.buildValue(columns, row));
   }
 
+  /**
+   * Builds the compacted value without touching the table or its columns.
+   *
+   * @return the final string ready to be displayed. It contains html, so make sure html is enabled for the target.
+   */
   buildValue(columns: Column<any>[], row: TableRow): string {
     return this._buildValue(this._createBean(columns, row));
   }
 
+  /**
+   * @returns the bean used to build the final html string for a given row.
+   */
   protected _createBean(columns: Column<any>[], row: TableRow): CompactBean {
     let bean = new CompactBean();
     this._processColumns(columns, row, bean);
@@ -144,6 +177,9 @@ export class TableCompactHandler implements TableCompactHandlerModel, ObjectWith
   }
 
   protected _acceptColumn(column: Column<any>): boolean {
+    if (![...this.columnFilters].every(filter => filter(column))) {
+      return false;
+    }
     return !column.guiOnly && (!this.useOnlyVisibleColumns || column.visibleIgnoreCompacted);
   }
 
@@ -152,14 +188,10 @@ export class TableCompactHandler implements TableCompactHandlerModel, ObjectWith
   }
 
   /**
-   * @param bean
-   *          the bean for the current row
-   * @param column
-   *          the currently processed column
-   * @param index
-   *          visible column index of the currently processed column
-   * @param row
-   *          the current row
+   * @param bean the bean for the current row
+   * @param column the currently processed column
+   * @param index visible column index of the currently processed column
+   * @param row the current row
    */
   protected _updateBean(bean: CompactBean, column: Column<any>, index: number, row: TableRow) {
     if (this._acceptColumnForTitle(column, index)) {
@@ -245,9 +277,13 @@ export class TableCompactHandler implements TableCompactHandlerModel, ObjectWith
   }
 
   protected _onTableEvent(event: TableRowsInsertedEvent | TableRowsUpdatedEvent | Event<Table>) {
-    let rows: TableRow[];
+    let rows: TableRow[] = [];
     if (event.type === 'columnStructureChanged') {
-      rows = this.table.rows;
+      if (!this._compactColumns(this.table.compact)) {
+        // _compactColumns triggers columnStructureChanged itself if a column changed its compacted state.
+        // -> there is no need to call updateValues twice, so only do it if compactColumns does not trigger columnStructureChanged.
+        rows = this.table.rows;
+      }
     } else {
       rows = (event as TableRowsInsertedEvent | TableRowsUpdatedEvent).rows;
     }

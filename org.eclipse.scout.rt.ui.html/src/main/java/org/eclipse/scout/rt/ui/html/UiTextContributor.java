@@ -112,6 +112,7 @@ public class UiTextContributor implements IUiTextContributor {
         "MaxOutlineRowWarningMobile",
         "MaxOutlineRowWarningWithEstimatedRowCount",
         "MaxOutlineRowWarning",
+        "More",
         "FormsCannotBeSaved",
         "NotAllCheckedFormsCanBeSaved",
         "FormValidationFailedTitle",
