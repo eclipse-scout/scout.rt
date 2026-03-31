@@ -93,6 +93,12 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     this.$container.setTabbable(hasMenus && this.enabledComputed && !Device.get().supportsOnlyTouch());
   }
 
+  protected override _updateEnabledComputed(enabledComputed: boolean, enabledComputedForChildren?: boolean) {
+    // The enabled state of the field status is irrelevant for its child menus -> always pass the state of the field
+    // This is because the field status should be enabled even if the parent field is disabled (inheritAccessibility is false), but the actual menus should be disabled
+    super._updateEnabledComputed(enabledComputed, this.parent.enabledComputed);
+  }
+
   update(status: StatusOrModel, menus: Menu | Menu[], autoRemove: boolean, showStatus?: boolean) {
     this.updating = true;
     this.setStatus(status);
@@ -290,6 +296,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
       this.$container.addClass('selected');
       aria.expanded(this.$container, true);
       aria.linkElementWithControls(this.$container, this.tooltip.$container);
+      this.recomputeEnabled(); // triggers _updateEnabledComputed
       this.tooltip.one('destroy', () => {
         this.tooltip = null;
         if (this.$container) {
@@ -336,6 +343,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     this.$container.addClass('selected');
     aria.expanded(this.$container, true);
     aria.linkElementWithControls(this.$container, this.contextMenu.$container);
+    this.recomputeEnabled(); // triggers _updateEnabledComputed
     this.contextMenu.one('destroy', () => {
       this.contextMenu = null;
       if (this.$container) {
