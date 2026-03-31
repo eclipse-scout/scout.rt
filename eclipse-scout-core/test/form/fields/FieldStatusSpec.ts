@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -107,6 +107,170 @@ describe('FieldStatus', () => {
       (groupBox.fields[0] as StringField).setValue(null);
       expect(groupBox.fields[0].fieldStatus.get$Focusable()).toHaveClass('invisible');
       expect(groupBox.fields[1].get$Focusable()).toBeFocused();
+    });
+  });
+
+  describe('enabled', () => {
+    it('is enabled but children disabled even if parent is disabled', () => {
+      let formField = scout.create(StringField, {
+        parent: session.desktop,
+        enabled: false,
+        menus: [{
+          objectType: Menu,
+          childActions: [{objectType: Menu}]
+        }]
+      });
+      formField.render();
+      expect(formField.enabledComputed).toBe(false);
+      expect(formField.fieldStatus.enabledComputed).toBe(true);
+      expect(formField.menus[0].enabledComputed).toBe(false);
+      expect(formField.menus[0].childActions[0].enabledComputed).toBe(false);
+
+      // open menu
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.contextMenu.menuItems[0].enabledComputed).toBe(false);
+      expect(formField.fieldStatus.contextMenu.menuItems[0].childActions[0].enabledComputed).toBe(false);
+
+      // close menu
+      formField.fieldStatus.contextMenu.animateRemoval = false;
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.contextMenu).toBe(null);
+
+      formField.setEnabled(true);
+      expect(formField.enabledComputed).toBe(true);
+      expect(formField.fieldStatus.enabledComputed).toBe(true);
+      expect(formField.menus[0].enabledComputed).toBe(true);
+      expect(formField.menus[0].childActions[0].enabledComputed).toBe(true);
+
+      // open menu
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.contextMenu.menuItems[0].enabledComputed).toBe(true);
+      expect(formField.fieldStatus.contextMenu.menuItems[0].childActions[0].enabledComputed).toBe(true);
+
+      // close menu
+      formField.fieldStatus.contextMenu.animateRemoval = false;
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.contextMenu).toBe(null);
+
+      formField.setEnabled(false);
+      expect(formField.enabledComputed).toBe(false);
+      expect(formField.fieldStatus.enabledComputed).toBe(true);
+      expect(formField.menus[0].enabledComputed).toBe(false);
+      expect(formField.menus[0].childActions[0].enabledComputed).toBe(false);
+
+      // open menu
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.contextMenu.menuItems[0].enabledComputed).toBe(false);
+      expect(formField.fieldStatus.contextMenu.menuItems[0].childActions[0].enabledComputed).toBe(false);
+
+      formField.insertMenu({objectType: Menu});
+      expect(formField.menus[1].enabledComputed).toBe(false);
+      expect(formField.enabledComputed).toBe(false);
+      expect(formField.fieldStatus.enabledComputed).toBe(true);
+
+      // close menu
+      formField.fieldStatus.contextMenu.animateRemoval = false;
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.contextMenu).toBe(null);
+
+      // open menu
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.contextMenu.menuItems[1].enabledComputed).toBe(false);
+
+      // close menu
+      formField.fieldStatus.contextMenu.animateRemoval = false;
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.contextMenu).toBe(null);
+
+      formField.insertMenu({objectType: Menu, inheritAccessibility: false});
+      expect(formField.menus[2].enabledComputed).toBe(true);
+      expect(formField.enabledComputed).toBe(false);
+      expect(formField.fieldStatus.enabledComputed).toBe(true);
+
+      // open menu
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.contextMenu.menuItems[1].enabledComputed).toBe(false);
+      expect(formField.fieldStatus.contextMenu.menuItems[2].enabledComputed).toBe(true);
+    });
+
+    it('is enabled but children disabled even if parent is disabled and menus are shown in tooltip', () => {
+      let formField = scout.create(StringField, {
+        parent: session.desktop,
+        enabled: false,
+        tooltipText: 'hi',
+        menus: [{
+          objectType: Menu,
+          childActions: [{objectType: Menu}]
+        }]
+      });
+      formField.render();
+      expect(formField.enabledComputed).toBe(false);
+      expect(formField.fieldStatus.enabledComputed).toBe(true);
+      expect(formField.menus[0].enabledComputed).toBe(false);
+      expect(formField.menus[0].childActions[0].enabledComputed).toBe(false);
+
+      // open tooltip
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.tooltip.menus[0].enabledComputed).toBe(false);
+      expect(formField.fieldStatus.tooltip.menus[0].childActions[0].enabledComputed).toBe(false);
+
+      // close tooltip
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.tooltip).toBe(null);
+
+      formField.setEnabled(true);
+      expect(formField.enabledComputed).toBe(true);
+      expect(formField.fieldStatus.enabledComputed).toBe(true);
+      expect(formField.menus[0].enabledComputed).toBe(true);
+      expect(formField.menus[0].childActions[0].enabledComputed).toBe(true);
+
+      // open tooltip
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.tooltip.menus[0].enabledComputed).toBe(true);
+      expect(formField.fieldStatus.tooltip.menus[0].childActions[0].enabledComputed).toBe(true);
+
+      // close tooltip
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.tooltip).toBe(null);
+
+      formField.setEnabled(false);
+      expect(formField.enabledComputed).toBe(false);
+      expect(formField.fieldStatus.enabledComputed).toBe(true);
+      expect(formField.menus[0].enabledComputed).toBe(false);
+      expect(formField.menus[0].childActions[0].enabledComputed).toBe(false);
+
+      // open tooltip
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.tooltip.menus[0].enabledComputed).toBe(false);
+      expect(formField.fieldStatus.tooltip.menus[0].childActions[0].enabledComputed).toBe(false);
+
+      // close tooltip
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.tooltip).toBe(null);
+
+      formField.insertMenu({objectType: Menu});
+      expect(formField.menus[1].enabledComputed).toBe(false);
+      expect(formField.enabledComputed).toBe(false);
+      expect(formField.fieldStatus.enabledComputed).toBe(true);
+
+      // open tooltip
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.tooltip.menus[1].enabledComputed).toBe(false);
+
+      // close tooltip
+      formField.fieldStatus.tooltip.animateRemoval = false;
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.tooltip).toBe(null);
+
+      formField.insertMenu({objectType: Menu, inheritAccessibility: false});
+      expect(formField.menus[2].enabledComputed).toBe(true);
+      expect(formField.enabledComputed).toBe(false);
+      expect(formField.fieldStatus.enabledComputed).toBe(true);
+
+      // open tooltip
+      formField.fieldStatus.doAction();
+      expect(formField.fieldStatus.tooltip.menus[1].enabledComputed).toBe(false);
+      expect(formField.fieldStatus.tooltip.menus[2].enabledComputed).toBe(true);
     });
   });
 
