@@ -1502,6 +1502,11 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   public void setColumnIndexInternal(int index) {
+    int currentColIndex = getColumnIndex();
+    if (currentColIndex >= 0) {
+      LOG.warn("Unexpected column index {} for column {}", currentColIndex, this, new Exception("Stacktrace"));
+      return;
+    }
     m_headerCell.setColumnIndexInternal(index);
   }
 
