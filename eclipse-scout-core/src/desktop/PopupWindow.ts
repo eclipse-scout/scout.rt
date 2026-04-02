@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -44,8 +44,7 @@ export class PopupWindow extends EventEmitter {
     myWindow.name = 'Scout popup-window ' + form.modelClass;
   }
 
-  protected _onUnload() {
-    $.log.isDebugEnabled() && $.log.debug('stored form ID ' + this.form.id + ' to session storage');
+  protected _onPageHide() {
     if (this.form.destroyed) {
       $.log.isDebugEnabled() && $.log.debug('form ID ' + this.form.id + ' is already destroyed - don\'t trigger unload event');
     } else {
@@ -97,7 +96,7 @@ export class PopupWindow extends EventEmitter {
 
     // Attach event handlers on window
     $(this.myWindow)
-      .on('unload', this._onUnload.bind(this))
+      .on('pagehide', this._onPageHide.bind(this))
       .on('resize', this._onResize.bind(this));
 
     // Delegate uncaught JavaScript errors in the popup-window to the main-window
