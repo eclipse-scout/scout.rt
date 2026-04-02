@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -437,9 +437,9 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     this.uiSessionId = data.startupData.uiSessionId;
 
     // Destroy UI session on server when page is closed or reloaded
-    $(window)
-      .on('beforeunload.' + this.uiSessionId, this._onWindowBeforeUnload.bind(this))
-      .on('unload.' + this.uiSessionId, this._onWindowUnload.bind(this));
+    window.addEventListener('beforeunload', event => this._onWindowBeforeUnload(event));
+    window.addEventListener('pagehide', event => this._onWindowPageHide(event));
+    window.addEventListener('pageshow', event => this._onWindowPageShow(event));
 
     // Special case: Page must be reloaded on startup (e.g. theme changed)
     if (data.startupData.reloadPage) {
@@ -692,6 +692,8 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       urlHint = 'log';
     } else if (request.syncResponseQueue) {
       urlHint = 'sync';
+    } else if (request.startup) {
+      urlHint = 'startup';
     }
     if (urlHint) {
       url = new URL(url).addParameter(urlHint).toString();
@@ -1548,7 +1550,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     });
   }
 
-  protected _onWindowBeforeUnload(evt: BeforeUnloadEvent) {
+  protected _onWindowBeforeUnload(event: BeforeUnloadEvent) {
     $.log.isInfoEnabled() && $.log.info('Session before unloading...');
     // TODO [7.0] bsh: Cancel pending requests
 
@@ -1560,6 +1562,22 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       // reset the flag after a short period of time.
       this.unloading = false;
     }, 200);
+  }
+
+  protected _onWindowPageHide(event: PageTransitionEvent) {
+    if (event.persisted) {
+      // Make content invisible to avoid flashing during future 'pageshow' event (which will perform a page reload anyway, see _onWindowPageShow)
+      this.$entryPoint.addClass('hidden');
+    }
+    // Unload UI session
+    this._onWindowUnload();
+  }
+
+  protected _onWindowPageShow(event: PageTransitionEvent) {
+    if (event.persisted) {
+      // Perform a reload to get a new UI session (the old one was disposed in _onWindowUnload).
+      location.reload();
+    }
   }
 
   protected _onWindowUnload() {
