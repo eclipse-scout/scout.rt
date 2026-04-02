@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -34,9 +34,6 @@ public class HeaderCell extends AbstractPropertyObserver implements IHeaderCell 
     int currentColIndex = getColumnIndex();
     if (currentColIndex < 0) {
       doSetColumnIndex(index);
-    }
-    else {
-      LOG.warn(null, new IllegalAccessException("do not use this internal method"));
     }
   }
 
