@@ -31,7 +31,6 @@ describe('Form', () => {
     });
     helper = new FormSpecHelper(session);
     outlineHelper = new OutlineSpecHelper(session);
-    uninstallUnloadHandlers(session);
   });
 
   afterEach(() => {

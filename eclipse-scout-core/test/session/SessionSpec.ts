@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -572,7 +572,6 @@ describe('Session', () => {
       let session = createSession();
       session.start();
 
-      uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 
       let requestData = mostRecentJsonRequest();
@@ -592,7 +591,6 @@ describe('Session', () => {
       }));
       session.start();
 
-      uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 
       let requestData = mostRecentJsonRequest();
