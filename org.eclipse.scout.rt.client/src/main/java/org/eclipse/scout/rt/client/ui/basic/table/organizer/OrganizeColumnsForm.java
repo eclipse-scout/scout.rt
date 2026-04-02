@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1111,6 +1111,9 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
       m_organizedTable.getReloadHandler().reload(IReloadReason.ORGANIZE_COLUMNS);
     }
     getColumnsTableField().reloadTableData();
+    // After reloading, the columnsTableField now contains the expected columns in the correct order
+    // -> ensure the order of columns is correctly applied to the table
+    updateColumnVisibilityAndOrder();
   }
 
   protected void applyConfigImpl(String configName) {
