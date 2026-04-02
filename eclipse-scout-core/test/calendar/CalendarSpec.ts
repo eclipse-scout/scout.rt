@@ -18,7 +18,6 @@ describe('Calendar', () => {
     jasmine.Ajax.install();
     jasmine.clock().install();
     session = sandboxSession();
-    uninstallUnloadHandlers(session);
   });
 
   afterEach(() => {

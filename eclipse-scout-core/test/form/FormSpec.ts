@@ -31,7 +31,6 @@ describe('Form', () => {
     });
     helper = new FormSpecHelper(session);
     outlineHelper = new OutlineSpecHelper(session);
-    uninstallUnloadHandlers(session);
     session.textMap.add('FormSaveChangesQuestion', 'Do you want to save the changes?');
     session.textMap.add('FormEmptyMandatoryFieldsMessage', 'The following fields must be filled in:');
     session.textMap.add('FormInvalidFieldsMessage', 'The following fields are invalid:');
