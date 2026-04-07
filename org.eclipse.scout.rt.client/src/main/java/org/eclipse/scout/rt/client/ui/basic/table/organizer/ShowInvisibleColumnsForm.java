@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -264,10 +264,17 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
         newCols.add(col);
         col.setVisible(true);
       }
-      if (m_insertAfterColumn == null || newCols.isEmpty()) {
+      if (newCols.isEmpty()) {
         return;
       }
-      ColumnSet colSet = newCols.get(0).getTable().getColumnSet();
+
+      ITable table = newCols.getFirst().getTable();
+      if (m_insertAfterColumn == null) {
+        ClientUIPreferences.getInstance().setAllTableColumnPreferences(table);
+        return;
+      }
+
+      ColumnSet colSet = table.getColumnSet();
       List<IColumn<?>> newOrder = new ArrayList<>();
       List<IColumn<?>> visibleColumns = colSet.getVisibleColumns();
       int position = 0;
@@ -305,7 +312,7 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
         i++;
       }
       colSet.setVisibleColumns(newOrder);
-      ClientUIPreferences.getInstance().setAllTableColumnPreferences(newCols.get(0).getTable());
+      ClientUIPreferences.getInstance().setAllTableColumnPreferences(table);
     }
 
     @Override
