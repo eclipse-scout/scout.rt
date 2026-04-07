@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Column, Form, GroupBox, InitModelOf, MaxRowCountContributionDo, NumberColumn, NumberField, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, ResetMenu, scout, SearchFormTableControl, SearchMenu, SmartColumn,
-  StaticLookupCall, StringField, Table, TableReloadReason, TableRow, WidgetModel
+  arrays, Column, Form, GroupBox, InitModelOf, MaxRowCountContributionDo, NumberColumn, NumberField, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, ResetMenu, scout, SearchFormTableControl, SearchMenu,
+  SearchRequiredTableStatus, SmartColumn, StaticLookupCall, StringField, Table, TableReloadReason, TableRow, WidgetModel
 } from '../../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
 
@@ -660,5 +660,106 @@ describe('PageWithTable', () => {
     expect(usedFilter.numVal).toBe(2);
     expect(searchFormData.strVal).toBe('new');
     expect(searchFormData.numVal).toBe(2);
+  });
+
+  describe('searchRequired', () => {
+
+    it('shows a table status if searchRequired is true instead of loading the data', async () => {
+      let pageWithSearchRequired = scout.create(SpecPageWithTable, {
+        parent: outline,
+        detailTable: {
+          objectType: Table
+        },
+        searchRequired: true
+      });
+      spyOn(pageWithSearchRequired, '_loadTableData').and.callFake(() => $.resolvedPromise());
+
+      outline.insertNodes([pageWithSearchRequired], null);
+      expect(pageWithSearchRequired.outline).toBe(outline);
+      expect(pageWithSearchRequired.detailTable).toBe(null);
+
+      outline.expandNode(pageWithSearchRequired); // <-- calls ensureLoadChildren() before the detail table is initialized
+      outline.selectNode(pageWithSearchRequired);
+      expect(pageWithSearchRequired._loadTableData).not.toHaveBeenCalled();
+      expect(pageWithSearchRequired.detailTable).toBeInstanceOf(Table);
+      expect(pageWithSearchRequired.detailTable.tableStatus).toEqual(SearchRequiredTableStatus.info(session.text('TooManyRows')));
+
+      // -----
+
+      let pageWithSearchRequiredWithoutDetailTable = scout.create(SpecPageWithTable, {
+        parent: outline,
+        searchRequired: true
+      });
+      spyOn(pageWithSearchRequiredWithoutDetailTable, '_loadTableData').and.callFake(() => $.resolvedPromise());
+
+      outline.insertNodes([pageWithSearchRequiredWithoutDetailTable], null);
+      expect(pageWithSearchRequiredWithoutDetailTable.outline).toBe(outline);
+      expect(pageWithSearchRequiredWithoutDetailTable.detailTable).toBe(null);
+
+      outline.expandNode(pageWithSearchRequiredWithoutDetailTable); // <-- calls ensureLoadChildren() before the detail table is initialized
+      outline.selectNode(pageWithSearchRequiredWithoutDetailTable);
+      expect(pageWithSearchRequiredWithoutDetailTable._loadTableData).not.toHaveBeenCalled();
+      expect(pageWithSearchRequiredWithoutDetailTable.detailTable).toBe(null);
+    });
+
+    it('loads the data if searchRequired is false or searchFilterCompleted is true', async () => {
+      let pageWithoutSearchRequired = scout.create(SpecPageWithTable, {
+        parent: outline,
+        detailTable: {
+          objectType: Table
+        }
+      });
+      spyOn(pageWithoutSearchRequired, '_loadTableData').and.callFake(() => $.resolvedPromise());
+
+      outline.insertNodes([pageWithoutSearchRequired], null);
+      expect(pageWithoutSearchRequired.outline).toBe(outline);
+      expect(pageWithoutSearchRequired.detailTable).toBe(null);
+
+      outline.expandNode(pageWithoutSearchRequired); // <-- calls ensureLoadChildren() before the detail table is initialized
+      outline.selectNode(pageWithoutSearchRequired);
+      expect(pageWithoutSearchRequired._loadTableData).toHaveBeenCalled();
+      expect(pageWithoutSearchRequired.detailTable).toBeInstanceOf(Table);
+      expect(pageWithoutSearchRequired.detailTable.tableStatus).toBeFalsy();
+
+      // -----
+
+      let pageWithSearchRequiredAndFilterCompleted = scout.create(SpecPageWithTable, {
+        parent: outline,
+        detailTable: {
+          objectType: Table
+        },
+        searchRequired: true
+      });
+      spyOn(pageWithSearchRequiredAndFilterCompleted, '_loadTableData').and.callFake(() => $.resolvedPromise());
+      pageWithSearchRequiredAndFilterCompleted.searchFilterCompleted = true;
+
+      outline.insertNodes(pageWithSearchRequiredAndFilterCompleted);
+      expect(pageWithSearchRequiredAndFilterCompleted.outline).toBe(outline);
+      expect(pageWithSearchRequiredAndFilterCompleted.detailTable).toBe(null);
+
+      outline.expandNode(pageWithSearchRequiredAndFilterCompleted); // <-- calls ensureLoadChildren() before the detail table is initialized
+      outline.selectNode(pageWithSearchRequiredAndFilterCompleted);
+      expect(pageWithSearchRequiredAndFilterCompleted._loadTableData).toHaveBeenCalled();
+      expect(pageWithSearchRequiredAndFilterCompleted.detailTable).toBeInstanceOf(Table);
+      expect(pageWithSearchRequiredAndFilterCompleted.detailTable.tableStatus).toBeFalsy();
+
+      // -----
+
+      let pageWithSearchRequiredWithoutDetailTable = scout.create(SpecPageWithTable, {
+        parent: outline,
+        searchRequired: true
+      });
+      spyOn(pageWithSearchRequiredWithoutDetailTable, '_loadTableData').and.callFake(() => $.resolvedPromise());
+      pageWithSearchRequiredWithoutDetailTable.searchFilterCompleted = true;
+
+      outline.insertNodes(pageWithSearchRequiredWithoutDetailTable);
+      expect(pageWithSearchRequiredWithoutDetailTable.outline).toBe(outline);
+      expect(pageWithSearchRequiredWithoutDetailTable.detailTable).toBe(null);
+
+      outline.expandNode(pageWithSearchRequiredWithoutDetailTable); // <-- calls ensureLoadChildren() before the detail table is initialized
+      outline.selectNode(pageWithSearchRequiredWithoutDetailTable);
+      expect(pageWithSearchRequiredWithoutDetailTable._loadTableData).not.toHaveBeenCalled();
+      expect(pageWithSearchRequiredWithoutDetailTable.detailTable).toBe(null);
+    });
   });
 });

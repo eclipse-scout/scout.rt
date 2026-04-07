@@ -223,7 +223,18 @@ export class PageWithTable extends Page implements PageWithTableModel {
     this._resetTableData();
   }
 
+  /**
+   * Reverts the data in the {@link detailTable} to the original state by reloading it. For tables with
+   * {@link searchRequired} = true, the data is not reloaded. Instead, the old rows are deleted, a table
+   * status is displayed and {@link searchFilterCompleted} is set to false.
+   *
+   * This method must only be called after the detail table has been created ({@link ensureDetailTable}).
+   */
   protected _resetTableData() {
+    // It's allowed to have no table - but we don't have to load data in that case
+    if (!this.detailTable) {
+      return;
+    }
     if (this.searchRequired) {
       this.detailTable.deleteAllRows();
       this.setSearchFilterCompleted(false);
@@ -265,6 +276,8 @@ export class PageWithTable extends Page implements PageWithTableModel {
 
   override ensureLoadChildren(): JQuery.Promise<any> {
     if (this.searchRequired && !this.searchFilterCompleted) {
+      // Show table status
+      this.ensureDetailTable();
       this._resetTableData();
       return $.resolvedPromise();
     }
