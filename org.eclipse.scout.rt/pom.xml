@@ -130,7 +130,7 @@
     <io.netty-version>4.1.130.Final</io.netty-version>
     <apache.tika-version>2.9.1</apache.tika-version>
     <batik.version>1.17</batik.version>
-    <activemq.version>6.0.0</activemq.version>
+    <activemq.version>6.2.3</activemq.version>
     <artemis.version>2.31.2</artemis.version>
     <com.google.http-client.version>1.43.3</com.google.http-client.version>
     <org.apache.httpcomponents.version>5.2.1</org.apache.httpcomponents.version>
