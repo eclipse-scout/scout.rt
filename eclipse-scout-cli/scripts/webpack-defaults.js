@@ -31,7 +31,7 @@ const ts = require('typescript');
  * @param {[]} args.resDirArray an array containing directories which should be copied to dist/res
  * @param {object} args.tsOptions a config object to be passed to the ts-loader
  * @param {object} args.forkTypeCheckOptions a config object to be passed to the ForkTsCheckerWebpackPlugin
- * @param {boolean|'fork'} args.typeCheck
+ * @param {boolean|'fork'|'auto'} args.typeCheck
  *    true: let the TypeScript compiler check the types.
  *    false: let the TypeScript compiler only transpile the TypeScript code without checking types, which makes it faster.
  *    fork: starts a separate process to run the type checks so that the build won't be blocked until type check completes.
@@ -644,7 +644,7 @@ function rewriteIndexImports(newImport, excludedFolder) {
 }
 
 function computeTypeCheck(typeCheck, devMode, watchMode) {
-  typeCheck = nvl(typeCheck, 'auto');
+  typeCheck = '' + nvl(typeCheck, 'auto');
   if (typeCheck !== 'auto' && typeCheck !== 'fork') {
     typeCheck = typeCheck.toLowerCase() === 'true';
   }
