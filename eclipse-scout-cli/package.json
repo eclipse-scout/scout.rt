@@ -67,7 +67,8 @@
     "yargs-parser": "22.0.0",
     "fork-ts-checker-webpack-plugin": "9.1.0",
     "fork-ts-checker-notifier-webpack-plugin": "9.0.0",
-    "@cyclonedx/webpack-plugin": "5.2.4"
+    "@cyclonedx/webpack-plugin": "5.2.4",
+    "karma-sourcemap-loader": "0.4.0"
   },
   "devDependencies": {
     "@eclipse-scout/releng": "^26.1.0"

@@ -84,10 +84,23 @@ module.exports = (config, specEntryPoint) => {
   const preprocessorObj = {};
   preprocessorObj[specIndex] = ['webpack'];
 
+  const scoutExternals = findScoutExternals();
+  if (scoutExternals?.length) {
+    webpackConfig.externals ||= {};
+    for (const external of scoutExternals) {
+      // mark scout external as webpack external
+      webpackConfig.externals[external.moduleName] = 'scout';
+      // add source maps for scout external
+      preprocessorObj[external.path] = ['sourcemap'];
+    }
+  }
+
   config.set({
     browsers: ['Chrome'],
     files: [
       {pattern: jquery, watched: false},
+      // include scout external files
+      ...scoutExternals.map(external => ({pattern: external.path, watched: false})),
       {pattern: specIndex, watched: false}
     ],
     frameworks: ['webpack', 'jasmine-scout', 'jasmine-jquery', 'jasmine-ajax', 'jasmine'], /* order of the frameworks is relevant! */
@@ -106,7 +119,13 @@ module.exports = (config, specEntryPoint) => {
       require('karma-jasmine-ajax'),
       require('@eclipse-scout/karma-jasmine-scout'),
       require('karma-webpack'),
-      require('karma-chrome-launcher')
+      require('karma-chrome-launcher'),
+      // add source map loader if scout externals are present
+      ...(
+        scoutExternals?.length
+          ? [require('karma-sourcemap-loader')]
+          : []
+      )
     ],
     client: {
       // Leave "Jasmine Spec Runner" output visible in browser
@@ -123,7 +142,13 @@ module.exports = (config, specEntryPoint) => {
     webpack: webpackConfig,
     webpackServer: {
       noInfo: true
-    }
+    },
+    // add source maps for scout externals if present
+    ...(
+      scoutExternals?.length
+        ? {sourceMapLoader: {onlyWithURL: true}}
+        : {}
+    )
   });
 };
 
@@ -152,4 +177,34 @@ function searchSpecEntryPoint(specEntryPoint) {
     return defaultTypescriptIndex;
   }
   return path.resolve('test', 'test-index.js');
+}
+
+function findScoutExternals() {
+  const esmJsFileExtension = '.esm.js';
+  const jsFileExtension = '.js';
+
+  // check whether scout browser build exists
+  const scoutEsmPath = require.resolve('@eclipse-scout/core');
+  if (!scoutEsmPath.endsWith(esmJsFileExtension)) {
+    return [];
+  }
+  const scoutExternalPath = scoutEsmPath.substring(0, scoutEsmPath.length - esmJsFileExtension.length) + jsFileExtension;
+  if (!fs.existsSync(scoutExternalPath)) {
+    return [];
+  }
+
+  // check whether testing browser build exists
+  const testingEsmPath = require.resolve('@eclipse-scout/core/testing');
+  if (!testingEsmPath.endsWith(esmJsFileExtension)) {
+    return [];
+  }
+  const testingExternalPath = testingEsmPath.substring(0, testingEsmPath.length - esmJsFileExtension.length) + jsFileExtension;
+  if (!fs.existsSync(testingExternalPath)) {
+    return [];
+  }
+
+  return [
+    {path: scoutExternalPath, moduleName: '@eclipse-scout/core'},
+    {path: testingExternalPath, moduleName: '@eclipse-scout/core/testing'}
+  ];
 }
