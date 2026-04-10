@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.SecureRandom;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -69,6 +70,27 @@ public interface ISecurityProvider {
    * </pre>
    */
   String ENCRYPTION_COMPATIBILITY_HEADER_2024_V1 = "[2024:v1]";
+  /**
+   * <pre>
+   * secretKeyAlgorithm: PBKDF2WithHmacSHA256
+   * cipherAlgorithm/Provider: AES/SunJCE
+   * GCM init vector length: 16
+   * GCM auth tag bit length: 128
+   * key derivation iteration count: 10000
+   * </pre>
+   */
+  String ENCRYPTION_COMPATIBILITY_HEADER_2026_V1_PREFIX = "2026:v1:";
+
+  /**
+   * <pre>
+   * secretKeyAlgorithm: PBKDF2WithHmacSHA256
+   * cipherAlgorithm/Provider: AES/SunJCE
+   * GCM init vector length: 16
+   * GCM auth tag bit length: 128
+   * key derivation iteration count: 10000
+   * </pre>
+   */
+  Pattern ENCRYPTION_COMPATIBILITY_HEADER_2026_V1_PATTERN = Pattern.compile("^\\[" + ENCRYPTION_COMPATIBILITY_HEADER_2026_V1_PREFIX + "[A-Za-z0-9+/]+={0,2}]$"); // [2026:v1:<base64 encoded password hash>]
 
   /**
    * Create a Message Authentication Code (MAC) for the given data and password.
