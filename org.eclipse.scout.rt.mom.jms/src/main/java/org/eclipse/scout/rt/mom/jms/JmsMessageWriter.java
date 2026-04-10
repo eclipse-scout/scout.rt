@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 /**
  * Allows to write a JMS message.
@@ -43,6 +44,7 @@ public class JmsMessageWriter {
   protected IMarshaller m_marshaller;
   protected Map<String, String> m_marshallerContext;
   protected IDataObjectMapper m_contextDataObjectMapper;
+  protected long m_maxMessageSize = 0;
 
   /**
    * Initializes this writer.
@@ -53,6 +55,11 @@ public class JmsMessageWriter {
     m_marshaller = assertNotNull(marshaller, "Marshaller not specified");
     m_marshallerContext = new HashMap<>();
     m_contextDataObjectMapper = BEANS.get(IDataObjectMapper.class);
+    return this;
+  }
+
+  public JmsMessageWriter withMaxMessageSize(final long maxMessageSize) {
+    this.m_maxMessageSize = maxMessageSize;
     return this;
   }
 
@@ -91,10 +98,18 @@ public class JmsMessageWriter {
 
     switch (m_marshaller.getMessageType()) {
       case MESSAGE_TYPE_TEXT:
-        writeTextMessage((TextMessage) m_message, (String) transportObject);
+        String text = (String) transportObject;
+        if (m_maxMessageSize > 0 && text != null && m_maxMessageSize < text.length()) {
+          throw new ProcessingException("Message too large: {} > {}.", text.length(), m_maxMessageSize);
+        }
+        writeTextMessage((TextMessage) m_message, text);
         break;
       case MESSAGE_TYPE_BYTES:
-        writeBytesMessage((BytesMessage) m_message, (byte[]) transportObject);
+        byte[] data = (byte[]) transportObject;
+        if (m_maxMessageSize > 0 && data != null && m_maxMessageSize < data.length) {
+          throw new ProcessingException("Message too large: {} > {}.", data.length, m_maxMessageSize);
+        }
+        writeBytesMessage((BytesMessage) m_message, data);
         break;
       case MESSAGE_TYPE_NO_PAYLOAD:
         break;
