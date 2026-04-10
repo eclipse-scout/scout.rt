@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,6 +14,9 @@ module.exports = (env, args) => {
   }
   if (args.run === 'testing') {
     return require('./webpack.config.testing.js')(env, args);
+  }
+  if (args.run === 'testing-global') {
+    return require('./webpack.config.testing.global.js')(env, args);
   }
   const baseConfig = require('@eclipse-scout/cli/scripts/webpack-defaults');
   const config = baseConfig(env, args);
