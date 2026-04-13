@@ -23,7 +23,7 @@
     "exports": {
       ".": {
         "types": "./dist/d.ts/src/index.d.ts",
-        "import": "./dist/eclipse-scout-chart.esm.js"
+        "default": "./dist/eclipse-scout-chart.esm.js"
       },
       "./src/*": "./src/*"
     },
