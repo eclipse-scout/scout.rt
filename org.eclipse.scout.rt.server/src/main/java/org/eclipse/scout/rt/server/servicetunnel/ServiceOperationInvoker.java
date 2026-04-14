@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.server.servicetunnel;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
+import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -260,18 +262,28 @@ public class ServiceOperationInvoker {
    */
   protected Throwable interceptException(Throwable t) {
     Throwable p;
-    if (t instanceof VetoException) {
-      VetoException ve = (VetoException) t;
-      p = new VetoException(ve.getStatus().getBody())
-          .withTitle(ve.getStatus().getTitle())
-          .withHtmlMessage(ve.getHtmlMessage())
-          .withCode(ve.getStatus().getCode())
-          .withSeverity(ve.getStatus().getSeverity());
+    if (t instanceof AccessForbiddenException afe) {
+      p = copyVetoException(afe, AccessForbiddenException::new);
+      afe.getContextInfos().stream()
+          .filter(contextInfo -> contextInfo.startsWith("permission="))
+          .map(contextInfo -> StringUtility.substring(contextInfo, 11))
+          .forEach(permissionInfo -> ((AccessForbiddenException) p).withContextInfo("permission", permissionInfo));
+    }
+    else if (t instanceof VetoException ve) {
+      p = copyVetoException(ve, VetoException::new);
     }
     else {
       p = new ProcessingException(TEXTS.get("RequestProblem"));
     }
     p.setStackTrace(new StackTraceElement[0]);
     return p;
+  }
+
+  protected VetoException copyVetoException(VetoException origin, Function<String, VetoException> newException) {
+    return newException.apply(origin.getStatus().getBody())
+        .withTitle(origin.getStatus().getTitle())
+        .withHtmlMessage(origin.getHtmlMessage())
+        .withCode(origin.getStatus().getCode())
+        .withSeverity(origin.getStatus().getSeverity());
   }
 }
