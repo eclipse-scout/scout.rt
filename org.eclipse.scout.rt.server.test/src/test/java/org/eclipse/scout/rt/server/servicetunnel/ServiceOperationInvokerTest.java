@@ -16,9 +16,15 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
+import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.security.AccessSupport;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission1;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -80,5 +86,15 @@ public class ServiceOperationInvokerTest {
     assertNull(res.getException());
     assertNotNull(res.getProcessingDuration());
     assertEquals(data, res.getData());
+  }
+
+  @Test(expected = ProcessingException.class) //exception is handled with JUnitExceptionHandler
+  public void testInvokeAccessForbidden() {
+    String exceptionMessage = "xxx";
+    AccessForbiddenException afe = BEANS.get(AccessSupport.class).getAccessCheckFailedException(new TestPermission1());
+    when(m_pingSvc.ping(any(String.class))).thenThrow(afe);
+    ServiceTunnelResponse res = invokePingService(createRunContext());
+    assertProcessingException(res, exceptionMessage);
+    assertEquals(List.of("permission=TestPermission1 [name=scout.test.permission.1]"), ((AccessForbiddenException) res.getException()).getContextInfos());
   }
 }
