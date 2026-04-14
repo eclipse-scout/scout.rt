@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -166,34 +166,34 @@ export class TileTableHeaderBox extends GroupBox implements TileTableHeaderBoxMo
   }
 
   protected _syncSortingGroupingFields() {
-    let primaryGroupingColumn = arrays.find(this.table.visibleColumns(), column => column.grouped && column.sortIndex === 0);
-    if (primaryGroupingColumn) {
-      this.groupByField.setValue(primaryGroupingColumn);
-    } else {
-      this.groupByField.setValue(null);
+    if (!this.isGrouping) {
+      let primaryGroupingColumn = arrays.find(this.table.visibleColumns(), column => column.grouped && column.sortIndex === 0);
+      if (primaryGroupingColumn) {
+        this.groupByField.setValue(primaryGroupingColumn);
+      } else {
+        this.groupByField.setValue(null);
+      }
     }
 
-    let primarySortingColumn = arrays.find(this.table.visibleColumns(), column => column.sortActive && column.sortIndex === 0);
-    if (primarySortingColumn) {
-      this.sortByField.setValue(this._findSortByLookupRowForKey({
-        column: primarySortingColumn,
-        asc: primarySortingColumn.sortAscending
-      }));
-    } else {
-      this.sortByField.setValue(null);
+    if (!this.isSorting) {
+      let primarySortingColumn = arrays.find(this.table.visibleColumns(), column => column.sortActive && column.sortIndex === 0);
+      if (primarySortingColumn) {
+        this.sortByField.setValue(this._findSortByLookupRowForKey({
+          column: primarySortingColumn,
+          asc: primarySortingColumn.sortAscending
+        }));
+      } else {
+        this.sortByField.setValue(null);
+      }
     }
   }
 
   protected _onTableGroup(event: TableGroupEvent) {
-    if (!this.isGrouping) {
-      this._syncSortingGroupingFields();
-    }
+    this._syncSortingGroupingFields();
   }
 
   protected _onTableSort(event: TableSortEvent) {
-    if (!this.isSorting) {
-      this._syncSortingGroupingFields();
-    }
+    this._syncSortingGroupingFields();
   }
 
   protected _onTableColumnStructureChanged(event: TableColumnStructureChangedEvent) {

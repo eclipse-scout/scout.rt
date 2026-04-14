@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -308,8 +309,11 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
       for (IColumn col : getTable().getColumns()) {
         if (col.isVisible() && isColumnTypeAllowedForSorting(col)) {
           String colLabel = ObjectUtility.nvl(col.getHeaderCell().getText(), col.getHeaderCell().getTooltipText());
-          lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, true), colLabel + " ↑")); // U+2191
-          lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, false), colLabel + " ↓")); // U+2193
+          lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, true), colLabel + " (" + TEXTS.get("ascending") + ")")
+              .withIconId(AbstractIcons.LongArrowUpBold));
+          lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, false), colLabel + " (" + TEXTS.get("descending") + ")")
+              .withIconId(AbstractIcons.LongArrowDownBold)
+          );
         }
       }
 
