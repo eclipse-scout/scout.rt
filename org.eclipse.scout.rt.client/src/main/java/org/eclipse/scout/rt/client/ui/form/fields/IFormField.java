@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -73,6 +73,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
   String PROP_ORDER = "order";
   String PROP_ERROR_STATUS = "errorStatus";
   String PROP_TOOLTIP_TEXT = "tooltipText";
+  String PROP_TOOLTIP_HTML_ENABLED = "tooltipHtmlEnabled";
   String PROP_TOOLTIP_ANCHOR = "tooltipAnchor";
   String PROP_FOREGROUND_COLOR = "foregroundColor";
   String PROP_BACKGROUND_COLOR = "backgroundColor";
@@ -463,6 +464,10 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
   String getTooltipText();
 
   void setTooltipText(String text);
+
+  boolean isTooltipHtmlEnabled();
+
+  void setTooltipHtmlEnabled(boolean tooltipHtmlEnabled);
 
   void setTooltipAnchor(String tooltipAnchor);
 

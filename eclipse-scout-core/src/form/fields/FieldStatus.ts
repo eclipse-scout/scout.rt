@@ -22,6 +22,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
   position: FormFieldStatusPosition;
   menus: Menu[];
   tooltip: Tooltip;
+  tooltipHtmlEnabled: boolean;
   contextMenu: ContextMenuPopup;
   updating: boolean;
 
@@ -32,6 +33,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
   constructor() {
     super();
     this.tooltip = null;
+    this.tooltipHtmlEnabled = false;
     this.contextMenu = null;
     this.status = null;
     this.updating = false;
@@ -201,6 +203,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
         parent: this,
         $anchor: this.$container,
         text: this.status.message,
+        htmlEnabled: this.tooltipHtmlEnabled,
         severity: this.status.severity,
         autoRemove: this.autoRemove,
         menus: this.menus
