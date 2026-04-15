@@ -54,6 +54,7 @@ export class FormField extends Widget implements FormFieldModel {
   /** If set to true, {@link saveNeeded} will return true as well, even if the value has not been changed. */
   touched: boolean;
   tooltipText: string;
+  tooltipHtmlEnabled: boolean;
   font: string;
   foregroundColor: string;
   backgroundColor: string;
@@ -120,6 +121,7 @@ export class FormField extends Widget implements FormFieldModel {
     this.suppressStatus = null;
     this.touched = false;
     this.tooltipText = null;
+    this.tooltipHtmlEnabled = false;
     this.tooltipAnchor = FormField.TooltipAnchor.DEFAULT;
     this.onFieldTooltipOptionsCreator = null;
     this.validationResultProvider = this._createValidationResultProvider();
@@ -228,7 +230,8 @@ export class FormField extends Widget implements FormFieldModel {
   protected _createFieldStatus(): FieldStatus {
     return scout.create(FieldStatus, {
       parent: this,
-      position: this.statusPosition
+      position: this.statusPosition,
+      tooltipHtmlEnabled: this.tooltipHtmlEnabled
     });
   }
 
@@ -495,6 +498,15 @@ export class FormField extends Widget implements FormFieldModel {
     this._updateTooltip();
   }
 
+  /** @see FormFieldModel.tooltipHtmlEnabled */
+  setTooltipHtmlEnabled(tooltipHtmlEnabled: boolean) {
+    this.setProperty('tooltipHtmlEnabled', tooltipHtmlEnabled);
+  }
+
+  protected _renderTooltipHtmlEnabled() {
+    this._updateTooltip();
+  }
+
   /** @see FormFieldModel.tooltipAnchor */
   setTooltipAnchor(tooltipAnchor: FormFieldTooltipAnchor) {
     this.setProperty('tooltipAnchor', tooltipAnchor);
@@ -692,6 +704,7 @@ export class FormField extends Widget implements FormFieldModel {
     let statusVisible = this._computeStatusVisible();
     this.fieldStatus.setPosition(this.statusPosition);
     this.fieldStatus.setVisible(statusVisible);
+    this.fieldStatus.setTooltipHtmlEnabled(this.tooltipHtmlEnabled);
     if (!statusVisible) {
       this.fieldStatus.setMenus(null);
       this.fieldStatus.setStatus(null);

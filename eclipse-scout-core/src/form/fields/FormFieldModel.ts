@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -144,6 +144,12 @@ export interface FormFieldModel extends WidgetModel {
    * The text to be used in the {@link Tooltip} that is either displayed in the status area or when hovering over the field, depending on {@link tooltipAnchor}.
    */
   tooltipText?: string;
+  /**
+   * Defines whether HTML code in the {@link tooltipText} property should be interpreted. If set to false, the HTML will be encoded.
+   *
+   * Default is false.
+   */
+  tooltipHtmlEnabled?: boolean;
   /**
    * Defines where and how the tooltip configured by {@link tooltipText} should appear.
    *
