@@ -48,6 +48,22 @@ public class MimeTypesTest {
   }
 
   @Test
+  public void findByMagicBytes() {
+    // jpg
+    assertTrue(MimeTypes.findByMagicBytes(HexUtility.decode("ffd8ff")).contains(MimeType.JPG));
+
+    // unknown mime-type
+    assertTrue(MimeTypes.findByMagicBytes(new byte[0]).isEmpty());
+    assertTrue(MimeTypes.findByMagicBytes(null).isEmpty());
+
+    // wav
+    assertTrue(MimeTypes.findByMagicBytes(HexUtility.decode("5249 4646 2e2e 2e2e 5741 5645")).contains(MimeType.WAV));
+
+    // pdf
+    assertTrue(MimeTypes.findByMagicBytes(HexUtility.decode("2550 4446")).contains(MimeType.PDF));
+  }
+
+  @Test
   public void testMatches() throws IOException {
     assertFalse(MimeType.JAR.matches((Path) null));
     assertFalse(MimeType.JAR.matches(Paths.get("not-existing")));
