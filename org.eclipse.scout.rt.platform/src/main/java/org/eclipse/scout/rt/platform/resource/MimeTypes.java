@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -83,10 +83,17 @@ public final class MimeTypes {
     if (res == null) {
       return Collections.emptyList();
     }
+    return findByMagicBytes(res.getContent());
+  }
+
+  public static Collection<IMimeType> findByMagicBytes(byte[] bytes) {
+    if (bytes == null) {
+      return Collections.emptyList();
+    }
     return EXT_TO_MIMETYPE
         .values()
         .stream()
-        .filter(t -> t.getMagic() != null && t.getMagic().matches(res))
+        .filter(t -> t.getMagic() != null && t.getMagic().matches(bytes))
         .collect(Collectors.toList());
   }
 
@@ -115,9 +122,6 @@ public final class MimeTypes {
     Set<String> detectedMajorParts = findByContentMagic(res).stream()
         .map(IMimeType::getMajorPart)
         .collect(Collectors.toSet());
-    if (detectedMajorParts.isEmpty() || detectedMajorParts.contains(ext)) {
-      return true;
-    }
-    return false;
+    return (detectedMajorParts.isEmpty() || detectedMajorParts.contains(ext));
   }
 }
