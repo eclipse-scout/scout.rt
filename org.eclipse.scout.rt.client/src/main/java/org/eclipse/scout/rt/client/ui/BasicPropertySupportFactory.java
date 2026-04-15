@@ -188,6 +188,7 @@ public class BasicPropertySupportFactory {
     defaultValues.put(IFormField.PROP_CSS_CLASS, null);
     defaultValues.put(IFormField.PROP_PREVENT_INITIAL_FOCUS, false);
     defaultValues.put(IFormField.PROP_SAVE_NEEDED, false);
+    defaultValues.put(IFormField.PROP_TOOLTIP_HTML_ENABLED, false);
     return Collections.unmodifiableMap(defaultValues);
   }
 
@@ -216,6 +217,7 @@ public class BasicPropertySupportFactory {
     defaultValues.put(IAction.PROP_ORDER, IOrdered.DEFAULT_ORDER);
     defaultValues.put(IAction.PROP_ACTION_STYLE, IMenu.ACTION_STYLE_DEFAULT);
     defaultValues.put(IAction.PROP_CSS_CLASS, null);
+    defaultValues.put(IAction.PROP_TOOLTIP_HTML_ENABLED, false);
     return Collections.unmodifiableMap(defaultValues);
   }
 

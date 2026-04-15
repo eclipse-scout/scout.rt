@@ -741,7 +741,7 @@ describe('Menu', () => {
       return $('body').find('.tooltip');
     }
 
-    function expectTooltip($element: JQuery, tooltipText: string) {
+    function expectTooltip($element: JQuery, tooltipText: string, htmlEnabled: boolean = false) {
       // No tooltip initially
       let $tooltips = find$Tooltips();
       expect($tooltips.length).toBe(0);
@@ -752,7 +752,11 @@ describe('Menu', () => {
       $tooltips = find$Tooltips();
       if (tooltipText) {
         expect($tooltips.length).toBe(1);
-        expect($tooltips.get(0).innerText).toBe(tooltipText); // text() does not return line breaks
+        if (htmlEnabled) {
+          expect($tooltips.get(0).getElementsByClassName('tooltip-content')[0].innerHTML).toBe(tooltipText);
+        } else {
+          expect($tooltips.get(0).innerText).toBe(tooltipText); // text() does not return line breaks
+        }
       } else {
         expect($tooltips.length).toBe(0);
       }
@@ -891,6 +895,24 @@ describe('Menu', () => {
       expectTooltip(menu.$container, 'Bar');
       expect(menu.$container.attr('aria-label')).toBe(undefined);
       expect(menu.$container.attr('aria-description')).toBe('Bar');
+
+      // test html-tooltip
+      menu.setTooltipHtmlEnabled(true);
+      menu.setTooltipText('the tooltip is <b>bold</b>');
+      menu.setText('the label is not <b>bold</b>');
+      menu.shrink();
+      expectTooltip(menu.$container, 'the label is not &lt;b&gt;bold&lt;/b&gt;<br><br>the tooltip is <b>bold</b>', true);
+
+      // test html-label and html-tooltip
+      menu.setHtmlEnabled(true);
+      menu.setText('the label is also <b>bold</b>');
+      expectTooltip(menu.$container, 'the label is also <b>bold</b><br><br>the tooltip is <b>bold</b>', true);
+
+      // test html-label
+      menu.setText('the label is still <b>bold</b>');
+      menu.setTooltipHtmlEnabled(false);
+      menu.setTooltipText('the tooltip is not anymore <b>bold</b>');
+      expectTooltip(menu.$container, 'the label is still <b>bold</b><br><br>the tooltip is not anymore &lt;b&gt;bold&lt;/b&gt;', true);
     });
   });
 });
