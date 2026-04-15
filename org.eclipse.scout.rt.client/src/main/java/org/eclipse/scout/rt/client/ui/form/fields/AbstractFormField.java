@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -320,6 +320,12 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   @Order(50)
   protected String getConfiguredTooltipText() {
     return null;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(52)
+  protected boolean getConfiguredTooltipHtmlEnabled() {
+    return false;
   }
 
   /**
@@ -857,6 +863,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     setMandatory(getConfiguredMandatory());
     setOrder(calculateViewOrder());
     setTooltipText(getConfiguredTooltipText());
+    setTooltipHtmlEnabled(getConfiguredTooltipHtmlEnabled());
     setTooltipAnchor(getConfiguredTooltipAnchor());
     setInitialLabel(getConfiguredLabel());
     setLabel(getConfiguredLabel());
@@ -1831,6 +1838,16 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   @Override
   public String getTooltipText() {
     return propertySupport.getPropertyString(PROP_TOOLTIP_TEXT);
+  }
+
+  @Override
+  public void setTooltipHtmlEnabled(boolean tooltipHtmlEnabled) {
+    propertySupport.setPropertyBool(PROP_TOOLTIP_HTML_ENABLED, tooltipHtmlEnabled);
+  }
+
+  @Override
+  public boolean isTooltipHtmlEnabled() {
+    return propertySupport.getPropertyBool(PROP_TOOLTIP_HTML_ENABLED);
   }
 
   @Override

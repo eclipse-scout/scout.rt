@@ -9,7 +9,7 @@
  */
 import {
   Action, ActionExecKeyStroke, ActionKeyStroke, aria, AriaRole, arrays, CloneOptions, ContextMenuPopup, EnumObject, HtmlComponent, icons, InitModelOf, MenuBarPopup, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke,
-  MenuModel, MenuOrder, ObjectOrChildModel, Popup, PopupAlignment, PropertyChangeEvent, scout, strings, tooltips, TreeVisitor, TreeVisitResult
+  MenuModel, MenuOrder, ObjectOrChildModel, Popup, PopupAlignment, PropertyChangeEvent, scout, strings, tooltips, TooltipSupport, TreeVisitor, TreeVisitResult
 } from '../index';
 
 export type SubMenuVisibility = EnumObject<typeof Menu.SubMenuVisibility>;
@@ -758,9 +758,20 @@ export class Menu extends Action implements MenuModel {
 
   protected override _computeTooltipText(): string {
     if (this._showTextAsTooltip()) {
-      return strings.join('\n\n', this.text, this.tooltipText);
+      let separator = (this.tooltipHtmlEnabled || this.htmlEnabled) ? '<br><br>' : '\n\n';
+      let text = this.tooltipHtmlEnabled && !this.htmlEnabled ? strings.encode(this.text) : this.text;
+      let tooltipText = (!this.tooltipHtmlEnabled && this.htmlEnabled) ? strings.encode(this.tooltipText) : this.tooltipText;
+      return strings.join(separator, text, tooltipText);
     }
     return super._computeTooltipText();
+  }
+
+  protected override _configureTooltip(): InitModelOf<TooltipSupport> {
+    let tooltip = super._configureTooltip();
+    if (this._showTextAsTooltip()) {
+      tooltip.htmlEnabled = this.tooltipHtmlEnabled || this.htmlEnabled;
+    }
+    return tooltip;
   }
 
   /**
