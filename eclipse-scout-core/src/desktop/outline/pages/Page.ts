@@ -93,7 +93,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
     this.inheritMenusFromParentTablePage = true;
     this.detailMenuContributors = [];
     this.events = new EventSupport();
-    this.events.registerSubTypePredicate('propertyChange', (event: PropertyChangeEvent, propertyName) => event.propertyName === propertyName);
+    this.events.registerSubTypeProvider('propertyChange', (event: PropertyChangeEvent) => event.propertyName);
     this.pageChanging = 0;
     this._tableFilterHandler = this._onTableFilter.bind(this);
     this._tableRowClickHandler = this._onTableRowClick.bind(this);

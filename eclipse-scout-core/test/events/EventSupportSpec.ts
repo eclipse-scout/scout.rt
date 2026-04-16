@@ -654,11 +654,11 @@ describe('EventSupport', () => {
     });
   });
 
-  describe('registerSubTypePredicate', () => {
+  describe('registerSubTypeProvider', () => {
 
     it('is used to execute specific listeners', () => {
       const eventSupport = new EventSupport();
-      eventSupport.registerSubTypePredicate('fancy', (event: FancyEvent, subType: string) => event?.subType === subType);
+      eventSupport.registerSubTypeProvider('fancy', (event: FancyEvent) => event.subType);
 
       let count = 0;
       let countFoo = 0;
