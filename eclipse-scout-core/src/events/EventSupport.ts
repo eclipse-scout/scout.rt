@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -104,21 +104,36 @@ export class EventSupport {
     return deferred.promise();
   }
 
+  /**
+   * Adds the given {@link EventListener} if it is not present.
+   */
   addListener(listener: EventListener) {
-    this._eventListeners.push(listener);
+    arrays.pushSet(this._eventListeners, listener);
   }
 
+  /**
+   * Removes the given {@link EventListener} if it is present.
+   */
   removeListener(listener: EventListener) {
     arrays.remove(this._eventListeners, listener);
   }
 
+  /**
+   * Counts all {@link EventListener}s that match the given filters.
+   *
+   * The type-filter will match all listeners that are triggered by all given types.
+   * For example if there are two listeners registered with type 'lorem' and 'lorem ipsum dolor' the filter 'lorem' will match 2 listeners.
+   * In this example, the type-filter 'ipsum dolor' will match 1 listener like 'dolor' or 'dolor ipsum lorem'.
+   *
+   * The func-filter will match all listeners that are registered using this exact {@link EventHandler}.
+   */
   count(type?: string, func?: EventHandler): number {
     let count = 0;
     this._eventListeners.forEach(listener => {
-      if (type && type !== listener.type) {
+      if (type && (!listener.type || !arrays.containsAll(listener.type.split(' '), type.split(' ').filter(Boolean)))) {
         return;
       }
-      if (func && func !== listener.func) {
+      if (func && !(func === listener.func || func === listener.origFunc)) {
         return;
       }
       count++;
@@ -127,13 +142,19 @@ export class EventSupport {
   }
 
   /**
-   * @returns the event types of the registered listeners
+   * Returns a list of unique single types of all registered listeners.
+   * Example: If there are two listeners registered for 'lorem' and 'lorem ipsum dolor' the multi-type is split and ['lorem', 'ipsum', 'dolor'] is returned.
    */
   types(): string[] {
     let types = new Set<string>();
     for (const listener of this._eventListeners) {
-      if (listener.type) {
-        types.add(listener.type);
+      if (!listener.type) {
+        continue;
+      }
+      for (const type of listener.type.split(' ')) {
+        if (type) {
+          types.add(type);
+        }
       }
     }
     return Array.from(types);

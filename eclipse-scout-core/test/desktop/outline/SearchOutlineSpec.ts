@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Column, EventListener, EventSupport, InitModelOf, Outline, PageWithTable, scout, SearchOutline, SearchPage, SearchState, Session, Table} from '../../../src/index';
+import {Column, InitModelOf, Outline, PageWithTable, scout, SearchOutline, SearchPage, SearchState, Session, Table} from '../../../src/index';
 
 describe('SearchOutline', () => {
   let session: Session;
@@ -323,12 +323,12 @@ describe('SearchOutline', () => {
       const searchPage = createSearchPage(outline, {text: 'SearchPage'});
 
       expect(searchPage.searchState.events.count('propertyChange:resultCount propertyChange:limited propertyChange:pending', outline._searchStateChangeHandler)).toBe(0);
-      expect((searchPage.searchState.events as SpecEventSupport)._eventListeners.filter(listener => listener.type === 'destroy' && listener.origFunc === outline._searchStateDestroyHandler).length).toBe(0);
+      expect(searchPage.searchState.events.count('destroy', outline._searchStateDestroyHandler)).toBe(0);
 
       outline.setSearchStates(new Set([searchPage.searchState]));
 
       expect(searchPage.searchState.events.count('propertyChange:resultCount propertyChange:limited propertyChange:pending', outline._searchStateChangeHandler)).toBe(1);
-      expect((searchPage.searchState.events as SpecEventSupport)._eventListeners.filter(listener => listener.type === 'destroy' && listener.origFunc === outline._searchStateDestroyHandler).length).toBe(1);
+      expect(searchPage.searchState.events.count('destroy', outline._searchStateDestroyHandler)).toBe(1);
     });
   });
 
@@ -340,12 +340,12 @@ describe('SearchOutline', () => {
       outline.setSearchStates(new Set([searchPage.searchState]));
 
       expect(searchPage.searchState.events.count('propertyChange:resultCount propertyChange:limited propertyChange:pending', outline._searchStateChangeHandler)).toBe(1);
-      expect((searchPage.searchState.events as SpecEventSupport)._eventListeners.filter(listener => listener.type === 'destroy' && listener.origFunc === outline._searchStateDestroyHandler).length).toBe(1);
+      expect(searchPage.searchState.events.count('destroy', outline._searchStateDestroyHandler)).toBe(1);
 
       outline.setSearchStates(new Set());
 
       expect(searchPage.searchState.events.count('propertyChange:resultCount propertyChange:limited propertyChange:pending', outline._searchStateChangeHandler)).toBe(0);
-      expect((searchPage.searchState.events as SpecEventSupport)._eventListeners.filter(listener => listener.type === 'destroy' && listener.origFunc === outline._searchStateDestroyHandler).length).toBe(0);
+      expect(searchPage.searchState.events.count('destroy', outline._searchStateDestroyHandler)).toBe(0);
     });
   });
 
@@ -558,9 +558,5 @@ describe('SearchOutline', () => {
     override _validateSearchQuery() {
       super._validateSearchQuery();
     }
-  }
-
-  class SpecEventSupport extends EventSupport {
-    declare _eventListeners: EventListener[];
   }
 });

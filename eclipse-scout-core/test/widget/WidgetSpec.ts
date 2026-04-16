@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1173,19 +1173,19 @@ describe('Widget', () => {
       expect(widget.parent).toBe(parent);
       expect(another.parent).toBe(parent);
 
-      let widgetListenerCount = widget.events._eventListeners.length;
-      let parentListenerCount = parent.events._eventListeners.length;
+      let widgetListenerCount = widget.events.count();
+      let parentListenerCount = parent.events.count();
       another.setParent(widget);
-      expect(parent.events._eventListeners.length).toBe(parentListenerCount - 1);
-      expect(widget.events._eventListeners.length).toBe(widgetListenerCount + 1);
+      expect(parent.events.count()).toBe(parentListenerCount - 1);
+      expect(widget.events.count()).toBe(widgetListenerCount + 1);
 
       another.setParent(parent);
-      expect(parent.events._eventListeners.length).toBe(parentListenerCount);
-      expect(widget.events._eventListeners.length).toBe(widgetListenerCount);
+      expect(parent.events.count()).toBe(parentListenerCount);
+      expect(widget.events.count()).toBe(widgetListenerCount);
 
       // Ensure parent destroy listener is removed on destroy
       another.destroy();
-      expect(parent.events._eventListeners.length).toBe(parentListenerCount - 1);
+      expect(parent.events.count()).toBe(parentListenerCount - 1);
     });
 
     it('triggers hierarchyChange event when parent changes', () => {

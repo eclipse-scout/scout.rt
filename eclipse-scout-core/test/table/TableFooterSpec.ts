@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,13 +43,13 @@ describe('TableFooterSpec', () => {
       let table = helper.createTable(model);
       table.render();
       expect(table.footer).not.toBeUndefined();
-      let listenerCount = table.events._eventListeners.length;
+      let listenerCount = table.events.count();
 
       table.setTableStatusVisible(false);
       table.setTableStatusVisible(true);
 
       // Still same amount of listeners expected after footer visibility changed
-      expect(table.events._eventListeners.length).toBe(listenerCount);
+      expect(table.events.count()).toBe(listenerCount);
     });
 
   });

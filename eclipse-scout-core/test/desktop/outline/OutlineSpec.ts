@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -267,24 +267,22 @@ describe('Outline', () => {
       helper.setMobileFlags(outline);
       let node0 = outline.nodes[0];
       let node1 = outline.nodes[1];
-      // @ts-expect-error
-      let eventListeners = node0.detailTable.events._eventListeners;
-      let initialListenerCount = eventListeners.length;
+      let initialListenerCount = node0.detailTable.events.count();
 
       outline.selectNodes(node0);
-      let selectionListenerCount = eventListeners.length;
+      let selectionListenerCount = node0.detailTable.events.count();
       expect(selectionListenerCount).toBe(initialListenerCount + 2); // destroy and propertyChange listener
 
       outline.selectNodes(node1);
-      selectionListenerCount = eventListeners.length;
+      selectionListenerCount = node0.detailTable.events.count();
       expect(selectionListenerCount).toBe(initialListenerCount); // listeners removed
 
       outline.selectNodes(node0);
-      selectionListenerCount = eventListeners.length;
+      selectionListenerCount = node0.detailTable.events.count();
       expect(selectionListenerCount).toBe(initialListenerCount + 2); // listeners attached again
 
       outline.nodes[0].detailTable.destroy();
-      expect(eventListeners.length).toBe(0); // every listener should be removed now
+      expect(node0.detailTable.events.count()).toBe(0); // every listener should be removed now
     });
 
     it('makes sure table does not update the menu parent for empty space menus', () => {
