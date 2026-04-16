@@ -7,19 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Event, EventHandler, EventListener, objects, scout} from '../index';
+import {Event, EventHandler, EventListener, scout, strings} from '../index';
 import $ from 'jquery';
 
-export type EventSubTypePredicate = (type: Event, subType: string) => boolean;
-
 export class EventSupport {
-  protected _eventListeners: EventListener[];
-  protected _subTypePredicates: EventSubTypePredicate[];
-
-  constructor() {
-    this._eventListeners = [];
-    this._subTypePredicates = objects.createMap();
-  }
+  protected _eventListenersByType = new Map<string, Set<EventListener>>();
+  protected _eventListenersByHandler = new Map<EventHandler, Set<EventListener>>();
+  protected _subTypeProviders = new Map<string, EventSubTypeProvider>();
 
   protected _assertFunc(func: EventHandler) {
     if (!func) {
@@ -71,25 +65,73 @@ export class EventSupport {
    *      If no handler is specified, all handlers are de-registered for the given type.
    */
   off(type: string, func?: EventHandler) {
+    type = strings.trim(type);
+
     if (!type && !func) {
+      // nothing to remove
       return;
     }
 
-    for (let i = this._eventListeners.length - 1; i >= 0; i--) {
-      let listener = this._eventListeners[i];
-      let funcMatches = (func === listener.func || func === listener.origFunc);
-      let typeMatches = (type === listener.type);
-      let remove = false;
-      if (func && type) {
-        remove = (funcMatches && typeMatches);
-      } else if (func) {
-        remove = funcMatches;
-      } else { // always type. all other cases have been checked above
-        remove = typeMatches;
+    // validates the types of a listener against the given type-filter
+    const typePredicate = (listener: EventListener) => type === listener.type;
+
+    if (func) {
+      // func-filter is set -> get listeners by func
+      const listenersByHandler = this._getListenersByHandler(func);
+      if (!listenersByHandler.size) {
+        // nothing to remove
+        return;
       }
 
-      if (remove) {
-        this._eventListeners.splice(i, 1);
+      // if type is set only process those listeners matching the typePredicate
+      for (const listener of (type ? [...listenersByHandler].filter(typePredicate) : listenersByHandler)) {
+        // remove listeners by handler
+        listenersByHandler.delete(listener);
+
+        // get additional handler of listener
+        const additionalHandler = func === listener.func ? listener.origFunc : listener.func;
+        if (additionalHandler) {
+          // remove listeners by additional handler
+          this._removeListenerByHandler(additionalHandler, listener);
+        }
+
+        if (!type) {
+          // no type -> remove from all types
+          for (const t of this._eventListenersByType.keys()) {
+            this._removeListenerByType(t, listener);
+          }
+        }
+
+        // type set -> remove from all matching listenersByType
+        for (const t of this._splitTypes(type)) {
+          this._removeListenerByType(t, listener);
+        }
+      }
+
+      // remove entry from map if there are no listeners left
+      if (listenersByHandler.size === 0) {
+        this._eventListenersByHandler.delete(func);
+      }
+      return;
+    }
+
+    // type set -> remove from all matching listenersByType
+    for (const t of this._splitTypes(type)) {
+      // get all listeners for type
+      const listenersByType = this._getListenersByType(t);
+
+      // remove all listeners matching the type predicate
+      for (const listener of [...listenersByType].filter(typePredicate)) {
+        listenersByType.delete(listener);
+
+        // remove listeners by handlers
+        this._removeListenerByHandler(listener.func, listener);
+        this._removeListenerByHandler(listener.origFunc, listener);
+      }
+
+      // remove entry from map if there are no listeners left
+      if (listenersByType.size === 0) {
+        this._eventListenersByType.delete(t);
       }
     }
   }
@@ -108,14 +150,53 @@ export class EventSupport {
    * Adds the given {@link EventListener} if it is not present.
    */
   addListener(listener: EventListener) {
-    arrays.pushSet(this._eventListeners, listener);
+    if (!listener) {
+      return;
+    }
+
+    // add listener for handlers
+    this._addListenerByHandler(listener.func, listener);
+    this._addListenerByHandler(listener.origFunc, listener);
+
+    const listenerType = strings.trim(listener.type);
+    if (!listenerType) {
+      // listener has no type -> add for all events
+      this._addListenerByType(null, listener);
+      return;
+    }
+
+    // add listener for all types given
+    const types = this._splitTypes(listenerType);
+    for (const type of types) {
+      this._addListenerByType(type, listener);
+    }
   }
 
   /**
    * Removes the given {@link EventListener} if it is present.
    */
   removeListener(listener: EventListener) {
-    arrays.remove(this._eventListeners, listener);
+    if (!listener) {
+      return;
+    }
+
+    // remove listeners by handlers
+    this._removeListenerByHandler(listener.func, listener);
+    this._removeListenerByHandler(listener.origFunc, listener);
+
+    const listenerType = strings.trim(listener.type);
+    if (!listenerType) {
+      // listener has no type -> remove from all-events-listeners
+      this._removeListenerByType(null, listener);
+      return;
+    }
+
+    // remove listener for all types given
+    const types = this._splitTypes(listenerType);
+    for (const type of types) {
+      // remove listeners by specific type
+      this._removeListenerByType(type, listener);
+    }
   }
 
   /**
@@ -128,17 +209,45 @@ export class EventSupport {
    * The func-filter will match all listeners that are registered using this exact {@link EventHandler}.
    */
   count(type?: string, func?: EventHandler): number {
-    let count = 0;
-    this._eventListeners.forEach(listener => {
-      if (type && (!listener.type || !arrays.containsAll(listener.type.split(' '), type.split(' ').filter(Boolean)))) {
-        return;
+    if (this._eventListenersByType.size === 0) {
+      return 0;
+    }
+
+    type = strings.trim(type);
+
+    if (!type && !func) {
+      // no type- and no func-filter -> combine all listener sets in order to remove duplicates (e.g. because a listener was added for multiple types) and return size
+      return [...this._eventListenersByType.values()]
+        .reduce((a, b) => new Set([...a, ...b]), new Set())
+        .size;
+    }
+
+    const types = [...this._splitTypes(type)];
+    // validates the types of a listener against all types of the given type-filter
+    const typePredicate = (listener: EventListener) => {
+      const listenerTypes = this._splitTypes(listener.type);
+      return types.every(t => listenerTypes.has(t));
+    };
+
+    if (func) {
+      // func-filter is set -> get listeners by func
+      const listenersByHandler = this._getListenersByHandler(func);
+
+      if (!type) {
+        // only func-filter -> count all listeners found by func-filter
+        return listenersByHandler.size;
       }
-      if (func && !(func === listener.func || func === listener.origFunc)) {
-        return;
-      }
-      count++;
-    });
-    return count;
+
+      // type-filter set -> only count those matching the typePredicate
+      return [...listenersByHandler].filter(typePredicate).length;
+    }
+
+    // type-filter is set -> types contains at least one element
+    // if listeners are registered for multiple types they are present in each single-type-set
+    const listenersByType = this._getListenersByType(types[0]);
+
+    // count all relevant listeners matching the predicate
+    return [...listenersByType].filter(typePredicate).length;
   }
 
   /**
@@ -146,75 +255,188 @@ export class EventSupport {
    * Example: If there are two listeners registered for 'lorem' and 'lorem ipsum dolor' the multi-type is split and ['lorem', 'ipsum', 'dolor'] is returned.
    */
   types(): string[] {
-    let types = new Set<string>();
-    for (const listener of this._eventListeners) {
-      if (!listener.type) {
-        continue;
-      }
-      for (const type of listener.type.split(' ')) {
-        if (type) {
-          types.add(type);
-        }
-      }
-    }
-    return Array.from(types);
+    const types = new Set(this._eventListenersByType.keys());
+    types.delete(null);
+    return [...types];
   }
 
   trigger(type: string, event?: Event) {
+    type = strings.trim(type);
+    if (!type) {
+      return;
+    }
+
     event = event || {} as Event;
     event.type = type;
 
-    // Create copy because firing a trigger might modify the list of listeners
-    let listeners = this._eventListeners.slice();
-    // Use traditional "for" loop to reduce size of stack trace
-    for (let i = 0; i < listeners.length; i++) {
-      let listener = listeners[i];
-      if (!listener.type || this._typeMatches(event, listener.type)) {
-        listener.func(event);
-      }
-    }
-  }
+    // get relevant types, always add all-events-listeners, i.e. listeners registered for type = null
+    const relevantTypes = new Set([null, event.type]);
 
-  protected _typeMatches(event: Event, listenerType: string): boolean {
-    let eventType = event.type;
-    let types = listenerType.split(' ');
-    // support for multi type definition 'type1 type2 [...]'
-    for (let i = 0; i < types.length; i++) {
-      if (eventType === types[i]) {
-        return true;
-      }
-      if (this._subTypeMatches(event, types[i])) {
-        return true;
+    // consider subType if present
+    const subTypeProvider = this._subTypeProviders.get(event.type);
+    if (subTypeProvider) {
+      const subType = subTypeProvider(event);
+      if (subType) {
+        relevantTypes.add(`${type}:${subType}`);
       }
     }
-    return false;
-  }
 
-  protected _subTypeMatches(event: Event, listenerType: string): boolean {
-    if (listenerType.indexOf(':') < 0) {
-      return false;
+    // remove all types from relevantTypes for which no listeners exist
+    for (const relevantType of relevantTypes) {
+      if (!this._eventListenersByType.has(relevantType)) {
+        relevantTypes.delete(relevantType);
+      }
     }
-    let parts = listenerType.split(':');
-    let type = parts[0];
-    let subType = parts[1];
-    if (type !== event.type) {
-      return false;
-    }
-    let predicate = this._subTypePredicates[type];
-    if (!predicate) {
+
+    if (!relevantTypes.size) {
+      // there are no relevant listeners -> return
       return;
     }
-    return predicate(event, subType);
+
+    // collect all listeners for the relevant types in a set in order to remove duplicates
+    const listeners = [...relevantTypes]
+      .map(t => this._getListenersByType(t))
+      .reduce((a, b) => new Set([...a, ...b]), new Set());
+
+    // trigger all listeners
+    for (const listener of listeners) {
+      listener.func(event);
+    }
   }
 
   /**
-   *
-   * @param type the type which could contain a subtype
-   * @param predicate the predicate which will be tested when an event with the given type is triggered.
+   * Gets a {@link Set} of {@link EventListener}s for the requested type.
+   * The result of this method is never `null`.
+   * If the create-flag is set, the {@link Set} is added to {@link _eventListenersByType}.
    */
-  registerSubTypePredicate(type: string, predicate: EventSubTypePredicate) {
+  protected _getListenersByType(type: string, create = false): Set<EventListener> {
+    return this._getListenersByIdentifier(this._eventListenersByType, type || null, create);
+  }
+
+  /**
+   * Adds an {@link EventListener} to {@link _eventListenersByType} for the given identifier.
+   */
+  protected _addListenerByType(type: string, listener: EventListener) {
+    this._addListenerByIdentifier(this._eventListenersByType, type || null, listener);
+  }
+
+  /**
+   * Removes an {@link EventListener} from {@link _eventListenersByType} for the given identifier.
+   */
+  protected _removeListenerByType(type: string, listener: EventListener) {
+    this._removeListenerByIdentifier(this._eventListenersByType, type || null, listener);
+  }
+
+  /**
+   * Gets a {@link Set} of {@link EventListener}s for the requested {@link EventHandler}.
+   * The result of this method is never `null`.
+   * If the create-flag is set, the {@link Set} is added to {@link _eventListenersByHandler}.
+   */
+  protected _getListenersByHandler(handler: EventHandler, create = false): Set<EventListener> {
+    if (!handler) {
+      return new Set();
+    }
+
+    return this._getListenersByIdentifier(this._eventListenersByHandler, handler, create);
+  }
+
+  /**
+   * Adds an {@link EventListener} to {@link _eventListenersByHandler} for the given identifier.
+   */
+  protected _addListenerByHandler(handler: EventHandler, listener: EventListener) {
+    if (!handler) {
+      return;
+    }
+
+    this._addListenerByIdentifier(this._eventListenersByHandler, handler, listener);
+  }
+
+  /**
+   * Removes an {@link EventListener} from {@link _eventListenersByHandler} for the given identifier.
+   */
+  protected _removeListenerByHandler(handler: EventHandler, listener: EventListener) {
+    if (!handler) {
+      return;
+    }
+
+    this._removeListenerByIdentifier(this._eventListenersByHandler, handler, listener);
+  }
+
+  /**
+   * Gets a {@link Set} of {@link EventListener}s for the requested identifier from the given {@link Map}.
+   * The result of this method is never `null`.
+   * If the create-flag is set, the {@link Set} is added to the {@link Map}.
+   */
+  protected _getListenersByIdentifier<TIdentifier extends string | EventHandler>(listenerMap: Map<TIdentifier, Set<EventListener>>, identifier: TIdentifier, create = false): Set<EventListener> {
+    if (!listenerMap) {
+      return new Set();
+    }
+
+    let listeners = listenerMap.get(identifier);
+    if (listeners) {
+      return listeners;
+    }
+
+    listeners = new Set();
+    if (!create) {
+      return listeners;
+    }
+
+    listenerMap.set(identifier, listeners);
+    return listeners;
+  }
+
+  /**
+   * Adds an {@link EventListener} to the given {@link Map} for the given identifier.
+   */
+  protected _addListenerByIdentifier<TIdentifier extends string | EventHandler>(listenerMap: Map<TIdentifier, Set<EventListener>>, identifier: TIdentifier, listener: EventListener) {
+    if (!listenerMap || !listener) {
+      return;
+    }
+
+    this._getListenersByIdentifier(listenerMap, identifier, true).add(listener);
+  }
+
+  /**
+   * Removes an {@link EventListener} from the given {@link Map} for the given identifier.
+   */
+  protected _removeListenerByIdentifier<TIdentifier extends string | EventHandler>(listenerMap: Map<TIdentifier, Set<EventListener>>, identifier: TIdentifier, listener: EventListener) {
+    if (!listenerMap || !listener) {
+      return;
+    }
+
+    const listeners = this._getListenersByIdentifier(listenerMap, identifier);
+    listeners.delete(listener);
+
+    // remove entry from map if there are no listeners left
+    if (listeners.size === 0) {
+      listenerMap.delete(identifier);
+    }
+  }
+
+  /**
+   * Splits the given type into unique single types (e.g.: 'lorem ipsum dolor' -> ['lorem', 'ipsum', 'dolor']).
+   */
+  protected _splitTypes(type: string): Set<string> {
+    if (!type) {
+      return new Set();
+    }
+    return new Set(type.split(' ').filter(Boolean));
+  }
+
+  /**
+   * Registers a {@link EventSubTypeProvider} for a specific event type.
+   */
+  registerSubTypeProvider(type: string, provider: EventSubTypeProvider) {
     scout.assertParameter('type', type);
-    scout.assertParameter('predicate', predicate);
-    this._subTypePredicates[type] = predicate;
+    scout.assertParameter('provider', provider);
+    this._subTypeProviders.set(type, provider);
   }
 }
+
+/**
+ * Builds a complete type for an {@link Event}.
+ * Consider a `FancyEvent` that is always triggered with the type 'fancy' but has a property `subType` which can hold the values 'foo' or 'bar'.
+ * If there is an {@link EventSubTypeProvider} returning this `subType`, listeners registered for 'fancy:foo' or 'fancy:bar' will be executed when the `subType` matches.
+ */
+export type EventSubTypeProvider = (type: Event) => string;

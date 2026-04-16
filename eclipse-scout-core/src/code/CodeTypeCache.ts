@@ -36,8 +36,8 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
 
   constructor() {
     super();
-    this.events.registerSubTypePredicate('codeTypeChange', (event: CodeTypeChangeEvent, codeTypeId) => event.codeType.id === codeTypeId); // only works if the CodeTypeId can be converted to a string
-    this.events.registerSubTypePredicate('codeTypeRemove', (event: CodeTypeRemoveEvent, codeTypeId) => event.id === codeTypeId); // only works if the CodeTypeId can be converted to a string
+    this.events.registerSubTypeProvider('codeTypeChange', (event: CodeTypeChangeEvent) => event.codeType.id); // only works if the CodeTypeId can be converted to a string
+    this.events.registerSubTypeProvider('codeTypeRemove', (event: CodeTypeRemoveEvent) => event.id); // only works if the CodeTypeId can be converted to a string
     this.registry = new Map();
     this._reloadTimeoutId = -1;
     this._idsToUpdate = [];
