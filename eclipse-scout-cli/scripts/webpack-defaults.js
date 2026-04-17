@@ -27,7 +27,7 @@ const ts = require('typescript');
  * @param {boolean} args.profile true, to show timing information for each build step. Default is false.
  * @param {boolean} args.watch true, if webpack runs in watch mode. Default is false.
  * @param {boolean} args.cyclonedxSkip true, if no CycloneDX SBOM should be created. Default is false.
- * @param {string} args.cyclonedxVersion CycloneDX version to use. Default is '1.5'.
+ * @param {string} args.cyclonedxVersion CycloneDX version to use. Default is '1.6'.
  * @param {[]} args.resDirArray an array containing directories which should be copied to dist/res
  * @param {object} args.tsOptions a config object to be passed to the ts-loader
  * @param {object} args.forkTypeCheckOptions a config object to be passed to the ForkTsCheckerWebpackPlugin
