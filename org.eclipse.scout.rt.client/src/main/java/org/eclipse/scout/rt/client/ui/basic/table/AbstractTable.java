@@ -29,6 +29,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.eclipse.scout.rt.api.data.table.DateGroupType;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
@@ -71,6 +72,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.AbstractTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
@@ -3980,6 +3982,11 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
     if (options.contains(IResetColumnsOption.SORTING)) {
       getColumnSet().resetSortingAndGrouping();
+      for (IColumn<?> col : getColumns()) {
+        if (col instanceof IDateColumn dateColumn) {
+          dateColumn.setGroupType(dateColumn.getInitialGroupType());
+        }
+      }
     }
 
     if (options.contains(IResetColumnsOption.WIDTHS)) {
@@ -4767,6 +4774,18 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       try {
         pushUIProcessor();
         column.setBackgroundEffect(effect);
+        ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void setDateGroupTypeFromUI(IDateColumn column, DateGroupType groupType) {
+      try {
+        pushUIProcessor();
+        column.setGroupType(groupType);
         ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
       }
       finally {

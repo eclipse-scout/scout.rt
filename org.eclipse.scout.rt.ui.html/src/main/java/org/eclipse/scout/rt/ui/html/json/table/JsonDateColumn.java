@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,6 +47,7 @@ public class JsonDateColumn<T extends IDateColumn> extends JsonColumn<T> {
     json.put("hasDate", getColumn().isHasDate());
     json.put("hasTime", getColumn().isHasTime());
     json.put(IDateColumn.PROP_GROUP_FORMAT, getColumn().getGroupFormat());
+    json.put(IDateColumn.PROP_GROUP_TYPE, getColumn().getGroupType() == null ? null : getColumn().getGroupType().stringValue());
     // TODO [7.0] CGU: update IDateColumnInterface
     // getDateFormat uses NlsLocale. IMHO getDateFormat should not perform any logic because it just a getter-> refactor. same on AbstractDateField
     // Alternative would be to use a clientJob or set localethreadlocal in ui thread as well, as done in rap

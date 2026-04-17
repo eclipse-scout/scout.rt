@@ -9,14 +9,14 @@
  */
 import {
   Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke, ContextMenuPopup, dataObjects, Desktop,
-  DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, ErrorHandler, EventHandler, events, Filter, Filterable, FilterOrFunction, FilterResult, FilterSupport, FullModelOf,
-  graphics, GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, menus,
-  NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToAlignment, ScrollToOptions, Status, StatusOrModel,
-  strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer, TableDefaultRowActionKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout,
-  TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke,
-  TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableSelectKeyStroke, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator,
-  TableToggleRowKeyStroke, TableTooltip, TableUiPreferences, tableUiPreferences, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences,
-  UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
+  DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, ErrorHandler, EventHandler, EventModel, events, Filter, Filterable, FilterOrFunction, FilterResult, FilterSupport,
+  FullModelOf, graphics, GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder,
+  menus as menuUtil, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToAlignment,
+  ScrollToOptions, Status, StatusOrModel, strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer, TableDefaultRowActionKeyStroke, TableEventMap,
+  TableFooter, TableGroupEvent, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke,
+  TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableSelectKeyStroke,
+  TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUiPreferences, tableUiPreferences, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox,
+  tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences, UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -1648,30 +1648,36 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   protected _addGroupColumn(column: Column<any>, direction?: 'asc' | 'desc', multiGroup?: boolean) {
-    let sortIndex = -1;
-
     if (!this.isGroupingPossible(column)) {
       return;
+    }
+    if (column.grouped) {
+      return; // column is already grouped, nothing to do (otherwise, the sort index would be increased unnecessarily)
     }
 
     direction = scout.nvl(direction, column.sortAscending ? 'asc' : 'desc');
     multiGroup = scout.nvl(multiGroup, true);
+
+    // do not update sort index for permanent head/tail sort columns, their order is fixed (see ColumnSet.java)
     if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
-      // do not update sort index for permanent head/tail sort columns, their order is fixed (see ColumnSet.java)
+      let sortedSiblingColumns = this.columns
+        .filter(c => c !== column)
+        .filter(c => c.sortActive)
+        .filter(c => !(c.initialAlwaysIncludeSortAtBegin || c.initialAlwaysIncludeSortAtEnd));
+
       if (multiGroup) {
-        sortIndex = Math.max(-1, arrays.max(this.columns.map(c => c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd || !c.grouped ? -1 : c.sortIndex)));
+        // compute the largest sort index of any grouped column
+        let sortIndex = Math.max(-1, arrays.max(this.columns.map(c => c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd || !c.grouped ? -1 : c.sortIndex)));
 
         if (!column.sortActive) {
           // column was not yet present: insert at determined position
           // and move all subsequent nodes by one.
           // add just after all other grouping columns in column set.
-          column.sortIndex = sortIndex + 1;
-          arrays.eachSibling(this.columns, column, siblingColumn => {
-            if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex > sortIndex) {
-              siblingColumn.sortIndex++;
+          sortedSiblingColumns.forEach(siblingColumn => {
+            if (siblingColumn.sortIndex > sortIndex) {
+              siblingColumn.sortIndex++; //
             }
           });
-
           // increase sortIndex for all permanent tail columns (a column has been added in front of them)
           this._permanentTailSortColumns.forEach(c => {
             c.sortIndex++;
@@ -1679,58 +1685,51 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
         } else {
           // column already sorted, update position:
           // move all sort columns between the newly determined sort-index and the old sort-index by one.
-          arrays.eachSibling(this.columns, column, siblingColumn => {
-            if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
-              siblingColumn.sortIndex > sortIndex &&
-              siblingColumn.sortIndex < column.sortIndex) {
+          sortedSiblingColumns.forEach(siblingColumn => {
+            if (siblingColumn.sortIndex > sortIndex && siblingColumn.sortIndex < column.sortIndex) {
               siblingColumn.sortIndex++;
             }
           });
-          column.sortIndex = sortIndex + 1;
         }
+
+        column.sortIndex = sortIndex + 1;
+
       } else {
         // no multi-group:
-        sortIndex = this._permanentHeadSortColumns.length;
+        let sortIndex = this._permanentHeadSortColumns.length;
 
         if (column.sortActive) {
           // column already sorted, update position:
           // move all sort columns between the newly determined sort-index and the old sort-index by one.
-          arrays.eachSibling(this.columns, column, siblingColumn => {
-            if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
-              siblingColumn.sortIndex >= sortIndex &&
-              siblingColumn.sortIndex < column.sortIndex) {
+          sortedSiblingColumns.forEach(siblingColumn => {
+            if (siblingColumn.sortIndex >= sortIndex && siblingColumn.sortIndex < column.sortIndex) {
               siblingColumn.sortIndex++;
             }
           });
-          column.sortIndex = sortIndex;
-        } else { // not sorted yet
-          arrays.eachSibling(this.columns, column, siblingColumn => {
-            if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex >= sortIndex) {
-              siblingColumn.sortIndex++;
-            }
+        } else {
+          // not sorted yet, update position:
+          // move all existing sort columns by one.
+          sortedSiblingColumns.forEach(siblingColumn => {
+            siblingColumn.sortIndex++;
           });
-
-          column.sortIndex = sortIndex;
-
           // increase sortIndex for all permanent tail columns (a column has been added in front of them)
           this._permanentTailSortColumns.forEach(c => {
             c.sortIndex++;
           });
         }
 
-        // remove all other grouped properties:
+        column.sortIndex = sortIndex;
+
+        // remove all other grouped columns
         arrays.eachSibling(this.columns, column, siblingColumn => {
-          if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex >= sortIndex) {
-            siblingColumn.grouped = false;
+          if (siblingColumn.grouped) {
+            this._removeGroupColumn(siblingColumn);
           }
         });
       }
 
       column.sortAscending = direction === 'asc';
       column.sortActive = true;
-    } else if (column.initialAlwaysIncludeSortAtBegin) {
-      // do not change order or direction. just set grouped to true.
-      column.grouped = true;
     }
 
     column.grouped = true;
@@ -2879,11 +2878,12 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    *          the column to group by.
    * @param direction
    *          the sorting direction. Either 'asc' or 'desc'.
+   *          Does not have an effect if `remove` is set to true.
    *          If not specified, the direction specified by the column is used ({@link Column.sortAscending}).
    * @param multiGroup
    *          true to add the column to the list of grouped columns.
    *          False to use this column exclusively as group column (reset other columns).
-   *          Does not have an effect is `remove` is set to true.
+   *          Does not have an effect if `remove` is set to true.
    *          Default is false.
    * @param remove
    *          true to remove the column from the list of grouped columns.
@@ -2901,13 +2901,12 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     if (!remove) {
       this._addGroupColumn(column, direction, multiGroup);
     }
-
     if (this.header) {
       this.header.onSortingChanged();
     }
     let sorted = this._sort(true);
 
-    let data: any = {
+    let data: EventModel<TableGroupEvent> = {
       column: column,
       groupAscending: column.sortAscending
     };

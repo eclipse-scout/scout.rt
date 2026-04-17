@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.eclipse.scout.rt.api.data.table.DateGroupType;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IDateColumnExtension;
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -38,6 +40,8 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   private boolean m_hasTime;
   private boolean m_hasDate;
   private Date m_autoDate;
+
+  private DateGroupType m_initialGroupType;
 
   public AbstractDateColumn() {
     this(true);
@@ -118,9 +122,22 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     return "yyyy";
   }
 
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(154)
+  protected DateGroupType getConfiguredGroupType() {
+    return null;
+  }
+
   @Override
   protected boolean getConfiguredUiSortPossible() {
     return true;
+  }
+
+  @Override
+  public void initColumn() {
+    ClientUIPreferences prefs = ClientUIPreferences.getInstance();
+    setGroupType(prefs.getTableColumnDateGroupType(this, getGroupType(), null));
+    super.initColumn();
   }
 
   @Override
@@ -131,6 +148,8 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     setHasTime(getConfiguredHasTime());
     setAutoDate(getConfiguredAutoDate());
     setGroupFormat(getConfiguredGroupFormat());
+    setGroupType(getConfiguredGroupType());
+    setInitialGroupType(getConfiguredGroupType());
   }
 
   /*
@@ -190,6 +209,26 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   }
 
   @Override
+  public DateGroupType getGroupType() {
+    return (DateGroupType) propertySupport.getProperty(PROP_GROUP_TYPE);
+  }
+
+  @Override
+  public void setGroupType(DateGroupType groupType) {
+    propertySupport.setProperty(PROP_GROUP_TYPE, groupType);
+  }
+
+  @Override
+  public DateGroupType getInitialGroupType() {
+    return m_initialGroupType;
+  }
+
+  @Override
+  public void setInitialGroupType(DateGroupType initialGroupType) {
+    m_initialGroupType = initialGroupType;
+  }
+
+  @Override
   protected IFormField prepareEditInternal(ITableRow row) {
     IDateField f = (IDateField) getDefaultEditor();
     mapEditorFieldProperties(f);
@@ -244,6 +283,40 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
       df.setLenient(true);
     }
     return df;
+  }
+
+  @Override
+  public int compareTableRows(ITableRow r1, ITableRow r2) {
+    // ---------------------------------------------------------------------------
+    // Keep implementation in sync with DateColumn.ts#compare
+    // ---------------------------------------------------------------------------
+
+    Date d1 = getValue(r1);
+    Date d2 = getValue(r2);
+    if (d1 == null && d2 == null) {
+      return 0;
+    }
+    if (d1 == null) {
+      return -1;
+    }
+    if (d2 == null) {
+      return 1;
+    }
+
+    if (isGroupingActive() && getGroupType() != null) {
+      int c = getGroupType().compare(d1, d2);
+      if (c != 0) {
+        return c;
+      }
+      // If we are here, the grouped values are the same. Only return 0 if this is _not_ the last sort column,
+      // or else the additional columns could not have an effect on the row order. However, if this _is_ the
+      // last sort column, sort the values normally (-> super call).
+      if (getTable().getColumnSet().getSortColumns().stream().anyMatch(col -> col.getSortIndex() > getSortIndex())) {
+        return 0;
+      }
+    }
+
+    return super.compareTableRows(r1, r2);
   }
 
   protected static class LocalDateColumnExtension<OWNER extends AbstractDateColumn> extends LocalColumnExtension<Date, OWNER> implements IDateColumnExtension<OWNER> {

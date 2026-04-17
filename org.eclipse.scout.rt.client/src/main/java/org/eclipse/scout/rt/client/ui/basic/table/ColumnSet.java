@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,9 +20,11 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.eclipse.scout.rt.api.data.table.DateGroupType;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -191,6 +193,7 @@ public class ColumnSet {
     private int m_sortIndex;
     private boolean m_ascending;
     private boolean m_grouped;
+    private DateGroupType m_dateGroupType;
     private String m_aggregationFunction;
 
     public int getSortIndex() {
@@ -217,6 +220,14 @@ public class ColumnSet {
       m_grouped = grouped;
     }
 
+    public DateGroupType getDateGroupType() {
+      return m_dateGroupType;
+    }
+
+    public void setDateGroupType(DateGroupType dateGroupType) {
+      m_dateGroupType = dateGroupType;
+    }
+
     public String getAggregationFunction() {
       return m_aggregationFunction;
     }
@@ -230,13 +241,17 @@ public class ColumnSet {
     if (col.isInitialAlwaysIncludeSortAtBegin() || col.isInitialAlwaysIncludeSortAtEnd()) {
       return createSortingAndGroupingConfig(col);
     }
+
     P_SortingAndGroupingConfig config = new P_SortingAndGroupingConfig();
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
     config.setSortIndex(prefs.getTableColumnSortIndex(col, col.getInitialSortIndex(), configName));
     config.setAscending(prefs.getTableColumnSortAscending(col, col.isInitialSortAscending(), configName));
     config.setGrouped(prefs.getTableColumnGrouped(col, col.isInitialGrouped(), configName));
-    if (col instanceof INumberColumn) {
-      config.setAggregationFunction(prefs.getTableColumnAggregationFunction(col, ((INumberColumn) col).getInitialAggregationFunction(), configName));
+    if (col instanceof INumberColumn numberColumn) {
+      config.setAggregationFunction(prefs.getTableColumnAggregationFunction(col, numberColumn.getInitialAggregationFunction(), configName));
+    }
+    if (col instanceof IDateColumn dateColumn) {
+      config.setDateGroupType(prefs.getTableColumnDateGroupType(col, dateColumn.getInitialGroupType(), configName));
     }
     return config;
   }
@@ -246,8 +261,11 @@ public class ColumnSet {
     config.setSortIndex(col.getInitialSortIndex());
     config.setAscending(col.isInitialSortAscending());
     config.setGrouped(col.isInitialGrouped());
-    if (col instanceof INumberColumn) {
-      config.setAggregationFunction(((INumberColumn) col).getInitialAggregationFunction());
+    if (col instanceof INumberColumn numberColumn) {
+      config.setAggregationFunction(numberColumn.getInitialAggregationFunction());
+    }
+    if (col instanceof IDateColumn dateColumn) {
+      config.setDateGroupType(dateColumn.getGroupType());
     }
     return config;
   }
@@ -278,8 +296,12 @@ public class ColumnSet {
       }
 
       //aggregation function:
-      if (col instanceof INumberColumn) {
-        ((INumberColumn) col).setAggregationFunction(columnConfigs.get(col).getAggregationFunction());
+      if (col instanceof INumberColumn numberColumn) {
+        numberColumn.setAggregationFunction(columnConfigs.get(col).getAggregationFunction());
+      }
+      // date group type
+      if (col instanceof IDateColumn dateColumn) {
+        dateColumn.setGroupType(columnConfigs.get(col).getDateGroupType());
       }
 
       index++;
@@ -1397,6 +1419,13 @@ public class ColumnSet {
     m_table.fireTableEventInternal(e);
   }
 
+  private void fireColumnDateGroupTypeChanged(IColumn<?> c) {
+    Assertions.assertInstance(c, IDateColumn.class, "DateGroupType is only supported on DateColumns.");
+    TableEvent e = new TableEvent(m_table, TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED);
+    e.setColumns(CollectionUtility.arrayList(c));
+    m_table.fireTableEventInternal(e);
+  }
+
   private void fireColumnStructureChanged() {
     TableEvent e = new TableEvent(m_table, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
     m_table.fireTableEventInternal(e);
@@ -1435,6 +1464,10 @@ public class ColumnSet {
       }
       if (INumberColumn.PROP_BACKGROUND_EFFECT.equals(e.getPropertyName())) {
         fireColumnBackgroundEffectChanged(c);
+        return;
+      }
+      if (IDateColumn.PROP_GROUP_TYPE.equals(e.getPropertyName())) {
+        fireColumnDateGroupTypeChanged(c);
         return;
       }
       if (c.isGroupingActive() && IColumn.PROP_VISIBLE.equals(e.getPropertyName())) {

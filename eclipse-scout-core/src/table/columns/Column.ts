@@ -1029,11 +1029,19 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   }
 
   compare(row1: TableRow, row2: TableRow): number {
-    let cell1 = this.table.cell(this, row1),
-      cell2 = this.table.cell(this, row2);
+    let cell1 = this.table.cell(this, row1);
+    let cell2 = this.table.cell(this, row2);
 
-    if (cell1.sortCode !== null || cell2.sortCode !== null) {
-      return comparators.NUMERIC.compare(cell1.sortCode, cell2.sortCode);
+    // Sort by sort code. If only one row has a sort code, sort it first.
+    if (cell1.sortCode !== null && cell2.sortCode !== null) {
+      let c = comparators.NUMERIC.compare(cell1.sortCode, cell2.sortCode);
+      if (c) { // only return if sort codes are different, otherwise continue comparing by value
+        return c;
+      }
+    } else if (cell1.sortCode !== null) {
+      return -1;
+    } else if (cell2.sortCode !== null) {
+      return 1;
     }
 
     let valueA = this.cellValueOrText(row1);

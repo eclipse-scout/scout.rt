@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -58,12 +58,16 @@
     flex-wrap: wrap;
 
     & > .table-header-menu-group-text {
-      flex-grow: 1;
+      flex: 1;
     }
 
     & > .actions > .action {
       height: 22px;
       margin-top: -4px;
+
+      &:not(:has(.text)) {
+        width: 26px; // use fixed width for icon-only actions to prevent "jumping" when the icon is changed
+      }
     }
   }
 
@@ -302,10 +306,8 @@
   vertical-align: middle;
 }
 
-.table-header-menu-toggle-sort-order {
-  &::before {
-    #scout.font-icon();
-  }
+.table-header-menu-toggle-sort-order::before {
+  #scout.font-icon();
 }
 
 .table-header-menu-toggle-sort-order-alphabetically::before {

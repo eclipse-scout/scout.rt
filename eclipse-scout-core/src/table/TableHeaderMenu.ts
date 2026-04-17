@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Action, aria, arrays, Cell, Column, ColumnUserFilter, ColumnUserFilterValues, Device, EnumObject, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, InitModelOf, ListBoxAriaRules, NumberColumn,
-  NumberColumnAggregationFunction, NumberField, Popup, RowLayout, scout, SomeRequired, Table, TableHeader, TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuGroupItem, TableHeaderMenuLayout,
-  TableHeaderMenuModel, TableRow, TableRowModel, TableRowsCheckedEvent, ValueField
+  AbstractLayout, Action, aria, arrays, Cell, Column, ColumnUserFilter, ColumnUserFilterValues, Device, EnumObject, Event, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, InitModelOf, ListBoxAriaRules, NumberColumn,
+  NumberColumnAggregationFunction, NumberField, objects, Popup, RowLayout, scout, SomeRequired, Table, TableHeader, TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuGroupItem, TableHeaderMenuLayout,
+  TableHeaderMenuModel, TableRow, TableRowModel, TableRowsCheckedEvent, tooltips, ValueField
 } from '../index';
 
 export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
@@ -160,11 +160,11 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     // Filtering
     this.filter = this.table.getFilter(this.column.id) as ColumnUserFilter;
     if (!this.filter) {
-      this.filter = this.column.createFilter();
+      this.filter = this._createFilter();
     }
     // always recalculate available values to make sure new/updated/deleted rows are considered
     this.filter.calculate();
-    this.filter.on('filterFieldsChanged', this._updateFilterTable.bind(this));
+    this.filter.on('filterFieldsChanged', this._updateTableFilter.bind(this));
     this._updateFilterTableCheckedMode();
 
     this.hasFilterTable = this.filter.availableValues.length > 0;
@@ -176,6 +176,10 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       this.table.on('filterRemoved', this._tableFilterHandler);
       this._filterTableRowsCheckedHandler = this._onFilterTableRowsChecked.bind(this);
     }
+  }
+
+  protected _createFilter(): ColumnUserFilter {
+    return this.column.createFilter();
   }
 
   protected override _createLayout(): AbstractLayout {
@@ -320,7 +324,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
 
     this.moveGroup = scout.create(TableHeaderMenuGroup, {
       parent: this,
-      textKey: 'ui.Move',
+      text: '${textKey:ui.Move}',
       cssClass: 'first'
     });
     this.toBeginButton = scout.create(TableHeaderMenuButton, {
@@ -388,7 +392,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   protected _renderColumnActionsGroup(): TableHeaderMenuGroup {
     this.columnActionsGroup = scout.create(TableHeaderMenuGroup, {
       parent: this,
-      textKey: 'ui.Column'
+      text: '${textKey:ui.Column}'
     });
 
     this.addColumnButton = scout.create(TableHeaderMenuButton, {
@@ -435,7 +439,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
 
     this.sortingGroup = scout.create(TableHeaderMenuGroup, {
       parent: this,
-      textKey: 'ColumnSorting'
+      text: '${textKey:ColumnSorting}'
     });
 
     if (!table.hasPermanentHeadOrTailSortColumns()) {
@@ -535,14 +539,9 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   }
 
   protected _renderGroupingGroup(): TableHeaderMenuGroup {
-    let menuPopup = this,
-      table = this.table,
-      column = this.column,
-      groupCount = this._groupColumnCount();
-
     let group = scout.create(TableHeaderMenuGroup, {
       parent: this,
-      textKey: 'ui.Grouping'
+      text: '${textKey:ui.Grouping}'
     });
 
     this.groupButton = scout.create(TableHeaderMenuButton, {
@@ -552,7 +551,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       additional: false,
       toggleAction: true
     });
-    this.groupButton.on('action', groupColumn.bind(this.groupButton));
+    this.groupButton.on('action', event => this._onGroupButtonAction(event));
 
     this.groupAddButton = scout.create(TableHeaderMenuButton, {
       parent: group,
@@ -561,8 +560,9 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       additional: true,
       toggleAction: true
     });
-    this.groupAddButton.on('action', groupColumn.bind(this.groupAddButton));
+    this.groupAddButton.on('action', event => this._onGroupButtonAction(event));
 
+    let groupCount = this._groupColumnCount();
     if (groupCount === 0) {
       this.groupAddButton.setVisible(false);
     } else if (groupCount === 1 && this.column.grouped) {
@@ -572,7 +572,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       this.groupAddButton.setVisible(true);
     }
 
-    if (table.hasPermanentHeadOrTailSortColumns() && groupCount > 0) {
+    if (this.table.hasPermanentHeadOrTailSortColumns() && groupCount > 0) {
       // If table has permanent head columns, other columns may not be grouped exclusively -> only enable add button (equally done for sort buttons)
       this.groupButton.setVisible(false);
       this.groupAddButton.setVisible(true);
@@ -589,19 +589,19 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
 
     group.render(this.$columnActions);
     return group;
+  }
 
-    function groupColumn() {
-      let direction: 'asc' | 'desc' = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
-      menuPopup.close();
-      table.group(column, direction, this.additional, !this.selected);
-    }
+  protected _onGroupButtonAction(event: Event<TableHeaderMenuButton>) {
+    const button = event.source;
+    this.table.group(this.column, undefined, button.additional, !button.selected);
+    this.close();
   }
 
   protected _renderHierarchyGroup(): TableHeaderMenuGroup {
     let table = this.table, menuPopup = this;
     this.hierarchyGroup = scout.create(TableHeaderMenuGroup, {
       parent: this,
-      textKey: 'ui.Hierarchy',
+      text: '${textKey:ui.Hierarchy}',
       visible: this.table.isTableNodeColumn(this.column)
     });
 
@@ -634,7 +634,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   protected _renderWidthGroup(): TableHeaderMenuGroup {
     let group = scout.create(TableHeaderMenuGroup, {
       parent: this,
-      textKey: 'Width'
+      text: '${textKey:Width}'
     });
     let optimizeWidthButton = scout.create(TableHeaderMenuButton, {
       parent: group,
@@ -682,7 +682,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       menuPopup = this,
       group = scout.create(TableHeaderMenuGroup, {
         parent: this,
-        textKey: 'ui.Aggregation'
+        text: '${textKey:ui.Aggregation}'
       }),
       allowedAggregationFunctions = arrays.ensure(column.allowedAggregationFunctions),
       isAggregationNoneAllowed = allowedAggregationFunctions.indexOf('none') !== -1;
@@ -724,7 +724,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       backgroundEffect = column.backgroundEffect,
       group = scout.create(TableHeaderMenuGroup, {
         parent: this,
-        textKey: 'ui.Coloring'
+        text: '${textKey:ui.Coloring}'
       });
 
     this.colorGradient1Button = scout.create(TableHeaderMenuButton, {
@@ -775,6 +775,8 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       .appendDiv('table-header-menu-group-text')
       .text(this._filterByText());
     HtmlComponent.install(this.$filterTableGroupTitle, this.session);
+    // Text is dynamic and might not have enough space due to the actions on the right side
+    tooltips.installForEllipsis(this.$filterTableGroupTitle, {parent: this});
 
     let $filterActions = this.$filterTableGroup.appendDiv('actions');
     this.filterSortOrderAction = scout.create(Action, {
@@ -797,31 +799,11 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     this.filterTable = this._createFilterTable();
     this.filterTable.ariaRules = new ListBoxAriaRules();
     this.filterTable.on('rowsChecked', this._filterTableRowsCheckedHandler);
-    let tableRows: TableRowModel[] = [];
-    this.filter.availableValues.forEach(filterValue => {
-      let tableRow: TableRowModel = {
-        cells: [
-          scout.create(Cell, {
-            text: (this.filter.column instanceof NumberColumn) ? filterValue.text : null,
-            value: (this.filter.column instanceof NumberColumn) ? filterValue.key : filterValue.text,
-            iconId: filterValue.iconId,
-            htmlEnabled: filterValue.htmlEnabled,
-            cssClass: filterValue.cssClass
-          }),
-          filterValue.count,
-          filterValue.key === null ? 1 : 0 // empty cell should always be at the bottom
-        ],
-        checked: this.filter.selectedValues.indexOf(filterValue.key) > -1,
-        dataMap: {
-          filterValue: filterValue
-        }
-      };
-      tableRows.push(tableRow);
-    });
-    this.filterTable.insertRows(tableRows);
+    this._reloadFilterTable();
     this.filterTable.render(this.$filterTableGroup);
     aria.linkElementWithLabel(this.filterTable.get$Focusable(), this.$filterTableGroupTitle);
     // must do this in a setTimeout, since table/popup is not visible yet (same as Table#revealSelection).
+    // FIXME bsh Remove setTimeout() when #385599 is fixed
     setTimeout(this.filterTable.revealChecked.bind(this.filterTable));
 
     return this.$filterTableGroup;
@@ -841,26 +823,53 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       checkable: true,
       cssClass: 'table-header-menu-filter-table',
       checkableStyle: Table.CheckableStyle.TABLE_ROW,
-      // column-texts are not visible since header is not visible
       columns: [{
+        id: 'ValueColumn',
         objectType: objectType,
-        text: 'filter-value',
         width: 120,
-        sortIndex: 1,
         horizontalAlignment: -1
       }, {
+        id: 'AmountColumn',
         objectType: NumberColumn,
-        text: 'aggregate-count',
         cssClass: 'table-header-menu-filter-number-column',
         width: 50,
         minWidth: 32,
         autoOptimizeWidth: true
       }, {
+        id: 'SortByColumn',
         objectType: NumberColumn,
         displayable: false,
         sortIndex: 0
       }]
     });
+  }
+
+  protected _reloadFilterTable() {
+    let tableRows: TableRowModel[] = [];
+    this.filter.availableValues.forEach((filterValue, filterValueIndex) => {
+      let tableRow: TableRowModel = {
+        cells: [
+          scout.create(Cell, {
+            value: filterValue.key,
+            text: filterValue.text,
+            iconId: filterValue.iconId,
+            htmlEnabled: filterValue.htmlEnabled,
+            cssClass: filterValue.cssClass
+          }),
+          filterValue.count,
+          scout.create(Cell, {
+            value: filterValueIndex, // inherit order calculated by TableMatrix, see ColumnUserFilter#calculate
+            sortCode: objects.isNullOrUndefined(filterValue.key) ? 1 : 0 // the special '-empty-' cell should always be at the end
+          })
+        ],
+        checked: this.filter.selectedValues.includes(filterValue.key),
+        dataMap: {
+          filterValue: filterValue
+        }
+      };
+      tableRows.push(tableRow);
+    });
+    this.filterTable.replaceRows(tableRows);
   }
 
   /**
@@ -899,20 +908,20 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     let sortMode = TableHeaderMenu.SortMode;
     if (this.filterSortMode === sortMode.ALPHABETICALLY) {
       // sort by amount
-      this.filterTable.sort(this.filterTable.columns[1], 'desc');
+      this.filterTable.sort(this.filterTable.columnById('AmountColumn'), 'desc');
+      this.filterTable.sort(this.filterTable.columnById('SortByColumn'), 'asc', true); // if two rows have the same amount, sort them by original order
       this.filterSortMode = sortMode.AMOUNT;
       this.filterSortOrderAction.setTooltipText(this.session.text('ui.SortAlphabetically'));
     } else {
-      // sort alphabetically (first by invisible column to make sure empty cells are always at the bottom)
-      this.filterTable.sort(this.filterTable.columns[2], 'asc');
-      this.filterTable.sort(this.filterTable.columns[0], 'asc', true);
-      this.filterSortOrderAction.setTooltipText(this.session.text('ui.SortByNumber'));
+      // sort by original order, see _reloadFilterTable()
+      this.filterTable.sort(this.filterTable.columnById('SortByColumn'), 'asc');
       this.filterSortMode = sortMode.ALPHABETICALLY;
+      this.filterSortOrderAction.setTooltipText(this.session.text('ui.SortByNumber'));
     }
     this._updateFilterTableActions();
   }
 
-  protected _updateFilterTable() {
+  protected _updateTableFilter() {
     if (this.filter.filterActive()) {
       this.table.addFilter(this.filter);
     } else {
@@ -991,7 +1000,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
         this.filter.selectedValues.push(row.dataMap.filterValue.key);
       }
     });
-    this._updateFilterTable();
+    this._updateTableFilter();
   }
 
   protected _onFilterTableChanged() {

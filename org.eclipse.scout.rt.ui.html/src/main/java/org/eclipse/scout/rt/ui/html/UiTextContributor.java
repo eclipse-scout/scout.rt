@@ -116,7 +116,13 @@ public class UiTextContributor implements IUiTextContributor {
         "FormsCannotBeSaved",
         "NotAllCheckedFormsCanBeSaved",
         "FormValidationFailedTitle",
-        "Width"));
+        "Width",
+        "DateGroupTypeYear",
+        "DateGroupTypeMonth",
+        "DateGroupTypeMonthAndYear",
+        "DateGroupTypeWeekOfYear",
+        "DateGroupTypeWeekday",
+        "DateGroupTypeDate"));
 
     // Additional text keys from org.eclipse.scout.rt.security
     textKeys.addAll(List.of(

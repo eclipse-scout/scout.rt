@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,7 +39,7 @@ export class ChartTableUserFilter extends TableUserFilter implements ChartTableU
   }
 
   override createFilterAddedEventData(): ChartTableUserFilterAddedEventData {
-    let data: ChartTableUserFilterAddedEventData = super.createFilterAddedEventData();
+    let data = super.createFilterAddedEventData() as ChartTableUserFilterAddedEventData;
     data.text = this.text;
     data.filters = this.filters;
     data.columnIdX = (this.xAxis && this.xAxis.column) ? this.xAxis.column.id : null;
@@ -48,7 +48,7 @@ export class ChartTableUserFilter extends TableUserFilter implements ChartTableU
   }
 
   calculate() {
-    let matrix = new TableMatrix(this.table, this.session);
+    let matrix = new TableMatrix(this.table);
     let columnX = this.table.columnById(this.columnIdX);
     let axisGroupX = columnX.createFilter().axisGroup();
     this.xAxis = matrix.addAxis(columnX, axisGroupX);
@@ -77,8 +77,8 @@ export class ChartTableUserFilter extends TableUserFilter implements ChartTableU
   }
 }
 
-export type ChartTableUserFilterAddedEventData = TableUserFilterAddedEventData & {
+export interface ChartTableUserFilterAddedEventData extends TableUserFilterAddedEventData {
   filters?: { deterministicKey: TableControlDeterministicKey }[];
   columnIdX?: string;
   columnIdY?: string;
-};
+}

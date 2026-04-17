@@ -137,6 +137,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         // ignore all previous aggregate function changes.
         typesToDelete.add(TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
         typesToDelete.add(TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED);
+        typesToDelete.add(TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED);
         typesToDelete.add(TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
       }
       else if (isIgnorePrevious(type)) {
@@ -470,8 +471,8 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    */
   protected boolean isCoalesceConsecutivePrevious(int type) {
     return switch (type) {
-      case TableEvent.TYPE_ROWS_UPDATED, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_DELETED, TableEvent.TYPE_ROWS_CHECKED, TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED, TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED,
-           TableEvent.TYPE_COLUMN_HEADERS_UPDATED -> true;
+      case TableEvent.TYPE_ROWS_UPDATED, org.eclipse.scout.rt.client.ui.basic.table.TableEvent.TYPE_ROWS_INSERTED, org.eclipse.scout.rt.client.ui.basic.table.TableEvent.TYPE_ROWS_DELETED, org.eclipse.scout.rt.client.ui.basic.table.TableEvent.TYPE_ROWS_CHECKED, org.eclipse.scout.rt.client.ui.basic.table.TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED, org.eclipse.scout.rt.client.ui.basic.table.TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED,
+           TableEvent.TYPE_COLUMN_HEADERS_UPDATED, TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED -> true;
       default -> false;
     };
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DateColumnUserFilter, DateColumnUserFilterStateDo, dates, IUserFilterStateDo, scout, Table, TableUserFilter, UserFilterStateMapper, UserFilterStateMappers} from '../../index';
+import {DateColumnUserFilter, DateColumnUserFilterStateDo, IUserFilterStateDo, scout, Table, TableUserFilter, UserFilterStateMapper, UserFilterStateMappers} from '../../index';
 
 export class DateColumnUserFilterStateMapper extends UserFilterStateMapper<DateColumnUserFilter, DateColumnUserFilterStateDo> {
 
@@ -23,6 +23,7 @@ export class DateColumnUserFilterStateMapper extends UserFilterStateMapper<DateC
     return scout.create(DateColumnUserFilterStateDo, {
       columnId: filter.column.buildUuid(),
       selectedValues: new Set(filter.selectedValues),
+      groupType: filter.groupType,
       dateFrom: filter.dateFrom,
       dateTo: filter.dateTo
     });
@@ -36,8 +37,9 @@ export class DateColumnUserFilterStateMapper extends UserFilterStateMapper<DateC
       table: table,
       column: column,
       selectedValues: [...filterState.selectedValues],
-      dateFrom: dates.toJsonDate(filterState.dateFrom), // FIXME bsh [js-preferences] There has to be an easier way!
-      dateTo: dates.toJsonDate(filterState.dateTo)
+      groupType: filterState.groupType,
+      dateFrom: filterState.dateFrom,
+      dateTo: filterState.dateTo
     });
   }
 }

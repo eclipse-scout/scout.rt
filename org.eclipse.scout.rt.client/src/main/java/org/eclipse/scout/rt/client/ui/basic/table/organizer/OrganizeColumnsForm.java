@@ -1133,8 +1133,8 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         col.setVisible(prefs.getTableColumnVisible(col, col.isInitialVisible(), configName));
         col.setWidth(prefs.getTableColumnWidth(col, col.getInitialWidth(), configName));
         col.setVisibleColumnIndexHint(prefs.getTableColumnViewIndex(col, col.getInitialSortIndex(), configName));
-        if (col instanceof INumberColumn) {
-          ((INumberColumn) col).setBackgroundEffect(prefs.getTableColumnBackgroundEffect(col, ((INumberColumn) col).getInitialBackgroundEffect(), configName));
+        if (col instanceof INumberColumn numberColumn) {
+          numberColumn.setBackgroundEffect(prefs.getTableColumnBackgroundEffect(col, numberColumn.getInitialBackgroundEffect(), configName));
         }
       }
 

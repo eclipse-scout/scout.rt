@@ -99,9 +99,13 @@
       "valueType" : "CLASS[java.util.Date]"
     }, {
       "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "groupType",
+      "valueType" : "ENUM[scout.DateGroupType]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
       "list" : true,
       "name" : "selectedValues",
-      "valueType" : "CLASS[java.lang.Integer]"
+      "valueType" : "CLASS[java.lang.Long]"
     } ],
     "typeName" : "scout.DateColumnUserFilterState",
     "typeVersion" : "scout-25.2.001"
@@ -283,6 +287,10 @@
       "valueType" : "ID[scout.TableColumnId]"
     }, {
       "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "dateGroupType",
+      "valueType" : "ENUM[scout.DateGroupType]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
       "name" : "groupingActive",
       "valueType" : "CLASS[java.lang.Boolean]"
     }, {
@@ -346,5 +354,9 @@
     "typeName" : "scout.UiPreferences",
     "typeVersion" : "scout-25.2.002"
   } ],
-  "enums" : [ ]
+  "enums" : [ {
+    "_type" : "scout.EnumApiSignature",
+    "enumName" : "scout.DateGroupType",
+    "values" : [ "calendar-week", "date", "month", "month-and-year", "weekday", "year" ]
+  } ]
 }

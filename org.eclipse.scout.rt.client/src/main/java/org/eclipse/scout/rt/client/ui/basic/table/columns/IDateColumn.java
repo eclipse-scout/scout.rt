@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,10 +11,13 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import java.util.Date;
 
+import org.eclipse.scout.rt.api.data.table.DateGroupType;
+
 public interface IDateColumn extends IColumn<Date> {
   double MILLIS_PER_DAY = 1000.0 * 3600.0 * 24.0;
 
   String PROP_GROUP_FORMAT = "groupFormat";
+  String PROP_GROUP_TYPE = "groupType";
 
   void setFormat(String s);
 
@@ -35,4 +38,12 @@ public interface IDateColumn extends IColumn<Date> {
   void setGroupFormat(String groupFormat);
 
   String getGroupFormat();
+
+  void setGroupType(DateGroupType groupType);
+
+  DateGroupType getGroupType();
+
+  void setInitialGroupType(DateGroupType initialGroupType);
+
+  DateGroupType getInitialGroupType();
 }

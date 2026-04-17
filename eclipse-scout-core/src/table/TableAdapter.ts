@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, BooleanColumn, Cell, ChildModelOf, Column, ColumnModel, ColumnUserFilter, defaultValues, Event, Filter, ModelAdapter, NumberColumn, ObjectOrModel, objects, RemoteEvent, RemoteTableOrganizer, scout, Table,
-  TableAggregationFunctionChangedEvent, TableAppLinkActionEvent, TableCancelCellEditEvent, TableColumnBackgroundEffectChangedEvent, TableColumnMovedEvent, TableColumnResizedEvent, TableCompleteCellEditEvent, TableDropEvent,
-  TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableModel, TablePrepareCellEditEvent, TableReloadEvent, TableRow, TableRowActionEvent, TableRowClickEvent, TableRowModel, TableRowsCheckedEvent, TableRowsExpandedEvent,
-  TableRowsSelectedEvent, TableSortEvent, TableUserFilter, ValueField
+  AdapterData, App, arrays, BooleanColumn, Cell, ChildModelOf, Column, ColumnModel, ColumnUserFilter, DateColumn, defaultValues, Event, Filter, ModelAdapter, NumberColumn, NumberColumnAggregationFunction, ObjectOrModel, objects,
+  RemoteEvent, RemoteTableOrganizer, scout, Table, TableAggregationFunctionChangedEvent, TableAppLinkActionEvent, TableCancelCellEditEvent, TableColumnBackgroundEffectChangedEvent, TableColumnDateGroupTypeChangedEvent,
+  TableColumnMovedEvent, TableColumnResizedEvent, TableCompleteCellEditEvent, TableDropEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableModel, TablePrepareCellEditEvent, TableReloadEvent, TableRow,
+  TableRowActionEvent, TableRowClickEvent, TableRowModel, TableRowsCheckedEvent, TableRowsExpandedEvent, TableRowsSelectedEvent, TableSortEvent, TableUserFilter, ValueField
 } from '../index';
 import $ from 'jquery';
 
@@ -148,6 +148,21 @@ export class TableAdapter extends ModelAdapter {
       backgroundEffect: column.backgroundEffect
     };
     this._send('columnBackgroundEffectChanged', data);
+  }
+
+  protected _onWidgetColumnDateGroupTypeChanged(event: TableColumnDateGroupTypeChangedEvent) {
+    this._sendColumnDateGroupTypeChanged(event.column);
+  }
+
+  protected _sendColumnDateGroupTypeChanged(column: DateColumn) {
+    if (column.guiOnly) {
+      return;
+    }
+    let data = {
+      columnId: column.id,
+      groupType: column.groupType
+    };
+    this._send('columnDateGroupTypeChanged', data);
   }
 
   sendColumnOrganizeAction(column: Column<any>, action: 'add' | 'remove' | 'modify') {
@@ -393,6 +408,8 @@ export class TableAdapter extends ModelAdapter {
       this._onWidgetColumnBackgroundEffectChanged(event as TableColumnBackgroundEffectChangedEvent);
     } else if (event.type === 'aggregationFunctionChanged') {
       this._onWidgetAggregationFunctionChanged(event as TableAggregationFunctionChangedEvent);
+    } else if (event.type === 'columnDateGroupTypeChanged') {
+      this._onWidgetColumnDateGroupTypeChanged(event as TableColumnDateGroupTypeChangedEvent);
     } else if (event.type === 'drop' && this.widget.dragAndDropHandler) {
       this.widget.dragAndDropHandler.uploadFiles(event as TableDropEvent);
     } else {
@@ -517,21 +534,6 @@ export class TableAdapter extends ModelAdapter {
     this.widget.revealSelection();
   }
 
-  protected _onColumnBackgroundEffectChanged(event: RemoteEvent) {
-    event.eventParts.forEach(function(eventPart) {
-      let column = this.widget.columnById(eventPart.columnId),
-        backgroundEffect = eventPart.backgroundEffect;
-
-      this.addFilterForWidgetEvent(widgetEvent => {
-        return (widgetEvent.type === 'columnBackgroundEffectChanged' &&
-          widgetEvent.column.id === column.id &&
-          widgetEvent.column.backgroundEffect === backgroundEffect);
-      });
-
-      column.setBackgroundEffect(backgroundEffect);
-    }, this);
-  }
-
   protected _onRequestFocusInCell(event: RemoteEvent) {
     let row = this.widget.rowById(event.rowId),
       column = this.widget.columnById(event.columnId);
@@ -539,24 +541,60 @@ export class TableAdapter extends ModelAdapter {
   }
 
   protected _onAggregationFunctionChanged(event: RemoteEvent) {
-    let columns = [],
-      functions = [];
+    let columns: NumberColumn[] = [];
+    let aggregationFunctions: NumberColumnAggregationFunction[] = [];
 
-    event.eventParts.forEach(function(eventPart) {
-      let func = eventPart.aggregationFunction,
-        column = this.widget.columnById(eventPart.columnId);
+    event.eventParts.forEach(eventPart => {
+      let column = this.widget.columnById(eventPart.columnId);
+      if (!(column instanceof NumberColumn)) {
+        return;
+      }
+      let aggregationFunction = eventPart.aggregationFunction;
 
-      this.addFilterForWidgetEvent(widgetEvent => {
-        return (widgetEvent.type === 'aggregationFunctionChanged' &&
+      this.addFilterForWidgetEvent((widgetEvent: TableAggregationFunctionChangedEvent) => {
+        return widgetEvent.type === 'aggregationFunctionChanged' &&
           widgetEvent.column.id === column.id &&
-          widgetEvent.column.aggregationFunction === func);
+          widgetEvent.column.aggregationFunction === aggregationFunction;
       });
-
       columns.push(column);
-      functions.push(func);
-    }, this);
+      aggregationFunctions.push(aggregationFunction);
+    });
 
-    this.widget.changeAggregations(columns, functions);
+    this.widget.changeAggregations(columns, aggregationFunctions);
+  }
+
+  protected _onColumnBackgroundEffectChanged(event: RemoteEvent) {
+    event.eventParts.forEach(eventPart => {
+      let column = this.widget.columnById(eventPart.columnId);
+      if (!(column instanceof NumberColumn)) {
+        return;
+      }
+      let backgroundEffect = eventPart.backgroundEffect;
+
+      this.addFilterForWidgetEvent((widgetEvent: TableColumnBackgroundEffectChangedEvent) => {
+        return widgetEvent.type === 'columnBackgroundEffectChanged' &&
+          widgetEvent.column.id === column.id &&
+          widgetEvent.column.backgroundEffect === backgroundEffect;
+      });
+      column.setBackgroundEffect(backgroundEffect);
+    });
+  }
+
+  protected _onColumnDateGroupTypeChanged(event: RemoteEvent) {
+    event.eventParts.forEach(eventPart => {
+      let column = this.widget.columnById(eventPart.columnId);
+      if (!(column instanceof DateColumn)) {
+        return;
+      }
+      let groupType = eventPart.groupType;
+
+      this.addFilterForWidgetEvent((widgetEvent: TableColumnDateGroupTypeChangedEvent) => {
+        return widgetEvent.type === 'columnDateGroupTypeChanged'
+          && widgetEvent.column.id === column.id
+          && widgetEvent.column.groupType === groupType;
+      });
+      column.setGroupType(groupType);
+    });
   }
 
   protected _onFiltersChanged(filters: (ObjectOrModel<TableUserFilter> | Filter<TableRow>)[]) {
@@ -607,6 +645,8 @@ export class TableAdapter extends ModelAdapter {
       this._onAggregationFunctionChanged(event);
     } else if (event.type === 'columnBackgroundEffectChanged') {
       this._onColumnBackgroundEffectChanged(event);
+    } else if (event.type === 'columnDateGroupTypeChanged') {
+      this._onColumnDateGroupTypeChanged(event);
     } else if (event.type === 'requestFocusInCell') {
       this._onRequestFocusInCell(event);
     } else {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Column, ErrorHandler, Event, ITableCustomizerDo, IUserFilterStateDo, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, objects, ObjectWithType, PropertyChangeEvent, scout, strings, Table,
+  arrays, Column, DateColumn, ErrorHandler, Event, ITableCustomizerDo, IUserFilterStateDo, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, objects, ObjectWithType, PropertyChangeEvent, scout, strings, Table,
   TableClientUiPreferenceProfileDo, TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableUserFilter, UiPreferences, uiPreferences, UserFilterStateMappers
 } from '../index';
 
@@ -123,7 +123,16 @@ export class TableUiPreferences implements ObjectWithType {
    */
   protected _installTableListener(table: Table) {
     this._uninstallTableListener(table);
-    table.on('columnMoved columnResized columnStructureChanged group sort aggregationFunctionChanged columnBackgroundEffectChanged', this._tableColumnListener);
+    table.on([
+      'columnMoved',
+      'columnResized',
+      'columnStructureChanged',
+      'group',
+      'sort',
+      'aggregationFunctionChanged',
+      'columnBackgroundEffectChanged',
+      'columnDateGroupTypeChanged'
+    ].join(' '), this._tableColumnListener);
     table.on('propertyChange:tileMode', this._tableTileModeListener);
   }
 
@@ -131,7 +140,16 @@ export class TableUiPreferences implements ObjectWithType {
    * Uninstalls the listener installed by {@link _installTableListener}.
    */
   protected _uninstallTableListener(table: Table) {
-    table.off('columnMoved columnResized columnStructureChanged group sort aggregationFunctionChanged columnBackgroundEffectChanged', this._tableColumnListener);
+    table.off([
+      'columnMoved',
+      'columnResized',
+      'columnStructureChanged',
+      'group',
+      'sort',
+      'aggregationFunctionChanged',
+      'columnBackgroundEffectChanged',
+      'columnDateGroupTypeChanged'
+    ].join(' '), this._tableColumnListener);
     table.off('propertyChange:tileMode', this._tableTileModeListener);
   }
 
@@ -265,6 +283,11 @@ export class TableUiPreferences implements ObjectWithType {
             ? column.backgroundEffect
             : this.isColumnPreferencesColumn(column)
               ? column.getColumnPreferences()?.backgroundEffectId
+              : undefined,
+          dateGroupType: column instanceof DateColumn
+            ? (column.grouped ? column.groupType : undefined) // only save group type if grouping is active
+            : this.isColumnPreferencesColumn(column)
+              ? column.getColumnPreferences()?.dateGroupType
               : undefined
         });
       });
@@ -517,6 +540,10 @@ export class TableUiPreferences implements ObjectWithType {
       // Use setters to correctly update internal structures (e.g. aggrStart function)
       column.setAggregationFunction(columnPreferences.aggregationFunctionId as NumberColumnAggregationFunction);
       column.setBackgroundEffect(columnPreferences.backgroundEffectId as NumberColumnBackgroundEffect, false); // false = don't redraw
+    }
+
+    if (column instanceof DateColumn) {
+      column.groupType = columnPreferences.dateGroupType;
     }
 
     if (this.isColumnPreferencesColumn(column)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Column, comparators, DateColumnEventMap, DateColumnModel, DateField, DateFormat, dates, InitModelOf, Locale, scout, TableRow} from '../../index';
+import {
+  Column, comparators, DateColumnEventMap, DateColumnModel, DateColumnTableHeaderMenu, DateColumnUserFilter, DateField, DateFormat, DateGroupType, dates, InitModelOf, Locale, scout, TableHeader, TableHeaderMenu, TableMatrix, TableRow
+} from '../../index';
 
 export class DateColumn extends Column<Date> implements DateColumnModel {
   declare model: DateColumnModel;
@@ -16,6 +18,7 @@ export class DateColumn extends Column<Date> implements DateColumnModel {
 
   format: DateFormat;
   groupFormat: DateFormat;
+  groupType: DateGroupType;
   hasDate: boolean;
   hasTime: boolean;
 
@@ -24,6 +27,7 @@ export class DateColumn extends Column<Date> implements DateColumnModel {
     this.format = null;
     // @ts-expect-error
     this.groupFormat = 'yyyy';
+    this.groupType = null;
     this.hasDate = true;
     this.hasTime = false;
     this.filterType = 'DateColumnUserFilter';
@@ -36,6 +40,15 @@ export class DateColumn extends Column<Date> implements DateColumnModel {
 
     this._setFormat(this.format);
     this._setGroupFormat(this.groupFormat);
+  }
+
+  override createTableHeaderMenu(tableHeader: TableHeader): TableHeaderMenu {
+    return scout.create(DateColumnTableHeaderMenu, {
+      parent: tableHeader,
+      column: this,
+      tableHeader: tableHeader,
+      $anchor: this.$header
+    });
   }
 
   setFormat(format: DateFormat | string) {
@@ -69,6 +82,14 @@ export class DateColumn extends Column<Date> implements DateColumnModel {
     }
   }
 
+  setGroupType(groupType: DateGroupType) {
+    let changed = this.setProperty('groupType', groupType);
+    if (!changed) {
+      return;
+    }
+    this.table.trigger('columnDateGroupTypeChanged', {column: this});
+  }
+
   protected override _formatValue(value: Date, row?: TableRow): string {
     return this.format.format(value);
   }
@@ -89,6 +110,15 @@ export class DateColumn extends Column<Date> implements DateColumnModel {
 
   override cellTextForGrouping(row: TableRow): string {
     let val = this.table.cellValue(this, row);
+    if (!val) {
+      return '';
+    }
+    let group = TableMatrix.resolveDateGroup(this.groupType);
+    if (group) {
+      let matrix = new TableMatrix(this.table);
+      let axis = matrix.addAxis(this, group);
+      return axis.format(axis.norm(val));
+    }
     return this.groupFormat.format(val);
   }
 
@@ -98,5 +128,42 @@ export class DateColumn extends Column<Date> implements DateColumnModel {
       hasDate: this.hasDate,
       hasTime: this.hasTime
     });
+  }
+
+  override compare(row1: TableRow, row2: TableRow): number {
+    // ---------------------------------------------------------------------------
+    // Keep implementation in sync with AbstractDateColumn.java#compareTableRows
+    // ---------------------------------------------------------------------------
+
+    let value1 = this.cellValue(row1);
+    let value2 = this.cellValue(row2);
+    if (!value1 && !value2) {
+      return 0;
+    }
+    if (!value1) {
+      return -1;
+    }
+    if (!value2) {
+      return 1;
+    }
+
+    if (this.grouped && this.groupType) {
+      let group = TableMatrix.resolveDateGroup(this.groupType);
+      if (group) {
+        let matrix = new TableMatrix(this.table);
+        let axis = matrix.addAxis(this, group);
+        let c = axis.norm(value1) - axis.norm(value2);
+        if (c) {
+          return c;
+        }
+        // If we are here, the grouped values are the same. Only return 0 if this is _not_ the last sort column,
+        // or else the additional columns could not have an effect on the row order. However, if this _is_ the
+        // last sort column, sort the values normally (-> super call).
+        if (this.table.columns.some(c => c !== this && c.sortActive && (c.sortIndex > this.sortIndex || c.initialAlwaysIncludeSortAtEnd))) {
+          return 0;
+        }
+      }
+    }
+    return super.compare(row1, row2);
   }
 }

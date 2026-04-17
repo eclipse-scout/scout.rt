@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,12 +19,12 @@ export interface ColumnUserFilterModel extends TableUserFilterModel {
   hasFilterFields?: boolean;
 
   /**
-   * array of (normalized) key, text composite
+   * array of key/text composites ({@link ColumnUserFilterValues)}
    */
   availableValues?: ColumnUserFilterValues[];
 
   /**
-   * array of (normalized) keys
+   * array of persistable keys (aka "deterministic keys")
    */
   selectedValues?: (string | number)[];
 }
