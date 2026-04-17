@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -186,6 +186,10 @@ public interface ICacheBuilder<K, V> {
    * <p>
    * Can be used to bound the maximum number of concurrent value resolve operations (non-fair). There is a risk of
    * deadlocks if the {@link #withValueResolver(ICacheValueResolver)} itself may be blocked.
+   * </p>
+   * <p>
+   * Each thread will be counted only once towards this maximum number (reentrant).
+   * </p>
    *
    * @param maxConcurrentResolve
    *     maximum concurrent resolves

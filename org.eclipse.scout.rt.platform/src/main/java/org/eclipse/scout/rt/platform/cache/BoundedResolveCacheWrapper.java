@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,8 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
-
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import java.util.function.Supplier;
 
 /**
  * This wrapper bounds the maximum concurrent resolve operation of a cache. In case a waiting operation is interrupted,
@@ -26,10 +25,16 @@ import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
  */
 public class BoundedResolveCacheWrapper<K, V> extends AbstractCacheWrapper<K, V> {
   private final Semaphore m_semaphore;
+  private final ThreadLocal<Boolean> m_semaphoreAcquired;
 
   public BoundedResolveCacheWrapper(ICache<K, V> delegate, int maximumResolves) {
+    this(delegate, maximumResolves, true);
+  }
+
+  public BoundedResolveCacheWrapper(ICache<K, V> delegate, int maximumResolves, boolean reentrant) {
     super(delegate);
     m_semaphore = new Semaphore(maximumResolves);
+    m_semaphoreAcquired = reentrant ? new ThreadLocal<>() : null;
   }
 
   @Override
@@ -38,20 +43,7 @@ public class BoundedResolveCacheWrapper<K, V> extends AbstractCacheWrapper<K, V>
     if (value != null) {
       return value;
     }
-    try {
-      m_semaphore.acquire();
-    }
-    catch (InterruptedException e) {
-      // interrupted, mark thread again as interrupted and resolve without a semaphore anyway
-      Thread.currentThread().interrupt();
-      throw new ThreadInterruptedError("Interrupted during acquire", e);
-    }
-    try {
-      return super.get(key);
-    }
-    finally {
-      m_semaphore.release();
-    }
+    return callWithSemaphore(() -> super.get(key));
   }
 
   @Override
@@ -68,18 +60,32 @@ public class BoundedResolveCacheWrapper<K, V> extends AbstractCacheWrapper<K, V>
     if (result.size() == keys.size()) {
       return result;
     }
+    return callWithSemaphore(() -> super.getAll(keys));
+  }
+
+  protected <RET> RET callWithSemaphore(Supplier<RET> callable) {
+    if (m_semaphoreAcquired != null && m_semaphoreAcquired.get() != null) {
+      return callable.get();
+    }
+
     try {
       m_semaphore.acquire();
     }
     catch (InterruptedException e) {
       // interrupted, mark thread again as interrupted and resolve without a semaphore anyway
       Thread.currentThread().interrupt();
-      return super.getAll(keys);
+      return callable.get();
     }
     try {
-      return super.getAll(keys);
+      if (m_semaphoreAcquired != null) {
+        m_semaphoreAcquired.set(true);
+      }
+      return callable.get();
     }
     finally {
+      if (m_semaphoreAcquired != null) {
+        m_semaphoreAcquired.remove();
+      }
       m_semaphore.release();
     }
   }
