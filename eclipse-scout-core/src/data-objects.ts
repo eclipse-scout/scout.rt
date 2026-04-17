@@ -141,6 +141,7 @@ export class TableColumnClientUiPreferenceDo extends BaseDoEntity {
   groupingActive: boolean;
   aggregationFunctionId: string;
   backgroundEffectId: string;
+  dateGroupType: DateGroupType;
 }
 
 export interface IUserFilterStateDo extends BaseDoEntity {
@@ -162,8 +163,21 @@ export class ColumnUserFilterStateDo extends BaseDoEntity implements IUserFilter
 export class DateColumnUserFilterStateDo extends BaseDoEntity implements IUserFilterStateDo {
   columnId: string;
   selectedValues: Set<number>;
+  groupType: DateGroupType;
   dateFrom: Date;
   dateTo: Date;
+}
+
+/**
+ * @see "DateGroupType.java"
+ */
+export enum DateGroupType {
+  YEAR = 'year',
+  MONTH = 'month',
+  MONTH_AND_YEAR = 'month-and-year',
+  CALENDAR_WEEK = 'calendar-week',
+  WEEKDAY = 'weekday',
+  DATE = 'date'
 }
 
 @typeName('scout.NumberColumnUserFilterState')

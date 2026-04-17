@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,17 +12,27 @@ package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 import java.io.Serial;
 import java.util.Date;
 
+import org.eclipse.scout.rt.api.data.table.DateGroupType;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
 public class DateColumnUserFilterState extends ColumnUserFilterState {
   @Serial
   private static final long serialVersionUID = 1L;
 
+  private DateGroupType m_groupType;
   private Date m_dateFrom;
   private Date m_dateTo;
 
   public DateColumnUserFilterState(IColumn<?> column) {
     super(column);
+  }
+
+  public DateGroupType getGroupType() {
+    return m_groupType;
+  }
+
+  public void setGroupType(DateGroupType groupType) {
+    m_groupType = groupType;
   }
 
   public Date getDateFrom() {

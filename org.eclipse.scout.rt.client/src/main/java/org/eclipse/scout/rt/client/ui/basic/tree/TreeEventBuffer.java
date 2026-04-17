@@ -365,7 +365,9 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
    */
   protected boolean isIgnorePrevious(int type) {
     return switch (type) {
-      case TreeEvent.TYPE_NODES_SELECTED, TreeEvent.TYPE_BEFORE_NODES_SELECTED, TreeEvent.TYPE_SCROLL_TO_SELECTION -> true;
+      case TreeEvent.TYPE_NODES_SELECTED,
+           TreeEvent.TYPE_BEFORE_NODES_SELECTED,
+           TreeEvent.TYPE_SCROLL_TO_SELECTION -> true;
       default -> false;
     };
   }
@@ -375,20 +377,35 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
    */
   protected boolean isCoalesceConsecutivePrevious(int type) {
     return switch (type) {
-      case TreeEvent.TYPE_NODES_UPDATED, TreeEvent.TYPE_NODES_INSERTED, TreeEvent.TYPE_NODES_DELETED, TreeEvent.TYPE_NODES_CHECKED -> true;
+      case TreeEvent.TYPE_NODES_UPDATED,
+           TreeEvent.TYPE_NODES_INSERTED,
+           TreeEvent.TYPE_NODES_DELETED,
+           TreeEvent.TYPE_NODES_CHECKED -> true;
       default -> false;
     };
   }
 
   protected boolean isNodesRequired(int type) {
     return switch (type) {
-      case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, TreeEvent.TYPE_NODES_DELETED, TreeEvent.TYPE_NODES_DRAG_REQUEST, TreeEvent.TYPE_NODES_INSERTED, TreeEvent.TYPE_NODES_UPDATED, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED ->
-        // Multiple nodes
-          true;
-      case TreeEvent.TYPE_NODE_ACTION, TreeEvent.TYPE_NODE_CHANGED, TreeEvent.TYPE_NODE_CLICK, TreeEvent.TYPE_NODE_COLLAPSED, TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE, TreeEvent.TYPE_NODE_DROP_ACTION, TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED,
-           TreeEvent.TYPE_NODE_ENSURE_VISIBLE, TreeEvent.TYPE_NODE_EXPANDED, TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE, TreeEvent.TYPE_NODE_FILTER_CHANGED ->
-        // Single node
-          true;
+      // Multiple nodes
+      case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED,
+           TreeEvent.TYPE_NODES_DELETED,
+           TreeEvent.TYPE_NODES_DRAG_REQUEST,
+           TreeEvent.TYPE_NODES_INSERTED,
+           TreeEvent.TYPE_NODES_UPDATED,
+           TreeEvent.TYPE_ALL_CHILD_NODES_DELETED -> true;
+      // Single node
+      case TreeEvent.TYPE_NODE_ACTION,
+           TreeEvent.TYPE_NODE_CHANGED,
+           TreeEvent.TYPE_NODE_CLICK,
+           TreeEvent.TYPE_NODE_COLLAPSED,
+           TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE,
+           TreeEvent.TYPE_NODE_DROP_ACTION,
+           TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED,
+           TreeEvent.TYPE_NODE_ENSURE_VISIBLE,
+           TreeEvent.TYPE_NODE_EXPANDED,
+           TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE,
+           TreeEvent.TYPE_NODE_FILTER_CHANGED -> true;
       default -> false;
     };
   }

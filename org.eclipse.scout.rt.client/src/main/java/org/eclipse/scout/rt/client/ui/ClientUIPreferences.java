@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,16 +17,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.eclipse.scout.rt.api.data.table.DateGroupType;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.prefs.IPreferences;
 import org.eclipse.scout.rt.client.services.common.prefs.Preferences;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.enumeration.EnumResolver;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
@@ -81,6 +84,7 @@ public class ClientUIPreferences {
   protected static final String TABLE_COLUMN_GROUPED = "table.column.grouped.";
   protected static final String TABLE_COLUMN_AGGR_FUNCTION = "table.column.aggr.function.";
   protected static final String TABLE_COLUMN_BACKGROUND_EFFECT = "table.column.background.effect.";
+  protected static final String TABLE_COLUMN_DATE_GROUP_TYPE = "table.column.dateGroupType.";
   protected static final String TABLE_COLUMN_SORT_ASC = "table.column.sortAsc.";
   protected static final String TABLE_COLUMN_SORT_EXPLICIT = "table.column.sortExplicit.";
   protected static final String TABLE_TILE_MODE = "table.tile.mode";
@@ -452,6 +456,11 @@ public class ClientUIPreferences {
     else {
       m_prefs.put(key, "false");
     }
+    if (grouped && col instanceof IDateColumn dateColumn) {
+      key = createColumnConfigKey(col, configName, TABLE_COLUMN_DATE_GROUP_TYPE);
+      DateGroupType dateGroupType = dateColumn.getGroupType();
+      m_prefs.put(key, dateGroupType == null ? null : dateGroupType.stringValue());
+    }
     //
     key = createColumnConfigKey(col, configName, TABLE_COLUMN_AGGR_FUNCTION);
     m_prefs.put(key, aggregationFunction);
@@ -477,6 +486,7 @@ public class ClientUIPreferences {
     renameEntry(createColumnConfigKey(col, oldConfigName, TABLE_COLUMN_AGGR_FUNCTION), createColumnConfigKey(col, newConfigName, TABLE_COLUMN_AGGR_FUNCTION));
     renameEntry(createColumnConfigKey(col, oldConfigName, TABLE_COLUMN_SORT_EXPLICIT), createColumnConfigKey(col, newConfigName, TABLE_COLUMN_SORT_EXPLICIT));
     renameEntry(createColumnConfigKey(col, oldConfigName, TABLE_COLUMN_BACKGROUND_EFFECT), createColumnConfigKey(col, newConfigName, TABLE_COLUMN_BACKGROUND_EFFECT));
+    renameEntry(createColumnConfigKey(col, oldConfigName, TABLE_COLUMN_DATE_GROUP_TYPE), createColumnConfigKey(col, newConfigName, TABLE_COLUMN_DATE_GROUP_TYPE));
   }
 
   protected String createColumnConfigKey(IColumn col, String configName, String propertyKey) {
@@ -528,6 +538,8 @@ public class ClientUIPreferences {
     m_prefs.remove(getUserAgentPrefix() + createColumnConfigKey(col, configName, TABLE_COLUMN_WIDTH));
     // background effect
     m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_BACKGROUND_EFFECT));
+    // date group type
+    m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_DATE_GROUP_TYPE));
 
     if (flush) {
       flush();
@@ -689,6 +701,23 @@ public class ClientUIPreferences {
     }
     String key = createColumnConfigKey(col, configName, TABLE_COLUMN_BACKGROUND_EFFECT);
     return m_prefs.get(key, defaultValue);
+  }
+
+  public DateGroupType getTableColumnDateGroupType(IColumn col, DateGroupType defaultValue, String configName) {
+    if (m_prefs == null) {
+      return defaultValue;
+    }
+    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_DATE_GROUP_TYPE);
+    String value = m_prefs.get(key, null);
+    if (value != null) {
+      try {
+        return BEANS.get(EnumResolver.class).resolve(DateGroupType.class, value);
+      }
+      catch (Exception e) {
+        LOG.warn("could not get table column date group type for [{}]. Loaded value '{}'", col.getClass().getName(), value, e);
+      }
+    }
+    return defaultValue;
   }
 
   public boolean getTableColumnVisible(IColumn col, boolean defaultValue) {

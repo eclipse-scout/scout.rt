@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -432,7 +432,6 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
   @Override
   public int compareTableRows(ITableRow r1, ITableRow r2) {
     ICodeType<?, VALUE> codeType = getCodeTypeClass() != null ? BEANS.opt(getCodeTypeClass()) : null;
-    ILookupCall<VALUE> call = getLookupCall() != null ? getLookupCall() : null;
     if (codeType != null) {
       if (isSortCodesByDisplayText()) {
         String s1 = getDisplayText(r1);
@@ -448,7 +447,7 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
         return c;
       }
     }
-    else if (call != null) {
+    else if (getLookupCall() != null) {
       String s1 = getDisplayText(r1);
       String s2 = getDisplayText(r2);
       return StringUtility.compareIgnoreCase(s1, s2);

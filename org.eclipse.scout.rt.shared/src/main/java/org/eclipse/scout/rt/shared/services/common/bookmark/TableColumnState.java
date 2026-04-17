@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.shared.services.common.bookmark;
 
 import java.io.Serial;
 import java.io.Serializable;
+
+import org.eclipse.scout.rt.api.data.table.DateGroupType;
 
 public class TableColumnState implements Serializable {
   @Serial
@@ -26,6 +28,7 @@ public class TableColumnState implements Serializable {
   private boolean m_groupingActive;
   private String m_aggregationFunction;
   private String m_backgroundEffect;
+  private DateGroupType m_dateGroupType;
 
   public TableColumnState() {
     super();
@@ -42,6 +45,7 @@ public class TableColumnState implements Serializable {
     this.m_groupingActive = state.m_groupingActive;
     this.m_aggregationFunction = state.m_aggregationFunction;
     this.m_backgroundEffect = state.m_backgroundEffect;
+    this.m_dateGroupType = state.m_dateGroupType;
   }
 
   public String getClassName() {
@@ -130,5 +134,13 @@ public class TableColumnState implements Serializable {
 
   public void setBackgroundEffect(String backgroundEffect) {
     m_backgroundEffect = backgroundEffect;
+  }
+
+  public DateGroupType getDateGroupType() {
+    return m_dateGroupType;
+  }
+
+  public void setDateGroupType(DateGroupType dateGroupType) {
+    m_dateGroupType = dateGroupType;
   }
 }

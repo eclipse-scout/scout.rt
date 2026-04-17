@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -95,6 +95,47 @@ describe('ContextMenuPopup', () => {
         expect(childMenu.destroyed).toBe(false);
       });
 
+      it('does not change the parent of the original menus', () => {
+        expect(menu.owner).toBe(session.desktop);
+        expect(menu.parent).toBe(session.desktop);
+        popup = scout.create(ContextMenuPopup, {
+          parent: session.desktop,
+          session: session,
+          menuItems: [menu],
+          cloneMenuItems: true
+        });
+        expect(menu.owner).toBe(session.desktop);
+        expect(menu.parent).toBe(session.desktop);
+        expect(popup.menuItems).toContain(menu);
+        expect(popup.children).not.toContain(menu);
+        expect(popup.findChild(Menu)).toBe(null);
+        popup.render();
+        expect(popup.children).not.toContain(menu);
+        expect(popup.findChild(Menu)).toBeInstanceOf(Menu);
+        expect(popup.findChild(Menu).cloneOf).toBe(menu);
+
+        class SpecContextMenuPopup extends ContextMenuPopup {
+          constructor() {
+            super();
+            this.cloneMenuItems = true;
+          }
+        }
+
+        let popup2 = scout.create(SpecContextMenuPopup, {
+          parent: session.desktop,
+          session: session,
+          menuItems: [menu]
+        });
+        expect(menu.owner).toBe(session.desktop);
+        expect(menu.parent).toBe(session.desktop);
+        expect(popup2.menuItems).toContain(menu);
+        expect(popup2.children).not.toContain(menu);
+        expect(popup2.findChild(Menu)).toBe(null);
+        popup2.render();
+        expect(popup2.children).not.toContain(menu);
+        expect(popup2.findChild(Menu)).toBeInstanceOf(Menu);
+        expect(popup2.findChild(Menu).cloneOf).toBe(menu);
+      });
     });
 
     describe('false', () => {
@@ -150,6 +191,40 @@ describe('ContextMenuPopup', () => {
         });
         popup.render();
         popup.destroy();
+      });
+
+      it('changes the parent of the original menus', () => {
+        expect(menu.owner).toBe(session.desktop);
+        expect(menu.parent).toBe(session.desktop);
+        popup = scout.create(ContextMenuPopup, {
+          parent: session.desktop,
+          session: session,
+          menuItems: [menu],
+          cloneMenuItems: false
+        });
+        expect(menu.owner).toBe(session.desktop);
+        expect(menu.parent).toBe(popup);
+        expect(popup.menuItems).toContain(menu);
+        expect(popup.children).toContain(menu);
+        expect(popup.findChild(Menu).cloneOf).toBe(null);
+
+        class SpecContextMenuPopup extends ContextMenuPopup {
+          constructor() {
+            super();
+            this.cloneMenuItems = false;
+          }
+        }
+
+        let popup2 = scout.create(SpecContextMenuPopup, {
+          parent: session.desktop,
+          session: session,
+          menuItems: [menu]
+        });
+        expect(menu.owner).toBe(session.desktop);
+        expect(menu.parent).toBe(popup2);
+        expect(popup2.menuItems).toContain(menu);
+        expect(popup2.children).toContain(menu);
+        expect(popup2.findChild(Menu).cloneOf).toBe(null);
       });
     });
   });

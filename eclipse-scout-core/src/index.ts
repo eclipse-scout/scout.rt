@@ -586,6 +586,7 @@ export * from './table/columns/CompactLineBlock';
 export * from './table/columns/DateColumn';
 export * from './table/columns/DateColumnModel';
 export * from './table/columns/DateColumnEventMap';
+export * from './table/columns/DateColumnTableHeaderMenu';
 export * from './table/columns/IconColumn';
 export * from './table/columns/NumberColumn';
 export * from './table/columns/NumberColumnModel';

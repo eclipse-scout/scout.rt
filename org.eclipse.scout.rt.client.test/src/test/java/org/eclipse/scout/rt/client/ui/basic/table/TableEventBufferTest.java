@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -275,7 +275,7 @@ public class TableEventBufferTest {
     assertEquals(1, events.get(2).getRowCount()); // row 2 was merged to insert
   }
 
-  ////// REPLACE
+  // -------------------- REPLACE --------------------
 
   /**
    * If a row is inserted and later updated, only an insert event with the updated value needs to be kept.
@@ -554,6 +554,43 @@ public class TableEventBufferTest {
     TableEvent bgEffectEvent = events.get(1);
     assertEquals(2, bgEffectEvent.getColumns().size());
     assertTrue(bgEffectEvent.getColumns().containsAll(CollectionUtility.arrayList(c1, c2)));
+  }
+
+  @Test
+  public void testCoalesceAndRemoveObsoleteColumnDateGroupTypeEvents() {
+    ITable table = mock(ITable.class);
+    final IColumn<?> c1 = mockColumn(0);
+    final IColumn<?> c2 = mockColumn(1);
+    final IColumn<?> c3 = mockColumn(2);
+
+    final TableEvent event0 = new TableEvent(table, TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED);
+    event0.setColumns(CollectionUtility.arrayList(c3));
+    final TableEvent event1 = new TableEvent(table, TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED);
+    event1.setColumns(CollectionUtility.arrayList(c2));
+    final TableEvent event2 = new TableEvent(table, TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED);
+    event2.setColumns(CollectionUtility.arrayList(c2));
+    final TableEvent event3 = new TableEvent(table, TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
+    event3.setColumns(CollectionUtility.arrayList(c1));
+    final TableEvent event4 = new TableEvent(table, TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED);
+    event4.setColumns(CollectionUtility.arrayList(c3));
+    final TableEvent event5 = new TableEvent(table, TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED);
+    event5.setColumns(CollectionUtility.arrayList(c3));
+
+    m_testBuffer.add(event0);
+    m_testBuffer.add(event1);
+    m_testBuffer.add(event2);
+    m_testBuffer.add(event3);
+    m_testBuffer.add(event4);
+    m_testBuffer.add(event5);
+
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(4, events.size());
+    assertEquals(TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED, events.get(0).getType());
+    assertEquals(List.of(c3, c2), events.get(0).getColumns());
+    assertEquals(TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED, events.get(1).getType());
+    assertEquals(TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED, events.get(2).getType());
+    assertEquals(TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED, events.get(3).getType());
+    assertEquals(List.of(c3), events.get(3).getColumns());
   }
 
   @Test

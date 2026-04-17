@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AppLinkActionEvent, Cell, Column, DropType, Event, FileDropEvent, Filter, KeyStroke, Menu, NumberColumn, PropertyChangeEvent, Status, Table, TableCheckableStyle, TableControl, TableGroupingStyle, TableHierarchicalStyle, TableReloadReason,
-  TableRow, Tile, TileTableHeaderBox, ValueField, WidgetEventMap
+  AppLinkActionEvent, Cell, Column, DateColumn, DropType, Event, FileDropEvent, Filter, KeyStroke, Menu, NumberColumn, PropertyChangeEvent, Status, Table, TableCheckableStyle, TableControl, TableGroupingStyle, TableHierarchicalStyle,
+  TableReloadReason, TableRow, Tile, TileTableHeaderBox, ValueField, WidgetEventMap
 } from '../index';
 
 export interface TableColumnBackgroundEffectChangedEvent<T = Table> extends Event<T> {
@@ -18,6 +18,10 @@ export interface TableColumnBackgroundEffectChangedEvent<T = Table> extends Even
 
 export interface TableAggregationFunctionChangedEvent<T = Table> extends Event<T> {
   column: NumberColumn;
+}
+
+export interface TableColumnDateGroupTypeChangedEvent<T = Table> extends Event<T> {
+  column: DateColumn;
 }
 
 export interface TableAllRowsDeletedEvent<T = Table> extends Event<T> {
@@ -194,6 +198,7 @@ export interface TableEventMap extends WidgetEventMap {
   'startCellEdit': TableStartCellEditEvent;
   'statusChanged': Event;
   'columnBackgroundEffectChanged': TableColumnBackgroundEffectChangedEvent;
+  'columnDateGroupTypeChanged': TableColumnDateGroupTypeChangedEvent;
   'propertyChange:autoResizeColumns': PropertyChangeEvent<boolean>;
   'propertyChange:checkable': PropertyChangeEvent<boolean>;
   'propertyChange:checkableStyle': PropertyChangeEvent<TableCheckableStyle>;

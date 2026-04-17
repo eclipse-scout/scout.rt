@@ -112,7 +112,6 @@ export class TableRow implements TableRowModel, ObjectWithType, FilterElement {
     return this.childRows.some(childRow => childRow.filterAccepted || childRow.hasFilterAcceptedChildren());
   }
 
-
   get table(): Table {
     return this.parent;
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, ColumnUserFilter, ColumnUserFilterModel, DateColumn, DateColumnUserFilterModel, DateField, dates, FilterFieldsGroupBox, InitModelOf, PropertyChangeEvent, TableMatrix, TableMatrixDateGroup, TableMatrixNumberGroup, TableRow,
-  TableUserFilterAddedEventData
+  aria, ColumnUserFilter, ColumnUserFilterModel, DateColumn, DateColumnUserFilterModel, DateField, DateGroupType, dates, FilterFieldsGroupBox, InitModelOf, PropertyChangeEvent, TableMatrix, TableMatrixDateGroup, TableMatrixNumberGroup,
+  TableRow, TableUserFilterAddedEventData
 } from '../../index';
 import $ from 'jquery';
 
@@ -17,19 +17,25 @@ export class DateColumnUserFilter extends ColumnUserFilter implements ColumnUser
   declare model: DateColumnUserFilterModel;
   declare column: DateColumn;
 
+  groupType: DateGroupType;
+
   dateFrom: Date;
   dateTo: Date;
+
   dateFromField: DateField;
   dateToField: DateField;
 
   constructor() {
     super();
 
+    this.groupType = null;
+
     this.dateFrom = null;
-    this.dateFromField = null;
     this.dateTo = null;
-    this.dateToField = null;
+
     this.hasFilterFields = true;
+    this.dateFromField = null;
+    this.dateToField = null;
   }
 
   protected override _init(model: InitModelOf<this>) {
@@ -39,16 +45,16 @@ export class DateColumnUserFilter extends ColumnUserFilter implements ColumnUser
   }
 
   override axisGroup(): TableMatrixNumberGroup | TableMatrixDateGroup {
-    if (this.column.hasDate) {
-      // Default grouping for date columns is year
-      return TableMatrix.DateGroup.YEAR;
+    if (!this.column.hasDate) {
+      // No grouping for time columns
+      return TableMatrix.DateGroup.NONE;
     }
-    // No grouping for time columns
-    return TableMatrix.DateGroup.NONE;
+    return TableMatrix.resolveDateGroup(this.groupType) ?? TableMatrix.DateGroup.YEAR;
   }
 
   override createFilterAddedEventData(): TableUserFilterAddedEventData {
-    let data = super.createFilterAddedEventData();
+    let data = super.createFilterAddedEventData() as DateColumnTableUserFilterAddedEventData;
+    data.groupType = this.groupType;
     data.dateFrom = dates.toJsonDate(this.dateFrom);
     data.dateTo = dates.toJsonDate(this.dateTo);
     return data;
@@ -67,7 +73,7 @@ export class DateColumnUserFilter extends ColumnUserFilter implements ColumnUser
     let
       keyValue = key.valueOf(),
       fromValue = this.dateFrom ? this.dateFrom.valueOf() : null,
-      // Shift the toValue to 1ms before midnight/next day. Thus any time of the selected day is accepted.
+      // Shift the toValue to 1ms before midnight/next day. Thus, any time of the selected day is accepted.
       toValue = this.dateTo ? dates.shift(this.dateTo, 0, 0, 1).valueOf() - 1 : null;
 
     if (fromValue && toValue) {
@@ -120,11 +126,17 @@ export class DateColumnUserFilter extends ColumnUserFilter implements ColumnUser
 
   protected _onInput(event: JQuery.TriggeredEvent) {
     if (!this.dateFromField.rendered) {
-      // popup has been closed in the mean time
+      // popup has been closed in the meantime
       return;
     }
     this.dateFrom = this.dateFromField.value;
     this.dateTo = this.dateToField.value;
     this.triggerFilterFieldsChanged();
   }
+}
+
+export interface DateColumnTableUserFilterAddedEventData extends TableUserFilterAddedEventData {
+  groupType?: DateGroupType;
+  dateFrom?: string;
+  dateTo?: string;
 }

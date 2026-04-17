@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,7 +30,7 @@ export class NumberColumnUserFilter extends ColumnUserFilter implements NumberCo
   }
 
   override createFilterAddedEventData(): TableUserFilterAddedEventData {
-    let data = super.createFilterAddedEventData();
+    let data = super.createFilterAddedEventData() as NumberColumnTableUserFilterAddedEventData;
     data.numberFrom = this.numberFrom;
     data.numberTo = this.numberTo;
     return data;
@@ -85,4 +85,9 @@ export class NumberColumnUserFilter extends ColumnUserFilter implements NumberCo
     aria.linkElementWithLabel(this.numberFromField.$field, $filterFieldsText);
     aria.linkElementWithLabel(this.numberToField.$field, $filterFieldsText);
   }
+}
+
+export interface NumberColumnTableUserFilterAddedEventData extends TableUserFilterAddedEventData {
+  numberFrom?: number;
+  numberTo?: number;
 }
