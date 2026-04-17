@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,6 +15,7 @@ import java.util.Set;
 
 import jakarta.annotation.Generated;
 
+import org.eclipse.scout.rt.api.data.table.DateGroupType;
 import org.eclipse.scout.rt.api.data.table.IUserFilterStateDo;
 import org.eclipse.scout.rt.api.data.table.TableColumnId;
 import org.eclipse.scout.rt.dataobject.DoEntity;
@@ -32,8 +33,16 @@ public class DateColumnUserFilterStateDo extends DoEntity implements IUserFilter
     return doValue("columnId");
   }
 
-  public DoSet<Integer> selectedValues() {
+  /**
+   * Numeric values representing the selected entries in the filter table.
+   * Value ranges depend on {@link #groupType()}, see TableMatrix.ts.
+   */
+  public DoSet<Long> selectedValues() {
     return doSet("selectedValues");
+  }
+
+  public DoValue<DateGroupType> groupType() {
+    return doValue("groupType");
   }
 
   public DoValue<Date> dateFrom() {
@@ -59,21 +68,41 @@ public class DateColumnUserFilterStateDo extends DoEntity implements IUserFilter
     return columnId().get();
   }
 
+  /**
+   * See {@link #selectedValues()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
-  public DateColumnUserFilterStateDo withSelectedValues(Collection<? extends Integer> selectedValues) {
+  public DateColumnUserFilterStateDo withSelectedValues(Collection<? extends Long> selectedValues) {
     selectedValues().updateAll(selectedValues);
     return this;
   }
 
+  /**
+   * See {@link #selectedValues()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
-  public DateColumnUserFilterStateDo withSelectedValues(Integer... selectedValues) {
+  public DateColumnUserFilterStateDo withSelectedValues(Long... selectedValues) {
     selectedValues().updateAll(selectedValues);
     return this;
   }
 
+  /**
+   * See {@link #selectedValues()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
-  public Set<Integer> getSelectedValues() {
+  public Set<Long> getSelectedValues() {
     return selectedValues().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public DateColumnUserFilterStateDo withGroupType(DateGroupType groupType) {
+    groupType().set(groupType);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public DateGroupType getGroupType() {
+    return groupType().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")

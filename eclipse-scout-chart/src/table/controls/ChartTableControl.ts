@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -417,7 +417,7 @@ export class ChartTableControl extends TableControl implements ChartTableControl
   }
 
   protected _columns(): Column[] {
-    return new TableMatrix(this.table, this.session).columns();
+    return new TableMatrix(this.table).columns();
   }
 
   protected _axisCount(columnCount: (number | Column<any>)[][], column: Column<any>): number {
@@ -517,7 +517,7 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     this._chartGroup2Map = {};
 
     // find best x- and y-axis: best is 9 different entries
-    let matrix = new TableMatrix(this.table, this.session),
+    let matrix = new TableMatrix(this.table),
       columnCount = matrix.columnCount(false); // filterNumberColumns false: number columns will be filtered below
     columnCount.sort((a, b) => {
       return Math.abs(a[1] as number - 8) - Math.abs(b[1] as number - 8);
@@ -799,7 +799,7 @@ export class ChartTableControl extends TableControl implements ChartTableControl
 
   protected _calculateValues(): TableMatrixResult {
     // build matrix
-    let matrix = new TableMatrix(this.table, this.session);
+    let matrix = new TableMatrix(this.table);
 
     // aggregation (data axis)
     let tableData = this.chartAggregation.id ? this._aggregationMap[this.chartAggregation.id].data('column') : -1;

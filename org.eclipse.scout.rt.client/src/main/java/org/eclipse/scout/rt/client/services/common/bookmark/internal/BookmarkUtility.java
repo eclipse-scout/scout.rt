@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
@@ -399,6 +400,9 @@ public final class BookmarkUtility {
           colState.setSortOrder(sortOrder);
           colState.setSortAscending(c.isSortAscending());
           colState.setGroupingActive(c.isGroupingActive());
+          if (c.isGroupingActive() && c instanceof IDateColumn dateColumn) {
+            colState.setDateGroupType(dateColumn.getGroupType());
+          }
         }
         else {
           colState.setSortOrder(-1);
@@ -440,15 +444,19 @@ public final class BookmarkUtility {
         columnSet.setVisibleColumns(visibleColumns);
       }
 
-      //aggregation functions and background effect:
       for (TableColumnState colState : oldColumns) {
-
+        // aggregation functions and background effect
         IColumn<?> col = resolveColumn(columnSet.getColumns(), colState.getClassName());
-        if (col instanceof INumberColumn) {
+        if (col instanceof INumberColumn<?> numberColumn) {
           if (colState.getAggregationFunction() != null) {
-            ((INumberColumn<?>) col).setAggregationFunction(colState.getAggregationFunction());
+            numberColumn.setAggregationFunction(colState.getAggregationFunction());
           }
-          ((INumberColumn<?>) col).setBackgroundEffect(colState.getBackgroundEffect());
+          numberColumn.setBackgroundEffect(colState.getBackgroundEffect());
+        }
+
+        // date group type
+        if (col instanceof IDateColumn dateColumn) {
+          dateColumn.setGroupType(colState.getDateGroupType());
         }
       }
 

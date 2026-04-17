@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -170,6 +170,7 @@ public class TableEvent extends EventObject implements IModelEvent {
 
   public static final int TYPE_COLUMN_AGGREGATION_CHANGED = 950;
   public static final int TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED = 960;
+  public static final int TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED = 970;
 
   private final int m_type;
   private List<? extends ITableRow> m_rows;

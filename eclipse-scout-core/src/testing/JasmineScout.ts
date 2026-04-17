@@ -76,6 +76,7 @@ window.sandboxSession = options => {
   model.backgroundJobPollingEnabled = false;
   model.suppressErrors = true;
   model.$entryPoint = $sandbox;
+  model.locale = options.locale || new LocaleSpecHelper().createLocale('de-CH');
   let session = scout.create(Session, model) as SandboxSession;
   $sandbox.data('sandboxSession', session);
 
@@ -88,7 +89,6 @@ window.sandboxSession = options => {
   // Simulate successful session initialization
   session.uiSessionId = '1.1';
   session.modelAdapterRegistry[session.uiSessionId] = session;
-  session.locale = new LocaleSpecHelper().createLocale('de-CH');
 
   let desktop = (options.desktop || {}) as InitModelOf<Desktop>;
   desktop.navigationVisible = scout.nvl(desktop.navigationVisible, false);

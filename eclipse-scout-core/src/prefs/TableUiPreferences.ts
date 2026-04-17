@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Column, ErrorHandler, Event, ITableCustomizerDo, IUserFilterStateDo, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, objects, ObjectWithType, PropertyChangeEvent, scout, strings, Table,
+  arrays, Column, DateColumn, ErrorHandler, Event, ITableCustomizerDo, IUserFilterStateDo, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, objects, ObjectWithType, PropertyChangeEvent, scout, strings, Table,
   TableClientUiPreferenceProfileDo, TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableUserFilter, UiPreferences, uiPreferences, UserFilterStateMappers
 } from '../index';
 
@@ -123,7 +123,16 @@ export class TableUiPreferences implements ObjectWithType {
    */
   protected _installTableListener(table: Table) {
     this._uninstallTableListener(table);
-    table.on('columnMoved columnResized columnStructureChanged group sort aggregationFunctionChanged columnBackgroundEffectChanged', this._tableColumnListener);
+    table.on([
+      'columnMoved',
+      'columnResized',
+      'columnStructureChanged',
+      'group',
+      'sort',
+      'aggregationFunctionChanged',
+      'columnBackgroundEffectChanged',
+      'columnDateGroupTypeChanged'
+    ].join(' '), this._tableColumnListener);
     table.on('propertyChange:tileMode', this._tableTileModeListener);
   }
 
@@ -131,7 +140,16 @@ export class TableUiPreferences implements ObjectWithType {
    * Uninstalls the listener installed by {@link _installTableListener}.
    */
   protected _uninstallTableListener(table: Table) {
-    table.off('columnMoved columnResized columnStructureChanged group sort aggregationFunctionChanged columnBackgroundEffectChanged', this._tableColumnListener);
+    table.off([
+      'columnMoved',
+      'columnResized',
+      'columnStructureChanged',
+      'group',
+      'sort',
+      'aggregationFunctionChanged',
+      'columnBackgroundEffectChanged',
+      'columnDateGroupTypeChanged'
+    ].join(' '), this._tableColumnListener);
     table.off('propertyChange:tileMode', this._tableTileModeListener);
   }
 
@@ -265,6 +283,11 @@ export class TableUiPreferences implements ObjectWithType {
             ? column.backgroundEffect
             : this.isColumnPreferencesColumn(column)
               ? column.getColumnPreferences()?.backgroundEffectId
+              : undefined,
+          dateGroupType: column instanceof DateColumn
+            ? (column.grouped ? column.groupType : null) // only save group type if grouping is active
+            : this.isColumnPreferencesColumn(column)
+              ? column.getColumnPreferences()?.dateGroupType
               : undefined
         });
       });
@@ -500,23 +523,36 @@ export class TableUiPreferences implements ObjectWithType {
     }
 
     // Use setter for 'visible' property because it is a multidimensional property
-    column.setVisible(columnPreferences.visible, false); // parameter 'false' skips call of onColumnVisibilityChanged()
+    if (columnPreferences.visible !== undefined) {
+      column.setVisible(columnPreferences.visible, false); // parameter 'false' skips call of onColumnVisibilityChanged()
+    }
 
     // Don't use setter for 'width' property to prevent unnecessarily redrawing the table (will be done again later in setColumns anyway)
-    if (!column.fixedWidth) {
+    if (columnPreferences.width !== undefined && !column.fixedWidth) {
       column.width = columnPreferences.width;
     }
 
     // Properties without setter (changes will be applied later by _setColumns)
-    column.sortIndex = columnPreferences.sortOrder;
-    column.sortAscending = columnPreferences.sortAscending;
-    column.sortActive = column.sortIndex >= 0;
-    column.grouped = columnPreferences.groupingActive;
+    if (columnPreferences.sortOrder !== undefined) {
+      column.sortIndex = columnPreferences.sortOrder;
+      column.sortActive = column.sortIndex >= 0;
+    }
+    if (columnPreferences.sortAscending !== undefined) {
+      column.sortAscending = columnPreferences.sortAscending;
+    }
+    if (columnPreferences.groupingActive !== undefined) {
+      column.grouped = columnPreferences.groupingActive;
+    }
 
-    if (column instanceof NumberColumn) {
-      // Use setters to correctly update internal structures (e.g. aggrStart function)
+    // Use setters to correctly update internal structures (e.g. aggrStart function)
+    if (columnPreferences.aggregationFunctionId !== undefined && column instanceof NumberColumn) {
       column.setAggregationFunction(columnPreferences.aggregationFunctionId as NumberColumnAggregationFunction);
+    }
+    if (columnPreferences.backgroundEffectId !== undefined && column instanceof NumberColumn) {
       column.setBackgroundEffect(columnPreferences.backgroundEffectId as NumberColumnBackgroundEffect, false); // false = don't redraw
+    }
+    if (columnPreferences.dateGroupType !== undefined && column instanceof DateColumn) {
+      column.setGroupType(columnPreferences.dateGroupType, false); // false = don't apply grouping
     }
 
     if (this.isColumnPreferencesColumn(column)) {

@@ -299,7 +299,8 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
    */
   protected boolean isResourceOrderUnchanged(int type) {
     return switch (type) {
-      case PlannerEvent.TYPE_RESOURCES_SELECTED, PlannerEvent.TYPE_RESOURCES_UPDATED -> true;
+      case PlannerEvent.TYPE_RESOURCES_SELECTED,
+           PlannerEvent.TYPE_RESOURCES_UPDATED -> true;
       default -> false;
     };
   }
@@ -325,7 +326,8 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
    */
   protected boolean isIgnorePrevious(int type) {
     return switch (type) {
-      case PlannerEvent.TYPE_RESOURCES_SELECTED, PlannerEvent.TYPE_ALL_RESOURCES_DELETED -> true;
+      case PlannerEvent.TYPE_RESOURCES_SELECTED,
+           PlannerEvent.TYPE_ALL_RESOURCES_DELETED -> true;
       default -> false;
     };
   }
@@ -335,14 +337,18 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
    */
   protected boolean isCoalesceConsecutivePrevious(int type) {
     return switch (type) {
-      case PlannerEvent.TYPE_RESOURCES_UPDATED, PlannerEvent.TYPE_RESOURCES_INSERTED, PlannerEvent.TYPE_RESOURCES_DELETED -> true;
+      case PlannerEvent.TYPE_RESOURCES_UPDATED,
+           PlannerEvent.TYPE_RESOURCES_INSERTED,
+           PlannerEvent.TYPE_RESOURCES_DELETED -> true;
       default -> false;
     };
   }
 
   protected boolean isResourcesRequired(int type) {
     return switch (type) {
-      case PlannerEvent.TYPE_RESOURCES_DELETED, PlannerEvent.TYPE_RESOURCES_INSERTED, PlannerEvent.TYPE_RESOURCES_UPDATED -> true;
+      case PlannerEvent.TYPE_RESOURCES_DELETED,
+           PlannerEvent.TYPE_RESOURCES_INSERTED,
+           PlannerEvent.TYPE_RESOURCES_UPDATED -> true;
       default -> false;
     };
   }

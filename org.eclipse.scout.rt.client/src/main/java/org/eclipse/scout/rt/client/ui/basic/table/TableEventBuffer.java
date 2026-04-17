@@ -137,6 +137,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         // ignore all previous aggregate function changes.
         typesToDelete.add(TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
         typesToDelete.add(TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED);
+        typesToDelete.add(TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED);
         typesToDelete.add(TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
       }
       else if (isIgnorePrevious(type)) {
@@ -438,8 +439,15 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    */
   protected boolean isRowOrderUnchanged(int type) {
     return switch (type) {
-      case TableEvent.TYPE_ROWS_SELECTED, TableEvent.TYPE_ROW_ACTION, TableEvent.TYPE_ROW_CLICK, TableEvent.TYPE_ROWS_UPDATED, TableEvent.TYPE_ROWS_CHECKED, TableEvent.TYPE_SCROLL_TO_SELECTION, TableEvent.TYPE_COLUMN_HEADERS_UPDATED,
-           TableEvent.TYPE_COLUMN_ORDER_CHANGED, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED -> true;
+      case TableEvent.TYPE_ROWS_SELECTED,
+           TableEvent.TYPE_ROW_ACTION,
+           TableEvent.TYPE_ROW_CLICK,
+           TableEvent.TYPE_ROWS_UPDATED,
+           TableEvent.TYPE_ROWS_CHECKED,
+           TableEvent.TYPE_SCROLL_TO_SELECTION,
+           TableEvent.TYPE_COLUMN_HEADERS_UPDATED,
+           TableEvent.TYPE_COLUMN_ORDER_CHANGED,
+           TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED -> true;
       default -> false;
     };
   }
@@ -459,7 +467,12 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    */
   protected boolean isIgnorePrevious(int type) {
     return switch (type) {
-      case TableEvent.TYPE_ROWS_SELECTED, TableEvent.TYPE_SCROLL_TO_SELECTION, TableEvent.TYPE_ROWS_DRAG_REQUEST, TableEvent.TYPE_ROW_ORDER_CHANGED, TableEvent.TYPE_COLUMN_ORDER_CHANGED, TableEvent.TYPE_ALL_ROWS_DELETED,
+      case TableEvent.TYPE_ROWS_SELECTED,
+           TableEvent.TYPE_SCROLL_TO_SELECTION,
+           TableEvent.TYPE_ROWS_DRAG_REQUEST,
+           TableEvent.TYPE_ROW_ORDER_CHANGED,
+           TableEvent.TYPE_COLUMN_ORDER_CHANGED,
+           TableEvent.TYPE_ALL_ROWS_DELETED,
            TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED -> true;
       default -> false;
     };
@@ -470,16 +483,31 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    */
   protected boolean isCoalesceConsecutivePrevious(int type) {
     return switch (type) {
-      case TableEvent.TYPE_ROWS_UPDATED, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_DELETED, TableEvent.TYPE_ROWS_CHECKED, TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED, TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED,
-           TableEvent.TYPE_COLUMN_HEADERS_UPDATED -> true;
+      case TableEvent.TYPE_ROWS_UPDATED,
+           TableEvent.TYPE_ROWS_INSERTED,
+           TableEvent.TYPE_ROWS_DELETED,
+           TableEvent.TYPE_ROWS_CHECKED,
+           TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED,
+           TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED,
+           TableEvent.TYPE_COLUMN_HEADERS_UPDATED,
+           TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED -> true;
       default -> false;
     };
   }
 
   protected boolean isRowsRequired(int type) {
     return switch (type) {
-      case TableEvent.TYPE_ROW_ACTION, TableEvent.TYPE_ROW_CLICK, TableEvent.TYPE_ROW_DROP_ACTION, TableEvent.TYPE_ROW_ORDER_CHANGED, TableEvent.TYPE_ROWS_COPY_REQUEST, TableEvent.TYPE_ROWS_DELETED, TableEvent.TYPE_ROWS_DRAG_REQUEST,
-           TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED, TableEvent.TYPE_ROWS_EXPANDED, TableEvent.TYPE_REQUEST_FOCUS_IN_CELL -> true;
+      case TableEvent.TYPE_ROW_ACTION,
+           TableEvent.TYPE_ROW_CLICK,
+           TableEvent.TYPE_ROW_DROP_ACTION,
+           TableEvent.TYPE_ROW_ORDER_CHANGED,
+           TableEvent.TYPE_ROWS_COPY_REQUEST,
+           TableEvent.TYPE_ROWS_DELETED,
+           TableEvent.TYPE_ROWS_DRAG_REQUEST,
+           TableEvent.TYPE_ROWS_INSERTED,
+           TableEvent.TYPE_ROWS_UPDATED,
+           TableEvent.TYPE_ROWS_EXPANDED,
+           TableEvent.TYPE_REQUEST_FOCUS_IN_CELL -> true;
       default -> false;
     };
   }

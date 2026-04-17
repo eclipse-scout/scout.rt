@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,8 +12,10 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.scout.rt.api.data.table.DateGroupType;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IReloadReason;
@@ -128,4 +130,6 @@ public interface ITableUIFacade {
   void removeFilteredRowsFromUI();
 
   void setColumnBackgroundEffect(INumberColumn<?> column, String mode);
+
+  void setDateGroupTypeFromUI(IDateColumn column, DateGroupType groupType);
 }

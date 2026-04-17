@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -46,6 +46,7 @@ public class JsonNumberColumnUserFilter extends JsonColumnUserFilter<NumberColum
   public ColumnUserFilterState createFilterStateFromJson(IColumn<?> column, JSONObject json) {
     NumberColumnUserFilterState filterState = new NumberColumnUserFilterState(column);
     filterState.setSelectedValues(createSelectedValuesFromJson(json));
+    // Properties from NumberColumnTableUserFilterAddedEventData
     filterState.setNumberFrom(toBigDecimal(json.optString("numberFrom")));
     filterState.setNumberTo(toBigDecimal(json.optString("numberTo")));
     return filterState;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -55,6 +55,10 @@ public class TableColumnClientUiPreferenceDo extends DoEntity {
 
   public DoValue<TableColumnBackgroundEffectId> backgroundEffectId() {
     return doValue("backgroundEffectId");
+  }
+
+  public DoValue<DateGroupType> dateGroupType() {
+    return doValue("dateGroupType");
   }
 
   /* **************************************************************************
@@ -173,5 +177,16 @@ public class TableColumnClientUiPreferenceDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public TableColumnBackgroundEffectId getBackgroundEffectId() {
     return backgroundEffectId().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TableColumnClientUiPreferenceDo withDateGroupType(DateGroupType dateGroupType) {
+    dateGroupType().set(dateGroupType);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public DateGroupType getDateGroupType() {
+    return dateGroupType().get();
   }
 }

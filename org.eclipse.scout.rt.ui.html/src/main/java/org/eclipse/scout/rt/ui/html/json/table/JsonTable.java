@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.api.data.table.DateGroupType;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -40,6 +41,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
@@ -49,6 +51,7 @@ import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
 import org.eclipse.scout.rt.client.ui.dnd.TextTransferObject;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.dataobject.enumeration.EnumResolver;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -113,6 +116,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   public static final String EVENT_COLUMN_STRUCTURE_CHANGED = "columnStructureChanged";
   public static final String EVENT_COLUMN_HEADERS_UPDATED = "columnHeadersUpdated";
   public static final String EVENT_COLUMN_BACKGROUND_EFFECT_CHANGED = "columnBackgroundEffectChanged";
+  public static final String EVENT_COLUMN_DATE_GROUP_TYPE_CHANGED = "columnDateGroupTypeChanged";
   public static final String EVENT_COLUMN_ORGANIZE_ACTION = "columnOrganizeAction";
   public static final String EVENT_REQUEST_FOCUS_IN_CELL = "requestFocusInCell";
   public static final String EVENT_START_CELL_EDIT = "startCellEdit";
@@ -657,6 +661,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     else if (EVENT_COLUMN_BACKGROUND_EFFECT_CHANGED.equals(event.getType())) {
       handleColumnBackgroundEffectChanged(event);
     }
+    else if (EVENT_COLUMN_DATE_GROUP_TYPE_CHANGED.equals(event.getType())) {
+      handleUiColumnDateGroupTypeChanged(event);
+    }
     else if (EVENT_COLUMN_ORGANIZE_ACTION.equals(event.getType())) {
       handleUiColumnOrganizeAction(event);
     }
@@ -840,6 +847,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     IColumn<?> column = extractColumn(event.getData());
     Assertions.assertInstance(column, INumberColumn.class, "BackgroundEffect can only be specified on numeric columns");
     getModel().getUIFacade().setColumnBackgroundEffect((INumberColumn<?>) column, event.getData().optString("backgroundEffect", null));
+  }
+
+  protected void handleUiColumnDateGroupTypeChanged(JsonEvent event) {
+    addTableEventFilterCondition(TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED);
+    IColumn<?> column = extractColumn(event.getData());
+    IDateColumn dateColumn = Assertions.assertInstance(column, IDateColumn.class, "DateGroupType can only be specified on date columns");
+    DateGroupType groupType = BEANS.get(EnumResolver.class).resolve(DateGroupType.class, event.getData().optString("groupType", null));
+    getModel().getUIFacade().setDateGroupTypeFromUI(dateColumn, groupType);
   }
 
   protected void handleUiColumnMoved(JsonEvent event) {
@@ -1369,6 +1384,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       case TableEvent.TYPE_USER_FILTER_ADDED, TableEvent.TYPE_USER_FILTER_REMOVED -> handleModelUserFilterChange(event);
       case TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED -> handleModelColumnAggregationChanged(event);
       case TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED -> handleModelColumnBackgroundEffectChanged(event);
+      case TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED -> handleModelColumnDateGroupTypeChanged(event);
       case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL -> handleModelRequestFocusInCell(event);
       case TableEvent.TYPE_START_CELL_EDIT -> handleModelStartCellEdit(event);
       case TableEvent.TYPE_END_CELL_EDIT -> handleModelEndCellEdit(event);
@@ -1616,6 +1632,25 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     }
     putProperty(jsonEvent, "eventParts", eventParts);
     addActionEvent(EVENT_COLUMN_BACKGROUND_EFFECT_CHANGED, jsonEvent);
+  }
+
+  protected void handleModelColumnDateGroupTypeChanged(TableEvent event) {
+    JSONObject jsonEvent = new JSONObject();
+    JSONArray eventParts = new JSONArray();
+    Collection<IColumn<?>> columns = filterVisibleColumns(event.getColumns());
+    if (columns.isEmpty()) {
+      return;
+    }
+    for (IColumn<?> c : columns) {
+      IDateColumn dateColumn = Assertions.assertInstance(c, IDateColumn.class, "DateGroupType is only supported on DateColumns");
+      DateGroupType groupType = dateColumn.getGroupType();
+      JSONObject eventPart = new JSONObject();
+      putProperty(eventPart, "columnId", getColumnId(c));
+      putProperty(eventPart, "groupType", groupType == null ? null : groupType.stringValue());
+      eventParts.put(eventPart);
+    }
+    putProperty(jsonEvent, "eventParts", eventParts);
+    addActionEvent(EVENT_COLUMN_DATE_GROUP_TYPE_CHANGED, jsonEvent);
   }
 
   protected void handleModelRequestFocusInCell(TableEvent event) {

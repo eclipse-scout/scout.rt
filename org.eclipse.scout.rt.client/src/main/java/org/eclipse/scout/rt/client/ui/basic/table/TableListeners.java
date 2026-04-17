@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -41,7 +41,8 @@ public final class TableListeners extends AbstractGroupedListenerList<TableListe
       TableEvent.TYPE_USER_FILTER_ADDED,
       TableEvent.TYPE_USER_FILTER_REMOVED,
       TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED,
-      TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED)));
+      TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED,
+      TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED)));
 
   @Override
   protected Integer eventType(TableEvent event) {

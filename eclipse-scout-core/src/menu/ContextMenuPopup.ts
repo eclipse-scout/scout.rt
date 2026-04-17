@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,7 +43,7 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
     options.focusableContainer = true; // In order to allow keyboard navigation, the popup must gain focus. Because menu-items are not focusable, make the container focusable instead.
 
     // If menu items are cloned, don't link the original menus with the popup, otherwise they would be removed when the context menu is removed
-    if (options.cloneMenuItems === false) {
+    if (scout.nvl(options.cloneMenuItems, this.cloneMenuItems) === false) {
       this._addWidgetProperties('menuItems');
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -155,6 +155,13 @@ describe('Table Grouping', () => {
       column: column,
       selectedValues: selectedValues
     });
+  }
+
+  function assertColumnState(column: Column, expectedState: { sortActive: boolean, sortIndex: number, sortAscending: boolean, grouped: boolean }) {
+    expect(column.sortActive).toBe(expectedState.sortActive);
+    expect(column.sortIndex).toBe(expectedState.sortIndex);
+    expect(column.sortAscending).toBe(expectedState.sortAscending);
+    expect(column.grouped).toBe(expectedState.grouped);
   }
 
   it('renders an aggregate row for each group', () => {
@@ -632,6 +639,42 @@ describe('Table Grouping', () => {
     removeGrouping(table, column2);
     expect(find$aggregateRows(table).length).toBe(0);
     assertGroupingProperty(table);
+  });
+
+  it('clears other group columns when grouping with multiGroup=false"', () => {
+    prepareTable();
+
+    table.sort(table.columns[0], 'desc'); // normal sort column (should be preserved when adding or removing group columns)
+
+    assertColumnState(table.columns[0], {sortActive: true, sortIndex: 0, sortAscending: false, grouped: false});
+    assertColumnState(table.columns[1], {sortActive: false, sortIndex: -1, sortAscending: true, grouped: false});
+    assertColumnState(table.columns[2], {sortActive: false, sortIndex: -1, sortAscending: true, grouped: false});
+    assertColumnState(table.columns[3], {sortActive: false, sortIndex: -1, sortAscending: true, grouped: false});
+    assertColumnState(table.columns[4], {sortActive: false, sortIndex: -1, sortAscending: true, grouped: false});
+
+    table.group(table.columns[1], 'desc', true);
+
+    assertColumnState(table.columns[0], {sortActive: true, sortIndex: 1, sortAscending: false, grouped: false});
+    assertColumnState(table.columns[1], {sortActive: true, sortIndex: 0, sortAscending: false, grouped: true});
+    assertColumnState(table.columns[2], {sortActive: false, sortIndex: -1, sortAscending: true, grouped: false});
+    assertColumnState(table.columns[3], {sortActive: false, sortIndex: -1, sortAscending: true, grouped: false});
+    assertColumnState(table.columns[4], {sortActive: false, sortIndex: -1, sortAscending: true, grouped: false});
+
+    table.group(table.columns[2], 'desc', true);
+
+    assertColumnState(table.columns[0], {sortActive: true, sortIndex: 2, sortAscending: false, grouped: false});
+    assertColumnState(table.columns[1], {sortActive: true, sortIndex: 0, sortAscending: false, grouped: true});
+    assertColumnState(table.columns[2], {sortActive: true, sortIndex: 1, sortAscending: false, grouped: true});
+    assertColumnState(table.columns[3], {sortActive: false, sortIndex: -1, sortAscending: true, grouped: false});
+    assertColumnState(table.columns[4], {sortActive: false, sortIndex: -1, sortAscending: true, grouped: false});
+
+    table.group(table.columns[3], 'desc', false); // <-- multiGroup=false
+
+    assertColumnState(table.columns[0], {sortActive: true, sortIndex: 1, sortAscending: false, grouped: false});
+    assertColumnState(table.columns[1], {sortActive: false, sortIndex: -1, sortAscending: false, grouped: false});
+    assertColumnState(table.columns[2], {sortActive: false, sortIndex: -1, sortAscending: false, grouped: false});
+    assertColumnState(table.columns[3], {sortActive: true, sortIndex: 0, sortAscending: false, grouped: true});
+    assertColumnState(table.columns[4], {sortActive: false, sortIndex: -1, sortAscending: true, grouped: false});
   });
 
   describe('removeAllGroupColumns', () => {

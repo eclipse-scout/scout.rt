@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -86,10 +86,9 @@ export class TableHeaderMenuLayout extends PopupLayout {
 
     // fix width of actions column, so it doesn't become wider when user
     // hovers over a button and thus the text of the group changes.
-    this._setMaxWidth();
     let htmlColumnActions = HtmlComponent.get(this.popup.$columnActions);
     let actionColumnSize = htmlColumnActions.size();
-    this._setMaxWidth(actionColumnSize.width);
+    this.popup.$columnActions.cssWidth(actionColumnSize.width);
     htmlColumnActions.validateLayout(); // Ensure widgets that require layouting (e.g. NumberField for column width) are layouted.
   }
 
@@ -127,13 +126,13 @@ export class TableHeaderMenuLayout extends PopupLayout {
    * + paddings of surrounding containers
    */
   override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
-    let rightColumnHeight = 0,
-      leftColumnHeight = 0,
-      containerInsets = graphics.insets($container),
-      oldMaxWidth = this._getMaxWidth();
+    // temp. remove width so we can determine pref. size
+    let origStyle = this.popup.$columnActions.attr('style');
+    this.popup.$columnActions.cssWidth(null);
 
-    this._setMaxWidth(); // temp. remove max-width so we can determine pref. size
-    leftColumnHeight = graphics.size(this.popup.$columnActions, true).height;
+    let containerInsets = graphics.insets($container);
+    let leftColumnHeight = graphics.size(this.popup.$columnActions, true).height;
+    let rightColumnHeight = 0;
 
     // Filter table
     if (this.popup.hasFilterTable) {
@@ -185,17 +184,9 @@ export class TableHeaderMenuLayout extends PopupLayout {
       prefSize.height = leftColumnHeight + rightColumnHeight + containerInsets.vertical();
     }
 
-    // restore max-width
-    this._setMaxWidth(oldMaxWidth);
+    // restore style
+    this.popup.$columnActions.attrOrRemove('style', origStyle);
 
     return prefSize;
-  }
-
-  protected _getMaxWidth(): number {
-    return parseInt(this.popup.$columnActions.css('max-width'), 10);
-  }
-
-  protected _setMaxWidth(maxWidth?: number) {
-    this.popup.$columnActions.css('max-width', maxWidth || '');
   }
 }

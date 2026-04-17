@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -42,7 +42,7 @@ export class ColumnUserFilter extends TableUserFilter implements ColumnUserFilte
   calculate() {
     let containsSelectedValue, reorderAxis;
 
-    this.matrix = new TableMatrix(this.table, this.session);
+    this.matrix = new TableMatrix(this.table);
     this.matrix.addData(this.column, TableMatrix.NumberGroup.COUNT);
     this.xAxis = this.matrix.addAxis(this.column, this.axisGroup());
     let cube = this.matrix.calculate();
@@ -75,7 +75,7 @@ export class ColumnUserFilter extends TableUserFilter implements ColumnUserFilte
       if (key !== null && this.xAxis.isIcon) {
         // Only display icon if isIcon (still display empty text if key is null)
         iconId = text;
-        text = null;
+        text = ''; // not null! otherwise, the column would fall back to the value as cell text
       }
       let cubeValue = cube.getValue([key]);
       this.availableValues.push({
@@ -202,6 +202,7 @@ export class ColumnUserFilter extends TableUserFilter implements ColumnUserFilte
 }
 
 export type ColumnUserFilterValues = {
+  /** Persistable key (aka "deterministic key") */
   key?: string | number;
   text?: string;
   iconId?: string;
