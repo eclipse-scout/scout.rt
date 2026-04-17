@@ -30,7 +30,7 @@ const webpackConfigFileName = './webpack.config.js';
 const webpackCustomConfigFileName = './webpack.config.custom.js';
 const StatsExtractWebpackPlugin = require('../scripts/StatsExtractWebpackPlugin');
 const webpackYargsOptions = {
-  boolean: ['progress', 'profile', 'clean'],
+  boolean: ['progress', 'profile', 'clean', 'watch', 'cyclonedxSkip'],
   array: ['resDirArray', 'themes']
 };
 const buildYargsOptions = {
