@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,6 +24,10 @@ export class WrappedFormField extends FormField implements WrappedFormFieldModel
     this._addWidgetProperties(['innerForm']);
     this.innerForm = null;
     this.initialFocusEnabled = false;
+    this.labelVisible = false;
+    this.statusVisible = false;
+    this.gridDataHints.useUiHeight = true;
+    this.gridDataHints.weightY = 1;
     this._formDestroyHandler = this._onInnerFormDestroy.bind(this);
   }
 
