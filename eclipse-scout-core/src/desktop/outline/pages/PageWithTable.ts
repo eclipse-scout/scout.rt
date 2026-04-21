@@ -498,6 +498,11 @@ export class PageWithTable extends Page implements PageWithTableModel {
    * @param restoreSelectionInfo information needed to restore the selection after table data was loaded
    */
   protected _onLoadTableDataDone(tableData: any, restoreSelectionInfo?: RestoreSelectionInfo) {
+    if (!this.detailTable) {
+      // table has been removed in the meantime
+      return;
+    }
+
     let success = false;
     try {
       const rows = arrays.ensure(this._transformTableDataToTableRows(tableData));
@@ -531,6 +536,11 @@ export class PageWithTable extends Page implements PageWithTableModel {
   }
 
   protected _onLoadTableDataFail(error: any, restoreSelectionInfo?: RestoreSelectionInfo) {
+    if (!this.detailTable) {
+      // table has been removed in the meantime
+      return;
+    }
+
     try {
       this.detailTable.setTableStatus(Status.error({
         message: this.session.text('ErrorWhileLoadingData')

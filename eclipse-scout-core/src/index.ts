@@ -845,6 +845,7 @@ export * from './form/fields/numberfield/NumberFieldEventMap';
 export * from './form/fields/numberfield/NumberFieldModel';
 export * from './form/fields/numberfield/Calculator';
 export * from './form/fields/integerfield/IntegerField';
+export * from './form/fields/pagefield/PageField';
 export * from './form/fields/placeholder/PlaceholderField';
 export * from './form/fields/placeholder/PlaceholderFieldAdapter';
 export * from './form/fields/plannerfield/PlannerField';

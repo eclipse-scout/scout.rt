@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -65,6 +65,9 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
   protected void initConfig() {
     m_outline = new SimpleOutline();
     super.initConfig();
+    // Don't use getConfiguredCssClass as they could be overridden
+    addCssClass("page-field");
+    getSearchFormField().addCssClass("search-form-field");
   }
 
   @Override
