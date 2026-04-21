@@ -15,7 +15,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
+import java.util.function.BinaryOperator;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.Assert;
@@ -125,5 +127,32 @@ public class PropertiesUtilityTest {
       System.clearProperty(ATTR_STRING_KEY);
       System.clearProperty(attrOtherSystemPropertyKey);
     }
+  }
+
+  @Test
+  public void testResolveValue() {
+    Map<String, String> mappings = Map.of("attributeA", "valueA", "attributeB", "valueB", "combinedA", "${attributeA}${attributeB}", "combinedB", "${combinedB}", "combinedC", "${attributeA}${attributeC}");
+    BinaryOperator<String> variableReplacer = (p, k) -> mappings.get(k);
+
+    // Simple resolving
+    assertEquals("valueA", PropertiesUtility.resolveValue("key1", "${attributeA}", PropertiesUtility.DEFAULT_VARIABLE_PATTERN, variableReplacer, true, false));
+    assertEquals("valueB", PropertiesUtility.resolveValue("key1", "${attributeB}", PropertiesUtility.DEFAULT_VARIABLE_PATTERN, variableReplacer, true, false));
+
+    // Recursive resolving
+    assertEquals("valueAvalueB", PropertiesUtility.resolveValue("key1", "${attributeA}${attributeB}", PropertiesUtility.DEFAULT_VARIABLE_PATTERN, variableReplacer, true, false));
+    assertEquals("valueAvalueB", PropertiesUtility.resolveValue("key1", "${combinedA}", PropertiesUtility.DEFAULT_VARIABLE_PATTERN, variableReplacer, true, false));
+
+    // Unresolvable variables
+    assertThrows(IllegalArgumentException.class, () -> PropertiesUtility.resolveValue("key1", "${attributeC}", PropertiesUtility.DEFAULT_VARIABLE_PATTERN, variableReplacer, true, false));
+    assertEquals("${attributeC}", PropertiesUtility.resolveValue("key1", "${attributeC}", PropertiesUtility.DEFAULT_VARIABLE_PATTERN, variableReplacer, false, false));
+
+    // Loop detection
+    assertThrows(IllegalArgumentException.class, () -> PropertiesUtility.resolveValue("key1", "${combinedCB}", PropertiesUtility.DEFAULT_VARIABLE_PATTERN, variableReplacer, true, false));
+
+    // Ignoring unresolvable variables
+    assertEquals("${attributeA}${attributeC}", PropertiesUtility.resolveValue("key1", "${attributeA}${attributeC}", PropertiesUtility.DEFAULT_VARIABLE_PATTERN, variableReplacer, false, false));
+    assertEquals("${attributeA}${attributeC}", PropertiesUtility.resolveValue("key1", "${combinedC}", PropertiesUtility.DEFAULT_VARIABLE_PATTERN, variableReplacer, false, false));
+    assertEquals("valueA${attributeC}", PropertiesUtility.resolveValue("key1", "${attributeA}${attributeC}", PropertiesUtility.DEFAULT_VARIABLE_PATTERN, variableReplacer, false, true));
+    assertEquals("valueA${attributeC}", PropertiesUtility.resolveValue("key1", "${combinedC}", PropertiesUtility.DEFAULT_VARIABLE_PATTERN, variableReplacer, false, true));
   }
 }

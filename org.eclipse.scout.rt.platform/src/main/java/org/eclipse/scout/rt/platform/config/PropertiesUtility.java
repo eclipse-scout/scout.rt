@@ -120,6 +120,26 @@ public class PropertiesUtility {
    */
   @SuppressWarnings("squid:S1149")
   public static String resolveValue(String propertyKey, String value, Pattern variablePattern, BinaryOperator<String> variableReplacer, boolean failOnProblems) {
+    return resolveValue(propertyKey, value, variablePattern, variableReplacer, failOnProblems, false);
+  }
+
+  /**
+   * Resolves all variables of format <code>${variableName}</code> in the given expression according to the current
+   * application context.
+   *
+   * @param propertyKey
+   *     The key of the property to resolve.
+   * @param value
+   *     The expression to resolve.
+   * @param variablePattern
+   *     The pattern for variables, such as <code>${var}</code>. The pattern must contain group(1) as the variable
+   *     name upon a match.
+   * @param variableReplacer
+   *     maps a variable name to its variable value
+   * @return A {@link String} where all variables have been replaced with their values.
+   */
+  @SuppressWarnings("squid:S1149")
+  public static String resolveValue(String propertyKey, String value, Pattern variablePattern, BinaryOperator<String> variableReplacer, boolean failOnProblems, boolean ignoreNotFoundValues) {
     Matcher m = variablePattern.matcher(value);
     boolean found = m.find();
     if (!found) {
@@ -134,12 +154,18 @@ public class PropertiesUtility {
         String variableName = m.group(1);
         String replacement = variableReplacer.apply(propertyKey, variableName);
         if (!StringUtility.hasText(replacement)) {
-          if (failOnProblems) {
-            throw new IllegalArgumentException("resolving expression '" + value + "': variable ${" + variableName + "} is not defined in the context.");
+          if (ignoreNotFoundValues) {
+            // Don't replace at all
+            replacement = m.group(0);
           }
           else {
-            LOG.debug("resolving expression '" + value + "': variable ${" + variableName + "} is not defined in the context.");
-            return t;
+            if (failOnProblems) {
+              throw new IllegalArgumentException("resolving expression '" + value + "': variable ${" + variableName + "} is not defined in the context.");
+            }
+            else {
+              LOG.debug("resolving expression '" + value + "': variable ${" + variableName + "} is not defined in the context.");
+              return t;
+            }
           }
         }
         if (replacement.contains(value)) {
