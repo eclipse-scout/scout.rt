@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {focusUtils, FormTableControl, InitModelOf, RemoteEvent, scout, Session, TableControl, TableControlAdapter, Widget} from '../../../src/index';
+import {focusUtils, FormTableControl, InitModelOf, RemoteEvent, scout, Session, TableControl, TableControlAdapter, TableControlModel, Widget} from '../../../src/index';
 import {FormSpecHelper, SpecTable, TableSpecHelper} from '../../../src/testing/index';
 
 describe('TableControl', () => {
@@ -35,8 +35,11 @@ describe('TableControl', () => {
     return createSimpleModel('TableControl', session);
   }
 
-  function createAction(model: InitModelOf<TableControl>): TableControl {
-    return scout.create(TableControl, model);
+  function createAction(model?: TableControlModel): TableControl {
+    return scout.create(TableControl, {
+      parent: session.desktop,
+      ...model
+    });
   }
 
   function createTableControlAdapter(model: InitModelOf<TableControlAdapter>): TableControlAdapter {
@@ -58,7 +61,7 @@ describe('TableControl', () => {
     });
 
     it('opens and closes the control container', () => {
-      let action = createAction(createModel());
+      let action = createAction();
       table.setTableControls([action]);
       table.render();
       let $controlContainer = table.footer.$controlContainer;
@@ -73,8 +76,8 @@ describe('TableControl', () => {
     });
 
     it('removes the content of the previous selected control without closing the container', () => {
-      let action = createAction(createModel());
-      let action2 = createAction(createModel());
+      let action = createAction();
+      let action2 = createAction();
       table.setTableControls([action, action2]);
 
       action.selected = true;
@@ -122,6 +125,35 @@ describe('TableControl', () => {
       ];
       expect(mostRecentJsonRequest()).toContainEvents(events);
     });
+
+    it('does nothing if table control is invisible', () => {
+      let action = createAction({selected: true, visible: false});
+      let visibleAction = createAction(); // required, otherwise footer would not be visible at all
+      table.setTableControls([action, visibleAction]);
+      table.render();
+      let $controlContainer = table.footer.$controlContainer;
+      expect(action.selected).toBe(false);
+      expect($controlContainer).toBeHidden();
+
+      action.setVisible(true);
+      action.setSelected(true);
+      expect(action.selected).toBe(true);
+      expect($controlContainer).toBeVisible();
+
+      action.setVisible(false);
+      $controlContainer.stop(true, true);
+      expect(action.selected).toBe(false);
+      expect($controlContainer).toBeHidden();
+
+      action.setSelected(true);
+      expect(action.selected).toBe(false);
+      expect($controlContainer).toBeHidden();
+
+      action.setVisible(true);
+      action.setSelected(true);
+      expect(action.selected).toBe(true);
+      expect($controlContainer).toBeVisible();
+    });
   });
 
   it('clicking in the control container does not focus the table', () => {
@@ -148,14 +180,14 @@ describe('TableControl', () => {
     });
 
     it('has aria role button', () => {
-      let action = createAction(createModel());
+      let action = createAction();
       table.setTableControls([action]);
       table.render();
       expect(action.$container).toHaveAttr('role', 'button');
     });
 
     it('has aria pressed set correctly when selected', () => {
-      let action = createAction(createModel());
+      let action = createAction();
       table.setTableControls([action]);
       table.render();
       expect(action.$container).toHaveAttr('aria-pressed', 'false');

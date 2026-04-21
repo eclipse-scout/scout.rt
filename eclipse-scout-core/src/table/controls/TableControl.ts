@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -216,8 +216,20 @@ export class TableControl extends Action implements TableControlModel {
   }
 
   protected _setSelected(selected: boolean) {
-    // Does nothing more than the default but allows for extension by a subclass
     this._setProperty('selected', selected);
+    this._updateSelected();
+  }
+
+  protected _setVisible(visible: boolean) {
+    this._setProperty('visible', visible);
+    this._updateSelected();
+  }
+
+  protected _updateSelected() {
+    if (this.selected && !this.visible) {
+      // Ensure invisible controls are not selected
+      this.setSelected(false);
+    }
   }
 
   protected override _configureTooltip(): InitModelOf<TooltipSupport> {
