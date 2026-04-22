@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.NotificationQueueExpireTime;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
@@ -158,6 +159,9 @@ public class ClientNotificationRegistry {
    *     flag to distribute notification over whole cluster
    */
   public void putForSession(String sessionId, Serializable notification, boolean distributeOverCluster) {
+    if (StringUtility.isNullOrEmpty(sessionId)) {
+      return;
+    }
     publish(ClientNotificationAddress.createSessionAddress(Collections.singleton(sessionId)), notification, distributeOverCluster);
   }
 
@@ -293,6 +297,9 @@ public class ClientNotificationRegistry {
    *     flag to distribute notification over whole cluster
    */
   public void putTransactionalForSession(String sessionId, Serializable notification, boolean distributeOverCluster) {
+    if (StringUtility.isNullOrEmpty(sessionId)) {
+      return;
+    }
     putTransactional(ClientNotificationAddress.createSessionAddress(Collections.singleton(sessionId)), notification, distributeOverCluster);
   }
 

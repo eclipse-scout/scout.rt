@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -34,9 +34,10 @@ public class SessionServiceTunnelService extends ServiceTunnelService {
   protected ServerRunContext createServiceTunnelRunContext(ServiceTunnelRequest serviceRequest) {
     ServerSessionRunContext serverRunContext = (ServerSessionRunContext) super.createServiceTunnelRunContext(serviceRequest);
 
-    if (SessionId.CURRENT.get() != null) {
+    String sessionId = SessionId.CURRENT.get();
+    if (sessionId != null) {
       final HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-      final IServerSession session = m_serverSessionRunContextProducer.get().getOrCreateScoutSession(req, serverRunContext, SessionId.CURRENT.get());
+      final IServerSession session = m_serverSessionRunContextProducer.get().getOrCreateScoutSession(req, serverRunContext, sessionId);
       serverRunContext.withSession(session);
     }
     return serverRunContext;
