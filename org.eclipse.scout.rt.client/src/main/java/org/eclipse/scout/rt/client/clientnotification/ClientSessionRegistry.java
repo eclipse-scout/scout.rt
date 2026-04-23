@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.HttpServiceTunnel;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -69,7 +70,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
         }
         if (userSessions.isEmpty()) {
           m_userToSessions.remove(userId);
-          execAllUserSessionsStopped(userId);
+          execAllUserSessionsStopped(session.getUser());
         }
       }
     }
@@ -78,7 +79,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
   /**
    * Called when all client sessions of a user have been stopped.
    */
-  protected void execAllUserSessionsStopped(String userId) {
+  protected void execAllUserSessionsStopped(User user) {
   }
 
   /**
