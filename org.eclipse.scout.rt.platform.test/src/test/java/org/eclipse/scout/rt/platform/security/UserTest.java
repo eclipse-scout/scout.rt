@@ -13,9 +13,15 @@ import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(PlatformTestRunner.class)
 public class UserTest {
+
+  protected static final String ALICE_USER_ID = "alice";
+  protected static final String BOB_USER_ID = "bob";
 
   @Test
   public void testEmpty() {
@@ -25,37 +31,37 @@ public class UserTest {
 
   @Test
   public void testUserId() {
-    User user = BEANS.get(User.class).withUserId("alice");
-    assertEquals("alice", user.getUserId());
-    user.withUserId("bob");
-    assertEquals("bob", user.getUserId());
+    User user = BEANS.get(User.class).withUserId(ALICE_USER_ID);
+    assertEquals(ALICE_USER_ID, user.getUserId());
+    user.withUserId(BOB_USER_ID);
+    assertEquals(BOB_USER_ID, user.getUserId());
   }
 
   @Test
   public void testEquals() {
-    User user = BEANS.get(User.class).withUserId("alice");
-    assertEquals(user, BEANS.get(User.class).withUserId("alice"));
+    User user = BEANS.get(User.class).withUserId(ALICE_USER_ID);
+    assertEquals(user, BEANS.get(User.class).withUserId(ALICE_USER_ID));
     assertNotEquals(user, BEANS.get(User.class));
-    assertNotEquals(user, BEANS.get(User.class).withUserId("bob"));
+    assertNotEquals(user, BEANS.get(User.class).withUserId(BOB_USER_ID));
   }
 
   @Test
   public void testReadOnly() {
-    User user = BEANS.get(User.class).withUserId("alice");
+    User user = BEANS.get(User.class).withUserId(ALICE_USER_ID);
     assertFalse(user.isReadOnly());
     user.setReadOnly();
     assertTrue(user.isReadOnly());
-    assertThrows(IllegalStateException.class, () -> user.withUserId("bob"));
+    assertThrows(IllegalStateException.class, () -> user.withUserId(BOB_USER_ID));
   }
 
   @Test
   public void testCurrent() {
-    User user = BEANS.get(User.class).withUserId("alice").setReadOnly();
+    User user = BEANS.get(User.class).withUserId(ALICE_USER_ID).setReadOnly();
     RunContexts.empty()
         .withUser(user)
         .run(() -> {
           assertEquals(user, User.current());
-          assertEquals("alice", User.currentUserId());
+          assertEquals(ALICE_USER_ID, User.currentUserId());
         });
   }
 
