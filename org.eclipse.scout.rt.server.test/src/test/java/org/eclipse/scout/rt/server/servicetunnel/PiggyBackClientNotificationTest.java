@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,6 @@ import static org.mockito.Mockito.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -57,10 +56,7 @@ public class PiggyBackClientNotificationTest {
 
   @Test
   public void testPiggyBack() {
-    HttpSession session = Mockito.mock(HttpSession.class);
     HttpServletRequest req = Mockito.mock(HttpServletRequest.class);
-    Mockito.when(req.getSession()).thenReturn(session);
-    Mockito.when(req.getSession(false)).thenReturn(session);
 
     RunContexts.copyCurrent()
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
