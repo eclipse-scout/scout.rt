@@ -50,7 +50,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.TestHttpSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.eclipse.scout.rt.testing.shared.services.lookup.IEchoService;
 import org.junit.AfterClass;
@@ -111,12 +110,9 @@ public class ServiceTunnelIdSignatureTest {
     var servletInputStream = new BufferedServletInputStream(new ByteArrayInputStream(serviceTunnelRequestOutputStream.toByteArray()));
 
     // create request returning the servlet input stream
-    var httpSession = new TestHttpSession("42");
     var request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getMethod()).thenReturn("POST");
     Mockito.when(request.getInputStream()).thenReturn(servletInputStream);
-    Mockito.when(request.getSession()).thenReturn(httpSession);
-    Mockito.when(request.getSession(false)).thenReturn(httpSession);
     Mockito.when(request.getHeader(IdSignatureClientRequestFilter.ID_SIGNATURE_HTTP_HEADER)).thenReturn("" + idSignature);
     Mockito.when(request.getHeader(SessionId.HTTP_HEADER_NAME)).thenReturn("4242");
 

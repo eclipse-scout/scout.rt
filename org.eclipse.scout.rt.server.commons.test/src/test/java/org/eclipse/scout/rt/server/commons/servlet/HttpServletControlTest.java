@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.commons.servlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -56,18 +55,13 @@ public class HttpServletControlTest {
     IBean<?> bean = BeanTestingHelper.get().registerBean(new BeanMetaData(CspEnabledProperty.class, cspProperty));
 
     try {
-      HttpClientInfo httpClientInfo = Mockito.mock(HttpClientInfo.class);
-
       HttpServletControl httpServletControl = new HttpServletControl();
       httpServletControl.setCspToken(TEST_CSP_TOKEN);
       HttpServlet servlet = Mockito.mock(HttpServlet.class);
-      HttpSession session = Mockito.mock(HttpSession.class);
       HttpServletRequest req = Mockito.mock(HttpServletRequest.class);
       HttpServletResponse resp = Mockito.mock(HttpServletResponse.class);
 
       Mockito.when(req.getMethod()).thenReturn(method);
-      Mockito.when(req.getSession(false)).thenReturn(session);
-      Mockito.when(session.getAttribute(HttpClientInfo.HTTP_CLIENT_INFO_ATTRIBUTE_NAME)).thenReturn(httpClientInfo);
 
       httpServletControl.setResponseHeaders(servlet, req, resp);
 
