@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -234,10 +234,24 @@ public enum MimeType implements IMimeType {
   }
 
   /**
-   * Common image mime types.
+   * Common video mime types.
    */
   public static MimeType[] getCommonVideoTypesAsArray() {
     return new MimeType[]{AVI, M2V, MKV, MOV, MP4, MPG};
+  }
+
+  /**
+   * Common audio mime types.
+   */
+  public static Collection<MimeType> getCommonAudioTypes() {
+    return Arrays.asList(getCommonAudioTypesAsArray());
+  }
+
+  /**
+   * Common audio mime types.
+   */
+  public static MimeType[] getCommonAudioTypesAsArray() {
+    return new MimeType[]{AA, AAC, M4P, MP3, OGA, WAV};
   }
 
   public static boolean isOneOf(Collection<MimeType> mimeTypes, String input) {
