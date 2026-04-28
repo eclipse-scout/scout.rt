@@ -777,6 +777,53 @@ describe('Form', () => {
         .always(done);
     });
 
+    it('blocks form display parent even if form is opened by multiple popups', async () => {
+      let form = scout.create(Form, {
+        parent: session.desktop
+      });
+      await form.open();
+      expect($('.glasspane').length).toBe(3);
+      expect(desktop.navigation.$container.children('.glasspane').length).toBe(1);
+      expect(desktop.header.$container.children('.glasspane').length).toBe(1);
+      expect(desktop.bench.$container.children('.glasspane').length).toBe(1);
+
+      let popup = scout.create(Popup, {
+        parent: form,
+        withGlassPane: true
+      });
+      popup.open();
+      expect($('.glasspane').length).toBe(7);
+      expect(desktop.navigation.$container.children('.glasspane').length).toBe(2);
+      expect(desktop.header.$container.children('.glasspane').length).toBe(2);
+      expect(desktop.bench.$container.children('.glasspane').length).toBe(2);
+      expect(form.$container.children('.glasspane').length).toBe(1);
+
+      let popup2 = scout.create(Popup, {
+        parent: popup,
+        withGlassPane: true
+      });
+      popup2.open();
+      expect($('.glasspane').length).toBe(12);
+      expect(desktop.navigation.$container.children('.glasspane').length).toBe(3);
+      expect(desktop.header.$container.children('.glasspane').length).toBe(3);
+      expect(desktop.bench.$container.children('.glasspane').length).toBe(3);
+      expect(form.$container.children('.glasspane').length).toBe(2);
+      expect(popup.$container.children('.glasspane').length).toBe(1);
+
+      let form2 = scout.create(Form, {
+        parent: form,
+        displayParent: form
+      });
+      await form2.open();
+      expect($('.glasspane').length).toBe(15);
+      expect(desktop.navigation.$container.children('.glasspane').length).toBe(3);
+      expect(desktop.header.$container.children('.glasspane').length).toBe(3);
+      expect(desktop.bench.$container.children('.glasspane').length).toBe(3);
+      expect(form.$container.children('.glasspane').length).toBe(3);
+      expect(popup.$container.children('.glasspane').length).toBe(2);
+      expect(popup2.$container.children('.glasspane').length).toBe(1);
+    });
+
     it('triggers propertyChange event if child form opens', async () => {
       let form = scout.create(Form, {
         parent: session.desktop,
