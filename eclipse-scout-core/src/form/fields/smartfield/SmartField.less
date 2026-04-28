@@ -56,7 +56,7 @@
     width: 100%;
     padding-left: @text-field-padding-x;
 
-    &:focus {
+    &:focus:not(.disabled) {
       border-bottom-right-radius: @control-border-radius;
       border-bottom-left-radius: @control-border-radius;
     }
@@ -75,13 +75,9 @@
       &.has-error {
         border-bottom-color: @error-border-color;
       }
-    }
 
-    &.read-only {
-      border-bottom-color: @border-color;
-
-      &.has-error {
-        border-bottom-color: @error-border-color;
+      &.disabled {
+        border-bottom-color: @text-field-alternative-disabled-border-color;
       }
     }
   }
@@ -99,6 +95,7 @@
 
     &.disabled {
       background-color: @control-disabled-background-color;
+      border-color: @control-disabled-border-color;
     }
   }
 
