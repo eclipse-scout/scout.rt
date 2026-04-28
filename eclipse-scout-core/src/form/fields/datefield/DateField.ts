@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -805,6 +805,10 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
    * in _onDateFieldInput(), which is fired after 'keydown'.
    */
   protected _onDateFieldKeyDown(event: JQuery.KeyDownEvent) {
+    if (!this.enabledComputed) {
+      return;
+    }
+
     let delta = 0,
       diffYears = 0,
       diffMonths = 0,
@@ -1036,6 +1040,10 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
    * in _onTimeFieldInput(), which is fired after 'keydown'.
    */
   protected _onTimeFieldKeyDown(event: JQuery.KeyDownEvent) {
+    if (!this.enabledComputed) {
+      return;
+    }
+
     let delta = 0,
       diffHours = 0,
       diffMinutes = 0,

@@ -48,12 +48,12 @@ export class KeyStrokeManager extends EventEmitter implements KeyStrokeManagerMo
 
     if (this.swallowF1) {
       $container
-        .keydown(helpHandler)
-        .keyup(helpHandler);
+        .on('keydown', helpHandler)
+        .on('keyup', helpHandler);
     }
     $container
-      .keydown(backspaceHandler)
-      .keyup(backspaceHandler);
+      .on('keydown', backspaceHandler)
+      .on('keyup', backspaceHandler);
 
     if ('onhelp' in myWindow) {
       myWindow['onhelp'] = filters.returnFalse;

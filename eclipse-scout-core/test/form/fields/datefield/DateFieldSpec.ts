@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -652,6 +652,20 @@ describe('DateField', () => {
         dateField.acceptInput();
         expect(dates.isSameDay(dateField.value, dates.newDate())).toBe(true);
         expectTime(dateField.value, expectedTime.getHours(), expectedTime.getMinutes(), expectedTime.getSeconds());
+      });
+
+      it('does not open the picker if field is disabled', () => {
+        let dateField = scout.create(DateField, {
+          parent: session.desktop,
+          hasTime: true,
+          enabled: false
+        });
+        dateField.render();
+        JQueryTesting.triggerKeyDown(dateField.$dateField, keys.DOWN);
+        expect(dateField.popup).toBe(undefined);
+
+        JQueryTesting.triggerKeyDown(dateField.$timeField, keys.DOWN);
+        expect(dateField.popup).toBe(undefined);
       });
 
       it('selects the current date if picker is open and no date is selected', () => {
