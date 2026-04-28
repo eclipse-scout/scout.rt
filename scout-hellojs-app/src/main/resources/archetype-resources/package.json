@@ -7,6 +7,6 @@
   },
   "dependencies": {
     "eslint": "9.39.2",
-    "@eclipse-scout/eslint-config": ">=26.1.0-snapshot <26.1.0"
+    "@eclipse-scout/eslint-config": "26.1.9"
   }
 }
