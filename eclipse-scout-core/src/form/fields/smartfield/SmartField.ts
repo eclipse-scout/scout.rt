@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -196,8 +196,8 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
 
     if (!this.touchMode) {
       $field
-        .keyup(this._onFieldKeyUp.bind(this))
-        .keydown(this._onFieldKeyDown.bind(this))
+        .on('keydown', this._onFieldKeyDown.bind(this))
+        .on('keyup', this._onFieldKeyUp.bind(this))
         .on('input', this._onFieldInput.bind(this));
     }
     this.addField($field);
@@ -1205,6 +1205,10 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
   }
 
   protected _onFieldKeyUp(event: JQuery.KeyUpEvent) {
+    if (!this.enabledComputed) {
+      return;
+    }
+
     // Escape
     if (event.which === keys.ESC) {
       return;
@@ -1265,6 +1269,10 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
   }
 
   protected _onFieldKeyDown(event: JQuery.KeyDownEvent) {
+    if (!this.enabledComputed) {
+      return;
+    }
+
     this._updateUserWasTyping(event);
 
     // We must prevent default focus handling
