@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -258,6 +258,10 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
   }
 
   protected _onInputKeydown(event: JQuery.KeyDownEvent) {
+    if (!this.enabledComputed) {
+      return;
+    }
+
     if (this._isNavigationKey(event) && this.popup) {
       this.popup.delegateKeyEvent(event);
     } else if (event.which === keys.ESC) {
@@ -275,6 +279,10 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
   }
 
   protected _onInputKeyup(event: JQuery.KeyUpEvent) {
+    if (!this.enabledComputed) {
+      return;
+    }
+
     // Prevent chooser popup from being opened again, after it has been closed by pressing ESC
     if (event.which === keys.ESC) {
       return;

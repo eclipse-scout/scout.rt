@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -902,10 +902,9 @@ describe('SmartField', () => {
       expect(field._userWasTyping).toBe(false);
 
       // send a regular key-press (no navigation)
-      // @ts-expect-error
-      field._onFieldKeyDown({
+      field._onFieldKeyDown($.Event('keydown', {
         which: keys.A
-      });
+      }) as JQuery.KeyDownEvent);
       expect(field._userWasTyping).toBe(true);
 
       // when the display text is set, reset the userWasTyping flag
@@ -918,6 +917,32 @@ describe('SmartField', () => {
       expect(field._userWasTyping).toBe(false);
     });
 
+    it('calls openPopup() when DOWN is pressed', () => {
+      field.render();
+      field.openPopup = browse => {
+        return null;
+      };
+
+      spyOn(field, 'openPopup');
+      field._onFieldKeyDown($.Event('keydown', {
+        which: keys.DOWN
+      }) as JQuery.KeyDownEvent);
+      expect(field.openPopup).toHaveBeenCalled();
+    });
+
+    it('does not call openPopup() if field is disabled and DOWN is pressed', () => {
+      field.setEnabled(false);
+      field.render();
+      field.openPopup = browse => {
+        return null;
+      };
+
+      spyOn(field, 'openPopup');
+      field._onFieldKeyDown($.Event('keydown', {
+        which: keys.DOWN
+      }) as JQuery.KeyDownEvent);
+      expect(field.openPopup).not.toHaveBeenCalled();
+    });
   });
 
   describe('_onFieldKeyUp', () => {
@@ -926,25 +951,51 @@ describe('SmartField', () => {
       field = createFieldWithLookupCall();
     });
 
+    it('calls openPopup() when character is pressed', () => {
+      field.render();
+      field.openPopup = browse => {
+        return null;
+      };
+
+      spyOn(field, 'openPopup');
+      field._onFieldKeyUp($.Event('keyup', {
+        which: keys.A
+      }) as JQuery.KeyUpEvent);
+      expect(field.openPopup).toHaveBeenCalled();
+    });
+
+    it('does not call openPopup() if field is disabled and character is pressed', () => {
+      field.setEnabled(false);
+      field.render();
+      field.openPopup = browse => {
+        return null;
+      };
+
+      spyOn(field, 'openPopup');
+      field._onFieldKeyUp($.Event('keyup', {
+        which: keys.A
+      }) as JQuery.KeyUpEvent);
+      expect(field.openPopup).not.toHaveBeenCalled();
+    });
+
     it('does not call openPopup() when TAB, CTRL or ALT has been pressed', () => {
       field.render();
       field.openPopup = browse => {
         return null;
       };
 
-      let keyEvents = [{
+      let keyEvents = [$.Event('keyup', {
         which: keys.TAB
-      }, {
+      }) as JQuery.KeyUpEvent, $.Event('keyup', {
         ctrlKey: true,
         which: keys.A
-      }, {
+      }) as JQuery.KeyUpEvent, $.Event('keyup', {
         altKey: true,
         which: keys.A
-      }];
+      }) as JQuery.KeyUpEvent];
 
       spyOn(field, 'openPopup');
       keyEvents.forEach(event => {
-        // @ts-expect-error
         field._onFieldKeyUp(event);
       });
       expect(field.openPopup).not.toHaveBeenCalled();
@@ -956,12 +1007,10 @@ describe('SmartField', () => {
       field._lookupByTextOrAll = () => {
         return null;
       };
-      let event = {
-        which: keys.A
-      };
       spyOn(field, '_lookupByTextOrAll').and.callThrough();
-      // @ts-expect-error
-      field._onFieldKeyUp(event);
+      field._onFieldKeyUp($.Event('keyup', {
+        which: keys.A
+      }) as JQuery.KeyUpEvent);
       expect(field._lookupByTextOrAll).toHaveBeenCalled();
     });
 
@@ -1221,8 +1270,7 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('Bar');
-      // @ts-expect-error
-      field._onFieldKeyUp({});
+      field._onFieldKeyUp($.Event('keyup', {}) as JQuery.KeyUpEvent);
       jasmine.clock().tick(500);
       let popup = field.popup as SmartFieldPopup<any>;
       expect(popup.proposalChooser.content.rows[0].cells[0].text).toBe('Bar');
