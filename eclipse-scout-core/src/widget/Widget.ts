@@ -1693,7 +1693,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     return [this.$container].concat(
       this.session.desktop.getPopupsFor(this)
         .filter(popup => !element.has(popup))
-        .reduce((acc, popup) => acc.concat(popup.glassPaneTargets()), []));
+        .reduce((acc, popup) => acc.concat(popup.glassPaneTargets(element)), []));
   }
 
   addGlassPaneContribution(contribution: GlassPaneContribution) {
