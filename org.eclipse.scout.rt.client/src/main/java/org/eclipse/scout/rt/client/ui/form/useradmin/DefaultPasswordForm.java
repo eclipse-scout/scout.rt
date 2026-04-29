@@ -31,18 +31,19 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 
 @ClassId("5bcb48f0-9b72-4f28-9c08-038cd5d9a1c4")
 public class DefaultPasswordForm extends AbstractForm {
-  private String m_userId;
+  private User m_user;
 
-  public String getUserId() {
-    return m_userId;
+  public User getUser() {
+    return m_user;
   }
 
-  public void setUserId(String userId) {
-    m_userId = userId;
+  public void setUser(User user) {
+    m_user = user;
   }
 
   @Override
@@ -188,7 +189,7 @@ public class DefaultPasswordForm extends AbstractForm {
         throw new VetoException(TEXTS.get("PasswordsDoNotMatch"));
       }
       IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
-      svc.resetPassword(getUserId(), getNewPasswordField().getValue().toCharArray());
+      svc.resetPassword(getUser(), getNewPasswordField().getValue().toCharArray());
       resetSessionsIfCurrentUser(svc);
     }
   }
@@ -200,7 +201,7 @@ public class DefaultPasswordForm extends AbstractForm {
         throw new VetoException(TEXTS.get("PasswordsDoNotMatch"));
       }
       IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
-      svc.changePassword(getUserId(), getOldPasswordField().getValue().toCharArray(), getNewPasswordField().getValue().toCharArray());
+      svc.changePassword(getUser(), getOldPasswordField().getValue().toCharArray(), getNewPasswordField().getValue().toCharArray());
       resetSessionsIfCurrentUser(svc);
     }
   }
@@ -224,8 +225,6 @@ public class DefaultPasswordForm extends AbstractForm {
   }
 
   protected boolean isCurrentUser() {
-    String userName = BEANS.get(IPasswordManagementService.class).getUsernameFor(getUserId());
-    String currentUserId = User.currentUserId();
-    return currentUserId.equals(userName);
+    return ObjectUtility.equals(User.current(), getUser());
   }
 }

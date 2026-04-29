@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.shared.services.common.pwd;
 
 import java.util.Date;
 
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
@@ -33,18 +34,16 @@ public interface IPasswordManagementService extends IService {
   /**
    * @return when the password of the user will expire
    */
-  Date getPasswordExpirationDate(String userId);
+  Date getPasswordExpirationDate(User user);
 
   /**
    * change the password of a user
    */
-  void changePassword(String userId, char[] oldPassword, char[] newPassword);
+  void changePassword(User user, char[] oldPassword, char[] newPassword);
 
   /**
    * reset the password of a user <br>
    * In the implementation make sure to use sufficient permission rights to enable this method.
    */
-  void resetPassword(String userId, char[] newPassword);
-
-  String getUsernameFor(String userId);
+  void resetPassword(User user, char[] newPassword);
 }
