@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ public class PasswordPolicyVerifier {
   private static final Logger LOG = LoggerFactory.getLogger(PasswordPolicyVerifier.class);
 
   /**
-   * Calls {@link IPasswordManagementService#getPasswordExpirationDate(String)} to check whether the password has
+   * Calls {@link IPasswordManagementService#getPasswordExpirationDate(User)} to check whether the password has
    * expired. When desired, warns the user in advance about the expiration. If expired, calls the
    * {@link DefaultPasswordForm#startChange()} and - when closed - re-checks the expiry date. When still expired, exits
    * the application (scout session).
@@ -40,7 +41,7 @@ public class PasswordPolicyVerifier {
    * @return true if the password is not expired, false if - after all - the password has expired. Normally when
    * returned false, the application quits.
    */
-  public boolean verify(String userId, int warnInAdvanceDays) {
+  public boolean verify(User user, int warnInAdvanceDays) {
     IPasswordManagementService service = BEANS.get(IPasswordManagementService.class);
     IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop == null) {
@@ -54,7 +55,7 @@ public class PasswordPolicyVerifier {
     try {
       boolean changeNow = false;
       Date now = new Date();
-      Date expiryDate = service.getPasswordExpirationDate(userId);
+      Date expiryDate = service.getPasswordExpirationDate(user);
       if (expiryDate.after(now)) {
         // not expired
         long remainDays = (expiryDate.getTime() - now.getTime()) / 3600000L / 24L;
@@ -83,9 +84,9 @@ public class PasswordPolicyVerifier {
       }
       //
       if (changeNow) {
-        callPasswordForm(userId);
+        callPasswordForm(user);
         // re-check
-        expiryDate = service.getPasswordExpirationDate(userId);
+        expiryDate = service.getPasswordExpirationDate(user);
       }
       return expiryDate.after(now);
     }
@@ -95,9 +96,9 @@ public class PasswordPolicyVerifier {
     }
   }
 
-  protected void callPasswordForm(String userId) {
+  protected void callPasswordForm(User user) {
     DefaultPasswordForm form = new DefaultPasswordForm();
-    form.setUserId(userId);
+    form.setUser(user);
     form.startChange();
     form.waitFor();
   }

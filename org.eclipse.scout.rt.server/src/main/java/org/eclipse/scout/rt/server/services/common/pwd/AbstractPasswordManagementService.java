@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.services.common.pwd;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.security.PasswordPolicy;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 
 /**
@@ -27,15 +28,15 @@ public abstract class AbstractPasswordManagementService implements IPasswordMana
   }
 
   @Override
-  public void changePassword(String userId, char[] oldPassword, char[] newPassword) {
-    checkAccess(userId, oldPassword);
-    resetPassword(userId, newPassword);
+  public void changePassword(User user, char[] oldPassword, char[] newPassword) {
+    checkAccess(user, oldPassword);
+    resetPassword(user, newPassword);
   }
 
   @Override
-  public void resetPassword(String userId, char[] newPassword) {
-    getPasswordPolicy().check(getUsernameFor(userId), newPassword, getHistoryIndexFor(userId, newPassword));
-    resetPasswordInternal(userId, newPassword);
+  public void resetPassword(User user, char[] newPassword) {
+    getPasswordPolicy().check(getUsernameFor(user), newPassword, getHistoryIndexFor(user, newPassword));
+    resetPasswordInternal(user, newPassword);
   }
 
   @Override
@@ -55,15 +56,19 @@ public abstract class AbstractPasswordManagementService implements IPasswordMana
    * @throws ProcessingException
    *     when the userId/password is invalid
    */
-  protected abstract void checkAccess(String userId, char[] password);
+  protected abstract void checkAccess(User user, char[] password);
 
   /**
    * @return the previous passwords of the user
    */
-  protected abstract int getHistoryIndexFor(String userId, char[] password);
+  protected abstract int getHistoryIndexFor(User user, char[] password);
 
   /**
    * Reset the password, all checks and verifications have already been passed.
    */
-  protected abstract void resetPasswordInternal(String userId, char[] newPassword);
+  protected abstract void resetPasswordInternal(User user, char[] newPassword);
+
+  protected String getUsernameFor(User user) {
+    return user.getUserId();
+  }
 }
