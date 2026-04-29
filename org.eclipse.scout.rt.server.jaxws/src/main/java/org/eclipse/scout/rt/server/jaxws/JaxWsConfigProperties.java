@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -219,12 +219,12 @@ public final class JaxWsConfigProperties {
 
     @Override
     public String description() {
-      return "Connect timeout in milliseconds to abort a webservice request, if establishment of the connection takes longer than this timeout. A timeout of null means an infinite timeout. The default value is null.";
+      return "Connect timeout in milliseconds to abort a webservice request, if establishment of the connection takes longer than this timeout. A timeout of null means an infinite timeout. The default value is 5 minutes.";
     }
 
     @Override
     public Integer getDefaultValue() {
-      return null; // infinite timeout
+      return 5 * 60 * 1000; // 5 minutes
     }
   }
 
@@ -237,12 +237,12 @@ public final class JaxWsConfigProperties {
 
     @Override
     public String description() {
-      return "Read timeout in milliseconds to abort a webservice request, if it takes longer than this timeout for data to be available for read. A timeout of null means an infinite timeout. The default value is null.";
+      return "Read timeout in milliseconds to abort a webservice request, if it takes longer than this timeout for data to be available for read. A timeout of null means an infinite timeout. The default value is 30 minutes.";
     }
 
     @Override
     public Integer getDefaultValue() {
-      return null; // infinite timeout
+      return 30 * 60 * 1000; // 30 minutes
     }
   }
 }
