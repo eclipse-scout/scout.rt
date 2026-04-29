@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, BlobWithName, ClipboardFieldModel, Device, DragAndDropOptions, FatalMessageOptions, keys, mimeTypes, scout, Session, strings, ValueField} from '../../../index';
+import {arrays, BlobWithName, ClipboardFieldModel, Device, DragAndDropOptions, FatalMessageOptions, InputFieldKeyStrokeContext, keys, KeyStrokeContext, mimeTypes, scout, Session, strings, ValueField} from '../../../index';
 import $ from 'jquery';
 
 export class ClipboardField extends ValueField<string> implements ClipboardFieldModel {
@@ -62,6 +62,10 @@ export class ClipboardField extends ValueField<string> implements ClipboardField
     keys.BACKSPACE,
     keys.DELETE
   ];
+
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
+    return new InputFieldKeyStrokeContext();
+  }
 
   protected override _render() {
     // We don't use makeDiv() here intentionally because the DIV created must
