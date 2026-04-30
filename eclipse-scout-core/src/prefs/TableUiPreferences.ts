@@ -285,7 +285,7 @@ export class TableUiPreferences implements ObjectWithType {
               ? column.getColumnPreferences()?.backgroundEffectId
               : undefined,
           dateGroupType: column instanceof DateColumn
-            ? (column.grouped ? column.groupType : undefined) // only save group type if grouping is active
+            ? (column.grouped ? column.groupType : null) // only save group type if grouping is active
             : this.isColumnPreferencesColumn(column)
               ? column.getColumnPreferences()?.dateGroupType
               : undefined
@@ -523,27 +523,36 @@ export class TableUiPreferences implements ObjectWithType {
     }
 
     // Use setter for 'visible' property because it is a multidimensional property
-    column.setVisible(columnPreferences.visible, false); // parameter 'false' skips call of onColumnVisibilityChanged()
+    if (columnPreferences.visible !== undefined) {
+      column.setVisible(columnPreferences.visible, false); // parameter 'false' skips call of onColumnVisibilityChanged()
+    }
 
     // Don't use setter for 'width' property to prevent unnecessarily redrawing the table (will be done again later in setColumns anyway)
-    if (!column.fixedWidth) {
+    if (columnPreferences.width !== undefined && !column.fixedWidth) {
       column.width = columnPreferences.width;
     }
 
     // Properties without setter (changes will be applied later by _setColumns)
-    column.sortIndex = columnPreferences.sortOrder;
-    column.sortAscending = columnPreferences.sortAscending;
-    column.sortActive = column.sortIndex >= 0;
-    column.grouped = columnPreferences.groupingActive;
-
-    if (column instanceof NumberColumn) {
-      // Use setters to correctly update internal structures (e.g. aggrStart function)
-      column.setAggregationFunction(columnPreferences.aggregationFunctionId as NumberColumnAggregationFunction);
-      column.setBackgroundEffect(columnPreferences.backgroundEffectId as NumberColumnBackgroundEffect, false); // false = don't redraw
+    if (columnPreferences.sortOrder !== undefined) {
+      column.sortIndex = columnPreferences.sortOrder;
+      column.sortActive = column.sortIndex >= 0;
+    }
+    if (columnPreferences.sortAscending !== undefined) {
+      column.sortAscending = columnPreferences.sortAscending;
+    }
+    if (columnPreferences.groupingActive !== undefined) {
+      column.grouped = columnPreferences.groupingActive;
     }
 
-    if (column instanceof DateColumn) {
-      column.groupType = columnPreferences.dateGroupType;
+    // Use setters to correctly update internal structures (e.g. aggrStart function)
+    if (columnPreferences.aggregationFunctionId !== undefined && column instanceof NumberColumn) {
+      column.setAggregationFunction(columnPreferences.aggregationFunctionId as NumberColumnAggregationFunction);
+    }
+    if (columnPreferences.backgroundEffectId !== undefined && column instanceof NumberColumn) {
+      column.setBackgroundEffect(columnPreferences.backgroundEffectId as NumberColumnBackgroundEffect, false); // false = don't redraw
+    }
+    if (columnPreferences.dateGroupType !== undefined && column instanceof DateColumn) {
+      column.setGroupType(columnPreferences.dateGroupType, false); // false = don't apply grouping
     }
 
     if (this.isColumnPreferencesColumn(column)) {

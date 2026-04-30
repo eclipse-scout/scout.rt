@@ -48,7 +48,7 @@ export class TableMatrix {
   }
 
   /**
-   * add data axis
+   * Adds a new data axis (value) that operates on the given table column.
    */
   addData(data: Column<any>, dataGroup: TableMatrixNumberGroup): TableMatrixDataAxis {
     // @ts-expect-error
@@ -96,7 +96,7 @@ export class TableMatrix {
   }
 
   /**
-   * add key axis (x or y)
+   * Adds a new key axis (x or y) that operates on the data in the given table column.
    */
   addAxis(axis: Column<any>, axisGroup: TableMatrixNumberGroup | TableMatrixDateGroup): TableMatrixKeyAxis {
     // @ts-expect-error
@@ -178,24 +178,40 @@ export class TableMatrix {
 
     // norm and format depends on datatype and group functionality
     if (axis instanceof DateColumn) {
+      // deterministic key is always a number
+      keyAxis.keyToDeterministicKey = (n: number): number => n;
+      keyAxis.deterministicKeyToKey = (d: number): number => d;
+
+      // Milliseconds in a normal day
+      const DAY_MILLIS = 24 * 60 * 60 * 1000;
+      // Offset from "local midnight" to "UTC midnight"
+      const LOCAL_EPOCH_OFFSET_MILLIS = new Date(1970, 0, 1).getTime();
+
       if (axisGroup === TableMatrix.DateGroup.NONE) {
+        // Dates from the server are sent without timezone, i.e. they look the same for all users but don't represent the same
+        // point in time. To make sure all users get the same numeric value, we shift it according to the local timezone.
+        //
+        // Example:
+        //
+        // dates.parseJsonDate('2025-10-20')                                      getTime()       LOCAL_EPOCH_OFFSET_MILLIS            norm()
+        // -------------------------------------------------------------------------------------------------------------------------------------
+        // Mon Oct 20 2025 00:00:00 GMT+0000 (Coordinated Universal Time)         1760918400000                           0      1760918400000
+        // Mon Oct 20 2025 00:00:00 GMT+0100 (Central European Standard Time)     1760914800000                    -3600000      1760918400000
+        // Mon Oct 20 2025 00:00:00 GMT+0200 (Central European Summer Time)       1760911200000                    -7200000      1760918400000
+        // Mon Oct 20 2025 00:00:00 GMT-0800 (Pacific Standard Time)              1760947200000                    28800000      1760918400000
+        // Mon Oct 20 2025 00:00:00 GMT-0700 (Pacific Daylight Time)              1760943600000                    25200000      1760918400000
         keyAxis.norm = f => {
           if (f === null || f === '') {
             return null;
           }
-          return f.getTime();
+          return f.getTime() - LOCAL_EPOCH_OFFSET_MILLIS;
         };
         keyAxis.format = n => {
           if (n === null) {
-            return null;
+            return emptyCell;
           }
-          let format = axis.format;
-          if (format) {
-            format = DateFormat.ensure(locale, format);
-          } else {
-            format = locale.dateFormat;
-          }
-          return format.format(new Date(n));
+          let format = DateFormat.ensure(locale, axis.format || locale.dateFormat);
+          return format.format(new Date(n + LOCAL_EPOCH_OFFSET_MILLIS));
         };
       } else if (axisGroup === TableMatrix.DateGroup.YEAR) {
         keyAxis.norm = f => {
@@ -228,15 +244,15 @@ export class TableMatrix {
           if (f === null || f === '') {
             return null;
           }
-          let d = dates.trunc(f);
-          d.setDate(1); // set to first of month
-          return d.getTime();
+          // months since 1970-01-01
+          return ((f.getFullYear() - 1970) * 12) + f.getMonth();
         };
         keyAxis.format = n => {
           if (n === null) {
             return emptyCell;
           }
-          return dates.format(new Date(n), locale, 'MMMM yyyy');
+          let date = dates.shift(new Date(1970, 0, 1), 0, n);
+          return dates.format(date, locale, 'MMMM yyyy');
         };
       } else if (axisGroup === TableMatrix.DateGroup.CALENDAR_WEEK) {
         keyAxis.norm = f => {
@@ -264,25 +280,7 @@ export class TableMatrix {
           }
           return locale.dateFormatSymbols.weekdaysOrdered[n];
         };
-      } else if (axisGroup === TableMatrix.DateGroup.DATE) {
-        keyAxis.norm = f => {
-          if (f === null || f === '') {
-            return null;
-          }
-          return dates.trunc(f).getTime();
-        };
-        keyAxis.format = n => {
-          if (n === null) {
-            return emptyCell;
-          }
-          return dates.format(new Date(n), locale, locale.dateFormatPatternDefault);
-        };
-      }
-      // deterministic key is always a number
-      keyAxis.keyToDeterministicKey = (n: number): number => n;
-      keyAxis.deterministicKeyToKey = (d: number): number => d;
-      // Convert locale-dependent weekday (0 = firstDayOfWeek) to locale-independent weekday (0 = Sun)
-      if (axisGroup === TableMatrix.DateGroup.WEEKDAY) {
+        // Convert locale-dependent weekday (0 = firstDayOfWeek) to locale-independent weekday (0 = Sun)
         keyAxis.keyToDeterministicKey = (n: number): number => {
           if (n === null) {
             return null;
@@ -294,6 +292,24 @@ export class TableMatrix {
             return null;
           }
           return (d + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
+        };
+      } else if (axisGroup === TableMatrix.DateGroup.DATE) {
+        keyAxis.norm = f => {
+          if (f === null || f === '') {
+            return null;
+          }
+          // Truncate to midnight in UTC, so that dividing by DAY_MILLIS will result in a whole number
+          let utcMillis = Date.UTC(f.getFullYear(), f.getMonth(), f.getDate());
+          return utcMillis / DAY_MILLIS;
+        };
+        keyAxis.format = n => {
+          if (n === null) {
+            return emptyCell;
+          }
+          let utcMillis = n * DAY_MILLIS;
+          // shift "UTC midnight" to "local midnight"
+          let date = new Date(utcMillis + LOCAL_EPOCH_OFFSET_MILLIS);
+          return dates.format(date, locale, locale.dateFormatPatternDefault);
         };
       }
     } else if (axis instanceof NumberColumn) {
@@ -555,23 +571,25 @@ export type TableMatrixKeyAxis = number[] & {
   sortCodeMap: Record<number, number>;
   isIcon?: boolean;
   iconId?: string;
+  /** The smallest numeric key in this axis */
   min: number;
+  /** The biggest numeric key in this axis */
   max: number;
-  /** converts any value to a numeric key */
+  /** Converts any value to a numeric key */
   norm(f: any): number;
-  /** formats the given numeric key ({@link norm}) for display */
+  /** Formats the given numeric key ({@link norm}) for display */
   format(n: number): string;
-  /** adds the numeric key ({@link norm}) to this axis if it does not already exist */
+  /** Adds the numeric key ({@link norm}) to this axis if it does not already exist */
   add(k: number);
-  /** converts the given numeric key ({@link norm}) to a persistable representation (aka "deterministic key") */
+  /** Converts the given numeric key ({@link norm}) to a persistable representation (aka "deterministic key") */
   keyToDeterministicKey(n: number): number | string;
-  /** converts the given persistable key (aka "deterministic key") back to a numeric key ({@link norm}) */
+  /** Converts the given persistable key (aka "deterministic key") back to a numeric key ({@link norm}) */
   deterministicKeyToKey(d: string | number): number;
-  /** same as {@link norm} + {@link keyToDeterministicKey} */
+  /** Same as {@link norm} + {@link keyToDeterministicKey} */
   normDeterministic(f: any): string | number;
-  /** sorts the keys in this axis. the default implementation first considers {@link sortCodeMap}, then calls {@link compareKeys}. */
+  /** Sorts the keys in this axis. the default implementation first considers {@link sortCodeMap}, then calls {@link compareKeys}. */
   reorder(): void;
-  /** compares the given numeric keys ({@link norm}). used by {@link reorder}, both keys are not null. */
+  /** Compares the given numeric keys ({@link norm}). used by {@link reorder}, both keys are not null. */
   compareKeys(n1: number, n2: number): number;
 };
 
@@ -580,11 +598,11 @@ export type TableMatrixDataAxis = {
   total: number;
   min: number;
   max: number;
-  /** converts any value to a numeric key */
+  /** Converts any value to a numeric key */
   norm(f: any): number;
-  /** formats the given numeric key ({@link norm}) for display */
+  /** Formats the given numeric key ({@link norm}) for display */
   format(n: number): string;
-  /** aggregates the given values into a single value */
+  /** Aggregates the given values into a single value */
   group(array: number[]): number;
 };
 

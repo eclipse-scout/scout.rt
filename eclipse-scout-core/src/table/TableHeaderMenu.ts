@@ -870,6 +870,14 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       tableRows.push(tableRow);
     });
     this.filterTable.replaceRows(tableRows);
+    if (this.filterTable.rendered) {
+      // Re-optimize column widths
+      this.filterTable.columns.forEach(column => {
+        column.autoOptimizeWidthRequired = column.autoOptimizeWidth;
+      });
+      this.filterTable.columnLayoutDirty = true;
+      this.filterTable.invalidateLayoutTree(false);
+    }
   }
 
   /**

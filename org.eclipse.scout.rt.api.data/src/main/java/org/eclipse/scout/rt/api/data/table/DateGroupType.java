@@ -10,7 +10,6 @@
 package org.eclipse.scout.rt.api.data.table;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.IsoFields;
 import java.time.temporal.WeekFields;
 import java.util.Date;
@@ -18,6 +17,7 @@ import java.util.Date;
 import org.eclipse.scout.rt.dataobject.enumeration.EnumName;
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 
 @EnumName("scout.DateGroupType")
 public enum DateGroupType implements IEnum {
@@ -73,8 +73,7 @@ public enum DateGroupType implements IEnum {
    * Returns a numeric value that can be used to order dates according to this group type.
    */
   protected long toKey(Date date) {
-    LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-    return toKey(localDate);
+    return toKey(DateUtility.toLocalDate(date));
   }
 
   /**

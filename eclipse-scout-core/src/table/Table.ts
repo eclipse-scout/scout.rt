@@ -1675,7 +1675,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
           // add just after all other grouping columns in column set.
           sortedSiblingColumns.forEach(siblingColumn => {
             if (siblingColumn.sortIndex > sortIndex) {
-              siblingColumn.sortIndex++; //
+              siblingColumn.sortIndex++;
             }
           });
           // increase sortIndex for all permanent tail columns (a column has been added in front of them)

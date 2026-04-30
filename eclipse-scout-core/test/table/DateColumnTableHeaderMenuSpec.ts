@@ -285,6 +285,40 @@ describe('DateColumnTableHeaderMenu', () => {
       expect(checkedMenus.length).toBe(1);
       expect(checkedMenus[0].groupType).toBe(DateGroupType.CALENDAR_WEEK);
     });
+
+    it('does not allow changing the group type if column.hasDate=false', () => {
+      dateColumn.hasDate = false;
+      dateColumn.setFormat(null); // recreate default format
+      dateColumn.setGroupFormat('HH');
+      table.deleteAllRows();
+      table.insertRows([
+        {id: 'row0', cells: [dates.create('2022-03-26 17:17:17.000')]},
+        {id: 'row1', cells: [dates.create('2022-03-10 17:17:17.000')]},
+        {id: 'row2', cells: [dates.create('2022-03-09 18:18:18.000')]},
+        {id: 'row3', cells: [null]},
+        {id: 'row4', cells: [dates.create('2022-03-10 17:17:33.000')]},
+        {id: 'row5', cells: [dates.create('2028-01-01 10:01:00.000')]}
+      ]);
+
+      // --------
+
+      table.header.openHeaderMenu(dateColumn);
+      let headerMenu = scout.assertInstance(table.header.tableHeaderMenu, DateColumnTableHeaderMenu);
+      headerMenu.animateRemoval = false;
+      let filterTable = headerMenu.filterTable;
+
+      expect(headerMenu.filterGroupTypeAction).toBe(undefined);
+
+      let filterItems = filterTable.rows.map(row => filterTable.columns[0].cellText(row));
+      expect(filterItems).toEqual([
+        '18:18',
+        '17:17',
+        '17:17',
+        '17:17',
+        '10:01',
+        '-empty-'
+      ]);
+    });
   });
 
   describe('grouping / sorting', () => {
@@ -446,27 +480,21 @@ describe('DateColumnTableHeaderMenu', () => {
       expect(table.rows).toEqual([row2, row1, row3, row0]);
 
       dateColumn1.setGroupType(DateGroupType.YEAR);
-      table.group(dateColumn1);
       expect(table.rows).toEqual([row2, row1, row3, row0]);
 
       dateColumn1.setGroupType(DateGroupType.MONTH);
-      table.group(dateColumn1);
       expect(table.rows).toEqual([row2, row3, row0, row1]);
 
       dateColumn1.setGroupType(DateGroupType.MONTH_AND_YEAR);
-      table.group(dateColumn1);
       expect(table.rows).toEqual([row2, row1, row3, row0]);
 
       dateColumn1.setGroupType(DateGroupType.CALENDAR_WEEK);
-      table.group(dateColumn1);
       expect(table.rows).toEqual([row2, row3, row0, row1]);
 
       dateColumn1.setGroupType(DateGroupType.WEEKDAY);
-      table.group(dateColumn1);
       expect(table.rows).toEqual([row1, row2, row3, row0]);
 
       dateColumn1.setGroupType(DateGroupType.DATE);
-      table.group(dateColumn1);
       expect(table.rows).toEqual([row2, row1, row3, row0]);
     });
 
@@ -683,6 +711,155 @@ describe('DateColumnTableHeaderMenu', () => {
       expect(checkedMenus[0].groupType).toBe(DateGroupType.MONTH_AND_YEAR);
     });
 
+    it('does not shows an additional menu when the column specifies a groupFormat that matches a groupType', () => {
+      expect(table.rows).toEqual([row0, row1, row2, row3]);
+      dateColumn1.setGroupFormat('MMMM');
+
+      table.header.openHeaderMenu(dateColumn1);
+      let headerMenu = scout.assertInstance(table.header.tableHeaderMenu, DateColumnTableHeaderMenu);
+      headerMenu.animateRemoval = false;
+
+      expect(headerMenu.groupButton.visible).toBe(true);
+      expect(headerMenu.groupButton.selected).toBe(false);
+      expect(headerMenu.groupAddButton.visible).toBe(false);
+
+      // ------
+
+      headerMenu.groupButton.doAction();
+      let contextMenu = headerMenu.findChild(ContextMenuPopup);
+      expect(contextMenu).toBeInstanceOf(ContextMenuPopup);
+      contextMenu.animateRemoval = false;
+
+      let menus = contextMenu.menuItems.filter(menu => menu instanceof DateGroupTypeMenu) as DateGroupTypeMenu[];
+      expect(menus.map(menu => menu.groupType)).toEqual([
+        DateGroupType.YEAR,
+        DateGroupType.MONTH,
+        DateGroupType.MONTH_AND_YEAR,
+        DateGroupType.CALENDAR_WEEK,
+        DateGroupType.WEEKDAY,
+        DateGroupType.DATE
+      ]);
+      let checkedMenus = menus.filter(menu => menu.iconId === icons.CHECKED_BOLD);
+      expect(checkedMenus.length).toBe(1);
+      expect(checkedMenus[0].groupType).toBe(DateGroupType.MONTH);
+
+      // ------
+
+      contextMenu.close();
+      headerMenu.close();
+      table.group(dateColumn1);
+
+      // ------
+
+      table.header.openHeaderMenu(dateColumn1);
+      headerMenu = scout.assertInstance(table.header.tableHeaderMenu, DateColumnTableHeaderMenu);
+      headerMenu.animateRemoval = false;
+
+      expect(headerMenu.groupButton.visible).toBe(true);
+      expect(headerMenu.groupButton.selected).toBe(true);
+      expect(headerMenu.groupAddButton.visible).toBe(false);
+
+      expect(headerMenu.groupingGroupTypeAction).toBeInstanceOf(Action);
+      expect(headerMenu.groupingGroupTypeAction.text).toBe('Month');
+
+      // ------
+
+      headerMenu.groupingGroupTypeAction.doAction();
+      contextMenu = headerMenu.findChild(ContextMenuPopup);
+      expect(contextMenu).toBeInstanceOf(ContextMenuPopup);
+      contextMenu.animateRemoval = false;
+
+      menus = contextMenu.menuItems.filter(menu => menu instanceof DateGroupTypeMenu) as DateGroupTypeMenu[];
+      expect(menus.map(menu => menu.groupType)).toEqual([
+        DateGroupType.YEAR,
+        DateGroupType.MONTH,
+        DateGroupType.MONTH_AND_YEAR,
+        DateGroupType.CALENDAR_WEEK,
+        DateGroupType.WEEKDAY,
+        DateGroupType.DATE
+      ]);
+      checkedMenus = menus.filter(menu => menu.iconId === icons.CHECKED_BOLD);
+      expect(checkedMenus.length).toBe(1);
+      expect(checkedMenus[0].groupType).toBe(DateGroupType.MONTH);
+
+      let targetMenu = menus.find(menu => menu.groupType === DateGroupType.CALENDAR_WEEK);
+      expect(targetMenu).toBeInstanceOf(DateGroupTypeMenu);
+      targetMenu.doAction();
+      expect(contextMenu.destroyed).toBe(true);
+      expect(headerMenu.destroyed).toBe(true);
+
+      expect(dateColumn1.grouped).toBe(true);
+      expect(dateColumn1.groupFormat.pattern).toBe('MMMM'); // unchanged
+      expect(dateColumn1.groupType).toBe(DateGroupType.CALENDAR_WEEK);
+      expect(table.rows).toEqual([row2, row3, row0, row1]);
+
+      // ------
+
+      table.header.openHeaderMenu(dateColumn1);
+      headerMenu = scout.assertInstance(table.header.tableHeaderMenu, DateColumnTableHeaderMenu);
+      headerMenu.animateRemoval = false;
+
+      expect(headerMenu.groupButton.visible).toBe(true);
+      expect(headerMenu.groupButton.selected).toBe(true);
+      expect(headerMenu.groupAddButton.visible).toBe(false);
+
+      expect(headerMenu.groupingGroupTypeAction).toBeInstanceOf(Action);
+      expect(headerMenu.groupingGroupTypeAction.text).toBe('Week of year');
+
+      // ------
+
+      headerMenu.groupingGroupTypeAction.doAction();
+      contextMenu = headerMenu.findChild(ContextMenuPopup);
+      expect(contextMenu).toBeInstanceOf(ContextMenuPopup);
+      contextMenu.animateRemoval = false;
+
+      menus = contextMenu.menuItems.filter(menu => menu instanceof DateGroupTypeMenu) as DateGroupTypeMenu[];
+      expect(menus.map(menu => menu.groupType)).toEqual([
+        DateGroupType.YEAR,
+        DateGroupType.MONTH,
+        DateGroupType.MONTH_AND_YEAR,
+        DateGroupType.CALENDAR_WEEK,
+        DateGroupType.WEEKDAY,
+        DateGroupType.DATE
+      ]);
+      checkedMenus = menus.filter(menu => menu.iconId === icons.CHECKED_BOLD);
+      expect(checkedMenus.length).toBe(1);
+      expect(checkedMenus[0].groupType).toBe(DateGroupType.CALENDAR_WEEK);
+    });
+
+    it('does not shows an additional menu when the column specifies a groupFormat that matches a groupType', () => {
+      expect(table.rows).toEqual([row0, row1, row2, row3]);
+      dateColumn1.setGroupFormat('MMMM');
+
+      table.header.openHeaderMenu(dateColumn1);
+      let headerMenu = scout.assertInstance(table.header.tableHeaderMenu, DateColumnTableHeaderMenu);
+      headerMenu.animateRemoval = false;
+
+      expect(headerMenu.groupButton.visible).toBe(true);
+      expect(headerMenu.groupButton.selected).toBe(false);
+      expect(headerMenu.groupAddButton.visible).toBe(false);
+
+      // ------
+
+      headerMenu.groupButton.doAction();
+      let contextMenu = headerMenu.findChild(ContextMenuPopup);
+      expect(contextMenu).toBeInstanceOf(ContextMenuPopup);
+      contextMenu.animateRemoval = false;
+
+      let menus = contextMenu.menuItems.filter(menu => menu instanceof DateGroupTypeMenu) as DateGroupTypeMenu[];
+      expect(menus.map(menu => menu.groupType)).toEqual([
+        DateGroupType.YEAR,
+        DateGroupType.MONTH,
+        DateGroupType.MONTH_AND_YEAR,
+        DateGroupType.CALENDAR_WEEK,
+        DateGroupType.WEEKDAY,
+        DateGroupType.DATE
+      ]);
+      let checkedMenus = menus.filter(menu => menu.iconId === icons.CHECKED_BOLD);
+      expect(checkedMenus.length).toBe(1);
+      expect(checkedMenus[0].groupType).toBe(DateGroupType.MONTH);
+    });
+
     it('changes the label if a group button is hovered', () => {
       dateColumn1.setGroupType(DateGroupType.YEAR);
       dateColumn2.setGroupType(DateGroupType.MONTH);
@@ -740,6 +917,90 @@ describe('DateColumnTableHeaderMenu', () => {
       contextMenu.close();
       expect(headerMenu.groupingGroupTypeAction.$container.isEveryParentVisible()).toBe(true);
       expect(menuGroup.$container.children('.table-header-menu-group-text:visible').text()).toBe('Grouping by Year');
+    });
+
+    it('applies grouping if applyGrouping is true', () => {
+      expect(table.rows).toEqual([row0, row1, row2, row3]);
+
+      table.group(dateColumn1); // default is DateGroupType.YEAR
+      expect(table.rows).toEqual([row2, row1, row3, row0]);
+
+      dateColumn1.setGroupType(DateGroupType.MONTH);
+      expect(table.rows).toEqual([row2, row3, row0, row1]);
+
+      dateColumn1.setGroupType(DateGroupType.YEAR, false);
+      expect(table.rows).toEqual([row2, row3, row0, row1]); // unchanged (because applyGrouping=false)
+
+      table.group(dateColumn1);
+      expect(table.rows).toEqual([row2, row1, row3, row0]); // changed after explicit grouping
+
+      table.removeGroupColumn(dateColumn1);
+      expect(table.rows).toEqual([row2, row1, row3, row0]); // unchanged
+
+      dateColumn1.setGroupType(DateGroupType.MONTH);
+      expect(table.rows).toEqual([row2, row1, row3, row0]); // unchanged (because column is not grouped)
+
+      table.group(dateColumn1);
+      expect(table.rows).toEqual([row2, row3, row0, row1]); // changed after explicit grouping
+    });
+
+    it('does not allow changing the group type if column.hasDate=false', () => {
+      dateColumn1.hasDate = false;
+      dateColumn1.setFormat(null); // recreate default format
+      dateColumn1.setGroupFormat('HH');
+
+      table.deleteAllRows();
+      table.insertRows([
+        {id: 'row0', cells: [dates.create('2022-03-26 17:17:17.000')]},
+        {id: 'row1', cells: [dates.create('2022-03-10 17:17:17.000')]},
+        {id: 'row2', cells: [dates.create('2022-03-09 18:18:18.000')]},
+        {id: 'row3', cells: [null]},
+        {id: 'row4', cells: [dates.create('2022-03-10 17:17:33.000')]},
+        {id: 'row5', cells: [dates.create('2028-01-01 10:01:00.000')]}
+      ]);
+      let row4, row5;
+      [row0, row1, row2, row3, row4, row5] = table.rows;
+
+      // --------
+
+      table.header.openHeaderMenu(dateColumn1);
+      let headerMenu = scout.assertInstance(table.header.tableHeaderMenu, DateColumnTableHeaderMenu);
+      headerMenu.animateRemoval = false;
+
+      expect(headerMenu.groupButton.visible).toBe(true);
+      expect(headerMenu.groupButton.selected).toBe(false);
+      expect(headerMenu.groupAddButton.visible).toBe(false);
+
+      headerMenu.groupButton.doAction();
+      let contextMenu = headerMenu.findChild(ContextMenuPopup);
+      expect(contextMenu).toBeFalsy();
+      expect(headerMenu.destroyed).toBe(true);
+
+      expect(dateColumn1.grouped).toBe(true);
+      expect(dateColumn1.groupType).toBe(null);
+      expect(table.rows).toEqual([row3, row2, row1, row4, row0, row5]);
+
+      // ------
+
+      table.header.openHeaderMenu(dateColumn1);
+      headerMenu = scout.assertInstance(table.header.tableHeaderMenu, DateColumnTableHeaderMenu);
+      headerMenu.animateRemoval = false;
+
+      expect(headerMenu.groupButton.visible).toBe(true);
+      expect(headerMenu.groupButton.selected).toBe(true);
+      expect(headerMenu.groupAddButton.visible).toBe(false);
+
+      expect(headerMenu.groupingGroupTypeAction).toBeFalsy();
+
+      // ------
+
+      headerMenu.groupButton.doAction();
+      contextMenu = headerMenu.findChild(ContextMenuPopup);
+      expect(contextMenu).toBeFalsy();
+      expect(headerMenu.destroyed).toBe(true);
+
+      expect(dateColumn1.grouped).toBe(false);
+      expect(dateColumn1.groupType).toBe(null);
     });
   });
 });

@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BooleanColumn, Column, DateColumn, NumberColumn, ObjectIdProvider, scout, Table, TableClientUiPreferenceProfileDo, TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableRow, TableTextUserFilter, tableUiPreferences,
-  TableUiPreferences, TextColumnUserFilter, Tile, uiPreferences, UiPreferencesDo, WidgetModel
+  BooleanColumn, Column, DateColumn, DateGroupType, NumberColumn, ObjectIdProvider, scout, Table, TableClientUiPreferenceProfileDo, TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableRow, TableTextUserFilter,
+  tableUiPreferences, TableUiPreferences, TextColumnUserFilter, Tile, uiPreferences, UiPreferencesDo, WidgetModel
 } from '../../src/index';
 import {SpecUiPreferencesStore} from '../../src/testing';
 
@@ -315,11 +315,11 @@ describe('TableUiPreferences', () => {
       });
       table.saveInitialUiPreferences();
 
-      let c2 = table.columnById('c2');
-      let c3 = table.columnById('c3');
-      let c4 = table.columnById('c4');
-      let c5 = table.columnById('c5');
-      let c6 = table.columnById('c6');
+      let c2 = table.columnById('c2') as Column;
+      let c3 = table.columnById('c3') as Column;
+      let c4 = table.columnById('c4') as NumberColumn;
+      let c5 = table.columnById('c5') as DateColumn;
+      let c6 = table.columnById('c6') as BooleanColumn;
 
       // -----
 
@@ -389,6 +389,51 @@ describe('TableUiPreferences', () => {
 
       tableUiPreferences.applyProfile(table, profile1);
       expect(table.filterCount()).toBe(0);
+
+      // -----
+
+      c5.setVisible(true);
+      c5.setGroupType(DateGroupType.MONTH_AND_YEAR);
+      table.group(c5, 'asc');
+      expect(table.columns.map(c => c.id)).toEqual(['c1', 'c2', 'c6', 'c3', 'c4', 'c5']);
+      expect(table.visibleColumns().map(c => c.id)).toEqual(['c2', 'c6', 'c3', 'c4', 'c5']);
+      expect(table.columns.map(c => c.width)).toEqual([60, 202, 106, 103, 104, 105]);
+      expect(table.columns.map(c => c.grouped)).toEqual([false, false, false, false, false, true]);
+      expect(table.columns.map(c => c.sortIndex)).toEqual([-1, -1, -1, -1, 1, 0]);
+      expect(table.columns.map(c => c.sortAscending)).toEqual([true, true, true, true, false, true]);
+      expect(table.columns.map(c => c.sortActive)).toEqual([false, false, false, false, true, true]);
+      expect(table.filterCount()).toBe(0);
+      expect(c5.groupType).toBe(DateGroupType.MONTH_AND_YEAR);
+
+      let profile3 = tableUiPreferences.createProfile(table);
+      table.resetToInitialUiPreferences();
+
+      expect(table.columns.map(c => c.id)).toEqual(['c1', 'c2', 'c3', 'c4', 'c5', 'c6']);
+      expect(table.visibleColumns().map(c => c.id)).toEqual(['c2', 'c3', 'c4', 'c5', 'c6']);
+      expect(table.columns.map(c => c.width)).toEqual([60, 102, 103, 104, 105, 106]);
+      expect(table.columns.map(c => c.grouped)).toEqual([false, false, false, false, false, false]);
+      expect(table.columns.map(c => c.sortIndex)).toEqual([-1, -1, -1, -1, 0, -1]);
+      expect(table.columns.map(c => c.sortAscending)).toEqual([true, true, true, true, false, true]);
+      expect(table.columns.map(c => c.sortActive)).toEqual([false, false, false, false, true, false]);
+      expect(table.filterCount()).toBe(0);
+      expect(c5.groupType).toBe(null);
+
+      c5.setGroupType(DateGroupType.CALENDAR_WEEK);
+      let columnDateGroupTypeChangedEvents = [];
+      table.on('columnDateGroupTypeChanged', event => columnDateGroupTypeChangedEvents.push(event));
+
+      tableUiPreferences.applyProfile(table, profile3);
+
+      expect(columnDateGroupTypeChangedEvents.length).toBe(1);
+      expect(table.columns.map(c => c.id)).toEqual(['c1', 'c2', 'c6', 'c3', 'c4', 'c5']);
+      expect(table.visibleColumns().map(c => c.id)).toEqual(['c2', 'c6', 'c3', 'c4', 'c5']);
+      expect(table.columns.map(c => c.width)).toEqual([60, 202, 106, 103, 104, 105]);
+      expect(table.columns.map(c => c.grouped)).toEqual([false, false, false, false, false, true]);
+      expect(table.columns.map(c => c.sortIndex)).toEqual([-1, -1, -1, -1, 1, 0]);
+      expect(table.columns.map(c => c.sortAscending)).toEqual([true, true, true, true, false, true]);
+      expect(table.columns.map(c => c.sortActive)).toEqual([false, false, false, false, true, true]);
+      expect(table.filterCount()).toBe(0);
+      expect(c5.groupType).toBe(DateGroupType.MONTH_AND_YEAR);
     });
 
     it('does not modify width of fixed width columns when applying a profile', () => {
@@ -679,8 +724,8 @@ describe('TableUiPreferences', () => {
         }, {
           id: 'c5',
           objectType: DateColumn,
-          width: 105,
           sortIndex: 0,
+          width: 105,
           sortAscending: false
         }, {
           id: 'c6',

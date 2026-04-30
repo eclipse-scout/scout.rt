@@ -662,7 +662,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       handleColumnBackgroundEffectChanged(event);
     }
     else if (EVENT_COLUMN_DATE_GROUP_TYPE_CHANGED.equals(event.getType())) {
-      handleColumnDateGroupTypeChanged(event);
+      handleUiColumnDateGroupTypeChanged(event);
     }
     else if (EVENT_COLUMN_ORGANIZE_ACTION.equals(event.getType())) {
       handleUiColumnOrganizeAction(event);
@@ -849,7 +849,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     getModel().getUIFacade().setColumnBackgroundEffect((INumberColumn<?>) column, event.getData().optString("backgroundEffect", null));
   }
 
-  protected void handleColumnDateGroupTypeChanged(JsonEvent event) {
+  protected void handleUiColumnDateGroupTypeChanged(JsonEvent event) {
     addTableEventFilterCondition(TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED);
     IColumn<?> column = extractColumn(event.getData());
     IDateColumn dateColumn = Assertions.assertInstance(column, IDateColumn.class, "DateGroupType can only be specified on date columns");

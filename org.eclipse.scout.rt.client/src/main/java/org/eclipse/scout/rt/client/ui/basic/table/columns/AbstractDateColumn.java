@@ -122,6 +122,11 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     return "yyyy";
   }
 
+  /**
+   * Configures the type used to group this column. If set, the {@link #getConfiguredGroupFormat() group format} is ignored.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}, i.e. the configured group format is used to group the data.
+   */
   @ConfigProperty(ConfigProperty.OBJECT)
   @Order(154)
   protected DateGroupType getConfiguredGroupType() {

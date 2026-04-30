@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, aria, ColumnUserFilter, ContextMenuPopup, DateColumn, DateColumnUserFilter, DateFormat, DateGroupType, dates, Event, icons, keys, Menu, MenuModel, scout, strings, TableHeaderMenu, TableHeaderMenuButton, TableHeaderMenuGroup,
+  Action, aria, ColumnUserFilter, ContextMenuPopup, DateColumn, DateColumnUserFilter, DateGroupType, dates, Event, icons, keys, Menu, MenuModel, scout, strings, TableHeaderMenu, TableHeaderMenuButton, TableHeaderMenuGroup,
   TableHeaderMenuModel, TableMatrix
 } from '../../index';
 
@@ -19,7 +19,6 @@ export class DateColumnTableHeaderMenu extends TableHeaderMenu implements DateCo
 
   groupingGroupTypeAction: Action;
   filterGroupTypeAction: Action;
-  protected _contextMenu: ContextMenuPopup;
 
   // ------------------------------------------------------------------
   // Grouping
@@ -28,6 +27,10 @@ export class DateColumnTableHeaderMenu extends TableHeaderMenu implements DateCo
   protected override _renderGroupingGroup(): TableHeaderMenuGroup {
     let group = super._renderGroupingGroup();
 
+    if (!this.column.hasDate) {
+      return group; // always use default grouping for time-only columns
+    }
+
     if (this.column.grouped) {
       // Render an alternative group title in the form "Grouped by [group-type]", where the group type is a clickable link.
       // The user can use this action to change the group type without having to ungroup and re-group the column. Clicking
@@ -35,7 +38,9 @@ export class DateColumnTableHeaderMenu extends TableHeaderMenu implements DateCo
       let $textWithGroupType = group.$text.afterDiv('table-header-menu-group-text');
       $textWithGroupType.appendSpan().text(this.session.text('ui.GroupingBy') + ' ');
 
-      let groupTypeText = this._formatGroupType(this.column.groupType) || this._formatGroupFormat(this.column.groupFormat);
+      let groupFormatPattern = this.column.groupFormat.pattern;
+      let groupType = this.column.groupType || this._getGroupTypeForFormatPattern(groupFormatPattern);
+      let groupTypeText = this._formatGroupType(groupType) ?? groupFormatPattern;
       this.groupingGroupTypeAction = scout.create(Action, {
         id: 'ChangeGroupTypeAction',
         parent: this,
@@ -79,20 +84,24 @@ export class DateColumnTableHeaderMenu extends TableHeaderMenu implements DateCo
   }
 
   protected override _onGroupButtonAction(event: Event<TableHeaderMenuButton> | Event<Action>) {
+    if (!this.column.hasDate) {
+      // always use default grouping for time-only columns
+      super._onGroupButtonAction(event as Event<TableHeaderMenuButton>);
+      return;
+    }
+
     // This handler is either called from a TableHeaderMenuButton or the "change group type" action created in _renderGroupingGroup()
     const anchor = event.source;
 
-    if (this._contextMenu) {
-      let isOwnContextMenu = this._contextMenu.anchor === anchor;
-      this._contextMenu.close();
-      if (isOwnContextMenu) {
-        return; // toggle only -> done
-      }
+    let contextMenu = anchor.findChild(DateGroupTypeContextMenuPopup);
+    if (contextMenu) {
+      contextMenu.close();
+      return; // toggle only -> done
     }
 
     // If button was already selected, just ungroup the column (don't show the context menu)
     if (anchor instanceof TableHeaderMenuButton && anchor.selected) {
-      this.table.group(this.column, undefined, undefined, true); // ungroup
+      this.table.removeGroupColumn(this.column);
       this.close();
       return;
     }
@@ -100,15 +109,15 @@ export class DateColumnTableHeaderMenu extends TableHeaderMenu implements DateCo
     // Create menus
     let menus = this._createGroupTypeMenus();
 
-    let specialGroupFormat = this.column.groupFormat.pattern;
-    let hasSpecialGroupFormat = specialGroupFormat !== 'yyyy';
-    if (hasSpecialGroupFormat) {
+    let groupFormatPattern = this.column.groupFormat.pattern;
+    let groupFormatGroupType = this._getGroupTypeForFormatPattern(groupFormatPattern);
+    if (!groupFormatGroupType) {
       // Show additional menu to change grouping according to a custom format
       let specialGroupFormatMenu = scout.create(DateGroupTypeMenu, {
         parent: this,
-        text: this._formatGroupFormat(this.column.groupFormat),
+        text: groupFormatPattern,
         groupType: null,
-        hint: dates.format(new Date(), this.session.locale, specialGroupFormat)
+        hint: dates.format(new Date(), this.session.locale, groupFormatPattern)
       });
       menus.unshift(specialGroupFormatMenu);
     }
@@ -120,12 +129,12 @@ export class DateColumnTableHeaderMenu extends TableHeaderMenu implements DateCo
         this.column.__filterGroupType = null;
       }
       // Set group type and apply grouping
-      this.column.setGroupType(groupType);
+      this.column.setGroupType(groupType, false); // false = don't apply grouping
       this.table.group(this.column, undefined, anchor instanceof TableHeaderMenuButton ? anchor.additional : true);
       this.close();
     };
 
-    let currentGroupType = this.column.groupType ?? (hasSpecialGroupFormat ? null : DateGroupType.YEAR);
+    let currentGroupType = this.column.groupType || groupFormatGroupType;
     menus.forEach(menu => {
       if (menu.groupType === currentGroupType) {
         menu.setIconId(icons.CHECKED_BOLD);
@@ -141,25 +150,18 @@ export class DateColumnTableHeaderMenu extends TableHeaderMenu implements DateCo
     });
 
     // Create context menu
-    this._contextMenu = scout.create(ContextMenuPopup, {
-      parent: this,
+    contextMenu = scout.create(DateGroupTypeContextMenuPopup, {
+      parent: anchor,
       menuItems: menus,
-      anchor: anchor,
-      cloneMenuItems: false,
-      closeOnAnchorMouseDown: false // we use our own toggle logic
+      anchor: anchor
     });
     if (anchor instanceof TableHeaderMenuButton) {
       anchor.parent.setActiveGroupItem(anchor);
-    }
-    this._contextMenu.one('destroy', event => {
-      if (anchor instanceof TableHeaderMenuButton) {
+      contextMenu.one('destroy', event => {
         anchor.parent.setActiveGroupItem(null);
-      }
-      if (this._contextMenu === event.source) {
-        this._contextMenu = null;
-      }
-    });
-    this._contextMenu.open();
+      });
+    }
+    contextMenu.open();
   }
 
   // ------------------------------------------------------------------
@@ -168,13 +170,19 @@ export class DateColumnTableHeaderMenu extends TableHeaderMenu implements DateCo
 
   protected override _createFilter(): ColumnUserFilter {
     let filter = super._createFilter() as DateColumnUserFilter;
-    // Initialize with the previously selected group type the active column group type
-    filter.groupType = this.column.__filterGroupType || (this.column.grouped ? this.column.groupType : null);
+
+    // Initialize the filter with the previously selected group type or the column group type
+    filter.groupType = this.column.__filterGroupType || this.column.groupType;
+
     return filter;
   }
 
   protected override _renderFilterTable(): JQuery {
     let $filterTable = super._renderFilterTable();
+
+    if (!this.column.hasDate) {
+      return $filterTable; // always use default grouping for time-only columns
+    }
 
     // Create an additional action to change the group type in the filter table (only if there are at least two menus to choose from)
     this.filterGroupTypeAction = scout.create(Action, {
@@ -194,12 +202,10 @@ export class DateColumnTableHeaderMenu extends TableHeaderMenu implements DateCo
   protected _onFilterChangeGroupTypeAction(event: Event<Action>) {
     const anchor = event.source;
 
-    if (this._contextMenu) {
-      let isOwnContextMenu = this._contextMenu.anchor === anchor;
-      this._contextMenu.close();
-      if (isOwnContextMenu) {
-        return; // toggle only -> done
-      }
+    let contextMenu = anchor.findChild(DateGroupTypeContextMenuPopup);
+    if (contextMenu) {
+      contextMenu.close();
+      return; // toggle only -> done
     }
 
     // Create menus
@@ -229,21 +235,16 @@ export class DateColumnTableHeaderMenu extends TableHeaderMenu implements DateCo
     });
 
     // Create context menu
-    this._contextMenu = scout.create(ContextMenuPopup, {
-      parent: this,
+    contextMenu = scout.create(DateGroupTypeContextMenuPopup, {
+      parent: anchor,
       menuItems: menus,
-      anchor: anchor,
-      cloneMenuItems: false,
-      closeOnAnchorMouseDown: false // we use our own toggle logic
+      anchor: anchor
     });
     anchor.$container?.addClass('selected has-popup');
-    this._contextMenu.one('destroy', event => {
+    contextMenu.one('destroy', event => {
       anchor.$container?.removeClass('selected has-popup');
-      if (this._contextMenu === event.source) {
-        this._contextMenu = null;
-      }
     });
-    this._contextMenu.open();
+    contextMenu.open();
   }
 
   // ------------------------------------------------------------------
@@ -267,6 +268,9 @@ export class DateColumnTableHeaderMenu extends TableHeaderMenu implements DateCo
     }));
   }
 
+  /**
+   * @returns the display name for the given {@link DateGroupType}.
+   */
   protected _formatGroupType(groupType: DateGroupType): string {
     switch (groupType) {
       case DateGroupType.YEAR:
@@ -285,18 +289,32 @@ export class DateColumnTableHeaderMenu extends TableHeaderMenu implements DateCo
     return groupType || null;
   }
 
-  protected _formatGroupTypeHint(groupType: DateGroupType): string {
-    if (groupType) {
-      let matrix = new TableMatrix(this.table);
-      let axis = matrix.addAxis(this.column, TableMatrix.resolveDateGroup(groupType));
-      return axis.format(axis.norm(new Date()));
+  /**
+   * Returns the corresponding {@link DateGroupType} value if its format exactly matches the given date format pattern.
+   * Otherwise, null is returned.
+   */
+  protected _getGroupTypeForFormatPattern(formatPattern: string): DateGroupType {
+    switch (formatPattern) {
+      case 'yyyy':
+        return DateGroupType.YEAR;
+      case 'MMMM':
+        return DateGroupType.MONTH;
+      case 'MMMM yyyy':
+        return DateGroupType.MONTH_AND_YEAR;
+      case 'EEEE':
+        return DateGroupType.WEEKDAY;
+      case this.session.locale.dateFormatPatternDefault:
+        return DateGroupType.DATE;
     }
     return null;
   }
 
-  protected _formatGroupFormat(groupFormat: DateFormat): string {
-    if (groupFormat?.pattern) {
-      return groupFormat.pattern === 'yyyy' ? this.session.text('DateGroupTypeYear') : groupFormat.pattern;
+  protected _formatGroupTypeHint(groupType: DateGroupType): string {
+    let group = TableMatrix.resolveDateGroup(groupType);
+    if (group) {
+      let matrix = new TableMatrix(this.table);
+      let axis = matrix.addAxis(this.column, group);
+      return axis.format(axis.norm(new Date()));
     }
     return null;
   }
@@ -360,4 +378,11 @@ interface DateColumnWithFilterType {
   __filterGroupType: DateGroupType;
 }
 
-// FIXME bsh: Add test
+export class DateGroupTypeContextMenuPopup extends ContextMenuPopup {
+
+  constructor() {
+    super();
+    this.cloneMenuItems = false;
+    this.closeOnAnchorMouseDown = false; // we use our own toggle logic
+  }
+}
