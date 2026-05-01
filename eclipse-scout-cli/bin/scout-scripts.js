@@ -244,6 +244,7 @@ function createWebpackCompiler(configFilePath, args) {
 function logWebpack(err, stats, statsConfig) {
   if (err) {
     console.error(err);
+    process.exitCode = 2; // let the webpack build fail on errors
     return;
   }
   const info = stats.toJson();
