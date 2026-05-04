@@ -210,7 +210,7 @@ export class FocusManager implements FocusManagerOptions {
    *
    * @param filter if specified, the filter is used to filter the array of glass pane targets
    */
-  isElementCovertByGlassPane(element: HTMLElement | JQuery, filter?: () => boolean): boolean {
+  isElementCovertByGlassPane(element: HTMLElement | JQuery, filter?: ($target: JQuery) => boolean): boolean {
     let targets = this._glassPaneTargets;
     if (filter) {
       targets = this._glassPaneTargets.filter(filter);
