@@ -70,7 +70,7 @@
     "karma-sourcemap-loader": "0.4.0"
   },
   "devDependencies": {
-    "@eclipse-scout/releng": "^26.1.0"
+    "@eclipse-scout/releng": "~26.2.0"
   },
   "bin": {
     "scout-scripts": "./bin/scout-scripts.js"

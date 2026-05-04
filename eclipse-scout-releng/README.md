@@ -15,3 +15,22 @@
 # Eclipse Scout - Releng
 
 Contains release engineering scripts for the [Eclipse Scout](https://www.npmjs.com/package/@eclipse-scout/core) framework.
+
+## Deploy
+
+1. Check that there are no *.js files in the module. If there are old build artifacts: remove them first.
+2. Update version in `package.json`: set to a unique new version without `-snapshot` suffix.
+3. Run tests using npm script `npm run test`.
+4. Build using npm script `npm run build`.
+5. Deploy to a local registry to test the new package: `npm publish --registry http://127.0.0.1:4873/`.
+6. If all is fine: Deploy to real registry: `npm publish` (requires corresponding access token in your `.npmrc`).
+
+## Version Update
+
+1. Align the following dependencies with the ones of the new pnpm version (check version by git checkout of the corresponding tag):
+   1. `@pnpm/*`
+   2. `realpath-missing` as specified by pnpm
+   3. `normalize-path` as specified by pnpm
+2. Use the newest compatible version of `typanion` (check version constraint of `@pnpm/npm-lifecycle > @yarnpkg/shell > clipanion` declaring the peer)
+3. Update the `engines` in the package.json
+4. In this module search for `Inspired by https://github.com/pnpm/pnpm` and check the history of the declared files for changes since the last version. Merge them as necessary.

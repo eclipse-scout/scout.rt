@@ -3,7 +3,7 @@
   "version": "${version}",
   "private": true,
   "scripts": {
-    "pnpm-install": "pnpm install --ignore-scripts"
+    "pnpm-install": "pnpx @eclipse-scout/releng@~26.2.0 install"
   },
   "dependencies": {
     "eslint": "9.39.2",
