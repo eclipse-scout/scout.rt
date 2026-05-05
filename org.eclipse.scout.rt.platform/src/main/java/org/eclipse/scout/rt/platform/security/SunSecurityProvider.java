@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,7 +43,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -60,6 +59,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.security.PasswordHash.PasswordHashBuilder;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 
@@ -201,8 +201,17 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
   }
 
   @Override
-  public byte[] createPasswordHash(char[] password, byte[] salt) {
-    return createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS);
+  public PasswordHash createPasswordHash(char[] password, byte[] salt) {
+    return PasswordHashBuilder.of(password, salt, (p, s) -> this.createPasswordHash(p, s, MIN_PASSWORD_HASH_ITERATIONS))
+        // in case the computation of the hash changes (i.e. the iterations or the implementation itself changes), add the "old" computation as a variant.
+        // example: the current one is the 2023 implementation, therefore we add all older implementations as a variant (2021, 2019, etc.)
+        .withVariant((p, s) -> this.createPasswordHash(p, s, MIN_PASSWORD_HASH_ITERATIONS_2021))
+        .withVariant((p, s) -> this.createPasswordHash(p, s, MIN_PASSWORD_HASH_ITERATIONS_2019))
+        .withVariant((p, s) -> this.createPasswordHash(p, s, MIN_PASSWORD_HASH_ITERATIONS_2016))
+        // 2014 variants
+        .withVariant((p, s) -> createHash(new ByteArrayInputStream(new String(p).getBytes(StandardCharsets.UTF_8)), s, 3557))
+        .withVariant((p, s) -> createHash(new ByteArrayInputStream(new String(p).getBytes(StandardCharsets.UTF_16)), s, 3557))
+        .build();
   }
 
   /**
@@ -246,30 +255,6 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
     catch (NoSuchAlgorithmException | InvalidKeySpecException | NoSuchProviderException e) {
       throw new ProcessingException("Unable to create password hash.", e);
     }
-  }
-
-  @Override
-  public boolean verifyPasswordHash(char[] password, byte[] salt, byte[] expectedHash) {
-    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS))) {
-      return true;
-    }
-    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2021))) {
-      return true;
-    }
-    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2019))) {
-      return true;
-    }
-    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2016))) {
-      return true;
-    }
-    //2014 variants
-    if (Arrays.equals(expectedHash, createHash(new ByteArrayInputStream(new String(password).getBytes(StandardCharsets.UTF_8)), salt, 3557))) {
-      return true;
-    }
-    if (Arrays.equals(expectedHash, createHash(new ByteArrayInputStream(new String(password).getBytes(StandardCharsets.UTF_16)), salt, 3557))) {
-      return true;
-    }
-    return false;
   }
 
   @Override
