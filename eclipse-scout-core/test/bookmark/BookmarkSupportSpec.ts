@@ -138,8 +138,8 @@ describe('BookmarkSupport', () => {
       expect(page.detailTable).toBeInstanceOf(Table);
       expect(page.detailTable.loading).toBe(true);
       expect(page.detailTable.rows.length).toBe(0);
-      await page.ensureLoadChildren();
-      expect(page.detailTable.loading).toBe(false);
+      page.ensureLoadChildren();
+      await page.detailTable.when('propertyChange:loading');
       expect(page.detailTable.rows.length).toBe(8);
 
       // Change search filter
@@ -282,8 +282,8 @@ describe('BookmarkSupport', () => {
       expect(page.detailTable).toBeInstanceOf(Table);
       expect(page.detailTable.loading).toBe(true);
       expect(page.detailTable.rows.length).toBe(0);
-      await page.ensureLoadChildren();
-      expect(page.detailTable.loading).toBe(false);
+      page.ensureLoadChildren();
+      await page.detailTable.when('propertyChange:loading');
       expect(page.detailTable.rows.length).toBe(3);
 
       // -----

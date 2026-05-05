@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Column, Form, GroupBox, InitModelOf, MaxRowCountContributionDo, NumberColumn, NumberField, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, ResetMenu, scout, SearchFormTableControl, SearchMenu,
+  arrays, Cell, Column, Deferred, Form, GroupBox, InitModelOf, MaxRowCountContributionDo, NumberColumn, NumberField, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, ResetMenu, scout, SearchFormTableControl, SearchMenu,
   SearchRequiredTableStatus, SmartColumn, StaticLookupCall, StringField, Table, TableReloadReason, TableRow, Tree, WidgetModel
 } from '../../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
@@ -62,6 +62,10 @@ describe('PageWithTable', () => {
 
     override _loadTableData(searchFilter: any): JQuery.Promise<any> {
       return super._loadTableData(searchFilter);
+    }
+
+    override _resetTableData() {
+      super._resetTableData();
     }
 
     override _createChildPage(row: TableRow): Page {
@@ -660,6 +664,137 @@ describe('PageWithTable', () => {
     expect(usedFilter.numVal).toBe(2);
     expect(searchFormData.strVal).toBe('new');
     expect(searchFormData.numVal).toBe(2);
+  });
+
+  it('marks table loading until data is loaded', async () => {
+    jasmine.clock().uninstall();
+
+    const table = page.detailTable;
+
+    // await initial load, because page was selected
+    expect(table.loading).toBeTrue();
+    await table.when('propertyChange:loading');
+
+    page.setSearchRequired(true);
+    page._resetTableData();
+
+    let loadTableDataDeferred: Deferred<any>;
+    const resetLoadTableData = () => {
+      loadTableDataDeferred = new Deferred();
+      page._loadTableData = searchFilter => $.when(loadTableDataDeferred.promise());
+    };
+
+    let loadTableDataPromise: JQuery.Promise<any>;
+    const loadTableDataOrig = page.loadTableData.bind(page);
+    page.loadTableData = (reloadReason?: TableReloadReason) => {
+      loadTableDataPromise = loadTableDataOrig(reloadReason);
+      return loadTableDataPromise;
+    };
+
+    // column without deferred cell text
+
+    resetLoadTableData();
+    table.setColumns([{objectType: NumberColumn}]);
+    // modifying columns marks the table loading
+    expect(table.loading).toBeTrue();
+    await table.when('propertyChange:loading');
+
+    table.reload();
+    expect(table.loading).toBeTrue();
+
+    loadTableDataDeferred.resolve([{cells: [42]}]);
+    await loadTableDataPromise;
+    expect(table.loading).toBeFalse();
+
+    // column with deferred cell text
+
+    class DeferredSmartColumn extends SmartColumn<number> {
+
+      lastCellTextDeferred: Deferred<void> = null;
+      lastCellTextPromise: JQuery.Promise<string> = null;
+
+      protected override _init(model: InitModelOf<this>) {
+        super._init({
+          lookupCall: {
+            objectType: StaticLookupCall,
+            data: [
+              [13, 'foo'],
+              [42, 'bar']
+            ]
+          },
+          ...model
+        });
+      }
+
+      override setCellTextDeferred(promise: JQuery.Promise<string>, row: TableRow, cell: Cell<number>) {
+        this.lastCellTextDeferred = new Deferred();
+        this.lastCellTextPromise = promise.then(async text => {
+          await this.lastCellTextDeferred.promise();
+          return text;
+        });
+        super.setCellTextDeferred(this.lastCellTextPromise, row, cell);
+      }
+    }
+
+    page._resetTableData();
+    resetLoadTableData();
+    table.setColumns([{objectType: DeferredSmartColumn, id: 'DeferredSmartColumn'}]);
+    // modifying columns marks the table loading
+    expect(table.loading).toBeTrue();
+    await table.when('propertyChange:loading');
+    const deferredSmartColumn = table.columnById('DeferredSmartColumn', DeferredSmartColumn);
+
+    table.reload();
+    expect(table.loading).toBeTrue();
+
+    loadTableDataDeferred.resolve([{cells: [42]}]);
+    await loadTableDataPromise;
+    // still loading because of deferred cell text update
+    expect(table.loading).toBeTrue();
+
+    deferredSmartColumn.lastCellTextDeferred.resolve();
+    await deferredSmartColumn.lastCellTextPromise;
+    expect(table.loading).toBeFalse();
+
+    // double reload with column with deferred cell text
+
+    resetLoadTableData();
+    expect(table.loading).toBeFalse();
+
+    table.reload();
+    expect(table.loading).toBeTrue();
+
+    // fail if table marked loading=false before second cellText is updated
+    let cellText2Resolved = false;
+    table.when('propertyChange:loading').then(() => {
+      if (!cellText2Resolved) {
+        fail('Table was marked with loading=false before data and cell texts are loaded.');
+      }
+    });
+
+    loadTableDataDeferred.resolve([{cells: [42]}]);
+    await loadTableDataPromise;
+    // still loading because of deferred cell text update
+    expect(table.loading).toBeTrue();
+
+    resetLoadTableData();
+    table.reload();
+
+    // resolve cell text from first reload after second reload was triggered
+    deferredSmartColumn.lastCellTextDeferred.resolve();
+    await deferredSmartColumn.lastCellTextPromise;
+    // still loading because second reload was triggered already
+    expect(table.loading).toBeTrue();
+
+    loadTableDataDeferred.resolve([{cells: [13]}]);
+    await loadTableDataPromise;
+    // still loading because of deferred cell text update
+    expect(table.loading).toBeTrue();
+
+    deferredSmartColumn.lastCellTextDeferred.resolve();
+    cellText2Resolved = true;
+    await deferredSmartColumn.lastCellTextPromise;
+    expect(table.loading).toBeFalse();
   });
 
   describe('searchRequired', () => {
