@@ -4219,7 +4219,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    * @param type the type of the column to look for. The return value will be cast to that type. This parameter has no effect at runtime.
    * @returns the column for the requested ID or null if no column has been found.
    */
-  columnById<TColumn extends Column>(columnId: string, type: abstract new() => TColumn): TColumn;
+  columnById<TColumn extends Column<any>>(columnId: string, type: abstract new() => TColumn): TColumn;
   /**
    * Searches for a column with the given ID.
    *
@@ -4230,7 +4230,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    * @returns the column for the requested ID or null if no column has been found.
    */
   columnById<TId extends string & keyof ColumnMapOf<this>>(columnId: TId): ColumnMapOf<this>[TId];
-  columnById<TId extends string & keyof ColumnMapOf<this>, TColumn extends Column>(columnId: TId, type?: abstract new() => TColumn): ColumnMapOf<this>[TId] | TColumn {
+  columnById<TId extends string & keyof ColumnMapOf<this>, TColumn extends Column<any>>(columnId: TId, type?: abstract new() => TColumn): ColumnMapOf<this>[TId] | TColumn {
     return arrays.find(this.columns, column => column.id === columnId) as ColumnMapOf<this>[TId];
   }
 
