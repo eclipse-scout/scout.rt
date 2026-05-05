@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -325,7 +325,7 @@ public final class SecurityUtility {
    * @see ISecurityProvider#createPasswordHash(char[], byte[])
    */
   public static byte[] hashPassword(char[] password, byte[] salt) {
-    return SECURITY_PROVIDER.get().createPasswordHash(password, salt);
+    return createPasswordHash(password, salt).get();
   }
 
   /**
@@ -338,7 +338,21 @@ public final class SecurityUtility {
    * @since 11.0
    */
   public static boolean verifyPasswordHash(char[] password, byte[] salt, byte[] expectedHash) {
-    return SECURITY_PROVIDER.get().verifyPasswordHash(password, salt, expectedHash);
+    return createPasswordHash(password, salt).verify(expectedHash);
+  }
+
+  /**
+   * @see PasswordHash#verify(byte[])
+   */
+  public static boolean verifyPasswordHash(PasswordHash passwordHash, byte[] expectedHash) {
+    return passwordHash.verify(expectedHash);
+  }
+
+  /**
+   * See {@link ISecurityProvider#createPasswordHash(char[], byte[])}
+   */
+  public static PasswordHash createPasswordHash(char[] password, byte[] salt) {
+    return SECURITY_PROVIDER.get().createPasswordHash(password, salt);
   }
 
   /**

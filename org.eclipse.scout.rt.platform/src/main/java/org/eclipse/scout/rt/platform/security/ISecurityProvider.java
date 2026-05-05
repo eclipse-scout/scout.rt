@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -137,7 +137,7 @@ public interface ISecurityProvider {
    * <code>DigestInputStream.getMessageDigest().digest()</code>.
    * </p>
    * <p>
-   * <b>Important:</b> For hashing of passwords use {@link #createPasswordHash(char[], byte[])}!
+   * <b>Important:</b> For hashing of passwords use {@link SecurityUtility#hashPassword(char[], byte[])}!
    * </p>
    *
    * @param stream
@@ -155,7 +155,7 @@ public interface ISecurityProvider {
    * <code>DigestInputStream.getMessageDigest().digest()</code>.
    * </p>
    * <p>
-   * <b>Important:</b> For hashing of passwords use {@link #createPasswordHash(char[], byte[])}!
+   * <b>Important:</b> For hashing of passwords use {@link SecurityUtility#hashPassword(char[], byte[])}!
    * </p>
    *
    * @param stream
@@ -167,7 +167,7 @@ public interface ISecurityProvider {
   DigestOutputStream toHashingStream(OutputStream stream);
 
   /**
-   * Creates a hash for the given password.<br>
+   * Creates a new {@link PasswordHash} used for hashing a password.
    *
    * @param password
    *     The password to create the hash for. Must not be {@code null} or empty.
@@ -175,28 +175,15 @@ public interface ISecurityProvider {
    *     The salt to use. Use {@link #createSecureRandomBytes(int)} to generate a new random salt for each
    *     credential. Do not use the same salt for multiple credentials. The salt should be at least 32 bytes long.
    *     Remember to save the salt with the hashed password! Must not be {@code null} or an empty array.
-   * @return the password hash
+   * @return The {@link PasswordHash} used for hashing a password.
    * @throws AssertionException
    *     If one of the following conditions is {@code true}:<br>
    *     <ul>
    *     <li>The password is {@code null} or an empty array</li>
    *     <li>The salt is {@code null} or an empty array</li>
    *     </ul>
-   * @throws ProcessingException
-   *     If there is an error creating the hash. <br>
    */
-  byte[] createPasswordHash(char[] password, byte[] salt);
-
-  /**
-   * This method is recommended in combination with {@link #createPasswordHash(char[], byte[])} where the iteration
-   * count is omitted. This has the advantage that the check of the password hash is independent of the creation of the
-   * hash. In case the iteration count is increased yearly, this method checks if the hash is valid
-   *
-   * @return true if calculated password hash created with {@link #createPasswordHash(char[], byte[])} matches the
-   * expected hash.
-   * @since 11.0
-   */
-  boolean verifyPasswordHash(char[] password, byte[] salt, byte[] expectedHash);
+  PasswordHash createPasswordHash(char[] password, byte[] salt);
 
   /**
    * Encrypts the given data using the given {@link EncryptionKey}.<br>

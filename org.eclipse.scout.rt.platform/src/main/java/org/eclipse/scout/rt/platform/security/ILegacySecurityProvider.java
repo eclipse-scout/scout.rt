@@ -40,7 +40,7 @@ public interface ILegacySecurityProvider {
   /**
    * Creates a hash for the given data using the given salt.
    * <p>
-   * <b>Important:</b> For hashing of passwords use {@link ISecurityProvider#createPasswordHash(char[], byte[])}!
+   * <b>Important:</b> For hashing of passwords use {@link SecurityUtility#hashPassword(char[], byte[])}!
    * </p>
    * <p><b>Important 2:</b> For "normal" hashing use {@link SecurityUtility#hash(byte[])}</p>
    *

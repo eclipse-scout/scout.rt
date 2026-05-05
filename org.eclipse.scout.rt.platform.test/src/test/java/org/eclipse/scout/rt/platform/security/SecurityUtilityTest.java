@@ -132,6 +132,17 @@ public class SecurityUtilityTest {
   }
 
   @Test
+  public void testCreatePasswordHash() {
+    char[] password = "AwesomePassword".toCharArray();
+    byte[] salt = SecurityUtility.createRandomBytes();
+    PasswordHash passwordHash = SecurityUtility.createPasswordHash(password, salt);
+
+    // ensure created password hash matches given inputs
+    Assert.assertArrayEquals(password, passwordHash.getPassword());
+    Assert.assertArrayEquals(salt, passwordHash.getSalt());
+  }
+
+  @Test
   public void testHash() {
     final byte[] data = "testdata".getBytes(ENCODING);
     byte[] hash = SecurityUtility.hash(data);
