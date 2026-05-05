@@ -415,9 +415,15 @@ export class PageWithTable extends Page implements PageWithTableModel {
     // Ensure the search form data is in sync with the search filter used to load the table data (e.g. required for getSearchFilterText())
     this._updateSearchData(searchFilter);
 
-    return this._loadTableData(searchFilter)
+    const promise = this._loadTableData(searchFilter)
       .then(data => this._onLoadTableDataDone(data, restoreSelectionInfo))
       .catch(error => this._onLoadTableDataFail(error, restoreSelectionInfo));
+
+    // Ensure loading of the detail table is set to false once all loading tasks have been completed.
+    // This includes loading the main table data but also column lookup calls.
+    this.detailTable.updateBuffer.pushPromise(promise);
+
+    return promise;
   }
 
   protected _updateSearchData(searchFilter: any) {
@@ -539,7 +545,6 @@ export class PageWithTable extends Page implements PageWithTableModel {
 
   protected _onLoadTableDataAlways(restoreSelectionInfo?: RestoreSelectionInfo) {
     this._restoreSelection(restoreSelectionInfo);
-    this.detailTable.setLoading(false);
   }
 
   /**
