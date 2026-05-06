@@ -33,13 +33,8 @@ import org.eclipse.scout.rt.rest.IRestResource;
  * &#064;Produces(MediaType.APPLICATION_JSON)
  * public Response load() {
  *   IChunkedDataWriter&#060;ExampleDo&#062; writer = IChunkedDataWriter.create(ExampleDo.class, "\r\n", 100);
- *   Jobs.schedule(() -> {
- *     try (writer) {
- *       // write all ExampleDo instances to writer
- *       writer.write(...);
- *     }
- *   }, Jobs.newInput());
- *   return Response.ok(writer.toEntity()).build();
+ *   Iterator&#060;ExampleDo&#062; iterator = fetchData();  // load data from source, e.g. database
+ *   return writer.toResponse(iterator);
  * }
  * </pre>
  */
