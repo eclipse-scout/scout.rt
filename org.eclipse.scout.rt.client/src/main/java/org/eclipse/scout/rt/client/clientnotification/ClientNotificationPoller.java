@@ -33,8 +33,10 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
 import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -159,7 +161,11 @@ public class ClientNotificationPoller {
           LOG.debug("Client notification polling has been interrupted. [clientNodeId={}]", IIds.toString(NodeId.current()), e);
         }
         catch (RuntimeException e) {
-          if (!(e instanceof PlatformException && ((PlatformException) e).isConsumed())) {
+          if (BEANS.get(DefaultExceptionTranslator.class).throwableCausesAccept(e, RemoteSystemUnavailableException.class::isInstance)) {
+            Exception ex = (LOG.isDebugEnabled() ? e : null); // only log stack trace on level DEBUG
+            LOG.warn("Failed to receive client notifications got {}, message={} [clientNodeId={}]", RemoteSystemUnavailableException.class.getSimpleName(), e.getMessage(), IIds.toString(NodeId.current()), ex);
+          }
+          else if (!(e instanceof PlatformException && ((PlatformException) e).isConsumed())) {
             LOG.error("Error receiving client notifications [clientNodeId={}]", IIds.toString(NodeId.current()), e);
           }
           SleepUtil.sleepSafe(10, TimeUnit.SECONDS); // sleep some time before connecting anew
