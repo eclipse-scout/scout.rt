@@ -18,11 +18,11 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.Form
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldIsEmptyChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldIsSaveNeededChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldMarkSavedChain;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
-public interface IFormFieldExtension<OWNER extends AbstractFormField> extends IExtension<OWNER> {
+public interface IFormFieldExtension<OWNER extends IFormField> extends IExtension<OWNER> {
 
   void execDataChanged(FormFieldDataChangedChain chain, Object... dataTypes);
 
