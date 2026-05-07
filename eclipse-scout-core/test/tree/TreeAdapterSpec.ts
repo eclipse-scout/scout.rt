@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -689,13 +689,35 @@ describe('TreeAdapter', () => {
 
     it('nodesSelected', () => {
       tree.selectNodes([jsNode, hybridNode, remoteNode]);
-
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
-
-      const request = mostRecentJsonRequest();
-      expect(request).toContainEventsExactly([
+      expect(mostRecentJsonRequest()).toContainEventsExactly([
         new RemoteEvent(adapter.id, 'nodesSelected', {nodeIds: [hybridNode.id, remoteNode.id]})
+      ]);
+
+      tree.selectNodes([jsNode]);
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1); // nothing is sent
+
+      tree.selectNodes([hybridNode]);
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(2);
+      expect(mostRecentJsonRequest()).toContainEventsExactly([
+        new RemoteEvent(adapter.id, 'nodesSelected', {nodeIds: [hybridNode.id]})
+      ]);
+
+      tree.selectNodes([remoteNode]);
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(3);
+      expect(mostRecentJsonRequest()).toContainEventsExactly([
+        new RemoteEvent(adapter.id, 'nodesSelected', {nodeIds: [remoteNode.id]})
+      ]);
+
+      tree.selectNodes([]);
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(4);
+      expect(mostRecentJsonRequest()).toContainEventsExactly([
+        new RemoteEvent(adapter.id, 'nodesSelected', {nodeIds: []})
       ]);
     });
 
@@ -750,13 +772,53 @@ describe('TreeAdapter', () => {
       tree.checkable = true;
 
       tree.checkNodes([jsNode, hybridNode, remoteNode]);
-
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
-
-      const request = mostRecentJsonRequest();
-      expect(request).toContainEventsExactly([
+      expect(mostRecentJsonRequest()).toContainEventsExactly([
         new RemoteEvent(adapter.id, 'nodesChecked', {nodes: [{nodeId: hybridNode.id, checked: true}, {nodeId: remoteNode.id, checked: true}]})
+      ]);
+
+      tree.checkNodes([jsNode, hybridNode, remoteNode], {checked: false});
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(2);
+      expect(mostRecentJsonRequest()).toContainEventsExactly([
+        new RemoteEvent(adapter.id, 'nodesChecked', {nodes: [{nodeId: hybridNode.id, checked: false}, {nodeId: remoteNode.id, checked: false}]})
+      ]);
+
+      tree.checkNodes([jsNode]);
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(2); // nothing is sent
+
+      tree.checkNodes([jsNode, hybridNode, remoteNode], {checked: false});
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(2); // nothing is sent
+
+      tree.checkNodes([hybridNode]);
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(3);
+      expect(mostRecentJsonRequest()).toContainEventsExactly([
+        new RemoteEvent(adapter.id, 'nodesChecked', {nodes: [{nodeId: hybridNode.id, checked: true}]})
+      ]);
+
+      tree.checkNodes([jsNode, hybridNode, remoteNode], {checked: false});
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(4);
+      expect(mostRecentJsonRequest()).toContainEventsExactly([
+        new RemoteEvent(adapter.id, 'nodesChecked', {nodes: [{nodeId: hybridNode.id, checked: false}]})
+      ]);
+
+      tree.checkNodes([remoteNode]);
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(5);
+      expect(mostRecentJsonRequest()).toContainEventsExactly([
+        new RemoteEvent(adapter.id, 'nodesChecked', {nodes: [{nodeId: remoteNode.id, checked: true}]})
+      ]);
+
+      tree.checkNodes([jsNode, hybridNode, remoteNode], {checked: false});
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(6);
+      expect(mostRecentJsonRequest()).toContainEventsExactly([
+        new RemoteEvent(adapter.id, 'nodesChecked', {nodes: [{nodeId: remoteNode.id, checked: false}]})
       ]);
     });
   });
