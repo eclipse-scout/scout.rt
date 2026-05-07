@@ -82,7 +82,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.inBackground = false;
     this.iconId = null;
     this.iconVisible = false;
-    this.mediator = null;
+    this.mediator = this._createMediator();
     this.navigateButtonsVisible = true;
     this.navigateUpInProgress = false;
     this.outlineOverview = null;
@@ -130,7 +130,6 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.addFilter(new DetailTableTreeFilter(), false);
     super._init(model);
 
-    this.mediator = this._createMediator();
     this._installLocalTreeListener();
 
     this.formController = scout.create(FormController, {
