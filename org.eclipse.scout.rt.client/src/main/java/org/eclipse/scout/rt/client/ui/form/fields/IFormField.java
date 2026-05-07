@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.w3c.dom.Element;
 
@@ -66,7 +67,7 @@ import org.w3c.dom.Element;
  *
  * @see IForm
  */
-public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimension, IDataChangeObserver, IContextMenuOwner {
+public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimension, IDataChangeObserver, IContextMenuOwner, IExtensibleObject {
 
   String PROP_VISIBLE = "visible";
   String PROP_MANDATORY = "mandatory";
