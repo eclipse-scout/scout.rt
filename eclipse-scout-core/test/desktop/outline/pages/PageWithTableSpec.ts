@@ -9,7 +9,7 @@
  */
 import {
   arrays, Column, Form, GroupBox, InitModelOf, MaxRowCountContributionDo, NumberColumn, NumberField, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, ResetMenu, scout, SearchFormTableControl, SearchMenu,
-  SearchRequiredTableStatus, SmartColumn, StaticLookupCall, StringField, Table, TableReloadReason, TableRow, WidgetModel
+  SearchRequiredTableStatus, SmartColumn, StaticLookupCall, StringField, Table, TableReloadReason, TableRow, Tree, WidgetModel
 } from '../../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
 
@@ -760,6 +760,24 @@ describe('PageWithTable', () => {
       outline.selectNode(pageWithSearchRequiredWithoutDetailTable);
       expect(pageWithSearchRequiredWithoutDetailTable._loadTableData).not.toHaveBeenCalled();
       expect(pageWithSearchRequiredWithoutDetailTable.detailTable).toBe(null);
+    });
+
+    it('does not fail on init in breadcrumb mode if search required is true and expanded false', () => {
+      let outline = scout.create(Outline, {
+        parent: session.desktop,
+        displayStyle: Tree.DisplayStyle.BREADCRUMB,
+        nodes: [{
+          id: 'Node',
+          objectType: SpecPageWithTable,
+          detailTable: {
+            objectType: Table
+          },
+          searchRequired: true
+        }],
+        selectedNodes: ['Node']
+      });
+      expect(outline.selectedNode()).toBe(outline.nodes[0]);
+      expect(outline.selectedNode().expanded).toBe(true);
     });
   });
 });
