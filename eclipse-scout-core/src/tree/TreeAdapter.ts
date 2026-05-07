@@ -74,8 +74,11 @@ export class TreeAdapter extends ModelAdapter {
   }
 
   protected _onWidgetNodesSelected(event: TreeNodesSelectedEvent) {
-    const selectedNodes = arrays.ensure(this.widget.selectedNodes)
+    const selectedNodes = this.widget.selectedNodes
       .filter(node => TreeAdapter.isRemote(node));
+    if (this.widget.selectedNodes.length && !selectedNodes.length) {
+      return;
+    }
     const nodeIds = this.widget.nodesToIds(selectedNodes);
     this._sendNodesSelected(nodeIds, event.debounce);
   }
@@ -94,7 +97,9 @@ export class TreeAdapter extends ModelAdapter {
   protected _onWidgetNodesChecked(event: TreeNodesCheckedEvent) {
     const nodes = arrays.ensure(event.nodes)
       .filter(node => TreeAdapter.isRemote(node));
-
+    if (!nodes.length) {
+      return;
+    }
     this._sendNodesChecked(nodes);
   }
 
