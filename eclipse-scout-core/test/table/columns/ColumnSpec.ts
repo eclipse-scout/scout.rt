@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BooleanColumn, Cell, Column, ListBoxAriaRules, NumberColumn, scout, Table, Widget} from '../../../src/index';
+import {BooleanColumn, Cell, Column, ListBoxAriaRules, NumberColumn, scout, Table, TableModel, Widget} from '../../../src/index';
 import {JQueryTesting, SpecTable, TableSpecHelper} from '../../../src/testing/index';
 
 describe('Column', () => {
@@ -227,7 +227,7 @@ describe('Column', () => {
   });
 
   describe('textWrap', () => {
-    let table, model, $rows, $cells0, $cell0_0;
+    let table: Table, model: TableModel, $rows: JQuery, $cells0: JQuery, $cell0_0: JQuery;
 
     beforeEach(() => {
       model = helper.createModelFixture(2, 2);
@@ -285,7 +285,7 @@ describe('Column', () => {
   });
 
   describe('initCell', () => {
-    let table, model;
+    let table: Table, model: TableModel;
 
     beforeEach(() => {
       model = helper.createModelFixture(1, 0);
@@ -302,7 +302,7 @@ describe('Column', () => {
     });
 
     it('calls formatValue to format the text', () => {
-      table.columns[0]._formatValue = value => value.toUpperCase();
+      table.columns[0].setFormatter(value => value.toUpperCase());
       table.insertRows([{
         cells: ['cell 1']
       }]);
@@ -312,7 +312,7 @@ describe('Column', () => {
     });
 
     it('calls formatValue to format the text, also for cell objects', () => {
-      table.columns[0]._formatValue = value => value.toUpperCase();
+      table.columns[0].setFormatter(value => value.toUpperCase());
       table.insertRows([{
         cells: [scout.create(Cell, {
           value: 'cell 1'
@@ -324,7 +324,7 @@ describe('Column', () => {
     });
 
     it('does not format the value if a text is provided', () => {
-      table.columns[0]._formatValue = value => value.toUpperCase();
+      table.columns[0].setFormatter(value => value.toUpperCase());
       table.insertRows([{
         cells: [scout.create(Cell, {
           value: 'cell 1',
@@ -337,7 +337,7 @@ describe('Column', () => {
     });
 
     it('sets the value to null if only text is provided', () => {
-      table.columns[0]._formatValue = value => value.toUpperCase();
+      table.columns[0].setFormatter(value => value.toUpperCase());
       table.insertRows([{
         cells: [scout.create(Cell, {
           text: 'cell text 1'
@@ -351,7 +351,7 @@ describe('Column', () => {
   });
 
   describe('setCellValue', () => {
-    let table, model;
+    let table: Table, model: TableModel;
 
     beforeEach(() => {
       model = helper.createModelFixture(2, 0);
@@ -371,8 +371,8 @@ describe('Column', () => {
       expect(row.cells[0].text).toEqual('new cell value');
     });
 
-    it('calls formatValue to format the text', () => {
-      table.columns[0]._formatValue = value => value.toUpperCase();
+    it('calls formatValue to format the value', () => {
+      table.columns[0].setFormatter(value => value.toUpperCase());
       table.insertRows([{
         cells: ['cell 1', 'cell 2']
       }]);
@@ -384,7 +384,74 @@ describe('Column', () => {
       expect(row.cells[0].value).toEqual('new cell value');
       expect(row.cells[0].text).toEqual('NEW CELL VALUE');
     });
+  });
 
+  describe('formatter', () => {
+    it('formats the value', () => {
+      const table = scout.create(Table, {
+        parent: session.desktop,
+        columns: [{
+          objectType: Column,
+          formatter: (value, row, defaultFormatter) => {
+            let text = defaultFormatter(value, row) as string;
+            if (!text) {
+              return text;
+            }
+            return text.match(/.{4}/g).join('-');
+          }
+        }, {
+          objectType: Column
+          // Uses the default formatter _formatValue
+        }]
+      });
+      table.insertRows([{
+        cells: ['1234123412341234', '1234123412341234']
+      }]);
+      expect(table.rows[0].cells[0].value).toEqual('1234123412341234');
+      expect(table.rows[0].cells[0].text).toEqual('1234-1234-1234-1234');
+      expect(table.rows[0].cells[1].value).toEqual('1234123412341234');
+      expect(table.rows[0].cells[1].text).toEqual('1234123412341234');
+
+      table.setCellValue(table.columns[0], table.rows[0], 'abcdabcdabcdabcd');
+      expect(table.rows[0].cells[0].value).toEqual('abcdabcdabcdabcd');
+      expect(table.rows[0].cells[0].text).toEqual('abcd-abcd-abcd-abcd');
+
+      table.setCellValue(table.columns[1], table.rows[0], 'abcdabcdabcdabcd');
+      expect(table.rows[0].cells[1].value).toEqual('abcdabcdabcdabcd');
+      expect(table.rows[0].cells[1].text).toEqual('abcdabcdabcdabcd');
+    });
+
+    it('can be changed dynamically', () => {
+      const table = scout.create(Table, {
+        parent: session.desktop,
+        columns: [{
+          objectType: Column
+        }]
+      });
+      table.insertRows([{
+        cells: ['1234123412341234']
+      }]);
+      expect(table.rows[0].cells[0].value).toEqual('1234123412341234');
+      expect(table.rows[0].cells[0].text).toEqual('1234123412341234');
+
+      table.columns[0].setFormatter((value, row, defaultFormatter) => {
+        let text = defaultFormatter(value, row) as string;
+        if (!text) {
+          return text;
+        }
+        return text.match(/.{4}/g).join('-');
+      });
+      expect(table.rows[0].cells[0].value).toEqual('1234123412341234');
+      expect(table.rows[0].cells[0].text).toEqual('1234-1234-1234-1234');
+
+      table.setCellValue(table.columns[0], table.rows[0], 'abcdabcdabcdabcd');
+      expect(table.rows[0].cells[0].value).toEqual('abcdabcdabcdabcd');
+      expect(table.rows[0].cells[0].text).toEqual('abcd-abcd-abcd-abcd');
+
+      table.columns[0].setFormatter(null);
+      expect(table.rows[0].cells[0].value).toEqual('abcdabcdabcdabcd');
+      expect(table.rows[0].cells[0].text).toEqual('abcdabcdabcdabcd');
+    });
   });
 
   describe('cell getters', () => {

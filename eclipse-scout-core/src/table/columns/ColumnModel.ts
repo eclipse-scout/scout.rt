@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Alignment, Column, ColumnComparator, ObjectModelWithId, ObjectModelWithUuid, Session, Table} from '../../index';
+import {Alignment, Column, ColumnComparator, ColumnFormatter, ObjectModelWithId, ObjectModelWithUuid, Session, Table} from '../../index';
 
 export interface ColumnModel<TValue = string> extends ObjectModelWithUuid<Column<TValue>>, ObjectModelWithId {
   /**
@@ -102,6 +102,17 @@ export interface ColumnModel<TValue = string> extends ObjectModelWithUuid<Column
    * Default is false.
    */
   fixedPosition?: boolean;
+
+  /**
+   * The formatter is responsible to format the {@link Cell.value} so it can be used as {@link Cell.text}.
+   *
+   * The default formatter is passed as parameter and can be called during formatting, if needed.
+   *
+   * Default is {@link Column._formatValue}.
+   *
+   * @see Column.formatValue
+   */
+  formatter?: ColumnFormatter<TValue>;
 
   /**
    * Configures if the table is grouped by this column.
