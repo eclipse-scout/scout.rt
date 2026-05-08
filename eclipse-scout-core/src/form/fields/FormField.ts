@@ -368,7 +368,7 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   /**
-   * Adds the given (functional) error status to the list of error status. Prefer this function over #setErrorStatus
+   * Adds the given (functional) error status to the list of error status. Prefer this function over {@link setErrorStatus}
    * when you don't want to mess with the internal error states of the field (parsing, validation).
    */
   addErrorStatus(errorStatus: string | Status) {
@@ -1643,6 +1643,7 @@ export type ValidationResult = {
   errorStatus?: Status;
   field: FormField;
   label: string;
+  promise?: JQuery.Promise<void>;
   reveal: () => void;
   visitResult?: TreeVisitResult;
 };

@@ -14,7 +14,11 @@ export interface ValueFieldModel<TValue extends TModelValue, TModelValue = TValu
    * Configures the validators to be used when the value of the field needs to be validated (e.g. when the value changes).
    *
    * When the value is validated, every validator is called and has to agree.
-   * If one validation fails, the value is not accepted.
+   * If one validation fails, the value won't be accepted.
+   *
+   * If the validation needs to be asynchronous, the validator can return a promise.
+   * The result of the promise is the validated value that will be passed to the remaining validators once the promise is resolved.
+   * If the promise is rejected, the validation fails.
    *
    * By default, the list contains the default validator which is {@link ValueField._validateValue}.
    */
@@ -51,6 +55,9 @@ export interface ValueFieldModel<TValue extends TModelValue, TModelValue = TValu
   clearable?: ValueFieldClearable;
   /**
    * The main asset of the {@link ValueField}.
+   *
+   * The value is only accepted if it is valid according to the {@link validators}.
+   * If the value is invalid, an {@link FormFieldModel.errorStatus} is shown.
    */
   value?: TModelValue;
   /**

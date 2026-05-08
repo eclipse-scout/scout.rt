@@ -121,7 +121,8 @@ describe('FormLifecycle', () => {
       expect(lifecycleComplete).toBe(expected);
     }
 
-    it('should call _lifecycleValidate function on form', () => {
+    it('should call _lifecycleValidate function on form', async () => {
+      jasmine.clock().uninstall();
       // validate should always be called, even when there is not a single touched field in the form
       let form2 = helper.createFormWithOneField();
       form2.lifecycle = scout.create(SpecLifecycle, {
@@ -132,7 +133,7 @@ describe('FormLifecycle', () => {
         validateCalled = true;
         return Status.ok();
       });
-      form2.ok();
+      await form2.ok();
       expect(validateCalled).toBe(true);
 
       // validate should not be called when there is an invalid field (field is mandatory but empty in this case)
@@ -140,7 +141,8 @@ describe('FormLifecycle', () => {
       let formField = form2.rootGroupBox.fields[0];
       formField.touch();
       formField.setMandatory(true);
-      form2.ok();
+      session.desktop.when('propertyChange:messageBoxes').then(() => helper.closeMessageBoxes());
+      await form2.ok();
       expect(validateCalled).toBe(false);
     });
 

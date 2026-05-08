@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, aria, arrays, EnumObject, focusUtils, FormField, InitModelOf, objects, ParsingFailedStatus, scout, Status, StatusSeverity, StatusType, strings, ValidationFailedStatus, ValueFieldEventMap, ValueFieldModel
+  AbstractLayout, App, aria, arrays, EnumObject, focusUtils, FormField, InitModelOf, objects, ParsingFailedStatus, promises, scout, Status, StatusSeverity, StatusType, strings, ValidationFailedStatus, ValueFieldEventMap, ValueFieldModel
 } from '../../index';
 import $ from 'jquery';
 
@@ -29,6 +29,8 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
   parser: ValueFieldParser<TValue>;
   value: TValue;
   validators: ValueFieldValidator<TValue>[];
+  validatePending: boolean;
+  protected _validatePendingCounter: number;
   protected _updateDisplayTextPending: boolean;
 
   constructor() {
@@ -45,6 +47,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     this.value = null;
     this.validators = [];
     this.validators.push(this._validateValue.bind(this));
+    this._validatePendingCounter = 0;
     this._updateDisplayTextPending = false;
     this.$clearIcon = null;
 
@@ -53,11 +56,11 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
 
   static Clearable = {
     /**
-     * The clear icon is showed when the field has text.
+     * The clear icon is shown when the field has text.
      */
     ALWAYS: 'always',
     /**
-     * The clear icon will be showed when the field is focused and has text.
+     * The clear icon will be shown when the field is focused and has text.
      */
     FOCUSED: 'focused',
     /**
@@ -150,30 +153,40 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
       // executes this._setDisplayText(), which updates the value.
       this._setProperty('displayText', displayText);
       if (!whileTyping) {
-        this.parseAndSetValue(displayText);
+        let result = this.parseAndSetValue(displayText);
+        if (objects.isPromise(result)) {
+          return result.then(() => this._triggerAcceptInput(whileTyping));
+        }
       }
       // Display text may be formatted -> Use this.displayText
       this._triggerAcceptInput(whileTyping);
     }
   }
 
-  parseAndSetValue(displayText: string) {
+  /**
+   * Parses the text using {@link parseValue} and sets the result using {@link setValue}.
+   *
+   * @returns `void` or a promise if an asynchronous validator has been called (see {@link ValueFieldModel.validators})
+   */
+  parseAndSetValue(displayText: string): JQuery.Promise<void> | void {
     this.removeErrorStatus(ParsingFailedStatus);
+    let parsedValue;
     try {
       let event = this.trigger('parse', {
         displayText: displayText
       });
       if (!event.defaultPrevented) {
-        let parsedValue = this.parseValue(displayText);
-        this.setValue(parsedValue);
+        parsedValue = this.parseValue(displayText);
       }
     } catch (error) {
       this._parsingFailed(displayText, error);
+      return;
     }
+    return this.setValue(parsedValue);
   }
 
   protected _parsingFailed(displayText: string, error: any) {
-    $.log.isDebugEnabled() && $.log.debug('Parsing failed for field with id ' + this.id, error);
+    $.log.isInfoEnabled() && $.log.info('Parsing failed for field with id ' + this.id, error);
     let event = this.trigger('parseError', {
       displayText: displayText,
       error: error
@@ -341,18 +354,31 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     this.trigger('clear');
   }
 
-  /** @see ValueFieldModel.value */
-  setValue(value: TValue | TModelValue) {
+  /**
+   * Sets a new value if it is valid.
+   *
+   * The value is first converted to the expected type using {@link _ensureValue}, if supported by the field.
+   * It is then validated using {@link validateValue}.
+   * If the value is valid, it will be formatted using {@link formatValue} which will set the result as {@link displayText}.
+   * If it is not valid, a {@link ValidationFailedStatus} is added using {@link addErrorStatus}.
+   * Finally, a `propertyChange:value` event will be emitted.
+   *
+   * @returns `void` or a promise if an asynchronous validator has been called (see {@link ValueFieldModel.validators})
+   * @see ValueFieldModel.value
+   **/
+  setValue(value: TValue | TModelValue): JQuery.Promise<void> | void {
     // Same code as in Widget#setProperty expect for the equals check
     // -> _setValue has to be called even if the value is equal so that update display text will be executed
     value = this._prepareProperty('value', value);
     if (this.rendered) {
       this._callRemoveProperty('value');
     }
-    this._callSetProperty('value', value);
-    if (this.rendered) {
-      this._callRenderProperty('value');
-    }
+    let result = this._setValue(value);
+    return promises.thenOrNow(result, () => {
+      if (this.rendered) {
+        this._callRenderProperty('value');
+      }
+    });
   }
 
   /**
@@ -371,14 +397,10 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     return value as TValue;
   }
 
-  protected _setValue(value: TValue | TModelValue) {
-    // When widget is initialized with a given errorStatus and a value -> don't remove the error
-    // status. This is a typical case for Scout Classic: field has a ParsingFailedError and user
-    // hits reload.
-    if (this.initialized) {
-      this.removeErrorStatus(ParsingFailedStatus);
-      this.removeErrorStatus(ValidationFailedStatus);
-    }
+  /**
+   * @returns `void` or a promise if an asynchronous validator has been called (see {@link ValueFieldModel.validators})
+   */
+  protected _setValue(value: TValue | TModelValue): JQuery.Promise<void> | void {
     let oldValue = this.value;
     let typedValue = null;
     try {
@@ -388,13 +410,169 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
       return;
     }
 
+    let valueOrPromise: TValue | JQuery.Promise<TValue>;
     try {
-      this.value = this.validateValue(typedValue);
+      valueOrPromise = this.validateValue(typedValue);
     } catch (error) {
       this._validationFailed(typedValue, error);
       return;
     }
 
+    if (objects.isPromise(valueOrPromise)) {
+      this._setValidatePending(true);
+      valueOrPromise.then(
+        validatedValue => {
+          if (this.destroyed) {
+            return;
+          }
+          if (this._validatePendingCounter === 1) {
+            this._validationSucceeded(validatedValue, oldValue);
+          }
+          this._setValidatePending(false);
+        },
+        // Don't use catch() to not catch errors that happen in _validationSucceeded to make sure it behaves the same as the synchronous implementation
+        error => {
+          if (this.destroyed) {
+            return;
+          }
+          if (this._validatePendingCounter === 1) {
+            this._validationFailed(typedValue, error);
+          }
+          this._setValidatePending(false);
+        }
+      ).catch(error => {
+        // Error in succeeded or failed
+        // Just calling errorHandler.handle() does not create fatal errors if error is a string or a Status
+        let errorHandler = App.get().errorHandler;
+        errorHandler.analyzeError(error).then(errorInfo => errorHandler.handleErrorInfo({
+          ...errorInfo,
+          showAsFatalError: true
+        }));
+      });
+      return this.when('propertyChange:validatePending').then(() => undefined);
+    }
+    this._validationSucceeded(valueOrPromise, oldValue);
+  }
+
+  protected _setValidatePending(validatePending: boolean) {
+    let counter = Math.max(validatePending ? this._validatePendingCounter + 1 : this._validatePendingCounter - 1, 0);
+    this._validatePendingCounter = counter;
+    this._setProperty('validatePending', counter > 0);
+  }
+
+  /**
+   * Validates the value by executing the {@link validators}. If a new value is the result, it will be set.
+   *
+   * @returns `void` or a promise if an asynchronous validator has been called (see {@link ValueFieldModel.validators})
+   */
+  validate(): JQuery.Promise<void> | void {
+    return this._setValue(this.value);
+  }
+
+  /**
+   * @param validator the validator to be added.
+   *     A validator is a function that accepts a raw value and either returns the validated value or
+   *     throws an {@link Error}, a {@link Status} or an error message as `string` if the value is invalid.
+   * @param revalidate True, to revalidate the value, false to just add the validator and do nothing else. Default is true.
+   * @see ValueFieldModel.validators
+   */
+  addValidator(validator: ValueFieldValidator<TValue>, revalidate?: boolean) {
+    let validators = this.validators.slice();
+    validators.push(validator);
+    this.setValidators(validators, revalidate);
+  }
+
+  /**
+   * @param validator the validator to be removed
+   * @param revalidate True, to revalidate the value, false to just remove the validator and do nothing else. Default is true.
+   * @see ValueFieldModel.validators
+   */
+  removeValidator(validator: ValueFieldValidator<TValue>, revalidate?: boolean) {
+    let validators = this.validators.slice();
+    arrays.remove(validators, validator);
+    this.setValidators(validators, revalidate);
+  }
+
+  /**
+   * Replaces all existing validators with the given one.
+   * If you want to add multiple validators, use {@link addValidator}.
+   *
+   * Remember calling the default validator which is passed as parameter to the validate function, if needed.
+   *
+   * @param validator the new validator which replaces every other. If null, the default validator is used.
+   *     A validator is a function that accepts a raw value and either returns the validated value or
+   *     throws an {@link Error}, a {@link Status} or an error message as `string` if the value is invalid.
+   */
+  setValidator(validator: ValueFieldValidator<TValue>, revalidate?: boolean) {
+    if (!validator) {
+      validator = this._validateValue.bind(this);
+    }
+    let validators = [];
+    if (validator) {
+      validators = [validator];
+    }
+    this.setValidators(validators, revalidate);
+  }
+
+  /** @see ValueFieldModel.validators */
+  setValidators(validators: ValueFieldValidator<TValue>[], revalidate?: boolean) {
+    this.setProperty('validators', validators);
+    if (this.initialized && scout.nvl(revalidate, true)) {
+      this.validate();
+    }
+  }
+
+  /**
+   * Validates the given value using the {@link ValueFieldModel.validators}.
+   *
+   * @param value the value to be validated
+   * @returns the validated value or a promise if an asynchronous validator has been called (see {@link ValueFieldModel.validators})
+   * @throws a message, a {@link Status} or an {@link Error} if the validation fails
+   */
+  validateValue(value: TValue): TValue | JQuery.Promise<TValue> {
+    let defaultValidator = this._validateValue.bind(this);
+
+    // Ensure value is never undefined (necessary for updateSaveNeeded and should make it easier in general)
+    let ensureNotUndefined = v => scout.nvl(v, null);
+    let validators = [...this.validators, ensureNotUndefined];
+
+    return this._validateValueImpl(value, validators, defaultValidator);
+  }
+
+  protected _validateValueImpl(value: TValue, validators: ValueFieldValidator<TValue>[], defaultValidator: ValueFieldValidator<TValue>): TValue | JQuery.Promise<TValue> {
+    for (let i = 0; i < validators.length; i++) {
+      const validator = validators[i];
+      const valueOrPromise = validator(value, defaultValidator);
+      if (objects.isPromise(valueOrPromise)) {
+        return valueOrPromise.then(result => this._validateValueImpl(result, validators.slice(i + 1), defaultValidator));
+      }
+      value = valueOrPromise as TValue;
+    }
+    return value;
+  }
+
+  /**
+   * @returns the validated value or a promise if the validation happens asynchronously
+   * @throws a message, a {@link Status} or an {@link Error} if the validation fails
+   */
+  protected _validateValue(value: TValue): TValue | JQuery.Promise<TValue> {
+    if (typeof value === 'string' && value === '') {
+      // Convert empty string to null.
+      // Not using strings.nullIfEmpty is by purpose because it also removes white space characters which may not be desired here
+      value = null;
+    }
+    return value;
+  }
+
+  protected _validationSucceeded(newValue: TValue, oldValue: TValue) {
+    // When widget is initialized with a given errorStatus and a value -> don't remove the error
+    // status. This is a typical case for Scout Classic: field has a ParsingFailedError and user
+    // hits reload.
+    if (this.initialized) {
+      this.removeErrorStatus(ParsingFailedStatus);
+      this.removeErrorStatus(ValidationFailedStatus);
+    }
+    this.value = newValue;
     this._updateDisplayText();
     if (this._valueEquals(oldValue, this.value)) {
       return;
@@ -421,105 +599,19 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     // NOP
   }
 
-  protected override _getCurrentMenuTypes(): string[] {
-    if (objects.isNullOrUndefined(this.value)) {
-      return [...super._getCurrentMenuTypes(), ValueField.MenuType.Null];
-    }
-    return [...super._getCurrentMenuTypes(), ValueField.MenuType.NotNull];
-  }
-
-  /**
-   * Validates the value by executing the validators. If a new value is the result, it will be set.
-   */
-  validate() {
-    this._setValue(this.value);
-  }
-
-  /**
-   * @param validator the validator to be added.
-   *     A validator is a function that accepts a raw value and either returns the validated value or
-   *     throws an Error, a Status or an error message (string) if the value is invalid.
-   * @param revalidate True, to revalidate the value, false to just add the validator and do nothing else. Default is true.
-   */
-  addValidator(validator: ValueFieldValidator<TValue>, revalidate?: boolean) {
-    let validators = this.validators.slice();
-    validators.push(validator);
-    this.setValidators(validators, revalidate);
-  }
-
-  /**
-   * @param validator the validator to be removed
-   * @param revalidate True, to revalidate the value, false to just remove the validator and do nothing else. Default is true.
-   */
-  removeValidator(validator: ValueFieldValidator<TValue>, revalidate?: boolean) {
-    let validators = this.validators.slice();
-    arrays.remove(validators, validator);
-    this.setValidators(validators, revalidate);
-  }
-
-  /**
-   * Replaces all existing validators with the given one. If you want to add multiple validators, use {@link #addValidator}.
-   * <p>
-   * Remember calling the default validator which is passed as parameter to the validate function, if needed.
-   *
-   * @param validator the new validator which replaces every other. If null, the default validator is used.
-   *     A validator is a function that accepts a raw value and either returns the validated value or
-   *     throws an Error, a Status or an error message (string) if the value is invalid.
-   */
-  setValidator(validator: ValueFieldValidator<TValue>, revalidate?: boolean) {
-    if (!validator) {
-      validator = this._validateValue.bind(this);
-    }
-    let validators = [];
-    if (validator) {
-      validators = [validator];
-    }
-    this.setValidators(validators, revalidate);
-  }
-
-  setValidators(validators: ValueFieldValidator<TValue>[], revalidate?: boolean) {
-    this.setProperty('validators', validators);
-    if (this.initialized && scout.nvl(revalidate, true)) {
-      this.validate();
-    }
-  }
-
-  /**
-   * @param the value to be validated
-   * @returns the validated value
-   * @throws a message, a {@link Status} or an error if the validation fails
-   */
-  validateValue(value: TValue): TValue {
-    let defaultValidator = this._validateValue.bind(this);
-    this.validators.forEach(validator => {
-      value = validator(value, defaultValidator);
-    });
-    value = scout.nvl(value, null); // Ensure value is never undefined (necessary for updateSaveNeeded and should make it easier generally)
-    return value;
-  }
-
-  /**
-   * @returns the validated value
-   * @throws a message, a {@link Status} or an error if the validation fails
-   */
-  protected _validateValue(value: TValue): TValue {
-    if (typeof value === 'string' && value === '') {
-      // Convert empty string to null.
-      // Not using strings.nullIfEmpty is by purpose because it also removes white space characters which may not be desired here
-      value = null;
-    }
-    return value;
-  }
-
   protected _validationFailed(value: TValue, error: any) {
-    $.log.isDebugEnabled() && $.log.debug('Validation failed for field with id ' + this.id, error);
+    $.log.isInfoEnabled() && $.log.info('Validation failed for field with id ' + this.id, error);
+    this.removeErrorStatus(ParsingFailedStatus);
+    this.removeErrorStatus(ValidationFailedStatus);
     let status = this._createValidationFailedStatus(value, error);
     this.addErrorStatus(status);
     this._updateDisplayText(value);
   }
 
   protected _ensureValueFailed(value: TModelValue, error: any) {
-    $.log.isDebugEnabled() && $.log.debug('EnsureValue failed for field with id ' + this.id, error);
+    $.log.isInfoEnabled() && $.log.info('EnsureValue failed for field with id ' + this.id, error);
+    this.removeErrorStatus(ParsingFailedStatus);
+    this.removeErrorStatus(ValidationFailedStatus);
     let status = this._createValidationFailedStatus(value, error);
     this.addErrorStatus(status);
     this.setDisplayText(this._formatRawValue(value));
@@ -660,6 +752,13 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     return this.value === null || this.value === undefined || (Array.isArray(this.value) && arrays.empty(this.value));
   }
 
+  protected override _getCurrentMenuTypes(): string[] {
+    if (objects.isNullOrUndefined(this.value)) {
+      return [...super._getCurrentMenuTypes(), ValueField.MenuType.Null];
+    }
+    return [...super._getCurrentMenuTypes(), ValueField.MenuType.NotNull];
+  }
+
   // ==== static helper methods ==== //
 
   /**
@@ -702,6 +801,6 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
 
 export type ValueFieldClearable = EnumObject<typeof ValueField.Clearable>;
 export type ValueFieldMenuType = EnumObject<typeof ValueField.MenuType>;
-export type ValueFieldValidator<TValue> = (value: TValue, defaultValidator?: ValueFieldValidator<TValue>) => TValue;
+export type ValueFieldValidator<TValue> = (value: TValue, defaultValidator?: ValueFieldValidator<TValue>) => TValue | JQuery.Promise<TValue>;
 export type ValueFieldFormatter<TValue> = (value: TValue, defaultFormatter?: ValueFieldFormatter<TValue>) => string | JQuery.Promise<string>;
 export type ValueFieldParser<TValue> = (displayText: string, defaultParser?: ValueFieldParser<TValue>) => TValue;

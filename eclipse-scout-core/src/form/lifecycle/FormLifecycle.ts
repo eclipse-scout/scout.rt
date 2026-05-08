@@ -48,12 +48,16 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
   static validateFormFields<TValidationResult extends ValidationResult = ValidationResult>(widget: Form | FormField): ElementsValidationResult<TValidationResult> {
     const missingElements = [];
     const invalidElements = [];
+    const pendingElements = [];
 
     widget.visitFields((field: FormField) => {
       let result = field.getValidationResult();
       if (!result.valid) {
-        // error status has priority over mandatory
-        if (result.errorStatus && result.errorStatus.isError()) { // ERROR
+        if (result.promise) {
+          // async validation is still pending
+          pendingElements.push(result);
+        } else if (result.errorStatus && result.errorStatus.isError()) { // ERROR
+          // errorStatus has priority over mandatory
           invalidElements.push(result);
         } else if (!result.validByMandatory) { // empty mandatory
           missingElements.push(result);
@@ -67,7 +71,7 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
       return result.visitResult;
     });
 
-    return {missingElements, invalidElements};
+    return {missingElements, invalidElements, pendingElements};
   }
 
   protected override _invalidElementText(element: TValidationResult): string {

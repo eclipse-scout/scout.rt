@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractLayout, DateField, DateFieldAcceptInputEvent, DatePicker, DatePickerTouchPopupLayout, DatePickerTouchPopupModel, InitModelOf, ParsingFailedStatus, scout, TouchPopup} from '../index';
+import {AbstractLayout, DateField, DateFieldAcceptInputEvent, DatePicker, DatePickerTouchPopupLayout, DatePickerTouchPopupModel, InitModelOf, ParsingFailedStatus, promises, scout, TouchPopup} from '../index';
 
 export class DatePickerTouchPopup extends TouchPopup {
   declare model: DatePickerTouchPopupModel;
@@ -52,7 +52,11 @@ export class DatePickerTouchPopup extends TouchPopup {
     this._touchField.setErrorStatus(event.errorStatus);
     let hasParsingFailedError = event.errorStatus ? event.errorStatus.containsStatus(ParsingFailedStatus) : false;
     if (!hasParsingFailedError) {
-      this._touchField.setValue(event.value);
+      let result = this._touchField.setValue(event.value);
+      promises.thenOrNow(result, () => {
+        this._touchField._triggerAcceptInput(event.whileTyping);
+      });
+      return;
     }
     this._touchField._triggerAcceptInput(event.whileTyping);
   }

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {PromiseCreator} from '../index';
+import {objects, PromiseCreator} from '../index';
 import $ from 'jquery';
 
 export const promises = {
@@ -119,6 +119,33 @@ export const promises = {
         deferred.resolve.apply(deferred, [promiseCreator.results]);
       }
     }
+  },
+
+  /**
+   * If the given value is a promise, the callback function is executed asynchronously once the promise resolves.
+   * Otherwise, the callback function is executed immediately.
+   *
+   * @value a promise or a value that will be passed to the callback function
+   * @returns a promise or the result of the callback function
+   */
+  thenOrNow<TValue, TResult>(value: TValue | JQuery.Promise<TValue>, callback: (value: TValue) => TResult): TResult | JQuery.Promise<TResult> {
+    if (objects.isPromise(value)) {
+      return value.then(callback);
+    }
+    return callback(value);
+  },
+
+  /**
+   * Ensures the given value is a promise.
+   *
+   * If the value is a promise, that promise is returned.
+   * Otherwise, a new resolved promise for the value is returned.
+   */
+  ensure<T>(value: T | JQuery.Promise<T>): JQuery.Promise<T> {
+    if (objects.isPromise(value)) {
+      return value;
+    }
+    return $.resolvedPromise(value);
   }
 };
 

@@ -454,17 +454,30 @@ export class Form extends Widget implements FormModel, DisplayParent {
             // If form has been closed right after it was opened ignore the load result
             return;
           }
+
           this.setData(data);
           this.importData();
-          this._setFormLoading(false);
-          this.formLoaded = true;
-          this.trigger('load');
+
+          // Wait for async field validators to complete so the value is set when the form loading finishes
+          let pendingFields = FormLifecycle.validateFormFields(this).pendingElements;
+          if (pendingFields.length) {
+            return $.promiseAll(pendingFields.map(field => field.promise))
+              .then(() => this._loadingDone());
+          }
+
+          this._loadingDone();
         })
         .always(() => this._setFormLoading(false));
     } catch (error) {
       this._setFormLoading(false);
       throw error;
     }
+  }
+
+  protected _loadingDone() {
+    this._setFormLoading(false);
+    this.formLoaded = true;
+    this.trigger('load');
   }
 
   protected _setFormLoading(loading: boolean) {

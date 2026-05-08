@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -88,13 +88,13 @@ export abstract class BasicField<TValue extends TModelValue, TModelValue = TValu
     }
   }
 
-  override acceptInput(whileTyping?: boolean) {
+  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
     if (this._displayTextModifiedTimeoutId !== null) {
       // Cancel pending "acceptInput(true)" call (see _onDisplayTextModified) and execute it now
       clearTimeout(this._displayTextModifiedTimeoutId);
       this._displayTextModifiedTimeoutId = null;
     }
-    super.acceptInput(whileTyping);
+    return super.acceptInput(whileTyping);
   }
 
   protected override _renderDisplayText() {

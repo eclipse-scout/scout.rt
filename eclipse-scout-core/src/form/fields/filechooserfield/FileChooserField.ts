@@ -135,7 +135,7 @@ export class FileChooserField extends ValueField<File> implements FileChooserFie
     this.fileInput.browse();
   }
 
-  protected override _validateValue(value: File): File {
+  protected override _validateValue(value: File): File | JQuery.Promise<File> {
     this.fileInput.validateMaximumUploadSize(value);
     return value;
   }

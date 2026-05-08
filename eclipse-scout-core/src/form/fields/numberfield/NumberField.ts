@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -153,7 +153,7 @@ export class NumberField extends BasicField<number, number | string> implements 
     return typedValue;
   }
 
-  protected override _validateValue(value: number): number {
+  protected override _validateValue(value: number): number | JQuery.Promise<number> {
     if (objects.isNullOrUndefined(value)) {
       return value;
     }

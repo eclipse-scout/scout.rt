@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  DateField, DateFieldModel, DateFieldPredictionResult, DateFormat, DatePicker, DatePickerTouchPopup, dates, FullModelOf, keys, Popup, RemoteEvent, scout, Status, TimePicker, TimePickerTouchPopup, ValidationFailedStatus
+  DateField, DateFieldAcceptInputEvent, DateFieldModel, DateFieldPredictionResult, DateFormat, DatePicker, DatePickerTouchPopup, dates, FullModelOf, keys, Popup, RemoteEvent, scout, Status, TimePicker, TimePickerTouchPopup,
+  ValidationFailedStatus
 } from '../../../../src/index';
 import {FormSpecHelper, JQueryTesting} from '../../../../src/testing/index';
 
@@ -306,6 +307,49 @@ describe('DateField', () => {
       expect(field.errorStatus.children[0] instanceof ValidationFailedStatus).toBe(true);
     });
 
+    it('triggers acceptInput with the correct value if input changed', () => {
+      let field = scout.create(SpecDateField, {parent: session.desktop});
+      field.render();
+
+      let acceptInputEvent: DateFieldAcceptInputEvent;
+      field.on('acceptInput', event => {
+        acceptInputEvent = event;
+      });
+      field.$dateField.val('22.05.2026');
+      field.acceptInput();
+      expect(acceptInputEvent.value.toISOString()).toBe(dates.create('2026-05-22 00:00:00.000').toISOString());
+
+      acceptInputEvent = null;
+      JQueryTesting.triggerKeyDown(field.$dateField, keys.DOWN); // Changes displayText property -> acceptInput needs to compare the value if input has changed
+      field.acceptInput();
+      expect(acceptInputEvent.value.toISOString()).toBe(dates.create('2026-05-23 00:00:00.000').toISOString());
+    });
+
+    it('triggers acceptInput with the correct value if input changed even with async validators', async () => {
+      jasmine.clock().uninstall();
+      let field = scout.create(SpecDateField, {parent: session.desktop});
+      field.render();
+      field.addValidator(value => $.resolvedPromise(value));
+
+      let acceptInputEvent: DateFieldAcceptInputEvent;
+      field.on('acceptInput', event => {
+        acceptInputEvent = event;
+      });
+      field.$dateField.val('22.05.2026');
+      let promise = field.acceptInput();
+      expect(acceptInputEvent).toBeUndefined();
+
+      await promise;
+      expect(acceptInputEvent.value.toISOString()).toBe(dates.create('2026-05-22 00:00:00.000').toISOString());
+
+      acceptInputEvent = undefined;
+      JQueryTesting.triggerKeyDown(field.$dateField, keys.DOWN); // Changes displayText property -> acceptInput needs to compare the value if input has changed
+      promise = field.acceptInput();
+      expect(acceptInputEvent).toBeUndefined();
+
+      await promise;
+      expect(acceptInputEvent.value.toISOString()).toBe(dates.create('2026-05-23 00:00:00.000').toISOString());
+    });
   });
 
   describe('acceptDate', () => {
@@ -494,7 +538,6 @@ describe('DateField', () => {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(0);
     });
-
   });
 
   describe('validation', () => {
@@ -518,7 +561,6 @@ describe('DateField', () => {
 
       expect(mostRecentJsonRequest()).toBeUndefined();
     });
-
   });
 
   describe('picker', () => {
@@ -578,6 +620,45 @@ describe('DateField', () => {
       expect(dateField.value.toISOString()).toBe(dates.create('2016-02-01 00:00:00.000').toISOString());
     });
 
+    it('triggers acceptInput event if a date is selected', () => {
+      let field = scout.create(DateField, {
+        parent: session.desktop,
+        autoDate: '2026-05-22'
+      });
+      field.render();
+      focusAndOpenDatePicker(field);
+
+      let acceptInputEvent: DateFieldAcceptInputEvent;
+      field.on('acceptInput', event => {
+        acceptInputEvent = event;
+      });
+      JQueryTesting.triggerClick(find$Day(field.getDatePicker(), new Date(2026, 4, 1)));
+      expect(acceptInputEvent.value.toISOString()).toBe(dates.create('2026-05-01 00:00:00.000').toISOString());
+      expect(field.popup).toBe(null);
+    });
+
+    it('triggers acceptInput event if a date is selected even with async validators', async () => {
+      jasmine.clock().uninstall();
+      let field = scout.create(DateField, {
+        parent: session.desktop,
+        autoDate: '2026-05-22'
+      });
+      field.addValidator(value => $.resolvedPromise(value));
+      field.render();
+      field.$dateField.focus();
+      openDatePicker(field);
+
+      let acceptInputEvent: DateFieldAcceptInputEvent;
+      field.on('acceptInput', event => {
+        acceptInputEvent = event;
+      });
+      JQueryTesting.triggerClick(find$Day(field.getDatePicker(), new Date(2026, 4, 1)));
+      expect(acceptInputEvent).toBeUndefined();
+
+      await field.when('acceptInput');
+      expect(acceptInputEvent.value.toISOString()).toBe(dates.create('2026-05-01 00:00:00.000').toISOString());
+      expect(field.popup).toBe(null);
+    });
   });
 
   describe('key handling', () => {

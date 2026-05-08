@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, BasicField, DesktopNotification, EnumObject, fields, InitModelOf, InputFieldKeyStrokeContext, JQueryWheelEvent, MaxLengthHandler, objects, scout, Status, StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke, StringFieldEventMap,
-  StringFieldLayout, StringFieldModel, strings, texts
+  aria, BasicField, DesktopNotification, EnumObject, fields, InitModelOf, InputFieldKeyStrokeContext, JQueryWheelEvent, MaxLengthHandler, objects, promises, scout, Status, StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke,
+  StringFieldEventMap, StringFieldLayout, StringFieldModel, strings, texts
 } from '../../../index';
 
 export class StringField extends BasicField<string> implements StringFieldModel {
@@ -452,9 +452,11 @@ export class StringField extends BasicField<string> implements StringFieldModel 
 
   /** @internal */
   _onIconClick() {
-    this.acceptInput();
-    this.$field.focus();
-    this.trigger('action');
+    let result = this.acceptInput();
+    promises.thenOrNow(result, () => {
+      this.$field.focus();
+      this.trigger('action');
+    });
   }
 
   protected _onSelectionChangingAction(event: JQuery.TriggeredEvent) {
@@ -534,7 +536,7 @@ export class StringField extends BasicField<string> implements StringFieldModel 
     });
   }
 
-  protected override _validateValue(value: string): string {
+  protected override _validateValue(value: string): string | JQuery.Promise<string> {
     if (objects.isNullOrUndefined(value)) {
       return value;
     }
@@ -556,14 +558,14 @@ export class StringField extends BasicField<string> implements StringFieldModel 
     return strings.empty(this.value);
   }
 
-  override acceptInput(whileTyping?: boolean) {
+  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
     let displayText = scout.nvl(this._readDisplayText(), '');
     if (this.inputObfuscated && displayText !== '') {
       // Disable obfuscation if user has typed text (on focus, field will be cleared if obfuscated, so any typed text is new text).
       this.inputObfuscated = false;
     }
 
-    super.acceptInput(whileTyping);
+    return super.acceptInput(whileTyping);
   }
 
   protected override _onFieldFocus(event: JQuery.FocusEvent) {
