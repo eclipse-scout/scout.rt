@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LookupRow, objects, ProposalFieldEventMap, ProposalFieldModel, SmartField, SmartFieldLookupResult, strings} from '../../../index';
+import {LookupRow, objects, promises, ProposalFieldEventMap, ProposalFieldModel, SmartField, SmartFieldLookupResult, strings} from '../../../index';
 import $ from 'jquery';
 
 export class ProposalField extends SmartField<string> implements ProposalFieldModel {
@@ -83,7 +83,7 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
     return value;
   }
 
-  protected override _validateValue(value: string): string {
+  protected override _validateValue(value: string): string | JQuery.Promise<string> {
     if (objects.isNullOrUndefined(value)) {
       return value;
     }
@@ -153,8 +153,10 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
 
   protected _customTextAccepted(searchText: string) {
     this._setLookupRow(null); // only reset property lookup
-    this._setValue(searchText);
-    this._inputAccepted(true, false);
+    let result = this._setValue(searchText);
+    promises.thenOrNow(result, () => {
+      this._inputAccepted(true, false);
+    });
   }
 
   override getValueForSelection(): string {

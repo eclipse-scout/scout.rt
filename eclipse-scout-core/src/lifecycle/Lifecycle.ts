@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, arrays, ElementsValidationStatus, EventEmitter, InitModelOf, LifecycleEventMap, LifecycleModel, LifecycleValidateEvent, MessageBox, MessageBoxes, objects, ObjectWithType, scout, Session, SomeRequired, Status, StatusSeverity, Widget
+  App, arrays, ElementsValidationStatus, EventEmitter, InitModelOf, LifecycleEventMap, LifecycleModel, LifecycleValidateEvent, MessageBox, MessageBoxes, objects, ObjectWithType, promises, scout, Session, SomeRequired, Status,
+  StatusSeverity, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -20,7 +21,7 @@ import $ from 'jquery';
  * - invalidElementsWarningTextKey
  * - saveChangesQuestionTextKey
  */
-export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status }> extends EventEmitter implements LifecycleModel, ObjectWithType {
+export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status; promise?: JQuery.Promise<void> }> extends EventEmitter implements LifecycleModel, ObjectWithType {
   declare model: LifecycleModel;
   declare initModel: SomeRequired<this['model'], 'widget'>;
   declare eventMap: LifecycleEventMap<TValidationResult>;
@@ -243,14 +244,14 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
   }
 
   protected _validate(): JQuery.Promise<Status> {
-    let elementStatus = this._validateElements();
-    if (elementStatus.isError()) {
-      return $.resolvedPromise(elementStatus);
-    }
-
-    const widgetValidation = this._validateWidget();
-    const promise = objects.isPromise(widgetValidation) ? widgetValidation : $.resolvedPromise(widgetValidation);
-    return promise.then(widgetStatus => this._combineValidationStatuses(elementStatus, widgetStatus));
+    return this._validateElements().then(elementStatus => {
+      if (elementStatus.isError()) {
+        return elementStatus;
+      }
+      const widgetValidation = this._validateWidget();
+      return promises.ensure(widgetValidation)
+        .then(widgetStatus => this._combineValidationStatuses(elementStatus, widgetStatus));
+    });
   }
 
   protected _combineValidationStatuses(elementStatus: Status, widgetStatus: Status): Status {
@@ -260,19 +261,24 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
   /**
    * Validates all elements (i.e. form-fields) covered by the lifecycle and checks for missing or invalid elements.
    */
-  protected _validateElements(): Status {
-    const elementsValidationResult = this.invalidElements();
+  protected _validateElements(): JQuery.Promise<Status> {
+    const validationResult = this.invalidElements();
+    if (validationResult.pendingElements.length > 0) {
+      return $.promiseAll(validationResult.pendingElements.map(element => element.promise))
+        .then(() => this._validateElements());
+    }
+
     let severity: StatusSeverity;
     let message: string;
-    if (elementsValidationResult.missingElements.length === 0 && elementsValidationResult.invalidElements.length === 0) {
+    if (validationResult.missingElements.length === 0 && validationResult.invalidElements.length === 0) {
       severity = Status.Severity.OK;
     } else {
-      severity = elementsValidationResult.missingElements.length
+      severity = validationResult.missingElements.length
         ? Status.Severity.ERROR
-        : arrays.max(elementsValidationResult.invalidElements.map(e => e.errorStatus ? e.errorStatus.severity : 0)) as StatusSeverity;
-      message = this._createInvalidElementsMessageHtml(elementsValidationResult.missingElements, elementsValidationResult.invalidElements);
+        : arrays.max(validationResult.invalidElements.map(e => e.errorStatus ? e.errorStatus.severity : 0)) as StatusSeverity;
+      message = this._createInvalidElementsMessageHtml(validationResult.missingElements, validationResult.invalidElements);
     }
-    return scout.create(ElementsValidationStatus<TValidationResult>, {severity, message, elementsValidationResult});
+    return $.resolvedPromise(scout.create(ElementsValidationStatus<TValidationResult>, {severity, message, elementsValidationResult: validationResult}));
   }
 
   protected _revealInvalidElement(invalidElement: TValidationResult) {
@@ -295,7 +301,8 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
   invalidElements(): ElementsValidationResult<TValidationResult> {
     return {
       missingElements: [],
-      invalidElements: []
+      invalidElements: [],
+      pendingElements: []
     };
   }
 
@@ -395,5 +402,14 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
   }
 }
 
-export type ElementsValidationResult<TValidationResult extends { errorStatus?: Status }> = { missingElements: TValidationResult[]; invalidElements: TValidationResult[] };
-export type TextListWithTitle = { title: string; elements: string[]; html?: boolean };
+export type ElementsValidationResult<TValidationResult extends { errorStatus?: Status }> = {
+  missingElements: TValidationResult[];
+  invalidElements: TValidationResult[];
+  pendingElements: TValidationResult[];
+};
+
+export type TextListWithTitle = {
+  title: string;
+  elements: string[];
+  html?: boolean;
+};

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -258,7 +258,7 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
   /**
    * Search and then select the button with the corresponding radioValue
    */
-  protected override _validateValue(value: TValue): TValue {
+  protected override _validateValue(value: TValue): TValue | JQuery.Promise<TValue> {
     super._validateValue(value);
 
     if (!this.initialized && this.lookupCall) {

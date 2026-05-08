@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, FormField, ParsingFailedStatus, scout, Status, StringField, ValueField} from '../../../src/index';
+import {ajax, AjaxCall, App, arrays, FormField, NumberField, ParsingFailedStatus, scout, Status, StringField, ValueField} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper} from '../../../src/testing/index';
 import {ValueFieldValidator} from '../../../src/form/fields/ValueField';
 
@@ -181,6 +181,15 @@ describe('ValueField', () => {
   });
 
   describe('setValue', () => {
+    class SpecStringField extends StringField {
+      override _validationSucceeded(newValue: string, oldValue: string) {
+        super._validationSucceeded(newValue, oldValue);
+      }
+
+      override _validationFailed(value: string, error: any) {
+        super._validationFailed(value, error);
+      }
+    }
 
     it('sets the value, formats it and sets the display text', () => {
       let field = helper.createField(StringField);
@@ -273,6 +282,227 @@ describe('ValueField', () => {
       expect(field.displayText).toBe('');
     });
 
+    it('waits for the async validators to complete before removing the error status', async () => {
+      jasmine.clock().uninstall();
+      let field = helper.createField(NumberField);
+      field.setValue('invalid number');
+      expect(field.errorStatus).toBeInstanceOf(Status);
+
+      field.addValidator(value => $.resolvedPromise(value));
+      field.setValue(3);
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).toBeInstanceOf(Status);
+
+      await field.when('propertyChange:validatePending');
+      expect(field.value).toBe(3);
+      expect(field.errorStatus).toBe(null);
+    });
+
+    it('only processes the success result of the last async validator if the previous ones have been aborted', async () => {
+      jasmine.clock().uninstall();
+      let field = scout.create(SpecStringField, {
+        parent: session.desktop
+      });
+      spyOn(field, '_validationSucceeded').and.callThrough();
+      spyOn(field, '_validationFailed').and.callThrough();
+
+      let call: AjaxCall;
+      field.addValidator(value => {
+        call?.abort();
+        call = ajax.createCall({
+          url: 'validate',
+          method: 'POST',
+          data: value,
+          dataType: 'text'
+        });
+        return call.call();
+      }, false);
+      field.setValue('x');
+      expect(field.value).toBe(null);
+
+      field.setValue('y');
+      let request = jasmine.Ajax.requests.mostRecent();
+      request.respondWith({
+        status: 200,
+        responseText: request.params + ' validated'
+      });
+      await field.when('propertyChange:validatePending');
+      expect(field.value).toBe('y validated');
+      expect(field.displayText).toBe('y validated');
+      expect(field._validationSucceeded).toHaveBeenCalledTimes(1);
+      expect(field._validationFailed).toHaveBeenCalledTimes(0);
+    });
+
+    it('only processes the error result of the last async validator if the previous ones have been aborted', async () => {
+      jasmine.clock().uninstall();
+
+      let field = scout.create(SpecStringField, {
+        parent: session.desktop
+      });
+      spyOn(field, '_validationSucceeded').and.callThrough();
+      spyOn(field, '_validationFailed').and.callThrough();
+
+      let call: AjaxCall;
+      field.addValidator(value => {
+        call?.abort();
+        call = ajax.createCall({
+          url: 'validate',
+          method: 'POST',
+          data: value,
+          dataType: 'text'
+        });
+        return call.call().then(response => response);
+      }, false);
+      field.setValue('x');
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).toBe(null);
+
+      field.setValue('y');
+      let request = jasmine.Ajax.requests.mostRecent();
+      request.respondWith({
+        status: 500,
+        responseText: request.params + ' validated'
+      });
+      await field.when('propertyChange:validatePending');
+      expect(field.value).toBe(null);
+      expect(field.displayText).toBe('y');
+      expect(field.errorStatus.message).toBe('[undefined text: InvalidValueMessageX]');
+      expect(field._validationSucceeded).toHaveBeenCalledTimes(0);
+      expect(field._validationFailed).toHaveBeenCalledTimes(1);
+    });
+
+    it('does nothing when validator succeeds but field is destroyed', () => {
+      let field = helper.createField(SpecStringField);
+      spyOn(field, '_validationSucceeded').and.callThrough();
+      spyOn(field, '_validationFailed').and.callThrough();
+
+      field.addValidator(value => $.resolvedPromise(value));
+      field.setValue('x');
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).toBe(null);
+
+      field.destroy();
+      jasmine.clock().tick(1);
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).toBe(null);
+      expect(field._validationSucceeded).not.toHaveBeenCalled();
+      expect(field._validationFailed).not.toHaveBeenCalled();
+    });
+
+    it('does nothing when validator fails but field is destroyed', async () => {
+      let field = helper.createField(SpecStringField);
+      spyOn(field, '_validationSucceeded').and.callThrough();
+      spyOn(field, '_validationFailed').and.callThrough();
+
+      field.addValidator(value => {
+        return $.resolvedPromise(value).then(() => {
+          throw 'fail';
+        });
+      });
+      field.setValue('x');
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).toBe(null);
+
+      field.destroy();
+      jasmine.clock().tick(1);
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).toBe(null);
+      expect(field._validationSucceeded).not.toHaveBeenCalled();
+      expect(field._validationFailed).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('validateValue', () => {
+    it('validates the value using the validators', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop
+      });
+
+      field.setValidators([
+        value => {
+          if (value === 'a') {
+            throw 'a is not allowed';
+          }
+          if (value === 'aa') {
+            return 'aaa';
+          }
+          return value;
+        },
+        value => {
+          if (value === 'b') {
+            throw 'b is not allowed';
+          }
+          if (value === 'bb') {
+            return 'bbb';
+          }
+          return value;
+        }
+      ]);
+      expect(field.validateValue('x')).toBe('x');
+      expect(field.validateValue('aa')).toBe('aaa');
+      expect(field.validateValue('bb')).toBe('bbb');
+      expect(() => field.validateValue('a')).toThrow('a is not allowed');
+      expect(() => field.validateValue('b')).toThrow('b is not allowed');
+    });
+
+    it('can handle async validators', async () => {
+      jasmine.clock().uninstall();
+      let field = scout.create(StringField, {
+        parent: session.desktop
+      });
+
+      field.setValidators([
+        value => {
+          if (value === 'a') {
+            throw 'a is not allowed';
+          }
+          if (value === 'aa') {
+            return 'aaa';
+          }
+          return value;
+        },
+        value => {
+          const def = $.Deferred();
+          setTimeout(() => {
+            if (value === 'b') {
+              def.reject('b is not allowed');
+            }
+            def.resolve(value);
+          });
+          return def.promise();
+        },
+        value => {
+          const def = $.Deferred();
+          setTimeout(() => {
+            if (value === 'c') {
+              def.reject(Status.error('c is not allowed'));
+            }
+            if (value === 'cc') {
+              def.resolve('ccc');
+            }
+            def.resolve(value);
+          });
+          return def.promise();
+        },
+        value => {
+          if (value === 'd') {
+            throw Status.error('d is not allowed');
+          }
+          if (value === 'dd') {
+            return 'ddd';
+          }
+          return value;
+        }
+      ], false);
+      expect(await field.validateValue('x')).toBe('x');
+      expect(await field.validateValue('aa')).toBe('aaa');
+      expect(await field.validateValue('cc')).toBe('ccc');
+      expect(await field.validateValue('dd')).toBe('ddd');
+      expect(() => field.validateValue('a')).toThrow('a is not allowed');
+      await expectAsync(field.validateValue('b')).toBeRejectedWith('b is not allowed');
+      await expectAsync(field.validateValue('c')).toBeRejectedWith(Status.error('c is not allowed'));
+      await expectAsync(field.validateValue('d')).toBeRejectedWith(Status.error('d is not allowed'));
+    });
   });
 
   describe('_validateValue', () => {
@@ -320,6 +550,19 @@ describe('ValueField', () => {
       expect(field.value).toBe('Foo');
     });
 
+    it('returns a promise if an async validator is used', async () => {
+      jasmine.clock().uninstall();
+      let field = helper.createField(StringField);
+      field.addValidator(value => $.resolvedPromise(value += ' async'));
+      let promise = field.parseAndSetValue('Foo');
+      expect(field.displayText).toBe('');
+      expect(field.value).toBe(null);
+
+      await promise;
+      expect(field.displayText).toBe('Foo async');
+      expect(field.value).toBe('Foo async');
+    });
+
     it('does not set the value but the error status if the parsing fails', () => {
       let field = helper.createField(StringField);
       field.setParser(text => {
@@ -347,6 +590,29 @@ describe('ValueField', () => {
       expect(field.errorStatus).toBe(null);
     });
 
+    it('does not catch errors that are not caught by setValue', () => {
+      let field = helper.createField(StringField);
+      field.on('propertyChange:value', () => {
+        throw 'error in value change';
+      });
+      // Only errors that happen during the actual validating (validators) or parsing (parser) should result in an error status
+      // A value change listener could do anything leaving the application in an unexpected state if it fails
+      expect(() => field.parseAndSetValue('Foo')).toThrow();
+      expect(field.errorStatus).toBe(null);
+    });
+
+    it('does not catch async errors that are not caught by setValue', () => {
+      let field = helper.createField(StringField);
+      field.addValidator(value => $.resolvedPromise(value += ' async'));
+      field.on('propertyChange:value', () => {
+        throw 'error in value change';
+      });
+      spyOn(App.get().errorHandler, 'handleErrorInfo');
+      field.parseAndSetValue('Foo');
+      jasmine.clock().tick(1);
+      expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalled();
+      expect(field.errorStatus).toBe(null);
+    });
   });
 
   describe('acceptInput', () => {
@@ -380,6 +646,23 @@ describe('ValueField', () => {
       field.$field.val('a value');
       field.acceptInput();
       expect(displayText).toBe('a value');
+    });
+
+    it('is triggered later if there is an async validator', async () => {
+      jasmine.clock().uninstall();
+      let field = helper.createField(StringField);
+      let displayText;
+      field.render();
+      field.on('acceptInput', event => {
+        displayText = event.displayText;
+      });
+      field.addValidator(value => $.resolvedPromise(value += ' async'));
+      field.$field.val('a value');
+      let promise = field.acceptInput();
+      expect(displayText).toBeUndefined();
+
+      await promise;
+      expect(displayText).toBe('a value async');
     });
 
     it('contains the actual displayText even if it was changed using format value', () => {
@@ -441,7 +724,7 @@ describe('ValueField', () => {
         parent: session.desktop,
         value: 'hi',
         validator: (value, defaultValidator: ValueFieldValidator<string>) => {
-          value = defaultValidator(value);
+          value = defaultValidator(value) as string;
           if (value === 'hi') {
             throw 'Hi is not allowed';
           }
@@ -498,7 +781,7 @@ describe('ValueField', () => {
       let field = helper.createField(StringField);
       expect(field.validators.length).toBe(1);
       field.setValidator((value, defaultValidator) => {
-        value = defaultValidator(value);
+        value = defaultValidator(value) as string;
         if (value === 'hi') {
           throw 'Hi is not allowed';
         }
@@ -676,7 +959,7 @@ describe('ValueField', () => {
       expect(field.empty).toBe(true);
     });
 
-    it('validate returns valid when errorStatus is not set and field is not mandatory', () => {
+    it('validationResult.valid is true when errorStatus is not set and field is not mandatory', () => {
       field.setValue(null);
       field.setErrorStatus(null);
       field.setMandatory(false);
@@ -684,7 +967,7 @@ describe('ValueField', () => {
       expect(result.valid).toBe(true);
     });
 
-    it('validate returns not valid when errorStatus is set or field is mandatory and empty', () => {
+    it('validationResult.valid is false when errorStatus is set or field is mandatory and empty', () => {
       let errorStatus = new Status({
         severity: Status.Severity.ERROR
       });
@@ -698,6 +981,19 @@ describe('ValueField', () => {
       result = field.getValidationResult();
       expect(result.valid).toBe(false);
       expect(result.validByMandatory).toBe(false);
+    });
+
+    it('validationResult.valid is false when validation is pending', async () => {
+      jasmine.clock().uninstall();
+      field.addValidator(value => $.resolvedPromise(value));
+      let result = field.getValidationResult();
+      expect(result.valid).toBe(false);
+      expect(result.promise).toBeDefined();
+
+      await result.promise;
+      result = field.getValidationResult();
+      expect(result.valid).toBe(true);
+      expect(result.promise).toBe(null);
     });
 
     describe('saveNeeded', () => {

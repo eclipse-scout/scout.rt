@@ -9,7 +9,7 @@
  */
 import {
   AjaxError, aria, arrays, CellEditorPopup, CellEditorRenderedOptions, CodeLookupCall, CodeType, ColumnDescriptor, Device, EnumObject, fields, FormField, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LoadingSupport,
-  LookupCall, LookupCallOrModel, LookupResult, LookupRow, MaxLengthHandler, objects, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke,
+  LookupCall, LookupCallOrModel, LookupResult, LookupRow, MaxLengthHandler, objects, promises, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke,
   SmartFieldEventMap, SmartFieldLayout, SmartFieldModel, SmartFieldPopup, SmartFieldTouchPopup, Status, strings, TreeProposalChooser, ValidationFailedStatus, ValueField
 } from '../../../index';
 import $ from 'jquery';
@@ -57,7 +57,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
   /** used to prevent multiple execution of blur/acceptInput */
   protected _acceptInputEnabled: boolean;
   protected _acceptInputDeferred: JQuery.Deferred<any>;
-  /** used to store the error state 'not unique' which must not be showed while typing, but when the field loses focus */
+  /** used to store the error state 'not unique' which must not be shown while typing, but when the field loses focus */
   protected _notUnique: boolean;
   protected _lastSearchText: string;
   protected _cellEditorPopup: CellEditorPopup<TValue>;
@@ -1630,7 +1630,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     return lookupRow.key;
   }
 
-  protected override _setValue(value: TValue) {
+  protected override _setValue(value: TValue): JQuery.Promise<void> | void {
     // set the cached lookup row to null. Keep in mind that the lookup row is set async in a timeout
     // most of the time. Thus, we must remove the reference to the old lookup row as early as possible
     if (!this._lockLookupRow) {
@@ -1646,8 +1646,10 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     }
     this.original()._currentLookupCall?.abort();
     this.original()._currentLookupCall = null;
-    super._setValue(value);
-    this._notUnique = false;
+    let result = super._setValue(value);
+    return promises.thenOrNow(result, () => {
+      this._notUnique = false;
+    });
   }
 
   /**

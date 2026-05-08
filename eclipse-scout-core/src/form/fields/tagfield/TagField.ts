@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Event, fields, HtmlComponent, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LookupCall, LookupCallOrModel, LookupResult, MaxLengthHandler, Popup, PropertyChangeEvent, scout, strings, TagBar,
+  arrays, Event, fields, HtmlComponent, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LookupCall, LookupCallOrModel, LookupResult, MaxLengthHandler, Popup, promises, PropertyChangeEvent, scout, strings, TagBar,
   TagBarTagRemoveEvent, TagChooserPopup, TagChooserPopupLookupRowSelectedEvent, TagFieldContainerLayout, TagFieldDeleteKeyStroke, TagFieldEnterKeyStroke, TagFieldEventMap, TagFieldLayout, TagFieldModel, TagFieldNavigationKeyStroke,
   TagFieldOpenPopupKeyStroke, ValueField
 } from '../../../index';
@@ -103,11 +103,13 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
     this.tagBar.updateTags();
   }
 
-  protected override _setValue(value: string[]) {
-    super._setValue(value);
-    if (this.tagBar) { // required for _init case
-      this.tagBar.setTags(this.value /* do not use the function parameter here. instead use the member variable because the value might have changed in a validator. */);
-    }
+  protected override _setValue(value: string[]): JQuery.Promise<void> | void {
+    let result = super._setValue(value);
+    return promises.thenOrNow(result, () => {
+      // tagBar may be null during init.
+      /* Do not use the function parameter here. instead use the member variable because the value might have changed in a validator. */
+      this.tagBar?.setTags(this.value);
+    });
   }
 
   protected _setLookupCall(lookupCall: LookupCallOrModel<string>) {
@@ -119,7 +121,7 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
     return '';
   }
 
-  protected override _validateValue(value: string[]): string[] {
+  protected override _validateValue(value: string[]): string[] | JQuery.Promise<string[]> {
     let tags = arrays.ensure(value);
     let result: string[] = [];
     tags.forEach(tag => {
@@ -188,7 +190,7 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
     this.$field.val('');
   }
 
-  override acceptInput(whileTyping?: boolean) {
+  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
     if (this.popup) {
       if (this.popup.selectedRow()) {
         this.popup.triggerLookupRowSelected();
@@ -197,7 +199,7 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
       }
       return;
     }
-    super.acceptInput(false);
+    return super.acceptInput(false);
   }
 
   override _triggerAcceptInput(whileTyping?: boolean) {
@@ -234,10 +236,12 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
     this._updateHasText();
   }
 
-  addTag(text: string) {
+  addTag(text: string): void | JQuery.Promise<void> {
     let value = this._parseValue(text);
-    this.setValue(value);
-    this._triggerAcceptInput();
+    let result = this.setValue(value);
+    return promises.thenOrNow(result, () => {
+      this._triggerAcceptInput();
+    });
   }
 
   removeTag(tag: string) {
@@ -354,8 +358,10 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
   protected _onLookupRowSelected(event: TagChooserPopupLookupRowSelectedEvent) {
     this._clear();
     this._updateHasText();
-    this.addTag(event.lookupRow.key);
-    this.closePopup();
+    let result = this.addTag(event.lookupRow.key);
+    return promises.thenOrNow(result, () => {
+      this.closePopup();
+    });
   }
 
   protected _onPopupClose(event: Event<Popup>) {

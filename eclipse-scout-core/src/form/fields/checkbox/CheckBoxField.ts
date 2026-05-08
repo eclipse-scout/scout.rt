@@ -99,10 +99,6 @@ export class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldM
     // NOP
   }
 
-  override setValue(value: boolean) {
-    this.setProperty('value', value);
-  }
-
   protected override _ensureValue(value: boolean): boolean {
     if (!this.triStateEnabled && objects.isNullOrUndefined(value)) {
       return false;

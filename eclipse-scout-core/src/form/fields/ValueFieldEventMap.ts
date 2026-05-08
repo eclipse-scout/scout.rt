@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,6 +29,7 @@ export interface ValueFieldEventMap<TValue> extends FormFieldEventMap {
   'parse': ValueFieldParseEvent<TValue>;
   'parseError': ValueFieldParseErrorEvent<TValue>;
   'propertyChange:value': PropertyChangeEvent<TValue>;
+  'propertyChange:validatePending': PropertyChangeEvent<boolean>;
   'propertyChange:clearable': PropertyChangeEvent<ValueFieldClearable>;
   'propertyChange:displayText': PropertyChangeEvent<string>;
   'propertyChange:formatter': PropertyChangeEvent<ValueFieldFormatter<TValue>>;

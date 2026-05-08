@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -139,4 +139,28 @@ describe('promises', () => {
     deferredArray[2].resolve('Bar', true);
   });
 
+  describe('thenOrNow', () => {
+    it('executes the function asynchronously if the value is a promise', async () => {
+      await expectAsync(promises.thenOrNow($.resolvedPromise('value'), value => 'async ' + value)).toBeResolvedTo('async value');
+    });
+
+    it('executes the function immediately if the value is not a promise', () => {
+      expect(promises.thenOrNow('value', value => {
+        expect(value).toBe('value');
+      })).toBeUndefined();
+
+      expect(promises.thenOrNow('value', value => 'immediate ' + value)).toBe('immediate value');
+    });
+  });
+
+  describe('ensure', () => {
+    it('returns the promise as it is if the value is a promise', () => {
+      let promise = $.resolvedPromise();
+      expect(promises.ensure(promise)).toBe(promise);
+    });
+
+    it('returns a new promise if the value is not a promise', async () => {
+      await expectAsync(promises.ensure('3')).toBeResolvedTo('3');
+    });
+  });
 });

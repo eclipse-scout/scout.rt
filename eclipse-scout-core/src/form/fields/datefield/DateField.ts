@@ -10,7 +10,7 @@
 import {
   AddCellEditorFieldCssClassesOptions, aria, arrays, CellEditorPopup, CellEditorRenderedOptions, DateFieldEventMap, DateFieldModel, DateFormat, DateFormatAnalyzeInfo, DatePicker, DatePickerDateSelectEvent, DatePickerPopup,
   DatePickerTouchPopup, DatePredictionFailedStatus, dates, DateTimeCompositeLayout, Device, Event, fields, focusUtils, FormField, HtmlComponent, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, objects, ParsingFailedStatus,
-  Popup, Predicate, scout, Status, StatusType, strings, styles, TimePicker, TimePickerPopup, TimePickerTimeSelectEvent, TimePickerTouchPopup, ValueField, ValueFieldWithCellEditorRenderedCallback
+  Popup, Predicate, promises, scout, Status, StatusType, strings, styles, TimePicker, TimePickerPopup, TimePickerTimeSelectEvent, TimePickerTouchPopup, ValueField, ValueFieldWithCellEditorRenderedCallback
 } from '../../../index';
 import $ from 'jquery';
 
@@ -452,7 +452,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     return dates.ensure(value);
   }
 
-  protected override _validateValue(value: Date): Date {
+  protected override _validateValue(value: Date): Date | JQuery.Promise<Date> {
     if (objects.isNullOrUndefined(value)) {
       return value;
     }
@@ -986,21 +986,23 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     }, 50);
   }
 
-  override acceptInput(whileTyping?: boolean) {
+  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
     let displayText = scout.nvl(this._readDisplayText(), '');
     let inputChanged = this._checkDisplayTextChanged(displayText);
     if (inputChanged) {
-      this.parseAndSetValue(displayText);
-    } else {
-      let oldValue = this.value;
-      this.parseAndSetValue(displayText);
+      let result = this.parseAndSetValue(displayText);
+      return promises.thenOrNow(result, () => {
+        this._triggerAcceptInput(whileTyping);
+      });
+    }
+
+    let oldValue = this.value;
+    let result = this.parseAndSetValue(displayText);
+    return promises.thenOrNow(result, () => {
       if (!dates.equals(this.value, oldValue)) {
-        inputChanged = true;
+        this._triggerAcceptInput(whileTyping);
       }
-    }
-    if (inputChanged) {
-      this._triggerAcceptInput(whileTyping);
-    }
+    });
   }
 
   /**
@@ -1213,9 +1215,11 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
   protected _setNewDateTimeValue(newValue: Date) {
     this._setDateValid(true);
     this._setTimeValid(true);
-    this.setValue(newValue);
-    this._triggerAcceptInput(false);
-    this.closePopup();
+    let result = this.setValue(newValue);
+    promises.thenOrNow(result, () => {
+      this._triggerAcceptInput(false);
+      this.closePopup();
+    });
   }
 
   protected _createPredictionField($inputField: JQuery): JQuery {

@@ -246,6 +246,24 @@ describe('Form', () => {
       await form.load();
       expect(loadCounter).toBe(1);
     });
+
+    it('waits for async field validators to complete', async () => {
+      let form = helper.createFormWithOneField();
+      let field = form.rootGroupBox.fields[0] as StringField;
+
+      field.setValidators([value => sleep(50).then(() => value + ' async')], false);
+      field.setValue('x');
+
+      let promise = form.load();
+      expect(field.value).toBe(null);
+      expect(field.validatePending).toBe(true);
+
+      await promise;
+      expect(field.value).toBe('x async');
+      expect(field.validatePending).toBe(false);
+
+      return promise;
+    });
   });
 
   describe('save', () => {
@@ -1987,7 +2005,6 @@ describe('Form', () => {
   });
 
   describe('validate', () => {
-
     let form: SpecForm;
     let mandatoryStringField: StringField;
     let numberField: NumberField;
@@ -2150,6 +2167,68 @@ describe('Form', () => {
       expect(validate.state()).toBe('resolved');
 
       jasmine.clock().uninstall();
+    });
+
+    it('waits for all async field validators to complete', async () => {
+      mandatoryStringField.setMandatory(false);
+
+      numberField.setValidators([value => sleep(50).then(() => value + 1), value => $.resolvedPromise(value + 1)], false);
+      numberField.setValue(1);
+
+      let promise = form.validate();
+      expect(numberField.value).toBe(null);
+      expect(numberField.validatePending).toBe(true);
+
+      let status = await promise;
+      expect(numberField.value).toBe(3);
+      expect(numberField.validatePending).toBe(false);
+      expect(status.isValid()).toBeTrue();
+
+      return promise;
+    });
+
+    it('waits for all async field validators to complete and returns false if one is invalid', async () => {
+      mandatoryStringField.setMandatory(false);
+
+      numberField.setValidators([value => sleep(50).then(() => value + 1), value => {
+        throw 'wrong number';
+      }], false);
+      numberField.setValue(1);
+
+      let promise = form.validate();
+      expect(numberField.value).toBe(null);
+
+      session.desktop.when('propertyChange:messageBoxes').then(() => helper.closeMessageBoxes());
+      let status = await promise;
+      expect(numberField.value).toBe(null);
+      expect(numberField.validatePending).toBe(false);
+      expect(numberField.errorStatus.message).toBe('wrong number');
+      expect(status.isValid()).toBeFalse();
+
+      return promise;
+    });
+
+    it('waits for all async field validators to complete if a field removes its error', async () => {
+      mandatoryStringField.setMandatory(false);
+
+      numberField.setValue('invalid number');
+      expect(numberField.errorStatus).toBeInstanceOf(Status);
+
+      numberField.setValidators([value => sleep(50).then(() => value + 1), value => $.resolvedPromise(value + 1)], false);
+      numberField.setValue(1);
+
+      let promise = form.validate();
+      expect(numberField.value).toBe(null);
+      expect(numberField.validatePending).toBe(true);
+      expect(numberField.errorStatus).toBeInstanceOf(Status);
+
+      let status = await promise;
+      expect(numberField.value).toBe(3);
+      expect(numberField.validatePending).toBe(false);
+      expect(numberField.errorStatus).toBe(null);
+      expect(status.isValid()).toBeTrue();
+
+      return promise;
     });
   });
 
