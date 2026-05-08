@@ -35,6 +35,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   modifiable: boolean;
   fixedWidth: boolean;
   fixedPosition: boolean;
+  formatter: ColumnFormatter<TValue>;
   grouped: boolean;
   headerCssClass: string;
   headerIconId: string;
@@ -106,6 +107,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     this.modifiable = true;
     this.fixedWidth = false;
     this.fixedPosition = false;
+    this.formatter = this._formatValue.bind(this);
     this.grouped = false;
     this.headerCssClass = null;
     this.headerIconId = null;
@@ -254,6 +256,19 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   }
 
   /**
+   * If cell does not define properties, use column values.
+   * Override this function to implement type specific init cell behavior.
+   */
+  protected _initCell(cell: Cell<TValue>): Cell<TValue> {
+    cell.cssClass = scout.nvl(cell.cssClass, this.cssClass);
+    cell.editable = scout.nvl(cell.editable, this.editable);
+    cell.horizontalAlignment = scout.nvl(cell.horizontalAlignment, this.horizontalAlignment);
+    cell.htmlEnabled = scout.nvl(cell.htmlEnabled, this.htmlEnabled);
+    cell.mandatory = scout.nvl(cell.mandatory, this.mandatory);
+    return cell;
+  }
+
+  /**
    * Ensures that a Cell instance is returned.
    * When vararg is a raw value a new Cell instance is created and the value is set as {@link cell.value} property.
    *
@@ -292,7 +307,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
       return;
     }
 
-    let returned = this._formatValue(value, row);
+    let returned = this.formatValue(value, row);
     if (objects.isPromise(returned)) {
       // Promise is returned -> set display text later
       this.setCellTextDeferred(returned, row, cell);
@@ -301,22 +316,45 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     }
   }
 
-  protected _formatValue(value: TValue, row?: TableRow): string | JQuery.Promise<string> {
-    return scout.nvl(value, '');
+  /**
+   * Updates the cell text for every row of this column.
+   */
+  protected _updateCellTexts() {
+    for (const row of this.table.rows) {
+      this._updateCellText(row, this.cell(row));
+    }
   }
 
   /**
-   * If cell does not define properties, use column values.
-   * Override this function to implement type specific init cell behavior.
+   * Replaces the existing {@link ColumnModel.formatter}.
    *
+   * @param formatter the new formatter. If null, the default formatter is used.
    */
-  protected _initCell(cell: Cell<TValue>): Cell<TValue> {
-    cell.cssClass = scout.nvl(cell.cssClass, this.cssClass);
-    cell.editable = scout.nvl(cell.editable, this.editable);
-    cell.horizontalAlignment = scout.nvl(cell.horizontalAlignment, this.horizontalAlignment);
-    cell.htmlEnabled = scout.nvl(cell.htmlEnabled, this.htmlEnabled);
-    cell.mandatory = scout.nvl(cell.mandatory, this.mandatory);
-    return cell;
+  setFormatter(formatter: ColumnFormatter<TValue>) {
+    if (!formatter) {
+      formatter = this._formatValue.bind(this);
+    }
+    this.setProperty('formatter', formatter);
+    if (this.initialized) {
+      this._updateCellTexts();
+    }
+  }
+
+  /**
+   * Uses the {@link ColumnModel.formatter} to format the cell value.
+   *
+   * @returns the formatted cell value as text or a promise if the formatting happens asynchronously.
+   */
+  formatValue(value: TValue, row: TableRow): string | JQuery.Promise<string> {
+    let defaultFormatter = this._formatValue.bind(this);
+    return this.formatter(value, row, defaultFormatter);
+  }
+
+  /**
+   * @returns the formatted cell value as text or a promise if the formatting happens asynchronously.
+   */
+  protected _formatValue(value: TValue, row?: TableRow): string | JQuery.Promise<string> {
+    return scout.nvl(value, '');
   }
 
   buildCellForRow(row: TableRow): string {
@@ -1226,3 +1264,4 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 }
 
 export type ColumnValidationResult = { valid: boolean; validByMandatory: boolean; errorStatus: Status };
+export type ColumnFormatter<TValue> = (value: TValue, row: TableRow, defaultFormatter?: ColumnFormatter<TValue>) => string | JQuery.Promise<string>;

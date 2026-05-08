@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,7 +28,9 @@ export interface ValueFieldModel<TValue extends TModelValue, TModelValue = TValu
   /**
    * The formatter is responsible to format the {@link value} so it can be used as {@link displayText}.
    *
-   * Default is {@link _formatValue}.
+   * The default formatter is passed as parameter and can be called during formatting, if needed.
+   *
+   * Default is {@link ValueField._formatValue}.
    *
    * @see ValueField.formatValue
    */

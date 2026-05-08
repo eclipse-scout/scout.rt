@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -586,35 +586,33 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
   }
 
   /**
-   * Replaces the existing formatter. The formatter is called during {@link formatValue}.
+   * Replaces the existing {@link ValueFieldModel.formatter}.
    *
-   * Remember calling the default formatter which is passed as parameter to the format function, if needed.
    * @param formatter the new formatter. If null, the default formatter is used.
-   *
-   * @see ValueFieldModel.formatter
    */
   setFormatter(formatter: ValueFieldFormatter<TValue>) {
+    if (!formatter) {
+      formatter = this._formatValue.bind(this);
+    }
     this.setProperty('formatter', formatter);
     if (this.initialized) {
       this.validate();
     }
   }
 
-  protected _setFormatter(formatter: ValueFieldFormatter<TValue>) {
-    if (!formatter) {
-      formatter = this._formatValue.bind(this);
-    }
-    this._setProperty('formatter', formatter);
-  }
-
   /**
-   * @returns the formatted display text
+   * Uses the {@link ValueFieldModel.formatter} to format the value.
+   *
+   * @returns the formatted value as display text or a promise if the formatting happens asynchronously.
    */
   formatValue(value: TValue): string | JQuery.Promise<string> {
     let defaultFormatter = this._formatValue.bind(this);
     return this.formatter(value, defaultFormatter);
   }
 
+  /**
+   * @returns the formatted value as display text or a promise if the formatting happens asynchronously.
+   */
   protected _formatValue(value: TValue): string | JQuery.Promise<string> {
     return scout.nvl(value, '') + '';
   }
