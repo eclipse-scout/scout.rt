@@ -47,7 +47,7 @@ public interface IMimeMagic {
   IMimeMagic RAR = createMagic("526172211A0700", "526172211A070100");
   IMimeMagic CLASS = createMagic("CAFEBABE");
   IMimeMagic OGG = createMagic("4F676753");
-  IMimeMagic EML = createMagic("52656365697665643A");
+  IMimeMagic EML = createMagic("52656365697665643A", "46726F6D3A", "582D556E73656E743A");
   IMimeMagic FLV = createMagic("464C56");
   IMimeMagic MPG = createMagic("47", "000001BA", "000001B3");
   IMimeMagic FLAC = createMagic("664C6143");
