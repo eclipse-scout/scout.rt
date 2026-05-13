@@ -223,6 +223,7 @@ $.injectScript = (url, options) => {
   let $scriptTag = $(scriptTag)
     .attr('src', url)
     .attr('async', true)
+    .attr('fetchpriority', 'high')
     .on('load error', event => {
       if (options.removeTag) {
         myDocument.head.removeChild(scriptTag);
