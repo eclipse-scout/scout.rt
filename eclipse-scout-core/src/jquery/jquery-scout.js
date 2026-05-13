@@ -216,6 +216,7 @@ $.injectScript = (url, options) => {
   $(linkTag)
     .attr('src', url)
     .attr('async', true)
+    .attr('fetchpriority', 'high')
     .on('load error', event => {
       if (options.removeTag) {
         myDocument.head.removeChild(linkTag);
