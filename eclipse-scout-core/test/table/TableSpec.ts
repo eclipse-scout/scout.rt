@@ -1881,11 +1881,11 @@ describe('Table', () => {
       });
 
       it('sorts columns with sortcode', () => {
-        let model = helper.createModelSingleColumnByValues([0, 1, 2, 3, 4], 'NumberColumn');
+        let model = helper.createModelSingleColumnByValues([0, 1, 2, 3, 4, 5], 'NumberColumn');
         let table = helper.createTable(model);
         column0 = table.columns[0];
 
-        let sortCodes = [13, 0, 42, 7, null];
+        let sortCodes = [13, 0, 42, 7, null, null];
         table.rows.forEach((row, index) => {
           column0.cell(row).sortCode = sortCodes[index];
         });
@@ -1893,10 +1893,10 @@ describe('Table', () => {
         table.render();
 
         table.sort(column0, 'desc');
-        helper.assertValuesInCells(table.rows, 0, [2, 0, 3, 1, 4]);
+        helper.assertValuesInCells(table.rows, 0, [2, 0, 3, 1, 5, 4]);
 
         table.sort(column0, 'asc');
-        helper.assertValuesInCells(table.rows, 0, [4, 1, 3, 0, 2]);
+        helper.assertValuesInCells(table.rows, 0, [4, 5, 1, 3, 0, 2]);
       });
 
       it('sorts smart columns with sortcode', () => {
@@ -1935,6 +1935,13 @@ describe('Table', () => {
               text: '4',
               value: 4
             })
+          ]),
+          helper.createModelRow(null, [
+            scout.create(Cell, {
+              sortCode: null,
+              text: '5',
+              value: 5
+            })
           ])
         ];
 
@@ -1945,10 +1952,10 @@ describe('Table', () => {
         table.render();
 
         table.sort(column0, 'desc');
-        helper.assertValuesInCells(table.rows, 0, [2, 0, 3, 1, 4]);
+        helper.assertValuesInCells(table.rows, 0, [2, 0, 3, 1, 5, 4]);
 
         table.sort(column0, 'asc');
-        helper.assertValuesInCells(table.rows, 0, [4, 1, 3, 0, 2]);
+        helper.assertValuesInCells(table.rows, 0, [4, 5, 1, 3, 0, 2]);
       });
 
       it('uses non sort columns as fallback', () => {
