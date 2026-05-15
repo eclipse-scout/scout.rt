@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, TableMatrix, TableMatrixKeyAxis, TableRow, TableUserFilter, TableUserFilterAddedEventData} from '@eclipse-scout/core';
+import {arrays, TableMatrix, TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup, TableRow, TableUserFilter, TableUserFilterAddedEventData} from '@eclipse-scout/core';
 import {ChartTableUserFilterModel} from '../../index';
 import {TableControlDeterministicKey} from './ChartTableControl';
 
@@ -20,6 +20,8 @@ export class ChartTableUserFilter extends TableUserFilter implements ChartTableU
   filters: { deterministicKey: TableControlDeterministicKey }[];
   columnIdX: string;
   columnIdY: string;
+  columnModifierX: TableMatrixNumberGroup | TableMatrixDateGroup;
+  columnModifierY: TableMatrixNumberGroup | TableMatrixDateGroup;
 
   constructor() {
     super();
@@ -30,6 +32,8 @@ export class ChartTableUserFilter extends TableUserFilter implements ChartTableU
     this.filters = [];
     this.columnIdX = null;
     this.columnIdY = null;
+    this.columnModifierX = null;
+    this.columnModifierY = null;
   }
 
   static TYPE = 'CHART';
@@ -44,18 +48,18 @@ export class ChartTableUserFilter extends TableUserFilter implements ChartTableU
     data.filters = this.filters;
     data.columnIdX = (this.xAxis && this.xAxis.column) ? this.xAxis.column.id : null;
     data.columnIdY = (this.yAxis && this.yAxis.column) ? this.yAxis.column.id : null;
+    data.columnModifierX = this.xAxis?.axisGroup ?? null;
+    data.columnModifierY = this.yAxis?.axisGroup ?? null;
     return data;
   }
 
   calculate() {
     let matrix = new TableMatrix(this.table);
     let columnX = this.table.columnById(this.columnIdX);
-    let axisGroupX = columnX.createFilter().axisGroup();
-    this.xAxis = matrix.addAxis(columnX, axisGroupX);
+    this.xAxis = matrix.addAxis(columnX, this.columnModifierX);
     if (this.columnIdY) {
       let columnY = this.table.columnById(this.columnIdY);
-      let axisGroupY = columnY.createFilter().axisGroup();
-      this.yAxis = matrix.addAxis(columnY, axisGroupY);
+      this.yAxis = matrix.addAxis(columnY, this.columnModifierY);
     }
     matrix.calculate();
   }
@@ -65,14 +69,14 @@ export class ChartTableUserFilter extends TableUserFilter implements ChartTableU
       // Lazy calculation. It is not possible on init, because the table is not rendered yet.
       this.calculate();
     }
-    let value = this.xAxis.column.cellValueOrTextForCalculation(row);
-    let deterministicKeyX = this.xAxis.normDeterministic(value);
+    let valueX = this.xAxis.column.cellValueOrTextForCalculation(row);
+    let deterministicKeyX = this.xAxis.normDeterministic(valueX);
 
     if (!this.yAxis) {
       return this.filters.filter(filter => filter.deterministicKey === deterministicKeyX).length > 0;
     }
-    value = this.yAxis.column.cellValueOrTextForCalculation(row);
-    let deterministicKeyY = this.yAxis.normDeterministic(value);
+    let valueY = this.yAxis.column.cellValueOrTextForCalculation(row);
+    let deterministicKeyY = this.yAxis.normDeterministic(valueY);
     return this.filters.filter(filter => arrays.equals(filter.deterministicKey as (number | string)[], [deterministicKeyX, deterministicKeyY])).length > 0;
   }
 }
@@ -81,4 +85,6 @@ export interface ChartTableUserFilterAddedEventData extends TableUserFilterAdded
   filters?: { deterministicKey: TableControlDeterministicKey }[];
   columnIdX?: string;
   columnIdY?: string;
+  columnModifierX?: number;
+  columnModifierY?: number;
 }

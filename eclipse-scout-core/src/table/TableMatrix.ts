@@ -60,6 +60,7 @@ export class TableMatrix {
 
     // copy column for later access
     dataAxis.column = data;
+    dataAxis.axisGroup = dataGroup;
 
     // data always is number
     dataAxis.format = n => locale.decimalFormat.format(n);
@@ -108,6 +109,7 @@ export class TableMatrix {
     // collect all axis
     this._allAxis.push(keyAxis);
     keyAxis.column = axis;
+    keyAxis.axisGroup = axisGroup;
 
     // normalized string data
     keyAxis.normTable = [];
@@ -575,6 +577,8 @@ export type TableMatrixKeyAxis = number[] & {
   min: number;
   /** The biggest numeric key in this axis */
   max: number;
+  /** The group type that was specified when creating this axis */
+  axisGroup: TableMatrixNumberGroup | TableMatrixDateGroup;
   /** Converts any value to a numeric key */
   norm(f: any): number;
   /** Formats the given numeric key ({@link norm}) for display */
@@ -598,6 +602,8 @@ export type TableMatrixDataAxis = {
   total: number;
   min: number;
   max: number;
+  /** The group type that was specified when creating this axis */
+  axisGroup: TableMatrixNumberGroup;
   /** Converts any value to a numeric key */
   norm(f: any): number;
   /** Formats the given numeric key ({@link norm}) for display */

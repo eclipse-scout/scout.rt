@@ -11,6 +11,7 @@ import {BaseDoEntity, IChartTableControlConfigDo, typeName} from '@eclipse-scout
 
 @typeName('scout.ChartTableControlConfig')
 export class ChartTableControlConfigDo extends BaseDoEntity implements IChartTableControlConfigDo {
+  selected: boolean;
   chartTypeId: string;
   chartGroup1ColumnId: string;
   chartGroup1Modifier: number;

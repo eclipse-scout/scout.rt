@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,8 @@ public class JsonChartTableUserFilter<T extends ChartTableUserFilterState> exten
   public static final String ATTRIBUTE_FILTERS = "filters";
   public static final String ATTRIBUTE_COLUMN_ID_X = "columnIdX";
   public static final String ATTRIBUTE_COLUMN_ID_Y = "columnIdY";
+  public static final String ATTRIBUTE_COLUMN_MODIFIER_X = "columnModifierX";
+  public static final String ATTRIBUTE_COLUMN_MODIFIER_Y = "columnModifierY";
 
   public JsonChartTableUserFilter(T filter) {
     super(filter);
@@ -41,6 +43,8 @@ public class JsonChartTableUserFilter<T extends ChartTableUserFilterState> exten
     json.put(ATTRIBUTE_FILTERS, new JSONArray(getFilterState().getFilters()));
     json.put(ATTRIBUTE_COLUMN_ID_X, getJsonTable().getColumnId(getFilterState().getColumnX()));
     json.put(ATTRIBUTE_COLUMN_ID_Y, getJsonTable().getColumnId(getFilterState().getColumnY()));
+    json.put(ATTRIBUTE_COLUMN_MODIFIER_X, getFilterState().getColumnModifierX());
+    json.put(ATTRIBUTE_COLUMN_MODIFIER_Y, getFilterState().getColumnModifierY());
     return json;
   }
 }

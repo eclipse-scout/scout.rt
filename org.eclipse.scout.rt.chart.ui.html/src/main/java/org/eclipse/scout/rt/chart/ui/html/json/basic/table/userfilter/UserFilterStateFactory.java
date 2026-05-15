@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -35,6 +35,8 @@ public class UserFilterStateFactory implements IUserFilterStateFactory {
       filterState.setFilters(createArrayValuesFromJson(data, JsonChartTableUserFilter.ATTRIBUTE_FILTERS));
       filterState.setColumnX(extractColumn(table, data, JsonChartTableUserFilter.ATTRIBUTE_COLUMN_ID_X));
       filterState.setColumnY(extractColumn(table, data, JsonChartTableUserFilter.ATTRIBUTE_COLUMN_ID_Y));
+      filterState.setColumnModifierX(optInteger(data, JsonChartTableUserFilter.ATTRIBUTE_COLUMN_MODIFIER_X));
+      filterState.setColumnModifierY(optInteger(data, JsonChartTableUserFilter.ATTRIBUTE_COLUMN_MODIFIER_Y));
       return filterState;
     }
     return null;
@@ -51,5 +53,10 @@ public class UserFilterStateFactory implements IUserFilterStateFactory {
       return null;
     }
     return table.optColumn(columnId);
+  }
+
+  protected Integer optInteger(JSONObject json, String propName) {
+    Object o = json.opt(propName);
+    return o instanceof Integer i ? i : null;
   }
 }

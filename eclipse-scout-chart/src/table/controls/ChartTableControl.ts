@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, Column, DateColumn, Event, EventListener, IconDesc, icons, InitModelOf, keys, KeyStrokeContext, NumberColumn, objects, scout, scrollbars, strings, styles, TabbableCoordinator, TabbableItem, Table, TableControl,
-  TableMatrix, TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup, TableMatrixResult, tooltips
+  Action, arrays, Column, DateColumn, Event, EventHandler, IconDesc, icons, InitModelOf, keys, KeyStrokeContext, NumberColumn, objects, scout, scrollbars, strings, styles, TabbableCoordinator, TabbableItem, Table,
+  TableColumnStructureChangedEvent, TableControl, TableFilterRemovedEvent, TableMatrix, TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup, TableMatrixResult, tooltips
 } from '@eclipse-scout/core';
-import {Chart, ChartTableControlEventMap, ChartTableControlLayout, ChartTableControlModel, ChartTableUserFilter, FocusFirstChartTypeKeyStroke} from '../../index';
+import {Chart, ChartTableControlEventMap, ChartTableControlLayout, ChartTableControlModel, ChartTableUserFilter, ChartValueClickEvent, FocusFirstChartTypeKeyStroke} from '../../index';
 import $ from 'jquery';
 import {BubbleDataPoint, ChartData, ChartType as ChartJsType} from 'chart.js';
 import {ChartConfig, ClickObject} from '../../chart/Chart';
@@ -25,18 +25,20 @@ export class ChartTableControl extends TableControl implements ChartTableControl
   chartGroup1: TableControlChartGroup;
   chartGroup2: TableControlChartGroup;
   chartType: TableControlChartType;
+
   oldChartType: TableControlChartType;
   chart: Chart;
   chartColorScheme: string;
   xAxis: TableMatrixKeyAxis;
   yAxis: TableMatrixKeyAxis;
-  dateGroup: (TableMatrixDateGroup | string)[][];
+  dateGroup: ([TableMatrixDateGroup, string])[]; // array of [TableMatrixDateGroup, Label] tuples
 
   $chartSelect: JQuery;
   $axisSelectContainer: JQuery;
   $xAxisSelect: JQuery;
   $yAxisSelect: JQuery;
   $dataSelect: JQuery;
+
   protected _chartTypeMap: Record<TableControlChartType, Action>;
   protected _chartTypeTabbableCoordinator: TabbableCoordinator;
   protected _aggregationMap: Record<string, JQuery>;
@@ -45,11 +47,20 @@ export class ChartTableControl extends TableControl implements ChartTableControl
   protected _chartGroup1TabbableCoordinator: TabbableCoordinator;
   protected _chartGroup2Map: Record<string, JQuery>;
   protected _chartGroup2TabbableCoordinator: TabbableCoordinator;
-  protected _tableUpdatedHandler: (e: Event<Table>) => void;
-  protected _tableColumnStructureChangedHandler: () => void;
-  protected _chartValueClickedHandler: () => void;
-  protected _filterRemovedListener: EventListener;
-  protected _tableUpdatedTimeOutId: number;
+
+  protected _tableUpdatedHandler: EventHandler<Event<Table>> = this._onTableUpdated.bind(this);
+  protected _tableColumnStructureChangedHandler: EventHandler<TableColumnStructureChangedEvent> = this._onTableColumnStructureChanged.bind(this);
+  protected _chartValueClickedHandler: EventHandler<ChartValueClickEvent> = this._onChartValueClick.bind(this);
+  protected _filterRemovedHandler: EventHandler<TableFilterRemovedEvent> = this._onTableFilterRemoved.bind(this);
+  protected _rebuildChartTimeoutId: number;
+  /**
+   * Flag to signal to the next scheduled "rebuild" ({@link _scheduleRebuild}) that the columns of
+   * the table have been changed and the entire content should be re-created. Otherwise, only the
+   * chart will be updated, without affecting the axis lists.
+   *
+   * This flag is automatically reset to `null` by the scheduled task.
+   */
+  protected _columnStructureChanged: boolean;
 
   constructor() {
     super();
@@ -78,9 +89,6 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     this._chartGroup1TabbableCoordinator = scout.create(TabbableCoordinator, {parent: this, autoRegisterKeyStrokes: false, orientation: 'vertical'});
     this._chartGroup2TabbableCoordinator = scout.create(TabbableCoordinator, {parent: this, autoRegisterKeyStrokes: false, orientation: 'vertical'});
     this._aggregationTabbableCoordinator = scout.create(TabbableCoordinator, {parent: this, autoRegisterKeyStrokes: false, orientation: 'vertical'});
-    this._tableUpdatedHandler = this._onTableUpdated.bind(this);
-    this._tableColumnStructureChangedHandler = this._onTableColumnStructureChanged.bind(this);
-    this._chartValueClickedHandler = this._onChartValueClick.bind(this);
   }
 
   static DATE_GROUP_FLAG = 0x100;
@@ -93,6 +101,14 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     this.chart = scout.create(Chart, {
       parent: this
     });
+
+    // group functions for dates
+    this.dateGroup = [
+      [TableMatrix.DateGroup.YEAR, this.session.text('ui.groupedByYear')],
+      [TableMatrix.DateGroup.MONTH, this.session.text('ui.groupedByMonth')],
+      [TableMatrix.DateGroup.WEEKDAY, this.session.text('ui.groupedByWeekday')],
+      [TableMatrix.DateGroup.DATE, this.session.text('ui.groupedByDate')]
+    ];
   }
 
   protected override _destroy() {
@@ -439,6 +455,20 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     return text;
   }
 
+  override renderContent() {
+    const renderContentImpl = () => {
+      if (this.rendered) {
+        super.renderContent();
+      }
+    };
+
+    if (this.table.isCustomizable() && !this.table.customizer.ready) {
+      this.table.customizer.whenReady().then(() => renderContentImpl());
+    } else {
+      renderContentImpl();
+    }
+  }
+
   protected override _renderContent($parent: JQuery) {
     this.$contentContainer = $parent.appendDiv('chart-container')
       .attr('tabindex', '-1');
@@ -449,22 +479,7 @@ export class ChartTableControl extends TableControl implements ChartTableControl
 
     this._renderChartSelectContainer();
 
-    // group functions for dates
-    this.dateGroup = [
-      [TableMatrix.DateGroup.YEAR, this.session.text('ui.groupedByYear')],
-      [TableMatrix.DateGroup.MONTH, this.session.text('ui.groupedByMonth')],
-      [TableMatrix.DateGroup.WEEKDAY, this.session.text('ui.groupedByWeekday')],
-      [TableMatrix.DateGroup.DATE, this.session.text('ui.groupedByDate')]
-    ];
-
     // listeners
-    this._filterRemovedListener = this.table.on('filterRemoved', event => {
-      if (!(event.filter instanceof ChartTableUserFilter)) {
-        return;
-      }
-      this.chart.setCheckedItems([]);
-    });
-
     this._addListeners();
 
     this._renderAxisSelectorsContainer();
@@ -478,13 +493,6 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     this._renderChartParts();
 
     this._drawChart();
-  }
-
-  protected _addListeners() {
-    this.table.on('rowsInserted', this._tableUpdatedHandler);
-    this.table.on('rowsDeleted', this._tableUpdatedHandler);
-    this.table.on('allRowsDeleted', this._tableUpdatedHandler);
-    this.chart.on('valueClick', this._chartValueClickedHandler);
   }
 
   protected _renderAxisSelectorsContainer() {
@@ -523,13 +531,10 @@ export class ChartTableControl extends TableControl implements ChartTableControl
       return Math.abs(a[1] as number - 8) - Math.abs(b[1] as number - 8);
     });
 
-    let axisCount, enabled;
     let columns = matrix.columns(false); // filterNumberColumns false: number columns will be filtered below
 
     // all x/y-axis for selection
-    for (let c1 = 0; c1 < columns.length; c1++) {
-      let column1 = columns[c1];
-
+    for (let column of columns) {
       // Check if data-spread is too large. This is a problem in large tables where a column has unique values.
       // We cannot create DOM elements for each unique value because this causes all browser to stop script
       // execution. May be in a later release we could implement some sort of data aggregation, but this is not
@@ -537,28 +542,28 @@ export class ChartTableControl extends TableControl implements ChartTableControl
       // which we don't have in the UI. Another possible solution: make the charts scrollable, however this is
       // probably not a good idea, because with a lot of data, the chart fails to provide an oversight over the data
       // when the user must scroll and only sees a small part of the chart.
-      if (column1 instanceof DateColumn) {
+      let enabled;
+      if (column instanceof DateColumn) {
         // dates are always aggregated, and thus we must not check if the chart has "too much data".
         enabled = true;
       } else {
-        axisCount = this._axisCount(columnCount, column1);
+        let axisCount = this._axisCount(columnCount, column);
         enabled = (axisCount <= ChartTableControl.MAX_AXIS_COUNT);
       }
 
-      let content = this._axisContentForColumn(column1);
+      let content = this._axisContentForColumn(column);
 
       let $div = this.$contentContainer
-        .makeDiv('select-axis prevent-initial-focus', this._plainAxisText(column1, content.text))
-        .data('column', column1)
+        .makeDiv('select-axis prevent-initial-focus', this._plainAxisText(column, content.text))
+        .data('column', column)
         .unfocusable()
         .setEnabled(enabled);
 
       if (!enabled) {
-        if (this.chartGroup1 && this.chartGroup1.id === column1.id) {
+        if (this.chartGroup1 && this.chartGroup1.id === column.id) {
           this.chartGroup1 = null;
           this.chartGroup2 = null;
-        }
-        if (this.chartGroup2 && this.chartGroup2.id === column1.id) {
+        } else if (this.chartGroup2 && this.chartGroup2.id === column.id) {
           this.chartGroup2 = null;
         }
       }
@@ -567,7 +572,7 @@ export class ChartTableControl extends TableControl implements ChartTableControl
         $div.addClass(content.icon.appendCssClass('font-icon'));
       }
 
-      if (column1 instanceof DateColumn) {
+      if (column instanceof DateColumn) {
         $div
           .data('modifier', TableMatrix.DateGroup.YEAR)
           .appendDiv('select-axis-group', String(this.dateGroup[0][1]));
@@ -588,8 +593,8 @@ export class ChartTableControl extends TableControl implements ChartTableControl
       }
 
       let $yDiv = $div.clone(true);
-      this._chartGroup1Map[column1.id] = $div;
-      this._chartGroup2Map[column1.id] = $yDiv;
+      this._chartGroup1Map[column.id] = $div;
+      this._chartGroup2Map[column.id] = $yDiv;
       this.$xAxisSelect.append($div);
       this.$yAxisSelect.append($yDiv);
     }
@@ -624,24 +629,22 @@ export class ChartTableControl extends TableControl implements ChartTableControl
         .data('modifier', TableMatrix.NumberGroup.COUNT);
 
       // all data for selection
-      for (let c2 = 0; c2 < columns.length; c2++) {
-        let column2 = columns[c2];
-        let fakeNumberLabelCol2 = c2 + 1;
-
-        if (column2 instanceof NumberColumn) {
+      for (let i = 0; i < columns.length; i++) {
+        let column = columns[i];
+        if (column instanceof NumberColumn) {
           let columnText;
-          if (strings.hasText(column2.text)) {
-            columnText = this._plainAxisText(column2, column2.text);
-          } else if (strings.hasText(column2.headerTooltipText)) {
-            columnText = column2.headerTooltipText;
+          if (strings.hasText(column.text)) {
+            columnText = this._plainAxisText(column, column.text);
+          } else if (strings.hasText(column.headerTooltipText)) {
+            columnText = column.headerTooltipText;
           } else {
-            columnText = '[' + fakeNumberLabelCol2 + ']';
+            columnText = '[' + (i + 1) + ']'; // fallback label
           }
 
-          this._aggregationMap[column2.id] = this.$dataSelect
+          this._aggregationMap[column.id] = this.$dataSelect
             .appendDiv('select-data data-sum prevent-initial-focus', columnText)
             .unfocusable()
-            .data('column', column2)
+            .data('column', column)
             .data('modifier', TableMatrix.NumberGroup.SUM);
         }
       }
@@ -729,7 +732,7 @@ export class ChartTableControl extends TableControl implements ChartTableControl
   protected _getDefaultChartGroup(column: Column<any>): TableControlChartGroup {
     let modifier;
     if (column instanceof DateColumn) {
-      modifier = 256;
+      modifier = TableMatrix.DateGroup.YEAR;
     }
     return {
       id: column.id,
@@ -1249,6 +1252,10 @@ export class ChartTableControl extends TableControl implements ChartTableControl
         text: this.tooltipText,
         xAxis: this._getXAxis(),
         yAxis: this._getYAxis(),
+        columnIdX: this._getXAxis()?.column?.id,
+        columnModifierX: this._getXAxis()?.axisGroup,
+        columnIdY: this._getYAxis()?.column?.id,
+        columnModifierY: this._getYAxis()?.axisGroup,
         filters: filters
       });
 
@@ -1291,7 +1298,6 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     this._removeScrollbars();
     this.$contentContainer.remove();
     this.chart.remove();
-    this.table.events.removeListener(this._filterRemovedListener);
     this._removeListeners();
     this.oldChartType = null;
     this.recomputeEnabled();
@@ -1310,36 +1316,79 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     this._uninstallScrollbars();
   }
 
+  protected _addListeners() {
+    this.table.on('rowsInserted rowsUpdated rowsDeleted allRowsDeleted', this._tableUpdatedHandler);
+    this.table.on('filterRemoved', this._filterRemovedHandler);
+    this.chart.on('valueClick', this._chartValueClickedHandler);
+  }
+
   protected _removeListeners() {
-    this.table.off('rowsInserted', this._tableUpdatedHandler);
-    this.table.off('rowsDeleted', this._tableUpdatedHandler);
-    this.table.off('allRowsDeleted', this._tableUpdatedHandler);
+    this.table.off('rowsInserted rowsUpdated rowsDeleted allRowsDeleted', this._tableUpdatedHandler);
+    this.table.off('filterRemoved', this._filterRemovedHandler);
     this.chart.off('valueClick', this._chartValueClickedHandler);
   }
 
   protected _onTableUpdated(event?: Event<Table>) {
-    if (this._tableUpdatedTimeOutId) {
-      return;
-    }
+    this._scheduleRebuild();
+  }
 
-    this._tableUpdatedTimeOutId = setTimeout(() => {
-      this._tableUpdatedTimeOutId = null;
+  protected _onTableColumnStructureChanged() {
+    this._columnStructureChanged = true;
+    this.recomputeEnabled();
+    if (this.contentRendered && this.selected) {
+      this._scheduleRebuild();
+    }
+  }
+
+  protected _onTableFilterRemoved(event: TableFilterRemovedEvent) {
+    if (event.filter instanceof ChartTableUserFilter) {
+      this.chart.setCheckedItems([]);
+    }
+  }
+
+  protected _scheduleRebuild() {
+    if (this._rebuildChartTimeoutId) {
+      return; // already scheduled
+    }
+    this._rebuildChartTimeoutId = setTimeout(async () => {
+      if (this.table.isCustomizable()) {
+        await this.table.customizer.whenReady(); // ensure custom columns are created
+      }
+      this._rebuildChartTimeoutId = null;
+      let columnStructureChanged = this._columnStructureChanged;
+      this._columnStructureChanged = null;
 
       if (!this.rendered) {
         return;
       }
 
-      this._setChartGroup1(null);
-      this._setChartGroup2(null);
-      this.removeContent();
-      this.renderContent();
+      if (columnStructureChanged) {
+        // Columns were replaced -> map old column ids to new column ids to preserve current selection (see _initializeSelection)
+        this._updateColumnIds(this._chartGroup1Map, this.chartGroup1);
+        this._updateColumnIds(this._chartGroup2Map, this.chartGroup2);
+        this._updateColumnIds(this._aggregationMap, this.chartAggregation);
+        this.removeContent();
+        this.renderContent();
+      } else {
+        this._drawChart();
+      }
     });
   }
 
-  protected _onTableColumnStructureChanged() {
-    this.recomputeEnabled();
-    if (this.contentRendered && this.selected) {
-      this._onTableUpdated();
+  protected _updateColumnIds(map: Record<string, JQuery>, selection: TableControlChartGroup | TableControlChartAggregation) {
+    for (let oldId of Object.keys(map)) {
+      let $div = map[oldId];
+      let oldColumn = $div.data('column');
+      if (oldColumn) { // 'all' entry does not have a column
+        let newColumn = this.table.columnByUuid(oldColumn.buildUuid());
+        if (newColumn) {
+          map[newColumn.id] = $div;
+          if (selection.id === oldId) {
+            selection.id = newColumn.id;
+          }
+        }
+      }
+      delete map[oldId];
     }
   }
 }

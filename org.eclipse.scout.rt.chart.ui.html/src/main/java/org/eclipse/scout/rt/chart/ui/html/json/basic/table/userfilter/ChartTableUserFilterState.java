@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -31,6 +31,8 @@ public class ChartTableUserFilterState extends AbstractUserFilterState implement
   private transient IColumn<?> m_columnY;
   private String m_columnIdX;
   private String m_columnIdY;
+  private Integer m_columnModifierX;
+  private Integer m_columnModifierY;
 
   public ChartTableUserFilterState() {
     setType(TYPE);
@@ -60,6 +62,22 @@ public class ChartTableUserFilterState extends AbstractUserFilterState implement
   public void setColumnY(IColumn<?> columnY) {
     m_columnY = columnY;
     m_columnIdY = (columnY != null) ? columnY.getColumnId() : null;
+  }
+
+  public Integer getColumnModifierX() {
+    return m_columnModifierX;
+  }
+
+  public void setColumnModifierX(Integer columnModifierX) {
+    m_columnModifierX = columnModifierX;
+  }
+
+  public Integer getColumnModifierY() {
+    return m_columnModifierY;
+  }
+
+  public void setColumnModifierY(Integer columnModifierY) {
+    m_columnModifierY = columnModifierY;
   }
 
   public List<Object> getFilters() {
