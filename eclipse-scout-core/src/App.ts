@@ -513,9 +513,14 @@ export class App extends EventEmitter {
   protected _beforeAjaxCall(request: JQuery.jqXHR, settings: AjaxSettings) {
     request.setRequestHeader('X-Scout-Correlation-Id', numbers.correlationId());
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // explicitly add here because jQuery only adds it automatically if it is no crossDomain request
-    if (this.sessions[0]?.ready) {
-      request.setRequestHeader('Accept-Language', this.sessions[0].locale.languageTag);
-      request.setRequestHeader('X-Scout-Ui-Session-Id', this.sessions[0].uiSessionId);
+    let session = this.sessions[0];
+    if (session) {
+      if (session.uiSessionId) {
+        request.setRequestHeader('X-Scout-Ui-Session-Id', session.uiSessionId);
+      }
+      if (session.ready) {
+        request.setRequestHeader('Accept-Language', session.locale.languageTag);
+      }
     }
   }
 
