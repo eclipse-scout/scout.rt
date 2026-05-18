@@ -29,4 +29,11 @@ public class ServerHttpRunContextProducer extends HttpRunContextProducer {
         .withUserAgent(HttpClientInfo.get(req).toUserAgents().build())
         .withThreadLocal(SessionId.CURRENT, req.getHeader(SessionId.HTTP_HEADER_NAME));
   }
+
+  @Override
+  protected RunContext newRunContext() {
+    // If both ClientRunContextFactory and ServerRunContextFactory are present on the classpath, ClientRunContextFactory is used by default (see @Order on ClientRunContextFactory).
+    // Therefore, we explicitly specify to create a ServerRunContext here.
+    return ServerRunContexts.copyCurrent(true);
+  }
 }
