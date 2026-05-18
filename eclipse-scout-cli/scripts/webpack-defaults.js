@@ -210,12 +210,6 @@ module.exports = (env, args) => {
           loader: require.resolve('babel-loader'),
           options: babelOptions
         }]
-      }, {
-        test: /\.[c|m]?jsx?$/,
-        enforce: 'pre',
-        use: [{
-          loader: require.resolve('source-map-loader')
-        }]
       }]
     },
     plugins: [
