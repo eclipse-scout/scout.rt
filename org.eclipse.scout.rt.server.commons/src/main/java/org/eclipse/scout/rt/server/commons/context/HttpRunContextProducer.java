@@ -59,7 +59,7 @@ public class HttpRunContextProducer {
   public RunContext produce(HttpServletRequest req, HttpServletResponse resp, RunContext existing) {
     RunContext contextToFill = existing;
     if (contextToFill == null) {
-      contextToFill = RunContexts.copyCurrent(true);
+      contextToFill = newRunContext();
     }
 
     return contextToFill
@@ -71,6 +71,10 @@ public class HttpRunContextProducer {
         .withDiagnostics(getServletDiagnosticsProviderFactory().getProviders(req, resp))
         .withLocale(req.getLocale())
         .withTransactionScope(TransactionScope.REQUIRES_NEW);
+  }
+
+  protected RunContext newRunContext() {
+    return RunContexts.copyCurrent(true);
   }
 
   protected User currentUser(HttpServletRequest req) {
