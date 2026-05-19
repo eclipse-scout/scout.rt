@@ -269,7 +269,7 @@ public class ApiDocGenerator {
 
   protected ApiDocIgnore getApiDocIgnoreAnnotation(Class<?> clazz) {
     // ask bean first: is faster and supports more features (inherited annotations from interfaces)
-    IBean<?> bean = BEANS.getBeanManager().optBean(clazz);
+    IBean<?> bean = BEANS.getBeanManager().uniqueBean(clazz);
     if (bean != null) {
       ApiDocIgnore ann = bean.getBeanAnnotation(ApiDocIgnore.class);
       if (ann != null) {
