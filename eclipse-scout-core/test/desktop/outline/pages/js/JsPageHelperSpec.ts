@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1116,7 +1116,6 @@ class MyPageWithTable extends PageWithTable {
 
   protected override _jsonModel(): TreeNodeModel {
     return {
-      lazyExpandingEnabled: true,
       detailTable: {
         objectType: Table,
         columns: [

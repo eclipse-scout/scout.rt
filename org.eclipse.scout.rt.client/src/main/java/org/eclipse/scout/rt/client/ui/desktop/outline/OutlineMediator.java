@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,7 +14,6 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -125,12 +124,12 @@ public class OutlineMediator {
     if (e.isConsumed()) {
       return;
     }
-    ITreeNode node = page.getTreeNodeFor(e.getFirstRow());
-    if (node != null) {
+    IPage childPage = page.getPageFor(e.getFirstRow());
+    if (childPage != null) {
       e.consume();
-      ITree tree = page.getTree();
-      if (tree != null) {
-        tree.getUIFacade().setNodeSelectedAndExpandedFromUI(node);
+      IOutline outline = page.getOutline();
+      if (outline != null) {
+        outline.drillDown(childPage);
       }
     }
   }

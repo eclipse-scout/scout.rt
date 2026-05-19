@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -188,19 +188,6 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
    * mark a node as dirty
    */
   void setChildrenDirty(boolean b);
-
-  /**
-   * a node with volatile (rapidly and constantly changing) children is reloaded on ANY ui call to
-   * {@link ITreeUIFacade#setNodeExpandedFromUI(ITreeNode, boolean, boolean)}
-   * {@link ITreeUIFacade#setNodeSelectedAndExpandedFromUI(ITreeNode)}
-   * {@link ITreeUIFacade#setNodesSelectedFromUI(List)} default is false
-   */
-  boolean isChildrenVolatile();
-
-  /**
-   * mark node as containing volatile children
-   */
-  void setChildrenVolatile(boolean b);
 
   /**
    * @return true if node is enabled and enabled is granted

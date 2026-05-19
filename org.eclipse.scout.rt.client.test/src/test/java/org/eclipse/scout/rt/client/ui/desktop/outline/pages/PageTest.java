@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -133,11 +133,11 @@ public class PageTest {
   @Test
   public void testCollapseLazyNodeOnReload() {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
-    desktop.setAvailableOutlines(Collections.singletonList(new LazyPageWithTableOutline()));
-    desktop.setOutline(LazyPageWithTableOutline.class);
+    desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
+    desktop.setOutline(PageWithTableOutline.class);
     desktop.activateFirstPage();
     IOutline outline = desktop.getOutline();
-    LazyPageWithTable page = (LazyPageWithTable) outline.getActivePage();
+    PageWithTable page = (PageWithTable) outline.getActivePage();
 
     assertEquals(3, page.getChildNodeCount());
     assertFalse(page.isExpanded());
@@ -147,7 +147,7 @@ public class PageTest {
 
     // Drill down to child node -> page should be expanded lazily
 
-    outline.getUIFacade().setNodeSelectedAndExpandedFromUI(page.getChildNode(0));
+    outline.drillDown(page.getChildPage(0));
     assertTrue(page.isExpanded());
     assertTrue(page.isExpandedLazy());
 
@@ -237,15 +237,15 @@ public class PageTest {
     }
   }
 
-  class LazyPageWithTableOutline extends AbstractOutline {
+  class PageWithTableOutline extends AbstractOutline {
 
     @Override
     protected void execCreateChildPages(List<IPage<?>> pageList) {
-      pageList.add(new LazyPageWithTable());
+      pageList.add(new PageWithTable());
     }
   }
 
-  class LazyPageWithTable extends AbstractPageWithTable<LazyPageWithTable.Table> {
+  class PageWithTable extends AbstractPageWithTable<PageWithTable.Table> {
 
     @Override
     protected void execLoadData(SearchFilter filter) {
@@ -259,7 +259,8 @@ public class PageTest {
 
     @Override
     protected IPage<?> execCreateChildPage(ITableRow row) {
-      return new P_Page();
+      return new AbstractPageWithNodes() {
+      };
     }
 
     public class Table extends AbstractTable {

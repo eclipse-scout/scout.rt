@@ -1281,9 +1281,10 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
   }
 
   /**
-   * Selects the given page.
+   * Selects the given page and, if necessary, scrolls it into the viewport to make it visible.
+   * Also expands the page if it is a node page and `expandDrillNode` is null or undefined.
    *
-   * @param drillNode The page to select. May be null, in which case nothing happens.
+   * @param drillNode The page to select. If it is null, nothing happens.
    * @param expandDrillNode Whether to automatically expand the drill node after selecting it.
    *        By default, this is `true` for node pages, `false` otherwise.
    */
@@ -1295,6 +1296,11 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
       // If the target node is a node page, expand it
       if (scout.nvl(expandDrillNode, drillNode.nodeType === Page.NodeType.NODES)) {
         this.expandNode(drillNode);
+      }
+
+      // Ensure selected node is visible
+      if (!this.scrollToSelection) {
+        this.revealSelection();
       }
     }
   }

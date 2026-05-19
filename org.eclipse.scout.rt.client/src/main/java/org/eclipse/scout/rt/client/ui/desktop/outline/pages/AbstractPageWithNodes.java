@@ -355,6 +355,11 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     return true;
   }
 
+  @Override
+  public boolean computeExpandOnDrillDown() {
+    return true;
+  }
+
   /**
    * inner table
    */

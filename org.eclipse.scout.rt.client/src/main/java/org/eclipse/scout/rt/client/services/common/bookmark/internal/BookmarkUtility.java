@@ -720,7 +720,7 @@ public final class BookmarkUtility {
     }
     IPage<?> childPage = null;
     boolean loadChildren = !leafState;
-    if (tablePage.isChildrenDirty() || tablePage.isChildrenVolatile()) {
+    if (tablePage.isChildrenDirty()) {
       loadChildren = true;
       tablePage.setChildrenLoaded(false);
     }
