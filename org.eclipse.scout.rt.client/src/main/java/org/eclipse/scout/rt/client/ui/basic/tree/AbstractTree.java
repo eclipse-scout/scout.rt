@@ -2843,7 +2843,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
           setTreeChanging(true);
           node = resolveNode(node);
           if (node != null && (node.isExpanded() != on || node.isExpandedLazy() != lazy)) {
-            if (on && (node.isChildrenDirty() || node.isChildrenVolatile())) {
+            if (on && node.isChildrenDirty()) {
               node.loadChildren();
             }
             setNodeExpanded(node, on, lazy);
@@ -2866,40 +2866,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     }
 
     @Override
-    public void setNodeSelectedAndExpandedFromUI(ITreeNode node) {
-      try {
-        pushUIProcessor();
-        try {
-          setTreeChanging(true);
-          node = resolveNode(node);
-          if (node != null) {
-            if (node.isChildrenDirty() || node.isChildrenVolatile()) {
-              node.loadChildren();
-            }
-            setNodeExpanded(node, true);
-            selectNode(node, false);
-            if (!isScrollToSelection()) {
-              scrollToSelection();
-            }
-          }
-        }
-        finally {
-          setTreeChanging(false);
-        }
-      }
-      catch (RuntimeException e) {
-        if (node != null) {
-          throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
-              .withContextInfo("cell", node.toPlainText());
-        }
-        throw e;
-      }
-      finally {
-        popUIProcessor();
-      }
-    }
-
-    @Override
     public void setNodesSelectedFromUI(List<ITreeNode> nodes) {
       try {
         pushUIProcessor();
@@ -2913,7 +2879,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
           // load children for selection
           for (ITreeNode node : validNodes) {
-            if (node.isChildrenLoaded() && (node.isChildrenDirty() || node.isChildrenVolatile())) {
+            if (node.isChildrenLoaded() && node.isChildrenDirty()) {
               node.loadChildren();
             }
           }

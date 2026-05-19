@@ -2453,14 +2453,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       let propertiesChanged: boolean;
       let oldNode = this.nodesMap[updatedNode.id];
 
-      // if same instance has been updated we must set the flag always to true
-      // because we cannot compare against an "old" node
-      if (updatedNode === oldNode) {
-        propertiesChanged = true;
-      } else {
-        propertiesChanged = this._applyUpdatedNodeProperties(oldNode, updatedNode);
-      }
-
+      propertiesChanged = this._applyUpdatedNodeProperties(oldNode, updatedNode);
       if (propertiesChanged) {
         this.applyFiltersForNode(oldNode);
         this._updateItemPath(false, oldNode.parentNode);
@@ -2490,6 +2483,16 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
    *          determine if the node has to be rendered again.
    */
   protected _applyUpdatedNodeProperties(oldNode: TreeNode, updatedNode: ObjectOrModel<TreeNode>): boolean {
+    // Make sure expandedLazy is reset to false when lazyExpanding is disabled (same code as in AbstractTreeNode.setLazyExpandingEnabled)
+    if (!updatedNode.lazyExpandingEnabled || !this.lazyExpandingEnabled) {
+      oldNode.expandedLazy = false;
+    }
+
+    // Always return true if the same instance has been updated because we cannot compare against an "old" node
+    if (updatedNode === oldNode) {
+      return true;
+    }
+
     // Note: We only update _some_ of the properties, because everything else will be handled
     // with separate events. --> See also: JsonTree.java/handleModelNodesUpdated()
     let propertiesChanged = false;
@@ -2503,10 +2506,6 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     }
     if (oldNode.lazyExpandingEnabled !== updatedNode.lazyExpandingEnabled) {
       oldNode.lazyExpandingEnabled = updatedNode.lazyExpandingEnabled;
-      // Also make sure expandedLazy is reset to false when lazyExpanding is disabled (same code as in AbstractTreeNode.setLazyExpandingEnabled)
-      if (!updatedNode.lazyExpandingEnabled || !this.lazyExpandingEnabled) {
-        oldNode.expandedLazy = false;
-      }
       propertiesChanged = true;
     }
     return propertiesChanged;

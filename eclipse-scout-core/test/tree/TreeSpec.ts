@@ -464,8 +464,8 @@ describe('Tree', () => {
   describe('updateNodes', () => {
     let model: SpecTreeModel;
     let tree: SpecTree;
-    let node0;
-    let child0;
+    let node0: TreeNode;
+    let child0: TreeNode;
 
     beforeEach(() => {
       model = helper.createModelFixture(3, 3, false);
@@ -484,6 +484,41 @@ describe('Tree', () => {
       // we expect that _decorateNode has been called and updates the DOM of the tree
       let $treeNode = tree.$container.find('[data-nodeid="' + node0.id + '"]').first();
       expect($treeNode.attr('class')).toContain('leaf');
+    });
+
+    it('sets lazyExpanding to false if lazyExpandingEnabled is false', () => {
+      tree.render();
+
+      tree.nodes[0].setLazyExpandingEnabled(true);
+      tree.expandNode(tree.nodes[0]);
+      expect(tree.nodes[0].lazyExpandingEnabled).toBe(true);
+      expect(tree.nodes[0].expanded).toBe(true);
+      expect(tree.nodes[0].expandedLazy).toBe(true);
+
+      tree.nodes[0].setLazyExpandingEnabled(false);
+      tree.updateNode({
+        id: tree.nodes[0].id,
+        lazyExpandingEnabled: false
+      });
+      expect(tree.nodes[0].lazyExpandingEnabled).toBe(false);
+      expect(tree.nodes[0].expanded).toBe(true);
+      expect(tree.nodes[0].expandedLazy).toBe(false);
+    });
+
+    it('sets lazyExpanding to false if lazyExpandingEnabled is false even if node instance is the same', () => {
+      tree.render();
+
+      tree.nodes[0].setLazyExpandingEnabled(true);
+      tree.expandNode(tree.nodes[0]);
+      expect(tree.nodes[0].lazyExpandingEnabled).toBe(true);
+      expect(tree.nodes[0].expanded).toBe(true);
+      expect(tree.nodes[0].expandedLazy).toBe(true);
+
+      tree.nodes[0].setLazyExpandingEnabled(false);
+      tree.updateNode(node0);
+      expect(tree.nodes[0].lazyExpandingEnabled).toBe(false);
+      expect(tree.nodes[0].expanded).toBe(true);
+      expect(tree.nodes[0].expandedLazy).toBe(false);
     });
 
     describe('enabled update', () => {

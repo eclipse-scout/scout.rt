@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -237,4 +237,9 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
    * @see #pageActivatedNotify()
    */
   boolean hasBeenActivated();
+
+  /**
+   * Whether the page should be expanded on {@link IOutline#drillDown(IPage)}.
+   */
+  boolean computeExpandOnDrillDown();
 }

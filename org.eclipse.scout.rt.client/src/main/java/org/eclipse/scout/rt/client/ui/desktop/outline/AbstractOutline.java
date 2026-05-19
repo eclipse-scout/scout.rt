@@ -1094,4 +1094,28 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       jsPage.changeNode(cell);
     }
   }
+
+  @Override
+  public void drillDown(IPage page) {
+    if (page == null) {
+      return;
+    }
+
+    try {
+      setTreeChanging(true);
+      if (page.computeExpandOnDrillDown()) {
+        if (page.isChildrenDirty()) {
+          page.loadChildren();
+        }
+        setNodeExpanded(page, true);
+      }
+      selectNode(page, false);
+      if (!isScrollToSelection()) {
+        scrollToSelection();
+      }
+    }
+    finally {
+      setTreeChanging(false);
+    }
+  }
 }

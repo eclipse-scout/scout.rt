@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.IOrdered;
@@ -235,4 +236,13 @@ public interface IOutline extends ITree, IOrdered, IDisplayParent, IVisibleDimen
    * @since 7.0
    */
   ClientRunContext createDisplayParentRunContext();
+
+  /**
+   * Selects the given page and, if necessary, scrolls it into the viewport to make it visible.
+   * Also expands the page if {@link IPage#computeExpandOnDrillDown()} returns <code>true</code>, which is the default for {@link IPageWithNodes}s.
+   *
+   * @param page
+   *     The page to select. If it is null, nothing happens.
+   */
+  void drillDown(IPage page);
 }

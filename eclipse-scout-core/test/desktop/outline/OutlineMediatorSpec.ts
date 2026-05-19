@@ -148,6 +148,7 @@ describe('OutlineMediator', () => {
   });
 
   it('tableRowsFiltered', () => {
+    page.setLazyExpandingEnabled(false);
     let modelRows = [
       tableHelper.createModelRow('0', ['Foo']),
       tableHelper.createModelRow('1', ['Bar'])
