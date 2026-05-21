@@ -31,7 +31,7 @@ public class ScoutJettyErrorHandler extends ErrorHandler {
   }
 
   @Override
-  protected void writeErrorJson(Request request, PrintWriter writer, int code, String message, Throwable cause, boolean showStacks) {
+  protected void writeErrorJson(Request request, PrintWriter writer, int code, String message, Throwable cause) {
     JSONObject json = new JSONObject();
     json.put("status", Integer.toString(code));
     json.put("message", message);
@@ -45,7 +45,7 @@ public class ScoutJettyErrorHandler extends ErrorHandler {
   }
 
   @Override
-  protected void writeErrorPlain(Request request, PrintWriter writer, int code, String message, Throwable cause, boolean showStacks) {
+  protected void writeErrorPlain(Request request, PrintWriter writer, int code, String message, Throwable cause) {
     writer.write("HTTP ERROR ");
     writer.write(Integer.toString(code));
     writer.write("\n");

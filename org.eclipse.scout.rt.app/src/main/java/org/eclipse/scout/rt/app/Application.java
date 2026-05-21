@@ -25,12 +25,19 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
+import org.eclipse.jetty.compression.gzip.GzipCompression;
+import org.eclipse.jetty.compression.gzip.GzipDecoderConfig;
+import org.eclipse.jetty.compression.gzip.GzipEncoderConfig;
+import org.eclipse.jetty.compression.server.CompressionConfig;
+import org.eclipse.jetty.compression.server.CompressionConfig.Builder;
+import org.eclipse.jetty.compression.server.CompressionHandler;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.SessionHandler;
 import org.eclipse.jetty.http.HttpCookie.SameSite;
 import org.eclipse.jetty.http.HttpField;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpStatus;
+import org.eclipse.jetty.http.UriCompliance;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
 import org.eclipse.jetty.server.Handler;
@@ -45,7 +52,6 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.GracefulHandler;
-import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.Uptime;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -439,7 +445,7 @@ public class Application {
     }
 
     if (CONFIG.getPropertyValue(ScoutApplicationGzipEnabled.class)) {
-      returnHandler = createGzipHandler(returnHandler);
+      returnHandler = createCompressionHandler(returnHandler);
     }
 
     if (CONFIG.getPropertyValue(ScoutApplicationGracefulShutdownProperty.class)) {
@@ -450,43 +456,54 @@ public class Application {
   }
 
   /**
-   * Create a {@link GzipHandler} and wrap the input handler with it.
+   * Create a {@link CompressionHandler} and wrap the input handler with it.
    *
    * @param handler
    *     original handler (to be wrapped)
-   * @return original handler wrapped by {@link GzipHandler}
+   * @return original handler wrapped by {@link CompressionHandler}
    */
-  protected Handler createGzipHandler(Handler handler) {
-    GzipHandler gzipHandler = new GzipHandler();
+  protected Handler createCompressionHandler(Handler handler) {
+    CompressionHandler compressionHandler = new CompressionHandler();
+    GzipCompression gzipCompression = new GzipCompression();
+    GzipDecoderConfig decoderConfig = new GzipDecoderConfig();
+    GzipEncoderConfig encoderConfig = new GzipEncoderConfig();
 
-    setStringPropertyValueIfFilled(ScoutApplicationGzipExcludedInflatePaths.class, gzipHandler::setExcludedInflatePaths);
-    setStringPropertyValueIfFilled(ScoutApplicationGzipExcludedMethods.class, gzipHandler::setExcludedMethods);
-    setStringPropertyValueIfFilled(ScoutApplicationGzipExcludedMimeTypes.class, gzipHandler::setExcludedMimeTypes);
-    setStringPropertyValueIfFilled(ScoutApplicationGzipExcludedPaths.class, gzipHandler::setExcludedPaths);
+    Builder configBuilder = CompressionConfig.builder();
 
-    setStringPropertyValueIfFilled(ScoutApplicationGzipIncludedInflatePaths.class, gzipHandler::setIncludedInflatePaths);
-    setStringPropertyValueIfFilled(ScoutApplicationGzipIncludedMethods.class, gzipHandler::setIncludedMethods);
-    setStringPropertyValueIfFilled(ScoutApplicationGzipIncludedMimeTypes.class, gzipHandler::setIncludedMimeTypes);
-    setStringPropertyValueIfFilled(ScoutApplicationGzipIncludedPaths.class, gzipHandler::setIncludedPaths);
+    setStringPropertyValueIfFilled(ScoutApplicationGzipExcludedInflatePaths.class, configBuilder::decompressExcludePath);
+    setStringPropertyValueIfFilled(ScoutApplicationGzipExcludedMethods.class, configBuilder::compressExcludeMethod);
+    setStringPropertyValueIfFilled(ScoutApplicationGzipExcludedMimeTypes.class, configBuilder::compressExcludeMimeType);
+    setStringPropertyValueIfFilled(ScoutApplicationGzipExcludedPaths.class, configBuilder::compressExcludePath);
 
-    Optional.ofNullable(CONFIG.getPropertyValue(ScoutApplicationGzipMinSize.class)).ifPresent(gzipHandler::setMinGzipSize);
-    gzipHandler.setSyncFlush(CONFIG.getPropertyValue(ScoutApplicationGzipSyncFlush.class));
+    setStringPropertyValueIfFilled(ScoutApplicationGzipIncludedInflatePaths.class, configBuilder::decompressIncludePath);
+    setStringPropertyValueIfFilled(ScoutApplicationGzipIncludedMethods.class, configBuilder::compressIncludeMethod);
+    setStringPropertyValueIfFilled(ScoutApplicationGzipIncludedMimeTypes.class, configBuilder::compressIncludeMimeType);
+    setStringPropertyValueIfFilled(ScoutApplicationGzipIncludedPaths.class, configBuilder::compressIncludePath);
 
-    gzipHandler.setInflateBufferSize(CONFIG.getPropertyValue(ScoutApplicationGzipInflateBufferSize.class)); // positive buffer size to enable compressed requests
+    CompressionConfig compressionConfig = configBuilder.build();
+    compressionHandler.putConfiguration("/*", compressionConfig);
 
+    Optional.ofNullable(CONFIG.getPropertyValue(ScoutApplicationGzipMinSize.class)).ifPresent(gzipCompression::setMinCompressSize);
+    encoderConfig.setSyncFlush(CONFIG.getPropertyValue(ScoutApplicationGzipSyncFlush.class));
+    decoderConfig.setBufferSize(CONFIG.getPropertyValue(ScoutApplicationGzipInflateBufferSize.class));// positive buffer size to enable compressed requests
+
+    gzipCompression.setDefaultDecoderConfig(decoderConfig);
+    gzipCompression.setDefaultEncoderConfig(encoderConfig);
+
+    compressionHandler.putCompression(gzipCompression);
     // wrap the original handler
-    gzipHandler.setHandler(handler);
-    return gzipHandler;
+    compressionHandler.setHandler(handler);
+    return compressionHandler;
   }
 
   protected Handler createGracefulHandler(Handler handler) {
     return new GracefulHandler(handler);
   }
 
-  protected void setStringPropertyValueIfFilled(Class<? extends IConfigProperty<List<String>>> propertyClass, Consumer<String[]> setter) {
-    List<String> propertyValue = CONFIG.getPropertyValue(propertyClass);
-    if (!CollectionUtility.isEmpty(propertyValue)) {
-      setter.accept(propertyValue.toArray(n -> new String[n]));
+  protected void setStringPropertyValueIfFilled(Class<? extends IConfigProperty<List<String>>> propertyClass, Consumer<String> setter) {
+    List<String> propertyValues = CONFIG.getPropertyValue(propertyClass);
+    if (!CollectionUtility.isEmpty(propertyValues)) {
+      propertyValues.forEach(setter);
     }
   }
 
