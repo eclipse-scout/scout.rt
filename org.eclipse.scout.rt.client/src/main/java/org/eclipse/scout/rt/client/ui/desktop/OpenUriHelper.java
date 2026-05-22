@@ -90,7 +90,7 @@ public class OpenUriHelper {
   }
 
   protected IOpenUriAction getOpenUriActionPdf() {
-    return OpenUriAction.OPEN;
+    return OpenUriAction.DOWNLOAD;
   }
 
   protected IOpenUriAction getOpenUriActionDefault() {
