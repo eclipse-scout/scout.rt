@@ -235,7 +235,7 @@ public enum MimeType implements IMimeType {
    * Common image mime types.
    */
   public static MimeType[] getCommonImageTypesAsArray() {
-    return new MimeType[]{BMP, GIF, JPG, JPE, JPEG, PNG, SVG, TIF, TIFF};
+    return new MimeType[]{AVIF, BMP, GIF, JPG, JFIF, JPE, JPEG, PNG, SVG, TIF, TIFF, WEBP};
   }
 
   /**
