@@ -285,6 +285,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   public AbstractPage(boolean callInitializer, String userPreferenceContext) {
     super(false);
+    LOG.trace("Creating page {}", this);
     m_userPreferenceContext = userPreferenceContext;
     m_localTreeListener = createLocalTreeListener();
     if (callInitializer) {
@@ -790,6 +791,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   public void disposeInternal() {
+    LOG.trace("Disposing page {}", this);
     super.disposeInternal();
     try {
       interceptDisposePage();

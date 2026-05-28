@@ -187,6 +187,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
 
   protected String createUniqueIdForPage(IPage<?> p, Object o) {
     if (p == null) {
+      LOG.warn("creating unique id invoked for null page", LOG.isDebugEnabled() ? new Exception("stacktrace") : null);
       return null;
     }
     StringBuilder builder = new StringBuilder();
@@ -201,7 +202,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
     return "" + crc.getValue();
   }
 
-  private void createIdForPage(StringBuilder b, IPage<?> page, Object o) {
+  protected void createIdForPage(StringBuilder b, IPage<?> page, Object o) {
     b.append("/");
     b.append(page.getClass().getName());
     if (page.getUserPreferenceContext() != null) {
