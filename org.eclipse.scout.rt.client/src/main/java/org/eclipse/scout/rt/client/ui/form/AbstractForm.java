@@ -2133,6 +2133,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   @Override
   protected final void disposeInternal() {
+    LOG.trace("Disposing form {} {}", getTitle(), this);
     disposeFormInternal();
     super.disposeInternal();
   }

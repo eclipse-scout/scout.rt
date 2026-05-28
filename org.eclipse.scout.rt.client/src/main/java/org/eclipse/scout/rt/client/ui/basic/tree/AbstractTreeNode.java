@@ -1185,6 +1185,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     if (getTree() == null) {
       return;
     }
+    LOG.trace("Unloading node {} with {} child nodes", this, getChildNodeCount());
     setExpanded(false);
     getTree().removeAllChildNodes(this);
     setChildrenLoaded(false);
