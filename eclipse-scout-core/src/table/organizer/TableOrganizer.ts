@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -166,8 +166,7 @@ export class TableOrganizer implements ObjectWithType {
   addColumn(column?: Column<any>): Promise<void> {
     if (this.table.isCustomizable()) {
       return this.table.customizer.addCustomColumn(column)
-        .then(() => {
-        }); // ignore return value
+        .then(() => undefined); // ignore return value
     }
     return this._showInvisibleColumnsForm(column);
   }
@@ -224,8 +223,7 @@ export class TableOrganizer implements ObjectWithType {
   modifyColumn(column: Column<any>): Promise<void> {
     if (this.table.isCustomizable() && this.table.customizer.isCustomizable(column)) {
       return this.table.customizer.modifyCustomColumn(column)
-        .then(() => {
-        }); // ignore return value
+        .then(() => undefined); // ignore return value
     }
     return Promise.resolve(); // non-customized columns cannot be modified
   }

@@ -279,14 +279,11 @@ export class TableUiPreferences implements ObjectWithType {
     return table.filters
       .filter(filter => filter instanceof TableUserFilter)
       .map((filter: TableUserFilter) => {
-        for (let mapper of UserFilterStateMappers.all()) {
-          let filterState = mapper.tryToDo(table, filter);
-          if (filterState) {
-            return filterState;
-          }
+        let filterState = UserFilterStateMappers.toDo(table, filter);
+        if (!filterState) {
+          scout.create(ErrorHandler, {displayError: false, sendError: true}).handle(`Unable to map filter to data object [table=${table.id}, filterType=${filter?.filterType}, filterLabel=${filter?.createLabel()}`);
         }
-        scout.create(ErrorHandler, {displayError: false, sendError: true}).handle(`Unable to map filter to data object [table=${table.id}, filterType=${filter?.filterType}, filterLabel=${filter?.createLabel()}`);
-        return null;
+        return filterState;
       })
       .filter(Boolean);
   }
