@@ -4505,14 +4505,12 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   applyUserFilterStates(userFilterStates: IUserFilterStateDo[]) {
     let newFilters = this.filters.filter(filter => !(filter instanceof TableUserFilter));
     arrays.ensure(userFilterStates).forEach(filterState => {
-      for (let mapper of UserFilterStateMappers.all()) {
-        let filter = mapper.tryFromDo(this, filterState);
-        if (filter) {
-          newFilters.push(filter);
-          return;
-        }
+      let filter = UserFilterStateMappers.fromDo(this, filterState);
+      if (!filter) {
+        scout.create(ErrorHandler, {displayError: false, logError: true}).handle(`No mapper found for user filter state: ${dataObjects.stringify(filterState)}`);
+        return;
       }
-      scout.create(ErrorHandler, {displayError: false, logError: true}).handle(`No mapper found for user filter state: ${dataObjects.stringify(filterState)}`);
+      newFilters.push(filter);
     });
     this.setFilters(newFilters);
   }
