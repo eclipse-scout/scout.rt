@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
+import java.security.Key;
 import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -51,7 +52,7 @@ public class SecurityUtilityTest {
     // empty array
     byte[] encryptData3 = SecurityUtility.encrypt(new byte[]{}, PASSWORD, salt, KEY_LEN);
     byte[] decryptedEmpty = SecurityUtility.decrypt(encryptData3, PASSWORD, salt, KEY_LEN);
-    Assert.assertArrayEquals(decryptedEmpty, new byte[]{});
+    Assert.assertArrayEquals(new byte[]{}, decryptedEmpty);
 
     // data based decryption
     String decryptedString = new String(SecurityUtility.decrypt(encryptData, PASSWORD, salt, KEY_LEN), ENCODING);
@@ -76,6 +77,97 @@ public class SecurityUtilityTest {
     Assert.assertArrayEquals(inputBytes, decryptedStream2.readAllBytes());
   }
 
+  @Test
+  public void testEnvelopeEncryption() throws IOException {
+    final String origData = "origData";
+    final byte[] salt = SecurityUtility.createRandomBytes();
+    final byte[] inputBytes = origData.getBytes(ENCODING);
+
+    Key kek = SecurityUtility.createKeyEncryptionKey(PASSWORD, salt);
+
+    // data based encryption
+    byte[] encryptedData1 = SecurityUtility.envelopeEncrypt(inputBytes, kek, KEY_LEN);
+    Assert.assertFalse(Arrays.equals(encryptedData1, inputBytes));
+
+    // data based decryption
+    String decryptedString = new String(SecurityUtility.envelopeDecrypt(encryptedData1, kek), ENCODING);
+    Assert.assertEquals(origData, decryptedString);
+
+    // empty array
+    byte[] encryptEmpty = SecurityUtility.envelopeEncrypt(new byte[]{}, kek, KEY_LEN);
+    byte[] decryptedEmpty = SecurityUtility.envelopeDecrypt(encryptEmpty, kek);
+    Assert.assertArrayEquals(new byte[]{}, decryptedEmpty);
+
+    // stream based encryption
+    ByteArrayOutputStream encryptedStream1 = new ByteArrayOutputStream();
+    SecurityUtility.envelopeEncrypt(new ByteArrayInputStream(inputBytes), encryptedStream1, kek, KEY_LEN);
+    byte[] encryptedStreamData1 = encryptedStream1.toByteArray();
+    Assert.assertFalse(Arrays.equals(encryptedData1, encryptedStreamData1)); // encryption always generates a new DEK, so the encrypted data will be different
+
+    // stream based decryption
+    ByteArrayOutputStream decryptedStream1 = new ByteArrayOutputStream();
+    SecurityUtility.envelopeDecrypt(new ByteArrayInputStream(encryptedData1), decryptedStream1, kek);
+    Assert.assertArrayEquals(inputBytes, decryptedStream1.toByteArray());
+
+    // input stream encryption wrapping
+    InputStream encryptedStream2 = SecurityUtility.envelopeEncrypt(new ByteArrayInputStream(inputBytes), kek, KEY_LEN);
+    byte[] encryptedStreamData2 = encryptedStream2.readAllBytes();
+    Assert.assertFalse(Arrays.equals(encryptedData1, encryptedStreamData2)); // encryption always generates a new DEK, so the encrypted data will be different
+
+    // input stream decryption wrapping
+    InputStream decryptedStream2 = SecurityUtility.envelopeDecrypt(new ByteArrayInputStream(encryptedStreamData2), kek);
+    Assert.assertArrayEquals(inputBytes, decryptedStream2.readAllBytes());
+  }
+
+  @Test
+  public void testEnvelopeEncryption_decryptUnencrypted() throws IOException {
+    final String origData = "origData";
+    final byte[] salt = SecurityUtility.createRandomBytes();
+    final byte[] inputBytes = origData.getBytes(ENCODING);
+
+    Key kek = SecurityUtility.createKeyEncryptionKey(PASSWORD, salt);
+
+    String decryptedString = new String(SecurityUtility.envelopeDecrypt(inputBytes, kek), ENCODING);
+    Assert.assertEquals(origData, decryptedString);
+
+    ByteArrayOutputStream decryptedStream1 = new ByteArrayOutputStream();
+    SecurityUtility.envelopeDecrypt(new ByteArrayInputStream(inputBytes), decryptedStream1, kek);
+    Assert.assertArrayEquals(inputBytes, decryptedStream1.toByteArray());
+
+    InputStream decryptedStream2 = SecurityUtility.envelopeDecrypt(new ByteArrayInputStream(inputBytes), kek);
+    Assert.assertArrayEquals(inputBytes, decryptedStream2.readAllBytes());
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testEnvelopeEncryption_encryptNoData() {
+    final byte[] salt = SecurityUtility.createRandomBytes();
+    SecurityUtility.envelopeEncrypt((byte[]) null, "pass".toCharArray(), salt, KEY_LEN);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testEnvelopeEncryption_encryptNoSalt() {
+    SecurityUtility.envelopeEncrypt("test".getBytes(ENCODING), "pass".toCharArray(), null, KEY_LEN);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testEnvelopeEncryption_encryptNoKey() {
+    final byte[] salt = SecurityUtility.createRandomBytes();
+    SecurityUtility.envelopeEncrypt("test".getBytes(ENCODING), null, salt, KEY_LEN);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testEnvelopeEncryption_encryptWrongKeyLen() {
+    final byte[] salt = SecurityUtility.createRandomBytes();
+    SecurityUtility.envelopeEncrypt("test".getBytes(ENCODING), "pass".toCharArray(), salt, 4);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testEnvelopeEncryption_decryptNoKey() {
+    final byte[] salt = SecurityUtility.createRandomBytes();
+    byte[] encrypted = SecurityUtility.envelopeEncrypt("test".getBytes(ENCODING), "pass".toCharArray(), salt, KEY_LEN);
+    SecurityUtility.envelopeDecrypt(encrypted, null);
+  }
+
   @Test(expected = AssertionException.class)
   public void testEncryptNoData() {
     final byte[] salt = SecurityUtility.createRandomBytes();
@@ -97,6 +189,29 @@ public class SecurityUtilityTest {
   public void testEncryptWrongKeyLen() {
     final byte[] salt = SecurityUtility.createRandomBytes();
     SecurityUtility.encrypt("test".getBytes(ENCODING), "pass".toCharArray(), salt, 4);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testDecryptNoData() {
+    final byte[] salt = SecurityUtility.createRandomBytes();
+    SecurityUtility.decrypt((byte[]) null, "pass".toCharArray(), salt, KEY_LEN);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testDecryptNoSalt() {
+    SecurityUtility.decrypt("test".getBytes(ENCODING), "pass".toCharArray(), null, KEY_LEN);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testDecryptNoKey() {
+    final byte[] salt = SecurityUtility.createRandomBytes();
+    SecurityUtility.decrypt("test".getBytes(ENCODING), null, salt, KEY_LEN);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testDecryptWrongKeyLen() {
+    final byte[] salt = SecurityUtility.createRandomBytes();
+    SecurityUtility.decrypt("test".getBytes(ENCODING), "pass".toCharArray(), salt, 4);
   }
 
   @Test(expected = AssertionException.class)
@@ -388,6 +503,16 @@ public class SecurityUtilityTest {
   }
 
   @Test
+  public void testDecryptionApiStability_2026_envelopeEncryption() {
+    final byte[] encrypted = Base64Utility.decode("WzIwMjY6RUU6djE6ZnhycUEwRy9FaC8yQ2FwaDdzQTVHZz09OjJwVi9zMEtZUUQ1eW1iUWhGcWgrTVMwRm9KYUd2OW1kKzF0NTRST0RDWmc9OnkwNlQ4T1hLOGluejg5VWM1cVp4bXc9PV3S0zpeAP0s+xXACoVdmFC0XiNGsK5c4/otBq0Jp1hnaJ8eyVOeVeocKOMy");
+    final byte[] salt = "salty".getBytes(ENCODING);
+    Assert.assertEquals("This is an encrypted string", new String(SecurityUtility.decrypt(encrypted, PASSWORD, salt, 128), ENCODING));
+    EncryptionKey key = SecurityUtility.createDecryptionKey(new PushbackInputStream(new ByteArrayInputStream(encrypted), 6), PASSWORD, salt, 128, null);
+    Assert.assertEquals("[2026:EE:v1:fxrqA0G/Eh/2Caph7sA5Gg==:2pV/s0KYQD5ymbQhFqh+MS0FoJaGv9md+1t54RODCZg=:y06T8OXK8inz89Uc5qZxmw==]", new String(key.getCompatibilityHeader(), StandardCharsets.US_ASCII));
+    Assert.assertEquals("This is an encrypted string", new String(SecurityUtility.decrypt(encrypted, key), ENCODING));
+  }
+
+  @Test
   public void testExtractCompatibilityHeader() {
     PushbackInputStream in = new PushbackInputStream(new ByteArrayInputStream(new byte[]{0, 1, 2, 3, 4, 5}), 6);
     Assert.assertNull(SecurityUtility.extractCompatibilityHeader(in));
@@ -407,6 +532,10 @@ public class SecurityUtilityTest {
 
     in = new PushbackInputStream(new ByteArrayInputStream(new byte[]{'[', '1', '2', '3', '0', ':', 0, ']', 78, 79}), 6);
     Assert.assertArrayEquals(new byte[]{'[', '1', '2', '3', '0', ':', 0, ']'}, SecurityUtility.extractCompatibilityHeader(in));
+    Assert.assertArrayEquals(new byte[]{78, 79}, IOUtility.readBytes(in));
+
+    in = new PushbackInputStream(new ByteArrayInputStream(new byte[]{'[', '1', '2', '3', '0', ':', 0, 'A', ':', '0', 'B', ':', '0', 'C', ':', '0', 'D', ']', 78, 79}), 6);
+    Assert.assertArrayEquals(new byte[]{'[', '1', '2', '3', '0', ':', 0, 'A', ':', '0', 'B', ':', '0', 'C', ':', '0', 'D', ']'}, SecurityUtility.extractCompatibilityHeader(in));
     Assert.assertArrayEquals(new byte[]{78, 79}, IOUtility.readBytes(in));
   }
 
@@ -436,6 +565,20 @@ public class SecurityUtilityTest {
     Assert.assertNotEquals(withoutCompatibilityHeaderDecryptionKey.get(), currentKey.get());
     Assert.assertEquals(oldDecryptionKey.get(), withoutCompatibilityHeaderDecryptionKey.get());
     Assert.assertArrayEquals(ISecurityProvider.ENCRYPTION_COMPATIBILITY_HEADER_2023_V1.getBytes(StandardCharsets.US_ASCII), withoutCompatibilityHeaderDecryptionKey.getCompatibilityHeader());
+  }
+
+  @Test
+  public void testEnvelopeEncryptionCompatibilityHeaderKeyGeneration() {
+    byte[] salt = "salty".getBytes(StandardCharsets.US_ASCII);
+
+    EncryptionKey newDek = SecurityUtility.createDocumentEncryptionKey(PASSWORD, salt, 128);
+
+    String envelopeEncryptionCompatibilityHeader2026 = String.format(ISecurityProvider.ENVELOPE_ENCRYPTION_COMPATIBILITY_HEADER_V1, "6Ofxp2Dz/Sdkq3RYUMIbLw==", "lG64XPmS5092gLLPxAw2dDc8qnBzS16dso6OiR+7kpg=", "FoCE25vlDKA48PcLDQHVsA==");
+    EncryptionKey decryptionKey = SecurityUtility.createDecryptionKey(new PushbackInputStream(new ByteArrayInputStream(envelopeEncryptionCompatibilityHeader2026.getBytes(StandardCharsets.US_ASCII)), 9), PASSWORD, salt, 128, null);
+    EncryptionKey decryptionKey2 = SecurityUtility.createDecryptionKey(new PushbackInputStream(new ByteArrayInputStream(envelopeEncryptionCompatibilityHeader2026.getBytes(StandardCharsets.US_ASCII)), 9), PASSWORD, salt, 128, null);
+    Assert.assertEquals(decryptionKey.get(), decryptionKey2.get()); // creating a decryption key from a compatibility header must always return the same DEK
+    Assert.assertNotEquals(decryptionKey.get(), newDek.get()); // creating a DEK always generates a new one
+    Assert.assertArrayEquals(envelopeEncryptionCompatibilityHeader2026.getBytes(StandardCharsets.US_ASCII), decryptionKey.getCompatibilityHeader());
   }
 
   @Test

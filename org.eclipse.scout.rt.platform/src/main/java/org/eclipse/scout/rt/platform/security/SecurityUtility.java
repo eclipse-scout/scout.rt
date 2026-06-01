@@ -19,12 +19,14 @@ import java.io.SequenceInputStream;
 import java.net.URL;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
+import java.security.Key;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.security.auth.Subject;
 
@@ -236,7 +238,7 @@ public final class SecurityUtility {
   public static InputStream decrypt(InputStream encryptedData, char[] password, byte[] salt, int keyLen, EncryptionKey optKey) {
     PushbackInputStream input = new PushbackInputStream(encryptedData, 6);
     EncryptionKey key = createDecryptionKey(input, password, salt, keyLen, optKey);
-    return decrypt(input, key);
+    return SECURITY_PROVIDER.get().decrypt(input, key);
   }
 
   /**
@@ -302,6 +304,37 @@ public final class SecurityUtility {
     else {
       return SECURITY_PROVIDER.get().createDecryptionKey(password, salt, keyLen, compatibilityHeader);
     }
+  }
+
+  /**
+   * Creates a backward compatible {@link EncryptionKey} that is compatible to the encryptedData stream, which has been encrypted using envelope encryption.
+   * <p>
+   * See {@link ISecurityProvider#createEnvelopeDecryptionKey(Key, byte[])}
+   *
+   * @param cipherStream
+   *     must be capable to push back 8 bytes.
+   * @param keyEncryptionKey
+   *     The key encryption key (KEK) to decrypt the document encryption key (DEK). Must not be {@code null} or empty.
+   * @return the key
+   */
+  public static EncryptionKey createEnvelopeDecryptionKey(PushbackInputStream cipherStream, Key keyEncryptionKey) {
+    byte[] compatibilityHeader = extractCompatibilityHeader(cipherStream);
+    return createEnvelopeDecryptionKey(compatibilityHeader, keyEncryptionKey);
+  }
+
+  /**
+   * Creates a backward compatible {@link EncryptionKey} that is compatible to the provided compatibility header.
+   * <p>
+   * See {@link ISecurityProvider#createEnvelopeDecryptionKey(Key, byte[])}
+   *
+   * @param compatibilityHeader
+   *     compatibility header of the file
+   * @param keyEncryptionKey
+   *     The key encryption key (KEK) to decrypt the document encryption key (DEK). Must not be {@code null} or empty.
+   * @return the key
+   */
+  public static EncryptionKey createEnvelopeDecryptionKey(byte[] compatibilityHeader, Key keyEncryptionKey) {
+    return SECURITY_PROVIDER.get().createEnvelopeDecryptionKey(keyEncryptionKey, compatibilityHeader);
   }
 
   /**
@@ -431,9 +464,26 @@ public final class SecurityUtility {
    *     if there is an error during decryption.
    */
   public static byte[] decrypt(byte[] encryptedData, char[] password, byte[] salt, int keyLen, EncryptionKey optKey) {
+    return decrypt(encryptedData, input -> createDecryptionKey(input, password, salt, keyLen, optKey));
+  }
+
+  /**
+   * @param encryptedData
+   *     The encrypted bytes. Must not be {@code null}.
+   * @param decryptionKeyFunction
+   *     Function to create an {@link EncryptionKey} to decrypt the data.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during decryption.
+   */
+  private static byte[] decrypt(byte[] encryptedData, Function<PushbackInputStream, EncryptionKey> decryptionKeyFunction) {
     Assertions.assertNotNull(encryptedData, "no data provided");
     PushbackInputStream input = new PushbackInputStream(new ByteArrayInputStream(encryptedData), 6);
-    EncryptionKey key = createDecryptionKey(input, password, salt, keyLen, optKey);
+    EncryptionKey key = decryptionKeyFunction.apply(input);
+    if (key == null) { // data is not encrypted. directly return the data again.
+      return encryptedData;
+    }
     int expectedOutSize = encryptedData.length - 8;
     ByteArrayOutputStream result = new ByteArrayOutputStream(expectedOutSize);
     SECURITY_PROVIDER.get().decrypt(input, result, key);
@@ -463,6 +513,243 @@ public final class SecurityUtility {
     EncryptionKey key = createEncryptionKey(password, salt, keyLen);
     return encrypt(clearTextData, key);
   }
+
+  /* **************************************************************************
+   * ENVELOPE ENCRYPTION
+   * *************************************************************************/
+
+  /**
+   * Encrypts the given clear text bytes using envelope encryption. The key encryption key (KEK) is derived from the given password and salt.
+   *
+   * @param clearTextData
+   *     The clear text data. Must not be {@code null}.
+   * @param password
+   *     The password of the key encryption key (KEK).
+   * @param salt
+   *     The salt of the key encryption key (KEK).
+   * @param keyLen
+   *     The length of the document encryption key to be generated (in bits). Must be one of 128, 192 or 256.
+   * @return The encrypted bytes.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during encryption.
+   */
+  public static byte[] envelopeEncrypt(byte[] clearTextData, char[] password, byte[] salt, int keyLen) {
+    EncryptionKey key = createDocumentEncryptionKey(password, salt, keyLen);
+    return encrypt(clearTextData, key);
+  }
+
+  /**
+   * Encrypts the given clear text bytes using envelope encryption.
+   *
+   * @param clearTextData
+   *     The clear text data. Must not be {@code null}.
+   * @param keyEncryptionKey
+   *     The key encryption key (KEK).
+   * @param keyLen
+   *     The length of the document encryption key to be generated (in bits). Must be one of 128, 192 or 256.
+   * @return The encrypted bytes.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during encryption.
+   */
+  public static byte[] envelopeEncrypt(byte[] clearTextData, Key keyEncryptionKey, int keyLen) {
+    EncryptionKey key = createDocumentEncryptionKey(keyEncryptionKey, keyLen);
+    return encrypt(clearTextData, key);
+  }
+
+  /**
+   * Encrypts the given cleartext stream using envelope encryption. The key encryption key (KEK) is derived from the given password and salt.
+   *
+   * @param clearTextData
+   *     The clear text data. Must not be {@code null}.
+   * @param encryptedData
+   *     The output stream where the encrypted data is written to.
+   * @param password
+   *     The password of the key encryption key (KEK).
+   * @param salt
+   *     The salt of the key encryption key (KEK).
+   * @param keyLen
+   *     The length of the document encryption key to be generated (in bits). Must be one of 128, 192 or 256.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during encryption.
+   */
+  public static void envelopeEncrypt(InputStream clearTextData, OutputStream encryptedData, char[] password, byte[] salt, int keyLen) {
+    EncryptionKey key = createDocumentEncryptionKey(password, salt, keyLen);
+    encrypt(clearTextData, encryptedData, key);
+  }
+
+  /**
+   * Encrypts the given cleartext stream using envelope encryption.
+   *
+   * @param clearTextData
+   *     The clear text data. Must not be {@code null}.
+   * @param encryptedData
+   *     The output stream where the encrypted data is written to.
+   * @param keyEncryptionKey
+   *     The key encryption key (KEK).
+   * @param keyLen
+   *     The length of the document encryption key to be generated (in bits). Must be one of 128, 192 or 256.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during encryption.
+   */
+  public static void envelopeEncrypt(InputStream clearTextData, OutputStream encryptedData, Key keyEncryptionKey, int keyLen) {
+    EncryptionKey key = createDocumentEncryptionKey(keyEncryptionKey, keyLen);
+    encrypt(clearTextData, encryptedData, key);
+  }
+
+  /**
+   * Encrypts the given cleartext stream using envelope encryption. The key encryption key (KEK) is derived from the given password and salt.
+   *
+   * @param clearTextData
+   *     The clear text data. Must not be {@code null}.
+   * @param password
+   *     The password of the key encryption key (KEK).
+   * @param salt
+   *     The salt of the key encryption key (KEK).
+   * @param keyLen
+   *     The length of the document encryption key to be generated (in bits). Must be one of 128, 192 or 256.
+   * @return The input stream with the encrypted data.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during encryption.
+   */
+  public static InputStream envelopeEncrypt(InputStream clearTextData, char[] password, byte[] salt, int keyLen) {
+    EncryptionKey key = createDocumentEncryptionKey(password, salt, keyLen);
+    return encrypt(clearTextData, key);
+  }
+
+  /**
+   * Encrypts the given cleartext stream using envelope encryption.
+   *
+   * @param clearTextData
+   *     The clear text data. Must not be {@code null}.
+   * @param keyEncryptionKey
+   *     The key encryption key (KEK).
+   * @param keyLen
+   *     The length of the document encryption key to be generated (in bits). Must be one of 128, 192 or 256.
+   * @return The input stream with the encrypted data.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during encryption.
+   */
+  public static InputStream envelopeEncrypt(InputStream clearTextData, Key keyEncryptionKey, int keyLen) {
+    EncryptionKey key = createDocumentEncryptionKey(keyEncryptionKey, keyLen);
+    return encrypt(clearTextData, key);
+  }
+
+  /**
+   * @param encryptedData
+   *     The encrypted bytes. Must not be {@code null}.
+   * @param keyEncryptionKey
+   *     The key encryption key (KEK).
+   * @return The clear text bytes.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during decryption.
+   */
+  public static byte[] envelopeDecrypt(byte[] encryptedData, Key keyEncryptionKey) {
+    return decrypt(encryptedData, input -> createEnvelopeDecryptionKey(input, keyEncryptionKey));
+  }
+
+  /**
+   * @param encryptedData
+   *     The encrypted bytes. Must not be {@code null}.
+   * @param clearTextData
+   *     The output stream where the decrypted data is written to.
+   * @param keyEncryptionKey
+   *     The key encryption key (KEK).
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during decryption.
+   */
+  public static void envelopeDecrypt(InputStream encryptedData, OutputStream clearTextData, Key keyEncryptionKey) {
+    PushbackInputStream input = new PushbackInputStream(encryptedData, 6);
+    EncryptionKey key = createEnvelopeDecryptionKey(input, keyEncryptionKey);
+    if (key == null) { // data is not encrypted. directly write data to output stream.
+      try {
+        input.transferTo(clearTextData);
+        return;
+      }
+      catch (IOException e) {
+        throw new ProcessingException("Unable to decrypt data", e);
+      }
+    }
+    SECURITY_PROVIDER.get().decrypt(input, clearTextData, key);
+  }
+
+  /**
+   * @param encryptedData
+   *     The encrypted bytes. Must not be {@code null}.
+   * @param keyEncryptionKey
+   *     The key encryption key (KEK).
+   * @return The input stream with the decrypted data.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during decryption.
+   */
+  public static InputStream envelopeDecrypt(InputStream encryptedData, Key keyEncryptionKey) {
+    PushbackInputStream input = new PushbackInputStream(encryptedData, 6);
+    EncryptionKey key = createEnvelopeDecryptionKey(input, keyEncryptionKey);
+    if (key == null) { // data is not encrypted. directly return the input stream again.
+      return input;
+    }
+    return SECURITY_PROVIDER.get().decrypt(input, key);
+  }
+
+  /**
+   * Derives the key encryption key from the given password and salt.
+   * Can then be used to generate a document encryption key.
+   * <p>
+   * See {@link ISecurityProvider#createKeyEncryptionKey(char[], byte[])}
+   * See {@link ISecurityProvider#createDocumentEncryptionKey(Key, int)}
+   */
+  public static Key createKeyEncryptionKey(char[] password, byte[] salt) {
+    return SECURITY_PROVIDER.get().createKeyEncryptionKey(password, salt);
+  }
+
+  /**
+   * Creates a new {@link EncryptionKey} that represents a document encryption key (DEK).
+   * The DEK is encrypted in its compatibility header using the key encryption key (KEK), which is derived from the given password and salt.
+   *
+   * @param kekPassword
+   *     password of the key encryption key (KEK)
+   * @param kekSalt
+   *     salt of the key encryption key (KEK)
+   * @param dekKeyLen
+   *     The length of the document encryption key (DEK) (in bits) to be created. Must be one of 128, 192 or 256.
+   */
+  public static EncryptionKey createDocumentEncryptionKey(char[] kekPassword, byte[] kekSalt, int dekKeyLen) {
+    return SECURITY_PROVIDER.get().createDocumentEncryptionKey(kekPassword, kekSalt, dekKeyLen);
+  }
+
+  /**
+   * Creates a new {@link EncryptionKey} that represents a document encryption key (DEK).
+   * The DEK is encrypted in its compatibility header using the key encryption key (KEK).
+   *
+   * @param keyEncryptionKey
+   *     key encryption key (KEK) to encrypt the document encryption key (DEK)
+   * @param keyLen
+   *     The length of the document encryption key (DEK) (in bits) to be created. Must be one of 128, 192 or 256.
+   */
+  public static EncryptionKey createDocumentEncryptionKey(Key keyEncryptionKey, int keyLen) {
+    return SECURITY_PROVIDER.get().createDocumentEncryptionKey(keyEncryptionKey, keyLen);
+  }
+
+  /* **************************************************************************
+   * OTHER METHODS
+   * *************************************************************************/
 
   /**
    * See {@link ISecurityProvider#createSecureRandomBytes(int)}
