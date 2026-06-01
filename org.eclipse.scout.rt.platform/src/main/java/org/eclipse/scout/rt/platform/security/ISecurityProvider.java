@@ -13,7 +13,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
+import java.security.Key;
 import java.security.SecureRandom;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -69,6 +71,27 @@ public interface ISecurityProvider {
    * </pre>
    */
   String ENCRYPTION_COMPATIBILITY_HEADER_2024_V1 = "[2024:v1]";
+
+  String ENVELOPE_ENCRYPTION_COMPATIBILITY_HEADER_V1_PREFIX = "[2026:EE:v1:";
+
+  /**
+   * <pre>
+   * secretKeyAlgorithm: PBKDF2WithHmacSHA256
+   * cipherAlgorithm/Provider: AES/SunJCE
+   * GCM init vector length: 16
+   * GCM auth tag bit length: 128
+   * key derivation iteration count: 10000
+   * parameters:
+   * <ol>
+   *   <li><b>wrapIv</b>: IV (nonce) used to encrypt the DEK (random data‑encryption key) using the KEK (password‑derived key‑encryption key)</li>
+   *   <li><b>wrappedDek</b>: Encrypted DEK. The DEK is generated randomly on every encryption and is encrypted using the KEK.</li>
+   *   <li><b>dataIv</b>: IV (nonce) used to encrypt the file content using the DEK. It is generated randomly for every file.</li>
+   * </ol>
+   * </pre>
+   */
+  String ENVELOPE_ENCRYPTION_COMPATIBILITY_HEADER_V1 = ENVELOPE_ENCRYPTION_COMPATIBILITY_HEADER_V1_PREFIX + "%s:%s:%s]";
+
+  Pattern ENVELOPE_ENCRYPTION_COMPATIBILITY_HEADER_V1_PATTERN = Pattern.compile("^\\Q" + ENVELOPE_ENCRYPTION_COMPATIBILITY_HEADER_V1_PREFIX + "\\E([^:]+):([^:]+):([^]]+)]$");
 
   /**
    * Create a Message Authentication Code (MAC) for the given data and password.
@@ -262,7 +285,7 @@ public interface ISecurityProvider {
    * {@link #encrypt(InputStream, OutputStream, EncryptionKey)}.
    * <p>
    * Warning: This key must only be used for encryption. Decryption must be backwards compatible and uses meta
-   * parameters stored at beginning of stream. Therefore never use an {@link EncryptionKey} directly to decrypt but
+   * parameters stored at beginning of stream. Therefore, never use an {@link EncryptionKey} directly to decrypt but
    * always with {@link SecurityUtility#decrypt(byte[], char[], byte[], int, EncryptionKey)}
    *
    * @param password
@@ -287,8 +310,39 @@ public interface ISecurityProvider {
   EncryptionKey createEncryptionKey(char[] password, byte[] salt, int keyLen);
 
   /**
+   * Creates a KEK (key encryption key) used to encrypt/decrypt a DEK (document encryption key).
+   *
+   * @param password
+   *     password of the KEK
+   * @param salt
+   *     salt of the KEK
+   * @return The {@link EncryptionKey} representing the KEK.
+   */
+  Key createKeyEncryptionKey(char[] password, byte[] salt);
+
+  /**
+   * Creates a random DEK (document encryption key) which is encrypted by the KEK (key encryption key) in the compact header.
+   *
+   * @param kekPassword
+   *     kekPassword of the KEK
+   * @param kekSalt
+   *     kekSalt of the KEK
+   * @param dekKeyLen
+   *     The length of the DEK (in bits). Must be one of 128, 192 or 256.
+   * @return The {@link EncryptionKey} representing the DEK used to encrypt data.
+   */
+  EncryptionKey createDocumentEncryptionKey(char[] kekPassword, byte[] kekSalt, int dekKeyLen);
+
+  /**
+   * Creates a random DEK (document encryption key) which is encrypted by the provided KEK (key encryption key).
+   */
+  EncryptionKey createDocumentEncryptionKey(Key keyEncryptionKey, int keyLen);
+
+  /**
    * Creates a backward compatible {@link EncryptionKey} that can be used in
    * {@link #decrypt(InputStream, OutputStream, EncryptionKey)}
+   * <p>
+   * This method should also be able to handle envelope encryption. In this case the password and salt is used to determine the key encryption key (KEK).
    *
    * @param password
    *     The password to use to create the key. Must not be {@code null} or empty.
@@ -317,6 +371,28 @@ public interface ISecurityProvider {
   default EncryptionKey createDecryptionKey(char[] password, byte[] salt, int keyLen, byte[] compatibilityHeader) {
     return createEncryptionKey(password, salt, keyLen);
   }
+
+  /**
+   * Creates a backward compatible {@link EncryptionKey} for envelope encryption that can be used in
+   * {@link #decrypt(InputStream, OutputStream, EncryptionKey)}
+   *
+   * @param keyEncryptionKey
+   *     The key encryption key to use to decrypt the document encryption key from the compatibility header. Must not be {@code null} or empty.
+   * @param compatibilityHeader
+   *     that was created when encrypting, see {@link EncryptionKey#getCompatibilityHeader()}
+   * @return The {@link EncryptionKey} used to decrypt data.
+   * @throws AssertionException
+   *     If one of the following conditions is {@code true}:<br>
+   *     <ul>
+   *     <li>The keyEncryptionKey is {@code null}</li>
+   *     <li>The key length is not valid.</li>
+   *     </ul>
+   * @see #decrypt(InputStream, OutputStream, EncryptionKey)
+   * <p>
+   * Implementors of this interface should implement this method in a way that backward compatibility is
+   * guaranteed.
+   */
+  EncryptionKey createEnvelopeDecryptionKey(Key keyEncryptionKey, byte[] compatibilityHeader);
 
   /**
    * Creates a new secure random instance. The returned instance has already been seeded and is ready to use.

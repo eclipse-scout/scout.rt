@@ -47,10 +47,12 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.regex.Matcher;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
+import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
@@ -112,6 +114,38 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
   }
 
   @Override
+  public Key createKeyEncryptionKey(char[] password, byte[] salt) {
+    return deriveKek(
+        password,
+        salt,
+        getKeyEncryptionKeyLength(),
+        getSecretKeyAlgorithm(),
+        getCipherAlgorithm(),
+        getCipherAlgorithmProvider(),
+        getKeyDerivationIterationCount());
+  }
+
+  @Override
+  public EncryptionKey createDocumentEncryptionKey(char[] kekPassword, byte[] kekSalt, int dekKeyLen) {
+    Key kek = createKeyEncryptionKey(kekPassword, kekSalt);
+    return createDocumentEncryptionKey(kek, dekKeyLen);
+  }
+
+  @Override
+  public EncryptionKey createDocumentEncryptionKey(Key keyEncryptionKey, int keyLen) {
+    return createDocumentEncryptionKeyInternal(
+        keyEncryptionKey,
+        keyLen,
+        getSecretKeyAlgorithm(),
+        getCipherAlgorithm(),
+        getCipherAlgorithmProvider(),
+        getCipherAlgorithm() + "/" + getCipherAlgorithmMode() + "/" + getCipherAlgorithmPadding(),
+        GCM_INITIALIZATION_VECTOR_LEN,
+        GCM_AUTH_TAG_BIT_LEN,
+        getKeyDerivationIterationCount());
+  }
+
+  @Override
   public EncryptionKey createDecryptionKey(char[] password, byte[] salt, int keyLen, byte[] compatibilityHeader) {
     String v = compatibilityHeader != null ? new String(compatibilityHeader, StandardCharsets.US_ASCII) : ENCRYPTION_COMPATIBILITY_HEADER_2021_V1;
     if (ENCRYPTION_COMPATIBILITY_HEADER_2021_V1.equals(v) || ENCRYPTION_COMPATIBILITY_HEADER_2023_V1.equals(v)) {
@@ -139,10 +173,37 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
           128,
           10000);
     }
+    if (v.startsWith(ENVELOPE_ENCRYPTION_COMPATIBILITY_HEADER_V1_PREFIX)) {
+      SecretKey kek = deriveKek(password, salt, 256, "PBKDF2WithHmacSHA256", "AES", "SunJCE", 10000);
+      return createEnvelopeDecryptionKey(kek, compatibilityHeader);
+    }
     throw new ProcessingException("Unknown compatibility header {}", v);
   }
 
-  private static EncryptionKey createEncryptionKeyInternal(
+  @Override
+  public EncryptionKey createEnvelopeDecryptionKey(Key keyEncryptionKey, byte[] compatibilityHeader) {
+    if (compatibilityHeader == null) {
+      return null;
+    }
+    String v = new String(compatibilityHeader, StandardCharsets.US_ASCII);
+    if (v.startsWith(ENVELOPE_ENCRYPTION_COMPATIBILITY_HEADER_V1_PREFIX)) {
+      return unwrapEnvelopeKey(
+          keyEncryptionKey,
+          compatibilityHeader,
+          "PBKDF2WithHmacSHA256",
+          "AES",
+          "SunJCE",
+          "AES/GCM/NoPadding",
+          128,
+          10000);
+    }
+    throw new ProcessingException("Unknown compatibility header {}", v);
+  }
+
+  /**
+   * Legacy key‑derivation (PBKDF2 → key + IV) – without envelope encryption
+   */
+  protected static EncryptionKey createEncryptionKeyInternal(
       char[] password,
       byte[] salt,
       int keyLen,
@@ -169,18 +230,205 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
 
       SecretKey secretKey = new SecretKeySpec(key, cipherAlgorithm);
       GCMParameterSpec parameters = new GCMParameterSpec(gcmAuthTagBitLen, iv);
-      byte[] compatibilityHeader = generateCompatibilityHeader(keyLen, secretKeyAlgorithm, cipherAlgorithm, cipherAlgorithmProvider, gcmInitVecLen, gcmAuthTagBitLen, keyDerivationIterationCount);
+      byte[] compatibilityHeader = generateCompatibilityHeader(
+          keyLen, secretKeyAlgorithm, cipherAlgorithm, cipherAlgorithmProvider,
+          gcmInitVecLen, gcmAuthTagBitLen, keyDerivationIterationCount, null);
       return new EncryptionKey(secretKey, parameters, compatibilityHeader);
     }
-    catch (NoSuchAlgorithmException e) {
-      throw new ProcessingException("Unable to create secret. Algorithm could not be found. Make sure to use JRE 1.8 or newer.", e);
-    }
-    catch (InvalidKeySpecException | NoSuchProviderException e) {
-      throw new ProcessingException("Unable to create secret.", e);
+    catch (GeneralSecurityException e) {
+      throw new ProcessingException("Unable to create legacy encryption key.", e);
     }
   }
 
-  protected static byte[] generateCompatibilityHeader(int keyLen, String secretKeyAlgorithm, String cipherAlgorithm, String cipherAlgorithmProvider, int gcmInitVecLen, int gcmAuthTagBitLen, int keyDerivationIterationCount) {
+  protected static EncryptionKey createDocumentEncryptionKeyInternal(
+      Key keyEncryptionKey,
+      int keyLen,
+      String secretKeyAlgorithm,
+      String cipherAlgorithm,
+      String cipherAlgorithmProvider,
+      String dekCipherTransformation,
+      int gcmInitVecLen,
+      int gcmAuthTagBitLen,
+      int keyDerivationIterationCount) {
+    assertTrue(keyLen == 128 || keyLen == 192 || keyLen == 256, "key length must be 128, 192 or 256.");
+    try {
+      // Generate a fresh random DEK (data‑encryption key)
+      SecretKey documentEncryptionKey = generateDek(keyLen, cipherAlgorithm);
+
+      // Random data IV (nonce) for payload encryption
+      byte[] dataIv = new byte[gcmInitVecLen];
+      new SecureRandom().nextBytes(dataIv);
+      GCMParameterSpec dataParams = new GCMParameterSpec(gcmAuthTagBitLen, dataIv);
+
+      // Wrap DEK with KEK using AES‑GCM
+      WrappedResult wrapRes = wrapDek(keyEncryptionKey, documentEncryptionKey, gcmAuthTagBitLen, gcmInitVecLen, dekCipherTransformation);
+
+      EnvelopeMeta envelopeMeta = new EnvelopeMeta(wrapRes.getWrapIv(), wrapRes.getWrappedKey(), dataIv);
+
+      // Build header: legacy part + envelope metadata
+      byte[] compatibilityHeader = generateCompatibilityHeader(keyLen, secretKeyAlgorithm, cipherAlgorithm,
+          cipherAlgorithmProvider, gcmInitVecLen, gcmAuthTagBitLen, keyDerivationIterationCount, envelopeMeta);
+
+      // Return key used for the actual file encryption
+      return new EncryptionKey(documentEncryptionKey, dataParams, compatibilityHeader);
+    }
+    catch (GeneralSecurityException e) {
+      throw new ProcessingException("Unable to create envelope encryption key.", e);
+    }
+  }
+
+  /**
+   * Derive a password‑based key encryption key
+   */
+  protected static SecretKey deriveKek(
+      char[] password,
+      byte[] salt,
+      int keyLen,
+      String secretKeyAlgorithm,
+      String cipherAlgorithm,
+      String cipherAlgorithmProvider,
+      int keyDerivationIterationCount) {
+    assertGreater(assertNotNull(password, "password must not be null.").length, 0, "empty password is not allowed.");
+    assertGreater(assertNotNull(salt, "salt must be provided.").length, 0, "empty salt is not allowed.");
+    try {
+      SecretKeyFactory factory = SecretKeyFactory.getInstance(secretKeyAlgorithm, cipherAlgorithmProvider);
+      PBEKeySpec spec = new PBEKeySpec(password, salt, keyDerivationIterationCount, keyLen);
+      return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), cipherAlgorithm);
+    }
+    catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e) {
+      throw new ProcessingException("Unable to create key encryption key", e);
+    }
+  }
+
+  /**
+   * Generate a fresh random DEK
+   */
+  protected static SecretKey generateDek(int keyLenBits, String cipherAlgorithm) throws GeneralSecurityException {
+    KeyGenerator kg = KeyGenerator.getInstance(cipherAlgorithm);
+    kg.init(keyLenBits, new SecureRandom());
+    return kg.generateKey();
+  }
+
+  /**
+   * Holder for wrapped‑DEK result
+   */
+  protected static class WrappedResult {
+    private final byte[] m_wrapIv;
+    private final byte[] m_wrappedKey;
+
+    protected WrappedResult(byte[] wrapIv, byte[] wrappedKey) {
+      m_wrapIv = wrapIv;
+      m_wrappedKey = wrappedKey;
+    }
+
+    public byte[] getWrapIv() {
+      return m_wrapIv;
+    }
+
+    public byte[] getWrappedKey() {
+      return m_wrappedKey;
+    }
+  }
+
+  /**
+   * Wrap DEK with KEK
+   */
+  protected static WrappedResult wrapDek(Key kek,
+      Key dek,
+      int gcmAuthTagBitLen,
+      int wrapIvLen,
+      String dekCipherTransformation) throws GeneralSecurityException {
+    byte[] wrapIv = new byte[wrapIvLen];
+    new SecureRandom().nextBytes(wrapIv);
+    Cipher wrapCipher = Cipher.getInstance(dekCipherTransformation);
+    wrapCipher.init(Cipher.ENCRYPT_MODE, kek, new GCMParameterSpec(gcmAuthTagBitLen, wrapIv));
+    byte[] ct = wrapCipher.doFinal(dek.getEncoded());
+    return new WrappedResult(wrapIv, ct);
+  }
+
+  /**
+   * Unwrap envelope: derive KEK, decrypt wrapped DEK, rebuild EncryptionKey
+   */
+  protected static EncryptionKey unwrapEnvelopeKey(
+      Key keyEncryptionKey,
+      byte[] compatibilityHeader,
+      String secretKeyAlgorithm,
+      String cipherAlgorithm,
+      String cipherAlgorithmProvider,
+      String dekCipherTransformation,
+      int gcmAuthTagBitLen,
+      int keyDerivationIterationCount) {
+    assertNotNull(keyEncryptionKey, "keyEncryptionKey must not be null.");
+
+    // parse metadata from header
+    EnvelopeMeta meta = parseEnvelopeMeta(compatibilityHeader);
+    byte[] wrapIv = meta.getWrapIv();
+    byte[] wrappedKey = meta.getWrappedDek();
+    byte[] dataIv = meta.getDataIv();
+
+    try {
+      // unwrap DEK
+      Cipher unwrapCipher = Cipher.getInstance(dekCipherTransformation);
+      unwrapCipher.init(Cipher.DECRYPT_MODE, keyEncryptionKey, new GCMParameterSpec(gcmAuthTagBitLen, wrapIv));
+      byte[] dekBytes = unwrapCipher.doFinal(wrappedKey);
+      SecretKey dek = new SecretKeySpec(dekBytes, cipherAlgorithm);
+
+      GCMParameterSpec dataParams = new GCMParameterSpec(gcmAuthTagBitLen, dataIv);
+
+      return new EncryptionKey(dek, dataParams, compatibilityHeader);
+    }
+    catch (GeneralSecurityException e) {
+      throw new ProcessingException("Unable to unwrap envelope encryption key.", e);
+    }
+  }
+
+  /**
+   * Extract envelope metadata (wrapIv, wrappedDek, dataIv) from the full header
+   */
+  protected static EnvelopeMeta parseEnvelopeMeta(byte[] headerBytes) {
+    String s = new String(headerBytes, StandardCharsets.US_ASCII);
+    Matcher m = ENVELOPE_ENCRYPTION_COMPATIBILITY_HEADER_V1_PATTERN.matcher(s);
+    if (m.matches()) {
+      String wrapIv = m.group(1);
+      String wrappedDek = m.group(2);
+      String dataIv = m.group(3);
+
+      byte[] wrapIvBytes = Base64Utility.decode(wrapIv);
+      byte[] wrappedDekBytes = Base64Utility.decode(wrappedDek);
+      byte[] dataIvBytes = Base64Utility.decode(dataIv);
+
+      return new EnvelopeMeta(wrapIvBytes, wrappedDekBytes, dataIvBytes);
+    }
+    else {
+      throw new ProcessingException("Header does not match expected envelope format");
+    }
+  }
+
+  protected static class EnvelopeMeta {
+    final byte[] wrapIv;
+    final byte[] wrappedDek;
+    final byte[] dataIv;
+
+    protected EnvelopeMeta(byte[] wrapIv, byte[] wrappedDek, byte[] dataIv) {
+      this.wrapIv = wrapIv;
+      this.wrappedDek = wrappedDek;
+      this.dataIv = dataIv;
+    }
+
+    public byte[] getWrapIv() {
+      return wrapIv;
+    }
+
+    public byte[] getWrappedDek() {
+      return wrappedDek;
+    }
+
+    public byte[] getDataIv() {
+      return dataIv;
+    }
+  }
+
+  protected static byte[] generateCompatibilityHeader(int keyLen, String secretKeyAlgorithm, String cipherAlgorithm, String cipherAlgorithmProvider, int gcmInitVecLen, int gcmAuthTagBitLen, int keyDerivationIterationCount, EnvelopeMeta envelopeMeta) {
     String headerStr = "[1:"
         + keyLen
         + "-" + secretKeyAlgorithm
@@ -191,6 +439,9 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
         + "-" + keyDerivationIterationCount
         + "]";
     if ("PBKDF2WithHmacSHA256".equals(secretKeyAlgorithm) && "AES".equals(cipherAlgorithm) && "SunJCE".equals(cipherAlgorithmProvider) && 16 == gcmInitVecLen && 128 == gcmAuthTagBitLen) {
+      if (envelopeMeta != null) {
+        return String.format(ENVELOPE_ENCRYPTION_COMPATIBILITY_HEADER_V1, Base64Utility.encode(envelopeMeta.getWrapIv()), Base64Utility.encode(envelopeMeta.getWrappedDek()), Base64Utility.encode(envelopeMeta.getDataIv())).getBytes(StandardCharsets.US_ASCII);
+      }
       switch (keyDerivationIterationCount) {
         case 10000 -> {
           return ENCRYPTION_COMPATIBILITY_HEADER_2024_V1.getBytes(StandardCharsets.US_ASCII);
@@ -253,8 +504,7 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
       SecretKeyFactory skf = SecretKeyFactory.getInstance(getPasswordHashSecretKeyAlgorithm(), getCipherAlgorithmProvider());
       PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, 256);
       SecretKey key = skf.generateSecret(spec);
-      byte[] res = key.getEncoded();
-      return res;
+      return key.getEncoded();
     }
     catch (NoSuchAlgorithmException | InvalidKeySpecException | NoSuchProviderException e) {
       throw new ProcessingException("Unable to create password hash.", e);
@@ -282,7 +532,6 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
   }
 
   protected void doCrypt(InputStream input, OutputStream output, EncryptionKey key, int mode) {
-    assertNotNull(key, "key must not be null.");
     assertNotNull(input, "input must not be null.");
     assertNotNull(output, "output must not be null.");
 
@@ -309,10 +558,7 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
 
       return cipherStreamConstructor.apply(stream, cipher);
     }
-    catch (NoSuchAlgorithmException e) {
-      throw new ProcessingException("Unable to crypt data. Algorithm could not be found. Make sure to use JRE 1.8 or newer.", e);
-    }
-    catch (NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchProviderException e) {
+    catch (NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchProviderException | NoSuchAlgorithmException e) {
       throw new ProcessingException("Unable to crypt data.", e);
     }
   }
@@ -633,6 +879,13 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
    */
   protected String getCipherAlgorithmPadding() {
     return "NoPadding ";
+  }
+
+  /**
+   * @return the length of the key encryption key.
+   */
+  protected int getKeyEncryptionKeyLength() {
+    return 256;
   }
 
   @Override
