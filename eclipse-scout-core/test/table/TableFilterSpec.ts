@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BooleanColumn, BooleanColumnUserFilterStateDo, ChildModelOf, Column, ColumnUserFilter, ColumnUserFilterStateDo, DateColumn, DateColumnUserFilter, DateColumnUserFilterStateDo, dates, IconColumn, NumberColumn, NumberColumnUserFilter,
-  NumberColumnUserFilterStateDo, Range, RemoteEvent, scout, Table, TableRow, TableTextUserFilter, TableTextUserFilterStateDo, tableUiPreferences, TextColumnUserFilter, TextColumnUserFilterStateDo
+  BooleanColumn, BooleanColumnUserFilterStateDo, ChildModelOf, Column, ColumnUserFilter, ColumnUserFilterStateDo, DateColumn, DateColumnUserFilter, DateColumnUserFilterStateDo, DateGroupType, dates, IconColumn, NumberColumn,
+  NumberColumnUserFilter, NumberColumnUserFilterStateDo, Range, RemoteEvent, scout, Table, TableRow, TableTextUserFilter, TableTextUserFilterStateDo, tableUiPreferences, TextColumnUserFilter, TextColumnUserFilterStateDo
 } from '../../src/index';
 import {SpecTable, TableSpecHelper} from '../../src/testing';
 
@@ -718,6 +718,7 @@ describe('TableFilter', () => {
         scout.create(DateColumnUserFilterStateDo, {
           columnId: 'c2',
           selectedValues: [1001, 1002],
+          groupType: DateGroupType.WEEKDAY,
           dateFrom: dates.create('2010-01-11'),
           dateTo: dates.create('2020-02-22')
         }),
