@@ -5,9 +5,13 @@
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
- * SPDX-License-Identifier: EPL-2.0
+ * AI Disclosure: This file was partially AI-generated.
+ * The AI-generated portions are made available under CC0-1.0
+ * and not subject to the project's licence.
+ *
+ * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
-import {arrays, PromiseCreator, promises} from '../../src/index';
+import {AbortablePromise, AbortError, arrays, Deferred, PromiseCreator, promises} from '../../src/index';
 
 describe('promises', () => {
 
@@ -161,6 +165,106 @@ describe('promises', () => {
 
     it('returns a new promise if the value is not a promise', async () => {
       await expectAsync(promises.ensure('3')).toBeResolvedTo('3');
+    });
+  });
+
+  describe('AbortablePromise', () => {
+
+    describe('constructor', () => {
+
+      it('resolves when executor calls resolve', async () => {
+        const abortablePromise = new AbortablePromise<number>(resolve => resolve(42));
+        await expectAsync(abortablePromise).toBeResolvedTo(42);
+      });
+
+      it('rejects when executor calls reject', async () => {
+        const abortablePromise = new AbortablePromise<number>((resolve, reject) => reject('error'));
+        await expectAsync(abortablePromise).toBeRejectedWith('error');
+      });
+
+      it('is a native Promise', () => {
+        const abortablePromise = new AbortablePromise<void>(resolve => resolve());
+        expect(abortablePromise).toBeInstanceOf(Promise);
+      });
+    });
+
+    describe('abort', () => {
+
+      it('rejects the promise with AbortError', async () => {
+        const abortablePromise = new AbortablePromise<void>(() => {
+        });
+        abortablePromise.abort();
+        await expectAsync(abortablePromise).toBeRejectedWith(new AbortError());
+      });
+
+      it('has no effect after the promise has already resolved', async () => {
+        const abortablePromise = new AbortablePromise<string>(resolve => resolve('done'));
+        await expectAsync(abortablePromise).toBeResolvedTo('done');
+        abortablePromise.abort();
+        await expectAsync(abortablePromise).toBeResolvedTo('done');
+      });
+
+      it('has no effect after the promise has already rejected', async () => {
+        const abortablePromise = new AbortablePromise<void>((resolve, reject) => reject('fail'));
+        await expectAsync(abortablePromise).toBeRejectedWith('fail');
+        abortablePromise.abort();
+        await expectAsync(abortablePromise).toBeRejectedWith('fail');
+      });
+
+      it('can be called multiple times without throwing', async () => {
+        const abortablePromise = new AbortablePromise<void>(() => {
+        });
+        abortablePromise.abort();
+        abortablePromise.abort();
+        await expectAsync(abortablePromise).toBeRejectedWith(new AbortError());
+      });
+    });
+
+    describe('of', () => {
+
+      it('returns undefined for a falsy argument', () => {
+        expect(AbortablePromise.of(null)).toBeUndefined();
+        expect(AbortablePromise.of(undefined)).toBeUndefined();
+      });
+
+      it('returns an AbortablePromise instance', () => {
+        const abortablePromise = AbortablePromise.of(Promise.resolve());
+        expect(abortablePromise).toBeInstanceOf(AbortablePromise);
+      });
+
+      it('wraps a resolved native Promise', async () => {
+        const abortablePromise = AbortablePromise.of(Promise.resolve('hello'));
+        await expectAsync(abortablePromise).toBeResolvedTo('hello');
+      });
+
+      it('wraps a rejected native Promise', async () => {
+        const abortablePromise = AbortablePromise.of(Promise.reject('boom'));
+        await expectAsync(abortablePromise).toBeRejectedWith('boom');
+      });
+
+      it('is resolved when the wrapped native Promise is resolved', async () => {
+        const deferred = new Deferred();
+        const abortablePromise = AbortablePromise.of(deferred.promise());
+        deferred.resolve('hello');
+        await expectAsync(abortablePromise).toBeResolvedTo('hello');
+      });
+
+      it('is rejected when the wrapped native Promise is rejected', async () => {
+        const deferred = new Deferred();
+        const abortablePromise = AbortablePromise.of(deferred.promise());
+        deferred.reject('boom');
+        await expectAsync(abortablePromise).toBeRejectedWith('boom');
+      });
+
+      it('aborting does not affect the original promise', async () => {
+        const deferred = new Deferred<string>();
+        const abortablePromise = AbortablePromise.of(deferred.promise());
+        abortablePromise.abort();
+        deferred.resolve('original');
+        // the original promise still resolves normally
+        await expectAsync(deferred.promise()).toBeResolvedTo('original');
+        await expectAsync(abortablePromise).toBeRejectedWith(new AbortError());
+      });
     });
   });
 });

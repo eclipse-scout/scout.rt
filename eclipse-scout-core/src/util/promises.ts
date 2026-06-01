@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {objects, PromiseCreator} from '../index';
+import {Abortable, objects, PromiseCreator} from '../index';
 import $ from 'jquery';
 
 export const promises = {
@@ -177,5 +177,53 @@ export class Deferred<T> {
 
   promise(): Promise<T> {
     return this._promise;
+  }
+}
+
+/**
+ * A helper class that makes ES6 promises abortable. The {@link AbortablePromise} is itself a ES6 promise and can be used similarly.
+ * When it is aborted is will be rejected with a {@link AbortError}.
+ */
+export class AbortablePromise<T> extends Promise<T> implements Abortable {
+
+  protected _reject: (reason: any) => void;
+
+  constructor(executor: (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void) {
+    let _reject: (reason: any) => void;
+
+    super((resolve, reject) => {
+      _reject = reject;
+      executor(resolve, reject);
+    });
+
+    this._reject = _reject;
+  }
+
+  /**
+   * Creates an {@link AbortablePromise} from the given ES6 promise.
+   */
+  static of<T>(promise: Promise<T>): AbortablePromise<T> {
+    if (!promise) {
+      return;
+    }
+    return new AbortablePromise((resolve, reject) => promise.then(resolve, reject));
+  }
+
+  /**
+   * Aborts this promise with a {@link AbortError}.
+   */
+  abort() {
+    this._reject(new AbortError());
+  }
+}
+
+/**
+ * Marker class for aborted promises.
+ */
+export class AbortError {
+  objectType: string;
+
+  constructor() {
+    this.objectType = 'AbortError';
   }
 }
