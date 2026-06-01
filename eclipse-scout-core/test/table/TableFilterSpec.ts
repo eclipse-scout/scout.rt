@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ChildModelOf, Column, ColumnUserFilter, Range, RemoteEvent, Table, TextColumnUserFilter} from '../../src/index';
+import {
+  BooleanColumn, BooleanColumnUserFilterStateDo, ChildModelOf, Column, ColumnUserFilter, ColumnUserFilterStateDo, DateColumn, DateColumnUserFilter, DateColumnUserFilterStateDo, dates, IconColumn, NumberColumn, NumberColumnUserFilter,
+  NumberColumnUserFilterStateDo, Range, RemoteEvent, scout, Table, TableRow, TableTextUserFilter, TableTextUserFilterStateDo, tableUiPreferences, TextColumnUserFilter, TextColumnUserFilterStateDo
+} from '../../src/index';
 import {SpecTable, TableSpecHelper} from '../../src/testing';
 
 describe('TableFilter', () => {
@@ -665,6 +668,99 @@ describe('TableFilter', () => {
         });
         expect(mostRecentJsonRequest()).toContainEvents(event);
       });
+    });
+  });
+
+  describe('user filter states', () => {
+
+    it('uses column-specific mappers to load and store user filter states', () => {
+      let table = scout.create(Table, {
+        parent: session.desktop,
+        columns: [{
+          id: 'c0',
+          objectType: Column
+        }, {
+          id: 'c1',
+          objectType: BooleanColumn
+        }, {
+          id: 'c2',
+          objectType: DateColumn
+        }, {
+          id: 'c3',
+          objectType: NumberColumn
+        }, {
+          id: 'c4',
+          objectType: IconColumn
+        }]
+      });
+      let customFilter = (row: TableRow): boolean => false;
+      table.addFilter(customFilter); // should NOT be overwritten below
+      table.addFilter(scout.create(TableTextUserFilter, { // should be overwritten below
+        session: session,
+        table: table,
+        text: 'xyz'
+      }));
+
+      let userFilterStates = [
+        scout.create(TableTextUserFilterStateDo, {
+          text: 'abc'
+        }),
+        scout.create(TextColumnUserFilterStateDo, {
+          columnId: 'c0',
+          selectedValues: ['apple', 'banana'],
+          textFilter: 'coconut'
+        }),
+        scout.create(BooleanColumnUserFilterStateDo, {
+          columnId: 'c1',
+          selectedValues: [true]
+        }),
+        scout.create(DateColumnUserFilterStateDo, {
+          columnId: 'c2',
+          selectedValues: [1001, 1002],
+          dateFrom: dates.create('2010-01-11'),
+          dateTo: dates.create('2020-02-22')
+        }),
+        scout.create(NumberColumnUserFilterStateDo, {
+          columnId: 'c3',
+          selectedValues: [123, 456],
+          numberFrom: 77,
+          numberTo: 88
+        }),
+        scout.create(ColumnUserFilterStateDo, {
+          columnId: 'c4',
+          selectedValues: ['foo', 'bar']
+        })
+      ];
+      table.applyUserFilterStates(userFilterStates);
+
+      expect(table.filters.length).toBe(7);
+      expect(table.filters[0].createdByFunction).toBe(true);
+      expect(table.filters[0].accept).toBe(customFilter);
+      expect(table.filters[1]).toBeInstanceOf(TableTextUserFilter);
+      expect(table.filters[2]).toBeInstanceOf(TextColumnUserFilter);
+      expect(table.filters[3]).toBeInstanceOf(ColumnUserFilter);
+      expect(table.filters[4]).toBeInstanceOf(DateColumnUserFilter);
+      expect(table.filters[5]).toBeInstanceOf(NumberColumnUserFilter);
+      expect(table.filters[6]).toBeInstanceOf(ColumnUserFilter);
+
+      let filterStates2 = tableUiPreferences.createUserFilterStates(table);
+      expect(filterStates2).toEqual(userFilterStates);
+
+      (table.getFilter('c3') as NumberColumnUserFilter).numberTo = 99;
+      let filterStates3 = tableUiPreferences.createUserFilterStates(table);
+      expect(filterStates3).not.toEqual(userFilterStates);
+      expect(filterStates3[0]).toEqual(userFilterStates[0]);
+      expect(filterStates3[1]).toEqual(userFilterStates[1]);
+      expect(filterStates3[2]).toEqual(userFilterStates[2]);
+      expect(filterStates3[3]).toEqual(userFilterStates[3]);
+      expect(filterStates3[4]).not.toEqual(userFilterStates[4]);
+      expect(filterStates3[4]).toEqual(scout.create(NumberColumnUserFilterStateDo, {
+        columnId: 'c3',
+        selectedValues: [123, 456],
+        numberFrom: 77,
+        numberTo: 99
+      }));
+      expect(filterStates3[5]).toEqual(userFilterStates[5]);
     });
   });
 });

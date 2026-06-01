@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -631,6 +631,7 @@ export * from './table/userfilter/ColumnUserFilter';
 export * from './table/userfilter/ColumnUserFilterModel';
 export * from './table/userfilter/ColumnUserFilterEventMap';
 export * from './table/userfilter/ColumnUserFilterStateMapper';
+export * from './table/userfilter/BooleanColumnUserFilterStateMapper';
 export * from './table/userfilter/DateColumnUserFilter';
 export * from './table/userfilter/DateColumnUserFilterModel';
 export * from './table/userfilter/DateColumnUserFilterStateMapper';
