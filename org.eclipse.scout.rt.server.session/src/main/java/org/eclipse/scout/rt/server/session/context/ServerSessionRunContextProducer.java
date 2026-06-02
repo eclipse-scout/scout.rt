@@ -26,6 +26,10 @@ import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 public class ServerSessionRunContextProducer {
 
   public ServerSessionRunContext produce(Subject subject) {
+    return produce(subject, null);
+  }
+
+  public ServerSessionRunContext produce(Subject subject, String sessionId) {
     final ServerSessionRunContext serverRunContext = ServerSessionRunContexts.copyCurrent(true)
         .withSubject(subject)
         .withUser(BEANS.get(IAccessControlService.class).getUser(subject))
@@ -35,7 +39,7 @@ public class ServerSessionRunContextProducer {
     // use the current set subject as subject of the session, because if the session is not null it must be the current session
     IServerSession session = serverRunContext.getSession();
     if (session == null || ObjectUtility.notEquals(Subject.current(), subject)) {
-      serverRunContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
+      serverRunContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(sessionId, serverRunContext.copy()));
     }
 
     return serverRunContext;
