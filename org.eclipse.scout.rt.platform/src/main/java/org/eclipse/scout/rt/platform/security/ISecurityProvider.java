@@ -205,6 +205,23 @@ public interface ISecurityProvider {
   void encrypt(InputStream clearTextData, OutputStream encryptedData, EncryptionKey key);
 
   /**
+   * Encrypts the given data using the given {@link EncryptionKey}.<br>
+   * Use {@link #decrypt(InputStream, OutputStream, EncryptionKey)} to decrypt the data again using the same key.
+   *
+   * @param clearTextData
+   *     An {@link InputStream} providing the clear text data. The {@link InputStream} is not closed by this
+   *     method!
+   * @param key
+   *     The {@link EncryptionKey} to use.
+   * @return An {@link InputStream} providing the encrypted data.
+   * @throws AssertionException
+   *     If one of the parameters is {@code null}.
+   * @see #createEncryptionKey(char[], byte[], int)
+   * @see #decrypt(InputStream, OutputStream, EncryptionKey)
+   */
+  InputStream encrypt(InputStream clearTextData, EncryptionKey key);
+
+  /**
    * Decrypts the given data using the given {@link EncryptionKey}.<br>
    * Use {@link #encrypt(InputStream, OutputStream, EncryptionKey)} to encrypt the data using the same key.
    *
@@ -222,6 +239,23 @@ public interface ISecurityProvider {
    * @see #encrypt(InputStream, OutputStream, EncryptionKey)
    */
   void decrypt(InputStream encryptedData, OutputStream clearTextData, EncryptionKey key);
+
+  /**
+   * Decrypts the given data using the given {@link EncryptionKey}.<br>
+   * Use {@link #encrypt(InputStream, EncryptionKey)} to encrypt the data using the same key.
+   *
+   * @param encryptedData
+   *     An {@link InputStream} providing the encrypted text data. The {@link InputStream} is not closed by this
+   *     method!
+   * @param key
+   *     The {@link EncryptionKey} to use.
+   * @return An {@link InputStream} providing the decrypted data.
+   * @throws AssertionException
+   *     If one of the parameters is {@code null}.
+   * @see #createDecryptionKey(char[], byte[], int, byte[])
+   * @see #decrypt(InputStream, EncryptionKey)
+   */
+  InputStream decrypt(InputStream encryptedData, EncryptionKey key);
 
   /**
    * Creates a new {@link EncryptionKey} to be only used with

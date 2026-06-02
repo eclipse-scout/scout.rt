@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PushbackInputStream;
+import java.io.SequenceInputStream;
 import java.net.URL;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
@@ -59,6 +60,31 @@ public final class SecurityUtility {
   }
 
   /**
+   * Encrypts the given clear text bytes using the given password and salt.
+   *
+   * @param clearTextData
+   *     The clear text data. Must not be {@code null}.
+   * @param encryptedData
+   *     The output stream where the encrypted data is written to.
+   * @param password
+   *     The password to use to create the key. Must not be {@code null} or empty.
+   * @param salt
+   *     The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *     random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
+   *     generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
+   * @param keyLen
+   *     The length of the key (in bits). Must be one of 128, 192 or 256.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during encryption.
+   */
+  public static void encrypt(InputStream clearTextData, OutputStream encryptedData, char[] password, byte[] salt, int keyLen) {
+    EncryptionKey key = createEncryptionKey(password, salt, keyLen);
+    encrypt(clearTextData, encryptedData, key);
+  }
+
+  /**
    * See {@link ISecurityProvider#encrypt(InputStream, OutputStream, EncryptionKey)}
    */
   public static void encrypt(InputStream clearTextData, OutputStream encryptedData, EncryptionKey key) {
@@ -75,10 +101,153 @@ public final class SecurityUtility {
   }
 
   /**
+   * @param clearTextData
+   *     The clear text input stream. Must not be {@code null}.
+   * @param password
+   *     The password to use to create the key. Must not be {@code null} or empty.
+   * @param salt
+   *     The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *     random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
+   *     generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
+   * @param keyLen
+   *     The length of the key (in bits). Must be one of 128, 192 or 256.
+   * @return The input stream with the encrypted data.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during decryption.
+   */
+  public static InputStream encrypt(InputStream clearTextData, char[] password, byte[] salt, int keyLen) {
+    EncryptionKey key = createEncryptionKey(password, salt, keyLen);
+    return encrypt(clearTextData, key);
+  }
+
+  /**
+   * See {@link ISecurityProvider#encrypt(InputStream, EncryptionKey)}
+   */
+  public static InputStream encrypt(InputStream clearTextData, EncryptionKey key) {
+    InputStream encryptedData = SECURITY_PROVIDER.get().encrypt(clearTextData, key);
+    byte[] compatibilityHeader = key.getCompatibilityHeader();
+    if (compatibilityHeader != null) {
+      return new SequenceInputStream(new ByteArrayInputStream(compatibilityHeader), encryptedData);
+    }
+    return encryptedData;
+  }
+
+  /**
+   * @param encryptedData
+   *     The encrypted input stream. Must not be {@code null}.
+   * @param clearTextData
+   *     The output stream where the decrypted data is written to.
+   * @param password
+   *     The password to use to create the key. Must not be {@code null} or empty.
+   * @param salt
+   *     The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *     random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
+   *     generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
+   * @param keyLen
+   *     The length of the key (in bits). Must be one of 128, 192 or 256.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during decryption.
+   */
+  public static void decrypt(InputStream encryptedData, OutputStream clearTextData, char[] password, byte[] salt, int keyLen) {
+    decrypt(encryptedData, clearTextData, password, salt, keyLen, null);
+  }
+
+  /**
+   * @param encryptedData
+   *     The encrypted input stream. Must not be {@code null}.
+   * @param clearTextData
+   *     The output stream where the decrypted data is written to.
+   * @param password
+   *     The password to use to create the key. Must not be {@code null} or empty.
+   * @param salt
+   *     The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *     random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
+   *     generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
+   * @param keyLen
+   *     The length of the key (in bits). Must be one of 128, 192 or 256.
+   * @param optKey
+   *     may be null. For performance optimization this may be pre-built key. However, in order to guarantee
+   *     backward compatibility this optKey is only used when its parameters match those of the encrypted stream.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during decryption.
+   */
+  public static void decrypt(InputStream encryptedData, OutputStream clearTextData, char[] password, byte[] salt, int keyLen, EncryptionKey optKey) {
+    PushbackInputStream input = new PushbackInputStream(encryptedData, 6);
+    EncryptionKey key = createDecryptionKey(input, password, salt, keyLen, optKey);
+    SECURITY_PROVIDER.get().decrypt(input, clearTextData, key);
+  }
+
+  /**
    * Note: for backward compatibility use a key created with
    * {@link #createDecryptionKey(PushbackInputStream, char[], byte[], int, EncryptionKey)}
    */
   public static void decrypt(InputStream encryptedData, OutputStream clearTextData, EncryptionKey key) {
+    PushbackInputStream input = checkCompatibilityHeader(encryptedData, key);
+    SECURITY_PROVIDER.get().decrypt(input, clearTextData, key);
+  }
+
+  /**
+   * @param encryptedData
+   *     The encrypted input stream. Must not be {@code null}.
+   * @param password
+   *     The password to use to create the key. Must not be {@code null} or empty.
+   * @param salt
+   *     The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *     random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
+   *     generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
+   * @param keyLen
+   *     The length of the key (in bits). Must be one of 128, 192 or 256.
+   * @return The input stream with the encrypted data.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during decryption.
+   */
+  public static InputStream decrypt(InputStream encryptedData, char[] password, byte[] salt, int keyLen) {
+    return decrypt(encryptedData, password, salt, keyLen, null);
+  }
+
+  /**
+   * @param encryptedData
+   *     The encrypted input stream. Must not be {@code null}.
+   * @param password
+   *     The password to use to create the key. Must not be {@code null} or empty.
+   * @param salt
+   *     The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *     random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
+   *     generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
+   * @param keyLen
+   *     The length of the key (in bits). Must be one of 128, 192 or 256.
+   * @param optKey
+   *     may be null. For performance optimization this may be pre-built key. However, in order to guarantee
+   *     backward compatibility this optKey is only used when its parameters match those of the encrypted stream.
+   * @return The input stream with the encrypted data.
+   * @throws AssertionException
+   *     on invalid input
+   * @throws ProcessingException
+   *     if there is an error during decryption.
+   */
+  public static InputStream decrypt(InputStream encryptedData, char[] password, byte[] salt, int keyLen, EncryptionKey optKey) {
+    PushbackInputStream input = new PushbackInputStream(encryptedData, 6);
+    EncryptionKey key = createDecryptionKey(input, password, salt, keyLen, optKey);
+    return decrypt(input, key);
+  }
+
+  /**
+   * See {@link ISecurityProvider#encrypt(InputStream, EncryptionKey)}
+   */
+  public static InputStream decrypt(InputStream encryptedData, EncryptionKey key) {
+    PushbackInputStream input = checkCompatibilityHeader(encryptedData, key);
+    return SECURITY_PROVIDER.get().decrypt(input, key);
+  }
+
+  private static PushbackInputStream checkCompatibilityHeader(InputStream encryptedData, EncryptionKey key) {
     PushbackInputStream input = new PushbackInputStream(encryptedData, 6);
     byte[] compatibilityHeader = extractCompatibilityHeader(input);// fast-forward inputStream to skip compatibility header
     if (compatibilityHeader != null) {
@@ -87,7 +256,7 @@ public final class SecurityUtility {
         Assertions.assertTrue(Arrays.equals(compatibilityHeader, keyCompatibilityHeader), "Key compatibility header mismatch.");
       }
     }
-    SECURITY_PROVIDER.get().decrypt(input, clearTextData, key);
+    return input;
   }
 
   /**
@@ -139,7 +308,7 @@ public final class SecurityUtility {
    * After this call the {@link PushbackInputStream} starts at the encrypted data.
    *
    * @param cipherStream
-   *     which can unread 6 charcters
+   *     which can unread 6 characters
    * @return extracted header <code>[yyyy:version]</code> or null of not found. yyyy is the 4-digit year and version is
    * freetext without the ']' character
    */

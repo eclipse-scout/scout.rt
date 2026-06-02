@@ -39,26 +39,47 @@ public class SecurityUtilityTest {
   private static final char[] PASSWORD = "insecure".toCharArray();
 
   @Test
-  public void testEncryption() {
+  public void testEncryption() throws IOException {
     final String origData = "origData";
     final byte[] salt = SecurityUtility.createRandomBytes();
     final byte[] inputBytes = origData.getBytes(ENCODING);
 
+    // data based encryption
     byte[] encryptData = SecurityUtility.encrypt(inputBytes, PASSWORD, salt, KEY_LEN);
     Assert.assertFalse(Arrays.equals(encryptData, inputBytes));
 
+    // empty array
     byte[] encryptData3 = SecurityUtility.encrypt(new byte[]{}, PASSWORD, salt, KEY_LEN);
     byte[] decryptedEmpty = SecurityUtility.decrypt(encryptData3, PASSWORD, salt, KEY_LEN);
     Assert.assertArrayEquals(decryptedEmpty, new byte[]{});
 
+    // data based decryption
     String decryptedString = new String(SecurityUtility.decrypt(encryptData, PASSWORD, salt, KEY_LEN), ENCODING);
     Assert.assertEquals(origData, decryptedString);
+
+    // stream based encryption
+    ByteArrayOutputStream encryptedStream = new ByteArrayOutputStream();
+    SecurityUtility.encrypt(new ByteArrayInputStream(inputBytes), encryptedStream, PASSWORD, salt, KEY_LEN);
+    Assert.assertArrayEquals(encryptData, encryptedStream.toByteArray());
+
+    // stream based decryption
+    ByteArrayOutputStream decryptedStream = new ByteArrayOutputStream();
+    SecurityUtility.decrypt(new ByteArrayInputStream(encryptData), decryptedStream, PASSWORD, salt, KEY_LEN);
+    Assert.assertArrayEquals(inputBytes, decryptedStream.toByteArray());
+
+    // input stream encryption wrapping
+    InputStream encryptedStream2 = SecurityUtility.encrypt(new ByteArrayInputStream(inputBytes), PASSWORD, salt, KEY_LEN);
+    Assert.assertArrayEquals(encryptData, encryptedStream2.readAllBytes());
+
+    // input stream decryption wrapping
+    InputStream decryptedStream2 = SecurityUtility.decrypt(new ByteArrayInputStream(encryptData), PASSWORD, salt, KEY_LEN);
+    Assert.assertArrayEquals(inputBytes, decryptedStream2.readAllBytes());
   }
 
   @Test(expected = AssertionException.class)
   public void testEncryptNoData() {
     final byte[] salt = SecurityUtility.createRandomBytes();
-    SecurityUtility.encrypt(null, "pass".toCharArray(), salt, KEY_LEN);
+    SecurityUtility.encrypt((byte[]) null, "pass".toCharArray(), salt, KEY_LEN);
   }
 
   @Test(expected = AssertionException.class)
@@ -330,20 +351,40 @@ public class SecurityUtilityTest {
   public void testDecryptionApiStability_2023() {
     final byte[] encrypted = Base64Utility.decode("43aysPcKhTvyzZIWa6d1wwntGobQOXT38VU=");
     final byte[] salt = Base64Utility.decode("iPENJpMTU8MxarL8ZMHxXw==");
+
+    // data based
     Assert.assertEquals("myTestData", new String(SecurityUtility.decrypt(encrypted, PASSWORD, salt, 128), ENCODING));
     EncryptionKey key = SecurityUtility.createDecryptionKey(new PushbackInputStream(new ByteArrayInputStream(encrypted), 6), PASSWORD, salt, 128, null);
     Assert.assertEquals("[2023:v1]", new String(key.getCompatibilityHeader(), StandardCharsets.US_ASCII));
     Assert.assertEquals("myTestData", new String(SecurityUtility.decrypt(encrypted, key), ENCODING));
+
+    // stream based
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    SecurityUtility.decrypt(new ByteArrayInputStream(encrypted), outputStream, PASSWORD, salt, 128);
+    Assert.assertEquals("myTestData", outputStream.toString(ENCODING));
+    outputStream = new ByteArrayOutputStream();
+    SecurityUtility.decrypt(new ByteArrayInputStream(encrypted), outputStream, key);
+    Assert.assertEquals("myTestData", outputStream.toString(ENCODING));
   }
 
   @Test
   public void testDecryptionApiStability_2024() {
     final byte[] encrypted = Base64Utility.decode("WzIwMjQ6djFdU1rrQiSnCSBlPEk7SZayaYngVKYszy7EbjV1RGUq0CsaJyOHtXZwCp+ogg==");
     final byte[] salt = "salty".getBytes(ENCODING);
+
+    // data based
     Assert.assertEquals("This is an encrypted string", new String(SecurityUtility.decrypt(encrypted, PASSWORD, salt, 128), ENCODING));
     EncryptionKey key = SecurityUtility.createDecryptionKey(new PushbackInputStream(new ByteArrayInputStream(encrypted), 6), PASSWORD, salt, 128, null);
     Assert.assertEquals("[2024:v1]", new String(key.getCompatibilityHeader(), StandardCharsets.US_ASCII));
     Assert.assertEquals("This is an encrypted string", new String(SecurityUtility.decrypt(encrypted, key), ENCODING));
+
+    // stream based
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    SecurityUtility.decrypt(new ByteArrayInputStream(encrypted), outputStream, PASSWORD, salt, 128);
+    Assert.assertEquals("This is an encrypted string", outputStream.toString(ENCODING));
+    outputStream = new ByteArrayOutputStream();
+    SecurityUtility.decrypt(new ByteArrayInputStream(encrypted), outputStream, key);
+    Assert.assertEquals("This is an encrypted string", outputStream.toString(ENCODING));
   }
 
   @Test
