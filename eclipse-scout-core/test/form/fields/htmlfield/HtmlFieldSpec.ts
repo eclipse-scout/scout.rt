@@ -73,22 +73,22 @@ describe('HtmlField', () => {
     });
   });
 
-  describe('empty css class', () => {
-    it('is added if field is empty', () => {
+  describe('has-text css class', () => {
+    it('is not added if field is empty', () => {
       let field = scout.create(HtmlField, {
         parent: session.desktop
       });
       field.render();
-      expect(field.$field).toHaveClass('empty');
+      expect(field.$field).not.toHaveClass('has-text');
     });
 
-    it('is not added if field is not empty', () => {
+    it('is added if field is not empty', () => {
       let field = scout.create(HtmlField, {
         parent: session.desktop,
         value: 'a'
       });
       field.render();
-      expect(field.$field).not.toHaveClass('empty');
+      expect(field.$field).toHaveClass('has-text');
     });
 
     it('toggles if value toggles', () => {
@@ -96,13 +96,13 @@ describe('HtmlField', () => {
         parent: session.desktop
       });
       field.render();
-      expect(field.$field).toHaveClass('empty');
+      expect(field.$field).not.toHaveClass('has-text');
 
       field.setValue('a');
-      expect(field.$field).not.toHaveClass('empty');
+      expect(field.$field).toHaveClass('has-text');
 
       field.setValue(null);
-      expect(field.$field).toHaveClass('empty');
+      expect(field.$field).not.toHaveClass('has-text');
     });
   });
 });

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ajax, AjaxCall, App, arrays, FormField, NumberField, ParsingFailedStatus, scout, Status, StringField, ValueField} from '../../../src/index';
+import {ajax, AjaxCall, App, arrays, FormField, FormFieldMenu, NumberField, ParsingFailedStatus, scout, Status, StringField, ValueField} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper} from '../../../src/testing/index';
 import {ValueFieldValidator} from '../../../src/form/fields/ValueField';
 
@@ -924,9 +924,8 @@ describe('ValueField', () => {
 
   });
 
-  describe('validation: initialValue, empty and mandatory', () => {
-
-    let field;
+  describe('initialValue', () => {
+    let field: StringField;
 
     beforeEach(() => {
       field = helper.createField(StringField);
@@ -949,14 +948,147 @@ describe('ValueField', () => {
       expect(field.touched).toBe(false);
       expect(field.saveNeeded).toBe(false);
     });
+  });
 
-    it('sets empty to true when value is an empty string (for StringField)', () => {
+  describe('saveNeeded', () => {
+    let field: StringField;
+
+    beforeEach(() => {
+      field = helper.createField(StringField);
+    });
+
+    it('is set false initially', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop
+      });
+      expect(field.saveNeeded).toBe(false);
+
+      field = scout.create(StringField, {
+        parent: session.desktop,
+        value: 'hi there'
+      });
+      expect(field.saveNeeded).toBe(false);
+    });
+
+    it('is set to true when value changes', () => {
+      expect(field.saveNeeded).toBe(false);
+      field.setValue('Bar');
+      expect(field.saveNeeded).toBe(true);
+      field.setValue(null);
+      expect(field.saveNeeded).toBe(false);
+    });
+
+    it('is set to true when value is different than initial value', () => {
+      field.setValue('Foo');
+      field.markAsSaved();
+      expect(field.saveNeeded).toBe(false);
+      field.setValue('Bar');
+      expect(field.saveNeeded).toBe(true);
+      field.setValue('Foo');
+      expect(field.saveNeeded).toBe(false);
+    });
+
+    it('is set to true when field is touched', () => {
+      expect(field.saveNeeded).toBe(false);
+      field.touch();
+      expect(field.saveNeeded).toBe(true);
+      field.setValue('Foo');
+      expect(field.saveNeeded).toBe(true);
+      field.setValue(null);
+      expect(field.saveNeeded).toBe(true); // Still true
+
+      field.markAsSaved();
+      expect(field.saveNeeded).toBe(false);
+      expect(field.touched).toBe(false);
+    });
+
+    it('is set to false when checkSaveNeeded is false even if the value has changed', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop,
+        checkSaveNeeded: false
+      });
+      expect(field.saveNeeded).toBe(false);
+
+      field.setValue('Foo');
+      expect(field.saveNeeded).toBe(false);
+
+      field.touch(); // touch has an effect even if check save needed is disabled
+      expect(field.saveNeeded).toBe(true);
+
+      field.markAsSaved();
+      expect(field.saveNeeded).toBe(false);
+
+      field.setCheckSaveNeeded(true);
+      field.setValue('Bar');
+      expect(field.saveNeeded).toBe(true);
+
+      field.setCheckSaveNeeded(false);
+      expect(field.saveNeeded).toBe(false);
+    });
+  });
+
+  describe('empty', () => {
+    it('is set to true when value is null initially ', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop
+      });
+      expect(field.empty).toBe(true);
+
+      field = scout.create(StringField, {
+        parent: session.desktop,
+        value: 'hi there'
+      });
+      expect(field.empty).toBe(false);
+    });
+
+    it('is set to true when value changed to null', () => {
+      let field = scout.create(StringField, {parent: session.desktop});
       field.setValue(null);
       expect(field.empty).toBe(true);
       field.setValue('Foo');
       expect(field.empty).toBe(false);
       field.setValue(null);
       expect(field.empty).toBe(true);
+    });
+
+    it('does not consider child form fields', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop,
+        menus: [{
+          objectType: FormFieldMenu,
+          field: {
+            objectType: StringField,
+            value: 'a value'
+          }
+        }]
+      });
+      let fieldInMenu = field.findChild(StringField);
+      expect(field.empty).toBe(true);
+      expect(fieldInMenu.empty).toBe(false);
+
+      fieldInMenu.setValue(null);
+      expect(field.empty).toBe(true);
+      expect(fieldInMenu.empty).toBe(true);
+
+      fieldInMenu.setValue('another value');
+      expect(field.empty).toBe(true);
+      expect(fieldInMenu.empty).toBe(false);
+
+      field.setValue('abc');
+      expect(field.empty).toBe(false);
+      expect(fieldInMenu.empty).toBe(false);
+
+      field.setValue(null);
+      expect(field.empty).toBe(true);
+      expect(fieldInMenu.empty).toBe(false);
+    });
+  });
+
+  describe('validationResult', () => {
+    let field: StringField;
+
+    beforeEach(() => {
+      field = helper.createField(StringField);
     });
 
     it('validationResult.valid is true when errorStatus is not set and field is not mandatory', () => {
@@ -994,77 +1126,6 @@ describe('ValueField', () => {
       result = field.getValidationResult();
       expect(result.valid).toBe(true);
       expect(result.promise).toBe(null);
-    });
-
-    describe('saveNeeded', () => {
-      it('is set false initially', () => {
-        let field = scout.create(StringField, {
-          parent: session.desktop
-        });
-        expect(field.saveNeeded).toBe(false);
-
-        field = scout.create(StringField, {
-          parent: session.desktop,
-          value: 'hi there'
-        });
-        expect(field.saveNeeded).toBe(false);
-      });
-
-      it('is set to true when value changes', () => {
-        expect(field.saveNeeded).toBe(false);
-        field.setValue('Bar');
-        expect(field.saveNeeded).toBe(true);
-        field.setValue(null);
-        expect(field.saveNeeded).toBe(false);
-      });
-
-      it('is set to true when value is different than initial value', () => {
-        field.setValue('Foo');
-        field.markAsSaved();
-        expect(field.saveNeeded).toBe(false);
-        field.setValue('Bar');
-        expect(field.saveNeeded).toBe(true);
-        field.setValue('Foo');
-        expect(field.saveNeeded).toBe(false);
-      });
-
-      it('is set to true when field is touched', () => {
-        expect(field.saveNeeded).toBe(false);
-        field.touch();
-        expect(field.saveNeeded).toBe(true);
-        field.setValue('Foo');
-        expect(field.saveNeeded).toBe(true);
-        field.setValue(null);
-        expect(field.saveNeeded).toBe(true); // Still true
-
-        field.markAsSaved();
-        expect(field.saveNeeded).toBe(false);
-        expect(field.touched).toBe(false);
-      });
-
-      it('is set to false when checkSaveNeeded is false even if the value has changed', () => {
-        let field = scout.create(StringField, {
-          parent: session.desktop,
-          checkSaveNeeded: false
-        });
-        expect(field.saveNeeded).toBe(false);
-
-        field.setValue('Foo');
-        expect(field.saveNeeded).toBe(false);
-
-        field.touch(); // touch has an effect even if check save needed is disabled
-        expect(field.saveNeeded).toBe(true);
-
-        field.markAsSaved();
-        expect(field.saveNeeded).toBe(false);
-
-        field.setCheckSaveNeeded(true);
-        field.setValue('Bar');
-        expect(field.saveNeeded).toBe(true);
-
-        field.setCheckSaveNeeded(false);
-        expect(field.saveNeeded).toBe(false);
-      });
     });
   });
 

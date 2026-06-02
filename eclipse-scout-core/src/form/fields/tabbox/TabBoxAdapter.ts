@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AdapterData, CompositeFieldAdapter} from '../../../index';
+import {AdapterData, CompositeFieldAdapter, TabBoxModel} from '../../../index';
 
 export class TabBoxAdapter extends CompositeFieldAdapter {
 
@@ -15,6 +15,11 @@ export class TabBoxAdapter extends CompositeFieldAdapter {
     super();
     this._addRemoteProperties(['selectedTab']);
     this._addOrderedProperties(['tabItems', 'selectedTab']);
+  }
+
+  protected override _initProperties(model: TabBoxModel & { currentMenuTypes: string[] }) {
+    super._initProperties(model);
+    model.markStrategy = null; // Don't update the marked property, it will be sent by the server
   }
 
   override exportAdapterData(adapterData: AdapterData): AdapterData {

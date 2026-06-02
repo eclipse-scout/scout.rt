@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ValueFieldModel} from '../../../index';
+import {FormFieldCheckEmpty, ValueFieldModel} from '../../../index';
 
 export interface HtmlFieldModel extends ValueFieldModel<string> {
   /**
@@ -22,5 +22,22 @@ export interface HtmlFieldModel extends ValueFieldModel<string> {
    * Default is true.
    */
   selectable?: boolean;
+  /**
+   * Configures the name of an anchor to which the html field should scroll when it is rendered or when the property is set.
+   *
+   * Default is null.
+   */
   scrollToAnchor?: string;
+  /**
+   * Default is true.
+   *
+   * @see WidgetModel.preventInitialFocus
+   */
+  preventInitialFocus?: boolean;
+  /**
+   * Default is false.
+   *
+   * @see FormFieldModel.checkEmpty
+   */
+  checkEmpty?: boolean | FormFieldCheckEmpty;
 }

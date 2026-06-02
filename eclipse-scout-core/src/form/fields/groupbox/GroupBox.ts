@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -143,6 +143,9 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     return this.fields;
   }
 
+  /**
+   * Inserts the given field at the end of the existing fields or at the specified index.
+   */
   insertField(field: ObjectOrChildModel<FormField>, index?: number) {
     let newFields = this.fields.slice() as ObjectOrChildModel<FormField>[];
     index = scout.nvl(index, this.fields.length);
@@ -150,18 +153,30 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     this.setFields(newFields);
   }
 
+  /**
+   * Inserts the given field before the specified sibling.
+   */
   insertFieldBefore(field: ObjectOrChildModel<FormField>, sibling: FormField) {
     scout.assertParameter('sibling', sibling);
     let index = this.fields.indexOf(sibling);
     this.insertField(field, index);
   }
 
+  /**
+   * Inserts the given field after the specified sibling.
+   */
   insertFieldAfter(field: ObjectOrChildModel<FormField>, sibling: FormField) {
     scout.assertParameter('sibling', sibling);
     let index = this.fields.indexOf(sibling) + 1;
     this.insertField(field, index);
   }
 
+  /**
+   * Removes the given field from the group box.
+   *
+   * Also destroys the field if the group box is the {@link WidgetModel.owner}.
+   * If you want to move the field into another group box, you need to change the owner first using {@link Widget.setOwner} before deleting the field and inserting it into the other box.
+   */
   deleteField(field: FormField) {
     let index = this.fields.indexOf(field);
     if (index < 0) {
