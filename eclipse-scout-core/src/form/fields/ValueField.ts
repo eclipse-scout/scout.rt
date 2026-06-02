@@ -749,7 +749,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
    * @returns true if the value is null or undefined. Also returns true if the value is an array and the array is empty.
    */
   protected override _computeEmpty(): boolean {
-    return this.value === null || this.value === undefined || (Array.isArray(this.value) && arrays.empty(this.value));
+    return objects.isNullOrUndefined(this.value) || (Array.isArray(this.value) && arrays.empty(this.value));
   }
 
   protected override _getCurrentMenuTypes(): string[] {

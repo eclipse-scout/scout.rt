@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -153,6 +153,55 @@ describe('CheckBoxField', () => {
 
       field.setValue(false);
       expect(field.saveNeeded).toBe(false);
+    });
+  });
+
+  describe('empty', () => {
+    it('is false if not checked', () => {
+      let field = scout.create(CheckBoxField, {
+        parent: session.desktop
+      });
+      expect(field.empty).toBe(true);
+
+      field = scout.create(CheckBoxField, {
+        parent: session.desktop,
+        value: true
+      });
+      expect(field.empty).toBe(false);
+    });
+
+    it('is updated when value changes', () => {
+      let field = scout.create(CheckBoxField, {
+        parent: session.desktop
+      });
+      expect(field.empty).toBe(true);
+
+      field.setValue(true);
+      expect(field.empty).toBe(false);
+
+      field.setValue(false);
+      expect(field.empty).toBe(true);
+    });
+
+    it('is true if value is null', () => {
+      let field = scout.create(CheckBoxField, {
+        parent: session.desktop,
+        triStateEnabled: true
+      });
+      expect(field.empty).toBe(true);
+
+      field = scout.create(CheckBoxField, {
+        parent: session.desktop,
+        triStateEnabled: true,
+        value: null
+      });
+      expect(field.empty).toBe(true);
+
+      field.setValue(true);
+      expect(field.empty).toBe(false);
+
+      field.setValue(false);
+      expect(field.empty).toBe(true);
     });
   });
 

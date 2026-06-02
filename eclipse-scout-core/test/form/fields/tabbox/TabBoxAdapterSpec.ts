@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {TabBoxSpecHelper} from '../../../../src/testing/index';
+import {scout, StringField, TabBox, TabBoxAdapter, TabItem} from '../../../../src';
 
 describe('TabBoxAdapter', () => {
   let session: SandboxSession;
@@ -69,6 +70,35 @@ describe('TabBoxAdapter', () => {
         expect(tabBox.selectedTab).toBe(tabBox.tabItems[1]);
         expect(tabBox.header.tabArea.selectedTab).toBe(tabBox.header.tabArea.getTabForItem(tabBox.selectedTab));
       });
+    });
+  });
+
+  describe('markStrategy', () => {
+    it('is set to null because server updates marked property', () => {
+      let model = {
+        id: 'tabBox1',
+        session: session,
+        parent: session.desktop,
+        objectType: 'TabBox',
+        tabItems: [{
+          objectType: 'TabItem',
+          fields: [{
+            objectType: 'StringField'
+          }, {
+            objectType: 'StringField',
+            value: 'value'
+          }]
+        }]
+      };
+      let adapter = scout.create(TabBoxAdapter, $.extend({}, model));
+      let tabBox = adapter.createWidget(model, session.desktop) as TabBox;
+      expect(tabBox.markStrategy).toBe(null);
+      expect(tabBox.tabItems[0].marked).toBe(false);
+
+      let stringField = tabBox.tabItems[0].fields[0] as StringField;
+      stringField.setValue('value');
+      expect(stringField.empty).toBe(false);
+      expect(tabBox.tabItems[0].marked).toBe(false);
     });
   });
 

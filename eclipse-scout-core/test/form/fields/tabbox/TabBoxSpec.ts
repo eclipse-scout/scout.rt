@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {keys, scout, TabBox, TabItem} from '../../../../src/index';
+import {keys, scout, StringField, TabBox, TabBoxModel, TabItem} from '../../../../src/index';
 import {JQueryTesting, TabBoxSpecHelper} from '../../../../src/testing/index';
 
 describe('TabBox', () => {
@@ -201,6 +201,340 @@ describe('TabBox', () => {
       tabBox.setSelectedTab(tabItem1);
       expect(tabItem1.getTab().$container).toHaveAttr('aria-selected', 'true');
       expect(tabItem2.getTab().$container.attr('aria-selected')).toBeFalsy();
+    });
+  });
+
+  describe('mark strategy', () => {
+    function createTabBox(model?: TabBoxModel): TabBox {
+      return scout.create(TabBox, {
+        parent: session.desktop,
+        tabItems: [{
+          objectType: TabItem,
+          fields: [{
+            objectType: StringField
+          }, {
+            objectType: StringField
+          }]
+        }, {
+          objectType: TabItem,
+          fields: [{
+            objectType: StringField
+          }, {
+            objectType: StringField
+          }]
+        }],
+        ...model
+      });
+    }
+
+    it('can be set initially', () => {
+      let tabBox = scout.create(TabBox, {
+        parent: session.desktop
+      });
+      expect(tabBox.markStrategy).toBe(TabBox.MarkStrategy.EMPTY);
+
+      tabBox = scout.create(TabBox, {
+        parent: session.desktop,
+        markStrategy: TabBox.MarkStrategy.SAVE_NEEDED
+      });
+      expect(tabBox.markStrategy).toBe(TabBox.MarkStrategy.SAVE_NEEDED);
+
+      tabBox = scout.create(TabBox, {
+        parent: session.desktop,
+        markStrategy: null
+      });
+      expect(tabBox.markStrategy).toBe(null);
+    });
+
+    it('updates marked state if strategy changes', () => {
+      let tabBox = createTabBox();
+      expect(tabBox.tabItems[0].marked).toBeFalse();
+
+      (tabBox.tabItems[0].fields[0] as StringField).setValue('value 2');
+      expect(tabBox.tabItems[0].marked).toBeTrue();
+
+      tabBox.setMarkStrategy(TabBox.MarkStrategy.SAVE_NEEDED);
+      expect(tabBox.tabItems[0].marked).toBeTrue();
+
+      tabBox.tabItems[0].fields[0].markAsSaved();
+      expect(tabBox.tabItems[0].marked).toBeFalse();
+
+      tabBox.setMarkStrategy(TabBox.MarkStrategy.EMPTY);
+      expect(tabBox.tabItems[0].marked).toBeTrue();
+
+      tabBox.setMarkStrategy(null);
+      expect(tabBox.tabItems[0].marked).toBeTrue(); // null means it does not change the marked state so it can be set manually (e.g. by Scout Classic)
+    });
+
+    describe('empty', () => {
+      it('marks tab if at least one field is not empty', () => {
+        let tabBox = scout.create(TabBox, {
+          parent: session.desktop,
+          tabItems: [{
+            objectType: TabItem,
+            fields: [{
+              objectType: StringField
+            }, {
+              objectType: StringField
+            }]
+          }, {
+            objectType: TabItem,
+            fields: [{
+              objectType: StringField
+            }, {
+              objectType: StringField,
+              value: 'value'
+            }]
+          }]
+        });
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeTrue();
+      });
+
+      it('marks tab item if it changes to non-empty', () => {
+        let tabBox = createTabBox();
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        (tabBox.tabItems[0].fields[0] as StringField).setValue('value');
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        (tabBox.tabItems[1].fields[1] as StringField).setValue('value');
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeTrue();
+
+        (tabBox.tabItems[1].fields[0] as StringField).setValue('value');
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeTrue();
+
+        (tabBox.tabItems[1].fields[1] as StringField).setValue(null);
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeTrue();
+
+        (tabBox.tabItems[1].fields[0] as StringField).setValue(null);
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        (tabBox.tabItems[0].fields[0] as StringField).setValue(null);
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+      });
+
+      it('removes marking if non-empty fields are deleted', () => {
+        let tabBox = createTabBox();
+        let stringField = tabBox.tabItems[0].fields[0] as StringField;
+        stringField.setValue('value');
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        tabBox.tabItems[0].deleteField(stringField);
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+      });
+
+      it('adds marking if a non-empty field is added', () => {
+        let tabBox = createTabBox();
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        tabBox.tabItems[0].insertField({
+          objectType: StringField,
+          value: 'a value'
+        });
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+      });
+
+      it('updates marking if a tab item is added', () => {
+        let tabBox = createTabBox();
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        let tabItem = scout.create(TabItem, {
+          parent: tabBox,
+          fields: [{
+            objectType: StringField
+          }]
+        });
+        (tabItem.fields[0] as StringField).setValue('value');
+        expect(tabItem.empty).toBe(false);
+
+        tabBox.insertTabItem(tabItem);
+        expect(tabItem.marked).toBe(true);
+
+        tabItem.setOwner(session.desktop);
+        tabBox.deleteTabItem(tabItem);
+
+        (tabItem.fields[0] as StringField).setValue(null);
+        expect(tabItem.empty).toBe(true);
+
+        tabBox.insertTabItem(tabItem);
+        expect(tabItem.marked).toBe(false);
+      });
+    });
+
+    describe('saveNeeded', () => {
+      it('marks tab item if at least one field requires saving', () => {
+        let tabBox = createTabBox({markStrategy: TabBox.MarkStrategy.SAVE_NEEDED});
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        (tabBox.tabItems[0].fields[0] as StringField).setValue('value');
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        (tabBox.tabItems[1].fields[1] as StringField).setValue('value');
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeTrue();
+
+        (tabBox.tabItems[1].fields[0] as StringField).setValue('value');
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeTrue();
+
+        (tabBox.tabItems[1].fields[1] as StringField).markAsSaved();
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeTrue();
+
+        (tabBox.tabItems[1].fields[0] as StringField).markAsSaved();
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        tabBox.tabItems[0].markAsSaved();
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        (tabBox.tabItems[0].fields[0] as StringField).setValue('value 2');
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        (tabBox.tabItems[0].fields[0] as StringField).setValue('value');
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+      });
+
+      it('does not mark tab if a field has a value initially', () => {
+        let tabBox = scout.create(TabBox, {
+          parent: session.desktop,
+          markStrategy: TabBox.MarkStrategy.SAVE_NEEDED,
+          tabItems: [{
+            objectType: TabItem,
+            fields: [{
+              objectType: StringField
+            }, {
+              objectType: StringField
+            }]
+          }, {
+            objectType: TabItem,
+            fields: [{
+              objectType: StringField
+            }, {
+              objectType: StringField,
+              value: 'value'
+            }]
+          }]
+        });
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+      });
+
+      it('removes marking if saveNeeded fields are deleted', () => {
+        let tabBox = createTabBox({markStrategy: TabBox.MarkStrategy.SAVE_NEEDED});
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        let stringField = tabBox.tabItems[0].fields[0] as StringField;
+        stringField.setValue('value');
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        tabBox.tabItems[0].deleteField(stringField);
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+      });
+
+      it('adds marking if a saveNeeded field is added', () => {
+        let tabBox = createTabBox({markStrategy: TabBox.MarkStrategy.SAVE_NEEDED});
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        let stringField = scout.create(StringField, {parent: tabBox.tabItems[0]});
+        stringField.setValue('value');
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+      });
+
+      it('updates marking if a tab item is added', () => {
+        let tabBox = createTabBox({markStrategy: TabBox.MarkStrategy.SAVE_NEEDED});
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        let tabItem = scout.create(TabItem, {
+          parent: tabBox,
+          fields: [{
+            objectType: StringField
+          }]
+        });
+        (tabItem.fields[0] as StringField).setValue('value');
+        expect(tabItem.empty).toBe(false);
+
+        tabBox.insertTabItem(tabItem);
+        expect(tabItem.marked).toBe(true);
+
+        tabItem.setOwner(session.desktop);
+        tabBox.deleteTabItem(tabItem);
+
+        (tabItem.fields[0] as StringField).setValue(null);
+        expect(tabItem.empty).toBe(true);
+
+        tabBox.insertTabItem(tabItem);
+        expect(tabItem.marked).toBe(false);
+      });
+    });
+
+    describe('null', () => {
+      it('does not mark tabs at all', () => {
+        let tabBox = createTabBox({markStrategy: null});
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+
+        (tabBox.tabItems[0].fields[0] as StringField).setValue('value');
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+      });
+
+      it('does not change existing mark states', () => {
+        let tabBox = scout.create(TabBox, {
+          parent: session.desktop,
+          markStrategy: null,
+          tabItems: [{
+            objectType: TabItem,
+            marked: true,
+            fields: [{
+              objectType: StringField
+            }, {
+              objectType: StringField
+            }]
+          }, {
+            objectType: TabItem,
+            marked: true,
+            fields: [{
+              objectType: StringField
+            }, {
+              objectType: StringField,
+              value: 'value'
+            }]
+          }]
+        });
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeTrue();
+
+        (tabBox.tabItems[1].fields[0] as StringField).setValue('value');
+        expect(tabBox.tabItems[0].marked).toBeTrue();
+        expect(tabBox.tabItems[1].marked).toBeTrue();
+
+        tabBox.tabItems[0].setMarked(false);
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeTrue();
+      });
     });
   });
 });

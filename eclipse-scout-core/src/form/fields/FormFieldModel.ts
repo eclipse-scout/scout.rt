@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -114,13 +114,13 @@ export interface FormFieldModel extends WidgetModel {
    * Defines the menus for the form field.
    *
    * Depending on the concrete field, the menus will be available through a context menu in the status area on the right of the field
-   * (e.g. for {@link StringField}) or in a {@link MenuBar} (e.g. for {@link GroupBox}.
+   * (e.g. for {@link StringField}) or in a {@link MenuBar} (e.g. for {@link GroupBox}).
    */
   menus?: ObjectOrChildModel<Menu>[];
   /**
    * Defines the position of the status area, that displays {@link errorStatus}, {@link menus} and {@link tooltipText}.
    *
-   * By default the status area is on the right side of the field.
+   * By default, the status area is on the right side of the field.
    */
   statusPosition?: FormFieldStatusPosition;
   /**
@@ -151,7 +151,7 @@ export interface FormFieldModel extends WidgetModel {
    */
   tooltipAnchor?: FormFieldTooltipAnchor;
   /**
-   * Can be used to provide custom options when creating an on-field-tooltip ({@link tooltipAnchor is set to {@link FormField.TooltipAnchor.ON_FIELD}}.
+   * Can be used to provide custom options when creating an on-field-tooltip ({@link tooltipAnchor} is set to {@link FormField.TooltipAnchor.ON_FIELD}).
    * If not specified, the default options created by {@link FormField._createOnFieldTooltipOptions} are used.
    */
   onFieldTooltipOptionsCreator?: (this: FormField) => TooltipSupportOptions;
@@ -204,9 +204,20 @@ export interface FormFieldModel extends WidgetModel {
    */
   labelBackgroundColor?: string;
   /**
-   * Configures whether save needed should be computed.
+   * Configures whether {@link FormField.empty} should be computed.
    *
-   * If set to false, {@link FormField.saveNeeded} will always return false for this field, even if a child field would return true.
+   * If set to false, {@link FormField.empty} will always return true for this field, even if {@link FormField.computeEmpty} would return false.
+   * This is useful to disable the empty check for fields not having a real empty state or whose empty state is not of interest, like fields just showing an info message.
+   *
+   * *Important*: If this is disabled on a mandatory field, the form cannot be saved anymore because the field would always be invalid.
+   *
+   * Default is true.
+   */
+  checkEmpty?: boolean;
+  /**
+   * Configures whether {@link FormField.saveNeeded} should be computed.
+   *
+   * If set to false, {@link FormField.saveNeeded} will always return false for this field, even if {@link FormField.computeSaveNeeded} would return true (e.g. because a child field needs to be saved).
    * However, if the field was {@link FormField.touched}, {@link FormField.saveNeeded} will be true.
    *
    * Default is true.

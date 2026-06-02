@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, arrays, CompositeField, EnumObject, fields, FormField, HtmlComponent, InitModelOf, Menu, ObjectIdProvider, ObjectOrChildModel, PropertyChangeEvent, scout, SingleLayout, Tab, TabArea, TabAreaStyle, TabBoxEventMap, TabBoxHeader,
-  TabBoxLayout, TabBoxModel, TabItem
+  aria, arrays, CompositeField, EnumObject, EventHandler, fields, FormField, HtmlComponent, InitModelOf, Menu, ObjectIdProvider, ObjectOrChildModel, PropertyChangeEvent, scout, SingleLayout, Tab, TabArea, TabAreaStyle, TabBoxEventMap,
+  TabBoxHeader, TabBoxLayout, TabBoxModel, TabItem
 } from '../../../index';
 import $ from 'jquery';
 
@@ -26,12 +26,14 @@ export class TabBox extends CompositeField implements TabBoxModel {
   header: TabBoxHeader;
   tabItems: TabItem[];
   tabAreaStyle: TabAreaStyle;
+  markStrategy: TabBoxMarkStrategy;
 
   /** @internal */
   _$tabContent: JQuery;
 
-  protected _statusPositionOrig: any;
-  protected _tabBoxHeaderPropertyChangeHandler: any;
+  protected _tabBoxHeaderPropertyChangeHandler: EventHandler<PropertyChangeEvent>;
+  protected _tabItemEmptyChangeHandler: EventHandler<PropertyChangeEvent>;
+  protected _tabItemSaveNeededChangeHandler: EventHandler<PropertyChangeEvent>;
 
   constructor() {
     super();
@@ -39,6 +41,7 @@ export class TabBox extends CompositeField implements TabBoxModel {
     this.gridDataHints.useUiHeight = true;
     this.gridDataHints.w = FormField.FULL_WIDTH;
     this.header = null;
+    this.markStrategy = TabBox.MarkStrategy.EMPTY;
     this.selectedTab = null;
     this.tabItems = [];
     this.tabAreaStyle = TabArea.DisplayStyle.DEFAULT;
@@ -48,7 +51,20 @@ export class TabBox extends CompositeField implements TabBoxModel {
     this._addPreserveOnPropertyChangeProperties(['selectedTab']);
 
     this._tabBoxHeaderPropertyChangeHandler = this._onTabBoxHeaderPropertyChange.bind(this);
+    this._tabItemEmptyChangeHandler = this._onTabItemEmptyChange.bind(this);
+    this._tabItemSaveNeededChangeHandler = this._onTabItemSaveNeededChange.bind(this);
   }
+
+  static MarkStrategy = {
+    /**
+     * Sets {@link TabItem.marked} of a tab item to true if it is not {@link empty}.
+     */
+    EMPTY: 'empty',
+    /**
+     * Sets {@link TabItem.marked} of a tab item to true if its {@link saveNeeded} state is true.
+     */
+    SAVE_NEEDED: 'saveNeeded'
+  } as const;
 
   static MenuType = {
     /**
@@ -74,6 +90,7 @@ export class TabBox extends CompositeField implements TabBoxModel {
     this._setTabItems(this.tabItems);
     this._setSelectedTab(this.selectedTab);
     this._setTabAreaStyle(this.tabAreaStyle);
+    this._setMarkStrategy(this.markStrategy);
   }
 
   protected override _destroy() {
@@ -140,13 +157,17 @@ export class TabBox extends CompositeField implements TabBoxModel {
 
   protected _setTabItems(tabItems: TabItem[]) {
     tabItems = tabItems || [];
-    let tabsToRemove = this.tabItems || [];
-    tabsToRemove.filter(tabItem => tabItems.indexOf(tabItem) < 0
-    ).forEach(tabItem => {
-      tabItem.remove();
-    });
+    const tabsToRemove = arrays.diff(this.tabItems, tabItems);
+    tabsToRemove.forEach(tabItem => tabItem.remove());
+
+    if (this.initialized) {
+      const tabsToAdd = arrays.diff(tabItems, this.tabItems);
+      this._removeMarkStrategyHandlers(tabsToRemove);
+      this._addMarkStrategyHandlers(tabsToAdd);
+    }
 
     this._setProperty('tabItems', tabItems);
+
     this.header.setTabItems(this.tabItems);
     // if no tab is selected select first
     if (this.tabItems.indexOf(this.selectedTab) < 0) {
@@ -228,6 +249,59 @@ export class TabBox extends CompositeField implements TabBoxModel {
     }
   }
 
+  /** @see {@link TabBoxModel.markStrategy} */
+  setMarkStrategy(markStrategy: TabBoxMarkStrategy) {
+    this.setProperty('markStrategy', markStrategy);
+  }
+
+  protected _setMarkStrategy(markStrategy: TabBoxMarkStrategy) {
+    this._removeMarkStrategyHandlers(this.tabItems);
+    this._setProperty('markStrategy', markStrategy);
+    this._addMarkStrategyHandlers(this.tabItems);
+  }
+
+  protected _removeMarkStrategyHandlers(tabItems: TabItem[]) {
+    if (!this.markStrategy) {
+      return;
+    }
+
+    for (const tabItem of tabItems) {
+      if (this.markStrategy === TabBox.MarkStrategy.SAVE_NEEDED) {
+        tabItem.off('propertyChange:saveNeeded', this._tabItemSaveNeededChangeHandler);
+      } else if (this.markStrategy === TabBox.MarkStrategy.EMPTY) {
+        tabItem.off('propertyChange:empty', this._tabItemEmptyChangeHandler);
+      }
+    }
+  }
+
+  protected _addMarkStrategyHandlers(tabItems: TabItem[]) {
+    for (const tabItem of tabItems) {
+      if (this.markStrategy === TabBox.MarkStrategy.SAVE_NEEDED) {
+        tabItem.on('propertyChange:saveNeeded', this._tabItemSaveNeededChangeHandler);
+        this._updateTabItemMarked(tabItem);
+      } else if (this.markStrategy === TabBox.MarkStrategy.EMPTY) {
+        tabItem.on('propertyChange:empty', this._tabItemEmptyChangeHandler);
+        this._updateTabItemMarked(tabItem);
+      }
+    }
+  }
+
+  protected _updateTabItemMarked(tabItem: TabItem) {
+    if (this.markStrategy === TabBox.MarkStrategy.SAVE_NEEDED) {
+      tabItem.setMarked(tabItem.saveNeeded);
+    } else if (this.markStrategy === TabBox.MarkStrategy.EMPTY) {
+      tabItem.setMarked(!tabItem.empty);
+    }
+  }
+
+  protected _onTabItemSaveNeededChange(event: PropertyChangeEvent<boolean, TabItem>) {
+    this._updateTabItemMarked(event.source);
+  }
+
+  protected _onTabItemEmptyChange(event: PropertyChangeEvent<boolean, TabItem>) {
+    this._updateTabItemMarked(event.source);
+  }
+
   protected override _renderStatusPosition() {
     super._renderStatusPosition();
     if (!this.fieldStatus.rendered) {
@@ -304,5 +378,6 @@ export class TabBox extends CompositeField implements TabBoxModel {
 }
 
 export type TabBoxMenuType = EnumObject<typeof TabBox.MenuType>;
+export type TabBoxMarkStrategy = EnumObject<typeof TabBox.MarkStrategy>;
 
 ObjectIdProvider.uuidPathSkipWidgets.add(TabBox);

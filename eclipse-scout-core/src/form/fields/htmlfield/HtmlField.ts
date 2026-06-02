@@ -45,7 +45,6 @@ export class HtmlField extends ValueField<string> implements HtmlFieldModel {
     this._renderScrollBarEnabled();
     this._renderScrollToAnchor();
     this._renderSelectable();
-    this._renderEmpty();
   }
 
   protected _prepareDisplayText(displayText: string): string {
@@ -63,6 +62,7 @@ export class HtmlField extends ValueField<string> implements HtmlFieldModel {
   }
 
   protected override _renderDisplayText() {
+    this._updateHasText();
     if (!this.displayText) {
       this.$field.empty();
       return;
@@ -97,8 +97,8 @@ export class HtmlField extends ValueField<string> implements HtmlFieldModel {
     // NOP, don't add "focused" class. It doesn't look good when the label is highlighted but no cursor is visible.
   }
 
-  protected _renderEmpty() {
-    this.$field.toggleClass('empty', this.empty);
+  protected override _renderClearable() {
+    // NOP, we don't need the default clear icon
   }
 
   setScrollBarEnabled(scrollBarEnabled: boolean) {
@@ -111,6 +111,10 @@ export class HtmlField extends ValueField<string> implements HtmlFieldModel {
     } else {
       this._uninstallScrollbars();
     }
+  }
+
+  setScrollToAnchor(scrollToAnchor: string) {
+    this.setProperty('scrollToAnchor', scrollToAnchor);
   }
 
   protected _renderScrollToAnchor() {
