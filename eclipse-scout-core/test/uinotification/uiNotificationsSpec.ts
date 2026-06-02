@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -839,7 +839,70 @@ describe('uiNotifications', () => {
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
     });
 
-    it('automatically restarts on response error if other topics are subscribed', () => {
+    it('automatically restarts on polling response error', () => {
+      uiNotifications.subscribe('aaa', () => undefined);
+
+      let response = scout.create(UiNotificationResponse, {
+        notifications: [{
+          id: '100',
+          topic: 'aaa',
+          nodeId: 'node1',
+          creationTime: '2023-09-16 21:44:13.000',
+          subscriptionStart: true
+        }]
+      });
+      jasmine.Ajax.requests.mostRecent().respondWith({
+        status: 200,
+        responseText: JSON.stringify(response.toPojo())
+      });
+
+      // Subscription was successful, start polling
+      jasmine.clock().tick(1);
+
+      let poller = pollers().get('main');
+      jasmine.Ajax.requests.mostRecent().respondWith({
+        status: 500
+      });
+      jasmine.clock().tick(1);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.FAILURE);
+
+      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
+    });
+
+    it('automatically restarts on empty polling response', () => {
+      uiNotifications.subscribe('aaa', () => undefined);
+
+      let response = scout.create(UiNotificationResponse, {
+        notifications: [{
+          id: '100',
+          topic: 'aaa',
+          nodeId: 'node1',
+          creationTime: '2023-09-16 21:44:13.000',
+          subscriptionStart: true
+        }]
+      });
+      jasmine.Ajax.requests.mostRecent().respondWith({
+        status: 200,
+        responseText: JSON.stringify(response.toPojo())
+      });
+
+      // Subscription was successful, start polling
+      jasmine.clock().tick(1);
+
+      let poller = pollers().get('main');
+      jasmine.Ajax.requests.mostRecent().respondWith({
+        status: 200
+        // no response text
+      });
+      jasmine.clock().tick(1);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.FAILURE);
+
+      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
+    });
+
+    it('automatically restarts if subscription fails and other topics are subscribed', () => {
       uiNotifications.subscribe('aaa', () => undefined);
 
       let response = scout.create(UiNotificationResponse, {
