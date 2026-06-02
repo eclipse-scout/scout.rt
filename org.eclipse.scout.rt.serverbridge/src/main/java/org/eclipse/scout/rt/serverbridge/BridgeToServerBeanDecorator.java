@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,26 +11,26 @@ package org.eclipse.scout.rt.serverbridge;
 
 import java.util.List;
 
+import javax.security.auth.Subject;
+
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
-import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.server.context.ServerRunContextProducer;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 /**
  * Bean decorator that executes bean method invocations in a server run context.<br>
  * The decision if a bean already runs on the server is done using context identifiers.
  *
- * @see RunContextIdentifiers
  * @see ServerRunContext
  * @see BridgeToServerBeanDecorationFactory
  * @since 5.2
@@ -65,18 +65,14 @@ public class BridgeToServerBeanDecorator<T> implements IBeanDecorator<T> {
       return continueCall(context);
     }
 
+    IClientSession clientSession = ClientSessionProvider.currentSession();
+
     // bridge to server scope
     ClientNotificationCollector collector = new ClientNotificationCollector();
-    ServerRunContext bridgeRunContext = ServerRunContexts
-        .copyCurrent()
+    ServerRunContext bridgeRunContext = BEANS.get(ServerRunContextProducer.class).produce(Subject.current(), clientSession != null ? clientSession.getId() : null)
         .withClientNotificationCollector(collector)
         .withClientNodeId(NodeId.current());
-    ISession currentSession = ISession.CURRENT.get();
-    IServerSession bridgeSession = null;
-    if (currentSession != null) {
-      bridgeSession = BEANS.get(ServerSessionProviderWithCache.class).provide(currentSession.getId(), bridgeRunContext);
-    }
-    Object result = bridgeRunContext.withSession(bridgeSession).call(() -> {
+    Object result = bridgeRunContext.call(() -> {
       try {
         return continueCall(context);
       }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -41,8 +41,12 @@ public class ServerRunContextProducer extends RunContextProducer {
    * Creates a {@link ServerRunContext} for the specified {@link Subject}.
    */
   @Override
-  public ServerRunContext produce(final Subject subject) {
-    final ServerRunContext serverRunContext = ServerRunContexts.copyCurrent(true)
+  public ServerRunContext produce(Subject subject) {
+    return produce(subject, null);
+  }
+
+  public ServerRunContext produce(Subject subject, String sessionId) {
+    ServerRunContext serverRunContext = ServerRunContexts.copyCurrent(true)
         .withSubject(subject)
         .withThreadLocal(UserId.CURRENT, BEANS.get(IAccessControlService.class).getUserId(subject))
         .withTransactionScope(TransactionScope.REQUIRES_NEW);
@@ -51,7 +55,7 @@ public class ServerRunContextProducer extends RunContextProducer {
     // use the current set subject as subject of the session, because if the session is not null it must be the current session
     IServerSession session = serverRunContext.getSession();
     if (session == null || ObjectUtility.notEquals(Subject.current(), subject)) {
-      serverRunContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
+      serverRunContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(sessionId, serverRunContext.copy()));
     }
 
     return serverRunContext;
