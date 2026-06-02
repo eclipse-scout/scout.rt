@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -143,15 +143,24 @@ export class UiNotificationPoller extends PropertyEventEmitter {
   }
 
   protected _onSuccess(response: UiNotificationResponse) {
+    if (!response) {
+      this.setStatus(BackgroundJobPollingStatus.FAILURE);
+      scout.getSession()?.sendLogRequest(`UI notification poller got an empty response, call will be retried in ${UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL}ms.`, LogLevel.INFO);
+      this._schedulePoll(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL);
+      return;
+    }
+
     if (response.error) {
       this._onSuccessError(response.error);
       return;
     }
+
     if (this.status === BackgroundJobPollingStatus.STOPPED) {
       // Don't do anything if poller was stopped in the meantime -> discard notifications
       // In case the poller will be started again, the discarded notifications will be sent again by the server
       return;
     }
+
     let notifications = response.notifications || [];
     $.log.isInfoEnabled() && $.log.info(`${notifications.length} UI notification(s) received.`);
     notifications = notifications.filter(notification => {
@@ -233,7 +242,7 @@ export class UiNotificationPoller extends PropertyEventEmitter {
     this.trigger('error', {error});
 
     App.get().errorHandler.analyzeError(error).then(errorInfo => {
-      scout.getSession()?.sendLogRequest(`UI notification poller failed, call will be retried in ${UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL} ms.\nError message:\n${errorInfo.log}\n()`, LogLevel.INFO);
+      scout.getSession()?.sendLogRequest(`UI notification poller failed, call will be retried in ${UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL}ms.\nError message:\n${errorInfo.log}\n()`, LogLevel.INFO);
     });
 
     this._schedulePoll(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL);
