@@ -24,7 +24,14 @@ export class FormField extends Widget implements FormFieldModel {
 
   dropType: DropType;
   dropMaximumSize: number;
+  /**
+   * Returns true if the field is considered empty, false if not.
+   * This will be computed by {@link computeEmpty}.
+   *
+   * Empty fields that are {@link mandatory} will be invalid, see {@link getValidationResult}.
+   **/
   empty: boolean;
+  checkEmpty: boolean | FormFieldCheckEmpty;
   errorStatus: Status;
   fieldStyle: FormFieldStyle;
   gridData: GridData;
@@ -44,14 +51,20 @@ export class FormField extends Widget implements FormFieldModel {
   menus: Menu[];
   menusVisible: boolean;
   defaultMenuTypes: string[];
-  /** If set to true, the field needs to be saved. This will be computed by {@link computeSaveNeeded}. */
+  /**
+   * Returns true if the field needs to be saved.
+   * This will be computed by {@link computeSaveNeeded}.
+   **/
   saveNeeded: boolean;
   checkSaveNeeded: boolean;
   lifecycleBoundary: boolean;
   statusPosition: FormFieldStatusPosition;
   statusVisible: boolean;
   suppressStatus: FormFieldSuppressStatus;
-  /** If set to true, {@link saveNeeded} will return true as well, even if the value has not been changed. */
+  /**
+   * Returns true if the field was touched using {@link touch()}.
+   * If it is true, {@link saveNeeded} will return true as well, even if the value has not been changed.
+   **/
   touched: boolean;
   tooltipText: string;
   font: string;
@@ -95,6 +108,7 @@ export class FormField extends Widget implements FormFieldModel {
     this.dropType = DropType.NONE;
     this.dropMaximumSize = dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
     this.empty = true;
+    this.checkEmpty = true;
     this.errorStatus = null;
     this.fieldStyle = FormField.DEFAULT_FIELD_STYLE;
     this.gridData = null;
@@ -217,7 +231,7 @@ export class FormField extends Widget implements FormFieldModel {
     this._setErrorStatus(this.errorStatus);
     this._setGridDataHints(this.gridDataHints);
     this._setGridData(this.gridData);
-    this._updateEmpty();
+    this.updateEmpty();
     this._watchFieldHierarchy();
     this.fieldStatus = this._createFieldStatus();
     this.fieldStatus.on('remove', () => {
@@ -1488,6 +1502,7 @@ export class FormField extends Widget implements FormFieldModel {
     }
   }
 
+  /** @see FormFieldModel.checkSaveNeeded */
   setCheckSaveNeeded(checkSaveNeeded: boolean) {
     if (this.setProperty('checkSaveNeeded', checkSaveNeeded)) {
       this.updateSaveNeeded();
@@ -1495,6 +1510,8 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   /**
+   * Computes whether the field needs to be saved.
+   *
    * Used by {@link updateSaveNeeded} to update the {@link saveNeeded} property.
    *
    * By default, all first level child fields are checked. The method returns true, if one of these fields needs to be saved.
@@ -1529,18 +1546,86 @@ export class FormField extends Widget implements FormFieldModel {
     this._setProperty('validationResultProvider', provider);
   }
 
-  protected _updateEmpty() {
-    this.setProperty('empty', this._computeEmpty());
+  /**
+   * Updates {@link empty} based on the result of {@link computeEmpty}.
+   */
+  updateEmpty() {
+    if (this.destroying) {
+      return;
+    }
+    this.setEmpty(this.computeEmpty());
+  }
+
+  protected setEmpty(empty: boolean) {
+    // Method is protected because the property is automatically computed
+    // It is not prefixed with _ so that _renderEmpty will be called (if a field implements it)
+    if (objects.isNullOrUndefined(empty)) {
+      return;
+    }
+    if (this.setProperty('empty', empty)) {
+      this.getParentField()?.updateEmpty();
+    }
+  }
+
+  /** @see FormFieldModel.checkEmpty */
+  setCheckEmpty(checkEmpty: boolean | FormFieldCheckEmpty) {
+    if (this.setProperty('checkEmpty', checkEmpty)) {
+      this.updateEmpty();
+    }
   }
 
   /**
    * @returns true if the field is considered empty, false if not.
-   *          Mandatory fields that are empty will return a {@link ValidationResult} with {@link ValidationResult.valid} and {@link ValidationResult.validByMandatory} set to false.
+   * It can also return null to indicate that the empty state of the child form fields should be checked because the field itself does not have an own empty state.
+   * @see computeEmpty
+   */
+  protected _computeEmpty(): boolean {
+    return null;
+  }
+
+  /**
+   * Computes whether the field is considered empty.
    *
+   * The result is used by {@link updateEmpty} to update the {@link empty} property.
+   * Mandatory fields that are empty will return a {@link ValidationResult} with {@link ValidationResult.valid} and {@link ValidationResult.validByMandatory} set to false.
+   *
+   * The method calls {@link _computeEmpty()} to compute the empty state of the field itself.
+   * If {@link _computeEmpty()} returns null, it checks whether all first level child fields are empty.
+   *
+   * @returns true if the field is considered empty, false if not.
    * @see getValidationResult
    */
-  protected _computeEmpty() {
-    return true;
+  computeEmpty(): boolean {
+    if (!this.checkEmpty) {
+      return true;
+    }
+
+    let defaultComputeEmpty = this._computeEmpty.bind(this);
+    let empty = objects.isFunction(this.checkEmpty) ? this.checkEmpty(defaultComputeEmpty) : this._computeEmpty();
+    if (empty === null) {
+      // Check whether any direct child field is empty
+      // It is not necessary to check the whole tree because the empty state of the children already reflect the state of their children
+      empty = this.areChildrenEmpty();
+    }
+
+    return empty;
+  }
+
+  /**
+   * @returns true if all direct child fields are empty, false otherwise
+   */
+  areChildrenEmpty(): boolean {
+    let empty = true;
+    this.visitFirstChildFields(field => {
+      if (field.destroying) {
+        return TreeVisitResult.SKIP_SUBTREE;
+      }
+      if (!field.empty) {
+        empty = false;
+        return true;
+      }
+    });
+    return empty;
   }
 
   requestInput() {
@@ -1575,7 +1660,7 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   /**
-   * Updates save needed state on parent field if the hierarchy changed, e.g. if the field was moved into another composite field.
+   * Updates save needed and empty states on parent field if the hierarchy changed, e.g. if the field was moved into another composite field.
    * Also handles the case where a field is not directly connected to a form field parent, but has a non-form-field in between
    * (e.g. FormFieldMenu has a Menu as parent -> if the menu is moved the state needs to be recomputed as well).
    */
@@ -1586,12 +1671,16 @@ export class FormField extends Widget implements FormFieldModel {
     parent = scout.nvl(parent, this.parent);
     // Each form field adds its own hierarchyChangeListener but non-form-fields don't -> add listener for every non-form field between this field and the next parent field
     let parentField = this._visitParentsUntilField(parent, parent => parent.on('hierarchyChange', this._hierarchyChangeHandler));
-    parentField?.updateSaveNeeded(this);
+    if (this.initialized) {
+      parentField?.updateEmpty();
+      parentField?.updateSaveNeeded(this);
+    }
   }
 
   protected _unwatchFieldHierarchy(oldParent?: Widget) {
     oldParent = scout.nvl(oldParent, this.parent);
     let oldParentField = this._visitParentsUntilField(oldParent, parent => parent.off('hierarchyChange', this._hierarchyChangeHandler));
+    oldParentField?.updateEmpty();
     oldParentField?.updateSaveNeeded();
   }
 
@@ -1688,3 +1777,10 @@ export interface VisitFieldsOptions {
    */
   visitSelf?: boolean;
 }
+
+/**
+ * @returns true if the field is considered empty, false if not.
+ * It can also return null to indicate that the empty state of the child form fields should be checked because the field itself does not have an own empty state.
+ * @see computeEmpty
+ */
+export type FormFieldCheckEmpty = (defaultCheckEmpty?: () => boolean) => boolean;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,14 +27,12 @@ public interface ITabBox extends ICompositeField {
   String PROP_TAB_AREA_STYLE = "tabAreaStyle";
 
   /**
-   * Define the default mark strategy of the tabs. This means the marker is set on the tabs if at least one field is not
-   * empty.
+   * Marks a tab item if at least one field is not empty.
    */
-  int MARK_STRATEGY_EMPTY = 0;
+  int MARK_STRATEGY_NOT_EMPTY = 0;
 
   /**
-   * Define a optional mark strategy of the tabs. This means the marker is set on the tabs if at least one field is
-   * marked as "save needed".
+   * Marks a tab item if at least one field is marked as "save needed".
    */
   int MARK_STRATEGY_SAVE_NEEDED = 1;
 

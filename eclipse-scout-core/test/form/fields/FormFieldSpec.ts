@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  CheckBoxField, FormField, FormFieldMenu, FormFieldTile, FormFieldValidationResultProvider, GridData, GroupBox, Menu, RadioButton, RadioButtonGroup, scout, Status, StringField, TileField, TileGrid, TreeVisitResult, Widget
+  CheckBoxField, FormField, FormFieldMenu, FormFieldTile, FormFieldValidationResultProvider, GridData, GroupBox, Menu, NumberField, RadioButton, RadioButtonGroup, scout, Status, StringField, TileField, TileGrid, TreeVisitResult, Widget
 } from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper} from '../../../src/testing/index';
 import {InitModelOf} from '../../../src/scout';
@@ -567,6 +567,251 @@ describe('FormField', () => {
 
       (groupBox.fields[0] as StringField).setValue('asdf');
       expect(groupBox.saveNeeded).toBe(false);
+    });
+  });
+
+  describe('property empty', () => {
+    it('is set to false if at least one child field is not empty', () => {
+      let groupBox = scout.create(GroupBox, {
+        parent: session.desktop,
+        fields: [{
+          objectType: StringField,
+          id: 'FirstField',
+          value: 'hi'
+        }, {
+          objectType: StringField,
+          id: 'SecondField'
+        }]
+      });
+      expect(groupBox.empty).toBe(false);
+      expect(groupBox.widget('FirstField', FormField).empty).toBe(false);
+      expect(groupBox.widget('SecondField', FormField).empty).toBe(true);
+
+      groupBox = scout.create(GroupBox, {
+        parent: session.desktop,
+        fields: [{
+          objectType: StringField,
+          id: 'FirstField'
+        }, {
+          objectType: GroupBox,
+          fields: [{
+            objectType: StringField,
+            id: 'SecondField',
+            value: 'hi'
+          }]
+        }]
+      });
+      expect(groupBox.empty).toBe(false);
+      expect(groupBox.fields[1].empty).toBe(false);
+      expect(groupBox.widget('FirstField', FormField).empty).toBe(true);
+      expect(groupBox.widget('SecondField', FormField).empty).toBe(false);
+    });
+
+    it('is updated if a child field changes its empty state', () => {
+      let groupBox = scout.create(GroupBox, {
+        parent: session.desktop,
+        fields: [{
+          objectType: StringField,
+          id: 'FirstField',
+          value: 'hi'
+        }, {
+          objectType: StringField,
+          id: 'SecondField'
+        }]
+      });
+      let firstField = groupBox.widget('FirstField', StringField);
+      let secondField = groupBox.widget('SecondField', StringField);
+      expect(firstField.empty).toBe(false);
+      expect(secondField.empty).toBe(true);
+      expect(groupBox.empty).toBe(false);
+
+      firstField.setValue(null);
+      expect(firstField.empty).toBe(true);
+      expect(secondField.empty).toBe(true);
+      expect(groupBox.empty).toBe(true);
+
+      secondField.setValue('hi');
+      expect(firstField.empty).toBe(true);
+      expect(secondField.empty).toBe(false);
+      expect(groupBox.empty).toBe(false);
+    });
+
+    it('is updated if fields are removed or added', () => {
+      let groupBox = scout.create(GroupBox, {
+        parent: session.desktop,
+        fields: [{
+          objectType: GroupBox,
+          fields: [{
+            objectType: StringField,
+            id: 'FirstField'
+          }]
+        }, {
+          objectType: StringField,
+          id: 'SecondField'
+        }]
+      });
+      expect(groupBox.empty).toBe(true);
+
+      let firstField = groupBox.widget('FirstField', StringField);
+      let childGroupBox = groupBox.fields[0] as GroupBox;
+      firstField.setValue('hi');
+      expect(groupBox.empty).toBe(false);
+
+      childGroupBox.deleteField(firstField);
+      expect(groupBox.empty).toBe(true);
+
+      let newField = scout.create(StringField, {parent: groupBox});
+      childGroupBox.insertField(newField);
+      expect(groupBox.empty).toBe(true);
+
+      newField.setValue('hi');
+      expect(groupBox.empty).toBe(false);
+
+      newField.setValue(null);
+      expect(groupBox.empty).toBe(true);
+
+      // Insert a new field that is not empty
+      let newField2 = scout.create(StringField, {
+        parent: groupBox,
+        value: '123'
+      });
+      childGroupBox.insertField(newField2);
+      expect(groupBox.empty).toBe(false);
+    });
+
+    it('works if field is temporarily removed', () => {
+      let groupBox = scout.create(GroupBox, {
+        parent: session.desktop,
+        fields: [{
+          objectType: StringField,
+          id: 'FirstField',
+          value: 'hi'
+        }, {
+          objectType: StringField,
+          id: 'SecondField'
+        }]
+      });
+      expect(groupBox.empty).toBe(false);
+
+      let firstField = groupBox.widget('FirstField', StringField);
+      firstField.setOwner(session.desktop);
+      groupBox.deleteField(firstField);
+      expect(groupBox.empty).toBe(true);
+
+      groupBox.insertField(firstField);
+      expect(groupBox.empty).toBe(false);
+    });
+
+    it('works if field is in a menu', () => {
+      let groupBox = scout.create(GroupBox, {parent: session.desktop});
+      expect(groupBox.empty).toBe(true);
+
+      let menu = scout.create(FormFieldMenu, {
+        parent: groupBox,
+        field: {
+          objectType: StringField
+        }
+      });
+      groupBox.insertMenu(menu);
+      let menubarField = (menu.field as StringField);
+      menubarField.setValue('hi');
+      expect(groupBox.empty).toBe(false);
+
+      groupBox.deleteMenu(menu);
+      expect(groupBox.empty).toBe(true);
+    });
+
+    it('does not visit children too many times during init to compute empty state', () => {
+      let areChildrenEmptySpy = spyOn(FormField.prototype, 'areChildrenEmpty').and.callThrough();
+      scout.create(GroupBox, {
+        parent: session.desktop,
+        fields: [{
+          objectType: GroupBox,
+          fields: [{
+            objectType: StringField,
+            id: 'FirstField'
+          }]
+        }, {
+          objectType: StringField,
+          id: 'SecondField'
+        }]
+      });
+      expect(areChildrenEmptySpy).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('checkEmpty', () => {
+    it('sets empty to true if checkEmpty is false even if a child is not empty', () => {
+      let groupBox = scout.create(GroupBox, {
+        parent: session.desktop,
+        checkEmpty: false,
+        fields: [{
+          objectType: StringField
+        }]
+      });
+      let stringField = (groupBox.fields[0] as StringField);
+      expect(stringField.empty).toBe(true);
+      expect(groupBox.empty).toBe(true);
+
+      stringField.setValue('value');
+      expect(stringField.empty).toBe(false);
+      expect(groupBox.empty).toBe(true);
+
+      stringField.setValue(null);
+      expect(stringField.empty).toBe(true);
+      expect(groupBox.empty).toBe(true);
+    });
+
+    it('updates empty if checkEmpty is toggled', () => {
+      let groupBox = scout.create(GroupBox, {
+        parent: session.desktop,
+        fields: [{
+          objectType: StringField,
+          value: 'value'
+        }]
+      });
+      let stringField = (groupBox.fields[0] as StringField);
+      expect(stringField.empty).toBe(false);
+      expect(groupBox.empty).toBe(false);
+
+      stringField.setCheckEmpty(false);
+      expect(stringField.empty).toBe(true);
+      expect(groupBox.empty).toBe(true);
+
+      stringField.setCheckEmpty(true);
+      expect(stringField.empty).toBe(false);
+      expect(groupBox.empty).toBe(false);
+    });
+
+    it('accepts a function to provide a custom empty computation', () => {
+      let groupBox = scout.create(GroupBox, {
+        parent: session.desktop,
+        fields: [{
+          objectType: NumberField,
+          value: 1
+        }, {
+          objectType: StringField,
+          value: 'value'
+        }]
+      });
+      let stringField = (groupBox.fields[1] as StringField);
+      expect(stringField.empty).toBe(false);
+
+      let numberField = (groupBox.fields[0] as NumberField);
+      stringField.setCheckEmpty(() => numberField.value === 1);
+      expect(stringField.empty).toBe(true);
+
+      numberField.setValue(3);
+      expect(stringField.empty).toBe(true); // Still true, updateEmpty not triggered
+
+      stringField.updateEmpty();
+      expect(stringField.empty).toBe(false);
+
+      stringField.setValue(null);
+      expect(stringField.empty).toBe(false); // Still false, default function is not called
+
+      stringField.setCheckEmpty(defaultCheckEmpty => numberField.value === 1 || defaultCheckEmpty());
+      expect(stringField.empty).toBe(true);
     });
   });
 

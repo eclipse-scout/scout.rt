@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,9 +7,17 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FormFieldModel, ObjectOrChildModel, TabAreaStyle, TabItem} from '../../../index';
+import {FormFieldModel, ObjectOrChildModel, TabAreaStyle, TabBoxMarkStrategy, TabItem} from '../../../index';
 
 export interface TabBoxModel extends FormFieldModel {
+  /**
+   * Defines the strategy to update the {@link TabItem.marked} property.
+   *
+   * If set to null, the {@link TabItem.marked} property won't be updated an can be set manually if needed.
+   *
+   * Default is {@link TabBox.MarkStrategy.NOT_EMPTY}.
+   */
+  markStrategy?: TabBoxMarkStrategy;
   /**
    * The tab, that should be selected initially.
    * If a string is provided, the tab will be resolved automatically.
@@ -17,6 +25,14 @@ export interface TabBoxModel extends FormFieldModel {
    * By default, the first tab will be selected.
    */
   selectedTab?: TabItem | string;
+  /**
+   * Defines the {@link TabItem}s to be displayed.
+   */
   tabItems?: ObjectOrChildModel<TabItem>[];
+  /**
+   * Defines the {@link TabAreaStyle} of the {@link TabArea}.
+   *
+   * Default is {@link TabArea.DisplayStyle.DEFAULT}
+   */
   tabAreaStyle?: TabAreaStyle;
 }

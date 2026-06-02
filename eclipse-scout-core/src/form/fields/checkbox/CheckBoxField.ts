@@ -213,6 +213,10 @@ export class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldM
     }
   }
 
+  protected override _computeEmpty(): boolean {
+    return !this.value;
+  }
+
   override prepareForCellEdit(opts?: AddCellEditorFieldCssClassesOptions) {
     super.prepareForCellEdit(opts);
     this.$checkBoxLabel.hide();

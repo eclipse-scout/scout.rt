@@ -140,7 +140,7 @@ export class TableField extends FormField implements TableFieldModel {
       this._deletedRows[row.id] = row;
     });
     this.updateSaveNeeded();
-    this._updateEmpty();
+    this.updateEmpty();
   }
 
   protected _updateInsertedRows(rows: TableRow[]) {
@@ -148,7 +148,7 @@ export class TableField extends FormField implements TableFieldModel {
       this._insertedRows[row.id] = row;
     });
     this.updateSaveNeeded();
-    this._updateEmpty();
+    this.updateEmpty();
   }
 
   protected _updateUpdatedRows(rows: TableRow[]) {
