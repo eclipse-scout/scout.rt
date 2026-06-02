@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.security;
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,8 +46,10 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
@@ -264,35 +267,52 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
   }
 
   @Override
+  public InputStream encrypt(InputStream clearTextData, EncryptionKey key) {
+    return doCrypt(clearTextData, key, Cipher.ENCRYPT_MODE, CipherInputStream::new);
+  }
+
+  @Override
   public void decrypt(InputStream encryptedData, OutputStream clearTextData, EncryptionKey key) {
     doCrypt(encryptedData, clearTextData, key, Cipher.DECRYPT_MODE);
   }
 
+  @Override
+  public InputStream decrypt(InputStream encryptedData, EncryptionKey key) {
+    return doCrypt(encryptedData, key, Cipher.DECRYPT_MODE, CipherInputStream::new);
+  }
+
   protected void doCrypt(InputStream input, OutputStream output, EncryptionKey key, int mode) {
     assertNotNull(key, "key must not be null.");
-    if (input == null) {
-      throw new AssertionException("input must not be null.");
+    assertNotNull(input, "input must not be null.");
+    assertNotNull(output, "output must not be null.");
+
+    try (OutputStream out = doCrypt(output, key, mode, CipherOutputStream::new)) {
+      int n;
+      byte[] buf = new byte[BUF_SIZE];
+      while ((n = input.read(buf)) >= 0) {
+        out.write(buf, 0, n);
+      }
     }
-    if (output == null) {
-      throw new AssertionException("output must not be null.");
+
+    catch (IOException e) {
+      throw new ProcessingException("Unable to crypt data.", e);
     }
+  }
+
+  protected <T extends Closeable> T doCrypt(T stream, EncryptionKey key, int mode, BiFunction<T, Cipher, T> cipherStreamConstructor) {
+    assertNotNull(key, "key must not be null.");
+    assertNotNull(stream, "stream must not be null.");
 
     try {
       Cipher cipher = Cipher.getInstance(getCipherAlgorithm() + "/" + getCipherAlgorithmMode() + "/" + getCipherAlgorithmPadding(), getCipherAlgorithmProvider());
       cipher.init(mode, key.get(), key.params());
 
-      try (OutputStream out = new CipherOutputStream(output, cipher)) {
-        int n;
-        byte[] buf = new byte[BUF_SIZE];
-        while ((n = input.read(buf)) >= 0) {
-          out.write(buf, 0, n);
-        }
-      }
+      return cipherStreamConstructor.apply(stream, cipher);
     }
     catch (NoSuchAlgorithmException e) {
       throw new ProcessingException("Unable to crypt data. Algorithm could not be found. Make sure to use JRE 1.8 or newer.", e);
     }
-    catch (NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchProviderException | IOException e) {
+    catch (NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchProviderException e) {
       throw new ProcessingException("Unable to crypt data.", e);
     }
   }
