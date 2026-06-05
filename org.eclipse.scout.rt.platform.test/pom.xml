@@ -24,6 +24,9 @@
 
   <properties>
     <surefire.excludedGroups>${scout.excludeTestCategories}</surefire.excludedGroups>
+    <!-- everything in this module is test code (also src/main) -->
+    <sonar.sources>pom.xml</sonar.sources>
+    <sonar.tests>src</sonar.tests>
   </properties>
 
   <dependencies>

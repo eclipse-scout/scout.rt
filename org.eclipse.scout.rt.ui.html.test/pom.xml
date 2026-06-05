@@ -25,7 +25,9 @@
 
   <properties>
     <scout.script.version>5.0.0</scout.script.version>
-    <sonar.tests>src/test</sonar.tests>
+    <!-- everything in this module is test code (also src/main) -->
+    <sonar.sources>pom.xml</sonar.sources>
+    <sonar.tests>src</sonar.tests>
   </properties>
 
   <dependencies>
