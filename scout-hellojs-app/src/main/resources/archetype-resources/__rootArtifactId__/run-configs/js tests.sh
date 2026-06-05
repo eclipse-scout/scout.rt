@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # This script starts the testserver and executes all JavaScript tests. It expects that npm install has already been executed previously.
 #

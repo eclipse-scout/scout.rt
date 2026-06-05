@@ -1,7 +1,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_pound = '#' )
 #set( $symbol_escape = '\' )
-${symbol_pound}!/bin/bash
+${symbol_pound}!/usr/bin/env bash
 
 ${symbol_pound} expected working directory is the one containing the bin, conf and lib directories
 

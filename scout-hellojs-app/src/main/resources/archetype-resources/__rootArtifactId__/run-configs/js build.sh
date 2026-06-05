@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # This script installs all the JS dependencies and builds the JavaScript and CSS bundles.
 # It also starts a watcher which triggers a rebuild of these bundles whenever JS or CSS code changes.
