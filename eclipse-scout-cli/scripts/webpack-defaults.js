@@ -210,7 +210,14 @@ module.exports = (env, args) => {
           loader: require.resolve('babel-loader'),
           options: babelOptions
         }]
-      }]
+      }],
+      // Use 'fetchpriority=high' for dynamic imports
+      // https://webpack.js.org/configuration/module/#moduleparserjavascriptdynamicimportfetchpriority
+      parser: {
+        javascript: {
+          dynamicImportFetchPriority: 'high'
+        }
+      }
     },
     plugins: [
       new WatchIgnorePlugin({paths: [/\.d\.ts$/]}),
