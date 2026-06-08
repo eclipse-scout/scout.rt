@@ -214,7 +214,14 @@ module.exports = (env, args) => {
         use: [{
           loader: require.resolve('source-map-loader')
         }]
-      }]
+      }],
+      // Use 'fetchpriority=high' for dynamic imports
+      // https://webpack.js.org/configuration/module/#moduleparserjavascriptdynamicimportfetchpriority
+      parser: {
+        javascript: {
+          dynamicImportFetchPriority: 'high'
+        }
+      }
     },
     plugins: [
       new WatchIgnorePlugin({paths: [/\.d\.ts$/]}),
