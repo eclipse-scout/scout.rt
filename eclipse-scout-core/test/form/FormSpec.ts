@@ -1521,7 +1521,74 @@ describe('Form', () => {
       expect(form.saveNeeded).toBe(false);
     });
 
-    it('is false right after loading even if values are set while init or loading', done => {
+    it('is true if values are set during init', () => {
+      class MyForm extends Form {
+        protected override _jsonModel(): FormModel {
+          return {
+            rootGroupBox: {
+              objectType: GroupBox,
+              fields: [{
+                objectType: TabBox,
+                tabItems: [{
+                  objectType: TabItem,
+                  fields: [{
+                    objectType: StringField,
+                    id: 'TabField'
+                  }, {
+                    objectType: StringField,
+                    id: 'TabField2'
+                  }]
+                }]
+              }]
+            }
+          };
+        }
+
+        protected override _init(model: InitModelOf<this>) {
+          super._init(model);
+          this.widget('TabField', StringField).setValue('hello');
+        }
+      }
+
+      form = scout.create(MyForm, {parent: session.desktop});
+      expect(form.saveNeeded).toBe(true);
+      expect(form.rootGroupBox.saveNeeded).toBe(true);
+    });
+
+    it('is true if _computeSaveNeeded returns true even if the root group box returns false', () => {
+      class MyForm extends Form {
+        protected override _jsonModel(): FormModel {
+          return {
+            rootGroupBox: {
+              objectType: GroupBox,
+              fields: [{
+                objectType: TabBox,
+                tabItems: [{
+                  objectType: TabItem,
+                  fields: [{
+                    objectType: StringField,
+                    id: 'TabField'
+                  }, {
+                    objectType: StringField,
+                    id: 'TabField2'
+                  }]
+                }]
+              }]
+            }
+          };
+        }
+
+        protected override _computeSaveNeeded(): boolean {
+          return true;
+        }
+      }
+
+      form = scout.create(MyForm, {parent: session.desktop});
+      expect(form.saveNeeded).toBe(true);
+      expect(form.rootGroupBox.saveNeeded).toBe(false);
+    });
+
+    it('is false right after loading even if values are set during init or load', done => {
       class MyForm extends Form {
         protected override _jsonModel(): FormModel {
           return {
