@@ -200,6 +200,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this._setClosable(this.closable);
     this._setExclusiveKey(this.exclusiveKey);
     this._setValidators(this.validators);
+    this.one('init', () => this.updateSaveNeeded());
   }
 
   protected override _createKeyStrokeContext(): KeyStrokeContext {
@@ -1136,6 +1137,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
    */
   updateSaveNeeded() {
     if (!this.initialized || this.destroying) {
+      // Don't call _computeSaveNeeded() during form init because it may want to access member variables that don't exist yet -> it will be done after initialization, see _init()
       return;
     }
     this.setSaveNeeded(this.rootGroupBox?.saveNeeded || this._computeSaveNeeded());
