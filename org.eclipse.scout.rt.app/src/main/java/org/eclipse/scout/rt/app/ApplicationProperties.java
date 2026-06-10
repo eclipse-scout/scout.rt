@@ -670,4 +670,22 @@ public final class ApplicationProperties {
       return "The server stop timeout in milliseconds to allow a proper shutdown. Default value is " + getDefaultValue() + ".";
     }
   }
+
+  public static class ScoutApplicationStreamIdleTimeoutProperty extends AbstractPositiveLongConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.jetty.stream.idletimeout";
+    }
+
+    @Override
+    public Long getDefaultValue() {
+      return TimeUnit.SECONDS.toMillis(40);
+    }
+
+    @Override
+    public String description() {
+      return "The HTTP2 stream idle timeout in milliseconds. Default value is " + getDefaultValue() + ".";
+    }
+  }
 }

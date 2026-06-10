@@ -87,6 +87,7 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCoo
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigSecureProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionTimeoutProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationStopTimeoutProperty;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationStreamIdleTimeoutProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationThreadPoolMaxSizeProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationUseTlsProperty;
 import org.eclipse.scout.rt.app.handler.ScoutJettyErrorHandler;
@@ -236,6 +237,7 @@ public class Application {
 
     HttpConnectionFactory http11 = new HttpConnectionFactory(httpsConfig);
     HTTP2ServerConnectionFactory http2 = new HTTP2ServerConnectionFactory(httpsConfig);
+    http2.setStreamIdleTimeout(CONFIG.getPropertyValue(ScoutApplicationStreamIdleTimeoutProperty.class));
 
     ALPNServerConnectionFactory alpn = new ALPNServerConnectionFactory();
     alpn.setDefaultProtocol(http11.getProtocol());
