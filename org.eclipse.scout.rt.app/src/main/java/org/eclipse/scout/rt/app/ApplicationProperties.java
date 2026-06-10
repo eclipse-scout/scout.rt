@@ -675,7 +675,7 @@ public final class ApplicationProperties {
 
     @Override
     public String getKey() {
-      return "scout.app.jetty.stream.idletimeout";
+      return "scout.app.jetty.stream.idleTimeout";   
     }
 
     @Override
