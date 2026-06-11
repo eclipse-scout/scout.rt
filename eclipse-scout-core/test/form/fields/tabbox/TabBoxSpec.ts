@@ -231,7 +231,7 @@ describe('TabBox', () => {
       let tabBox = scout.create(TabBox, {
         parent: session.desktop
       });
-      expect(tabBox.markStrategy).toBe(TabBox.MarkStrategy.EMPTY);
+      expect(tabBox.markStrategy).toBe(TabBox.MarkStrategy.NOT_EMPTY);
 
       tabBox = scout.create(TabBox, {
         parent: session.desktop,
@@ -259,14 +259,14 @@ describe('TabBox', () => {
       tabBox.tabItems[0].fields[0].markAsSaved();
       expect(tabBox.tabItems[0].marked).toBeFalse();
 
-      tabBox.setMarkStrategy(TabBox.MarkStrategy.EMPTY);
+      tabBox.setMarkStrategy(TabBox.MarkStrategy.NOT_EMPTY);
       expect(tabBox.tabItems[0].marked).toBeTrue();
 
       tabBox.setMarkStrategy(null);
       expect(tabBox.tabItems[0].marked).toBeTrue(); // null means it does not change the marked state so it can be set manually (e.g. by Scout Classic)
     });
 
-    describe('empty', () => {
+    describe('notEmpty', () => {
       it('marks tab if at least one field is not empty', () => {
         let tabBox = scout.create(TabBox, {
           parent: session.desktop,

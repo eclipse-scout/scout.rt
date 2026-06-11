@@ -41,7 +41,7 @@ export class TabBox extends CompositeField implements TabBoxModel {
     this.gridDataHints.useUiHeight = true;
     this.gridDataHints.w = FormField.FULL_WIDTH;
     this.header = null;
-    this.markStrategy = TabBox.MarkStrategy.EMPTY;
+    this.markStrategy = TabBox.MarkStrategy.NOT_EMPTY;
     this.selectedTab = null;
     this.tabItems = [];
     this.tabAreaStyle = TabArea.DisplayStyle.DEFAULT;
@@ -59,7 +59,7 @@ export class TabBox extends CompositeField implements TabBoxModel {
     /**
      * Sets {@link TabItem.marked} of a tab item to true if it is not {@link empty}.
      */
-    EMPTY: 'empty',
+    NOT_EMPTY: 'notEmpty',
     /**
      * Sets {@link TabItem.marked} of a tab item to true if its {@link saveNeeded} state is true.
      */
@@ -268,7 +268,7 @@ export class TabBox extends CompositeField implements TabBoxModel {
     for (const tabItem of tabItems) {
       if (this.markStrategy === TabBox.MarkStrategy.SAVE_NEEDED) {
         tabItem.off('propertyChange:saveNeeded', this._tabItemSaveNeededChangeHandler);
-      } else if (this.markStrategy === TabBox.MarkStrategy.EMPTY) {
+      } else if (this.markStrategy === TabBox.MarkStrategy.NOT_EMPTY) {
         tabItem.off('propertyChange:emptyVisible', this._tabItemEmptyChangeHandler);
       }
     }
@@ -279,7 +279,7 @@ export class TabBox extends CompositeField implements TabBoxModel {
       if (this.markStrategy === TabBox.MarkStrategy.SAVE_NEEDED) {
         tabItem.on('propertyChange:saveNeeded', this._tabItemSaveNeededChangeHandler);
         this._updateTabItemMarked(tabItem);
-      } else if (this.markStrategy === TabBox.MarkStrategy.EMPTY) {
+      } else if (this.markStrategy === TabBox.MarkStrategy.NOT_EMPTY) {
         tabItem.on('propertyChange:emptyVisible', this._tabItemEmptyChangeHandler);
         this._updateTabItemMarked(tabItem);
       }
@@ -289,7 +289,7 @@ export class TabBox extends CompositeField implements TabBoxModel {
   protected _updateTabItemMarked(tabItem: TabItem) {
     if (this.markStrategy === TabBox.MarkStrategy.SAVE_NEEDED) {
       tabItem.setMarked(tabItem.saveNeeded);
-    } else if (this.markStrategy === TabBox.MarkStrategy.EMPTY) {
+    } else if (this.markStrategy === TabBox.MarkStrategy.NOT_EMPTY) {
       tabItem.setMarked(!tabItem.emptyVisible);
     }
   }

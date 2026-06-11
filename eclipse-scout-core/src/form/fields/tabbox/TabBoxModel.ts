@@ -15,7 +15,7 @@ export interface TabBoxModel extends FormFieldModel {
    *
    * If set to null, the {@link TabItem.marked} property won't be updated an can be set manually if needed.
    *
-   * Default is {@link TabBox.MarkStrategy.EMPTY}.
+   * Default is {@link TabBox.MarkStrategy.NOT_EMPTY}.
    */
   markStrategy?: TabBoxMarkStrategy;
   /**
