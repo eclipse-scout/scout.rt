@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,6 +37,14 @@ export const systems = {
     });
     systems._systemsMap.set(name, system);
     return system;
+  },
+
+  /**
+   * Retrieves the {@link System} with given name.
+   * @param name The optional name of the System. If omitted, {@link System.MAIN_SYSTEM} is used.
+   */
+  get(name?: string): System {
+    return systems._systemsMap.get(name || System.MAIN_SYSTEM);
   },
 
   /**
