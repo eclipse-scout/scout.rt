@@ -372,6 +372,47 @@ describe('TabBox', () => {
         tabBox.insertTabItem(tabItem);
         expect(tabItem.marked).toBe(false);
       });
+
+      it('only considers visible fields', () => {
+        let tabBox = scout.create(TabBox, {
+          parent: session.desktop,
+          tabItems: [{
+            objectType: TabItem,
+            fields: [{
+              objectType: StringField
+            }, {
+              objectType: StringField
+            }]
+          }, {
+            objectType: TabItem,
+            fields: [{
+              objectType: StringField
+            }, {
+              objectType: StringField,
+              value: 'value',
+              visible: false
+            }]
+          }]
+        });
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+
+        tabBox.tabItems[1].fields[1].setVisible(true);
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeTrue();
+
+        (tabBox.tabItems[1].fields[0] as StringField).setValue('value');
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeTrue();
+
+        tabBox.tabItems[1].fields[1].setVisible(false);
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeTrue();
+
+        tabBox.tabItems[1].fields[0].setVisible(false);
+        expect(tabBox.tabItems[0].marked).toBeFalse();
+        expect(tabBox.tabItems[1].marked).toBeFalse();
+      });
     });
 
     describe('saveNeeded', () => {

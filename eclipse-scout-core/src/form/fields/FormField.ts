@@ -25,10 +25,18 @@ export class FormField extends Widget implements FormFieldModel {
   dropType: DropType;
   dropMaximumSize: number;
   /**
-   * If set to true, the field is considered empty. This will be computed by {@link computeEmpty}.
+   * Returns true if the field is considered empty, false if not.
+   * This will be computed by {@link computeEmpty}.
+   *
    * Empty fields that are {@link mandatory} will be invalid, see {@link getValidationResult}.
    **/
   empty: boolean;
+  /**
+   * Compared to {@link empty}, this property only returns false if the field is visible.
+   * So an invisible field is always empty.
+   * This property will also be computed by {@link computeEmpty} using the parameter `onlyVisible`.
+   **/
+  emptyVisible: boolean;
   checkEmpty: boolean;
   errorStatus: Status;
   fieldStyle: FormFieldStyle;
@@ -49,14 +57,20 @@ export class FormField extends Widget implements FormFieldModel {
   menus: Menu[];
   menusVisible: boolean;
   defaultMenuTypes: string[];
-  /** If set to true, the field needs to be saved. This will be computed by {@link computeSaveNeeded}. */
+  /**
+   * Returns true if the field needs to be saved.
+   * This will be computed by {@link computeSaveNeeded}.
+   **/
   saveNeeded: boolean;
   checkSaveNeeded: boolean;
   lifecycleBoundary: boolean;
   statusPosition: FormFieldStatusPosition;
   statusVisible: boolean;
   suppressStatus: FormFieldSuppressStatus;
-  /** If set to true, {@link saveNeeded} will return true as well, even if the value has not been changed. */
+  /**
+   * Returns true if the field was touched using {@link touch()}.
+   * If it is true, {@link saveNeeded} will return true as well, even if the value has not been changed.
+   **/
   touched: boolean;
   tooltipText: string;
   font: string;
@@ -100,6 +114,7 @@ export class FormField extends Widget implements FormFieldModel {
     this.dropType = DropType.NONE;
     this.dropMaximumSize = dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
     this.empty = true;
+    this.emptyVisible = true;
     this.checkEmpty = true;
     this.errorStatus = null;
     this.fieldStyle = FormField.DEFAULT_FIELD_STYLE;
@@ -1539,22 +1554,28 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   /**
-   * Updates {@link empty} based on the result of {@link computeEmpty}.
+   * Updates {@link empty} and {@link emptyVisible} based on the result of {@link computeEmpty}.
+   *
+   * @param onlyVisible if set to true, only updates the {@link emptyVisible} property. Default is false.
    */
-  protected _updateEmpty() {
+  protected _updateEmpty(onlyVisible = false) {
     if (this.destroying || !this.checkEmpty) {
       return;
     }
-    let empty = this.computeEmpty();
-    if (!objects.isNullOrUndefined(empty)) {
-      this.setEmpty(empty);
+    if (!onlyVisible) {
+      this.setEmpty(this.computeEmpty());
     }
+    this.setEmpty(this.computeEmpty(true), true);
   }
 
-  protected setEmpty(empty: boolean) {
+  protected setEmpty(empty: boolean, onlyVisible = false) {
+    if (objects.isNullOrUndefined(empty)) {
+      return;
+    }
     // Method is protected because the property is automatically computed
     // It is not prefixed with _ so that _renderEmpty will be called (if a field implements it)
-    if (this.setProperty('empty', empty)) {
+    let propertyName = onlyVisible ? 'emptyVisible' : 'empty';
+    if (this.setProperty(propertyName, empty)) {
       this.getParentField()?._updateEmpty();
     }
   }
@@ -1579,39 +1600,54 @@ export class FormField extends Widget implements FormFieldModel {
   /**
    * Computes whether the field is considered empty.
    *
-   * The result is used by {@link _updateEmpty} to update the {@link empty} property.
+   * The result is used by {@link _updateEmpty} to update the {@link empty} and {@link emptyVisible} properties.
    * Mandatory fields that are empty will return a {@link ValidationResult} with {@link ValidationResult.valid} and {@link ValidationResult.validByMandatory} set to false.
    *
    * The method calls {@link _computeEmpty()} to compute the empty state of the field itself.
    * If {@link _computeEmpty()} returns null, it checks whether all first level child fields are empty.
    *
+   * @param onlyVisible true to only consider visible fields, so if the field is invisible, the method returns true. Default is false.
    * @returns true if the field is considered empty, false if not.
    * @see getValidationResult
    */
-  computeEmpty(): boolean {
+  computeEmpty(onlyVisible = false): boolean {
+    if (onlyVisible && !this.visible) {
+      return true;
+    }
     let empty = this._computeEmpty();
     if (empty === null) {
       // Check whether any direct child field is empty
       // It is not necessary to check the whole tree because the empty state of the children already reflect the state of their children
       // Also don't do it during init to prevent unnecessary children traversal
-      empty = this.areChildrenEmpty();
+      empty = this.areChildrenEmpty(onlyVisible);
     }
 
     return empty;
   }
 
   /**
+   * @param onlyVisible true to only consider visible fields, so it checks the {@link emptyVisible} property instead of {@link empty}. Default is false.
    * @returns true if all direct child fields are empty, false otherwise
    */
-  areChildrenEmpty(): boolean {
+  areChildrenEmpty(onlyVisible = false): boolean {
     let empty = true;
     this.visitFirstChildFields(field => {
-      if (!field.destroying && !field.empty) {
+      if (field.destroying) {
+        return TreeVisitResult.SKIP_SUBTREE;
+      }
+      let childEmpty = onlyVisible ? field.emptyVisible : field.empty;
+      if (!childEmpty) {
         empty = false;
         return true;
       }
     });
     return empty;
+  }
+
+  override setVisible(visible: boolean | Record<string, boolean>) {
+    if (this.setProperty('visible', visible)) {
+      this._updateEmpty(true);
+    }
   }
 
   requestInput() {

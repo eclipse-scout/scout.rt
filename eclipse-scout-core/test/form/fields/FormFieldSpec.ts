@@ -736,7 +736,7 @@ describe('FormField', () => {
           id: 'SecondField'
         }]
       });
-      expect(areChildrenEmptySpy).toHaveBeenCalledTimes(2);
+      expect(areChildrenEmptySpy).toHaveBeenCalledTimes(4); // 2 times for empty, 2 times for emptyVisible
     });
 
     it('is set to true if checkEmpty is false even if a child is not empty', () => {

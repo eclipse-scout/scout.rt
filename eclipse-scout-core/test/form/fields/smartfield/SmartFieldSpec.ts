@@ -1444,6 +1444,7 @@ describe('SmartField', () => {
       expect(propertyChangeEvents.map(event => event.propertyName)).toEqual([
         'loading',
         'empty',
+        'emptyVisible',
         'saveNeeded',
         'value',
         'loading',

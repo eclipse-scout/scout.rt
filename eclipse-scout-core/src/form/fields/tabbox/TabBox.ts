@@ -269,7 +269,7 @@ export class TabBox extends CompositeField implements TabBoxModel {
       if (this.markStrategy === TabBox.MarkStrategy.SAVE_NEEDED) {
         tabItem.off('propertyChange:saveNeeded', this._tabItemSaveNeededChangeHandler);
       } else if (this.markStrategy === TabBox.MarkStrategy.EMPTY) {
-        tabItem.off('propertyChange:empty', this._tabItemEmptyChangeHandler);
+        tabItem.off('propertyChange:emptyVisible', this._tabItemEmptyChangeHandler);
       }
     }
   }
@@ -280,7 +280,7 @@ export class TabBox extends CompositeField implements TabBoxModel {
         tabItem.on('propertyChange:saveNeeded', this._tabItemSaveNeededChangeHandler);
         this._updateTabItemMarked(tabItem);
       } else if (this.markStrategy === TabBox.MarkStrategy.EMPTY) {
-        tabItem.on('propertyChange:empty', this._tabItemEmptyChangeHandler);
+        tabItem.on('propertyChange:emptyVisible', this._tabItemEmptyChangeHandler);
         this._updateTabItemMarked(tabItem);
       }
     }
@@ -290,7 +290,7 @@ export class TabBox extends CompositeField implements TabBoxModel {
     if (this.markStrategy === TabBox.MarkStrategy.SAVE_NEEDED) {
       tabItem.setMarked(tabItem.saveNeeded);
     } else if (this.markStrategy === TabBox.MarkStrategy.EMPTY) {
-      tabItem.setMarked(!tabItem.empty);
+      tabItem.setMarked(!tabItem.emptyVisible);
     }
   }
 
