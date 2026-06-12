@@ -18,8 +18,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -597,11 +600,15 @@ public final class FileUtility {
    * <p>
    * Never returns an empty String or null.
    * <p>
-   * Chops filename to max length of 250 characters.
+   * Chops filename to max length of 250 bytes.
    *
    * @since 5.1
    */
   public static String toValidFilename(final String filename) {
+    return toValidFilename(filename, StandardCharsets.UTF_8);
+  }
+
+  public static String toValidFilename(final String filename, Charset charset) {
     if (filename == null) {
       return DEFAULT_FILENAME;
     }
@@ -651,18 +658,36 @@ public final class FileUtility {
     s = StringUtility.join(".", filenameParts);
     s = PAT_FILENAME_TRIM.matcher(s).replaceAll("");
 
-    // on some operating systems, the name may not be longer than 250 characters
-    if (s.length() > 250) {
+    // on some operating systems, the name may not be longer than 250 bytes
+    if (s.getBytes(charset).length > 250) {
       int dot = s.lastIndexOf('.');
       String suffix = (dot > 0 ? s.substring(dot) : "");
       //suffix is at most 32 chars
       if (suffix.length() > 32) {
         suffix = "";
       }
-      s = s.substring(0, 250 - suffix.length()) + suffix;
+      s = truncateToBytes(s, 250 - suffix.getBytes(charset).length, charset) + suffix;
     }
 
     return s;
+  }
+
+  /**
+   * Truncates a string to max number of bytes.
+   */
+  public static String truncateToBytes(String input, int maxBytes, Charset charset) {
+    if (input == null) {
+      return null;
+    }
+    CharsetEncoder encoder = charset.newEncoder();
+
+    ByteBuffer byteBuffer = ByteBuffer.allocate(maxBytes);
+
+    CharBuffer charBuffer = CharBuffer.wrap(input);
+    encoder.encode(charBuffer, byteBuffer, true);
+
+    byteBuffer.flip();
+    return charset.decode(byteBuffer).toString();
   }
 
   /**
