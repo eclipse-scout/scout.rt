@@ -214,12 +214,27 @@ public class FileUtilityTest {
         FileUtility
             .toValidFilename(
                 "someReallyLongName01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123.doc"));
+    assertEquals(
+        "♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  .♍  ☀  ♯",
+        FileUtility
+            .toValidFilename(
+                "♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯.♍  ☀  ♯"));
 
     assertEquals("_.txt", FileUtility.toValidFilename("...txt"));
     assertEquals("_.txt", FileUtility.toValidFilename("..txt"));
     assertEquals("_.txt", FileUtility.toValidFilename(" .txt"));
     assertEquals("_.txt", FileUtility.toValidFilename("  .txt"));
     assertEquals("_.txt", FileUtility.toValidFilename(" _.txt"));
+  }
+
+  @Test
+  public void testTruncateToBytes() {
+    assertNull(FileUtility.truncateToBytes(null, 100, UTF_8));
+    assertEquals("♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯", FileUtility.truncateToBytes("♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯", 100, UTF_8));
+
+    String truncated = FileUtility.truncateToBytes("♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕", 100, UTF_8);
+    assertEquals("♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯  ♕  ☢  ☣  ☠  ", truncated);
+    assertEquals(100, truncated.getBytes(UTF_8).length);
   }
 
   @Test
