@@ -15,8 +15,11 @@
   position: relative;
   --table-row-margin-x: @table-row-margin-x;
   --table-row-padding-y: @table-row-padding-y;
+  --table-row-active-background-color: @table-row-active-background-color;
   --table-aggregate-row-padding-y-small: @table-aggregate-padding-y-small;
   --table-aggregate-row-padding-y-large: @table-aggregate-padding-y-large;
+  --focus-row-selected-background-color: @item-selection-background-color;
+  --focus-row-selected-border-color: @item-selection-border-color;
 
   &.perma-focus > .table-data,
   & > .table-data:is(:focus, .focused) {
@@ -24,10 +27,10 @@
 
     & > .table-row {
       &.selected {
-        background-color: @item-selection-background-color;
+        background-color: var(--focus-row-selected-background-color);
 
         &::after {
-          border-color: @item-selection-border-color;
+          border-color: var(--focus-row-selected-border-color);
         }
       }
     }
@@ -244,7 +247,7 @@
 
 .table-row {
   &:active {
-    background-color: @table-row-active-background-color;
+    background-color: var(--table-row-active-background-color);
   }
 
   &:is(.selected, .focused)::after {
