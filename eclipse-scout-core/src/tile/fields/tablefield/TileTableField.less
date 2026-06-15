@@ -116,17 +116,9 @@
 
 .tile.dashboard {
   &.inverted > .table-field > .table {
-
-    &:focus,
-    &.focused {
-      & > .table-data > .table-row.selected {
-        background-color: @tile-table-default-inverted-selection-background-color;
-
-        &::after {
-          border-color: @tile-table-default-inverted-selection-border-color;
-        }
-      }
-    }
+    --focus-row-selected-background-color: @tile-table-default-inverted-selection-background-color;
+    --focus-row-selected-border-color: @tile-table-default-inverted-selection-border-color;
+    --table-row-active-background-color: transparent;
 
     & > .table-header {
       border-bottom-color: @tile-table-default-inverted-border-color;
@@ -140,20 +132,12 @@
       }
     }
 
-    & > .table-data {
-      & > .table-row {
-        &:active {
-          background-color: transparent;
-        }
+    & > .table-data > .table-row > .table-cell {
+      color: @tile-default-inverted-color;
+      border-bottom-color: @tile-table-default-inverted-border-color;
 
-        & > .table-cell {
-          color: @tile-default-inverted-color;
-          border-bottom-color: @tile-table-default-inverted-border-color;
-
-          & > .font-icon {
-            color: @tile-default-inverted-color;
-          }
-        }
+      & > .font-icon {
+        color: @tile-default-inverted-color;
       }
     }
 
@@ -167,17 +151,9 @@
   }
 
   &.color-alternative.inverted > .table-field > .table {
-
-    &:focus,
-    &.focused {
-      & > .table-data > .table-row.selected {
-        background-color: @tile-table-alternative-inverted-selection-background-color;
-
-        &::after {
-          border-color: @tile-table-alternative-inverted-selection-border-color;
-        }
-      }
-    }
+    --focus-row-selected-background-color: @tile-table-alternative-inverted-selection-background-color;
+    --focus-row-selected-border-color: @tile-table-alternative-inverted-selection-border-color;
+    --table-row-active-background-color: transparent;
 
     & > .table-header {
       border-bottom-color: @tile-table-default-inverted-border-color;
@@ -191,20 +167,12 @@
       }
     }
 
-    & > .table-data {
-      & > .table-row {
-        &:active {
-          background-color: transparent;
-        }
+    & > .table-data > .table-row > .table-cell {
+      color: @tile-alternative-inverted-color;
+      border-bottom-color: @tile-table-default-inverted-border-color;
 
-        & > .table-cell {
-          color: @tile-alternative-inverted-color;
-          border-bottom-color: @tile-table-default-inverted-border-color;
-
-          & > .font-icon {
-            color: @tile-alternative-inverted-color;
-          }
-        }
+      & > .font-icon {
+        color: @tile-alternative-inverted-color;
       }
     }
 
