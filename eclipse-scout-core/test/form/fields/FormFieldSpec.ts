@@ -1212,21 +1212,79 @@ describe('FormField', () => {
       expect(formField.$field.attr('aria-errormessage')).toBe(formField.fieldStatus.tooltip.$content.attr('id'));
     });
 
-    it('has aria-labelledby set if label position is not on field', () => {
-      formField.labelPosition = FormField.LabelPosition.DEFAULT;
-      formField.label = 'hello';
+    it('has aria-labelledby set to link label with field', () => {
+      let formField = scout.create(StringField, {
+        parent: session.desktop,
+        label: 'hello'
+      });
       formField.render();
-      expect(formField.$field.attr('aria-labelledby')).toBeTruthy();
+      expect(formField.$field).toHaveAttr('aria-labelledby', formField.$label.attr('id'));
+      expect(formField.$field.attr('aria-label')).toBeFalsy();
+
+      formField.setLabel(null);
+      expect(formField.$field.attr('aria-labelledby')).toBeFalsy();
+      expect(formField.$field.attr('aria-label')).toBeFalsy();
+
+      formField.setLabel('hallo');
+      expect(formField.$field).toHaveAttr('aria-labelledby', formField.$label.attr('id'));
+      expect(formField.$field.attr('aria-label')).toBeFalsy();
+    });
+
+    it('has aria-labelledby even if label is invisible', () => {
+      let formField = scout.create(StringField, {
+        parent: session.desktop,
+        label: 'hello',
+        labelVisible: false
+      });
+      formField.render();
+      expect(formField.$field).toHaveAttr('aria-labelledby', formField.$label.attr('id'));
+      expect(formField.$field.attr('aria-label')).toBeFalsy();
+
+      formField.setLabel(null);
+      expect(formField.$field.attr('aria-labelledby')).toBeFalsy();
+      expect(formField.$field.attr('aria-label')).toBeFalsy();
+
+      formField.setLabel('hallo');
       expect(formField.$field).toHaveAttr('aria-labelledby', formField.$label.attr('id'));
       expect(formField.$field.attr('aria-label')).toBeFalsy();
     });
 
     it('has aria-label set if label position is on field', () => {
-      formField.labelPosition = FormField.LabelPosition.ON_FIELD;
-      formField.label = 'hello';
+      let formField = scout.create(TileField, { // StringField uses a native placeholder and does not require a label
+        parent: session.desktop,
+        tileGrid: {
+          objectType: TileGrid,
+          selectable: true
+        },
+        labelPosition: FormField.LabelPosition.ON_FIELD,
+        label: 'hello'
+      });
       formField.render();
-      expect(formField.$field.attr('aria-label')).toBeTruthy();
       expect(formField.$field).toHaveAttr('aria-label', 'hello');
+      expect(formField.$field.attr('aria-labelledby')).toBeFalsy();
+    });
+
+    it('has neither aria-label nor aria-labelledby set if field has a role that does not support labels', () => {
+      formField.render();
+      expect(formField.$field.attr('aria-label')).toBeFalsy();
+      expect(formField.$field.attr('aria-labelledby')).toBeFalsy();
+
+      formField.setLabel('hallo');
+      expect(formField.$field.attr('aria-label')).toBeFalsy();
+      expect(formField.$field.attr('aria-labelledby')).toBeFalsy();
+
+      formField.remove();
+      formField.render();
+      expect(formField.$field.attr('aria-label')).toBeFalsy();
+      expect(formField.$field.attr('aria-labelledby')).toBeFalsy();
+
+      formField.setLabelPosition(FormField.LabelPosition.ON_FIELD);
+      expect(formField.$field.attr('aria-label')).toBeFalsy();
+      expect(formField.$field.attr('aria-labelledby')).toBeFalsy();
+
+      formField.remove();
+      formField.render();
+      expect(formField.$field.attr('aria-label')).toBeFalsy();
       expect(formField.$field.attr('aria-labelledby')).toBeFalsy();
     });
   });

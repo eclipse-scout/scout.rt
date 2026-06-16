@@ -111,6 +111,7 @@ export class TabBox extends CompositeField implements TabBoxModel {
 
   protected override _renderProperties() {
     super._renderProperties();
+    this._renderTabItems();
     this._renderSelectedTab();
   }
 
@@ -177,18 +178,17 @@ export class TabBox extends CompositeField implements TabBoxModel {
     }
   }
 
-  protected _renderTabItems(tabItems: TabItem[]) {
-    // void only selected tab is rendered
+  protected _renderTabItems() {
+    // Tabs are rendered by the TabBoxHeader, content is rendered by _renderSelectedTab
+
+    // Link content with tabs
+    for (const tabItem of this.tabItems) {
+      aria.linkElementWithControls(tabItem.getTab().$container, this._$tabContent);
+    }
   }
 
-  protected _removeTabItems(tabItems: TabItem[]) {
-    // void only selected tab is rendered
-  }
-
-  protected _removeTabContent() {
-    this.tabItems.forEach(tabItem => {
-      tabItem.remove();
-    });
+  protected _removeTabItems() {
+    // Tabs are rendered by the TabBoxHeader, content is rendered by _renderSelectedTab
   }
 
   /**
@@ -211,6 +211,9 @@ export class TabBox extends CompositeField implements TabBoxModel {
     if (this.selectedTab) {
       this.selectedTab.render(this._$tabContent);
       this.selectedTab.get$Scrollable().data('scroll-shadow-customizer', this._updateScrollShadow.bind(this));
+      aria.linkElementWithLabel(this._$tabContent, this.selectedTab.getTab().$container, null, true);
+    } else {
+      aria.removeLabelledby(this._$tabContent);
     }
     if (this.rendered) {
       this._updateScrollShadow();

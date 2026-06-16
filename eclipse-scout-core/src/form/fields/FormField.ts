@@ -541,6 +541,10 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   protected _updateAriaDescAndErrorMessageOnElement($field: JQuery) {
+    if (!$field) {
+      return;
+    }
+
     let status = this._errorStatus();
     let maskedDescription = this.masked ? this.session.text('YouAreNotAllowedToReadThisData') : null;
     let errorSeverity = status?.severity === Status.Severity.ERROR;
@@ -598,7 +602,6 @@ export class FormField extends Widget implements FormFieldModel {
       if (this.$label) {
         this.$label.text('');
       }
-      aria.label(this.$field, this.label);
     } else if (this.$label) {
       this._removePlaceholder();
       // Make sure an empty label has the same height as the other labels, especially important for top labels
@@ -610,6 +613,11 @@ export class FormField extends Widget implements FormFieldModel {
       if (this.labelUseUiWidth || this.labelWidthInPixel === FormField.LabelWidth.UI) {
         this.invalidateLayoutTree();
       }
+    }
+
+    if (this.rendered) {
+      // Also called by addField during render -> only necessary to call it if label changes dynamically
+      this._updateAriaLabel();
     }
   }
 
@@ -1109,11 +1117,42 @@ export class FormField extends Widget implements FormFieldModel {
    */
   protected _linkWithLabel($element: JQuery) {
     if (strings.empty(this.label)) { // no label, do not link field to nbsp
+      aria.removeLabelledby($element);
       return;
     }
 
     if (this.labelPosition !== FormField.LabelPosition.ON_FIELD) {
-      aria.linkElementWithLabel($element, this.$label);
+      aria.linkElementWithLabel($element, this.get$AriaLabelTarget());
+    }
+  }
+
+  /**
+   * @returns the element containing the label that should be linked with the field.
+   */
+  get$AriaLabelTarget(): JQuery {
+    return this.$label;
+  }
+
+  protected _updateAriaLabel() {
+    this._updateAriaLabelOnElement(this.$field);
+  }
+
+  /**
+   * Links the `$elem` with the label returned by {@link get$AriaLabelTarget} using `aria-labelledby`, or sets aria-label on the `$elem` if the {@link labelPosition} is `ON_FIELD`.
+   * Does nothing if no `$elem` is given or `$elem` does not support `aria-label` or `aria-labelledby` according to the w3c spec.
+   */
+  protected _updateAriaLabelOnElement($elem: JQuery) {
+    if (!$elem) {
+      return;
+    }
+    if (!aria.supportsLabel($elem)) {
+      return;
+    }
+
+    if (this.labelPosition === FormField.LabelPosition.ON_FIELD) {
+      aria.label($elem, this.label);
+    } else {
+      this._linkWithLabel($elem);
     }
   }
 
@@ -1134,7 +1173,7 @@ export class FormField extends Widget implements FormFieldModel {
       this.addFieldContainer($field);
     }
     this.$field = $field;
-    this._linkWithLabel($field);
+    this._updateAriaLabel();
     this.$field.on('blur', this._onFieldBlur.bind(this))
       .on('focus', this._onFieldFocus.bind(this));
   }

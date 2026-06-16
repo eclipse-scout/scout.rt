@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ActionKeyStroke, aria, CloneOptions, ContextMenuPopup, Device, EnumObject, Event, EventHandler, Form, FormMenuActionKeyStroke, FormMenuEventMap, FormMenuModel, GroupBox, InitModelOf, Menu, MobilePopup, ObjectOrChildModel, Popup, scout,
-  WidgetPopup
+  ActionKeyStroke, aria, AriaRole, CloneOptions, ContextMenuPopup, Device, EnumObject, Event, EventHandler, Form, FormMenuActionKeyStroke, FormMenuEventMap, FormMenuModel, GroupBox, InitModelOf, Menu, MobilePopup, ObjectOrChildModel, Popup,
+  scout, WidgetPopup
 } from '../index';
 
 export class FormMenu extends Menu implements FormMenuModel {
@@ -220,9 +220,9 @@ export class FormMenu extends Menu implements FormMenuModel {
     return true;
   }
 
-  override updateAriaRole() {
+  protected override _computeAriaRole(): AriaRole {
     // Always render as menuitem. The form may be installed later, which would falsely render a menuitemcheckbox.
-    aria.role(this.$container, 'menuitem');
+    return 'menuitem';
   }
 
   protected override _handleSelectedInEllipsis() {

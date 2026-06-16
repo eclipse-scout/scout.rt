@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -437,10 +437,14 @@ export class Action extends Widget implements ActionModel, TabbableItem {
 
   protected _renderSelected() {
     this.$container.toggleClass('selected', this.selected);
-    aria.pressed(this.$container, this.isToggleAction() ? this.selected : null);
+    this.updateAriaSelected();
     if (this.rendered) { // prevent unnecessary tooltip updates during initial rendering
       this._updateTooltip();
     }
+  }
+
+  updateAriaSelected() {
+    aria.pressed(this.$container, this.isToggleAction() ? this.selected : null);
   }
 
   /** @see ActionModel.keyStroke */

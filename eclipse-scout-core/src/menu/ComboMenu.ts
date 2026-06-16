@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ColumnLayout, EventHandler, HtmlComponent, Menu, PropertyChangeEvent, widgets} from '../index';
+import {AriaRole, ColumnLayout, EventHandler, HtmlComponent, Menu, PropertyChangeEvent, widgets} from '../index';
 
 export class ComboMenu extends Menu {
   protected _childVisibleChangeHandler: EventHandler<PropertyChangeEvent<boolean>>;
@@ -30,6 +30,10 @@ export class ComboMenu extends Menu {
   protected override _renderProperties() {
     super._renderProperties();
     this._renderChildActions();
+  }
+
+  protected override _computeAriaRole(): AriaRole {
+    return 'none'; // a menu item must not have menu items as children
   }
 
   protected override _setChildActions(childActions: Menu[]) {

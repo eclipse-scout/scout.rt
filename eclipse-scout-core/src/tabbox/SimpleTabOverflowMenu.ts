@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ContextMenuPopup, Menu, MenuModel, Popup, scout, SimpleTabArea} from '..';
+import {AriaRole, ContextMenuPopup, Menu, MenuModel, Popup, scout, SimpleTabArea} from '..';
 
 export class SimpleTabOverflowMenu extends Menu implements SimpleTabOverflowMenuModel {
   declare parent: SimpleTabArea;
@@ -28,6 +28,10 @@ export class SimpleTabOverflowMenu extends Menu implements SimpleTabOverflowMenu
       .addClass('simple-overflow-tab-item')
       .removeClass('menu-item')
       .appendDiv('num-tabs').text(this.overflowTabIndices.length);
+  }
+
+  protected override _computeAriaRole(): AriaRole {
+    return 'tab'; // role tablist only allows tabs
   }
 
   protected override _doActionTogglesPopup(): boolean {

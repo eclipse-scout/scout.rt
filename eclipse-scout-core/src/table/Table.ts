@@ -1775,9 +1775,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
     let ariaAttributes = '';
     if (strings.hasText(this.ariaRules.rowRole)) {
-      let selected = this.isRowSelected(row) === true;
-      let checked = String(row.checked === true);
-      let disabled = !row.enabled;
       ariaAttributes = ` role="${this.ariaRules.rowRole}"`;
       if (this.virtual && rowIndex >= 0) {
         if (this.ariaRules.rowIndexAttr) {
@@ -1797,18 +1794,18 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       if (this.hierarchical) {
         ariaAttributes += ` ${this.ariaRules.levelAttr}="${row.hierarchyLevel + 1}"`;
       }
-      if (selected) {
-        ariaAttributes += ' aria-selected="true"';
+      if (this.checkable) {
+        ariaAttributes += ` aria-selected="${row.checked}"`; // Always set selected state to even announce "not selected"
+      } else {
+        if (this.isRowSelected(row)) {
+          ariaAttributes += ' aria-selected="true"';
+        }
       }
-      if (disabled) {
+      if (!row.enabled) {
         ariaAttributes += ' aria-disabled="true"';
       }
-      if (this.checkable) {
-        ariaAttributes += ` aria-checked="${checked}"`;
-      }
       if (this.hierarchical && row.expandable) {
-        let expanded = row.expanded;
-        ariaAttributes += ` aria-expanded="${expanded}"`;
+        ariaAttributes += ` aria-expanded="${row.expanded}"`;
       }
     }
 
@@ -3920,7 +3917,9 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
         followingRowSelected = false;
       }
 
-      aria.selected(row.$row, thisRowSelected || null);
+      if (!this.checkable) {
+        aria.selected(row.$row, thisRowSelected || null);
+      }
 
       let classChanged =
         addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected, 'selected') +
@@ -3954,7 +3953,9 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       }
       row.$row.setSelected(false);
       row.$row.toggleClass(Table.SELECTION_CLASSES, false);
-      aria.selected(row.$row, null);
+      if (!this.checkable) {
+        aria.selected(row.$row, null);
+      }
     });
   }
 
@@ -5539,10 +5540,12 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
         throw new Error('checkableColumn not set');
       }
       $styleElem = this.checkableColumn.$checkBox(row.$row);
-      aria.checked(row.$row, row.checked); // also set the row to aria checked
     }
+    // aria-checked would only be allowed for list boxes and not for tables with multiple columns.
+    // Since aria-selected is allowed for list boxes as well, we can always use it.
+    // aria-checked and selected are actually the same for screen readers, so even though a row can be selected but not checked, this state would not be announced.
+    aria.selected(row.$row, row.checked);
     $styleElem.toggleClass('checked', row.checked);
-    aria.checked($styleElem, row.checked);
   }
 
   /** @see TableModel.checkable */

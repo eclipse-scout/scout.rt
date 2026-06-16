@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, FileChooserFieldBrowseKeyStroke, FileChooserFieldDeleteKeyStroke, FileChooserFieldEventMap, FileChooserFieldModel, FileInput, FileInputChangeEvent, InitModelOf, objects, scout, ValueField} from '../../../index';
+import {aria, arrays, FileChooserFieldBrowseKeyStroke, FileChooserFieldDeleteKeyStroke, FileChooserFieldEventMap, FileChooserFieldModel, FileInput, FileInputChangeEvent, InitModelOf, objects, scout, ValueField} from '../../../index';
 
 export class FileChooserField extends ValueField<File> implements FileChooserFieldModel {
   declare model: FileChooserFieldModel;
@@ -76,6 +76,7 @@ export class FileChooserField extends ValueField<File> implements FileChooserFie
 
   protected _renderFileInput() {
     this.fileInput.render();
+    aria.role(this.fileInput.$container, 'button');
     this.addField(this.fileInput.$container);
   }
 

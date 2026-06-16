@@ -184,14 +184,14 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
 
   protected _renderFields() {
     this._ensureLookupCallExecuted();
-    this.fields.forEach(function(formField) {
+    this.fields.forEach(formField => {
       formField.render(this.$body);
 
       // set each children layout data to logical grid data
       formField.setLayoutData(new LogicalGridData(formField));
 
       this._linkWithLabel(formField.$field);
-    }, this);
+    });
     this._provideTabIndex(); // depends on rendered fields
     this.invalidateLogicalGrid();
   }

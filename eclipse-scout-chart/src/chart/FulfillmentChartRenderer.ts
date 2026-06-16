@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -92,7 +92,7 @@ export class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
       .data('animation-end', end);
 
     let radius2 = (this.fullR / 8) * 6.7;
-    let $transparentCircle = this._renderCirclePath('fulfillment-chart-inner-circle-transparent', 'InnerCircle3', radius2);
+    let $transparentCircle = this._renderCirclePath('fulfillment-chart-inner-circle-transparent', radius2);
     $transparentCircle.css('fill', this.firstOpaqueBackgroundColor);
 
     // Label
@@ -102,7 +102,6 @@ export class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
       .attr('y', this.chartBox.mY())
       .css('font-size', (this.fullR / 2) + 'px') // font of label in center relative to circle radius
       .attr('dy', '0.3em') // workaround for 'dominant-baseline: central' which is not supported in IE
-      .attrXLINK('href', '#InnerCircle')
       .text(percentage + '%');
 
     if (this.chart.config.options.clickable) {
@@ -142,7 +141,7 @@ export class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
     return pathString;
   }
 
-  protected _renderCirclePath(cssClass: string, id: string, radius: number): JQuery<SVGElement> {
+  protected _renderCirclePath(cssClass: string, radius: number): JQuery<SVGElement> {
     let chartGroupCss = this.chart.data.chartValueGroups[0].cssClass;
     let color = arrays.ensure(this.chart.data.chartValueGroups[1].colorHexValue)[0];
 
@@ -154,7 +153,6 @@ export class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
 
     let radius2 = radius * 2;
     let $path = this.$svg.appendSVG('path', cssClass)
-      .attr('id', id)
       .attr('d', 'M ' + this.chartBox.mX() + ' ' + this.chartBox.mY() +
         ' m 0, ' + (-radius) +
         ' a ' + radius + ',' + radius + ' 0 1, 1 0,' + radius2 +
@@ -173,8 +171,8 @@ export class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
     let radius = (this.fullR / 8) * 7.5,
       radius2 = (this.fullR / 8) * 7.2;
 
-    this._renderCirclePath('fulfillment-chart-inner-circle', 'InnerCircle', radius);
-    let $transparentCircle = this._renderCirclePath('fulfillment-chart-inner-circle-transparent', 'InnerCircle2', radius2);
+    this._renderCirclePath('fulfillment-chart-inner-circle', radius);
+    let $transparentCircle = this._renderCirclePath('fulfillment-chart-inner-circle-transparent', radius2);
     $transparentCircle.css('fill', this.firstOpaqueBackgroundColor);
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -99,7 +99,7 @@ describe('BooleanColumn', () => {
     });
 
     it('triggers rowClick event correctly', () => {
-      let model = helper.createModelSingleColumnByValues([true, false], 'BooleanColumn');
+      let model = helper.createModelSingleColumnByValues([true, false], BooleanColumn);
       let table = helper.createTable(model);
       let column0 = table.columns[0];
       column0.setEditable(true);
@@ -115,7 +115,7 @@ describe('BooleanColumn', () => {
 
     describe('setCellValue', () => {
       it('rebuilds the cell', () => {
-        let model = helper.createModelSingleColumnByValues([true], 'BooleanColumn');
+        let model = helper.createModelSingleColumnByValues([true], BooleanColumn);
         let table = helper.createTable(model);
         let column0 = table.columns[0];
         let updateRowCount = 0;
@@ -137,7 +137,7 @@ describe('BooleanColumn', () => {
     describe('triStateEnabled', () => {
       describe('onMouseUp', () => {
         it('toggles the check box if column is editable', () => {
-          let model = helper.createModelSingleColumnByValues([true], 'BooleanColumn');
+          let model = helper.createModelSingleColumnByValues([true], BooleanColumn);
           let table = helper.createTable(model);
           let column0 = table.columns[0] as BooleanColumn;
           column0.setTriStateEnabled(true);
@@ -173,7 +173,7 @@ describe('BooleanColumn', () => {
 
       describe('cell edit', () => {
         it('updates the cell correctly', () => {
-          let model = helper.createModelSingleColumnByValues([true], 'BooleanColumn');
+          let model = helper.createModelSingleColumnByValues([true], BooleanColumn);
           let table = helper.createTable(model);
           let column0 = table.columns[0] as BooleanColumn;
           column0.setTriStateEnabled(true);
@@ -241,7 +241,7 @@ describe('BooleanColumn', () => {
     });
 
     it('renders aria-checked correctly for tristate', () => {
-      let model = helper.createModelSingleColumnByValues([true], 'BooleanColumn');
+      let model = helper.createModelSingleColumnByValues([true], BooleanColumn);
       let table = helper.createTable(model);
       let column0 = table.columns[0] as BooleanColumn;
       column0.setTriStateEnabled(true);
@@ -255,6 +255,38 @@ describe('BooleanColumn', () => {
 
       column0.onMouseUp({} as JQuery.MouseUpEvent, table.rows[0].$row);
       expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).toHaveAttr('aria-checked', 'false');
+    });
+
+    it('does not add role checkbox and aria-checked if its the checkable column', () => {
+      let model = helper.createModelSingleColumnByValues([false], BooleanColumn);
+      let table = helper.createTable(model);
+      table.setCheckable(true);
+      table.render();
+      let row0 = table.rows[0];
+      let column0 = table.columns[0] as BooleanColumn;
+      let column1 = table.columns[1] as BooleanColumn;
+      let $checkbox0 = column0.$checkBox(row0.$row);
+      let $checkbox1 = column1.$checkBox(row0.$row);
+      expect($checkbox0).not.toHaveAttr('role');
+      expect($checkbox0).not.toHaveAttr('aria-checked');
+      expect($checkbox1).toHaveAttr('role', 'checkbox');
+      expect($checkbox1).toHaveAttr('aria-checked', 'false');
+
+      table.checkAll();
+      expect($checkbox0).not.toHaveAttr('role');
+      $checkbox0 = column0.$checkBox(row0.$row);
+      $checkbox1 = column1.$checkBox(row0.$row);
+      expect($checkbox0).not.toHaveAttr('aria-checked');
+      expect($checkbox1).toHaveAttr('role', 'checkbox');
+      expect($checkbox1).toHaveAttr('aria-checked', 'false');
+
+      column1.setCellValue(table.rows[0], true);
+      $checkbox0 = column0.$checkBox(row0.$row);
+      $checkbox1 = column1.$checkBox(row0.$row);
+      expect($checkbox0).not.toHaveAttr('role');
+      expect($checkbox0).not.toHaveAttr('aria-checked');
+      expect($checkbox1).toHaveAttr('role', 'checkbox');
+      expect($checkbox1).toHaveAttr('aria-checked', 'true');
     });
   });
 

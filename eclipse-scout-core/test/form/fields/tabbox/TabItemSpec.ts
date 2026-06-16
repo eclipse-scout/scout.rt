@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -35,11 +35,11 @@ describe('TabItem', () => {
       tabBox.validateLayout();
       expect(HtmlComponent.get(tabBox.header.tabArea.$container).valid).toBe(true);
       let firstTab = tabBox.header.tabArea.tabs[0];
-      expect(firstTab['_computeVisible']()).toBe(false);
+      expect(firstTab['_computeStatusVisible']()).toBe(false);
 
-      // TabArea needs to be invalidated, it may necessary to show ellipsis now because status got visible
+      // TabArea needs to be invalidated, it may be necessary to show ellipsis now because status got visible
       tabBox.tabItems[0].setTooltipText('test');
-      expect(firstTab['_computeVisible']()).toBe(true);
+      expect(firstTab['_computeStatusVisible']()).toBe(true);
       expect(HtmlComponent.get(tabBox.header.tabArea.$container).valid).toBe(false);
     });
 

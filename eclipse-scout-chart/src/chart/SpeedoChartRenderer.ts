@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -193,7 +193,6 @@ export class SpeedoChartRenderer extends AbstractSvgChartRenderer {
    */
   protected _renderSegment(from: number, to: number, colorClass: string): JQuery<SVGElement> {
     return this.$svg.appendSVG('path', 'speedo-chart-arc ' + colorClass)
-      .attr('id', 'ArcAxisWide' + this.chart.id)
       .attr('fill', 'none')
       .attr('stroke-width', this.scaleWeight + 'px')
       .attr('d', this._pathSegment(from, to));

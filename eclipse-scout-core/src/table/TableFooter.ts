@@ -154,6 +154,8 @@ export class TableFooter extends Widget implements TableFooterModel {
     this._infoTableStatusMenu.on('action', this._onStatusMouseDown.bind(this));
     this._infoTableStatusMenu.$container.removeClass('menu-item');
     this._infoTableStatusMenu.$container.appendSpan('icon font-icon');
+    aria.role(this._infoTableStatusMenu.$container, 'button');
+    this._infoTableStatusMenu.updateAriaSelected();
 
     // ------
 
@@ -339,11 +341,6 @@ export class TableFooter extends Widget implements TableFooterModel {
     }
     this._infoLoadAction.setEnabled(this.table.hasReloadHandler);
 
-    // hide info button from screen reader, screen reader users use shortcuts
-    if ($infoButton) {
-      aria.hidden($infoButton, true);
-    }
-
     if (!this.htmlComp.layouting) {
       this.invalidateLayoutTree(false);
     }
@@ -382,11 +379,6 @@ export class TableFooter extends Widget implements TableFooterModel {
       $infoButton = $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsFiltered));
     }
 
-    // hide info button from screen reader, screen reader users use shortcuts
-    if ($infoButton) {
-      aria.hidden($infoButton, true);
-    }
-
     if (!this.htmlComp.layouting) {
       this.invalidateLayoutTree(false);
     }
@@ -414,11 +406,6 @@ export class TableFooter extends Widget implements TableFooterModel {
         $info.appendSpan().text(this.session.text('ui.NumRowsSelectedMin'));
       }
       $infoButton = $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsSelected));
-    }
-
-    // hide info button from screen reader, screen reader users use shortcuts
-    if ($infoButton) {
-      aria.hidden($infoButton, true);
     }
 
     if (!this.htmlComp.layouting) {
@@ -699,6 +686,7 @@ export class TableFooter extends Widget implements TableFooterModel {
     if (this._tableStatusTooltip) {
       this._tableStatusTooltip.destroy();
     }
+    this._infoTableStatusMenu.setSelected(false);
   }
 
   protected _showTableStatusTooltip() {
@@ -737,6 +725,7 @@ export class TableFooter extends Widget implements TableFooterModel {
 
     // Adjust icon style
     this._infoTableStatusMenu.addCssClass('tooltip-active');
+    this._infoTableStatusMenu.setSelected(true);
     this._tableStatusTooltip.on('remove', () => {
       this._infoTableStatusMenu.removeCssClass('tooltip-active');
       // When the tooltip is removed (e.g. because of the auto-remove timeout, or

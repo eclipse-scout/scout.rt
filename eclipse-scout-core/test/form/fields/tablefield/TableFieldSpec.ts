@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Column, Status, Table, TableField, TableModel, TableRow} from '../../../../src/index';
+import {Column, FormField, scout, Status, Table, TableField, TableModel, TableRow} from '../../../../src/index';
 import {FormSpecHelper, SpecTable, SpecTableModel, TableSpecHelper} from '../../../../src/testing/index';
 
 describe('TableField', () => {
@@ -393,6 +393,52 @@ describe('TableField', () => {
 
       tableField.table.deleteAllRows();
       expect(tableField.empty).toBe(true);
+    });
+  });
+
+  describe('aria-properties', () => {
+    it('has aria-labelledby set to link label with field', () => {
+      let tableField = scout.create(TableField, {
+        parent: session.desktop,
+        table: {
+          objectType: Table
+        },
+        label: 'hello'
+      });
+      tableField.render();
+      expect(tableField.table.$data).toHaveAttr('aria-labelledby', tableField.$label.attr('id'));
+      expect(tableField.table.$data.attr('aria-label')).toBeFalsy();
+
+      tableField.setLabel(null);
+      expect(tableField.table.$data.attr('aria-labelledby')).toBeFalsy();
+      expect(tableField.table.$data.attr('aria-label')).toBeFalsy();
+
+      tableField.setLabel('hallo');
+      expect(tableField.table.$data).toHaveAttr('aria-labelledby', tableField.$label.attr('id'));
+      expect(tableField.table.$data.attr('aria-label')).toBeFalsy();
+
+      tableField.setLabelVisible(false);
+      expect(tableField.table.$data).toHaveAttr('aria-labelledby', tableField.$label.attr('id'));
+      expect(tableField.table.$data.attr('aria-label')).toBeFalsy();
+
+      tableField.remove();
+      tableField.render();
+      expect(tableField.table.$data).toHaveAttr('aria-labelledby', tableField.$label.attr('id'));
+      expect(tableField.table.$data.attr('aria-label')).toBeFalsy();
+    });
+
+    it('has aria-label set if label position is on field', () => {
+      let tableField = scout.create(TableField, {
+        parent: session.desktop,
+        table: {
+          objectType: Table
+        },
+        labelPosition: FormField.LabelPosition.ON_FIELD,
+        label: 'hello'
+      });
+      tableField.render();
+      expect(tableField.table.$data).toHaveAttr('aria-label', 'hello');
+      expect(tableField.table.$data.attr('aria-labelledby')).toBeFalsy();
     });
   });
 });

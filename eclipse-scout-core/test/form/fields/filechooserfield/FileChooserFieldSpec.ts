@@ -70,17 +70,22 @@ describe('FileChooserField', () => {
         parent: session.desktop,
         acceptTypes: '.png,.jpg'
       });
+      field.render();
 
       expect(field.fileInput.acceptTypes).toBe('.png,.jpg');
+      expect(field.fileInput.$fileInput.attr('accept')).toBe('.png,.jpg');
 
       field.setAcceptTypes('.pdf');
       expect(field.fileInput.acceptTypes).toBe('.pdf');
+      expect(field.fileInput.$fileInput.attr('accept')).toBe('.pdf');
 
       field.setAcceptTypes(null);
       expect(field.fileInput.acceptTypes).toBeNull();
+      expect(field.fileInput.$fileInput.attr('accept')).toBeUndefined();
 
       field.setAcceptTypes('.csv');
       expect(field.fileInput.acceptTypes).toBe('.csv');
+      expect(field.fileInput.$fileInput.attr('accept')).toBe('.csv');
     });
   });
 

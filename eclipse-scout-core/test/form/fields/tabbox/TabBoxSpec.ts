@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {keys, scout, StringField, TabBox, TabBoxModel, TabItem} from '../../../../src/index';
+import {arrays, keys, scout, StringField, TabBox, TabBoxModel, TabItem} from '../../../../src/index';
 import {JQueryTesting, TabBoxSpecHelper} from '../../../../src/testing/index';
 
 describe('TabBox', () => {
@@ -181,25 +181,60 @@ describe('TabBox', () => {
       expect(tabBox._$tabContent).toHaveAttr('role', 'tabpanel');
     });
 
+    it('has a content area with aria-labelledby pointing to selected tab', () => {
+      tabBox.render();
+      let selectedId = tabBox.selectedTab.getTab().$container.attr('id');
+      expect(tabBox._$tabContent.attr('aria-labelledby')).toBe(selectedId);
+
+      tabBox.setSelectedTab(tabItem2);
+      selectedId = tabBox.selectedTab.getTab().$container.attr('id');
+      expect(tabBox._$tabContent.attr('aria-labelledby')).toBe(selectedId);
+
+      tabBox.setSelectedTab(tabItem1);
+      selectedId = tabBox.selectedTab.getTab().$container.attr('id');
+      expect(tabBox._$tabContent.attr('aria-labelledby')).toBe(selectedId);
+
+      tabBox.setSelectedTab(null);
+      expect(tabBox._$tabContent).not.toHaveAttr('aria-labelledby');
+    });
+
     it('has tabs with aria role tab', () => {
       tabBox.render();
       tabBox.header.tabArea.tabs.forEach(tab => {
         expect(tab.$container).toHaveAttr('role', 'tab');
       });
-      expect(tabBox._$tabContent).toHaveAttr('role', 'tabpanel');
+
+      tabBox.insertTabItem({objectType: TabItem});
+      expect(arrays.last(tabBox.header.tabArea.tabs).$container).toHaveAttr('role', 'tab');
     });
 
-    it('has selected tabs aria-selected property set to true', () => {
+    it('has tabs with aria-controls pointing to content', () => {
       tabBox.render();
-      // per default first tab is selected
+
+      let panelId = tabBox._$tabContent.attr('id');
+      tabBox.header.tabArea.tabs.forEach(tab => {
+        expect(tab.$container).toHaveAttr('aria-controls', panelId);
+      });
+
+      tabBox.insertTabItem({objectType: TabItem});
+      expect(arrays.last(tabBox.header.tabArea.tabs).$container).toHaveAttr('aria-controls', panelId);
+    });
+
+    it('has selected tab with aria-selected property set to true', () => {
+      tabBox.render();
       expect(tabItem1.getTab().$container).toHaveAttr('aria-selected', 'true');
       expect(tabItem2.getTab().$container.attr('aria-selected')).toBeFalsy();
-      // test switch back and forth
+
       tabBox.setSelectedTab(tabItem2);
       expect(tabItem1.getTab().$container.attr('aria-selected')).toBeFalsy();
       expect(tabItem2.getTab().$container).toHaveAttr('aria-selected', 'true');
+
       tabBox.setSelectedTab(tabItem1);
       expect(tabItem1.getTab().$container).toHaveAttr('aria-selected', 'true');
+      expect(tabItem2.getTab().$container.attr('aria-selected')).toBeFalsy();
+
+      tabBox.setSelectedTab(null);
+      expect(tabItem1.getTab().$container.attr('aria-selected')).toBeFalsy();
       expect(tabItem2.getTab().$container.attr('aria-selected')).toBeFalsy();
     });
   });

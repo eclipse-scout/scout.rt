@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,8 +29,10 @@ export type AriaRole =
   | 'article'
   | 'banner'
   | 'button'
+  | 'caption'
   | 'cell'
   | 'checkbox'
+  | 'code'
   | 'columnheader'
   | 'combobox'
   | 'command'
@@ -38,17 +40,21 @@ export type AriaRole =
   | 'complementary'
   | 'contentinfo'
   | 'definition'
+  | 'deletion'
   | 'dialog'
   | 'directory'
   | 'document'
+  | 'emphasis'
   | 'feed'
   | 'figure'
   | 'form'
+  | 'generic'
   | 'grid'
   | 'gridcell'
   | 'group'
   | 'heading'
   | 'img'
+  | 'insertion'
   | 'link'
   | 'list'
   | 'listbox'
@@ -68,6 +74,7 @@ export type AriaRole =
   | 'none'
   | 'note'
   | 'option'
+  | 'paragraph'
   | 'presentation'
   | 'progressbar'
   | 'radio'
@@ -83,7 +90,10 @@ export type AriaRole =
   | 'slider'
   | 'spinbutton'
   | 'status'
+  | 'strong'
+  | 'subscript'
   | 'suggestion'
+  | 'superscript'
   | 'switch'
   | 'tab'
   | 'table'
@@ -91,6 +101,7 @@ export type AriaRole =
   | 'tabpanel'
   | 'term'
   | 'textbox'
+  | 'time'
   | 'timer'
   | 'toolbar'
   | 'tooltip'
@@ -102,6 +113,47 @@ export type AriaHasPopup = 'menu' | 'listbox' | 'tree' | 'grid' | 'dialog' | 'tr
 export type AriaLive = 'assertive' | 'polite' | 'off';
 export type AriaCurrent = 'page' | 'step' | 'location' | 'date' | 'time' | 'true' | 'false' | boolean;
 export type AriaOrientation = 'horizontal' | 'vertical';
+
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-labelledby#associated_roles
+ */
+const unsupportedLabelRoles = new Set(['caption', 'code', 'deletion', 'emphasis', 'generic', 'insertion', 'mark', 'none', 'paragraph', 'presentation', 'strong', 'subscript', 'suggestion', 'superscript', 'term', 'time']);
+
+/**
+ * Contains tag names and their implicit role, but only those tags that map to an unsupported label role according to {@link unsupportedLabelRoles}.
+ * This means that tag names whose role supports a label are not included (article, button, details, ...).
+ * Also, the tag names that don't map to an exact role are not included (a, area, footer, header, li, section).
+ *
+ * @see https://www.w3.org/TR/html-aria/#docconformance
+ */
+const roleByTagForUnsupportedLabelRoles: Partial<Record<keyof HTMLElementTagNameMap, AriaRole>> = {
+  b: 'generic',
+  bdi: 'generic',
+  bdo: 'generic',
+  body: 'generic',
+  caption: 'caption',
+  code: 'code',
+  data: 'generic',
+  del: 'deletion',
+  dfn: 'term',
+  div: 'generic',
+  em: 'emphasis',
+  html: 'generic',
+  i: 'generic',
+  ins: 'insertion',
+  p: 'paragraph',
+  pre: 'generic',
+  q: 'generic',
+  s: 'deletion',
+  samp: 'generic',
+  small: 'generic',
+  span: 'generic',
+  strong: 'strong',
+  sub: 'subscript',
+  sup: 'superscript',
+  time: 'time',
+  u: 'generic'
+};
 
 export const aria = {
 
@@ -152,7 +204,11 @@ export const aria = {
     let targetId = aria.ensureId($targetElement);
     if (!replace) {
       let attributeValue = $elem.attr(ariaAttribute) || '';
-      if (attributeValue && !strings.contains(attributeValue, targetId)) {
+      if (attributeValue) {
+        if (strings.contains(attributeValue, targetId)) {
+          return;
+        }
+
         // Add to the existing value if there is one
         if (objects.isNullOrUndefined(position) || position === AriaLabelledByInsertPosition.FRONT) {
           targetId += ' ' + attributeValue;
@@ -190,6 +246,13 @@ export const aria = {
    */
   linkElementWithLabel($elem: JQuery<Element>, $label: JQuery<Element>, position = AriaLabelledByInsertPosition.FRONT, replace = false) {
     aria._linkElementWithTargetElement($elem, $label, 'aria-labelledby', position, replace);
+  },
+
+  removeLabelledby($elem: JQuery<Element>) {
+    if (!$elem) {
+      return;
+    }
+    $elem.removeAttr('aria-labelledby');
   },
 
   /**
@@ -399,6 +462,22 @@ export const aria = {
     } else {
       $elem.removeAttr('aria-label');
     }
+  },
+
+  /**
+   * @returns true if the element supports aria-label or aria-labelledby, false if not
+   */
+  supportsLabel($elem: JQuery<Element>): boolean {
+    if (!$elem) {
+      return false;
+    }
+
+    let role = $elem.attr('role');
+    if (!role) {
+      role = roleByTagForUnsupportedLabelRoles[$elem[0].tagName.toLowerCase()];
+    }
+
+    return !unsupportedLabelRoles.has(role);
   },
 
   /**
@@ -625,7 +704,7 @@ export const aria = {
     let role = $elem.attr('role');
     if (role) {
       if (!Object.keys(aria.orientationDefault()).includes(role)) {
-        // Don't set orientation if the role that doesn't support it
+        // Don't set orientation if the role doesn't support it
         orientation = null;
       } else {
         // Don't set orientation if it is the role's default

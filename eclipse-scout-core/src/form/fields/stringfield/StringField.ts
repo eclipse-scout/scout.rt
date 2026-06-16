@@ -408,7 +408,9 @@ export class StringField extends BasicField<string> implements StringFieldModel 
   }
 
   protected _renderWrapText() {
-    this.$field.attr('wrap', this.wrapText ? 'soft' : 'off');
+    if (this.$field.is('textarea')) {
+      this.$field.attr('wrap', this.wrapText ? null : 'off');
+    }
   }
 
   setTrimText(trimText: boolean) {

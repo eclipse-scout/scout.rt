@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -69,8 +69,7 @@ export class Tab extends Widget implements TabModel {
     ObjectIdProvider.get().setDependentUuid('tab', this.tabItem, this);
 
     this.fieldStatus = scout.create(FieldStatus, {
-      parent: this,
-      visible: false
+      parent: this
     });
     this.fieldStatus.on('statusMouseDown', this._statusMouseDownHandler);
 
@@ -99,8 +98,6 @@ export class Tab extends Widget implements TabModel {
     });
     aria.linkElementWithLabel(this.$container, this.$subLabel);
     aria.linkElementWithLabel(this.$container, this.$label);
-    this.fieldStatus.render();
-    this.fieldStatus.$container.cssWidth(HtmlEnvironment.get().fieldStatusWidth);
 
     this.$container.on('mousedown', this._onTabMouseDown.bind(this));
     this.session.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
@@ -170,14 +167,20 @@ export class Tab extends Widget implements TabModel {
   }
 
   protected _updateStatus() {
-    let visible = this._computeVisible(),
-      status = null,
-      autoRemove = true,
-      initialShow = false;
-    this.fieldStatus.setVisible(visible);
+    let visible = this._computeStatusVisible();
     if (!visible) {
+      this.fieldStatus.remove();
+      this.invalidateLayoutTree();
       return;
     }
+    if (!this.fieldStatus.rendered) {
+      this.fieldStatus.render();
+      this.fieldStatus.$container.cssWidth(HtmlEnvironment.get().fieldStatusWidth);
+      this.invalidateLayoutTree();
+    }
+    let status;
+    let autoRemove = true;
+    let initialShow = false;
     if (this.errorStatus) {
       status = this.errorStatus;
       autoRemove = !status.isError();
@@ -191,7 +194,7 @@ export class Tab extends Widget implements TabModel {
     this.fieldStatus.update(status, null, autoRemove, initialShow);
   }
 
-  protected _computeVisible(): boolean {
+  protected _computeStatusVisible(): boolean {
     return this.visible && !this.overflown && (!!this.errorStatus || strings.hasText(this.tooltipText));
   }
 
