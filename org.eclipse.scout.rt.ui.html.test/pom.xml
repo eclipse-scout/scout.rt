@@ -25,7 +25,6 @@
 
   <properties>
     <scout.script.version>5.0.0</scout.script.version>
-    <sonar.tests>src/test</sonar.tests>
   </properties>
 
   <dependencies>

@@ -24,6 +24,7 @@
   <name>${project.artifactId}</name>
 
   <properties>
+    <sonar.sources>bin,scripts,pom.xml</sonar.sources>
     <master_skip_npm_build_dev>true</master_skip_npm_build_dev>
     <master_skip_npm_build_prod>true</master_skip_npm_build_prod>
     <master_skip_karma_test>true</master_skip_karma_test>
