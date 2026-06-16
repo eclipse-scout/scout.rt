@@ -146,7 +146,6 @@
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.rt/target/jacoco-all.exec</master_coverage_jacoco_destFile>
     <master_test_forkCount>1</master_test_forkCount>
-      **/resources/WebContent/**
     </sonar.exclusions>
 
     <scout.excludeTestCategories /> <!-- may be set as a system property to disable test with test category (defined in platform.test) -->
