@@ -154,37 +154,6 @@
     <scout.excludeTestCategories /> <!-- may be set as a system property to disable test with test category (defined in platform.test) -->
   </properties>
 
-  <profiles>
-    <profile>
-      <id>sonar.sources.definition</id>
-      <activation>
-        <file>
-          <!-- only activate if the folder exists in the module, otherwise we get an error from the sonar-maven-plugin -->
-          <exists>src/main</exists>
-        </file>
-      </activation>
-      <properties>
-        <!-- Treat everything in src/main as source code (not just java) -->
-        <!-- default from the Maven Scanner would be src/main/java,pom.xml -->
-        <sonar.sources>src/main,pom.xml</sonar.sources>
-      </properties>
-    </profile>
-    <profile>
-      <id>sonar.tests.definition</id>
-      <activation>
-        <file>
-          <!-- only activate if the folder exists in the module, otherwise we get an error from the sonar-maven-plugin -->
-          <exists>src/test</exists>
-        </file>
-      </activation>
-      <properties>
-        <!-- Treat everything in src/test as test code -->
-        <!-- default from the Maven Scanner would be src/test/java -->
-        <sonar.tests>src/test</sonar.tests>
-      </properties>
-    </profile>
-  </profiles>
-
   <dependencyManagement>
     <dependencies>
       <!-- Build Dependencies -->
