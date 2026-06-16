@@ -484,7 +484,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
     let filtered = column.filtered;
 
     $header.children('.table-header-item-state').remove();
-    let $state = $header.appendSpan('table-header-item-state');
+    let $state = $header.appendDiv('table-header-item-state');
     $state.empty();
     $header.removeClass('sort-asc sort-desc sorted group-asc group-desc grouped filtered');
     $state.removeClass('sort-asc sort-desc sorted group-asc group-desc grouped filtered');

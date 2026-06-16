@@ -4541,7 +4541,7 @@ describe('Table', () => {
       helper.assertAriaRowIndexAndCount(table, 0, 2);
     });
 
-    it('has selected rows and their cells set to aria-selected true', () => {
+    it('has aria-selected set to true for selected rows', () => {
       let model = helper.createModelFixture(2, 4);
       let table = helper.createTable(model);
       table.render();
@@ -4576,6 +4576,51 @@ describe('Table', () => {
 
       expectSelected(table.rows[0], false);
       expectSelected(table.rows[1], true);
+    });
+
+    it('has aria-selected set for checked rows if table is checkable', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      table.setCheckable(true);
+      table.render();
+
+      expect(table.rows[0].$row.attr('aria-selected')).toBe('false');
+      expect(table.rows[1].$row.attr('aria-selected')).toBe('false');
+
+      table.checkRow(table.rows[0]);
+      expect(table.rows[0].$row.attr('aria-selected')).toBe('true');
+      expect(table.rows[1].$row.attr('aria-selected')).toBe('false');
+
+      table.checkAll();
+      expect(table.rows[0].$row.attr('aria-selected')).toBe('true');
+      expect(table.rows[1].$row.attr('aria-selected')).toBe('true');
+
+      table.uncheckAll();
+      expect(table.rows[0].$row.attr('aria-selected')).toBe('false');
+      expect(table.rows[1].$row.attr('aria-selected')).toBe('false');
+
+      // aria-selected must not be modified by selection in a checkable table
+      table.selectRow(table.rows[0]);
+      expect(table.rows[0].$row.attr('aria-selected')).toBe('false');
+      expect(table.rows[1].$row.attr('aria-selected')).toBe('false');
+
+      table.selectAll();
+      expect(table.rows[0].$row.attr('aria-selected')).toBe('false');
+      expect(table.rows[1].$row.attr('aria-selected')).toBe('false');
+
+      table.remove();
+      table.render();
+      expect(table.rows[0].$row.attr('aria-selected')).toBe('false');
+      expect(table.rows[1].$row.attr('aria-selected')).toBe('false');
+
+      table.checkRow(table.rows[1]);
+      expect(table.rows[0].$row.attr('aria-selected')).toBe('false');
+      expect(table.rows[1].$row.attr('aria-selected')).toBe('true');
+
+      table.remove();
+      table.render();
+      expect(table.rows[0].$row.attr('aria-selected')).toBe('false');
+      expect(table.rows[1].$row.attr('aria-selected')).toBe('true');
     });
 
     it('has aria-activedescendant set if a row is focused or selected', () => {

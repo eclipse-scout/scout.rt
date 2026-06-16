@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -114,9 +114,9 @@ describe('DateColumnUserFilter', () => {
       filter.addFilterFields(box);
       filter.dateFromField.label = 'dateFromField';
       box.render();
-      expect(filter.dateFromField.$field.attr('aria-labelledBy')).toBeTruthy();
-      expect(filter.dateFromField.$field.attr('aria-labelledBy')).toBe(filter.dateFromField.$label.attr('id'));
-      expect(filter.dateFromField.$field.attr('aria-label')).toBeFalsy();
+      expect(filter.dateFromField.$dateField.attr('aria-labelledBy')).toBeTruthy();
+      expect(filter.dateFromField.$dateField.attr('aria-labelledBy')).toBe(filter.dateFromField.$label.attr('id'));
+      expect(filter.dateFromField.$dateField.attr('aria-label')).toBeFalsy();
     });
   });
 });

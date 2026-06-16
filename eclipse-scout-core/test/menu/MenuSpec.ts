@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -678,6 +678,23 @@ describe('Menu', () => {
       testMenu.setSelected(true);
       expect(testMenu.$container).toHaveAttr('aria-checked', 'true');
       expect(testMenu.$container.attr('aria-pressed')).toBeFalsy();
+    });
+
+    it('has aria pressed set correctly if it is a button', () => {
+      let testMenu = helper.createMenu({
+        text: 'My Test Menu',
+        tooltipText: 'moo',
+        toggleAction: true
+      });
+      testMenu.render();
+      testMenu.$container.attr('role', 'button');
+      testMenu.updateAriaSelected();
+      expect(testMenu.$container).toHaveAttr('role', 'button');
+      expect(testMenu.$container).toHaveAttr('aria-pressed', 'false');
+      expect(testMenu.$container).not.toHaveAttr('aria-checked');
+      testMenu.setSelected(true);
+      expect(testMenu.$container).toHaveAttr('aria-pressed', 'true');
+      expect(testMenu.$container).not.toHaveAttr('aria-checked');
     });
 
     it('has aria-haspopup set to menu if it has child actions', () => {

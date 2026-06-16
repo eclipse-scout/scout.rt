@@ -90,7 +90,6 @@ export class TableField extends FormField implements TableFieldModel {
     }
     this.table.render();
     this.addField(this.table.$container);
-    this._linkWithLabel(this.table.$data);
     this.$field.addDeviceClass();
     this.invalidateLayoutTree();
   }
@@ -102,6 +101,10 @@ export class TableField extends FormField implements TableFieldModel {
     this.table.remove();
     this._removeField();
     this.invalidateLayoutTree();
+  }
+
+  protected override _updateAriaLabel() {
+    this._updateAriaLabelOnElement(this.table?.$data);
   }
 
   override computeSaveNeeded(): boolean {

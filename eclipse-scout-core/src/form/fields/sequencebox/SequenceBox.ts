@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Button, CheckBoxField, CloneOptions, CompositeField, DateField, dates, EventHandler, FormField, FormFieldSuppressStatus, HorizontalGrid, HtmlComponent, InitModelOf, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig,
-  Menu, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, PropertyChangeEvent, scout, SequenceBoxEventMap, SequenceBoxGridConfig, SequenceBoxModel, StatusOrModel, strings, ValueField, Widget
+  aria, Button, CheckBoxField, CloneOptions, CompositeField, DateField, dates, EventHandler, FormField, FormFieldSuppressStatus, HorizontalGrid, HtmlComponent, InitModelOf, LogicalGrid, LogicalGridData, LogicalGridLayout,
+  LogicalGridLayoutConfig, Menu, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, PropertyChangeEvent, scout, SequenceBoxEventMap, SequenceBoxGridConfig, SequenceBoxModel, StatusOrModel, strings, ValueField, Widget
 } from '../../../index';
 
 export class SequenceBox extends CompositeField implements SequenceBoxModel {
@@ -405,7 +405,7 @@ export class SequenceBox extends CompositeField implements SequenceBoxModel {
       if (field.$timeField) {
         this._linkWithLabel(field.$timeField);
       }
-    } else if (field.$field) { // If $field is set depends on the concrete field e.g. a group box does not have a $field
+    } else if (aria.supportsLabel(field.$field)) {
       this._linkWithLabel(field.$field);
     }
   }

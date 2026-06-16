@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -451,9 +451,8 @@ export class Button extends FormField implements ButtonModel {
     this.setProperty('preventDoubleClick', preventDoubleClick);
   }
 
-  protected override _linkWithLabel($element: JQuery) {
-    super._linkWithLabel($element);
-    aria.linkElementWithLabel($element, this.$buttonLabel);
+  override get$AriaLabelTarget(): JQuery {
+    return this.$buttonLabel;
   }
 
   override get$Focusable(): JQuery {

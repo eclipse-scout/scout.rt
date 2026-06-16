@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, ActionExecKeyStroke, ActionKeyStroke, aria, arrays, CloneOptions, ContextMenuPopup, EnumObject, HtmlComponent, icons, InitModelOf, MenuBarPopup, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel,
-  MenuOrder, ObjectOrChildModel, Popup, PopupAlignment, PropertyChangeEvent, scout, strings, tooltips, TreeVisitor, TreeVisitResult
+  Action, ActionExecKeyStroke, ActionKeyStroke, aria, AriaRole, arrays, CloneOptions, ContextMenuPopup, EnumObject, HtmlComponent, icons, InitModelOf, MenuBarPopup, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke,
+  MenuModel, MenuOrder, ObjectOrChildModel, Popup, PopupAlignment, PropertyChangeEvent, scout, strings, tooltips, TreeVisitor, TreeVisitResult
 } from '../index';
 
 export type SubMenuVisibility = EnumObject<typeof Menu.SubMenuVisibility>;
@@ -161,16 +161,19 @@ export class Menu extends Action implements MenuModel {
   }
 
   /**
-   * Aria role for menus is based on multiple properties. Properties that influence the menu role should call
-   * this update when rendering the property
+   * Aria role for menus is based on multiple properties.
+   * Properties that influence the menu role should call this method when rendering the property.
    */
   updateAriaRole() {
+    aria.role(this.$container, this._computeAriaRole());
+  }
+
+  protected _computeAriaRole(): AriaRole {
     if (this.separator) {
-      aria.role(this.$container, 'separator');
-      return;
+      return 'separator';
     }
     let hasPopup = this.togglesPopupOrSubMenu();
-    aria.role(this.$container, this.isToggleAction() && !hasPopup ? 'menuitemcheckbox' : 'menuitem');
+    return this.isToggleAction() && !hasPopup ? 'menuitemcheckbox' : 'menuitem';
   }
 
   protected override _renderSelected() {
@@ -202,8 +205,22 @@ export class Menu extends Action implements MenuModel {
     }
     this.$container.toggleClass('has-popup', hasPopup);
     aria.hasPopup(this.$container, hasPopup ? 'menu' : null);
-    aria.pressed(this.$container, null); // remove pressed set by action
-    aria.checked(this.$container, this.isToggleAction() && !hasPopup ? this.selected : null);
+    this.updateAriaSelected();
+  }
+
+  override updateAriaSelected() {
+    let hasPopup = this.$container.attr('aria-haspopup');
+    let selected = this.isToggleAction() && !hasPopup ? this.selected : null;
+
+    // Menu uses role menuitem or menuitemcheckbox.
+    // But if it is used outside a menubar, the role could be changed to button -> a button needs aria-pressed instead of aria-checked
+    if (this.$container.attr('role') === 'button') {
+      aria.pressed(this.$container, selected);
+      aria.checked(this.$container, null);
+    } else {
+      aria.pressed(this.$container, null);
+      aria.checked(this.$container, selected);
+    }
   }
 
   protected _closeSubMenus() {

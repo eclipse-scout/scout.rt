@@ -51,7 +51,6 @@ export class TreeField extends FormField implements TreeFieldModel {
     }
     this.tree.render();
     this.addField(this.tree.$container);
-    this._linkWithLabel(this.tree.$data);
     this.$field.addDeviceClass();
     this.invalidateLayoutTree();
   }
@@ -63,6 +62,10 @@ export class TreeField extends FormField implements TreeFieldModel {
     this.tree.remove();
     this._removeField();
     this.invalidateLayoutTree();
+  }
+
+  protected override _updateAriaLabel() {
+    this._updateAriaLabelOnElement(this.tree?.$data);
   }
 
   override getDelegateScrollable(): Widget {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -80,7 +80,7 @@ export class FileInput extends Widget implements FileInputModel {
   }
 
   protected _renderAcceptTypes() {
-    let acceptTypes = this.acceptTypes || '';
+    let acceptTypes = this.acceptTypes || null;
     this.$fileInput.attr('accept', acceptTypes);
   }
 

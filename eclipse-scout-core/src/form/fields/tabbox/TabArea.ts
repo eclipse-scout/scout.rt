@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,9 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria,
-  arrays, EllipsisMenu, EnumObject, EventHandler, HtmlComponent, InitModelOf, KeyStrokeContext, ObjectIdProvider, PropertyChangeEvent, scout, SomeRequired, strings, Tab, TabAreaEventMap, TabAreaLayout, TabAreaLeftKeyStroke, TabAreaModel,
-  TabAreaRightKeyStroke, TabBox, TabItem, Widget
+  aria, arrays, EllipsisMenu, EnumObject, EventHandler, HtmlComponent, InitModelOf, KeyStrokeContext, ObjectIdProvider, PropertyChangeEvent, scout, SomeRequired, strings, Tab, TabAreaEventMap, TabAreaLayout, TabAreaLeftKeyStroke,
+  TabAreaModel, TabAreaRightKeyStroke, TabBox, TabItem, Widget
 } from '../../../index';
 
 export type TabAreaStyle = EnumObject<typeof TabArea.DisplayStyle>;
@@ -84,6 +83,7 @@ export class TabArea extends Widget implements TabAreaModel {
     this.htmlComp.setLayout(new TabAreaLayout(this));
 
     this.ellipsis.render(this.$container);
+    aria.role(this.ellipsis.$container, 'tab'); // role tablist only allows tabs
 
     this.$selectionMarker = this.$container.appendDiv('selection-marker');
   }

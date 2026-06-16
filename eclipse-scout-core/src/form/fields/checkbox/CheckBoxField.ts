@@ -75,7 +75,7 @@ export class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldM
       .appendDiv('label')
       .on('mousedown', this._onMouseDown.bind(this));
 
-    aria.linkElementWithLabel(this.$checkBox, this.$checkBoxLabel);
+    this._updateAriaLabel();
     tooltips.installForEllipsis(this.$checkBoxLabel, {
       parent: this
     });
@@ -93,6 +93,10 @@ export class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldM
     tooltips.uninstall(this.$checkBoxLabel);
     this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
     super._remove();
+  }
+
+  override get$AriaLabelTarget(): JQuery {
+    return this.$checkBoxLabel;
   }
 
   protected override _renderDisplayText() {

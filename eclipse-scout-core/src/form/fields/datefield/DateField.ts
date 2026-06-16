@@ -215,7 +215,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
       this.$dateField = fields.makeInputOrDiv(this, 'date')
         .on('mousedown', this._onDateFieldMouseDown.bind(this))
         .appendTo(this.$field);
-      this._linkWithLabel(this.$dateField);
+      this._updateAriaLabel();
       if (this.$timeField) {
         // make sure date field comes before time field, otherwise tab won't work as expected
         this.$dateField.insertBefore(this.$timeField);
@@ -270,7 +270,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
       this.$timeField = fields.makeInputOrDiv(this, 'time')
         .on('mousedown', this._onTimeFieldMouseDown.bind(this))
         .appendTo(this.$field);
-      this._linkWithLabel(this.$timeField);
+      this._updateAriaLabel();
       if (this.$dateField) {
         // make sure time field comes after date field, otherwise tab won't work as expected
         this.$timeField.insertAfter(this.$dateField);
@@ -508,12 +508,13 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
   }
 
   protected override _updateAriaDescAndErrorMessage() {
-    if (this.$dateField) {
-      this._updateAriaDescAndErrorMessageOnElement(this.$dateField);
-    }
-    if (this.$timeField) {
-      this._updateAriaDescAndErrorMessageOnElement(this.$timeField);
-    }
+    this._updateAriaDescAndErrorMessageOnElement(this.$dateField);
+    this._updateAriaDescAndErrorMessageOnElement(this.$timeField);
+  }
+
+  protected override _updateAriaLabel() {
+    this._updateAriaLabelOnElement(this.$dateField);
+    this._updateAriaLabelOnElement(this.$timeField);
   }
 
   protected override _updateErrorStatusClasses() {

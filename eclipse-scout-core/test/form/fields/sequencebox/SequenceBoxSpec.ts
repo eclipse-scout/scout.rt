@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -883,6 +883,23 @@ describe('SequenceBox', () => {
       expect(dateField.$timeField.attr('aria-labelledby')).toBeTruthy();
       expect(dateField.$timeField.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + dateField.$label.attr('id'));
       expect(dateField.$timeField.attr('aria-label')).toBeFalsy();
+    });
+
+    it('has neither aria-label nor aria-labelledby set to sequence box itself', () => {
+      let field = createField();
+      field.setLabel('box label');
+      field.render();
+      expect(field.$field.attr('aria-label')).toBeFalsy();
+      expect(field.$field.attr('aria-labelledby')).toBeFalsy();
+
+      field.setLabelPosition(FormField.LabelPosition.ON_FIELD);
+      expect(field.$field.attr('aria-label')).toBeFalsy();
+      expect(field.$field.attr('aria-labelledby')).toBeFalsy();
+
+      field.remove();
+      field.render();
+      expect(field.$field.attr('aria-label')).toBeFalsy();
+      expect(field.$field.attr('aria-labelledby')).toBeFalsy();
     });
   });
 

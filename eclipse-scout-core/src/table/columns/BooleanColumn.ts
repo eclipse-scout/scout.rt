@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -44,7 +44,7 @@ export class BooleanColumn extends Column<boolean> implements BooleanColumnModel
     }
 
     if (cell.empty) {
-      // if cell wants to be really empty (e.g. no checkbox icon, use logic of base class)
+      // if cell wants to be empty (e.g. no checkbox icon, use logic of base class)
       return super.buildCell(cell, row);
     }
 
@@ -81,16 +81,21 @@ export class BooleanColumn extends Column<boolean> implements BooleanColumnModel
       }
     }
 
-    // A label is necessary so the content is correctly read even if the value is false.
-    // It also allows to toggle an editable column even without accessing edit mode first.
-    let ariaAttributes = `role="checkbox" ${ariaChecked}`;
-    if (this.table.headerVisible) {
-      ariaAttributes += `aria-labelledBy="${this.headerLabelId}"`;
-    } else {
-      ariaAttributes += `aria-label="${this.text}"`;
+    let ariaAttributes = '';
+    // A checkable table uses aria-selected on the row to announce the checked state.
+    // In that case a checkbox in a cell creates redundant announcement so it is not allowed
+    if (!this.table.checkable || this.table.checkableColumn !== this) {
+      // A label is necessary so the content is correctly read even if the value is false.
+      // It also allows to toggle an editable column even without accessing edit mode first.
+      ariaAttributes = ` role="checkbox" ${ariaChecked}`;
+      if (this.table.headerVisible) {
+        ariaAttributes += `aria-labelledBy="${this.headerLabelId}"`;
+      } else {
+        ariaAttributes += `aria-label="${this.text}"`;
+      }
     }
 
-    content = `${content}<div ${ariaAttributes} class="${checkBoxCssClass}"></div>`;
+    content = `${content}<div${ariaAttributes} class="${checkBoxCssClass}"></div>`;
 
     return this._buildCell(cell, content, style, cssClass);
   }

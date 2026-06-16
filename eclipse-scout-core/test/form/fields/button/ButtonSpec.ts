@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -257,6 +257,17 @@ describe('Button', () => {
       expect(button.$field).toHaveAttr('aria-pressed', 'false');
       button.setSelected(true);
       expect(button.$field).toHaveAttr('aria-pressed', 'true');
+    });
+
+    it('has aria-labelledby set', () => {
+      let button = scout.create(Button, {
+        parent: session.desktop,
+        label: 'label'
+      });
+      button.render();
+      expect(button.$field.attr('aria-labelledby')).toBeTruthy();
+      expect(button.$field.attr('aria-labelledby')).toBe(button.$buttonLabel.attr('id'));
+      expect(button.$field.attr('aria-label')).toBeFalsy();
     });
   });
 

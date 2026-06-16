@@ -32,8 +32,7 @@ describe('CheckBoxField', () => {
     });
 
     it('_renderValue sets checked property', () => {
-      let $div = $('<div>');
-      checkBox.render($div);
+      checkBox.render();
 
       checkBox.setValue(true);
       expect(checkBox.$checkBox.hasClass('checked')).toBe(true);
@@ -42,8 +41,7 @@ describe('CheckBoxField', () => {
     });
 
     it('_renderValue sets disabled property', () => {
-      let $div = $('<div>');
-      checkBox.render($div);
+      checkBox.render();
 
       checkBox.setEnabled(false);
       expect(checkBox.$field.hasClass('disabled')).toBe(true);
@@ -215,22 +213,20 @@ describe('CheckBoxField', () => {
     });
 
     it('has aria role checkbox', () => {
-      let $div = $('<div>');
-      checkBox.render($div);
+      checkBox.render();
       expect(checkBox.$checkBox).toHaveAttr('role', 'checkbox');
     });
 
     it('has aria-labelledby set', () => {
-      let $div = $('<div>');
-      checkBox.render($div);
+      checkBox.setLabel('hallo');
+      checkBox.render();
       expect(checkBox.$checkBox.attr('aria-labelledby')).toBeTruthy();
       expect(checkBox.$checkBox.attr('aria-labelledby')).toBe(checkBox.$checkBoxLabel.attr('id'));
       expect(checkBox.$checkBox.attr('aria-label')).toBeFalsy();
     });
 
     it('has aria-checked property set', () => {
-      let $div = $('<div>');
-      checkBox.render($div);
+      checkBox.render();
 
       expect(checkBox.$checkBox).toHaveAttr('aria-checked', 'false');
       checkBox.setValue(true);

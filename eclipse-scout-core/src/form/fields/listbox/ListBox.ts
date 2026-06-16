@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Column, InitModelOf, ListBoxLayout, ListBoxModel, ListBoxAriaRules, LookupBox, lookupField, LookupResult, LookupRow, ObjectOrChildModel, objects, scout, Table, TableModel, TableRowModel, TableRowsCheckedEvent,
-  Widget
+  arrays, Column, InitModelOf, ListBoxAriaRules, ListBoxLayout, ListBoxModel, LookupBox, lookupField, LookupResult, LookupRow, ObjectOrChildModel, objects, scout, Table, TableModel, TableRowModel, TableRowsCheckedEvent, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -56,7 +55,10 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
   protected _renderStructure() {
     this.table.render(this.$fieldContainer);
     this.addField(this.table.$container);
-    this._linkWithLabel(this.table.$data);
+  }
+
+  protected override _updateAriaLabel() {
+    this._updateAriaLabelOnElement(this.table.$data);
   }
 
   protected _onTableRowsChecked(event: TableRowsCheckedEvent) {
