@@ -278,22 +278,10 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     let parentPage = param.parentPage;
     let parentBookmarkPage = param.parentBookmarkPage;
 
-    // Check if the currently selected page is a child of 'parentPage'. If yes, change the current selection to parentPage.
-    // Otherwise, after reloading the parent page, the selection would be restored (see PageWithTable#restoreSelection).
-    // This would cause the child page to be loaded _before_ the search data from the bookmark has been applied, resulting
-    // in the wrong data being shown.
-    // TODO bsh [js-bookmark] This workaround has a negative side-effect in that the parent page is visible for a short moment. Is there a better solution?
-    if (parentPage) {
-      let currentPage = outline.selectedNode();
-      while (currentPage) {
-        if (currentPage === parentPage) {
-          outline.selectNode(parentPage);
-        }
-        currentPage = currentPage.parentNode;
-      }
-    }
-
     if (parentPage && parentBookmarkPage) {
+      if (parentPage instanceof PageWithTable) {
+        await parentPage.ensureSearchFilter(); // ensure search filter is ready to be compared with the bookmarked filter
+      }
       this._applyBookmarkPage(parentPage, parentBookmarkPage, false);
     }
 
@@ -523,6 +511,15 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   protected _prepareTablePreferences(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveState: boolean) {
+    if (!bookmarkPage.tablePreferences) {
+      // Special case for tables with uiPreferencesEnabled=false and bookmarks without table preferences. If the bookmark is
+      // applied with saveState=true, save the current state as initial state so the user can revert the table to this state.
+      if (saveState && !page.detailTable.uiPreferencesEnabled) {
+        page.detailTable.saveInitialUiPreferences();
+      }
+      return; // not part of bookmark
+    }
+
     const table = page.detailTable;
     const prefs = bookmarkPage.tablePreferences;
     const profile = tableUiPreferences.getProfile(prefs, TableUiPreferences.PROFILE_ID_BOOKMARK);
@@ -540,6 +537,10 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   protected _prepareSearchFilter(page: PageWithTable, bookmarkPage: TableBookmarkPageDo, saveState: boolean) {
+    if (!bookmarkPage.searchData) {
+      return; // not part of bookmark
+    }
+
     // Import search data
     page.setSearchFilter(bookmarkPage.searchData, saveState);
     page.setSearchFilterCompleted(bookmarkPage.searchFilterComplete);
@@ -552,6 +553,10 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   protected _prepareChartTableControlState(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {
+    if (!bookmarkPage.chartTableControlConfig) {
+      return; // not part of bookmark
+    }
+
     const helper = scout.create(ChartTableControlConfigHelper);
     helper.importConfig(page, bookmarkPage.chartTableControlConfig);
   }

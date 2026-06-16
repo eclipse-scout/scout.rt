@@ -327,6 +327,10 @@ export class PageWithTable extends Page implements PageWithTableModel {
     return this.getSearchFormTableControl()?.form || null;
   }
 
+  async ensureSearchFilter(): Promise<void> {
+    // nop
+  }
+
   /**
    * Returns the exported data of the {@link #getSearchForm search form}, or `undefined` if no search form is present.
    */
