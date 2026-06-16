@@ -23,7 +23,13 @@
 
   <properties>
     <scout.script.version>5.0.0</scout.script.version>
-    <sonar.exclusions>**/resources/WebContent/**,src/main/resources/org/eclipse/scout/rt/ui/html/json/defaultValues.json</sonar.exclusions>
+    <sonar.exclusions>
+      **/generated-sources/**,
+      **/generated/**,
+      **/resources/WebContent/**,
+      **/*_.java,
+      src/main/resources/org/eclipse/scout/rt/ui/html/json/defaultValues.json
+    </sonar.exclusions>
   </properties>
 
   <dependencies>
