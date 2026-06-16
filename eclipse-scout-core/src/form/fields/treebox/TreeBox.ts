@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -60,12 +60,16 @@ export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<T
       return;
     }
     this._valueSyncing = true;
-    let valueArray = objects.values(this.tree.nodesMap)
-      .filter(node => node.checked)
-      .map((node: TreeBoxTreeNode<TValue>) => node.lookupRow.key);
+    let valueArray = this._getValueFromTree();
 
     this.setValue(valueArray);
     this._valueSyncing = false;
+  }
+
+  protected _getValueFromTree() {
+    return objects.values(this.tree.nodesMap)
+      .filter(node => node.checked)
+      .map((node: TreeBoxTreeNode<TValue>) => node.lookupRow.key);
   }
 
   protected override _valueChanged() {
@@ -138,13 +142,17 @@ export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<T
   protected _populateTreeRecursive(parentKey: TValue, nodesArray: TreeNode[], lookupRows: LookupRow<TValue>[]) {
     let node: TreeBoxTreeNode<TValue>;
     lookupRows.forEach(function(lookupRow) {
-      if (lookupRow.parentKey === parentKey) {
+      if (this._isParentKey(lookupRow.parentKey, parentKey)) {
         node = this._createNode(lookupRow);
         this._populateTreeRecursive(node.lookupRow.key, node.childNodes, lookupRows);
         node.leaf = !node.childNodes.length;
         nodesArray.push(node);
       }
     }, this);
+  }
+
+  protected _isParentKey(rowParentKey: TValue, parentKey: TValue) {
+    return rowParentKey === parentKey;
   }
 
   /**
