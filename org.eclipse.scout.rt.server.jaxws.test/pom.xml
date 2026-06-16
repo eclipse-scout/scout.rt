@@ -22,12 +22,6 @@
   <packaging>jar</packaging>
   <name>${project.artifactId}</name>
 
-  <properties>
-    <!-- everything in this module is test code (also src/main) -->
-    <sonar.sources>pom.xml</sonar.sources>
-    <sonar.tests>src</sonar.tests>
-  </properties>
-
   <build>
     <plugins>
       <plugin>
