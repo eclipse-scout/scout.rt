@@ -63,12 +63,16 @@ export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<T
       return;
     }
     this._valueSyncing = true;
-    let valueArray = objects.values(this.tree.nodesMap)
-      .filter(node => node.checked)
-      .map((node: TreeBoxTreeNode<TValue>) => node.lookupRow.key);
+    let valueArray = this._getValueFromTree();
 
     this.setValue(valueArray);
     this._valueSyncing = false;
+  }
+
+  protected _getValueFromTree(): TValue[] {
+    return objects.values(this.tree.nodesMap)
+      .filter(node => node.checked)
+      .map((node: TreeBoxTreeNode<TValue>) => node.lookupRow.key);
   }
 
   protected override _valueChanged() {
@@ -140,14 +144,21 @@ export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<T
 
   protected _populateTreeRecursive(parentKey: TValue, nodesArray: TreeNode[], lookupRows: LookupRow<TValue>[]) {
     let node: TreeBoxTreeNode<TValue>;
-    lookupRows.forEach(function(lookupRow) {
-      if (lookupRow.parentKey === parentKey) {
+    lookupRows.forEach(lookupRow => {
+      if (this._isChildRow(lookupRow, parentKey)) {
         node = this._createNode(lookupRow);
         this._populateTreeRecursive(node.lookupRow.key, node.childNodes, lookupRows);
         node.leaf = !node.childNodes.length;
         nodesArray.push(node);
       }
-    }, this);
+    });
+  }
+
+  /**
+   * Returns true if the lookup row is a child of the row with the given key.
+   */
+  protected _isChildRow(lookupRow: LookupRow<TValue>, parentKey: TValue): boolean {
+    return lookupRow.parentKey === parentKey;
   }
 
   /**
