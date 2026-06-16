@@ -25,7 +25,6 @@
 
   <properties>
     <sonar.sources>bin,src,pom.xml</sonar.sources>
-    <sonar.tests>test</sonar.tests>
     <master_skip_npm_build_dev>true</master_skip_npm_build_dev>
     <master_skip_npm_build_prod>true</master_skip_npm_build_prod>
     <master_skip_karma_test>true</master_skip_karma_test>
