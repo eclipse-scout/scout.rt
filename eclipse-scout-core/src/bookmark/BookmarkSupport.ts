@@ -248,7 +248,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       }
       this.setLoading(true);
       try {
-        return this._activateBookmarkPath(param, options);
+        return await this._activateBookmarkPath(param, options);
       } finally {
         this.setLoading(false);
       }
