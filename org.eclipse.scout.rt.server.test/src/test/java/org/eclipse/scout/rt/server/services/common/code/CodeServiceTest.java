@@ -10,7 +10,6 @@
 package org.eclipse.scout.rt.server.services.common.code;
 
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.verify;
 
 import java.io.Serial;
@@ -78,7 +77,8 @@ public class CodeServiceTest {
     codeService.reloadCodeType(SomeCodeType.class);
 
     ArgumentCaptor<InvalidateCacheNotification> notification = ArgumentCaptor.forClass(InvalidateCacheNotification.class);
-    verify(m_clientNotificationReg).putTransactionalForAllNodes(notification.capture(), anyBoolean());
+    //noinspection deprecation
+    verify(m_clientNotificationReg).putTransactionalForAllNodesWithoutClusterNotification(notification.capture());
 
     Set<Class<? extends ICodeType<?, ?>>> codeTypeClasses = ((CodeTypeCacheEntryFilter) notification.getValue().getFilter()).getCodeTypeClasses();
     assertEquals("CodeType list in the notification size", 1, codeTypeClasses.size());
@@ -95,7 +95,8 @@ public class CodeServiceTest {
     codeService.reloadCodeTypes(list);
 
     ArgumentCaptor<InvalidateCacheNotification> notification = ArgumentCaptor.forClass(InvalidateCacheNotification.class);
-    verify(m_clientNotificationReg).putTransactionalForAllNodes(notification.capture(), anyBoolean());
+    //noinspection deprecation
+    verify(m_clientNotificationReg).putTransactionalForAllNodesWithoutClusterNotification(notification.capture());
 
     Set<Class<? extends ICodeType<?, ?>>> codeTypeClasses = ((CodeTypeCacheEntryFilter) notification.getValue().getFilter()).getCodeTypeClasses();
     assertEquals("CodeType list in the notification size", 2, codeTypeClasses.size());
@@ -109,7 +110,7 @@ public class CodeServiceTest {
    * {@link CodeService#invalidateCodeType(Class)}
    */
   @Test
-  public void testInvlidateCodeType() {
+  public void testInvalidateCodeType() {
     ICodeService codeService = BEANS.get(ICodeService.class);
     codeService.getCodeType(SomeCodeType.class);
     // verify that execLoadCodes has been invoked and reset flag, so that next execLoadCodes can be detected
@@ -119,7 +120,8 @@ public class CodeServiceTest {
 
     // check notification
     ArgumentCaptor<InvalidateCacheNotification> notification = ArgumentCaptor.forClass(InvalidateCacheNotification.class);
-    verify(m_clientNotificationReg).putTransactionalForAllNodes(notification.capture(), anyBoolean());
+    //noinspection deprecation
+    verify(m_clientNotificationReg).putTransactionalForAllNodesWithoutClusterNotification(notification.capture());
 
     Set<Class<? extends ICodeType<?, ?>>> codeTypeClasses = ((CodeTypeCacheEntryFilter) notification.getValue().getFilter()).getCodeTypeClasses();
     assertEquals("CodeType list in the notification size", 1, codeTypeClasses.size());
@@ -167,7 +169,7 @@ public class CodeServiceTest {
    * {@link CodeService#invalidateCodeTypes(List)}
    */
   @Test
-  public void testInvlidateCodeTypes() {
+  public void testInvalidateCodeTypes() {
     ICodeService codeService = BEANS.get(ICodeService.class);
 
     List<Class<? extends ICodeType<?, ?>>> list = new ArrayList<>();
@@ -176,7 +178,8 @@ public class CodeServiceTest {
     codeService.invalidateCodeTypes(list);
 
     ArgumentCaptor<InvalidateCacheNotification> notification = ArgumentCaptor.forClass(InvalidateCacheNotification.class);
-    verify(m_clientNotificationReg).putTransactionalForAllNodes(notification.capture(), anyBoolean());
+    //noinspection deprecation
+    verify(m_clientNotificationReg).putTransactionalForAllNodesWithoutClusterNotification(notification.capture());
 
     Set<Class<? extends ICodeType<?, ?>>> codeTypeClasses = ((CodeTypeCacheEntryFilter) notification.getValue().getFilter()).getCodeTypeClasses();
     assertEquals("CodeType list in the notification size", 2, codeTypeClasses.size());

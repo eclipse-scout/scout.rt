@@ -66,6 +66,7 @@ public class ClientNotificationPoller {
   private IFuture<Void> m_livenessFuture;
   private volatile long m_pollerStaleTimeMillis;
   private volatile long m_lastPollRequest;
+  private volatile boolean m_nodeRegistered;
 
   @PostConstruct
   public void start() {
@@ -91,9 +92,17 @@ public class ClientNotificationPoller {
 
   protected void startPoller() {
     touch(); // reset timestamp of last poll request to eliminate timing issues (poller must run before liveness check)
-    m_pollerFuture = Jobs.schedule(new P_NotificationPoller(this::touch), Jobs.newInput()
+    m_pollerFuture = Jobs.schedule(new P_NotificationPoller(this::ensureNodeRegistered, this::touch), Jobs.newInput()
         .withRunContext(createRunContext())
         .withName(ClientNotificationPoller.class.getSimpleName()));
+  }
+
+  protected void ensureNodeRegistered() {
+    if (!m_nodeRegistered) {
+      BEANS.optional(IClientNotificationService.class).ifPresent(svc -> svc.registerNode(NodeId.current()));
+      m_nodeRegistered = true;
+      LOG.info("Registered node {}", NodeId.current());
+    }
   }
 
   protected void stopPoller() {
@@ -104,6 +113,14 @@ public class ClientNotificationPoller {
     LOG.debug("Stopping client notification poller [clientNodeId={}].", IIds.toString(NodeId.current()));
     m_pollerFuture.cancel(true);
     m_pollerFuture = null;
+  }
+
+  protected void unregisterNode() {
+    if (m_nodeRegistered) {
+      createRunContext().run(() -> BEANS.optional(IClientNotificationService.class).ifPresent(svc -> svc.unregisterNode(NodeId.current())));
+      m_nodeRegistered = false;
+      LOG.info("Unregistered node {}", NodeId.current());
+    }
   }
 
   protected RunContext createRunContext() {
@@ -128,9 +145,11 @@ public class ClientNotificationPoller {
 
   private static final class P_NotificationPoller implements IRunnable {
 
+    private final Runnable m_ensureNodeRegistered;
     private final Runnable m_livenessCheck;
 
-    public P_NotificationPoller(Runnable livenessCheck) {
+    public P_NotificationPoller(Runnable ensureNodeRegistered, Runnable livenessCheck) {
+      m_ensureNodeRegistered = ensureNodeRegistered;
       m_livenessCheck = livenessCheck;
     }
 
@@ -149,6 +168,7 @@ public class ClientNotificationPoller {
               .withParentRunMonitor(outerRunMonitor)
               .run(() -> {
                 try {
+                  m_ensureNodeRegistered.run();
                   LOG.debug("Getting notifications from backend [clientNodeId={}]", IIds.toString(NodeId.current()));
                   handleMessagesReceived(BEANS.get(IClientNotificationService.class).getNotifications(NodeId.current()));
                 }
@@ -239,8 +259,7 @@ public class ClientNotificationPoller {
       if (event.getState() == State.PlatformStopping) {
         ClientNotificationPoller poller = BEANS.get(ClientNotificationPoller.class);
         poller.stop();
-        poller.createRunContext().run(() -> BEANS.optional(IClientNotificationService.class)
-            .ifPresent(svc -> svc.unregisterNode(NodeId.current())));
+        poller.unregisterNode();
       }
     }
   }

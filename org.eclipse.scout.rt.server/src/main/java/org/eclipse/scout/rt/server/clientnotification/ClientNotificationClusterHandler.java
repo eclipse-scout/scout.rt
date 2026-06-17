@@ -25,6 +25,6 @@ public class ClientNotificationClusterHandler implements INotificationHandler<Cl
   @Override
   public void handleNotification(ClientNotificationClusterNotification notification) {
     Collection<? extends ClientNotificationMessage> messages = notification.getClientNotificationMessages();
-    BEANS.get(ClientNotificationRegistry.class).publishWithoutClusterNotification(messages);
+    BEANS.get(ClientNotificationRegistry.class).publishWithoutClusterNotification(messages, null);
   }
 }

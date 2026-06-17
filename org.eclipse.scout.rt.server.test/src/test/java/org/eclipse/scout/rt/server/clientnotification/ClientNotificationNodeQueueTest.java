@@ -18,10 +18,13 @@ import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.NodeQueueCapacity;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
+import org.eclipse.scout.rt.testing.platform.mock.MockConfigPropertyRule;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -30,13 +33,18 @@ import org.junit.runner.RunWith;
  */
 @RunWith(PlatformTestRunner.class)
 public class ClientNotificationNodeQueueTest {
+
   private ClientNotificationNodeQueue m_queue;
+
   private static final int MAX_TEST_CAPACITY = 10;
+
+  @Rule
+  public MockConfigPropertyRule<Integer> m_nodeQueueCapacityPropertyRule = new MockConfigPropertyRule<>(NodeQueueCapacity.class, MAX_TEST_CAPACITY);
 
   @Before
   public void setup() {
-    m_queue = new ClientNotificationNodeQueue(MAX_TEST_CAPACITY);
-    m_queue.setNodeId(NodeId.of("testNodeId"));
+    m_queue = new ClientNotificationNodeQueue();
+    m_queue.init(NodeId.of("testNodeId"));
   }
 
   @Test
@@ -57,8 +65,8 @@ public class ClientNotificationNodeQueueTest {
     IFuture<List<ClientNotificationMessage>> res = Jobs.schedule(() -> m_queue.getNotifications(10, 100, TimeUnit.MILLISECONDS), Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
     ClientNotificationAddress allNodes = ClientNotificationAddress.createAllNodesAddress();
-    m_queue.put(new ClientNotificationMessage(allNodes, "test", true, "cid"));
-    m_queue.put(new ClientNotificationMessage(allNodes, "test2", true, "cid"));
+    m_queue.put(new ClientNotificationMessage(allNodes, "test", "cid"));
+    m_queue.put(new ClientNotificationMessage(allNodes, "test2", "cid"));
     List<ClientNotificationMessage> notifications = res.awaitDoneAndGet();
     assertEquals(2, notifications.size());
     assertEquals("test", notifications.get(0).getNotification());
@@ -76,7 +84,7 @@ public class ClientNotificationNodeQueueTest {
   private void putTestNotifications(int count) {
     ClientNotificationAddress allNodes = ClientNotificationAddress.createAllNodesAddress();
     for (int i = 0; i < count; i++) {
-      m_queue.put(new ClientNotificationMessage(allNodes, "test" + i, true, "cid"));
+      m_queue.put(new ClientNotificationMessage(allNodes, "test" + i, "cid"));
     }
   }
 }

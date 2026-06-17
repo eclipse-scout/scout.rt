@@ -11,10 +11,8 @@ package org.eclipse.scout.rt.server.session;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
-import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
-import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,13 +21,11 @@ public class ServerSessionLifecycleHandler implements IServerSessionLifecycleHan
   private static final Logger LOG = LoggerFactory.getLogger(ServerSessionLifecycleHandler.class);
 
   private final String m_scoutSessionId;
-  private final NodeId m_clientNodeId; // may be null
   private final ServerRunContext m_serverRunContextForSessionStart;
 
   public ServerSessionLifecycleHandler(String scoutSessionId, ServerRunContext serverRunContextForSessionStart) {
     m_scoutSessionId = assertNotNullOrEmpty(scoutSessionId, "sessionId must not be null or empty");
     m_serverRunContextForSessionStart = assertNotNull(serverRunContextForSessionStart, "serverRunContext must not be null");
-    m_clientNodeId = serverRunContextForSessionStart.getClientNodeId();
   }
 
   @Override
@@ -46,9 +42,6 @@ public class ServerSessionLifecycleHandler implements IServerSessionLifecycleHan
     }
 
     assertEqual(session.getId(), getId()); // ensure mapping between the actual session and the id used in the caches matches
-    if (m_clientNodeId != null) {
-      BEANS.get(IClientNotificationService.class).registerNode(m_clientNodeId);
-    }
     return session;
   }
 

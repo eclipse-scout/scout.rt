@@ -31,17 +31,17 @@ public class ClientNotificationService implements IClientNotificationService {
   }
 
   @Override
-  public void registerNode(NodeId nodeId) {
-    BEANS.get(ClientNotificationRegistry.class).registerNode(nodeId);
+  public void registerNode(NodeId clientNodeId) {
+    BEANS.get(ClientNotificationRegistry.class).registerNode(clientNodeId, true);
   }
 
   @Override
-  public void unregisterNode(NodeId nodeId) {
-    BEANS.get(ClientNotificationRegistry.class).unregisterNode(nodeId);
+  public void unregisterNode(NodeId clientNodeId) {
+    BEANS.get(ClientNotificationRegistry.class).unregisterNode(clientNodeId, true);
   }
 
   @Override
-  public List<ClientNotificationMessage> getNotifications(NodeId nodeId) {
-    return BEANS.get(ClientNotificationRegistry.class).consume(nodeId, m_maxNotifications, m_blockingTimeout, TimeUnit.MILLISECONDS);
+  public List<ClientNotificationMessage> getNotifications(NodeId clientNodeId) {
+    return BEANS.get(ClientNotificationRegistry.class).consume(clientNodeId, m_maxNotifications, m_blockingTimeout, TimeUnit.MILLISECONDS);
   }
 }

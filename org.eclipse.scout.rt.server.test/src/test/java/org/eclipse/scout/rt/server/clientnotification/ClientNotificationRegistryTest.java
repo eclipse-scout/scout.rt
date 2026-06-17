@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -45,8 +46,8 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testNotificationsForAllNodes() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-    reg.registerNode(NodeId.of("testNodeId"));
-    reg.registerNode(NodeId.of("testNodeId2"));
+    reg.registerNode(NodeId.of("testNodeId"), true);
+    reg.registerNode(NodeId.of("testNodeId2"), true);
     reg.putForAllNodes(TEST_NOTIFICATION);
     List<ClientNotificationMessage> notificationsNode1 = consumeNoWait(reg, NodeId.of("testNodeId"));
     List<ClientNotificationMessage> notificationsNode2 = consumeNoWait(reg, NodeId.of("testNodeId2"));
@@ -60,7 +61,7 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testNotificationsUnregisteredSingleSession() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-    reg.registerNode(NodeId.of("testNodeId"));
+    reg.registerNode(NodeId.of("testNodeId"), true);
     reg.putForUser(TEST_USER, TEST_NOTIFICATION);
     List<ClientNotificationMessage> notificationsNode = consumeNoWait(reg, NodeId.of("testNodeId"));
     assertEquals(1, notificationsNode.size());
@@ -72,7 +73,7 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testMultipleNotifications() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-    reg.registerNode(TEST_NODE);
+    reg.registerNode(TEST_NODE, true);
     reg.putForUser(TEST_USER, TEST_NOTIFICATION);
     reg.putForUser(TEST_USER, "notification2");
 
@@ -85,7 +86,7 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testNotificationsForAllSessions() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-    reg.registerNode(NodeId.of("testNodeId"));
+    reg.registerNode(NodeId.of("testNodeId"), true);
     reg.putForAllSessions(TEST_NOTIFICATION);
     List<ClientNotificationMessage> notificationsNode = consumeNoWait(reg, NodeId.of("testNodeId"));
     assertEquals(1, notificationsNode.size());
@@ -102,10 +103,10 @@ public class ClientNotificationRegistryTest {
         .withApplicationScoped(true));
     try {
       ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-      reg.registerNode(NodeId.of("testNodeId"));
+      reg.registerNode(NodeId.of("testNodeId"), false);
       reg.publish(Collections.emptySet());
       assertEquals(Collections.emptyList(), consumeNoWait(reg, NodeId.of("testNodeId")));
-      Mockito.verifyNoInteractions(mockClusterSyncService);
+      Mockito.verifyNoMoreInteractions(mockClusterSyncService);
     }
     finally {
       BeanTestingHelper.get().unregisterBean(bean);
@@ -123,14 +124,17 @@ public class ClientNotificationRegistryTest {
         .withApplicationScoped(true));
     try {
       ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-      reg.registerNode(NodeId.of("testNodeId"));
-      reg.registerNode(NodeId.of("testNodeId2"));
-      reg.putForAllNodes(TEST_NOTIFICATION, false);
+      reg.registerNode(NodeId.of("testNodeId"), false);
+      reg.registerNode(NodeId.of("testNodeId2"), false);
+      RunContexts.empty().run(() -> {
+        //noinspection deprecation
+        reg.putTransactionalForAllNodesWithoutClusterNotification(TEST_NOTIFICATION);
+      });
       List<ClientNotificationMessage> notificationsNode1 = consumeNoWait(reg, NodeId.of("testNodeId"));
       List<ClientNotificationMessage> notificationsNode2 = consumeNoWait(reg, NodeId.of("testNodeId2"));
       assertSingleTestNotification(notificationsNode1);
       assertSingleTestNotification(notificationsNode2);
-      Mockito.verifyNoInteractions(mockClusterSyncService);
+      Mockito.verifyNoMoreInteractions(mockClusterSyncService);
     }
     finally {
       BeanTestingHelper.get().unregisterBean(bean);
@@ -140,8 +144,8 @@ public class ClientNotificationRegistryTest {
   @Test
   public void registeredNodeAvailable() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-    reg.registerNode(TEST_NODE);
-    assertTrue(reg.getRegisteredNodeIds().contains(TEST_NODE));
+    reg.registerNode(TEST_NODE, true);
+    assertTrue(reg.getRegisteredClientNodeIds().contains(TEST_NODE));
   }
 
   /**
@@ -150,7 +154,7 @@ public class ClientNotificationRegistryTest {
   @Test
   public void registeredNodeInitialsNotAvailable() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-    assertFalse(reg.getRegisteredNodeIds().contains(TEST_NODE));
+    assertFalse(reg.getRegisteredClientNodeIds().contains(TEST_NODE));
   }
 
   /**
@@ -159,9 +163,9 @@ public class ClientNotificationRegistryTest {
   @Test
   public void registeredNodeNotAvailable_afterUnregister() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-    reg.registerNode(TEST_NODE);
-    reg.unregisterNode(TEST_NODE);
-    assertFalse(reg.getRegisteredNodeIds().contains(TEST_NODE));
+    reg.registerNode(TEST_NODE, true);
+    reg.unregisterNode(TEST_NODE, true);
+    assertFalse(reg.getRegisteredClientNodeIds().contains(TEST_NODE));
   }
 
   /**
@@ -170,8 +174,8 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testNodeAvailable_AfterUnregisterSession() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-    reg.registerNode(TEST_NODE);
-    assertTrue(reg.getRegisteredNodeIds().contains(TEST_NODE));
+    reg.registerNode(TEST_NODE, true);
+    assertTrue(reg.getRegisteredClientNodeIds().contains(TEST_NODE));
   }
 
   /**
@@ -180,8 +184,9 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testQueueRemovedAfterTimeout() throws InterruptedException {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(10);
-    reg.registerNode(TEST_NODE);
+    reg.registerNode(TEST_NODE, true);
     Thread.sleep(100);
+    reg.cleanupDeadNodes();
     reg.putForAllNodes("notification");
     List<ClientNotificationMessage> consumed = consumeNoWait(reg, TEST_NODE);
     assertTrue(consumed.isEmpty());
@@ -193,7 +198,7 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testQueueNotRemovedIfConsumed() throws InterruptedException {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(100);
-    reg.registerNode(TEST_NODE);
+    reg.registerNode(TEST_NODE, true);
     for (int i = 0; i < 100; i++) {
       Thread.sleep(10);
       consumeNoWait(reg, TEST_NODE);
@@ -220,8 +225,8 @@ public class ClientNotificationRegistryTest {
           .withClientNotificationCollector(collector)
           .run(() -> {
             ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-            reg.registerNode(currentNode);
-            reg.registerNode(otherNode);
+            reg.registerNode(currentNode, true);
+            reg.registerNode(otherNode, true);
 
             reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
             commit();
@@ -252,8 +257,8 @@ public class ClientNotificationRegistryTest {
     collector.consume();
     ServerRunContexts.copyCurrent().withClientNodeId(currentNode).withClientNotificationCollector(collector).run(() -> {
       ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-      reg.registerNode(currentNode);
-      reg.registerNode(otherNode);
+      reg.registerNode(currentNode, true);
+      reg.registerNode(otherNode, true);
       reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
       commit();
       //no notifications for current request (piggyback)

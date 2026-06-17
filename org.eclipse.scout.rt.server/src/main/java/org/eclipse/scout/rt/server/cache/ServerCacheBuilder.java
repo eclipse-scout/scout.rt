@@ -23,7 +23,8 @@ public class ServerCacheBuilder<K, V> extends CacheBuilder<K, V> {
     if (isShared()) {
       cache = new ClientNotificationServerCacheWrapper<>(cache);
     }
-    // it is important, that the ClusterNotificationCacheWrapper is added after the client notification cache wrapper
+    // It is important, that the ClusterNotificationCacheWrapper is added after the client notification cache wrapper
+    // in order to first publish cache invalidation to backend cluster and afterward publish the notification for all UI nodes
     if (isClusterEnabled()) {
       cache = new ClusterNotificationCacheWrapper<>(cache);
     }

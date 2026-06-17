@@ -23,7 +23,7 @@ public final class ClientNotificationProperties {
 
     @Override
     public Integer getDefaultValue() {
-      return 10000;
+      return 10_000;
     }
 
     @Override
@@ -41,12 +41,12 @@ public final class ClientNotificationProperties {
 
     @Override
     public Integer getDefaultValue() {
-      return 10000;
+      return 10_000;
     }
 
     @Override
     public String description() {
-      return "The maximum amount of time in millisecons a consumer blocks while waiting for new notifications. The default is 10 seconds.";
+      return "The maximum amount of time in milliseconds a consumer blocks while waiting for new notifications. The default is 10 seconds.";
     }
 
     @Override
@@ -91,6 +91,26 @@ public final class ClientNotificationProperties {
     @Override
     public String getKey() {
       return "scout.clientnotification.notificationQueueExpireTime";
+    }
+  }
+
+  public static class NotificationQueueCleanupTime extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public Integer getDefaultValue() {
+      return 15 * 60 * 1000;
+    }
+
+    @Override
+    public String description() {
+      return """
+          Cleanup interval for job checking for old queues which may exist if a client node does not properly unregister (e.g. due to a crash).
+          The default value is 15 minutes.""";
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.clientnotification.notificationQueueCleanupTime";
     }
   }
 }

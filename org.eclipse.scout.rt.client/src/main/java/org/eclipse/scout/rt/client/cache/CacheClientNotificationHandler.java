@@ -14,6 +14,8 @@ import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.shared.cache.CacheNotificationHandler;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
 import org.eclipse.scout.rt.shared.notification.INotificationHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Client {@link CacheNotificationHandler} that additionally informs any session listeners.
@@ -21,6 +23,8 @@ import org.eclipse.scout.rt.shared.notification.INotificationHandler;
  * @since 5.2
  */
 public class CacheClientNotificationHandler extends AbstractObservableNotificationHandler<InvalidateCacheNotification> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(CacheClientNotificationHandler.class);
 
   private final INotificationHandler<InvalidateCacheNotification> m_basicHandler;
 
@@ -34,6 +38,7 @@ public class CacheClientNotificationHandler extends AbstractObservableNotificati
 
   @Override
   public void handleNotification(InvalidateCacheNotification notification, IClientNotificationAddress address) {
+    LOG.debug("Received InvalidateCacheNotification for cache {}", notification.getCacheId());
     // invalidate caches first
     m_basicHandler.handleNotification(notification);
     super.handleNotification(notification, address);
