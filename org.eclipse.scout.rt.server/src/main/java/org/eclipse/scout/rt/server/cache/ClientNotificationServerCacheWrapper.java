@@ -15,6 +15,8 @@ import org.eclipse.scout.rt.platform.cache.ICache;
 import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
 import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Cache wrapper used to notify clients about invalidate operations.
@@ -26,6 +28,8 @@ import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry
  */
 public final class ClientNotificationServerCacheWrapper<K, V> extends AbstractCacheWrapper<K, V> {
 
+  private static final Logger LOG = LoggerFactory.getLogger(ClientNotificationServerCacheWrapper.class);
+
   public ClientNotificationServerCacheWrapper(ICache<K, V> delegate) {
     super(delegate);
   }
@@ -33,8 +37,11 @@ public final class ClientNotificationServerCacheWrapper<K, V> extends AbstractCa
   @Override
   public void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate) {
     super.invalidate(filter, propagate);
-    // always send invalidate operations from a server to clients and do not check on the propagate property
+    // always send invalidate operations from a server to all clients and do not check on the propagate property
+    LOG.debug("Propagate InvalidateCacheNotification for cache '{}' to UI nodes", getCacheId());
     InvalidateCacheNotification notification = new InvalidateCacheNotification(getCacheId(), filter);
-    BEANS.get(ClientNotificationRegistry.class).putTransactionalForAllNodes(notification, false);
+    // Do not re-distribute this message to other cluster nodes, since this was already published by ClusterNotificationCacheWrapper before
+    //noinspection deprecation
+    BEANS.get(ClientNotificationRegistry.class).putTransactionalForAllNodesWithoutClusterNotification(notification);
   }
 }

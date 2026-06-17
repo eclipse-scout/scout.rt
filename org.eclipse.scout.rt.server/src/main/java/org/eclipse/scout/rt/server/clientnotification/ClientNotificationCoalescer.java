@@ -27,7 +27,13 @@ import org.eclipse.scout.rt.server.notification.NotificationCoalescer;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
 
+/**
+ * TODO Cleanup implementation when {@link ClientNotificationMessage#isDistributeOverCluster()} is cleaned up.
+ * This requires an updated client notification dispatching to ensure all Scout backends (cluster nodes) are able to dispatch
+ * any client notification for an arbitrary client node.
+ */
 @ApplicationScoped
+@SuppressWarnings("deprecation")
 public class ClientNotificationCoalescer {
 
   public List<ClientNotificationMessage> coalesce(List<ClientNotificationMessage> inNotifications) {
@@ -38,7 +44,7 @@ public class ClientNotificationCoalescer {
     messagesPerDistributeAndAddress.put(false, new HashMap<>());
     for (ClientNotificationMessage message : notificationsNoDuplicates) {
       Map<IClientNotificationAddress, List<ClientNotificationMessage>> messagesPerAddress = messagesPerDistributeAndAddress.get(message.isDistributeOverCluster());
-      List<ClientNotificationMessage> messages = messagesPerAddress.computeIfAbsent(message.getAddress(), k -> new ArrayList<>());
+      List<ClientNotificationMessage> messages = messagesPerAddress.computeIfAbsent(message.getAddress(), _ -> new ArrayList<>());
       messages.add(message);
     }
     List<ClientNotificationMessage> result = new ArrayList<>();

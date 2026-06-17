@@ -65,7 +65,7 @@ public class ClientNotificationClusterNotificationTest {
     m_svc.enable();
     ClientNotificationTestRegistry reg = new ClientNotificationTestRegistry();
     m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(ClientNotificationRegistry.class, reg)));
-    reg.registerNode(TEST_NODE);
+    reg.registerNode(TEST_NODE, false);
   }
 
   @After
@@ -82,7 +82,7 @@ public class ClientNotificationClusterNotificationTest {
     IMessage<IClusterNotificationMessage> momMsg = mock(IMessage.class);
 
     ClientNotificationAddress address = ClientNotificationAddress.createAllNodesAddress();
-    ClientNotificationMessage message = new ClientNotificationMessage(address, "test", true, "cid");
+    ClientNotificationMessage message = new ClientNotificationMessage(address, "test", "cid");
     ArrayList<ClientNotificationMessage> messages = new ArrayList<>();
     messages.add(message);
     when(momMsg.getTransferObject()).thenReturn(new ClusterNotificationMessage(new ClientNotificationClusterNotification(messages), m_testProps));
@@ -95,8 +95,8 @@ public class ClientNotificationClusterNotificationTest {
 
   public class ClientNotificationTestRegistry extends ClientNotificationRegistry {
     @Override
-    public void registerNode(NodeId nodeId) {
-      super.registerNode(nodeId);
+    public void registerNode(NodeId clientNodeId, boolean distributeOverCluster) {
+      super.registerNode(clientNodeId, distributeOverCluster);
     }
   }
 

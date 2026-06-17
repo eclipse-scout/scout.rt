@@ -73,7 +73,7 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
       m_notificationRegistry.publish(notifications, Assertions.assertNotNull(IClientNodeId.CURRENT.get(), "Missing 'client node id' on current calling context"));
     }
     else {
-      // if we cannot 'piggy-back' the notifications to the current request (e.g. for rest-calls), we hold the notifications back until the transaction is released
+      // if we cannot 'piggyback' the notifications to the current request (e.g. for rest-calls), we hold the notifications back until the transaction is released
       // to ensure the notifications are sent after all transaction-members are committed.
       m_notificationsToPublish = notifications;
     }
