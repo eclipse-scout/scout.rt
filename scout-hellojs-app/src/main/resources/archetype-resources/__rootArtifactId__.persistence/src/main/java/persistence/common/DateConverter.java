@@ -3,6 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package}.persistence.common;
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -12,6 +13,7 @@ import org.jooq.Converter;
 
 public class DateConverter implements Converter<LocalDateTime, Date> {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Override

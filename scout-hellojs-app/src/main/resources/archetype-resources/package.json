@@ -1,6 +1,6 @@
 {
   "name": "@${simpleArtifactName}/root",
-  "version": "${version}",
+  "version": "${versionWithoutSnapshot}-snapshot",
   "private": true,
   "scripts": {
     "pnpm-install": "pnpx @eclipse-scout/releng@~26.2.0 install"

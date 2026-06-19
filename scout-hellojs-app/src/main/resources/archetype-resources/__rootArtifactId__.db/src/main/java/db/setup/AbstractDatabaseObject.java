@@ -21,13 +21,6 @@ public abstract class AbstractDatabaseObject implements IDatabaseObject {
   }
 
   @Override
-  public String getCreateSQL() {
-    return context
-        .createSchema(getName())
-        .getSQL();
-  }
-
-  @Override
   public void create() {
     String sql = getCreateSQL();
     getLogger().info("SQL-DEV sql statement: {}", sql);

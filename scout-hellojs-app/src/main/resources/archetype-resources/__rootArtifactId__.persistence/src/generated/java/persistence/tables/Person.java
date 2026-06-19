@@ -19,13 +19,14 @@ import org.jooq.Name;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
 import org.jooq.SQL;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -159,7 +160,7 @@ public class Person extends TableImpl<PersonRecord> {
    */
   @Override
   public Person where(Condition condition) {
-    return new Person(getQualifiedName(), aliased() ? this : null, null, condition);
+    return new Person(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
   }
 
   /**
@@ -226,7 +227,7 @@ public class Person extends TableImpl<PersonRecord> {
    * Create an inline derived table from this table
    */
   @Override
-  public Person whereExists(Select<?> select) {
+  public Person whereExists(TableLike<?> select) {
     return where(DSL.exists(select));
   }
 
@@ -234,7 +235,7 @@ public class Person extends TableImpl<PersonRecord> {
    * Create an inline derived table from this table
    */
   @Override
-  public Person whereNotExists(Select<?> select) {
+  public Person whereNotExists(TableLike<?> select) {
     return where(DSL.notExists(select));
   }
 }
