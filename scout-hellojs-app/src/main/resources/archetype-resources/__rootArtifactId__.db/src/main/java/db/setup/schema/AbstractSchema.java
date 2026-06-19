@@ -14,9 +14,16 @@ public abstract class AbstractSchema extends AbstractDatabaseObject implements I
   }
 
   @Override
+  public String getCreateSQL() {
+    return getContext()
+      .createSchema(getName())
+      .getSQL();
+  }
+
+  @Override
   public void drop() {
     getContext()
-        .dropSchemaIfExists(getName())
-        .execute();
+      .dropSchemaIfExists(getName())
+      .execute();
   }
 }

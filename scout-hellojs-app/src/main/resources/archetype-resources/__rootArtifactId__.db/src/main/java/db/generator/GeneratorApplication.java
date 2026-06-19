@@ -29,23 +29,23 @@ public class GeneratorApplication {
   public static final String OUTPUT_DIRECTORY = "../${rootArtifactId}.persistence/src/generated/java";
   public static final String OUTPUT_PACKAGE = "${package}.persistence";
 
-  public static void main(String[] args) {
+  static void main() {
     new Environment().runWithConfig(new GeneratorApplication()::generate);
   }
 
   public void generate(DSLContext context) {
     Configuration configuration = new Configuration().withGenerator(new Generator()
-        .withName(JavaGenerator.class.getName())
-        .withDatabase(new Database()
-            .withForcedTypes(
-                new ForcedType().withName(UUID.class.getName()).withIncludeTypes("varchar(36)"),
-                new ForcedType().withUserType(Date.class.getName())
-                    .withConverter(DateConverter.class.getName()).withIncludeTypes("timestamp"),
-                new ForcedType().withName(BigDecimal.class.getName()).withIncludeTypes("bigint"))
-            .withName(DerbyDatabase.class.getName()).withIncludes(".*")
-            .withInputSchema(CONFIG.getPropertyValue(SchemaProperty.class)).withOutputSchema("Schema")
-            .withExcludes("SYS*.*"))
-        .withTarget(new Target().withDirectory(OUTPUT_DIRECTORY).withPackageName(OUTPUT_PACKAGE)));
+      .withName(JavaGenerator.class.getName())
+      .withDatabase(new Database()
+        .withForcedTypes(
+          new ForcedType().withName(UUID.class.getName()).withIncludeTypes("varchar(36)"),
+          new ForcedType().withUserType(Date.class.getName())
+            .withConverter(DateConverter.class.getName()).withIncludeTypes("timestamp"),
+          new ForcedType().withName(BigDecimal.class.getName()).withIncludeTypes("bigint"))
+        .withName(DerbyDatabase.class.getName()).withIncludes(".*")
+        .withInputSchema(CONFIG.getPropertyValue(SchemaProperty.class)).withOutputSchema("Schema")
+        .withExcludes("SYS*.*"))
+      .withTarget(new Target().withDirectory(OUTPUT_DIRECTORY).withPackageName(OUTPUT_PACKAGE)));
 
     GenerationTool tool = new GenerationTool();
     try {

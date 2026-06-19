@@ -1,6 +1,6 @@
 {
   "name": "@${simpleArtifactName}/ui",
-  "version": "${version}",
+  "version": "${versionWithoutSnapshot}-snapshot",
   "engines": {
     "node": ">=24.12.0",
     "npm": ">=11.6.2",

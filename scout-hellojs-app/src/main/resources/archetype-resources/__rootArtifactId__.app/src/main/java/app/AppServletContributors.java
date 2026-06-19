@@ -3,7 +3,6 @@
 #set( $symbol_escape = '\' )
 package ${package}.app;
 
-import org.eclipse.jetty.ee10.servlet.FilterHolder;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.scout.rt.jetty.IServletContributor;
@@ -12,7 +11,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.rest.RestApplication;
 import org.eclipse.scout.rt.rest.ServletConstants;
 import org.eclipse.scout.rt.server.context.ServerHttpRunContextFilter;
-import org.eclipse.scout.rt.ui.html.app.UiServletContributors.UiServletContributor;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.glassfish.jersey.servlet.ServletProperties;

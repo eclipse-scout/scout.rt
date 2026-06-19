@@ -18,7 +18,7 @@ import ${package}.persistence.PersistenceProperties.DatabaseAddSamplesProperty;
 
 public class DbSetup {
 
-  public static void main(String[] args) {
+  static void main() {
     new Environment().runWithConfig(new DbSetup()::setup);
   }
 

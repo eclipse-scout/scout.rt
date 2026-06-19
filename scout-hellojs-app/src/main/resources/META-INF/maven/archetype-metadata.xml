@@ -15,7 +15,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <requiredProperties>
     <requiredProperty key="javaVersion">
-      <defaultValue>11</defaultValue>
+      <defaultValue>25</defaultValue>
     </requiredProperty>
     <requiredProperty key="displayName">
       <defaultValue>My Application</defaultValue>
