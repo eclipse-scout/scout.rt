@@ -66,18 +66,18 @@ export class System implements SystemModel, ObjectWithType {
   }
 
   /**
-   * Sets the URL relative to the base URL of this system for a named endpoint.
-   * @param endpointName The endpoint identifier for which the relative URL should be updated.
+   * Sets the URL relative to the base URL of this system for an endpoint.
+   * @param defaultEndpointUrl The default endpoint for which the relative URL should be updated.
    * @param endpointUrl The new endpoint url relative to the {@link baseUrl} of this system.
    */
-  setEndpointUrl(endpointName: string, endpointUrl: string) {
-    if (!endpointName) {
+  setEndpointUrl(defaultEndpointUrl: string, endpointUrl: string) {
+    if (!defaultEndpointUrl) {
       return;
     }
     if (endpointUrl) {
-      this._endpointUrls.set(endpointName, endpointUrl);
+      this._endpointUrls.set(defaultEndpointUrl, endpointUrl);
     } else {
-      this._endpointUrls.delete(endpointName);
+      this._endpointUrls.delete(defaultEndpointUrl);
     }
   }
 
@@ -85,29 +85,33 @@ export class System implements SystemModel, ObjectWithType {
    * @returns the endpoints to load config properties.
    */
   getConfigEndpointUrls(): string[] {
-    let urls = [];
-    let defaultBackendUrl = 'config-properties';
+    const urls = [];
     if (this.hasUiBackend) {
       urls.push('res/config-properties.json');
-      defaultBackendUrl = null; // by default only fetch from UI server. Only use both if explicitly requested
     }
-    let backendConfigResource = this.getEndpointUrl('config-properties', defaultBackendUrl);
-    if (backendConfigResource) {
-      urls.push(backendConfigResource);
+
+    // by default only fetch from UI server. Only use both if explicitly requested
+    const defaultBackendUrl = 'config-properties';
+    if (!this.hasUiBackend || this._endpointUrls.has(defaultBackendUrl)) {
+      const backendUrl = this.getEndpointUrl(defaultBackendUrl);
+      if (backendUrl) {
+        urls.push(backendUrl);
+      }
     }
     return urls;
   }
 
   /**
-   * @returns The full URL including the {@link baseUrl} to the endpoint with given name. The result is always without trailing slash.
+   * @param endpointUrl The default relative url to use, if no custom url is specified.
+   * @returns The full URL including the {@link baseUrl} to the endpoint with given url. The result is always without trailing slash.
    */
-  getEndpointUrl(endpointName: string, defaultEndpoint?: string): string {
-    let customizedEndpointUrl = this._endpointUrls.get(endpointName);
-    let relEndpointUrl = customizedEndpointUrl || defaultEndpoint;
-    if (!relEndpointUrl) {
+  getEndpointUrl(endpointUrl: string): string {
+    let customizedEndpointUrl = this._endpointUrls.get(endpointUrl);
+    let url = customizedEndpointUrl || endpointUrl;
+    if (!url) {
       return null;
     }
-    return this._concatPath(this.baseUrl, relEndpointUrl);
+    return this._concatPath(this.baseUrl, url);
   }
 
   protected _concatPath(a: string, b: string): string {

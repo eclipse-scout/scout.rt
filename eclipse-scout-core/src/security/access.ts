@@ -32,7 +32,7 @@ export const access = {
    * Loads permissions from the main system using the url configuration of that {@link System}.
    */
   bootstrapSystem(): JQuery.Promise<void> {
-    const url = systems.getOrCreate().getEndpointUrl('permissions', 'permissions');
+    const url = systems.getOrCreate().getEndpointUrl('permissions');
     return access.bootstrap(url);
   },
 
