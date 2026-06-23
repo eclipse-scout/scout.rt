@@ -6,7 +6,7 @@ export class PersonRestClient extends AbstractRestClient {
   static DATA_TYPE = 'person';
 
   constructor() {
-    super(PersonRestClient.DATA_TYPE, systems.getOrCreate().getEndpointUrl('persons', 'persons') + '/');
+    super(PersonRestClient.DATA_TYPE, systems.getOrCreate().getEndpointUrl('persons') + '/');
   }
 
   /**

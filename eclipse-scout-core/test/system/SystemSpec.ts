@@ -27,14 +27,10 @@ describe('System', () => {
       expect(system.name).toBe('test');
       expect(system.baseUrl).toBe('abc/');
       expect(system.hasUiBackend).toBeTrue();
-      expect(system.getEndpointUrl('a')).toBeNull();
-      expect(system.getEndpointUrl('a', 'def')).toBe('abc/def');
-      expect(system.getEndpointUrl('b')).toBeNull();
+      expect(system.getEndpointUrl('a')).toBe('abc/a');
+      expect(system.getEndpointUrl('b')).toBe('abc/b');
       expect(system.getEndpointUrl('c')).toBe('abc/rel');
-      expect(system.getEndpointUrl('c', 'whatEver')).toBe('abc/rel');
-      expect(system.getEndpointUrl('d', 'whatEver')).toBe('abc/rel2');
-      expect(system.getEndpointUrl('notExisting')).toBeNull();
-      expect(system.getEndpointUrl('notExisting', '/default/')).toBe('abc/default');
+      expect(system.getEndpointUrl('notExisting')).toBe('abc/notExisting');
     });
 
     it('uses defaults for system name', () => {
@@ -43,7 +39,7 @@ describe('System', () => {
       expect(system.name).toBe('test');
       expect(system.baseUrl).toBe('api');
       expect(system.hasUiBackend).toBeFalse();
-      expect(system.getEndpointUrl('a', 'def')).toBe('api/def');
+      expect(system.getEndpointUrl('a')).toBe('api/a');
       expect(system.getConfigEndpointUrls()).toEqual(['api/config-properties']);
     });
 
@@ -53,7 +49,7 @@ describe('System', () => {
       expect(system.name).toBe(System.MAIN_SYSTEM);
       expect(system.baseUrl).toBe('api');
       expect(system.hasUiBackend).toBeTrue();
-      expect(system.getEndpointUrl('a', 'def')).toBe('api/def');
+      expect(system.getEndpointUrl('a')).toBe('api/a');
       expect(system.getConfigEndpointUrls()).toEqual(['res/config-properties.json']);
     });
   });
@@ -62,14 +58,11 @@ describe('System', () => {
     it('updates endpoint in map', () => {
       let system = new System();
       system.init({name: System.MAIN_SYSTEM});
-      expect(system.getEndpointUrl('a', 'def')).toBe('api/def');
-      expect(system.getEndpointUrl('a')).toBeNull();
+      expect(system.getEndpointUrl('a')).toBe('api/a');
       system.setEndpointUrl('a', 'a-url');
-      expect(system.getEndpointUrl('a', 'def')).toBe('api/a-url');
       expect(system.getEndpointUrl('a')).toBe('api/a-url');
       system.setEndpointUrl('a', null);
-      expect(system.getEndpointUrl('a', 'def')).toBe('api/def');
-      expect(system.getEndpointUrl('a')).toBeNull();
+      expect(system.getEndpointUrl('a')).toBe('api/a');
     });
   });
 

@@ -48,7 +48,7 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
    * Loads code types from the main system using the url configuration of that {@link System}.
    */
   bootstrapSystem(): JQuery.Promise<void> {
-    const url = systems.getOrCreate().getEndpointUrl('codes', 'codes');
+    const url = systems.getOrCreate().getEndpointUrl('codes');
     return this.bootstrap(url);
   }
 

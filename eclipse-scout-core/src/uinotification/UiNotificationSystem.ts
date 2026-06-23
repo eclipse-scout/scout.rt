@@ -101,7 +101,7 @@ export class UiNotificationSystem implements UiNotificationSystemModel, ObjectWi
     let poller = this.poller;
     if (topics.length > 0 && !poller) {
       // First topic added -> create poller
-      let endpointUrl = systems.getOrCreate(this.name).getEndpointUrl('ui-notifications', 'ui-notifications');
+      let endpointUrl = systems.getOrCreate(this.name).getEndpointUrl('ui-notifications');
       poller = scout.create(UiNotificationPoller, {
         system: this,
         url: endpointUrl
