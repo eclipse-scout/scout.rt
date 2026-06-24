@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -521,14 +521,15 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
       code = errorInfo.errorDo.errorCode;
     }
     let body = status.message || session.optText('ui.UnexpectedProblem', 'Unexpected problem');
-    if (code) {
-      body += ' (' + session.optText('ui.ErrorCodeX', 'Code ' + code, code) + ').';
-    }
     let html = null;
+    let $container = session.desktop?.$container || session.$entryPoint;
+    if (code) {
+      let codeText = session.optText('ErrorCode', 'Code');
+      html = $container.makeDiv('error-popup-code', codeText + ': ' + code)[0].outerHTML;
+    }
     if (errorInfo?.errorDo?.correlationId) {
-      let $container = session.desktop?.$container || session.$entryPoint;
       let correlationIdText = session.optText('CorrelationId', 'Correlation ID');
-      html = $container.makeDiv('error-popup-correlation-id', correlationIdText + ': ' + errorInfo.errorDo.correlationId)[0].outerHTML;
+      html = (html ?? '') + $container.makeDiv('error-popup-correlation-id', correlationIdText + ': ' + errorInfo.errorDo.correlationId)[0].outerHTML;
     }
 
     return {

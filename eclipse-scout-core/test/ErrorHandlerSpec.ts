@@ -260,8 +260,8 @@ describe('ErrorHandler', () => {
       });
       expect(msgBoxModel).toEqual({
         header: undefined,
-        body: 'status msg (Code 100).',
-        html: null,
+        body: 'status msg',
+        html: '<div class="error-popup-code">Code: 100</div>',
         severity: Status.Severity.INFO,
         iconId: 'testicon',
         hiddenText: 'log',
@@ -288,10 +288,10 @@ describe('ErrorHandler', () => {
       }) as MessageBoxModel;
       expect(msgBoxModel).toEqual({
         header: 'title',
-        body: 'message (Code Y789).',
+        body: 'message',
         severity: Status.Severity.WARNING,
         hiddenText: 'log',
-        html: '<div class="error-popup-correlation-id">Correlation ID: Corr567</div>',
+        html: '<div class="error-popup-code">Code: Y789</div><div class="error-popup-correlation-id">Correlation ID: Corr567</div>',
         iconId: null,
         yesButtonText: 'Ok'
       });
@@ -315,9 +315,9 @@ describe('ErrorHandler', () => {
       }) as MessageBoxModel;
       expect(msgBoxModel).toEqual({
         header: 'title',
-        body: 'message (Code Y789).',
+        body: 'message',
         severity: Status.Severity.WARNING,
-        html: '<div class="error-popup-correlation-id">Correlation ID: Corr567</div>',
+        html: '<div class="error-popup-code">Code: Y789</div><div class="error-popup-correlation-id">Correlation ID: Corr567</div>',
         hiddenText: 'log',
         iconId: null,
         yesButtonText: 'Ok'

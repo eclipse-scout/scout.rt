@@ -52,10 +52,14 @@ public class ErrorDoRestClientExceptionTransformer extends AbstractEntityRestCli
   protected RuntimeException transformClientError(RuntimeException e, Response response, BiFunction<String, RuntimeException, VetoException> vetoExceptionFactory) {
     return safeTransformEntityErrorResponse(e, response, () -> {
       ErrorDo error = response.readEntity(ErrorResponse.class).getError();
-      return vetoExceptionFactory.apply(error.getMessage(), e)
+      VetoException vetoException = vetoExceptionFactory.apply(error.getMessage(), e)
           .withTitle(error.getTitle())
           .withCode(error.getErrorCodeAsInt())
           .withSeverity(error.getSeverityAsInt());
+      if (vetoException instanceof AccessForbiddenException afe) {
+        afe.withPermissionCode(error.getErrorCode());
+      }
+      return vetoException;
     }, () -> {
       StatusType statusInfo = response.getStatusInfo();
       return vetoExceptionFactory.apply(statusInfo.getReasonPhrase(), e);

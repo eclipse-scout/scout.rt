@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,10 @@
 package org.eclipse.scout.rt.dataobject.exception;
 
 import java.io.Serial;
+import java.security.Permission;
+import java.util.Optional;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 
@@ -23,6 +26,13 @@ public class AccessForbiddenException extends VetoException {
   @Serial
   private static final long serialVersionUID = 1L;
 
+  /**
+   * Optional code representing the {@link Permission} that caused the access check to fail.
+   * <p>
+   * This code is shown in the error popup (e.g. "Code: XYZ") to inform the user which permission is missing.
+   */
+  private String m_permissionCode;
+
   public AccessForbiddenException() {
     super();
   }
@@ -33,6 +43,24 @@ public class AccessForbiddenException extends VetoException {
 
   public AccessForbiddenException(IProcessingStatus status) {
     super(status);
+  }
+
+  public String getPermissionCode() {
+    return m_permissionCode;
+  }
+
+  public AccessForbiddenException withPermission(Permission permission) {
+    withPermissionCode(Optional.ofNullable(permission)
+        .map(p -> BEANS.optional(IPermissionCodeHelper.class)
+            .map(helper -> helper.getPermissionCode(p))
+            .orElse(p.getName()))
+        .orElse(null));
+    return this;
+  }
+
+  public AccessForbiddenException withPermissionCode(final String permissionCode) {
+    m_permissionCode = permissionCode;
+    return this;
   }
 
   @Override

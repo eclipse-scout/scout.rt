@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,8 @@ public abstract class AbstractVetoExceptionMapper<E extends VetoException> exten
 
   @Override
   public Response toResponseImpl(E exception) {
-    LOG.info("{}: {}", exception.getClass().getSimpleName(), exception.getMessage());
+    //noinspection LoggingPlaceholderCountMatchesArgumentCount
+    LOG.info("{}: {}", exception.getClass().getSimpleName(), exception.getMessage(), LOG.isDebugEnabled() ? exception : null);
     return createErrorResponseBuilder(exception).build();
   }
 
