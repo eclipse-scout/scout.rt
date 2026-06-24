@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -49,6 +49,19 @@ public final class ACCESS {
   }
 
   /**
+   * Throws an exception if {@link #check(Permission)} fails for the given permission.
+   *
+   * @param accessCheckFailedMessage
+   *     A message which should be displayed to the user in case the permission check failed.
+   *     If <code>null</code>, {@link IPermission#getAccessCheckFailedMessage()} is used.
+   * @throws AccessForbiddenException
+   *     thrown if access is not granted
+   */
+  public static void checkAndThrow(Permission permission, String accessCheckFailedMessage) {
+    BEANS.get(AccessSupport.class).checkAndThrow(permission, accessCheckFailedMessage);
+  }
+
+  /**
    * @return true if access for any given permission is granted
    */
   public static boolean checkAny(Permission... permissions) {
@@ -89,14 +102,14 @@ public final class ACCESS {
   }
 
   /**
-   * This methods returns the granted {@link PermissionLevel} for a given permission instance {@code permission}.
+   * This method returns the granted {@link PermissionLevel} for a given permission instance {@code permission}.
    * <ul>
    * <li>{@link PermissionLevel#UNDEFINED} if {@code permission} is {@code null} or in general 'not an
    * {@link IPermission}'
    * <li>{@link PermissionLevel#NONE} if no level at all is granted to {@code permission}
    * <li>{@link PermissionLevel} if the level can be determined exactly.
    * <li>{@link PermissionLevel#UNDEFINED} if there are multiple granted permission levels possible and there is not
-   * enough data in the permission contained to determine the result more closer.
+   * enough data in the permission contained to determine the result closer.
    * </ul>
    *
    * @return non null {@link PermissionLevel}

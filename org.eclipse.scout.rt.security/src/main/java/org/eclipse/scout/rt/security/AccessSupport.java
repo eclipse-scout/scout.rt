@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +32,13 @@ public class AccessSupport {
   }
 
   public void checkAndThrow(Permission p) {
+    checkAndThrow(p, null);
+  }
+
+  public void checkAndThrow(Permission p, String accessCheckFailedMessage) {
     if (!check(p)) {
       LOG.debug("checkAndThrow(p) failed, throwing exception");
-      throw getAccessCheckFailedException(p);
+      throw getAccessCheckFailedException(p, accessCheckFailedMessage);
     }
   }
 
@@ -83,15 +88,21 @@ public class AccessSupport {
   }
 
   public AccessForbiddenException getAccessCheckFailedException(Permission p) {
-    if (p instanceof IPermission) {
-      return getAccessCheckFailedException((IPermission) p);
-    }
-    return getDefaultAccessCheckFailedException()
-        .withContextInfo("permission", "{}", p);
+    return getAccessCheckFailedException(p, null);
   }
 
-  protected AccessForbiddenException getAccessCheckFailedException(IPermission p) {
-    return new AccessForbiddenException(p.getAccessCheckFailedMessage())
+  public AccessForbiddenException getAccessCheckFailedException(Permission p, String accessCheckFailedMessage) {
+    if (p instanceof IPermission) {
+      return getAccessCheckFailedException((IPermission) p, accessCheckFailedMessage)
+          .withPermission(p);
+    }
+    return getDefaultAccessCheckFailedException()
+        .withContextInfo("permission", "{}", p)
+        .withPermission(p);
+  }
+
+  protected AccessForbiddenException getAccessCheckFailedException(IPermission p, String accessCheckFailedMessage) {
+    return new AccessForbiddenException(StringUtility.isNullOrEmpty(accessCheckFailedMessage) ? p.getAccessCheckFailedMessage() : accessCheckFailedMessage)
         .withContextInfo("permission", "{}", p);
   }
 

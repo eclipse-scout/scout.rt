@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
+import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
@@ -169,6 +170,10 @@ public class ErrorPopup {
    * @return <code>true</code> if the error was handled by this method and the parsing is finished.
    */
   protected boolean parseError(Throwable t) {
+    if (t instanceof AccessForbiddenException) {
+      parseAccessForbiddenException((AccessForbiddenException) t);
+      return true;
+    }
     if (t instanceof VetoException) {
       parseVetoException((VetoException) t);
       return true;
@@ -200,6 +205,24 @@ public class ErrorPopup {
     return t instanceof RemoteSystemUnavailableException ||
         t instanceof SocketException ||
         t instanceof UnknownHostException;
+  }
+
+  protected void parseAccessForbiddenException(AccessForbiddenException afe) {
+    m_header = afe.getStatus().getTitle();
+    if (afe.getHtmlMessage() != null) {
+      m_body = null;
+      m_html = afe.getHtmlMessage();
+    }
+    else if (afe.getStatus().getBody() != null) {
+      m_body = afe.getStatus().getBody();
+      if (afe.getPermissionCode() != null) {
+        m_html = HTML.div(StringUtility.box(TEXTS.get("ErrorCode") + ": ", afe.getPermissionCode(), ""))
+            .cssClass("error-popup-code");
+      }
+      else {
+        m_html = null;
+      }
+    }
   }
 
   /**

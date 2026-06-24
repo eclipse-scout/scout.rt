@@ -264,6 +264,7 @@ public class ServiceOperationInvoker {
     Throwable p;
     if (t instanceof AccessForbiddenException afe) {
       p = copyVetoException(afe, AccessForbiddenException::new);
+      ((AccessForbiddenException) p).withPermissionCode(afe.getPermissionCode());
       afe.getContextInfos().stream()
           .filter(contextInfo -> contextInfo.startsWith("permission="))
           .map(contextInfo -> StringUtility.substring(contextInfo, 11))

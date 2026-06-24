@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -142,6 +142,19 @@ public class DefaultExceptionMapperTest {
       assertEquals(exception.getStatus().getTitle(), error.getTitle());
       assertEquals(exception.getStatus().getBody(), error.getMessage());
       assertEquals(exception.getStatus().getCode(), error.getErrorCodeAsInt());
+    }
+  }
+
+  @Test
+  public void testToResponseAccessForbiddenException_permissionCode() {
+    AccessForbiddenExceptionMapper mapper = new AccessForbiddenExceptionMapper();
+    AccessForbiddenException exception = new AccessForbiddenException("foo {}", "bar", new Exception()).withTitle("hagbard").withPermissionCode("fooPermission");
+    try (Response response = mapper.toResponse(exception)) {
+      assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
+      ErrorDo error = response.readEntity(ErrorResponse.class).getError();
+      assertEquals(exception.getStatus().getTitle(), error.getTitle());
+      assertEquals(exception.getStatus().getBody(), error.getMessage());
+      assertEquals(exception.getPermissionCode(), error.getErrorCode());
     }
   }
 
