@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, CallModel, InitModelOf, objects, ObjectWithType, scout, strings} from '../index';
+import {abortableContext, arrays, CallModel, InitModelOf, objects, ObjectWithType, scout, strings} from '../index';
 import $ from 'jquery';
 
 /**
@@ -35,6 +35,7 @@ export abstract class Call implements CallModel, ObjectWithType {
   uniqueName: string;
   logPrefix: string;
   result: any;
+  registerInAbortableContext = true;
 
   constructor() {
     this.initialized = false;
@@ -74,6 +75,10 @@ export abstract class Call implements CallModel, ObjectWithType {
     // Assign a unique name to the call to help distinguish different calls in the log
     this.uniqueName = scout.nvl(this.type, 'call') + '-' + (Call.GLOBAL_SEQ++) + strings.box(' ', this.name, '');
 
+    // register in current abortable context if auto-register-flag is set
+    if (this.registerInAbortableContext) {
+      abortableContext.registerAbortableInCurrentContext(this);
+    }
     this.initialized = true;
   }
 

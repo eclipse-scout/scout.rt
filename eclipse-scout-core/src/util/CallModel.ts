@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,4 +47,8 @@ export interface CallModel extends ObjectModel<Call> {
    * All log messages are prefixed with this string. It contains the uniqueName and the current state (e.g. callCounter)
    */
   logPrefix?: string;
+  /**
+   * Whether the call is registered in the current {@link abortableContext} during initialization or not. Default is `true`.
+   */
+  registerInAbortableContext?: boolean;
 }

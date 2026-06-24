@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,4 +21,16 @@ export interface LoadingSupportOptions extends WidgetSupportOptions {
    * Default is false.
    */
   withGlassPane?: boolean;
+  /**
+   * Whether the loading support is abortable.
+   *
+   * If the loading support is abortable a cancel button will be rendered together with the loading indicator.
+   *
+   * Default is `false`.
+   */
+  abortable?: boolean;
+  /**
+   * Handler that is called when loading is aborted (see {@link abortable}).
+   */
+  abortHandler?: () => void;
 }

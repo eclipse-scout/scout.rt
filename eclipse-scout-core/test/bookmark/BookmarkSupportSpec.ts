@@ -147,7 +147,7 @@ describe('BookmarkSupport', () => {
       searchForm.widget('TextField').setValue('n'); // 'Green', 'Magenta', 'Cyan'
       searchForm.widget('SearchMenu').doAction();
       await page.detailTable.when('reload');
-      await page.ensureLoadChildren();
+      await page.detailTable.when('propertyChange:loading');
       expect(page.detailTable.rows.length).toBe(3);
       expect(page.detailTable.visibleRows.length).toBe(3);
 
@@ -736,7 +736,7 @@ describe('BookmarkSupport', () => {
       let searchForm = page.getSearchForm() as SpecSearchForm;
       searchForm.widget('ResetMenu').doAction();
       await page.detailTable.when('reload');
-      await page.ensureLoadChildren();
+      await page.detailTable.when('propertyChange:loading');
 
       expect(table.columns.length).toBe(5);
       expect(table.visibleColumns().length).toBe(4);
@@ -1076,7 +1076,7 @@ describe('BookmarkSupport', () => {
       searchForm1.widget('TextField').setValue('le');
       searchForm1.widget('SearchMenu').doAction();
       await page1.detailTable.when('reload');
-      await page1.ensureLoadChildren();
+      await page1.detailTable.when('propertyChange:loading');
       expect(page1.detailTable.rows.length).toBe(3);
       expect(page1.detailTable.rows[0].getKeyValues()).toEqual([FRUIT_1_KEY]);
       expect(page1.detailTable.rows[1].getKeyValues()).toEqual([FRUIT_3_KEY]);
@@ -1475,6 +1475,8 @@ describe('BookmarkSupport', () => {
       // Selected table page changed
       selectedPage.setChildrenLoaded(false);
       await BookmarkSupport.get(session).activateBookmarkPath(activateBookmarkPathParam);
+      expect(selectedPage.detailTable.loading).toBeTrue();
+      await selectedPage.detailTable.when('propertyChange:loading');
       expect(nodesInsertedEvents.length).toBe(1);
       expect(nodesInsertedEvents[0].parentNode).toBe(selectedPage);
     });
@@ -1497,7 +1499,7 @@ describe('BookmarkSupport', () => {
       searchForm.widget('TextField').setValue('bl'); // Matches 'Black' and 'Blue'
       searchForm.widget('SearchMenu').doAction();
       await page.detailTable.when('reload');
-      await page.ensureLoadChildren();
+      await page.detailTable.when('propertyChange:loading');
       expect(page.detailTable.rows.length).toBe(2);
 
       // -----
@@ -1638,7 +1640,7 @@ describe('BookmarkSupport', () => {
       searchForm.widget('TextField').setValue('bl'); // Matches 'Black' and 'Blue'
       searchForm.widget('SearchMenu').doAction();
       await page.detailTable.when('reload');
-      await page.ensureLoadChildren();
+      await page.detailTable.when('propertyChange:loading');
       expect(page.detailTable.rows.length).toBe(2);
 
       // -----
@@ -1781,7 +1783,7 @@ describe('BookmarkSupport', () => {
       searchForm.widget('TextField').setValue('bl'); // Matches 'Black' and 'Blue'
       searchForm.widget('SearchMenu').doAction();
       await page.detailTable.when('reload');
-      await page.ensureLoadChildren();
+      await page.detailTable.when('propertyChange:loading');
       expect(page.detailTable.rows.length).toBe(2);
 
       // -----
@@ -1872,7 +1874,7 @@ describe('BookmarkSupport', () => {
       searchForm.widget('TextField').setValue('bl'); // Matches 'Black' and 'Blue'
       searchForm.widget('SearchMenu').doAction();
       await page.detailTable.when('reload');
-      await page.ensureLoadChildren();
+      await page.detailTable.when('propertyChange:loading');
       expect(page.detailTable.rows.length).toBe(2);
 
       // -----
@@ -1963,7 +1965,7 @@ describe('BookmarkSupport', () => {
       searchForm.widget('TextField').setValue('bl'); // Matches 'Black' and 'Blue'
       searchForm.widget('SearchMenu').doAction();
       await page.detailTable.when('reload');
-      await page.ensureLoadChildren();
+      await page.detailTable.when('propertyChange:loading');
       expect(page.detailTable.rows.length).toBe(2);
 
       let bookmark = scout.create(BookmarkDo, {
@@ -2133,6 +2135,7 @@ describe('BookmarkSupport', () => {
 
       searchForm.widget('ResetMenu').doAction();
       await searchForm.when('reset');
+      await page.detailTable.when('propertyChange:loading');
       expect(searchForm.widget('TextField').value).toBe(null); // <--
 
       page.detailTable.resetToInitialUiPreferences();

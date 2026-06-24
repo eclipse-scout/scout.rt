@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Abortable, objects, PromiseCreator} from '../index';
+import {Abortable, AbortError, objects, PromiseCreator} from '../index';
 import $ from 'jquery';
 
 export const promises = {
@@ -202,7 +202,7 @@ export class AbortablePromise<T> extends Promise<T> implements Abortable {
   /**
    * Creates an {@link AbortablePromise} from the given ES6 promise.
    */
-  static of<T>(promise: Promise<T>): AbortablePromise<T> {
+  static of<T>(promise: PromiseLike<T>): AbortablePromise<T> {
     if (!promise) {
       return;
     }
@@ -214,16 +214,5 @@ export class AbortablePromise<T> extends Promise<T> implements Abortable {
    */
   abort() {
     this._reject(new AbortError());
-  }
-}
-
-/**
- * Marker class for aborted promises.
- */
-export class AbortError {
-  objectType: string;
-
-  constructor() {
-    this.objectType = 'AbortError';
   }
 }

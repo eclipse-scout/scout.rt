@@ -70,6 +70,7 @@ export * from './aria/TreeGridAriaRules';
 export * from './aria/ListBoxAriaRules';
 export * from './aria/HorizontalListBoxAriaRules';
 export * from './aria/VoidGridAriaRules';
+export * from './util/abortableContext';
 export * from './util/arrays';
 export * from './util/BinaryResource';
 export * from './util/CallModel';

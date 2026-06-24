@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, AutoLeafPageWithNodes, BookmarkSupport, BookmarkTableRowIdentifierDo, dataObjects, DoEntity, Event, EventHandler, Form, InitModelOf, LimitedResultInfoContributionDo, ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel,
-  PropertyChangeEvent, scout, SearchFilterTextBuilder, SearchFormTableControl, SearchRequiredTableStatus, Status, Table, TableAllRowsDeletedEvent, TableControl, TableMaxResultsHelper, TableOrganizerMenu, TableReloadEvent, TableReloadReason,
-  TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
+  abortableContext, AbortablePromise, AbortError, arrays, AutoLeafPageWithNodes, BookmarkSupport, BookmarkTableRowIdentifierDo, dataObjects, DoEntity, Event, EventHandler, Form, InitModelOf, LimitedResultInfoContributionDo, ObjectOrModel,
+  Page, PageWithTableEventMap, PageWithTableModel, PropertyChangeEvent, scout, SearchFilterTextBuilder, SearchFormTableControl, SearchRequiredTableStatus, Status, Table, TableAllRowsDeletedEvent, TableControl, TableMaxResultsHelper,
+  TableOrganizerMenu, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
 } from '../../../index';
 import $ from 'jquery';
 
@@ -23,6 +23,10 @@ export class PageWithTable extends Page implements PageWithTableModel {
   searchFilterCompleted = false;
 
   protected _reloadReason: TableReloadReason;
+  /**
+   * {@link AbortController} to abort loading.
+   */
+  protected _abortController: AbortController;
   protected _tableRowDeleteHandler: EventHandler<TableRowsDeletedEvent | TableAllRowsDeletedEvent>;
   protected _tableRowInsertHandler: EventHandler<TableRowsInsertedEvent>;
   protected _tableRowUpdateHandler: EventHandler<TableRowsUpdatedEvent>;
@@ -58,6 +62,11 @@ export class PageWithTable extends Page implements PageWithTableModel {
       this.setAlwaysCreateChildPage(true);
       this.setLeaf(false);
     }
+  }
+
+  protected override _destroy() {
+    this._abortController?.abort();
+    super._destroy();
   }
 
   setAlwaysCreateChildPage(alwaysCreateChildPage: boolean) {
@@ -104,6 +113,10 @@ export class PageWithTable extends Page implements PageWithTableModel {
 
     table.on('propertyChange:tableControls', this._tableControlsChangeHandler);
     this._addSearchFormTableControlListeners(this._findSearchFormTableControl(table));
+
+    // make loading support abortable
+    table.loadingSupport?.setAbortable(true);
+    table.loadingSupport?.setAbortHandler(() => this._abortController?.abort());
 
     // Ensure _initDetailTableUiPreferences is only called after _initDetailTable has been completed (including subclasses).
     this.one('propertyChange:detailTable', event => {
@@ -237,6 +250,8 @@ export class PageWithTable extends Page implements PageWithTableModel {
       return;
     }
     if (this.searchRequired) {
+      // abort current load
+      this._abortController?.abort();
       this.detailTable.deleteAllRows();
       this.setSearchFilterCompleted(false);
       // Reset table status (otherwise, a previous message such as "limited result" message would remain visible)
@@ -420,7 +435,24 @@ export class PageWithTable extends Page implements PageWithTableModel {
     // Ensure the search form data is in sync with the search filter used to load the table data (e.g. required for getSearchFilterText())
     this._updateSearchData(searchFilter);
 
-    const promise = this._loadTableData(searchFilter)
+    // abort previous load and create new AbortController for current load
+    this._abortController?.abort();
+    this._abortController = new AbortController();
+
+    const promise = $
+      .when(
+        // Create an abortable context and wrap this._loadTableData(searchFilter) in an AbortablePromise.
+        // With this the load is abortable and results in an AbortError when the AbortController is aborted.
+        // All Abortables that are registered in the current abortable context during this._loadTableData(searchFilter) (e.g. ajax calls) are aborted as well.
+        abortableContext.runInContext(
+          () => {
+            const abortablePromise = AbortablePromise.of(this._loadTableData(searchFilter));
+            abortableContext.registerAbortableInCurrentContext(abortablePromise);
+            return abortablePromise;
+          },
+          this._abortController
+        )
+      )
       .then(data => this._onLoadTableDataDone(data, restoreSelectionInfo))
       .catch(error => this._onLoadTableDataFail(error, restoreSelectionInfo));
 
@@ -489,6 +521,39 @@ export class PageWithTable extends Page implements PageWithTableModel {
    *
    * To return static data, use a resolved promise: `return $.resolvedPromise({...});`
    *
+   * Loading table data is executed in an {@link abortableContext} to support abortable loading.
+   * For a typical implementation where data is loaded via rest, the call is registered automatically.
+   *
+   * @example simple implementation of `_loadTableData(searchFilter)`
+   * ```ts
+   * protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+   *   return ajax.postDataObject('api/foo/list', this._withMaxRowCountContribution(searchFilter));
+   * }
+   * ```
+   *
+   * As only synchronously created calls are registered automatically, implementations that make several calls subsequently
+   * must create new abortable contexts for each asynchronously created rest call to ensure all calls are aborted correctly.
+   * If this is not done, the {@link PageWithTable} will still behave correctly, i.e. will not show resulting data when loading was aborted.
+   * So creating a new abortable context for a subsequent call is not necessary for the user experience but prevents unnecessary calls being made.
+   * To create such a new abortable context all implementations can use the protected member {@link _abortController}.
+   *
+   * @example implementation of `_loadTableData(searchFilter)` using multiple and asynchronously created rest calls
+   * ```ts
+   * protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+   *   return $.when(this._loadTableDataAsync(searchFilter));
+   * }
+   *
+   * protected async _loadTableDataAsync(searchFilter: any): Promise<any> {
+   *   const abortController = this._abortController;
+   *   const searchRestrictions = await ajax.postDataObject('search-api/util/build-search-restrictions', this._withMaxRowCountContribution(searchFilter));
+   *   const foos = await abortableContext.runInContext(
+   *     () => ajax.postDataObject('api/foo/list', {searchRestrictions}),
+   *     abortController
+   *   );
+   *   return foos;
+   * }
+   * ```
+   *
    * @param searchFilter The search filter as exported by the search form or null.
    */
   protected _loadTableData(searchFilter: any): JQuery.Promise<any> {
@@ -547,6 +612,10 @@ export class PageWithTable extends Page implements PageWithTableModel {
     }
 
     try {
+      if (error instanceof AbortError) {
+        // load was aborted by the user -> no need to set any error status
+        return;
+      }
       this.detailTable.setTableStatus(Status.error({
         message: this.session.text('ErrorWhileLoadingData')
       }));
