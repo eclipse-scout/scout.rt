@@ -740,7 +740,8 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
 
   protected _callAjax(callOptions: InitModelOf<AjaxCall>): JQuery.Promise<RemoteResponse> {
     let defaultOptions = {
-      retryIntervals: [100, 500, 500, 500]
+      retryIntervals: [100, 500, 500, 500],
+      registerInAbortableContext: false
     };
     let ajaxCall = scout.create(AjaxCall, $.extend(defaultOptions, callOptions, this.ajaxCallOptions));
     this.registerAjaxCall(ajaxCall);

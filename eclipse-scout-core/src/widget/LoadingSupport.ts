@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,14 +7,17 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {GlassPane, LoadingSupportOptions, scout, WidgetSupport} from '../index';
+import {Action, GlassPane, LoadingSupportOptions, scout, WidgetSupport} from '../index';
 
 export class LoadingSupport extends WidgetSupport {
   loadingIndicatorDelay: number;
   withGlassPane: boolean;
+  abortable = false;
+  abortHandler: () => void = null;
   protected _$loadingIndicator: JQuery;
   protected _loadingIndicatorTimeoutId: number;
   protected _glassPane: GlassPane;
+  protected _cancelAction: Action;
   protected _containerScrollHandler: (event: JQuery.ScrollEvent) => void;
 
   /**
@@ -24,6 +27,8 @@ export class LoadingSupport extends WidgetSupport {
     super(options);
     this.loadingIndicatorDelay = scout.nvl(options.loadingIndicatorDelay, 250); // ms
     this.withGlassPane = scout.nvl(options.withGlassPane, false);
+    this.abortable = scout.nvl(options.abortable, this.abortable);
+    this.abortHandler = scout.nvl(options.abortHandler, this.abortHandler);
 
     this._$loadingIndicator = null;
     this._loadingIndicatorTimeoutId = null;
@@ -32,6 +37,14 @@ export class LoadingSupport extends WidgetSupport {
 
   setLoadingIndicatorDelay(loadingIndicatorDelay: number) {
     this.loadingIndicatorDelay = loadingIndicatorDelay;
+  }
+
+  setAbortable(abortable: boolean) {
+    this.abortable = abortable;
+  }
+
+  setAbortHandler(abortHandler: () => void) {
+    this.abortHandler = abortHandler;
   }
 
   protected override _ensure$Container() {
@@ -92,6 +105,20 @@ export class LoadingSupport extends WidgetSupport {
     // Create loading indicator
     let $indicatorParent = this._glassPane ? this._glassPane.$container : this.$container;
     this._$loadingIndicator = $indicatorParent.appendDiv('loading-indicator');
+    if (this.abortable) {
+      // LoadingSupport is abortable -> add cancel button
+      this._cancelAction = scout.create(Action, {
+        parent: this.widget,
+        text: this.widget.session.text('Cancel'),
+        cssClass: 'button cancel-button'
+      });
+      this._cancelAction.one('action', event => {
+        // button was clicked -> remove button after a short delay and call abortHandler
+        setTimeout(() => this._cancelAction.remove(), 100);
+        this.abortHandler?.();
+      });
+      this._cancelAction.render(this._$loadingIndicator);
+    }
   }
 
   protected _removeLoadingIndicator() {
@@ -119,6 +146,7 @@ export class LoadingSupport extends WidgetSupport {
     }
     this.$container?.off('scroll', this._containerScrollHandler);
     this._glassPane?.destroy();
+    this._cancelAction?.destroy();
   }
 
   protected _onContainerScroll(event: JQuery.ScrollEvent) {

@@ -5,11 +5,15 @@
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
- * SPDX-License-Identifier: EPL-2.0
+ * AI Disclosure: This file was partially AI-generated.
+ * The AI-generated portions are made available under CC0-1.0
+ * and not subject to the project's licence.
+ *
+ * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
 import {
-  arrays, Cell, Column, Deferred, Form, GroupBox, InitModelOf, MaxRowCountContributionDo, NumberColumn, NumberField, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, ResetMenu, scout, SearchFormTableControl, SearchMenu,
-  SearchRequiredTableStatus, SmartColumn, StaticLookupCall, StringField, Table, TableReloadReason, TableRow, Tree, WidgetModel
+  AbortError, arrays, Cell, Column, Deferred, Form, GroupBox, InitModelOf, MaxRowCountContributionDo, NumberColumn, NumberField, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, ResetMenu, scout, SearchFormTableControl,
+  SearchMenu, SearchRequiredTableStatus, SmartColumn, StaticLookupCall, StringField, Table, TableReloadReason, TableRow, Tree, WidgetModel
 } from '../../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
 
@@ -37,15 +41,10 @@ describe('PageWithTable', () => {
     outline.render();
     outline.selectNode(page);
     page.detailTable.render();
-
-    jasmine.clock().install();
-  });
-
-  afterEach(() => {
-    jasmine.clock().uninstall();
   });
 
   class SpecPageWithTable extends PageWithTable {
+    declare _abortController: AbortController;
     override _reloadReason: TableReloadReason = null;
 
     override _createSearchFilter(): any {
@@ -150,7 +149,7 @@ describe('PageWithTable', () => {
     expect(maxRowCountContributionDo._type).toBe('scout.MaxRowCountContribution');
   });
 
-  it('row limits are imported', () => {
+  it('row limits are imported', async () => {
     page._loadTableData = searchFilter => {
       return $.resolvedPromise({
         _contributions: [{
@@ -163,13 +162,13 @@ describe('PageWithTable', () => {
     };
     page._transformTableDataToTableRows = data => undefined;
     page.detailTable.reload();
-    jasmine.clock().tick(10);
+    await page.detailTable.when('propertyChange:loading');
     expect(page.detailTable.maxRowCount).toBe(456);
     expect(page.detailTable.estimatedRowCount).toBe(1111);
     expect(page.detailTable.tableStatus.message).toBe('[undefined text: MaxOutlineRowWarningWithEstimatedRowCount]');
   });
 
-  it('stores reload reason', () => {
+  it('stores reload reason', async () => {
     page._loadTableData = searchFilter => {
       return $.resolvedPromise({
         _contributions: [{
@@ -182,19 +181,19 @@ describe('PageWithTable', () => {
     };
     page._transformTableDataToTableRows = data => undefined;
     page.detailTable.reload();
-    jasmine.clock().tick(10);
+    await page.detailTable.when('propertyChange:loading');
     page.detailTable.footer._compactStyle = false;
     page.detailTable.footer._infoLoadAction.doAction();
-    jasmine.clock().tick(10);
+    await page.detailTable.when('propertyChange:loading');
     expect(page._reloadReason).toEqual(Table.ReloadReason.OVERRIDE_ROW_LIMIT);
 
     // reload reason must stay on next reloads. otherwise the override gets lost. Keep it until a new reason is provided.
     page.detailTable.reload();
-    jasmine.clock().tick(10);
+    await page.detailTable.when('propertyChange:loading');
     expect(page._reloadReason).toEqual(Table.ReloadReason.OVERRIDE_ROW_LIMIT);
   });
 
-  it('should handle errors in _onLoadTableDataDone', () => {
+  it('should handle errors in _onLoadTableDataDone', async () => {
     page._loadTableData = searchFilter => $.resolvedPromise([{
       rowId: 1,
       parentRow: 666, // does not exist -> causes an error in Table.js#insertRows
@@ -202,7 +201,7 @@ describe('PageWithTable', () => {
     }]);
     expect(page.detailTable.tableStatus).toBe(undefined);
     page.detailTable.reload();
-    jasmine.clock().tick(3);
+    await page.detailTable.when('propertyChange:loading');
 
     // expect error to be set as tableStatus
     let keys = Object.keys(page.detailTable.tableStatus);
@@ -260,7 +259,6 @@ describe('PageWithTable', () => {
       }
     }
 
-    jasmine.clock().uninstall();
     let lookupCall = new DummyLookupCall();
     lookupCall.init({session: session});
     let samplePage = new SamplePageWithTable();
@@ -295,7 +293,7 @@ describe('PageWithTable', () => {
       .catch(fail);
   });
 
-  it('restores the selection after reload if possible', () => {
+  it('restores the selection after reload if possible', async () => {
     const tablePage = scout.create(SpecPageWithTable, {
       parent: outline,
       detailTable: {
@@ -344,7 +342,7 @@ describe('PageWithTable', () => {
     expect(outline.selectedNode()).toBe(tablePage);
 
     table.reload();
-    jasmine.clock().tick(3);
+    await table.when('propertyChange:loading');
     expect(outline.selectedNode()).toBe(tablePage);
 
     table.selectRow(table.getRowByKey([2]));
@@ -355,13 +353,13 @@ describe('PageWithTable', () => {
     expect(outline.selectedNode().text).toBe('Row 2');
 
     table.reload();
-    jasmine.clock().tick(3);
+    await table.when('propertyChange:loading');
     expect(outline.selectedNode()).toBe(tablePage.childNodes[2]);
     expect(outline.selectedNode().text).toBe('Row 2');
 
     searchIds = [1, 3];
     table.reload();
-    jasmine.clock().tick(3);
+    await table.when('propertyChange:loading');
     expect(outline.selectedNode()).toBe(tablePage);
 
     table.selectRow(table.getRowByKey([3]));
@@ -372,7 +370,7 @@ describe('PageWithTable', () => {
     searchIds = [0, 2, 3];
     data[3][1] = 'Updated row 3';
     table.reload();
-    jasmine.clock().tick(3);
+    await table.when('propertyChange:loading');
     expect(outline.selectedNode()).toBe(tablePage.childNodes[2]);
     expect(outline.selectedNode().text).toBe('Updated row 3');
 
@@ -380,11 +378,11 @@ describe('PageWithTable', () => {
     expect(outline.selectedNode()).toBe(page);
 
     table.reload();
-    jasmine.clock().tick(3);
+    await table.when('propertyChange:loading');
     expect(outline.selectedNode()).toBe(page);
   });
 
-  it('childPages text is updated from the summary columns of the table', () => {
+  it('childPages text is updated from the summary columns of the table', async () => {
     const tablePage = scout.create(SpecPageWithTable, {
       parent: outline,
       detailTable: tableHelper.createTable(tableHelper.createModel(tableHelper.createModelColumns(5), []))
@@ -399,7 +397,7 @@ describe('PageWithTable', () => {
 
     const table = tablePage.detailTable;
     table.reload();
-    jasmine.clock().tick(3);
+    await table.when('propertyChange:loading');
 
     const [pageAbc, page123] = table.rows.map(r => r.page);
 
@@ -421,7 +419,7 @@ describe('PageWithTable', () => {
     expect(page123.text).toBe('1 4 5');
   });
 
-  it('updates childrenLoaded flag', () => {
+  it('updates childrenLoaded flag', async () => {
     let page = scout.create(SpecPageWithTable, {
       parent: outline,
       detailTable: {
@@ -432,7 +430,7 @@ describe('PageWithTable', () => {
     expect(page.childrenLoaded).toBe(false);
 
     outline.selectNode(page);
-    jasmine.clock().tick(1);
+    await page.detailTable.when('propertyChange:loading');
     let detailTable = page.detailTable;
     expect(detailTable).toBeTruthy();
 
@@ -443,7 +441,7 @@ describe('PageWithTable', () => {
     expect(page.childrenLoaded).toBe(true); // same as before, because reloading the table does not call loadChildren()
     expect(detailTable.loading).toBe(true);
 
-    jasmine.clock().tick(1);
+    await page.detailTable.when('propertyChange:loading');
     expect(page.childrenLoaded).toBe(true);
     expect(detailTable.loading).toBe(false);
 
@@ -451,13 +449,12 @@ describe('PageWithTable', () => {
     expect(page.childrenLoaded).toBe(false); // <--
     expect(detailTable.loading).toBe(true);
 
-    jasmine.clock().tick(1);
+    await page.detailTable.when('propertyChange:loading');
     expect(page.childrenLoaded).toBe(true);
     expect(detailTable.loading).toBe(false);
   });
 
   it('reloads its data if childrenLoaded is false and selected on outline change', async () => {
-    jasmine.clock().uninstall();
     let page = scout.create(SpecPageWithTable, {
       parent: outline,
       detailTable: {
@@ -537,7 +534,7 @@ describe('PageWithTable', () => {
     expect(observedTestValue).toBe(2);
   });
 
-  it('collapses lazy expanded nodes on reload', () => {
+  it('collapses lazy expanded nodes on reload', async () => {
     class LazyPageWithTable extends PageWithTable {
       constructor() {
         super();
@@ -580,7 +577,7 @@ describe('PageWithTable', () => {
     });
     outline.insertNode(page);
     outline.selectNode(page);
-    jasmine.clock().tick(1);
+    await page.detailTable.when('propertyChange:loading');
 
     expect(page.childNodes.length).toBe(3);
     expect(page.expanded).toBe(false);
@@ -603,7 +600,7 @@ describe('PageWithTable', () => {
 
     outline.selectNode(page);
     page.detailTable.reload();
-    jasmine.clock().tick(1);
+    await page.detailTable.when('propertyChange:loading');
 
     expect(page.childNodes.length).toBe(3);
     expect(page.expanded).toBe(false);
@@ -618,7 +615,7 @@ describe('PageWithTable', () => {
     expect(page.expandedLazy).toBe(false);
 
     page.detailTable.reload();
-    jasmine.clock().tick(1);
+    await page.detailTable.when('propertyChange:loading');
     expect(page.childNodes.length).toBe(3);
     expect(page.expanded).toBe(true);
     expect(page.expandedLazy).toBe(false);
@@ -626,7 +623,6 @@ describe('PageWithTable', () => {
 
   describe('getSearchFilterText', () => {
     it('only considers the texts of the actual search filter', async () => {
-      jasmine.clock().uninstall();
       page.detailTable.setTableControls([{
         objectType: SearchFormTableControl,
         form: {
@@ -660,7 +656,6 @@ describe('PageWithTable', () => {
   });
 
   it('keeps the search form data and used search filter in sync', async () => {
-    jasmine.clock().uninstall();
     page.detailTable.setTableControls([{
       objectType: SearchFormTableControl,
       form: {
@@ -700,8 +695,6 @@ describe('PageWithTable', () => {
   });
 
   it('marks table loading until data is loaded', async () => {
-    jasmine.clock().uninstall();
-
     const table = page.detailTable;
 
     // await initial load, because page was selected
@@ -946,6 +939,118 @@ describe('PageWithTable', () => {
       });
       expect(outline.selectedNode()).toBe(outline.nodes[0]);
       expect(outline.selectedNode().expanded).toBe(true);
+    });
+  });
+
+  describe('abortController', () => {
+
+    it('is aborted on destroy', () => {
+      page.detailTable.reload();
+
+      const abortController = page._abortController;
+      expect(abortController).toBeDefined();
+      expect(abortController.signal.aborted).toBeFalse();
+
+      page.destroy();
+      expect(abortController.signal.aborted).toBeTrue();
+    });
+
+    it('is aborted by the loadingSupport of the detailTable', () => {
+      expect(page.detailTable.loadingSupport.abortable).toBeTrue();
+      expect(page.detailTable.loadingSupport.abortHandler).toBeDefined();
+
+      page.detailTable.reload();
+
+      const abortController = page._abortController;
+      expect(abortController.signal.aborted).toBeFalse();
+
+      page.detailTable.loadingSupport.abortHandler();
+      expect(abortController.signal.aborted).toBeTrue();
+    });
+
+    it('is aborted when the searchForm is reset and searchRequired=true', () => {
+      page.setSearchRequired(true);
+
+      page.detailTable.reload();
+
+      const abortController = page._abortController;
+      expect(abortController.signal.aborted).toBeFalse();
+
+      page._resetTableData();
+      expect(abortController.signal.aborted).toBeTrue();
+    });
+
+    it('is aborted before a new load is executed', () => {
+      page.detailTable.reload();
+
+      const firstAbortController = page._abortController;
+      expect(firstAbortController.signal.aborted).toBeFalse();
+
+      page.detailTable.reload();
+
+      expect(firstAbortController.signal.aborted).toBeTrue();
+      const secondAbortController = page._abortController;
+      expect(secondAbortController).not.toBe(firstAbortController);
+      expect(secondAbortController.signal.aborted).toBeFalse();
+    });
+
+    it('aborts the current load resulting in an AbortError', async () => {
+      page.detailTable.insertColumn({id: 'StringColumn', objectType: Column});
+      page._loadTableData = () => $.resolvedPromise([
+        {cells: ['foo']},
+        {cells: ['bar']}
+      ]);
+
+      page.detailTable.reload();
+      await page.detailTable.when('propertyChange:loading');
+
+      expect(page.detailTable.rows.length).toBe(2);
+      expect(page.detailTable.rows.map(row => page.detailTable.columnById('StringColumn').cellValue(row))).toEqual(['foo', 'bar']);
+
+      page._loadTableData = () => $.resolvedPromise([
+        {cells: ['lorem']},
+        {cells: ['ipsum']},
+        {cells: ['dolor']}
+      ]);
+
+      page.detailTable.reload();
+
+      const deferred = new Deferred<void>();
+      page.one('error', ({error}) => {
+        expect(error).toBeInstanceOf(AbortError);
+        deferred.resolve();
+      });
+      page._abortController.abort();
+
+      await deferred.promise();
+      await page.detailTable.when('propertyChange:loading');
+
+      expect(page.detailTable.rows.length).toBe(2);
+      expect(page.detailTable.rows.map(row => page.detailTable.columnById('StringColumn').cellValue(row))).toEqual(['foo', 'bar']);
+      expect(page.detailTable.tableStatus).toBeNull();
+    });
+
+    it('does nothing when aborted after the load is finished', async () => {
+      page.detailTable.insertColumn({id: 'StringColumn', objectType: Column});
+      page._loadTableData = () => $.resolvedPromise([
+        {cells: ['foo']},
+        {cells: ['bar']}
+      ]);
+
+      page.detailTable.reload();
+      await page.detailTable.when('propertyChange:loading');
+
+      expect(page.detailTable.rows.length).toBe(2);
+      expect(page.detailTable.rows.map(row => page.detailTable.columnById('StringColumn').cellValue(row))).toEqual(['foo', 'bar']);
+      expect(page.detailTable.tableStatus).toBeNull();
+
+      page.one('error', ({error}) => {
+        fail(error);
+      });
+      page._abortController.abort();
+
+      page.detailTable.reload();
+      await page.detailTable.when('propertyChange:loading');
     });
   });
 });
