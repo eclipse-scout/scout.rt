@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,8 +9,8 @@
  */
 
 import {
-  arrays, dataObjects, HybridActionContextElement, HybridActionContextElements, HybridManager, InitModelOf, LoadChildPagesHybridActionDo, objects, ObjectWithType, Outline, OutlineAdapter, Page, PageParamDo, PageWithTable, scout,
-  SomeRequired, Table, TableRowsInsertedEvent, TreeAllChildNodesDeletedEvent, TreeNodesDeletedEvent, TreeNodesInsertedEvent, TreeNodesUpdatedEvent, typeName
+  arrays, BookmarkSupport, dataObjects, HybridActionContextElement, HybridActionContextElements, HybridManager, InitModelOf, LoadChildPagesHybridActionDo, objects, ObjectWithType, Outline, OutlineAdapter, Page, PageParamDo, PageWithTable,
+  scout, SomeRequired, Table, TableRowsInsertedEvent, TreeAllChildNodesDeletedEvent, TreeNodesDeletedEvent, TreeNodesInsertedEvent, TreeNodesUpdatedEvent, typeName
 } from '../../../../index';
 
 /**
@@ -249,7 +249,10 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
         pageParams.push(pageParam);
       });
     // ensure replace flag
-    replace = scout.nvl(replace, this._replaceChildPages);
+    // FIXME [js-page-reload] Beim Reload von Js-TablePages während dem Laden eines Bookmarks (Data-Changed-Event + "reload from root")
+    //       sollen existierende-Child-Nodes wiederverwendet werden, daher replace = false. Ansonsten werden die Nodes entfernt und
+    //       mit ihnen auch die Selektion, was der Benutzer dann sieht.
+    replace = scout.nvl(replace, BookmarkSupport.get(this.page.session).loading ? false : this._replaceChildPages);
 
     // call load child pages
     const hybridManager = await HybridManager.get(this.page.session, true);

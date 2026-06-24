@@ -131,7 +131,11 @@ public abstract class AbstractJsPage extends AbstractPage<ITable> implements IJs
           childPagesToAdd.removeAll(getChildPages());
           outline.addChildNodes(this, childPagesToAdd);
 
-          outline.updateChildNodeOrder(this, childPages);
+          // XXX Warum sollte das nötig sein? Das synct die Serverreihenfolge zum UI. Dort wird
+          // die Reihenfolge aber eigentlich von der JS-Table definiert -> man sieht kurz die
+          // falsche Reihenfolge. Vielleicht ist auch das Problem, dass die Reihenfolge von der
+          // JS-Table nicht nach Java gesynct wird (nur UI preferences).
+          //          outline.updateChildNodeOrder(this, childPages);
         }
       }
       finally {
@@ -163,6 +167,9 @@ public abstract class AbstractJsPage extends AbstractPage<ITable> implements IJs
     IPage<?> childPage = createChildPage(pageParam);
     if (childPage != null) {
       childPage.setPrimaryKey(pageParam);
+      // XXX Das darf man eigentlich nur bei NodePages unterhalb einer TablePage machen.
+      // Leider weiss man bei JS-Pages nicht, ob es eine Table- oder NodePage ist.
+      childPage.getCellForUpdate().setText(null);
     }
     return childPage;
   }

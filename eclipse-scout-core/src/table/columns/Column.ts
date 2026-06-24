@@ -76,6 +76,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   tableNodeLevel0CellPadding: number;
   expandableIconLevel0CellPadding: number;
   nodeColumnCandidate: boolean;
+  cellTextInProgress = 0;
 
   // Inspector infos (are only available for remote columns)
   modelClass: string;
@@ -295,6 +296,13 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     let returned = this._formatValue(value, row);
     if (objects.isPromise(returned)) {
       // Promise is returned -> set display text later
+      // FIXME [js-page-reload] Spalten als "Text wird gerade resolved" markieren, damit in Page.ts der bestehende Text
+      //       nicht mit einem leeren Text überschrieben wird. Verhindert Flackern beim Reload von JS-TablePages wenn
+      //       die darunter hängenden Java-NodePages reused werden.
+      this.cellTextInProgress++;
+      returned.always(() => {
+        this.cellTextInProgress--;
+      });
       this.setCellTextDeferred(returned, row, cell);
     } else {
       this.setCellText(row, returned, cell);

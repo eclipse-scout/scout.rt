@@ -532,6 +532,10 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
 
     // keep in sync with token: [5vv7MGGQ5BQY5NXX7CwJ9tmL4]
     const summaryColumns = page._computeSummaryColumns(row);
+    // FIXME [js-page-reload] Cell-Text wird noch berechnet -> keine leeren Texte auf die Page übernehmen
+    if (summaryColumns.some(column => column.cellTextInProgress)) {
+      return page;
+    }
     page.text = page.computeTextForRow(row, summaryColumns);
 
     // get properties from cell of first summary column
