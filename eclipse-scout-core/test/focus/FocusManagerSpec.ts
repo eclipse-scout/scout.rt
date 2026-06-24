@@ -5,7 +5,11 @@
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
- * SPDX-License-Identifier: EPL-2.0
+ * AI Disclosure: This file was partially AI-generated.
+ * The AI-generated portions are made available under CC0-1.0
+ * and not subject to the project's licence.
+ *
+ * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
 import {FocusManagerSpecHelper, FormSpecHelper, JQueryTesting} from '../../src/testing/index';
 import {Button, FocusManager, FocusRule, GlassPane, scout} from '../../src/index';
@@ -535,6 +539,79 @@ describe('FocusManager', () => {
 
       expectMouseDownToPreventDefault(false);
       JQueryTesting.triggerMouseDown($input3);
+    });
+  });
+
+  describe('isElementCovertByGlassPane', () => {
+
+    it('returns false when there are no glass pane targets', () => {
+      let $element = session.$entryPoint.appendDiv();
+      expect(focusManager.isElementCovertByGlassPane($element)).toBeFalse();
+    });
+
+    it('returns false when the element is not inside any glass pane target', () => {
+      let $coveredContainer = session.$entryPoint.appendDiv();
+      let $uncoveredElement = session.$entryPoint.appendDiv();
+
+      let glassPane = scout.create(GlassPane, {parent: session.desktop});
+      glassPane.render($coveredContainer);
+
+      expect(focusManager.isElementCovertByGlassPane($uncoveredElement)).toBeFalse();
+    });
+
+    it('returns true when the element is inside a glass pane target', () => {
+      let $container = session.$entryPoint.appendDiv();
+      let $element = $container.appendDiv();
+
+      expect(focusManager.isElementCovertByGlassPane($element)).toBeFalse();
+
+      let glassPane = scout.create(GlassPane, {parent: session.desktop});
+      glassPane.render($container);
+
+      expect(focusManager.isElementCovertByGlassPane($element)).toBeTrue();
+    });
+
+    it('returns false when the element is a child of the glass pane itself', () => {
+      let $container = session.$entryPoint.appendDiv();
+
+      let glassPane = scout.create(GlassPane, {parent: session.desktop});
+      glassPane.render($container);
+      let $insideGlassPane = glassPane.$container.appendDiv();
+
+      expect(focusManager.isElementCovertByGlassPane($insideGlassPane)).toBeFalse();
+    });
+
+    it('returns true when the element belongs to a glass pane display parent', () => {
+      // A registered glass pane target is required so the method does not return early
+      let $container = session.$entryPoint.appendDiv();
+      let glassPane = scout.create(GlassPane, {parent: session.desktop});
+      glassPane.render($container);
+
+      expect(focusManager.isElementCovertByGlassPane(session.desktop.$container)).toBeFalse();
+
+      focusManager.registerGlassPaneDisplayParent(session.desktop);
+      expect(focusManager.isElementCovertByGlassPane(session.desktop.$container)).toBeTrue();
+    });
+
+    it('uses the filter to limit which glass pane targets are considered', () => {
+      let $container1 = session.$entryPoint.appendDiv();
+      let $container2 = session.$entryPoint.appendDiv();
+      let $element1 = $container1.appendDiv();
+      let $element2 = $container2.appendDiv();
+
+      let glassPane1 = scout.create(GlassPane, {parent: session.desktop});
+      let glassPane2 = scout.create(GlassPane, {parent: session.desktop});
+      glassPane1.render($container1);
+      glassPane2.render($container2);
+
+      // Without filter: both elements are covered
+      expect(focusManager.isElementCovertByGlassPane($element1)).toBeTrue();
+      expect(focusManager.isElementCovertByGlassPane($element2)).toBeTrue();
+
+      // With filter: only container2 is considered -> only element2 is covered
+      const filter = ($target: JQuery) => $target[0] === $container2[0];
+      expect(focusManager.isElementCovertByGlassPane($element1, filter)).toBeFalse();
+      expect(focusManager.isElementCovertByGlassPane($element2, filter)).toBeTrue();
     });
   });
 });

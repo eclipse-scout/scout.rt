@@ -222,9 +222,18 @@ export class FocusManager implements FocusManagerOptions {
     if (this._glassPaneDisplayParents.indexOf(scout.widget(element)) >= 0) {
       return true;
     }
-    // Checks whether the element is a child of a glasspane target.
+    // Checks whether the element is a child of a glasspane target but not of the last glasspane itself.
     // If so, the some-iterator returns immediately with true.
-    return targets.some($glassPaneTarget => $(element).closest($glassPaneTarget).length !== 0);
+    return targets.some($glassPaneTarget => {
+      const $element = $(element);
+      if ($element.closest($glassPaneTarget).length === 0) {
+        // not child of the glasspane target -> not covert
+        return false;
+      }
+      const $lastGlasspane = $glassPaneTarget.children('.glasspane').last();
+      // child of the glasspane target, check whether the element is a child of the last glasspane otherwise it is covert
+      return $element.closest($lastGlasspane).length === 0;
+    });
   }
 
   /**
