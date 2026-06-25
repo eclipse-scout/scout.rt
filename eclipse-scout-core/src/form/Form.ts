@@ -10,8 +10,8 @@
 import {
   AbortKeyStroke, App, aria, AriaLabelledByInsertPosition, arrays, BusyIndicatorOptions, Button, ButtonSystemType, ChildModelOf, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, ErrorHandler, Event, EventHandler,
   FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormInvalidEvent, FormLayout, FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf,
-  KeyStroke, KeyStrokeContext, Lifecycle, MessageBox, MessageBoxController, MessageBoxes, ModelOf, NotificationBadgeStatus, ObjectOrChildModel, objects, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status, StatusOrModel,
-  strings, TextListWithTitle, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
+  KeyStroke, KeyStrokeContext, Lifecycle, MessageBox, MessageBoxController, MessageBoxes, MessageBoxOption, ModelOf, NotificationBadgeStatus, ObjectOrChildModel, objects, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status,
+  StatusOrModel, strings, TextListWithTitle, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
 
@@ -92,6 +92,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   $subTitle: JQuery;
   $dragHandle: JQuery;
   protected _modal: boolean;
+  protected _busy: boolean;
   protected _glassPaneRenderer: GlassPaneRenderer;
   protected _preMaximizedBounds: Rectangle;
   protected _resizeHandler: (Event) => boolean;
@@ -119,6 +120,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.maximized = false;
     this.headerVisible = null;
     this._modal = null;
+    this._busy = false;
     this.logicalGrid = scout.create(FormGrid);
     this.dialogs = [];
     this.views = [];
@@ -486,15 +488,15 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
-   * This function is called when an error occurs in the {@link _onLifecycleLoad} function or when the {@link _load} function returns with a rejected promise.
-   * By default, the error is forwarded to the {@link ErrorHandler}, the form is closed and a rejected promise is returned so a caller of {@link load} may catch the error.
+   * This function is called when an error occurs in {@link Lifecycle.load}.
    */
   protected _handleLoadErrorInternal(error: any): JQuery.Promise<void> {
     return this._handleErrorInternal(error, 'load', error => this._handleLoadError(error));
   }
 
   /**
-   * Default load error handler. May be overridden by sub-classes.
+   * Default load error handler. May be overridden by subclasses.
+   * By default, the error is forwarded to the {@link ErrorHandler}, the form is closed and a rejected promise is returned so a caller of {@link load} may catch the error.
    */
   protected _handleLoadError(error: any): JQuery.Promise<void> {
     this.close();
@@ -529,15 +531,15 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
-   * This function is called when an error occurs in the {@link _onLifecyclePostLoad} function or when the {@link _postLoad} function returns with a rejected promise.
-   * By default, the error is forwarded to the {@link ErrorHandler} and a rejected promise is returned.
+   * This function is called when an error occurs in the {@link _onLifecyclePostLoad}.
    */
   protected _handlePostLoadErrorInternal(error: any): JQuery.Promise<void> {
     return this._handleErrorInternal(error, 'postLoad', error => this._handlePostLoadError(error));
   }
 
   /**
-   * Default postLoad error handler. May be overridden by sub-classes.
+   * Default postLoad error handler. May be overridden by subclasses.
+   * By default, the error is forwarded to the {@link ErrorHandler} and a rejected promise is returned.
    */
   protected _handlePostLoadError(error: any): JQuery.Promise<void> {
     return this._handleError(error);
@@ -575,7 +577,12 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * @returns promise which is resolved when the save completes and rejected on an error.
    */
   ok(): JQuery.Promise<void> {
-    return this.lifecycle.ok();
+    try {
+      return this.withBusyHandling(() => this.lifecycle.ok())
+        .catch(error => this._handleSaveErrorInternal(error));
+    } catch (error) {
+      return this._handleSaveErrorInternal(error);
+    }
   }
 
   /**
@@ -587,7 +594,12 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * @returns promise which is resolved when the save completes and rejected on an error.
    */
   save(): JQuery.Promise<void> {
-    return this.lifecycle.save();
+    try {
+      return this.withBusyHandling(() => this.lifecycle.save())
+        .catch(error => this._handleSaveErrorInternal(error));
+    } catch (error) {
+      return this._handleSaveErrorInternal(error);
+    }
   }
 
   /**
@@ -598,38 +610,32 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   protected _onLifecycleSave(): JQuery.Promise<void> {
-    try {
-      return this.withBusyHandling(() => {
-        let data = this.exportData();
-        return this._save(data)
-          .then(() => {
-            this.formSaved = true;
-            this.setData(data);
-            this.trigger('save');
-          });
-      }).catch(error => this._handleSaveErrorInternal(error));
-    } catch (error) {
-      return this._handleSaveErrorInternal(error);
-    }
+    let data = this.exportData();
+    return this._save(data)
+      .then(() => {
+        this.formSaved = true;
+        this.setData(data);
+        this.trigger('save');
+      });
   }
 
   /**
-   * This function is called when an error occurs in {@link _onLifecycleSave} or when {@link _save} returns with a rejected promise.
-   * By default, the error is forwarded to the {@link ErrorHandler} and the promise is rejected so a caller of {@link save} may catch the error.
+   * This function is called when an error occurs in {@link Lifecycle.save}.
    */
   protected _handleSaveErrorInternal(error: any): JQuery.Promise<void> {
     return this._handleErrorInternal(error, 'save', error => this._handleSaveError(error));
   }
 
   /**
-   * Default save error handler. May be overridden by sub-classes.
+   * Default save error handler. May be overridden by subclasses.
+   * By default, the error is forwarded to the {@link ErrorHandler} and the promise is rejected so a caller of {@link save} may catch the error.
    */
   protected _handleSaveError(error: any): JQuery.Promise<void> {
     return this._handleError(error);
     // do not close as the user might want to change any value causing the error or just to retry.
   }
 
-  protected _handleErrorInternal(error: any, phase: string, errorHandler: (error: any) => JQuery.Promise<void>): JQuery.Promise<void> {
+  protected _handleErrorInternal<T>(error: any, phase: string, errorHandler: (error: any) => JQuery.Promise<T>): JQuery.Promise<T> {
     const event = this.trigger('error', {phase, error});
     let promise;
     if (event.defaultPrevented) {
@@ -646,7 +652,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
-   * Default error handler for {@link _load}, {@link _save} and {@link _postLoad}. May be overridden by subclasses.
+   * Default error handler for {@link load}, {@link save}, {@link validate} and {@link _onLifecyclePostLoad}. May be overridden by subclasses.
    * @returns A promise that resolves when the error is handled.
    */
   protected _handleError(error: any): JQuery.Promise<void> {
@@ -662,7 +668,28 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * @returns a promise resolved with the validation result as {@link Status}.
    */
   validate(): JQuery.Promise<Status> {
-    return this.lifecycle.validate();
+    try {
+      return this.withBusyHandling(() => this.lifecycle.validate())
+        .catch(error => this._handleValidateErrorInternal(error));
+    } catch (error) {
+      return this._handleValidateErrorInternal(error);
+    }
+  }
+
+  /**
+   * This function is called when an error occurs in {@link Lifecycle.validate}.
+   */
+  protected _handleValidateErrorInternal(error: any): JQuery.Promise<Status> {
+    return this._handleErrorInternal(error, 'validate', error => this._handleValidateError(error))
+      .then(e => undefined);
+  }
+
+  /**
+   * Default validate error handler. May be overridden by subclasses.
+   * By default, the error is forwarded to the {@link ErrorHandler} and the promise is rejected so a caller of {@link validate} may catch the error.
+   */
+  protected _handleValidateError(error: any): JQuery.Promise<void> {
+    return this._handleError(error);
   }
 
   /**
@@ -677,11 +704,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
-   * This function is called by the lifecycle, for instance when the 'ok' function is called.
-   * The function is called every time the 'ok' function is called, which means it runs even when
-   * there is not a single touched field. The function should be used to implement an overall validate
-   * logic which is not related to a specific field. For instance, you could validate the state of an
-   * internal member variable.
+   * This function is called by the lifecycle, for instance when {@link ok} or {@link validate} is called.
    *
    * Do not override this method, use {@link _validate} instead.
    */
@@ -750,13 +773,18 @@ export class Form extends Widget implements FormModel, DisplayParent {
     if (!status || status.isValid()) {
       return $.resolvedPromise(status);
     }
-    return this._createStatusMessageBox(status).buildAndOpen().then(option => {
+    this.setBusy(false); // cancel busy indicator so that the message box can be clicked
+    return this._openStatusMessageBox(status).then(option => {
       if (!status.isError() && option === MessageBox.Buttons.YES) {
         // proceed anyway
         return $.resolvedPromise(Status.ok(status.message));
       }
       return $.resolvedPromise(status);
     });
+  }
+
+  protected _openStatusMessageBox(status: Status): JQuery.Promise<MessageBoxOption> {
+    return this._createStatusMessageBox(status).buildAndOpen();
   }
 
   protected _createStatusMessageBox(status: Status): MessageBoxes {
@@ -810,7 +838,12 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * Resets the form to its initial state.
    */
   reset(): JQuery.Promise<void> {
-    return this.lifecycle.reset();
+    try {
+      return this.withBusyHandling(() => this.lifecycle.reset())
+        .catch(error => this._handleLoadErrorInternal(error));
+    } catch (error) {
+      return this._handleLoadErrorInternal(error);
+    }
   }
 
   /**
@@ -1708,6 +1741,11 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   /** @see BusySupport.setBusy */
   setBusy(busy: boolean | BusyIndicatorOptions) {
+    const newBusy = objects.isObject(busy) ? busy.busy : busy;
+    if (newBusy === this._busy) {
+      return;
+    }
+    this._busy = newBusy;
     this.session.desktop.setBusy(busy);
   }
 
