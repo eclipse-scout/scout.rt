@@ -84,6 +84,11 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   protected _queuedRequest: RemoteRequest;
   protected _asyncDelay: number;
   protected _sendTimeoutId: number;
+  /**
+   * Use a boolean because _setBusy(false) and _setBusy(true) are not symmetric here:
+   * In onAjaxDone some _setBusy(false) are omitted (in case areBusyIndicatedEventsQueued()=true to prevent flickering).
+   */
+  protected _busy: boolean;
   protected _cancellationHandler: EventHandler<Event<BusyIndicator>>;
 
   constructor() {
@@ -153,6 +158,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       objectType: 'NullWidget'
     }, rootParent);
     this.widget = this.root;
+    this._busy = false;
     this._cancellationHandler = e => this._sendCancelRequest();
   }
 
@@ -558,7 +564,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     // If an event requires a new request, only the previous events are sent now.
     // The next requests are send the next time _sendNow is called (-> when the response to the current request arrives)
     let events: RemoteEvent[] = [];
-    this.asyncEvents.some((event, i) => {
+    this.asyncEvents.some(event => {
       if (event.newRequest && events.length > 0) {
         return true;
       }
@@ -836,9 +842,13 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   }
 
   protected _setBusy(busy: boolean) {
+    if (busy === this._busy) {
+      return;
+    }
+
+    this._busy = busy;
     this.desktop?.setBusy({
       busy: busy,
-      force: true,
       renderDelay: 500, // longer delay as otherwise the cursor flickers on every backend call
       busyIndicatorModel: {
         cancellable: true

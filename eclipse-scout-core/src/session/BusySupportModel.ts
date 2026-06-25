@@ -19,7 +19,7 @@ export interface BusySupportModel extends ObjectModel<BusySupport> {
   /**
    * The default model to use for the {@link BusyIndicator}.
    * It may be overwritten using {@link BusyIndicatorOptions.busyIndicatorModel} in {@link BusySupport.setBusy}.
-   * By default it sets {@link busyIndicatorModel.cancellable} to false.
+   * By default, it sets {@link busyIndicatorModel.cancellable} to false.
    */
   busyIndicatorModel?: ModelOf<BusyIndicator>;
   /**

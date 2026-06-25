@@ -33,6 +33,8 @@ declare global {
     override _processErrorJsonResponse(jsonError: JsonErrorResponse);
 
     override _processErrorResponse(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string, request: RemoteRequest);
+
+    override _setBusy(busy: boolean);
   }
 
   function sandboxSession(options?: SandboxSessionOptions & ModelOf<Session>): SandboxSession;
