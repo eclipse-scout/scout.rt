@@ -1154,21 +1154,26 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
     this._fatalMessagesOnScreen[errorCode] = true;
 
+    if (this.desktop) {
+      // assert busy indicator is removed so that the message box can be clicked.
+      this.desktop.setBusy({busy: false, force: true});
+    }
+
     options = options || {};
-    let model = {
-        session: this,
-        parent: (this.desktop || new NullWidget()) as Widget,
-        iconId: options.iconId,
-        severity: scout.nvl(options.severity, Status.Severity.ERROR),
-        header: options.header,
-        body: options.body,
-        hiddenText: options.hiddenText,
-        yesButtonText: options.yesButtonText,
-        noButtonText: options.noButtonText,
-        cancelButtonText: options.cancelButtonText
-      },
-      messageBox = scout.create(MessageBox, model),
-      $entryPoint = options.entryPoint || this.$entryPoint;
+    const model = {
+      session: this,
+      parent: (this.desktop || new NullWidget()) as Widget,
+      iconId: options.iconId,
+      severity: scout.nvl(options.severity, Status.Severity.ERROR),
+      header: options.header,
+      body: options.body,
+      hiddenText: options.hiddenText,
+      yesButtonText: options.yesButtonText,
+      noButtonText: options.noButtonText,
+      cancelButtonText: options.cancelButtonText
+    };
+    const messageBox = scout.create(MessageBox, model);
+    const $entryPoint = options.entryPoint || this.$entryPoint;
 
     messageBox.on('action', event => {
       delete this._fatalMessagesOnScreen[errorCode];

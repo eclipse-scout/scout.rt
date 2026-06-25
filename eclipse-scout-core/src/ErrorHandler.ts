@@ -505,6 +505,10 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
       session,
       ...this._buildErrorMessageBoxModel(session, errorInfo)
     };
+    if (session.desktop) {
+      // assert busy indicator is removed so that the message box can be clicked.
+      session.desktop.setBusy({busy: false, force: true});
+    }
     const messageBox = scout.create(MessageBox, msgBoxModel);
     messageBox.on('action', event => messageBox.close());
     messageBox.render(session.$entryPoint); // do not use messageBox.open() as the Desktop might not yet be ready (e.g. if there is an error in the App startup)
