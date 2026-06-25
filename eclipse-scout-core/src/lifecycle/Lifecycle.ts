@@ -122,10 +122,14 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
     if (showMessageBox) {
       return this._showYesNoCancelMessageBox(
         this.askIfNeedSaveText,
-        this.ok.bind(this),
+        this._okAfterAskIfSaveNeeded.bind(this),
         this.close.bind(this));
     }
     return this.close();
+  }
+
+  protected _okAfterAskIfSaveNeeded(): JQuery.Promise<void> {
+    return this.ok();
   }
 
   protected _showYesNoCancelMessageBox(message: string, yesAction: () => JQuery.Promise<void>, noAction: () => JQuery.Promise<void>): JQuery.Promise<void> {

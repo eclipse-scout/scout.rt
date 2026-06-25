@@ -266,6 +266,85 @@ describe('Form', () => {
     });
   });
 
+  describe('busy', () => {
+
+    let form: SpecForm;
+    beforeEach(() => {
+      form = helper.createFormWithOneField();
+      return undefined;
+    });
+
+    function expectDesktopBusyWhileValidating(op: () => JQuery.Promise<any>) {
+      let validatorCalled = false;
+      form.addValidator(f => {
+        // validator is executed while saving
+        expect(form.session.desktop.busy).toBe(true);
+        validatorCalled = true;
+        return $.resolvedPromise(Status.ok());
+      });
+      expect(form.session.desktop.busy).toBe(false);
+      return op().then(() => {
+        expect(form.session.desktop.busy).toBe(false);
+        expect(validatorCalled).toBe(true);
+      });
+    }
+
+    function expectDesktopBusyWhileLoading(op: () => JQuery.Promise<any>) {
+      expect(form.session.desktop.busy).toBe(false);
+      let formLoadingCalled = false;
+      form.one('propertyChange:formLoading', e => {
+        expect(form.session.desktop.busy).toBe(true);
+        formLoadingCalled = true;
+      });
+      return op().then(() => {
+        expect(form.session.desktop.busy).toBe(false);
+        expect(formLoadingCalled).toBe(true);
+      });
+    }
+
+    it('is active during save', done => {
+      expectDesktopBusyWhileValidating(() => form.save()).always(done);
+    });
+
+    it('is active during ok', done => {
+      expectDesktopBusyWhileValidating(() => form.ok()).always(done);
+    });
+
+    it('is active during validate', done => {
+      expectDesktopBusyWhileValidating(() => form.validate()).always(done);
+    });
+
+    it('is active during cancel', done => {
+      expectDesktopBusyWhileValidating(() => form.lifecycle['_okAfterAskIfSaveNeeded']()).always(done);
+    });
+
+    it('is active during load', done => {
+      expectDesktopBusyWhileLoading(() => form.load()).always(done);
+    });
+
+    it('is active during reset', done => {
+      expectDesktopBusyWhileLoading(() => form.reset()).always(done);
+    });
+
+    it('is removed on validation message', done => {
+      const field = form.findChild(c => c instanceof StringField) as StringField;
+      field.setErrorStatus(Status.error('test-error'));
+      form.one('invalid', e => {
+        expect(form.session.desktop.busy).toBe(true);
+      });
+      spyOn(form, '_openStatusMessageBox').and.callFake(s => {
+        expect(form.session.desktop.busy).toBe(false);
+        return $.resolvedPromise(MessageBox.Buttons.YES);
+      });
+      expect(form.session.desktop.busy).toBe(false);
+      form.save().then(() => {
+        expect(form.session.desktop.busy).toBe(false);
+      }).always(done);
+    });
+
+    afterEach(() => form.close());
+  });
+
   describe('save', () => {
 
     it('calls _save', done => {

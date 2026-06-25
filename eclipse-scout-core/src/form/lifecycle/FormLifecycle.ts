@@ -41,6 +41,10 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
     this.widget.setData(this.widget.exportData());
   }
 
+  protected override _okAfterAskIfSaveNeeded(): JQuery.Promise<void> {
+    return this.widget.ok();
+  }
+
   override invalidElements(): ElementsValidationResult<TValidationResult> {
     return FormLifecycle.validateFormFields(this.widget);
   }
