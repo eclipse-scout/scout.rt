@@ -38,6 +38,31 @@ describe('Session', () => {
     session.sendEvent(new RemoteEvent(target, type, data), delay);
   }
 
+  describe('_setBusy', () => {
+    it('works correctly if asymmetric', () => {
+      const session = createSession();
+      session._setBusy(true);
+      expect(session.desktop.busy).toBe(true);
+      session._setBusy(true);
+      expect(session.desktop.busy).toBe(true);
+      session._setBusy(false);
+      expect(session.desktop.busy).toBe(false);
+    });
+
+    it('does not interfere with other usages', () => {
+      const session = createSession();
+      session.desktop.setBusy(true);
+      session._setBusy(true);
+      expect(session.desktop.busy).toBe(true);
+      session._setBusy(true);
+      expect(session.desktop.busy).toBe(true);
+      session._setBusy(false);
+      expect(session.desktop.busy).toBe(true);
+      session.desktop.setBusy(false);
+      expect(session.desktop.busy).toBe(false);
+    });
+  });
+
   describe('send', () => {
 
     it('sends multiple async events in one call', () => {
