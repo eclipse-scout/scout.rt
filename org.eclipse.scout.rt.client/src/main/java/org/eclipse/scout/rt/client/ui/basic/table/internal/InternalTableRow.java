@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -59,7 +59,7 @@ public class InternalTableRow extends TableRow implements ICellObserver {
     }
     // copy status and properties
     setStatus(row.getStatus());
-    setCssClass(row.getCssClass());
+    setCssClass(row.getCssClass(), false);
     setIconId(row.getIconId());
     // set table at end to avoid events before the row is even attached
     m_table = table;

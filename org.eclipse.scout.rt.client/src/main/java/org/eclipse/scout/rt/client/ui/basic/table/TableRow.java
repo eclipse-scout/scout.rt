@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -448,9 +448,16 @@ public class TableRow implements ITableRow {
 
   @Override
   public void setCssClass(String cssClass) {
+    setCssClass(cssClass, true);
+  }
+
+  @Override
+  public void setCssClass(String cssClass, boolean propagateCssClassToCells) {
     m_cssClass = cssClass;
-    for (Cell m_cell : m_cells) {
-      m_cell.setCssClass(cssClass);
+    if (propagateCssClassToCells) {
+      for (Cell m_cell : m_cells) {
+        m_cell.setCssClass(cssClass);
+      }
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -172,6 +172,8 @@ public interface ITableRow {
    * Convenience method for setting css class on all cells of this row
    */
   void setCssClass(String cssClass);
+
+  void setCssClass(String cssClass, boolean propagateCssClassToCells);
 
   String getCssClass();
 
