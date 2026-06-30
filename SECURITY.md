@@ -1,39 +1,42 @@
-_ISO 27005 defines vulnerability as:
-"A weakness of an asset or group of assets that can be exploited by one or more threats."_
+# Security Policy
 
-## The Eclipse Security Team
+This Eclipse Foundation Project adheres to the [Eclipse Foundation Vulnerability Reporting Policy](https://www.eclipse.org/security/policy/).
 
-The Eclipse Security Team provides help and advice to Eclipse projects
-on vulnerability issues and is the first point of contact
-for handling security vulnerabilities.
-Members of the Security Team are committers on Eclipse Projects
-and members of the Eclipse Architecture Council.
+## How To Report a Vulnerability
 
-Contact the [Eclipse Security Team](mailto:security@eclipse.org).
+If you think you have found a vulnerability in this repository, please report it to us through coordinated disclosure.
 
-**Note that, as a matter of policy, the security team does not open attachments.**
+**Please do not report security vulnerabilities through public issues, discussions, or change requests.**
 
-## Reporting a Security Vulnerability
+Instead, report a [vulnerability](https://github.com/eclipse-scout/scout.rt/security/advisories/new) directly via private vulnerability reporting on GitHub.
 
-Vulnerabilities should be reported via email to the Eclipse Security Team.
+You can find more information about reporting and disclosure at the [Eclipse Foundation Security page](https://www.eclipse.org/security/).
 
-The general security mailing list address is security@eclipse.org.
-Members of the Eclipse Security Team will receive messages sent to this address.
-This address should be used only for reporting undisclosed vulnerabilities;
-regular issue reports and questions unrelated to vulnerabilities in Eclipse software
-will be ignored.
-Note that this email address is not encrypted.
+Please include as much of the information listed below as you can to help us better understand and resolve the issue:
 
-## Disclosure
+* The type of issue (e.g., buffer overflow, SQL injection, or cross-site scripting)
+* Affected version(s)
+* Impact of the issue, including how an attacker might exploit the issue
+* Step-by-step instructions to reproduce the issue
+* The location of the affected source code (tag/branch/commit or direct URL)
+* Full paths of source file(s) related to the manifestation of the issue
+* Configuration required to reproduce the issue
+* Log files that are related to this issue (if possible)
+* Proof-of-concept or exploit code (if possible)
 
-Disclosure is initially limited to the reporter and all Eclipse Committers,
-but is expanded to include other individuals, and the general public.
-The timing and manner of disclosure is governed by the
-[Eclipse Security Policy](https://www.eclipse.org/security/policy.php).
+This information will help us triage your report more quickly.
 
-Publicly disclosed issues are listed on the
-[Disclosed Vulnerabilities Page](https://www.eclipse.org/security/known.php).
+## Supported Versions
 
-## Related Security Advisories
+Supported versions are:
 
-* 2021-12-23: [CVE-2021-44228 (log4shell)](https://www.eclipse.org/forums/index.php/t/1109741/)
+* The newest version released
+* The newest x.2 version (older than the newest release)
+
+Examples:
+
+* If the newest release is 26.1, supported releases are 26.1 and 25.2
+* If the newest release is 26.2, supported releases are 26.2 and 25.2
+* If the newest release is 27.1, supported releases are 27.1 and 26.2
+
+For a list of released versions see the [Eclipse-Scout documentation](https://eclipsescout.github.io/).
