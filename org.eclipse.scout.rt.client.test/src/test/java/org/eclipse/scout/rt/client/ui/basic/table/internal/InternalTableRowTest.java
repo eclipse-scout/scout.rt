@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -59,6 +59,27 @@ public class InternalTableRowTest {
     ir.setCssClass("test");
     assertEquals("test", ir.getCssClass());
     assertEquals("test", ir.getCell(0).getCssClass());
+  }
+
+  @Test
+  public void testPropagateCssClassToCells() {
+    TestTable table = new TestTable();
+    ITableRow row = table.createRow();
+    row.setCssClass("CssClassOnRow");
+    assertEquals("CssClassOnRow", row.getCssClass());
+    // setting a css class will set css class on cell as well
+    assertEquals("CssClassOnRow", row.getCellForUpdate(0).getCssClass());
+    // set css class on the cell to a different one
+    row.getCellForUpdate(0).setCssClass("CssClassOnCell");
+    assertEquals("CssClassOnCell", row.getCellForUpdate(0).getCssClass());
+    // get internal table row and ensure that the css classes for the row and the cell match
+    InternalTableRow ir = new InternalTableRow(table, row);
+    assertEquals("CssClassOnRow", ir.getCssClass());
+    assertEquals("CssClassOnCell", ir.getCellForUpdate(0).getCssClass());
+    // set css class on row but do not propagate to cells
+    ir.setCssClass("ChangedCssClassOnRow", false);
+    assertEquals("ChangedCssClassOnRow", ir.getCssClass());
+    assertEquals("CssClassOnCell", ir.getCellForUpdate(0).getCssClass());
   }
 
   @Test
