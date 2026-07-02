@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, arrays, BaseDoEntity, BookmarkDo, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierDoFactory, ChartTableControlConfigHelper, Constructor, Desktop, IBookmarkDo,
-  IBookmarkPageDo, InitModelOf, MaxRowCountContributionDo, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageParamDo, PageWithNodes, PageWithTable, scout, Session, Status,
-  TableBookmarkPageDo, TableRow, TableUiPreferences, tableUiPreferences
+  App, arrays, BaseDoEntity, BookmarkDo, BookmarkDoBuilder, BookmarkDoBuilderModel, BookmarkSupportModel, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierDoFactory, ChartTableControlConfigHelper, Constructor, dataObjects, Desktop,
+  IBookmarkDo, IBookmarkPageDo, InitModelOf, ISearchDo, MaxRowCountContributionDo, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageParamDo, PageWithNodes, PageWithTable, scout,
+  Session, Status, TableBookmarkPageDo, TableRow, TableUiPreferences, tableUiPreferences
 } from '../index';
 import $ from 'jquery';
 
@@ -541,6 +541,11 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       return; // not part of bookmark
     }
 
+    let searchFilter = page.getSearchFilter();
+    if (searchFilter && this._compareSearchFilter(searchFilter, bookmarkPage.searchData)) {
+      return;
+    }
+
     // Import search data
     page.setSearchFilter(bookmarkPage.searchData, saveState);
     page.setSearchFilterCompleted(bookmarkPage.searchFilterComplete);
@@ -548,8 +553,21 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       page.setSearchRequired(false);
     }
 
-    // Mark page as dirty so ensureChildrenLoaded() will reload the data
-    page.childrenLoaded = false;
+    page.setChildrenLoaded(false);
+  }
+
+  /**
+   * @param searchFilter the search filter of the page, never null or undefined.
+   * @param searchData the search data of the bookmark, never null or undefined.
+   */
+  protected _compareSearchFilter(searchFilter: any, searchData: ISearchDo): boolean {
+    if (!(searchFilter instanceof BaseDoEntity)) {
+      searchFilter = dataObjects.deserialize(searchFilter); // May not always result in a BaseDoEntity, e.g. if searchFilter is not a POJO
+    }
+    if (searchFilter instanceof BaseDoEntity) {
+      return searchFilter.equals(searchData);
+    }
+    return false; // SearchFilter is likely an instance of another class than BaseDoEntity -> cannot compare it
   }
 
   protected _prepareChartTableControlState(page: PageWithTable, bookmarkPage: TableBookmarkPageDo) {

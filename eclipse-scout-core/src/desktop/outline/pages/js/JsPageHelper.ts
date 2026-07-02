@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -108,7 +108,7 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
 
     // mark page as childrenLoaded=false if all child pages are deleted
     if (!this.page.childNodes.length) {
-      this.page.childrenLoaded = false;
+      this.page.setChildrenLoaded(false);
     }
 
     // clean up _childPagesById map
@@ -132,7 +132,7 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
     }
 
     // always mark page as childrenLoaded=false as all child pages are deleted
-    this.page.childrenLoaded = false;
+    this.page.setChildrenLoaded(false);
 
     // clean up _childPagesById map
     this._childPagesById.clear();
@@ -336,7 +336,7 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
     }
 
     // mark page with childrenLoaded=true
-    this.page.childrenLoaded = true;
+    this.page.setChildrenLoaded(true);
   }
 
   /**

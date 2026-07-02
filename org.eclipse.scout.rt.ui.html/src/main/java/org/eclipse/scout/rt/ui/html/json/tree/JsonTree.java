@@ -559,15 +559,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
       case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED -> handleModelChildNodeOrderChanged(event);
       case TreeEvent.TYPE_REQUEST_FOCUS -> handleModelRequestFocus(event);
       case TreeEvent.TYPE_SCROLL_TO_SELECTION -> handleModelScrollToSelection(event);
+      case TreeEvent.TYPE_CHILD_NODES_DIRTY -> handleChildNodesDirty(event);
       default -> handleModelOtherTreeEvent(event);
     }
-    // TODO [7.0] bsh: Tree | Events not yet implemented:
-    // - TYPE_NODE_REQUEST_FOCUS
-    // - TYPE_NODE_ENSURE_VISIBLE what is the difference to scroll_to_selection? delete in TreeEvent
-    // - TYPE_NODES_DRAG_REQUEST
-    // - TYPE_DRAG_FINISHED
-    // - TYPE_NODE_DROP_ACTION, partly implemented with consumeBinaryResource(...)
-    // - TYPE_NODE_DROP_TARGET_CHANGED
   }
 
   /**
@@ -620,11 +614,12 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
       }
       JSONObject jsonNode = new JSONObject();
       putProperty(jsonNode, "id", nodeId);
-      // Only send _some_ of the properties. Everything else (e.g. "checked", "expanded") will be handled with separate events.
-      // --> See also: Tree.ts/_applyUpdatedNodeProperties()
-      putProperty(jsonNode, "leaf", node.isLeaf());
-      putProperty(jsonNode, "enabled", node.isEnabled());
-      putProperty(jsonNode, "lazyExpandingEnabled", node.isLazyExpandingEnabled());
+      putNodeUpdatedProperties(node, jsonNode);
+
+      // do not send the event if it is empty (only contains the id)
+      if (Set.of("id").equals(jsonNode.keySet())) {
+        return;
+      }
 
       jsonNodes.put(jsonNode);
     }
@@ -635,6 +630,14 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     putProperty(jsonEvent, PROP_NODES, jsonNodes);
     putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, optNodeId(event.getCommonParentNode()));
     addActionEvent(EVENT_NODES_UPDATED, jsonEvent);
+  }
+
+  protected void putNodeUpdatedProperties(ITreeNode node, JSONObject jsonNode) {
+    // Only send _some_ of the properties. Everything else (e.g. "checked", "expanded") will be handled with separate events.
+    // --> See also: Tree.ts/_applyUpdatedNodeProperties()
+    putProperty(jsonNode, "leaf", node.isLeaf());
+    putProperty(jsonNode, "enabled", node.isEnabled());
+    putProperty(jsonNode, "lazyExpandingEnabled", node.isLazyExpandingEnabled());
   }
 
   protected void handleModelNodesDeleted(TreeEvent event) {
@@ -767,6 +770,26 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
 
   protected void handleModelScrollToSelection(TreeEvent event) {
     addActionEvent(EVENT_SCROLL_TO_SELECTION).protect();
+  }
+
+  protected void handleChildNodesDirty(TreeEvent event) {
+    JSONArray jsonNodes = new JSONArray();
+    for (ITreeNode node : event.getNodes()) {
+      if (!isNodeAccepted(node)) {
+        continue;
+      }
+      String nodeId = optNodeId(node);
+      if (nodeId == null) { // Ignore nodes that are not yet sent to the UI (may happen due to asynchronous event processing)
+        continue;
+      }
+      jsonNodes.put(nodeId);
+    }
+    if (jsonNodes.length() == 0) {
+      return;
+    }
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_NODES, jsonNodes);
+    addActionEvent("childNodesDirty", jsonEvent);
   }
 
   @Override

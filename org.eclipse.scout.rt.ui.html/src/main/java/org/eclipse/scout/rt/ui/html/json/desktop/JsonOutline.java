@@ -179,9 +179,21 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   @Override
   protected void putCellProperties(JSONObject json, ITreeNode node) {
     if (node instanceof IJsPage) {
+      // The UI is master of these properties (text, iconId etc.), Java does not have the correct state -> don't send them
+      // See also OutlineAdapter._createJsPageModel
       return;
     }
     super.putCellProperties(json, node);
+  }
+
+  @Override
+  protected void putNodeUpdatedProperties(ITreeNode node, JSONObject jsonNode) {
+    if (node instanceof IJsPage) {
+      // The UI is master of these properties (lazyExpandingEnabled etc.), Java does not have the correct state -> don't send them
+      // See also OutlineAdapter._createJsPageModel
+      return;
+    }
+    super.putNodeUpdatedProperties(node, jsonNode);
   }
 
   @Override
@@ -328,7 +340,9 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   protected void handleModelPageChanged(OutlineEvent event) {
     IPage<?> page = (IPage<?>) event.getNode();
 
-    if (!isNodeAccepted(page)) {
+    if (!isNodeAccepted(page) || page instanceof IJsPage) {
+      // The UI is master of these properties (navigateButtonsVisible etc.), Java does not have the correct state -> don't send them
+      // See also #treeNodeToJson() and OutlineAdapter._createJsPageModel
       return;
     }
 

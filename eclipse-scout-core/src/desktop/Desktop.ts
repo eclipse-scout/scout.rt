@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -743,6 +743,10 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
       if (this.navigation) {
         this.navigation.setOutline(this.outline);
       }
+
+      // Ensure selected page is reloaded if it is dirty
+      this.outline?.activePage()?.ensureLoadChildren();
+
       // call render after triggering event so glasspane rendering taking place can refer to the current outline content
       this.trigger('outlineChange');
 

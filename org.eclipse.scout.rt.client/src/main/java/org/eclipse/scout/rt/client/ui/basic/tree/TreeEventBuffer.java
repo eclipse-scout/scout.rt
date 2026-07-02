@@ -380,7 +380,8 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       case TreeEvent.TYPE_NODES_UPDATED,
            TreeEvent.TYPE_NODES_INSERTED,
            TreeEvent.TYPE_NODES_DELETED,
-           TreeEvent.TYPE_NODES_CHECKED -> true;
+           TreeEvent.TYPE_NODES_CHECKED,
+           TreeEvent.TYPE_CHILD_NODES_DIRTY -> true;
       default -> false;
     };
   }
@@ -393,7 +394,8 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
            TreeEvent.TYPE_NODES_DRAG_REQUEST,
            TreeEvent.TYPE_NODES_INSERTED,
            TreeEvent.TYPE_NODES_UPDATED,
-           TreeEvent.TYPE_ALL_CHILD_NODES_DELETED -> true;
+           TreeEvent.TYPE_ALL_CHILD_NODES_DELETED,
+           TreeEvent.TYPE_CHILD_NODES_DIRTY -> true;
       // Single node
       case TreeEvent.TYPE_NODE_ACTION,
            TreeEvent.TYPE_NODE_CHANGED,

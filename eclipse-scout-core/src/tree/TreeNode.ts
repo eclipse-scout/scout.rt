@@ -44,6 +44,9 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
   destroyed: boolean;
   filterAccepted: boolean;
   filterDirty: boolean;
+  /**
+   * Returns true if child nodes are loaded. May be set to false to force a reload of the child nodes on the next {@link ensureLoadChildren}
+   **/
   childrenLoaded: boolean;
   childrenChecked: boolean;
   height: number;
@@ -501,5 +504,9 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
 
   setFont(font: string) {
     this.font = font;
+  }
+
+  setChildrenLoaded(loaded: boolean) {
+    this.childrenLoaded = loaded;
   }
 }

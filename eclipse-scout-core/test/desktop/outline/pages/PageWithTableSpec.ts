@@ -456,6 +456,39 @@ describe('PageWithTable', () => {
     expect(detailTable.loading).toBe(false);
   });
 
+  it('reloads its data if childrenLoaded is false and selected on outline change', async () => {
+    jasmine.clock().uninstall();
+    let page = scout.create(SpecPageWithTable, {
+      parent: outline,
+      detailTable: {
+        objectType: Table
+      }
+    });
+    let spy = spyOn(page, '_loadTableData').and.callThrough();
+    expect(page.childrenLoaded).toBe(false);
+    expect(spy.calls.count()).toBe(0);
+
+    outline.selectNode(page);
+    await page.detailTable.when('propertyChange:loading');
+    expect(page.childrenLoaded).toBe(true);
+    expect(spy.calls.count()).toBe(1);
+
+    let outline2 = helper.createOutline();
+    session.desktop.setOutline(outline2);
+    expect(page.childrenLoaded).toBe(true);
+    expect(spy.calls.count()).toBe(1);
+
+    // Page gets dirty while another outline is active
+    page.setChildrenLoaded(false);
+    expect(page.childrenLoaded).toBe(false);
+    expect(spy.calls.count()).toBe(1);
+
+    session.desktop.setOutline(outline);
+    await page.detailTable.when('propertyChange:loading');
+    expect(page.childrenLoaded).toBe(true);
+    expect(spy.calls.count()).toBe(2);
+  });
+
   it('calls _initDetailTableUiPreferences after _initDetailTable', () => {
     let observedTestValue = 0;
 

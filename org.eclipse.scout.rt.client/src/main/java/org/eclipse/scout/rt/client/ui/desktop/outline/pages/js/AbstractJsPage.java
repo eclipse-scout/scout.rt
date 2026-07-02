@@ -215,4 +215,12 @@ public abstract class AbstractJsPage extends AbstractPage<ITable> implements IJs
       pageWithNodes.updateTableRowFromPage(this);
     }
   }
+
+  @Override
+  public void setChildrenDirty(boolean dirty) {
+    super.setChildrenDirty(dirty);
+    if (dirty) {
+      getOutline().fireChildNodesDirty(CollectionUtility.arrayList(this));
+    }
+  }
 }

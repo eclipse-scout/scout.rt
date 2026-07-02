@@ -11,13 +11,13 @@
 import {
   ActivateBookmarkPathParam, BaseDoEntity, BookmarkDo, BookmarkDoBuilder, BookmarkSupport, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierStringComponentDo, BooleanColumn, Column, dates, Desktop, NodeBookmarkPageDo, NumberColumn,
   NumberColumnUserFilter, NumberColumnUserFilterStateDo, Outline, OutlineBookmarkDefinitionDo, PageBookmarkDefinitionDo, PageIdDummyPageParamDo, ResetMenu, scout, SearchMenu, Table, TableBookmarkPageDo, TableClientUiPreferenceProfileDo,
-  TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableTextUserFilter, TableTextUserFilterStateDo, TableUiPreferences, UuidPool
+  TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableTextUserFilter, TableTextUserFilterStateDo, TableUiPreferences, TreeNodesInsertedEvent, UuidPool
 } from '../../src/index';
 import {
-  FRUIT_1_KEY, FRUIT_2_KEY, FRUIT_3_KEY, FRUIT_4_KEY, FRUIT_5_KEY, goToOutline, SPEC_NODE_PAGE_1_UUID, SPEC_NODE_PAGE_2_UUID, SPEC_NODE_PAGE_3_UUID, SPEC_NODE_PAGE_4_UUID, SPEC_OUTLINE_1_ID, SPEC_OUTLINE_1_UUID, SPEC_OUTLINE_2_ID,
-  SPEC_OUTLINE_2_UUID, SPEC_OUTLINE_3_ID, SPEC_OUTLINE_3_UUID, SPEC_TABLE_PAGE_1_UUID, SPEC_TABLE_PAGE_2_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID,
-  SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, SPEC_TABLE_PAGE_3_TABLE_UUID, SPEC_TABLE_PAGE_3_UUID, specDesktopModel, SpecNodePage1, SpecNodePage2, SpecNodePage3, SpecNodePage4, SpecPageParamDo,
-  SpecSearchDo, SpecSearchForm, SpecTablePage1, SpecTablePage2, SpecTablePage3
+  createSpecSearchDo, FRUIT_1_KEY, FRUIT_2_KEY, FRUIT_3_KEY, FRUIT_4_KEY, FRUIT_5_KEY, goToOutline, SPEC_NODE_PAGE_1_UUID, SPEC_NODE_PAGE_2_UUID, SPEC_NODE_PAGE_3_UUID, SPEC_NODE_PAGE_4_UUID, SPEC_OUTLINE_1_ID, SPEC_OUTLINE_1_UUID,
+  SPEC_OUTLINE_2_ID, SPEC_OUTLINE_2_UUID, SPEC_OUTLINE_3_ID, SPEC_OUTLINE_3_UUID, SPEC_TABLE_PAGE_1_UUID, SPEC_TABLE_PAGE_2_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID,
+  SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID, SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, SPEC_TABLE_PAGE_3_TABLE_UUID, SPEC_TABLE_PAGE_3_UUID, specDesktopModel, SpecNodePage1, SpecNodePage2, SpecNodePage3,
+  SpecNodePage4, SpecPageParamDo, SpecSearchDo, SpecSearchForm, SpecTablePage1, SpecTablePage2, SpecTablePage3
 } from './bookmark-fixtures';
 
 describe('BookmarkSupport', () => {
@@ -1104,6 +1104,183 @@ describe('BookmarkSupport', () => {
       expect(page1.childNodes[1]).not.toBe(childNode2);
     });
 
+    it('reloads page only if necessary', async () => {
+      // Activate bookmark
+      let bookmark = scout.create(BookmarkDo, {
+        definition: scout.create(OutlineBookmarkDefinitionDo, {
+          outlineId: SPEC_OUTLINE_2_UUID,
+          bookmarkedPage: scout.create(TableBookmarkPageDo, {
+            pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_TABLE_PAGE_2_UUID}),
+            displayText: 'Table Page 2'
+          }),
+          pagePath: [
+            scout.create(NodeBookmarkPageDo, {
+              pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_NODE_PAGE_3_UUID}),
+              displayText: 'Node Page 3'
+            }),
+            scout.create(TableBookmarkPageDo, {
+              pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_TABLE_PAGE_2_UUID}),
+              displayText: 'Table Page 2'
+            }),
+            scout.create(NodeBookmarkPageDo, {
+              pageParam: scout.create(SpecPageParamDo, {fooId: FRUIT_5_KEY}), // Kiwi
+              displayText: 'Kiwi'
+            })
+          ]
+        })
+      });
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
+
+      // Assert new state of desktop
+      expect(desktop.outline).toBeInstanceOf(Outline);
+      expect(desktop.outline.id).toBe(SPEC_OUTLINE_2_ID);
+      expect(desktop.outline.selectedNode()).toBeInstanceOf(SpecTablePage2);
+
+      let selectedPage = desktop.outline.selectedNode() as SpecTablePage2;
+      expect(selectedPage.childrenLoaded).toBe(true);
+      expect(selectedPage.expanded).toBe(false);
+      expect(selectedPage.childNodes.length).toBe(5);
+      expect(selectedPage.detailTable.rows.length).toBe(5);
+
+      let nodesInsertedEvents: TreeNodesInsertedEvent[] = [];
+      desktop.outline.on('nodesInserted', event => {
+        nodesInsertedEvents.push(event);
+      });
+
+      // Open same bookmark again
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
+
+      // Assert same page and same data, nothing has been reloaded
+      expect(desktop.outline.selectedNode()).toBeInstanceOf(SpecTablePage2);
+      selectedPage = desktop.outline.selectedNode() as SpecTablePage2;
+      expect(selectedPage.childrenLoaded).toBe(true);
+      expect(selectedPage.expanded).toBe(false);
+      expect(selectedPage.childNodes.length).toBe(5);
+      expect(selectedPage.detailTable.rows.length).toBe(5);
+      expect(nodesInsertedEvents.length).toBe(0);
+
+      // Selected table page changed -> Only this page must be reloaded
+      selectedPage.setChildrenLoaded(false);
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
+      expect(nodesInsertedEvents.length).toBe(1);
+      expect(nodesInsertedEvents[0].parentNode).toBe(selectedPage);
+
+      // Parent table page changed -> child node page and table page must be reloaded
+      nodesInsertedEvents = [];
+      selectedPage.parentNode.parentNode.setChildrenLoaded(false);
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
+      expect(nodesInsertedEvents.length).toBe(3);
+      expect(nodesInsertedEvents[0].parentNode).toBe(selectedPage.parentNode.parentNode);
+      expect(nodesInsertedEvents[1].parentNode.text).toBe(selectedPage.parentNode.text);
+      expect(nodesInsertedEvents[2].parentNode.text).toBe(selectedPage.text);
+    });
+
+    it('reloads page if search filter differs', async () => {
+      // Activate bookmark
+      let bookmark = scout.create(BookmarkDo, {
+        definition: scout.create(OutlineBookmarkDefinitionDo, {
+          outlineId: SPEC_OUTLINE_2_UUID,
+          bookmarkedPage: scout.create(TableBookmarkPageDo, {
+            pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_TABLE_PAGE_2_UUID}),
+            displayText: 'Table Page 2',
+            searchFilterComplete: true,
+            searchData: createSpecSearchDo({text: 'le'})
+          }),
+          pagePath: [
+            scout.create(NodeBookmarkPageDo, {
+              pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_NODE_PAGE_3_UUID}),
+              displayText: 'Node Page 3'
+            }),
+            scout.create(TableBookmarkPageDo, {
+              pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_TABLE_PAGE_2_UUID}),
+              displayText: 'Table Page 2',
+              searchFilterComplete: true,
+              searchData: createSpecSearchDo({text: 'kiwi'})
+            }),
+            scout.create(NodeBookmarkPageDo, {
+              pageParam: scout.create(SpecPageParamDo, {fooId: FRUIT_5_KEY}), // Kiwi
+              displayText: 'Kiwi'
+            })
+          ]
+        })
+      });
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
+
+      // Assert new state of desktop
+      expect(desktop.outline).toBeInstanceOf(Outline);
+      expect(desktop.outline.id).toBe(SPEC_OUTLINE_2_ID);
+      expect(desktop.outline.selectedNode()).toBeInstanceOf(SpecTablePage2);
+
+      let selectedPage = desktop.outline.selectedNode() as SpecTablePage2;
+      expect(selectedPage.childrenLoaded).toBe(true);
+      expect(selectedPage.expanded).toBe(false);
+      expect(selectedPage.childNodes.length).toBe(3);
+      expect(selectedPage.detailTable.rows.length).toBe(3); // Apple, Pineapple, Lemon
+
+      let parentTablePage = selectedPage.parentNode.parentNode as SpecTablePage2;
+      expect(parentTablePage.childrenLoaded).toBe(true);
+      expect(parentTablePage.expanded).toBe(true);
+      expect(parentTablePage.childNodes.length).toBe(1);
+      expect(parentTablePage.detailTable.rows.length).toBe(1);
+
+      let nodesInsertedEvents: TreeNodesInsertedEvent[] = [];
+      desktop.outline.on('nodesInserted', event => {
+        nodesInsertedEvents.push(event);
+      });
+
+      // Open same bookmark again
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
+
+      // Assert same page and same data, nothing has been reloaded
+      expect(nodesInsertedEvents.length).toBe(0);
+      selectedPage = desktop.outline.selectedNode() as SpecTablePage2;
+      expect(selectedPage.childrenLoaded).toBe(true);
+      expect(selectedPage.expanded).toBe(false);
+      expect(selectedPage.childNodes.length).toBe(3);
+      expect(selectedPage.detailTable.rows.length).toBe(3);
+      parentTablePage = selectedPage.parentNode.parentNode as SpecTablePage2;
+      expect(parentTablePage.childrenLoaded).toBe(true);
+      expect(parentTablePage.expanded).toBe(true);
+      expect(parentTablePage.childNodes.length).toBe(1);
+      expect(parentTablePage.detailTable.rows.length).toBe(1);
+
+      // Select parent table page and adjust search
+      desktop.outline.selectNode(parentTablePage);
+      let searchForm = parentTablePage.getSearchForm() as SpecSearchForm;
+      searchForm.widget('TextField').setValue('apple');
+      searchForm.widget('SearchMenu').doAction();
+      await parentTablePage.detailTable.when('reload');
+      await parentTablePage.detailTable.when('propertyChange:loading');
+      expect(parentTablePage.detailTable.rows.length).toBe(2);
+      expect(parentTablePage.childNodes.length).toBe(2);
+
+      // Parent table must be reloaded
+      nodesInsertedEvents = [];
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
+      expect(nodesInsertedEvents.length).toBe(3);
+      expect(nodesInsertedEvents[0].parentNode).toBe(selectedPage.parentNode.parentNode);
+      expect(nodesInsertedEvents[1].parentNode.text).toBe(selectedPage.parentNode.text);
+      expect(nodesInsertedEvents[2].parentNode.text).toBe(selectedPage.text);
+
+      // Select parent table page and activate bookmark again without changing search form
+      nodesInsertedEvents = [];
+      desktop.outline.selectNode(parentTablePage);
+      await BookmarkSupport.get(session).activateBookmark(bookmark);
+
+      // Assert that nothing has been reloaded
+      expect(nodesInsertedEvents.length).toBe(0);
+      selectedPage = desktop.outline.selectedNode() as SpecTablePage2;
+      expect(selectedPage.childrenLoaded).toBe(true);
+      expect(selectedPage.expanded).toBe(false);
+      expect(selectedPage.childNodes.length).toBe(3);
+      expect(selectedPage.detailTable.rows.length).toBe(3);
+      parentTablePage = selectedPage.parentNode.parentNode as SpecTablePage2;
+      expect(parentTablePage.childrenLoaded).toBe(true);
+      expect(parentTablePage.expanded).toBe(true);
+      expect(parentTablePage.childNodes.length).toBe(1);
+      expect(parentTablePage.detailTable.rows.length).toBe(1);
+    });
+
     it('can handle errors', async () => {
       // Provoke 'wrong-definition-type' error
       let bookmark = scout.create(BookmarkDo);
@@ -1176,7 +1353,7 @@ describe('BookmarkSupport', () => {
               })
             ],
             searchFilterComplete: true,
-            searchData: scout.create(SpecSearchDo, {text: 'le'})
+            searchData: createSpecSearchDo({text: 'le'})
           }),
           scout.create(NodeBookmarkPageDo, {
             pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_NODE_PAGE_4_UUID}),
@@ -1243,6 +1420,64 @@ describe('BookmarkSupport', () => {
         expect(error).toBe(BookmarkSupport.ERROR_PAGE_WRONG_OUTLINE);
       }
     });
+
+    it('reloads page on partial activation if pathPath is empty', async () => {
+      // Go to the start page
+      let outline = goToOutline(desktop, SPEC_OUTLINE_2_ID);
+      let page1 = scout.assertInstance(outline.nodes[1], SpecNodePage3);
+      outline.drillDown(page1);
+      await page1.ensureLoadChildren();
+      let page2 = scout.assertInstance(page1.childNodes[1], SpecTablePage2);
+      outline.drillDown(page2);
+      await page2.ensureLoadChildren();
+      expect(page2.detailTable.rows.length).toBe(5);
+
+      // Activate bookmark
+      let activateBookmarkPathParam: ActivateBookmarkPathParam = {
+        parentOutline: outline,
+        parentPage: page2,
+        parentBookmarkPage: scout.create(TableBookmarkPageDo, {
+          pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_TABLE_PAGE_2_UUID}),
+          displayText: 'Table Page 2'
+        }),
+        pagePath: [] // Normally, BookmarkSupport._resolvePage calls ensureLoadChildren, but if path is empty, BookmarkSupport._revealPage does it
+      };
+      await BookmarkSupport.get(session).activateBookmarkPath(activateBookmarkPathParam);
+
+      // Assert new state of desktop
+      expect(desktop.outline).toBeInstanceOf(Outline);
+      expect(desktop.outline.id).toBe(SPEC_OUTLINE_2_ID);
+      expect(desktop.outline.selectedNode()).toBeInstanceOf(SpecTablePage2);
+
+      let selectedPage = desktop.outline.selectedNode() as SpecTablePage2;
+      expect(selectedPage.childrenLoaded).toBe(true);
+      expect(selectedPage.expanded).toBe(false);
+      expect(selectedPage.childNodes.length).toBe(5);
+      expect(selectedPage.detailTable.rows.length).toBe(5);
+
+      let nodesInsertedEvents: TreeNodesInsertedEvent[] = [];
+      desktop.outline.on('nodesInserted', event => {
+        nodesInsertedEvents.push(event);
+      });
+
+      // Activate same bookmark path again
+      await BookmarkSupport.get(session).activateBookmarkPath(activateBookmarkPathParam);
+
+      // Assert same page and same data, nothing has been reloaded
+      expect(desktop.outline.selectedNode()).toBeInstanceOf(SpecTablePage2);
+      selectedPage = desktop.outline.selectedNode() as SpecTablePage2;
+      expect(selectedPage.childrenLoaded).toBe(true);
+      expect(selectedPage.expanded).toBe(false);
+      expect(selectedPage.childNodes.length).toBe(5);
+      expect(selectedPage.detailTable.rows.length).toBe(5);
+      expect(nodesInsertedEvents.length).toBe(0);
+
+      // Selected table page changed
+      selectedPage.setChildrenLoaded(false);
+      await BookmarkSupport.get(session).activateBookmarkPath(activateBookmarkPathParam);
+      expect(nodesInsertedEvents.length).toBe(1);
+      expect(nodesInsertedEvents[0].parentNode).toBe(selectedPage);
+    });
   });
 
   describe('applyBookmarkToPage', () => {
@@ -1287,7 +1522,7 @@ describe('BookmarkSupport', () => {
       let bookmark = scout.create(BookmarkDo, {
         definition: scout.create(PageBookmarkDefinitionDo, {
           bookmarkedPage: scout.create(TableBookmarkPageDo, {
-            searchData: scout.create(SpecSearchDo, {text: 'yell'}),
+            searchData: createSpecSearchDo({text: 'yell'}),
             tablePreferences: scout.create(TableClientUiPreferencesDo, {
               tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
               tablePreferenceProfiles: new Map([
@@ -1428,7 +1663,7 @@ describe('BookmarkSupport', () => {
       let bookmark = scout.create(BookmarkDo, {
         definition: scout.create(PageBookmarkDefinitionDo, {
           bookmarkedPage: scout.create(TableBookmarkPageDo, {
-            searchData: scout.create(SpecSearchDo, {text: 'yell'}),
+            searchData: createSpecSearchDo({text: 'yell'}),
             tablePreferences: scout.create(TableClientUiPreferencesDo, {
               tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
               tablePreferenceProfiles: new Map([
@@ -1571,7 +1806,7 @@ describe('BookmarkSupport', () => {
       let bookmark = scout.create(BookmarkDo, {
         definition: scout.create(PageBookmarkDefinitionDo, {
           bookmarkedPage: scout.create(TableBookmarkPageDo, {
-            searchData: scout.create(SpecSearchDo, {text: 'yell'}),
+            searchData: createSpecSearchDo({text: 'yell'}),
             tablePreferences: null // <--
           })
         })
@@ -1664,7 +1899,7 @@ describe('BookmarkSupport', () => {
       let bookmark = scout.create(BookmarkDo, {
         definition: scout.create(PageBookmarkDefinitionDo, {
           bookmarkedPage: scout.create(TableBookmarkPageDo, {
-            searchData: scout.create(SpecSearchDo, {text: 'yell'}),
+            searchData: createSpecSearchDo({text: 'yell'}),
             tablePreferences: null // <--
           })
         })
@@ -1734,7 +1969,7 @@ describe('BookmarkSupport', () => {
       let bookmark = scout.create(BookmarkDo, {
         definition: scout.create(PageBookmarkDefinitionDo, {
           bookmarkedPage: scout.create(TableBookmarkPageDo, {
-            searchData: scout.create(SpecSearchDo, {text: 'yell'}),
+            searchData: createSpecSearchDo({text: 'yell'}),
             tablePreferences: scout.create(TableClientUiPreferencesDo, {
               tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
               tablePreferenceProfiles: new Map([
@@ -1828,7 +2063,7 @@ describe('BookmarkSupport', () => {
       let bookmark = scout.create(BookmarkDo, {
         definition: scout.create(PageBookmarkDefinitionDo, {
           bookmarkedPage: scout.create(TableBookmarkPageDo, {
-            searchData: scout.create(SpecSearchDo, {text: 'cy'}),
+            searchData: createSpecSearchDo({text: 'cy'}),
             tablePreferences: scout.create(TableClientUiPreferencesDo, {
               tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
               tablePreferenceProfiles: new Map([
