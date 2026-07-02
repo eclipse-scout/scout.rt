@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BaseDoEntity, BooleanColumn, CheckBoxField, Column, DateField, Desktop, DesktopModel, Form, FormModel, GroupBox, ListBox, NumberColumn, ObjectOrModel, Outline, OutlineViewButton, Page, PageParamDo, PageWithNodes, PageWithTable, ResetMenu,
-  scout, SearchFormTableControl, SearchMenu, StringField, strings, Table, TableRow, Tree, typeName
+  BaseDoEntity, BooleanColumn, CheckBoxField, Column, DateField, Desktop, DesktopModel, Form, FormModel, GroupBox, ListBox, ModelOf, NumberColumn, ObjectOrModel, Outline, OutlineViewButton, Page, PageParamDo, PageWithNodes, PageWithTable,
+  ResetMenu, scout, SearchFormTableControl, SearchMenu, StringField, strings, Table, TableRow, Tree, typeName
 } from '../../src';
 import {LanguageDummyLookupCall} from '../../src/testing';
 
@@ -485,6 +485,16 @@ export class SpecSearchForm extends Form {
       creationDate: this.widget('CreationDateField').value
     });
   }
+}
+
+export function createSpecSearchDo(model: ModelOf<SpecSearchDo>): SpecSearchDo {
+  return scout.create(SpecSearchDo, {
+    text: null,
+    showHiddenValues: false,
+    languages: [],
+    creationDate: null,
+    ...model
+  });
 }
 
 export class SpecDetailForm extends Form {

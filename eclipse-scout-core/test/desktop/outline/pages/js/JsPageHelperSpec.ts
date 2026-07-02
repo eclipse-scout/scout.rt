@@ -383,14 +383,14 @@ describe('JsPageHelper', () => {
         expect(styles.hasCssClass(page.cssClass, 'js-page-child-page-loading')).toBeFalse();
       }
 
-      myPageWithTable.childrenLoaded = false;
+      myPageWithTable.setChildrenLoaded(false);
       outline.insertNodes(myPageWithTable.childNodes, myPageWithTable);
       expect(myPageWithTable.childNodes.length).toBe(2);
       for (const page of myPageWithTable.childNodes) {
         expect(styles.hasCssClass(page.cssClass, 'js-page-child-page-loading')).toBeTrue();
       }
 
-      myPageWithTable.childrenLoaded = true;
+      myPageWithTable.setChildrenLoaded(true);
       outline.insertNodes(myPageWithTable.childNodes, myPageWithTable);
       expect(myPageWithTable.childNodes.length).toBe(2);
       for (const page of myPageWithTable.childNodes) {

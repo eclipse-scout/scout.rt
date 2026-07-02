@@ -96,8 +96,8 @@ export class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, P
       } else {
         // remove control icon, when no child nodes are available
         let node = this.content.nodesMap[this._createNodeId(result.rec)];
-        node.leaf = true;
-        node.childrenLoaded = true;
+        node.setLeaf(true);
+        node.setChildrenLoaded(true);
         this.content.updateNode(node);
       }
     } else {
@@ -268,8 +268,8 @@ export class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, P
     }
     treeNode.parentNode = parentNode;
     parentNode.childNodes.push(treeNode);
-    parentNode.leaf = false;
-    parentNode.childrenLoaded = true;
+    parentNode.setLeaf(false);
+    parentNode.setChildrenLoaded(true);
   }
 
   override clearLookupRows() {

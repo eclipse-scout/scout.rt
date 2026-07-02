@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -142,6 +142,12 @@ public class TreeEvent extends EventObject implements IModelEvent {
    */
   public static final int TYPE_NODES_CHECKED = 870;
 
+  /**
+   * Contains nodes with dirty child nodes.
+   * The event is only used internally for specific cases. It will NOT be emitted for every node that gets dirty child nodes.
+   */
+  public static final int TYPE_CHILD_NODES_DIRTY = 880;
+
   private final int m_type;
   private ITreeNode m_commonParentNode;
   private Collection<? extends ITreeNode> m_nodes;
@@ -237,7 +243,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
   }
 
   /**
-   * Updates the nodes of this events and computes the new common parent node.
+   * Updates the nodes of this event and computes the new common parent node.
    */
   protected void setNodes(Collection<ITreeNode> nodes) {
     m_nodes = nodes;
@@ -275,7 +281,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
   }
 
   public boolean hasNodes() {
-    return m_nodes == null ? false : !m_nodes.isEmpty();
+    return m_nodes != null && !m_nodes.isEmpty();
   }
 
   public int getNodeCount() {

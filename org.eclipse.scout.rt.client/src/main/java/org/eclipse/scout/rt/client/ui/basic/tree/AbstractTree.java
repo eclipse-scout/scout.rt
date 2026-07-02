@@ -2287,6 +2287,14 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODE_CHANGED, node));
   }
 
+  @Override
+  public void fireChildNodesDirty(List<ITreeNode> nodes) {
+    filterInitializingTreeNodes(nodes);
+    if (CollectionUtility.hasElements(nodes)) {
+      fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_CHILD_NODES_DIRTY, nodes));
+    }
+  }
+
   private void fireNodeFilterChanged() {
     if (getRootNode() != null && getRootNode().isInitializing()) {
       return;

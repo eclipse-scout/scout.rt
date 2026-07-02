@@ -293,12 +293,12 @@ export class PageWithTable extends Page implements PageWithTableModel {
       return $.resolvedPromise();
     }
 
-    this.childrenLoaded = false;
+    this.setChildrenLoaded(false);
     const deferred = $.Deferred();
     this.one('load error', e => deferred.resolve());
     this.detailTable.reload();
     return deferred.promise().then(() => {
-      this.childrenLoaded = true;
+      this.setChildrenLoaded(true);
     });
   }
 

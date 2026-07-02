@@ -177,6 +177,8 @@ export class TreeAdapter extends ModelAdapter {
       this._onRequestFocus();
     } else if (event.type === 'scrollToSelection') {
       this._onScrollToSelection();
+    } else if (event.type === 'childNodesDirty') {
+      this._onChildNodesDirty(event.nodes);
     } else {
       super.onModelAction(event);
     }
@@ -313,6 +315,13 @@ export class TreeAdapter extends ModelAdapter {
 
   protected _onScrollToSelection() {
     this.widget.revealSelection();
+  }
+
+  protected _onChildNodesDirty(nodeIds: string[]) {
+    let nodes = this.widget.nodesByIds(nodeIds);
+    for (const node of nodes) {
+      node.setChildrenLoaded(false);
+    }
   }
 
   protected _initNodeModel(nodeModel?: TreeNodeModel): ChildModelOf<TreeNode> {
