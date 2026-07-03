@@ -17,6 +17,7 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
@@ -95,14 +96,20 @@ public interface IClientSession extends ISession, IPropertyObserver {
    */
   Subject getSubject();
 
-  void setSubject(Subject subject);
-
   /**
    * Consumers can query for the {@link User} of a {@link IClientSession}
    * <p>
    * The user is set when this object is created from {@link User#current()}
    */
   User getUser();
+
+  /**
+   * Updates {@link Subject} and {@link User} on the {@link IClientSession} with given {@link RunContext}
+   *
+   * @deprecated this method is meant for internal framework usage only. Other usages are highly discouraged
+   */
+  @Deprecated
+  void applySubjectAndUser(RunContext runContext);
 
   /**
    * Authenticated userId, provided by {@link User#getUserId()}}

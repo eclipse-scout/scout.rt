@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -91,7 +92,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private IDesktop m_desktop;
   private VirtualDesktop m_virtualDesktop;
   private volatile Subject m_subject;
-  private final User m_user;
+  private volatile User m_user;
 
   private final SharedVariableMap m_sharedVariableMap;
   private Set<String> m_exposedSharedVariables;
@@ -496,13 +497,15 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   @Override
-  public void setSubject(Subject subject) {
-    m_subject = subject;
+  public User getUser() {
+    return m_user;
   }
 
   @Override
-  public User getUser() {
-    return m_user;
+  @SuppressWarnings("deprecation")
+  public void applySubjectAndUser(RunContext runContext) {
+    m_subject = runContext.getSubject();
+    m_user = runContext.getUser();
   }
 
   @Override

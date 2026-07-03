@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -38,13 +38,7 @@ import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
  */
 @Bean
 public interface IAccessController {
-
-  /**
-   * Allows to inform the {@link org.eclipse.scout.rt.ui.html.IUiSession} that a new Subject is created by an
-   * {@link IAccessController} that should be updated on the {@link org.eclipse.scout.rt.client.IClientSession}
-   */
-  String UPDATED_SUBJECT = "scout.authentication.updatedSubject";
-
+  
   /**
    * Invoke to authenticate the given {@link HttpServletRequest}.
    * <p>

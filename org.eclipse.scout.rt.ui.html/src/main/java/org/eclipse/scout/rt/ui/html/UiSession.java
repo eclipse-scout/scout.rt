@@ -63,7 +63,6 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
-import org.eclipse.scout.rt.server.commons.authentication.IAccessController;
 import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
 import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
@@ -812,8 +811,7 @@ public class UiSession implements IUiSession {
 
   /**
    * Verifies if an access controller has created a new {@link Subject} and replaces the current one on the
-   * {@link IClientSession} with the new one. An {@link IAccessController} can request this by setting the
-   * {@link IAccessController#UPDATED_SUBJECT} attribute on the request.
+   * {@link IClientSession} with the new one.
    */
   @Override
   public void verifySubject(HttpServletRequest request) {
@@ -824,8 +822,9 @@ public class UiSession implements IUiSession {
     if (subject == null) {
       return;
     }
-    if (request.getAttribute(IAccessController.UPDATED_SUBJECT) != null) {
-      m_clientSession.setSubject(subject);
+    if (!ObjectUtility.equals(subject, m_clientSession.getSubject())) {
+      //noinspection deprecation
+      m_clientSession.applySubjectAndUser(RunContext.CURRENT.get());
     }
   }
 

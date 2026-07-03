@@ -11,11 +11,15 @@ package org.eclipse.scout.rt.ui.html;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.security.auth.Subject;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionBindingListener;
 
@@ -31,6 +35,11 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.security.JwtPrincipal;
+import org.eclipse.scout.rt.platform.security.SamlPrincipal;
+import org.eclipse.scout.rt.platform.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.security.SimplePrincipalWithDelegation;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
@@ -281,5 +290,32 @@ public class UiSessionTest {
 
     assertTrue(uiSession.isDisposed());
     assertEquals(expectSessionActiveAfterwards, clientSession.isActive());
+  }
+
+  @Test
+  public void testVerifySubject() {
+    UiSession uiSession = (UiSession) JsonTestUtility.createAndInitializeUiSession();
+
+    // Update Subject
+    Subject subject = new Subject();
+    subject.getPrincipals().add(new SimplePrincipal("NewPrinciple0"));
+    subject.getPrincipals().add(new JwtPrincipal("NewPrinciple1", "testTokenString"));
+    subject.getPrincipals().add(new SamlPrincipal("NewPrinciple2", null));
+    subject.getPrincipals().add(new SimplePrincipalWithDelegation("NewPrinciple3", null));
+    subject.setReadOnly();
+
+    Subject oldSubject = uiSession.getClientSession().getSubject();
+    User user = BEANS.get(User.class).withUserId("NewPrinciple0").setReadOnly();
+    RunContext.CURRENT.get()
+        .withSubject(subject)
+        .withUser(user);
+
+    uiSession.verifySubject(mock(HttpServletRequest.class));
+
+    assertEquals(subject, uiSession.getClientSession().getSubject());
+    assertEquals(user, uiSession.getClientSession().getUser());
+
+    assertNotEquals(oldSubject, subject);
+    JsonTestUtility.endRequest(uiSession);
   }
 }
