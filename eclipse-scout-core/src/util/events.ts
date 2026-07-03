@@ -69,7 +69,7 @@ export const events = {
       if (touch) {
         // Touch events may contain fractional values, while mouse events should not
         // - https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/pageX
-        // - https://www.chromestatus.com/features/6169687914184704
+        // - https://www.chromestatus.com/feature/6169687914184704
         event.pageX = Math.round(touch.pageX) as undefined;
         event.pageY = Math.round(touch.pageY) as undefined;
       }

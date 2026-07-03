@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,6 +30,8 @@ public abstract class AbstractTableRowData extends AbstractContributionComposite
   private Map<String, Object> m_customValues;
 
   public static final String CUSTOM_VALUES_ID_GEO_LOCATION = "geoLocationCustomValuesId";
+  public static final String CUSTOM_VALUES_ID_DRAGGABLE = "draggable#64a35343-e5a3-421b-a65f-afe4c422cb74";
+  public static final String CUSTOM_VALUES_ID_DROP_TYPES = "dropTypes#dd64f1b3-86ad-451e-aa24-adde5762d045";
 
   /**
    * @return Returns this row's state.
@@ -46,7 +48,6 @@ public abstract class AbstractTableRowData extends AbstractContributionComposite
   /**
    * Sets this row's state
    *
-   * @param rowState
    * @see #STATUS_NON_CHANGED
    * @see #STATUS_INSERTED
    * @see #STATUS_UPDATED
@@ -65,8 +66,6 @@ public abstract class AbstractTableRowData extends AbstractContributionComposite
 
   /**
    * Sets a map with custom values.
-   *
-   * @param customValues
    */
   public void setCustomValues(Map<String, Object> customValues) {
     m_customValues = customValues;
@@ -74,9 +73,6 @@ public abstract class AbstractTableRowData extends AbstractContributionComposite
 
   /**
    * Returns the custom value with the given <code>id</code> or <code>null</code> if it does not exist.
-   *
-   * @param id
-   * @return
    */
   public Object getCustomValue(String id) {
     if (m_customValues == null) {
@@ -88,9 +84,6 @@ public abstract class AbstractTableRowData extends AbstractContributionComposite
   /**
    * Sets a custom value for the given <code>id</code>. If <code>value</code> is <code>null</code>, the custom column
    * entry is removed by {@link #removeCustomValue(String)}.
-   *
-   * @param id
-   * @param value
    */
   public void setCustomValue(String id, Object value) {
     if (value == null) {

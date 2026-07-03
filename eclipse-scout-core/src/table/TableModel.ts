@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -308,4 +308,12 @@ export interface TableModel extends WidgetModel {
    * set the `uuid` property explicitly.
    */
   uiPreferencesEnabled?: boolean;
+  /**
+   * Specifies whether rows can be moved by dragging them with the mouse. Only has an effect if the table is enabled.
+   * Default is `false`.
+   *
+   * @see DraggableTableRow.draggable
+   * @see DraggableTableRow.dropTypes
+   */
+  rowsDraggable?: boolean;
 }

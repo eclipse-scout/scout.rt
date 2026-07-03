@@ -1,0 +1,117 @@
+/*
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+.table-row.draggable.dragged {
+
+  // Dim cell content (but not the border!)
+  & > .table-cell > span {
+    opacity: 0.5;
+  }
+
+  // Hide selection border
+  &::after {
+    .hidden();
+  }
+}
+
+.tms-drag-info {
+  position: fixed;
+  display: block;
+  pointer-events: none;
+  background-color: @tooltip-info-background-color;
+  border-radius: @tooltip-border-radius;
+  border: @tooltip-border-width solid @tooltip-border-color;
+  color: @tooltip-info-color;
+  #scout.drop-shadow(@y: 4px, @blur: 6px, @alpha: 5%);
+  transform: translate(18px, -50%);
+
+  & > .arrow {
+    position: absolute;
+    width: @tooltip-arrow-size;
+    height: @tooltip-arrow-size;
+    background-color: inherit;
+    border: inherit;
+    left: 0;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  & > .content {
+    padding: @tooltip-padding-y @tooltip-padding-x;
+    position: relative;
+    background-color: inherit; // Necessary if arrow has a border
+    border-radius: @tooltip-border-radius;
+    max-width: 300px;
+    width: max-content; // prevent wrapping text when positioned at the right edge of the window
+
+    & > .text {
+      font-weight: @tooltip-font-weight;
+
+      & + .text {
+        margin-top: 5px;
+      }
+
+      &.small {
+        font-weight: revert;
+        font-size: @font-size-small;
+      }
+    }
+  }
+}
+
+.tms-drop-indicator {
+  --color: @item-selection-border-color;
+  --border-style: solid;
+  display: block;
+  position: absolute;
+  width: 100%;
+  margin-top: -1px;
+  pointer-events: none;
+
+  &.invalid {
+    --color: @error-color;
+    --border-style: dashed;
+  }
+
+  &::before {
+    content: '';
+    display: block;
+    border-top: 2px var(--border-style) var(--color);
+  }
+
+  &.center {
+    padding: 2px 1px 1px 1px;
+  }
+
+  &.center::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 2px var(--border-style) var(--color);
+    border-radius: @control-border-radius;
+  }
+}
+
+.tms-cursor-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  cursor: grab;
+
+  &.dragging {
+    cursor: grabbing;
+  }
+
+  &.invalid-target {
+    cursor: no-drop;
+  }
+}
