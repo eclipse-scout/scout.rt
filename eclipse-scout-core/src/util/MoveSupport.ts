@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,78 +7,79 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, EventEmitter, EventMap, events, graphics, Insets, keys, Point, Rectangle, Session, Widget} from '../index';
+import {App, ErrorHandler, Event, EventEmitter, EventMap, events, graphics, InitModelOf, Insets, keys, Point, Rectangle, scout, scrollbars, Session, ViewportScroller, ViewportScrollerModel, Widget} from '../index';
 import $ from 'jquery';
 
-export class MoveSupport<TElem extends Widget> extends EventEmitter {
+export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
   declare self: MoveSupport<TElem>;
   declare eventMap: MoveSupportEventMap;
+
   /**
    * Minimal distance in pixels for a "mouse move" action to take effect.
    * Prevents "mini jumps" when simply clicking on an element.
    */
-  mouseMoveThreshold: number;
+  mouseMoveThreshold = 7;
   /**
    * The maximum size the clone should have. If it exceeds that size it will be scaled down.
    */
-  maxCloneSize: number;
-
+  maxCloneSize = 200;
   /**
    * Widget containing the draggable elements
    */
   widget: Widget;
 
+  /**
+   * Temporary data structure to hold data while a move operation is in progress.
+   */
   protected _moveData: MoveData<TElem>;
-  protected _animationDurationFactor: number;
-  protected _mouseMoveHandler: (event: JQuery.MouseMoveEvent) => void;
-  protected _mouseUpHandler: (event: JQuery.MouseUpEvent) => void;
-  protected _keyDownHandler: (event: KeyboardEvent) => void;
-  protected _releasingScrollHandler: (event: JQuery.ScrollEvent) => void;
+  /**
+   * For debugging, to slow down the animation
+   */
+  protected _animationDurationFactor = 1;
+  // FIXME bsh [dnd-table]: Remove when no longer needed
+  protected _paused = false;
+
+  protected _mouseMoveHandler = this._onMouseMove.bind(this);
+  protected _mouseUpHandler = this._onMouseUp.bind(this);
+  protected _keyDownHandler = this._onKeyDown.bind(this);
+  protected _scrollHandler = this._onScroll.bind(this);
 
   /**
    * @param widget the widget containing the draggable elements. Is used to automatically cancel the move operation when the widget is removed.
    */
   constructor(widget: Widget) {
     super();
-
-    this.maxCloneSize = 200;
-    this.mouseMoveThreshold = 7;
     this.widget = widget;
-
-    this._moveData = null;
-    this._animationDurationFactor = 1; // for debugging to slow down the animation
-
-    this._mouseMoveHandler = this._onMouseMove.bind(this);
-    this._mouseUpHandler = this._onMouseUp.bind(this);
-    this._keyDownHandler = this._onKeyDown.bind(this);
-    this._releasingScrollHandler = this._onReleasingScroll.bind(this);
   }
 
   /**
-   * @return `true` if the dragging was started successfully, falsy otherwise.
+   * @return `true` if the dragging was started successfully, false otherwise.
    */
   start(event: JQuery.MouseDownEvent, elements: TElem[], draggedElement: TElem): boolean {
+    if (this._paused) {
+      return false;
+    }
     if (this._moveData) {
       // Do nothing, when dragging is already in progress. This can happen when the user leaves
       // the browser window (e.g. using Alt-Tab) while holding the mouse button pressed and
       // then returns and presses the mouse button again.
-      return;
-    }
-    if (draggedElement.$container.hasClass('dragged')) {
-      // If MoveSupport is created again for an already dragged element, do nothing. This makes sure the placeholder element cannot be dragged if clone is released and drag started right again
-      return;
+      return false;
     }
     if (!event || !elements || !draggedElement || !elements.includes(draggedElement) || !draggedElement.$container) {
-      return;
+      return false;
+    }
+    if (draggedElement.$container.hasClass('dragged')) {
+      // If MoveSupport is created again for an already dragged element, do nothing. This ensures
+      // the placeholder element cannot be dragged if clone is released and drag started right again
+      return false;
     }
     if (event.which !== 1) {
       // Only accept left mouse button clicks (right one is reserved for context menu)
-      return;
+      return false;
     }
     events.fixTouchEvent(event);
 
     this._initMoveData(event, elements, draggedElement);
-    $('iframe').addClass('dragging-in-progress');
 
     // TODO CGU on touch devices it must be possible to scroll but also to drag the element -> drag should start not when pointer is moved but when touch is pressed down for some time
 
@@ -88,19 +89,22 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
     this.one('cancel end', () => {
       this.widget.off('remove', handler);
     });
+
     return true;
   }
 
   protected _initMoveData(event: JQuery.MouseDownEvent, elements: TElem[], draggedElement: TElem) {
     let $window = draggedElement.$container.window();
-    let $elements = draggedElement.$container.parent();
+    let $container = draggedElement.$container.parent();
     this._moveData = {} as MoveData<TElem>;
     this._moveData.session = draggedElement.session;
     this._moveData.$window = $window;
-    this._moveData.$container = $elements;
-    this._moveData.containerBounds = graphics.offsetBounds($elements, {
+    this._moveData.$container = $container;
+    this._moveData.containerBounds = graphics.offsetBounds($container, {
       includeMargin: true
     });
+
+    this._initViewportScroller(this._moveData.$container.scrollParent());
 
     this._moveData.elements = elements;
     this._moveData.elementInfos = this._createElementInfos(elements, draggedElement);
@@ -112,14 +116,15 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
     this._moveData.currentCursorPosition = this._moveData.startCursorPosition;
 
     // Compute distances from the cursor to the edges of the dragged element
-    let draggedElementInfo = this._moveData.draggedElementInfo;
+    let bounds = this._moveData.draggedElementInfo.bounds;
     this._moveData.cursorDistance = new Insets(
-      event.pageY - draggedElementInfo.bounds.y,
-      draggedElementInfo.bounds.x + draggedElementInfo.bounds.width - event.pageX,
-      draggedElementInfo.bounds.y + this._moveData.draggedElementInfo.bounds.height - event.pageY,
-      event.pageX - draggedElementInfo.bounds.x
+      event.pageY - bounds.y,
+      bounds.x + bounds.width - event.pageX,
+      bounds.y + bounds.height - event.pageY,
+      event.pageX - bounds.x
     );
 
+    // Install global listeners, will be removed again in _cleanup()
     this._moveData.$window
       .off('mousemove touchmove', this._mouseMoveHandler)
       .off('mouseup touchend touchcancel', this._mouseUpHandler)
@@ -127,6 +132,53 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
       .on('mouseup touchend touchcancel', this._mouseUpHandler);
     this._moveData.$window[0].removeEventListener('keydown', this._keyDownHandler, true);
     this._moveData.$window[0].addEventListener('keydown', this._keyDownHandler, true);
+    $('iframe').addClass('dragging-in-progress');
+  }
+
+  protected _initViewportScroller($viewport: JQuery, options?: ViewportScrollerModel) {
+    if (!$viewport?.length) {
+      return;
+    }
+    this._moveData.$viewport = $viewport;
+    this._moveData.scrollPosition = new Point($viewport.scrollLeft(), $viewport.scrollTop());
+    this._moveData.maxScrollPosition = new Point(
+      Math.max(0, $viewport[0].scrollWidth - $viewport[0].clientWidth),
+      Math.max(0, $viewport[0].scrollHeight - $viewport[0].clientHeight)
+    );
+    $viewport.on('scroll', this._scrollHandler);
+    this._moveData.viewportScroller = scout.create(ViewportScroller, this._viewportScrollerModel());
+  }
+
+  protected _viewportScrollerModel(): InitModelOf<ViewportScroller> {
+    let viewportSize = graphics.size(this._moveData.$viewport);
+    return {
+      viewportWidth: viewportSize.width,
+      viewportHeight: viewportSize.height,
+      active: () => !!this._moveData,
+      scroll: (dx: number, dy: number) => this._scrollViewport(dx, dy)
+    };
+  }
+
+  protected _scrollViewport(dx: number, dy: number) {
+    let oldScrollPosition = this._moveData.scrollPosition;
+    let newScrollPosition = new Point(
+      Math.min(Math.max(0, oldScrollPosition.x + dx), this._moveData.maxScrollPosition.x),
+      Math.min(Math.max(0, oldScrollPosition.y + dy), this._moveData.maxScrollPosition.y)
+    );
+
+    if (newScrollPosition.x !== oldScrollPosition.x) {
+      scrollbars.scrollLeft(this._moveData.$viewport, newScrollPosition.x);
+    }
+    if (newScrollPosition.y !== oldScrollPosition.y) {
+      scrollbars.scrollTop(this._moveData.$viewport, newScrollPosition.y);
+    }
+  }
+
+  protected _onScroll(event: JQuery.ScrollEvent) {
+    this._moveData.scrollPosition = new Point(
+      event.target.scrollLeft,
+      event.target.scrollTop
+    );
   }
 
   protected _createElementInfos(elements: TElem[], draggedElement: TElem): DraggableElementInfo<TElem>[] {
@@ -142,6 +194,7 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
         } as DraggableElementInfo<TElem>;
         this._updateElementInfo(info);
         if (element === draggedElement) {
+          this._moveData.draggedElement = element;
           this._moveData.draggedElementInfo = info;
           this._moveData.$draggedElement = $element;
         }
@@ -179,14 +232,18 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
 
   protected _restoreStyles() {
     // Remove clone
-    this._moveData.$clone && this._moveData.$clone.remove();
+    this._moveData.$clone?.remove();
 
-    // A done class makes it possible to disable transitions that must not be active while the clone will be swapped with the dragged element
+    // A done class makes it possible to disable transitions that must not be active while the clone
+    // will be swapped with the dragged element
     this._moveData.$draggedElement.removeClass('dragged releasing');
     this._moveData.$container.removeClass('dragging-element');
   }
 
   protected _onMouseMove(event: JQuery.MouseMoveEvent) {
+    if (this._paused) {
+      return;
+    }
     events.fixTouchEvent(event);
     this._updateOffsets();
 
@@ -196,23 +253,46 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
     );
     let distance = this._moveData.currentCursorPosition.subtract(this._moveData.startCursorPosition);
 
-    // Ignore small mouse movements
     if (!this._moveData.moving) {
+      // Ignore small mouse movements
       if (Math.abs(distance.x) < this.mouseMoveThreshold && Math.abs(distance.y) < this.mouseMoveThreshold) {
         return;
       }
+
       this._moveData.moving = true;
       this._onFirstMouseMove();
+      this._startMove(event);
     }
 
-    // Create a clone of the dragged element that is positioned 'fixed', i.e. with document-absolute coordinates
-    if (!this._moveData.$clone) {
-      this._moveData.cloneBounds = graphics.offsetBounds(this._moveData.$draggedElement);
-      this._moveData.cloneStartOffset = this._moveData.cloneBounds.point();
-      this._append$Clone();
+    this._whileMove(event, distance);
+  }
 
-      // Change style of dragged element
-      this._moveData.$draggedElement.addClass('dragged');
+  /**
+   * Optional hook for subclasses, called just before {@link _startMove}. The default implementation does nothing.
+   */
+  protected _onFirstMouseMove() {
+  }
+
+  protected _startMove(event: JQuery.MouseEventBase) {
+    // Create a clone of the dragged element that is positioned 'fixed', i.e. with document-absolute coordinates
+    this._moveData.cloneBounds = graphics.offsetBounds(this._moveData.$draggedElement);
+    this._moveData.cloneStartOffset = this._moveData.cloneBounds.point();
+    this._append$Clone();
+
+    // Change style of dragged element, but only after the clone has been created
+    this._moveData.$container.addClass('dragging-element');
+    this._moveData.$draggedElement.addClass('dragged');
+  }
+
+  protected _whileMove(event: JQuery.MouseMoveEvent, distance: Point) {
+    // Automatically scroll the viewport when the cursor is moved towards the edges while dragging
+    if (this._moveData.$viewport) {
+      let viewportOffset = this._moveData.$viewport.offset();
+      let viewportMousePosition = new Point(
+        event.pageX - viewportOffset.left,
+        event.pageY - viewportOffset.top
+      );
+      this._moveData.viewportScroller.update(viewportMousePosition);
     }
 
     // Update clone position
@@ -220,19 +300,22 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
 
     // Scale down clone if necessary
     let scale = this._calculateScale();
-    this._moveData.$clone.css({
-      'top': this._moveData.cloneBounds.y,
-      'left': this._moveData.cloneBounds.x,
-      '--dragging-scale': scale,
-      'transform-origin': this._moveData.cursorDistance.left + 'px ' + this._moveData.cursorDistance.top + 'px'
-    });
+    this._update$Clone(scale);
 
-    // Don't change element order if the clone is outside the container area
-    if (!this._moveData.containerBounds.intersects(this._moveData.cloneBounds)) {
-      return;
+    // Check if the (scaled) clone is outside the container area
+    let scaledCloneBounds = new Rectangle(
+      this._moveData.cloneBounds.x + this._moveData.cursorDistance.left - Math.round(scale * this._moveData.cursorDistance.left),
+      this._moveData.cloneBounds.y + this._moveData.cursorDistance.top - Math.round(scale * this._moveData.cursorDistance.top),
+      Math.round(scale * this._moveData.cloneBounds.width),
+      Math.round(scale * this._moveData.cloneBounds.height)
+    );
+    let scaledCloneInside = this._moveData.containerBounds.intersects(scaledCloneBounds);
+    let cursorInside = this._moveData.containerBounds.contains(new Point(event.pageX, event.pageY)); // check needed because clone might have no size
+    if (scaledCloneInside || cursorInside) {
+      this._drag(event);
+    } else {
+      this._dragOutside(event);
     }
-
-    this._drag(event);
   }
 
   protected _calculateScale(): number {
@@ -267,8 +350,8 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
     this.trigger('drag');
   }
 
-  protected _onFirstMouseMove() {
-    this._moveData.$container.addClass('dragging-element');
+  protected _dragOutside(event: JQuery.MouseMoveEvent) {
+    this.trigger('dragOutside');
   }
 
   protected _append$Clone() {
@@ -304,26 +387,55 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
       });
   }
 
+  protected _update$Clone(scale: number) {
+    this._moveData.$clone.css({
+      'top': this._moveData.cloneBounds.y,
+      'left': this._moveData.cloneBounds.x,
+      '--dragging-scale': scale,
+      'transform-origin': `${this._moveData.cursorDistance.left}px ${this._moveData.cursorDistance.top}px`
+    });
+  }
+
   protected _onMouseUp(event: JQuery.MouseUpEvent) {
+    if (this._paused) {
+      return;
+    }
     events.fixTouchEvent(event);
     this._updateOffsets();
     this._cleanup();
-    this._dragEnd(event)
-      .then(targetBounds => this._moveToTarget(targetBounds).then(() => targetBounds))
-      .then(targetBounds => {
-        this._restoreStyles();
 
-        if (!targetBounds.equals(this._moveData.draggedElementInfo.bounds)) {
-          this._moveEnd();
-        }
-        this._moveData = null;
-        this._end();
-      });
+    if (this._moveData.moving) {
+      this._dragEnd(event)
+        .then(async targetBounds => {
+          if (targetBounds) {
+            await this._moveToTarget(targetBounds);
+          }
+          this._restoreStyles();
+          if (targetBounds && !targetBounds.equals(this._moveData.draggedElementInfo.bounds)) {
+            this._moveEnd();
+          }
+          this._moveData = null;
+          this._end();
+        }, error => {
+          scout.create(ErrorHandler, {displayError: false}).handle(error);
+          this.cancel();
+        })
+        .catch(error => App.get().errorHandler.handle(error));
+    } else {
+      this._restoreStyles();
+      this._moveData = null;
+      this._end();
+    }
   }
 
   protected _onKeyDown(event: KeyboardEvent) {
     if (event.which === keys.ESC) {
       this.cancel();
+      event.preventDefault();
+      event.stopPropagation();
+    } else if (event.which === keys.PAUSE) {
+      this._paused = !this._paused;
+      event.preventDefault();
       event.stopPropagation();
     }
   }
@@ -333,6 +445,7 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
       .off('mousemove touchmove', this._mouseMoveHandler)
       .off('mouseup touchend touchcancel', this._mouseUpHandler);
     this._moveData.$window[0].removeEventListener('keydown', this._keyDownHandler, true);
+    this._moveData.$viewport?.off('scroll', this._scrollHandler);
     $('iframe').removeClass('dragging-in-progress');
   }
 
@@ -343,7 +456,12 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
 
     // stop all animations in case of scroll (e.g. by mousewheel, page down etc.)
     let $scrollParents = this._moveData.$draggedElement.scrollParents();
-    $scrollParents.on('scroll', this._releasingScrollHandler);
+    let releasingScrollHandler = (event: JQuery.ScrollEvent) => {
+      this._moveData.elementInfos.forEach(info => info.$element.stop(true, true));
+      this._moveData.$clone.stop(true, true);
+      this._moveData.$cloneShadow?.stop(true, true);
+    };
+    $scrollParents.on('scroll', releasingScrollHandler);
 
     let promises = [];
     this._moveData.$clone.addClass('releasing');
@@ -365,7 +483,7 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
       .promise());
 
     // Fade out shadow
-    promises.push(this._moveData.$cloneShadow
+    this._moveData.$cloneShadow && promises.push(this._moveData.$cloneShadow
       .stop(true)
       .animate({
         opacity: 0
@@ -375,32 +493,44 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
       .promise());
 
     return $.promiseAll(promises).then(() => {
-      $scrollParents.off('scroll', this._releasingScrollHandler);
+      $scrollParents.off('scroll', releasingScrollHandler);
     });
   }
 
-  protected _onReleasingScroll(event: JQuery.ScrollEvent) {
-    this._moveData.elementInfos.forEach(info => info.$element.stop(true, true));
-    this._moveData.$cloneShadow.stop(true, true);
-    this._moveData.$clone.stop(true, true);
-  }
-
   /**
-   * @returns the target offset bounds to where the element should be moved
+   * Called when the mouse button is released.
+   *
+   * After the promise is resolved, the clone is moved to the returned target bounds. The default
+   * implementation returns the dragged element's original location. When the animation has been
+   * completed, the clone is destroyed and the operation ends.
+   *
+   * @returns the target offset bounds to where the element should be moved, or null if the
+   *          operation should be ended without animation.
    */
   protected _dragEnd(event: JQuery.MouseUpEvent): JQuery.Promise<Rectangle> {
     let info = this._moveData.draggedElementInfo;
     return $.resolvedPromise(new Rectangle(info.bounds.x, info.bounds.y, info.bounds.width, info.bounds.height));
   }
 
+  /**
+   * Called when the move operation has finished and the element was actually moved.
+   * All animations are done, the clone and all listeners have been removed.
+   */
   protected _moveEnd() {
     this.trigger('moveEnd');
   }
 
+  /**
+   * Called when the move operation has finished normally. The element may or may not have been
+   * moved. All animations are done, the clone and all listeners have been removed.
+   */
   protected _end() {
     this.trigger('end');
   }
 
+  /**
+   * Called when the move operation has been cancelled (e.g. user pressed ESC or widget was removed).
+   */
   protected _cancel() {
     this.trigger('cancel');
   }
@@ -409,11 +539,7 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
 /**
  * Temporary data structure to store data while mouse actions are handled.
  */
-export interface MoveData<TElem extends Widget> {
-  /**
-   * Distance from cursor to the edges of the dragged element.
-   */
-  cursorDistance: Insets;
+export interface MoveData<TElem extends DraggableElement> {
   session: Session;
   $window: JQuery<Window>;
   /**
@@ -421,9 +547,26 @@ export interface MoveData<TElem extends Widget> {
    */
   $container: JQuery;
   /**
-   * The offset bounds of the container;
+   * The offset bounds of the container relative to the document, including margins.
    */
   containerBounds: Rectangle;
+  /**
+   * The element representing the scrollable viewport. Is either the same as $container or its scroll parent.
+   * The viewport is scrolled automatically when the mouse cursor is moved near its edges while dragging.
+   */
+  $viewport: JQuery;
+  /**
+   * The current scroll position of $viewport.
+   */
+  scrollPosition: Point;
+  /**
+   * The maximum scroll position of $viewport.
+   */
+  maxScrollPosition: Point;
+  /**
+   * Helper object to automatically scroll the $viewport when the mouse is moved towards its edges while dragging.
+   */
+  viewportScroller: ViewportScroller;
   /**
    * The draggable elements.
    */
@@ -433,39 +576,62 @@ export interface MoveData<TElem extends Widget> {
    */
   elementInfos: DraggableElementInfo<TElem>[];
   /**
+   * The dragged element. Same as to `draggedElementInfo.element`.
+   */
+  draggedElement: TElem;
+  /**
+   * The dragged DOM element. Same as `draggedElementInfo.$element`.
+   */
+  $draggedElement: JQuery;
+  /**
    * Contains various information about the dragged element.
    */
   draggedElementInfo: DraggableElementInfo<TElem>;
   /**
-   * Points to draggedElementInfo.$element.
+   * Distance from cursor to the edges of the dragged element when the dragging started.
    */
-  $draggedElement: JQuery;
+  cursorDistance: Insets;
   /**
-   * The position of the cursor when the dragging started.
+   * The position of the cursor relative to the container when the dragging started.
    */
   startCursorPosition: Point;
   /**
-   * The current position of the cursor.
+   * The current position of the cursor relative to the container.
    */
   currentCursorPosition: Point;
   /**
-   * Whether an element is being moved.
+   * Whether the dragged element is being moved.
    */
   moving: boolean;
   /**
-   * A clone of the dragged element that follows the cursor. The dragged element itself stays at its original position until it should be moved to a new location.
+   * A clone of the dragged element that follows the cursor. The dragged element itself stays
+   * at its original position until it should be moved to a new location. This element is only
+   * created once the dragging has started (i.e. mouseMoveThreshold has been exceeded).
    */
   $clone: JQuery;
   /**
-   * A dedicated shadow element so it can be animated.
+   * A dedicated shadow element (inside the $clone) so it can be animated.
    */
   $cloneShadow: JQuery;
   cloneStartOffset: Point;
   cloneBounds: Rectangle;
 }
 
-export interface DraggableElementInfo<TElem extends Widget> {
+// FIXME bsh [dnd-table]: rename to MovableElement?
+export interface DraggableElement {
+  $container: JQuery;
+  /**
+   * Used to populate {@link MoveData.session}.
+   */
+  session: Session;
+}
+
+// FIXME bsh [dnd-table]: rename to MovableElementInfo?
+export interface DraggableElementInfo<TElem extends DraggableElement> {
   element: TElem;
+  /**
+   * Same as `element.$container`
+   */
   $element: JQuery;
   /**
    * The relative position to the container.
@@ -479,6 +645,7 @@ export interface DraggableElementInfo<TElem extends Widget> {
 
 export interface MoveSupportEventMap extends EventMap {
   'drag': Event;
+  'dragOutside': Event;
   'moveEnd': Event;
   'end': Event;
   'cancel': Event;

@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.rt.api.data.table.DateGroupType;
+import org.eclipse.scout.rt.api.data.table.TableRowDropPosition;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
@@ -49,15 +50,11 @@ public interface ITableUIFacade {
 
   void fireColumnMovedFromUI(IColumn<?> c, int toViewIndex);
 
-  /**
-   * @param visibleColumns
-   */
   void fireVisibleColumnsChangedFromUI(Collection<IColumn<?>> visibleColumns);
 
   void setColumnWidthFromUI(IColumn<?> c, int newWidth);
 
   /**
-   * @param column
    * @param multiSort
    *     True: Multiple sort columns are supported, which means the given column is added to the list of sort
    *     columns, if not added yet.<br>
@@ -132,4 +129,6 @@ public interface ITableUIFacade {
   void setColumnBackgroundEffect(INumberColumn<?> column, String mode);
 
   void setDateGroupTypeFromUI(IDateColumn column, DateGroupType groupType);
+
+  void fireRowDropFromUI(ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position);
 }

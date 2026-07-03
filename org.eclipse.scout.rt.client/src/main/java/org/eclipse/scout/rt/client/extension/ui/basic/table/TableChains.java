@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.extension.ui.basic.table;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.api.data.table.TableRowDropPosition;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -63,6 +64,23 @@ public final class TableChains {
         @Override
         protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           next.execRowAction(TableRowActionChain.this, row);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
+
+  public static class TableRowDropChain extends AbstractTableChain {
+
+    public TableRowDropChain(List<? extends ITableExtension<? extends AbstractTable>> extensions) {
+      super(extensions);
+    }
+
+    public void execRowDrop(ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position) {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
+          next.execRowDrop(TableRowDropChain.this, sourceRow, targetRow, position);
         }
       };
       callChain(methodInvocation);

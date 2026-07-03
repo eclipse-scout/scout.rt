@@ -190,6 +190,11 @@
   overflow: hidden;
   width: 100%;
 
+  &.rows-draggable {
+    // Ensure empty space at the bottom, so that rows can be easily dragged to the end
+    padding-bottom: 15px;
+  }
+
   :not(.header-invisible) > & {
     /* Draw the .table-data div one pixel higher, over the header (for selection border).
        Add the padding to keep the size of the first row and not overdraw the header line with the row background */

@@ -9,14 +9,14 @@
  */
 import {
   Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke, ContextMenuPopup, dataObjects, Desktop,
-  DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, ErrorHandler, EventHandler, EventModel, events, Filter, Filterable, FilterOrFunction, FilterResult, FilterSupport,
-  FullModelOf, graphics, GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder,
-  menus as menuUtil, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToAlignment,
-  ScrollToOptions, Status, StatusOrModel, strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer, TableDefaultRowActionKeyStroke, TableEventMap,
-  TableFooter, TableGroupEvent, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke,
-  TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableSelectKeyStroke,
-  TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUiPreferences, tableUiPreferences, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox,
-  tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences, UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
+  DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DraggableTableRowElement, DropType, EnumObject, ErrorHandler, EventHandler, EventModel, events, Filter, Filterable, FilterOrFunction,
+  FilterResult, FilterSupport, FullModelOf, graphics, GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations,
+  MenuItemsOrder, menus as menuUtil, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars,
+  ScrollToAlignment, ScrollToOptions, Status, StatusOrModel, strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer, TableDefaultRowActionKeyStroke,
+  TableEventMap, TableFooter, TableGroupEvent, TableHeader, TableLayout, TableModel, TableMoveSupport, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke,
+  TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowDropPosition, TableRowModel, TableSelectAllKeyStroke,
+  TableSelectionHandler, TableSelectKeyStroke, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUiPreferences, tableUiPreferences, TableUpdateBuffer, TableUserFilter,
+  TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences, UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -136,6 +136,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   defaultRowAction: Action;
   userPreferenceContext: string;
   uiPreferencesEnabled: boolean;
+  rowsDraggable = false;
 
   $data: JQuery;
   $emptyData: JQuery;
@@ -170,6 +171,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   protected _mouseDownRowId: string;
   protected _mouseDownColumn: Column<any>;
   protected _initialUiPreferences: TableClientUiPreferenceProfileDo;
+  protected _rowsDraggableComputed: boolean;
 
   constructor() {
     super();
@@ -410,6 +412,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._sortWhileInit(); // required in case the rows are already provided in the initial model
     this._updateMenusEnabled();
     this._initTablePreferences();
+    this._setRowsDraggable(this.rowsDraggable);
   }
 
   protected _initTablePreferences() {
@@ -650,6 +653,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._updateRowHeight();
     this._updateAriaRowCount();
     this._renderViewport();
+    this._renderRowsDraggableComputed();
     if (this.scrollToSelection) {
       this.revealSelection();
     }
@@ -807,12 +811,17 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       !($target.hasClass('checkable') || $target.parent().hasClass('checkable'))) {
       this.checkRow(row, !row.checked);
     }
+
     if (isRightClick) {
       event.preventDefault();
       this.showContextMenu({
         pageX: event.pageX,
         pageY: event.pageY
       });
+    }
+
+    if (event.which === 1 && this.isRowDraggable(row)) {
+      this._dragRow(event, row);
     }
   }
 
@@ -2368,6 +2377,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    */
   protected _installRow(row: TableRow) {
     row.height = this._measureRowHeight(row.$row);
+    row.$row.toggleClass('draggable', this.isRowDraggable(row));
 
     if (row.hasError) {
       this._showCellErrorForRow(row);
@@ -6741,6 +6751,111 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     tableUiPreferences.applyProfile(this, this._initialUiPreferences, {applyUserFilters: true, applyNonDisplayableColumns: true});
     if (this.uiPreferencesEnabled) {
       tableUiPreferences.clearGlobalProfile(this);
+    }
+  }
+
+  /**
+   * @see TableModel.rowsDraggable
+   */
+  setRowsDraggable(rowsDraggable: boolean) {
+    this.setProperty('rowsDraggable', rowsDraggable);
+  }
+
+  protected _setRowsDraggable(rowsDraggable: boolean) {
+    this._setProperty('rowsDraggable', !!rowsDraggable);
+    this._updateRowsDraggableComputed();
+  }
+
+  override recomputeEnabled(parentEnabled?: boolean) {
+    super.recomputeEnabled(parentEnabled);
+    this._updateRowsDraggableComputed();
+  }
+
+  isRowDraggable(row: TableRow): boolean {
+    return this._rowsDraggableComputed && scout.nvl(row.draggable, row.enabled);
+  }
+
+  protected _updateRowsDraggableComputed() {
+    let oldRowsDraggableComputed = this._rowsDraggableComputed;
+    this._rowsDraggableComputed = this.rowsDraggable && this.enabledComputed;
+    if (oldRowsDraggableComputed !== this._rowsDraggableComputed) {
+      this.selectionHandler.mouseMoveSelectionEnabled = !this._rowsDraggableComputed;
+      if (this.rendered) {
+        this._renderRowsDraggableComputed();
+        this._rerenderViewport(); // reinstall rows to apply isRowDraggable()
+      }
+    }
+  }
+
+  protected _renderRowsDraggableComputed() {
+    this.$data.toggleClass('rows-draggable', this._rowsDraggableComputed);
+  }
+
+  protected _dragRow(event: JQuery.MouseDownEvent, draggedRow: TableRow) {
+    let draggedElement = null;
+    let elements = this.visibleRows.map(row => {
+      let element = {
+        row: row,
+        $container: row.$row,
+        session: this.session
+      } as DraggableTableRowElement;
+      if (row === draggedRow) {
+        draggedElement = element;
+      }
+      return element;
+    });
+    if (draggedElement) {
+      let moveSupport = this._createMoveSupport();
+      moveSupport.start(event, elements, draggedElement);
+    }
+  }
+
+  protected _createMoveSupport(): TableMoveSupport {
+    return new TableMoveSupport(this);
+  }
+
+  /**
+   * Moves a row within the table. The new location is computed using the given target row and position.
+   * If the table is hierarchical, the parent row is updated accordingly.
+   */
+  dropRow(sourceRow: TableRow, targetRow: TableRow, position: TableRowDropPosition) {
+    let sourceIndex = this.rows.indexOf(sourceRow);
+    let targetIndex = this.rows.indexOf(targetRow);
+
+    // Check if source row gets a new parent row
+    let parentRow = targetRow.parentRow;
+    if (position === TableRowDropPosition.FIRST_CHILD || position === TableRowDropPosition.LAST_CHILD) {
+      parentRow = targetRow;
+    }
+    let parentRowChanged = false;
+    if (sourceRow.parentRow !== parentRow) {
+      sourceRow.parentRow = parentRow;
+      parentRowChanged = true;
+    }
+
+    // Compute new position
+    if (position === TableRowDropPosition.LAST_CHILD) {
+      // Insert at end of subtree
+      let lastRow = targetRow;
+      while (arrays.hasElements(lastRow.childRows)) {
+        lastRow = arrays.last(lastRow.childRows);
+      }
+      targetIndex = this.rows.indexOf(lastRow) + 1;
+    }
+    if (position === TableRowDropPosition.AFTER || position === TableRowDropPosition.FIRST_CHILD) {
+      targetIndex++;
+    }
+    if (sourceIndex < targetIndex) {
+      // Going downward -> because the source row will be removed from its old place, all subsequent
+      // rows will be moved up by 1 -> decrease target index by the same amount.
+      targetIndex--;
+    }
+
+    // Update row
+    if (sourceIndex !== targetIndex) {
+      this.moveRow(sourceIndex, targetIndex);
+    } else if (parentRowChanged) {
+      this.updateRow(sourceRow);
     }
   }
 

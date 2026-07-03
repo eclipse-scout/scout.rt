@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -301,11 +301,21 @@ export interface TableModel extends WidgetModel {
   userPreferenceContext?: string;
   /**
    * Specifies whether certain UI changes made by the user (e.g. order or width of columns) are stored and re-applied later.
-   * The default is `false`.
+   *
+   * Default is false.
    *
    * **Important:** To ensure that the saved preferences are assigned to the correct table again, it is important that
    * it has a unique and stable identifier. If this property is set to true, it is therefore highly recommended to also
    * set the `uuid` property explicitly.
    */
   uiPreferencesEnabled?: boolean;
+  /**
+   * Specifies whether rows can be moved by dragging them with the mouse. Only has an effect if the table is enabled.
+   *
+   * Default is false.
+   *
+   * @see TableRow.draggable
+   * @see TableRow.dropTypes
+   */
+  rowsDraggable?: boolean;
 }

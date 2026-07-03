@@ -11,7 +11,7 @@ import {
   AdapterData, App, arrays, BooleanColumn, Cell, ChildModelOf, Column, ColumnModel, ColumnUserFilter, DateColumn, defaultValues, Event, Filter, ModelAdapter, NumberColumn, NumberColumnAggregationFunction, ObjectOrModel, objects,
   RemoteEvent, RemoteTableOrganizer, scout, Table, TableAggregationFunctionChangedEvent, TableAppLinkActionEvent, TableCancelCellEditEvent, TableColumnBackgroundEffectChangedEvent, TableColumnDateGroupTypeChangedEvent,
   TableColumnMovedEvent, TableColumnResizedEvent, TableCompleteCellEditEvent, TableDropEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableModel, TablePrepareCellEditEvent, TableReloadEvent, TableRow,
-  TableRowActionEvent, TableRowClickEvent, TableRowModel, TableRowsCheckedEvent, TableRowsExpandedEvent, TableRowsSelectedEvent, TableSortEvent, TableUserFilter, ValueField
+  TableRowActionEvent, TableRowClickEvent, TableRowDropEvent, TableRowDropPosition, TableRowModel, TableRowsCheckedEvent, TableRowsExpandedEvent, TableRowsSelectedEvent, TableSortEvent, TableUserFilter, ValueField
 } from '../index';
 import $ from 'jquery';
 
@@ -367,6 +367,19 @@ export class TableAdapter extends ModelAdapter {
     event.preventDefault();
   }
 
+  protected _onWidgetRowDrop(event: TableRowDropEvent) {
+    this._sendRowDrop(event.sourceRow, event.targetRow, event.position);
+    event.preventDefault();
+  }
+
+  protected _sendRowDrop(sourceRow: TableRow, targetRow: TableRow, position: TableRowDropPosition) {
+    this._send('rowDrop', {
+      sourceRowId: sourceRow.id,
+      targetRowId: targetRow.id,
+      position: position
+    });
+  }
+
   protected override _onWidgetEvent(event: Event<Table>) {
     if (event.type === 'rowsSelected') {
       this._onWidgetRowsSelected(event as TableRowsSelectedEvent);
@@ -412,6 +425,8 @@ export class TableAdapter extends ModelAdapter {
       this._onWidgetColumnDateGroupTypeChanged(event as TableColumnDateGroupTypeChangedEvent);
     } else if (event.type === 'drop' && this.widget.dragAndDropHandler) {
       this.widget.dragAndDropHandler.uploadFiles(event as TableDropEvent);
+    } else if (event.type === 'rowDrop') {
+      this._onWidgetRowDrop(event as TableRowDropEvent);
     } else {
       super._onWidgetEvent(event);
     }

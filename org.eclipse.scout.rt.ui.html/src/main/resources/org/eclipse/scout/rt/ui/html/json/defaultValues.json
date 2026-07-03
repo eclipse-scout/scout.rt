@@ -269,6 +269,7 @@
       "rowIconVisible": false,
       "rows": [],
       "rowIconColumnWidth": 32,
+      "rowsDraggable": false,
       "scrollToSelection": false,
       "selectedRows": [],
       "sortEnabled": true,

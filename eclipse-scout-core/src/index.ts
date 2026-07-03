@@ -571,6 +571,7 @@ export * from './table/TileTableHeaderGroupByLookupCall';
 export * from './table/TileTableHeaderGroupByLookupCallModel';
 export * from './table/TileTableHeaderSortByLookupCall';
 export * from './table/TileTableHeaderSortByLookupCallModel';
+export * from './table/TableMoveSupport';
 export * from './table/columns/comparators';
 export * from './table/columns/Column';
 export * from './table/columns/ColumnModel';
