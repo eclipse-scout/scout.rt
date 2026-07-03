@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -144,13 +144,12 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   _createSearchPattern(text: string): RegExp {
-    // Implementation copied from LocalLookupCall.java
+    // Implementation copied from LookupHelper.createTextSearchPattern to match LocalLookupCall.java
 
     const WILDCARD = '*';
     const WILDCARD_PLACEHOLDER = '@wildcard@';
 
     text = strings.nvl(text);
-    text = text.toLowerCase();
     text = text.replace(new RegExp(strings.quote(WILDCARD), 'g'), WILDCARD_PLACEHOLDER);
     text = strings.quote(text);
 
@@ -163,10 +162,13 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
     if (!strings.endsWith(text, WILDCARD_PLACEHOLDER)) {
       text += WILDCARD_PLACEHOLDER;
     }
+    if (!strings.startsWith(text, WILDCARD_PLACEHOLDER)) {
+      text = WILDCARD_PLACEHOLDER + text;
+    }
 
     text = text.replace(new RegExp(strings.quote(WILDCARD_PLACEHOLDER), 'g'), '.*');
 
-    return new RegExp('^' + text + '$', 's'); // s = DOT_ALL
+    return new RegExp('^' + text + '$', 'siu'); // s = DOT_ALL, i = CASE_INSENSITIVE, u = UNICODE_CASE
   }
 
   protected override _getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {

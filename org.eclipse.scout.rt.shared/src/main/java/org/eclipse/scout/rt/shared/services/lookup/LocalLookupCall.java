@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,12 +19,13 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.dataobject.lookup.LookupHelper;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
 
 /**
@@ -40,8 +41,6 @@ public class LocalLookupCall<T> extends LookupCall<T> {
   private static final long serialVersionUID = 0L;
 
   private boolean m_hierarchicalLookup;
-
-  private static final String WILDCARD_PLACEHOLDER = "@wildcard@";
 
   @Override
   @SuppressWarnings("squid:S1185") // method is required to satisfy LookupCall quality checks that require equals to be overridden
@@ -82,25 +81,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
   }
 
   protected Pattern createSearchPattern(String s) {
-    if (s == null) {
-      s = "";
-    }
-    s = s.replace(getWildcard(), WILDCARD_PLACEHOLDER);
-    s = s.toLowerCase();
-    s = StringUtility.escapeRegexMetachars(s);
-
-    // replace repeating wildcards to prevent regex DoS
-    String duplicateWildcards = WILDCARD_PLACEHOLDER.concat(WILDCARD_PLACEHOLDER);
-    while (s.contains(duplicateWildcards)) {
-      s = s.replace(duplicateWildcards, WILDCARD_PLACEHOLDER);
-    }
-
-    if (!s.contains(WILDCARD_PLACEHOLDER)) {
-      s = s.concat(WILDCARD_PLACEHOLDER);
-    }
-
-    s = s.replace(WILDCARD_PLACEHOLDER, ".*");
-    return Pattern.compile(s, Pattern.DOTALL);
+    return BEANS.get(LookupHelper.class).createTextSearchPattern(s, getWildcard());
   }
 
   @Override
