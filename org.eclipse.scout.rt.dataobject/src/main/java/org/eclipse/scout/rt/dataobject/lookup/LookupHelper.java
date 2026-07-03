@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -330,7 +330,7 @@ public class LookupHelper {
       return truePredicate();
     }
     Assertions.assertNotNull(textAccessor, "textAccessor is required");
-    Pattern pattern = createTextSearchPattern(textPattern);
+    Pattern pattern = createTextSearchPattern(textPattern, WILDCARD);
     return data -> {
       if (data == null) {
         return false;
@@ -362,15 +362,25 @@ public class LookupHelper {
 
   /**
    * Text lookup pattern
+   * <p>
+   * When changing this method, update StaticLookupCall._createSearchPattern as well.
    */
-  protected Pattern createTextSearchPattern(String text) {
+  public Pattern createTextSearchPattern(String text, String wildcard) {
     if (text == null) {
       text = "";
     }
-    text = text.replace(WILDCARD, WILDCARD_REPLACE);
+    text = text.replace(wildcard, WILDCARD_REPLACE);
     text = StringUtility.escapeRegexMetachars(text);
+
+    // replace repeating wildcards to prevent regex DoS
+    String duplicateWildcards = WILDCARD_REPLACE.concat(WILDCARD_REPLACE);
+    while (text.contains(duplicateWildcards)) {
+      text = text.replace(duplicateWildcards, WILDCARD_REPLACE);
+    }
+
     text = text.replace(WILDCARD_REPLACE, MATCH_ALL_REGEX);
-    if (!text.contains(MATCH_ALL_REGEX)) {
+
+    if (!text.endsWith(MATCH_ALL_REGEX)) {
       text = text + MATCH_ALL_REGEX;
     }
     if (!text.startsWith(MATCH_ALL_REGEX)) {

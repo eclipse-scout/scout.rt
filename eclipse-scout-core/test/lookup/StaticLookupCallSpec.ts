@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -88,7 +88,10 @@ describe('StaticLookupCall', () => {
     lookupCall.getByText('f').then(result => expectLookupRows(result).toEqual(['Foo']));
     jasmine.clock().tick(500);
 
-    lookupCall.getByText('a').then(result => expectLookupRows(result).toEqual([]));
+    lookupCall.getByText('a').then(result => expectLookupRows(result).toEqual(['Bar', 'Baz']));
+    jasmine.clock().tick(500);
+
+    lookupCall.getByText('O').then(result => expectLookupRows(result).toEqual(['Foo']));
     jasmine.clock().tick(500);
 
     lookupCall.getByText('*a').then(result => expectLookupRows(result).toEqual(['Bar', 'Baz']));

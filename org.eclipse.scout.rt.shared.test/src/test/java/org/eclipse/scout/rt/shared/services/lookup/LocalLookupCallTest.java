@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -92,7 +92,9 @@ public class LocalLookupCallTest {
     runGetDataByTextFiltered(8, null, null);
     runGetDataByTextFiltered(4, "*or*", null);
     runGetDataByTextFiltered(4, "*or*", "*");
-    runGetDataByTextFiltered(3, "*or", null);
+    runGetDataByTextFiltered(4, "*or", null);
+    runGetDataByTextFiltered(4, "or*", null);
+    runGetDataByTextFiltered(4, "or", null);
     runGetDataByTextFiltered(2, "ip", null);
     runGetDataByTextFiltered(0, "foo", null);
     runGetDataByTextFiltered(1, "ipi", null);
@@ -100,6 +102,8 @@ public class LocalLookupCallTest {
     runGetDataByTextFiltered(8, "", null);
     runGetDataByTextFiltered(0, "°", null);
     runGetDataByTextFiltered(1, "*?*", null);
+    runGetDataByTextFiltered(1, "?*", null);
+    runGetDataByTextFiltered(1, "?", null);
     runGetDataByTextFiltered(1, "*\\*", null);
   }
 
@@ -107,16 +111,20 @@ public class LocalLookupCallTest {
   public void testGetDataByTextFilteredCustomWildcard() {
     runGetDataByTextFiltered(8, null, "°");
     runGetDataByTextFiltered(4, "°or°", "°");
-    runGetDataByTextFiltered(3, "°or", "°");
+    runGetDataByTextFiltered(4, "°or", "°");
+    runGetDataByTextFiltered(4, "or°", "°");
+    runGetDataByTextFiltered(4, "or", "°");
     runGetDataByTextFiltered(2, "ip", "°");
     runGetDataByTextFiltered(0, "foo", "°");
     runGetDataByTextFiltered(1, "ipi", "°");
     runGetDataByTextFiltered(8, "°", "°");
     runGetDataByTextFiltered(8, "", "°");
-    runGetDataByTextFiltered(0, "*", "°");
+    runGetDataByTextFiltered(2, "*", "°");
     runGetDataByTextFiltered(2, "°*°", "°");
     runGetDataByTextFiltered(1, "text with°*°", "°");
     runGetDataByTextFiltered(1, "°?°", "°");
+    runGetDataByTextFiltered(1, "?°", "°");
+    runGetDataByTextFiltered(1, "?", "°");
     runGetDataByTextFiltered(1, "°\\°", "°");
   }
 
