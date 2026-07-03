@@ -134,7 +134,8 @@ public class UiSessionInitAndDisposeTest {
             "UiSession.getOrCreateClientSession",
             "ClientSession.execLoadSession",
             "Desktop.execOpened",
-            "Desktop.execGuiAttached"),
+            "Desktop.execGuiAttached",
+            "UiSession.verifySubject"),
         m_protocol);
     m_protocol.clear();
 
@@ -190,11 +191,12 @@ public class UiSessionInitAndDisposeTest {
             "UiSession.getOrCreateClientSession",
             "ClientSession.execLoadSession",
             "Desktop.execOpened",
-            "Desktop.execGuiAttached"),
+            "Desktop.execGuiAttached",
+            "UiSession.verifySubject"),
         m_protocol);
     m_protocol.clear();
 
-    //brower tab closed -> json unload
+    //browser tab closed -> json unload
     try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/unload/" + uiSessionId, null);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
@@ -248,11 +250,12 @@ public class UiSessionInitAndDisposeTest {
             "UiSession.getOrCreateClientSession",
             "ClientSession.execLoadSession",
             "Desktop.execOpened",
-            "Desktop.execGuiAttached"),
+            "Desktop.execGuiAttached",
+            "UiSession.verifySubject"),
         m_protocol);
     m_protocol.clear();
 
-    //brower tab reload -> json unload
+    //browser tab reload -> json unload
     try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/unload/" + uiSessionId, null);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
@@ -288,13 +291,14 @@ public class UiSessionInitAndDisposeTest {
         Arrays.asList(
             "UiSession.dispose",
             "UiSession.init",
-            "UiSession.getOrCreateClientSession"),
+            "UiSession.getOrCreateClientSession",
+            "UiSession.verifySubject"),
         m_protocol.stream().filter(s -> s.startsWith("UiSession.")).collect(Collectors.toList()));
     m_protocol.clear();
     assertEquals(1, store.countClientSessions());
     assertEquals(1, store.countUiSessions());
 
-    //brower tab closed -> json unload
+    //browser tab closed -> json unload
     try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/unload/" + uiSessionId, null);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
@@ -345,11 +349,12 @@ public class UiSessionInitAndDisposeTest {
             "UiSession.getOrCreateClientSession",
             "ClientSession.execLoadSession",
             "Desktop.execOpened",
-            "Desktop.execGuiAttached"),
+            "Desktop.execGuiAttached",
+            "UiSession.verifySubject"),
         m_protocol);
     m_protocol.clear();
 
-    //brower tab duplicate -> json startup with same client session
+    //browser tab duplicate -> json startup with same client session
     // this results in two UiSessions attached to the same client session
     final String clientSessionIdB;
     final String uiSessionIdB;
@@ -367,8 +372,9 @@ public class UiSessionInitAndDisposeTest {
     assertEquals(
         Arrays.asList(
             "UiSession.init",
-            "UiSession.getOrCreateClientSession"
+            "UiSession.getOrCreateClientSession",
             // "Desktop.execGuiAttached" -> this is not called because there is already uiSessionA attached to the clientSession
+            "UiSession.verifySubject"
         ),
         m_protocol);
     m_protocol.clear();
@@ -379,13 +385,13 @@ public class UiSessionInitAndDisposeTest {
 
     final FixtureClientSession clientSession = (FixtureClientSession) store.getClientSessionMap().values().iterator().next();
 
-    //brower tab A closed -> json unload
+    //browser tab A closed -> json unload
     try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/unload/" + uiSessionIdA, null);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       unloadHandler.handlePost(req, resp);
     }
-    //brower tab B closed -> json unload
+    //browser tab B closed -> json unload
     try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/unload/" + uiSessionIdB, null);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
@@ -450,11 +456,12 @@ public class UiSessionInitAndDisposeTest {
             "UiSession.getOrCreateClientSession",
             "ClientSession.execLoadSession",
             "Desktop.execOpened",
-            "Desktop.execGuiAttached"),
+            "Desktop.execGuiAttached",
+            "UiSession.verifySubject"),
         m_protocol);
     m_protocol.clear();
 
-    //brower tab duplicate -> json startup with same client session
+    //browser tab duplicate -> json startup with same client session
     // this results in two UiSessions attached to the same client session
     final String clientSessionIdB;
     final String uiSessionIdB;
@@ -472,8 +479,9 @@ public class UiSessionInitAndDisposeTest {
     assertEquals(
         Arrays.asList(
             "UiSession.init",
-            "UiSession.getOrCreateClientSession"
+            "UiSession.getOrCreateClientSession",
             // "Desktop.execGuiAttached" -> this is not called because there is already uiSessionA attached to the clientSession
+            "UiSession.verifySubject"
         ),
         m_protocol);
     m_protocol.clear();
@@ -482,7 +490,7 @@ public class UiSessionInitAndDisposeTest {
     assertNotEquals(uiSessionIdA, uiSessionIdB);
     assertEquals(2, store.countUiSessions());
 
-    //brower tab A closed -> json unload
+    //browser tab A closed -> json unload
     final IClientSession clientSessionA = store.getClientSessionMap().get(clientSessionIdA);
     try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/unload/" + uiSessionIdA, null);
@@ -508,7 +516,7 @@ public class UiSessionInitAndDisposeTest {
     assertEquals(1, store.countClientSessions());
     assertEquals(1, store.countUiSessions());
 
-    //brower tab B closed -> json unload
+    //browser tab B closed -> json unload
     try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/unload/" + uiSessionIdB, null);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
@@ -562,6 +570,12 @@ public class UiSessionInitAndDisposeTest {
     public void dispose() {
       writeToProtocol("UiSession.dispose");
       super.dispose();
+    }
+
+    @Override
+    public void verifySubject(HttpServletRequest request) {
+      writeToProtocol("UiSession.verifySubject");
+      super.verifySubject(request);
     }
   }
 
