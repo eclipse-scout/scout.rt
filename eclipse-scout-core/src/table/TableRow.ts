@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import $ from 'jquery';
-import {AggregateTableRow, Cell, EnumObject, FilterElement, InitModelOf, LookupRow, objectFactoryHints, ObjectWithType, Page, SomeRequired, Table, TableRowModel} from '../index';
+import {AggregateTableRow, Cell, EnumObject, FilterElement, InitModelOf, LookupRow, objectFactoryHints, ObjectWithType, Page, SomeRequired, Table, TableRowDropTypesDo, TableRowModel} from '../index';
 
 export type TableRowStatus = EnumObject<typeof TableRow.Status>;
 
@@ -45,6 +45,8 @@ export class TableRow implements TableRowModel, ObjectWithType, FilterElement {
    */
   page: Page;
   expandable: boolean;
+  draggable: boolean;
+  dropTypes: TableRowDropTypesDo;
 
   constructor() {
     this.$row = null;

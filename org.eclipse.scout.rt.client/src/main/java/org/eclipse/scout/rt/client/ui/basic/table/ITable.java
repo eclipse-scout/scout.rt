@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -91,6 +91,11 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * Boolean
    */
   String PROP_CHECKABLE = "checkable";
+
+  /**
+   * Boolean
+   */
+  String PROP_ROWS_DRAGGABLE = "rowsDraggable";
 
   /**
    * Boolean
@@ -536,6 +541,10 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   boolean isCheckable();
 
   void setCheckable(boolean b);
+
+  boolean isRowsDraggable();
+
+  void setRowsDraggable(boolean rowsDraggable);
 
   boolean isCompact();
 

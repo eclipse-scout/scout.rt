@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.extension.ui.basic.table;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.api.data.table.TableRowDropPosition;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableContentChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCopyChain;
@@ -26,6 +27,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableIni
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableResetColumnsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowClickChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowDropChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsSelectedChain;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -44,6 +46,8 @@ public interface ITableExtension<TABLE extends AbstractTable> extends IExtension
   void execAppLinkAction(TableAppLinkActionChain chain, String ref);
 
   void execRowAction(TableRowActionChain chain, ITableRow row);
+
+  void execRowDrop(TableRowDropChain chain, ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position);
 
   void execContentChanged(TableContentChangedChain chain);
 

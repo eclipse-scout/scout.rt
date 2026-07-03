@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.api.data.table.DateGroupType;
+import org.eclipse.scout.rt.api.data.table.TableRowDropPosition;
+import org.eclipse.scout.rt.api.data.table.TableRowDropTypesDo;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -67,6 +69,7 @@ import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonDataObjectHelper;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -98,6 +101,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   public static final String EVENT_ROW_CLICK = "rowClick";
   public static final String EVENT_ROW_ACTION = "rowAction";
+  public static final String EVENT_ROW_DROP = "rowDrop";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
   public static final String EVENT_ROWS_INSERTED = "rowsInserted";
   public static final String EVENT_ROWS_UPDATED = "rowsUpdated";
@@ -225,6 +229,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       @Override
       protected Boolean modelValue() {
         return getModel().isCheckable();
+      }
+    });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_ROWS_DRAGGABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isRowsDraggable();
       }
     });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_COMPACT, model) {
@@ -604,6 +614,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     else if (EVENT_ROW_ACTION.equals(event.getType())) {
       handleUiRowAction(event);
     }
+    else if (EVENT_ROW_DROP.equals(event.getType())) {
+      handleUiRowDrop(event);
+    }
     else if (EVENT_ROWS_SELECTED.equals(event.getType())) {
       handleUiRowsSelected(event);
     }
@@ -899,6 +912,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     getModel().getUIFacade().fireRowActionFromUI(tableRow);
   }
 
+  protected void handleUiRowDrop(JsonEvent event) {
+    JSONObject data = event.getData();
+    ITableRow sourceRow = getTableRow(data.getString("sourceRowId"));
+    ITableRow targetRow = getTableRow(data.getString("targetRowId"));
+    TableRowDropPosition position = BEANS.get(EnumResolver.class).resolve(TableRowDropPosition.class, data.optString("position", null));
+    getModel().getUIFacade().fireRowDropFromUI(sourceRow, targetRow, position);
+  }
+
   protected void handleUiAppLinkAction(JsonEvent event) {
     IColumn<?> column = extractColumn(event.getData());
     String ref = event.getData().optString("ref", null);
@@ -1053,6 +1074,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     if (row.getCustomValue(AbstractTableRowData.CUSTOM_VALUES_ID_GEO_LOCATION) != null) {
       JSONObject geoLocations = new JSONObject((Map<?, ?>) row.getCustomValue(AbstractTableRowData.CUSTOM_VALUES_ID_GEO_LOCATION));
       putProperty(jsonRow, "geoLocationValues", geoLocations);
+    }
+    if (row.getCustomValue(AbstractTableRowData.CUSTOM_VALUES_ID_DRAGGABLE) instanceof Boolean draggable) {
+      putProperty(jsonRow, "draggable", draggable);
+    }
+    if (row.getCustomValue(AbstractTableRowData.CUSTOM_VALUES_ID_DROP_TYPES) instanceof TableRowDropTypesDo dropTypes) {
+      putProperty(jsonRow, "dropTypes", BEANS.get(JsonDataObjectHelper.class).dataObjectToJson(dropTypes));
     }
     putProperty(jsonRow, "compactValue", BinaryResourceUrlUtility.replaceImageUrls(this, row.getCompactValue()));
     JsonObjectUtility.filterDefaultValues(jsonRow, "TableRow");

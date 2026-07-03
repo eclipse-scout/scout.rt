@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -49,5 +49,6 @@ function visible(element) {
 $.extend($.expr[':'], {
   'focusable-native': element => focusable(element, false),
   'focusable': element => focusable(element, false, true),
-  'tabbable': element => focusable(element, true)
+  'tabbable': element => focusable(element, true),
+  'scrollable': element => Boolean($.data(element, 'scrollable'))
 });

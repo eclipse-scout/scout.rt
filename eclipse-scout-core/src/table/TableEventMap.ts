@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AppLinkActionEvent, Cell, Column, DateColumn, DropType, Event, FileDropEvent, Filter, KeyStroke, Menu, NumberColumn, PropertyChangeEvent, Status, Table, TableCheckableStyle, TableControl, TableGroupingStyle, TableHierarchicalStyle,
-  TableReloadReason, TableRow, Tile, TileTableHeaderBox, ValueField, WidgetEventMap
+  AppLinkActionEvent, Cell, Column, DateColumn, DropType, Event, FileDropEvent, Filter, KeyStroke, Menu, NumberColumn, PropertyChangeEvent, Status, Table, TableAcceptRowDropEvent, TableCheckableStyle, TableControl, TableGroupingStyle,
+  TableHierarchicalStyle, TableReloadReason, TableRow, TableRowDropEvent, Tile, TileTableHeaderBox, ValueField, WidgetEventMap
 } from '../index';
 
 export interface TableColumnBackgroundEffectChangedEvent<T = Table> extends Event<T> {
@@ -199,6 +199,9 @@ export interface TableEventMap extends WidgetEventMap {
   'statusChanged': Event;
   'columnBackgroundEffectChanged': TableColumnBackgroundEffectChangedEvent;
   'columnDateGroupTypeChanged': TableColumnDateGroupTypeChangedEvent;
+  'acceptRowDrop': TableAcceptRowDropEvent;
+  'rowDrop': TableRowDropEvent;
+  'afterRowDrop': TableRowDropEvent;
   'propertyChange:autoResizeColumns': PropertyChangeEvent<boolean>;
   'propertyChange:checkable': PropertyChangeEvent<boolean>;
   'propertyChange:checkableStyle': PropertyChangeEvent<TableCheckableStyle>;

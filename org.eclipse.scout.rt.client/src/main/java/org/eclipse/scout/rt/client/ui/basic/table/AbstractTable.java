@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.eclipse.scout.rt.api.data.table.DateGroupType;
+import org.eclipse.scout.rt.api.data.table.TableRowDropPosition;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
@@ -48,6 +49,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableIni
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableResetColumnsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowClickChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowDropChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsSelectedChain;
 import org.eclipse.scout.rt.client.res.AttachmentSupport;
@@ -539,6 +541,17 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
+   * Specifies whether rows can be moved by dragging them with the mouse. Only has an effect if the table is enabled.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(100)
+  protected boolean getConfiguredRowsDraggable() {
+    return false;
+  }
+
+  /**
    * Configures the checkable column. The checkable column represents the check state of the row, i.e. if it is checked
    * or not. If no checkable column is configured, only the row itself represents if the row was checked or not.
    * <p>
@@ -754,7 +767,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    */
   protected void appendCopyTextForRow(StringBuilder clipboardPlainText, ITableRow row, boolean firstRow, List<IColumn<?>> columns) {
     if (!firstRow) {
-      clipboardPlainText.append(System.getProperty("line.separator"));
+      clipboardPlainText.append(System.lineSeparator());
     }
 
     boolean firstColumn = true;
@@ -1014,6 +1027,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     setCssClass((getConfiguredCssClass()));
     setRowIconVisible(getConfiguredRowIconVisible());
     setRowIconColumnWidth(getConfiguredRowIconColumnWidth());
+    setRowsDraggable(getConfiguredRowsDraggable());
     setHeaderVisible(getConfiguredHeaderVisible());
     setHeaderEnabled(getConfiguredHeaderEnabled());
     setHeaderMenusEnabled(getConfiguredHeaderMenusEnabled());
@@ -1254,7 +1268,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       setCheckableColumn(checkableColumn);
     }
 
-    PropertyChangeListener columnVisibleListener = evt -> {
+    PropertyChangeListener columnVisibleListener = _ -> {
       // disable ui sort possible property if needed
       checkIfColumnPreventsUiSortForTable();
       // prevent invisible context column (because the UI does not know of invisible columns)
@@ -1667,6 +1681,16 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void setCheckable(boolean b) {
     propertySupport.setPropertyBool(PROP_CHECKABLE, b);
+  }
+
+  @Override
+  public boolean isRowsDraggable() {
+    return propertySupport.getPropertyBool(PROP_ROWS_DRAGGABLE);
+  }
+
+  @Override
+  public void setRowsDraggable(boolean rowsDraggable) {
+    propertySupport.setPropertyBool(PROP_ROWS_DRAGGABLE, rowsDraggable);
   }
 
   @Override
@@ -3249,7 +3273,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         if (parentRow == null) {
           throw new IllegalArgumentException("Could not find the parent row of '" + row + "'. parent keys are defined.");
         }
-        parentToChildren.computeIfAbsent(parentRow, children -> new ArrayList<>())
+        parentToChildren.computeIfAbsent(parentRow, _ -> new ArrayList<>())
             .add(row);
       }
       else {
@@ -4422,6 +4446,19 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
   }
 
+  private void fireRowDrop(ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position) {
+    try {
+      // FIXME bsh [dnd-table]: fireRowDrop vs. fireRowDropAction()?
+      interceptRowDrop(sourceRow, targetRow, position);
+    }
+    catch (Exception ex) {
+      BEANS.get(ExceptionHandler.class).handle(ex);
+    }
+  }
+
+  protected void execRowDrop(ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position) {
+  }
+
   private void fireRowOrderChanged() {
     synchronized (m_cachedFilteredRowsLock) {
       m_cachedFilteredRows = null;
@@ -4666,6 +4703,22 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         row = resolveRow(row);
         if (row != null) {
           fireRowAction(row);
+        }
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void fireRowDropFromUI(ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position) {
+      try {
+        pushUIProcessor();
+        //
+        sourceRow = resolveRow(sourceRow);
+        targetRow = resolveRow(targetRow);
+        if (sourceRow != null && targetRow != null) {
+          fireRowDrop(sourceRow, targetRow, position);
         }
       }
       finally {
@@ -5139,6 +5192,11 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
 
     @Override
+    public void execRowDrop(TableRowDropChain chain, ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position) {
+      getOwner().execRowDrop(sourceRow, targetRow, position);
+    }
+
+    @Override
     public void execContentChanged(TableContentChangedChain chain) {
       getOwner().execContentChanged();
     }
@@ -5219,6 +5277,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
     TableRowActionChain chain = new TableRowActionChain(extensions);
     chain.execRowAction(row);
+  }
+
+  protected final void interceptRowDrop(ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position) {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableRowDropChain chain = new TableRowDropChain(extensions);
+    chain.execRowDrop(sourceRow, targetRow, position);
   }
 
   protected final void interceptContentChanged() {
