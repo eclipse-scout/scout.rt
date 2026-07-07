@@ -2361,6 +2361,10 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   scrollToTop(options?: ScrollOptions) {
+    if (!this.rendered) {
+      this.session.layoutValidator.schedulePostValidateFunction(this.scrollToTop.bind(this));
+      return;
+    }
     if (this.getDelegateScrollable()) {
       this.getDelegateScrollable().scrollToTop();
       return;
@@ -2369,14 +2373,15 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     if (!$scrollable) {
       return;
     }
-    if (!this.rendered) {
-      this.session.layoutValidator.schedulePostValidateFunction(this.scrollToTop.bind(this));
-      return;
-    }
+    this.scrollTop = null; // Prevent scrollTop from being restored by _renderScrollTop during rendering
     scrollbars.scrollTop($scrollable, 0, options);
   }
 
   scrollToBottom(options?: ScrollOptions) {
+    if (!this.rendered) {
+      this.session.layoutValidator.schedulePostValidateFunction(this.scrollToBottom.bind(this));
+      return;
+    }
     if (this.getDelegateScrollable()) {
       this.getDelegateScrollable().scrollToBottom();
       return;
@@ -2385,10 +2390,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     if (!$scrollable) {
       return;
     }
-    if (!this.rendered) {
-      this.session.layoutValidator.schedulePostValidateFunction(this.scrollToBottom.bind(this));
-      return;
-    }
+    this.scrollTop = null; // Prevent scrollTop from being restored by _renderScrollTop during rendering
     scrollbars.scrollToBottom($scrollable, options);
   }
 
