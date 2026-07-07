@@ -2270,6 +2270,164 @@ describe('Widget', () => {
     });
   });
 
+  describe('scrollToTop', () => {
+    beforeEach(() => {
+      jasmine.clock().install();
+    });
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
+
+    it('scrolls to top if widget is rendered', () => {
+      let widget = new ScrollableWidget();
+      widget.init({
+        parent: parent,
+        session: session
+      });
+
+      // ensure widget is already rendered
+      widget.render(session.$entryPoint);
+
+      // scroll to some position (other than top-most position)
+      widget.$container[0].scrollTop = 40;
+      widget.$container.trigger('scroll');
+      jasmine.clock().tick(500);
+      expect(widget.scrollTop).toBe(40);
+
+      // ensure scroll to top works properly
+      widget.scrollToTop();
+      widget.$container.trigger('scroll');
+      expect(widget.scrollTop).toBe(0);
+    });
+
+    it('scrolls to top after layouting if widget is not yet rendered', () => {
+      let widget = new ScrollableWidget();
+      widget.init({
+        parent: parent,
+        session: session
+      });
+
+      // call method before widget is rendered -> should be called after layouting is finished
+      widget.scrollToTop();
+
+      // render widget and change scroll position
+      widget.render(session.$entryPoint);
+      widget.$container[0].scrollTop = 40;
+      widget.$container.trigger('scroll');
+      jasmine.clock().tick(500);
+      expect(widget.scrollTop).toBe(40);
+
+      // trigger layouting and ensure scroll to top is executed
+      widget.revalidateLayoutTree();
+      widget.$container.trigger('scroll');
+      jasmine.clock().tick(500);
+      expect(widget.scrollTop).toBe(0);
+    });
+
+    it('removes previous scroll top position and is applied on render after remove', () => {
+      let widget = new ScrollableWidget();
+      widget.init({
+        parent: parent,
+        session: session
+      });
+      widget.render(session.$entryPoint);
+      widget.$container[0].scrollTop = 40;
+      widget.$container.trigger('scroll');
+      jasmine.clock().tick(500);
+      expect(widget.scrollTop).toBe(40);
+
+      // remove widget (scroll top would be applied after re-rendering)
+      widget.remove();
+
+      // trigger scroll to top
+      widget.scrollToTop();
+
+      // re-render (previous scroll top position should not be applied)
+      widget.render(session.$entryPoint);
+      widget.revalidateLayoutTree(); // Scroll top will be rendered after the layout
+      expect(widget.$container[0].scrollTop).toBe(0);
+    });
+  });
+
+  describe('scrollToBottom', () => {
+    beforeEach(() => {
+      jasmine.clock().install();
+    });
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
+
+    it('scrolls to bottom if widget is rendered', () => {
+      let widget = new ScrollableWidget();
+      widget.init({
+        parent: parent,
+        session: session
+      });
+
+      // ensure widget is already rendered
+      widget.render(session.$entryPoint);
+      widget.$container[0].scrollTop = 0;
+      widget.$container.trigger('scroll');
+      jasmine.clock().tick(500);
+      expect(widget.scrollTop).toBe(0);
+
+      // ensure scroll to bottom works properly
+      widget.scrollToBottom();
+      widget.$container.trigger('scroll');
+      expect(widget.scrollTop).toBeGreaterThan(0);
+    });
+
+    it('scrolls to bottom after layouting if widget is not yet rendered', () => {
+      let widget = new ScrollableWidget();
+      widget.init({
+        parent: parent,
+        session: session
+      });
+
+      // call method before widget is rendered -> should be called after layouting is finished
+      widget.scrollToBottom();
+
+      // render widget and change scroll position
+      widget.render(session.$entryPoint);
+      widget.$container[0].scrollTop = 0;
+      widget.$container.trigger('scroll');
+      jasmine.clock().tick(500);
+      expect(widget.scrollTop).toBe(0);
+
+      // trigger layouting and ensure scroll to bottom is executed
+      widget.revalidateLayoutTree();
+      widget.$container.trigger('scroll');
+      jasmine.clock().tick(500);
+      expect(widget.scrollTop).toBeGreaterThan(0);
+    });
+
+    it('removes previous scroll top position and is applied on render after remove', () => {
+      let widget = new ScrollableWidget();
+      widget.init({
+        parent: parent,
+        session: session
+      });
+      widget.render(session.$entryPoint);
+      widget.$container[0].scrollTop = 10;
+      widget.$container.trigger('scroll');
+      jasmine.clock().tick(500);
+      expect(widget.scrollTop).toBe(10);
+
+      // remove widget (scroll top would be applied after re-rendering)
+      widget.remove();
+
+      // trigger scroll to bottom
+      widget.scrollToBottom();
+
+      // re-render (previous scroll top position should not be applied)
+      widget.render(session.$entryPoint);
+      widget.revalidateLayoutTree(); // Scroll top will be rendered after the layout
+      expect(widget.$container[0].scrollTop).toBeGreaterThan(10);
+    });
+  });
+
   describe('isEveryParentVisible', () => {
 
     let parentWidget1, parentWidget2, parentWidget3, testWidget;
