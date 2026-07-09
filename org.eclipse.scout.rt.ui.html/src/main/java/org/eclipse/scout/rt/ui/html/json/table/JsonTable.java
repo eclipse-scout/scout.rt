@@ -838,6 +838,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected void handleColumnAggregationFunctionChanged(JsonEvent event) {
     addTableEventFilterCondition(TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
     IColumn<?> column = extractColumn(event.getData());
+    if (column == null) {
+      LOG.info("Requested column with ID {} doesn't exist. Skip aggregationFunctionChanged event.", event.getData().optString(PROP_COLUMN_ID, null));
+      return;
+    }
     Assertions.assertInstance(column, INumberColumn.class, "Aggregation can only be specified on numeric columns");
     getModel().getUIFacade().fireAggregationFunctionChanged((INumberColumn<?>) column, event.getData().getString("aggregationFunction"));
   }
@@ -845,6 +849,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected void handleColumnBackgroundEffectChanged(JsonEvent event) {
     addTableEventFilterCondition(TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED);
     IColumn<?> column = extractColumn(event.getData());
+    if (column == null) {
+      LOG.info("Requested column with ID {} doesn't exist. Skip columnBackgroundEffectChanged event.", event.getData().optString(PROP_COLUMN_ID, null));
+      return;
+    }
     Assertions.assertInstance(column, INumberColumn.class, "BackgroundEffect can only be specified on numeric columns");
     getModel().getUIFacade().setColumnBackgroundEffect((INumberColumn<?>) column, event.getData().optString("backgroundEffect", null));
   }
@@ -852,6 +860,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected void handleUiColumnDateGroupTypeChanged(JsonEvent event) {
     addTableEventFilterCondition(TableEvent.TYPE_COLUMN_DATE_GROUP_TYPE_CHANGED);
     IColumn<?> column = extractColumn(event.getData());
+    if (column == null) {
+      LOG.info("Requested column with ID {} doesn't exist. Skip columnDateGroupTypeChanged event.", event.getData().optString(PROP_COLUMN_ID, null));
+      return;
+    }
     IDateColumn dateColumn = Assertions.assertInstance(column, IDateColumn.class, "DateGroupType can only be specified on date columns");
     DateGroupType groupType = BEANS.get(EnumResolver.class).resolve(DateGroupType.class, event.getData().optString("groupType", null));
     getModel().getUIFacade().setDateGroupTypeFromUI(dateColumn, groupType);

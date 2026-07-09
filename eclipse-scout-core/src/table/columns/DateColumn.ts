@@ -101,10 +101,12 @@ export class DateColumn extends Column<Date> implements DateColumnModel {
   }
 
   protected _setGroupType(groupType: DateGroupType) {
-    this._setProperty('groupType', groupType);
+    const changed = this._setProperty('groupType', groupType);
     this._updateGroupTypeAxis();
-    // Trigger event to update ui preferences and sync to java model
-    this.table.trigger('columnDateGroupTypeChanged', {column: this});
+    if (changed) {
+      // Trigger event to update ui preferences and sync to java model
+      this.table.trigger('columnDateGroupTypeChanged', {column: this});
+    }
   }
 
   protected _updateGroupTypeAxis() {
