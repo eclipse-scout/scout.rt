@@ -258,6 +258,173 @@ describe('PnpmWorkspaceYaml', () => {
     });
   });
 
+  describe('addScoutOverrides', () => {
+
+    it('does nothing when scout block is absent', async () => {
+      await withPnpmWorkspaceYaml(
+        'packages:\n' +
+        '  - pkg-a\n' +
+        'overrides:\n' +
+        '  lodash: 4.17.21\n',
+        async pnpmWorkspaceYaml => {
+          pnpmWorkspaceYaml.addScoutOverrides();
+
+          await pnpmWorkspaceYaml.flush();
+          const content = await fs.readFile(pnpmWorkspaceYaml.path, 'utf8');
+          assert.equal(
+            content,
+            'packages:\n' +
+            '  - pkg-a\n' +
+            'overrides:\n' +
+            '  lodash: 4.17.21\n'
+          );
+        }
+      );
+    });
+
+    it('adds anchor to scout overrides and creates overrides with merge key when no overrides section exists', async () => {
+      await withPnpmWorkspaceYaml(
+        'packages:\n' +
+        '  - pkg-a\n' +
+        'scout:\n' +
+        '  overrides:\n' +
+        '    express: 4.18.0\n',
+        async pnpmWorkspaceYaml => {
+          pnpmWorkspaceYaml.addScoutOverrides();
+
+          await pnpmWorkspaceYaml.flush();
+          const content = await fs.readFile(pnpmWorkspaceYaml.path, 'utf8');
+          assert.equal(
+            content,
+            'packages:\n' +
+            '  - pkg-a\n' +
+            'scout:\n' +
+            '  overrides: &scout-overrides\n' +
+            '    express: 4.18.0\n' +
+            'overrides:\n' +
+            '  <<: *scout-overrides\n'
+          );
+        }
+      );
+    });
+
+    it('adds anchor to scout overrides and merge key to existing overrides', async () => {
+      await withPnpmWorkspaceYaml(
+        'packages:\n' +
+        '  - pkg-a\n' +
+        'scout:\n' +
+        '  overrides:\n' +
+        '    express: 4.18.0\n' +
+        'overrides:\n' +
+        '  lodash: 4.17.21\n',
+        async pnpmWorkspaceYaml => {
+          pnpmWorkspaceYaml.addScoutOverrides();
+
+          await pnpmWorkspaceYaml.flush();
+          const content = await fs.readFile(pnpmWorkspaceYaml.path, 'utf8');
+          assert.equal(
+            content,
+            'packages:\n' +
+            '  - pkg-a\n' +
+            'scout:\n' +
+            '  overrides: &scout-overrides\n' +
+            '    express: 4.18.0\n' +
+            'overrides:\n' +
+            '  <<: *scout-overrides\n' +
+            '  lodash: 4.17.21\n'
+          );
+        }
+      );
+    });
+
+    it('is a no-op when merge key already correctly links to scout overrides', async () => {
+      await withPnpmWorkspaceYaml(
+        'packages:\n' +
+        '  - pkg-a\n' +
+        'scout:\n' +
+        '  overrides: &scout-overrides\n' +
+        '    express: 4.18.0\n' +
+        'overrides:\n' +
+        '  <<: *scout-overrides\n',
+        async pnpmWorkspaceYaml => {
+          pnpmWorkspaceYaml.addScoutOverrides();
+
+          await pnpmWorkspaceYaml.flush();
+          const content = await fs.readFile(pnpmWorkspaceYaml.path, 'utf8');
+          assert.equal(
+            content,
+            'packages:\n' +
+            '  - pkg-a\n' +
+            'scout:\n' +
+            '  overrides: &scout-overrides\n' +
+            '    express: 4.18.0\n' +
+            'overrides:\n' +
+            '  <<: *scout-overrides\n'
+          );
+        }
+      );
+    });
+
+    it('moves merge key to beginning when present but not first in overrides', async () => {
+      await withPnpmWorkspaceYaml(
+        'packages:\n' +
+        '  - pkg-a\n' +
+        'scout:\n' +
+        '  overrides: &scout-overrides\n' +
+        '    express: 4.18.0\n' +
+        'overrides:\n' +
+        '  lodash: 4.17.21\n' +
+        '  <<: *scout-overrides\n',
+        async pnpmWorkspaceYaml => {
+          pnpmWorkspaceYaml.addScoutOverrides();
+
+          await pnpmWorkspaceYaml.flush();
+          const content = await fs.readFile(pnpmWorkspaceYaml.path, 'utf8');
+          assert.equal(
+            content,
+            'packages:\n' +
+            '  - pkg-a\n' +
+            'scout:\n' +
+            '  overrides: &scout-overrides\n' +
+            '    express: 4.18.0\n' +
+            'overrides:\n' +
+            '  <<: *scout-overrides\n' +
+            '  lodash: 4.17.21\n'
+          );
+        }
+      );
+    });
+
+    it('moves overrides after scout when overrides precedes scout block', async () => {
+      await withPnpmWorkspaceYaml(
+        'packages:\n' +
+        '  - pkg-a\n' +
+        'overrides:\n' +
+        '  lodash: 4.17.21\n' +
+        'scout:\n' +
+        '  overrides:\n' +
+        '    express: 4.18.0\n',
+        async pnpmWorkspaceYaml => {
+          pnpmWorkspaceYaml.addScoutOverrides();
+
+          await pnpmWorkspaceYaml.flush();
+          const content = await fs.readFile(pnpmWorkspaceYaml.path, 'utf8');
+          assert.equal(
+            content,
+            'packages:\n' +
+            '  - pkg-a\n' +
+            'scout:\n' +
+            '  overrides: &scout-overrides\n' +
+            '    express: 4.18.0\n' +
+            'overrides:\n' +
+            '  <<: *scout-overrides\n' +
+            '  lodash: 4.17.21\n'
+          );
+        }
+      );
+    });
+  });
+
   describe('updateScoutOverrides', () => {
 
     it('creates scout block with the given overrides and overrides using a merge key when no overrides exist', async () => {

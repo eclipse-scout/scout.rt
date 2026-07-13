@@ -19,6 +19,8 @@ import files from './files.ts';
 const PNPM_WORKSPACE_REGEX = /^pnpm-workspace(-.*)?\.yaml$/;
 const PNPM_WORKSPACE_FILE_EXTENSION = '.yaml';
 
+const SCOUT_OVERRIDES_ANCHOR = 'scout-overrides';
+
 /**
  * This class contains all information of a `pnpm-workspace.yaml`.
  **/
@@ -143,13 +145,36 @@ export class PnpmWorkspaceYaml {
   }
 
   /**
+   * Adds a link to the scout overrides to the overrides.
+   */
+  addScoutOverrides() {
+    const existingScout = this.doc.get('scout') as YAML.YAMLMap;
+    if (!existingScout) {
+      // there is no scout block -> nothing to link
+      return;
+    }
+
+    const existingScoutOverrides = existingScout.get('overrides') as YAML.YAMLMap;
+    if (!existingScout) {
+      // there are no scout overrides -> nothing to link
+      return;
+    }
+
+    if (!existingScoutOverrides.anchor) {
+      // no anchor present -> add anchor
+      existingScoutOverrides.anchor = SCOUT_OVERRIDES_ANCHOR;
+    }
+
+    this._ensureScoutOverridesAlias(existingScout, existingScoutOverrides);
+  }
+
+  /**
    * Updates scout overrides in this `pnpm-workspace.yaml` and links them into the overrides.
    */
   updateScoutOverrides(newScoutOverrides: Record<string, string>) {
     // create new scout overrides block
-    const scoutOverridesAnchorName = 'scout-overrides';
     const scoutOverrides = new YAML.YAMLMap();
-    scoutOverrides.anchor = scoutOverridesAnchorName;
+    scoutOverrides.anchor = SCOUT_OVERRIDES_ANCHOR;
     Object.entries(newScoutOverrides).forEach(([name, override]) => scoutOverrides.set(name, override));
 
     // replace scout block and include overrides
@@ -158,13 +183,13 @@ export class PnpmWorkspaceYaml {
     this.doc.set('scout', scout);
 
     // ensure scout-overrides block is linked in overrides using an alias
-    this._ensureScoutOverridesAlias(scout, scoutOverrides, scoutOverridesAnchorName);
+    this._ensureScoutOverridesAlias(scout, scoutOverrides);
   }
 
   /**
    * Ensures the scout overrides are included in the overrides.
    */
-  protected _ensureScoutOverridesAlias(scout: YAML.YAMLMap, scoutOverrides: YAML.YAMLMap, scoutOverridesAnchorName: string) {
+  protected _ensureScoutOverridesAlias(scout: YAML.YAMLMap, scoutOverrides: YAML.YAMLMap) {
     const mergeKey = '<<';
     const existingOverrides = this.doc.get('overrides') as YAML.YAMLMap;
     if (existingOverrides?.items?.length) {
@@ -174,21 +199,21 @@ export class PnpmWorkspaceYaml {
         // merge key is present and points to an alias
         const alias = first.value as YAML.Alias;
         // check if the alias points to the scout overrides
-        if (alias?.source === scoutOverridesAnchorName) {
+        if (alias?.source === SCOUT_OVERRIDES_ANCHOR) {
           return;
         }
       }
 
       // merge key is missing, not at the beginning or does not point to the correct alias -> add at the beginning or move to the beginning
       const existingOverridesItems = existingOverrides.items;
-      const scoutOverridesMergeKeyIndex = existingOverridesItems.findIndex((pair: YAML.Pair<YAML.Scalar>) => pair.key?.value === mergeKey && pair.value instanceof YAML.Alias && pair.value.source === scoutOverridesAnchorName);
+      const scoutOverridesMergeKeyIndex = existingOverridesItems.findIndex((pair: YAML.Pair<YAML.Scalar>) => pair.key?.value === mergeKey && pair.value instanceof YAML.Alias && pair.value.source === SCOUT_OVERRIDES_ANCHOR);
       if (scoutOverridesMergeKeyIndex > -1) {
         existingOverridesItems.splice(scoutOverridesMergeKeyIndex, 1);
       }
       existingOverrides.items = [
         new YAML.Pair(
           new YAML.Scalar(mergeKey),
-          this.doc.createAlias(scoutOverrides, scoutOverridesAnchorName)
+          this.doc.createAlias(scoutOverrides, SCOUT_OVERRIDES_ANCHOR)
         ),
         ...existingOverrides.items
       ];
@@ -207,7 +232,7 @@ export class PnpmWorkspaceYaml {
       // create new overrides block including the alias
       // it is added at the end and therefore after the
       const newOverrides = {};
-      newOverrides[mergeKey] = this.doc.createAlias(scoutOverrides, scoutOverridesAnchorName);
+      newOverrides[mergeKey] = this.doc.createAlias(scoutOverrides, SCOUT_OVERRIDES_ANCHOR);
       this.doc.set('overrides', newOverrides);
     }
   }

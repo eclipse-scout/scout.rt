@@ -47,18 +47,30 @@ export async function scoutInstall(dir: string, options: UpdateOptions = {update
     await disableScoutOverrides(dir);
   }
 
-  // update
-  console.log('Perform \'pnpm update\'\n');
-  await pnpm.fork(dir, 'update', '--no-save', ...commonPnpmArguments);
-  console.log();
+  try {
+    // update
+    console.log('Perform \'pnpm update\'\n');
+    await pnpm.fork(dir, 'update', '--no-save', ...commonPnpmArguments);
+    console.log();
+  } finally {
+    // enable overrides again
+    if (options.updateMode === updateMode.ALL) {
+      await enableScoutOverrides(dir);
+    }
+  }
 
   // 'pnpm install' updates all non overridden dependencies that do not fulfill the required version
   // -> disable scout overrides and call 'pnpm install' depending on the updateMode
   if (options.updateMode === updateMode.REQUIRED) {
     await disableScoutOverrides(dir);
-    console.log('Perform \'pnpm install\'\n');
-    await pnpm.fork(dir, 'install', ...commonPnpmArguments);
-    console.log();
+    try {
+      console.log('Perform \'pnpm install\'\n');
+      await pnpm.fork(dir, 'install', ...commonPnpmArguments);
+      console.log();
+    } finally {
+      // enable overrides again
+      await enableScoutOverrides(dir);
+    }
   }
 
   if (options.updateMode !== updateMode.SNAPSHOTS) {
@@ -76,6 +88,16 @@ export async function disableScoutOverrides(dir: string): Promise<void> {
   console.log(`Disable scout overrides in '${dir}'\n`);
   const wsYaml = await PnpmWorkspaceYaml.parse(dir);
   wsYaml.removeScoutOverrides();
+  await wsYaml.flush();
+}
+
+/**
+ * Enables scout overrides of the `pnpm-workspace.yaml` in the given directory (see {@link PnpmWorkspaceYaml.addScoutOverrides}).
+ */
+export async function enableScoutOverrides(dir: string): Promise<void> {
+  console.log(`Enable scout overrides in '${dir}'\n`);
+  const wsYaml = await PnpmWorkspaceYaml.parse(dir);
+  wsYaml.addScoutOverrides();
   await wsYaml.flush();
 }
 
