@@ -263,6 +263,164 @@ describe('scoutInstall', () => {
         assert.equal(updateAllScoutOverridesMock.mock.callCount(), 0);
       });
     });
+
+    it('ensures scout overrides are re-enabled in REQUIRED mode if pnpm update fails', async () => {
+      await withPnpmWorkspaceYaml(async dir => {
+        pnpmForkMock.mock.mockImplementation(async (workingDir: string, ...args: string[]) => {
+          if (args[0] === 'update') {
+            throw 'Pnpm update fails';
+          }
+        });
+
+        try {
+          await scoutInstall(dir, {updateMode: updateMode.REQUIRED});
+        } catch (e) {
+          // nop
+        }
+
+        assert.equal(
+          await fs.readFile(join(dir, 'pnpm-workspace.yaml'), 'utf8'),
+          'packages:\n' +
+          '  - pkg-a\n' +
+          'scout:\n' +
+          '  overrides: &scout-overrides\n' +
+          '    lodash: 4.17.21\n' +
+          'overrides:\n' +
+          '  <<: *scout-overrides\n'
+        );
+      });
+    });
+
+    it('ensures scout overrides are re-enabled in ALL mode if pnpm update fails', async () => {
+      await withPnpmWorkspaceYaml(async dir => {
+        pnpmForkMock.mock.mockImplementation(async (workingDir: string, ...args: string[]) => {
+          if (args[0] === 'update') {
+            throw 'Pnpm update fails';
+          }
+        });
+
+        try {
+          await scoutInstall(dir, {updateMode: updateMode.ALL});
+        } catch (e) {
+          // nop
+        }
+
+        assert.equal(
+          await fs.readFile(join(dir, 'pnpm-workspace.yaml'), 'utf8'),
+          'packages:\n' +
+          '  - pkg-a\n' +
+          'scout:\n' +
+          '  overrides: &scout-overrides\n' +
+          '    lodash: 4.17.21\n' +
+          'overrides:\n' +
+          '  <<: *scout-overrides\n'
+        );
+      });
+    });
+
+    it('ensures scout overrides are re-enabled in SNAPSHOTS mode if pnpm update fails', async () => {
+      await withPnpmWorkspaceYaml(async dir => {
+        pnpmForkMock.mock.mockImplementation(async (workingDir: string, ...args: string[]) => {
+          if (args[0] === 'update') {
+            throw 'Pnpm update fails';
+          }
+        });
+
+        try {
+          await scoutInstall(dir, {updateMode: updateMode.SNAPSHOTS});
+        } catch (e) {
+          // nop
+        }
+
+        assert.equal(
+          await fs.readFile(join(dir, 'pnpm-workspace.yaml'), 'utf8'),
+          'packages:\n' +
+          '  - pkg-a\n' +
+          'scout:\n' +
+          '  overrides: &scout-overrides\n' +
+          '    lodash: 4.17.21\n' +
+          'overrides:\n' +
+          '  <<: *scout-overrides\n'
+        );
+      });
+    });
+
+    it('ensures scout overrides are re-enabled in REQUIRED mode if pnpm install fails', async () => {
+      await withPnpmWorkspaceYaml(async dir => {
+        pnpmForkMock.mock.mockImplementation(async (workingDir: string, ...args: string[]) => {
+          if (args[0] === 'install') {
+            throw 'Pnpm install fails';
+          }
+        });
+
+        try {
+          await scoutInstall(dir, {updateMode: updateMode.REQUIRED});
+        } catch (e) {
+          // nop
+        }
+
+        assert.equal(
+          await fs.readFile(join(dir, 'pnpm-workspace.yaml'), 'utf8'),
+          'packages:\n' +
+          '  - pkg-a\n' +
+          'scout:\n' +
+          '  overrides: &scout-overrides\n' +
+          '    lodash: 4.17.21\n' +
+          'overrides:\n' +
+          '  <<: *scout-overrides\n'
+        );
+      });
+    });
+
+    it('ensures scout overrides are re-enabled in REQUIRED mode if updating overrides fails', async () => {
+      await withPnpmWorkspaceYaml(async dir => {
+        updateAllScoutOverridesMock.mock.mockImplementation(async (lockfileDir: string, convergenceLogLevel?: DependencyConvergenceLogLevel) => {
+          throw 'Updating overrides fails';
+        });
+
+        try {
+          await scoutInstall(dir, {updateMode: updateMode.REQUIRED});
+        } catch (e) {
+          // nop
+        }
+
+        assert.equal(
+          await fs.readFile(join(dir, 'pnpm-workspace.yaml'), 'utf8'),
+          'packages:\n' +
+          '  - pkg-a\n' +
+          'scout:\n' +
+          '  overrides: &scout-overrides\n' +
+          '    lodash: 4.17.21\n' +
+          'overrides:\n' +
+          '  <<: *scout-overrides\n'
+        );
+      });
+    });
+
+    it('ensures scout overrides are re-enabled in ALL mode if updating overrides fails', async () => {
+      await withPnpmWorkspaceYaml(async dir => {
+        updateAllScoutOverridesMock.mock.mockImplementation(async (lockfileDir: string, convergenceLogLevel?: DependencyConvergenceLogLevel) => {
+          throw 'Updating overrides fails';
+        });
+
+        try {
+          await scoutInstall(dir, {updateMode: updateMode.ALL});
+        } catch (e) {
+          // nop
+        }
+
+        assert.equal(
+          await fs.readFile(join(dir, 'pnpm-workspace.yaml'), 'utf8'),
+          'packages:\n' +
+          '  - pkg-a\n' +
+          'scout:\n' +
+          '  overrides: &scout-overrides\n' +
+          '    lodash: 4.17.21\n' +
+          'overrides:\n' +
+          '  <<: *scout-overrides\n'
+        );
+      });
+    });
   });
 });
 
