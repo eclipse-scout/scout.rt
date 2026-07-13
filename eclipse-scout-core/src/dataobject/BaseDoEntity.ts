@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Constructor, dataObjects, DeepPartial, DoContributionClassOrType, InitModelOf, objectFactoryHints, objects, ObjectType} from '../index';
+import {Constructor, dataObjects, DataObjectVisitor, dataObjectVisitors, DeepPartial, DoContributionClassOrType, InitModelOf, objectFactoryHints, objects, ObjectType} from '../index';
 import $ from 'jquery';
 
 /**
@@ -103,5 +103,12 @@ export class BaseDoEntity {
    */
   equals(obj: any) {
     return objects.equalsRecursive(this, obj, true /* prevent stackoverflow as this is called in equals */);
+  }
+
+  /**
+   * Visits this {@link BaseDoEntity} using {@link dataObjectVisitors.forEachRecWhile}.
+   */
+  visit<T>(visitor: DataObjectVisitor<T>, type?: Constructor<T>) {
+    dataObjectVisitors.forEachRecWhile(this, type, visitor);
   }
 }

@@ -137,6 +137,7 @@ export * from './dataobject/serialize/DataObjectDeserializer';
 export * from './dataobject/serialize/DataObjectSerializer';
 export * from './dataobject/serialize/DoTypeResolver';
 export * from './dataobject/dataObjects';
+export * from './dataobject/dataObjectVisitors';
 export * from './dataobject/BaseDoEntity';
 export * from './dataobject/ValueDo';
 export * from './ajax/ajax';
