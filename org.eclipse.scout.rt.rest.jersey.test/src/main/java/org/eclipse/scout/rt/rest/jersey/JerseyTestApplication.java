@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.LocalHostAddressHelper;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.rest.RestApplication;
+import org.eclipse.scout.rt.server.context.ServerRunContextFilter;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.glassfish.jersey.servlet.ServletProperties;
@@ -157,6 +158,7 @@ public class JerseyTestApplication {
 
       // register RestApplication
       ServletHolder servlet = handler.addServlet(ServletContainer.class, "/api/*");
+      handler.addFilter(ServerRunContextFilter.class, "/api/*", null);
       servlet.setInitParameter(ServerProperties.WADL_FEATURE_DISABLE, Boolean.TRUE.toString());
       servlet.setInitParameter(ServletProperties.JAXRS_APPLICATION_CLASS, RestApplication.class.getName());
       servlet.setInitOrder(1); // load-on-startup
