@@ -8,16 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 .table-row.draggable.dragged {
-
-  // Dim cell content (but not the border!)
-  & > .table-cell > span {
-    opacity: 0.5;
-  }
-
-  // Hide selection border
-  &::after {
-    .hidden();
-  }
+  opacity: 0.4;
 }
 
 .tms-drag-info {
@@ -66,12 +57,12 @@
 }
 
 .tms-drop-indicator {
+  @tms-drop-indicator-border-width: 2px; // cannot use CSS variable, because CSS round() function is not available in all currently supported browser versions
   --color: @item-selection-border-color;
   --border-style: solid;
   display: block;
   position: absolute;
   width: 100%;
-  margin-top: -1px;
   pointer-events: none;
 
   &.invalid {
@@ -82,11 +73,19 @@
   &::before {
     content: '';
     display: block;
-    border-top: 2px var(--border-style) var(--color);
+    border-top: @tms-drop-indicator-border-width var(--border-style) var(--color);
+  }
+
+  &:not(.center):not(.above-first-row) {
+    // Center line vertically above lower border of previous row
+    margin-top: -1px - max(0, floor((@tms-drop-indicator-border-width - 1) / 2));
   }
 
   &.center {
-    padding: 2px 1px 1px 1px;
+    --border-padding: 1px;
+    padding: var(--border-padding);
+    padding-bottom: calc(var(--border-padding) + 1px); // compensate for bottom row border
+    margin-top: 0;
   }
 
   &.center::before {
@@ -94,7 +93,7 @@
     display: block;
     width: 100%;
     height: 100%;
-    border: 2px var(--border-style) var(--color);
+    border: @tms-drop-indicator-border-width var(--border-style) var(--color);
     border-radius: @control-border-radius;
   }
 }

@@ -56,7 +56,7 @@ export class TableMoveSupport extends MoveSupport<DraggableTableRowElement> {
       // After another short delay, automatically start dragging
       this._cursorBackdropTimeoutId = setTimeout(() => {
         this._moveData.moving = true;
-        this._onFirstMouseMove();
+        this._startMove(event);
         this._moveData.$window.trigger($.Event('mousemove', {
           pageX: event.pageX,
           pageY: event.pageY
@@ -101,8 +101,10 @@ export class TableMoveSupport extends MoveSupport<DraggableTableRowElement> {
       let rowMiddleY = rowBounds.y + rowBounds.height * 0.5;
       placementNoCenter = event.pageY < rowMiddleY ? 'above' : 'below';
 
-      let rowMiddleY1 = rowBounds.y + Math.min(20, rowBounds.height * 0.25);
-      let rowMiddleY2 = rowBounds.y + Math.min(20, rowBounds.height * 0.75);
+      // Check if the cursor is over the top or bottom edge of a row or over the center area between the edges.
+      let rowEdgeHeight = Math.min(20, rowBounds.height * 0.25);
+      let rowMiddleY1 = rowBounds.y + rowEdgeHeight;
+      let rowMiddleY2 = rowBounds.y + rowBounds.height - rowEdgeHeight;
       placement = event.pageY < rowMiddleY1 ? 'above' : (event.pageY > rowMiddleY2 ? 'below' : 'center');
 
       if (targetRow.expandable && targetRow.expanded) {
@@ -284,14 +286,18 @@ export class TableMoveSupport extends MoveSupport<DraggableTableRowElement> {
     );
 
     let indent = indicatorLevel * this.table.rowLevelPadding;
-    if (indicatorLevel && this.table.tableNodeColumn && placement !== 'center') {
-      for (let column of this.table.visibleColumns()) {
+    if (indicatorLevel && this.table.tableNodeColumn) {
+      if (placement !== 'center') {
+        indent += this.table.tableNodeColumn.tableNodeLevel0CellPadding;
+      }
+      // Add the width of all columns before the tableNodeColumn, i.e. columns with nodeColumnCandidate=false
+      // or GUI-only columns, for example the BooleanColumn in checkable tables.
+      for (let column of this.table.visibleColumns(true)) {
         if (column === this.table.tableNodeColumn) {
           break;
         }
         indent += column.width;
       }
-      indent += this.table.tableNodeColumn.tableNodeLevel0CellPadding;
     }
 
     this._moveData.$dropIndicator.cssLeft(rowPosition.x + indent);

@@ -212,9 +212,27 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
 
       this._moveData.moving = true;
       this._onFirstMouseMove();
+      this._startMove(event);
     }
 
     this._whileMove(event, distance);
+  }
+
+  /**
+   * Optional hook for subclasses, called just before {@link _startMove}. The default implementation does nothing.
+   */
+  protected _onFirstMouseMove() {
+  }
+
+  protected _startMove(event: JQuery.MouseEventBase) {
+    // Create a clone of the dragged element that is positioned 'fixed', i.e. with document-absolute coordinates
+    this._moveData.cloneBounds = graphics.offsetBounds(this._moveData.$draggedElement);
+    this._moveData.cloneStartOffset = this._moveData.cloneBounds.point();
+    this._append$Clone();
+
+    // Change style of dragged element, but only after the clone has been created
+    this._moveData.$container.addClass('dragging-element');
+    this._moveData.$draggedElement.addClass('dragged');
   }
 
   protected _whileMove(event: JQuery.MouseMoveEvent, distance: Point) {
@@ -275,16 +293,6 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
 
   protected _dragOutside(event: JQuery.MouseMoveEvent) {
     this.trigger('dragOutside');
-  }
-
-  protected _onFirstMouseMove() {
-    this._moveData.$container.addClass('dragging-element');
-    this._moveData.$draggedElement.addClass('dragged');
-
-    // Create a clone of the dragged element that is positioned 'fixed', i.e. with document-absolute coordinates
-    this._moveData.cloneBounds = graphics.offsetBounds(this._moveData.$draggedElement);
-    this._moveData.cloneStartOffset = this._moveData.cloneBounds.point();
-    this._append$Clone();
   }
 
   protected _append$Clone() {
