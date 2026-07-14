@@ -49,6 +49,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableIni
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableResetColumnsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowClickChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowDropChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsSelectedChain;
 import org.eclipse.scout.rt.client.res.AttachmentSupport;
@@ -4447,9 +4448,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   private void fireRowDrop(ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position) {
     try {
-      // FIXME bsh [dnd-table]: Add interceptRowDrop()
       // FIXME bsh [dnd-table]: fireRowDrop vs. fireRowDropAction()?
-      execRowDrop(sourceRow, targetRow, position);
+      interceptRowDrop(sourceRow, targetRow, position);
     }
     catch (Exception ex) {
       BEANS.get(ExceptionHandler.class).handle(ex);
@@ -4457,7 +4457,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   protected void execRowDrop(ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position) {
-    // FIXME bsh [dnd-table]: Should there be a default implementation, analog to Table#_rowDrop in JS?
   }
 
   private void fireRowOrderChanged() {
@@ -5193,6 +5192,11 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
 
     @Override
+    public void execRowDrop(TableRowDropChain chain, ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position) {
+      getOwner().execRowDrop(sourceRow, targetRow, position);
+    }
+
+    @Override
     public void execContentChanged(TableContentChangedChain chain) {
       getOwner().execContentChanged();
     }
@@ -5273,6 +5277,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
     TableRowActionChain chain = new TableRowActionChain(extensions);
     chain.execRowAction(row);
+  }
+
+  protected final void interceptRowDrop(ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position) {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableRowDropChain chain = new TableRowDropChain(extensions);
+    chain.execRowDrop(sourceRow, targetRow, position);
   }
 
   protected final void interceptContentChanged() {
