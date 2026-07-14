@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, ErrorHandler, Event, EventEmitter, EventMap, events, graphics, Insets, keys, Point, Rectangle, scout, Session, Widget} from '../index';
+import {App, ErrorHandler, Event, EventEmitter, EventMap, events, graphics, InitModelOf, Insets, keys, Point, Rectangle, scout, scrollbars, Session, ViewportScroller, ViewportScrollerModel, Widget} from '../index';
 import $ from 'jquery';
 
 export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
@@ -42,6 +42,7 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
   protected _mouseMoveHandler = this._onMouseMove.bind(this);
   protected _mouseUpHandler = this._onMouseUp.bind(this);
   protected _keyDownHandler = this._onKeyDown.bind(this);
+  protected _scrollHandler = this._onScroll.bind(this);
 
   /**
    * @param widget the widget containing the draggable elements. Is used to automatically cancel the move operation when the widget is removed.
@@ -103,6 +104,8 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
       includeMargin: true
     });
 
+    this._initViewportScroller(this._moveData.$container.scrollParent());
+
     this._moveData.elements = elements;
     this._moveData.elementInfos = this._createElementInfos(elements, draggedElement);
 
@@ -130,6 +133,52 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
     this._moveData.$window[0].removeEventListener('keydown', this._keyDownHandler, true);
     this._moveData.$window[0].addEventListener('keydown', this._keyDownHandler, true);
     $('iframe').addClass('dragging-in-progress');
+  }
+
+  protected _initViewportScroller($viewport: JQuery, options?: ViewportScrollerModel) {
+    if (!$viewport?.length) {
+      return;
+    }
+    this._moveData.$viewport = $viewport;
+    this._moveData.scrollPosition = new Point($viewport.scrollLeft(), $viewport.scrollTop());
+    this._moveData.maxScrollPosition = new Point(
+      Math.max(0, $viewport[0].scrollWidth - $viewport[0].clientWidth),
+      Math.max(0, $viewport[0].scrollHeight - $viewport[0].clientHeight)
+    );
+    $viewport.on('scroll', this._scrollHandler);
+    this._moveData.viewportScroller = scout.create(ViewportScroller, this._viewportScrollerModel());
+  }
+
+  protected _viewportScrollerModel(): InitModelOf<ViewportScroller> {
+    let viewportSize = graphics.size(this._moveData.$viewport);
+    return {
+      viewportWidth: viewportSize.width,
+      viewportHeight: viewportSize.height,
+      active: () => !!this._moveData,
+      scroll: (dx: number, dy: number) => this._scrollViewport(dx, dy)
+    };
+  }
+
+  protected _scrollViewport(dx: number, dy: number) {
+    let oldScrollPosition = this._moveData.scrollPosition;
+    let newScrollPosition = new Point(
+      Math.min(Math.max(0, oldScrollPosition.x + dx), this._moveData.maxScrollPosition.x),
+      Math.min(Math.max(0, oldScrollPosition.y + dy), this._moveData.maxScrollPosition.y)
+    );
+
+    if (newScrollPosition.x !== oldScrollPosition.x) {
+      scrollbars.scrollLeft(this._moveData.$viewport, newScrollPosition.x);
+    }
+    if (newScrollPosition.y !== oldScrollPosition.y) {
+      scrollbars.scrollTop(this._moveData.$viewport, newScrollPosition.y);
+    }
+  }
+
+  protected _onScroll(event: JQuery.ScrollEvent) {
+    this._moveData.scrollPosition = new Point(
+      event.target.scrollLeft,
+      event.target.scrollTop
+    );
   }
 
   protected _createElementInfos(elements: TElem[], draggedElement: TElem): DraggableElementInfo<TElem>[] {
@@ -236,6 +285,16 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
   }
 
   protected _whileMove(event: JQuery.MouseMoveEvent, distance: Point) {
+    // Automatically scroll the viewport when the cursor is moved towards the edges while dragging
+    if (this._moveData.$viewport) {
+      let viewportOffset = this._moveData.$viewport.offset();
+      let viewportMousePosition = new Point(
+        event.pageX - viewportOffset.left,
+        event.pageY - viewportOffset.top
+      );
+      this._moveData.viewportScroller.update(viewportMousePosition);
+    }
+
     // Update clone position
     this._moveData.cloneBounds = this._moveData.cloneBounds.moveTo(this._moveData.cloneStartOffset.add(distance));
 
@@ -386,6 +445,7 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
       .off('mousemove touchmove', this._mouseMoveHandler)
       .off('mouseup touchend touchcancel', this._mouseUpHandler);
     this._moveData.$window[0].removeEventListener('keydown', this._keyDownHandler, true);
+    this._moveData.$viewport?.off('scroll', this._scrollHandler);
     $('iframe').removeClass('dragging-in-progress');
   }
 
@@ -490,6 +550,23 @@ export interface MoveData<TElem extends DraggableElement> {
    * The offset bounds of the container relative to the document, including margins.
    */
   containerBounds: Rectangle;
+  /**
+   * The element representing the scrollable viewport. Is either the same as $container or its scroll parent.
+   * The viewport is scrolled automatically when the mouse cursor is moved near its edges while dragging.
+   */
+  $viewport: JQuery;
+  /**
+   * The current scroll position of $viewport.
+   */
+  scrollPosition: Point;
+  /**
+   * The maximum scroll position of $viewport.
+   */
+  maxScrollPosition: Point;
+  /**
+   * Helper object to automatically scroll the $viewport when the mouse is moved towards its edges while dragging.
+   */
+  viewportScroller: ViewportScroller;
   /**
    * The draggable elements.
    */
