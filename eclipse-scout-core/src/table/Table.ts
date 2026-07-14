@@ -6755,6 +6755,9 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     }
   }
 
+  /**
+   * @see TableModel.rowsDraggable
+   */
   setRowsDraggable(rowsDraggable: boolean) {
     this.setProperty('rowsDraggable', rowsDraggable);
   }
@@ -6769,21 +6772,23 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._updateRowsDraggableComputed();
   }
 
-  isRowDraggable(row: DraggableTableRow): boolean {
-    return this._rowsDraggableComputed && scout.nvl(row.draggable, true);
+  isRowDraggable(row: TableRow): boolean {
+    return this._rowsDraggableComputed && scout.nvl(row.draggable, row.enabled);
   }
 
   protected _updateRowsDraggableComputed() {
     let oldRowsDraggableComputed = this._rowsDraggableComputed;
     this._rowsDraggableComputed = this.rowsDraggable && this.enabledComputed;
-    if (oldRowsDraggableComputed !== this._rowsDraggableComputed && this.rendered) {
-      this._renderRowsDraggableComputed();
-      this._rerenderViewport(); // reinstall rows to apply isRowDraggable()
+    if (oldRowsDraggableComputed !== this._rowsDraggableComputed) {
+      this.selectionHandler.mouseMoveSelectionEnabled = !this._rowsDraggableComputed;
+      if (this.rendered) {
+        this._renderRowsDraggableComputed();
+        this._rerenderViewport(); // reinstall rows to apply isRowDraggable()
+      }
     }
   }
 
   protected _renderRowsDraggableComputed() {
-    this.selectionHandler.mouseMoveSelectionEnabled = !this._rowsDraggableComputed;
     this.$data.toggleClass('rows-draggable', this._rowsDraggableComputed);
   }
 
@@ -6811,7 +6816,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   getAcceptedRowDropTypes(event: JQuery.MouseMoveEvent, sourceRow: TableRow, targetRow: TableRow): TableRowDropTypesDo {
-    let defaultDropTypes = (targetRow as DraggableTableRow).dropTypes || scout.create(TableRowDropTypesDo, {
+    let defaultDropTypes = targetRow.dropTypes || scout.create(TableRowDropTypesDo, {
       before: TableRowDropType.ALLOWED,
       after: TableRowDropType.ALLOWED,
       inside: this.hierarchical ? TableRowDropType.ALLOWED : TableRowDropType.NONE
@@ -6834,13 +6839,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       position: position
     });
     this.trigger('rowDrop', rowDropEvent);
-    if (rowDropEvent.promise) {
-      try {
-        await rowDropEvent.promise;
-      } catch (error) {
-        rowDropEvent.preventDefault();
-      }
-    }
     if (!rowDropEvent.defaultPrevented) {
       this._dropRow(sourceRow, targetRow, position);
     }
@@ -6852,7 +6850,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
     // Check if source row gets a new parent row
     let parentRow = targetRow.parentRow;
-    if (position === 'first-child' || position === 'last-child') {
+    if (position === TableRowDropPosition.FIRST_CHILD || position === TableRowDropPosition.LAST_CHILD) {
       parentRow = targetRow;
     }
     let parentRowChanged = false;
@@ -6862,7 +6860,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     }
 
     // Compute new position
-    if (position === 'last-child') {
+    if (position === TableRowDropPosition.LAST_CHILD) {
       // Insert at end of subtree
       let lastRow = targetRow;
       while (arrays.hasElements(lastRow.childRows)) {
@@ -6870,7 +6868,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       }
       targetIndex = this.rows.indexOf(lastRow) + 1;
     }
-    if (position === 'after' || position === 'first-child') {
+    if (position === TableRowDropPosition.AFTER || position === TableRowDropPosition.FIRST_CHILD) {
       targetIndex++;
     }
     if (sourceIndex < targetIndex) {
@@ -6959,20 +6957,6 @@ export type AggregateTableRow = {
   nextRow: TableRow;
   $row?: JQuery;
   height?: number;
-};
-
-/**
- * Interface for rows with custom values "draggable" and "dropTypes" (see JsonTable#tableRowToJson).
- */
-export type DraggableTableRow = TableRow & {
-  /**
-   * Default is true
-   */
-  draggable?: boolean;
-  /**
-   * Default is {@link TableRowDropType#NONE}
-   */
-  dropTypes?: TableRowDropTypesDo;
 };
 
 export type ColumnMap = {

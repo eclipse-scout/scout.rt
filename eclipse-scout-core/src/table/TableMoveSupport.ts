@@ -98,7 +98,7 @@ export class TableMoveSupport extends MoveSupport<DraggableTableRowElement> {
       targetRow = rowBelowCursor;
 
       let rowBounds = graphics.offsetBounds($rowBelowCursor);
-      let rowMiddleY = rowBounds.y + rowBounds.height * 0.5;
+      let rowMiddleY = rowBounds.center().y;
       placementNoCenter = event.pageY < rowMiddleY ? 'above' : 'below';
 
       // Check if the cursor is over the top or bottom edge of a row or over the center area between the edges.
@@ -374,7 +374,7 @@ export class TableMoveSupport extends MoveSupport<DraggableTableRowElement> {
       // FIXME bsh [dnd-table]: add support for multiple rows
       // $content.appendDiv('text small').text('und 2 weitere Zeilen');
     } else {
-      $content.appendDiv('text').text('1 Zeile'); // FIXME bsh [dnd-table]: NLS
+      $content.appendDiv('text').text(this.table.session.text('ui.TableRowCount1'));
     }
 
     let cursorX = this._moveData.containerBounds.x + this._moveData.startCursorPosition.x;
@@ -470,18 +470,12 @@ export class TableRowDropTypesDo extends BaseDoEntity {
   }
 }
 
-/**
- * @see "TableRowDropType.java"
- */
 export enum TableRowDropType {
   ALLOWED = 'allowed',
   FORBIDDEN = 'forbidden',
   NONE = 'none'
 }
 
-/**
- * @see "TableRowDropPosition.java"
- */
 export enum TableRowDropPosition {
   /**
    * Move source row directly before target row (same level).
@@ -541,24 +535,9 @@ export class TableRowDropEvent extends Event<Table> implements TableRowDropEvent
   targetRow: TableRow;
   position: TableRowDropPosition;
 
-  /**
-   * When promise is **resolved**:
-   * Row order is changed and operation ends successfully.
-   * This is the default.
-   *
-   * When promise is **rejected**:
-   * Row order is not changed and operation is ended.
-   * This is the same as calling `event.preventDefault()`.
-   */
-  promise: Promise<void>;
-
   constructor(model: TableRowDropEventModel) {
     super();
     $.extend(this, model);
-  }
-
-  setPromise(promise: Promise<void>) {
-    this.promise = promise;
   }
 }
 

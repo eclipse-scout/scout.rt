@@ -369,16 +369,7 @@ export class TableAdapter extends ModelAdapter {
 
   protected _onWidgetRowDrop(event: TableRowDropEvent) {
     this._sendRowDrop(event.sourceRow, event.targetRow, event.position);
-    event.promise = new Promise((resolve, reject) => {
-      // FIXME bsh [dnd-table]: Maybe better wait for a dedicated 'rowDropEnd' event? Similar to hybrid actions. Or even _use_ a hybrid action?
-      this.session.whenRequestsDone()
-        .then(() => {
-          event.preventDefault();
-          resolve();
-        }, () => {
-          reject();
-        });
-    });
+    event.preventDefault();
   }
 
   protected _sendRowDrop(sourceRow: TableRow, targetRow: TableRow, position: TableRowDropPosition) {
