@@ -50,6 +50,7 @@ export default (): FormModel => ({
               objectType: Table,
               autoResizeColumns: true,
               defaultRowAction: 'EditMenu',
+              rowsDraggable: true,
               columns: [
                 {
                   id: 'BookmarkColumn',
