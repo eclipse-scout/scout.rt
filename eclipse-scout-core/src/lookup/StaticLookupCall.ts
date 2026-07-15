@@ -28,6 +28,7 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
     this.delay = 0;
     this.data = null;
     this.active = true;
+    this.batch = true;
   }
 
   protected override _init(model: InitModelOf<this>) {

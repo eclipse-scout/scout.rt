@@ -15,6 +15,13 @@ export interface LookupCallColumnLookupCallDoneEvent<TValue = any, TKey = TValue
 
 export interface LookupCallColumnPrepareLookupCallEvent<TValue = any, TKey = TValue, TSource extends LookupCallColumn<TValue, TKey> = LookupCallColumn<TValue, TKey>> extends Event<TSource> {
   lookupCall: LookupCall<TKey>;
+  /**
+   * Optional {@link TableRow} for which the {@link LookupCall} is prepared. This argument is set in the following cases:
+   * <ol>
+   *   <li>{@link LookupCall.batch} is false and it is prepared for formatting a cell of a SmartColumn or LookupColumn.</li>
+   *   <li>The LookupCall is prepared for a cell editor of a SmartColumn or LookupColumn.</li>
+   * </ol>
+   */
   row?: TableRow;
 }
 
