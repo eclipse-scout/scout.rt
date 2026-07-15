@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AggregateTableRow, Alignment, Cell, CellEditorPopup, ColumnComparator, ColumnEventMap, ColumnModel, ColumnOptimalWidthMeasurer, ColumnUserFilter, comparators, Event, EventHandler, FormField, GridData, icons, InitModelOf,
-  objectFactoryHints, ObjectIdProvider, objects, ObjectWithType, ObjectWithUuid, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent, TableHeader, TableHeaderMenu, TableRow,
-  texts, UuidPathOptions, ValueField
+  AggregateTableRow, Alignment, BatchCall, BatchCallResult, Cell, CellEditorPopup, ColumnComparator, ColumnEventMap, ColumnModel, ColumnOptimalWidthMeasurer, ColumnUserFilter, comparators, Event, EventHandler, FormField, GridData, icons,
+  InitModelOf, objectFactoryHints, ObjectIdProvider, objects, ObjectWithType, ObjectWithUuid, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent, TableHeader,
+  TableHeaderMenu, TableRow, texts, UuidPathOptions, ValueField
 } from '../../index';
 import $ from 'jquery';
 
@@ -92,6 +92,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
    */
   _realWidth: number;
   protected _headerLabelId: string;
+  protected _batchFormat: BatchCall<TValue, unknown>;
   protected _tableColumnsChangedHandler: EventHandler<TableColumnMovedEvent | Event<Table>>;
 
   constructor() {
@@ -147,7 +148,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 
     this._tableColumnsChangedHandler = this._onTableColumnsChanged.bind(this);
     this._realWidth = null;
-
+    this._batchFormat = null;
     this.$header = null;
     this.$separator = null;
 
@@ -310,7 +311,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     let returned = this.formatValue(value, row);
     if (objects.isPromise(returned)) {
       // Promise is returned -> set display text later
-      this.setCellTextDeferred(returned, row, cell);
+      this.setCellTextDeferred(returned);
     } else {
       this.setCellText(row, returned, cell);
     }
@@ -345,7 +346,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
    *
    * @returns the formatted cell value as text or a promise if the formatting happens asynchronously.
    */
-  formatValue(value: TValue, row: TableRow): string | JQuery.Promise<string> {
+  formatValue(value: TValue, row: TableRow): string | JQuery.Promise<BatchCallResult<TValue, unknown>> {
     let defaultFormatter = this._formatValue.bind(this);
     return this.formatter(value, row, defaultFormatter);
   }
@@ -353,7 +354,14 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   /**
    * @returns the formatted cell value as text or a promise if the formatting happens asynchronously.
    */
-  protected _formatValue(value: TValue, row?: TableRow): string | JQuery.Promise<string> {
+  protected _formatValue(value: TValue, row?: TableRow): string | JQuery.Promise<BatchCallResult<TValue, unknown>> {
+    if (objects.isEmpty(value)) {
+      return '';
+    }
+    if (this._batchFormat) {
+      this._batchFormat.addKey(value);
+      return this._batchFormat.promise();
+    }
     return scout.nvl(value, '');
   }
 
@@ -398,12 +406,10 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
       // If every cell of a row is empty the row would collapse, using nbsp makes sure the row is as height as the others even if it is empty
       content = '&nbsp;';
       cssClass = strings.join(' ', cssClass, 'empty');
+    } else if (cell.flowsLeft) {
+      content = text + icon;
     } else {
-      if (cell.flowsLeft) {
-        content = text + icon;
-      } else {
-        content = icon + text;
-      }
+      content = icon + text;
     }
 
     if (tableNodeColumn && row.expandable) {
@@ -781,26 +787,48 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     cell.setValue(value);
   }
 
-  setCellTextDeferred(promise: JQuery.Promise<string>, row: TableRow, cell: Cell<TValue>) {
-    promise
-      .done(text => this.setCellText(row, text, cell))
-      .fail(error => {
-        this.setCellText(row, '', cell);
-        $.log.error('Could not resolve cell text for value ' + cell.value, error);
-      });
-
+  setCellTextDeferred(promise: JQuery.Promise<BatchCallResult<TValue, unknown>>) {
     // (then) promises always resolve asynchronously which means the text will always be set later after row is initialized and will generate an update row event.
     // To make sure not every cell update will render the viewport (which is an expensive operation), the update is buffered and done as soon as all promises resolve.
-    this.table.updateBuffer.pushPromise(promise);
+    const added = this.table.updateBuffer.pushPromise(promise);
+    if (added) {
+      promise
+        .done(result => this._onSetCellTextDeferredDone(result))
+        .fail(error => this._onSetCellTextDeferredFail(error));
+    }
+  }
+
+  protected _onSetCellTextDeferredDone(result: BatchCallResult<TValue, unknown>) {
+    if (!result.size) {
+      return;
+    }
+    for (const row of this.parent.rows) {
+      const cell = this.parent.cell(this, row);
+      if (result.has(cell.value)) {
+        // only update cells for which a mapping exists
+        const cellText = this._batchFormatResultToCellText(result.get(cell.value), row, cell);
+        this.setCellText(row, cellText, cell);
+      }
+    }
+  }
+
+  protected _onSetCellTextDeferredFail(error: any) {
+    for (const row of this.parent.rows) {
+      const cell = this.parent.cell(this, row);
+      this.setCellText(row, '', cell);
+    }
+    $.log.error('Could not resolve cell text.', error);
+  }
+
+  protected _batchFormatResultToCellText(result: unknown, row: TableRow, cell: Cell<TValue>): string {
+    return scout.nvl(strings.asString(result), '');
   }
 
   /**
    * Updates the cell text for the given row and calls {@link Table.updateRow} if the row is initialized and the table contains it.
    */
   setCellText(row: TableRow, text: string, cell?: Cell<TValue>) {
-    if (!cell) {
-      cell = this.cell(row);
-    }
+    cell ??= this.cell(row);
     if (cell.text === text) {
       // Don't trigger row update if text has not changed
       return;
@@ -817,9 +845,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   }
 
   setCellErrorStatus(row: TableRow, errorStatus: Status, cell?: Cell<TValue>) {
-    if (!cell) {
-      cell = this.cell(row);
-    }
+    cell ??= this.cell(row);
     cell.setErrorStatus(errorStatus);
   }
 
@@ -1267,4 +1293,4 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 }
 
 export type ColumnValidationResult = { valid: boolean; validByMandatory: boolean; errorStatus: Status };
-export type ColumnFormatter<TValue> = (value: TValue, row: TableRow, defaultFormatter?: ColumnFormatter<TValue>) => string | JQuery.Promise<string>;
+export type ColumnFormatter<TValue> = (value: TValue, row: TableRow, defaultFormatter?: ColumnFormatter<TValue>) => string | JQuery.Promise<BatchCallResult<TValue, unknown>>;

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {TableSpecHelper} from '../../../src/testing/index';
-import {arrays, Cell, LookupCall, objects, scout, SmartColumn} from '../../../src';
+import {arrays, Cell, LookupCall, LookupResult, LookupRow, objects, QueryBy, scout, SmartColumn, Table, TableRow} from '../../../src';
 
 describe('SmartColumn', () => {
   let session: SandboxSession, helper: TableSpecHelper;
@@ -24,59 +24,75 @@ describe('SmartColumn', () => {
     jasmine.clock().uninstall();
   });
 
+  class SpecLookupCall extends LookupCall<string> {
+    override _getByKeys(keys: string[]): JQuery.Promise<LookupResult<string>> {
+      return super._getByKeys(keys);
+    }
+
+    override _getByKey(key: string): JQuery.Promise<LookupResult<string>> {
+      return super._getByKey(key);
+    }
+  }
+
+  function _createSpecLookupCall(lookupRows: LookupRow<string>[]): SpecLookupCall {
+    const lookupCall = scout.create(SpecLookupCall, {session: session, batch: true});
+    spyOn(lookupCall, '_getByKeys').and.returnValue($.resolvedPromise({lookupRows: lookupRows, queryBy: QueryBy.KEYS}));
+    spyOn(lookupCall, '_getByKey').and.callFake(key => {
+      const validKey = objects.ensureValidKey(key);
+      return $.resolvedPromise({lookupRows: lookupRows.filter(r => r.key === validKey), queryBy: QueryBy.KEY});
+    });
+    return lookupCall;
+  }
+
   it('rows with object key can be resolved', () => {
     const table = helper.createTable({
       columns: [{
         objectType: SmartColumn
       }]
     });
-
-    const lookupCall = scout.create(LookupCall, {session: session, batch: true});
-    (table.columns[0] as SmartColumn<any>).setLookupCall(lookupCall);
-
     const key1 = {a: 1, b: 1};
     const key2 = {a: 1, b: 2};
     const key3 = {a: 2, b: 2};
-    const valueMap = {};
     // ensureValidKey will stringify an object key
-    valueMap[objects.ensureValidKey(key1)] = 'Value 1';
-    valueMap[objects.ensureValidKey(key2)] = 'Value 2';
-    valueMap[objects.ensureValidKey(key3)] = 'Value 3';
-    spyOn(lookupCall, 'textsByKeys').and.returnValue($.resolvedPromise(valueMap));
-    spyOn(lookupCall, 'textByKey').and.callFake(key => {
-      return $.resolvedPromise(valueMap[objects.ensureValidKey(key)]);
-    });
+    const lookupRows = [
+      scout.create(LookupRow<string>, {key: objects.ensureValidKey(key1), text: 'Value 1'}),
+      scout.create(LookupRow<string>, {key: objects.ensureValidKey(key2), text: 'Value 2'}),
+      scout.create(LookupRow<string>, {key: objects.ensureValidKey(key3), text: 'Value 3'})
+    ];
+    const keys = lookupRows.map(row => row.key);
+    const lookupCall = _createSpecLookupCall(lookupRows);
+    (table.columns[0] as SmartColumn<any>).setLookupCall(lookupCall);
 
     // insert 6 rows
-    table.insertRows(Object.keys(valueMap).concat(Object.keys(valueMap)).map(getRow));
+    table.insertRows(keys.concat(keys).map(getRow));
     table.render();
     jasmine.clock().tick(500);
 
     // text should get resolved with a single batch lookup call
-    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(1);
+    expect(lookupCall._getByKeys).toHaveBeenCalledTimes(1);
 
-    // textsByKeys should be called with unique keys
-    expect(lookupCall.textsByKeys).toHaveBeenCalledWith(arrayEqualsIgnoreOrder(Object.keys(valueMap)));
+    // _getByKeys should be called with unique keys
+    expect(lookupCall._getByKeys).toHaveBeenCalledWith(arrayEqualsIgnoreOrder(keys));
 
     table.insertRow(getRow(objects.ensureValidKey(key1)));
     jasmine.clock().tick(500);
-    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(2);
+    expect(lookupCall._getByKeys).toHaveBeenCalledTimes(2);
 
     table.insertRow(getRow(objects.ensureValidKey(key2)));
     jasmine.clock().tick(500);
-    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(3);
+    expect(lookupCall._getByKeys).toHaveBeenCalledTimes(3);
 
     // disable batch mode, now textByKey should be called instead
     lookupCall.setBatch(false);
 
-    table.insertRows(Object.keys(valueMap).map(getRow));
+    table.insertRows(keys.map(getRow));
     jasmine.clock().tick(500);
 
-    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(3);
-    expect(lookupCall.textByKey).toHaveBeenCalledTimes(3);
+    expect(lookupCall._getByKeys).toHaveBeenCalledTimes(3);
+    expect(lookupCall._getByKey).toHaveBeenCalledTimes(3);
 
     // rows have texts returned by lookup call
-    checkTableRowTexts(table, valueMap);
+    checkTableRowTexts(table, lookupRows);
   });
 
   // SmartColumn must deal with values of type number or string
@@ -139,47 +155,48 @@ describe('SmartColumn', () => {
         objectType: SmartColumn
       }]
     });
-
-    const lookupCall = scout.create(LookupCall, {session: session, batch: true});
+    const lookupRows = [
+      scout.create(LookupRow<string>, {key: 'key1', text: 'Value 1'}),
+      scout.create(LookupRow<string>, {key: 'key2', text: 'Value 2'}),
+      scout.create(LookupRow<string>, {key: 'key3', text: 'Value 3'})
+    ];
+    const keys = lookupRows.map(row => row.key);
+    const lookupCall = _createSpecLookupCall(lookupRows);
     (table.columns[0] as SmartColumn<any>).setLookupCall(lookupCall);
 
-    const valueMap = {key1: 'Value 1', key2: 'Value 2', key3: 'Value 3'};
-    spyOn(lookupCall, 'textsByKeys').and.returnValue($.resolvedPromise(valueMap));
-    spyOn(lookupCall, 'textByKey').and.callFake(key => $.resolvedPromise(valueMap[objects.ensureValidKey(key)]));
-
     // insert 6 rows
-    table.insertRows(Object.keys(valueMap).concat(Object.keys(valueMap)).map(getRow));
+    table.insertRows(keys.concat(keys).map(getRow));
     table.render();
     jasmine.clock().tick(500);
 
     // text should get resolved with a single batch lookup call
-    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(1);
+    expect(lookupCall._getByKeys).toHaveBeenCalledTimes(1);
 
     // textsByKeys should be called with unique keys
-    expect(lookupCall.textsByKeys).toHaveBeenCalledWith(arrayEqualsIgnoreOrder(Object.keys(valueMap)));
+    expect(lookupCall._getByKeys).toHaveBeenCalledWith(arrayEqualsIgnoreOrder(keys));
 
     table.insertRow(getRow('key1'));
     jasmine.clock().tick(500);
-    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(2);
+    expect(lookupCall._getByKeys).toHaveBeenCalledTimes(2);
 
     table.insertRow(getRow('key2'));
     jasmine.clock().tick(500);
-    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(3);
+    expect(lookupCall._getByKeys).toHaveBeenCalledTimes(3);
 
-    // textByKey should never be called in batch mode
-    expect(lookupCall.textByKey).not.toHaveBeenCalled();
+    // _getByKey should never be called in batch mode
+    expect(lookupCall._getByKey).not.toHaveBeenCalled();
 
     // disable batch mode, now textByKey should be called instead
     lookupCall.setBatch(false);
 
-    table.insertRows(Object.keys(valueMap).map(getRow));
+    table.insertRows(keys.map(getRow));
     jasmine.clock().tick(500);
 
-    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(3);
-    expect(lookupCall.textByKey).toHaveBeenCalledTimes(3);
+    expect(lookupCall._getByKeys).toHaveBeenCalledTimes(3);
+    expect(lookupCall._getByKey).toHaveBeenCalledTimes(3);
 
     // rows have texts returned by lookup call
-    checkTableRowTexts(table, valueMap);
+    checkTableRowTexts(table, lookupRows);
   });
 
   /**
@@ -236,43 +253,45 @@ describe('SmartColumn', () => {
         objectType: SmartColumn
       }]
     });
-
-    let lookupCall = scout.create(LookupCall, {session: session, batch: true});
+    const lookupRows = [
+      scout.create(LookupRow<string>, {key: 'key1', text: 'Value 1'}),
+      scout.create(LookupRow<string>, {key: 'key2', text: 'Value 2'}),
+      scout.create(LookupRow<string>, {key: 'key3', text: 'Value 3'})
+    ];
+    const keys = lookupRows.map(row => row.key);
+    const lookupCall = _createSpecLookupCall(lookupRows);
     let column1 = table.columns[0] as SmartColumn<any>;
     column1.setLookupCall(lookupCall);
 
     let counter = 0;
-    let rowAvailable;
+    let eventRow;
     column1.on('prepareLookupCall', event => {
       counter++;
       expect(event.type).toBe('prepareLookupCall');
       expect(event.source).toBe(column1);
-      rowAvailable = event.row;
+      eventRow = event.row;
     });
-
-    let valueMap = {key1: 'Value 1', key2: 'Value 2', key3: 'Value 3'};
-    spyOn(lookupCall, 'textsByKeys').and.returnValue($.resolvedPromise(valueMap));
-    spyOn(lookupCall, 'textByKey').and.callFake(key => $.resolvedPromise(valueMap[objects.ensureValidKey(key)]));
 
     let getRow = key => ({cells: [key]});
 
     lookupCall.batch = false;
-    table.insertRows(Object.keys(valueMap).map(getRow));
+    table.insertRows(keys.map(getRow));
     jasmine.clock().tick(500);
     expect(counter).toBe(3); // Key lookups
-    expect(rowAvailable).not.toBe(undefined);
+    expect(eventRow).toBeInstanceOf(TableRow);
 
     counter = 0;
     lookupCall.batch = true;
     table.deleteAllRows();
-    table.insertRows(Object.keys(valueMap).map(getRow));
+    table.insertRows(keys.map(getRow));
     table.render();
     jasmine.clock().tick(500);
     expect(counter).toBe(1); // Only one prepareLookup event should be triggered when doing batch lookups
-    expect(rowAvailable).toBe(undefined);
+    expect(eventRow).toBe(undefined);
   });
 
-  const checkTableRowTexts = (table, valueMap) => table.rows.forEach(row => expect(row.cells[0].text).toEqual(valueMap[row.cells[0].value]));
+  const checkTableRowTexts = (table: Table, rows: LookupRow<string>[]) => table.rows
+    .forEach(row => expect(row.cells[0].text).toEqual(rows.find(r => r.key === row.cells[0].value).text));
 
   const getRow = key => ({cells: [key]});
 

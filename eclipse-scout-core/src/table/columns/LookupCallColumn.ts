@@ -40,11 +40,19 @@ export class LookupCallColumn<TValue, TKey = TValue> extends Column<TValue> impl
   protected _setCodeType(codeType: string | (new() => CodeType<TKey>)) {
     this._setProperty('codeType', codeType);
     if (codeType) {
-      this.lookupCall = scout.create(CodeLookupCall<TKey>, {
+      this._setLookupCall(scout.create(CodeLookupCall<TKey>, {
         session: this.session,
         codeType
-      });
+      }));
     }
+  }
+
+  protected _prepareAndExecuteLookupCallCloneAsync(lookupCall: LookupCall<any>, row?: TableRow): string {
+    this.trigger('prepareLookupCall', {lookupCall, row});
+    const promise = lookupCall.execute()
+      .then(result => this.setCellText(row, LookupCall.firstLookupRow(result)?.text ?? ''));
+    this.parent.updateBuffer.pushPromise(promise);
+    return ''; // value will be resolved later by promise
   }
 
   setBrowseHierarchy(browseHierarchy: boolean) {

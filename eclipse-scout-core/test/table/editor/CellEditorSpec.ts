@@ -729,7 +729,7 @@ describe('CellEditor', () => {
       helper.applyDisplayStyle(table);
       // Ensure texts are set and no updates are pending
       expect(table.rows[0].cells[0].text).toEqual('Key 0');
-      expect(table.updateBuffer.promises.length).toBe(0);
+      expect(table.updateBuffer.promises.size).toBe(0);
     });
 
     it('does not fail when completing edit after removing a value', done => {
