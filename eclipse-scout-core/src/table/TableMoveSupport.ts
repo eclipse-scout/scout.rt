@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, BaseDoEntity, DraggableElement, Event, graphics, MoveData, MoveSupport, Point, Rectangle, scout, strings, Table, TableRow, typeName} from '@eclipse-scout/core';
+import {arrays, BaseDoEntity, DraggableElement, Event, graphics, MoveData, MoveSupport, Point, Rectangle, scout, strings, Table, TableField, TableRow, typeName} from '../index';
 import $ from 'jquery';
 
 export class TableMoveSupport extends MoveSupport<DraggableTableRowElement> {
@@ -139,7 +139,7 @@ export class TableMoveSupport extends MoveSupport<DraggableTableRowElement> {
     if (this._moveData.targetRow !== targetRow) {
       let dropTypes: TableRowDropTypesDo;
       if (targetRow) {
-        dropTypes = this.table.getAcceptedRowDropTypes(event, this._moveData.sourceRow, targetRow);
+        dropTypes = this._getAcceptedRowDropTypes(event, this._moveData.sourceRow, targetRow);
       }
       this._moveData.targetRowDropTypes = scout.create(TableRowDropTypesDo, {
         before: dropTypes ? (dropTypes.before || TableRowDropType.ALLOWED) : TableRowDropType.NONE,
@@ -179,6 +179,26 @@ export class TableMoveSupport extends MoveSupport<DraggableTableRowElement> {
     if (targetChanged || wasOutside) {
       this._updateDropIndicator();
     }
+  }
+
+  /**
+   * Returns the possible row drop types for a given source and target row. These can be specified by setting the
+   * property {@link TableRow.dropTypes} on the target row or listening for the `acceptRowDrop` event on the table.
+   */
+  protected _getAcceptedRowDropTypes(event: JQuery.MouseMoveEvent, sourceRow: TableRow, targetRow: TableRow): TableRowDropTypesDo {
+    let defaultDropTypes = targetRow.dropTypes || scout.create(TableRowDropTypesDo, {
+      before: TableRowDropType.ALLOWED,
+      after: TableRowDropType.ALLOWED,
+      inside: this.table.hierarchical ? TableRowDropType.ALLOWED : TableRowDropType.NONE
+    });
+    let acceptRowDropEvent = new TableAcceptRowDropEvent({
+      mouseEvent: event,
+      sourceRow: sourceRow,
+      targetRow: targetRow,
+      dropTypes: defaultDropTypes
+    });
+    this.table.trigger('acceptRowDrop', acceptRowDropEvent);
+    return acceptRowDropEvent.dropTypes;
   }
 
   /**
@@ -326,8 +346,19 @@ export class TableMoveSupport extends MoveSupport<DraggableTableRowElement> {
         return;
       }
 
-      // Delegate to table
-      await this.table.dropRow(event, this._moveData.sourceRow, this._moveData.targetRow, this._getDropPosition());
+      // Fire event on table
+      let sourceRow = this._moveData.sourceRow;
+      let targetRow = this._moveData.targetRow;
+      let position = this._getDropPosition();
+      let rowDropEvent = new TableRowDropEvent({mouseEvent: event, sourceRow, targetRow, position});
+      this.table.trigger('rowDrop', rowDropEvent);
+      if (!rowDropEvent.defaultPrevented) {
+        this.table.dropRow(sourceRow, targetRow, position);
+        if (this.table.parent instanceof TableField) {
+          this.table.parent.touch();
+        }
+      }
+      this.table.trigger('afterRowDrop', rowDropEvent);
     }).then(() => null);
   }
 
@@ -497,6 +528,10 @@ export enum TableRowDropPosition {
 
 // --------------------
 
+/**
+ * Triggered while dragging a row over another row to allow listeners to specify the possible
+ * drop types for the target row.
+ */
 export class TableAcceptRowDropEvent extends Event<Table> implements TableAcceptRowDropEventModel {
   mouseEvent: JQuery.MouseMoveEvent;
   sourceRow: TableRow;
@@ -529,6 +564,17 @@ export interface TableAcceptRowDropEventModel {
   dropTypes?: TableRowDropTypesDo;
 }
 
+/**
+ * Triggered when the mouse button has been released at an accepted location and the dragged row
+ * is about to be moved there.
+ *
+ * By default, {@link Table#dropRow} is used to change the row position and, if the parent widget
+ * is a {@link TableField}, it the field is touched. Listeners can prevent this by calling
+ * {@link Event.preventDefault()} and providing their own logic.
+ *
+ * After this event has been fully processed, an additional {@link TableRowAfterDropEvent}
+ * is always triggered, regardless of default prevention.
+ */
 export class TableRowDropEvent extends Event<Table> implements TableRowDropEventModel {
   mouseEvent: JQuery.MouseUpEvent;
   sourceRow: TableRow;
@@ -543,6 +589,27 @@ export class TableRowDropEvent extends Event<Table> implements TableRowDropEvent
 
 export interface TableRowDropEventModel {
   mouseEvent: JQuery.MouseUpEvent;
+  sourceRow: TableRow;
+  targetRow: TableRow;
+  position: TableRowDropPosition;
+}
+
+/**
+ * Triggered after the row drop operation has been completed (either using the default or a custom implementation).
+ * This event cannot be prevented.
+ */
+export class TableRowAfterDropEvent extends Event<Table> implements TableRowAfterDropEventModel {
+  sourceRow: TableRow;
+  targetRow: TableRow;
+  position: TableRowDropPosition;
+
+  constructor(model: TableRowDropEventModel) {
+    super();
+    $.extend(this, model);
+  }
+}
+
+export interface TableRowAfterDropEventModel {
   sourceRow: TableRow;
   targetRow: TableRow;
   position: TableRowDropPosition;

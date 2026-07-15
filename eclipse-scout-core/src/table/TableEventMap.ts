@@ -201,6 +201,7 @@ export interface TableEventMap extends WidgetEventMap {
   'columnDateGroupTypeChanged': TableColumnDateGroupTypeChangedEvent;
   'acceptRowDrop': TableAcceptRowDropEvent;
   'rowDrop': TableRowDropEvent;
+  'afterRowDrop': TableRowDropEvent;
   'propertyChange:autoResizeColumns': PropertyChangeEvent<boolean>;
   'propertyChange:checkable': PropertyChangeEvent<boolean>;
   'propertyChange:checkableStyle': PropertyChangeEvent<TableCheckableStyle>;

@@ -12,12 +12,11 @@ import {
   DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DraggableTableRowElement, DropType, EnumObject, ErrorHandler, EventHandler, EventModel, events, Filter, Filterable, FilterOrFunction,
   FilterResult, FilterSupport, FullModelOf, graphics, GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations,
   MenuItemsOrder, menus as menuUtil, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars,
-  ScrollToAlignment, ScrollToOptions, Status, StatusOrModel, strings, styles, TabbableCoordinator, TableAcceptRowDropEvent, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer,
-  TableDefaultRowActionKeyStroke, TableEventMap, TableFooter, TableGroupEvent, TableHeader, TableLayout, TableModel, TableMoveSupport, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke,
-  TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowDropEvent,
-  TableRowDropPosition, TableRowDropType, TableRowDropTypesDo, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableSelectKeyStroke, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator,
-  TableToggleRowKeyStroke, TableTooltip, TableUiPreferences, tableUiPreferences, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences,
-  UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
+  ScrollToAlignment, ScrollToOptions, Status, StatusOrModel, strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer, TableDefaultRowActionKeyStroke,
+  TableEventMap, TableFooter, TableGroupEvent, TableHeader, TableLayout, TableModel, TableMoveSupport, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke,
+  TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowDropPosition, TableRowModel, TableSelectAllKeyStroke,
+  TableSelectionHandler, TableSelectKeyStroke, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUiPreferences, tableUiPreferences, TableUpdateBuffer, TableUserFilter,
+  TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences, UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -6815,36 +6814,11 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     return new TableMoveSupport(this);
   }
 
-  getAcceptedRowDropTypes(event: JQuery.MouseMoveEvent, sourceRow: TableRow, targetRow: TableRow): TableRowDropTypesDo {
-    let defaultDropTypes = targetRow.dropTypes || scout.create(TableRowDropTypesDo, {
-      before: TableRowDropType.ALLOWED,
-      after: TableRowDropType.ALLOWED,
-      inside: this.hierarchical ? TableRowDropType.ALLOWED : TableRowDropType.NONE
-    });
-    let acceptRowDropEvent = new TableAcceptRowDropEvent({
-      mouseEvent: event,
-      sourceRow: sourceRow,
-      targetRow: targetRow,
-      dropTypes: defaultDropTypes
-    });
-    this.trigger('acceptRowDrop', acceptRowDropEvent);
-    return acceptRowDropEvent.dropTypes;
-  }
-
-  async dropRow(event: JQuery.MouseUpEvent, sourceRow: TableRow, targetRow: TableRow, position: TableRowDropPosition): Promise<void> {
-    let rowDropEvent = new TableRowDropEvent({
-      mouseEvent: event,
-      sourceRow: sourceRow,
-      targetRow: targetRow,
-      position: position
-    });
-    this.trigger('rowDrop', rowDropEvent);
-    if (!rowDropEvent.defaultPrevented) {
-      this._dropRow(sourceRow, targetRow, position);
-    }
-  }
-
-  protected _dropRow(sourceRow: TableRow, targetRow: TableRow, position: TableRowDropPosition) {
+  /**
+   * Moves a row within the table. The new location is computed using the given target row and position.
+   * If the table is hierarchical, the parent row is updated accordingly.
+   */
+  dropRow(sourceRow: TableRow, targetRow: TableRow, position: TableRowDropPosition) {
     let sourceIndex = this.rows.indexOf(sourceRow);
     let targetIndex = this.rows.indexOf(targetRow);
 
