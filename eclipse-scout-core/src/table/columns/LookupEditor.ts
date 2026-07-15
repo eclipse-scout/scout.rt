@@ -8,14 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  CellEditorPopup, CellEditorRenderedOptions, ChildModelOf, CodeType, Column, InitModelOf, ListBox, LookupBox, LookupCall, LookupEditorEventMap, LookupEditorModel, LookupEditorTreeLayout, Popup, PopupLayout, scout, scrollbars, SmartField,
-  strings, Table, Tree, TreeBox, ValueField, WidgetPopup
+  CellEditorPopup, CellEditorRenderedOptions, ChildModelOf, CodeType, Column, InitModelOf, ListBox, LookupBox, LookupCall, LookupEditorEventMap, LookupEditorModel, LookupEditorTreeLayout, LookupRow, Popup, PopupLayout, scout, scrollbars,
+  SmartField, strings, Table, TableRow, Tree, TreeBox, ValueField, WidgetPopup
 } from '../../index';
 
 export class LookupEditor<TValue> extends ValueField<TValue[]> implements LookupEditorModel<TValue> {
   declare model: LookupEditorModel<TValue>;
   declare eventMap: LookupEditorEventMap<TValue>;
 
+  row: TableRow;
   lookupCall: LookupCall<TValue> = null;
   codeType: string | (new() => CodeType<TValue>) = null;
   browseHierarchy = false;
@@ -40,17 +41,17 @@ export class LookupEditor<TValue> extends ValueField<TValue[]> implements Lookup
     if (this._popup) {
       return this._popup.content.displayText;
     }
-    return LookupEditor.formatValues(value, this.lookupCall, lookupCall => this.trigger('prepareLookupCall', {lookupCall}));
-  }
-
-  static formatValues<TValue>(values: TValue[], lookupCall: LookupCall<TValue>, prepareLookupCall?: (lookupCall: LookupCall<TValue>) => void): string | JQuery.Promise<string> {
-    if (!values?.length || !lookupCall) {
+    if (!value?.length || !this.lookupCall) {
       return '';
     }
-    lookupCall = lookupCall.clone();
+    return LookupEditor.formatValues(value, this.lookupCall, lookupCall => this.trigger('prepareLookupCall', {lookupCall, row: this.row}))
+      .then(lookupRows => strings.join(', ', ...lookupRows.map(r => r.text)));
+  }
+
+  static formatValues<TValue>(values: TValue[], lookupCall: LookupCall<TValue>, prepareLookupCall?: (lookupCall: LookupCall<TValue>) => void): JQuery.Promise<LookupRow<TValue>[]> {
+    lookupCall = lookupCall.cloneForKeys(values);
     prepareLookupCall?.(lookupCall);
-    return lookupCall.textsByKeys(values)
-      .then(result => strings.join(', ', ...Object.values(result)));
+    return lookupCall.execute().then(result => result?.lookupRows || []);
   }
 
   protected override _renderDisplayText() {
@@ -114,7 +115,7 @@ export class LookupEditor<TValue> extends ValueField<TValue[]> implements Lookup
       // Ensure cell editor is fully visible.
       // This is important when tabbing through the cells to show the cell editor if it is not visible yet.
       // The LookupBoxPopup also requires the center of its anchor (cell editor) to be visible, otherwise it will get invisible (see Popup._validateVisibility)
-      // This is only necessary because the cell editor itself will never be focused. Otherwise the browser would scroll it into view automatically, as it happens for cell editors of other columns.
+      // This is only necessary because the cell editor itself will never be focused. Otherwise, the browser would scroll it into view automatically, as it happens for cell editors of other columns.
       scrollbars.scrollTo(cellEditorPopup.table.$data, cellEditorPopup.$container);
       scrollbars.scrollHorizontalTo(cellEditorPopup.table.$data, cellEditorPopup.$container);
 

@@ -143,6 +143,7 @@ export * from './dataobject/ValueDo';
 export * from './ajax/ajax';
 export * from './ajax/AjaxCall';
 export * from './ajax/AjaxError';
+export * from './util/BatchCall';
 export * from './uinotification/TopicDo';
 export * from './uinotification/uiNotifications';
 export * from './uinotification/UiNotificationDo';
