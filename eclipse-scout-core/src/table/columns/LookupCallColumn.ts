@@ -40,11 +40,26 @@ export class LookupCallColumn<TValue, TKey = TValue> extends Column<TValue> impl
   protected _setCodeType(codeType: string | (new() => CodeType<TKey>)) {
     this._setProperty('codeType', codeType);
     if (codeType) {
-      this.lookupCall = scout.create(CodeLookupCall<TKey>, {
+      this._setLookupCall(scout.create(CodeLookupCall<TKey>, {
         session: this.session,
         codeType
-      });
+      }));
     }
+  }
+
+  /**
+   * Prepares the given {@link LookupCall} (by triggering the 'prepareLookupCall' event) for the given {@link TableRow} and then executes the call.
+   * This method may be used to execute the {@link LookupCall} row by row (no batching).
+   * @param lookupCall The lookup call to execute. It is not cloned but directly prepared and executed. Callers should clone it before if necessary.
+   * @param row The row for which the call should be prepared.
+   * @returns The {@link LookupRow.text} of the first {@link LookupRow} in the {@link LookupResult.lookupRows} returned from the {@link LookupCall}.
+   */
+  protected _prepareAndExecuteLookupCall(lookupCall: LookupCall<any>, row?: TableRow): string {
+    this.trigger('prepareLookupCall', {lookupCall, row});
+    const promise = lookupCall.execute()
+      .then(result => this.setCellText(row, LookupCall.firstLookupRow(result)?.text ?? ''));
+    this.parent.updateBuffer.pushPromise(promise);
+    return ''; // value will be resolved later by promise
   }
 
   setBrowseHierarchy(browseHierarchy: boolean) {
