@@ -139,7 +139,7 @@ scout:
     "@cyclonedx/webpack-plugin>normalize-package-data": 8.0.0
     "@eclipse-scout/eslint-config>globals": 16.5.0
     "@eclipse-scout/migrate>jscodeshift": 17.3.0
-    "@eclipse-scout/releng": 26.2.0
+    "@eclipse-scout/releng": 26.2.1
     "@eclipse-scout/releng>yargs": 18.0.0
     "@emnapi/core": 1.10.0
     "@emnapi/runtime": 1.10.0
@@ -217,7 +217,6 @@ scout:
     "@pnpm/server>uuid": 9.0.1
     "@pnpm/util.lex-comparator": 3.0.2
     "@pnpm/worker": 1000.5.0
-    "@rushstack/worker-pool>@types/node": 24.12.0
     "@sinclair/typebox": 0.34.49
     "@sinonjs/commons": 3.0.1
     "@sinonjs/fake-timers": 13.0.5
@@ -243,11 +242,9 @@ scout:
     "@types/jquery": 3.5.33
     "@types/jscodeshift": 17.3.0
     "@types/json-schema": 7.0.15
-    "@types/node": 26.1.0
-    "@types/node@26.1.0>undici-types": 8.3.0
+    "@types/node": 24.12.0
     "@types/sizzle": 2.3.10
     "@types/ssri": 7.1.5
-    "@types/ssri>@types/node": 24.12.0
     "@types/stack-utils": 2.0.3
     "@types/ws": 8.18.1
     "@types/yargs": 17.0.35
