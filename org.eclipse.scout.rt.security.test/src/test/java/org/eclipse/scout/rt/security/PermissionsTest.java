@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
+import org.eclipse.scout.rt.dataobject.id.IdCodec.IdSignaturePasswordProperty;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -37,10 +38,12 @@ import org.eclipse.scout.rt.security.fixture.TestPermissionLevels;
 import org.eclipse.scout.rt.security.fixture.UFixturePermission;
 import org.eclipse.scout.rt.security.fixture.UJFixturePermission;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
+import org.eclipse.scout.rt.testing.platform.mock.MockConfigPropertyRule;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -59,6 +62,9 @@ public class PermissionsTest {
 
   private AccessSupport m_support;
   private final List<IBean<?>> m_beans = new ArrayList<>();
+
+  @Rule
+  public MockConfigPropertyRule<String> m_idSignaturePasswordPropertyRule = new MockConfigPropertyRule<>(IdSignaturePasswordProperty.class, "myPassword");
 
   @Before
   public void before() {

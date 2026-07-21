@@ -16,9 +16,12 @@ import java.security.BasicPermission;
 import java.security.Permission;
 
 import org.eclipse.scout.rt.dataobject.exception.IPermissionCodeHelper;
+import org.eclipse.scout.rt.dataobject.id.IdCodec.IdSignaturePasswordProperty;
 import org.eclipse.scout.rt.security.fixture.AFixturePermission;
 import org.eclipse.scout.rt.security.fixture.DFixturePermission;
+import org.eclipse.scout.rt.testing.platform.mock.MockConfigPropertyRule;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -29,6 +32,9 @@ import org.junit.runner.RunWith;
 public class PermissionCodeHelperTest {
 
   private final IPermissionCodeHelper m_helper = new PermissionCodeHelper();
+
+  @Rule
+  public MockConfigPropertyRule<String> m_idSignaturePasswordPropertyRule = new MockConfigPropertyRule<>(IdSignaturePasswordProperty.class, "myPassword");
 
   @Test
   public void testGetPermissionCode_nullPermission() {
@@ -46,7 +52,7 @@ public class PermissionCodeHelperTest {
 
   @Test
   public void testGetPermissionCode_iPermission() {
-    assertEquals("21b4f4bd9e", m_helper.getPermissionCode(new AFixturePermission()));
-    assertEquals("2ac968752f", m_helper.getPermissionCode(new DFixturePermission()));
+    assertEquals("2712551d2f", m_helper.getPermissionCode(new AFixturePermission()));
+    assertEquals("23a6330c80", m_helper.getPermissionCode(new DFixturePermission()));
   }
 }

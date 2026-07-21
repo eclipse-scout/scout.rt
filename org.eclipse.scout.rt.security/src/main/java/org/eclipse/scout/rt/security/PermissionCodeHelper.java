@@ -12,16 +12,22 @@ package org.eclipse.scout.rt.security;
 import java.nio.charset.StandardCharsets;
 import java.security.Permission;
 
-import org.eclipse.scout.rt.api.data.security.PermissionId;
 import org.eclipse.scout.rt.dataobject.exception.IPermissionCodeHelper;
+import org.eclipse.scout.rt.dataobject.id.IId;
+import org.eclipse.scout.rt.dataobject.id.IdCodec;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.HexUtility;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 
 /**
- * The permission code is calculated by hashing the permission name using {@link SecurityUtility#hash}
- * and then encoding it to hex and shortening it.
+ * Creates a short (10‑char) permission code.
+ * <p>
+ * If the {@link Permission} implements {@link IPermission}, the signature of the permission's {@link IPermission#getId() ID}
+ * is hashed; otherwise the permission name is hashed.
  */
 public class PermissionCodeHelper implements IPermissionCodeHelper {
+
+  protected final LazyValue<IdCodec> m_idCodec = new LazyValue<>(IdCodec.class);
 
   @Override
   public String getPermissionCode(Permission permission) {
@@ -35,11 +41,13 @@ public class PermissionCodeHelper implements IPermissionCodeHelper {
   }
 
   protected String getPermissionCode(IPermission permission) {
-    return hashPermissionId(permission.getId());
+    return hash(permission.getId());
   }
 
-  protected String hashPermissionId(PermissionId permissionId) {
-    return hash(permissionId.unwrap());
+  protected String hash(IId id) {
+    String idString = m_idCodec.get().toUnqualified(id);
+    String signature = m_idCodec.get().createSignature(idString);
+    return hash(signature);
   }
 
   protected String hash(String text) {
