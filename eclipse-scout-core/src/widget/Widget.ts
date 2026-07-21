@@ -2183,7 +2183,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this, options));
       return false;
     }
-    return this.session.focusManager.requestFocus(this.get$Focusable(), null, options);
+    return this.session.focusManager.requestFocus(this.get$Focusable(), options);
   }
 
   /**
