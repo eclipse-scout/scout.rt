@@ -1630,30 +1630,26 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   renderInitialFocus() {
-    let focused = false;
     if (this.restoreFocus()) {
       // If the form is re-rendered, the last focused element should be focused again
       return;
     }
+
+    // If the widget to be focused is outside the view area, the browser tries to scroll the widget into view.
+    // This may sometimes be desired, but if a form opens, the user typically expects to see the top of the form.
+    // Furthermore, if the scroll area contains large (not absolutely positioned) content, it can happen that the browsers scrolls the content even though the focused widget already is in the view area.
+    // This is probably because the focus happens while the form is not layouted yet. So actually, automatic scrolling to the focused widget when the form is not layouted yet does not work reliably.
+    // Because of this, preventScroll is set to true. If it is necessary to scroll to a specific widget, Widget.reveal() can be used.
     if (this.initialFocus) {
-      focused = this.initialFocus.focus();
+      this.initialFocus.focus({preventScroll: true});
     } else {
       // If no explicit focus is requested, try to focus the first focusable element.
       // Do it only if the focus is not already on an element in the form (e.g. focus could have been requested explicitly by a child element)
       // And only if the context belonging to that element is ready. Not ready means, some other widget (probably an outer container) is still preparing the context and will do the initial focus later
       if (!this.$container.isOrHas(this.$container.activeElement())) {
         let focusManager = this.session.focusManager;
-        focused = focusManager.requestFocusIfReady(focusManager.findFirstFocusableElement(this.$container));
+        focusManager.requestFocusIfReady(focusManager.findFirstFocusableElement(this.$container), {preventScroll: true});
       }
-    }
-    if (focused) {
-      // If the focus widget is outside the view area the browser tries to scroll the widget into view.
-      // If the scroll area contains large (not absolutely positioned) content it can happen that the browsers scrolls the content even though the focused widget already is in the view area.
-      // This is probably because the focus happens while the form is not layouted yet. We should actually refactor this and do the focusing after layouting, but this would be a bigger change.
-      // The current workaround is to revert the scrolling done by the browser. Automatic scrolling to the focused widget when the form is not layouted does not work anyway.
-      let $scrollParent = this.$container.activeElement().scrollParent();
-      $scrollParent.scrollTop(0);
-      $scrollParent.scrollLeft(0);
     }
   }
 

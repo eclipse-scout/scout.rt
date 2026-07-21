@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -85,12 +85,7 @@ export class FileChooser extends Widget implements FileChooserModel {
     this.keyStrokeContext.registerKeyStrokes([
       new FocusAdjacentElementKeyStroke(this.session, this),
       new ClickActiveElementKeyStroke(this, [keys.SPACE, keys.ENTER]),
-      new CloseKeyStroke(this, (() => {
-        if (!this.cancelButton) {
-          return null;
-        }
-        return this.cancelButton.$container;
-      }))
+      new CloseKeyStroke(this, () => this.cancelButton?.$container)
     ]);
   }
 
@@ -208,9 +203,7 @@ export class FileChooser extends Widget implements FileChooserModel {
       this.cancel();
       return;
     }
-    if (this.cancelButton && this.cancelButton.$container && this.session.focusManager.requestFocus(this.cancelButton.$container)) {
-      this.cancelButton.doAction();
-    }
+    this.cancelButton?.doAction();
   }
 
   cancel() {
@@ -224,9 +217,7 @@ export class FileChooser extends Widget implements FileChooserModel {
    * Destroys the file chooser and unlinks it from the display parent.
    */
   protected _close() {
-    if (this.displayParent) {
-      this.displayParent.fileChooserController.unregisterAndRemove(this);
-    }
+    this.displayParent?.fileChooserController.unregisterAndRemove(this);
     this.destroy();
   }
 

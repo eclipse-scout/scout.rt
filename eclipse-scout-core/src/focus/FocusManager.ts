@@ -291,22 +291,23 @@ export class FocusManager implements FocusManagerOptions {
     }
   }
 
-  requestFocusIfReady(element: HTMLElement | JQuery, filter?: () => boolean): boolean {
-    return this.requestFocus(element, filter, {onlyIfReady: true});
+  /**
+   * @see requestFocus
+   * @see RequestFocusOptions.onlyIfReady
+   */
+  requestFocusIfReady(element: HTMLElement | JQuery, options?: FocusContextFocusOptions): boolean {
+    options = options || {};
+    return this.requestFocus(element, {...options, onlyIfReady: true});
   }
 
   /**
    * Requests the focus for the given element, but only if being a valid focus location.
    *
-   * @param element
-   *        the element to focus, or null to focus the context's first focusable element matching the given filter.
-   * @param filter
-   *        filter that controls which element should be focused, or null to accept all focusable candidates.
-   * @param options
-   *        options to customize the focus request.
+   * @param element the element to focus. The method returns false if the element is null, undefined or not focusable.
+   * @param options options to customize the focus request.
    * @returns true if focus was gained, false otherwise.
    */
-  requestFocus(element: HTMLElement | JQuery, filter?: () => boolean, options?: RequestFocusOptions): boolean {
+  requestFocus(element: HTMLElement | JQuery, options?: RequestFocusOptions): boolean {
     options = options || {};
     let $element = $.ensure(element);
     if (!$element.is(':focusable')) {
@@ -319,7 +320,7 @@ export class FocusManager implements FocusManagerOptions {
       if (scout.nvl(options.onlyIfReady, false) && !context.prepared) {
         return false;
       }
-      context.validateAndSetFocus(htmlElement, filter, options);
+      context.validateAndSetFocus(htmlElement, null, options);
     }
 
     return focusUtils.isActiveElement(htmlElement);

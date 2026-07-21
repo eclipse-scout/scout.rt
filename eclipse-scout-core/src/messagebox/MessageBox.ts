@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -66,7 +66,7 @@ export class MessageBox extends Widget implements MessageBoxModel {
     this.noButton = null;
     this.cancelButton = null;
     this.abortButton = null;
-    this.inheritAccessibility = false; // do not inherit enabled-state by default. Otherwise the MessageBox cannot be closed anymore
+    this.inheritAccessibility = false; // do not inherit enabled-state by default. Otherwise, the MessageBox cannot be closed anymore
     this.$content = null;
     this.$header = null;
     this.$body = null;
@@ -108,12 +108,7 @@ export class MessageBox extends Widget implements MessageBoxModel {
       new ClickActiveElementKeyStroke(this, [
         keys.SPACE, keys.ENTER
       ]),
-      new AbortKeyStroke(this, () => {
-        if (this.abortButton) {
-          return this.abortButton.$container;
-        }
-        return null;
-      })
+      new AbortKeyStroke(this, () => this.abortButton?.$container)
     ]);
   }
 
@@ -241,9 +236,7 @@ export class MessageBox extends Widget implements MessageBoxModel {
   }
 
   protected _renderHiddenText() {
-    if (this.$hiddenText) {
-      this.$hiddenText.remove();
-    }
+    this.$hiddenText?.remove();
     if (this.hiddenText) {
       this.$hiddenText = this.$content.appendElement('<!-- \n' + this.hiddenText.replace(/<!--|-->/g, '') + '\n -->');
     }
@@ -353,19 +346,15 @@ export class MessageBox extends Widget implements MessageBoxModel {
    * Destroys the message box and unlinks it from the display parent.
    */
   close() {
-    if (this.displayParent) {
-      this.displayParent.messageBoxController.unregisterAndRemove(this);
-    }
+    this.displayParent?.messageBoxController.unregisterAndRemove(this);
     this.destroy();
   }
 
   /**
-   * Aborts the message box by using the default abort button. Used by the ESC key stroke.
+   * Aborts the message box by using the default abort button. Used by the ESC keystroke.
    */
   abort() {
-    if (this.abortButton && this.abortButton.$container && this.session.focusManager.requestFocus(this.abortButton.$container)) {
-      this.abortButton.doAction();
-    }
+    this.abortButton?.doAction();
   }
 
   protected override _attach() {

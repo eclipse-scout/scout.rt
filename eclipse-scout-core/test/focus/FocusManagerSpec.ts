@@ -171,6 +171,11 @@ describe('FocusManager', () => {
       focusManager.uninstallFocusContext($container1);
     });
 
+    it('returns false if the element is null or undefined', () => {
+      expect(focusManager.requestFocus(null)).toBe(false);
+      expect(focusManager.requestFocus(undefined)).toBe(false);
+    });
+
     it('activates the context of the element if the element to focus is not in the active context', () => {
       let $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
       let $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
