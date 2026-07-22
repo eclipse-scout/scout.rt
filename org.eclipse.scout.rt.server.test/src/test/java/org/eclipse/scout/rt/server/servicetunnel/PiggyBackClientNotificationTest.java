@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
 /**
@@ -56,7 +55,8 @@ public class PiggyBackClientNotificationTest {
 
   @Test
   public void testPiggyBack() {
-    HttpServletRequest req = Mockito.mock(HttpServletRequest.class);
+    HttpServletRequest req = mock(HttpServletRequest.class);
+    when(req.getHeader(NodeId.HTTP_HEADER_NAME)).thenReturn("testNodeId");
 
     RunContexts.copyCurrent()
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
@@ -66,7 +66,6 @@ public class PiggyBackClientNotificationTest {
           Class[] parameterTypes = new Class[]{String.class};
           Object[] args = new Object[]{"test"};
           ServiceTunnelRequest serviceTunnelRequest = new ServiceTunnelRequest(IPingService.class.getName(), "ping", parameterTypes, args);
-          serviceTunnelRequest.setClientNodeId(NodeId.of("testNodeId"));
           ServiceTunnelResponse res = s.evaluate(serviceTunnelRequest);
           assertEquals("pong", res.getData());
           assertNull(res.getException());

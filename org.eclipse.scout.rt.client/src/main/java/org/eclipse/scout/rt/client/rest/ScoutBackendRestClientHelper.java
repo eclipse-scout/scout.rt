@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,6 +47,7 @@ public class ScoutBackendRestClientHelper extends AbstractRestClientHelper {
     // no classic IdSignatureClientRequestFilter; process resource will determine on its own if header should be added
     filters.add(BEANS.get(ServiceTunnelIdSignatureClientRequestFilter.class));
     filters.add(BEANS.get(SessionIdClientRequestFilter.class));
+    filters.add(BEANS.get(NodeIdClientRequestFilter.class));
     return filters;
   }
 

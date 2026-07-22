@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.context;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.server.commons.context.HttpRunContextProducer;
 import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
@@ -27,7 +28,8 @@ public class ServerHttpRunContextProducer extends HttpRunContextProducer {
     ServerRunContext serverRunContext = (ServerRunContext) super.produce(req, resp);
     return serverRunContext
         .withUserAgent(HttpClientInfo.get(req).toUserAgents().build())
-        .withThreadLocal(SessionId.CURRENT, req.getHeader(SessionId.HTTP_HEADER_NAME));
+        .withThreadLocal(SessionId.CURRENT, req.getHeader(SessionId.HTTP_HEADER_NAME))
+        .withClientNodeId(NodeId.of(req.getHeader(NodeId.HTTP_HEADER_NAME)));
   }
 
   @Override

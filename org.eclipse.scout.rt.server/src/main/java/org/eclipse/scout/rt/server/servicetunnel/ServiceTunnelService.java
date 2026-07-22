@@ -24,6 +24,7 @@ import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -127,11 +128,14 @@ public class ServiceTunnelService {
   }
 
   protected ServerRunContext createServiceTunnelRunContext(ServiceTunnelRequest serviceRequest) {
+    final HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+    NodeId clientNodeId = NodeId.of(req.getHeader(NodeId.HTTP_HEADER_NAME));
+
     // overwrite default settings from HTTP request with values from ServiceTunnelRequest
     return ServerRunContexts.copyCurrent()
         .withLocale(serviceRequest.getLocale())
         .withUserAgent(UserAgents.createByIdentifier(serviceRequest.getUserAgent()))
-        .withClientNodeId(serviceRequest.getClientNodeId());
+        .withClientNodeId(clientNodeId);
   }
 
   // === MESSAGE UNMARSHALLING / MARSHALLING ===

@@ -23,6 +23,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -57,7 +58,8 @@ public class ServiceTunnelServiceTest {
   public void before() {
     m_requestMock = mock(HttpServletRequest.class);
     m_responseMock = mock(HttpServletResponse.class);
-    when(m_requestMock.getHeader(SessionId.HTTP_HEADER_NAME)).thenReturn("testId");
+    when(m_requestMock.getHeader(SessionId.HTTP_HEADER_NAME)).thenReturn("testSessionId");
+    when(m_requestMock.getHeader(NodeId.HTTP_HEADER_NAME)).thenReturn("testNodeId");
   }
 
   @Test
@@ -90,7 +92,8 @@ public class ServiceTunnelServiceTest {
       ServiceTunnelService s = BEANS.get(ServiceTunnelService.class);
       ServiceTunnelRequest serviceRequest = prepareTestRequest();
       ServerRunContext context = s.createServiceTunnelRunContext(serviceRequest);
-      assertEquals("testId", context.call(SessionId.CURRENT::get));
+      assertEquals("testSessionId", context.call(SessionId.CURRENT::get));
+      assertEquals(NodeId.of("testNodeId"), context.getClientNodeId());
     });
   }
 

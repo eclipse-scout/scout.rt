@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -76,10 +77,12 @@ public class HttpServerSessionRunContextProducer {
     }
 
     String clientSessionId = req.getHeader(SessionId.HTTP_HEADER_NAME);
+    NodeId clientNodeId = NodeId.of(req.getHeader(NodeId.HTTP_HEADER_NAME));
 
     final ServerSessionRunContext serverRunContext = (ServerSessionRunContext) getInnerRunContextProducer().produce(req, resp, contextToFill);
     serverRunContext.withUserAgent(HttpClientInfo.get(req).toUserAgents().build());
     serverRunContext.withThreadLocal(SessionId.CURRENT, clientSessionId);
+    serverRunContext.withClientNodeId(clientNodeId);
     if (!hasSessionSupport()) {
       // don't touch the session
       return serverRunContext;
