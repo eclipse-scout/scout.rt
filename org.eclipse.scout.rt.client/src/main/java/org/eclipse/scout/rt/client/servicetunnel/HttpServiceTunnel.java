@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatch
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.servicetunnel.ServiceTunnelClientConfigProperties.BackendUrlProperty;
-import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -158,7 +157,6 @@ public class HttpServiceTunnel {
       userAgent = UserAgents.createDefault();
     }
     request.setUserAgent(userAgent.createIdentifier());
-    request.setClientNodeId(NodeId.current());
   }
 
   /**

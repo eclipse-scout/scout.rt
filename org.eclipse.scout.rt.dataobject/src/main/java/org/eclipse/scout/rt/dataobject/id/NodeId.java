@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,6 +24,11 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 public final class NodeId extends AbstractStringId {
   @Serial
   private static final long serialVersionUID = 1L;
+
+  /**
+   * Name of the HTTP header to transport the {@code node id} of the client.
+   */
+  public static final String HTTP_HEADER_NAME = "X-Scout-Client-Node-Id";
 
   private NodeId(String id) {
     super(id);

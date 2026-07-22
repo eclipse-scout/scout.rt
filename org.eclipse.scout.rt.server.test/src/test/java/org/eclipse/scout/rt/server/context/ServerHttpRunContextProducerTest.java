@@ -16,6 +16,7 @@ import static org.mockito.Mockito.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -40,6 +41,8 @@ import org.junit.runner.RunWith;
 public class ServerHttpRunContextProducerTest {
   protected static final String TEST_SESSION_ID = "test-session-42";
   protected static final String CHROME_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36";
+  protected static final String TEST_NODE_NAME = "testNode";
+  protected static final NodeId TEST_NODE_ID = NodeId.of(TEST_NODE_NAME);
 
   protected ServerHttpRunContextProducer m_producer;
 
@@ -50,7 +53,7 @@ public class ServerHttpRunContextProducerTest {
 
   @Test
   public void testProduceServerRunContext() {
-    HttpServletRequest req = createRequestMock(null, null);
+    HttpServletRequest req = createRequestMock(null, null, null);
     HttpServletResponse resp = mock(HttpServletResponse.class);
 
     RunContext context = m_producer.produce(req, resp);
@@ -72,7 +75,7 @@ public class ServerHttpRunContextProducerTest {
 
   @Test
   public void testProduceSessionId() {
-    HttpServletRequest req = createRequestMock(TEST_SESSION_ID, null);
+    HttpServletRequest req = createRequestMock(TEST_SESSION_ID, null, null);
     HttpServletResponse resp = mock(HttpServletResponse.class);
 
     RunContext context = m_producer.produce(req, resp);
@@ -81,7 +84,7 @@ public class ServerHttpRunContextProducerTest {
 
   @Test
   public void testProduceNoSessionId() {
-    HttpServletRequest req = createRequestMock(null, null);
+    HttpServletRequest req = createRequestMock(null, null, null);
     HttpServletResponse resp = mock(HttpServletResponse.class);
 
     RunContext context = m_producer.produce(req, resp);
@@ -90,7 +93,7 @@ public class ServerHttpRunContextProducerTest {
 
   @Test
   public void testProduceUserAgent() {
-    HttpServletRequest req = createRequestMock(null, CHROME_USER_AGENT);
+    HttpServletRequest req = createRequestMock(null, CHROME_USER_AGENT, null);
     HttpServletResponse resp = mock(HttpServletResponse.class);
 
     RunContext context = m_producer.produce(req, resp);
@@ -102,7 +105,7 @@ public class ServerHttpRunContextProducerTest {
 
   @Test
   public void testProduceNoUserAgent() {
-    HttpServletRequest req = createRequestMock(null, null);
+    HttpServletRequest req = createRequestMock(null, null, null);
     HttpServletResponse resp = mock(HttpServletResponse.class);
 
     RunContext context = m_producer.produce(req, resp);
@@ -112,9 +115,28 @@ public class ServerHttpRunContextProducerTest {
     assertEquals(UiEngineType.UNKNOWN, serverRunContext.getUserAgent().getUiEngineType());
   }
 
-  protected HttpServletRequest createRequestMock(String sessionId, String userAgent) {
+  @Test
+  public void testProduceClientNodeId() {
+    HttpServletRequest req = createRequestMock(TEST_SESSION_ID, null, TEST_NODE_NAME);
+    HttpServletResponse resp = mock(HttpServletResponse.class);
+
+    ServerRunContext context = (ServerRunContext) m_producer.produce(req, resp);
+    assertEquals(TEST_NODE_ID, context.getClientNodeId());
+  }
+
+  @Test
+  public void testProduceNoClientNodeId() {
+    HttpServletRequest req = createRequestMock(null, null, null);
+    HttpServletResponse resp = mock(HttpServletResponse.class);
+
+    ServerRunContext context = (ServerRunContext) m_producer.produce(req, resp);
+    assertNull(context.getClientNodeId());
+  }
+
+  protected HttpServletRequest createRequestMock(String sessionId, String userAgent, String clientNodeName) {
     HttpServletRequest req = mock(HttpServletRequest.class);
     when(req.getHeader(eq(SessionId.HTTP_HEADER_NAME))).thenReturn(sessionId);
+    when(req.getHeader(eq(NodeId.HTTP_HEADER_NAME))).thenReturn(clientNodeName);
     when(req.getHeader(eq("User-Agent"))).thenReturn(userAgent);
     return req;
   }
