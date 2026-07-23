@@ -32,8 +32,10 @@
 
   &.loading {
     & > .tile,
-    & > .scrollbar {
-      opacity: 0;
+    & > .scrollbar,
+    & + .scroll-shadow {
+      // "!important" is necessary because the TileGridLayout sets the opacity using inline style.
+      opacity: 0 !important;
     }
 
     & > .loading-indicator {
