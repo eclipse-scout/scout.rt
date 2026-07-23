@@ -28,6 +28,8 @@ import jakarta.ws.rs.core.UriInfo;
 
 import org.eclipse.scout.rt.api.data.ApiExposed;
 import org.eclipse.scout.rt.api.data.meta.MetaVersionInfoDo;
+import org.eclipse.scout.rt.dataobject.id.IIds;
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
@@ -122,6 +124,15 @@ public class MetaResource implements IRestResource {
   public String whoAmI() {
     Subject subject = RunContext.CURRENT.get().getSubject();
     return ObjectUtility.nvl(SecurityUtility.getPrincipalNames(subject), "(nobody)");
+  }
+
+  @GET
+  @Path("node")
+  @Produces(MediaType.TEXT_PLAIN)
+  @ApiDocDescription(text = "Returns the current node id.")
+  @ApiExposed
+  public String node() {
+    return ObjectUtility.nvl(IIds.toString(NodeId.current()), "n/a");
   }
 
   @GET
