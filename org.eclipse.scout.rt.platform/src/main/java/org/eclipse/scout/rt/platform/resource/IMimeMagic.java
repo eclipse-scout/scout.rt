@@ -47,7 +47,22 @@ public interface IMimeMagic {
   IMimeMagic RAR = createMagic("526172211A0700", "526172211A070100");
   IMimeMagic CLASS = createMagic("CAFEBABE");
   IMimeMagic OGG = createMagic("4F676753");
-  IMimeMagic EML = createMagic("52656365697665643A", "46726F6D3A", "582D556E73656E743A");
+  IMimeMagic EML = createMagic(
+      // magic bytes of EML files are simply ascii bytes of the first header
+      "52656365697665643A", // Received:
+      "46726F6D3A", // From:
+      "582D556E73656E743A", // X-Unsent:
+      "466F727761726420746F", // Forward to
+      "232120726E657773", // #! rnews
+      "4E232120726E657773", // N#! rnews
+      "5069706520746F", // Pipe to
+      "52656C61792D56657273696F6E3A", // Relay-Version:
+      "52657475726E2D506174683A", // Return-Path:
+      "52657475726E2D706174683A", // Return-path:
+      "5375626A6563743A20", // Subject:
+      "446174653A", // Date:
+      "4D6573736167652D49443A" // Message-ID:
+  );
   IMimeMagic FLV = createMagic("464C56");
   IMimeMagic MPG = createMagic("47", "000001BA", "000001B3");
   IMimeMagic FLAC = createMagic("664C6143");
