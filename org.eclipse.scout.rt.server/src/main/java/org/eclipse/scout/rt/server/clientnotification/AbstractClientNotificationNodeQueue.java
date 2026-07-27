@@ -24,10 +24,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.dataobject.id.NodeId;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
+import org.eclipse.scout.rt.platform.util.date.IDateProvider;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.NodeQueueCapacity;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
@@ -43,10 +45,12 @@ public abstract class AbstractClientNotificationNodeQueue implements IClientNoti
 
   protected final FinalValue<NodeId> m_clientNodeId = new FinalValue<>();
 
+  protected final Long m_createTimestamp = System.currentTimeMillis();
+
   protected final AtomicLong m_lastConsumeAccess;
 
   public AbstractClientNotificationNodeQueue() {
-    m_lastConsumeAccess = new AtomicLong(System.currentTimeMillis());
+    m_lastConsumeAccess = new AtomicLong();
   }
 
   @Override
@@ -110,6 +114,11 @@ public abstract class AbstractClientNotificationNodeQueue implements IClientNoti
     }
   }
 
+  @Override
+  public long getCreateTimestamp() {
+    return m_createTimestamp;
+  }
+
   /**
    * @return time since messages have last been consumed
    */
@@ -120,12 +129,15 @@ public abstract class AbstractClientNotificationNodeQueue implements IClientNoti
 
   @Override
   public String getLastConsumeAccessFormatted() {
+    if (getLastConsumeAccess() == 0) {
+      return "";
+    }
     return DateUtility.format(new Date(getLastConsumeAccess()), "yyyy-MM-dd HH:mm:ss.SSS");
   }
 
   @Override
   public List<ClientNotificationMessage> consume(int maxAmount, long maxWaitTime, TimeUnit unit) {
-    m_lastConsumeAccess.set(System.currentTimeMillis());
+    m_lastConsumeAccess.set(BEANS.get(IDateProvider.class).currentUTCMillis());
 
     List<ClientNotificationMessage> result = getNotifications(maxAmount, maxWaitTime, unit);
     LOG.debug("Consumed {} notifications. [clientNodeId={}]", result.size(), getClientNodeId());

@@ -179,10 +179,27 @@ public class ClientNotificationRegistryTest {
   }
 
   /**
-   * If no message is consumed, queue is removed
+   * If no message is consumed, queue is removed after timeout.
    */
   @Test
   public void testQueueRemovedAfterTimeout() throws InterruptedException {
+    ClientNotificationRegistry reg = new ClientNotificationRegistry(10);
+    reg.registerNode(TEST_NODE, true);
+    reg.putForAllNodes("notification");
+    List<ClientNotificationMessage> consumed = consumeNoWait(reg, TEST_NODE);
+    assertEquals(1, consumed.size());
+    Thread.sleep(100);
+    reg.cleanupDeadNodes();
+    reg.putForAllNodes("notification2");
+    consumed = consumeNoWait(reg, TEST_NODE);
+    assertTrue(consumed.isEmpty());
+  }
+
+  /**
+   * If never a message was consumed, queue is removed after timeout.
+   */
+  @Test
+  public void testQueueRemovedAfterTimeoutNeverConsumer() throws InterruptedException {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(10);
     reg.registerNode(TEST_NODE, true);
     Thread.sleep(100);

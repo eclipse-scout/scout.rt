@@ -11,19 +11,28 @@ package org.eclipse.scout.rt.server.clientnotification;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.dataobject.id.NodeId;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.date.IDateProvider;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.NodeQueueCapacity;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.mock.MockConfigPropertyRule;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.util.date.FixedDateProvider;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,12 +43,26 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class ClientNotificationNodeQueueTest {
 
-  private ClientNotificationNodeQueue m_queue;
+  protected static final int MAX_TEST_CAPACITY = 10;
+  protected static final FixedDateProvider DATE_PROVIDER = new FixedDateProvider();
+  protected static List<IBean<Object>> s_beans = new ArrayList<>();
 
-  private static final int MAX_TEST_CAPACITY = 10;
+  protected ClientNotificationNodeQueue m_queue;
 
   @Rule
   public MockConfigPropertyRule<Integer> m_nodeQueueCapacityPropertyRule = new MockConfigPropertyRule<>(NodeQueueCapacity.class, MAX_TEST_CAPACITY);
+
+  @BeforeClass
+  public static void beforeClass() {
+    s_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(IDateProvider.class)
+        .withApplicationScoped(true)
+        .withInitialInstance(DATE_PROVIDER)));
+  }
+
+  @AfterClass
+  public static void afterClass() {
+    BeanTestingHelper.get().unregisterBeans(s_beans);
+  }
 
   @Before
   public void setup() {
@@ -79,6 +102,17 @@ public class ClientNotificationNodeQueueTest {
     List<ClientNotificationMessage> notifications = m_queue.getNotifications(100, MAX_TEST_CAPACITY, TimeUnit.MILLISECONDS);
     assertEquals(MAX_TEST_CAPACITY, notifications.size());
     assertEquals("test1", notifications.get(0).getNotification());
+  }
+
+  @Test
+  public void testLastConsumeAccess() {
+    assertEquals(0, m_queue.getLastConsumeAccess());
+    assertEquals("", m_queue.getLastConsumeAccessFormatted());
+
+    DATE_PROVIDER.setDate(new Date(1));
+    m_queue.consume(1, 1, TimeUnit.MILLISECONDS);
+    assertEquals(1, m_queue.getLastConsumeAccess());
+    assertEquals("1970-01-01 01:00:00.001", m_queue.getLastConsumeAccessFormatted());
   }
 
   private void putTestNotifications(int count) {
