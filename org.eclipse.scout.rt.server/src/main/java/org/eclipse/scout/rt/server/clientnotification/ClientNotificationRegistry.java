@@ -407,7 +407,10 @@ public class ClientNotificationRegistry {
       Iterator<IClientNotificationNodeQueue> iter = m_notificationQueues.values().iterator();
       while (iter.hasNext()) {
         IClientNotificationNodeQueue queue = iter.next();
-        if (isQueueExpired(queue.getLastConsumeAccess())) {
+        long queueLastConsumeAccess = queue.getLastConsumeAccess();
+        // use queue creation timestamp if messages were never consumed yet, avoid cleaning up new queues which were never consumed within cleanup interval
+        long lastAccess = queueLastConsumeAccess != 0 ? queueLastConsumeAccess : queue.getCreateTimestamp();
+        if (isQueueExpired(lastAccess)) {
           LOG.info("Removing expired queue [clientNodeId={}, lastConsumeAccess={}]", queue.getClientNodeId(), queue.getLastConsumeAccessFormatted());
           expiredQueues.add(queue);
           iter.remove();

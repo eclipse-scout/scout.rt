@@ -49,6 +49,11 @@ public interface IClientNotificationNodeQueue {
   List<ClientNotificationMessage> consume(int maxAmount, long maxWaitTime, TimeUnit unit);
 
   /**
+   * @return timestamp of queue creation.
+   */
+  long getCreateTimestamp();
+
+  /**
    * @return timestamp of last message consume invocation.
    */
   long getLastConsumeAccess();
