@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.platform.util.date.IDateProvider;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.NodeQueueCapacity;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
@@ -112,7 +113,7 @@ public class ClientNotificationNodeQueueTest {
     DATE_PROVIDER.setDate(new Date(1));
     m_queue.consume(1, 1, TimeUnit.MILLISECONDS);
     assertEquals(1, m_queue.getLastConsumeAccess());
-    assertEquals("1970-01-01 01:00:00.001", m_queue.getLastConsumeAccessFormatted());
+    assertEquals(DateUtility.format(new Date(1), "yyyy-MM-dd HH:mm:ss.SSS"), m_queue.getLastConsumeAccessFormatted());
   }
 
   private void putTestNotifications(int count) {
