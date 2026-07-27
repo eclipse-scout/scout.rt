@@ -3379,7 +3379,13 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._triggerRowsDeleted(rows);
 
     if (invalidate) {
-      this._renderViewport();
+      if (removedRows.some(removedRow => removedRow.parentRow ? arrays.empty(removedRow.parentRow.childRows) : arrays.hasElements(removedRow.childRows))) {
+        // If one of the removed rows was the last child row of a parent row or a root row with children,
+        // re-render the entire viewport to correctly update the indentation of the tableNodeColumn.
+        this._rerenderViewport();
+      } else {
+        this._renderViewport();
+      }
       // Update markers and filler because row may be removed by removeRows. RenderViewport doesn't do it if view range is already correctly rendered.
       this._renderRangeMarkers();
       this._renderFiller();
@@ -4287,11 +4293,13 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
   protected _rebuildTreeStructure() {
     let hierarchical = false;
+    let wasHierarchical = false;
     this.rows.forEach(row => {
       row.childRows = [];
       hierarchical = hierarchical || !objects.isNullOrUndefined(row.parentRow);
+      wasHierarchical = wasHierarchical || !objects.isNullOrUndefined(row['_parentRowId']);
     });
-    if (!hierarchical) {
+    if (!hierarchical && !wasHierarchical) {
       this.rootRows = this.rows;
       this._setHierarchical(hierarchical);
       return;
