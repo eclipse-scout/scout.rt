@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -334,15 +334,21 @@ describe('HierarchicalTableSpec', () => {
       table.render();
     });
 
-    it('is updated when insert a new child row', () => {
-      let row = helper.createModelRow('33', ['newRow']);
+    it('is updated when inserting a new child row', () => {
+      expect(table.hierarchical).toBe(true);
+      expect(table.rows.map(row => row.hierarchyLevel)).toEqual([0, 1, 2, 0]);
+      expect(table.rows.map(row => row['_parentRowId'])).toEqual([null, '0', '1', null]);
       spyOn(table, '_renderViewport').and.callThrough();
 
+      let row = helper.createModelRow('33', ['newRow']);
       row.parentRow = rows[0].id;
       table.insertRow(row);
       row = table.rowById('33');
       expect(table._renderViewport.calls.count()).toBe(2);
 
+      expect(table.hierarchical).toBe(true);
+      expect(table.rows.map(row => row.hierarchyLevel)).toEqual([0, 1, 2, 1, 0]);
+      expect(table.rows.map(row => row['_parentRowId'])).toEqual([null, '0', '1', '0', null]);
       expectRowIds(table.visibleRows, [0, 1, 2, 33, 3]);
       expectRowIds(getExpandedRows(table), [0, 1]);
       expect(rows[0].childRows.length).toBe(2);
@@ -350,28 +356,154 @@ describe('HierarchicalTableSpec', () => {
       expect(row.parentRow).toBe(rows[0]);
     });
 
+    it('is updated when inserting a new child row into a non-hierarchical table', () => {
+      rows[1].parentRow = null;
+      rows[2].parentRow = null;
+      table.updateRows([rows[1], rows[2]]);
+
+      expect(table.hierarchical).toBe(false);
+      expect(table.rows.map(row => row.hierarchyLevel)).toEqual([0, 0, 0, 0]);
+      expect(table.rows.map(row => row['_parentRowId'])).toEqual([null, null, null, null]);
+      spyOn(table, '_renderViewport').and.callThrough();
+      spyOn(table, '_rerenderViewport').and.callThrough();
+
+      let row = helper.createModelRow('33', ['newRow']);
+      row.parentRow = rows[0].id;
+      table.insertRow(row);
+      row = table.rowById('33');
+      expect(table._renderViewport.calls.count()).toBe(2);
+      expect(table._rerenderViewport.calls.count()).toBe(1);
+
+      expect(table.hierarchical).toBe(true);
+      expect(table.rows.map(row => row.hierarchyLevel)).toEqual([0, 1, 0, 0, 0]);
+      expect(table.rows.map(row => row['_parentRowId'])).toEqual([null, '0', null, null, null]);
+      expectRowIds(table.visibleRows, [0, 33, 1, 2, 3]);
+      expectRowIds(getExpandedRows(table), [0]);
+      expect(rows[0].childRows.length).toBe(1);
+      expect(rows[0].childRows[0]).toBe(row);
+      expect(row.parentRow).toBe(rows[0]);
+    });
+
     it('is updated when deleting a child row', () => {
+      expect(table.hierarchical).toBe(true);
+      expect(table.rows.map(row => row.hierarchyLevel)).toEqual([0, 1, 2, 0]);
+      expect(table.rows.map(row => row['_parentRowId'])).toEqual([null, '0', '1', null]);
+      expectRowIds(table.rows, [0, 1, 2, 3]);
+      expectRowIds(getTreeRows(table), [0, 1, 2, 3]);
+      spyOn(table, '_renderViewport').and.callThrough();
+      spyOn(table, '_rerenderViewport').and.callThrough();
+
       let expectedRowIds = [0, 1, 3];
       table.deleteRow(rows[2]);
+
+      expect(table.hierarchical).toBe(true);
+      expect(table.rows.map(row => row.hierarchyLevel)).toEqual([0, 1, 0]);
+      expect(table.rows.map(row => row['_parentRowId'])).toEqual([null, '0', null]);
       expectRowIds(table.rows, expectedRowIds);
       expectRowIds(getTreeRows(table), expectedRowIds);
       expectRowIds(table._filteredRows, expectedRowIds);
       expectRowIds(table.visibleRows, expectedRowIds);
       expectRowIds(getUiRows(table), expectedRowIds);
+      expect(table._renderViewport.calls.count()).toBe(1);
+      expect(table._rerenderViewport.calls.count()).toBe(1);
+
+      expectedRowIds = [0, 3];
+      table.deleteRow(rows[1]);
+
+      expect(table.hierarchical).toBe(false);
+      expect(table.rows.map(row => row.hierarchyLevel)).toEqual([0, 0]);
+      expect(table.rows.map(row => row['_parentRowId'])).toEqual([null, null]);
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, expectedRowIds);
+      expectRowIds(getUiRows(table), expectedRowIds);
+      expect(table._renderViewport.calls.count()).toBe(2);
+      expect(table._rerenderViewport.calls.count()).toBe(2);
     });
 
     it('is updated when deleting a row and its children', () => {
+      expect(table.hierarchical).toBe(true);
+      expect(table.rows.map(row => row.hierarchyLevel)).toEqual([0, 1, 2, 0]);
+      expect(table.rows.map(row => row['_parentRowId'])).toEqual([null, '0', '1', null]);
+      expectRowIds(table.rows, [0, 1, 2, 3]);
+      expectRowIds(getTreeRows(table), [0, 1, 2, 3]);
+      spyOn(table, '_renderViewport').and.callThrough();
+      spyOn(table, '_rerenderViewport').and.callThrough();
+
       // cascade deleted row
       let expectedRowIds = [0, 3];
       table.deleteRow(rows[1]);
 
+      expect(table.hierarchical).toBe(false);
+      expect(table.rows.map(row => row.hierarchyLevel)).toEqual([0, 0]);
+      expect(table.rows.map(row => row['_parentRowId'])).toEqual([null, null]);
       expectRowIds(table.rows, expectedRowIds);
       expectRowIds(getTreeRows(table), expectedRowIds);
       expectRowIds(table._filteredRows, expectedRowIds);
       expectRowIds(table.visibleRows, expectedRowIds);
       expectRowIds(getUiRows(table), expectedRowIds);
+      expect(table._renderViewport.calls.count()).toBe(1);
+      expect(table._rerenderViewport.calls.count()).toBe(1);
     });
 
+    it('is updated when altering row hierarchy', () => {
+      expect(table.hierarchical).toBe(true);
+      expect(table.rows.map(row => row.hierarchyLevel)).toEqual([0, 1, 2, 0]);
+      expect(table.rows.map(row => row['_parentRowId'])).toEqual([null, '0', '1', null]);
+      expectRowIds(table.rows, [0, 1, 2, 3]);
+      expectRowIds(getTreeRows(table), [0, 1, 2, 3]);
+      spyOn(table, '_renderViewport').and.callThrough();
+      spyOn(table, '_rerenderViewport').and.callThrough();
+
+      rows[2].parentRow = rows[0];
+      table.updateRow(rows[2]);
+      // +-- 0
+      // |   +-- 1
+      // |   +-- 2
+      // +-- 3
+
+      expect(table.hierarchical).toBe(true);
+      expect(table.rows.map(row => row.hierarchyLevel)).toEqual([0, 1, 1, 0]);
+      expect(table.rows.map(row => row['_parentRowId'])).toEqual([null, '0', '0', null]);
+      expectRowIds(table.rows, [0, 1, 2, 3]);
+      expectRowIds(getTreeRows(table), [0, 1, 2, 3]);
+      expect(table._renderViewport.calls.count()).toBe(1);
+      expect(table._rerenderViewport.calls.count()).toBe(1);
+
+      // Switch from 'hierarchical' to 'non-hierarchical'
+      rows[1].parentRow = null;
+      rows[2].parentRow = null;
+      table.updateRows([rows[1], rows[2]]);
+      // 0
+      // 1
+      // 2
+      // 3
+
+      expect(table.hierarchical).toBe(false);
+      expect(table.rows.map(row => row.hierarchyLevel)).toEqual([0, 0, 0, 0]);
+      expect(table.rows.map(row => row['_parentRowId'])).toEqual([null, null, null, null]);
+      expectRowIds(table.rows, [0, 1, 2, 3]);
+      expectRowIds(getTreeRows(table), [0, 1, 2, 3]);
+      expect(table._renderViewport.calls.count()).toBe(2);
+      expect(table._rerenderViewport.calls.count()).toBe(2);
+
+      // Switch from 'non-hierarchical' to 'hierarchical'
+      rows[1].parentRow = rows[3];
+      table.updateRow(rows[1]);
+      // +-- 0
+      // +-- 2
+      // +-- 3
+      //     +-- 1
+
+      expect(table.hierarchical).toBe(true);
+      expect(table.rows.map(row => row.hierarchyLevel)).toEqual([0, 0, 0, 1]);
+      expect(table.rows.map(row => row['_parentRowId'])).toEqual([null, null, null, '3']);
+      expectRowIds(table.rows, [0, 2, 3, 1]);
+      expectRowIds(getTreeRows(table), [0, 2, 3, 1]);
+      expect(table._renderViewport.calls.count()).toBe(3);
+      expect(table._rerenderViewport.calls.count()).toBe(3);
+    });
   });
 
   describe('expanded rows', () => {
