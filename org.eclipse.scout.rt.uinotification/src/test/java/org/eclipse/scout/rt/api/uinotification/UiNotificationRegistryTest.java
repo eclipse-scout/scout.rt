@@ -608,7 +608,7 @@ public class UiNotificationRegistryTest {
       registry.put("topic", createMessage(), UiNotificationPutOptions.noTransaction().withPublishOverCluster(false));
       verify(clusterService, times(2)).publish(any());
 
-      registry.put("topic", createMessage(), UiNotificationPutOptions.noClusterSync().withTransactional(false));
+      registry.put("topic", createMessage(), new UiNotificationPutOptions().withPublishOverCluster(false).withTransactional(false));
       verify(clusterService, times(2)).publish(any());
     }
     finally {
