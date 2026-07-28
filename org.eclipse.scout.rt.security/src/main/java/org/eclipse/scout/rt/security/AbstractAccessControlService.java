@@ -218,7 +218,8 @@ public abstract class AbstractAccessControlService implements IAccessControlServ
     IPermissionCollection permissions = getCache().get(user);
     LOG.trace("getPermissions() called for {}, returned {}", user, permissions);
     if (permissions == null) {
-      LOG.error("getPermissions() called for {}, returned {}", user, permissions);
+      //noinspection LoggingPlaceholderCountMatchesArgumentCount
+      LOG.error("getPermissions() called for {}, returned {}", user, permissions, LOG.isDebugEnabled() ? new Exception("stacktrace") : null);
     }
     return permissions == null ? BEANS.get(NonePermissionCollection.class) : permissions;
   }
