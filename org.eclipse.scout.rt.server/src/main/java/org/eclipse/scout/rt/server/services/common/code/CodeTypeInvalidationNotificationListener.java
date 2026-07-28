@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -66,6 +66,10 @@ public class CodeTypeInvalidationNotificationListener implements ICacheInvalidat
     }
     ITransaction transaction = ITransaction.CURRENT.get();
     if (transaction == null) {
+      return;
+    }
+    if (!propagate) {
+      // Do not create ui notifications if propagate flag is false as ui notifications are already propagated to other cluster nodes by the UiNotificationRegistry.
       return;
     }
     CodeTypeUiNotificationTransactionMember member = transaction.registerMemberIfAbsentAndNotCancelled(CodeTypeUiNotificationTransactionMember.TRANSACTION_MEMBER_ID, this::createTransactionMember);
@@ -148,7 +152,7 @@ public class CodeTypeInvalidationNotificationListener implements ICacheInvalidat
       // send message to current user directly including the new code types
       // this is required so that the caches are update to date very soon after the user applied the change
       CodeTypeUpdateMessageDo messageWithNewCodeTypes = BEANS.get(CodeTypeUpdateMessageDo.class).withCodeTypes(codeTypes);
-      uiNotificationRegistry.put(TOPIC, currentUserId, messageWithNewCodeTypes, noTransaction().withPublishOverCluster(false));
+      uiNotificationRegistry.put(TOPIC, currentUserId, messageWithNewCodeTypes, noTransaction());
 
       // send updated codeType ids to other users so that they can reload them
       Set<String> idsToUpdate = codeTypes.stream().map(CodeTypeDo::getId).collect(toSet());
@@ -156,7 +160,7 @@ public class CodeTypeInvalidationNotificationListener implements ICacheInvalidat
       CodeTypeUpdateMessageDo messageWithCodeTypeIdsToUpdate = BEANS.get(CodeTypeUpdateMessageDo.class)
           .withCodeTypeIds(idsToUpdate)
           .withReloadDelayWindow(reloadDelayWindow);
-      uiNotificationRegistry.putExcept(TOPIC, singleton(currentUserId), messageWithCodeTypeIdsToUpdate, noTransaction().withPublishOverCluster(false));
+      uiNotificationRegistry.putExcept(TOPIC, singleton(currentUserId), messageWithCodeTypeIdsToUpdate, noTransaction());
     }
 
     protected String getUserId() {

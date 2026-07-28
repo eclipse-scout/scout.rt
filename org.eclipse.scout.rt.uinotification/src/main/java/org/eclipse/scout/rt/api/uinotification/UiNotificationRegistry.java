@@ -386,7 +386,7 @@ public class UiNotificationRegistry {
   public void handleClusterNotification(UiNotificationMessageDo message) {
     UiNotificationDo notification = message.getNotification();
     LOG.info("Received ui notification with id {} from cluster node {} for topic {} and user {}.", notification.getId(), notification.getNodeId(), notification.getTopic(), message.getUser());
-    putInternal(message, UiNotificationPutOptions.noClusterSync());
+    putInternal(message, new UiNotificationPutOptions().withPublishOverCluster(false));
   }
 
   protected void putInternal(UiNotificationMessageDo message, UiNotificationPutOptions options) {

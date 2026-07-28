@@ -50,15 +50,20 @@ public class UiNotificationPutOptions {
   }
 
   /**
+   * For internal use only.
+   *
    * @param publishOverCluster
    *     Whether the notification is published to all other cluster nodes or not. Default is {@code true}.
    */
-  public UiNotificationPutOptions withPublishOverCluster(Boolean publishOverCluster) {
+  protected UiNotificationPutOptions withPublishOverCluster(Boolean publishOverCluster) {
     m_publishOverCluster = publishOverCluster;
     return this;
   }
 
-  public Boolean getPublishOverCluster() {
+  /**
+   * For internal use only.
+   */
+  protected Boolean getPublishOverCluster() {
     return m_publishOverCluster;
   }
 
@@ -71,12 +76,5 @@ public class UiNotificationPutOptions {
    */
   public static UiNotificationPutOptions noTransaction() {
     return new UiNotificationPutOptions().withTransactional(false);
-  }
-
-  /**
-   * Creates an {@link UiNotificationPutOptions} instance with {@code publishOverCluster = false}.
-   */
-  public static UiNotificationPutOptions noClusterSync() {
-    return new UiNotificationPutOptions().withPublishOverCluster(false);
   }
 }

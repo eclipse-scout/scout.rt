@@ -59,6 +59,10 @@ public class PermissionsInvalidationNotificationListener implements ICacheInvali
     if (transaction == null) {
       return;
     }
+    if (!propagate) {
+      // Do not create ui notifications if propagate flag is false as ui notifications are already propagated to other cluster nodes by the UiNotificationRegistry.
+      return;
+    }
     transaction.registerMemberIfAbsentAndNotCancelled(PermissionsUiNotificationTransactionMember.TRANSACTION_MEMBER_ID, id -> createTransactionMember(filter));
   }
 
@@ -107,11 +111,11 @@ public class PermissionsInvalidationNotificationListener implements ICacheInvali
         cacheKeys.stream()
             .map(User::getUserId)
             .filter(Objects::nonNull)
-            .forEach(userId -> uiNotificationRegistry.put(TOPIC, userId, updateDo, noTransaction().withPublishOverCluster(false)));
+            .forEach(userId -> uiNotificationRegistry.put(TOPIC, userId, updateDo, noTransaction()));
       }
       else {
         // update for all clients
-        uiNotificationRegistry.put(TOPIC, updateDo, noTransaction().withPublishOverCluster(false));
+        uiNotificationRegistry.put(TOPIC, updateDo, noTransaction());
       }
     }
   }
