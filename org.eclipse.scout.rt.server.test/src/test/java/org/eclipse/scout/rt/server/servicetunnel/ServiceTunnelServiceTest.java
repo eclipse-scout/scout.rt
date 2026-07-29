@@ -16,8 +16,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import javax.security.auth.Subject;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response;
@@ -26,12 +24,10 @@ import jakarta.ws.rs.core.StreamingOutput;
 import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.server.commons.servlet.logging.ServletDiagnosticsProviderFactory;
+import org.eclipse.scout.rt.server.context.ServerHttpRunContextProducer;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -112,12 +108,6 @@ public class ServiceTunnelServiceTest {
   }
 
   private static RunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
-    return RunContexts.copyCurrent(true)
-        .withSubject(Subject.current())
-        .withUser(User.current())
-        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
-        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
-        .withThreadLocal(SessionId.CURRENT, req.getHeader(SessionId.HTTP_HEADER_NAME))
-        .withDiagnostics(BEANS.get(ServletDiagnosticsProviderFactory.class).getProviders(req, resp));
+    return BEANS.get(ServerHttpRunContextProducer.class).produce(req, resp);
   }
 }
