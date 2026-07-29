@@ -1092,12 +1092,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
     // add convenience observer for drag & drop callbacks, event history and ui sort possible check
     addTableListener(e -> {
-          //event history
-          IEventHistory<TableEvent> h = getEventHistory();
-          if (h != null) {
-            h.notifyEvent(e);
-          }
-          //dnd
+      //event history
+      IEventHistory<TableEvent> h = getEventHistory();
+      if (h != null) {
+        h.notifyEvent(e);
+      }
+      //dnd
       switch (e.getType()) {
         case TableEvent.TYPE_ROWS_DRAG_REQUEST -> {
           if (e.getDragObject() == null) {
@@ -1149,8 +1149,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         }
         case TableEvent.TYPE_COLUMN_HEADERS_UPDATED, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED -> checkIfColumnPreventsUiSortForTable();
       }
-        }
-    );
+    });
   }
 
   protected void initMenus() {
@@ -4456,7 +4455,72 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
   }
 
+  /**
+   * Called when rows are {@linkplain #isRowsDraggable() draggable} and the user moved a row.
+   * <p>
+   * Subclasses can override this method. The default calls {@link #dropRow(ITableRow, ITableRow, TableRowDropPosition)}.
+   */
   protected void execRowDrop(ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position) {
+    dropRow(sourceRow, targetRow, position);
+  }
+
+  @Override
+  public void dropRow(ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position) {
+    setTableChanging(true);
+    try {
+      int sourceIndex = sourceRow.getRowIndex();
+      int targetIndex = targetRow.getRowIndex();
+
+      // Check if source row gets a new parent row
+      ITableRow parentRow = targetRow.getParentRow();
+      if (position == TableRowDropPosition.FIRST_CHILD || position == TableRowDropPosition.LAST_CHILD) {
+        parentRow = targetRow;
+      }
+      boolean parentRowChanged = false;
+      if (sourceRow.getParentRow() != parentRow) {
+        int[] keyColumnIndexes = getColumnSet().getKeyColumnIndexes();
+        int[] parentKeyColumnIndexes = getColumnSet().getParentKeyColumnIndexes();
+        Assertions.assertEqual(keyColumnIndexes.length, parentKeyColumnIndexes.length,
+            "Mismatch between key columns and parent key columns. keyColumnIndexes={}, parentKeyColumnIndexes={}",
+            keyColumnIndexes, parentKeyColumnIndexes);
+        for (int i = 0; i < parentKeyColumnIndexes.length; i++) {
+          sourceRow.setCellValue(parentKeyColumnIndexes[i], parentRow == null ? null : parentRow.getCellValue(keyColumnIndexes[i]));
+        }
+        rebuildTreeStructure();
+
+        parentRowChanged = true;
+      }
+
+      // Compute new position
+      if (position == TableRowDropPosition.AFTER || position == TableRowDropPosition.LAST_CHILD) {
+        // Insert after last child of target row
+        ITableRow lastRow = targetRow;
+        while (CollectionUtility.hasElements(lastRow.getChildRows())) {
+          lastRow = CollectionUtility.lastElement(lastRow.getChildRows());
+        }
+        targetIndex = lastRow.getRowIndex() + 1;
+      }
+      else if (position == TableRowDropPosition.FIRST_CHILD) {
+        // Insert directly after target row
+        targetIndex++;
+      }
+      if (sourceIndex < targetIndex) {
+        // Going downward -> because the source row will be removed from its old place, all subsequent
+        // rows will be moved up by 1 -> decrease target index by the same amount.
+        targetIndex--;
+      }
+
+      // Update row
+      if (sourceIndex != targetIndex) {
+        moveRow(sourceIndex, targetIndex);
+      }
+      else if (parentRowChanged) {
+        updateRow(sourceRow);
+      }
+    }
+    finally {
+      setTableChanging(false);
+    }
   }
 
   private void fireRowOrderChanged() {
