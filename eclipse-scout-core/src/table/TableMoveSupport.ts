@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, BaseDoEntity, DraggableElement, Event, graphics, MoveData, MoveSupport, Point, Rectangle, scout, strings, Table, TableField, TableRow, typeName} from '../index';
+import {arrays, BaseDoEntity, BooleanColumn, DraggableElement, Event, graphics, MoveData, MoveSupport, Point, Rectangle, scout, strings, Table, TableField, TableRow, typeName} from '../index';
 import $ from 'jquery';
 
 export class TableMoveSupport extends MoveSupport<DraggableTableRowElement> {
@@ -435,6 +435,9 @@ export class TableMoveSupport extends MoveSupport<DraggableTableRowElement> {
     for (let column of this.table.visibleColumns()) {
       if (!column.nodeColumnCandidate) {
         continue; // ignore special gui-only columns
+      }
+      if (column instanceof BooleanColumn) {
+        continue; // ignore boolean columns, they don't have a meaningful text
       }
       // Explicitly cast text to String, because callText() might return other types (see Column#_formatValue)-
       // Some "empty" values would not be falsy otherwise, e.g. an empty array.

@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.api.data.table.TableRowDropPosition;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
@@ -1360,4 +1361,10 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * <b>Caution</b>: use this with care because it should only be necessary in very rare cases.
    */
   void firePendingEvents();
+
+  /**
+   * Moves a row within the table. The new location is computed using the given target row and position.
+   * If the table is hierarchical, the parent row is updated accordingly.
+   */
+  void dropRow(ITableRow sourceRow, ITableRow targetRow, TableRowDropPosition position);
 }

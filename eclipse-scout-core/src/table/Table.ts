@@ -6842,15 +6842,15 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     }
 
     // Compute new position
-    if (position === TableRowDropPosition.LAST_CHILD) {
-      // Insert at end of subtree
+    if (position === TableRowDropPosition.AFTER || position === TableRowDropPosition.LAST_CHILD) {
+      // Insert after last child of target row
       let lastRow = targetRow;
       while (arrays.hasElements(lastRow.childRows)) {
         lastRow = arrays.last(lastRow.childRows);
       }
       targetIndex = this.rows.indexOf(lastRow) + 1;
-    }
-    if (position === TableRowDropPosition.AFTER || position === TableRowDropPosition.FIRST_CHILD) {
+    } else if (position === TableRowDropPosition.FIRST_CHILD) {
+      // Insert directly after target row
       targetIndex++;
     }
     if (sourceIndex < targetIndex) {
