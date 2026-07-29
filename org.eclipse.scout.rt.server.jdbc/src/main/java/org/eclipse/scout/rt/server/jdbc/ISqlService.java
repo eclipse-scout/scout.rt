@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,6 +14,7 @@ import java.sql.Connection;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.job.IJobManager;
+import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
@@ -53,7 +54,7 @@ import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchroni
  * The name of the bind variable (e.g. <code>:companyNr</code>) must match the property name (e.g. the bean must
  * implement <code>Long getCompanyNr()</code>)</li>
  * <li>a {@link java.util.Map} with name/value pairs</li>
- * <li>by default the ServerSession's bean properties are used as well</li>
+ * <li>by default the {@link User#currentUserId()} is added as bind as well</li>
  * </ul>
  * </p>
  * <h3>Database specific tokens</h3> Often used sql functions that may have different names in different sql styles can
