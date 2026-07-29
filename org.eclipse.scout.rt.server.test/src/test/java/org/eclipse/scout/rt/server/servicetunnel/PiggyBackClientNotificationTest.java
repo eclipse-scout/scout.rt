@@ -18,9 +18,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
-import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.server.context.ServerHttpRunContextProducer;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -58,9 +57,7 @@ public class PiggyBackClientNotificationTest {
     HttpServletRequest req = mock(HttpServletRequest.class);
     when(req.getHeader(NodeId.HTTP_HEADER_NAME)).thenReturn("testNodeId");
 
-    RunContexts.copyCurrent()
-        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
-        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, mock(HttpServletResponse.class))
+    BEANS.get(ServerHttpRunContextProducer.class).produce(req, mock(HttpServletResponse.class))
         .run(() -> {
           ServiceTunnelService s = new ServiceTunnelService();
           Class[] parameterTypes = new Class[]{String.class};
