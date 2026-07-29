@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.rest.id.IdSignatureClientRequestFilter;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
@@ -130,7 +131,8 @@ public class ServiceTunnelService {
     // overwrite default settings from HTTP request with values from ServiceTunnelRequest
     return ServerRunContexts.copyCurrent()
         .withLocale(serviceRequest.getLocale())
-        .withUserAgent(UserAgents.createByIdentifier(serviceRequest.getUserAgent()));
+        .withUserAgent(UserAgents.createByIdentifier(serviceRequest.getUserAgent()))
+        .withClientNotificationCollector(new ClientNotificationCollector());
   }
 
   // === MESSAGE UNMARSHALLING / MARSHALLING ===

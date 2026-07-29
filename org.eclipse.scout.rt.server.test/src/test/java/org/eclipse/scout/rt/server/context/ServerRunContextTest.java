@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -42,6 +43,7 @@ public class ServerRunContextTest {
     assertNull(runContext.getSubject());
     assertNull(runContext.getUserAgent());
     assertNull(runContext.getLocale());
+    assertNull(runContext.getClientNotificationCollector());
     assertEquals(TransactionScope.REQUIRES_NEW, runContext.getTransactionScope());
   }
 
@@ -54,6 +56,7 @@ public class ServerRunContextTest {
     runContext.withUserAgent(UserAgents.create().build());
     runContext.withLocale(Locale.CANADA_FRENCH);
     runContext.withTransactionScope(TransactionScope.MANDATORY);
+    runContext.withClientNotificationCollector(new ClientNotificationCollector());
 
     ServerRunContext copy = runContext.copy();
 
@@ -63,6 +66,7 @@ public class ServerRunContextTest {
     assertSame(runContext.getUserAgent(), copy.getUserAgent());
     assertSame(runContext.getLocale(), copy.getLocale());
     assertEquals(TransactionScope.MANDATORY, runContext.getTransactionScope());
+    assertSame(runContext.getClientNotificationCollector(), copy.getClientNotificationCollector());
   }
 
   @Test
@@ -73,6 +77,7 @@ public class ServerRunContextTest {
     assertNull(serverCtx.getSubject());
     assertNull(serverCtx.getUserAgent());
     assertNull(serverCtx.getLocale());
+    assertNull(serverCtx.getClientNotificationCollector());
     assertEquals(TransactionScope.REQUIRES_NEW, serverCtx.getTransactionScope());
   }
 
@@ -82,6 +87,7 @@ public class ServerRunContextTest {
     final Locale locale = Locale.CANADA_FRENCH;
     final Subject subject = new Subject();
     final User user = BEANS.get(User.class).withUserId("alice").setReadOnly();
+    final ClientNotificationCollector clientNotificationCollector = new ClientNotificationCollector();
 
     ServerRunContexts
         .empty()
@@ -89,6 +95,7 @@ public class ServerRunContextTest {
         .withLocale(locale)
         .withSubject(subject)
         .withUser(user)
+        .withClientNotificationCollector(clientNotificationCollector)
         .run(() -> {
           RunContext runContext = RunContexts.copyCurrent();
           assertThat(runContext, CoreMatchers.instanceOf(ServerRunContext.class));
@@ -98,6 +105,7 @@ public class ServerRunContextTest {
           assertSame(locale, serverCtx.getLocale());
           assertSame(subject, serverCtx.getSubject());
           assertSame(user, serverCtx.getUser());
+          assertSame(clientNotificationCollector, serverCtx.getClientNotificationCollector());
         });
   }
 
