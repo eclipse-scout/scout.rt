@@ -56,7 +56,7 @@ public class ServerRunContext extends RunContext {
 
   protected UserAgent m_userAgent;
   protected NodeId m_clientNodeId;
-  protected ClientNotificationCollector m_clientNotificationCollector = new ClientNotificationCollector();
+  protected ClientNotificationCollector m_clientNotificationCollector;
 
   @Override
   protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
