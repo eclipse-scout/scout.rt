@@ -675,17 +675,17 @@ public final class ApplicationProperties {
 
     @Override
     public String getKey() {
-      return "scout.app.jetty.stream.idleTimeout";   
+      return "scout.app.jetty.stream.idleTimeout";
     }
 
     @Override
     public Long getDefaultValue() {
-      return TimeUnit.SECONDS.toMillis(40);
+      return TimeUnit.HOURS.toMillis(1);
     }
 
     @Override
     public String description() {
-      return "The HTTP2 stream idle timeout in milliseconds. Default value is " + getDefaultValue() + ".";
+      return "The HTTP2 stream idle timeout in milliseconds. Set to Long.MAX_VALUE to effectively disable stream idle timeouts for debugging or development purposes. Default: " + getDefaultValue() + ".";
     }
   }
 }
