@@ -292,7 +292,8 @@ public class ColumnSet {
         sortIndex = columnConfigs.get(col).getSortIndex();
       }
       if (sortIndex >= 0) {
-        sortMap.put(new CompositeObject(sortIndex, index), col);
+        // Order columns by their sort index (grouped columns first).
+        sortMap.put(new CompositeObject(col.isInitialGrouped() ? 0 : 1, sortIndex, index), col);
       }
 
       // aggregation function

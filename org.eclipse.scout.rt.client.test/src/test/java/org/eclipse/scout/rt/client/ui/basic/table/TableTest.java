@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.basic.table.TableTest.P_Table.FirstColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.tile.AbstractHtmlTile;
@@ -29,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -962,5 +964,168 @@ public class TableTest {
     assertEquals(2, recentEvents.size());
     assertTrue(recentEvents.contains(customEvent));
     assertTrue(recentEvents.contains(scrollToSelectionEvent));
+  }
+
+  @Test
+  public void testDuplicateSortIndex() {
+    AbstractStringColumn col1 = new AbstractStringColumn() {
+      @Override
+      public String getColumnId() {
+        return "col1";
+      }
+
+      @Override
+      protected int getConfiguredSortIndex() {
+        return 0;
+      }
+    };
+    AbstractStringColumn col2 = new AbstractStringColumn() {
+      @Override
+      public String getColumnId() {
+        return "col2";
+      }
+
+      @Override
+      protected int getConfiguredSortIndex() {
+        return 0;
+      }
+    };
+    AbstractStringColumn col3 = new AbstractStringColumn() {
+      @Override
+      public String getColumnId() {
+        return "col3";
+      }
+
+      @Override
+      protected int getConfiguredSortIndex() {
+        return 1;
+      }
+    };
+    ITable table = new AbstractTable() {
+      @Override
+      protected void injectColumnsInternal(OrderedCollection<IColumn<?>> columns) {
+        columns.addLast(col1);
+        columns.addLast(col2);
+        columns.addLast(col3);
+      }
+    };
+    table.resetColumns();
+    assertEquals(List.of("col1", "col2", "col3"), table.getColumnSet().getColumns().stream().map(col -> col.getColumnId()).toList());
+    assertEquals(List.of("col1", "col2", "col3"), table.getColumnSet().getSortColumns().stream().map(col -> col.getColumnId()).toList());
+  }
+
+  @Test
+  public void testDuplicateSortIndex_grouped() {
+    AbstractStringColumn col1 = new AbstractStringColumn() {
+      @Override
+      public String getColumnId() {
+        return "col1";
+      }
+
+      @Override
+      protected int getConfiguredSortIndex() {
+        return 0;
+      }
+    };
+    AbstractStringColumn col2 = new AbstractStringColumn() {
+      @Override
+      public String getColumnId() {
+        return "col2";
+      }
+
+      @Override
+      protected int getConfiguredSortIndex() {
+        return 0;
+      }
+
+      @Override
+      protected boolean getConfiguredGrouped() {
+        return true; // <--
+      }
+    };
+    AbstractStringColumn col3 = new AbstractStringColumn() {
+      @Override
+      public String getColumnId() {
+        return "col3";
+      }
+
+      @Override
+      protected int getConfiguredSortIndex() {
+        return 1;
+      }
+    };
+    ITable table = new AbstractTable() {
+      @Override
+      protected void injectColumnsInternal(OrderedCollection<IColumn<?>> columns) {
+        columns.addLast(col1);
+        columns.addLast(col2);
+        columns.addLast(col3);
+      }
+    };
+    table.resetColumns();
+    assertEquals(List.of("col1", "col2", "col3"), table.getColumnSet().getColumns().stream().map(col -> col.getColumnId()).toList());
+    assertEquals(List.of("col2", "col1", "col3"), table.getColumnSet().getSortColumns().stream().map(col -> col.getColumnId()).toList());
+    assertEquals(List.of(1, 0, 2), table.getColumnSet().getColumns().stream().map(col -> col.getSortIndex()).toList());
+    assertEquals(List.of(false, true, false), table.getColumnSet().getColumns().stream().map(col -> col.isGroupingActive()).toList());
+  }
+
+  @Test
+  public void testDuplicateSortIndex_twoColumnsGrouped() {
+    AbstractStringColumn col1 = new AbstractStringColumn() {
+      @Override
+      public String getColumnId() {
+        return "col1";
+      }
+
+      @Override
+      protected int getConfiguredSortIndex() {
+        return 0;
+      }
+    };
+    AbstractStringColumn col2 = new AbstractStringColumn() {
+      @Override
+      public String getColumnId() {
+        return "col2";
+      }
+
+      @Override
+      protected int getConfiguredSortIndex() {
+        return 0;
+      }
+
+      @Override
+      protected boolean getConfiguredGrouped() {
+        return true; // <--
+      }
+    };
+    AbstractStringColumn col3 = new AbstractStringColumn() {
+      @Override
+      public String getColumnId() {
+        return "col3";
+      }
+
+      @Override
+      protected int getConfiguredSortIndex() {
+        return 1;
+      }
+
+      @Override
+      protected boolean getConfiguredGrouped() {
+        return true; // <--
+      }
+    };
+    ITable table = new AbstractTable() {
+      @Override
+      protected void injectColumnsInternal(OrderedCollection<IColumn<?>> columns) {
+        columns.addLast(col1);
+        columns.addLast(col2);
+        columns.addLast(col3);
+      }
+    };
+    table.resetColumns();
+    assertEquals(List.of("col1", "col2", "col3"), table.getColumnSet().getColumns().stream().map(col -> col.getColumnId()).toList());
+    assertEquals(List.of("col2", "col3", "col1"), table.getColumnSet().getSortColumns().stream().map(col -> col.getColumnId()).toList());
+    assertEquals(List.of(2, 0, 1), table.getColumnSet().getColumns().stream().map(col -> col.getSortIndex()).toList());
+    assertEquals(List.of(false, true, true), table.getColumnSet().getColumns().stream().map(col -> col.isGroupingActive()).toList());
   }
 }
