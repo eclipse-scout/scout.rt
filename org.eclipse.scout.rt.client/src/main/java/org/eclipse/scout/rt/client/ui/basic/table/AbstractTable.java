@@ -2489,6 +2489,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         }
       }
       if (!changedColumnValues.isEmpty()) {
+        rebuildTreeStructure();
         enqueueValueChangeTasks(row, changedColumnValues);
       }
       enqueueDecorationTasks(row);
@@ -3270,7 +3271,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       if (parentRowKeys.stream().filter(Objects::nonNull).findAny().orElse(null) != null) {
         ITableRow parentRow = getRowByKey(parentRowKeys);
         if (parentRow == null) {
-          throw new IllegalArgumentException("Could not find the parent row of '" + row + "'. parent keys are defined.");
+          throw new IllegalStateException("Could not find the parent row of '" + row + "'. Parent row keys: " + parentRowKeys);
         }
         parentToChildren.computeIfAbsent(parentRow, _ -> new ArrayList<>())
             .add(row);
@@ -3285,6 +3286,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     boolean hierarchical = !parentToChildren.isEmpty();
     setHierarchicalInternal(hierarchical);
     if (hierarchical) {
+      // Rebuild m_rows in the correct order and ensure parent and child rows are linked correctly
       CollectingVisitor<ITableRow> collector = new CollectingVisitor<>();
       rootNodes.forEach(root -> TreeTraversals.create(collector, node -> {
         List<ITableRow> childRows = parentToChildren.getOrDefault(node, Collections.emptyList());
@@ -3292,7 +3294,14 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         childRows.forEach(childRow -> childRow.setParentRowInternal(node));
         return childRows;
       }).traverse(root));
-      m_rows = Collections.synchronizedList(collector.getCollection());
+      synchronized (m_cachedRowsLock) {
+        m_cachedRows = null;
+        m_rows = Collections.synchronizedList(collector.getCollection());
+      }
+    }
+    // Ensure row indexes matche the position of each row in m_rows
+    for (int i = 0; i < m_rows.size(); i++) {
+      ((InternalTableRow) m_rows.get(i)).setRowIndex(i);
     }
     m_treeStructureDirty = false;
   }
@@ -3371,14 +3380,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         ITableRow row = m_rows.remove(sourceIndex);
         m_rows.add(targetIndex, row);
       }
-      // update row indexes
-      int min = Math.min(sourceIndex, targetIndex);
-      int max = Math.max(sourceIndex, targetIndex);
-      ITableRow[] changedRows = new ITableRow[max - min + 1];
-      for (int i = min; i <= max; i++) {
-        changedRows[i - min] = getRow(i);
-        ((InternalTableRow) changedRows[i - min]).setRowIndex(i);
-      }
+      // update row indexes and move child rows below their moved parents
+      rebuildTreeStructure();
       fireRowOrderChanged();
       // rebuild selection and checked rows
       selectRows(getSelectedRows(), false);
@@ -4476,7 +4479,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       if (position == TableRowDropPosition.FIRST_CHILD || position == TableRowDropPosition.LAST_CHILD) {
         parentRow = targetRow;
       }
-      boolean parentRowChanged = false;
       if (sourceRow.getParentRow() != parentRow) {
         int[] keyColumnIndexes = getColumnSet().getKeyColumnIndexes();
         int[] parentKeyColumnIndexes = getColumnSet().getParentKeyColumnIndexes();
@@ -4484,11 +4486,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
             "Mismatch between key columns and parent key columns. keyColumnIndexes={}, parentKeyColumnIndexes={}",
             keyColumnIndexes, parentKeyColumnIndexes);
         for (int i = 0; i < parentKeyColumnIndexes.length; i++) {
+          // Note: this calls updateRowImpl, which also rebuilds the tree structure
           sourceRow.setCellValue(parentKeyColumnIndexes[i], parentRow == null ? null : parentRow.getCellValue(keyColumnIndexes[i]));
         }
-        rebuildTreeStructure();
-
-        parentRowChanged = true;
       }
 
       // Compute new position
@@ -4513,9 +4513,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       // Update row
       if (sourceIndex != targetIndex) {
         moveRow(sourceIndex, targetIndex);
-      }
-      else if (parentRowChanged) {
-        updateRow(sourceRow);
       }
     }
     finally {

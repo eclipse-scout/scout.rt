@@ -52,7 +52,7 @@ public class HierarchicalTableTest {
   /**
    * Table expect always to have all parent rows
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = IllegalStateException.class)
   public void testAddRowsWithInvalidRowList() {
     P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
     table.init();
@@ -66,7 +66,7 @@ public class HierarchicalTableTest {
   /**
    * Table expect always to have all parent rows
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = IllegalStateException.class)
   public void testAddRowWithUnresolvedParentRow() {
     P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
     table.init();
@@ -107,7 +107,8 @@ public class HierarchicalTableTest {
     rows.add(table.createRow(new Object[]{3, 1}));
     table.replaceRows(rows);
     rows = table.getRows();
-    assertEquals(rows.get(0), table.findParentRow(rows.get(2)));
+    expectRowOrder(new Integer[]{1, 3, 2}, rows);
+    assertEquals(rows.get(0), table.findParentRow(rows.get(1)));
 
     // remove parent row and expect cascading deletion of child row
     table.deleteRow(rows.get(0));
@@ -139,6 +140,7 @@ public class HierarchicalTableTest {
     rows.add(table.createRow(new Object[]{6, 5}));
     table.replaceRows(rows);
     rows = table.getRows();
+    expectRowOrder(new Integer[]{1, 2, 3, 4, 5, 6}, rows);
 
     table.collapseAll(null);
 

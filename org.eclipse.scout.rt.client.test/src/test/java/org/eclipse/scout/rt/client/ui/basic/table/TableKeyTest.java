@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -41,6 +41,14 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class TableKeyTest {
 
+  private void expectRowOrder(Object[] primaryKeys, List<ITableRow> rows) {
+    assertArrayEquals(primaryKeys, rows.stream().map(row -> row.getKeyValues().get(0)).toArray());
+  }
+
+  private void expectRowOrder(CompositeObject[] multiValuedPrimaryKeys, List<ITableRow> rows) {
+    assertArrayEquals(multiValuedPrimaryKeys, rows.stream().map(row -> new CompositeObject(row.getKeyValues().toArray())).toArray());
+  }
+
   @Test
   public void testKeyAndParentKey() {
     P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
@@ -51,12 +59,13 @@ public class TableKeyTest {
     rows.add(table.createRow(new Object[]{3, 1}));
     table.replaceRows(rows);
     rows = table.getRows();
+    expectRowOrder(new Object[]{1, 3, 2}, rows);
     assertEquals(rows.get(0), table.getRowByKey(table.getRowKeys(rows.get(0))));
     assertEquals(rows.get(1), table.getRowByKey(table.getRowKeys(rows.get(1))));
     assertEquals(rows.get(2), table.getRowByKey(table.getRowKeys(rows.get(2))));
-    assertEquals(rows.get(0), table.findParentRow(rows.get(2)));
     assertNull(table.findParentRow(rows.get(0)));
-    assertNull(table.findParentRow(rows.get(1)));
+    assertEquals(rows.get(0), table.findParentRow(rows.get(1)));
+    assertNull(table.findParentRow(rows.get(2)));
   }
 
   @Test
@@ -71,13 +80,23 @@ public class TableKeyTest {
     rows.add(table.createRow(new Object[]{3, "Key3", 1, "Key1", null}));
     table.replaceRows(rows);
     rows = table.getRows();
-    assertArrayEquals(new Object[]{1, "Key1"}, rows.get(0).getKeyValues().toArray());
-    assertArrayEquals(new Object[]{1, "Key2"}, rows.get(1).getKeyValues().toArray());
+    expectRowOrder(new CompositeObject[]{
+        new CompositeObject(1, "Key1"),
+        new CompositeObject(3, "Key3"),
+        new CompositeObject(1, "Key2"),
+        new CompositeObject(2, "Key1"),
+        new CompositeObject(2, "Key2")
+    }, rows);
+    assertArrayEquals(new Object[]{null, null}, rows.get(0).getParentKeyValues().toArray());
+    assertArrayEquals(rows.get(0).getKeyValues().toArray(), rows.get(1).getParentKeyValues().toArray());
+    assertArrayEquals(new Object[]{null, null}, rows.get(2).getParentKeyValues().toArray());
     assertArrayEquals(new Object[]{null, null}, rows.get(3).getParentKeyValues().toArray());
-    assertArrayEquals(rows.get(0).getKeyValues().toArray(), rows.get(4).getParentKeyValues().toArray());
-    assertEquals(rows.get(0), table.findParentRow(rows.get(4)));
+    assertArrayEquals(new Object[]{null, null}, rows.get(4).getParentKeyValues().toArray());
     assertNull(table.findParentRow(rows.get(0)));
-    assertNull(table.findParentRow(rows.get(1)));
+    assertEquals(rows.get(0), table.findParentRow(rows.get(1)));
+    assertNull(table.findParentRow(rows.get(2)));
+    assertNull(table.findParentRow(rows.get(3)));
+    assertNull(table.findParentRow(rows.get(4)));
   }
 
   @Test
@@ -90,10 +109,24 @@ public class TableKeyTest {
     rows.add(table.createRow(new Object[]{3, 1}));
     table.replaceRows(rows);
     rows = table.getRows();
-    assertEquals(rows.get(0), table.findParentRow(rows.get(2)));
+    expectRowOrder(new Object[]{1, 3, 2}, rows);
+    assertEquals(rows.get(0), table.findParentRow(rows.get(1)));
     // update primary key of parent row
+    rows.get(1).getCellForUpdate(table.getParentKeyColumn()).setValue(2);
+    rows = table.getRows();
+    expectRowOrder(new Object[]{1, 2, 3}, rows);
     rows.get(0).getCellForUpdate(table.getPrimaryKeyColumn()).setValue(33);
-    assertNull(table.findParentRow(rows.get(2)));
+    rows = table.getRows();
+    expectRowOrder(new Object[]{33, 2, 3}, rows);
+    assertEquals(rows.get(1), table.findParentRow(rows.get(2)));
+    // cannot change the key of a row that is referenced by a child row
+    try {
+      rows.get(1).getCellForUpdate(table.getPrimaryKeyColumn()).setValue(44);
+      fail("Expected exception");
+    }
+    catch (IllegalStateException e) {
+      // ok
+    }
   }
 
   @Test
@@ -108,10 +141,41 @@ public class TableKeyTest {
     rows.add(table.createRow(new Object[]{3, "Key3", 1, "Key1", null}));
     table.replaceRows(rows);
     rows = table.getRows();
-    assertEquals(rows.get(0), table.findParentRow(rows.get(4)));
+    expectRowOrder(new CompositeObject[]{
+        new CompositeObject(1, "Key1"),
+        new CompositeObject(3, "Key3"),
+        new CompositeObject(1, "Key2"),
+        new CompositeObject(2, "Key1"),
+        new CompositeObject(2, "Key2")
+    }, rows);
+    assertEquals(rows.get(0), table.findParentRow(rows.get(1)));
     // update primary key of parent row
+    rows.get(1).getCellForUpdate(table.getParentKey2Column()).setValue("Key2");
+    rows = table.getRows();
+    expectRowOrder(new CompositeObject[]{
+        new CompositeObject(1, "Key1"),
+        new CompositeObject(1, "Key2"),
+        new CompositeObject(3, "Key3"), // <--
+        new CompositeObject(2, "Key1"),
+        new CompositeObject(2, "Key2")
+    }, rows);
     rows.get(0).getCellForUpdate(table.getPrimaryKey2Column()).setValue("NewKey1");
-    assertNull(table.findParentRow(rows.get(4)));
+    rows = table.getRows();
+    expectRowOrder(new CompositeObject[]{
+        new CompositeObject(1, "NewKey1"), // <--
+        new CompositeObject(1, "Key2"),
+        new CompositeObject(3, "Key3"),
+        new CompositeObject(2, "Key1"),
+        new CompositeObject(2, "Key2")
+    }, rows);
+    // cannot change the key of a row that is referenced by a child row
+    try {
+      rows.get(1).getCellForUpdate(table.getPrimaryKey2Column()).setValue("NewKey2");
+      fail("Expected exception");
+    }
+    catch (IllegalStateException e) {
+      // ok
+    }
   }
 
   @Test
@@ -124,9 +188,12 @@ public class TableKeyTest {
     rows.add(table.createRow(new Object[]{3, 1}));
     table.replaceRows(rows);
     rows = table.getRows();
-    assertEquals(rows.get(0), table.findParentRow(rows.get(2)));
+    expectRowOrder(new Object[]{1, 3, 2}, rows);
+    assertEquals(rows.get(0), table.findParentRow(rows.get(1)));
     // update primary key of parent row
-    rows.get(2).getCellForUpdate(table.getParentKeyColumn()).setValue(2);
+    rows.get(1).getCellForUpdate(table.getParentKeyColumn()).setValue(2);
+    rows = table.getRows();
+    expectRowOrder(new Object[]{1, 2, 3}, rows);
     assertEquals(rows.get(1), table.findParentRow(rows.get(2)));
   }
 
@@ -142,11 +209,35 @@ public class TableKeyTest {
     rows.add(table.createRow(new Object[]{3, "Key3", 1, "Key1", null}));
     table.replaceRows(rows);
     rows = table.getRows();
-    assertEquals(rows.get(0), table.findParentRow(rows.get(4)));
+    expectRowOrder(new CompositeObject[]{
+        new CompositeObject(1, "Key1"),
+        new CompositeObject(3, "Key3"),
+        new CompositeObject(1, "Key2"),
+        new CompositeObject(2, "Key1"),
+        new CompositeObject(2, "Key2")
+    }, rows);
+    assertEquals(rows.get(0), table.findParentRow(rows.get(1)));
     // update primary key of parent row
-    rows.get(4).getCellForUpdate(table.getParentKey1Column()).setValue(2);
-    assertEquals(rows.get(2), table.findParentRow(rows.get(4)));
-    rows.get(4).getCellForUpdate(table.getParentKey2Column()).setValue("Key2");
+    rows.get(1).getCellForUpdate(table.getParentKey1Column()).setValue(2);
+    table.updateAllRows();
+    rows = table.getRows();
+    expectRowOrder(new CompositeObject[]{
+        new CompositeObject(1, "Key1"),
+        new CompositeObject(1, "Key2"),
+        new CompositeObject(2, "Key1"),
+        new CompositeObject(3, "Key3"), // <--
+        new CompositeObject(2, "Key2")
+    }, rows);
+    assertEquals(rows.get(2), table.findParentRow(rows.get(3)));
+    rows.get(3).getCellForUpdate(table.getParentKey2Column()).setValue("Key2");
+    rows = table.getRows();
+    expectRowOrder(new CompositeObject[]{
+        new CompositeObject(1, "Key1"),
+        new CompositeObject(1, "Key2"),
+        new CompositeObject(2, "Key1"),
+        new CompositeObject(2, "Key2"),
+        new CompositeObject(3, "Key3") // <--
+    }, rows);
     assertEquals(rows.get(3), table.findParentRow(rows.get(4)));
   }
 
