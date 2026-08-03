@@ -318,4 +318,13 @@ export interface TableModel extends WidgetModel {
    * @see TableRow.dropTypes
    */
   rowsDraggable?: boolean;
+  /**
+   * Specifies whether the table loads its data asynchronously.
+   *
+   * If set to true the table shows a loading indicator when it is loading.
+   * Otherwise, the desktop is busy while the table is loading.
+   *
+   * Default is true.
+   */
+  asyncLoading?: boolean;
 }

@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, ChildModelOf, dataObjects, ErrorHandler, EventHandler, Form, icons, objects, Outline, OutlineReloadKeyStroke, Page, PageModel, PageParamDo, PageResolver, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow,
-  TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter, TreeNodeModel
+  App, ChildModelOf, dataObjects, ErrorHandler, EventHandler, Form, icons, objects, Outline, OutlineReloadKeyStroke, Page, PageModel, PageParamDo, PageResolver, PageWithTable, RemoteEvent, scout, Table, TableAdapter,
+  TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter, TreeNodeModel
 } from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
@@ -179,6 +179,7 @@ export class OutlineAdapter extends TreeAdapter {
     objects.replacePrototypeFunction(Page, '_updateDetailTableMenus', OutlineAdapter._updateDetailTableMenus, true);
     objects.replacePrototypeFunction(Page, 'linkWithRow', OutlineAdapter.linkWithRow, true);
     objects.replacePrototypeFunction(Page, 'unlinkWithRow', OutlineAdapter.unlinkWithRow, true);
+    objects.replacePrototypeFunction(PageWithTable, '_initDetailTable', OutlineAdapter._initDetailTable, true);
   }
 
   /**
@@ -370,6 +371,14 @@ export class OutlineAdapter extends TreeAdapter {
     this.unlinkWithRowOrig(row);
     // @ts-expect-error
     this._updateDetailMenus();
+  }
+
+  protected static _initDetailTable(this: Page & { _initDetailTableOrig }, table: Table) {
+    this._initDetailTableOrig(table);
+
+    if (this.outline.modelAdapter instanceof OutlineAdapter) {
+      table.setAsyncLoading(false);
+    }
   }
 }
 

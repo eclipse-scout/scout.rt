@@ -551,6 +551,7 @@ export * from './table/TableHeaderMenuGroupEventMap';
 export * from './table/TableHeaderMenuButton';
 export * from './table/TableHeaderMenuButtonModel';
 export * from './table/TableLayout';
+export * from './table/TableLoadingSupport';
 export * from './table/TableSelectionHandler';
 export * from './table/TableTileGridMediator';
 export * from './table/TableTileGridMediatorModel';

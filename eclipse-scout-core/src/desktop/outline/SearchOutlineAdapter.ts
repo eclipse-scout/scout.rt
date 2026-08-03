@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, Event, objects, OutlineAdapter, Page, RemoteEvent, SearchOutline, SearchOutlineModel, SearchPage, SearchState} from '../../index';
+import {App, Event, objects, OutlineAdapter, Page, PageWithTable, RemoteEvent, SearchOutline, SearchOutlineModel, SearchPage, SearchState, Table} from '../../index';
 
 export class SearchOutlineAdapter extends OutlineAdapter {
   declare widget: SearchOutline;
@@ -125,6 +125,11 @@ export class SearchOutlineAdapter extends OutlineAdapter {
     // When this function is called on a SearchOutline it will call 'this._initTreeNodeInternalOrig' which is the function itself and therefore, a stack overflow error is thrown.
     // And as there is nothing to remember (i.e. the SearchOutline has no own implementation of _initTreeNodeInternal) this flag can simply be set to false.
     objects.replacePrototypeFunction(SearchOutline, '_initTreeNodeInternal', SearchOutlineAdapter._initTreeNodeInternalRemote, false);
+    // Currently the _initDetailTable function of the PageWithTable is OutlineAdapter._initDetailTable and _initDetailTableOrig is PageWithTable._initDetailTable (both are inherited from the prototype of the PageWithTable).
+    // Remembering the orig function will result in OutlineAdapter._initDetailTable being _initDetailTableOrig on the prototype of PageWithTable.
+    // When this function is called on a PageWithTable it will call 'this._initDetailTableOrig' which is the function itself and therefore, a stack overflow error is thrown.
+    // And as there is nothing more to remember this flag can simply be set to false.
+    objects.replacePrototypeFunction(PageWithTable, '_initDetailTable', SearchOutlineAdapter._initDetailTable, false);
   }
 
   protected static override _initTreeNodeInternalRemote(this: SearchOutline & { modelAdapter: SearchOutlineAdapter; _initTreeNodeInternalOrig }, page: SearchPage, parentNode: Page) {
@@ -139,6 +144,16 @@ export class SearchOutlineAdapter extends OutlineAdapter {
     const searchState = this.modelAdapter._searchStates.get(page.id);
     if (searchState) {
       page.searchState = searchState;
+    }
+  }
+
+  protected static override _initDetailTable(this: Page & { _initDetailTableOrig }, table: Table) {
+    // _initDetailTable was replaced without remembering the orig function which was OutlineAdapter._initDetailTable.
+    // Therefore, call this function directly and not via _initDetailTableOrig.
+    OutlineAdapter._initDetailTable.call(this, table);
+
+    if (this.outline.modelAdapter instanceof SearchOutlineAdapter) {
+      table.setAsyncLoading(true);
     }
   }
 }
