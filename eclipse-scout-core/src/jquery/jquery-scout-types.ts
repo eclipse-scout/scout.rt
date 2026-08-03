@@ -25,6 +25,13 @@ export interface InjectScriptOptions extends InjectOptions {
   removeTag?: boolean;
 }
 
+export interface InjectStyleSheetOptions extends InjectOptions {
+  /**
+   * {@link Record} of key value pairs to be set as data on the injected style sheet.
+   */
+  data?: Record<string, string | number | boolean | symbol | object>;
+}
+
 export interface AppLink {
   ref: string;
   name?: string;
@@ -127,7 +134,7 @@ declare global {
      *   $.injectStyleSheet('http://server/path/style.css')
      *     .done(function($linkTag) { ... });
      */
-    injectStyleSheet(url: string, options?: InjectOptions): JQuery.Promise<JQuery>;
+    injectStyleSheet(url: string, options?: InjectStyleSheetOptions): JQuery.Promise<JQuery>;
 
     /**
      * Dynamically adds styles to the document.
@@ -1219,5 +1226,26 @@ declare global {
     onPassive<TType extends string>(eventType: TType, handler: JQuery.TypeEventHandler<TElement, undefined, TElement, TElement, TType>): this;
 
     offPassive<TType extends string>(eventType: TType, handler: JQuery.TypeEventHandler<TElement, undefined, TElement, TElement, TType>): this;
+  }
+
+  module JQuery {
+    interface InjectStyleSheetEvent<
+      TDelegateTarget = any,
+      TData = any,
+      TCurrentTarget = any,
+      TTarget = any,
+    > extends TriggeredEvent<TDelegateTarget, TData, TCurrentTarget, TTarget> {
+      type: 'injectStyleSheet';
+      $linkTag: JQuery<HTMLLinkElement>;
+    }
+
+    interface TypeToTriggeredEventMap<
+      TDelegateTarget,
+      TData,
+      TCurrentTarget,
+      TTarget,
+    > {
+      injectStyleSheet: InjectStyleSheetEvent<TDelegateTarget, TData, TCurrentTarget, TTarget>;
+    }
   }
 }
