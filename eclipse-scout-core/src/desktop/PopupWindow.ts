@@ -24,6 +24,8 @@ export class PopupWindow extends EventEmitter {
   htmlComp: HtmlComponent;
   $container: JQuery;
 
+  protected _headInjectStyleSheetHandler = this._onHeadInjectStyleSheet.bind(this);
+
   constructor(myWindow: Window, form: Form) { // use 'myWindow' in place of 'window' to prevent confusion with global window variable
     super();
 
@@ -45,6 +47,7 @@ export class PopupWindow extends EventEmitter {
   }
 
   protected _onPageHide() {
+    $(window.document.head).off('injectStyleSheet', this._headInjectStyleSheetHandler);
     if (this.form.destroyed) {
       $.log.isDebugEnabled() && $.log.debug('form ID ' + this.form.id + ' is already destroyed - don\'t trigger unload event');
     } else {
@@ -53,7 +56,7 @@ export class PopupWindow extends EventEmitter {
   }
 
   /** @internal */
-  _onReady() {
+  async _onReady(): Promise<void> {
     // set container (used as document-root from callers)
     let myDocument = this.myWindow.document,
       $myWindow = $(this.myWindow),
@@ -69,6 +72,8 @@ export class PopupWindow extends EventEmitter {
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new SingleLayout());
     this.$container.height($myWindow.height());
+    // wait for relevant stylesheets to be injected before rendering
+    await this._injectStyleSheets();
     this.form.render(this.$container);
 
     // resize browser-window before layout?
@@ -110,6 +115,36 @@ export class PopupWindow extends EventEmitter {
     // Finally set initialized flag to true, at this point the PopupWindow is fully initialized
     this.initialized = true;
     this.trigger('init');
+  }
+
+  /**
+   * Injects all style sheets from {@link window} marked with `relevantForPopupWindow` into {@link myWindow}.
+   */
+  protected async _injectStyleSheets(): Promise<void> {
+    $(window.document.head).on('injectStyleSheet', this._headInjectStyleSheetHandler);
+    await Promise.all(
+      [...window.document.styleSheets]
+        .map(styleSheet => $(styleSheet.ownerNode) as JQuery<HTMLLinkElement>)
+        .map($linkTag => this._injectStyleSheet($linkTag))
+    );
+  }
+
+  /**
+   * Injects a style sheet if it is marked with `relevantForPopupWindow` into {@link myWindow}.
+   */
+  protected async _injectStyleSheet($linkTag: JQuery<HTMLLinkElement>): Promise<JQuery> {
+    if (!$linkTag.length || !$linkTag.data('relevantForPopupWindow')) {
+      return;
+    }
+    const url = $linkTag[0].href;
+    if (!url) {
+      return;
+    }
+    return $.injectStyleSheet(url, {document: this.myWindow.document});
+  }
+
+  protected async _onHeadInjectStyleSheet(event: JQuery.InjectStyleSheetEvent): Promise<void> {
+    await this._injectStyleSheet(event.$linkTag);
   }
 
   // Note: currently _onResize is only called when the window is resized, but not when the position of the window changes.
