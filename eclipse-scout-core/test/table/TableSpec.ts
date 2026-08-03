@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, BeanColumn, BooleanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, keys, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, SmartColumn,
-  StaticLookupCall, Status, strings, Table, TableAdapter, TableField, TableRow, TableRowModel, TableUserFilter, Tooltip
+  Action, arrays, BeanColumn, BooleanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, keys, LoadingSupport, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars,
+  SmartColumn, StaticLookupCall, Status, strings, Table, TableAdapter, TableField, TableRow, TableRowModel, TableUserFilter, Tooltip
 } from '../../src/index';
 import {JQueryTesting, LocaleSpecHelper, SpecTable, SpecTableModel, TableSpecHelper} from '../../src/testing/index';
 import $ from 'jquery';
@@ -5421,6 +5421,83 @@ describe('Table', () => {
 
       table.addFilter(row => row !== table.rows[0]);
       expect(table.focusedRow).toBe(null);
+    });
+  });
+
+  describe('asyncLoading', () => {
+
+    beforeEach(() => {
+      jasmine.clock().uninstall();
+      $(`<style>
+      @keyframes nop { 0% { opacity: 1; } 100% { opacity: 1; } }
+      .loading-indicator.animate-remove { animation: nop; animation-duration: 100ms;}
+      </style>`).appendTo($('#sandbox'));
+    });
+
+    it('renders loading indicator while loading when asyncLoading=true', async () => {
+      const model = helper.createModelFixture(3, 2);
+      const table = helper.createTable(model);
+      table.loadingSupport.setLoadingIndicatorDelay(0);
+      table.render();
+
+      table.setAsyncLoading(true);
+      expect(session.desktop.busy).toBeFalse();
+      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+
+      table.setLoading(true);
+      expect(session.desktop.busy).toBeFalse();
+      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(1);
+
+      table.setLoading(false);
+      await JQueryTesting.whenAnimationEnd((table.loadingSupport as LoadingSupport & { _$loadingIndicator: JQuery })._$loadingIndicator);
+      expect(session.desktop.busy).toBeFalse();
+      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+    });
+
+    it('sets desktop busy while loading when asyncLoading=false', () => {
+      const model = helper.createModelFixture(3, 2);
+      const table = helper.createTable(model);
+      table.loadingSupport.setLoadingIndicatorDelay(0);
+      table.render();
+
+      table.setAsyncLoading(false);
+      expect(session.desktop.busy).toBeFalse();
+      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+
+      table.setLoading(true);
+      expect(session.desktop.busy).toBeTrue();
+      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+
+      table.setLoading(false);
+      expect(session.desktop.busy).toBeFalse();
+      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+    });
+
+    it('may be changed while loading', async () => {
+      const model = helper.createModelFixture(3, 2);
+      const table = helper.createTable(model);
+      table.loadingSupport.setLoadingIndicatorDelay(0);
+      table.render();
+
+      table.setLoading(true);
+
+      table.setAsyncLoading(true);
+      expect(session.desktop.busy).toBeFalse();
+      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(1);
+
+      table.setAsyncLoading(false);
+      await JQueryTesting.whenAnimationEnd((table.loadingSupport as LoadingSupport & { _$loadingIndicator: JQuery })._$loadingIndicator);
+      expect(session.desktop.busy).toBeTrue();
+      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+
+      table.setAsyncLoading(true);
+      expect(session.desktop.busy).toBeFalse();
+      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(1);
+
+      table.setLoading(false);
+      await JQueryTesting.whenAnimationEnd((table.loadingSupport as LoadingSupport & { _$loadingIndicator: JQuery })._$loadingIndicator);
+      expect(session.desktop.busy).toBeFalse();
+      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
     });
   });
 });

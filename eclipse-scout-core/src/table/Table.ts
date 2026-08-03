@@ -13,10 +13,10 @@ import {
   FilterResult, FilterSupport, FullModelOf, graphics, GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations,
   MenuItemsOrder, menus as menuUtil, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars,
   ScrollToAlignment, ScrollToOptions, Status, StatusOrModel, strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer, TableDefaultRowActionKeyStroke,
-  TableEventMap, TableFooter, TableGroupEvent, TableHeader, TableLayout, TableModel, TableMoveSupport, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke,
-  TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowDropPosition, TableRowModel, TableSelectAllKeyStroke,
-  TableSelectionHandler, TableSelectKeyStroke, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUiPreferences, tableUiPreferences, TableUpdateBuffer, TableUserFilter,
-  TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences, UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
+  TableEventMap, TableFooter, TableGroupEvent, TableHeader, TableLayout, TableLoadingSupport, TableModel, TableMoveSupport, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke,
+  TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowDropPosition,
+  TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableSelectKeyStroke, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUiPreferences, tableUiPreferences,
+  TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences, UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -137,6 +137,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   userPreferenceContext: string;
   uiPreferencesEnabled: boolean;
   rowsDraggable = false;
+  asyncLoading = true;
 
   $data: JQuery;
   $emptyData: JQuery;
@@ -521,7 +522,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   protected override _createLoadingSupport(): LoadingSupport {
-    return new LoadingSupport({
+    return new TableLoadingSupport({
       widget: this,
       withGlassPane: true,
       $container: () => {
@@ -6865,6 +6866,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     } else if (parentRowChanged) {
       this.updateRow(sourceRow);
     }
+  }
+
+  setAsyncLoading(asyncLoading: boolean) {
+    this.setProperty('asyncLoading', asyncLoading);
   }
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */
