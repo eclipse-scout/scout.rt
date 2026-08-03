@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -241,7 +241,8 @@ $.injectStyleSheet = (url, options) => {
 
   let myDocument = options.document || window.document;
   let linkTag = myDocument.createElement('link');
-  $(linkTag)
+  const $linkTag = $(linkTag);
+  $linkTag
     .attr('rel', 'stylesheet')
     .attr('type', 'text/css')
     .attr('href', url)
@@ -252,10 +253,20 @@ $.injectStyleSheet = (url, options) => {
         deferred.resolve($(linkTag));
       }
     });
+  if (objects.isObject(options.data)) {
+    for (const [key, value] of Object.entries(options.data)) {
+      $linkTag.data(key, value);
+    }
+  }
+
   // Use raw JS function to append the <script> tag, because jQuery handles
   // script tags specially (see "domManip" function) and uses eval() which
   // is not CSP-safe.
   myDocument.head.appendChild(linkTag);
+  $(myDocument.head).trigger({
+    type: 'injectStyleSheet',
+    $linkTag
+  });
 
   return deferred.promise();
 };
