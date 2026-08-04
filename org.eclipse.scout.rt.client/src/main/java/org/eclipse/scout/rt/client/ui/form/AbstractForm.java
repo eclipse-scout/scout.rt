@@ -73,7 +73,7 @@ import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
+import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooserFactory;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.OpenUriAction;
@@ -2432,7 +2432,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   @Override
   public void doImportXml() {
     try {
-      List<BinaryResource> a = new FileChooser(Collections.singletonList("xml"), false).startChooser();
+      List<BinaryResource> a = BEANS.get(FileChooserFactory.class).createFileChooser(Collections.singletonList("xml"), false).startChooser();
       if (a.size() == 1) {
         BinaryResource newPath = a.get(0);
         try (InputStream in = new ByteArrayInputStream(newPath.getContent())) { // NOSONAR
