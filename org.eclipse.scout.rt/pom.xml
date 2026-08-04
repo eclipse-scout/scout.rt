@@ -751,6 +751,11 @@
             <groupId>com.sun.mail</groupId>
             <artifactId>jakarta.mail</artifactId>
           </exclusion>
+          <!-- We don't want to use their XML Parser-->
+          <exclusion>
+            <groupId>com.fasterxml.woodstox</groupId>
+            <artifactId>woodstox-core</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
 

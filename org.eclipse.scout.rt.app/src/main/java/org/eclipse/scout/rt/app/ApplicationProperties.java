@@ -688,4 +688,21 @@ public final class ApplicationProperties {
       return "The HTTP2 stream idle timeout in milliseconds. Set to Long.MAX_VALUE to effectively disable stream idle timeouts for debugging or development purposes. Default: " + getDefaultValue() + ".";
     }
   }
+
+  public static class ScoutApplicationXMLFactoryImplementation extends AbstractStringConfigProperty {
+    @Override
+    public String getKey() {
+      return "scout.app.xmlFactoryImpl";
+    }
+
+    @Override
+    public String getDefaultValue() {
+      return "com.sun.xml.internal.stream.XMLInputFactoryImpl";
+    }
+
+    @Override
+    public String description() {
+      return "Expected XMLInputFactory implementation. A warning is logged, if other implementation is registered. Default: " + getDefaultValue() + ".";
+    }
+  }
 }

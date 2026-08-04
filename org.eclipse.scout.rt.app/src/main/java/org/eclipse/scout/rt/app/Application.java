@@ -24,6 +24,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+import javax.xml.stream.XMLInputFactory;
+
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
 import org.eclipse.jetty.compression.gzip.GzipCompression;
 import org.eclipse.jetty.compression.gzip.GzipDecoderConfig;
@@ -90,6 +92,7 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationStopTimeou
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationStreamIdleTimeoutProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationThreadPoolMaxSizeProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationUseTlsProperty;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationXMLFactoryImplementation;
 import org.eclipse.scout.rt.app.handler.ScoutJettyErrorHandler;
 import org.eclipse.scout.rt.app.servlet.ScoutServletContextHandler;
 import org.eclipse.scout.rt.jetty.IServletContributor;
@@ -156,6 +159,14 @@ public class Application {
 
     if (CONFIG.getPropertyValue(ScoutApplicationJvmShutdownHookEnabledProperty.class)) {
       registerJvmShutdownHook();
+    }
+
+    String expectedXmlFactoryImpl = CONFIG.getPropertyValue(ScoutApplicationXMLFactoryImplementation.class);
+    if (StringUtility.hasText(expectedXmlFactoryImpl)) {
+      String actualXmlFactoryImpl = XMLInputFactory.newFactory().getClass().getName();
+      if (!expectedXmlFactoryImpl.equals(actualXmlFactoryImpl)) {
+        LOG.warn("Unexpected XMLInputFactory implementation.\nExpected: {}\nActual: {}", expectedXmlFactoryImpl, actualXmlFactoryImpl);
+      }
     }
 
     logServerReady();
