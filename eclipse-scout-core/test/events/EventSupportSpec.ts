@@ -652,6 +652,87 @@ describe('EventSupport', () => {
       expect(count1).toBe(5);
       expect(count2).toBe(4);
     });
+
+    it('triggers listeners in order they aer registered', () => {
+      const eventSupport = new EventSupport();
+      eventSupport.registerSubTypeProvider('fancy', (event: FancyEvent) => event.subType);
+      let listenersTriggered = [];
+
+      const handlerA = () => listenersTriggered.push('a');
+      const handlerB = () => listenersTriggered.push('b');
+      const handlerC = () => listenersTriggered.push('c');
+      const handlerD = () => listenersTriggered.push('d');
+
+      // simple case
+      eventSupport.on('lorem', handlerA);
+      eventSupport.on('lorem', handlerB);
+      eventSupport.on('lorem', handlerC);
+
+      eventSupport.trigger('lorem');
+      expect(listenersTriggered).toEqual(['a', 'b', 'c']);
+
+      eventSupport.off('lorem');
+      listenersTriggered = [];
+
+      // listeners added multiple times
+      eventSupport.on('lorem', handlerC);
+      eventSupport.on('lorem', handlerB);
+      eventSupport.on('lorem', handlerC);
+      eventSupport.on('lorem', handlerA);
+      eventSupport.on('lorem', handlerB);
+
+      eventSupport.trigger('lorem');
+      expect(listenersTriggered).toEqual(['c', 'b', 'c', 'a', 'b']);
+
+      eventSupport.off('lorem');
+      listenersTriggered = [];
+
+      // listeners are de- and re-registered
+      eventSupport.on('lorem', handlerC);
+      eventSupport.on('lorem', handlerB);
+      eventSupport.off('lorem', handlerC);
+      eventSupport.on('lorem', handlerC);
+      eventSupport.on('lorem', handlerA);
+      eventSupport.off('lorem', handlerB);
+      eventSupport.on('lorem', handlerB);
+
+      eventSupport.trigger('lorem');
+      expect(listenersTriggered).toEqual(['c', 'a', 'b']);
+
+      eventSupport.off('lorem');
+      listenersTriggered = [];
+
+      // listeners registered for event with subtype
+      eventSupport.on('fancy:lorem', handlerA);
+      eventSupport.on('fancy:lorem', handlerB);
+      eventSupport.on('fancy:lorem', handlerC);
+
+      eventSupport.trigger('fancy', new FancyEvent('lorem'));
+      expect(listenersTriggered).toEqual(['a', 'b', 'c']);
+
+      eventSupport.off('fancy:lorem');
+      listenersTriggered = [];
+
+      // listeners registered for event without subtype
+      eventSupport.on('fancy', handlerC);
+      eventSupport.on('fancy', handlerB);
+      eventSupport.on('fancy', handlerA);
+
+      eventSupport.trigger('fancy', new FancyEvent('lorem'));
+      expect(listenersTriggered).toEqual(['c', 'b', 'a']);
+
+      eventSupport.off('fancy');
+      listenersTriggered = [];
+
+      // listeners registered for event with and without subtype
+      eventSupport.on('fancy', handlerA);
+      eventSupport.on('fancy:lorem', handlerB);
+      eventSupport.on('fancy:lorem', handlerC);
+      eventSupport.on('fancy', handlerD);
+
+      eventSupport.trigger('fancy', new FancyEvent('lorem'));
+      expect(listenersTriggered).toEqual(['a', 'b', 'c', 'd']);
+    });
   });
 
   describe('registerSubTypeProvider', () => {

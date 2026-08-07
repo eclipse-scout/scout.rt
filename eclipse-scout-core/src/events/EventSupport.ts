@@ -11,9 +11,10 @@ import {Event, EventHandler, EventListener, scout, strings} from '../index';
 import $ from 'jquery';
 
 export class EventSupport {
-  protected _eventListenersByType = new Map<string, Set<EventListener>>();
-  protected _eventListenersByHandler = new Map<EventHandler, Set<EventListener>>();
+  protected _eventListenersByType = new Map<string, Set<EventListenerWithSortIndex>>();
+  protected _eventListenersByHandler = new Map<EventHandler, Set<EventListenerWithSortIndex>>();
   protected _subTypeProviders = new Map<string, EventSubTypeProvider>();
+  protected _sortIndex = 0;
 
   protected _assertFunc(func: EventHandler) {
     if (!func) {
@@ -153,6 +154,8 @@ export class EventSupport {
     if (!listener) {
       return;
     }
+
+    (listener as EventListenerWithSortIndex)._sortIndex = this._sortIndex++;
 
     // add listener for handlers
     this._addListenerByHandler(listener.func, listener);
@@ -298,41 +301,42 @@ export class EventSupport {
       .map(t => this._getListenersByType(t))
       .reduce((a, b) => new Set([...a, ...b]), new Set());
 
-    // trigger all listeners
-    for (const listener of listeners) {
+    // trigger all listeners in order they were registered
+    const listenersSorted = [...listeners].sort((l1, l2) => l1._sortIndex - l2._sortIndex);
+    for (const listener of listenersSorted) {
       listener.func(event);
     }
   }
 
   /**
-   * Gets a {@link Set} of {@link EventListener}s for the requested type.
+   * Gets a {@link Set} of {@link EventListenerWithSortIndex}s for the requested type.
    * The result of this method is never `null`.
    * If the create-flag is set, the {@link Set} is added to {@link _eventListenersByType}.
    */
-  protected _getListenersByType(type: string, create = false): Set<EventListener> {
+  protected _getListenersByType(type: string, create = false): Set<EventListenerWithSortIndex> {
     return this._getListenersByIdentifier(this._eventListenersByType, type || null, create);
   }
 
   /**
-   * Adds an {@link EventListener} to {@link _eventListenersByType} for the given identifier.
+   * Adds an {@link EventListenerWithSortIndex} to {@link _eventListenersByType} for the given identifier.
    */
-  protected _addListenerByType(type: string, listener: EventListener) {
+  protected _addListenerByType(type: string, listener: EventListenerWithSortIndex) {
     this._addListenerByIdentifier(this._eventListenersByType, type || null, listener);
   }
 
   /**
-   * Removes an {@link EventListener} from {@link _eventListenersByType} for the given identifier.
+   * Removes an {@link EventListenerWithSortIndex} from {@link _eventListenersByType} for the given identifier.
    */
-  protected _removeListenerByType(type: string, listener: EventListener) {
+  protected _removeListenerByType(type: string, listener: EventListenerWithSortIndex) {
     this._removeListenerByIdentifier(this._eventListenersByType, type || null, listener);
   }
 
   /**
-   * Gets a {@link Set} of {@link EventListener}s for the requested {@link EventHandler}.
+   * Gets a {@link Set} of {@link EventListenerWithSortIndex}s for the requested {@link EventHandler}.
    * The result of this method is never `null`.
    * If the create-flag is set, the {@link Set} is added to {@link _eventListenersByHandler}.
    */
-  protected _getListenersByHandler(handler: EventHandler, create = false): Set<EventListener> {
+  protected _getListenersByHandler(handler: EventHandler, create = false): Set<EventListenerWithSortIndex> {
     if (!handler) {
       return new Set();
     }
@@ -341,9 +345,9 @@ export class EventSupport {
   }
 
   /**
-   * Adds an {@link EventListener} to {@link _eventListenersByHandler} for the given identifier.
+   * Adds an {@link EventListenerWithSortIndex} to {@link _eventListenersByHandler} for the given identifier.
    */
-  protected _addListenerByHandler(handler: EventHandler, listener: EventListener) {
+  protected _addListenerByHandler(handler: EventHandler, listener: EventListenerWithSortIndex) {
     if (!handler) {
       return;
     }
@@ -352,9 +356,9 @@ export class EventSupport {
   }
 
   /**
-   * Removes an {@link EventListener} from {@link _eventListenersByHandler} for the given identifier.
+   * Removes an {@link EventListenerWithSortIndex} from {@link _eventListenersByHandler} for the given identifier.
    */
-  protected _removeListenerByHandler(handler: EventHandler, listener: EventListener) {
+  protected _removeListenerByHandler(handler: EventHandler, listener: EventListenerWithSortIndex) {
     if (!handler) {
       return;
     }
@@ -363,11 +367,11 @@ export class EventSupport {
   }
 
   /**
-   * Gets a {@link Set} of {@link EventListener}s for the requested identifier from the given {@link Map}.
+   * Gets a {@link Set} of {@link EventListenerWithSortIndex}s for the requested identifier from the given {@link Map}.
    * The result of this method is never `null`.
    * If the create-flag is set, the {@link Set} is added to the {@link Map}.
    */
-  protected _getListenersByIdentifier<TIdentifier extends string | EventHandler>(listenerMap: Map<TIdentifier, Set<EventListener>>, identifier: TIdentifier, create = false): Set<EventListener> {
+  protected _getListenersByIdentifier<TIdentifier extends string | EventHandler>(listenerMap: Map<TIdentifier, Set<EventListenerWithSortIndex>>, identifier: TIdentifier, create = false): Set<EventListenerWithSortIndex> {
     if (!listenerMap) {
       return new Set();
     }
@@ -387,9 +391,9 @@ export class EventSupport {
   }
 
   /**
-   * Adds an {@link EventListener} to the given {@link Map} for the given identifier.
+   * Adds an {@link EventListenerWithSortIndex} to the given {@link Map} for the given identifier.
    */
-  protected _addListenerByIdentifier<TIdentifier extends string | EventHandler>(listenerMap: Map<TIdentifier, Set<EventListener>>, identifier: TIdentifier, listener: EventListener) {
+  protected _addListenerByIdentifier<TIdentifier extends string | EventHandler>(listenerMap: Map<TIdentifier, Set<EventListenerWithSortIndex>>, identifier: TIdentifier, listener: EventListenerWithSortIndex) {
     if (!listenerMap || !listener) {
       return;
     }
@@ -398,9 +402,9 @@ export class EventSupport {
   }
 
   /**
-   * Removes an {@link EventListener} from the given {@link Map} for the given identifier.
+   * Removes an {@link EventListenerWithSortIndex} from the given {@link Map} for the given identifier.
    */
-  protected _removeListenerByIdentifier<TIdentifier extends string | EventHandler>(listenerMap: Map<TIdentifier, Set<EventListener>>, identifier: TIdentifier, listener: EventListener) {
+  protected _removeListenerByIdentifier<TIdentifier extends string | EventHandler>(listenerMap: Map<TIdentifier, Set<EventListenerWithSortIndex>>, identifier: TIdentifier, listener: EventListenerWithSortIndex) {
     if (!listenerMap || !listener) {
       return;
     }
@@ -434,6 +438,7 @@ export class EventSupport {
   }
 }
 
+export type EventListenerWithSortIndex = EventListener & { _sortIndex?: number };
 /**
  * Builds a complete type for an {@link Event}.
  * Consider a `FancyEvent` that is always triggered with the type 'fancy' but has a property `subType` which can hold the values 'foo' or 'bar'.
