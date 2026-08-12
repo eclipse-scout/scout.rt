@@ -336,6 +336,12 @@ export class SearchOutline extends Outline implements SearchOutlineModel {
     });
 
     this._updateSearchStatus();
+
+    // If a valid search query is present and a new search state was added (e.g. new page inserted)
+    // retrigger the search. This also covers the case where the entire outline is reloaded with F5.
+    if (this._searchQueryValid && searchStatesToAdd.size) {
+      this.search();
+    }
   }
 
   protected _installSearchStateListeners(searchState: SearchState) {

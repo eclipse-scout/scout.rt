@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Column, InitModelOf, Outline, PageWithTable, scout, SearchOutline, SearchPage, SearchState, Session, Table} from '../../../src/index';
+import {Column, Event, InitModelOf, Outline, PageWithTable, scout, SearchOutline, SearchPage, SearchState, Session, Table} from '../../../src/index';
 
 describe('SearchOutline', () => {
   let session: Session;
@@ -39,6 +39,99 @@ describe('SearchOutline', () => {
 
       expect(outline._searchStates).toEqual(new Set([searchPage0.searchState, searchPage1.searchState, searchPage2.searchState]));
     });
+
+    it('does not retrigger search when search query is absent', () => {
+      const outline = createSearchOutline();
+
+      const events: Event<SearchOutline>[] = [];
+      outline.on('search resetSearch', event => events.push(event));
+
+      expect(outline.pending).toBe(false);
+      expect(outline.searchQuery).toBe(undefined);
+      expect(outline.searchStatus).toBe(null);
+
+      const searchPage0 = createSearchPage(outline, {text: 'SearchPage0'});
+      outline.insertNode(searchPage0);
+
+      expect(searchPage0.searchState.pending).toBe(true);
+      expect(outline.pending).toBe(true);
+      expect(outline.searchStatus).toBe(null);
+      expect(events.map(event => event.type)).toEqual([]);
+
+      const searchPage1 = createSearchPage(outline, {text: 'SearchPage1'});
+      const searchPage2 = createSearchPage(outline, {text: 'SearchPage2'});
+      outline.insertNodes([searchPage1, searchPage2]);
+
+      expect(searchPage0.searchState.pending).toBe(true);
+      expect(searchPage1.searchState.pending).toBe(true);
+      expect(searchPage2.searchState.pending).toBe(true);
+      expect(outline.pending).toBe(true);
+      expect(outline.searchStatus).toBe(null);
+      expect(events.map(event => event.type)).toEqual([]);
+
+      outline.setSearchQuery('f o o');
+
+      expect(searchPage0.searchState.pending).toBe(true);
+      expect(searchPage1.searchState.pending).toBe(true);
+      expect(searchPage2.searchState.pending).toBe(true);
+      expect(outline.pending).toBe(true);
+      expect(outline.searchStatus).toBe('The search term is too short.');
+      expect(events.map(event => event.type)).toEqual(['resetSearch']);
+    });
+
+    it('retriggers search when search query is present', () => {
+      const outline = createSearchOutline();
+      outline.on('search', event => {
+        for (let searchState of outline.nodes.map((node: SearchPage) => node.searchState)) {
+          if (outline.searchQuery) {
+            searchState.setPending(false);
+            searchState.setResultCount(111);
+            searchState.setLimited(false);
+          } else {
+            searchState.setPending(true);
+          }
+        }
+      });
+
+      expect(outline.searchQuery).toBe(undefined);
+      expect(outline.searchStatus).toBe(null);
+      expect(outline.pending).toBe(false);
+
+      const events: Event<SearchOutline>[] = [];
+      outline.on('search resetSearch', event => events.push(event));
+
+      // -----
+
+      const searchPage0 = createSearchPage(outline, {text: 'SearchPage0'});
+      outline.insertNode(searchPage0);
+
+      expect(searchPage0.searchState.pending).toBe(true);
+      expect(outline.pending).toBe(true);
+      expect(outline.searchStatus).toBe(null);
+      expect(events.map(event => event.type)).toEqual([]);
+
+      // -----
+
+      outline.setSearchQuery('foo');
+
+      expect(searchPage0.searchState.pending).toBe(false);
+      expect(outline.pending).toBe(false);
+      expect(outline.searchStatus).toBe('111 search results for "foo"');
+      expect(events.map(event => event.type)).toEqual(['search']);
+
+      // -----
+
+      const searchPage1 = createSearchPage(outline, {text: 'SearchPage1'});
+      const searchPage2 = createSearchPage(outline, {text: 'SearchPage2'});
+      outline.insertNodes([searchPage1, searchPage2]);
+
+      expect(searchPage0.searchState.pending).toBe(false);
+      expect(searchPage1.searchState.pending).toBe(false);
+      expect(searchPage2.searchState.pending).toBe(false);
+      expect(outline.pending).toBe(false);
+      expect(outline.searchStatus).toBe('333 search results for "foo"');
+      expect(events.map(event => event.type)).toEqual(['search', 'search']);
+    });
   });
 
   describe('nodesDeleted', () => {
@@ -59,6 +152,47 @@ describe('SearchOutline', () => {
       outline.deleteNodes([searchPage1, searchPage2]);
 
       expect(outline._searchStates).toEqual(new Set());
+    });
+
+    it('does not retrigger search when search query is present', () => {
+      const outline = createSearchOutline();
+      outline.on('search', event => {
+        for (let searchState of outline.nodes.map((node: SearchPage) => node.searchState)) {
+          if (outline.searchQuery) {
+            searchState.setPending(false);
+            searchState.setResultCount(111);
+            searchState.setLimited(false);
+          } else {
+            searchState.setPending(true);
+          }
+        }
+      });
+
+      const searchPage0 = createSearchPage(outline, {text: 'SearchPage0'});
+      const searchPage1 = createSearchPage(outline, {text: 'SearchPage1'});
+      const searchPage2 = createSearchPage(outline, {text: 'SearchPage2'});
+      outline.insertNodes([searchPage0, searchPage1, searchPage2]);
+      outline.setSearchQuery('foo');
+
+      spyOn(outline, 'setSearchStates').and.callThrough();
+
+      const events: Event<SearchOutline>[] = [];
+      outline.on('search resetSearch', event => events.push(event));
+
+      // -----
+
+      expect(outline.setSearchStates).toHaveBeenCalledTimes(0);
+      expect(outline.pending).toBe(false);
+      expect(outline.searchStatus).toBe('333 search results for "foo"');
+
+      // -----
+
+      outline.deleteNode(searchPage1);
+
+      expect(outline.setSearchStates).toHaveBeenCalledTimes(1);
+      expect(outline.pending).toBe(false);
+      expect(outline.searchStatus).toBe('222 search results for "foo"');
+      expect(events.map(event => event.type)).toEqual([]);
     });
   });
 
