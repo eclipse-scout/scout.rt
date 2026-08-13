@@ -6479,9 +6479,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   /**
+   * Updates column properties and redraws the header. Always add all affected columns, e.g. when a column is grouped and other sorted columns need to adjust their sortIndex.
    * @param columns array of columns which were updated.
    */
-  updateColumnHeaders(columns: Column[]) {
+  updateColumnHeaders(columns: ObjectOrModel<Column>[]) {
     let oldColumnState: ColumnModel;
 
     // Update model columns
@@ -6507,6 +6508,9 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
         // Adjust indices of other sort columns (if a sort column in the middle got removed, there won't necessarily be an event for the other columns)
         this._removeSortColumn(column);
       } else if (column.grouped && column.sortActive && column.sortIndex === -1) {
+        // the column was not grouped earlier, but is now -> use _addGroupColumn to update e.g. sortIndex of all other columns
+        // reset the grouped-flag as _addGroupColumn does nothing if the column is grouped already
+        column.grouped = false;
         this._addGroupColumn(column);
       } else if (column.sortActive && column.sortIndex === -1) {
         // Necessary if there is a tail sort column (there won't be an event for the tail sort column if another sort column was added before)
