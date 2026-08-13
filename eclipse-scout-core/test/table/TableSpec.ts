@@ -3158,6 +3158,188 @@ describe('Table', () => {
       expect($colHeaders.eq(2).text()).toBe('<b>test</b>');
       expect($colHeaders.eq(3).text()).toBe('test');
     });
+
+    it('updates the grouped state of model columns', () => {
+      table = helper.createTable(model);
+      [column0, column1, column2] = table.columns;
+
+      const getSortAndGroupInfo = (c: Column) => {
+        const {sortActive, sortAscending, sortIndex, grouped} = c;
+        return {sortActive, sortAscending, sortIndex, grouped};
+      };
+
+      expect(table.columns.map(c => getSortAndGroupInfo(c))).toEqual([
+        {sortActive: false, sortAscending: true, sortIndex: -1, grouped: false},
+        {sortActive: false, sortAscending: true, sortIndex: -1, grouped: false},
+        {sortActive: false, sortAscending: true, sortIndex: -1, grouped: false}
+      ]);
+
+      // sort descending by column2
+      table.updateColumnHeaders([
+        {
+          ...column2,
+          sortActive: true,
+          sortAscending: false
+        }
+      ]);
+
+      expect(table.columns.map(c => getSortAndGroupInfo(c))).toEqual([
+        {sortActive: false, sortAscending: true, sortIndex: -1, grouped: false},
+        {sortActive: false, sortAscending: true, sortIndex: -1, grouped: false},
+        {sortActive: true, sortAscending: false, sortIndex: 0, grouped: false}
+      ]);
+
+      // group and sort by column1
+      table.updateColumnHeaders([
+        {
+          ...column1,
+          sortActive: true,
+          sortIndex: 0,
+          grouped: true
+        },
+        {
+          ...column2,
+          sortIndex: 1
+        }
+      ]);
+
+      expect(table.columns.map(c => getSortAndGroupInfo(c))).toEqual([
+        {sortActive: false, sortAscending: true, sortIndex: -1, grouped: false},
+        {sortActive: true, sortAscending: true, sortIndex: 0, grouped: true},
+        {sortActive: true, sortAscending: false, sortIndex: 1, grouped: false}
+      ]);
+
+      // group additionally and sort descending by column0
+      table.updateColumnHeaders([
+        {
+          ...column0,
+          sortActive: true,
+          sortAscending: false,
+          sortIndex: 1,
+          grouped: true
+        },
+        {
+          ...column2,
+          sortIndex: 2
+        }
+      ]);
+
+      expect(table.columns.map(c => getSortAndGroupInfo(c))).toEqual([
+        {sortActive: true, sortAscending: false, sortIndex: 1, grouped: true},
+        {sortActive: true, sortAscending: true, sortIndex: 0, grouped: true},
+        {sortActive: true, sortAscending: false, sortIndex: 2, grouped: false}
+      ]);
+
+      // remove grouped columns
+      table.updateColumnHeaders([
+        {
+          ...column0,
+          sortActive: false,
+          sortAscending: true,
+          sortIndex: -1,
+          grouped: false
+        },
+        {
+          ...column1,
+          sortActive: false,
+          sortIndex: -1,
+          grouped: false
+        },
+        {
+          ...column2,
+          sortIndex: 0
+        }
+      ]);
+
+      expect(table.columns.map(c => getSortAndGroupInfo(c))).toEqual([
+        {sortActive: false, sortAscending: true, sortIndex: -1, grouped: false},
+        {sortActive: false, sortAscending: true, sortIndex: -1, grouped: false},
+        {sortActive: true, sortAscending: false, sortIndex: 0, grouped: false}
+      ]);
+
+      // sort by column1
+      table.updateColumnHeaders([
+        {
+          ...column1,
+          sortActive: true,
+          sortIndex: 1
+        }
+      ]);
+
+      expect(table.columns.map(c => getSortAndGroupInfo(c))).toEqual([
+        {sortActive: false, sortAscending: true, sortIndex: -1, grouped: false},
+        {sortActive: true, sortAscending: true, sortIndex: 1, grouped: false},
+        {sortActive: true, sortAscending: false, sortIndex: 0, grouped: false}
+      ]);
+
+      // add grouped to first sort column (column2)
+      table.updateColumnHeaders([
+        {
+          ...column2,
+          grouped: true
+        }
+      ]);
+
+      expect(table.columns.map(c => getSortAndGroupInfo(c))).toEqual([
+        {sortActive: false, sortAscending: true, sortIndex: -1, grouped: false},
+        {sortActive: true, sortAscending: true, sortIndex: 1, grouped: false},
+        {sortActive: true, sortAscending: false, sortIndex: 0, grouped: true}
+      ]);
+
+      // remove grouped columns
+      table.updateColumnHeaders([
+        {
+          ...column1,
+          sortIndex: 0
+        },
+        {
+          ...column2,
+          sortActive: false,
+          sortIndex: -1,
+          grouped: false
+        }
+      ]);
+
+      expect(table.columns.map(c => getSortAndGroupInfo(c))).toEqual([
+        {sortActive: false, sortAscending: true, sortIndex: -1, grouped: false},
+        {sortActive: true, sortAscending: true, sortIndex: 0, grouped: false},
+        {sortActive: false, sortAscending: false, sortIndex: -1, grouped: false}
+      ]);
+
+      // sort by column2
+      table.updateColumnHeaders([
+        {
+          ...column2,
+          sortActive: true,
+          sortIndex: 1
+        }
+      ]);
+
+      expect(table.columns.map(c => getSortAndGroupInfo(c))).toEqual([
+        {sortActive: false, sortAscending: true, sortIndex: -1, grouped: false},
+        {sortActive: true, sortAscending: true, sortIndex: 0, grouped: false},
+        {sortActive: true, sortAscending: false, sortIndex: 1, grouped: false}
+      ]);
+
+      // add grouped to second sort column (column2)
+      table.updateColumnHeaders([
+        {
+          ...column1,
+          sortIndex: 1
+        },
+        {
+          ...column2,
+          sortIndex: 0,
+          grouped: true
+        }
+      ]);
+
+      expect(table.columns.map(c => getSortAndGroupInfo(c))).toEqual([
+        {sortActive: false, sortAscending: true, sortIndex: -1, grouped: false},
+        {sortActive: true, sortAscending: true, sortIndex: 1, grouped: false},
+        {sortActive: true, sortAscending: false, sortIndex: 0, grouped: true}
+      ]);
+    });
   });
 
   describe('headerVisible', () => {
