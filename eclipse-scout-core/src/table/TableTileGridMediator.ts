@@ -526,6 +526,14 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
     }
     this.tiles = this.table.rows.map(row => this.tilesMap[row.id]);
     this.tileAccordion.setTiles(this.tiles);
+
+    // row order changes may affect group order
+    // collect all groups in the order they are present on the tiles in a Set (maintains insertion order and removes duplicates)
+    const groups = new Set(this.tiles.map(tile => this.tileAccordion.getGroupByTile(tile)));
+    // add all unused groups
+    this.tileAccordion.groups.forEach(group => groups.add(group));
+    // update groups
+    this.tileAccordion.setGroups([...groups]);
   }
 
   /** @internal */
