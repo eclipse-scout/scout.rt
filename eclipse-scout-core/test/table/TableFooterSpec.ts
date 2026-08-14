@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {scout, Status, TableControl} from '../../src/index';
+import {scout, Status, TableControl, TableTextUserFilter} from '../../src/index';
 import {JQueryTesting, TableSpecHelper} from '../../src/testing/index';
 import $ from 'jquery';
 
@@ -288,7 +288,78 @@ describe('TableFooterSpec', () => {
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
       expect(table.tableStatus.uiState).toBe(undefined);
     });
+  });
 
+  describe('text filter', () => {
+    let table;
+    let $filterInput;
+    let $filterInfo;
+
+    beforeEach(() => {
+      table = helper.createTable(helper.createModelFixture(2, 2));
+      table.setFooterVisible(true);
+      table.render();
+
+      $filterInput = table.footer.$container.find('.table-text-filter');
+      $filterInfo = table.footer.$container.find('.table-info-filter');
+      expect(table.footer.filterText).toBeUndefined();
+      expect($filterInput.val()).toBe('');
+      expect($filterInfo).toBeHidden();
+      expect(table.filters.length).toBe(0);
+    });
+
+    function addTextFilterAndAssert() {
+      $filterInput.val('text');
+      $filterInput.trigger('input');
+      jasmine.clock().tick(250); // await debounce
+      expect(table.footer.filterText).toBe('text');
+      expect($filterInput.val()).toBe('text');
+      expect($filterInfo).not.toBeHidden();
+      expect(table.filters.length === 1 && table.filters[0] instanceof TableTextUserFilter && table.filters[0].text === 'text').toBe(true);
+    }
+
+    function assertFilterRemoved() {
+      expect(table.footer.filterText).toBe('');
+      expect($filterInput.val()).toBe('');
+      expect($filterInfo).toHaveClass('hiding');
+      expect(table.filters.length).toBe(0);
+    }
+
+    it('shows filter info if text is entered', () => {
+      addTextFilterAndAssert();
+    });
+
+    it('hides filter info if text is cleared', () => {
+      addTextFilterAndAssert();
+
+      $filterInput.val('');
+      $filterInput.trigger('input');
+      jasmine.clock().tick(250);
+      assertFilterRemoved();
+
+      // Ensure filter can be added again
+      addTextFilterAndAssert();
+    });
+
+    it('hides filter info if text is cleared using x-icon', () => {
+      addTextFilterAndAssert();
+
+      JQueryTesting.triggerClick(table.footer.$clearIcon);
+      assertFilterRemoved();
+
+      // Ensure filter can be added again
+      addTextFilterAndAssert();
+    });
+
+    it('hides filter info and clears text if filters are reset', () => {
+      addTextFilterAndAssert();
+
+      JQueryTesting.triggerClick($filterInfo);
+      assertFilterRemoved();
+
+      // Ensure filter can be added again
+      addTextFilterAndAssert();
+    });
   });
 
   describe('aria properties', () => {
