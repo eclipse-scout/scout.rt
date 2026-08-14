@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,14 +36,14 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDoStru
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDoStructureMigrationHandler_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDoStructureMigrationHandler_4;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDoStructureMigrationHandler_5;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_1;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_3;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.BravoFixture_1;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.BravoFixture_2;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_1;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_2;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_3;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_5;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_3;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.Bravofixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.Bravofixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_3;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_5;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -106,11 +106,11 @@ public class DataObjectMigratorStructureMigrationTest {
         .build();
 
     // stop at bravoFixture-2, otherwise namespace will change too
-    assertTrue(s_migrator.applyStructureMigration(s_migrationContext, actual, BravoFixture_2.VERSION));
+    assertTrue(s_migrator.applyStructureMigration(s_migrationContext, actual, Bravofixture_2.VERSION));
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "bravoFixture.PetFixture")
-        .put("_typeVersion", BravoFixture_2.VERSION.unwrap())
+        .put("_typeVersion", Bravofixture_2.VERSION.unwrap())
         .put("name", "Charlie")
         .build();
 
@@ -134,7 +134,7 @@ public class DataObjectMigratorStructureMigrationTest {
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.PostalAddressFixture")
-        .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+        .put("_typeVersion", Charliefixture_2.VERSION.unwrap())
         .put("street", "Main street 12")
         .build();
 
@@ -151,7 +151,7 @@ public class DataObjectMigratorStructureMigrationTest {
   public void testUpdateVersionWithPreviousTypeVersion() {
     IDoEntity actual = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.PostalAddressFixture")
-        .put("_typeVersion", CharlieFixture_1.VERSION.unwrap())
+        .put("_typeVersion", Charliefixture_1.VERSION.unwrap())
         .put("street", "Main street 12")
         .build();
 
@@ -159,7 +159,7 @@ public class DataObjectMigratorStructureMigrationTest {
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.PostalAddressFixture")
-        .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+        .put("_typeVersion", Charliefixture_2.VERSION.unwrap())
         .put("street", "Main street 12")
         .build();
 
@@ -176,7 +176,7 @@ public class DataObjectMigratorStructureMigrationTest {
   public void testNamespaceChange() {
     IDoEntity actual = BEANS.get(DoEntityBuilder.class)
         .put("_type", "bravoFixture.PetFixture")
-        .put("_typeVersion", BravoFixture_1.VERSION.unwrap())
+        .put("_typeVersion", Bravofixture_1.VERSION.unwrap())
         .put("name", "JOHN")
         .build();
 
@@ -184,7 +184,7 @@ public class DataObjectMigratorStructureMigrationTest {
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "alfaFixture.PetFixture")
-        .put("_typeVersion", AlfaFixture_3.VERSION.unwrap())
+        .put("_typeVersion", Alfafixture_3.VERSION.unwrap())
         .put("name", "John")
         .put("familyFriendly", true)
         .build();
@@ -199,7 +199,7 @@ public class DataObjectMigratorStructureMigrationTest {
   public void testMigrationHandlerForOriginalDataObject() {
     IDoEntity actual = BEANS.get(DoEntityBuilder.class)
         .put("_type", "alfaFixture.CustomerFixture")
-        .put("_typeVersion", AlfaFixture_1.VERSION.unwrap())
+        .put("_typeVersion", Alfafixture_1.VERSION.unwrap())
         .put("firstName", "John")
         .build();
 
@@ -207,7 +207,7 @@ public class DataObjectMigratorStructureMigrationTest {
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "alfaFixture.CustomerFixture")
-        .put("_typeVersion", AlfaFixture_3.VERSION.unwrap())
+        .put("_typeVersion", Alfafixture_3.VERSION.unwrap())
         .put("firstName", "JOHN") // uppercase due to CustomerFixtureMigrationHandler_3
         .build();
 
@@ -225,7 +225,7 @@ public class DataObjectMigratorStructureMigrationTest {
   public void testMigrationHandlerForSubclassedDataObject() {
     IDoEntity actual = BEANS.get(DoEntityBuilder.class)
         .put("_type", "alfaFixture.CustomerFixture")
-        .put("_typeVersion", CharlieFixture_1.VERSION.unwrap())
+        .put("_typeVersion", Charliefixture_1.VERSION.unwrap())
         .put("firstName", "John")
         .build();
 
@@ -233,7 +233,7 @@ public class DataObjectMigratorStructureMigrationTest {
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "alfaFixture.CustomerFixture")
-        .put("_typeVersion", CharlieFixture_3.VERSION.unwrap())
+        .put("_typeVersion", Charliefixture_3.VERSION.unwrap())
         .put("firstName", "john") // lowercase due to CharlieCustomerFixtureMigrationHandler_3
         .build();
 
@@ -244,11 +244,11 @@ public class DataObjectMigratorStructureMigrationTest {
   public void testHouseFixtureMigration_1_to_5() {
     IDoEntity actual = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.BuildingFixture")
-        .put("_typeVersion", CharlieFixture_1.VERSION.unwrap())
+        .put("_typeVersion", Charliefixture_1.VERSION.unwrap())
         .put("name", "Family Doe")
         .putList("rooms", BEANS.get(DoEntityBuilder.class)
             .put("_type", "charlieFixture.RoomFixture")
-            .put("_typeVersion", CharlieFixture_1.VERSION.unwrap())
+            .put("_typeVersion", Charliefixture_1.VERSION.unwrap())
             .put("roomName", "Kitchen")
             .build())
         .build();
@@ -257,11 +257,11 @@ public class DataObjectMigratorStructureMigrationTest {
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.HouseFixture") // BuildingFixture -> HouseFixture
-        .put("_typeVersion", CharlieFixture_2.VERSION.unwrap()) // updated version
+        .put("_typeVersion", Charliefixture_2.VERSION.unwrap()) // updated version
         .put("name", "Family Doe")
         .putList("rooms", BEANS.get(DoEntityBuilder.class)
             .put("_type", "charlieFixture.RoomFixture")
-            .put("_typeVersion", CharlieFixture_5.VERSION.unwrap()) // updated version
+            .put("_typeVersion", Charliefixture_5.VERSION.unwrap()) // updated version
             .put("name", "Kitchen") // roomName -> name
             .put("displayText", "Family Doe: Kitchen") // display text was calculated based on name of house and room
             .build())
@@ -274,11 +274,11 @@ public class DataObjectMigratorStructureMigrationTest {
   public void testHouseFixtureMigration_3_to_5() {
     IDoEntity actual = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.HouseFixture")
-        .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+        .put("_typeVersion", Charliefixture_2.VERSION.unwrap())
         .put("name", "Family Doe")
         .putList("rooms", BEANS.get(DoEntityBuilder.class)
             .put("_type", "charlieFixture.RoomFixture")
-            .put("_typeVersion", CharlieFixture_3.VERSION.unwrap())
+            .put("_typeVersion", Charliefixture_3.VERSION.unwrap())
             .put("name", "Kitchen")
             .put("areaInSquareFoot", 10764)
             .build())
@@ -288,11 +288,11 @@ public class DataObjectMigratorStructureMigrationTest {
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.HouseFixture")
-        .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+        .put("_typeVersion", Charliefixture_2.VERSION.unwrap())
         .put("name", "Family Doe")
         .putList("rooms", BEANS.get(DoEntityBuilder.class)
             .put("_type", "charlieFixture.RoomFixture")
-            .put("_typeVersion", CharlieFixture_5.VERSION.unwrap()) // updated version
+            .put("_typeVersion", Charliefixture_5.VERSION.unwrap()) // updated version
             .put("name", "Kitchen")
             .put("displayText", "Family Doe: Kitchen (1000m2)") // display text was calculated based on areaInSquareMeter and name of house and room
             .put("areaInSquareMeter", 1000) // areaInSquareFoot -> areaInSquareMeter
@@ -313,15 +313,15 @@ public class DataObjectMigratorStructureMigrationTest {
   public void testStackedLocalContextData() {
     IDoEntity actual = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.PersonFixture")
-        .put("_typeVersion", CharlieFixture_1.VERSION.unwrap())
+        .put("_typeVersion", Charliefixture_1.VERSION.unwrap())
         .put("name", "John Doe")
         .putList("children", BEANS.get(DoEntityBuilder.class)
             .put("_type", "charlieFixture.PersonFixture")
-            .put("_typeVersion", CharlieFixture_1.VERSION.unwrap())
+            .put("_typeVersion", Charliefixture_1.VERSION.unwrap())
             .put("name", "John Doe Junior")
             .putList("children", BEANS.get(DoEntityBuilder.class)
                 .put("_type", "charlieFixture.PersonFixture")
-                .put("_typeVersion", CharlieFixture_1.VERSION.unwrap())
+                .put("_typeVersion", Charliefixture_1.VERSION.unwrap())
                 .put("name", "John Doe Junior 2. Gen")
                 .build())
             .build())
@@ -331,17 +331,17 @@ public class DataObjectMigratorStructureMigrationTest {
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.PersonFixture")
-        .put("_typeVersion", CharlieFixture_2.VERSION.unwrap()) // updated version
+        .put("_typeVersion", Charliefixture_2.VERSION.unwrap()) // updated version
         .put("name", "John Doe")
         .put("relation", "(none)") // add relation
         .putList("children", BEANS.get(DoEntityBuilder.class)
             .put("_type", "charlieFixture.PersonFixture")
-            .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())// updated version
+            .put("_typeVersion", Charliefixture_2.VERSION.unwrap())// updated version
             .put("name", "John Doe Junior")
             .put("relation", "Child of John Doe") // added relation
             .putList("children", BEANS.get(DoEntityBuilder.class)
                 .put("_type", "charlieFixture.PersonFixture")
-                .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())// updated version
+                .put("_typeVersion", Charliefixture_2.VERSION.unwrap())// updated version
                 .put("name", "John Doe Junior 2. Gen")
                 .put("relation", "Child of John Doe Junior") // added relation
                 .build())
@@ -359,7 +359,7 @@ public class DataObjectMigratorStructureMigrationTest {
   public void testListManipulationViaMigrationHandler() {
     IDoEntity actual = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.PersonFixture")
-        .put("_typeVersion", CharlieFixture_1.VERSION.unwrap())
+        .put("_typeVersion", Charliefixture_1.VERSION.unwrap())
         .put("name", "example")
         .build();
 
@@ -367,12 +367,12 @@ public class DataObjectMigratorStructureMigrationTest {
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.PersonFixture")
-        .put("_typeVersion", CharlieFixture_2.VERSION.unwrap()) // updated version
+        .put("_typeVersion", Charliefixture_2.VERSION.unwrap()) // updated version
         .put("name", "example")
         .put("relation", "(none)") // added relation
         .putList("children", BEANS.get(DoEntityBuilder.class) // added child
             .put("_type", "charlieFixture.PersonFixture")
-            .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+            .put("_typeVersion", Charliefixture_2.VERSION.unwrap())
             .put("name", "Jane Doe")
             .put("relation", "(undefined)")
             .build())

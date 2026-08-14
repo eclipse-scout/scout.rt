@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -80,7 +80,7 @@ public abstract class AbstractTypeVersion implements ITypeVersion {
   /**
    * Optional suffix (class name only) starting with __ followed by any word characters.
    */
-  private static final Pattern CLASS_NAME_PATTERN = Pattern.compile("(\\w+?)_(\\d+(?:_\\d+)*)(?:__\\w+)?");
+  public static final Pattern CLASS_NAME_PATTERN = Pattern.compile("(\\w+?)_(\\d+(?:_\\d+)*)(?:__\\w+)?");
 
   static NamespaceVersion fromClassName(Class<? extends ITypeVersion> typeVersionClass) {
     if (typeVersionClass == null) {

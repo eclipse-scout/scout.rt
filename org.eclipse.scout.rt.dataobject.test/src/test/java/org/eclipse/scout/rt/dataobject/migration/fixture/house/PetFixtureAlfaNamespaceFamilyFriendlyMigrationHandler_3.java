@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,8 +16,8 @@ import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoStructureMigrationHandler;
 import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationHelper;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_3;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.BravoFixture_3;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_3;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.Bravofixture_3;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
@@ -34,11 +34,11 @@ public class PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3 extends Abs
   public Class<? extends ITypeVersion> toTypeVersionClass() {
     // The target type version must be in the same namespace to trigger the migration handler correctly.
     // The namespace is then migrated as part of the handler execution.
-    return BravoFixture_3.class;
+    return Bravofixture_3.class;
   }
 
   protected NamespaceVersion typeVersionToUpdate() {
-    return AlfaFixture_3.VERSION;
+    return Alfafixture_3.VERSION;
   }
 
   /**

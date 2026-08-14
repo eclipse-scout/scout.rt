@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,20 +21,20 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 
 public final class DataObjectFixtureTypeVersions {
 
-  public static final class DataObjectFixture_1_0_0 extends AbstractTypeVersion {
+  public static final class Dataobjectfixture_1_0_0 extends AbstractTypeVersion {
 
     public static final NamespaceVersion VERSION = NamespaceVersion.of(DataObjectFixtureNamespace.ID, "1.0.0");
 
-    public DataObjectFixture_1_0_0() {
+    public Dataobjectfixture_1_0_0() {
       super(VERSION);
     }
   }
 
-  public static final class DataObjectFixture_1_0_0_034 extends AbstractTypeVersion {
+  public static final class Dataobjectfixture_1_0_0_034 extends AbstractTypeVersion {
 
     public static final NamespaceVersion VERSION = NamespaceVersion.of(DataObjectFixtureNamespace.ID, "1.0.0.034");
 
-    public DataObjectFixture_1_0_0_034() {
+    public Dataobjectfixture_1_0_0_034() {
       super(VERSION);
     }
   }
@@ -43,7 +43,7 @@ public final class DataObjectFixtureTypeVersions {
    * Manually registered in {@link DataObjectInventoryTest}.
    */
   @IgnoreBean
-  public static final class DataObjectFixture_No_Version implements ITypeVersion {
+  public static final class Dataobjectfixture_No_Version implements ITypeVersion {
 
     @Override
     public NamespaceVersion getVersion() {
@@ -60,7 +60,7 @@ public final class DataObjectFixtureTypeVersions {
    * Manually registered in {@link DataObjectInventoryTest}.
    */
   @IgnoreBean
-  public static final class NonRegisteredNamespaceFixture_1_0_0 implements ITypeVersion {
+  public static final class Nonregisterednamespacefixture_1_0_0 implements ITypeVersion {
 
     public static final NamespaceVersion VERSION = NamespaceVersion.of("noRegisteredNamespace", "1.0.0");
 
@@ -79,11 +79,11 @@ public final class DataObjectFixtureTypeVersions {
    * Manually registered in {@link DataObjectInventoryTest}.
    */
   @IgnoreBean
-  public static final class DataObjectFixture_1_0_0_Duplicate implements ITypeVersion {
+  public static final class Dataobjectfixture_1_0_0_Duplicate implements ITypeVersion {
 
     @Override
     public NamespaceVersion getVersion() {
-      return DataObjectFixture_1_0_0.VERSION;
+      return Dataobjectfixture_1_0_0.VERSION;
     }
 
     @Override
@@ -96,7 +96,7 @@ public final class DataObjectFixtureTypeVersions {
    * Only used for {@link AbstractTypeVersionTest#testFromClassName()}.
    */
   @IgnoreBean
-  public static final class DataObjectFixture_1_3_0__suffix extends AbstractTypeVersion {
+  public static final class Dataobjectfixture_1_3_0__suffix extends AbstractTypeVersion {
   }
 
   /**
@@ -110,20 +110,20 @@ public final class DataObjectFixtureTypeVersions {
    * Only used for {@link AbstractTypeVersionTest#testFromClassName()}.
    */
   @IgnoreBean
-  public static final class DataObjectFixture_1_3_0__lorem_ipsum extends AbstractTypeVersion {
+  public static final class Dataobjectfixture_1_3_0__lorem_ipsum extends AbstractTypeVersion {
   }
 
   /**
    * Only used for {@link AbstractTypeVersionTest#testFromClassName()}.
    */
   @IgnoreBean
-  public static final class DataObjectFixture_1_3_0__loremIpsumDolor_3 extends AbstractTypeVersion {
+  public static final class Dataobjectfixture_1_3_0__loremIpsumDolor_3 extends AbstractTypeVersion {
   }
 
   /**
    * Only used for {@link AbstractTypeVersionTest#testFromClassName()}.
    */
   @IgnoreBean
-  public static final class DataObjectFixture_1_3_002__suffix extends AbstractTypeVersion {
+  public static final class Dataobjectfixture_1_3_002__suffix extends AbstractTypeVersion {
   }
 }

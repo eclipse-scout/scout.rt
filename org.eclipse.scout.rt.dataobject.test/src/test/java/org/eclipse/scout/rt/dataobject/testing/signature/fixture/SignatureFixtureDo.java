@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,13 +19,13 @@ import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
-import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.Dataobjectfixture_1_0_0;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureEnum;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
 
 @TypeName("dataObjectFixture.SignatureFixture")
-@TypeVersion(DataObjectFixture_1_0_0.class)
+@TypeVersion(Dataobjectfixture_1_0_0.class)
 public class SignatureFixtureDo extends DoEntity {
 
   public DoList<FixtureStringId> idAttribute() {

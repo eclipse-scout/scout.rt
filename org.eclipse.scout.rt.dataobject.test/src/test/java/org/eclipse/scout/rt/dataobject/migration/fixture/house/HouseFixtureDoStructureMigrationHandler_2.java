@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,7 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoStructureRenameMigrationHandler;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_2;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 
 /**
@@ -24,7 +24,7 @@ public class HouseFixtureDoStructureMigrationHandler_2 extends AbstractDoStructu
 
   @Override
   public Class<? extends ITypeVersion> toTypeVersionClass() {
-    return CharlieFixture_2.class;
+    return Charliefixture_2.class;
   }
 
   @Override

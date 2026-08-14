@@ -14,7 +14,7 @@ import java.util.Map;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoValueMigrationHandlerByMap;
 import org.eclipse.scout.rt.dataobject.migration.DoValueMigrationId;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_1;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 
 @IgnoreBean
@@ -27,7 +27,7 @@ public class StreetNameStringIdValueMigrationHandlerByMap_1 extends AbstractDoVa
 
   @Override
   public Class<? extends ITypeVersion> typeVersionClass() {
-    return CharlieFixture_1.class;
+    return Charliefixture_1.class;
   }
 
   @Override

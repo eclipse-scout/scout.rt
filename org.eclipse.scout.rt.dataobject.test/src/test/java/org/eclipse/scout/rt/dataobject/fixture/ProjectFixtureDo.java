@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,11 +13,11 @@ import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
-import org.eclipse.scout.rt.dataobject.fixture.DataObjectProjectFixtureTypeVersions.DataObjectProjectFixture_1_2_3_004;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectProjectFixtureTypeVersions.Dataobjectprojectfixture_1_2_3_004;
 import org.eclipse.scout.rt.platform.Replace;
 
 @Replace
-@TypeVersion(DataObjectProjectFixture_1_2_3_004.class)
+@TypeVersion(Dataobjectprojectfixture_1_2_3_004.class)
 public class ProjectFixtureDo extends ScoutFixtureDo {
 
   public DoValue<Integer> count() {

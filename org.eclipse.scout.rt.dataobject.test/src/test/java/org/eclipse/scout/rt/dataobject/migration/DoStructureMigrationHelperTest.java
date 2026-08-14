@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,13 +16,13 @@ import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDo;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_1;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_2;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_3;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_1;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_2;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_3;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_5;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_3;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_3;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_5;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -66,25 +66,25 @@ public class DoStructureMigrationHelperTest {
   @Test
   public void testGetTypeVersion() {
     assertNull(s_helper.getTypeVersion(BEANS.get(DoEntityBuilder.class).build()));
-    assertEquals(AlfaFixture_1.VERSION, s_helper.getTypeVersion(BEANS.get(DoEntityBuilder.class).put("_typeVersion", "alfaFixture-1").build()));
+    assertEquals(Alfafixture_1.VERSION, s_helper.getTypeVersion(BEANS.get(DoEntityBuilder.class).put("_typeVersion", "alfaFixture-1").build()));
   }
 
   @Test
   public void testSetTypeVersion() {
     IDoEntity doEntity = BEANS.get(DoEntityBuilder.class).build();
-    s_helper.setTypeVersion(doEntity, AlfaFixture_1.VERSION);
-    assertEquals(AlfaFixture_1.VERSION, s_helper.getTypeVersion(doEntity));
-    assertEquals(AlfaFixture_1.VERSION.unwrap(), doEntity.getString("_typeVersion"));
+    s_helper.setTypeVersion(doEntity, Alfafixture_1.VERSION);
+    assertEquals(Alfafixture_1.VERSION, s_helper.getTypeVersion(doEntity));
+    assertEquals(Alfafixture_1.VERSION.unwrap(), doEntity.getString("_typeVersion"));
   }
 
   @Test
   public void testUpdateTypeVersion() {
     IDoEntity doEntity = BEANS.get(DoEntityBuilder.class).build();
-    s_helper.setTypeVersion(doEntity, AlfaFixture_1.VERSION);
-    assertFalse(s_helper.updateTypeVersion(doEntity, AlfaFixture_1.VERSION)); // already up-to-date
-    assertTrue(s_helper.updateTypeVersion(doEntity, AlfaFixture_2.VERSION)); // changed
-    assertEquals(AlfaFixture_2.VERSION.unwrap(), doEntity.getString("_typeVersion")); // verify
-    assertFalse(s_helper.updateTypeVersion(doEntity, AlfaFixture_2.VERSION)); // already up-to-date
+    s_helper.setTypeVersion(doEntity, Alfafixture_1.VERSION);
+    assertFalse(s_helper.updateTypeVersion(doEntity, Alfafixture_1.VERSION)); // already up-to-date
+    assertTrue(s_helper.updateTypeVersion(doEntity, Alfafixture_2.VERSION)); // changed
+    assertEquals(Alfafixture_2.VERSION.unwrap(), doEntity.getString("_typeVersion")); // verify
+    assertFalse(s_helper.updateTypeVersion(doEntity, Alfafixture_2.VERSION)); // already up-to-date
   }
 
   @Test
@@ -93,62 +93,62 @@ public class DoStructureMigrationHelperTest {
 
     // Single data object
     Assert.assertEquals(CollectionUtility.hashMap(
-            new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION)),
+            new ImmutablePair<>("charlieFixture.HouseFixture", Charliefixture_2.VERSION)),
         helper.collectRawDataObjectTypeVersions(
             BEANS.get(DoEntityBuilder.class)
                 .put("_type", "charlieFixture.HouseFixture")
-                .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+                .put("_typeVersion", Charliefixture_2.VERSION.unwrap())
                 .build()));
 
     // Data object containing another data objects (house owner attribute not set here)
     Assert.assertEquals(CollectionUtility.hashMap(
-            new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-            new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_5.VERSION),
-            new ImmutablePair<>("charlieFixture.PostalAddressFixture", CharlieFixture_2.VERSION)),
+            new ImmutablePair<>("charlieFixture.HouseFixture", Charliefixture_2.VERSION),
+            new ImmutablePair<>("charlieFixture.RoomFixture", Charliefixture_5.VERSION),
+            new ImmutablePair<>("charlieFixture.PostalAddressFixture", Charliefixture_2.VERSION)),
         helper.collectRawDataObjectTypeVersions(
             BEANS.get(DoEntityBuilder.class)
                 .put("_type", "charlieFixture.HouseFixture")
-                .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+                .put("_typeVersion", Charliefixture_2.VERSION.unwrap())
                 .putList("rooms",
                     BEANS.get(DoEntityBuilder.class)
                         .put("_type", "charlieFixture.RoomFixture")
-                        .put("_typeVersion", CharlieFixture_5.VERSION.unwrap())
+                        .put("_typeVersion", Charliefixture_5.VERSION.unwrap())
                         .build())
                 .put("postalAddress",
                     BEANS.get(DoEntityBuilder.class)
                         .put("_type", "charlieFixture.PostalAddressFixture")
-                        .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+                        .put("_typeVersion", Charliefixture_2.VERSION.unwrap())
                         .build())
                 .build()));
 
     // Data object with a subclass but using origin class (different type version) [not a real case]
     Assert.assertEquals(CollectionUtility.hashMap(
-            new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-            new ImmutablePair<>("alfaFixture.CustomerFixture", AlfaFixture_3.VERSION)),
+            new ImmutablePair<>("charlieFixture.HouseFixture", Charliefixture_2.VERSION),
+            new ImmutablePair<>("alfaFixture.CustomerFixture", Alfafixture_3.VERSION)),
         helper.collectRawDataObjectTypeVersions(
             BEANS.get(DoEntityBuilder.class)
                 .put("_type", "charlieFixture.HouseFixture")
-                .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+                .put("_typeVersion", Charliefixture_2.VERSION.unwrap())
                 .put("owner",
                     BEANS.get(DoEntityBuilder.class)
                         .put("_type", "alfaFixture.CustomerFixture")
-                        .put("_typeVersion", AlfaFixture_3.VERSION.unwrap()) // CustomerFixtureDo
+                        .put("_typeVersion", Alfafixture_3.VERSION.unwrap()) // CustomerFixtureDo
                         .build())
                 .build()));
 
     // Data object with a subclass using replaced class
     Assert.assertEquals(CollectionUtility.hashMap(
-            new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-            new ImmutablePair<>("alfaFixture.CustomerFixture", CharlieFixture_3.VERSION)),
+            new ImmutablePair<>("charlieFixture.HouseFixture", Charliefixture_2.VERSION),
+            new ImmutablePair<>("alfaFixture.CustomerFixture", Charliefixture_3.VERSION)),
 
         helper.collectRawDataObjectTypeVersions(
             BEANS.get(DoEntityBuilder.class)
                 .put("_type", "charlieFixture.HouseFixture")
-                .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+                .put("_typeVersion", Charliefixture_2.VERSION.unwrap())
                 .put("owner",
                     BEANS.get(DoEntityBuilder.class)
                         .put("_type", "alfaFixture.CustomerFixture")
-                        .put("_typeVersion", CharlieFixture_3.VERSION.unwrap()) // CharlieCustomerFixtureDo
+                        .put("_typeVersion", Charliefixture_3.VERSION.unwrap()) // CharlieCustomerFixtureDo
                         .build())
                 .build()));
 
@@ -159,52 +159,52 @@ public class DoStructureMigrationHelperTest {
 
   @Test
   public void testIsMigrationApplicable() {
-    assertFalse(s_helper.isMigrationApplicable(BEANS.get(RoomFixtureDo.class), CharlieFixture_2.VERSION)); // typed data object (not raw)
-    assertTrue(s_helper.isMigrationApplicable(BEANS.get(DoEntityBuilder.class).put("_type", "charlieFixture.RoomFixture").build(), CharlieFixture_2.VERSION)); // no type version (yet)
-    assertFalse(s_helper.isMigrationApplicable(BEANS.get(DoEntityBuilder.class).put("_type", "charlieFixture.RoomFixture").put("_typeVersion", AlfaFixture_1.VERSION.unwrap()).build(), CharlieFixture_2.VERSION)); // different namespace
-    assertFalse(s_helper.isMigrationApplicable(BEANS.get(DoEntityBuilder.class).put("_type", "charlieFixture.RoomFixture").put("_typeVersion", CharlieFixture_2.VERSION.unwrap()).build(), CharlieFixture_2.VERSION)); // same version
-    assertTrue(s_helper.isMigrationApplicable(BEANS.get(DoEntityBuilder.class).put("_type", "charlieFixture.RoomFixture").put("_typeVersion", CharlieFixture_1.VERSION.unwrap()).build(), CharlieFixture_2.VERSION)); // lower version
-    assertFalse(s_helper.isMigrationApplicable(BEANS.get(DoEntityBuilder.class).put("_type", "charlieFixture.RoomFixture").put("_typeVersion", CharlieFixture_3.VERSION.unwrap()).build(), CharlieFixture_2.VERSION)); // higher version (invalid)
+    assertFalse(s_helper.isMigrationApplicable(BEANS.get(RoomFixtureDo.class), Charliefixture_2.VERSION)); // typed data object (not raw)
+    assertTrue(s_helper.isMigrationApplicable(BEANS.get(DoEntityBuilder.class).put("_type", "charlieFixture.RoomFixture").build(), Charliefixture_2.VERSION)); // no type version (yet)
+    assertFalse(s_helper.isMigrationApplicable(BEANS.get(DoEntityBuilder.class).put("_type", "charlieFixture.RoomFixture").put("_typeVersion", Alfafixture_1.VERSION.unwrap()).build(), Charliefixture_2.VERSION)); // different namespace
+    assertFalse(s_helper.isMigrationApplicable(BEANS.get(DoEntityBuilder.class).put("_type", "charlieFixture.RoomFixture").put("_typeVersion", Charliefixture_2.VERSION.unwrap()).build(), Charliefixture_2.VERSION)); // same version
+    assertTrue(s_helper.isMigrationApplicable(BEANS.get(DoEntityBuilder.class).put("_type", "charlieFixture.RoomFixture").put("_typeVersion", Charliefixture_1.VERSION.unwrap()).build(), Charliefixture_2.VERSION)); // lower version
+    assertFalse(s_helper.isMigrationApplicable(BEANS.get(DoEntityBuilder.class).put("_type", "charlieFixture.RoomFixture").put("_typeVersion", Charliefixture_3.VERSION.unwrap()).build(), Charliefixture_2.VERSION)); // higher version (invalid)
   }
 
   /**
-   * References {@link HouseFixtureDo} with type version {@link CharlieFixture_2} and {@link RoomFixtureDo} with type
-   * version {@link CharlieFixture_5}.
+   * References {@link HouseFixtureDo} with type version {@link Charliefixture_2} and {@link RoomFixtureDo} with type
+   * version {@link Charliefixture_5}.
    */
   @Test
   public void testIsAnyMigrationRequired() {
     assertFalse(s_helper.isAnyMigrationRequired(CollectionUtility.emptyHashMap())); // no versions at all -> not outdated
 
     assertTrue(s_helper.isAnyMigrationRequired(CollectionUtility.hashMap(
-        new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_1.VERSION.unwrap()),
-        new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_1.VERSION.unwrap()))));
+        new ImmutablePair<>("charlieFixture.HouseFixture", Charliefixture_1.VERSION.unwrap()),
+        new ImmutablePair<>("charlieFixture.RoomFixture", Charliefixture_1.VERSION.unwrap()))));
 
     // invalid constellation, all data objects within a persisted data object have a consistent type version
     assertTrue(s_helper.isAnyMigrationRequired(CollectionUtility.hashMap(
-        new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION.unwrap()),
-        new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_1.VERSION.unwrap()))));
+        new ImmutablePair<>("charlieFixture.HouseFixture", Charliefixture_2.VERSION.unwrap()),
+        new ImmutablePair<>("charlieFixture.RoomFixture", Charliefixture_1.VERSION.unwrap()))));
 
     // invalid constellation, all data objects within a persisted data object have a consistent type version
     assertTrue(s_helper.isAnyMigrationRequired(CollectionUtility.hashMap(
-        new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_1.VERSION.unwrap()),
-        new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_5.VERSION.unwrap()))));
+        new ImmutablePair<>("charlieFixture.HouseFixture", Charliefixture_1.VERSION.unwrap()),
+        new ImmutablePair<>("charlieFixture.RoomFixture", Charliefixture_5.VERSION.unwrap()))));
 
     assertFalse(s_helper.isAnyMigrationRequired(CollectionUtility.hashMap(
-        new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_3.VERSION.unwrap()),
-        new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_5.VERSION.unwrap()))));
+        new ImmutablePair<>("charlieFixture.HouseFixture", Charliefixture_3.VERSION.unwrap()),
+        new ImmutablePair<>("charlieFixture.RoomFixture", Charliefixture_5.VERSION.unwrap()))));
   }
 
   /**
-   * References {@link HouseFixtureDo} that has type version {@link CharlieFixture_3}.
+   * References {@link HouseFixtureDo} that has type version {@link Charliefixture_3}.
    */
   @Test
   public void testIsMigrationRequired() {
     assertTrue(s_helper.isMigrationRequired("charlieFixture.HouseFixture", null)); // no type version
     assertFalse(s_helper.isMigrationRequired("charlieFixture.HouseFixture", NamespaceVersion.of("unknown", "1.0.0"))); // unknown type version
-    assertTrue(s_helper.isMigrationRequired("charlieFixture.BuildingFixture", CharlieFixture_1.VERSION)); // unknown type name (e.g. renamed)
-    assertTrue(s_helper.isMigrationRequired("charlieFixture.HouseFixture", CharlieFixture_1.VERSION)); // lower type version
-    assertFalse(s_helper.isMigrationRequired("charlieFixture.HouseFixture", CharlieFixture_3.VERSION)); // same type version
-    assertFalse(s_helper.isMigrationRequired("charlieFixture.HouseFixture", CharlieFixture_5.VERSION)); // newer type version (invalid)
+    assertTrue(s_helper.isMigrationRequired("charlieFixture.BuildingFixture", Charliefixture_1.VERSION)); // unknown type name (e.g. renamed)
+    assertTrue(s_helper.isMigrationRequired("charlieFixture.HouseFixture", Charliefixture_1.VERSION)); // lower type version
+    assertFalse(s_helper.isMigrationRequired("charlieFixture.HouseFixture", Charliefixture_3.VERSION)); // same type version
+    assertFalse(s_helper.isMigrationRequired("charlieFixture.HouseFixture", Charliefixture_5.VERSION)); // newer type version (invalid)
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoStructureMigrationHandler;
 import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.Charliefixture_2;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -30,7 +30,7 @@ public class PersonFixtureDoStructureMigrationHandler_2 extends AbstractDoStruct
 
   @Override
   public Class<? extends ITypeVersion> toTypeVersionClass() {
-    return CharlieFixture_2.class;
+    return Charliefixture_2.class;
   }
 
   /**
@@ -56,7 +56,7 @@ public class PersonFixtureDoStructureMigrationHandler_2 extends AbstractDoStruct
       children.add(BEANS.get(DoEntityBuilder.class)
           .put("_type", "charlieFixture.PersonFixture")
           // when no type version is added or charlieFixture-1 is used, this migration handler would be called for the added child too
-          .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+          .put("_typeVersion", Charliefixture_2.VERSION.unwrap())
           .put("name", "Jane Doe")
           .put("relation", "(undefined)")
           .build());

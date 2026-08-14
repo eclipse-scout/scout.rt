@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,47 +14,47 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 
 public final class AlfaFixtureTypeVersions {
 
-  public static final class AlfaFixture_1 extends AbstractTypeVersion {
+  public static final class Alfafixture_1 extends AbstractTypeVersion {
 
     public static final NamespaceVersion VERSION = NamespaceVersion.of(AlfaFixtureNamespace.ID, "1");
 
-    public AlfaFixture_1() {
+    public Alfafixture_1() {
       super(VERSION);
     }
   }
 
-  public static final class AlfaFixture_2 extends AbstractTypeVersion {
+  public static final class Alfafixture_2 extends AbstractTypeVersion {
 
     public static final NamespaceVersion VERSION = NamespaceVersion.of(AlfaFixtureNamespace.ID, "2");
 
-    public AlfaFixture_2() {
+    public Alfafixture_2() {
       super(VERSION);
     }
   }
 
-  public static final class AlfaFixture_3 extends AbstractTypeVersion {
+  public static final class Alfafixture_3 extends AbstractTypeVersion {
 
     public static final NamespaceVersion VERSION = NamespaceVersion.of(AlfaFixtureNamespace.ID, "3");
 
-    public AlfaFixture_3() {
+    public Alfafixture_3() {
       super(VERSION);
     }
   }
 
-  public static final class AlfaFixture_6 extends AbstractTypeVersion {
+  public static final class Alfafixture_6 extends AbstractTypeVersion {
 
     public static final NamespaceVersion VERSION = NamespaceVersion.of(AlfaFixtureNamespace.ID, "6");
 
-    public AlfaFixture_6() {
+    public Alfafixture_6() {
       super(VERSION);
     }
   }
 
-  public static final class AlfaFixture_7 extends AbstractTypeVersion {
+  public static final class Alfafixture_7 extends AbstractTypeVersion {
 
     public static final NamespaceVersion VERSION = NamespaceVersion.of(AlfaFixtureNamespace.ID, "7");
 
-    public AlfaFixture_7() {
+    public Alfafixture_7() {
       super(VERSION);
     }
   }

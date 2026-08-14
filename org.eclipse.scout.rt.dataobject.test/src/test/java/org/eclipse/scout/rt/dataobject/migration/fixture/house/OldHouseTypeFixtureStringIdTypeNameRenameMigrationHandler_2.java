@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.dataobject.id.UnknownId;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoValueUntypedMigrationHandler;
 import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.DoValueMigrationId;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureTypeVersions.DeltaFixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureTypeVersions.Deltafixture_2;
 
 /**
  * Migration handler migrating former OldHouseTypeFixtureStringId instances to {@link HouseTypeFixtureStringId}.
@@ -30,9 +30,9 @@ public class OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler_2 extends
 
   @Override
   public Class<? extends ITypeVersion> typeVersionClass() {
-    // Type version DeltaFixture_2 is after CharlieFixture_2 and therefore HouseTypeFixtureDoValueMigrationHandler_2.
+    // Type version Deltafixture_2 is after Charliefixture_2 and therefore HouseTypeFixtureDoValueMigrationHandler_2.
     // But untyped value migrations will always be applied before regular value migrations, based on the primary sort order.
-    return DeltaFixture_2.class;
+    return Deltafixture_2.class;
   }
 
   @Override

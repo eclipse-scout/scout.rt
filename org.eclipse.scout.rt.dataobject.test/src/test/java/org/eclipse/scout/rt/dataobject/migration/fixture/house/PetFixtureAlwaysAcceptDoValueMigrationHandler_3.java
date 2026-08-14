@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoValueMigrationHandler;
 import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.DoValueMigrationId;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_3;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.Alfafixture_3;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -36,7 +36,7 @@ public class PetFixtureAlwaysAcceptDoValueMigrationHandler_3 extends AbstractDoV
 
   @Override
   public Class<? extends ITypeVersion> typeVersionClass() {
-    return AlfaFixture_3.class;
+    return Alfafixture_3.class;
   }
 
   @Override
