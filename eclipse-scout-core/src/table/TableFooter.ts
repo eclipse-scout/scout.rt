@@ -859,6 +859,7 @@ export class TableFooter extends Widget implements TableFooterModel {
     this._updateInfoFilterVisibility();
     if (event.filter instanceof TableUserFilter && event.filter.filterType === TableTextUserFilter.TYPE) {
       this._$textFilter.val('');
+      this.filterText = '';
       this._updateHasFilterText();
     }
   }
