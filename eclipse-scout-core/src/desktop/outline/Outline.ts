@@ -95,8 +95,6 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.nodeMenuBar = null;
     this.nodeMenuBarVisible = false;
     this.nodesFocusable = true;
-    this.preventInitialFocus = true;
-    this.preventClickFocus = true;
     this.detailMenuBar = null;
     this.detailMenuBarVisible = false;
     this.dialogs = [];
@@ -273,6 +271,12 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this._renderTitle();
     this._updateIcon();
     this._renderTitleMenuBar();
+  }
+
+  protected override _renderData() {
+    super._renderData();
+    this.$data.addClass('prevent-initial-focus')
+      .unfocusable();
   }
 
   protected override _computeNodePaddingLeft(node: Page): number {

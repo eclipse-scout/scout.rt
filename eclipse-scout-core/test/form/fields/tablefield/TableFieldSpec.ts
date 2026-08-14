@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Column, FormField, scout, Status, Table, TableField, TableModel, TableRow} from '../../../../src/index';
+import {CloseMenu, Column, Form, FormField, GroupBox, Menu, scout, Status, Table, TableField, TableModel, TableRow} from '../../../../src/index';
 import {FormSpecHelper, SpecTable, SpecTableModel, TableSpecHelper} from '../../../../src/testing/index';
 
 describe('TableField', () => {
@@ -393,6 +393,68 @@ describe('TableField', () => {
 
       tableField.table.deleteAllRows();
       expect(tableField.empty).toBe(true);
+    });
+  });
+
+  describe('preventInitialFocus', () => {
+    it('prevents the initial focus of focusable children', async () => {
+      jasmine.clock().uninstall();
+      let tableField = createTableField({
+        table: {
+          ...createTableModel(2, 2),
+          menus: [{objectType: Menu, text: 'Menu'}]
+        }
+      });
+      tableField.setPreventInitialFocus(true);
+
+      let form = scout.create(Form, {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [tableField],
+          menus: [{
+            objectType: CloseMenu
+          }]
+        }
+      });
+      await form.open();
+      expect(tableField.$container).toHaveClass('prevent-initial-focus');
+      expect(form.findChild(CloseMenu).$container).toBeFocused();
+    });
+
+    it('does not prevent the initial focus if set to false', async () => {
+      jasmine.clock().uninstall();
+      let tableField = createTableField({
+        table: {
+          ...createTableModel(2, 2),
+          menus: [{objectType: Menu, text: 'Menu'}]
+        }
+      });
+
+      let form = scout.create(Form, {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [tableField],
+          menus: [{
+            objectType: CloseMenu
+          }]
+        }
+      });
+      await form.open();
+      expect(tableField.$container).not.toHaveClass('prevent-initial-focus');
+      expect(tableField.table.get$Focusable()).toBeFocused();
+    });
+  });
+
+  describe('focus', () => {
+    it('focuses the table', () => {
+      let tableField = createTableField({table: createTableModel(2, 2)});
+      tableField.render();
+      expect(tableField.table.get$Focusable()).not.toBeFocused();
+
+      tableField.focus();
+      expect(tableField.table.get$Focusable()).toBeFocused();
     });
   });
 

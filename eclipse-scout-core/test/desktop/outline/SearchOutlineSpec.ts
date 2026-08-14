@@ -261,6 +261,13 @@ describe('SearchOutline', () => {
     });
   });
 
+  it('sets the initial focus to the query field', () => {
+    const outline = createSearchOutline();
+    outline.render();
+    session.focusManager.validateFocus();
+    expect(outline.$queryField).toBeFocused();
+  });
+
   describe('search', () => {
 
     it('sets all searchStates pending', () => {

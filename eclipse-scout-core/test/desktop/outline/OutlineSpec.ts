@@ -33,6 +33,13 @@ describe('Outline', () => {
     jasmine.clock().uninstall();
   });
 
+  it('prevents the initial focus', () => {
+    let outline = helper.createOutlineWithOneDetailTable();
+    outline.render();
+    session.focusManager.validateFocus();
+    expect(outline.get$Focusable()).not.toBeFocused();
+  });
+
   describe('collapsing', () => {
     // Regression test for erroneous behavior of MessageBoxController
     it('still allows a messagebox to be shown', () => {
