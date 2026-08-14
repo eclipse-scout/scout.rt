@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -64,10 +64,14 @@ describe('TableTileModeSpec', () => {
     });
 
     it('groups data', () => {
-      table.columns[0].grouped = true;
-      table.sort(table.columns[0], 'desc');
       table.setTileMode(true);
-      expect(table.tableTileGridMediator.tileAccordion.groups.length).toBe(5);
+      expect(table.tableTileGridMediator.tileAccordion.groups.map(g => g.id)).toEqual(['default']);
+
+      table.group(table.columns[0], 'desc');
+      expect(table.tableTileGridMediator.tileAccordion.groups.map(g => g.id)).toEqual(['4_0', '3_0', '2_0', '1_0', '0_0']);
+
+      table.sort(table.columns[0], 'asc');
+      expect(table.tableTileGridMediator.tileAccordion.groups.map(g => g.id)).toEqual(['0_0', '1_0', '2_0', '3_0', '4_0']);
     });
 
     it('filters data (key filter)', () => {
