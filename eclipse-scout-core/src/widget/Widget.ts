@@ -1051,7 +1051,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       // Do not remove class as it may be added explicitly on the dom element instead of using this property
       return;
     }
-    this.get$Focusable()?.toggleClass('prevent-initial-focus', this.preventInitialFocus);
+    this.$container?.toggleClass('prevent-initial-focus', this.preventInitialFocus);
   }
 
   /** @see WidgetModel.preventClickFocus */
@@ -1064,7 +1064,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       // Do not remove class as it may be added explicitly on the dom element instead of using this property
       return;
     }
-    this.get$Focusable()?.toggleClass('unfocusable', this.preventClickFocus);
+    this.$container?.toggleClass('unfocusable', this.preventClickFocus);
   }
 
   protected _setCssClass(cssClass: string) {

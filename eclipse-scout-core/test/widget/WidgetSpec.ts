@@ -1971,7 +1971,7 @@ describe('Widget', () => {
   });
 
   describe('preventInitialFocus', () => {
-    it('adds or removes the class prevent-initial-focus to the focusable element', () => {
+    it('adds or removes the class prevent-initial-focus to the container', () => {
       let widget = createWidget({
         parent: parent
       });
@@ -2006,7 +2006,7 @@ describe('Widget', () => {
   });
 
   describe('preventClickFocus', () => {
-    it('adds or removes the class unfocusable to the focusable element', () => {
+    it('adds or removes the class unfocusable to the container', () => {
       let widget = createWidget({
         parent: parent
       });

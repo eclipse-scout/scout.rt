@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -86,6 +86,7 @@ export interface WidgetModel extends ObjectModelWithUuid<Widget>, ObjectModelWit
   tabbable?: boolean;
   /**
    * Defines whether the widget should look focused.
+   *
    * It does _not_ focus the widget. It basically just toggles the class `focused`.
    *
    * To focus the widget, use {@link focus}.
@@ -94,7 +95,9 @@ export interface WidgetModel extends ObjectModelWithUuid<Widget>, ObjectModelWit
   /**
    * Defines whether the {@link FocusManager} is allowed to consider this widget when computing the first focusable field in a container.
    *
-   * The property may be undefined which means the class will neither be removed nor added to {@link get$Focusable()}.
+   * If set to true, the class `prevent-initial-focus` will be added to {@link $container}, so neither the {@link $container} nor any of its descendant DOM elements will get the initial focus.
+   *
+   * The property may be undefined which means the class will neither be removed nor added to {@link $container}.
    * This makes it possible to still use the css class `prevent-initial-focus` instead of this property.
    *
    * Default is undefined.
@@ -103,10 +106,10 @@ export interface WidgetModel extends ObjectModelWithUuid<Widget>, ObjectModelWit
   /**
    * Defines whether the focus gain should be prevented when the widget is clicked.
    *
-   * If set to true the class `unfocusable` will be set on {@link get$Focusable()} so it won't get the focus even if it was focusable.
+   * If set to true, the class `unfocusable` will be added to {@link $container}, so neither the {@link $container} nor any of its descendant DOM elements will get the focus when being clicked.
    * However, if the widget is {@link tabbable}, it may still get the focus by keyboard or if {@link focus} is called programmatically.
    *
-   * The property may be undefined which means the `unfocusable` class will neither be removed nor added to {@link get$Focusable()}.
+   * The property may be undefined which means the `unfocusable` class will neither be removed nor added to {@link $container}.
    * This makes it possible to still use the css class directly instead of this property.
    *
    * Default is undefined.
