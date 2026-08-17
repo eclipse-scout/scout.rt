@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -136,11 +136,6 @@ export class Group<TBody extends Widget = Widget> extends Widget implements Grou
     this.$collapseBorderRight = null;
     this._removeIconId();
     super._remove();
-  }
-
-  protected override _renderEnabled() {
-    super._renderEnabled();
-    this.$header.setTabbable(this.enabledComputed);
   }
 
   /** @see GroupModel.iconId */
@@ -354,6 +349,9 @@ export class Group<TBody extends Widget = Widget> extends Widget implements Grou
     this.$container.toggleClass('collapsible', this.collapsible);
     this.$header.toggleClass('disabled', !this.collapsible);
     aria.disabled(this.$header, !this.collapsible || null);
+    if (!this.header) { // Only set tabbable if no custom widget is used because we don't know if a tabindex is required or not
+      this.$header.setTabbable(this.collapsible);
+    }
     // footer is visible if collapseStyle is 'bottom' and either header is visible or has a (collapsible) body
     this.$footer.setVisible(this.collapseStyle === Group.CollapseStyle.BOTTOM && (this.headerVisible || this.collapsible));
     this.$collapseIcon.setVisible(this.collapsible);
