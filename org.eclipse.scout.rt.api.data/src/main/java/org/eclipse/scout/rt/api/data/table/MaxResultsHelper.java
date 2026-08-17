@@ -141,6 +141,7 @@ public class MaxResultsHelper {
     private int m_requestedMaxResults; // <= 0 if not specified
     private boolean m_estimateRowCountEnabled;
     private int m_estimatedRowCount; // <= 0 if not specified
+    private LimitedResultInfoContributionDo m_limitedResultInfoContributionDo;
 
     /**
      * @param maxResultsLimit
@@ -224,7 +225,7 @@ public class MaxResultsHelper {
      * <li>The maximum number of entries that are allowed
      * ({@link LimitedResultInfoContributionDo#getMaxRowCount()})</li>
      * <li>({@link LimitedResultInfoContributionDo#getEstimatedRowCount()}) An estimation how may rows would be
-     * available Must be set using {@link #setEstimatedRowCount(int)}.</li>
+     * available. Must be set using {@link #setEstimatedRowCount(int)}.</li>
      * </ol>
      * <p>
      * <b>Note</b>: The given data {@link List} is directly modified! No new list is created! The returned list is the
@@ -250,6 +251,7 @@ public class MaxResultsHelper {
         // only set estimation if limited
         contribution.withEstimatedRowCount(getEstimatedRowCount());
       }
+      m_limitedResultInfoContributionDo = contribution;
       return result;
     }
 
@@ -340,6 +342,40 @@ public class MaxResultsHelper {
      */
     public void setEstimatedRowCount(int estimatedRowCount) {
       m_estimatedRowCount = estimatedRowCount;
+    }
+
+    /**
+     * @return The {@link LimitedResultInfoContributionDo} or {@code null}. A value can be set by calling {@link #limit(List, IDoEntity)} or {@link #setLimitedResultInfoContributionDo(LimitedResultInfoContributionDo)}.
+     */
+    public LimitedResultInfoContributionDo getLimitedResultInfoContributionDo() {
+      return m_limitedResultInfoContributionDo;
+    }
+
+    /**
+     * Sets the created {@link LimitedResultInfoContributionDo}.
+     *
+     * @param limitedResultInfoContributionDo
+     *     the new {@link LimitedResultInfoContributionDo} or {@code null}.
+     */
+    public void setLimitedResultInfoContributionDo(LimitedResultInfoContributionDo limitedResultInfoContributionDo) {
+      m_limitedResultInfoContributionDo = limitedResultInfoContributionDo;
+    }
+
+    /**
+     * Writes the current {@link #getLimitedResultInfoContributionDo()} to the given {@link IDoEntity}.
+     *
+     * @param response
+     *     The {@link IDoEntity} that should receive the {@link LimitedResultInfoContributionDo}. May be {@code null}, then this method does nothing.
+     * @return The input {@link IDoEntity}.
+     */
+    public <T extends IDoEntity> T applyResultInfoTo(T response) {
+      if (response != null) {
+        LimitedResultInfoContributionDo resultInfo = getLimitedResultInfoContributionDo();
+        if (resultInfo != null) {
+          response.putContribution(resultInfo);
+        }
+      }
+      return response;
     }
   }
 }

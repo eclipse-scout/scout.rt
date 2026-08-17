@@ -163,9 +163,68 @@ describe('PageWithTable', () => {
     page._transformTableDataToTableRows = data => undefined;
     page.detailTable.reload();
     await page.detailTable.when('propertyChange:loading');
-    expect(page.detailTable.maxRowCount).toBe(456);
+    expect(page.detailTable.maxRowCountServer).toBe(456);
+    expect(page.detailTable.maxRowCount).toBe(0);
     expect(page.detailTable.estimatedRowCount).toBe(1111);
     expect(page.detailTable.tableStatus.message).toBe('[undefined text: MaxOutlineRowWarningWithEstimatedRowCount]');
+  });
+
+  it('server row limits do not overwrite client model', async () => {
+    const serverLimit = 5;
+    const clientLimit = 3;
+    const allData = [{cells: [1]}, {cells: [2]}, {cells: [3]}, {cells: [4]}, {cells: [5]}, {cells: [6]}];
+
+    page.detailTable.setMaxRowCount(clientLimit);
+    page._loadTableData = searchFilter => {
+      searchFilter = page._withMaxRowCountContribution(searchFilter);
+      const maxRowsContribution = searchFilter?._contributions?.[0] as MaxRowCountContributionDo;
+      const limit = Math.min(maxRowsContribution?.hint || Number.MAX_SAFE_INTEGER, serverLimit);
+      const data = allData.slice(0, limit);
+      return $.resolvedPromise({
+        rows: data,
+        _contributions: [{
+          _type: 'scout.LimitedResultInfoContribution',
+          limitedResult: data.length < allData.length,
+          maxRowCount: serverLimit,
+          estimatedRowCount: allData.length
+        }]
+      });
+    };
+    page._transformTableDataToTableRows = res => res.rows;
+    expect(page.detailTable.maxRowCount).toBe(clientLimit);
+
+    page.detailTable.reload();
+    await page.detailTable.when('propertyChange:loading');
+    expect(page.detailTable.maxRowCountServer).toBe(serverLimit);
+    expect(page.detailTable.maxRowCount).toBe(clientLimit);
+    expect(page.detailTable.estimatedRowCount).toBe(allData.length);
+    expect(page.detailTable.tableStatus.message).toBe('[undefined text: MaxOutlineRowWarningWithEstimatedRowCount]');
+    expect(page.detailTable.rows.length).toBe(clientLimit);
+    page.detailTable.reload(Table.ReloadReason.OVERRIDE_ROW_LIMIT);
+    await page.detailTable.when('propertyChange:loading');
+    expect(page.detailTable.maxRowCountServer).toBe(serverLimit);
+    expect(page.detailTable.maxRowCount).toBe(clientLimit);
+    expect(page.detailTable.estimatedRowCount).toBe(allData.length);
+    expect(page.detailTable.rows.length).toBe(serverLimit);
+    expect(page.detailTable.tableStatus.message).toBe('[undefined text: MaxOutlineRowWarningWithEstimatedRowCount]');
+  });
+
+  it('corrects wrong row estimation', async () => {
+    page._loadTableData = searchFilter => {
+      return $.resolvedPromise({
+        _contributions: [{
+          _type: 'scout.LimitedResultInfoContribution',
+          limitedResult: true,
+          estimatedRowCount: 2 // estimation is lower than actual rows
+        }]
+      });
+    };
+    page._transformTableDataToTableRows = data => [{cells: [1]}, {cells: [2]}, {cells: [3]}, {cells: [4]}];
+    page.detailTable.reload();
+    await page.detailTable.when('propertyChange:loading');
+
+    expect(page.detailTable.estimatedRowCount).toBe(5); // expect to be one more than actual rows (corrected estimation)
+    expect(page.detailTable.rows.length).toBe(4);
   });
 
   it('stores reload reason', async () => {

@@ -15,11 +15,10 @@ export class TableMaxResultsHelper {
    * Checks if more data could be loaded into the table.
    * @param numRows The number of currently loaded rows of the table.
    * @param estRows The number of estimated rows that would be available.
-   * @param maxRows The number of maximum rows that are allowed to be loaded.
-   * @returns true if a estRows and maxRows are available and the currently loaded number of rows (numRows) is smaller than the two. This means more data could be loaded.
+   * @returns true if a estRows is available and the currently loaded number of rows (numRows) is smaller. This means more data could be loaded.
    */
-  isLoadMoreDataPossible(numRows: number, estRows: number, maxRows: number): boolean {
-    return estRows > 0 && maxRows > 0 && numRows < estRows && numRows < maxRows;
+  isLoadMoreDataPossible(numRows: number, estRows: number): boolean {
+    return estRows > 0 && numRows < estRows;
   }
 
   /**
@@ -60,6 +59,9 @@ export class TableMaxResultsHelper {
    * @returns the maximum number of rows for the given table and reload reason.
    */
   getMaxTableRowCount(table: Table, reloadReason: TableReloadReason): number {
+    if (Table.ReloadReason.OVERRIDE_ROW_LIMIT === reloadReason) {
+      return 0; // no limit
+    }
     return table?.maxRowCount;
   }
 }

@@ -589,14 +589,16 @@ export class PageWithTable extends Page implements PageWithTableModel {
     }
   }
 
+  // see org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable.setResultInfo
   protected _readLimitedResultInfo(numRows: number, limitedResultInfoDo?: LimitedResultInfoContributionDo) {
     if (!limitedResultInfoDo) {
       return;
     }
     // update table properties. The footer is automatically updated after the new rows have been created
-    if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(numRows, limitedResultInfoDo.estimatedRowCount, limitedResultInfoDo.maxRowCount)) {
-      // only update if the next load would be a ReloadReason.OVERRIDE_ROW_LIMIT so that the new limit is used
-      this.detailTable.setMaxRowCount(limitedResultInfoDo.maxRowCount);
+    this.detailTable.setMaxRowCountServer(limitedResultInfoDo.maxRowCount);
+    if (limitedResultInfoDo.limitedResult && limitedResultInfoDo.estimatedRowCount > 0) {
+      // if there is an estimation, but it is lower than the actual rows: correct it
+      limitedResultInfoDo.estimatedRowCount = Math.max(numRows + 1, limitedResultInfoDo.estimatedRowCount);
     }
     this.detailTable.setEstimatedRowCount(limitedResultInfoDo.estimatedRowCount);
   }

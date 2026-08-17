@@ -241,6 +241,7 @@ export interface TableEventMap extends WidgetEventMap {
   'propertyChange:viewRangeSize': PropertyChangeEvent<number>;
   'propertyChange:virtual': PropertyChangeEvent<boolean>;
   'propertyChange:maxRowCount': PropertyChangeEvent<number>;
+  'propertyChange:maxRowCountServer': PropertyChangeEvent<number>;
   'propertyChange:estimatedRowCount': PropertyChangeEvent<number>;
   'propertyChange:asyncLoading': PropertyChangeEvent<boolean>;
 }
