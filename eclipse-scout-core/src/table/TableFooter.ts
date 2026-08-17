@@ -306,10 +306,10 @@ export class TableFooter extends Widget implements TableFooterModel {
   }
 
   protected _renderInfoLoad() {
-    let $info = this._infoLoadAction.$container,
-      numRows = this.table.rows.length,
-      estRows = this.table.estimatedRowCount,
-      maxRows = this.table.maxRowCount;
+    const $info = this._infoLoadAction.$container;
+    const numRows = this.table.rows.length;
+    const estRows = this.table.estimatedRowCount;
+    const maxRowsServer = this.table.maxRowCountServer;
 
     $info.empty();
     let $infoButton;
@@ -322,11 +322,11 @@ export class TableFooter extends Widget implements TableFooterModel {
         $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows)));
       }
       if (this.table.hasReloadHandler) {
-        if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(numRows, estRows, maxRows)) {
-          if (estRows < maxRows) {
+        if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(numRows, estRows)) {
+          if (estRows < maxRowsServer) {
             $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.LoadAllData')).appendTo($info);
           } else {
-            $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.LoadNData', this.computeCountInfo(maxRows))).appendTo($info);
+            $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.LoadNData', this.computeCountInfo(maxRowsServer))).appendTo($info);
           }
         } else {
           $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
@@ -814,8 +814,7 @@ export class TableFooter extends Widget implements TableFooterModel {
     } else {
       let numRows = this.table.rows.length;
       let estRows = this.table.estimatedRowCount;
-      let maxRows = this.table.maxRowCount;
-      if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(numRows, estRows, maxRows)) {
+      if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(numRows, estRows)) {
         this.table.reload(Table.ReloadReason.OVERRIDE_ROW_LIMIT);
       } else {
         this.table.reload();

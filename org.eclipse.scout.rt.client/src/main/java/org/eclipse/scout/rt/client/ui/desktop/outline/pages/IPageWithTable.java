@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,6 +47,18 @@ public interface IPageWithTable<T extends ITable> extends IPage<T> {
   boolean isSearchActive();
 
   void setSearchActive(boolean b);
+
+  /**
+   * Apply result meta info to this page.
+   *
+   * @param limitedResult
+   *     If the result was limited (not complete)
+   * @param maxRowCount
+   *     Maximum row count the user is allowed to load into this table.
+   * @param estimatedRowCount
+   *     In case the result was limited, how many rows that are estimated to be available in total.
+   */
+  void setResultInfo(boolean limitedResult, int maxRowCount, long estimatedRowCount);
 
   /**
    * @since 6.0

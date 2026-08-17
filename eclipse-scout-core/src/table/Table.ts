@@ -94,6 +94,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   visibleRows: TableRow[];
   estimatedRowCount: number;
   maxRowCount: number;
+  maxRowCountServer: number;
   aggregateRowHeight: number;
   truncatedCellTooltipEnabled: boolean;
   checkableColumn: BooleanColumn;
@@ -226,6 +227,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.visibleRows = [];
     this.estimatedRowCount = 0;
     this.maxRowCount = 0;
+    this.maxRowCountServer = 0;
     this.truncatedCellTooltipEnabled = null;
     this.visibleRowsMap = {};
     this.rowLevelPadding = 0;
@@ -5855,6 +5857,13 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   /** @see TableModel.maxRowCount */
   setMaxRowCount(maxRowCount: number) {
     this.setProperty('maxRowCount', maxRowCount);
+  }
+
+  /**
+   * Sets the new value of the maxRowCount received from the server.
+   */
+  setMaxRowCountServer(maxRowCountServer: number) {
+    this.setProperty('maxRowCountServer', maxRowCountServer);
   }
 
   /** @see TableModel.estimatedRowCount */

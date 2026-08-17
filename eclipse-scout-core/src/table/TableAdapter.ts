@@ -39,6 +39,8 @@ export class TableAdapter extends ModelAdapter {
     if (this.widget.hasUserFilter()) {
       this._onWidgetFilter();
     }
+
+    this.widget.maxRowCountServer = this.widget.maxRowCount; // in scout classic maxRowCount always comes from the server.
   }
 
   protected _sendRowsSelected(rowIds: string[], debounceSend?: boolean) {
@@ -685,6 +687,11 @@ export class TableAdapter extends ModelAdapter {
     model.objectType = scout.nvl(model.objectType, 'TableRow');
     defaultValues.applyTo(model);
     return model;
+  }
+
+  protected _syncMaxRowCount(maxRowCount: number) {
+    this.widget.setMaxRowCount(maxRowCount);
+    this.widget.setMaxRowCountServer(maxRowCount);
   }
 
   protected static _createRowRemote(this: Table & { modelAdapter: TableAdapter; _createRowOrig }, rowModel: TableRowModel): TableRow {
