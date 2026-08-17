@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,11 +9,11 @@
  */
 package org.eclipse.scout.rt.rest;
 
-import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
  * Marks a class as REST resource so that it can be found by {@link RestApplication} using jandex.
  */
-@Bean
+@ApplicationScoped
 public interface IRestResource {
 }
