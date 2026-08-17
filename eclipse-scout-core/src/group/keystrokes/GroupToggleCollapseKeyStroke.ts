@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,9 @@ export class GroupToggleCollapseKeyStroke extends KeyStroke {
   constructor(group: Group) {
     super();
     this.field = group;
-    this.which = [keys.SPACE];
+    this.which = [keys.SPACE, keys.ENTER];
+    this.inheritAccessibility = false;
+    this.stopPropagation = true;
   }
 
   override handle(event: JQuery.KeyboardEventBase) {

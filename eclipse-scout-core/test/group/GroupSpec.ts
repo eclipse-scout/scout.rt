@@ -40,5 +40,21 @@ describe('Group', () => {
       session.focusManager.validateFocus();
       expect(accordionField.accordion.groups[0].$header).not.toBeFocused();
     });
+
+    it('is tabbable if the group is collapsible', () => {
+      let group = scout.create(Group, {parent: session.desktop});
+      group.render();
+      expect(group.$header.attr('tabindex')).toBe('0');
+
+      group.setCollapsible(false);
+      expect(group.$header.attr('tabindex')).toBe(undefined);
+
+      group.setCollapsible(true);
+      expect(group.$header.attr('tabindex')).toBe('0');
+
+      group = scout.create(Group, {parent: session.desktop, collapsible: false});
+      group.render();
+      expect(group.$header.attr('tabindex')).toBe(undefined);
+    });
   });
 });

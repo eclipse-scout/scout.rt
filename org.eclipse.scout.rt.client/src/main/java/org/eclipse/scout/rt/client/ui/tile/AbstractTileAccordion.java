@@ -691,7 +691,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
 
   /**
    * Creates the label displayed as suffix in the title of the group-header. The default implementation returns the
-   * count of tiles and some braces. Example: "(19)".
+   * number of tiles.
    * <p>
    * Override this method if you need another suffix, or change the count.
    */
