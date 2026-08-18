@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -34,8 +34,6 @@ public class RegisterBeanTestRule<BEAN> extends AbstractScoutTestRule {
   private final Class<? super BEAN> m_beanClazz;
   private final Supplier<? extends BEAN> m_mockSupplier;
 
-  private IBean<?> m_temporaryBean;
-
   public RegisterBeanTestRule(Class<? super BEAN> beanClazz, BEAN mock) {
     this(beanClazz, () -> mock);
   }
@@ -45,7 +43,7 @@ public class RegisterBeanTestRule<BEAN> extends AbstractScoutTestRule {
     m_mockSupplier = mockSupplier;
   }
 
-  public void registerBean() {
+  protected IBean<Object> registerBean() {
     IBean<? super BEAN> bean = Platform.get().getBeanManager().optBean(m_beanClazz);
     if (bean != null) {
       if (m_beanClazz.isInterface() && !Objects.equals(bean.getBeanClazz(), m_beanClazz)) {
@@ -57,14 +55,10 @@ public class RegisterBeanTestRule<BEAN> extends AbstractScoutTestRule {
         assertEquals("Bean is already registered with another bean class, rule must be used with bean class of actual registered bean!", bean.getBeanClazz(), m_beanClazz);
       }
     }
-    m_temporaryBean = BeanTestingHelper.get().registerBean(
+    return BeanTestingHelper.get().registerBean(
         new BeanMetaData(m_beanClazz)
             .withApplicationScoped(true)
             .withInitialInstance(m_mockSupplier.get()));
-  }
-
-  public void unregisterBean() {
-    BeanTestingHelper.get().unregisterBean(m_temporaryBean);
   }
 
   @Override
@@ -73,12 +67,12 @@ public class RegisterBeanTestRule<BEAN> extends AbstractScoutTestRule {
 
       @Override
       public void evaluate() throws Throwable {
+        IBean<Object> bean = registerBean();
         try {
-          registerBean();
           base.evaluate();
         }
         finally {
-          unregisterBean();
+          BeanTestingHelper.get().unregisterBean(bean);
         }
       }
     };
