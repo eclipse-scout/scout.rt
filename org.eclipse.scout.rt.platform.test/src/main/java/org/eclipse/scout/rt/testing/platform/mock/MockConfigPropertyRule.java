@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,8 +11,6 @@ package org.eclipse.scout.rt.testing.platform.mock;
 
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
-
-import java.util.List;
 
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -27,9 +25,6 @@ public class MockConfigPropertyRule<DATA_TYPE> extends AbstractScoutTestRule {
   private final Class<? extends IConfigProperty<DATA_TYPE>> m_configPropertyClazz;
   private DATA_TYPE m_initialValue;
   private DATA_TYPE m_value;
-  private final IConfigProperty<DATA_TYPE> m_mock;
-
-  private List<IBean<?>> m_temporaryBeans;
 
   /**
    * @param defaultValue
@@ -38,21 +33,21 @@ public class MockConfigPropertyRule<DATA_TYPE> extends AbstractScoutTestRule {
   public MockConfigPropertyRule(Class<? extends IConfigProperty<DATA_TYPE>> configPropertyClazz, DATA_TYPE defaultValue) {
     m_configPropertyClazz = configPropertyClazz;
     m_initialValue = defaultValue;
-    m_mock = mock(m_configPropertyClazz);
-
-    when(m_mock.getValue()).thenAnswer(i -> m_value);
-    when(m_mock.getValue(nullable(String.class))).thenAnswer(i -> m_value);
   }
 
-  public void registerProperty() {
-    m_temporaryBeans = BeanTestingHelper.get().registerBeans(
+  public void setValue(DATA_TYPE value) {
+    m_value = value;
+  }
+
+  protected IBean<Object> registerProperty() {
+    IConfigProperty<DATA_TYPE> mockConfig = mock(m_configPropertyClazz);
+    when(mockConfig.getValue()).thenAnswer(i -> m_value);
+    when(mockConfig.getValue(nullable(String.class))).thenAnswer(i -> m_value);
+
+    return BeanTestingHelper.get().registerBean(
         new BeanMetaData(m_configPropertyClazz)
             .withApplicationScoped(true)
-            .withInitialInstance(m_mock));
-  }
-
-  public void unregisterProperty() {
-    BeanTestingHelper.get().unregisterBeans(m_temporaryBeans);
+            .withInitialInstance(mockConfig));
   }
 
   @Override
@@ -61,19 +56,15 @@ public class MockConfigPropertyRule<DATA_TYPE> extends AbstractScoutTestRule {
 
       @Override
       public void evaluate() throws Throwable {
+        m_value = m_initialValue;
+        IBean<Object> bean = registerProperty();
         try {
-          m_value = m_initialValue;
-          registerProperty();
           base.evaluate();
         }
         finally {
-          unregisterProperty();
+          BeanTestingHelper.get().unregisterBean(bean);
         }
       }
     };
-  }
-
-  public void setValue(DATA_TYPE value) {
-    m_value = value;
   }
 }
