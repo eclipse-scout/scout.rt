@@ -143,7 +143,7 @@ public class BearerAuthAccessController implements IAccessController {
         tokenParts.add(Base64Utility.decode(encodedPart));
       }
       catch (IllegalArgumentException e) {
-        LOG.error("Token is not a valid base64 encoded value. Check part {} of the token", i, e);
+        LOG.info("Token is not a valid base64 encoded value. Check part {} of the token", i, LOG.isDebugEnabled()? e: null);
       }
     }
 
