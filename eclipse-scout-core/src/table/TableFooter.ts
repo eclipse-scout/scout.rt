@@ -122,6 +122,7 @@ export class TableFooter extends Widget implements TableFooterModel {
     filter = this.table.getFilter(TableTextUserFilter.TYPE);
     if (filter) {
       this._$textFilter.val(filter.text);
+      this.filterText = filter.text;
     }
     this.$clearIcon = $filter.appendSpan('clear-icon unfocusable action text-field-icon')
       .on('mousedown', this._onDeleteFilterMouseDown.bind(this));
@@ -778,17 +779,15 @@ export class TableFooter extends Widget implements TableFooterModel {
   }
 
   protected _applyFilter() {
-    let filterText = this._$textFilter.val() as string;
+    let filterText = this._$textFilter.val();
     if (this.filterText !== filterText) {
       this.filterText = filterText;
       if (filterText) {
-        let filter = scout.create(TableTextUserFilter, {
+        this.table.addFilter(scout.create(TableTextUserFilter, {
           session: this.session,
-          table: this.table
-        });
-
-        filter.text = filterText;
-        this.table.addFilter(filter);
+          table: this.table,
+          text: filterText
+        }));
       } else {
         this.table.removeFilterByKey(TableTextUserFilter.TYPE);
       }
@@ -849,6 +848,7 @@ export class TableFooter extends Widget implements TableFooterModel {
       let currentText = this._$textFilter.val();
       if (currentText !== textFilter.text) {
         this._$textFilter.val(textFilter.text);
+        this.filterText = textFilter.text;
         this._updateHasFilterText();
       }
     }
