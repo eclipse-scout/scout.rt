@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {scout, Status, TableControl, TableTextUserFilter} from '../../src/index';
+import {scout, Status, Table, TableControl, TableTextUserFilter} from '../../src/index';
 import {JQueryTesting, TableSpecHelper} from '../../src/testing/index';
 import $ from 'jquery';
 
@@ -52,6 +52,21 @@ describe('TableFooterSpec', () => {
       expect(table.events._eventListeners.length).toBe(listenerCount);
     });
 
+    it('initializes the filter text from an existing table text filter', () => {
+      let model = helper.createModelFixture(2);
+      model.tableStatusVisible = true;
+      let table = helper.createTable(model);
+      table.addFilter(scout.create(TableTextUserFilter, {
+        session: session,
+        table: table,
+        text: 'text'
+      }));
+
+      expect(table.footer.filterText).toBe(undefined);
+      table.render();
+      expect(table.footer.filterText).toBe('text');
+      expect(table.footer.$container.find('.table-text-filter').val()).toBe('text');
+    });
   });
 
   describe('remove', () => {
@@ -291,9 +306,9 @@ describe('TableFooterSpec', () => {
   });
 
   describe('text filter', () => {
-    let table;
-    let $filterInput;
-    let $filterInfo;
+    let table: Table;
+    let $filterInput: JQuery;
+    let $filterInfo: JQuery;
 
     beforeEach(() => {
       table = helper.createTable(helper.createModelFixture(2, 2));
@@ -359,6 +374,30 @@ describe('TableFooterSpec', () => {
 
       // Ensure filter can be added again
       addTextFilterAndAssert();
+    });
+
+    it('updates filter info if table text filter is added or removed programmatically', () => {
+      let textFilter = scout.create(TableTextUserFilter, {
+        session: session,
+        table: table,
+        text: 'text'
+      });
+
+      table.addFilter(textFilter);
+      expect(table.footer.filterText).toBe('text');
+      expect($filterInput.val()).toBe('text');
+      expect($filterInfo).not.toBeHidden();
+
+      table.removeFilter(textFilter);
+      expect(table.footer.filterText).toBe('');
+      expect($filterInput.val()).toBe('');
+      expect($filterInfo).toHaveClass('hiding');
+
+      // Ensure filter can be added again
+      table.addFilter(textFilter);
+      expect(table.footer.filterText).toBe('text');
+      expect($filterInput.val()).toBe('text');
+      expect($filterInfo).not.toBeHidden();
     });
   });
 
