@@ -1023,8 +1023,9 @@ public class MailHelper {
 
   /**
    * Extract message ids by reading the {@link #HEADER_IN_REPLY_TO} headers if available or otherwise try to read
-   * message id lines from the third part of the message (contains details of the DSN, see
-   * https://tools.ietf.org/html/rfc3461#section-6.2).
+   * message id lines from the third part of the message (contains details of the DSN).
+   *
+   * @see <a href="https://tools.ietf.org/html/rfc3461#section-6.2">RFC 3461, section 6.2</a>
    */
   public List<String> extractInReplyMessageIds(MimeMessage mimeMessage) {
     if (mimeMessage == null) {
@@ -1220,7 +1221,7 @@ public class MailHelper {
   /**
    * <p>
    * Scan all attachments (also inline) of the specific part using {@link MalwareScanner}. If an exception occurs
-   * (possibly {@link UnsafeResourceException )} the attachment is considered unsafe and is replaced by a text file with
+   * (possibly {@link UnsafeResourceException}) the attachment is considered unsafe and is replaced by a text file with
    * the contents of {@link #getUnsafeAttachmentText()}.
    * </p>
    * <p>
@@ -1246,7 +1247,7 @@ public class MailHelper {
 
         String fileName = attachment.getFileName();
         if (fileName != null) {
-          // actually changes the file-name, may break inline images; however content was changed as well to text, so they would be broken anyways
+          // actually changes the file-name, may break inline images; however content was changed as well to text, so they would be broken anyway
           attachment.setFileName(fileName + ".txt");
         }
         attachment.setText(getUnsafeAttachmentText());
@@ -1261,7 +1262,7 @@ public class MailHelper {
 
   protected boolean isSafePart(Part attachment) throws MessagingException {
     try {
-      BEANS.get(MalwareScanner.class).scan(BinaryResources.create().withContent(IOUtility.readBytes(attachment.getInputStream())).build());
+      BEANS.get(MalwareScanner.class).scan(BinaryResources.create().withFilename(attachment.getFileName()).withContent(IOUtility.readBytes(attachment.getInputStream())).build());
       return true;
     }
     catch (IOException e) {
