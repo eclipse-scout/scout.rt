@@ -125,8 +125,8 @@ public class BearerAuthAccessController implements IAccessController {
    * Reads the bearer token from the request's {@link ServletFilterHelper#HTTP_HEADER_AUTHORIZATION} headers.
    *
    * @return The provided token. A bearer token is in most cases base64 encoded, but may contain character like "-",
-   * ".", "_" or "~" which are not part of a base64 token and used to separate different token parts (see
-   * https://datatracker.ietf.org/doc/html/rfc6750#section-2.1)
+   * ".", "_" or "~" which are not part of a base64 token and used to separate different token parts
+   * @see <a href="https://datatracker.ietf.org/doc/html/rfc6750#section-2.1">RFC 6750, section 2.1</a>
    */
   protected List<byte[]> readBearerToken(final HttpServletRequest req) {
     final String bearerToken = parseBearerAuthRequest(req);
@@ -143,7 +143,8 @@ public class BearerAuthAccessController implements IAccessController {
         tokenParts.add(Base64Utility.decode(encodedPart));
       }
       catch (IllegalArgumentException e) {
-        LOG.error("Token is not a valid base64 encoded value. Check part {} of the token", i, e);
+        //noinspection LoggingPlaceholderCountMatchesArgumentCount
+        LOG.info("Token is not a valid base64 encoded value. Check part {} of the token", i, LOG.isDebugEnabled() ? e : null);
       }
     }
 
