@@ -3777,11 +3777,6 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   scrollTo(row: TableRow, options?: ScrollToOptions | ScrollToAlignment) {
-    if (!this._isDataRendered() || !this.htmlComp?.layouted) {
-      // Execute delayed because table may be not layouted yet
-      this.session.layoutValidator.schedulePostValidateFunction(() => this.scrollTo(row, options));
-      return;
-    }
     if (this.viewRangeRendered.size() === 0) {
       // Cannot scroll to a row no row is rendered
       return;
