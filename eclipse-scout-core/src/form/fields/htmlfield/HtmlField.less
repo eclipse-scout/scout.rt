@@ -19,6 +19,10 @@
   & > .field {
     margin-left: @mandatory-indicator-width;
 
+    .no-mandatory-indicator& {
+      margin-left: 0;
+    }
+
     // :empty cannot be used if there are scrollbars
     // .has-text is used instead of .empty so the HtmlField.empty property can be set to true without affecting the placeholder (e.g. by using FormField.checkEmpty = false).
     &[placeholder]:not(.has-text)::before {
