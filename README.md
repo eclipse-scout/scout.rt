@@ -8,7 +8,7 @@ This repository contains the source code of the runtime components, the actual f
 
 If you are completely new and wondering what Eclipse Scout is, please visit our [website](https://eclipse.dev/scout/).
 
-To get started with Scout, follow our [Get Started Guide](https://eclipsescout.github.io/scout-docs/26.2/getstarted/getstarted.html).
+To get started with Scout, follow our [Get Started Guide](https://eclipsescout.github.io/scout-docs/27.1/getstarted/getstarted.html).
 
 ## Documentation
 

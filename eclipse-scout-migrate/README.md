@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-  <a href="https://ci.eclipse.org/scout/job/scout-integration-26.2-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins" src="https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-25.2-RT-nightly_pipeline%2F"></a>
-  <a href="https://ci.eclipse.org/scout/job/scout-integration-26.2-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins tests" src="https://img.shields.io/jenkins/tests?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-25.2-RT-nightly_pipeline%2F"></a>
+  <a href="https://ci.eclipse.org/scout/job/scout-integration-27.1-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins" src="https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-25.2-RT-nightly_pipeline%2F"></a>
+  <a href="https://ci.eclipse.org/scout/job/scout-integration-27.1-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins tests" src="https://img.shields.io/jenkins/tests?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-25.2-RT-nightly_pipeline%2F"></a>
   <a href="https://www.npmjs.com/package/@eclipse-scout/migrate" target="_blank" rel="noopener noreferrer"><img alt="npm" src="https://img.shields.io/npm/dm/@eclipse-scout/migrate"></a>
   <a href="https://www.eclipse.org/legal/epl-2.0/" target="_blank" rel="noopener noreferrer"><img alt="NPM" src="https://img.shields.io/npm/l/@eclipse-scout/migrate"></a>
   <a href="https://www.npmjs.com/package/@eclipse-scout/migrate" target="_blank" rel="noopener noreferrer"><img alt="npm (scoped)" src="https://img.shields.io/npm/v/@eclipse-scout/migrate"></a>
@@ -29,7 +29,7 @@ To set up the tool, do the following:
 ```json
 {
   "devDependencies": {
-    "@eclipse-scout/migrate": "~26.2.0"
+    "@eclipse-scout/migrate": "~27.1.0"
   }
 }
 ```
@@ -45,7 +45,7 @@ Some migrations require a `tsconfig.json`. You can add it as follows (do it only
 ```json
 {
   "devDependencies": {
-    "@eclipse-scout/tsconfig": "~26.2.0"
+    "@eclipse-scout/tsconfig": "~27.1.0"
   }
 }
 ```
@@ -138,7 +138,7 @@ In order to run the TypeScript migration, do the following:
     In your widget, implement the model interface and declare a model variable.
   - To create the event maps, you can run the `event-maps` script from below and copy the result into a separate event maps file.
 - If you use third party libraries, you may want to check if they provide types and add them to the `devDependencies` of your `package.json` (e.g. @types/jquery).
-  See also [Project Setup for TypeScript](https://eclipsescout.github.io/scout-docs/26.2/technical-guide/user-interface/typescript.html#project-setup-for-typescript)
+  See also [Project Setup for TypeScript](https://eclipsescout.github.io/scout-docs/27.1/technical-guide/user-interface/typescript.html#project-setup-for-typescript)
 - Remove the added `scripts`, `overrides` and dependency to `@eclipse-scout/migrate`.
 
 ```json

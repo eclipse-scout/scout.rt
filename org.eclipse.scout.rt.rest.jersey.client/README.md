@@ -6,7 +6,7 @@ for a Jersey REST `Client`.
 
 By default, Jersey creates a new unbounded `java.util.concurrent.ExecutorService` to submit tasks
 for asynchronous REST calls (see [DefaultClientAsyncExecutorProvider](https://github.com/eclipse-ee4j/jersey/blob/master/core-client/src/main/java/org/glassfish/jersey/client/DefaultClientAsyncExecutorProvider.java)).
-When running jobs in a Scout platform, the [JobManager](https://eclipsescout.github.io/scout-docs/26.2/technical-guide/common-concepts/job-manager.html)
+When running jobs in a Scout platform, the [JobManager](https://eclipsescout.github.io/scout-docs/27.1/technical-guide/common-concepts/job-manager.html)
 uses a single `ExecutorService` instance that can be easily configured using system properties. By
 including this module in the dependencies of your project, all asynchronous REST calls made via an
 `IRestClientHelper` bean will be submitted to the same executor service.

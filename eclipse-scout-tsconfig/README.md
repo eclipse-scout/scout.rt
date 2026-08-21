@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-  <a href="https://ci.eclipse.org/scout/job/scout-integration-26.2-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins" src="https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-25.2-RT-nightly_pipeline%2F"></a>
-  <a href="https://ci.eclipse.org/scout/job/scout-integration-26.2-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins tests" src="https://img.shields.io/jenkins/tests?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-25.2-RT-nightly_pipeline%2F"></a>
+  <a href="https://ci.eclipse.org/scout/job/scout-integration-27.1-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins" src="https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-25.2-RT-nightly_pipeline%2F"></a>
+  <a href="https://ci.eclipse.org/scout/job/scout-integration-27.1-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins tests" src="https://img.shields.io/jenkins/tests?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-25.2-RT-nightly_pipeline%2F"></a>
   <a href="https://www.npmjs.com/package/@eclipse-scout/tsconfig" target="_blank" rel="noopener noreferrer"><img alt="npm" src="https://img.shields.io/npm/dm/@eclipse-scout/tsconfig"></a>
   <a href="https://www.eclipse.org/legal/epl-2.0/" target="_blank" rel="noopener noreferrer"><img alt="NPM" src="https://img.shields.io/npm/l/@eclipse-scout/tsconfig"></a>
   <a href="https://www.npmjs.com/package/@eclipse-scout/tsconfig" target="_blank" rel="noopener noreferrer"><img alt="npm (scoped)" src="https://img.shields.io/npm/v/@eclipse-scout/tsconfig"></a>

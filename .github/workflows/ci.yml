@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ "releases/26.2" ]
+    branches: [ "releases/27.1" ]
   pull_request:
-    branches: [ "releases/26.2" ]
+    branches: [ "releases/27.1" ]
 
 jobs:
   build:
