@@ -219,7 +219,7 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
   }
 
   /**
-   * Calls loadChildPages on the UI server for the given ids or {@link PageParamDo}s. The pages are created by the Java equivalent of the JsPage (see AbstractJsPage.createChildPage).
+   * Calls `loadChildPages` on the UI server for the given ids or {@link PageParamDo}s. The pages are created by the Java equivalent of the JsPage (see AbstractJsPage.createChildPage).
    * The returned {@link Promise} is resolved when all child pages are created on the UI server.
    *
    * @param idsOrPageParams ids or {@link PageParamDo}s that are used to create child pages on the UI server.
@@ -267,6 +267,22 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
     // As the session processes all events in the response synchronously the nodesInserted-event is processed before the Promise that is waiting for the hybrid action to complete is resolved.
     // Therefore, all child pages created on the UI server are already inserted into the tree, and they can be collected into the child pages map.
     this._addChildPagesToIdMap();
+  }
+
+  /**
+   * Calls `removeChildPages` on the UI server.
+   * The returned {@link Promise} is resolved when all child pages are removed on the UI server.
+   */
+  async callRemoveChildPages(): Promise<void> {
+    if (this.page.leaf) {
+      return;
+    }
+    const hybridManager = await HybridManager.get(this.page.session, true);
+    await hybridManager.callActionAndWaitWithContext('scout.RemoveChildPages',
+      null,
+      scout.create(HybridActionContextElements)
+        .withElement('page', HybridActionContextElement.of(this.outline, this.page))
+    );
   }
 
   /**
