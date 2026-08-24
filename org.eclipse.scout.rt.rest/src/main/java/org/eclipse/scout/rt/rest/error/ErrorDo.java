@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.rest.logger.LogLevel;
 
 @TypeName("scout.Error")
 public class ErrorDo extends DoEntity {
@@ -58,6 +59,16 @@ public class ErrorDo extends DoEntity {
    */
   public DoValue<String> severity() {
     return doValue("severity");
+  }
+
+  /**
+   * Optional log level overriding the default level derived from {@link #severity()}.
+   * <p>
+   * If {@code null}, the log level is determined from the severity.
+   * </p>
+   */
+  public DoValue<LogLevel> logLevel() {
+    return doValue("logLevel");
   }
 
   /**
@@ -181,5 +192,22 @@ public class ErrorDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public String getSeverity() {
     return severity().get();
+  }
+
+  /**
+   * See {@link #logLevel()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public ErrorDo withLogLevel(LogLevel logLevel) {
+    logLevel().set(logLevel);
+    return this;
+  }
+
+  /**
+   * See {@link #logLevel()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public LogLevel getLogLevel() {
+    return logLevel().get();
   }
 }

@@ -14,6 +14,7 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.rest.error.ErrorResponseBuilder;
+import org.eclipse.scout.rt.rest.logger.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,7 @@ public abstract class AbstractVetoExceptionMapper<E extends VetoException> exten
         .withMessage(exception.getStatus().getBody())
         .withErrorCode(exception.getStatus().getCode())
         .withSeverity(exception.getStatus().getSeverity())
-        .withCorrelationId(false);
+        .withCorrelationId(false)
+        .withLogLevel(LogLevel.INFO);
   }
 }
