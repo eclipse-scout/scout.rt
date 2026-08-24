@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.rest.error.ErrorDo;
 import org.eclipse.scout.rt.rest.error.ErrorResponse;
+import org.eclipse.scout.rt.rest.logger.LogLevel;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -129,6 +130,7 @@ public class DefaultExceptionMapperTest {
       assertEquals(exception.getStatus().getCode(), error.getErrorCodeAsInt());
       assertEquals("warning", error.getSeverity());
       assertEquals(exception.getStatus().getSeverity(), error.getSeverityAsInt());
+      assertEquals(LogLevel.INFO, error.getLogLevel());
     }
   }
 

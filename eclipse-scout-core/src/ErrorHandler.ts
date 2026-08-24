@@ -97,6 +97,7 @@ export interface ErrorDo extends DoEntity {
   message?: string;
   correlationId?: string;
   severity?: string;
+  logLevel?: LogLevel;
 }
 
 export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
@@ -320,7 +321,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
 
     if (errorDo) {
       errorInfo.message = errorDo.message;
-      errorInfo.level = this._severityToLogLevel(errorDo.severity);
+      errorInfo.level = scout.nvl(errorDo.logLevel, this._severityToLogLevel(errorDo.severity));
     }
 
     // logging info
