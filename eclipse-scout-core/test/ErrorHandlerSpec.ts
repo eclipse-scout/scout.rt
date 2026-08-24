@@ -208,6 +208,32 @@ describe('ErrorHandler', () => {
         expect(errorInfo.level).toBe(LogLevel.WARN);
       }).always(done);
     });
+
+    it('can handle ErrorDo logLevel', done => {
+      let errorDo: ErrorDo = {
+        _type: 'scout.Error',
+        httpStatus: 404,
+        errorCode: 'T1234',
+        message: 'test message',
+        correlationId: 'Corr1234',
+        title: 'test title',
+        severity: 'warning',
+        logLevel: LogLevel.INFO
+      };
+      let fakeXHR = {
+        readyState: 4,
+        status: 404,
+        statusText: 'Not found',
+        responseJSON: {
+          error: errorDo
+        }
+      };
+      errorHandler.analyzeError(fakeXHR).then(errorInfo => {
+        expect(errorInfo.errorDo).toBe(errorDo);
+        expect(errorInfo.message).toBe(errorDo.message);
+        expect(errorInfo.level).toBe(LogLevel.INFO);
+      }).always(done);
+    });
   });
 
   describe('MessageBoxModel for error', () => {

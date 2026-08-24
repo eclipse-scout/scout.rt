@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.rest.logger.LogLevel;
 
 /**
  * Builder for {@link ErrorDo} and {@link ErrorResponse} objects.
@@ -37,6 +38,7 @@ public class ErrorResponseBuilder {
   private String m_message;
   private String m_severity;
   private boolean m_correlationId = true;
+  private LogLevel m_logLevel;
   private Map<String, String> m_headers = new LinkedHashMap<>();
 
   public ErrorResponseBuilder withHttpStatus(int httpStatus) {
@@ -88,6 +90,11 @@ public class ErrorResponseBuilder {
     return this;
   }
 
+  public ErrorResponseBuilder withLogLevel(LogLevel logLevel) {
+    m_logLevel = logLevel;
+    return this;
+  }
+
   public ErrorResponseBuilder addHeader(String key, String value) {
     m_headers.put(key, value);
     return this;
@@ -126,6 +133,9 @@ public class ErrorResponseBuilder {
     }
     if (m_correlationId) {
       error.withCorrelationId(CorrelationId.CURRENT.get());
+    }
+    if (m_logLevel != null) {
+      error.withLogLevel(m_logLevel);
     }
     return error;
   }
