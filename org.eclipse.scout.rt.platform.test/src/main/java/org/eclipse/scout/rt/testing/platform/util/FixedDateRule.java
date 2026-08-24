@@ -21,6 +21,9 @@ import org.eclipse.scout.rt.testing.platform.util.date.FixedDateProvider;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
+/**
+ * Test rule to use an {@link IDateProvider} providing a fixed date.
+ */
 public class FixedDateRule extends AbstractScoutTestRule {
 
   private final FixedDateProvider m_dateProvider;
