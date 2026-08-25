@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.testing.platform.util;
+package org.eclipse.scout.rt.testing.platform.util.date;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.date.IDateProvider;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
-import org.eclipse.scout.rt.testing.platform.util.date.FixedDateProvider;
+import org.eclipse.scout.rt.testing.platform.util.AbstractScoutTestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 

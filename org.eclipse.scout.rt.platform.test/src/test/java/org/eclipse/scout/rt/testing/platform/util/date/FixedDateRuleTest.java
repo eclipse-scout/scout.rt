@@ -16,7 +16,6 @@ import java.util.Date;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.date.IDateProvider;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.util.FixedDateRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
