@@ -49,6 +49,7 @@ public class ICalBuilderTest {
   @AfterClass
   public static void afterClass() {
     BeanTestingHelper.get().unregisterBeans(mockedBeans);
+    mockedBeans = null;
   }
 
   @Test

@@ -74,6 +74,9 @@ public class PostConstructTest {
     Platform.get().getBeanManager().unregisterBean(m_bean01);
     Platform.get().getBeanManager().unregisterBean(m_bean02);
     Platform.get().getBeanManager().unregisterBean(m_bean04);
+    m_bean01 = null;
+    m_bean02 = null;
+    m_bean04 = null;
   }
 
   @ApplicationScoped
