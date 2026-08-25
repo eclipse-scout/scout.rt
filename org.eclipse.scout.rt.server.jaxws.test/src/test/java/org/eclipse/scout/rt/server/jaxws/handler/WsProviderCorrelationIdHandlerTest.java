@@ -57,6 +57,7 @@ public class WsProviderCorrelationIdHandlerTest {
   @AfterClass
   public static void afterClass() {
     BEANS.get(BeanTestingHelper.class).unregisterBean(s_beans);
+    s_beans = null;
   }
 
   @Test

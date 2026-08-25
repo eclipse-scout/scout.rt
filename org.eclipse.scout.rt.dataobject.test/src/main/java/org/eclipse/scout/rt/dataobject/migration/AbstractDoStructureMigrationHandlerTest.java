@@ -56,6 +56,7 @@ public abstract class AbstractDoStructureMigrationHandlerTest {
   @AfterClass
   public static void afterClass() {
     BEANS.get(BeanTestingHelper.class).unregisterBean(s_uuidProvider);
+    s_uuidProvider = null;
   }
 
   protected Class<?> getResourceBaseClass() {
