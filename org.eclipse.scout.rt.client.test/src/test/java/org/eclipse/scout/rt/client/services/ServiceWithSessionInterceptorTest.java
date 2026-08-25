@@ -33,6 +33,7 @@ public class ServiceWithSessionInterceptorTest {
   @AfterClass
   public static void tearDown() {
     Platform.get().getBeanManager().unregisterBean(m_bean01);
+    m_bean01 = null;
   }
 
   @Test

@@ -65,6 +65,7 @@ public class MultipartRestClientTest {
   @AfterClass
   public static void afterClass() {
     BEANS.get(BeanTestingHelper.class).unregisterBean(s_uuidProvider);
+    s_uuidProvider = null;
   }
 
   private WebTarget m_target;

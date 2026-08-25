@@ -65,6 +65,7 @@ public class AbstractRadioButtonGroupTest {
   @AfterClass
   public static void afterClass() {
     BeanTestingHelper.get().unregisterBeans(m_beans);
+    m_beans = null;
   }
 
   @Before

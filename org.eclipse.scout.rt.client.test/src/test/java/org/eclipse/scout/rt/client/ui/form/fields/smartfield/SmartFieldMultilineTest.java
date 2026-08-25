@@ -45,6 +45,7 @@ public class SmartFieldMultilineTest {
   @AfterClass
   public static void afterClass() {
     BeanTestingHelper.get().unregisterBeans(m_beans);
+    m_beans = null;
   }
 
   private SingleCallSingleField m_singleCallSingleField = new SingleCallSingleField();

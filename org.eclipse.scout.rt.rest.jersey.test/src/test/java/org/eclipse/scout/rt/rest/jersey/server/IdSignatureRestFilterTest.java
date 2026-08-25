@@ -64,6 +64,7 @@ public class IdSignatureRestFilterTest {
     BEANS.get(JacksonPrettyPrintDataObjectMapper.class).getObjectMapper().clearCaches();
     BEANS.get(JacksonIdSignatureDataObjectMapper.class).getObjectMapper().clearCaches();
     BeanTestingHelper.get().unregisterBeans(s_beans);
+    s_beans = null;
   }
 
   protected Builder request(ClientRequestFilter... filters) {

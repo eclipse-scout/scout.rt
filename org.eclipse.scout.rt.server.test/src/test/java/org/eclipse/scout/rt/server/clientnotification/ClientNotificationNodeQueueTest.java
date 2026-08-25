@@ -63,6 +63,7 @@ public class ClientNotificationNodeQueueTest {
   @AfterClass
   public static void afterClass() {
     BeanTestingHelper.get().unregisterBeans(s_beans);
+    s_beans = null;
   }
 
   @Before
