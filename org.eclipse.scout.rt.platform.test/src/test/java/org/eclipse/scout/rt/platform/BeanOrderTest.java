@@ -51,6 +51,8 @@ public class BeanOrderTest {
   public static void removeBeans() {
     Platform.get().getBeanManager().unregisterBean(m_bean01);
     Platform.get().getBeanManager().unregisterBean(m_bean02);
+    m_bean01 = null;
+    m_bean02 = null;
   }
 
   private static interface ITestBean {

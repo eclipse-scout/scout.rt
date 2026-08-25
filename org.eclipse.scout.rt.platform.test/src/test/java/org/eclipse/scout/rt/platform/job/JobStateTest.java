@@ -50,6 +50,7 @@ public class JobStateTest {
   @AfterClass
   public static void afterClass() {
     JobTestUtil.unregisterAndShutdownJobManager(s_jobManagerBean);
+    s_jobManagerBean = null;
   }
 
   @Test

@@ -64,6 +64,7 @@ public class ListBoxTest extends AbstractListBox<Long> {
   @AfterClass
   public static void afterClass() {
     BeanTestingHelper.get().unregisterBeans(m_beans);
+    m_beans = null;
   }
 
   private HashSet<Long> m_testValue;

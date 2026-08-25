@@ -80,6 +80,7 @@ public class ServiceTunnelIdSignatureTest {
     BEANS.get(JacksonIdSignatureDataObjectMapper.class).getObjectMapper().clearCaches();
     BeanTestingHelper.get().unregisterBeans(s_beans);
     BEANS.get(TestingRestClientConfigFactory.class).resetConnectorProvider();
+    s_beans = null;
   }
 
   @Test

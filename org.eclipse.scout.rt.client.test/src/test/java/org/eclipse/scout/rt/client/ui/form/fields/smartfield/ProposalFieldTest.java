@@ -53,6 +53,7 @@ public class ProposalFieldTest {
   @AfterClass
   public static void afterClass() {
     BeanTestingHelper.get().unregisterBeans(m_beans);
+    m_beans = null;
   }
 
   private ProposalField m_proposalField = new ProposalField();

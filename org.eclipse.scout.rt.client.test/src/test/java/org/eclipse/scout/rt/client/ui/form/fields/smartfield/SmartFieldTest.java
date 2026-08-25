@@ -92,6 +92,7 @@ public class SmartFieldTest {
   @AfterClass
   public static void afterClass() {
     BeanTestingHelper.get().unregisterBeans(m_beans);
+    m_beans = null;
   }
 
   public static class TestForm extends AbstractForm {
