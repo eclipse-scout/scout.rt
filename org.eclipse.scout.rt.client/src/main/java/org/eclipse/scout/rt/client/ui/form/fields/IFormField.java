@@ -89,6 +89,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
   String PROP_LABEL_WIDTH_IN_PIXEL = "labelWidthInPixel";
   String PROP_LABEL_USE_UI_WIDTH = "labelUseUiWidth";
   String PROP_LABEL_HTML_ENABLED = "labelHtmlEnabled";
+  String PROP_PLACEHOLDER = "placeholder";
   String PROP_KEY_STROKES = "keyStrokes";
   String PROP_STATUS_VISIBLE = "statusVisible";
   String PROP_STATUS_POSITION = "statusPosition";
@@ -128,8 +129,11 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    */
   byte LABEL_POSITION_LEFT = 1;
   /**
-   * Position the label on the field, meaning that the label is only displayed when the field is empty
+   * Position the label on the field, meaning that the label is only displayed when the field is empty. Overrides placeholder value, if it was set.
+   *
+   * @deprecated Please use placeholder instead. This position option will disappear in future releases
    */
+  @Deprecated
   byte LABEL_POSITION_ON_FIELD = 2;
   /**
    * Position the label on the right of the field. Currently, no fields implement this position style.
@@ -407,6 +411,10 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * @since 19.11.2009
    */
   void setLabelHorizontalAlignment(byte a);
+
+  String getPlaceholder();
+
+  void setPlaceholder(String placeholder);
 
   /**
    * @return fully qualified label. This is the path in the container tree
