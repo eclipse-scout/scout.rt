@@ -15,6 +15,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import org.eclipse.scout.rt.platform.TypeParameterBeanRegistry;
@@ -143,6 +148,70 @@ public class TypeParameterBeanRegistryTest {
     Consumer<String> consumer = beans.get(0);
     consumer.accept("foo");
     assertEquals("foo", holder.getValue());
+  }
+
+  @Test
+  public void testConcurrentRegisterDisposeAndLookup() throws Exception {
+    final TypeParameterBeanRegistry<ITestHandler> registry = new TypeParameterBeanRegistry<>(ITestHandler.class);
+    registry.registerBean(new String1Handler());
+
+    final AtomicReference<Throwable> error = new AtomicReference<>();
+    final CountDownLatch startLatch = new CountDownLatch(1);
+
+    final int readers = 4;
+    final int writers = 4;
+    final int iterations = 50_000;
+
+    final CountDownLatch finishedLatch = new CountDownLatch(readers + writers);
+
+    try (final ExecutorService pool = Executors.newFixedThreadPool(readers + writers)) {
+      Runnable reader = () -> {
+        try {
+          startLatch.await();
+
+          for (int i = 0; i < iterations && error.get() == null; i++) {
+            registry.getBeans(String.class);
+            registry.getBeans(CharSequence.class);
+          }
+        }
+        catch (Throwable t) {
+          error.compareAndSet(null, t);
+        }
+        finally {
+          finishedLatch.countDown();
+        }
+      };
+
+      Runnable writer = () -> {
+        try {
+          startLatch.await();
+
+          for (int i = 0; i < iterations && error.get() == null; i++) {
+            IRegistrationHandle handle = registry.registerBean(new CharSequenceHandler());
+            handle.dispose();
+          }
+        }
+        catch (Throwable t) {
+          error.compareAndSet(null, t);
+        }
+        finally {
+          finishedLatch.countDown();
+        }
+      };
+
+      for (int i = 0; i < readers; i++) {
+        pool.execute(reader);
+      }
+
+      for (int i = 0; i < writers; i++) {
+        pool.execute(writer);
+      }
+
+      startLatch.countDown();
+
+      assertTrue(finishedLatch.await(30, TimeUnit.SECONDS));
+      assertNull(error.get());
+    }
   }
 
   protected void consume(String string) {
