@@ -100,7 +100,15 @@ public class TypeParameterBeanRegistry<BEAN> {
       // Add the bean to the inventory. Thereby, the indexes are computed for that element.
       m_inventory.add(beanRegistration);
 
-      return () -> m_inventory.remove(beanRegistration);
+      return () -> {
+        m_lock.writeLock().lock();
+        try {
+          m_inventory.remove(beanRegistration);
+        }
+        finally {
+          m_lock.writeLock().unlock();
+        }
+      };
     }
     finally {
       m_lock.writeLock().unlock();
