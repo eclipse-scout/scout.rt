@@ -94,17 +94,7 @@ export class FileChooserField extends ValueField<File> implements FileChooserFie
   }
 
   protected override _renderPlaceholder() {
-    let $field = this.fileInput.$text;
-    if ($field) {
-      $field.placeholder(this.label);
-    }
-  }
-
-  protected override _removePlaceholder() {
-    let $field = this.fileInput.$text;
-    if ($field) {
-      $field.placeholder('');
-    }
+    super._renderPlaceholder(this.fileInput.$text);
   }
 
   setMaximumUploadSize(maximumUploadSize: number) {
