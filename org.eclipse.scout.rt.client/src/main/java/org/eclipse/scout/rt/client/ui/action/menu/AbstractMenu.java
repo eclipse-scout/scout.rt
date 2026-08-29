@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 @ClassId("e8dbfee4-503c-401e-8579-d0aa8618f59d")
 public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements IMenu {
 
-  private static final Set<? extends IMenuType> DEFAULT_MENU_TYPES = Set.of(
+  public static final Set<? extends IMenuType> DEFAULT_MENU_TYPES = Set.of(
       TableMenuType.SingleSelection,
       TreeMenuType.SingleSelection,
       ValueFieldMenuType.NotNull,
