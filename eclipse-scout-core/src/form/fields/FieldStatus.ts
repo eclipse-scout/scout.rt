@@ -22,6 +22,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
   position: FormFieldStatusPosition;
   menus: Menu[];
   tooltip: Tooltip;
+  tooltipHtmlEnabled: boolean;
   contextMenu: ContextMenuPopup;
   updating: boolean;
 
@@ -34,6 +35,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
   constructor() {
     super();
     this.tooltip = null;
+    this.tooltipHtmlEnabled = false;
     this.contextMenu = null;
     this.status = null;
     this.updating = false;
@@ -178,6 +180,10 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     this.invalidateLayoutTree();
   }
 
+  setTooltipHtmlEnabled(tooltipHtmlEnabled: boolean) {
+    this.setProperty('tooltipHtmlEnabled', tooltipHtmlEnabled);
+  }
+
   protected override _renderVisible() {
     super._renderVisible();
     if (!this.visible) {
@@ -278,6 +284,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
     if (this.tooltip) {
       // update existing tooltip
       this.tooltip.setText(this.status.message);
+      this.tooltip.setHtmlEnabled(this.tooltipHtmlEnabled);
       this.tooltip.setSeverity(this.status.severity);
       this.tooltip.setMenus(this.menus);
     } else {
@@ -285,6 +292,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
         parent: this,
         $anchor: this.$container,
         text: this.status.message,
+        htmlEnabled: this.tooltipHtmlEnabled,
         severity: this.status.severity,
         autoRemove: this.autoRemove,
         menus: this.menus
