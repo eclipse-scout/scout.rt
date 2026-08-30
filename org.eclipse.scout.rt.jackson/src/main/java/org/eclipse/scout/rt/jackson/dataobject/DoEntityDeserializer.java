@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -273,6 +273,10 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     if (currentToken == JsonToken.VALUE_NUMBER_FLOAT) {
       // deserialize floating point numbers as BigDecimal
       return AttributeType.ofDoValue(TypeFactory.defaultInstance().constructType(BigDecimal.class));
+    }
+    if (currentToken == JsonToken.VALUE_NUMBER_INT) {
+      // deserialize integer numbers as Long
+      return AttributeType.ofDoValue(TypeFactory.defaultInstance().constructType(Long.class));
     }
     // JSON scalar values are deserialized as raw object using default jackson typing
     return AttributeType.ofDoValue(TypeFactory.unknownType());

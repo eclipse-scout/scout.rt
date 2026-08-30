@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -753,7 +753,7 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestEntityWithDoValueOfObjectDo_Long.json", json);
 
     marshalled = s_dataObjectMapper.readValue(json, TestEntityWithDoValueOfObjectDo.class);
-    assertEquals(Integer.valueOf(42), marshalled.getObject()); // Integer because Jackson uses the smallest possible number type
+    assertEquals(Long.valueOf(42), marshalled.getObject()); // Integer because Jackson uses the smallest possible number type
     assertEquals(DoValue.class, marshalled.object().getClass());
 
     // Entity
@@ -777,7 +777,7 @@ public class JsonDataObjectsSerializationTest {
     marshalled = s_dataObjectMapper.readValue(json, TestEntityWithDoValueOfObjectDo.class);
     assertEquals(DoEntity.class, marshalled.getObject().getClass());
     DoEntity entity = (DoEntity) marshalled.getObject();
-    assertEquals(Integer.valueOf(42), entity.get("longValue"));
+    assertEquals(Long.valueOf(42), entity.get("longValue"));
     assertEquals(List.of("a", "b", "c"), entity.get("listValue"));
     assertEquals(DoValue.class, marshalled.object().getClass());
     assertEquals(DoList.class, entity.getNode("listValue").getClass());
@@ -821,8 +821,8 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(ArrayList.class, marshalled.getObject().getClass());
     assertEquals(
         List.of(
-            BEANS.get(DoEntityBuilder.class).put("longValue", Integer.valueOf(42)).putList("listValue", List.of("a", "b")).build(),
-            BEANS.get(DoEntityBuilder.class).put("longValue", Integer.valueOf(43)).putList("listValue", List.of("c", "d")).build()),
+            BEANS.get(DoEntityBuilder.class).put("longValue", Long.valueOf(42)).putList("listValue", List.of("a", "b")).build(),
+            BEANS.get(DoEntityBuilder.class).put("longValue", Long.valueOf(43)).putList("listValue", List.of("c", "d")).build()),
         marshalled.getObject());
     assertEquals(DoValue.class, marshalled.object().getClass());
   }
@@ -1033,7 +1033,7 @@ public class JsonDataObjectsSerializationTest {
     DoEntity entity = s_dataObjectMapper.readValue(jsonInput, DoEntity.class);
 
     // raw properties got default JSON->Java conversion types
-    assertEquals(Integer.valueOf(123456), entity.get("bigIntegerAttribute"));
+    assertEquals(Long.valueOf(123456), entity.get("bigIntegerAttribute"));
     assertEquals(new BigDecimal("789.0"), entity.get("bigDecimalAttribute"));
     assertEquals("2017-09-22 14:23:12.123", entity.get("dateAttribute"));
 
@@ -1120,8 +1120,8 @@ public class JsonDataObjectsSerializationTest {
     DoEntity entity = s_dataObjectMapper.readValue(jsonInput, DoEntity.class);
 
     // raw properties got default JSON->Java conversion types
-    assertEquals(Integer.valueOf(123456), entity.getNode("bigIntegerAttribute").get());
-    assertEquals(Integer.valueOf(42), entity.getNode("numberAttribute").get());
+    assertEquals(Long.valueOf(123456), entity.getNode("bigIntegerAttribute").get());
+    assertEquals(Long.valueOf(42), entity.getNode("numberAttribute").get());
     assertEquals(new BigDecimal("789.0"), entity.getNode("bigDecimalAttribute").get());
     assertEquals("2017-09-22 14:23:12.123", entity.getNode("dateAttribute").get());
 
@@ -1152,8 +1152,8 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(expected.getBigDecimalAttribute(), entity.get("bigDecimalAttribute", BigDecimal.class));
     assertEquals(expected.getBigDecimalAttribute(), entity.getDecimal("bigDecimalAttribute"));
     // short integer/long values are converted to Integer
-    assertEquals(expected.getBigIntegerAttribute(), NumberUtility.toBigInteger(entity.get("bigIntegerAttribute", Integer.class).longValue()));
-    assertEquals(expected.getLongAttribute().longValue(), entity.get("longAttribute", Integer.class).longValue());
+    assertEquals(expected.getBigIntegerAttribute(), NumberUtility.toBigInteger(entity.get("bigIntegerAttribute", Long.class).longValue()));
+    assertEquals(expected.getLongAttribute().longValue(), entity.get("longAttribute", Long.class).longValue());
     // date value is converted to String
     assertEquals(expected.getDateAttribute(), DateUtility.parse(entity.get("dateAttribute", String.class), IValueFormatConstants.TIMESTAMP_PATTERN));
     assertEquals(expected.getDateAttribute(), s_dataObjectHelper.getDateAttribute(entity, "dateAttribute"));
@@ -1218,7 +1218,7 @@ public class JsonDataObjectsSerializationTest {
     DoEntity testDo = s_dataObjectMapper.readValue(inputJson, DoEntity.class);
 
     // BigInteger is converted to integer when read as raw value
-    assertEquals(Integer.valueOf(123456), testDo.get("bigIntegerAttribute"));
+    assertEquals(Long.valueOf(123456), testDo.get("bigIntegerAttribute"));
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestBigIntegerDoRaw.json", json); // is written without type information
@@ -1230,14 +1230,14 @@ public class JsonDataObjectsSerializationTest {
     DoEntity testDo = s_dataObjectMapper.readValue(inputJson, DoEntity.class);
 
     assertEquals("MTIz", testDo.get("content"));
-    assertEquals(3, testDo.get("contentLength"));
-    assertEquals(-1, testDo.get("lastModified")); // becomes an Integer (not long)
+    assertEquals(3L, testDo.get("contentLength"));
+    assertEquals(-1L, testDo.get("lastModified")); // becomes a long (default fallback value)
     assertEquals("image/jpeg", testDo.get("contentType"));
     assertEquals("unicorn.jpg", testDo.get("filename"));
     assertNull(testDo.get("charset"));
-    assertEquals(19726487, testDo.get("fingerprint")); // becomes an Integer (not long)
+    assertEquals(19726487L, testDo.get("fingerprint")); // becomes a Long (default fallback value)
     assertEquals(false, testDo.get("cachingAllowed"));
-    assertEquals(0, testDo.get("cacheMaxAge"));
+    assertEquals(0L, testDo.get("cacheMaxAge"));
   }
 
   // ------------------------------------ Raw data object test cases with type name ------------------------
@@ -3228,7 +3228,7 @@ public class JsonDataObjectsSerializationTest {
    * string to deserialize.
    */
   @Test
-  public void testDeserialize_Numbers() throws Exception {
+  public void testDeserialize_FloatingNumbers() throws Exception {
     TestComplexEntityDo entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123.456"), TestComplexEntityDo.class);
     assertEquals(Float.valueOf(123.456f), entity.getFloatAttribute());
 
@@ -3266,8 +3266,66 @@ public class JsonDataObjectsSerializationTest {
     Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123,456\""), TestComplexEntityDo.class));
   }
 
+  /**
+   * Various tests for floating number deserialization using untyped data objects. Deserializer defaults to {@link BigDecimal} as data type for numbers.
+   */
+  @Test
+  public void testDeserialize_FloatingNumbers_untyped() throws Exception {
+    DoEntity entity = s_dataObjectMapper.readValue(BEANS.get(DoEntityBuilder.class).put("floatAttribute", 123.456).buildString(), DoEntity.class);
+    assertEquals(new BigDecimal("123.456"), entity.get("floatAttribute", BigDecimal.class));
+
+    entity = s_dataObjectMapper.readValue(BEANS.get(DoEntityBuilder.class).put("doubleAttribute", (double) Float.MAX_VALUE + 1).buildString(), DoEntity.class);
+    assertEquals(BigDecimal.valueOf(Float.MAX_VALUE + 1), entity.get("doubleAttribute", BigDecimal.class));
+
+    BigDecimal bigDecimal = BigDecimal.valueOf(Double.MAX_VALUE).add(BigDecimal.ONE.divide(new BigDecimal(4)));
+    entity = s_dataObjectMapper.readValue(BEANS.get(DoEntityBuilder.class).put("bigDecimalAttribute", bigDecimal).buildString(), DoEntity.class);
+    assertEquals(bigDecimal, entity.get("bigDecimalAttribute", BigDecimal.class));
+  }
+
+  /**
+   * Various tests for integer/long number deserialization
+   * <p>
+   * Note: Jackson allows to deserialize numbers which are specified as JSON numbers or JSON strings within the JSON
+   * string to deserialize.
+   */
+  @Test
+  public void testDeserialize_Numbers() throws Exception {
+    TestComplexEntityDo entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("integerAttribute", "123"), TestComplexEntityDo.class);
+    assertEquals(Integer.valueOf(123), entity.getIntegerAttribute());
+
+    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("integerAttribute", "\"123\""), TestComplexEntityDo.class);
+    assertEquals(Integer.valueOf(123), entity.getIntegerAttribute());
+
+    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("longAttribute", "123"), TestComplexEntityDo.class);
+    assertEquals(Long.valueOf(123), entity.getLongAttribute());
+
+    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("longAttribute", "\"123\""), TestComplexEntityDo.class);
+    assertEquals(Long.valueOf(123), entity.getLongAttribute());
+
+    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("bigIntegerAttribute", "123"), TestComplexEntityDo.class);
+    assertEquals(new BigInteger("123"), entity.getBigIntegerAttribute());
+
+    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("bigIntegerAttribute", "\"123\""), TestComplexEntityDo.class);
+    assertEquals(new BigInteger("123"), entity.getBigIntegerAttribute());
+  }
+
   protected String createTestComplexEntityJson(String attributeName, String value) {
     return "{\"_type\" : \"TestComplexEntity\", \"" + attributeName + "\" : " + value + "}";
+  }
+
+  /**
+   * Various tests for integer/long number deserialization using untyped data objects. Deserializer defaults to {@link Long} as data type for numbers.
+   */
+  @Test
+  public void testDeserialize_Numbers_untyped() throws Exception {
+    DoEntity entity = s_dataObjectMapper.readValue(BEANS.get(DoEntityBuilder.class).put("integerAttribute", 123).buildString(), DoEntity.class);
+    assertEquals(Long.valueOf(123), entity.get("integerAttribute"));
+
+    entity = s_dataObjectMapper.readValue(BEANS.get(DoEntityBuilder.class).put("longAttribute", Integer.MAX_VALUE + 1L).buildString(), DoEntity.class);
+    assertEquals(Long.valueOf(2147483648L), entity.get("longAttribute"));
+
+    // BigInteger is to large for default long deserialization
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(BEANS.get(DoEntityBuilder.class).put("bigIntegerAttribute", new BigInteger(String.valueOf(Long.MAX_VALUE)).add(BigInteger.ONE)).buildString(), DoEntity.class));
   }
 
   @Test
@@ -3434,7 +3492,7 @@ public class JsonDataObjectsSerializationTest {
 
     // OK - read unknown entity into a concrete DO class declaring nested attribute as raw IDoEntity
     TestMapDo entityMarshalled = s_dataObjectMapper.readValue(serialized, TestMapDo.class);
-    assertEquals(Integer.valueOf(12345), entityMarshalled.getIDoEntityAttribute().get("nr", Integer.class));
+    assertEquals(Long.valueOf(12345), entityMarshalled.getIDoEntityAttribute().get("nr", Long.class));
   }
 
   /**
@@ -3487,7 +3545,7 @@ public class JsonDataObjectsSerializationTest {
 
     // OK - read unknown entity into a concrete DO class declaring nested attribute as correct TestItemDo -> unknown entity is parsed correctly into TestItemDo
     TestItemEntityDo entityMarshalled = s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class);
-    assertEquals(Integer.valueOf(12345), entityMarshalled.get("item", IDoEntity.class).get("nr", Integer.class));
+    assertEquals(Long.valueOf(12345), entityMarshalled.get("item", IDoEntity.class).get("nr", Long.class));
     assertEquals("myId", entityMarshalled.getItem().getId());
   }
 
