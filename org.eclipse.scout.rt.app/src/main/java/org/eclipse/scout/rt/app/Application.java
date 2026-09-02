@@ -75,6 +75,7 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipMinSiz
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipSyncFlush;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationHttpRequestMaxHeaderSizeProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationHttpSessionEnabledProperty;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationIdleTimeoutProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationJvmShutdownHookEnabledProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationKeyStorePasswordProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationKeyStorePathProperty;
@@ -227,6 +228,10 @@ public class Application {
   protected ServerConnector createHttpServerConnector(Server server) {
     HttpConfiguration httpConfig = createHttpConfiguration();
     ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(httpConfig), new HTTP2CServerConnectionFactory(httpConfig));
+    Long timeout = CONFIG.getPropertyValue(ScoutApplicationIdleTimeoutProperty.class);
+    if (timeout != null) {
+      http.setIdleTimeout(timeout);
+    }
     return http;
   }
 
@@ -244,7 +249,10 @@ public class Application {
 
     SslConnectionFactory tls = new SslConnectionFactory(sslContextFactory, alpn.getProtocol());
     ServerConnector https = new ServerConnector(server, tls, alpn, http2, http11);
-
+    Long timeout = CONFIG.getPropertyValue(ScoutApplicationIdleTimeoutProperty.class);
+    if (timeout != null) {
+      https.setIdleTimeout(timeout);
+    }
     return https;
   }
 

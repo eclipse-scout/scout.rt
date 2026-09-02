@@ -688,4 +688,17 @@ public final class ApplicationProperties {
       return "The HTTP2 stream idle timeout in milliseconds. Set to Long.MAX_VALUE to effectively disable stream idle timeouts for debugging or development purposes. Default: " + getDefaultValue() + ".";
     }
   }
+
+  public static class ScoutApplicationIdleTimeoutProperty extends AbstractPositiveLongConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.jetty.idleTimeout";
+    }
+
+    @Override
+    public String description() {
+      return "The jetty server idle timeout for HTTP and HTTPS connector in milliseconds.";
+    }
+  }
 }
