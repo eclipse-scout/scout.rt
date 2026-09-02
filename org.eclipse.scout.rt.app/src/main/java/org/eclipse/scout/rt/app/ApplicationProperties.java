@@ -18,6 +18,8 @@ import org.eclipse.jetty.compression.gzip.GzipEncoderConfig;
 import org.eclipse.jetty.compression.server.CompressionConfig;
 import org.eclipse.jetty.compression.server.CompressionHandler;
 import org.eclipse.jetty.http.HttpCookie.SameSite;
+import org.eclipse.jetty.http2.server.AbstractHTTP2ServerConnectionFactory;
+import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
@@ -671,6 +673,39 @@ public final class ApplicationProperties {
     }
   }
 
+  /**
+   * Sets the maximum idle time for a Jetty server connection (e.g. TCP connection socket timeout).
+   * <p>
+   * <b>Note:</b> If {@link ScoutApplicationHttpSessionEnabledProperty} is enabled, keep this value larger or equals to {@link ScoutApplicationSessionTimeoutProperty} to ensure the connection is not closed as long as a session is active.
+   *
+   * @see AbstractConnector#setIdleTimeout(long)
+   */
+  public static class ScoutApplicationConnectionIdleTimeoutProperty extends AbstractPositiveLongConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.jetty.connection.idleTimeout";
+    }
+
+    @Override
+    public Long getDefaultValue() {
+      // Do not use a short timeout in DEV mode to allow longer debugging sessions
+      return TimeUnit.MINUTES.toMillis(Platform.get().inDevelopmentMode() ? 60 : 6);
+    }
+
+    @Override
+    public String description() {
+      return "The jetty server idle timeout for HTTP and HTTPS connector in milliseconds. Default: " + getDefaultValue() + ".";
+    }
+  }
+
+  /**
+   * Sets the timeout for HTTP/2 stream connections.
+   * <p>
+   * <b>Note:</b> Keep this value smaller or equals to {@link ScoutApplicationConnectionIdleTimeoutProperty} to ensure the stream can be closed before the underlying connection is terminated.
+   *
+   * @see AbstractHTTP2ServerConnectionFactory#setStreamIdleTimeout(long)
+   */
   public static class ScoutApplicationStreamIdleTimeoutProperty extends AbstractPositiveLongConfigProperty {
 
     @Override
@@ -680,7 +715,8 @@ public final class ApplicationProperties {
 
     @Override
     public Long getDefaultValue() {
-      return TimeUnit.HOURS.toMillis(1);
+      // Do not use a short timeout in DEV mode to allow longer debugging sessions
+      return TimeUnit.MINUTES.toMillis(Platform.get().inDevelopmentMode() ? 60 : 6);
     }
 
     @Override
