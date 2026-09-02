@@ -763,6 +763,7 @@ public class JmsMomImplementor implements IMomImplementor {
     connection.start();
   }
 
+  @SuppressWarnings("java:S3824")
   public Destination resolveJmsDestination(final IDestination<?> destination, final Session session) {
     if (destination == null) {
       return null;
