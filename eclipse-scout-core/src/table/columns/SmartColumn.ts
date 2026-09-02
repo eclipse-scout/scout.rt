@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Cell, codes, CodeType, LookupCallColumn, LookupCallOrModel, LookupRow, objects, scout, SmartColumnEventMap, SmartColumnModel, SmartField, TableRow} from '../../index';
+import {BatchCall, BatchCallResult, Cell, codes, CodeType, InitModelOf, LookupCallColumn, LookupCallOrModel, LookupRow, objects, scout, SmartColumnEventMap, SmartColumnModel, SmartField, TableRow} from '../../index';
 
 /**
  * Column where each cell fetches its value using a lookup call.
@@ -26,14 +26,16 @@ export class SmartColumn<TValue> extends LookupCallColumn<TValue> implements Sma
   browseLoadIncremental: boolean;
   activeFilterEnabled: boolean;
 
-  protected _lookupCallBatchContext: SmartColumnBatchContext<TValue>;
-
   constructor() {
     super();
     this.browseAutoExpandAll = true;
     this.browseLoadIncremental = false;
     this.activeFilterEnabled = false;
-    this._lookupCallBatchContext = null;
+  }
+
+  protected override _init(model: InitModelOf<this>) {
+    super._init(model);
+    this._batchFormat = new BatchCall<TValue, string>(this._batchFormatValues.bind(this));
   }
 
   protected override _initCell(cell: Cell<TValue>): Cell<TValue> {
@@ -65,6 +67,17 @@ export class SmartColumn<TValue> extends LookupCallColumn<TValue> implements Sma
     }
   }
 
+  protected _batchFormatValues(keys: TValue[]): JQuery.Promise<Map<TValue, string>> {
+    const lookupCall = this.lookupCall.cloneForKeys(keys);
+    this.trigger('prepareLookupCall', {lookupCall});
+    return lookupCall.execute().then(response => {
+      if (!objects.isArray(response?.lookupRows)) {
+        return null;
+      }
+      return new Map(response.lookupRows.map(row => [row.key, row.text]));
+    });
+  }
+
   protected override _setCodeType(codeType: string | (new() => CodeType<TValue>)) {
     super._setCodeType(codeType);
     if (this.initialized) {
@@ -84,64 +97,19 @@ export class SmartColumn<TValue> extends LookupCallColumn<TValue> implements Sma
     this.setProperty('activeFilterEnabled', activeFilterEnabled);
   }
 
-  protected override _formatValue(value: TValue, row?: TableRow): string | JQuery.Promise<string> {
+  protected override _formatValue(value: TValue, row?: TableRow): string | JQuery.Promise<BatchCallResult<TValue, unknown>> {
+    if (objects.isNullOrUndefined(value)) {
+      return '';
+    }
     if (!this.lookupCall) {
-      return scout.nvl(value, '');
+      return value + '';
     }
-
     if (this.lookupCall.batch) {
-      return this._batchFormatValue(value);
+      // use column batch feature
+      return super._formatValue(value, row);
     }
-
-    let lookupCall = this.lookupCall.clone();
-    this.trigger('prepareLookupCall', {
-      lookupCall: lookupCall,
-      row: row
-    });
-
-    return lookupCall.textByKey(value);
-  }
-
-  /**
-   * Defers all invocations of the lookup call for the duration of the current event handler.
-   * Once the current event handler completes, all lookup calls are resolved in a single batch.
-   */
-  protected _batchFormatValue(key: TValue): JQuery.Promise<string> {
-    if (objects.isNullOrUndefined(key)) {
-      return $.resolvedPromise('');
-    }
-
-    let currentBatchContext = this._lookupCallBatchContext;
-    if (!currentBatchContext) {
-      // create new batch context for this column
-      const batchResult = $.Deferred();
-      currentBatchContext = {
-        keySet: new Set(),
-        result: batchResult.promise()
-      };
-      this._lookupCallBatchContext = currentBatchContext;
-
-      setTimeout(() => {
-        // reset batch context for next batch run
-        this._lookupCallBatchContext = null;
-
-        let lookupCall = this.lookupCall.clone();
-        this.trigger('prepareLookupCall', {
-          lookupCall: lookupCall
-        });
-
-        // batch lookup texts
-        lookupCall.textsByKeys([...currentBatchContext.keySet])
-          .then(textMap => batchResult.resolve(textMap)) // resolve result in current batch context
-          .catch(e => batchResult.reject(e)); // reject any errors
-      });
-    }
-
-    // add key to current batch
-    currentBatchContext.keySet.add(key);
-
-    // return text for current key
-    return currentBatchContext.result.then(textMap => textMap[objects.ensureValidKey(key)] || '');
+    // LookupCall doesn't support batch: resolve each cell separately
+    return this._prepareAndExecuteLookupCallCloneAsync(this.lookupCall.cloneForKey(value), row);
   }
 
   /**
@@ -204,8 +172,3 @@ export class SmartColumn<TValue> extends LookupCallColumn<TValue> implements Sma
     cell.setSortCode(this._calculateCellSortCode(cell));
   }
 }
-
-export type SmartColumnBatchContext<TValue> = {
-  keySet: Set<TValue>;
-  result: JQuery.Promise<Record<string, string>>;
-};

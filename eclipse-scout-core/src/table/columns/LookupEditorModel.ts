@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CodeType, LookupCallOrModel, ValueFieldModel} from '../../index';
+import {CodeType, LookupCallOrModel, TableRow, ValueFieldModel} from '../../index';
 
 export interface LookupEditorModel<TValue> extends ValueFieldModel<TValue[]> {
   /**
@@ -26,4 +26,8 @@ export interface LookupEditorModel<TValue> extends ValueFieldModel<TValue[]> {
    * @see LookupCallColumnModel.browseMaxRowCount
    */
   browseMaxRowCount?: number;
+  /**
+   * The row for which the editor opens
+   */
+  row?: TableRow;
 }

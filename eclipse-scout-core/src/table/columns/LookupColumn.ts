@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Cell, ColumnValidationResult, LookupBox, LookupCallColumn, LookupColumnEventMap, LookupColumnModel, LookupEditor, scout, Status, TableRow, ValueField} from '../../index';
+import {
+  arrays, BatchCall, BatchCallResult, Cell, ColumnValidationResult, InitModelOf, LookupBox, LookupCallColumn, LookupColumnEventMap, LookupColumnModel, LookupEditor, LookupRow, scout, Status, strings, TableRow, ValueField
+} from '../../index';
 
 /**
  * This column is a multivalued LookupCallColumn. If editable it opens a popup containing a {@link LookupBox} in order to select multiple values.
@@ -23,13 +25,38 @@ export class LookupColumn<TValue> extends LookupCallColumn<TValue[], TValue> imp
     this.setProperty('distinct', distinct);
   }
 
+  protected override _init(model: InitModelOf<this>) {
+    super._init(model);
+    this._batchFormat = new BatchCall<TValue[], string>(this._batchFormatValues.bind(this));
+  }
+
+  protected _batchFormatValues(keys: TValue[][]): JQuery.Promise<Map<TValue[], string>> {
+    const allKeys = [...new Set(keys.flat())];
+    return LookupEditor.formatValues(allKeys, this.lookupCall, lookupCall => this.trigger('prepareLookupCall', {lookupCall})).then(rows => {
+      const rowsByKey = new Map<TValue, LookupRow<TValue>>(rows.map(r => [r.key, r]));
+      return new Map<TValue[], string>(keys.map(k => [k, strings.join(', ', ...k.map(e => rowsByKey.get(e)?.text))]));
+    });
+  }
+
+  protected override _formatValue(value: TValue[], row?: TableRow): string | JQuery.Promise<BatchCallResult<TValue[], unknown>> {
+    if (!value?.length || !this.lookupCall) {
+      return '';
+    }
+    if (this.lookupCall.batch) {
+      // use column batch feature
+      return super._formatValue(value, row);
+    }
+    return this._prepareAndExecuteLookupCallCloneAsync(this.lookupCall.cloneForKeys(value), row);
+  }
+
   protected override _createEditor(row: TableRow): LookupEditor<TValue> {
     const editor = scout.create(LookupEditor<TValue>, {
       parent: this.table,
       lookupCall: this.lookupCall,
       codeType: this.codeType,
       browseHierarchy: this.browseHierarchy,
-      browseMaxRowCount: this.browseMaxRowCount
+      browseMaxRowCount: this.browseMaxRowCount,
+      row: row
     });
 
     editor.on('lookupCallDone', e => {
@@ -77,7 +104,7 @@ export class LookupColumn<TValue> extends LookupCallColumn<TValue[], TValue> imp
     }
 
     const cell = this.cell(row);
-    if (!this.table.rows.find(r => r !== row && arrays.containsAny(cell.value, this.cellValue(r)))) {
+    if (!this.table.rows.some(r => r !== row && arrays.containsAny(cell.value, this.cellValue(r)))) {
       return validationResult;
     }
 
@@ -88,10 +115,6 @@ export class LookupColumn<TValue> extends LookupCallColumn<TValue[], TValue> imp
       valid: errorStatus.isValid(),
       errorStatus
     };
-  }
-
-  protected override _formatValue(value: TValue[], row?: TableRow): string | JQuery.Promise<string> {
-    return LookupEditor.formatValues(value, this.lookupCall, lookupCall => this.trigger('prepareLookupCall', {lookupCall, row}));
   }
 }
 

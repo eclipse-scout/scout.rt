@@ -12,8 +12,8 @@
  * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
 import {
-  AbortError, arrays, Cell, Column, Deferred, Form, GroupBox, InitModelOf, MaxRowCountContributionDo, NumberColumn, NumberField, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, ResetMenu, scout, SearchFormTableControl,
-  SearchMenu, SearchRequiredTableStatus, SmartColumn, StaticLookupCall, StringField, Table, TableReloadReason, TableRow, Tree, WidgetModel
+  AbortError, arrays, BatchCallResult, Column, Deferred, Form, GroupBox, InitModelOf, MaxRowCountContributionDo, NumberColumn, NumberField, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, ResetMenu, scout,
+  SearchFormTableControl, SearchMenu, SearchRequiredTableStatus, SmartColumn, StaticLookupCall, StringField, Table, TableReloadReason, TableRow, Tree, WidgetModel
 } from '../../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
 
@@ -737,7 +737,7 @@ describe('PageWithTable', () => {
     class DeferredSmartColumn extends SmartColumn<number> {
 
       lastCellTextDeferred: Deferred<void> = null;
-      lastCellTextPromise: JQuery.Promise<string> = null;
+      lastCellTextPromise: JQuery.Promise<BatchCallResult<number, string>> = null;
 
       protected override _init(model: InitModelOf<this>) {
         super._init({
@@ -752,13 +752,13 @@ describe('PageWithTable', () => {
         });
       }
 
-      override setCellTextDeferred(promise: JQuery.Promise<string>, row: TableRow, cell: Cell<number>) {
+      override setCellTextDeferred(promise: JQuery.Promise<BatchCallResult<number, string>>) {
         this.lastCellTextDeferred = new Deferred();
-        this.lastCellTextPromise = promise.then(async text => {
+        this.lastCellTextPromise = promise.then(async result => {
           await this.lastCellTextDeferred.promise();
-          return text;
+          return result;
         });
-        super.setCellTextDeferred(this.lastCellTextPromise, row, cell);
+        super.setCellTextDeferred(this.lastCellTextPromise);
       }
     }
 

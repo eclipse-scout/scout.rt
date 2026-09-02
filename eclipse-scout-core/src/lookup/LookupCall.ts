@@ -77,7 +77,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
   /**
    * This method may be called directly on any {@link LookupCall}. For the key lookup an internal clone is created automatically.
    *
-   * You should not override this function. Instead override {@link _textByKey}.
+   * You should not override this function. Instead, override {@link _textByKey}.
    *
    * @returns a promise which returns a text of the lookup row resolved by {@link getByKey}.
    */
@@ -106,7 +106,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
   /**
    * This method may be called directly on any {@link LookupCall}. For the keys lookup an internal clone is created automatically.
    *
-   * You should not override this function. Instead override {@link _textsByKeys}.
+   * You should not override this function. Instead, override {@link _textsByKeys}.
    *
    * @returns A promise which returns an object that maps every {@link LookupRow} key to the text of the resolved {@link LookupRow}.
    */
@@ -143,7 +143,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
   /**
    * Only call this function if this LookupCall is not used again. Otherwise, use {@link cloneForAll().execute()} or {@link clone().getAll()}.
    *
-   * You should not override this function. Instead override {@link _getAll}.
+   * You should not override this function. Instead, override {@link _getAll}.
    */
   getAll(): JQuery.Promise<LookupResult<TKey>> {
     this.queryBy = QueryBy.ALL;
@@ -160,7 +160,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
   /**
    * Only call this function if this {@link LookupCall} is not used again. Otherwise, use {@link cloneForText(text).execute()} or {@link clone().getByText(text)}.
    *
-   * You should not override this function. Instead override {@link _getByText}.
+   * You should not override this function. Instead, override {@link _getByText}.
    */
   getByText(text: string): JQuery.Promise<LookupResult<TKey>> {
     this.queryBy = QueryBy.TEXT;
@@ -178,7 +178,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
   /**
    * Only call this function if this {@link LookupCall} is not used again. Otherwise, use {@link cloneForKey(key).execute()} or {@link clone().getByKey(parentKey)}.
    *
-   * You should not override this function. Instead override {@link _getByKey}.
+   * You should not override this function. Instead, override {@link _getByKey}.
    */
   getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
     this.queryBy = QueryBy.KEY;
@@ -190,13 +190,13 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
    * Override this method to implement.
    */
   protected _getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
-    throw new Error('getByKey() not implemented');
+    throw new Error('_getByKey() not implemented');
   }
 
   /**
    * Only call this function if this {@link LookupCall} is not used again. Otherwise, use {@link cloneForKeys(keys).execute()} or {@link clone().getByKeys(keys)}.
    *
-   * You should not override this function. Instead override {@link _getByKeys}.
+   * You should not override this function. Instead, override {@link _getByKeys}.
    */
   getByKeys(keys: TKey[]): JQuery.Promise<LookupResult<TKey>> {
     this.queryBy = QueryBy.KEYS;
@@ -214,7 +214,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
   /**
    * Only call this function if this {@link LookupCall} is not used again. Otherwise, use {@link cloneForRec(parentKey).execute()} or {@link clone().getByRec(parentKey)}.
    *
-   * You should not override this function. Instead override {@link _getByRec}.
+   * You should not override this function. Instead, override {@link _getByRec}.
    *
    * Returns a result with lookup rows for the given parent key. This is used for incremental lookups.
    *
