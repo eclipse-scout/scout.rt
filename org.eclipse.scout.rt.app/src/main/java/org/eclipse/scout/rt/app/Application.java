@@ -57,6 +57,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationAutoCreateSelfSignedCertificateProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationCertificateAliasProperty;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationConnectionIdleTimeoutProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationConsoleInputHandlerEnabledProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationContextHandlerExtendedResourceLookup;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationContextPathProperty;
@@ -227,6 +228,7 @@ public class Application {
   protected ServerConnector createHttpServerConnector(Server server) {
     HttpConfiguration httpConfig = createHttpConfiguration();
     ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(httpConfig), new HTTP2CServerConnectionFactory(httpConfig));
+    http.setIdleTimeout(CONFIG.getPropertyValue(ScoutApplicationConnectionIdleTimeoutProperty.class));
     return http;
   }
 
@@ -244,7 +246,7 @@ public class Application {
 
     SslConnectionFactory tls = new SslConnectionFactory(sslContextFactory, alpn.getProtocol());
     ServerConnector https = new ServerConnector(server, tls, alpn, http2, http11);
-
+    https.setIdleTimeout(CONFIG.getPropertyValue(ScoutApplicationConnectionIdleTimeoutProperty.class));
     return https;
   }
 
