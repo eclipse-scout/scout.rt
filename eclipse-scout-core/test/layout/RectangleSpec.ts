@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,6 +39,35 @@ describe('Rectangle', () => {
     });
   });
 
+  it('contains', () => {
+    let r1 = new Rectangle(1, 1, 10, 20);
+    let r2 = new Rectangle(1, 1, 5, 5);
+    let r3 = new Rectangle(0, 0, 5, 5);
+    let r4 = new Rectangle(1, 1, 4, 4);
+    let p1 = new Point(0, 0);
+    let p2 = new Point(1, 1);
+    let p3 = new Point(0, 15);
+    let p4 = new Point(5, 5);
+
+    expect(r1.contains(r1)).toBe(true);
+    expect(r1.contains(r2)).toBe(true);
+    expect(r1.contains(r3)).toBe(false);
+    expect(r2.contains(r1)).toBe(false);
+    expect(r2.contains(r3)).toBe(false);
+    expect(r3.contains(r2)).toBe(false);
+    expect(r3.contains(r4)).toBe(true);
+
+    expect(r1.contains(p1)).toBe(false);
+    expect(r1.contains(p2)).toBe(true);
+    expect(r1.contains(p3)).toBe(false);
+    expect(r1.contains(p4)).toBe(true);
+
+    expect(r1.contains(0, 0)).toBe(false);
+    expect(r1.contains(1, 1)).toBe(true);
+    expect(r1.contains(0, 15)).toBe(false);
+    expect(r1.contains(5, 5)).toBe(true);
+  });
+
   it('intersects', () => {
     let r1 = new Rectangle(0, 0, 10, 5);
     let r2 = new Rectangle(0, 0, 20, -1);
@@ -65,6 +94,7 @@ describe('Rectangle', () => {
   });
 
   describe('intersect', () => {
+
     it('computes the intersection between two rectangles', () => {
       let rect = new Rectangle(2, 3, 10, 8);
 

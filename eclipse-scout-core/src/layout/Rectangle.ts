@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -59,8 +59,18 @@ export class Rectangle {
     return this.y + this.height;
   }
 
-  contains(xOrPoint: number | Point, y?: number): boolean {
-    let point = new Point(xOrPoint, y);
+  /**
+   * Tests whether the specified point or rectangle is fully contained in this rectangle.
+   *
+   * @param xOrPointOrRectangle the point or rectangle to test against
+   * @returns true if the specified point or rectangle is contained in this rectangle
+   */
+  contains(xOrPointOrRectangle: number | Point | Rectangle, y?: number): boolean {
+    if (xOrPointOrRectangle instanceof Rectangle) {
+      let rect = xOrPointOrRectangle;
+      return rect.x >= this.x && rect.y >= this.y && rect.right() <= this.right() && rect.bottom() <= this.bottom();
+    }
+    let point = new Point(xOrPointOrRectangle, y);
     return point.y >= this.y && point.y < this.bottom() && point.x >= this.x && point.x < this.right();
   }
 
