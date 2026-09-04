@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,7 @@ import java.io.Serializable;
 
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
@@ -21,9 +22,9 @@ import org.eclipse.scout.rt.platform.service.IService;
 public interface IClusterSynchronizationService extends IService {
 
   /**
-   * Indicates the order of the cluster synchronization's {@link IPlatformListener} to shutdown itself upon entering
+   * Indicates the order of the cluster synchronization's {@link IPlatformListener} to shut down itself upon entering
    * platform state {@link State#PlatformStopping}. Any listener depending on cluster synchronization facility must be
-   * configured with an order less than {@link #DESTROY_ORDER}.
+   * configured with an order less than this value.
    */
   long DESTROY_ORDER = 5_700;
 
@@ -43,9 +44,14 @@ public interface IClusterSynchronizationService extends IService {
   IClusterNodeStatusInfo getStatusInfo();
 
   /**
-   * @return info about sent and received messages of a given message type
+   * @return info about sent and received messages of a given message type. For {@link InvalidateCacheNotification} use {@link #getCacheInvalidationStatusInfo(String)}.
    */
   IClusterNodeStatusInfo getStatusInfo(Class<? extends Serializable> messageType);
+
+  /**
+   * @return info about sent and received messages of {@link InvalidateCacheNotification} for the provided {@code cacheId}.
+   */
+  IClusterNodeStatusInfo getCacheInvalidationStatusInfo(String cacheId);
 
   IClusterNotificationProperties getNotificationProperties();
 
