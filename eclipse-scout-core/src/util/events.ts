@@ -313,3 +313,37 @@ export interface SwipeCallbackEvent {
 export interface PropagatedEvent extends Event {
   sourceEvent: Event;
 }
+
+/**
+ * Constants for {@link MouseEvent.button} values.
+ */
+export enum MouseButton {
+  /** Main button, usually the left button, or the un-initialized state */
+  PRIMARY = 0,
+  /** Auxiliary button, usually the wheel button or the middle button (if present) */
+  AUXILIARY = 1,
+  /** Secondary button, usually the right button */
+  SECONDARY = 2,
+  /** Fourth button, typically the "Browser Back" button */
+  BACK = 3,
+  /** Fifth button, typically the "Browser Forward" button */
+  FORWARD = 4
+}
+
+/**
+ * Constants for {@link MouseEvent.buttons} values.
+ */
+export enum MouseButtons {
+  /** No button or un-initialized */
+  NONE = 0,
+  /** Primary button, usually the left button */
+  PRIMARY = 1,
+  /** Secondary button, usually the right button */
+  SECONDARY = 2,
+  /** Auxiliary button, usually the wheel button or the middle button (if present) */
+  AUXILIARY = 4,
+  /** Fourth button, typically the "Browser Back" button */
+  BACK = 8,
+  /** Fifth button, typically the "Browser Forward" button */
+  FORWARD = 16
+}
