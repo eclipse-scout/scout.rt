@@ -96,6 +96,10 @@ export interface FormFieldModel extends WidgetModel {
    */
   labelHtmlEnabled?: boolean;
   /**
+   * Field placeholder. This value is overridden by label if label position is {@link FormField.LabelPosition.ON_FIELD}
+   */
+  placeholder?: string;
+  /**
    * Defines whether the user has to fill out this field.
    *
    * If set to true, an indicator is shown so the user knows he cannot leave it empty.

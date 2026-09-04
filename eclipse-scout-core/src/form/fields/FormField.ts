@@ -46,6 +46,7 @@ export class FormField extends Widget implements FormFieldModel {
   labelWidthInPixel: number;
   labelUseUiWidth: boolean;
   labelHtmlEnabled: boolean;
+  placeholder: string;
   mandatory: boolean;
   statusMenuMappings: StatusMenuMapping[];
   menus: Menu[];
@@ -121,6 +122,7 @@ export class FormField extends Widget implements FormFieldModel {
     this.labelWidthInPixel = 0;
     this.labelUseUiWidth = false;
     this.labelHtmlEnabled = false;
+    this.placeholder = null;
     this.mandatory = false;
     this.statusMenuMappings = [];
     this.menus = [];
@@ -146,7 +148,7 @@ export class FormField extends Widget implements FormFieldModel {
 
     this._addWidgetProperties(['keyStrokes', 'menus', 'statusMenuMappings']);
     this._addCloneProperties(['dropType', 'dropMaximumSize', 'errorStatus', 'fieldStyle', 'gridDataHints', 'gridData', 'label', 'labelVisible', 'labelPosition',
-      'labelWidthInPixel', 'labelUseUiWidth', 'mandatory', 'mode', 'saveNeeded', 'touched', 'statusVisible', 'statusPosition', 'statusMenuMappings',
+      'labelWidthInPixel', 'placeholder', 'labelUseUiWidth', 'mandatory', 'mode', 'saveNeeded', 'touched', 'statusVisible', 'statusPosition', 'statusMenuMappings',
       'tooltipText', 'tooltipAnchor']);
 
     this._menuPropertyChangeHandler = this._onMenuPropertyChange.bind(this);
@@ -224,7 +226,7 @@ export class FormField extends Widget implements FormFieldModel {
       property: 'labelPosition',
       constType: FormField.LabelPosition
     }]);
-    this.resolveTextKeys(['label', 'tooltipText']);
+    this.resolveTextKeys(['label', 'tooltipText', 'placeholder']);
     this._setValidationResultProvider(this.validationResultProvider);
     this._setKeyStrokes(this.keyStrokes);
     this._setMenus(this.menus);
@@ -307,6 +309,7 @@ export class FormField extends Widget implements FormFieldModel {
     this._renderLabelVisible();
     this._renderStatusVisible();
     this._renderStatusPosition();
+    this._renderPlaceholder();
     this._renderFont();
     this._renderForegroundColor();
     this._renderBackgroundColor();
@@ -598,12 +601,10 @@ export class FormField extends Widget implements FormFieldModel {
   protected _renderLabel() {
     let label = this.label;
     if (this.labelPosition === FormField.LabelPosition.ON_FIELD) {
-      this._renderPlaceholder();
       if (this.$label) {
         this.$label.text('');
       }
     } else if (this.$label) {
-      this._removePlaceholder();
       // Make sure an empty label has the same height as the other labels, especially important for top labels
       this.$label
         .contentOrNbsp(this.labelHtmlEnabled, label, 'empty')
@@ -614,6 +615,8 @@ export class FormField extends Widget implements FormFieldModel {
         this.invalidateLayoutTree();
       }
     }
+
+    this._renderPlaceholder();
 
     if (this.rendered) {
       // Also called by addField during render -> only necessary to call it if label changes dynamically
@@ -634,8 +637,9 @@ export class FormField extends Widget implements FormFieldModel {
 
   protected _renderPlaceholder($field?: JQuery) {
     $field = scout.nvl($field, this.$field);
+    let placeholderValue = this.labelPosition === FormField.LabelPosition.ON_FIELD ? this.label : this.placeholder;
     if ($field) {
-      $field.placeholder(this.label);
+      $field.placeholder(placeholderValue);
     }
   }
 
@@ -647,6 +651,11 @@ export class FormField extends Widget implements FormFieldModel {
     if ($field) {
       $field.placeholder('');
     }
+  }
+
+  /** @see FormFieldModel.placeholder */
+  setPlaceholder(placeholder: string) {
+    this.setProperty('placeholder', placeholder);
   }
 
   /** @see FormFieldModel.labelVisible */
