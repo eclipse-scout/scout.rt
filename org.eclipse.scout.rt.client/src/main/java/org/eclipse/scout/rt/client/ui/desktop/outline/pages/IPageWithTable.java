@@ -49,18 +49,6 @@ public interface IPageWithTable<T extends ITable> extends IPage<T> {
   void setSearchActive(boolean b);
 
   /**
-   * Apply result meta info to this page.
-   *
-   * @param limitedResult
-   *     If the result was limited (not complete)
-   * @param maxRowCount
-   *     Maximum row count the user is allowed to load into this table.
-   * @param estimatedRowCount
-   *     In case the result was limited, how many rows that are estimated to be available in total.
-   */
-  void setResultInfo(boolean limitedResult, int maxRowCount, long estimatedRowCount);
-
-  /**
    * @since 6.0
    */
   boolean isAlwaysCreateChildPage();

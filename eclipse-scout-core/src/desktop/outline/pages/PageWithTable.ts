@@ -576,10 +576,9 @@ export class PageWithTable extends Page implements PageWithTableModel {
     let success = false;
     try {
       const rows = arrays.ensure(this._transformTableDataToTableRows(tableData));
-      const limitedResultInfoDo = this._getLimitedResultInfoDo(tableData);
-      this._readLimitedResultInfo(rows.length, limitedResultInfoDo); // apply properties from LimitedResultInfoDo to table (must be before replaceRows as this triggers the TableFooter update which already requires the new values).
+      this.detailTable.setResultInfo(this._getLimitedResultInfoDo(tableData)); // apply properties from LimitedResultInfoDo to table (must be before replaceRows as this triggers the TableFooter update which already requires the new values).
       this.detailTable.replaceRows(rows);
-      this.detailTable.setLimitedResultTableStatus(!!limitedResultInfoDo?.limitedResult); // set table status after replaceRows as the new rows are required
+      this.detailTable.updateLimitedResultTableStatus(); // set table status after replaceRows as the new rows are required
       success = true;
     } finally {
       this._onLoadTableDataAlways(restoreSelectionInfo);
@@ -587,20 +586,6 @@ export class PageWithTable extends Page implements PageWithTableModel {
     if (success) {
       this.trigger('load');
     }
-  }
-
-  // see org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable.setResultInfo
-  protected _readLimitedResultInfo(numRows: number, limitedResultInfoDo?: LimitedResultInfoContributionDo) {
-    if (!limitedResultInfoDo) {
-      return;
-    }
-    // update table properties. The footer is automatically updated after the new rows have been created
-    this.detailTable.setMaxRowCountServer(limitedResultInfoDo.maxRowCount);
-    if (limitedResultInfoDo.limitedResult && limitedResultInfoDo.estimatedRowCount > 0) {
-      // if there is an estimation, but it is lower than the actual rows: correct it
-      limitedResultInfoDo.estimatedRowCount = Math.max(numRows + 1, limitedResultInfoDo.estimatedRowCount);
-    }
-    this.detailTable.setEstimatedRowCount(limitedResultInfoDo.estimatedRowCount);
   }
 
   protected _getLimitedResultInfoDo(tableData: any): LimitedResultInfoContributionDo {

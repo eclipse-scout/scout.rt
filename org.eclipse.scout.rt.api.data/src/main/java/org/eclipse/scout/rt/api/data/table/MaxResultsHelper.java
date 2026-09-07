@@ -57,18 +57,30 @@ public class MaxResultsHelper {
     }
 
     MaxRowCountContributionDo maxRowCountContributionDo = dataObject.getContribution(MaxRowCountContributionDo.class);
+    int override = getOverrideFromContribution(maxRowCountContributionDo);
+    if (override > 0) {
+      return override;
+    }
+    return getHintFromContribution(maxRowCountContributionDo);
+  }
+
+  protected int getOverrideFromContribution(MaxRowCountContributionDo maxRowCountContributionDo) {
     if (maxRowCountContributionDo != null) {
       Integer maxRowCountOverride = maxRowCountContributionDo.getOverride();
       if (maxRowCountOverride != null && maxRowCountOverride > 0) {
         return maxRowCountOverride;
       }
+    }
+    return -1;
+  }
 
+  protected int getHintFromContribution(MaxRowCountContributionDo maxRowCountContributionDo) {
+    if (maxRowCountContributionDo != null) {
       Integer maxRowCount = maxRowCountContributionDo.getHint();
       if (maxRowCount != null && maxRowCount > 0) {
         return maxRowCount;
       }
     }
-
     return -1;
   }
 
