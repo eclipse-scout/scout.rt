@@ -50,6 +50,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
+import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 
 /**
  * The desktop model (may) consist of
@@ -155,6 +156,10 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   String STARTUP_REQUEST_PARAM_URL = "url";
 
   String PROP_DENSE = "dense";
+
+  String PROP_DEVICE_TYPE = "deviceType";
+
+  String PROP_ENFORCED_DEVICE_TYPE = "enforcedDeviceType";
 
   /**
    * Default style with header, navigation (tree) and bench (forms).
@@ -1049,4 +1054,21 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * @since 22.0
    */
   void reloadPageFromRoot(IPage<?> page);
+
+  /**
+   * @return the current enforced device type. Null if device detection is used and no device type is enforced.
+   * Use org.eclipse.scout.rt.shared.ui.UserAgentUtility#getCurrentUiDeviceType() to get the current device type that is used.
+   * @since 27.1
+   */
+  IUiDeviceType getDeviceType();
+
+  /**
+   * @param deviceType
+   *     name of the device type to be enforced.
+   * @since 27.1
+   */
+
+  void setDeviceType(IUiDeviceType deviceType);
+
+  boolean userAgreedToReloadSessionAndSavedPendingWork(String formIds);
 }

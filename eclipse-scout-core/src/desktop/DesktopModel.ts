@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, BenchColumnLayoutData, DesktopDisplayStyle, DesktopNotification, DisplayParentModel, DisplayViewId, Form, Menu, NativeNotificationDefaults, ObjectOrChildModel, Outline, ViewButton, Widget, WidgetModel} from '../index';
+import {
+  Action, BenchColumnLayoutData, DesktopDisplayStyle, DesktopNotification, DeviceType, DisplayParentModel, DisplayViewId, Form, Menu, NativeNotificationDefaults, ObjectOrChildModel, Outline, ViewButton, Widget, WidgetModel
+} from '../index';
 
 export interface DesktopModel extends WidgetModel, DisplayParentModel {
   /**
@@ -121,6 +123,12 @@ export interface DesktopModel extends WidgetModel, DisplayParentModel {
    * Default is false.
    */
   dense?: boolean;
+  /**
+   * Defines for which device type the page is rendered.
+   *
+   * When a device type is enforced (@see {@link DesktopModel#enforcedDeviceType}), the deviceType will change as well.
+   */
+  deviceType?: DeviceType;
   /**
    * Configures whether the keystrokes to select {@link DesktopTab}s should be enabled.
    *

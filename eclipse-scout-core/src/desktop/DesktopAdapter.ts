@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, Desktop, DesktopCancelFormsEvent, DesktopFormActivateEvent, DesktopHistoryState, DesktopNotification, DisplayParent, Event, FileChooser, FileChooserAdapter, Form, FormAdapter, MessageBox, MessageBoxAdapter, ModelAdapter, objects,
-  Outline, RemoteEvent, Widget
+  App, Desktop, DesktopCancelFormsEvent, DesktopFormActivateEvent, DesktopHistoryState, DesktopNotification, Device, DisplayParent, Event, FileChooser, FileChooserAdapter, Form, FormAdapter, MessageBox, MessageBoxAdapter, ModelAdapter,
+  objects, Outline, RemoteEvent, scout, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -18,7 +18,7 @@ export class DesktopAdapter extends ModelAdapter {
 
   constructor() {
     super();
-    this._addRemoteProperties(['benchVisible', 'navigationVisible', 'navigationHandleVisible', 'headerVisible', 'geolocationServiceAvailable', 'inBackground', 'focusedElement']);
+    this._addRemoteProperties(['benchVisible', 'navigationVisible', 'navigationHandleVisible', 'headerVisible', 'geolocationServiceAvailable', 'inBackground', 'focusedElement', 'deviceType']);
   }
 
   protected override _goOffline() {
@@ -251,6 +251,7 @@ export class DesktopAdapter extends ModelAdapter {
     }
 
     objects.replacePrototypeFunction(Desktop, '_initTheme', DesktopAdapter._initTheme, true);
+    objects.replacePrototypeFunction(Device, '_reloadPage', DesktopAdapter._reloadPage, true);
   }
 
   static _initTheme(this: Desktop & { _initThemeOrig; _activeTheme }) {
@@ -260,6 +261,14 @@ export class DesktopAdapter extends ModelAdapter {
     } else {
       this._initThemeOrig();
     }
+  }
+
+  static _reloadPage(this: Device & { _reloadPageOrig }) {
+    let desktop = scout.getSession().desktop;
+    if (desktop?.modelAdapter instanceof DesktopAdapter) {
+      desktop.modelAdapter._send('reloadSession');
+    }
+    this._reloadPageOrig();
   }
 }
 
