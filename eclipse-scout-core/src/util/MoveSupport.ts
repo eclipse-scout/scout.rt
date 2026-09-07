@@ -211,7 +211,8 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
     );
     $.extend(elementInfo, {
       position: position,
-      bounds: bounds
+      bounds: bounds,
+      initialBounds: elementInfo.initialBounds || bounds
     });
   }
 
@@ -342,6 +343,7 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
       }
       this._moveData.elementInfos.forEach(info => {
         info.bounds = info.bounds.translate(diff);
+        info.initialBounds = info.initialBounds.translate(diff);
       });
     }
   }
@@ -411,7 +413,7 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
             await this._moveToTarget(targetBounds);
           }
           this._restoreStyles();
-          if (targetBounds && !targetBounds.equals(this._moveData.draggedElementInfo.bounds)) {
+          if (targetBounds && !targetBounds.equals(this._moveData.draggedElementInfo.initialBounds)) {
             this._moveEnd();
           }
           this._moveData = null;
@@ -641,6 +643,13 @@ export interface DraggableElementInfo<TElem extends DraggableElement> {
    * The size and absolute position (relative to the window).
    */
   bounds: Rectangle;
+  /**
+   * The initial size and absolute position (relative to the window).
+   *
+   * Used to determine if the position of the element has actually been changed when the mouse button is released.
+   * The 'moveEnd' event is only triggered if the current {@link bounds} are different from this value.
+   */
+  initialBounds: Rectangle;
 }
 
 export interface MoveSupportEventMap extends EventMap {
