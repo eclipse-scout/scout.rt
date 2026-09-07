@@ -9,9 +9,9 @@
  */
 import {
   AbstractLayout, Action, arrays, BenchColumnLayoutData, BusyIndicatorOptions, BusySupport, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel,
-  DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form,
-  GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, objects,
-  OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
+  DesktopNavigation, DesktopNotification, Device, DeviceType, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser,
+  FileChooserController, Form, GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel,
+  objects, OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
   SplitterPositionChangeEvent, strings, styles, Tooltip, Tree, TreeDisplayStyle, UnsavedFormChangesForm, URL, ViewButton, webstorage, Widget, widgets
 } from '../index';
 import $ from 'jquery';
@@ -64,6 +64,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   openUriHandler: OpenUriHandler;
   theme: string;
   dense: boolean;
+  deviceType: DeviceType;
   animateLayoutChange: boolean;
   url: URL;
   responsiveHandler: ResponsiveHandler;
@@ -125,6 +126,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this.openUriHandler = null;
     this.theme = null;
     this.dense = false;
+    this.deviceType = null;
     this.url = null;
     this.busySupport = scout.create(BusySupport, {parent: this});
 
@@ -224,6 +226,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     super._init(model);
     this.url = new URL();
     this._initTheme();
+    this._initDeviceType();
     this.formController = scout.create(DesktopFormController, {
       displayParent: this,
       session: this.session
@@ -1660,6 +1663,10 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     return cookies.get('scout.ui.theme') || Desktop.DEFAULT_THEME;
   }
 
+  protected _activeDeviceType(): string {
+    return cookies.get('scout.ui.enforcedDeviceType') || Device.get().getDetectedDeviceType();
+  }
+
   logoAction() {
     if (this.logoActionEnabled) {
       this.trigger('logoAction');
@@ -1707,6 +1714,42 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
       this.url.removeParameter('theme');
       reloadOptions.redirectUrl = this.url.toString();
     }
+    scout.reloadPage(reloadOptions);
+  }
+
+  protected _initDeviceType() {
+    let deviceType = this._activeDeviceType();
+    if (deviceType) {
+      this.setDeviceType(deviceType);
+    }
+  }
+
+  /**
+   * Changes the current device type.
+   *
+   * The device type is stored in a persistent cookie called scout.ui.enforcedDeviceType.
+   * In order to activate it, the browser is reloaded so that it will be rendered for the new device type.
+   *
+   * Since it is a persistent cookie, the device type will be activated again the next time the app is started, unless the cookie is deleted.
+   * @see DesktopModel.deviceType
+   */
+  setDeviceType(deviceType: string) {
+    this.setProperty('deviceType', deviceType);
+    if (this.deviceType !== this._activeDeviceType()) {
+      this._switchDeviceType(deviceType);
+    }
+  }
+
+  protected _switchDeviceType(deviceType: string) {
+    // Add a persistent cookie which expires in 1 year
+    cookies.set('scout.ui.enforcedDeviceType', deviceType, 365 * 24 * 3600);
+
+    // Reload page in order to render for the new device type
+    // Don't remove body but make it invisible, otherwise JS exceptions might be thrown if body is removed while an action executed
+    $('body').setVisible(false);
+    let reloadOptions: ReloadPageOptions = {
+      clearBody: false
+    };
     scout.reloadPage(reloadOptions);
   }
 

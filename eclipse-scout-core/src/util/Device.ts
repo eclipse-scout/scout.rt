@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, EnumObject, InitModelOf, ObjectModel, objects, ObjectWithType, Predicate, scout} from '../index';
+import {App, cookies, EnumObject, InitModelOf, ObjectModel, objects, ObjectWithType, Predicate, scout} from '../index';
 import $ from 'jquery';
 
 let instance: Device;
@@ -32,6 +32,7 @@ export class Device implements DeviceModel, ObjectWithType {
   userAgent: string;
   features: Record<string, boolean>;
   system: DeviceSystem;
+  enforcedType: DeviceType;
   type: DeviceType;
   browser: DeviceBrowser;
   browserVersion: number;
@@ -172,6 +173,9 @@ export class Device implements DeviceModel, ObjectWithType {
 
   hasOnScreenKeyboard(): boolean {
     return this.supportsFeature('_onScreenKeyboard', () => {
+      if (this.isEnforcedTypeDesktop()) {
+        return false;
+      }
       return this.isIos() || this.isAndroid() || this.isWindowsTabletMode();
     });
   }
@@ -281,10 +285,49 @@ export class Device implements DeviceModel, ObjectWithType {
       || (browser === browsers.SAFARI && version >= 15.4);
   }
 
+  protected getEnforcedType(): DeviceType {
+    if (!this.enforcedType) {
+      this.enforcedType = Device.Type[cookies.get('scout.ui.enforcedDeviceType')];
+    }
+    return this.enforcedType;
+  }
+
+  protected isEnforcedTypeDesktop(): boolean {
+    return this.supportsFeature('_EnforcedTypeDesktop', property => {
+      return Device.Type.DESKTOP === this.getEnforcedType();
+    });
+  }
+
+  protected isEnforcedTypeTablet(): boolean {
+    return this.supportsFeature('_EnforcedTypeTablet', property => {
+      return Device.Type.TABLET === this.getEnforcedType();
+    });
+  }
+
+  protected isEnforcedTypeMobile(): boolean {
+    return this.supportsFeature('_EnforcedTypeMobile', property => {
+      return Device.Type.MOBILE === this.getEnforcedType();
+    });
+  }
+
   /**
    * Can not detect type until DOM is ready because we must create a DIV to measure the scrollbars.
    */
   protected _detectType(userAgent: string): DeviceType {
+    let autoDetectionType = this._detectTypeInternal(userAgent);
+    if (this.isEnforcedTypeDesktop()) {
+      return Device.Type.DESKTOP;
+    }
+    if (this.isEnforcedTypeTablet()) {
+      return Device.Type.TABLET;
+    }
+    if (this.isEnforcedTypeMobile()) {
+      return Device.Type.MOBILE;
+    }
+    return autoDetectionType;
+  }
+
+  protected _detectTypeInternal(userAgent: string): DeviceType {
     if (Device.System.ANDROID === this.system) {
       if (userAgent.indexOf('Mobile') > -1) {
         return Device.Type.MOBILE;
@@ -299,6 +342,10 @@ export class Device implements DeviceModel, ObjectWithType {
       return Device.Type.TABLET;
     }
     return Device.Type.DESKTOP;
+  }
+
+  getDetectedDeviceType(): string {
+    return this._detectTypeInternal(this.userAgent);
   }
 
   protected _parseSystem() {
@@ -414,6 +461,9 @@ export class Device implements DeviceModel, ObjectWithType {
    * different in the future.
    */
   supportsOnlyTouch(): boolean {
+    if (this.isEnforcedTypeTablet() || this.isEnforcedTypeMobile()) {
+      return true;
+    }
     return this.supportsFeature('_onlyTouch', this.hasOnScreenKeyboard.bind(this));
   }
 
@@ -422,6 +472,9 @@ export class Device implements DeviceModel, ObjectWithType {
    * @see https://codeburst.io/the-only-way-to-detect-touch-with-javascript-7791a3346685
    */
   supportsTouch(): boolean {
+    if (this.isEnforcedTypeTablet() || this.isEnforcedTypeMobile()) {
+      return true;
+    }
     return this.supportsFeature('_touch', property => {
       return (('ontouchstart' in window) || window.TouchEvent || window['DocumentTouch'] && document instanceof window['DocumentTouch']) as boolean;
     });
