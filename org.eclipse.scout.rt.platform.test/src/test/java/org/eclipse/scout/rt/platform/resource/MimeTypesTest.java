@@ -18,8 +18,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.HexUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -27,7 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Test cases for {@link MimeTypes} and {@link IMimeMagic}.
+ * Test cases for {@link MimeType}, {@link MimeTypes} and {@link IMimeMagic}.
  */
 @RunWith(PlatformTestRunner.class)
 public class MimeTypesTest {
@@ -109,6 +112,34 @@ public class MimeTypesTest {
 
     BinaryResource binRes = BinaryResources.create().withContent(bytes).build();
     assertTrue(verifyMagic(binRes));
+  }
+
+  @Test
+  public void testToFileExtensionsNullEmpty() {
+    assertTrue(MimeType.toFileExtensions(null).isEmpty());
+    assertTrue(MimeType.toFileExtensions(Collections.emptyList()).isEmpty());
+  }
+
+  @Test
+  public void testToFileExtensions() {
+    List<String> fileExtensions = MimeType.toFileExtensions(CollectionUtility.arrayList(MimeType.CSS, MimeType.BMP));
+    assertEquals(2, fileExtensions.size());
+    assertTrue(fileExtensions.contains(MimeType.CSS.getFileExtension()));
+    assertTrue(fileExtensions.contains(MimeType.BMP.getFileExtension()));
+  }
+
+  @Test
+  public void testToStringTypesNullEmpty() {
+    assertTrue(MimeType.toStringTypes(null).isEmpty());
+    assertTrue(MimeType.toStringTypes(Collections.emptyList()).isEmpty());
+  }
+
+  @Test
+  public void testToStringTypes() {
+    List<String> stringTypes = MimeType.toStringTypes(CollectionUtility.arrayList(MimeType.CSS, MimeType.BMP));
+    assertEquals(2, stringTypes.size());
+    assertTrue(stringTypes.contains(MimeType.CSS.getType()));
+    assertTrue(stringTypes.contains(MimeType.BMP.getType()));
   }
 
   @Test
