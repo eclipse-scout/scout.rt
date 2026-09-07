@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, EnumObject, InitModelOf, ObjectModel, objects, ObjectWithType, Predicate, scout} from '../index';
+import {App, cookies, EnumObject, InitModelOf, ObjectModel, objects, ObjectWithType, Predicate, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, ReloadPageOptions, scout} from '../index';
 import $ from 'jquery';
 
 let instance: Device;
@@ -26,24 +26,29 @@ export type DeviceBrowser = EnumObject<typeof Device.Browser>;
  *
  * @singleton
  */
-export class Device implements DeviceModel, ObjectWithType {
+export class Device extends PropertyEventEmitter implements DeviceModel, ObjectWithType {
   declare model: DeviceModel;
+  declare eventMap: DevicePropertyEventMap;
+  declare self: Device;
   objectType: string;
   userAgent: string;
   features: Record<string, boolean>;
   system: DeviceSystem;
-  type: DeviceType;
+  enforcedType: DeviceType;
+  detectedType: DeviceType;
   browser: DeviceBrowser;
   browserVersion: number;
   systemVersion: number;
   scrollbarWidth: number;
 
   constructor(model?: InitModelOf<Device>) {
+    super();
     // user agent string from browser
     this.userAgent = model.userAgent;
     this.features = {};
     this.system = Device.System.UNKNOWN;
-    this.type = Device.Type.DESKTOP;
+    this.enforcedType = null;
+    this.detectedType = Device.Type.DESKTOP;
     this.browser = Device.Browser.UNKNOWN;
     this.browserVersion = 0;
     this.scrollbarWidth = 0;
@@ -56,6 +61,7 @@ export class Device implements DeviceModel, ObjectWithType {
     }
   }
 
+  static ENFORCED_DEVICE_TYPE_COOKIE = 'scout.ui.enforcedDeviceType' as const;
   static VENDOR_PREFIXES = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'] as const;
 
   static Browser = {
@@ -94,7 +100,8 @@ export class Device implements DeviceModel, ObjectWithType {
   bootstrap(): JQuery.Promise<any> {
     // Pre-calculate value and store in a simple property, to prevent many function calls inside loops
     this.scrollbarWidth = this._detectScrollbarWidth();
-    this.type = this._detectType(this.userAgent);
+    this.detectedType = this._detectType(this.userAgent);
+    this._setEnforcedType(this.readEnforcedTypeFromCookie());
 
     if (this.isIos()) {
       this._installActiveHandler();
@@ -172,6 +179,9 @@ export class Device implements DeviceModel, ObjectWithType {
 
   hasOnScreenKeyboard(): boolean {
     return this.supportsFeature('_onScreenKeyboard', () => {
+      if (Device.Type.DESKTOP === this.enforcedType) {
+        return false;
+      }
       return this.isIos() || this.isAndroid() || this.isWindowsTabletMode();
     });
   }
@@ -279,6 +289,47 @@ export class Device implements DeviceModel, ObjectWithType {
     return (browser === browsers.CHROME && version >= 93)
       || (browser === browsers.FIREFOX && version >= 92)
       || (browser === browsers.SAFARI && version >= 15.4);
+  }
+
+  get type(): DeviceType {
+    return this.enforcedType || this.detectedType;
+  }
+
+  readEnforcedTypeFromCookie(): DeviceType {
+    let enforcedTypeCandidate = cookies.get(Device.ENFORCED_DEVICE_TYPE_COOKIE);
+    if (scout.isOneOf(enforcedTypeCandidate, Object.values(Device.Type))) {
+      return enforcedTypeCandidate as DeviceType;
+    }
+    return null;
+  }
+
+  setEnforcedType(deviceType: DeviceType): void {
+    let oldType = this.type;
+    this.setProperty('enforcedType', deviceType);
+
+    if (this.type !== oldType) {
+      this._reloadPage();
+    }
+  }
+
+  protected _setEnforcedType(deviceType: DeviceType): void {
+    this._setProperty('enforcedType', deviceType);
+    // Add a persistent cookie which expires in 1 year
+    cookies.set(Device.ENFORCED_DEVICE_TYPE_COOKIE, this.enforcedType, this.enforcedType ? 365 * 24 * 3600 : 0);
+  }
+
+  protected _reloadPage(): void {
+    // Reload page in order to render for the new device type
+    // Don't remove body but make it invisible, otherwise JS exceptions might be thrown if body is removed while an action executed
+    $('body').setVisible(false);
+    let reloadOptions: ReloadPageOptions = {
+      clearBody: false
+    };
+    scout.reloadPage(reloadOptions);
+  }
+
+  detectType(): DeviceType {
+    return this._detectType(this.userAgent);
   }
 
   /**
@@ -414,6 +465,12 @@ export class Device implements DeviceModel, ObjectWithType {
    * different in the future.
    */
   supportsOnlyTouch(): boolean {
+    if (this.enforcedType === Device.Type.DESKTOP) {
+      return false;
+    }
+    if (scout.isOneOf(this.enforcedType, Device.Type.TABLET, Device.Type.MOBILE)) {
+      return true;
+    }
     return this.supportsFeature('_onlyTouch', this.hasOnScreenKeyboard.bind(this));
   }
 
@@ -422,6 +479,12 @@ export class Device implements DeviceModel, ObjectWithType {
    * @see https://codeburst.io/the-only-way-to-detect-touch-with-javascript-7791a3346685
    */
   supportsTouch(): boolean {
+    if (this.enforcedType === Device.Type.DESKTOP) {
+      return false;
+    }
+    if (scout.isOneOf(this.enforcedType, Device.Type.TABLET, Device.Type.MOBILE)) {
+      return true;
+    }
     return this.supportsFeature('_touch', property => {
       return (('ontouchstart' in window) || window.TouchEvent || window['DocumentTouch'] && document instanceof window['DocumentTouch']) as boolean;
     });
@@ -604,7 +667,7 @@ export class Device implements DeviceModel, ObjectWithType {
     return scrollbarWidth;
   }
 
-  toString(): string {
+  override toString(): string {
     return 'scout.Device[' +
       'system=' + this.system +
       ' browser=' + this.browser +
@@ -619,6 +682,10 @@ export class Device implements DeviceModel, ObjectWithType {
   }
 }
 
+export interface DevicePropertyEventMap extends PropertyEventMap {
+  'propertyChange:enforcedType': PropertyChangeEvent<DeviceType>;
+}
+
 App.addListener('prepare', () => {
   if (instance) {
     // if the device was created before the app itself, use it instead of creating a new one
@@ -628,3 +695,4 @@ App.addListener('prepare', () => {
     userAgent: navigator.userAgent
   });
 });
+

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.desktop;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 
 /**
  * The desktop model (may) consist of
@@ -93,4 +94,8 @@ public interface IDesktopUIFacade {
   void setInBackgroundFromUI(boolean inBackground);
 
   void setFocusedElementFromUI(IWidget widget);
+
+  void setDeviceTypeFromUI(IUiDeviceType deviceType);
+
+  void reloadSessionFromUI();
 }
