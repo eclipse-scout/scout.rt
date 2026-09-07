@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,9 +16,11 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -238,21 +240,38 @@ public class BasicPropertySupport implements IListenerListWithManagement {
 
   private <T> boolean setPropertyList(String name, List<T> newValue, boolean alwaysFire) {
     Object oldValue = m_props.get(name);
+    newValue = optimizeList(newValue);
     boolean propChanged = setPropertyNoFire(name, newValue);
     if (propChanged || alwaysFire) {
       Object eventOldValue = null;
       if (oldValue instanceof List) {
-        eventOldValue = CollectionUtility.arrayList((Collection<?>) oldValue);
+        eventOldValue = List.copyOf((Collection<?>) oldValue);
       }
       // fire a copy
       List<T> eventNewValue = null;
       if (newValue != null) {
-        eventNewValue = CollectionUtility.arrayList(newValue);
+        eventNewValue = List.copyOf(newValue);
       }
       firePropertyChangeImpl(name, eventOldValue, eventNewValue);
       return propChanged;
     }
     return false;
+  }
+
+  public <T> List<T> optimizeList(List<T> newValue) {
+    if (newValue == null) {
+      return null;
+    }
+    if (newValue.isEmpty()) {
+      return Collections.emptyList();
+    }
+    if (newValue.size() == 1) {
+      return Collections.singletonList(newValue.getFirst());
+    }
+    if (newValue.size() == 2) {
+      return List.of(newValue.get(0), newValue.get(1));
+    }
+    return List.copyOf(newValue);
   }
 
   @SuppressWarnings("unchecked")
@@ -270,6 +289,7 @@ public class BasicPropertySupport implements IListenerListWithManagement {
 
   private <T> boolean setPropertySet(String name, Set<T> newValue, boolean alwaysFire) {
     Object oldValue = m_props.get(name);
+    newValue = optimizeSet(newValue);
     boolean propChanged = setPropertyNoFire(name, newValue);
     if (propChanged || alwaysFire) {
       Object eventOldValue = null;
@@ -285,6 +305,23 @@ public class BasicPropertySupport implements IListenerListWithManagement {
       return propChanged;
     }
     return false;
+  }
+
+  public <T> Set<T> optimizeSet(Set<T> newValue) {
+    if (newValue == null) {
+      return null;
+    }
+    if (newValue.isEmpty()) {
+      return Collections.emptySet();
+    }
+    if (newValue.size() == 1) {
+      return Collections.singleton(newValue.iterator().next());
+    }
+    if (newValue.size() == 2) {
+      Iterator<T> it = newValue.iterator();
+      return Set.of(it.next(), it.next());
+    }
+    return Set.copyOf(newValue);
   }
 
   @SuppressWarnings("unchecked")
