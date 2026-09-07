@@ -251,6 +251,7 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
       int gcmAuthTagBitLen,
       int keyDerivationIterationCount) {
     assertTrue(keyLen == 128 || keyLen == 192 || keyLen == 256, "key length must be 128, 192 or 256.");
+    assertGreaterOrEqual(gcmInitVecLen, 12, "GCM initialization vector length must be at least 12 bytes.");
     try {
       // Generate a fresh random DEK (data‑encryption key)
       SecretKey documentEncryptionKey = generateDek(keyLen, cipherAlgorithm);
