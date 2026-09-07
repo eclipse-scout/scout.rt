@@ -312,7 +312,6 @@ export class TableFooter extends Widget implements TableFooterModel {
     const maxRowsServer = this.table.maxRowCountServer;
 
     $info.empty();
-    let $infoButton;
     if (!this._compactStyle) {
       if (numRows <= 1) {
         $info.appendSpan().text(this.session.text('ui.NumRowLoaded', this.computeCountInfo(numRows)));
@@ -322,14 +321,14 @@ export class TableFooter extends Widget implements TableFooterModel {
         $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows)));
       }
       if (this.table.hasReloadHandler) {
-        if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(numRows, estRows)) {
-          if (estRows < maxRowsServer) {
-            $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.LoadAllData')).appendTo($info);
+        if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(this.table)) {
+          if (maxRowsServer > 0 && estRows >= maxRowsServer) {
+            $info.appendSpan('table-info-button').text(this.session.text('ui.LoadNData', this.computeCountInfo(maxRowsServer))).appendTo($info);
           } else {
-            $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.LoadNData', this.computeCountInfo(maxRowsServer))).appendTo($info);
+            $info.appendSpan('table-info-button').text(this.session.text('ui.LoadAllData')).appendTo($info);
           }
         } else {
-          $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
+          $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
         }
       }
     } else {
@@ -338,7 +337,7 @@ export class TableFooter extends Widget implements TableFooterModel {
       } else {
         $info.appendSpan().text(this.session.text('ui.NumRowsLoadedMin'));
       }
-      $infoButton = $info.appendSpan('table-info-button').text(this.computeCountInfo(numRows));
+      $info.appendSpan('table-info-button').text(this.computeCountInfo(numRows));
     }
     this._infoLoadAction.setEnabled(this.table.hasReloadHandler);
 
@@ -353,7 +352,6 @@ export class TableFooter extends Widget implements TableFooterModel {
     let filteredBy = this.table.filteredBy().join(', '); // filteredBy() returns an array
 
     $info.empty();
-    let $infoButton;
     if (!this._compactStyle) {
       if (filteredBy) {
         if (numRowsFiltered <= 1) {
@@ -369,7 +367,7 @@ export class TableFooter extends Widget implements TableFooterModel {
         }
       }
       if (this.table.hasUserFilter()) {
-        $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.RemoveFilter')).appendTo($info);
+        $info.appendSpan('table-info-button').text(this.session.text('ui.RemoveFilter')).appendTo($info);
       }
     } else {
       if (numRowsFiltered <= 1) {
@@ -377,7 +375,7 @@ export class TableFooter extends Widget implements TableFooterModel {
       } else {
         $info.appendSpan().text(this.session.text('ui.NumRowsFilteredMin'));
       }
-      $infoButton = $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsFiltered));
+      $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsFiltered));
     }
 
     if (!this.htmlComp.layouting) {
@@ -392,21 +390,20 @@ export class TableFooter extends Widget implements TableFooterModel {
       all = numRows > 0 && numRows === numRowsSelected;
 
     $info.empty();
-    let $infoButton;
     if (!this._compactStyle) {
       if (numRowsSelected <= 1) {
         $info.appendSpan().text(this.session.text('ui.NumRowSelected', this.computeCountInfo(numRowsSelected)));
       } else {
         $info.appendSpan().text(this.session.text('ui.NumRowsSelected', this.computeCountInfo(numRowsSelected)));
       }
-      $infoButton = $info.appendSpan('table-info-button').text(this.session.text(all ? 'ui.SelectNone' : 'ui.SelectAll')).appendTo($info);
+      $info.appendSpan('table-info-button').text(this.session.text(all ? 'ui.SelectNone' : 'ui.SelectAll')).appendTo($info);
     } else {
       if (numRowsSelected <= 1) {
         $info.appendSpan().text(this.session.text('ui.NumRowSelectedMin'));
       } else {
         $info.appendSpan().text(this.session.text('ui.NumRowsSelectedMin'));
       }
-      $infoButton = $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsSelected));
+      $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsSelected));
     }
 
     if (!this.htmlComp.layouting) {
@@ -811,14 +808,10 @@ export class TableFooter extends Widget implements TableFooterModel {
   protected _onInfoLoadAction() {
     if (this._compactStyle) {
       this._toggleTableInfoTooltip(this._infoLoadAction.$container, TableInfoLoadTooltip);
+    } else if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(this.table)) {
+      this.table.reload(Table.ReloadReason.OVERRIDE_ROW_LIMIT);
     } else {
-      let numRows = this.table.rows.length;
-      let estRows = this.table.estimatedRowCount;
-      if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(numRows, estRows)) {
-        this.table.reload(Table.ReloadReason.OVERRIDE_ROW_LIMIT);
-      } else {
-        this.table.reload();
-      }
+      this.table.reload();
     }
   }
 

@@ -10,13 +10,13 @@
 import {
   Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke, ContextMenuPopup, dataObjects, Desktop,
   DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DraggableTableRowElement, DropType, EnumObject, ErrorHandler, EventHandler, EventModel, events, Filter, Filterable, FilterOrFunction,
-  FilterResult, FilterSupport, FullModelOf, graphics, GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations,
-  MenuItemsOrder, menus as menuUtil, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars,
-  ScrollToAlignment, ScrollToOptions, Status, StatusOrModel, strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer, TableDefaultRowActionKeyStroke,
-  TableEventMap, TableFooter, TableGroupEvent, TableHeader, TableLayout, TableLoadingSupport, TableModel, TableMoveSupport, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke,
-  TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowDropPosition,
-  TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableSelectKeyStroke, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUiPreferences, tableUiPreferences,
-  TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences, UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
+  FilterResult, FilterSupport, FullModelOf, graphics, GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultInfoContributionDo, LimitedResultTableStatus, LoadingSupport,
+  Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range,
+  scout, scrollbars, ScrollToAlignment, ScrollToOptions, Status, StatusOrModel, strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer,
+  TableDefaultRowActionKeyStroke, TableEventMap, TableFooter, TableGroupEvent, TableHeader, TableLayout, TableLoadingSupport, TableModel, TableMoveSupport, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke,
+  TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow,
+  TableRowDropPosition, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableSelectKeyStroke, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUiPreferences,
+  tableUiPreferences, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences, UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -95,6 +95,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   estimatedRowCount: number;
   maxRowCount: number;
   maxRowCountServer: number;
+  limitedResult: boolean;
   aggregateRowHeight: number;
   truncatedCellTooltipEnabled: boolean;
   checkableColumn: BooleanColumn;
@@ -226,6 +227,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.rootRows = [];
     this.visibleRows = [];
     this.estimatedRowCount = 0;
+    this.limitedResult = false;
     this.maxRowCount = 0;
     this.maxRowCountServer = 0;
     this.truncatedCellTooltipEnabled = null;
@@ -5452,21 +5454,34 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.setProperty('tableStatus', status);
   }
 
+  // see org.eclipse.scout.rt.client.ui.basic.table.AbstractTable.setResultInfo
+  setResultInfo(limitedResultInfoDo: LimitedResultInfoContributionDo) {
+    this.setLimitedResult(scout.nvl(limitedResultInfoDo?.limitedResult, false));
+    this.setMaxRowCountServer(scout.nvl(limitedResultInfoDo?.maxRowCount, 0));
+    this.setEstimatedRowCount(scout.nvl(limitedResultInfoDo?.estimatedRowCount, 0));
+  }
+
   /**
    * If the rows of this table are limited, the tableStatus is set to the corresponding message.
    * {@link rows.length} and {@link estimatedRowCount} of this table are taken into account to create the status message.
-   * @param limitedResult Specifies if the rows of this table are limited.
    */
-  setLimitedResultTableStatus(limitedResult: boolean) {
-    if (!limitedResult) {
+  updateLimitedResultTableStatus() {
+    if (!this.limitedResult) {
       this.setTableStatus(null);
       return;
     }
 
-    const estimatedRowCount = this.estimatedRowCount;
+    let estimatedRowCount = this.estimatedRowCount;
     const numRows = this.rows.length;
     const decimalFormat = this.session.locale.decimalFormat;
     const showingRowCountText = decimalFormat.format(numRows);
+
+    if (estimatedRowCount > 0 && estimatedRowCount <= numRows) {
+      // if there is an estimation, but it is lower than the actual rows: correct it
+      // see also org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable.createPopulateTableStatus
+      estimatedRowCount = numRows * 10;
+    }
+
     let message: string;
     if (Device.get().type === Device.Type.MOBILE) {
       if (estimatedRowCount > 0) {
@@ -5861,9 +5876,17 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
   /**
    * Sets the new value of the maxRowCount received from the server.
+   * @param maxRowCountServer The new maxRowCount received from the server.
    */
   setMaxRowCountServer(maxRowCountServer: number) {
     this.setProperty('maxRowCountServer', maxRowCountServer);
+  }
+
+  /**
+   * @param limitedResult If the result loaded into this table is limited or represents all data.
+   */
+  setLimitedResult(limitedResult: boolean) {
+    this.setProperty('limitedResult', limitedResult);
   }
 
   /** @see TableModel.estimatedRowCount */

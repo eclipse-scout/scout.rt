@@ -13,12 +13,11 @@ export class TableMaxResultsHelper {
 
   /**
    * Checks if more data could be loaded into the table.
-   * @param numRows The number of currently loaded rows of the table.
-   * @param estRows The number of estimated rows that would be available.
-   * @returns true if a estRows is available and the currently loaded number of rows (numRows) is smaller. This means more data could be loaded.
+   * @param table The table to evaluate.
+   * @returns true if more data can be loaded. This is if the table has a {@link Table.limitedResult}.
    */
-  isLoadMoreDataPossible(numRows: number, estRows: number): boolean {
-    return estRows > 0 && numRows < estRows;
+  isLoadMoreDataPossible(table: Table): boolean {
+    return !!table?.limitedResult && !(table.maxRowCountServer > 0 && table.rows.length >= table.maxRowCountServer);
   }
 
   /**

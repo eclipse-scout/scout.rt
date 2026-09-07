@@ -4314,6 +4314,14 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   @Override
+  public void setResultInfo(boolean limitedResult, int maxRowCount, long estimatedRowCount) {
+    // see Table.ts#setResultInfo
+    setLimitedResult(limitedResult);
+    setEstimatedRowCount(estimatedRowCount);
+    setMaxRowCount(maxRowCount);
+  }
+
+  @Override
   public TableListeners tableListeners() {
     return m_listeners;
   }
@@ -5500,6 +5508,16 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void setEstimatedRowCount(long estimatedRowCount) {
     propertySupport.setPropertyLong(PROP_ESTIMATED_ROW_COUNT, estimatedRowCount);
+  }
+
+  @Override
+  public boolean isLimitedResult() {
+    return propertySupport.getPropertyBool(PROP_LIMITED_RESULT);
+  }
+
+  @Override
+  public void setLimitedResult(boolean limitedResult) {
+    propertySupport.setPropertyBool(PROP_LIMITED_RESULT, limitedResult);
   }
 
   @Override

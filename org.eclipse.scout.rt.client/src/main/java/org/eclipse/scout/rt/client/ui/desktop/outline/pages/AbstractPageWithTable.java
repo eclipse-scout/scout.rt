@@ -288,11 +288,18 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     if (table == null) {
       return null;
     }
-    boolean limited = isLimitedResult();
+    boolean limited = table.isLimitedResult();
     if (!limited) {
       return null;
     }
     long estimatedRowCount = table.getEstimatedRowCount();
+    int rowCount = table.getRowCount();
+    if (estimatedRowCount > 0 && estimatedRowCount <= rowCount) {
+      // if there is an estimation, but it is lower than the actual rows: correct it
+      // see also Table.ts#updateLimitedResultTableStatus
+      estimatedRowCount = rowCount * 10L;
+    }
+
     String showingRowCountText = NumberFormat.getIntegerInstance(NlsLocale.get()).format(table.getRowCount());
     String estimatedRowCountText = NumberFormat.getIntegerInstance(NlsLocale.get()).format(estimatedRowCount);
     String message;
@@ -679,37 +686,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
   }
 
-  /**
-   * Indicates if the result displayed in the table is the whole result or if there is more data in the server (that
-   * wasn't sent to the client). Is set if {@link #importPageData(AbstractTablePageData)} was used.
-   *
-   * @since 3.10.0-M3
-   */
-  public boolean isLimitedResult() {
-    return FLAGS_BIT_HELPER.isBitSet(LIMITED_RESULT, m_flags);
-  }
-
-  public void setLimitedResult(boolean limitedResult) {
-    m_flags = FLAGS_BIT_HELPER.changeBit(LIMITED_RESULT, limitedResult, m_flags);
-  }
-
-  @Override
-  public void setResultInfo(boolean limitedResult, int maxRowCount, long estimatedRowCount) {
-    T table = getTable(false);
-    if (table == null) {
-      return;
-    }
-
-    // see also PageWithTable.ts#_readLimitedResultInfo
-    setLimitedResult(limitedResult);
-    if (limitedResult && estimatedRowCount > 0) {
-      // if there is an estimation, but it is lower than the actual rows: correct it
-      estimatedRowCount = Math.max(table.getRowCount() + 1L, estimatedRowCount);
-    }
-    table.setEstimatedRowCount(estimatedRowCount);
-    table.setMaxRowCount(maxRowCount);
-  }
-
   @Override
   public boolean isAlwaysCreateChildPage() {
     return FLAGS_BIT_HELPER.isBitSet(ALWAYS_CREATE_CHILD_PAGE, m_flags);
@@ -751,7 +727,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
 
     table.importFromTableBeanData(tablePageData);
-    setResultInfo(tablePageData.isLimitedResult(), tablePageData.getMaxRowCount(), tablePageData.getEstimatedRowCount());
+    table.setResultInfo(tablePageData.isLimitedResult(), tablePageData.getMaxRowCount(), tablePageData.getEstimatedRowCount());
   }
 
   /**

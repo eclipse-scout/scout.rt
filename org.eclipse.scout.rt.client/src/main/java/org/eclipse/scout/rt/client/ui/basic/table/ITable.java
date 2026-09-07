@@ -235,6 +235,13 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   String PROP_ESTIMATED_ROW_COUNT = "estimatedRowCount";
 
   /**
+   * type boolean
+   *
+   * @since 26.2
+   */
+  String PROP_LIMITED_RESULT = "limitedResult";
+
+  /**
    * type int
    *
    * @since 9.0
@@ -1293,6 +1300,31 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * @since 9.0
    */
   void setEstimatedRowCount(long estimatedRowCount);
+
+  /**
+   * @return If the table holds a limited result.
+   * @since 26.2
+   */
+  boolean isLimitedResult();
+
+  /**
+   * Sets if the table holds a limited result.
+   *
+   * @since 26.2
+   */
+  void setLimitedResult(boolean limitedResult);
+
+  /**
+   * Apply result meta info to this table.
+   *
+   * @param limitedResult
+   *     If the result was limited (not complete)
+   * @param maxRowCount
+   *     Maximum row count the user is allowed to load into this table.
+   * @param estimatedRowCount
+   *     In case the result was limited, how many rows that are estimated to be available in total.
+   */
+  void setResultInfo(boolean limitedResult, int maxRowCount, long estimatedRowCount);
 
   /**
    * Maximum row count the user is allowed to load into this table, maximal capacity, optional.
