@@ -252,6 +252,7 @@
       "dropType": 0,
       "dropMaximumSize": 52428800,
       "estimatedRowCount": 0,
+      "limitedResult": false,
       "filters": [],
       "groupingStyle": "top",
       "hasReloadHandler": false,
