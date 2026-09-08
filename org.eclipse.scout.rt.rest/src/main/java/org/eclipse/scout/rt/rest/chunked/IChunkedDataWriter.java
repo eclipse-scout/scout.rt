@@ -12,12 +12,16 @@ package org.eclipse.scout.rt.rest.chunked;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.rest.IRestResource;
@@ -33,8 +37,7 @@ import org.eclipse.scout.rt.rest.IRestResource;
  * &#064;Produces(MediaType.APPLICATION_JSON)
  * public Response load() {
  *   IChunkedDataWriter&#060;ExampleDo&#062; writer = IChunkedDataWriter.create(ExampleDo.class, "\r\n", 100);
- *   Iterator&#060;ExampleDo&#062; iterator = fetchData();  // load data from source, e.g. database
- *   return writer.toResponse(iterator);
+ *   return writer.toResponse(() -> fetchData()));   // load data from source, e.g. database
  * }
  * </pre>
  */
@@ -95,13 +98,66 @@ public interface IChunkedDataWriter<T> extends Closeable {
 
   /**
    * Schedules job which consumes given iterator and returns response created by {@link #toEntity()}.
+   *
+   * @deprecated Instead, use {@link #toResponse(Supplier)}
    */
+  @Deprecated(forRemoval = true, since = "26.2")
   default Response toResponse(Iterator<T> iterator) {
     writeAsync(() -> {
       while (iterator.hasNext()) {
         write(iterator.next());
       }
     });
+    return Response.ok(toEntity()).build();
+  }
+
+  /**
+   * Schedules job that invokes given supplier and that writes its values, and returns a response created by {@link #toEntity()}.
+   * The iterator supplier as well as the iteration loop are performed within the same job in order to use
+   * the same transaction. This method blocks until the supplier completes and re-throws any unchecked exception.
+   */
+  default Response toResponse(Supplier<Iterator<T>> iteratorSupplier) {
+    final CountDownLatch supplierDone = new CountDownLatch(1);
+    final AtomicReference<Throwable> uncheckedException = new AtomicReference<>();
+
+    writeAsync(() -> {
+      // invoke supplier within the same transaction that also runs over the iterator,
+      // so that txn-related resources are still available (e.g. db connection)
+      Iterator<T> iterator;
+      try {
+        iterator = iteratorSupplier.get();
+      }
+      catch (RuntimeException | Error e) {
+        uncheckedException.set(e);
+        throw e;
+      }
+      finally {
+        supplierDone.countDown();
+      }
+
+      // write chunked data
+      while (iterator.hasNext()) {
+        write(iterator.next());
+      }
+    });
+
+    // wait for the supplier to complete
+    try {
+      supplierDone.await();
+    }
+    catch (InterruptedException e) {
+      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+    }
+
+    // rethrow any unchecked exception occurred by the supplier
+    Throwable throwable = uncheckedException.get();
+    if (throwable instanceof RuntimeException runtimeException) {
+      throw runtimeException;
+    }
+    if (throwable instanceof Error error) {
+      throw error;
+    }
+
     return Response.ok(toEntity()).build();
   }
 }
