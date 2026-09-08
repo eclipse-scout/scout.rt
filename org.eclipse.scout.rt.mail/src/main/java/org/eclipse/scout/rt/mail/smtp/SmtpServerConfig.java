@@ -32,6 +32,7 @@ public class SmtpServerConfig {
   private boolean m_useStartTls;
   private String m_sslProtocols;
   private boolean m_oAuth2;
+  private boolean m_useUtf8;
 
   private Map<String, String> m_additionalSessionProperties;
 
@@ -209,6 +210,19 @@ public class SmtpServerConfig {
     return this;
   }
 
+  public boolean isUseUtf8() {
+    return m_useUtf8;
+  }
+
+  /**
+   * @param useUtf8
+   *     Enables UTF-8 support.
+   */
+  public SmtpServerConfig withUseUtf8(boolean useUtf8) {
+    m_useUtf8 = useUtf8;
+    return this;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -225,6 +239,7 @@ public class SmtpServerConfig {
     result = prime * result + (m_useSmtps ? 1231 : 1237);
     result = prime * result + (m_useStartTls ? 1231 : 1237);
     result = prime * result + ((m_username == null) ? 0 : m_username.hashCode());
+    result = prime * result + (m_useUtf8 ? 1231 : 1237);
     return result;
   }
 
@@ -304,6 +319,9 @@ public class SmtpServerConfig {
       }
     }
     else if (!m_username.equals(other.m_username)) {
+      return false;
+    }
+    if (m_useUtf8 != other.m_useUtf8) {
       return false;
     }
     return true;
