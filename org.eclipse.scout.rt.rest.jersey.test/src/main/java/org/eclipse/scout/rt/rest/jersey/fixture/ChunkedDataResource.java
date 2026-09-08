@@ -159,7 +159,7 @@ public class ChunkedDataResource implements IRestResource {
   public Response getDataObjectsScoutIterator() {
     @SuppressWarnings("resource")
     IChunkedDataWriter<FixtureDo> writer = IChunkedDataWriter.create(FixtureDo.class, "\n\n", 100);
-    return writer.toResponse(Stream.of(1, 2, 3).map(this::createFixtureDo).iterator());
+    return writer.toResponse(() -> Stream.of(1, 2, 3).map(this::createFixtureDo).iterator());
   }
 
   /**
