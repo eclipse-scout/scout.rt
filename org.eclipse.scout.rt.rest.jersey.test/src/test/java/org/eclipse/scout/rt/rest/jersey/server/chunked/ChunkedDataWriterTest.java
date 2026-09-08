@@ -11,7 +11,6 @@ package org.eclipse.scout.rt.rest.jersey.server.chunked;
 
 import static org.junit.Assert.*;
 
-import java.io.Serial;
 import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -40,12 +39,15 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class ChunkedDataWriterTest {
 
+  private FixtureIterator m_iterator;
+
   @Test
   public void testToResponse() {
     @SuppressWarnings("resource")
     IChunkedDataWriter<String> writer = IChunkedDataWriter.create(String.class, "\r\n", 100);
-    Response res = writer.toResponse(() -> fetchData("a", "b", "c"));
+    Response res = writer.toResponse(() -> fetchData());
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
+    assertTrue(m_iterator.waitForCompletionAndVerifyTxn());
   }
 
   @Test
@@ -65,40 +67,42 @@ public class ChunkedDataWriterTest {
         })));
   }
 
-  @Test(expected = WrongTransactionException.class)
+  @Test
   public void testToResponse_differentTransactions() {
     IBean<Object> fixtureRunCtxFactoryBean = BeanTestingHelper.get().registerBean(new BeanMetaData(RequiresNewFixtureRunContextFactory.class));
     try {
       @SuppressWarnings("resource")
       IChunkedDataWriter<String> writer = IChunkedDataWriter.create(String.class, "\r\n", 100);
-      CompletableIterator iterator = fetchData("a", "b", "c");
+      FixtureIterator iterator = fetchData();
       Response res = writer.toResponse(() -> iterator);
       assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
-      iterator.waitForCompletion();
+      assertFalse(iterator.waitForCompletionAndVerifyTxn());
     }
     finally {
       BeanTestingHelper.get().unregisterBean(fixtureRunCtxFactoryBean);
     }
   }
 
-  protected CompletableIterator fetchData(String... elements) {
-    return new CompletableIterator(elements);
+  protected FixtureIterator fetchData() {
+    m_iterator = new FixtureIterator();
+    return m_iterator;
   }
 
-  protected static class CompletableIterator implements Iterator<String> {
+  protected static class FixtureIterator implements Iterator<String> {
     final ITransaction m_creatingTxn;
     final Iterator<String> m_delegate;
     final CountDownLatch m_completedLatch;
+    private volatile boolean m_iteratesInCreatingTxn = true;
 
-    public CompletableIterator(String... elements) {
-      m_delegate = CollectionUtility.arrayList(elements).iterator();
+    public FixtureIterator() {
+      m_delegate = CollectionUtility.arrayList("a", "b", "c").iterator();
       m_creatingTxn = ITransaction.CURRENT.get();
       m_completedLatch = new CountDownLatch(1);
     }
 
     @Override
     public boolean hasNext() {
-      assertTxn();
+      checkTxn();
       boolean hasNext = m_delegate.hasNext();
       if (!hasNext) {
         m_completedLatch.countDown();
@@ -108,34 +112,23 @@ public class ChunkedDataWriterTest {
 
     @Override
     public String next() {
-      assertTxn();
+      checkTxn();
       return m_delegate.next();
     }
 
-    private void assertTxn() {
+    private void checkTxn() {
       if (m_creatingTxn != ITransaction.CURRENT.get()) {
-        m_completedLatch.countDown();
-        throw new WrongTransactionException("Iterator is not running in the same transaction it was created");
+        m_iteratesInCreatingTxn = false;
       }
     }
 
-    public void waitForCompletion() {
+    public boolean waitForCompletionAndVerifyTxn() {
       try {
-        //noinspection ResultOfMethodCallIgnored
-        m_completedLatch.await(5, TimeUnit.SECONDS);
+        return m_completedLatch.await(5, TimeUnit.SECONDS) && m_iteratesInCreatingTxn;
       }
       catch (InterruptedException e) {
         throw new ThreadInterruptedError("Interrupted", e);
       }
-    }
-  }
-
-  protected static class WrongTransactionException extends RuntimeException {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    public WrongTransactionException(String message) {
-      super(message);
     }
   }
 
