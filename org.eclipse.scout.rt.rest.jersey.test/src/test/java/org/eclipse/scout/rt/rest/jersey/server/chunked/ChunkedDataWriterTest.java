@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.TransactionCancelledError;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.rest.chunked.IChunkedDataWriter;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
@@ -56,15 +57,24 @@ public class ChunkedDataWriterTest {
     IChunkedDataWriter<String> writer = IChunkedDataWriter.create(String.class, "\r\n", 100);
 
     JUnitExceptionHandler exceptionHandler = BEANS.get(JUnitExceptionHandler.class);
-    exceptionHandler.ignoreExceptionOnce(RuntimeException.class, () -> assertThrows(RuntimeException.class,
-        () -> writer.toResponse(() -> {
-          throw new RuntimeException("by intention");
-        })));
+    exceptionHandler.ignoreExceptionOnce(RuntimeException.class, () -> {
+      assertThrows(RuntimeException.class,
+          () -> writer.toResponse(() -> {
+            throw new RuntimeException("by intention");
+          }));
+      // The exception above is thrown in a job and finally handled by the JUnitExceptionHandler.
+      // But because it involves another job, we must give it some time to be processed.
+      SleepUtil.sleepSafe(100, TimeUnit.MILLISECONDS);
+    });
 
-    exceptionHandler.ignoreExceptionOnce(TransactionCancelledError.class, () -> assertThrows(TransactionCancelledError.class,
-        () -> writer.toResponse(() -> {
-          throw new TransactionCancelledError("by intention");
-        })));
+    exceptionHandler.ignoreExceptionOnce(TransactionCancelledError.class, () -> {
+      assertThrows(TransactionCancelledError.class,
+          () -> writer.toResponse(() -> {
+            throw new TransactionCancelledError("by intention");
+          }));
+      // same applies here (see comment above)
+      SleepUtil.sleepSafe(100, TimeUnit.MILLISECONDS);
+    });
   }
 
   @Test
