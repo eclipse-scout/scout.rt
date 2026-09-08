@@ -470,6 +470,7 @@ public class Application {
     GzipEncoderConfig encoderConfig = new GzipEncoderConfig();
 
     Builder configBuilder = CompressionConfig.builder();
+    configBuilder.defaults();
 
     setStringPropertyValueIfFilled(ScoutApplicationGzipExcludedInflatePaths.class, configBuilder::decompressExcludePath);
     setStringPropertyValueIfFilled(ScoutApplicationGzipExcludedMethods.class, configBuilder::compressExcludeMethod);
