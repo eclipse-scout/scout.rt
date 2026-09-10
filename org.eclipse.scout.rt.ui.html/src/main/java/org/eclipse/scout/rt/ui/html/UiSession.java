@@ -33,6 +33,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -646,6 +647,14 @@ public class UiSession implements IUiSession {
     detachDesktop();
 
     m_sessionMetrics.sessionDestroyed(SESSION_TYPE);
+
+    // inform other sessions to stop + reload
+    if (getClientSession() != null && ObjectUtility.equals(getClientSession().getExitCode(), AbstractClientSession.EXIT_CODE_RELOAD_SESSION)) {
+      sessionStore().getUiSessionMap().values().stream()
+          .map(uiSession -> uiSession.getClientSession())
+          .filter(clientSession -> !clientSession.isStopping())
+          .forEach(clientSession -> clientSession.stop(AbstractClientSession.EXIT_CODE_RELOAD_SESSION));
+    }
   }
 
   /**
@@ -1136,7 +1145,12 @@ public class UiSession implements IUiSession {
 
   protected JSONObject createLogoutEventData() {
     JSONObject obj = new JSONObject();
-    obj.put("redirectUrl", getLogoutRedirectUrl());
+    if (getClientSession().getExitCode() == AbstractClientSession.EXIT_CODE_LOGOUT) {
+      obj.put("redirectUrl", getLogoutRedirectUrl());
+    }
+    if (getClientSession().getExitCode() == AbstractClientSession.EXIT_CODE_RELOAD_SESSION) {
+      obj.put("reloadPage", Boolean.TRUE);
+    }
     return obj;
   }
 
@@ -1422,7 +1436,6 @@ public class UiSession implements IUiSession {
   public void updateEnforcedDeviceType(IUiDeviceType enforcedDeviceType) {
     if (currentHttpResponse() != null && enforcedDeviceType != null) {
       setEnforcedDeviceType(enforcedDeviceType);
-      sendReloadPageEvent();
       LOG.info("UI enforced device type changed to: {}", enforcedDeviceType.stringValue());
     }
   }
