@@ -9,24 +9,18 @@
  */
 package org.eclipse.scout.rt.server.services.common.pwd;
 
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PasswordPolicyMinLengthProperty;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.security.PasswordPolicy;
-import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
-import org.junit.After;
+import org.eclipse.scout.rt.testing.platform.mock.MockConfigPropertyRule;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class DefaultPasswordPolicyTest {
 
-  protected IBean<?> m_minLengthPropertyMockBean;
-
-  @After
-  public void after() {
-    BEANS.get(BeanTestingHelper.class).unregisterBean(m_minLengthPropertyMockBean);
-  }
+  @Rule
+  public MockConfigPropertyRule<Integer> m_passwordPolicyMinLengthPropertyRule = new MockConfigPropertyRule<>(PasswordPolicyMinLengthProperty.class, 12);
 
   @Test
   public void testPolicy() {
@@ -45,7 +39,7 @@ public class DefaultPasswordPolicyTest {
     policy.check("uid", "12Characters_".toCharArray(), -1);
     policy.check(null, "12Characters_".toCharArray(), -1);
 
-    setMinPasswordLength(20);
+    m_passwordPolicyMinLengthPropertyRule.setValue(20);
     assertVetoException(policy, "uname", "13Characters_".toCharArray(), -1);
     policy.check("uname", "20CharacterPassword_".toCharArray(), -1);
   }
@@ -59,10 +53,5 @@ public class DefaultPasswordPolicyTest {
       hasException = true;
     }
     Assert.assertTrue(hasException);
-  }
-
-  protected void setMinPasswordLength(Integer minLength) {
-    BEANS.get(BeanTestingHelper.class).unregisterBean(m_minLengthPropertyMockBean);
-    m_minLengthPropertyMockBean = BEANS.get(BeanTestingHelper.class).mockConfigProperty(PasswordPolicyMinLengthProperty.class, minLength);
   }
 }
