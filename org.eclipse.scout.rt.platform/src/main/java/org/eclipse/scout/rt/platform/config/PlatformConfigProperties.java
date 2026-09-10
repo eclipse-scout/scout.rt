@@ -399,7 +399,7 @@ public final class PlatformConfigProperties {
 
     @Override
     public Integer getDefaultValue() {
-      return 12;
+      return 14;
     }
   }
 }
