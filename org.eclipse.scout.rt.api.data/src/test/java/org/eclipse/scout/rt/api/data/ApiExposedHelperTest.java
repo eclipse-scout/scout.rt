@@ -73,12 +73,12 @@ public class ApiExposedHelperTest {
     helper.setObjectTypeToDo(null, null);
     helper.setObjectTypeToDo((Object) null, null);
 
-    // nothing is transferred if no annotation present
+    // nothing is transferred if no object type is provided
     DoEntity emptyBean = BEANS.get(DoEntity.class);
     helper.setObjectTypeToDo(new ApiExposedHelperTest(), emptyBean);
     assertNull(emptyBean.get(ApiExposedHelper.OBJECT_TYPE_ATTRIBUTE_NAME, String.class));
 
-    // value is transferred from annotation to DO
+    // value is transferred to DO
     emptyBean = BEANS.get(DoEntity.class);
     helper.setObjectTypeToDo(new ApiExposedFixture(), emptyBean);
     assertEquals("test2", emptyBean.get(ApiExposedHelper.OBJECT_TYPE_ATTRIBUTE_NAME, String.class));
@@ -94,6 +94,14 @@ public class ApiExposedHelperTest {
     beanWithCustomValue.put(ApiExposedHelper.OBJECT_TYPE_ATTRIBUTE_NAME, customValue);
     helper.setObjectTypeToDo(ApiExposedFixture.class, beanWithCustomValue);
     assertEquals(customValue, beanWithCustomValue.get(ApiExposedHelper.OBJECT_TYPE_ATTRIBUTE_NAME, String.class));
+  }
+
+  @Test
+  public void testObjectTypeProvidedByProvider() {
+    ApiExposedHelper helper = BEANS.get(ApiExposedHelper.class);
+
+    assertEquals("testObjectType", helper.objectTypeOf(TestObjectTypeFixture.class));
+    assertEquals("testObjectType", helper.objectTypeOf(new TestObjectTypeFixture()));
   }
 
   @Bean
@@ -116,5 +124,19 @@ public class ApiExposedHelperTest {
   @ObjectType("")
   public static class ApiExposedEmptyFixture {
 
+  }
+
+  public static class TestObjectTypeFixture {
+  }
+
+  public static class TestObjectTypeProvider implements IObjectTypeProvider {
+
+    @Override
+    public String objectTypeOf(Class<?> type) {
+      if (type == TestObjectTypeFixture.class) {
+        return "testObjectType";
+      }
+      return null;
+    }
   }
 }
