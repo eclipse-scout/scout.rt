@@ -9,17 +9,22 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import org.eclipse.scout.rt.client.ui.BasicPropertySupportFactory;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
+import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class HeaderCell extends AbstractPropertyObserver implements IHeaderCell {
-  private static final Logger LOG = LoggerFactory.getLogger(HeaderCell.class);
 
   public HeaderCell() {
     doSetColumnIndex(-1);
     setHorizontalAlignment(-1);
+  }
+
+  @Override
+  protected BasicPropertySupport createPropertySupport() {
+    return BEANS.get(BasicPropertySupportFactory.class).createFor(this);
   }
 
   @Override
