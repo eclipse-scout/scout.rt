@@ -13,7 +13,7 @@
  */
 import {
   AbortError, arrays, Cell, Column, Deferred, Form, GroupBox, InitModelOf, MaxRowCountContributionDo, NumberColumn, NumberField, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, ResetMenu, scout, SearchFormTableControl,
-  SearchMenu, SearchRequiredTableStatus, SmartColumn, StaticLookupCall, StringField, Table, TableReloadReason, TableRow, Tree, WidgetModel
+  SearchMenu, SearchRequiredTableStatus, SmartColumn, StaticLookupCall, StringField, Table, TableFooterLayout, TableReloadReason, TableRow, Tree, WidgetModel
 } from '../../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
 
@@ -143,7 +143,7 @@ describe('PageWithTable', () => {
       }
     };
     let requestWithLimit = page._withMaxRowCountContribution(searchFilter);
-    expect(requestWithLimit._contributions.length).toBe(2);
+    expect(requestWithLimit._contributions).toHaveSize(2);
     let maxRowCountContributionDo: MaxRowCountContributionDo = requestWithLimit._contributions[1];
     expect(maxRowCountContributionDo.hint).toBe(123);
     expect(maxRowCountContributionDo._type).toBe('scout.MaxRowCountContribution');
@@ -199,17 +199,18 @@ describe('PageWithTable', () => {
     expect(page.detailTable.maxRowCount).toBe(clientLimit);
     expect(page.detailTable.estimatedRowCount).toBe(allData.length);
     expect(page.detailTable.tableStatus.message).toBe('[undefined text: MaxOutlineRowWarningWithEstimatedRowCount]');
-    expect(page.detailTable.rows.length).toBe(clientLimit);
+    expect(page.detailTable.rows).toHaveSize(clientLimit);
     page.detailTable.reload(Table.ReloadReason.OVERRIDE_ROW_LIMIT);
     await page.detailTable.when('propertyChange:loading');
     expect(page.detailTable.maxRowCountServer).toBe(serverLimit);
     expect(page.detailTable.maxRowCount).toBe(clientLimit);
     expect(page.detailTable.estimatedRowCount).toBe(allData.length);
-    expect(page.detailTable.rows.length).toBe(serverLimit);
+    expect(page.detailTable.rows).toHaveSize(serverLimit);
     expect(page.detailTable.tableStatus.message).toBe('[undefined text: MaxOutlineRowWarningWithEstimatedRowCount]');
   });
 
   it('corrects wrong row estimation', async () => {
+    session.textMap.add('MaxOutlineRowWarningWithEstimatedRowCount', 'Large dataset. Only {0} out of approx. {1} results are shown.');
     page._loadTableData = searchFilter => {
       return $.resolvedPromise({
         _contributions: [{
@@ -223,8 +224,50 @@ describe('PageWithTable', () => {
     page.detailTable.reload();
     await page.detailTable.when('propertyChange:loading');
 
-    expect(page.detailTable.estimatedRowCount).toBe(5); // expect to be one more than actual rows (corrected estimation)
-    expect(page.detailTable.rows.length).toBe(4);
+    expect(page.detailTable.rows).toHaveSize(4);
+    expect(page.detailTable.tableStatus.message).toBe('Large dataset. Only 4 out of approx. 40 results are shown.'); // expect ten times the actual rows (corrected estimation)
+  });
+
+  it('allows load all data if result is limited.', async () => {
+    const footer = page.detailTable.footer;
+
+    // don't layout the footer so that it does not switch to compact mode
+    const noopFooterLayout = new TableFooterLayout(footer);
+    noopFooterLayout.layout = ($container: JQuery) => {
+    };
+    footer.htmlComp.setLayout(noopFooterLayout);
+
+    page._loadTableData = searchFilter => {
+      return $.resolvedPromise({
+        _contributions: [{
+          _type: 'scout.LimitedResultInfoContribution',
+          limitedResult: true
+        }]
+      });
+    };
+    page._transformTableDataToTableRows = data => [{cells: [1]}];
+    page.detailTable.reload();
+    await page.detailTable.when('propertyChange:loading');
+
+    expect(footer._infoLoadAction.$container.html()).toContainText('ui.LoadAllData');
+
+    session.textMap.add('ui.LoadNData', 'Load {0}');
+    session.textMap.add('ui.TableRowCount', '{0} rows');
+    page._loadTableData = searchFilter => {
+      return $.resolvedPromise({
+        _contributions: [{
+          _type: 'scout.LimitedResultInfoContribution',
+          limitedResult: true,
+          maxRowCount: 100,
+          estimatedRowCount: 200
+        }]
+      });
+    };
+    page._transformTableDataToTableRows = data => [{cells: [1]}];
+    page.detailTable.reload();
+    await page.detailTable.when('propertyChange:loading');
+
+    expect(footer._infoLoadAction.$container.html()).toContainText('Load 100 rows'); // as estimation > maxRows
   });
 
   it('stores reload reason', async () => {
@@ -258,7 +301,7 @@ describe('PageWithTable', () => {
       parentRow: 666, // does not exist -> causes an error in Table.js#insertRows
       cells: []
     }]);
-    expect(page.detailTable.tableStatus).toBe(undefined);
+    expect(page.detailTable.tableStatus).toBeUndefined();
     page.detailTable.reload();
     await page.detailTable.when('propertyChange:loading');
 
@@ -638,11 +681,11 @@ describe('PageWithTable', () => {
     outline.selectNode(page);
     await page.detailTable.when('propertyChange:loading');
 
-    expect(page.childNodes.length).toBe(3);
+    expect(page.childNodes).toHaveSize(3);
     expect(page.expanded).toBe(false);
     expect(page.expandedLazy).toBe(false);
     expect(page.detailTable).toBeInstanceOf(Table);
-    expect(page.detailTable.rows.length).toBe(3);
+    expect(page.detailTable.rows).toHaveSize(3);
     expect(page.detailTable.hasReloadHandler).toBe(true);
 
     // -----
@@ -661,7 +704,7 @@ describe('PageWithTable', () => {
     page.detailTable.reload();
     await page.detailTable.when('propertyChange:loading');
 
-    expect(page.childNodes.length).toBe(3);
+    expect(page.childNodes).toHaveSize(3);
     expect(page.expanded).toBe(false);
     expect(page.expandedLazy).toBe(false);
 
@@ -675,7 +718,7 @@ describe('PageWithTable', () => {
 
     page.detailTable.reload();
     await page.detailTable.when('propertyChange:loading');
-    expect(page.childNodes.length).toBe(3);
+    expect(page.childNodes).toHaveSize(3);
     expect(page.expanded).toBe(true);
     expect(page.expandedLazy).toBe(false);
   });
@@ -729,19 +772,19 @@ describe('PageWithTable', () => {
 
     page.loadTableData();
     expect(usedFilter.strVal).toBe('initial');
-    expect(usedFilter.numVal).toBe(null);
+    expect(usedFilter.numVal).toBeNull();
 
     let searchForm = page.getSearchForm();
     let searchFormData = searchForm.data as SearchData;
     expect(searchFormData.strVal).toBe('initial');
-    expect(searchFormData.numVal).toBe(null);
+    expect(searchFormData.numVal).toBeNull();
 
     let stringField = searchForm.findChild(StringField);
     let numberField = searchForm.findChild(NumberField);
     stringField.setValue('new');
     numberField.setValue(2);
     expect(searchFormData.strVal).toBe('initial'); // Search not executed yet
-    expect(searchFormData.numVal).toBe(null);
+    expect(searchFormData.numVal).toBeNull();
 
     let searchMenu = searchForm.findChild(SearchMenu);
     searchMenu.doAction();
@@ -896,7 +939,7 @@ describe('PageWithTable', () => {
 
       outline.insertNodes([pageWithSearchRequired], null);
       expect(pageWithSearchRequired.outline).toBe(outline);
-      expect(pageWithSearchRequired.detailTable).toBe(null);
+      expect(pageWithSearchRequired.detailTable).toBeNull();
 
       outline.expandNode(pageWithSearchRequired); // <-- calls ensureLoadChildren() before the detail table is initialized
       outline.selectNode(pageWithSearchRequired);
@@ -914,12 +957,12 @@ describe('PageWithTable', () => {
 
       outline.insertNodes([pageWithSearchRequiredWithoutDetailTable], null);
       expect(pageWithSearchRequiredWithoutDetailTable.outline).toBe(outline);
-      expect(pageWithSearchRequiredWithoutDetailTable.detailTable).toBe(null);
+      expect(pageWithSearchRequiredWithoutDetailTable.detailTable).toBeNull();
 
       outline.expandNode(pageWithSearchRequiredWithoutDetailTable); // <-- calls ensureLoadChildren() before the detail table is initialized
       outline.selectNode(pageWithSearchRequiredWithoutDetailTable);
       expect(pageWithSearchRequiredWithoutDetailTable._loadTableData).not.toHaveBeenCalled();
-      expect(pageWithSearchRequiredWithoutDetailTable.detailTable).toBe(null);
+      expect(pageWithSearchRequiredWithoutDetailTable.detailTable).toBeNull();
     });
 
     it('loads the data if searchRequired is false or searchFilterCompleted is true', async () => {
@@ -933,7 +976,7 @@ describe('PageWithTable', () => {
 
       outline.insertNodes([pageWithoutSearchRequired], null);
       expect(pageWithoutSearchRequired.outline).toBe(outline);
-      expect(pageWithoutSearchRequired.detailTable).toBe(null);
+      expect(pageWithoutSearchRequired.detailTable).toBeNull();
 
       outline.expandNode(pageWithoutSearchRequired); // <-- calls ensureLoadChildren() before the detail table is initialized
       outline.selectNode(pageWithoutSearchRequired);
@@ -955,7 +998,7 @@ describe('PageWithTable', () => {
 
       outline.insertNodes(pageWithSearchRequiredAndFilterCompleted);
       expect(pageWithSearchRequiredAndFilterCompleted.outline).toBe(outline);
-      expect(pageWithSearchRequiredAndFilterCompleted.detailTable).toBe(null);
+      expect(pageWithSearchRequiredAndFilterCompleted.detailTable).toBeNull();
 
       outline.expandNode(pageWithSearchRequiredAndFilterCompleted); // <-- calls ensureLoadChildren() before the detail table is initialized
       outline.selectNode(pageWithSearchRequiredAndFilterCompleted);
@@ -974,12 +1017,12 @@ describe('PageWithTable', () => {
 
       outline.insertNodes(pageWithSearchRequiredWithoutDetailTable);
       expect(pageWithSearchRequiredWithoutDetailTable.outline).toBe(outline);
-      expect(pageWithSearchRequiredWithoutDetailTable.detailTable).toBe(null);
+      expect(pageWithSearchRequiredWithoutDetailTable.detailTable).toBeNull();
 
       outline.expandNode(pageWithSearchRequiredWithoutDetailTable); // <-- calls ensureLoadChildren() before the detail table is initialized
       outline.selectNode(pageWithSearchRequiredWithoutDetailTable);
       expect(pageWithSearchRequiredWithoutDetailTable._loadTableData).not.toHaveBeenCalled();
-      expect(pageWithSearchRequiredWithoutDetailTable.detailTable).toBe(null);
+      expect(pageWithSearchRequiredWithoutDetailTable.detailTable).toBeNull();
     });
 
     it('does not fail on init in breadcrumb mode if search required is true and expanded false', () => {
@@ -1063,7 +1106,7 @@ describe('PageWithTable', () => {
       page.detailTable.reload();
       await page.detailTable.when('propertyChange:loading');
 
-      expect(page.detailTable.rows.length).toBe(2);
+      expect(page.detailTable.rows).toHaveSize(2);
       expect(page.detailTable.rows.map(row => page.detailTable.columnById('StringColumn').cellValue(row))).toEqual(['foo', 'bar']);
 
       page._loadTableData = () => $.resolvedPromise([
@@ -1084,7 +1127,7 @@ describe('PageWithTable', () => {
       await deferred.promise();
       await page.detailTable.when('propertyChange:loading');
 
-      expect(page.detailTable.rows.length).toBe(2);
+      expect(page.detailTable.rows).toHaveSize(2);
       expect(page.detailTable.rows.map(row => page.detailTable.columnById('StringColumn').cellValue(row))).toEqual(['foo', 'bar']);
       expect(page.detailTable.tableStatus).toBeNull();
     });
@@ -1099,7 +1142,7 @@ describe('PageWithTable', () => {
       page.detailTable.reload();
       await page.detailTable.when('propertyChange:loading');
 
-      expect(page.detailTable.rows.length).toBe(2);
+      expect(page.detailTable.rows).toHaveSize(2);
       expect(page.detailTable.rows.map(row => page.detailTable.columnById('StringColumn').cellValue(row))).toEqual(['foo', 'bar']);
       expect(page.detailTable.tableStatus).toBeNull();
 
