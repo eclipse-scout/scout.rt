@@ -46,7 +46,7 @@ public class FixedDateRule extends AbstractScoutTestRule {
 
       @Override
       public void evaluate() throws Throwable {
-        // NOTE: register IDateProvider and NOT DateProvider -> there should be no BEANS.get(DateProvider.class) calls
+        // NOTE: register IDateProvider and NOT DateProvider -> there should be no BEANS.get(IDateProvider.class) calls
         IBean<Object> bean = BeanTestingHelper.get().registerBean(new BeanMetaData(IDateProvider.class, getDateProvider()));
         try {
           base.evaluate();
