@@ -325,10 +325,6 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     super._renderPlaceholder(this._fieldForPlaceholder());
   }
 
-  protected override _removePlaceholder($field?: JQuery) {
-    super._removePlaceholder(this._fieldForPlaceholder());
-  }
-
   protected _fieldForPlaceholder(): JQuery {
     if (this.hasDate) {
       return this.$dateField;
