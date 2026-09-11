@@ -19,7 +19,8 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
- * Helper class to access values of {@link ApiExposed},{@link ObjectType} and {@link FieldName} annotation values.
+ * Helper class to access values of {@link ApiExposed} and {@link FieldName} annotations
+ * and to resolve object types using the {@link IObjectTypeProvider}s.
  */
 @ApplicationScoped
 public class ApiExposedHelper {
@@ -82,8 +83,8 @@ public class ApiExposedHelper {
   }
 
   /**
-   * @return The value of the {@link ObjectType} annotation of the instance given (declared directly on the class or one
-   * of its super classes). If the annotation is not present or has no value {@code null} is returned.
+   * @return The object type of the given instance. The object type is resolved using the registered {@link IObjectTypeProvider}s.
+   * If no provider returns an object type, {@code null} is returned.
    */
   public String objectTypeOf(Object instance) {
     if (instance == null) {
@@ -93,32 +94,27 @@ public class ApiExposedHelper {
   }
 
   /**
-   * @return The value of the {@link ObjectType} annotation of the class given (declared directly on the class or one of
-   * its super classes). If the annotation is not present or has no value {@code null} is returned.
+   * @return The object type of the given class. The object type is resolved using the registered {@link IObjectTypeProvider}s.
+   * If no provider returns an object type, {@code null} is returned.
    */
   public String objectTypeOf(Class<?> clazz) {
-    ObjectType annotation = getAnnotation(clazz, ObjectType.class);
-    if (annotation == null) {
-      return null;
-    }
-    String objectType = annotation.value();
-    if (StringUtility.hasText(objectType)) {
-      return objectType;
-    }
-    return null;
+    return BEANS.all(IObjectTypeProvider.class).stream()
+        .map(provider -> provider.objectTypeOf(clazz))
+        .filter(StringUtility::hasText)
+        .findFirst()
+        .orElse(null);
   }
 
   /**
-   * Reads the {@link ObjectType} annotation value of the instance given (using {@link #objectTypeOf(Object)}) and
-   * writes the value to the {@value #OBJECT_TYPE_ATTRIBUTE_NAME} attribute in the {@link IDoEntity} given. If the
-   * DoEntity already contains such an attribute, it is preserved (nothing is overwritten). This method does nothing if
-   * the instance or the doEntity is {@code null}.
+   * Resolves the object type of the given instance (using {@link #objectTypeOf(Object)}) and writes the value to the
+   * {@value #OBJECT_TYPE_ATTRIBUTE_NAME} attribute in the {@link IDoEntity} given. If the DoEntity already contains
+   * such an attribute, it is preserved (nothing is overwritten). This method does nothing if the instance or the
+   * doEntity is {@code null}.
    *
    * @param instance
-   *     The instance whose class has the {@link ObjectType} annotation that should be read.
+   *     The instance whose object type should be resolved.
    * @param doEntity
-   *     The target {@link IDoEntity} that should receive the {@value #OBJECT_TYPE_ATTRIBUTE_NAME} annotation
-   *     value.
+   *     The target {@link IDoEntity} that should receive the {@value #OBJECT_TYPE_ATTRIBUTE_NAME} value.
    */
   public void setObjectTypeToDo(Object instance, IDoEntity doEntity) {
     if (instance == null) {
@@ -128,16 +124,15 @@ public class ApiExposedHelper {
   }
 
   /**
-   * Reads the {@link ObjectType} annotation value of the class given (using {@link #objectTypeOf(Class)}) and writes
-   * the value to the {@value #OBJECT_TYPE_ATTRIBUTE_NAME} attribute in the {@link IDoEntity} given. If the DoEntity
-   * already contains such an attribute, it is preserved (nothing is overwritten). This method does nothing if the class
-   * or the doEntity is {@code null}.
+   * Resolves the object type of the given class (using {@link #objectTypeOf(Class)}) and writes the value to the
+   * {@value #OBJECT_TYPE_ATTRIBUTE_NAME} attribute in the {@link IDoEntity} given. If the DoEntity already contains
+   * such an attribute, it is preserved (nothing is overwritten). This method does nothing if the class or the doEntity
+   * is {@code null}.
    *
    * @param fromClass
-   *     The class that has the {@link ObjectType} annotation that should be read.
+   *     The class whose object type should be resolved.
    * @param doEntity
-   *     The target {@link IDoEntity} that should receive the {@value #OBJECT_TYPE_ATTRIBUTE_NAME} annotation
-   *     value.
+   *     The target {@link IDoEntity} that should receive the {@value #OBJECT_TYPE_ATTRIBUTE_NAME} value.
    */
   public void setObjectTypeToDo(Class<?> fromClass, IDoEntity doEntity) {
     if (doEntity == null || fromClass == null) {
