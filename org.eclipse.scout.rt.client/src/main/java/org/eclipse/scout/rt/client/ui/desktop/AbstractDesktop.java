@@ -110,7 +110,6 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -119,8 +118,10 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.session.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
+import org.eclipse.scout.rt.shared.session.ISession;
+import org.eclipse.scout.rt.shared.session.job.filter.future.SessionFutureFilter;
+import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -2829,6 +2830,16 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @Override
   public void setNativeNotificationDefaults(NativeNotificationDefaults nativeNotificationDefaults) {
     propertySupport.setProperty(PROP_NATIVE_NOTIFICATION_DEFAULTS, nativeNotificationDefaults);
+  }
+
+  @Override
+  public IUiDeviceType getEnforcedDeviceType() {
+    return (IUiDeviceType) propertySupport.getProperty(PROP_ENFORCED_DEVICE_TYPE);
+  }
+
+  @Override
+  public void setEnforcedDeviceType(IUiDeviceType enforcedDeviceType) {
+    propertySupport.setProperty(PROP_ENFORCED_DEVICE_TYPE, enforcedDeviceType);
   }
 
   /**
