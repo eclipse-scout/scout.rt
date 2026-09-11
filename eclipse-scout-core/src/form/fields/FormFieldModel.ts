@@ -145,6 +145,12 @@ export interface FormFieldModel extends WidgetModel {
    */
   tooltipText?: string;
   /**
+   * Defines whether HTML code in the {@link tooltipText} property should be interpreted. If set to false, the HTML will be encoded.
+   *
+   * Default is false.
+   */
+  tooltipHtmlEnabled?: boolean;
+  /**
    * Defines where and how the tooltip configured by {@link tooltipText} should appear.
    *
    * By default, the tooltip is shown when the user clicks on the info icon in the status area.
