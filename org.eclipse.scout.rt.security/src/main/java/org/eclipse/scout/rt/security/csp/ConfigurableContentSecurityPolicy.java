@@ -35,7 +35,7 @@ public class ConfigurableContentSecurityPolicy extends ContentSecurityPolicy {
   public static final char SEPARATOR_ENTRY_POINT = '#';
 
   @Serial
-  private static final long serialVersionUID = -3275289365043640433L;
+  private static final long serialVersionUID = -2376666070789320477L;
 
   static {
     Map<String, String> defaults = new LinkedHashMap<>();
@@ -50,7 +50,6 @@ public class ConfigurableContentSecurityPolicy extends ContentSecurityPolicy {
     defaults.put(DIRECTIVE_FRAME_SRC, "*"); // Everything is allowed because the iframes created by the BrowserField run in the sandbox mode and therefore handle security policy on their own.
     defaults.put(DIRECTIVE_MANIFEST_SRC, EXPRESSION_SELF);
     defaults.put(DIRECTIVE_MEDIA_SRC, EXPRESSION_SELF);
-    defaults.put(DIRECTIVE_OBJECT_SRC, EXPRESSION_SELF);
     defaults.put(DIRECTIVE_WORKER_SRC, EXPRESSION_SELF);
 
     // document directives
