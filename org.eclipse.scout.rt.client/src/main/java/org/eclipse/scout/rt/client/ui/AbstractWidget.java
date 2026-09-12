@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,11 +21,13 @@ import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
+import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.visitor.IBreadthFirstTreeVisitor;
@@ -46,7 +48,7 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractWidget.class);
   private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED, IDimensions.ENABLED_SLAVE);
-  private static final String PROP_ENABLED_BYTE = "enabledByte";
+  public static final String PROP_ENABLED_BYTE = "enabledByte";
 
   private final WidgetListeners m_listenerList;
 
@@ -68,6 +70,11 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
     }
     initConfigInternal();
     setInitConfigDone(true);
+  }
+
+  @Override
+  protected BasicPropertySupport createPropertySupport() {
+    return BEANS.get(BasicPropertySupportFactory.class).createFor(this);
   }
 
   /**
