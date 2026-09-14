@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -253,5 +253,30 @@ public class LookupHelperTest {
     assertEquals(LookupHelper.DEFAULT_MAX_ROWS, m_helper.maxRowCount(BEANS.get(FixtureEnumLookupRestrictionDo.class)));
     assertEquals(LookupHelper.DEFAULT_MAX_ROWS, m_helper.maxRowCount(BEANS.get(FixtureEnumLookupRestrictionDo.class).withMaxRowCount(null)));
     assertEquals(42, m_helper.maxRowCount(BEANS.get(FixtureEnumLookupRestrictionDo.class).withMaxRowCount(42)));
+  }
+
+  @Test
+  public void testSoftHyphenIgnored() {
+    m_testData.put(10L, new FixtureData(10L, "Test\u00ADtestbaz", "additional data", true));
+
+    var restriction = BEANS.get(LongLookupRestrictionDo.class).withText("Testtest");
+    var lookupResponse = m_helper.filterData(restriction, m_testData.values().stream(), FixtureData::getId, FixtureData::getText, FixtureData::getActive, LongLookupRowDo.class);
+    assertLookupResponse(lookupResponse, 10L);
+    assertActiveLookupRows(lookupResponse, 10L);
+  }
+
+  @Test
+  public void testEnDashEmDash() {
+    // Dash
+    m_testData.put(10L, new FixtureData(10L, "Test-testbaz", "additional data", true));
+    // En dash
+    m_testData.put(11L, new FixtureData(11L, "Test–testbaz", "additional data", true));
+    // Em dash
+    m_testData.put(12L, new FixtureData(12L, "Test—testbaz", "additional data", true));
+
+    var restriction = BEANS.get(LongLookupRestrictionDo.class).withText("Test-test");
+    var lookupResponse = m_helper.filterData(restriction, m_testData.values().stream(), FixtureData::getId, FixtureData::getText, FixtureData::getActive, LongLookupRowDo.class);
+    assertLookupResponse(lookupResponse, 10L, 11L, 12L);
+    assertActiveLookupRows(lookupResponse, 10L, 11L, 12L);
   }
 }
