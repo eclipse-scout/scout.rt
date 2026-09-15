@@ -96,11 +96,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private static final String PAGE_ACTIVATED = "PAGE_ACTIVATED";
   static final String SEARCH_REQUIRED = "SEARCH_REQUIRED";
   static final String SEARCH_ACTIVE = "SEARCH_ACTIVE";
-  static final String LIMITED_RESULT = "LIMITED_RESULT";
   static final String ALWAYS_CREATE_CHILD_PAGE = "ALWAYS_CREATE_CHILD_PAGE";
 
   static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(TABLE_VISIBLE, DETAIL_FORM_VISIBLE, PAGE_MENUS_ADDED,
-      LIMITED_RESULT, ALWAYS_CREATE_CHILD_PAGE, SEARCH_ACTIVE, SEARCH_REQUIRED, PAGE_ACTIVE);
+      ALWAYS_CREATE_CHILD_PAGE, SEARCH_ACTIVE, SEARCH_REQUIRED, PAGE_ACTIVE);
   static final NamedBitMaskHelper FLAGS2_BIT_HELPER = new NamedBitMaskHelper(PAGE_ACTIVATED, SHOW_TILE_OVERVIEW, NAVIGATE_BUTTONS_VISIBLE);
   private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = menuType -> {
     if (menuType == TreeMenuType.SingleSelection) {
@@ -121,8 +120,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   /**
    * Provides 8 boolean flags.<br>
    * Currently used: {@link #TABLE_VISIBLE}, {@link #DETAIL_FORM_VISIBLE}, {@link #PAGE_MENUS_ADDED},
-   * {@link #SEARCH_REQUIRED}, {@link #SEARCH_ACTIVE}, {@link #LIMITED_RESULT}, {@link #ALWAYS_CREATE_CHILD_PAGE},
-   * {@link #PAGE_ACTIVE}
+   * {@link #SEARCH_REQUIRED}, {@link #SEARCH_ACTIVE}, {@link #ALWAYS_CREATE_CHILD_PAGE}, {@link #PAGE_ACTIVE}
    */
   byte m_flags;
 

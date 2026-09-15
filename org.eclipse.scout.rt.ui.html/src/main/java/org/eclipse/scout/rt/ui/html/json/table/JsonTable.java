@@ -366,6 +366,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
         return getModel().getEstimatedRowCount();
       }
     });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_LIMITED_RESULT, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isLimitedResult();
+      }
+    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_MAX_ROW_COUNT, model) {
       @Override
       protected Integer modelValue() {
