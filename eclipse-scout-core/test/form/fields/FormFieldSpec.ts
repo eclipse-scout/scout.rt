@@ -136,7 +136,6 @@ describe('FormField', () => {
         spyOn(formField, '_renderLabelPosition');
         expect(formField._renderLabelPosition).not.toHaveBeenCalled();
       });
-
     });
 
     describe('position top', () => {
@@ -199,6 +198,37 @@ describe('FormField', () => {
       formField.setEnabled(true);
       expect(formField.$container.children('.masked-indicator').length).toBe(0);
       expect(formField.$container.attr('class')).not.toContain('masked');
+    });
+  });
+
+  describe('property placeholder', () => {
+    let formField, model;
+
+    beforeEach(() => {
+      model = helper.createFieldModel();
+      formField = new StringField();
+      formField.init(model);
+    });
+
+    it('placeholder is set directly', () => {
+      formField.placeholder = 'placeholderText';
+      formField.render();
+      expect(formField.$field.attr('placeholder')).toBe(formField.placeholder);
+    });
+
+    it('placeholder is set with setter', () => {
+      formField.setPlaceholder('placeholderText');
+      formField.render();
+      expect(formField.$field.attr('placeholder')).toBe(formField.placeholder);
+    });
+
+    it('label position wins over placeholder', () => {
+      formField.label = 'labelName';
+      formField.labelPosition = FormField.LabelPosition.ON_FIELD;
+      formField.placeholder = 'placeholderText';
+      formField.render();
+      expect(formField.$label.html()).toBeFalsy();
+      expect(formField.$field.attr('placeholder')).toBe(formField.label);
     });
   });
 
