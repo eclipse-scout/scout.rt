@@ -15,10 +15,11 @@ export class TableMaxResultsHelper {
    * Checks if more data could be loaded into the table.
    * @param numRows The number of currently loaded rows of the table.
    * @param estRows The number of estimated rows that would be available.
-   * @returns true if a estRows is available and the currently loaded number of rows (numRows) is smaller. This means more data could be loaded.
+   * @param maxRows The number of maximum rows that are allowed to be loaded.
+   * @returns true if a estRows and maxRows are available and the currently loaded number of rows (numRows) is smaller than the two. This means more data could be loaded.
    */
-  isLoadMoreDataPossible(numRows: number, estRows: number): boolean {
-    return estRows > 0 && numRows < estRows;
+  isLoadMoreDataPossible(numRows: number, estRows: number, maxRows: number): boolean {
+    return estRows > 0 && maxRows > 0 && numRows < estRows && numRows < maxRows;
   }
 
   /**
@@ -46,6 +47,10 @@ export class TableMaxResultsHelper {
    * @returns the {@link MaxRowCountContributionDo} if there is a valid maxRowCount for the given table or null if no row count constraint is used.
    */
   buildMaxRowCountContribution(table: Table, reloadReason: TableReloadReason): MaxRowCountContributionDo {
+    if (Table.ReloadReason.OVERRIDE_ROW_LIMIT === reloadReason) {
+      return scout.create(MaxRowCountContributionDo, {hint: 0, override: 2147483646 /* = Integer.MAX_VALUE - 1, should be further limited by the server */});
+    }
+
     const maxOutlineRowCount = this.getMaxTableRowCount(table, reloadReason);
     if (maxOutlineRowCount > 0) {
       return scout.create(MaxRowCountContributionDo, {hint: maxOutlineRowCount});
@@ -59,9 +64,6 @@ export class TableMaxResultsHelper {
    * @returns the maximum number of rows for the given table and reload reason.
    */
   getMaxTableRowCount(table: Table, reloadReason: TableReloadReason): number {
-    if (Table.ReloadReason.OVERRIDE_ROW_LIMIT === reloadReason) {
-      return 0; // no limit
-    }
     return table?.maxRowCount;
   }
 }
