@@ -223,7 +223,7 @@ describe('PageWithTable', () => {
     page.detailTable.reload();
     await page.detailTable.when('propertyChange:loading');
 
-    expect(page.detailTable.estimatedRowCount).toBe(5); // expect to be one more than actual rows (corrected estimation)
+    expect(page.detailTable.estimatedRowCount).toBe(40); // expect to be 10 times actual rows (corrected estimation)
     expect(page.detailTable.rows.length).toBe(4);
   });
 

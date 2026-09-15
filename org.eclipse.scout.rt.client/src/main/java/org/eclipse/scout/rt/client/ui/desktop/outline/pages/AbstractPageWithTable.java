@@ -702,9 +702,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
     // see also PageWithTable.ts#_readLimitedResultInfo
     setLimitedResult(limitedResult);
-    if (limitedResult && estimatedRowCount > 0) {
-      // if there is an estimation, but it is lower than the actual rows: correct it
-      estimatedRowCount = Math.max(table.getRowCount() + 1L, estimatedRowCount);
+    if (limitedResult && estimatedRowCount <= table.getRowCount()) {
+      // if there is no estimation or it is too low: correct it
+      // an estimation is required so that the 'Load all data' menu is shown!
+      estimatedRowCount = table.getRowCount() * 10L;
     }
     table.setEstimatedRowCount(estimatedRowCount);
     table.setMaxRowCount(maxRowCount);

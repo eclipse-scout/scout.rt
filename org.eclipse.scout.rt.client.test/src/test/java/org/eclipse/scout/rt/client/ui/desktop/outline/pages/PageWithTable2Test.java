@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -70,7 +70,7 @@ public class PageWithTable2Test {
     Table table = page.getTable();
     assertEquals("row count", 3, table.getRowCount());
     assertEquals("Status - severity", IStatus.INFO, page.getTableStatus().getSeverity());
-    assertEquals("Status - message", TEXTS.get("MaxOutlineRowWarning", "3"), page.getTableStatus().getMessage());
+    assertEquals("Status - message", TEXTS.get("MaxOutlineRowWarningWithEstimatedRowCount", "3", "30"), page.getTableStatus().getMessage());
   }
 
   public class SimpleTablePage extends AbstractPageWithTable<SimpleTablePage.Table> {
