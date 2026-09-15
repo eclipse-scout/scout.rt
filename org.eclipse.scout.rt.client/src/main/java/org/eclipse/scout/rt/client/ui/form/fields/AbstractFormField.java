@@ -264,6 +264,16 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
+   * @return Field placeholder. The placeholder is shown inside the field when the field is empty, but only if it supports placeholders.
+   * This value is overridden by label if label position is {@link #LABEL_POSITION_ON_FIELD}
+   */
+  @ConfigProperty(ConfigProperty.TEXT)
+  @Order(27)
+  protected String getConfiguredPlaceholder() {
+    return null;
+  }
+
+  /**
    * @return One of the <code>FIELD_STYLE_*</code> constants. Default is {@link #FIELD_STYLE_ALTERNATIVE}.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -866,6 +876,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     setLabelHorizontalAlignment(getConfiguredLabelHorizontalAlignment());
     setLabelVisible(getConfiguredLabelVisible());
     setLabelHtmlEnabled(getConfiguredLabelHtmlEnabled());
+    setPlaceholder(getConfiguredPlaceholder());
     setStatusVisible(getConfiguredStatusVisible());
     setStatusPosition(getConfiguredStatusPosition());
     setCssClass((getConfiguredCssClass()));
@@ -1384,6 +1395,16 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   @Override
   public void setLabelHorizontalAlignment(byte a) {
     m_labelHorizontalAlignment = a;
+  }
+
+  @Override
+  public String getPlaceholder() {
+    return propertySupport.getPropertyString(PROP_PLACEHOLDER);
+  }
+
+  @Override
+  public void setPlaceholder(String placeholder) {
+    propertySupport.setProperty(PROP_PLACEHOLDER, placeholder);
   }
 
   @Override

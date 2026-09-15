@@ -181,6 +181,7 @@ public class BasicPropertySupportFactory {
     defaultValues.put(IFormField.PROP_LABEL_USE_UI_WIDTH, false);
     defaultValues.put(IFormField.PROP_LABEL_VISIBLE, true);
     defaultValues.put(IFormField.PROP_LABEL_HTML_ENABLED, false);
+    defaultValues.put(IFormField.PROP_PLACEHOLDER, null);
     defaultValues.put(IFormField.PROP_STATUS_VISIBLE, true);
     defaultValues.put(IFormField.PROP_STATUS_POSITION, IFormField.STATUS_POSITION_DEFAULT);
     defaultValues.put(IFormField.PROP_CSS_CLASS, null);
