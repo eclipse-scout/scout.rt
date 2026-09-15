@@ -129,7 +129,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    */
   byte LABEL_POSITION_LEFT = 1;
   /**
-   * Position the label on the field, meaning that the label is only displayed when the field is empty. Overrides placeholder value, if it was set.
+Position the label on the field, meaning that the label is only displayed when the field is empty. Overrides {@link #getPlaceholder() placeholder}  value, if there is one.
    */
   byte LABEL_POSITION_ON_FIELD = 2;
   /**
