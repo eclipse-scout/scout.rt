@@ -796,7 +796,7 @@ describe('PageWithTable', () => {
     class DeferredSmartColumn extends SmartColumn<number> {
 
       lastCellTextDeferred: Deferred<void> = null;
-      lastCellTextPromise: JQuery.Promise<BatchCallResult<number, string>> = null;
+      lastCellTextPromise: JQuery.Promise<void> = null;
 
       protected override _init(model: InitModelOf<this>) {
         super._init({
@@ -811,13 +811,13 @@ describe('PageWithTable', () => {
         });
       }
 
-      override setCellTextDeferred(promise: JQuery.Promise<BatchCallResult<number, string>>) {
+      protected override _buildCellTextUpdatePromise(promise: JQuery.Promise<BatchCallResult<number, unknown>>): JQuery.Promise<void> {
         this.lastCellTextDeferred = new Deferred();
-        this.lastCellTextPromise = promise.then(async result => {
+        this.lastCellTextPromise = super._buildCellTextUpdatePromise(promise).then(async result => {
           await this.lastCellTextDeferred.promise();
           return result;
         });
-        super.setCellTextDeferred(this.lastCellTextPromise);
+        return this.lastCellTextPromise;
       }
     }
 

@@ -791,12 +791,17 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   setCellTextDeferred(promise: JQuery.Promise<BatchCallResult<TValue, unknown>>) {
     // promises always resolve asynchronously which means the text will always be set later after row is initialized and will generate an update row event.
     // To make sure not every cell update will render the viewport (which is an expensive operation), the update is buffered and done as soon as all promises resolve.
-    const added = this.table.updateBuffer.pushPromise(promise);
+    const updateBuffer = this.table.updateBuffer;
+    const added = updateBuffer.pushPromise(promise);
     if (added) {
-      promise
-        .then(result => this._onSetCellTextDeferredDone(result))
-        .catch(error => this._onSetCellTextDeferredFail(error));
+      updateBuffer.pushPromise(this._buildCellTextUpdatePromise(promise));
     }
+  }
+
+  protected _buildCellTextUpdatePromise(promise: JQuery.Promise<BatchCallResult<TValue, unknown>>): JQuery.Promise<void> {
+    return promise
+      .then(result => this._onSetCellTextDeferredDone(result))
+      .catch(error => this._onSetCellTextDeferredFail(error));
   }
 
   protected _onSetCellTextDeferredDone(result: BatchCallResult<TValue, unknown>) {
