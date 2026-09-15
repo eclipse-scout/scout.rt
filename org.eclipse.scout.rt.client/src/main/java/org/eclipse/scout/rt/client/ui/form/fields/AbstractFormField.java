@@ -263,6 +263,10 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     return false;
   }
 
+  /**
+   * @return Field placeholder. The placeholder is shown inside the field when the field is empty, but only if it supports placeholders.
+   * This value is overridden by label if label position is {@link #LABEL_POSITION_ON_FIELD}
+   */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(27)
   protected String getConfiguredPlaceholder() {
