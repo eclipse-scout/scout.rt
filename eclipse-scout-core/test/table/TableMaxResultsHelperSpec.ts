@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 
 import {TableSpecHelper} from '../../src/testing';
-import {dataObjects, DoEntityWithContributions, MaxRowCountContributionDo, scout, Table, TableMaxResultsHelper} from '../../src';
+import {dataObjects, DoEntityWithContributions, LimitedResultInfoContributionDo, MaxRowCountContributionDo, scout, Table, TableMaxResultsHelper} from '../../src';
 
 describe('TableMaxResultsHelper', () => {
   let table: Table;
@@ -18,7 +18,36 @@ describe('TableMaxResultsHelper', () => {
     setFixtures(sandbox());
     const session = sandboxSession();
     const helper = new TableSpecHelper(session);
-    table = helper.createTable(helper.createModel([], []));
+    table = helper.createTable(helper.createModelFixture(1, 10));
+  });
+
+  describe('isLoadMoreDataPossible', () => {
+
+    function isLoadMoreDataPossible(limitedResultInfoDo: LimitedResultInfoContributionDo): boolean {
+      return scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(table.rows.length, limitedResultInfoDo.estimatedRowCount, limitedResultInfoDo.maxRowCount);
+    }
+
+    it('allows loading more data if result is limited', () => {
+      expect(isLoadMoreDataPossible({limitedResult: false})).toBeFalse();
+      expect(isLoadMoreDataPossible({limitedResult: true})).toBeFalse();
+      expect(isLoadMoreDataPossible({limitedResult: true, estimatedRowCount: 100})).toBeFalse();
+      expect(isLoadMoreDataPossible({limitedResult: false, estimatedRowCount: 100})).toBeFalse();
+    });
+
+    it('does not allow loading more data if maxRowCount is reached', () => {
+      expect(isLoadMoreDataPossible({limitedResult: false, maxRowCount: 10})).toBeFalse();
+      expect(isLoadMoreDataPossible({limitedResult: false, maxRowCount: 5})).toBeFalse();
+      expect(isLoadMoreDataPossible({limitedResult: false, maxRowCount: 11})).toBeFalse();
+      expect(isLoadMoreDataPossible({limitedResult: true, maxRowCount: 10})).toBeFalse();
+      expect(isLoadMoreDataPossible({limitedResult: true, maxRowCount: 5})).toBeFalse();
+      expect(isLoadMoreDataPossible({limitedResult: true, maxRowCount: 11})).toBeFalse();
+      expect(isLoadMoreDataPossible({limitedResult: false, maxRowCount: 10, estimatedRowCount: 100})).toBeFalse();
+      expect(isLoadMoreDataPossible({limitedResult: false, maxRowCount: 5, estimatedRowCount: 100})).toBeFalse();
+      expect(isLoadMoreDataPossible({limitedResult: false, maxRowCount: 11, estimatedRowCount: 100})).toBeTrue();
+      expect(isLoadMoreDataPossible({limitedResult: true, maxRowCount: 10, estimatedRowCount: 100})).toBeFalse();
+      expect(isLoadMoreDataPossible({limitedResult: true, maxRowCount: 5, estimatedRowCount: 100})).toBeFalse();
+      expect(isLoadMoreDataPossible({limitedResult: true, maxRowCount: 11, estimatedRowCount: 100})).toBeTrue();
+    });
   });
 
   describe('withMaxRowCountContribution', () => {

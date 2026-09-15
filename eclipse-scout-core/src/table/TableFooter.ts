@@ -322,11 +322,11 @@ export class TableFooter extends Widget implements TableFooterModel {
         $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows)));
       }
       if (this.table.hasReloadHandler) {
-        if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(numRows, estRows)) {
-          if (estRows < maxRowsServer) {
-            $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.LoadAllData')).appendTo($info);
-          } else {
+        if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(numRows, estRows, maxRowsServer)) {
+          if (maxRowsServer > 0 && estRows >= maxRowsServer) {
             $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.LoadNData', this.computeCountInfo(maxRowsServer))).appendTo($info);
+          } else {
+            $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.LoadAllData')).appendTo($info);
           }
         } else {
           $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
@@ -812,9 +812,10 @@ export class TableFooter extends Widget implements TableFooterModel {
     if (this._compactStyle) {
       this._toggleTableInfoTooltip(this._infoLoadAction.$container, TableInfoLoadTooltip);
     } else {
-      let numRows = this.table.rows.length;
-      let estRows = this.table.estimatedRowCount;
-      if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(numRows, estRows)) {
+      const numRows = this.table.rows.length;
+      const estRows = this.table.estimatedRowCount;
+      const maxRowsServer = this.table.maxRowCountServer;
+      if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(numRows, estRows, maxRowsServer)) {
         this.table.reload(Table.ReloadReason.OVERRIDE_ROW_LIMIT);
       } else {
         this.table.reload();

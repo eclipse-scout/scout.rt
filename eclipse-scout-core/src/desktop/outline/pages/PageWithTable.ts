@@ -595,12 +595,15 @@ export class PageWithTable extends Page implements PageWithTableModel {
       return;
     }
     // update table properties. The footer is automatically updated after the new rows have been created
-    this.detailTable.setMaxRowCountServer(limitedResultInfoDo.maxRowCount);
-    if (limitedResultInfoDo.limitedResult && limitedResultInfoDo.estimatedRowCount > 0) {
-      // if there is an estimation, but it is lower than the actual rows: correct it
-      limitedResultInfoDo.estimatedRowCount = Math.max(numRows + 1, limitedResultInfoDo.estimatedRowCount);
+    // see also AbstractPageWithTable.setResultInfo
+    let estimation = limitedResultInfoDo.estimatedRowCount;
+    if (limitedResultInfoDo.limitedResult && estimation <= numRows) {
+      // if there is no estimation or it is too low: correct it
+      // an estimation is required so that the 'Load all data' menu is shown!
+      estimation = numRows * 10;
     }
-    this.detailTable.setEstimatedRowCount(limitedResultInfoDo.estimatedRowCount);
+    this.detailTable.setEstimatedRowCount(estimation);
+    this.detailTable.setMaxRowCountServer(limitedResultInfoDo.maxRowCount);
   }
 
   protected _getLimitedResultInfoDo(tableData: any): LimitedResultInfoContributionDo {
