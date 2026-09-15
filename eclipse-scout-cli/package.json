@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "esbuild": "0.27.2",
+    "postcss": "8.5.16",
     "@babel/core": "7.28.5",
     "@babel/preset-env": "7.28.5",
     "babel-loader": "10.0.0",
