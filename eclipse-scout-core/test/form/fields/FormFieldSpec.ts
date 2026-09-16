@@ -202,33 +202,59 @@ describe('FormField', () => {
   });
 
   describe('property placeholder', () => {
-    let formField, model;
-
-    beforeEach(() => {
-      model = helper.createFieldModel();
-      formField = new StringField();
-      formField.init(model);
-    });
-
     it('placeholder is set directly', () => {
-      formField.placeholder = 'placeholderText';
+      let formField = scout.create(StringField, {
+        parent: session.desktop,
+        placeholder: 'placeholderText'
+      });
       formField.render();
-      expect(formField.$field.attr('placeholder')).toBe(formField.placeholder);
+      expect(formField.$field.attr('placeholder')).toBe('placeholderText');
+
+      formField.setPlaceholder(null);
+      expect(formField.$field).not.toHaveAttr('placeholder');
+
+      formField.setPlaceholder('placeholderText2');
+      expect(formField.$field.attr('placeholder')).toBe('placeholderText2');
+
     });
 
     it('placeholder is set with setter', () => {
+      let formField = scout.create(StringField, {
+        parent: session.desktop
+      });
       formField.setPlaceholder('placeholderText');
       formField.render();
       expect(formField.$field.attr('placeholder')).toBe(formField.placeholder);
+
+      formField.setPlaceholder(null);
+      expect(formField.$field).not.toHaveAttr('placeholder');
+
+      formField.setPlaceholder('placeholderText2');
+      expect(formField.$field.attr('placeholder')).toBe('placeholderText2');
     });
 
     it('label position wins over placeholder', () => {
-      formField.label = 'labelName';
-      formField.labelPosition = FormField.LabelPosition.ON_FIELD;
-      formField.placeholder = 'placeholderText';
+      let formField = scout.create(StringField, {
+        parent: session.desktop,
+        placeholder: 'placeholderText',
+        label: 'labelName',
+        labelPosition: FormField.LabelPosition.ON_FIELD
+      });
       formField.render();
       expect(formField.$label.html()).toBeFalsy();
-      expect(formField.$field.attr('placeholder')).toBe(formField.label);
+      expect(formField.$field.attr('placeholder')).toBe('labelName');
+
+      formField.setLabelPosition(FormField.LabelPosition.TOP);
+      expect(formField.$field.attr('placeholder')).toBe('placeholderText');
+
+      formField.setLabelPosition(FormField.LabelPosition.ON_FIELD);
+      expect(formField.$field.attr('placeholder')).toBe('labelName');
+
+      formField.setLabel(null);
+      expect(formField.$field).not.toHaveAttr('placeholder');
+
+      formField.setLabelPosition(FormField.LabelPosition.BOTTOM);
+      expect(formField.$field.attr('placeholder')).toBe('placeholderText');
     });
   });
 
