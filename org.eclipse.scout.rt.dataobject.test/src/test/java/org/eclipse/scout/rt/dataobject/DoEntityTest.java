@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,16 +25,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import org.eclipse.scout.rt.dataobject.fixture.CollectionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.FirstSimpleContributionFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.Lorem1FixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.SecondSimpleContributionFixtureDo;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobState;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.junit.Test;
@@ -107,7 +115,7 @@ public class DoEntityTest {
     entity.putList("foo", Arrays.asList("bar"));
     assertTrue(entity.has("foo"));
     assertTrue(entity.getNode("foo").exists());
-    assertEquals("bar", entity.getList("foo", String.class).get(0));
+    assertEquals("bar", entity.getList("foo", String.class).getFirst());
     assertEquals(Arrays.asList("bar"), entity.get("foo"));
     assertEquals(Arrays.asList("bar"), entity.getList("foo"));
   }
@@ -196,11 +204,11 @@ public class DoEntityTest {
     assertSame(values, entity.getList("foo"));
 
     DoNode<?> attribute = entity.getNode("foo");
-    assertEquals("value1", entity.getList("foo", String.class).get(0));
+    assertEquals("value1", entity.getList("foo", String.class).getFirst());
 
     // update existing node value
     entity.putList("foo", Arrays.asList("value2"));
-    assertEquals("value2", entity.getList("foo", String.class).get(0));
+    assertEquals("value2", entity.getList("foo", String.class).getFirst());
     assertSame(attribute, entity.getNode("foo"));
   }
 
@@ -436,7 +444,7 @@ public class DoEntityTest {
     DoEntity entity = BEANS.get(DoEntity.class);
     List<Object> list = newListWithOneNullValue();
     entity.putList("bar", list);
-    assertNull(entity.getList("bar").get(0));
+    assertNull(entity.getList("bar").getFirst());
   }
 
   @Test
@@ -451,7 +459,7 @@ public class DoEntityTest {
   public void testGetStringList() {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.putList("foo", Arrays.asList("bar", "baz"));
-    assertEquals("bar", entity.getStringList("foo").get(0));
+    assertEquals("bar", entity.getStringList("foo").getFirst());
     assertEquals("baz", entity.getStringList("foo").get(1));
     assertEquals(Arrays.asList("bar", "baz"), entity.getStringList("foo"));
   }
@@ -475,7 +483,7 @@ public class DoEntityTest {
     DoEntity entity = BEANS.get(DoEntity.class);
     List<Object> list = newListWithOneNullValue();
     entity.putList("bar", list);
-    assertNull(entity.getStringList("bar").get(0));
+    assertNull(entity.getStringList("bar").getFirst());
   }
 
   @Test
@@ -503,7 +511,7 @@ public class DoEntityTest {
   public void testGetBooleanList() {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.putList("foo", Arrays.asList(true, false));
-    assertEquals(true, entity.getBooleanList("foo").get(0));
+    assertEquals(true, entity.getBooleanList("foo").getFirst());
     assertEquals(false, entity.getBooleanList("foo").get(1));
     assertEquals(Arrays.asList(true, false), entity.getBooleanList("foo"));
   }
@@ -527,7 +535,7 @@ public class DoEntityTest {
     DoEntity entity = BEANS.get(DoEntity.class);
     List<Object> list = newListWithOneNullValue();
     entity.putList("bar", list);
-    assertNull(entity.getBooleanList("bar").get(0));
+    assertNull(entity.getBooleanList("bar").getFirst());
   }
 
   @Test
@@ -564,7 +572,7 @@ public class DoEntityTest {
   public void testGetDecimalList() {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.putList("foo", Arrays.asList(1, 2));
-    assertEquals(new BigDecimal("1"), entity.getDecimalList("foo").get(0));
+    assertEquals(new BigDecimal("1"), entity.getDecimalList("foo").getFirst());
     assertEquals(new BigDecimal("2"), entity.getDecimalList("foo").get(1));
     assertEquals(Arrays.asList(new BigDecimal("1"), new BigDecimal("2")), entity.getDecimalList("foo"));
 
@@ -591,7 +599,7 @@ public class DoEntityTest {
     DoEntity entity = BEANS.get(DoEntity.class);
     List<Object> list = newListWithOneNullValue();
     entity.putList("bar", list);
-    assertNull(entity.getDecimalList("bar").get(0));
+    assertNull(entity.getDecimalList("bar").getFirst());
   }
 
   protected List<Object> newListWithOneNullValue() {
@@ -759,7 +767,7 @@ public class DoEntityTest {
     assertEquals(entity1, entity2);
     assertEquals(entity1.hashCode(), entity2.hashCode());
 
-    entity2.getOtherEntities().get(0).withId("bar");
+    entity2.getOtherEntities().getFirst().withId("bar");
     assertNotEquals(entity1, entity2);
   }
 
@@ -865,6 +873,7 @@ public class DoEntityTest {
   public void testDoList() {
     DoEntity entity = BEANS.get(DoEntity.class);
     DoList<String> doList = entity.doList("attribute");
+    assertSame(doList, entity.doList("attribute"));
     assertEquals(CollectionUtility.emptyArrayList(), doList.get());
 
     List<String> values = Arrays.asList("value");
@@ -882,7 +891,7 @@ public class DoEntityTest {
     List<String> value = Arrays.asList("value");
     entity.putList("attribute", value);
     assertEquals(value, entity.getList("attribute"));
-    assertEquals("value", entity.getList("attribute").get(0));
+    assertEquals("value", entity.getList("attribute").getFirst());
 
     assertThrows(AssertionException.class, () -> entity.getValueNode("attribute"));
     assertThrows(AssertionException.class, () -> entity.getCollectionNode("attribute"));
@@ -893,6 +902,7 @@ public class DoEntityTest {
   public void testDoSet() {
     DoEntity entity = BEANS.get(DoEntity.class);
     DoSet<String> doSet = entity.doSet("attribute");
+    assertSame(doSet, entity.doSet("attribute"));
     assertEquals(CollectionUtility.emptyHashSet(), doSet.get());
 
     Set<String> value = Collections.singleton("foo");
@@ -921,6 +931,7 @@ public class DoEntityTest {
   public void testDoCollection() {
     DoEntity entity = BEANS.get(DoEntity.class);
     DoCollection<String> doCollection = entity.doCollection("attribute");
+    assertSame(doCollection, entity.doCollection("attribute"));
     assertEquals(CollectionUtility.emptyArrayList(), doCollection.get());
 
     Collection<String> value = Arrays.asList("foo");
@@ -943,5 +954,48 @@ public class DoEntityTest {
     assertThrows(AssertionException.class, () -> entity.getListNode("attribute"));
     assertThrows(AssertionException.class, () -> entity.getValueNode("attribute"));
     assertThrows(AssertionException.class, () -> entity.getSetNode("attribute"));
+  }
+
+  @Test
+  public void testConcurrentGetCollection() {
+    testConcurrentGet_internal(BEANS.get(CollectionFixtureDo.class), CollectionFixtureDo::getSimpleDoCollection);
+  }
+
+  @Test
+  public void testConcurrentGetList() {
+    testConcurrentGet_internal(BEANS.get(EntityFixtureDo.class), EntityFixtureDo::getOtherEntities);
+  }
+
+  @Test
+  public void testConcurrentGetSet() {
+    testConcurrentGet_internal(BEANS.get(CollectionFixtureDo.class), CollectionFixtureDo::getSimpleDoSet);
+  }
+
+  @Test
+  public void testConcurrentGetValue() {
+    testConcurrentGet_internal(BEANS.get(Lorem1FixtureDo.class), Lorem1FixtureDo::getValue1);
+  }
+
+  protected <E extends IDoEntity, R> void testConcurrentGet_internal(E entity, Function<E, R> getFunction) {
+    CountDownLatch latch = new CountDownLatch(1);
+    List<IFuture<R>> jobs = new ArrayList<>();
+
+    // a lot of jobs to test thread-safety of get calls
+    for (int i = 0; i < 1000; i++) {
+      jobs.add(Jobs.schedule(() -> {
+        latch.await();
+        return getFunction.apply(entity);
+      }, Jobs.newInput()));
+    }
+
+    // wait for all jobs to be running
+    while (!jobs.stream().map(IFuture::getState).allMatch(JobState.RUNNING::equals)) {
+      SleepUtil.sleepSafe(10, TimeUnit.MILLISECONDS);
+    }
+    latch.countDown();
+
+    // all objects must be the same (equality is not enough), hence compare all other objects with the first object
+    R firstElement = jobs.iterator().next().awaitDoneAndGet(); // get the first element
+    assertTrue(jobs.stream().map(IFuture::awaitDoneAndGet).allMatch(o -> firstElement == o));
   }
 }
