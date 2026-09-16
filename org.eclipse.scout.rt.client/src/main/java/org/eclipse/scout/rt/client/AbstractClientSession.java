@@ -73,6 +73,8 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private static final Logger LOG = LoggerFactory.getLogger(AbstractClientSession.class);
 
   protected static final String SESSION_TYPE = "client";
+  public static final int EXIT_CODE_LOGOUT = 0; // Client session stops with a logout
+  public static final int EXIT_CODE_RELOAD_SESSION = 1; // Client session stops and will be reloaded
 
   protected final SessionMetricsHelper m_sessionMetrics = BEANS.get(SessionMetricsHelper.class);
 
@@ -85,7 +87,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private volatile boolean m_stopping;
   private final Semaphore m_permitToSaveBeforeClosing = new Semaphore(1);
   private final Semaphore m_permitToStop = new Semaphore(1);
-  private int m_exitCode = 0;
+  private int m_exitCode = EXIT_CODE_LOGOUT;
 
   // model
   private String m_id;
@@ -453,7 +455,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   protected void inactivateSession() {
     try {
       ILogoutService logoutService = BEANS.opt(ILogoutService.class);
-      if (logoutService != null) {
+      if (logoutService != null && getExitCode() == AbstractClientSession.EXIT_CODE_LOGOUT) {
         logoutService.logout();
       }
     }

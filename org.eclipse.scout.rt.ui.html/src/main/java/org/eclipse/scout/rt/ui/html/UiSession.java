@@ -33,6 +33,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -72,6 +73,7 @@ import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.session.SessionMetricsHelper;
 import org.eclipse.scout.rt.shared.session.job.filter.event.SessionJobEventFilter;
+import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UiSystem;
@@ -108,6 +110,7 @@ public class UiSession implements IUiSession {
   private static final String EVENT_LOCALE_CHANGED = "localeChanged";
   private static final String EVENT_DISPOSE_ADAPTER = "disposeAdapter";
   private static final String EVENT_RELOAD_PAGE = "reloadPage";
+  private static final String COOKIE_NAME_ENFORCED_DEVICE_TYPE = "scout.ui.enforcedDeviceType";
   /**
    * in milliseconds
    */
@@ -263,6 +266,8 @@ public class UiSession implements IUiSession {
         return;
       }
 
+      initEnforcedDeviceType(req, m_clientSession.getDesktop());
+
       // Register job listener to signal poller once possible UI data to be transported to the UI is available.
       installUiDataAvailableListener(m_clientSession);
 
@@ -287,6 +292,19 @@ public class UiSession implements IUiSession {
       m_httpContext.clear();
       m_currentJsonRequest = null;
     }
+  }
+
+  private void initEnforcedDeviceType(HttpServletRequest req, IDesktop desktop) {
+    Cookie cookie = CookieUtility.getCookieByName(req, COOKIE_NAME_ENFORCED_DEVICE_TYPE);
+    if (cookie == null || cookie.getValue() == null) {
+      return;
+    }
+    IUiDeviceType enforcedDeviceType = UiDeviceType.resolveValue(cookie.getValue());
+    if (enforcedDeviceType == null) {
+      return;
+    }
+    desktop.setEnforcedDeviceType(enforcedDeviceType);
+    setEnforcedDeviceType(enforcedDeviceType); // ensure cookie never gets expired
   }
 
   protected JsonResponse createJsonResponse() {
@@ -629,6 +647,14 @@ public class UiSession implements IUiSession {
     detachDesktop();
 
     m_sessionMetrics.sessionDestroyed(SESSION_TYPE);
+
+    // inform other sessions to stop + reload
+    if (getClientSession() != null && ObjectUtility.equals(getClientSession().getExitCode(), AbstractClientSession.EXIT_CODE_RELOAD_SESSION)) {
+      sessionStore().getUiSessionMap().values().stream()
+          .map(uiSession -> uiSession.getClientSession())
+          .filter(clientSession -> !clientSession.isStopping())
+          .forEach(clientSession -> clientSession.stop(AbstractClientSession.EXIT_CODE_RELOAD_SESSION));
+    }
   }
 
   /**
@@ -1119,7 +1145,12 @@ public class UiSession implements IUiSession {
 
   protected JSONObject createLogoutEventData() {
     JSONObject obj = new JSONObject();
-    obj.put("redirectUrl", getLogoutRedirectUrl());
+    if (getClientSession().getExitCode() == AbstractClientSession.EXIT_CODE_LOGOUT) {
+      obj.put("redirectUrl", getLogoutRedirectUrl());
+    }
+    if (getClientSession().getExitCode() == AbstractClientSession.EXIT_CODE_RELOAD_SESSION) {
+      obj.put("reloadPage", Boolean.TRUE);
+    }
     return obj;
   }
 
@@ -1399,6 +1430,20 @@ public class UiSession implements IUiSession {
     UiThemeHelper.get().storeTheme(currentHttpResponse(), sessionStore().getHttpSession(), theme);
     sendReloadPageEvent();
     LOG.info("UI theme changed to: {}", theme);
+  }
+
+  @Override
+  public void updateEnforcedDeviceType(IUiDeviceType enforcedDeviceType) {
+    if (currentHttpResponse() != null && enforcedDeviceType != null) {
+      setEnforcedDeviceType(enforcedDeviceType);
+      LOG.info("UI enforced device type changed to: {}", enforcedDeviceType.stringValue());
+    }
+  }
+
+  protected void setEnforcedDeviceType(IUiDeviceType enforcedDeviceType) {
+    if (enforcedDeviceType != null) {
+      CookieUtility.addPersistentCookie(currentHttpResponse(), COOKIE_NAME_ENFORCED_DEVICE_TYPE, enforcedDeviceType.stringValue(), (int) TimeUnit.DAYS.toSeconds(365)); // 1 year
+    }
   }
 
   @Override
