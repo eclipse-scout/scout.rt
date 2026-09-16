@@ -174,6 +174,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   protected _mouseDownColumn: Column<any>;
   protected _initialUiPreferences: TableClientUiPreferenceProfileDo;
   protected _rowsDraggableComputed: boolean;
+  protected _restoreScrollTopHandler: () => void;
 
   constructor() {
     super();
@@ -3308,9 +3309,16 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this._restoreScrollTop(scrollTop);
   }
 
+  /**
+   * Restores the previous scroll position.
+   */
   protected _restoreScrollTop(scrollTop: number) {
     if (this.updateBuffer.isBuffering()) {
-      this.updateBuffer.one('complete', () => this._restoreScrollTop(scrollTop));
+      this._restoreScrollTopHandler = () => {
+        this._restoreScrollTopHandler = null;
+        this._restoreScrollTop(scrollTop);
+      };
+      this.updateBuffer.on('complete', event => this._restoreScrollTopHandler && this._restoreScrollTopHandler());
       return;
     }
     // Cannot use setScrollTop because this.scrollTop may still have the old value so that _renderScrollTop would not been called
@@ -3780,6 +3788,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       // Row may not be visible due to the filter -> don't try to scroll because it would fail
       return;
     }
+    // Cancel restore of scroll top, because new scroll position is applied
+    this._restoreScrollTopHandler = null;
     scrollbars.scrollTo(this.$data, row.$row, options);
   }
 
