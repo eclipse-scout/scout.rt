@@ -28,13 +28,13 @@ export class PersonForm extends Form {
     this.widget('ExternalField').setValue(person.external);
   }
 
-  protected override _save(data: PersonDo): JQuery.Promise<void> {
+  protected override _save(data: PersonDo): Promise<void> {
     let rest = scout.create(PersonRestClient);
     return (data.id ? rest.store(data) : rest.create(data))
       .then(() => undefined);
   }
 
-  protected override _load(): JQuery.Promise<PersonDo> {
+  protected override _load(): Promise<PersonDo> {
     if (this.data.id) {
       this.setTitle(this.session.text('EditPerson'));
       // refresh data from server

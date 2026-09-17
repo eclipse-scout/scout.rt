@@ -17,14 +17,14 @@ export class RemoteApp extends App {
     this.remote = true;
   }
 
-  protected override _defaultBootstrappers(options: AppBootstrapOptions): (() => JQuery.Promise<void>)[] {
+  protected override _defaultBootstrappers(options: AppBootstrapOptions): (() => Promise<void>)[] {
     return super._defaultBootstrappers(options).concat(
       this._defaultValuesBootstrapper(),
       this._configPropertiesBootstrapper(options)
     );
   }
 
-  protected _configPropertiesBootstrapper(options: AppBootstrapOptions): () => JQuery.Promise<void> {
+  protected _configPropertiesBootstrapper(options: AppBootstrapOptions): () => Promise<void> {
     if (options.configUrl) {
       return null; // custom URL has been provided. Boostrap using this URL already in queue.
     }
@@ -32,7 +32,7 @@ export class RemoteApp extends App {
     return config.bootstrapSystem.bind(config);
   }
 
-  protected _defaultValuesBootstrapper(): () => JQuery.Promise<void> {
+  protected _defaultValuesBootstrapper(): () => Promise<void> {
     return defaultValues.bootstrap.bind(defaultValues);
   }
 
@@ -43,7 +43,7 @@ export class RemoteApp extends App {
     return super._createErrorHandler(opts);
   }
 
-  protected override _loadSession($entryPoint: JQuery, options: SessionModel): JQuery.Promise<any> {
+  protected override _loadSession($entryPoint: JQuery, options: SessionModel): Promise<any> {
     let model = (options || {}) as InitModelOf<Session>;
     model.$entryPoint = $entryPoint;
     let session = this._createSession(model);

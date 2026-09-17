@@ -26,7 +26,7 @@ export class UiNotifications {
    *    and/or {@link System.setEndpointUrl}.
    * @returns a promise that will be resolved as soon as the subscription was successful and notifications can be received.
    */
-  subscribe(topic: string, handler: UiNotificationHandler, system?: string): JQuery.Promise<string> {
+  subscribe(topic: string, handler: UiNotificationHandler, system?: string): Promise<string> {
     return this._getOrInitSystem(system).subscribe(topic, handler);
   }
 
@@ -36,7 +36,7 @@ export class UiNotifications {
    *
    * @see subscribe
    */
-  subscribeOne(topic: string, handler: UiNotificationHandler, system?: string): JQuery.Promise<string> {
+  subscribeOne(topic: string, handler: UiNotificationHandler, system?: string): Promise<string> {
     return this._getOrInitSystem(system).subscribeOne(topic, handler);
   }
 

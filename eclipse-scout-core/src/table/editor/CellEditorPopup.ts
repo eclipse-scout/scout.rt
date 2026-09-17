@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,7 +21,12 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
   column: Column<TValue>;
   row: TableRow;
   cell: Cell<TValue>;
-  protected _pendingCompleteCellEdit: JQuery.Promise<void>;
+  protected _pendingCompleteCellEdit: Promise<void>;
+  /**
+   * Tracks synchronously whether {@link _pendingCompleteCellEdit} has already resolved, since a native promise
+   * cannot be inspected synchronously for its state.
+   */
+  protected _completeCellEditResolved: boolean;
   protected _rowOrderChangedHandler: EventHandler<TableRowOrderChangedEvent>;
   protected _keyStrokeHandler: EventHandler<KeyStrokeManagerKeyStrokeEvent>;
 
@@ -186,7 +191,7 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
    * @param waitForAcceptInput default is true
    * @returns A promise resolved when acceptInput is performed on the editor field
    */
-  completeEdit(waitForAcceptInput?: boolean): JQuery.Promise<any> {
+  completeEdit(waitForAcceptInput?: boolean): Promise<any> {
     if (this._pendingCompleteCellEdit) {
       // Make sure complete cell edit does not get sent twice since it will lead to exceptions. This may happen if user clicks very fast multiple times.
       return this._pendingCompleteCellEdit;
@@ -197,8 +202,10 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
     // Otherwise call completeEdit immediately, also call it immediately if waitForAcceptInput is false (see _onKeyStroke)
     let field = this.cell.field;
     let acceptInputPromise = field.acceptInput();
+    this._completeCellEditResolved = false;
     if (!acceptInputPromise || !scout.nvl(waitForAcceptInput, true)) {
       this._pendingCompleteCellEdit = $.resolvedPromise();
+      this._completeCellEditResolved = true;
       this.table.completeCellEdit();
     } else {
       this._pendingCompleteCellEdit = acceptInputPromise.then(() => this.table.completeCellEdit());
@@ -207,6 +214,7 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
     this._pendingCompleteCellEdit.then(() => {
       // Ensure complete will never be called more than once
       this._pendingCompleteCellEdit = $.resolvedPromise();
+      this._completeCellEditResolved = true;
     });
 
     return this._pendingCompleteCellEdit;
@@ -214,6 +222,13 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
 
   isCompleteCellEditRequested(): boolean {
     return !!this._pendingCompleteCellEdit;
+  }
+
+  /**
+   * @returns `true` if there is no pending complete cell edit operation, or if it has already resolved.
+   */
+  isCompleteCellEditResolved(): boolean {
+    return !this._pendingCompleteCellEdit || this._completeCellEditResolved;
   }
 
   cancelEdit() {
@@ -279,9 +294,9 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
     return true;
   }
 
-  waitForCompleteCellEdit(): JQuery.Promise<void> {
+  waitForCompleteCellEdit(): Promise<void> {
     if (this._pendingCompleteCellEdit) {
-      return this._pendingCompleteCellEdit.promise();
+      return this._pendingCompleteCellEdit;
     }
     return $.resolvedPromise();
   }

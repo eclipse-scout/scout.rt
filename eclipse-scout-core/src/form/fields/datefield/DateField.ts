@@ -452,7 +452,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     return dates.ensure(value);
   }
 
-  protected override _validateValue(value: Date): Date | JQuery.Promise<Date> {
+  protected override _validateValue(value: Date): Date | Promise<Date> {
     if (objects.isNullOrUndefined(value)) {
       return value;
     }
@@ -1025,7 +1025,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     }, 50);
   }
 
-  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
+  override acceptInput(whileTyping?: boolean): Promise<void> | void {
     let displayText = scout.nvl(this._readDisplayText(), '');
     let inputChanged = this._checkDisplayTextChanged(displayText);
     if (inputChanged) {
@@ -1852,7 +1852,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     this.getTimePicker().shiftSelectedTime(hourUnits, minuteUnits, secondUnits);
   }
 
-  protected override _formatValue(value: Date): string | JQuery.Promise<string> {
+  protected override _formatValue(value: Date): string | Promise<string> {
     let
       dateText = '',
       timeText = '';

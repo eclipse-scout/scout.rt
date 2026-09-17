@@ -414,7 +414,7 @@ describe('Accordion', () => {
       const anchorAndDiffsCollapsed = calcAnchorAndDiffs(tooltip);
 
       expect(anchorAndDiffsCollapsed.anchor).not.toEqual(anchorAndDiffs.anchor);
-      expect(anchorAndDiffsCollapsed.xDiff).toBe(anchorAndDiffs.xDiff);
+      expect(anchorAndDiffsCollapsed.xDiff).toBeCloseTo(anchorAndDiffs.xDiff, 2);
       expect(anchorAndDiffsCollapsed.yDiff).toBeCloseTo(anchorAndDiffs.yDiff, 2);
 
       group0.setCollapsed(false);

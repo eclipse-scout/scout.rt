@@ -35,7 +35,7 @@ describe('PersonForm', () => {
           personForm.close();
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
   });
 });

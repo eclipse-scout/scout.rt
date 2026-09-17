@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Permission, PermissionCollection, PermissionCollectionType, scout} from '../../src/index';
+import {Deferred, Permission, PermissionCollection, PermissionCollectionType, scout} from '../../src/index';
 import {accessSpecHelper} from '../../src/testing';
 
 describe('PermissionCollection', () => {
@@ -17,23 +17,14 @@ describe('PermissionCollection', () => {
   }
 
   class SpecPermission extends Permission {
-    override _evalPermission(permission: Permission): JQuery.Promise<boolean> {
+    override _evalPermission(permission: Permission): Promise<boolean> {
       return super._evalPermission(permission);
     }
   }
 
   describe('implies', () => {
 
-    beforeEach(() => {
-      jasmine.clock().install();
-    });
-
-    afterEach(() => {
-      jasmine.clock().uninstall();
-    });
-
     it('all permissions if type is ALL', async () => {
-      jasmine.clock().uninstall();
       const collection = scout.create(PermissionCollection, {type: PermissionCollectionType.ALL});
 
       expect(collection.implies(null, true)).toBeFalse();
@@ -46,7 +37,6 @@ describe('PermissionCollection', () => {
     });
 
     it('no permission if type is NONE', async () => {
-      jasmine.clock().uninstall();
       const collection = scout.create(PermissionCollection, {type: PermissionCollectionType.NONE});
 
       expect(collection.implies(null, true)).toBeFalse();
@@ -59,7 +49,6 @@ describe('PermissionCollection', () => {
     });
 
     it('only permission contained in the collection if type is DEFAULT', async () => {
-      jasmine.clock().uninstall();
       const collection = scout.create(PermissionCollection, {
         permissions: {
           some: [Permission.quick('some')]
@@ -75,51 +64,45 @@ describe('PermissionCollection', () => {
       expect(await collection.implies(Permission.quick('other'))).toBeFalse();
     });
 
-    it('resolves if first check is succeeds', () => {
-      let evalDeferred1: JQuery.Deferred<boolean>;
-      let evalDeferred2: JQuery.Deferred<boolean>;
+    it('resolves if first check is succeeds', async () => {
+      let evalDeferred1: Deferred<boolean>;
+      let evalDeferred2: Deferred<boolean>;
       const permission1 = scout.create(SpecPermission, {id: 'test'});
       const permission2 = scout.create(SpecPermission, {id: 'test'});
       const collection = scout.create(PermissionCollection, accessSpecHelper.permissionCollectionModel(permission1, permission2));
 
       permission1._evalPermission = (permission: Permission) => {
-        evalDeferred1 = $.Deferred();
+        evalDeferred1 = new Deferred();
         return evalDeferred1.promise();
       };
       permission2._evalPermission = (permission: Permission) => {
-        evalDeferred2 = $.Deferred();
+        evalDeferred2 = new Deferred();
         return evalDeferred2.promise();
       };
 
       let promise = collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue());
-      expect(promise.state()).toBe('pending');
+      await expectAsync(promise).toBePending();
       evalDeferred1.resolve(true);
-      jasmine.clock().tick(1);
-      expect(promise.state()).toBe('resolved');
+      await expectAsync(promise).toBeResolved();
 
       promise = collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue());
-      expect(promise.state()).toBe('pending');
+      await expectAsync(promise).toBePending();
       evalDeferred2.resolve(false);
-      jasmine.clock().tick(1);
-      expect(promise.state()).toBe('pending');
+      await expectAsync(promise).toBePending();
       evalDeferred1.resolve(true);
-      jasmine.clock().tick(1);
-      expect(promise.state()).toBe('resolved');
+      await expectAsync(promise).toBeResolved();
 
       promise = collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue());
-      expect(promise.state()).toBe('pending');
+      await expectAsync(promise).toBePending();
       evalDeferred2.resolve(true);
-      jasmine.clock().tick(1);
-      expect(promise.state()).toBe('resolved');
+      await expectAsync(promise).toBeResolved();
 
       promise = collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeFalse());
-      expect(promise.state()).toBe('pending');
+      await expectAsync(promise).toBePending();
       evalDeferred2.resolve(false);
-      jasmine.clock().tick(1);
-      expect(promise.state()).toBe('pending');
+      await expectAsync(promise).toBePending();
       evalDeferred1.resolve(false);
-      jasmine.clock().tick(1);
-      expect(promise.state()).toBe('resolved');
+      await expectAsync(promise).toBeResolved();
     });
   });
 

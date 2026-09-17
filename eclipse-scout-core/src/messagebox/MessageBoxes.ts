@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {InitModelOf, MessageBox, MessageBoxesModel, MessageBoxOption, ObjectWithType, scout, SomeRequired, Status, StatusSeverity, strings, Widget} from '../index';
+import {Deferred, InitModelOf, MessageBox, MessageBoxesModel, MessageBoxOption, ObjectWithType, scout, SomeRequired, Status, StatusSeverity, strings, Widget} from '../index';
 import $ from 'jquery';
 
 /**
@@ -119,8 +119,8 @@ export class MessageBoxes implements MessageBoxesModel, ObjectWithType {
    * @returns promise resolved to selected {@link MessageBoxOption}.
    * @see MessageBox.Buttons
    */
-  buildAndOpen(): JQuery.Promise<MessageBoxOption> {
-    let def = $.Deferred();
+  buildAndOpen(): Promise<MessageBoxOption> {
+    let def = new Deferred<MessageBoxOption>();
     let messageBox = this.build();
     messageBox.on('action', event => {
       if (this.closeOnClick) {
@@ -158,7 +158,7 @@ export class MessageBoxes implements MessageBoxesModel, ObjectWithType {
    * @param severity default is {@link Status.Severity.INFO}
    * @returns promise resolved to clicked button
    */
-  static openOk(parent: Widget, bodyText: string, severity?: StatusSeverity): JQuery.Promise<MessageBoxOption> {
+  static openOk(parent: Widget, bodyText: string, severity?: StatusSeverity): Promise<MessageBoxOption> {
     return this.createOk(parent)
       .withBody(bodyText)
       .withSeverity(severity)
@@ -171,7 +171,7 @@ export class MessageBoxes implements MessageBoxesModel, ObjectWithType {
    * @param severity default is {@link Status.Severity.INFO}
    * @returns promise resolved to clicked button
    */
-  static openYesNo(parent: Widget, bodyText: string, severity?: StatusSeverity): JQuery.Promise<MessageBoxOption> {
+  static openYesNo(parent: Widget, bodyText: string, severity?: StatusSeverity): Promise<MessageBoxOption> {
     return this.createYesNo(parent)
       .withBody(bodyText)
       .withSeverity(severity)

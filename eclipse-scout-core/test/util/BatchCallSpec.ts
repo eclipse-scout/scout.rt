@@ -18,14 +18,14 @@ describe('BatchCall', () => {
     session = sandboxSession();
   });
 
-  function specBatchCall(keys: string[]): JQuery.Promise<Map<string, string>> {
+  function specBatchCall(keys: string[]): Promise<Map<string, string>> {
     return $.resolvedPromise(new Map(keys.map(key => [key, `[${key}]`])));
   }
 
   describe('coalesce', () => {
     it('can be disabled', async () => {
 
-      function dataObjectBatchCall(keys: BaseDoEntity[]): JQuery.Promise<Map<BaseDoEntity, string>> {
+      function dataObjectBatchCall(keys: BaseDoEntity[]): Promise<Map<BaseDoEntity, string>> {
         expect(keys).toHaveSize(5); // 2 times inserted do1 is in the array only once
         return $.resolvedPromise(new Map(keys.map(key => [key, key._type])));
       }
@@ -138,7 +138,7 @@ describe('BatchCall', () => {
     });
 
     it('can handle missing data', async () => {
-      function emptyBatchCall(keys: string[]): JQuery.Promise<Map<string, string>> {
+      function emptyBatchCall(keys: string[]): Promise<Map<string, string>> {
         return null;
       }
 
@@ -156,7 +156,7 @@ describe('BatchCall', () => {
     });
 
     it('propagates call errors', async () => {
-      function throwingBatchCall(keys: string[]): JQuery.Promise<Map<string, string>> {
+      function throwingBatchCall(keys: string[]): Promise<Map<string, string>> {
         throw new Error('NullPointerException');
       }
 
@@ -178,7 +178,7 @@ describe('BatchCall', () => {
     });
 
     it('propagates promise errors', async () => {
-      function throwingBatchCall(keys: string[]): JQuery.Promise<Map<string, string>> {
+      function throwingBatchCall(keys: string[]): Promise<Map<string, string>> {
         return $.rejectedPromise('error');
       }
 
@@ -200,7 +200,7 @@ describe('BatchCall', () => {
     });
 
     it('considers order of returned data', async () => {
-      function sortedSpecBatchCall(keys: string[]): JQuery.Promise<Map<string, string>> {
+      function sortedSpecBatchCall(keys: string[]): Promise<Map<string, string>> {
         return $.resolvedPromise(new Map(keys.slice().sort().map(key => [key, `[${key}]`])));
       }
 
@@ -235,7 +235,7 @@ describe('BatchCall', () => {
         }
       }
 
-      function keySpecBatchCall(key: SpecKey[]): JQuery.Promise<Map<SpecKey, string>> {
+      function keySpecBatchCall(key: SpecKey[]): Promise<Map<SpecKey, string>> {
         // simulate serialization over ajax call
         let serializedKeys = key.map(key => dataObjects.serialize(key));
         let deserializedKeys = serializedKeys.map(key => dataObjects.deserialize(key, SpecKey));
