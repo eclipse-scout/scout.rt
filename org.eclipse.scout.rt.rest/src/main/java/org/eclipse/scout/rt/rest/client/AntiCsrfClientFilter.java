@@ -14,7 +14,7 @@ import java.io.IOException;
 import jakarta.ws.rs.client.ClientRequestContext;
 
 import org.eclipse.scout.rt.platform.util.LazyValue;
-import org.eclipse.scout.rt.rest.csrf.AntiCsrfHelper;
+import org.eclipse.scout.rt.security.csrf.AntiCsrfHelper;
 
 /**
  * This filter prevents CSRF attacks on REST services.
@@ -27,6 +27,6 @@ public class AntiCsrfClientFilter implements IGlobalRestRequestFilter {
 
   @Override
   public void filter(ClientRequestContext requestContext) throws IOException {
-    m_requestWithHelper.get().prepareRequest(requestContext);
+    m_requestWithHelper.get().prepareRequest(requestContext.getHeaders()::add, requestContext.getMethod(), requestContext.getUri().getPath());
   }
 }
