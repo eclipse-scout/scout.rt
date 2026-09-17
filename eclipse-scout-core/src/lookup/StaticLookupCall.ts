@@ -208,7 +208,7 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   protected _lookupRowByKey(key: TKey): LookupRow<TKey> {
-    let data = arrays.find(this.data, data => data[0] === key);
+    let data = arrays.find(this.data, data => objects.equals(data[0], key));
     if (!data) {
       return null;
     }
@@ -231,7 +231,7 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
 
   protected _lookupRowsByRec(rec: TKey): LookupRow<TKey>[] {
     return this.data.reduce((aggr, data) => {
-      if (data[2] === rec) {
+      if (objects.equals(data[2], rec)) {
         aggr.push(this._dataToLookupRow(data));
       }
       return aggr;
