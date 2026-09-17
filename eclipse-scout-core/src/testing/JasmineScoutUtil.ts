@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,12 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractConstructor, arrays, AutoLeafPageWithNodes, BaseDoEntity, Constructor, dataObjects, DoEntity, HybridActionEvent, HybridManager, ObjectFactory, Page, PageWithNodes, PageWithTable, scout, Session, strings, TypeDescriptor, Widget
+  AbstractConstructor, ajax, arrays, AutoLeafPageWithNodes, BaseDoEntity, Constructor, dataObjects, DoEntity, HybridActionEvent, HybridManager, ObjectFactory, Page, PageWithNodes, PageWithTable, scout, Session, strings, TypeDescriptor,
+  Widget
 } from '../index';
 import $ from 'jquery';
 import 'jasmine-ajax';
 
-let _jsonResourceCache = {};
+let _jsonResourceCache: Record<string, Promise<any>> = {};
 
 /**
  * Utility functions for jasmine tests.
@@ -23,7 +24,7 @@ export const JasmineScoutUtil = {
   /**
    * @returns the loaded JSON data structure
    */
-  loadJsonResource(jsonResourceUrl: string, options: { useCache?: boolean } = {}): JQuery.Promise<any> {
+  loadJsonResource(jsonResourceUrl: string, options: { useCache?: boolean } = {}): Promise<any> {
     scout.assertParameter('jsonResourceUrl', jsonResourceUrl);
 
     if (scout.nvl(options.useCache, true)) {
@@ -33,33 +34,29 @@ export const JasmineScoutUtil = {
       }
     }
 
-    return $.ajax({
-      async: false,
-      method: 'GET',
-      dataType: 'json',
-      contentType: 'application/json; charset=UTF-8',
-      cache: false,
-      url: jsonResourceUrl
-    })
-      .done(json => {
+    return ajax.getJson(jsonResourceUrl)
+      .then(json => {
         if (scout.nvl(options.useCache, true)) {
           _jsonResourceCache[jsonResourceUrl] = json;
         }
         return $.resolvedPromise(json);
       })
-      .fail((jqXHR, textStatus, errorThrown) => {
+      .catch(() => {
         throw new Error('Could not load resource from url: ' + jsonResourceUrl);
       });
   },
 
+  /**
+   * Loads the JSON resource and mocks the call with it as soon as it is loaded.
+   */
   loadJsonResourceAndMockRestCall(resourceUrlToMock: string, jsonResourceUrl: string, options: {
     useCache?: boolean;
     restriction?: any;
     method?: string;
-  } = {}) {
+  } = {}): Promise<void> {
     scout.assertParameter('resourceUrlToMock', resourceUrlToMock);
 
-    JasmineScoutUtil.loadJsonResource(jsonResourceUrl, options)
+    return JasmineScoutUtil.loadJsonResource(jsonResourceUrl, options)
       .then(json => JasmineScoutUtil.mockRestCall(resourceUrlToMock, json, options));
   },
 

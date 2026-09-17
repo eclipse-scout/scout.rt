@@ -61,11 +61,7 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
 
   // --------------------------------------
 
-  build(): JQuery.Promise<IBookmarkDo> {
-    return $.when(this._build());
-  }
-
-  protected async _build(): Promise<IBookmarkDo> {
+  async build(): Promise<IBookmarkDo> {
     let bookmarkDefinition = await this._createBookmarkDefinition();
     return this._createBookmark(bookmarkDefinition);
   }
