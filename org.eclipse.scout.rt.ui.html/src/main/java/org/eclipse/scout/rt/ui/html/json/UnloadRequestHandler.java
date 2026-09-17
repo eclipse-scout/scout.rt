@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
-import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 
@@ -19,6 +18,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.security.csrf.IAntiCsrfFilterExclusion;
 import org.eclipse.scout.rt.server.commons.authentication.ServletFilterHelper;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
@@ -34,12 +34,13 @@ import org.slf4j.LoggerFactory;
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon}
  * @since 6.1
  */
+@SuppressWarnings("JavadocDeclaration")
 @Order(5500)
 public class UnloadRequestHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(UnloadRequestHandler.class);
 
   @Override
-  public boolean handlePost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+  public boolean handlePost(HttpServletRequest req, HttpServletResponse resp) {
     final String pathInfo = req.getPathInfo();
 
     final Matcher matcher = ServletFilterHelper.UNLOAD_PATH_PATTERN.matcher(pathInfo);
@@ -78,6 +79,17 @@ public class UnloadRequestHandler extends AbstractUiServletRequestHandler {
     }
     finally {
       uiSessionLock.unlock();
+    }
+  }
+
+  /**
+   * Don't check X-Requested-With header for unload requests
+   */
+  public static class UnloadRequestFilterExclusion implements IAntiCsrfFilterExclusion {
+
+    @Override
+    public boolean isIgnored(String method, String path) {
+      return ServletFilterHelper.UNLOAD_PATH_PATTERN.matcher(path).matches();
     }
   }
 }
