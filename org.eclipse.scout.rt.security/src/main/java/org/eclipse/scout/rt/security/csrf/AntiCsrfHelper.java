@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,15 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.rest.csrf;
-
-import jakarta.ws.rs.client.ClientRequestContext;
-import jakarta.ws.rs.container.ContainerRequestContext;
+package org.eclipse.scout.rt.security.csrf;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.rest.client.AntiCsrfClientFilter;
-import org.eclipse.scout.rt.rest.container.AntiCsrfContainerFilter;
 
 /**
  * Helper bean to include and validate the {@code X-Requested-With} HTTP header.
@@ -36,8 +31,6 @@ import org.eclipse.scout.rt.rest.container.AntiCsrfContainerFilter;
  * <li><a href="http://seclab.stanford.edu/websec/csrf/csrf.pdf">Robust Defenses for Cross-Site Request Forgery</a></li>
  * </ul>
  *
- * @see AntiCsrfContainerFilter
- * @see AntiCsrfClientFilter
  */
 @ApplicationScoped
 public class AntiCsrfHelper {
@@ -48,31 +41,43 @@ public class AntiCsrfHelper {
   /**
    * Adds the {@value #REQUESTED_WITH_HEADER} header to the request if necessary.
    * <p>
-   * This header prevents CSRF attacks on REST services if the server validates the existence of the header.
-   * {@link #isValidRequest(ContainerRequestContext)} can be used for this
+   * This header prevents CSRF attacks on services if the server validates the existence of the header.
+   * {@link #isValidRequest(HeaderLookup, String, String)} can be used for this
    */
-  public void prepareRequest(ClientRequestContext requestContext) {
-    if (BEANS.all(IAntiCsrfFilterExclusion.class).stream().anyMatch(f -> f.isIgnored(requestContext))) {
+  public void prepareRequest(HeaderWriter headerWriter, String method, String path) {
+    if (isExcludedRequest(method, path)) {
       return;
     }
 
-    requestContext
-        .getHeaders()
-        .add(REQUESTED_WITH_HEADER, REQUESTED_WITH_VALUE);
+    headerWriter.add(REQUESTED_WITH_HEADER, REQUESTED_WITH_VALUE);
   }
 
   /**
    * Only allows the request if the {@value #REQUESTED_WITH_HEADER} header is present or the HTTP method can be ignored.
    * <p>
    * This header must be added by clients.<br>
-   * For Java clients use {@link #prepareRequest(ClientRequestContext)}.<br>
+   * For Java clients use {@link #prepareRequest(HeaderWriter, String, String)}.<br>
    * For AJAX requests from JavaScript the header is automatically included by jQuery.
    */
-  public boolean isValidRequest(ContainerRequestContext requestContext) {
-    if (BEANS.all(IAntiCsrfFilterExclusion.class).stream().anyMatch(f -> f.isIgnored(requestContext))) {
+  public boolean isValidRequest(HeaderLookup lookup, String method, String path) {
+    if (isExcludedRequest(method, path)) {
       return true;
     }
 
-    return requestContext.getHeaders().containsKey(REQUESTED_WITH_HEADER); // don't care about the value of the header
+    return lookup.containsHeader(REQUESTED_WITH_HEADER); // don't care about the value of the header
+  }
+
+  protected boolean isExcludedRequest(String method, String path) {
+    return BEANS.all(IAntiCsrfFilterExclusion.class).stream().anyMatch(f -> f.isIgnored(method, path));
+  }
+
+  @FunctionalInterface
+  public interface HeaderLookup {
+    boolean containsHeader(String headerName);
+  }
+
+  @FunctionalInterface
+  public interface HeaderWriter {
+    void add(String headerName, Object headerValue);
   }
 }

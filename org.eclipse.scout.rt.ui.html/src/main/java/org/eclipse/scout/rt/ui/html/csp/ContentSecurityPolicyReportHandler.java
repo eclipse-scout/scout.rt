@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.security.csp.ContentSecurityPolicy;
+import org.eclipse.scout.rt.security.csrf.IAntiCsrfFilterExclusion;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.UiServlet;
@@ -58,5 +59,16 @@ public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequest
 
   protected String getReport(HttpServletRequest req) throws IOException {
     return BEANS.get(HttpServletControl.class).getCspReport(req);
+  }
+
+  /**
+   * Don't check X-Requested-With header for csp reports
+   */
+  public static class ContentSecurityPolicyFilterExclusion implements IAntiCsrfFilterExclusion {
+
+    @Override
+    public boolean isIgnored(String method, String path) {
+      return HANDLER_PATH.equals(path);
+    }
   }
 }

@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 import org.eclipse.scout.rt.server.commons.healthcheck.HealthCheckServlet;
+import org.eclipse.scout.rt.server.commons.servlet.filter.AntiCsrfFilter;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.app.filter.UiServletMultipartConfigFilter;
 import org.eclipse.scout.rt.ui.html.filter.UiServletUserBootstrapFilter;
@@ -63,6 +64,15 @@ public final class UiServletContributors {
     @Override
     public void contribute(ServletContextHandler handler) {
       handler.addFilter(UiServletMultipartConfigFilter.class, "/*", null);
+    }
+  }
+
+  @Order(200)
+  public static class AntiCsrfFilterContributor implements IServletFilterContributor {
+
+    @Override
+    public void contribute(ServletContextHandler handler) {
+      handler.addFilter(AntiCsrfFilter.class, "/*", null);
     }
   }
 
