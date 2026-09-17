@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {FullModelOf, InitModelOf, ObjectModel, ObjectOrModel, objects, Permission, PermissionLevel, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, scout} from '../index';
+import {Deferred, FullModelOf, InitModelOf, ObjectModel, ObjectOrModel, objects, Permission, PermissionLevel, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, scout} from '../index';
 
 export class PermissionCollection extends PropertyEventEmitter implements PermissionCollectionModel {
   declare self: PermissionCollection;
@@ -59,9 +59,9 @@ export class PermissionCollection extends PropertyEventEmitter implements Permis
    * Quick implies is executed synchronously while non-quick implies is executed asynchronously.
    */
   implies(permission: Permission, quick: true): boolean;
-  implies(permission: Permission, quick?: false): JQuery.Promise<boolean>;
-  implies(permission: Permission, quick?: boolean): boolean | JQuery.Promise<boolean>;
-  implies(permission: Permission, quick?: boolean): boolean | JQuery.Promise<boolean> {
+  implies(permission: Permission, quick?: false): Promise<boolean>;
+  implies(permission: Permission, quick?: boolean): boolean | Promise<boolean>;
+  implies(permission: Permission, quick?: boolean): boolean | Promise<boolean> {
     if (!permission) {
       return quick ? false : $.resolvedPromise(false);
     }
@@ -82,9 +82,9 @@ export class PermissionCollection extends PropertyEventEmitter implements Permis
           return false;
         }
 
-        const deferred = $.Deferred();
+        const deferred = new Deferred<boolean>();
         // collect all promises
-        const impliedPromises: JQuery.Promise<void>[] = [];
+        const impliedPromises: Promise<void>[] = [];
         for (const p of permissions) {
           impliedPromises.push(p.implies(permission, false)
             .then(implies => {
@@ -96,7 +96,7 @@ export class PermissionCollection extends PropertyEventEmitter implements Permis
         }
 
         // resolve with false if not already resolved (i.e. not implied by any permission)
-        $.promiseAll(impliedPromises).then(values => deferred.resolve(false));
+        Promise.all(impliedPromises).then(values => deferred.resolve(false));
 
         return deferred.promise();
       }

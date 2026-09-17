@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, EventHandler, EventListener, EventSupport, InitModelOf, ObjectModel, ObjectWithType, scout, systems, UiNotificationDo, UiNotificationHandler, UiNotificationPoller} from '../index';
+import {Deferred, Event, EventHandler, EventListener, EventSupport, InitModelOf, ObjectModel, ObjectWithType, scout, systems, UiNotificationDo, UiNotificationHandler, UiNotificationPoller} from '../index';
 
 export class UiNotificationSystem implements UiNotificationSystemModel, ObjectWithType {
   declare model: UiNotificationSystemModel;
@@ -26,7 +26,7 @@ export class UiNotificationSystem implements UiNotificationSystemModel, ObjectWi
     this.name = model?.name;
   }
 
-  subscribe(topic: string, handler: UiNotificationHandler): JQuery.Promise<string> {
+  subscribe(topic: string, handler: UiNotificationHandler): Promise<string> {
     scout.assertParameter('topic', topic);
     scout.assertParameter('handler', handler);
     this.events.on(topic, handler);
@@ -36,7 +36,7 @@ export class UiNotificationSystem implements UiNotificationSystemModel, ObjectWi
     });
   }
 
-  subscribeOne(topic: string, handler: UiNotificationHandler): JQuery.Promise<string> {
+  subscribeOne(topic: string, handler: UiNotificationHandler): Promise<string> {
     scout.assertParameter('topic', topic);
     scout.assertParameter('handler', handler);
     this.events.one(topic, handler);
@@ -51,13 +51,13 @@ export class UiNotificationSystem implements UiNotificationSystemModel, ObjectWi
     this.events.off(topic, handler);
   }
 
-  whenSubscriptionStart(topic: string): JQuery.Promise<string> {
+  whenSubscriptionStart(topic: string): Promise<string> {
     if (this.poller.notifications.get(topic)?.size) {
       // If there is at least one notification, the subscription has been started successfully.
       // The notification may be the subscriptionStart notification or another one if subscriptionStart notification has been removed because history size exceeded HISTORY_COUNT.
       return $.resolvedPromise(topic);
     }
-    let deferred = $.Deferred();
+    let deferred = new Deferred<string>();
     let subscriptionStartHandler = event => {
       if (event.notification.topic === topic) {
         deferred.resolve(topic);

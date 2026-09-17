@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Form, GroupBox, PopupWindow, scout} from '../../src/index';
+import {Deferred, Form, GroupBox, PopupWindow, scout} from '../../src/index';
 import $ from 'jquery';
 
 describe('PopupWindow', () => {
@@ -50,7 +50,7 @@ describe('PopupWindow', () => {
       location: {href: null},
       onerror: myErrorHandler
     };
-    const deferred = $.Deferred();
+    const deferred = new Deferred<void>();
     $(myWindow).one('pageshow', () => deferred.resolve());
     await deferred.promise();
   });

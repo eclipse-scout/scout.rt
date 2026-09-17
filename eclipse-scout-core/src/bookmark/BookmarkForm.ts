@@ -50,7 +50,7 @@ export class BookmarkForm extends Form implements BookmarkFormModel {
     return model();
   }
 
-  protected override _load(): JQuery.Promise<any> {
+  protected override _load(): Promise<any> {
     // 1. Edit in-memory bookmark
     if (this.bookmark) {
       return $.resolvedPromise(this.bookmark);
@@ -72,7 +72,7 @@ export class BookmarkForm extends Form implements BookmarkFormModel {
     return this.data;
   }
 
-  protected override _save(data: any): JQuery.Promise<void> {
+  protected override _save(data: any): Promise<void> {
     if (this.bookmark) {
       return $.resolvedPromise(); // nop, bookmark was already updated in exportData()
     }
@@ -80,7 +80,7 @@ export class BookmarkForm extends Form implements BookmarkFormModel {
       .then(bookmark => this.setData(bookmark));
   }
 
-  override ok(): JQuery.Promise<void> {
+  override ok(): Promise<void> {
     if (!this.bookmarkId && !this.bookmark) {
       this.touch(); // Save always in "new" mode
     }

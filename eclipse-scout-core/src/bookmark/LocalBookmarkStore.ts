@@ -34,7 +34,7 @@ export class LocalBookmarkStore extends BookmarkStore {
     webstorage.setItemToLocalStorage(this._storeId, dataObjects.stringify(allBookmarks));
   }
 
-  override storeBookmark(bookmark: BookmarkDo): JQuery.Promise<BookmarkDo> {
+  override storeBookmark(bookmark: BookmarkDo): Promise<BookmarkDo> {
     return $.resolvedPromise().then(() => {
       if (!bookmark) {
         return bookmark;
@@ -52,20 +52,20 @@ export class LocalBookmarkStore extends BookmarkStore {
     });
   }
 
-  override loadBookmark(bookmarkId: string): JQuery.Promise<BookmarkDo> {
+  override loadBookmark(bookmarkId: string): Promise<BookmarkDo> {
     return $.resolvedPromise().then(() => {
       let allBookmarks = this._readFromStore() || [];
       return allBookmarks.find(b => b.id === bookmarkId) || null;
     });
   }
 
-  override loadAllBookmarks(): JQuery.Promise<BookmarkDo[]> {
+  override loadAllBookmarks(): Promise<BookmarkDo[]> {
     return $.resolvedPromise().then(() => {
       return this._readFromStore() || [];
     });
   }
 
-  override storeAllBookmarks(allBookmarks: BookmarkDo[]): JQuery.Promise<void> {
+  override storeAllBookmarks(allBookmarks: BookmarkDo[]): Promise<void> {
     return $.resolvedPromise().then(() => {
       allBookmarks = arrays.ensure(allBookmarks).filter(bookmark => {
         if (!bookmark) {

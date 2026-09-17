@@ -13,7 +13,7 @@ export class PersonRestClient extends AbstractRestClient {
    * Loads a single person.
    * @param id The id of the person to fetch. Must not be null.
    */
-  load(id: string): JQuery.Promise<PersonDo> {
+  load(id: string): Promise<PersonDo> {
     return this._loadItem(id);
   }
 
@@ -22,7 +22,7 @@ export class PersonRestClient extends AbstractRestClient {
    * @param restriction Filters which persons to fetch. Must not be null.
    * @returns The persons matching the restriction
    */
-  list(restriction: PersonRestrictionDo): JQuery.Promise<PersonDo[]> {
+  list(restriction: PersonRestrictionDo): Promise<PersonDo[]> {
     return this._listItems(restriction);
   }
 
@@ -31,7 +31,7 @@ export class PersonRestClient extends AbstractRestClient {
    * @param person The person to create. Must not be null.
    * @returns the created person
    */
-  create(person: PersonDo): JQuery.Promise<PersonDo> {
+  create(person: PersonDo): Promise<PersonDo> {
     return this._createItem(person);
   }
 
@@ -40,7 +40,7 @@ export class PersonRestClient extends AbstractRestClient {
    * @param person The person to update. Must not be null.
    * @returns The updated person
    */
-  store(person: PersonDo): JQuery.Promise<PersonDo> {
+  store(person: PersonDo): Promise<PersonDo> {
     return this._storeItem(person.id, person);
   }
 
@@ -48,7 +48,7 @@ export class PersonRestClient extends AbstractRestClient {
    * Deletes a person.
    * @param id The id of the person to delete. Must not be null.
    */
-  remove(id: string): JQuery.Promise<void> {
+  remove(id: string): Promise<void> {
     return this._removeItem(id);
   }
 }

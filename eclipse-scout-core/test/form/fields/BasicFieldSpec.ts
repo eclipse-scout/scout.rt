@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -41,21 +41,23 @@ describe('BasicField', () => {
   }
 
   describe('acceptInput must always be sent to server at the end of input, if at least one change has been made', () => {
-    it('updateDisplayTextOnModify = true, with changed text', () => {
+    it('updateDisplayTextOnModify = true, with changed text', async () => {
+      jasmine.clock().autoTick();
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test1');
       field.$field.trigger('input');
-      jasmine.clock().tick(251); // because of debounce
-      sendQueuedAjaxCalls();
+      await sleep(251); // 251 because of debounce
+      await sendQueuedAjaxCallsAsync(session);
       let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1',
         whileTyping: true,
         showBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
+
       JQueryTesting.triggerBlur(field.$field);
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1',
         whileTyping: false,
@@ -99,12 +101,13 @@ describe('BasicField', () => {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('updateDisplayTextOnModify = false, with changed text', () => {
+    it('updateDisplayTextOnModify = false, with changed text', async () => {
+      jasmine.clock().uninstall();
       field.updateDisplayTextOnModify = false;
       field.render();
       field.$field.val('Test2');
       field.$field.trigger('input');
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test2',
         whileTyping: true,
@@ -112,7 +115,7 @@ describe('BasicField', () => {
       });
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
       JQueryTesting.triggerBlur(field.$field);
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test2',
         whileTyping: false,
@@ -121,22 +124,24 @@ describe('BasicField', () => {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with changed text', () => {
+    it('updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with changed text', async () => {
+      jasmine.clock().autoTick();
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test3');
       field.$field.trigger('input');
-      jasmine.clock().tick(251); // because of debounce
-      sendQueuedAjaxCalls();
+      await sleep(251); // 251 because of debounce
+      await sendQueuedAjaxCallsAsync(session);
       let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test3',
         whileTyping: true,
         showBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
+
       field.setUpdateDisplayTextOnModify(false);
       JQueryTesting.triggerBlur(field.$field);
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test3',
         whileTyping: false,
@@ -145,13 +150,14 @@ describe('BasicField', () => {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with *pending* changed text', () => {
+    it('updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with *pending* changed text', async () => {
+      jasmine.clock().autoTick();
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test3');
       field.$field.trigger('input');
-      jasmine.clock().tick(100); // debounced function has not been executed yet!
-      sendQueuedAjaxCalls();
+      await sleep(100); // debounced function has not been executed yet!
+      await sendQueuedAjaxCallsAsync(session);
       let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test3',
         whileTyping: true,
@@ -160,11 +166,11 @@ describe('BasicField', () => {
       expect(mostRecentJsonRequest()).not.toContainEvents(event); // not!
 
       field.setUpdateDisplayTextOnModify(false); // this should trigger to immediate execution of acceptInput(true)
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       expect(mostRecentJsonRequest()).toContainEvents(event);
 
       JQueryTesting.triggerBlur(field.$field);
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test3',
         whileTyping: false,

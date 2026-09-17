@@ -7,13 +7,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, LookupCall, LookupFieldAdapter, LookupResult, LookupRow, objects, QueryBy, RemoteLookupRequest, scout} from '../index';
+import {arrays, Deferred, LookupCall, LookupFieldAdapter, LookupResult, LookupRow, objects, QueryBy, RemoteLookupRequest, scout} from '../index';
 import $ from 'jquery';
-import Deferred = JQuery.Deferred;
 
 export class RemoteLookupCall<TKey> extends LookupCall<TKey> {
   adapter: LookupFieldAdapter;
-  deferred: Deferred<LookupResult<TKey>, { abort: boolean }> & { requestParameter?: RemoteLookupRequest<string | TKey | void> };
+  deferred: Deferred<LookupResult<TKey>> & { requestParameter?: RemoteLookupRequest<string | TKey | void> };
 
   constructor(adapter: LookupFieldAdapter) {
     super();
@@ -21,25 +20,25 @@ export class RemoteLookupCall<TKey> extends LookupCall<TKey> {
     this.deferred = null;
   }
 
-  protected override _getAll(): JQuery.Promise<LookupResult<TKey>> {
+  protected override _getAll(): Promise<LookupResult<TKey>> {
     this._newDeferred(new RemoteLookupRequest(QueryBy.ALL));
     this.adapter.sendLookup(QueryBy.ALL);
     return this.deferred.promise();
   }
 
-  protected override _getByText(text: string): JQuery.Promise<LookupResult<TKey>> {
+  protected override _getByText(text: string): Promise<LookupResult<TKey>> {
     this._newDeferred(new RemoteLookupRequest(QueryBy.TEXT, text));
     this.adapter.sendLookup(QueryBy.TEXT, text);
     return this.deferred.promise();
   }
 
-  protected override _getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
+  protected override _getByKey(key: TKey): Promise<LookupResult<TKey>> {
     this._newDeferred(new RemoteLookupRequest(QueryBy.KEY, key));
     this.adapter.sendLookup(QueryBy.KEY, key);
     return this.deferred.promise();
   }
 
-  protected override _getByRec(rec: TKey): JQuery.Promise<LookupResult<TKey>> {
+  protected override _getByRec(rec: TKey): Promise<LookupResult<TKey>> {
     this._newDeferred(new RemoteLookupRequest(QueryBy.REC, rec));
     this.adapter.sendLookup(QueryBy.REC, rec);
     return this.deferred.promise();
@@ -81,7 +80,7 @@ export class RemoteLookupCall<TKey> extends LookupCall<TKey> {
         abort: true
       });
     }
-    this.deferred = $.Deferred();
+    this.deferred = new Deferred<LookupResult<TKey>>();
     this.deferred.requestParameter = requestParameter;
   }
 }
