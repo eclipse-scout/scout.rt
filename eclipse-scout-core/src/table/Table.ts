@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke, ContextMenuPopup, dataObjects, Desktop,
-  DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DraggableTableRowElement, DropType, EnumObject, ErrorHandler, EventHandler, EventModel, events, Filter, Filterable, FilterOrFunction,
-  FilterResult, FilterSupport, FullModelOf, graphics, GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultInfoContributionDo, LimitedResultTableStatus, LoadingSupport,
-  Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range,
-  scout, scrollbars, ScrollToAlignment, ScrollToOptions, Status, StatusOrModel, strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer,
-  TableDefaultRowActionKeyStroke, TableEventMap, TableFooter, TableGroupEvent, TableHeader, TableLayout, TableLoadingSupport, TableModel, TableMoveSupport, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke,
+  Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke, ContextMenuPopup, dataObjects, Deferred,
+  Desktop, DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DraggableTableRowElement, DropType, EnumObject, ErrorHandler, EventHandler, EventModel, events, Filter, Filterable,
+  FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultInfoContributionDo, LimitedResultTableStatus,
+  LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate,
+  PropertyChangeEvent, Range, scout, scrollbars, ScrollToAlignment, ScrollToOptions, Status, StatusOrModel, strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke,
+  TableCustomizer, TableDefaultRowActionKeyStroke, TableEventMap, TableFooter, TableGroupEvent, TableHeader, TableLayout, TableLoadingSupport, TableModel, TableMoveSupport, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke,
   TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow,
   TableRowDropPosition, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableSelectKeyStroke, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUiPreferences,
   tableUiPreferences, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences, UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
@@ -2243,6 +2243,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
           return;
         }
         let row = $row.data('row') as TableRow;
+        if (!row) {
+          // If $row has no binding to row or if the binding has already been removed, ignore it // TODO CGU happend in SmartFieldSpec, why?
+          return;
+        }
         this._removeRow(row);
       });
     }
@@ -2513,8 +2517,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    *    This only has an effect if the editor has a popup (e.g. SmartField or DateField).
    * @returns The promise will be resolved when the preparation has been finished.
    */
-  prepareCellEdit(column: Column<any>, row: TableRow, openFieldPopupOnCellEdit?: boolean): JQuery.Promise<void> {
-    let promise: JQuery.Promise<void> = $.resolvedPromise();
+  prepareCellEdit(column: Column<any>, row: TableRow, openFieldPopupOnCellEdit?: boolean): Promise<void> {
+    let promise: Promise<void> = $.resolvedPromise();
     if (this.cellEditorPopup) {
       promise = this.cellEditorPopup.waitForCompleteCellEdit();
     }
@@ -4546,7 +4550,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     let returnValue = column.calculateOptimalWidth();
     if (objects.isObject(returnValue)) {
       // Function returned a promise -> delay resizing
-      returnValue.always(this._resizeToFit.bind(this, column, maxWidth));
+      returnValue.then(calculatedSize => this._resizeToFit(column, maxWidth, calculatedSize));
     } else {
       this._resizeToFit(column, maxWidth, returnValue);
     }
@@ -6289,7 +6293,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     const insertedColumns = arrays.diff(columns, this.columns);
     const currentColumns = [...this.columns];
 
-    let buffering: JQuery.Deferred<void>;
+    let buffering: Deferred<void>;
 
     // deleted columns
     for (const column of deletedColumns) {
@@ -6330,7 +6334,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
       // set updateBuffer buffering until all columns are added, otherwise column.initCell triggers updateRow before the rows cell array is modified
       if (!buffering) {
-        buffering = $.Deferred();
+        buffering = new Deferred();
         this.updateBuffer.pushPromise(buffering.promise());
       }
 
@@ -6628,13 +6632,12 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
         callback();
       }
     };
-    let promise = this.cellEditorPopup.waitForCompleteCellEdit();
-    if (promise.state() === 'resolved') {
+    if (this.cellEditorPopup.isCompleteCellEditResolved()) {
       // Do it immediately if promise has already been resolved.
       // This makes sure updateRow does not immediately reopen the editor after closing.
       destroyEditor();
     } else {
-      promise.then(destroyEditor);
+      this.cellEditorPopup.waitForCompleteCellEdit().then(destroyEditor);
     }
   }
 
