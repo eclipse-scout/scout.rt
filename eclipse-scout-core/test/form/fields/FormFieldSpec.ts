@@ -202,7 +202,7 @@ describe('FormField', () => {
   });
 
   describe('property placeholder', () => {
-    it('placeholder is set directly', () => {
+    it('can be set initially', () => {
       let formField = scout.create(StringField, {
         parent: session.desktop,
         placeholder: 'placeholderText'
@@ -215,10 +215,9 @@ describe('FormField', () => {
 
       formField.setPlaceholder('placeholderText2');
       expect(formField.$field.attr('placeholder')).toBe('placeholderText2');
-
     });
 
-    it('placeholder is set with setter', () => {
+    it('can be changed dynamically', () => {
       let formField = scout.create(StringField, {
         parent: session.desktop
       });
@@ -233,7 +232,7 @@ describe('FormField', () => {
       expect(formField.$field.attr('placeholder')).toBe('placeholderText2');
     });
 
-    it('label position wins over placeholder', () => {
+    it('is ignored if label position is set to on_field', () => {
       let formField = scout.create(StringField, {
         parent: session.desktop,
         placeholder: 'placeholderText',
