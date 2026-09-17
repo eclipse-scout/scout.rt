@@ -449,7 +449,7 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
     $('iframe').removeClass('dragging-in-progress');
   }
 
-  protected _moveToTarget(targetBounds: Rectangle): JQuery.Promise<void> {
+  protected _moveToTarget(targetBounds: Rectangle): Promise<void> {
     if (!this._moveData.$clone) {
       return $.resolvedPromise();
     }
@@ -507,7 +507,7 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
    * @returns the target offset bounds to where the element should be moved, or null if the
    *          operation should be ended without animation.
    */
-  protected _dragEnd(event: JQuery.MouseUpEvent): JQuery.Promise<Rectangle> {
+  protected _dragEnd(event: JQuery.MouseUpEvent): Promise<Rectangle> {
     let info = this._moveData.draggedElementInfo;
     return $.resolvedPromise(new Rectangle(info.bounds.x, info.bounds.y, info.bounds.width, info.bounds.height));
   }

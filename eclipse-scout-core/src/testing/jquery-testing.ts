@@ -7,6 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
+import {Deferred} from '../index';
+
 export interface TriggerMouseOptions {
   clicks?: number;
   click?: number;
@@ -195,8 +197,8 @@ export const JQueryTesting = {
     $elem[0].dispatchEvent(event);
   },
 
-  whenAnimationEnd($elem: JQuery): JQuery.Promise<Document> {
-    let def = $.Deferred();
+  whenAnimationEnd($elem: JQuery): Promise<Document> {
+    let def = new Deferred<Document>();
     $elem.oneAnimationEnd(() => {
       def.resolve();
     });
@@ -227,8 +229,8 @@ export const JQueryTesting = {
   /**
    * The returned promise resolves when the document of the iframe is loaded.
    */
-  whenDocLoad($iframe: JQuery<HTMLIFrameElement>): JQuery.Promise<Document> {
-    let def = $.Deferred();
+  whenDocLoad($iframe: JQuery<HTMLIFrameElement>): Promise<Document> {
+    let def = new Deferred<Document>();
     $iframe.on('load', () => {
       def.resolve($iframe[0].contentDocument);
     });

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, graphics, scout, strings} from '../index';
+import {arrays, Deferred, graphics, scout, strings} from '../index';
 import $ from 'jquery';
 
 export interface FontDescriptor {
@@ -53,7 +53,8 @@ export interface FontPreloadOptions {
 }
 
 export const fonts = {
-  _deferred: $.Deferred(),
+  // Not created eagerly: this module may be evaluated before util/promises.ts due to circular imports in the barrel, which would leave Deferred undefined at this point.
+  _deferred: null as Deferred<void>,
 
   /**
    * Indicates whether all fonts have been loaded successfully. Check this variable before
@@ -69,7 +70,7 @@ export const fonts = {
    * @param fontArr (optional) array of fonts
    * @returns promise that is resolved when all fonts are loaded
    */
-  bootstrap(fontArr: FontDescriptor[]): JQuery.Promise<void> {
+  bootstrap(fontArr: FontDescriptor[]): Promise<void> {
     fontArr = fontArr || fonts.autoDetectFonts();
 
     if (fontArr.length === 0) {
@@ -90,11 +91,19 @@ export const fonts = {
             'characters to TEST_STRING before calling app.init().');
         }
         fonts.loadingComplete = true;
-        fonts._deferred.resolve();
+        fonts._ensureDeferred().resolve();
       }
     });
 
     return $.resolvedPromise();
+  },
+
+  /** @internal */
+  _ensureDeferred(): Deferred<void> {
+    if (!fonts._deferred) {
+      fonts._deferred = new Deferred();
+    }
+    return fonts._deferred;
   },
 
   /**
@@ -104,8 +113,8 @@ export const fonts = {
    * loadingComplete first! Do not wait for the promise when loadingComplete
    * is true, because the promise will never be resolved.
    */
-  preloader(): JQuery.Promise<void> {
-    return fonts._deferred.promise();
+  preloader(): Promise<void> {
+    return fonts._ensureDeferred().promise();
   },
 
   TEST_FONTS: 'monospace',

@@ -7,15 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, scout, typeName, UiCallbackErrorDo, UiCallbackHandler, UiCallbackParam} from '../index';
+import {BaseDoEntity, Deferred, scout, typeName, UiCallbackErrorDo, UiCallbackHandler, UiCallbackParam} from '../index';
 
 export class GeoLocationUiCallbackHandler implements UiCallbackHandler {
 
-  handle(param: UiCallbackParam): JQuery.Promise<GeoLocationDo> {
+  handle(param: UiCallbackParam): Promise<GeoLocationDo> {
     if (!navigator.geolocation) {
       return $.rejectedPromise('Geolocation API not supported');
     }
-    let deferred: JQuery.Deferred<GeoLocationDo> = $.Deferred();
+    let deferred: Deferred<GeoLocationDo> = new Deferred();
     navigator.geolocation.getCurrentPosition(
       position => deferred.resolve(this._positionSuccess(position)),
       positionError => deferred.reject(this._positionError(positionError)));

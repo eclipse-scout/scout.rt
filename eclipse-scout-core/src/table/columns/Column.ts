@@ -349,7 +349,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
    *
    * @returns the formatted cell value as text or a promise if the formatting happens asynchronously (e.g. by using {@link _batchFormat}).
    */
-  formatValue(value: TValue, row: TableRow): string | JQuery.Promise<BatchCallResult<TValue, unknown>> {
+  formatValue(value: TValue, row: TableRow): string | Promise<BatchCallResult<TValue, unknown>> {
     let defaultFormatter = this._formatValue.bind(this);
     return this.formatter(value, row, defaultFormatter);
   }
@@ -357,7 +357,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   /**
    * @returns the formatted cell value as text or a promise if the formatting happens asynchronously.
    */
-  protected _formatValue(value: TValue, row?: TableRow): string | JQuery.Promise<BatchCallResult<TValue, unknown>> {
+  protected _formatValue(value: TValue, row?: TableRow): string | Promise<BatchCallResult<TValue, unknown>> {
     if (objects.isEmpty(value)) {
       return '';
     }
@@ -788,7 +788,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     cell.setValue(value);
   }
 
-  setCellTextDeferred(promise: JQuery.Promise<BatchCallResult<TValue, unknown>>) {
+  setCellTextDeferred(promise: Promise<BatchCallResult<TValue, unknown>>) {
     // promises always resolve asynchronously which means the text will always be set later after row is initialized and will generate an update row event.
     // To make sure not every cell update will render the viewport (which is an expensive operation), the update is buffered and done as soon as all promises resolve.
     const updateBuffer = this.table.updateBuffer;
@@ -975,7 +975,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     this.table?.resizeToFit(this, maxWidth);
   }
 
-  calculateOptimalWidth(): number | JQuery.Promise<number> {
+  calculateOptimalWidth(): number | Promise<number> {
     return this.optimalWidthMeasurer.measure();
   }
 
@@ -1295,4 +1295,4 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 }
 
 export type ColumnValidationResult = { valid: boolean; validByMandatory: boolean; errorStatus: Status };
-export type ColumnFormatter<TValue> = (value: TValue, row: TableRow, defaultFormatter?: ColumnFormatter<TValue>) => string | JQuery.Promise<BatchCallResult<TValue, unknown>>;
+export type ColumnFormatter<TValue> = (value: TValue, row: TableRow, defaultFormatter?: ColumnFormatter<TValue>) => string | Promise<BatchCallResult<TValue, unknown>>;

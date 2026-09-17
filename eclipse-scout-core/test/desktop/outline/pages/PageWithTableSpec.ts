@@ -59,7 +59,7 @@ describe('PageWithTable', () => {
       return super._transformTableDataToTableRows(tableData);
     }
 
-    override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+    override _loadTableData(searchFilter: any): Promise<any> {
       return super._loadTableData(searchFilter);
     }
 
@@ -284,7 +284,7 @@ describe('PageWithTable', () => {
         });
       }
 
-      protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+      protected override _loadTableData(searchFilter: any): Promise<any> {
         let data = [{
           string: 'string 1',
           smartValue: null
@@ -611,7 +611,7 @@ describe('PageWithTable', () => {
         });
       }
 
-      protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+      protected override _loadTableData(searchFilter: any): Promise<any> {
         return $.resolvedPromise(['Red', 'Green', 'Blue']);
       }
 
@@ -766,10 +766,10 @@ describe('PageWithTable', () => {
     let loadTableDataDeferred: Deferred<any>;
     const resetLoadTableData = () => {
       loadTableDataDeferred = new Deferred();
-      page._loadTableData = searchFilter => $.when(loadTableDataDeferred.promise());
+      page._loadTableData = searchFilter => loadTableDataDeferred.promise();
     };
 
-    let loadTableDataPromise: JQuery.Promise<any>;
+    let loadTableDataPromise: Promise<any>;
     const loadTableDataOrig = page.loadTableData.bind(page);
     page.loadTableData = (reloadReason?: TableReloadReason) => {
       loadTableDataPromise = loadTableDataOrig(reloadReason);
@@ -796,7 +796,7 @@ describe('PageWithTable', () => {
     class DeferredSmartColumn extends SmartColumn<number> {
 
       lastCellTextDeferred: Deferred<void> = null;
-      lastCellTextPromise: JQuery.Promise<BatchCallResult<number, string>> = null;
+      lastCellTextPromise: Promise<BatchCallResult<number, string>> = null;
 
       protected override _init(model: InitModelOf<this>) {
         super._init({
@@ -811,7 +811,7 @@ describe('PageWithTable', () => {
         });
       }
 
-      override setCellTextDeferred(promise: JQuery.Promise<BatchCallResult<number, string>>) {
+      override setCellTextDeferred(promise: Promise<BatchCallResult<number, string>>) {
         this.lastCellTextDeferred = new Deferred();
         this.lastCellTextPromise = promise.then(async result => {
           await this.lastCellTextDeferred.promise();
@@ -838,7 +838,10 @@ describe('PageWithTable', () => {
     expect(table.loading).toBeTrue();
 
     deferredSmartColumn.lastCellTextDeferred.resolve();
-    await deferredSmartColumn.lastCellTextPromise;
+    // lastCellTextPromise only covers the deferred cell text lookup itself; the update buffer's own
+    // then(_onSetCellTextDeferredDone) reaction (which finally clears loading) settles a few microtasks later.
+    // Wait for the update buffer's own 'complete' event instead of guessing the exact number of hops.
+    await table.updateBuffer.when('complete');
     expect(table.loading).toBeFalse();
 
     // double reload with column with deferred cell text
@@ -878,7 +881,8 @@ describe('PageWithTable', () => {
 
     deferredSmartColumn.lastCellTextDeferred.resolve();
     cellText2Resolved = true;
-    await deferredSmartColumn.lastCellTextPromise;
+    // see comment above: wait for the update buffer's own 'complete' event instead of guessing hops
+    await table.updateBuffer.when('complete');
     expect(table.loading).toBeFalse();
   });
 

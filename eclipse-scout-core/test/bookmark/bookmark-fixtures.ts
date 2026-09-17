@@ -192,7 +192,7 @@ export class SpecNodePage3 extends PageWithNodes {
     this.text = 'Node Page 3';
   }
 
-  protected override _createChildPages(): JQuery.Promise<Page[]> {
+  protected override _createChildPages(): Promise<Page[]> {
     return $.resolvedPromise([
       scout.create(SpecNodePage1, {parent: this.outline}),
       scout.create(SpecTablePage2, {parent: this.outline}),
@@ -209,7 +209,7 @@ export class SpecNodePage4 extends PageWithNodes {
     this.text = 'Node Page 4';
   }
 
-  protected override _createChildPages(): JQuery.Promise<Page[]> {
+  protected override _createChildPages(): Promise<Page[]> {
     return $.resolvedPromise([
       scout.create(SpecNodePage2, {parent: this.outline}),
       scout.create(SpecTablePage2, {parent: this.outline})
@@ -237,7 +237,7 @@ export class SpecTablePage1 extends PageWithTable {
     });
   }
 
-  protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+  protected override _loadTableData(searchFilter: any): Promise<any> {
     let data = ['A', 'B', 'C'];
     return $.resolvedPromise(data);
   }
@@ -294,7 +294,7 @@ export class SpecTablePage2 extends PageWithTable {
     this.getSearchForm().on('search reset', event => table.reload(Table.ReloadReason.SEARCH));
   }
 
-  protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+  protected override _loadTableData(searchFilter: any): Promise<any> {
     let data = [
       {key: FRUIT_1_KEY, name: 'Apple', amount: 42},
       {key: FRUIT_2_KEY, name: 'Banana', amount: 37},
@@ -395,7 +395,7 @@ export class SpecTablePage3 extends PageWithTable {
     super._initDetailTableUiPreferences(table);
   }
 
-  protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+  protected override _loadTableData(searchFilter: any): Promise<any> {
     let data = [
       {key: '#000000', label: 'Black', primary: false, usage: 329},
       {key: '#ff0000', label: 'Red', primary: true, usage: 287},
