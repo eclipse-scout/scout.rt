@@ -88,7 +88,7 @@ export abstract class BasicField<TValue extends TModelValue, TModelValue = TValu
     }
   }
 
-  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
+  override acceptInput(whileTyping?: boolean): Promise<void> | void {
     if (this._displayTextModifiedTimeoutId !== null) {
       // Cancel pending "acceptInput(true)" call (see _onDisplayTextModified) and execute it now
       clearTimeout(this._displayTextModifiedTimeoutId);

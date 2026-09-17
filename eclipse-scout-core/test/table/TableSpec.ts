@@ -918,7 +918,7 @@ describe('Table', () => {
       helper.assertSelectionEvent(model.id, helper.getRowIds(model.rows));
     });
 
-    it('selects none if all are selected', () => {
+    it('selects none if all are selected', async () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
       let table = adapter.createWidget(model, session.desktop) as SpecTable;
@@ -932,11 +932,13 @@ describe('Table', () => {
       table.toggleSelection();
       helper.assertSelection(table, []);
       sendQueuedAjaxCalls();
+      await flushMicrotasks(5);
       helper.assertSelectionEvent(model.id, []);
 
       table.toggleSelection();
       helper.assertSelection(table, table.rows);
       sendQueuedAjaxCalls();
+      await flushMicrotasks(5);
       helper.assertSelectionEvent(model.id, helper.getRowIds(table.rows));
     });
   });
@@ -2044,7 +2046,7 @@ describe('Table', () => {
       expect(mostRecentJsonRequest()).toContainEventTypesExactly(['property', 'rowsSelected', 'rowClick']);
     });
 
-    it('sends only click if row already is selected', () => {
+    it('sends only click if row already is selected', async () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
       let table = adapter.createWidget(model, session.desktop) as SpecTable;
@@ -2053,6 +2055,7 @@ describe('Table', () => {
       let $row = table.$rows().first();
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
+      await flushMicrotasks(5);
 
       expect(mostRecentJsonRequest()).toContainEventTypesExactly(['property', 'rowsSelected', 'rowClick']);
 
@@ -2063,6 +2066,7 @@ describe('Table', () => {
       jasmine.Ajax.requests.reset();
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
+      await flushMicrotasks(5);
 
       expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowClick']);
     });
@@ -2600,18 +2604,18 @@ describe('Table', () => {
       expect(requestData).toContainEvents(event);
     });
 
-    it('only selects first row if mouse move selection or multi selection is disabled', () => {
+    it('only selects first row if mouse move selection or multi selection is disabled', async () => {
       let model = helper.createModelFixture(2, 4);
       let adapter = helper.createTableAdapter(model);
       let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.selectionHandler.mouseMoveSelectionEnabled = false;
-      verifyMouseMoveSelectionIsDisabled(model, table, false);
+      await verifyMouseMoveSelectionIsDisabled(model, table, false);
 
       model = helper.createModelFixture(2, 4);
       model.multiSelect = false;
       adapter = helper.createTableAdapter(model);
       table = adapter.createWidget(model, session.desktop) as SpecTable;
-      verifyMouseMoveSelectionIsDisabled(model, table, true);
+      await verifyMouseMoveSelectionIsDisabled(model, table, true);
     });
 
     it('can delete all rows during mouse down event', () => {
@@ -2624,7 +2628,7 @@ describe('Table', () => {
       }).not.toThrow();
     });
 
-    function verifyMouseMoveSelectionIsDisabled(model, table, selectionMovable) {
+    async function verifyMouseMoveSelectionIsDisabled(model, table, selectionMovable) {
       table.render();
 
       let $rows = table.$data.children('.table-row');
@@ -2649,6 +2653,7 @@ describe('Table', () => {
       }
 
       sendQueuedAjaxCalls();
+      await flushMicrotasks(5);
 
       let requestData = mostRecentJsonRequest();
       let event = new RemoteEvent(table.id, 'rowsSelected', {

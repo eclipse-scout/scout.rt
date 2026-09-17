@@ -34,6 +34,22 @@ describe('uiNotifications', () => {
     return jasmine.Ajax.requests.mostRecent().data();
   }
 
+  /**
+   * Waits until the poller has actually issued its next request (see UiNotificationPoller#_schedulePoll), instead
+   * of guessing a fixed delay with sleep(): the poller schedules the next poll via a *real* setTimeout(0), which
+   * races unpredictably against an independently scheduled sleep(1) (and can additionally be superseded by a
+   * restart() triggered from within the same test, e.g. when subscribing to another topic right after awaiting).
+   * Waiting for the observable effect (a new request exists) instead of a fixed duration avoids that race.
+   */
+  async function waitForRequestCount(count: number): Promise<void> {
+    for (let i = 0; jasmine.Ajax.requests.count() < count; i++) {
+      if (i > 1000) {
+        throw new Error(`Timed out waiting for request count to reach ${count}, current count is ${jasmine.Ajax.requests.count()}`);
+      }
+      await sleep(1);
+    }
+  }
+
   function pollers(): Map<string, UiNotificationPoller> {
     return new Map<string, UiNotificationPoller>(Array.from(uiNotifications.systems.entries())
       .filter(([, system]) => !!system.poller)
@@ -363,24 +379,22 @@ describe('uiNotifications', () => {
       });
     });
 
-    it('does not register the handler on errors', () => {
-      jasmine.clock().install();
+    it('does not register the handler on errors', async () => {
       let handler = () => undefined;
 
-      uiNotifications.subscribe('aaa', handler).catch(error => {
+      let subscribePromise = uiNotifications.subscribe('aaa', handler).catch(error => {
         expect(error).toBeDefined();
       });
 
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 500
       });
-      jasmine.clock().tick(1);
+      await subscribePromise;
 
       // Handler must not be registered and poller must not be running after an unsuccessful subscribe
       let system = uiNotifications.systems.get(System.MAIN_SYSTEM);
       expect(system.events.count()).toBe(0);
       expect(system.poller).toBe(null);
-      jasmine.clock().uninstall();
     });
 
     it('starts a poller per system', () => {
@@ -422,12 +436,13 @@ describe('uiNotifications', () => {
           message: {}
         }]
       });
+      let requestCount = jasmine.Ajax.requests.count();
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
         responseText: dataObjects.stringify(response)
       });
 
-      await sleep(1);
+      await waitForRequestCount(requestCount + 1);
       expect(mostRecentRequestData()['topics']).toEqual([{
         _type: 'scout.Topic',
         name: 'aaa',
@@ -463,12 +478,13 @@ describe('uiNotifications', () => {
           message: {}
         }]
       });
+      requestCount = jasmine.Ajax.requests.count();
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
         responseText: dataObjects.stringify(response2)
       });
 
-      await sleep(1);
+      await waitForRequestCount(requestCount + 1);
       expect(mostRecentRequestData()['topics']).toEqual([{
         _type: 'scout.Topic',
         name: 'aaa', lastNotifications: [{
@@ -497,12 +513,13 @@ describe('uiNotifications', () => {
           message: {}
         }]
       });
+      requestCount = jasmine.Ajax.requests.count();
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
         responseText: dataObjects.stringify(response3)
       });
 
-      await sleep(1);
+      await waitForRequestCount(requestCount + 1);
       expect(mostRecentRequestData()['topics']).toEqual([{
         _type: 'scout.Topic',
         name: 'aaa', lastNotifications: [{
@@ -539,7 +556,7 @@ describe('uiNotifications', () => {
         responseText: dataObjects.stringify(response)
       });
 
-      await sleep(1);
+      await sleep(10);
       expect(poller.notifications.get('aaa').get('node1').length).toBe(1);
       expect(poller.notifications.get('aaa').get('node1')[0].id).toBe('1');
 
@@ -569,7 +586,7 @@ describe('uiNotifications', () => {
         responseText: dataObjects.stringify(response2)
       });
 
-      await sleep(1);
+      await sleep(10);
       expect(poller.notifications.get('aaa').get('node1').length).toBe(2);
       expect(poller.notifications.get('aaa').get('node1')[0].id).toBe('2');
       expect(poller.notifications.get('aaa').get('node1')[1].id).toBe('1'); // 1 is newer
@@ -819,27 +836,28 @@ describe('uiNotifications', () => {
   describe('poller', () => {
     beforeEach(() => {
       jasmine.clock().install();
+      // Don't wait for time-consuming sleep()s in real time
+      jasmine.clock().autoTick();
     });
 
     afterEach(() => {
       jasmine.clock().uninstall();
     });
 
-    it('automatically restarts on connection error', () => {
+    it('automatically restarts on connection error', async () => {
       uiNotifications.subscribe('aaa', () => undefined);
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 503
       });
-      jasmine.clock().tick(1);
-      // Connection errors don't change state because they are handled by AjaxCall directly without calling UiNotificationPoller._onError
+      await sleep(1);
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
 
-      jasmine.clock().tick(UiNotificationPoller.CONNECTION_ERROR_RETRY_INTERVALS[0] + 1000);
+      await sleep(UiNotificationPoller.CONNECTION_ERROR_RETRY_INTERVALS[0] + 1000);
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
     });
 
-    it('automatically restarts on polling response error', () => {
+    it('automatically restarts on polling response error', async () => {
       uiNotifications.subscribe('aaa', () => undefined);
 
       let response = scout.create(UiNotificationResponse, {
@@ -857,20 +875,20 @@ describe('uiNotifications', () => {
       });
 
       // Subscription was successful, start polling
-      jasmine.clock().tick(1);
+      await sleep(1);
 
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 500
       });
-      jasmine.clock().tick(1);
+      await poller.when('propertyChange:status');
       expect(poller.status).toBe(BackgroundJobPollingStatus.FAILURE);
 
-      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      await poller.when('propertyChange:status'); // will be resolved after UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
     });
 
-    it('automatically restarts on empty polling response', () => {
+    it('automatically restarts on empty polling response', async () => {
       uiNotifications.subscribe('aaa', () => undefined);
 
       let response = scout.create(UiNotificationResponse, {
@@ -887,22 +905,22 @@ describe('uiNotifications', () => {
         responseText: JSON.stringify(response.toPojo())
       });
 
-      // Subscription was successful, start polling
-      jasmine.clock().tick(1);
+      // Subscription was successful; wait for the next poll request to actually be sent.
+      await sleep(1);
 
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200
         // no response text
       });
-      jasmine.clock().tick(1);
+      await poller.when('propertyChange:status');
       expect(poller.status).toBe(BackgroundJobPollingStatus.FAILURE);
 
-      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      await poller.when('propertyChange:status'); // will be resolved after UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
     });
 
-    it('automatically restarts if subscription fails and other topics are subscribed', () => {
+    it('automatically restarts if subscription fails and other topics are subscribed', async () => {
       uiNotifications.subscribe('aaa', () => undefined);
 
       let response = scout.create(UiNotificationResponse, {
@@ -918,58 +936,60 @@ describe('uiNotifications', () => {
         status: 200,
         responseText: JSON.stringify(response.toPojo())
       });
-      jasmine.clock().tick(1);
+      await sleep(1);
 
-      uiNotifications.subscribe('bbb', () => undefined);
+      let subscribePromise = uiNotifications.subscribe('bbb', () => undefined);
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 500
       });
-      jasmine.clock().tick(1);
+      await expectAsync(subscribePromise).toBeRejected();
+
       // UiNotificationSystem.unsubscribe triggers a restart of the poller after the error, so it is already running again
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
 
-      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      await sleep(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
     });
 
-    it('does not restart if subscription fails and no other topics are subscribed', () => {
-      uiNotifications.subscribe('aaa', () => undefined);
+    it('does not restart if subscription fails and no other topics are subscribed', async () => {
+      let subscribePromise = uiNotifications.subscribe('aaa', () => undefined);
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 500
       });
-      jasmine.clock().tick(1);
+      await expectAsync(subscribePromise).toBeRejected();
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
 
-      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      await sleep(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
     });
 
-    it('does not restart if operation is not allowed', () => {
-      uiNotifications.subscribe('aaa', () => undefined);
+    it('does not restart if operation is not allowed', async () => {
+      let subscribePromise = uiNotifications.subscribe('aaa', () => undefined);
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 403
       });
-      jasmine.clock().tick(1);
+      await poller.when('propertyChange:status');
+      await expectAsync(subscribePromise).toBeRejected();
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
 
-      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      await sleep(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED); // still stopped
     });
 
-    it('does not restart on session timeout', () => {
+    it('does not restart on session timeout', async () => {
       uiNotifications.subscribe('aaa', () => undefined);
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
         responseText: JSON.stringify({error: {code: Session.JsonResponseError.SESSION_TIMEOUT}})
       });
-      jasmine.clock().tick(1);
+      await poller.when('propertyChange:status');
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
 
-      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      await sleep(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED); // still stopped
     });
 

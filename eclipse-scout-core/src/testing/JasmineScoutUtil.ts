@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractConstructor, arrays, AutoLeafPageWithNodes, BaseDoEntity, Constructor, dataObjects, DoEntity, HybridActionEvent, HybridManager, ObjectFactory, Page, PageWithNodes, PageWithTable, scout, Session, strings, TypeDescriptor, Widget
+  AbstractConstructor, ajax, arrays, AutoLeafPageWithNodes, BaseDoEntity, Constructor, dataObjects, DoEntity, HybridActionEvent, HybridManager, ObjectFactory, Page, PageWithNodes, PageWithTable, scout, Session, strings, TypeDescriptor,
+  Widget
 } from '../index';
 import $ from 'jquery';
 import 'jasmine-ajax';
@@ -23,7 +24,7 @@ export const JasmineScoutUtil = {
   /**
    * @returns the loaded JSON data structure
    */
-  loadJsonResource(jsonResourceUrl: string, options: { useCache?: boolean } = {}): JQuery.Promise<any> {
+  loadJsonResource(jsonResourceUrl: string, options: { useCache?: boolean } = {}): Promise<any> {
     scout.assertParameter('jsonResourceUrl', jsonResourceUrl);
 
     if (scout.nvl(options.useCache, true)) {
@@ -33,21 +34,14 @@ export const JasmineScoutUtil = {
       }
     }
 
-    return $.ajax({
-      async: false,
-      method: 'GET',
-      dataType: 'json',
-      contentType: 'application/json; charset=UTF-8',
-      cache: false,
-      url: jsonResourceUrl
-    })
-      .done(json => {
+    return ajax.getJson(jsonResourceUrl, {async: false, cache: false})
+      .then(json => {
         if (scout.nvl(options.useCache, true)) {
           _jsonResourceCache[jsonResourceUrl] = json;
         }
         return $.resolvedPromise(json);
       })
-      .fail((jqXHR, textStatus, errorThrown) => {
+      .catch(() => {
         throw new Error('Could not load resource from url: ' + jsonResourceUrl);
       });
   },

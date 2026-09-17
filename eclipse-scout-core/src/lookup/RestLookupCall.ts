@@ -7,9 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxCall, arrays, DoEntity, InitModelOf, LookupCall, LookupResult, LookupRow, objects, RestLookupCallModel, scout} from '../index';
+import {AjaxCall, arrays, Deferred, DoEntity, InitModelOf, LookupCall, LookupResult, LookupRow, objects, RestLookupCallModel, scout} from '../index';
 import $ from 'jquery';
-import Deferred = JQuery.Deferred;
 
 /**
  * A lookup call that can load lookup rows from a REST service.
@@ -49,7 +48,7 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
 
   protected _restriction: Record<string, any>;
   protected _ajaxCall: AjaxCall;
-  protected _deferred: Deferred<LookupResult<TKey>, { abort: boolean }>;
+  protected _deferred: Deferred<LookupResult<TKey>>;
 
   constructor() {
     super();
@@ -92,21 +91,21 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
     }
   }
 
-  protected override _getAll(): JQuery.Promise<LookupResult<TKey>> {
+  protected override _getAll(): Promise<LookupResult<TKey>> {
     return this._call();
   }
 
-  protected override _getByText(text: string): JQuery.Promise<LookupResult<TKey>> {
+  protected override _getByText(text: string): Promise<LookupResult<TKey>> {
     this.addRestriction('text', text);
     return this._call();
   }
 
-  protected override _getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
+  protected override _getByKey(key: TKey): Promise<LookupResult<TKey>> {
     this.addRestriction('ids', arrays.ensure(key));
     return this._call();
   }
 
-  protected override _getByKeys(keys: TKey[]): JQuery.Promise<LookupResult<TKey>> {
+  protected override _getByKeys(keys: TKey[]): Promise<LookupResult<TKey>> {
     this.addRestriction('ids', arrays.ensure(keys));
     return this._call();
   }
@@ -165,12 +164,12 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
     return scout.create((LookupRow<TKey>), clonedLookupRowDo);
   }
 
-  protected _call(): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected _call(): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     this._ajaxCall = this._createAjaxCall();
 
     this._ajaxCall.call()
-      .then((data: LookupResponse, textStatus, jqXHR) => {
+      .then((data: LookupResponse) => {
         let lookupRows = arrays.ensure(data ? data.rows : null)
           .filter(this._acceptLookupRow.bind(this))
           .map(this._createLookupRowFromDo.bind(this));

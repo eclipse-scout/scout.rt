@@ -333,7 +333,7 @@ describe('Desktop', () => {
         expect(session.focusManager._glassPaneTargets.length).toBe(0);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('does not remove message boxes with display parent outline', () => {
@@ -1288,7 +1288,7 @@ describe('Desktop', () => {
           expect(desktop.activeForm).toBe(dialogParent);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('will send the outline to back', () => {
@@ -1332,7 +1332,7 @@ describe('Desktop', () => {
           expect(desktop.activeForm).toBe(view);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('will be set to undefined if dialog closes and there is no currentView and no display parent', done => {
@@ -1347,7 +1347,7 @@ describe('Desktop', () => {
           expect(desktop.activeForm).toBe(null);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('must not be the detail form', done => {
@@ -1365,7 +1365,7 @@ describe('Desktop', () => {
           expect(desktop.activeForm).toBe(null);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('must not be the detail form even if it is the display parent', done => {
@@ -1385,7 +1385,7 @@ describe('Desktop', () => {
           expect(desktop.activeForm).toBe(null);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('must be a form', done => {
@@ -1403,10 +1403,10 @@ describe('Desktop', () => {
           expect(desktop.activeForm).toBe(null);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
-    it('must not be a removed form', () => {
+    it('must not be a removed form', async () => {
       const outline = outlineHelper.createOutlineWithOneDetailForm();
       const page = outline.nodes[0];
 
@@ -1870,7 +1870,7 @@ describe('Desktop', () => {
         expect(desktop.views).toEqual([]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close some open tabs on desktop', done => {
@@ -1886,7 +1886,7 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view3]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close others and expect to not cancel the display parent of a modal form', done => {
@@ -1913,7 +1913,7 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view1, modalView]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close tabs and save unsaved changes', done => {
@@ -1942,13 +1942,13 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view3]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close tabs and cancel UnsavedFormChangesForm', done => {
       view2.rootGroupBox.fields[0].setValue('Foo');
 
-      desktop.cancelViews([view1, view2]);
+      desktop.cancelViews([view1, view2]).catch(() => {});
       // UnsavedFormChangesForm should be the last child
       let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
@@ -1960,7 +1960,7 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view1, view2, view3]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close tabs and dont save unsaved changes', done => {
@@ -1969,7 +1969,7 @@ describe('Desktop', () => {
       promises.push(view1.whenClose());
       promises.push(view2.whenClose());
 
-      desktop.cancelViews([view1, view2]);
+      desktop.cancelViews([view1, view2]).catch(() => {});
 
       // UnsavedFormChangesForm should be the last child
       let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
@@ -1991,10 +1991,10 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view3]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
-    it('close tabs when one tab has an open message box', () => {
+    it('close tabs when one tab has an open message box', async () => {
       let msgBox = scout.create(MessageBox, {
         parent: view3,
         displayParent: view3
@@ -2003,17 +2003,12 @@ describe('Desktop', () => {
       spyOn(msgBox, 'close').and.callThrough();
       expect(msgBox.rendered).toBe(true);
 
-      jasmine.clock().install();
-
-      desktop.cancelViews([view2, view3]);
-
-      jasmine.clock().tick(10);
+      await desktop.cancelViews([view2, view3]);
 
       expect(msgBox.close).toHaveBeenCalled();
       expect(view3.close).toHaveBeenCalled();
       expect(view2.close).toHaveBeenCalled();
       expect(desktop.bench.getViews()).toEqual([view1]);
-      jasmine.clock().uninstall();
     });
 
     it('close tabs with open file chooser and save unsaved changes', done => {
@@ -2053,7 +2048,7 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view3]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close tabs when one tab has an open modal dialog with unsaved changes', done => {
@@ -2097,7 +2092,7 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view3]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close tabs when one tab has an open modal dialog without unsaved changes', done => {
@@ -2129,10 +2124,10 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view3]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
-    it('close tabs when one tab has invalid unsaved changes', () => {
+    it('close tabs when one tab has invalid unsaved changes', async () => {
       view2.rootGroupBox.fields[0].setValidator(value => {
         if (strings.equalsIgnoreCase(value, 'Foo')) {
           throw new Error('Validation failed');
@@ -2142,40 +2137,37 @@ describe('Desktop', () => {
       view2.rootGroupBox.fields[0].touch();
       view2.rootGroupBox.fields[0].setValue('Foo');
 
-      jasmine.clock().install();
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
+      await session.desktop.when('propertyChange:dialogs');
       let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
-      openFormsField.when('lookupCallDone').then(() => {
-        expect(openFormsField.value.length).toBe(1);
-        expect(openFormsField.value[0]).toEqual(view2);
-        unsavedFormChangesForm.ok();
-        jasmine.clock().tick(10);
-        // validation message should be displayed since view2 is in invalid state
-        expect(session.$entryPoint.find('.messagebox').length).toBe(1);
-        desktop.messageBoxes[0].yesButton.doAction();
-        jasmine.clock().tick(10);
-        // uncheck all entries to not save the unsaved changes
-        openFormsField.setValue(null);
-        unsavedFormChangesForm.ok();
-        jasmine.clock().tick(10);
-      });
 
-      jasmine.clock().tick(10);
+      await openFormsField.when('lookupCallDone');
+      expect(openFormsField.value.length).toBe(1);
+      expect(openFormsField.value[0]).toEqual(view2);
+      unsavedFormChangesForm.ok();
+
+      // validation message should be displayed since view2 is in invalid state
+      await session.desktop.when('propertyChange:messageBoxes');
+      expect(session.$entryPoint.find('.messagebox').length).toBe(1);
+      desktop.messageBoxes[0].yesButton.doAction();
+
+      // uncheck all entries to not save the unsaved changes
+      openFormsField.setValue(null);
+      await unsavedFormChangesForm.ok();
 
       expect(view1.ok).not.toHaveBeenCalled();
       expect(view1.close).toHaveBeenCalled();
       expect(view2.ok).not.toHaveBeenCalled();
       expect(view2.close).toHaveBeenCalled();
       expect(desktop.bench.getViews()).toEqual([view3]);
-      jasmine.clock().uninstall();
     });
 
-    it('close tabs when one tab has a child with invalid unsaved changes', () => {
+    it('close tabs when one tab has a child with invalid unsaved changes', async () => {
       let modalDialog = formHelper.createFormWithOneField({
         parent: view2,
         displayParent: view2,
@@ -2199,29 +2191,28 @@ describe('Desktop', () => {
       field.touch();
       field.setValue('Foo');
 
-      jasmine.clock().install();
       desktop.cancelViews([view1, view2]);
+
       // UnsavedFormChangesForm should be the last child
+      await session.desktop.when('propertyChange:dialogs');
       let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
-      openFormsField.when('lookupCallDone').then(() => {
-        expect(openFormsField.value.length).toBe(1);
-        expect(openFormsField.value[0]).toEqual(view2);
-        unsavedFormChangesForm.ok();
-        jasmine.clock().tick(10);
-        // validation message should be displayed since view2 is in invalid state
-        expect(session.$entryPoint.find('.messagebox').length).toBe(1);
-        desktop.messageBoxes[0].yesButton.doAction();
-        jasmine.clock().tick(10);
-        // uncheck all entries to not save the unsaved changes
-        openFormsField.setValue(null);
-        unsavedFormChangesForm.ok();
-        jasmine.clock().tick(10);
-      });
 
-      jasmine.clock().tick(10);
+      await openFormsField.when('lookupCallDone');
+      expect(openFormsField.value.length).toBe(1);
+      expect(openFormsField.value[0]).toEqual(view2);
+      unsavedFormChangesForm.ok();
+      await session.desktop.when('propertyChange:messageBoxes');
+
+      // validation message should be displayed since view2 is in invalid state
+      expect(session.$entryPoint.find('.messagebox').length).toBe(1);
+      desktop.messageBoxes[0].yesButton.doAction();
+
+      // uncheck all entries to not save the unsaved changes
+      openFormsField.setValue(null);
+      await unsavedFormChangesForm.ok();
 
       expect(modalDialog.ok).not.toHaveBeenCalled();
       expect(modalDialog.close).toHaveBeenCalled();
@@ -2230,7 +2221,6 @@ describe('Desktop', () => {
       expect(view2.ok).not.toHaveBeenCalled();
       expect(view2.close).toHaveBeenCalled();
       expect(desktop.bench.getViews()).toEqual([view3]);
-      jasmine.clock().uninstall();
     });
 
   });
@@ -2696,16 +2686,8 @@ describe('Desktop', () => {
 
   describe('overlays', () => {
 
-    beforeEach(() => {
-      session.inspector = true;
-      jasmine.clock().install();
-    });
-
-    afterEach(() => {
-      jasmine.clock().uninstall();
-    });
-
     it('displays tooltips behind popups', () => {
+      jasmine.clock().install();
       let desktop = session.desktop;
       desktop.render(session.$entryPoint);
 
@@ -2753,9 +2735,10 @@ describe('Desktop', () => {
       expect(scout.widget($overlays.eq(1))).toBeInstanceOf(Tooltip);
       expect($overlays.eq(1).text()).toBe('Tooltip 2');
       expect(scout.widget($overlays.eq(2))).toBeInstanceOf(DatePickerPopup);
+      jasmine.clock().uninstall();
     });
 
-    it('orders overlays relative to their context', () => {
+    it('orders overlays relative to their context', async () => {
       let desktop = session.desktop;
       desktop.render(session.$entryPoint);
 
@@ -2836,15 +2819,10 @@ describe('Desktop', () => {
       let dialog2Field2 = dialog2.rootGroupBox.widget('Field2', StringField);
 
       // --------------
-
-      view1.open();
-      jasmine.clock().tick(500);
-      dialog1.open();
-      jasmine.clock().tick(500);
+      await view1.open();
+      await dialog1.open();
       popup1.open();
-      jasmine.clock().tick(500);
-      dialog2.open();
-      jasmine.clock().tick(500);
+      await dialog2.open();
 
       $overlays = desktop.$overlaySeparator.nextAll();
       expect(scout.widget($overlays.eq(0))).toBe(dialog1);
@@ -2857,7 +2835,7 @@ describe('Desktop', () => {
       view1Field1.fieldStatus.togglePopup();
       view1Field2.fieldStatus.togglePopup();
       view1Field3.activate();
-      jasmine.clock().tick(500);
+      await view1Field3.when('lookupCallDone');
       view1Field3.popup.animateRemoval = false;
 
       let popup2 = scout.create(WidgetPopup, {
@@ -2909,7 +2887,7 @@ describe('Desktop', () => {
       popup2Field2.fieldStatus.togglePopup();
 
       popup1Field3.activate();
-      jasmine.clock().tick(500);
+      await popup1Field3.when('lookupCallDone');
       popup1Field3.popup.animateRemoval = false;
 
       // --------------
@@ -2964,7 +2942,7 @@ describe('Desktop', () => {
       expect(overlayWidgets.length).toBe(16);
     });
 
-    it('always opens message boxes on top of everything', () => {
+    it('always opens message boxes on top of everything', async () => {
       let desktop = session.desktop;
       desktop.render(session.$entryPoint);
 
@@ -3005,10 +2983,8 @@ describe('Desktop', () => {
 
       // --------------
 
-      dialog1.open();
-      jasmine.clock().tick(500);
-      dialog2.open();
-      jasmine.clock().tick(500);
+      await dialog1.open();
+      await dialog2.open();
 
       $overlays = desktop.$overlaySeparator.nextAll();
       expect(scout.widget($overlays.eq(0))).toBe(dialog1);
@@ -3053,7 +3029,7 @@ describe('Desktop', () => {
       expect(overlayWidgets.length).toBe(7);
     });
 
-    it('renders the tooltip of an form with initial error status correctly', () => {
+    it('renders the tooltip of an form with initial error status correctly', async () => {
       let desktop = session.desktop;
       desktop.render(session.$entryPoint);
 
@@ -3076,8 +3052,7 @@ describe('Desktop', () => {
 
       // --------------
 
-      dialog.open();
-      jasmine.clock().tick(500);
+      await dialog.open();
 
       $overlays = desktop.$overlaySeparator.nextAll();
       let overlayWidgets = $overlays.toArray().map(elem => scout.widget(elem));
@@ -3092,7 +3067,7 @@ describe('Desktop', () => {
       expect(overlayWidgets.length).toBe(2);
     });
 
-    it('never renders overlays outside desktop', () => {
+    it('never renders overlays outside desktop', async () => {
       let desktop = session.desktop;
       desktop.render(session.$entryPoint);
       desktop.addNotification(scout.create(DesktopNotification, {
@@ -3104,7 +3079,7 @@ describe('Desktop', () => {
       });
       smartField.render();
       smartField.activate();
-      jasmine.clock().tick(500);
+      await smartField.when('lookupCallDone');
       smartField.popup.animateRemoval = false;
       expect(smartField.popup.$container.parent()[0]).toBe(desktop.$container[0]);
     });

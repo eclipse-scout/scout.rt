@@ -121,7 +121,7 @@ export class DragAndDropHandler {
     }
   }
 
-  protected _validationFailed(error: DropValidationErrorMessage): JQuery.Promise<MessageBoxOption> {
+  protected _validationFailed(error: DropValidationErrorMessage): Promise<MessageBoxOption> {
     $.log.isDebugEnabled() && $.log.debug('File validation failed', error);
     let title = '';
     let message = 'Invalid files';
