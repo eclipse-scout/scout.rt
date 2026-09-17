@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -142,13 +142,13 @@ export class DesktopAdapter extends ModelAdapter {
     }
     event.preventDefault();
     // cancel all js forms first
-    let cancelJsForms: JQuery.Promise<void> = $.resolvedPromise();
+    let cancelJsForms: Promise<void> = $.resolvedPromise();
     if (jsForms.length) {
       cancelJsForms = this.widget.cancelViews(jsForms);
     }
     // cancel remote forms after js forms are canceled (i.e. the promise was resolved) or the js-form-cancellation was cancelled (i.e. the promise was rejected)
     if (formIds.length) {
-      cancelJsForms.always(() => this._send('cancelForms', {formIds}));
+      cancelJsForms.finally(() => this._send('cancelForms', {formIds}));
     }
   }
 

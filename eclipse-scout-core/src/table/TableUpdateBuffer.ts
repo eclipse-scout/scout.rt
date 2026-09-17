@@ -13,7 +13,7 @@ export class TableUpdateBuffer extends EventEmitter {
   declare self: TableUpdateBuffer;
   declare eventMap: UpdateBufferEventMap;
 
-  promises: Set<JQuery.Promise<any>>;
+  promises: Set<Promise<any>>;
   table: Table;
   protected _rowMap: Record<string, ObjectOrModel<TableRow>>;
 
@@ -28,7 +28,7 @@ export class TableUpdateBuffer extends EventEmitter {
    * The buffer is active if it contains at least one promise. When all promises resolve the buffer will be processed.
    * @returns `true` if the promise has been added, `false` if nothing was added because it already exists in the buffer.
    */
-  pushPromise(promise: JQuery.Promise<any>): boolean {
+  pushPromise(promise: Promise<any>): boolean {
     if (this.promises.has(promise)) {
       return false;
     }

@@ -30,7 +30,7 @@ export class SpecSmartField extends SmartField<number> {
     super._acceptByText(sync, searchText);
   }
 
-  override _lookupByTextOrAll(browse?: boolean, searchText?: string, searchAlways?: boolean): JQuery.Promise<any> {
+  override _lookupByTextOrAll(browse?: boolean, searchText?: string, searchAlways?: boolean): Promise<any> {
     return super._lookupByTextOrAll(browse, searchText, searchAlways);
   }
 
@@ -38,11 +38,11 @@ export class SpecSmartField extends SmartField<number> {
     super._lookupByTextOrAllDone(result);
   }
 
-  override _executeLookup(lookupCall: LookupCall<number>, abortExisting?: boolean): JQuery.Promise<SmartFieldLookupResult<number>> {
+  override _executeLookup(lookupCall: LookupCall<number>, abortExisting?: boolean): Promise<SmartFieldLookupResult<number>> {
     return super._executeLookup(lookupCall, abortExisting);
   }
 
-  override _formatValue(value: number): string | JQuery.Promise<string> {
+  override _formatValue(value: number): string | Promise<string> {
     return super._formatValue(value);
   }
 

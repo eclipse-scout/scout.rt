@@ -11,7 +11,7 @@
  * jQuery plugin with scout extensions
  */
 import $ from 'jquery';
-import {App, aria, arrays, Device, Dimension, events, fields, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
+import {App, aria, arrays, Deferred, Device, Dimension, events, fields, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
 
 // === internal methods ===
 
@@ -216,7 +216,7 @@ $.negate = fx => function(...args) {
 
 $.injectScript = (url, options) => {
   options = options || {};
-  let deferred = $.Deferred();
+  let deferred = new Deferred();
 
   let myDocument = options.document || window.document;
   let scriptTag = myDocument.createElement('script');
@@ -248,7 +248,7 @@ $.injectScript = (url, options) => {
 
 $.injectStyleSheet = (url, options) => {
   options = options || {};
-  let deferred = $.Deferred();
+  let deferred = new Deferred();
 
   let myDocument = options.document || window.document;
   let linkTag = myDocument.createElement('link');
@@ -305,38 +305,42 @@ $.pxToNumber = pixel => {
   return parseFloat(pixel);
 };
 
+/**
+ * If the given `array` has a length > 1, the array is returned.
+ * If the length is 1, the first element is returned.
+ * Otherwise, it returns `undefined`.
+ */
+function singleValue(array) {
+  return array.length <= 1 ? array[0] : array;
+}
+
 $.resolvedDeferred = (...args) => {
-  let deferred = $.Deferred();
-  deferred.resolve(...args);
+  let deferred = new Deferred();
+  deferred.resolve(singleValue(args));
   return deferred;
 };
 
 $.resolvedPromise = (...args) => {
-  let deferred = $.Deferred();
-  deferred.resolve(...args);
+  let deferred = new Deferred();
+  deferred.resolve(singleValue(args));
   return deferred.promise();
 };
 
 $.rejectedPromise = (...args) => {
-  let deferred = $.Deferred();
-  deferred.reject(...args);
+  let deferred = new Deferred();
+  deferred.reject(singleValue(args));
   return deferred.promise();
 };
 
 $.promiseAll = (promises, asArray) => {
   asArray = scout.nvl(asArray, false);
   promises = arrays.ensure(promises);
-  let deferred = $.Deferred();
-  $.when(...promises).done((...args) => {
+  return Promise.all(promises).then(results => {
     if (asArray) {
-      deferred.resolve(args);
-    } else {
-      deferred.resolve(...args);
+      return results;
     }
-  }).fail((...args) => {
-    deferred.reject(...args);
+    return singleValue(results);
   });
-  return deferred.promise();
 };
 
 $.ajaxJson = url => $.ajax({

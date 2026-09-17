@@ -538,7 +538,7 @@ export class StringField extends BasicField<string> implements StringFieldModel 
     });
   }
 
-  protected override _validateValue(value: string): string | JQuery.Promise<string> {
+  protected override _validateValue(value: string): string | Promise<string> {
     if (objects.isNullOrUndefined(value)) {
       return value;
     }
@@ -560,7 +560,7 @@ export class StringField extends BasicField<string> implements StringFieldModel 
     return strings.empty(this.value);
   }
 
-  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
+  override acceptInput(whileTyping?: boolean): Promise<void> | void {
     let displayText = scout.nvl(this._readDisplayText(), '');
     if (this.inputObfuscated && displayText !== '') {
       // Disable obfuscation if user has typed text (on focus, field will be cleared if obfuscated, so any typed text is new text).

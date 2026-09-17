@@ -1580,7 +1580,14 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       }
 
       if (node.expanded) {
-        node.ensureLoadChildren().done(this._addChildrenToFlatList.bind(this, node, null, renderAnimated, null, true /* required that ctrl+shift+add expands all rows of a table-page */));
+        let loadChildrenPromise = node.ensureLoadChildren();
+        // If children are loaded, ensureLoadChildren() returns a resolved promise. Don't wait for it to be resolved to make it synchronous.
+        if (node.childrenLoaded) {
+          // Children are already loaded -> update the flat list synchronously instead of going through the promise,
+          this._addChildrenToFlatList(node, null, renderAnimated, null, true /* required that ctrl+shift+add expands all rows of a table-page */);
+        } else {
+          loadChildrenPromise.then(this._addChildrenToFlatList.bind(this, node, null, renderAnimated, null, true /* required that ctrl+shift+add expands all rows of a table-page */));
+        }
       } else {
         this._removeChildrenFromFlatList(node, renderAnimated);
       }
