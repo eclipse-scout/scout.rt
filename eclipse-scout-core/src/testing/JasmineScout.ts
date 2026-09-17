@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectIdProvider, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session,
+  AdapterData, App, arrays, Deferred, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectIdProvider, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session,
   SessionStartupResponse, uiNotifications, uiPreferences, Widget, WidgetModel
 } from '../index';
 import {jasmineScoutMatchers, JasmineScoutUtil, LocaleSpecHelper, SpecUiPreferencesStore, TestingApp, UiNotificationsMock} from './index';
@@ -28,7 +28,7 @@ declare global {
 
     override _processStartupResponse(data: SessionStartupResponse);
 
-    override _resumeBackgroundJobPolling();
+    override _resumeBackgroundJobPolling(): Promise<void>;
 
     override _processErrorJsonResponse(jsonError: JsonErrorResponse);
 
@@ -56,11 +56,22 @@ declare global {
 
   function sendQueuedAjaxCalls(response?: JasmineAjaxResponse, time?: number);
 
+  function sendQueuedAjaxCallsAsync(session: Session, response?: JasmineAjaxResponse, time?: number): Promise<void>;
+
   function receiveResponseForAjaxCall(request: JasmineAjaxRequest, response?: JasmineAjaxResponse);
 
   function createPropertyChangeEvent(model: { id: string }, properties: object);
 
-  function sleep(duration?: number): JQuery.Promise<void>;
+  function sleep(duration?: number): Promise<void>;
+
+  /**
+   * Ensures promise callbacks are executed.
+   *
+   * Compared to {@link sleep}, it only executes microtasks, no macrotask (e.g. setTimeout).
+   * Because of this, it could even be used if a jasmine.clock() is installed.
+   * @param count specifies how many microtasks are executed. Defaults to 3.
+   */
+  function flushMicrotasks(count?: number): Promise<void>;
 }
 
 export interface SandboxSessionOptions {
@@ -187,13 +198,39 @@ window.sandboxDesktop = () => {
 
 /**
  * Sends the queued requests and simulates a response as well.
+ *
+ * The session does not send the events immediately but schedules a job to do it.
+ * Uses {@link jasmine.clock} to trigger the scheduled job.
+ *
  * @param response if not set an empty success response will be generated
  */
 window.sendQueuedAjaxCalls = (response, time) => {
   time = time || 0;
   jasmine.clock().tick(time);
 
+  // TODO CGU compared to previous behavior, onAjaxDone/always is not executed after this call, maybe we should better migrate every test to new async method
+
   window.receiveResponseForAjaxCall(null, response);
+};
+
+/**
+ * Sends the queued requests and simulates a response as well.
+ *
+ * The session does not send the events immediately but schedules a job to do it.
+ * Uses {@link sleep} to trigger the scheduled job.
+ *
+ * @param response if not set an empty success response will be generated
+ */
+window.sendQueuedAjaxCallsAsync = async (session, response, time) => {
+  time = time || 0;
+
+  // Triggers the scheduled request in Session.ts
+  await sleep(time);
+
+  window.receiveResponseForAjaxCall(null, response);
+
+  // Wait for the response to be processed
+  await session.whenRequestsDone();
 };
 
 window.receiveResponseForAjaxCall = (request, response) => {
@@ -218,14 +255,26 @@ window.createPropertyChangeEvent = (model, properties) => ({
 });
 
 window.sleep = duration => {
-  let deferred = $.Deferred();
+  let deferred = new Deferred<void>();
   setTimeout(() => deferred.resolve(), duration);
   return deferred.promise();
 };
 
+window.flushMicrotasks = async (count = 3) => {
+  for (let i = 0; i < count; i++) {
+    await Promise.resolve();
+  }
+};
+
 export const JasmineScout = {
-  runTestSuite(context) {
-    this.startApp(TestingApp);
+  async runTestSuite(context) {
+    // Await full completion here, before any describe()/it() blocks are registered and before the spec files
+    // are loaded (see context.keys().forEach(context) below): some specs access globally bootstrapped state
+    // (e.g. HtmlEnvironment.get()) directly in their describe() body, which runs synchronously as soon as the
+    // spec module is loaded. With jQuery Deferred, App.init() used to complete synchronously within the same
+    // call (assisted by jasmine.clock().tick()); with native promises every then() is a microtask hop, so the
+    // completion must actually be awaited before proceeding.
+    await this.startApp(TestingApp);
 
     beforeAll(() => {
       spyOn(scout, 'reloadPage').and.callFake(() => {
@@ -242,6 +291,15 @@ export const JasmineScout = {
       const $sandbox = $('#sandbox');
       const session = $sandbox.data('sandboxSession');
       $sandbox.removeData('sandboxSession');
+      if (session) {
+        // Destroy cancels a scheduled send (see Session.sendEvent). If jasmine.clock() is not installed,
+        // this becomes a real setTimeout: if a test doesn't flush it (e.g. via sendQueuedAjaxCallsAsync),
+        // it would otherwise fire later, after this test's (and its jasmine.Ajax mock's) teardown, triggering a real
+        // network call whose rejection becomes an unhandled promise rejection.
+        // It also ensures, a new event cannot be scheduled again, which could happen if an async operation in a test calls sendEvent.
+        // For example: a focused field is removed and the focus context blurs the removed field which triggers an accept input event
+        session.destroy();
+      }
       if (session?.layoutValidator) {
         (session.layoutValidator as { _postValidateFunctions: (() => void)[] })._postValidateFunctions = [];
         session.layoutValidator.desktop = null;
@@ -256,10 +314,9 @@ export const JasmineScout = {
     context.keys().forEach(context);
   },
 
-  startApp(AppClass: new() => App) {
-    // App initialization uses promises which are executed asynchronously
-    // -> Use the clock to make sure all promise callbacks are executed before any test starts.
-    jasmine.clock().install();
+  async startApp(AppClass: new() => App) {
+    // App initialization uses native promises which are resolved asynchronously via microtasks
+    // -> await the actual init() promise instead of faking time, since jasmine's clock only fakes macrotasks (setTimeout etc.), not microtasks.
     jasmine.Ajax.install();
 
     App.addListener('prepare', () => {
@@ -267,11 +324,8 @@ export const JasmineScout = {
       JasmineScoutUtil.mockRestCall('api/codes', {});
       UiNotificationsMock.register(); // Disable endless unsuccessful polling in specs if a component subscribes for ui notifications
     });
-    new AppClass().init();
-
-    jasmine.clock().tick(1000);
+    await new AppClass().init();
 
     jasmine.Ajax.uninstall();
-    jasmine.clock().uninstall();
   }
 };

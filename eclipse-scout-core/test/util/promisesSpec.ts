@@ -22,8 +22,8 @@ describe('promises', () => {
   function createPromiseCreatorForDeferredArray(deferredArray) {
     return new PromiseCreator(deferredArray.map((v, i) => {
       return () => {
-        deferredArray[i] = $.Deferred();
-        return deferredArray[i];
+        deferredArray[i] = new Deferred();
+        return deferredArray[i].promise();
       };
     }));
   }
@@ -56,96 +56,106 @@ describe('promises', () => {
     setTimeout(deferredArray[0].reject.bind(deferredArray[0], 'Bar'));
   });
 
-  it('parallel stops executing after failed promise', done => {
+  // TODO CGU check if this refactoring makes sense
+  it('parallel stops executing after failed promise', async () => {
+    // native promises settle asynchronously (unlike jQuery's synchronous done/fail), so drive the pool
+    // with real waits between steps instead of chaining off each deferred's own resolution
+    function wait(ms = 20) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     let deferredArray = createDeferredArray(9);
     let promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
+    let rejectReason;
     promises.parallel(3, promiseCreator).then(() => {
       fail('Unexpected code branch');
-    }, msg => {
-      expect(msg).toBe(4);
-      expect(deferredArray[0].state()).toBe('resolved');
-      expect(deferredArray[1].state()).toBe('resolved');
-      expect(deferredArray[2].state()).toBe('pending');
-      expect(deferredArray[3].state()).toBe('resolved');
-      expect(deferredArray[4].state()).toBe('rejected');
-      expect(deferredArray[5].state()).toBe('pending');
-      expect(deferredArray[6]).toBeNull();
-      expect(deferredArray[7]).toBeNull();
-      expect(deferredArray[8]).toBeNull();
-      done();
+    }, reason => {
+      rejectReason = reason;
     });
-    deferredArray[1].then(function() {
-      setTimeout(deferredArray[0].resolve.bind(this, 2), 0);
-      expect(deferredArray[0]).not.toBeNull();
-      expect(deferredArray[1]).not.toBeNull();
-      expect(deferredArray[2]).not.toBeNull();
-      expect(deferredArray[3]).toBeNull();
-      expect(deferredArray[4]).toBeNull();
-    });
-    deferredArray[0].then(function() {
-      setTimeout(deferredArray[3].resolve.bind(this, 3), 0);
-      expect(deferredArray[2]).not.toBeNull();
-      expect(deferredArray[3]).not.toBeNull();
-      expect(deferredArray[4]).toBeNull();
-      expect(deferredArray[5]).toBeNull();
-      expect(deferredArray[6]).toBeNull();
-      deferredArray[3].then(function() {
-        setTimeout(deferredArray[4].reject.bind(this, 4), 0);
-      });
-    });
+
+    // initial pool of 3 is created synchronously
+    expect(deferredArray[0]).not.toBeNull();
+    expect(deferredArray[1]).not.toBeNull();
+    expect(deferredArray[2]).not.toBeNull();
+    expect(deferredArray[3]).toBeNull();
+
     deferredArray[1].resolve(1);
+    await wait();
+    expect(deferredArray[3]).not.toBeNull();
+    expect(deferredArray[4]).toBeNull();
+
+    deferredArray[0].resolve(2);
+    await wait();
+    expect(deferredArray[4]).not.toBeNull();
+    expect(deferredArray[5]).toBeNull();
+
+    deferredArray[3].resolve(3);
+    await wait();
+    expect(deferredArray[5]).not.toBeNull();
+    expect(deferredArray[6]).toBeNull();
+
+    deferredArray[4].reject(4);
+    await wait();
+
+    expect(rejectReason).toBe(4);
+    expect(deferredArray[0].state()).toBe('resolved');
+    expect(deferredArray[1].state()).toBe('resolved');
+    expect(deferredArray[2].state()).toBe('pending');
+    expect(deferredArray[3].state()).toBe('resolved');
+    expect(deferredArray[4].state()).toBe('rejected');
+    expect(deferredArray[5].state()).toBe('pending');
+    expect(deferredArray[6]).toBeNull();
+    expect(deferredArray[7]).toBeNull();
+    expect(deferredArray[8]).toBeNull();
   });
 
-  it('does not cut off error arguments', done => {
+  it('propagates the rejection reason unchanged', done => {
     let deferredArray = createDeferredArray(1);
     let promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
     promises.oneByOne(promiseCreator).then(() => {
       fail('Unexpected code branch');
-    }, (...args) => {
-      expect(args).toBeTruthy();
-      expect(args.length).toBe(2);
-      expect(args[0]).toBe('Foo');
-      expect(args[1]).toBe('Bar');
+    }, reason => {
+      // native promises only support a single rejection reason, so multiple values must be passed as one array
+      expect(reason).toEqual(['Foo', 'Bar']);
       done();
     });
-    setTimeout(deferredArray[0].reject.bind(deferredArray[0], 'Foo', 'Bar'));
+    setTimeout(deferredArray[0].reject.bind(deferredArray[0], ['Foo', 'Bar']));
   });
 
-  it('adds all result arguments, one for each deferred', done => {
+  it('adds one result per deferred', done => {
     let deferredArray = arrays.init(3, null).map(() => {
-      return $.Deferred();
+      return new Deferred();
     });
     let promiseCreator = new PromiseCreator(deferredArray.map((v, i) => {
       return () => deferredArray[i].promise();
     }));
-    promises.groupwise(4, promiseCreator).then((...args) => {
-      expect(args).toBeTruthy();
-      expect(args.length).toBe(3);
-      // same behavior as if multiple Deferred or Promise or Thenable objects have been used with $.when or $.promiseAll method
-      // empty argument resolve call adds an undefined to result
-      expect(args[0]).toBeUndefined();
-      // one argument resolve call just adds the argument to result
-      expect(args[1]).toBe('Foo');
-      // multiple argument resolve call adds all arguments as an array to result
-      expect(args[2]).toEqual(['Bar', true]);
+    promises.groupwise(4, promiseCreator).then(results => {
+      expect(results).toBeTruthy();
+      expect(results.length).toBe(3);
+      // empty resolve call adds an undefined to result
+      expect(results[0]).toBeUndefined();
+      // single value resolve call just adds the value to result
+      expect(results[1]).toBe('Foo');
+      // native promises only support a single resolved value, so multiple values must be passed as one array
+      expect(results[2]).toEqual(['Bar', true]);
       done();
     }, msg => {
       fail('Unexpected code branch');
       done();
     });
     // resolve order 2, 1, 0
-    deferredArray[1].then(() => {
+    deferredArray[1].promise().then(() => {
       setTimeout(deferredArray[0].resolve.bind(deferredArray[0]));
     });
-    deferredArray[2].then(() => {
+    deferredArray[2].promise().then(() => {
       setTimeout(deferredArray[1].resolve.bind(deferredArray[1], 'Foo'));
     });
-    deferredArray[2].resolve('Bar', true);
+    deferredArray[2].resolve(['Bar', true]);
   });
 
   describe('thenOrNow', () => {
     it('executes the function asynchronously if the value is a promise', async () => {
-      await expectAsync(promises.thenOrNow($.resolvedPromise('value'), value => 'async ' + value)).toBeResolvedTo('async value');
+      await expectAsync(promises.thenOrNow(Promise.resolve('value'), value => 'async ' + value)).toBeResolvedTo('async value');
     });
 
     it('executes the function immediately if the value is not a promise', () => {
@@ -159,7 +169,7 @@ describe('promises', () => {
 
   describe('ensure', () => {
     it('returns the promise as it is if the value is a promise', () => {
-      let promise = $.resolvedPromise();
+      let promise = Promise.resolve();
       expect(promises.ensure(promise)).toBe(promise);
     });
 

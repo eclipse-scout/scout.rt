@@ -94,7 +94,7 @@ export class PageWithNodes extends Page {
     });
   }
 
-  override loadChildren(): JQuery.Promise<any> {
+  override loadChildren(): Promise<any> {
     this.setChildrenLoaded(false);
     return this._createChildPages().then(childPages => {
       this._rebuildDetailTable(childPages);
@@ -107,7 +107,7 @@ export class PageWithNodes extends Page {
   /**
    * Override this method to create child pages for this page. The default impl. returns the current `childNodes` list.
    */
-  protected _createChildPages(): JQuery.Promise<Page[]> {
+  protected _createChildPages(): Promise<Page[]> {
     return $.resolvedPromise(this.childNodes);
   }
 }

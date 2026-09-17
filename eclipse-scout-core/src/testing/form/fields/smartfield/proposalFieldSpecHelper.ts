@@ -126,7 +126,7 @@ export class SpecProposalField extends ProposalField {
     return super._getLastSearchText();
   }
 
-  override acceptInput(sync?: boolean): JQuery.Promise<void> | void {
+  override acceptInput(sync?: boolean): Promise<void> | void {
     this._acceptInputEnabled = true; // accept all inputs, no need for a timeout
     return super.acceptInput(sync);
   }

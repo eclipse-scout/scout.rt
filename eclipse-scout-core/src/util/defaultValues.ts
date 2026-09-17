@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, objects, strings, TypeDescriptor} from '../index';
+import {ajax, App, objects, strings, TypeDescriptor} from '../index';
 import $ from 'jquery';
 
 export interface DefaultValuesBootstrapOptions {
@@ -27,14 +27,14 @@ export const defaultValues = {
    */
   _objectTypeHierarchyFlat: {},
 
-  bootstrap(options?: DefaultValuesBootstrapOptions): JQuery.Promise<any> {
+  bootstrap(options?: DefaultValuesBootstrapOptions): Promise<any> {
     options = options || {};
     let defaultOptions = {
       url: 'defaultValues'
     };
     options = $.extend({}, defaultOptions, options);
     // Load default value configuration from server (and cache it)
-    return $.ajaxJson(options.url)
+    return ajax.getJson(options.url)
       .then(response => App.handleJsonError(options.url, response))
       .then(defaultValues.init.bind(this));
   },

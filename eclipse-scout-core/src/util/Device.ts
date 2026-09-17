@@ -91,7 +91,7 @@ export class Device implements DeviceModel, ObjectWithType {
    *
    * Precalculates the value of some attributes to store them in a static way (and prevent many repeating function calls within loops).
    */
-  bootstrap(): JQuery.Promise<any> {
+  bootstrap(): Promise<any> {
     // Pre-calculate value and store in a simple property, to prevent many function calls inside loops
     this.scrollbarWidth = this._detectScrollbarWidth();
     this.type = this._detectType(this.userAgent);

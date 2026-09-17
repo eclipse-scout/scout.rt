@@ -26,7 +26,7 @@ export class ConfigPropertyCache implements ObjectModel<ConfigPropertyCache> {
    * Loads config properties from the given system using the configuration of that {@link System}.
    * @param system The optional system name to which the properties belong. By default, {@link System.MAIN_SYSTEM} is used.
    */
-  bootstrapSystem(system?: string): JQuery.Promise<void> {
+  bootstrapSystem(system?: string): Promise<void> {
     const urls = systems.getOrCreate(system).getConfigEndpointUrls();
     return this.bootstrap(urls, system);
   }
@@ -36,7 +36,7 @@ export class ConfigPropertyCache implements ObjectModel<ConfigPropertyCache> {
    * @param urls The urls to fetch the properties from. Typically, 'res/config-properties.json' for the UI backend and/or 'api/config-properties' for the server backend.
    * @param system The optional system name to which the properties belong. By default, {@link System.MAIN_SYSTEM} is used.
    */
-  bootstrap(urls: string | string[], system?: string): JQuery.Promise<void> {
+  bootstrap(urls: string | string[], system?: string): Promise<void> {
     let promises = arrays.ensure(urls)
       .map(url => ajax.getDataObject(url)
         .then(response => App.handleJsonError(url, response))
@@ -107,7 +107,7 @@ export class ConfigPropertyCache implements ObjectModel<ConfigPropertyCache> {
    * @param system An optional system from which the property should be loaded. By default, {@link System.MAIN_SYSTEM} is used.
    * @returns a promise that when resolved returns the newly loaded property with the given key.
    */
-  load<TKey extends keyof ConfigProperties[TSystem] & string, TSystem extends keyof ConfigProperties & string = 'main'>(key: TKey, system?: TSystem): JQuery.Promise<ConfigProperty<ConfigProperties[TSystem][TKey]>> {
+  load<TKey extends keyof ConfigProperties[TSystem] & string, TSystem extends keyof ConfigProperties & string = 'main'>(key: TKey, system?: TSystem): Promise<ConfigProperty<ConfigProperties[TSystem][TKey]>> {
     return this.bootstrapSystem(system) // load/refresh properties from system into this cache
       .then(() => this.get(key, system));
   }

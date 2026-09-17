@@ -13,18 +13,18 @@ export class ChartTableControlConfigHelper implements ObjectWithType {
 
   objectType: string;
 
-  exportConfig(page: Page): JQuery.Promise<IChartTableControlConfigDo> {
-    return $.when(this._exportConfig(page));
+  exportConfig(page: Page): Promise<IChartTableControlConfigDo> {
+    return this._exportConfig(page);
   }
-
+// TODO CGU remove method and replace overrides
   protected async _exportConfig(page: Page): Promise<IChartTableControlConfigDo> {
     return null;
   }
 
-  importConfig(page: Page, config: IChartTableControlConfigDo): JQuery.Promise<void> {
-    return $.when(this._importConfig(page, config));
+  importConfig(page: Page, config: IChartTableControlConfigDo): Promise<void> {
+    return this._importConfig(page, config);
   }
-
+// TODO CGU remove method and replace overrides
   protected async _importConfig(page: Page, config: IChartTableControlConfigDo): Promise<void> {
   }
 }

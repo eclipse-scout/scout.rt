@@ -44,7 +44,7 @@ export class ContextMenuPopupLayout extends PopupLayout {
         this.popup.revalidateLayoutTree();
         this.popup.animateResize = false;
         this.popup._animateTextOffset(this.popup.$body, oldOffset);
-        this.popup.$container.promise().done(() => this.popup._processSubMenuQueue());
+        this.popup.$container.promise().then(() => this.popup._processSubMenuQueue());
       });
     }
   }

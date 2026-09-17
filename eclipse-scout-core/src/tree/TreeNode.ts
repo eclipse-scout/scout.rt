@@ -60,7 +60,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
   /**
    * This internal variable stores the promise which is used when a loadChildren() operation is in progress.
    */
-  protected _loadChildrenPromise: JQuery.Promise<any>;
+  protected _loadChildrenPromise: Promise<any>;
 
   constructor() {
     this.$node = null;
@@ -197,14 +197,14 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
   }
 
   /**
-   * This method loads the child nodes of this node and returns a jQuery.Promise to register callbacks
+   * Loads the child nodes of this node and returns a {@link Promise} to register callbacks
    * when loading is done or has failed. To skip loading the children when they are already loaded, use
-   * {@link #ensureLoadChildren} instead.
+   * {@link #ensureLoadChildren} instead or check the flag {@link childrenLoaded}.
    *
-   * @returns a Promise or null when TreeNode cannot load children (which is the case for all
-   *     TreeNodes in the remote case). The default impl. returns an empty resolved promise.
+   * @returns a Promise that is resolved when the children are loaded. Because the default implementation does not load any children, an empty resolved promise is returned.
    */
-  loadChildren(): JQuery.Promise<any> {
+  loadChildren(): Promise<any> {
+    this.childrenLoaded = true;
     return $.resolvedPromise();
   }
 
@@ -212,7 +212,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
    * This method calls loadChildren() but does nothing when children are already loaded or when loadChildren()
    * is already in progress.
    */
-  ensureLoadChildren(): JQuery.Promise<any> {
+  ensureLoadChildren(): Promise<any> {
     // when children are already loaded we return an already resolved promise so the caller can continue immediately
     if (this.childrenLoaded) {
       return $.resolvedPromise();
@@ -222,11 +222,6 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
       return this._loadChildrenPromise;
     }
     let promise = this.loadChildren();
-    if (promise.state() === 'resolved') {
-      this._loadChildrenPromise = null;
-      return promise;
-    }
-
     this._loadChildrenPromise = promise;
     promise.then(this._onLoadChildrenDone.bind(this));
     return promise; // we must always return a promise, never null - otherwise caller would throw an error

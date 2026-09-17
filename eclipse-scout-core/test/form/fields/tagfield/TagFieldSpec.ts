@@ -99,7 +99,7 @@ describe('TagField', () => {
    */
   describe('key-strokes', () => {
 
-    it('ENTER', () => {
+    it('ENTER', async () => {
       field = scout.create(TagField, {
         parent: session.desktop,
         lookupCall: {
@@ -112,6 +112,10 @@ describe('TagField', () => {
       field.render();
       typeProposal(field, 'fo', keys.O);
       jasmine.clock().tick(500);
+      // The lookup call's result is processed via a microtask chain (promise.then(_onLookupDone)) which the fake
+      // clock cannot flush, unlike the JQuery.Deferred this used to be.
+      await Promise.resolve();
+      await Promise.resolve();
 
       expect(field.popup instanceof TagChooserPopup).toBe(true);
 
@@ -136,7 +140,7 @@ describe('TagField', () => {
 
   describe('tag lookup', () => {
 
-    it('start and prepare a lookup call clone when typing', () => {
+    it('start and prepare a lookup call clone when typing', async () => {
       let templatePropertyValue = 11;
       let eventCounter = 0;
       field = scout.create(TagField, {
@@ -160,6 +164,10 @@ describe('TagField', () => {
       field.render();
       typeProposal(field, 'ba', keys.A);
       jasmine.clock().tick(500);
+      // The lookup call's result is processed via a microtask chain (promise.then(_onLookupDone)) which the fake
+      // clock cannot flush, unlike the JQuery.Deferred this used to be.
+      await Promise.resolve();
+      await Promise.resolve();
 
       // expect popup is open and has 2 lookup rows (Bar, Baz)
       expect(field.popup instanceof TagChooserPopup).toBe(true);
