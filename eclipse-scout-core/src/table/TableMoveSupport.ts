@@ -335,7 +335,7 @@ export class TableMoveSupport extends MoveSupport<DraggableTableRowElement> {
 
   // --------------------
 
-  protected override _dragEnd(event: JQuery.MouseUpEvent): JQuery.Promise<Rectangle> {
+  protected override _dragEnd(event: JQuery.MouseUpEvent): Promise<Rectangle> {
     return $.resolvedPromise().then(async () => {
       // Immediately destroy clone, without animation
       this._moveData.$clone.remove();

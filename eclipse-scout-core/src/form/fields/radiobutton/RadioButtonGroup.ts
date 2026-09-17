@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, arrays, CloneOptions, FormField, HorizontalGrid, HtmlComponent, InitModelOf, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, LookupCall, LookupCallOrModel, LookupResult, LookupRow,
+  aria, arrays, CloneOptions, Deferred, FormField, HorizontalGrid, HtmlComponent, InitModelOf, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, LookupCall, LookupCallOrModel, LookupResult, LookupRow,
   ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, objects, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap, RadioButtonGroupGridConfig, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel,
   RadioButtonGroupRightOrDownKeyStroke, scout, Status, ValueField
 } from '../../../index';
@@ -258,7 +258,7 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
   /**
    * Search and then select the button with the corresponding radioValue
    */
-  protected override _validateValue(value: TValue): TValue | JQuery.Promise<TValue> {
+  protected override _validateValue(value: TValue): TValue | Promise<TValue> {
     super._validateValue(value);
 
     if (!this.initialized && this.lookupCall) {
@@ -290,7 +290,7 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
     }
   }
 
-  protected override _formatValue(value: TValue): string | JQuery.Promise<string> {
+  protected override _formatValue(value: TValue): string | Promise<string> {
     if (value === null) {
       return '';
     }
@@ -409,14 +409,14 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
     });
   }
 
-  protected _lookupByAll(): JQuery.Promise<LookupResult<TValue>> {
+  protected _lookupByAll(): Promise<LookupResult<TValue>> {
     if (!this.lookupCall) {
       return;
     }
 
-    let deferred = $.Deferred();
+    let deferred = new Deferred<LookupResult<TValue>>();
     this._executeLookup(this.lookupCall.cloneForAll(), true)
-      .done(result => {
+      .then(result => {
         this._lookupByAllDone(result);
         deferred.resolve(result);
       });
@@ -427,7 +427,7 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
   /**
    * A wrapper function around lookup calls used to set the _lookupInProgress flag, and display the state in the UI.
    */
-  protected _executeLookup(lookupCall: LookupCall<TValue>, abortExisting: boolean): JQuery.Promise<LookupResult<TValue>> {
+  protected _executeLookup(lookupCall: LookupCall<TValue>, abortExisting: boolean): Promise<LookupResult<TValue>> {
     if (abortExisting && this._currentLookupCall) {
       this._currentLookupCall.abort();
     }
@@ -442,7 +442,7 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
 
     return lookupCall
       .execute()
-      .always(() => {
+      .finally(() => {
         this._lookupInProgress = false;
         this._lookupExecuted = true;
         this._currentLookupCall = null;

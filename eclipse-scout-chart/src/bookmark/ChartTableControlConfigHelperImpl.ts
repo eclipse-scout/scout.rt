@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,7 +12,7 @@ import {ChartTableControl, ChartTableControlConfigDo, TableControlChartType} fro
 
 export class ChartTableControlConfigHelperImpl extends ChartTableControlConfigHelper {
 
-  protected override async _exportConfig(page: Page): Promise<ChartTableControlConfigDo> {
+  override async exportConfig(page: Page): Promise<ChartTableControlConfigDo> {
     if (!page?.detailTable) {
       return null;
     }
@@ -31,7 +31,7 @@ export class ChartTableControlConfigHelperImpl extends ChartTableControlConfigHe
     return null;
   }
 
-  protected override async _importConfig(page: Page, config: ChartTableControlConfigDo): Promise<void> {
+  override async importConfig(page: Page, config: ChartTableControlConfigDo): Promise<void> {
     if (!page?.detailTable || !config) {
       return;
     }
