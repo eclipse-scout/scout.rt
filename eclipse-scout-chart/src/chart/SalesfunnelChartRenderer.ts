@@ -414,7 +414,7 @@ export class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       tabIndex: 0
     }, this._createAnimationObjectWithTabIndexRemoval(shrink))
       .promise()
-      .done(() => {
+      .then(() => {
         this._remove(afterRemoveFunc);
         this.animationTriggered = false;
       });

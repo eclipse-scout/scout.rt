@@ -7,14 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BackgroundJobPollingStatus, Device, RemoteEvent, Session, TextMap, TextMapType, texts, UserAgent} from '../../src/index';
+import {App, BackgroundJobPollingStatus, Device, RemoteEvent, Session, TextMap, TextMapType, texts, UserAgent} from '../../src/index';
 import {LocaleSpecHelper} from '../../src/testing';
 
 describe('Session', () => {
 
   beforeEach(() => {
     jasmine.Ajax.install();
-    jasmine.clock().install();
   });
 
   afterEach(() => {
@@ -29,7 +28,7 @@ describe('Session', () => {
     });
     // test request only, don't test response (would require valid session, desktop etc.)
     session._processStartupResponse = () => {
-      // nop
+      return Promise.resolve();
     };
     return session;
   }
@@ -65,7 +64,7 @@ describe('Session', () => {
 
   describe('send', () => {
 
-    it('sends multiple async events in one call', () => {
+    it('sends multiple async events in one call', async () => {
       let session = createSession();
       // initially there should be no request at all
       expect(jasmine.Ajax.requests.count()).toBe(0);
@@ -79,7 +78,7 @@ describe('Session', () => {
       send(session, '1', 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       // after executing setTimeout there must be exactly one ajax request
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -89,7 +88,9 @@ describe('Session', () => {
       expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected', 'nodeExpanded']);
     });
 
-    it('sends multiple async events in one call over multiple user interactions if sending was delayed', () => {
+    it('sends multiple async events in one call over multiple user interactions if sending was delayed', async () => {
+      jasmine.clock().install();
+      jasmine.clock().autoTick();
       let session = createSession();
 
       // send first event delayed (in 500 ms)
@@ -97,7 +98,7 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
-      sendQueuedAjaxCalls(null, 100);
+      await sleep(100);
 
       // since 500 ms are not passed yet, the request has not been sent and following events should be added
       send(session, '1', 'nodeSelected');
@@ -106,7 +107,7 @@ describe('Session', () => {
       send(session, '1', 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      sendQueuedAjaxCalls(null, 1000);
+      await sleep(1000);
 
       // after executing setTimeout there must be exactly one ajax request
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -116,7 +117,9 @@ describe('Session', () => {
       expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected', 'nodeExpanded']);
     });
 
-    it('does not await the full delay if a subsequent send call has a smaller delay', () => {
+    it('does not await the full delay if a subsequent send call has a smaller delay', async () => {
+      jasmine.clock().install();
+      jasmine.clock().autoTick();
       let session = createSession();
 
       // send first event delayed (in 500 ms)
@@ -124,7 +127,7 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
-      sendQueuedAjaxCalls(null, 100);
+      await sleep(100);
 
       // since 500 ms are not passed yet, the request has not been sent and following events should be added
       send(session, '1', 'nodeSelected');
@@ -133,7 +136,7 @@ describe('Session', () => {
       send(session, '1', 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      sendQueuedAjaxCalls(null, 0);
+      await sleep(0);
 
       // after executing setTimeout there must be exactly one ajax request
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -143,7 +146,9 @@ describe('Session', () => {
       expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected', 'nodeExpanded']);
     });
 
-    it('does not await the full delay if a previous send call has a smaller delay', () => {
+    it('does not await the full delay if a previous send call has a smaller delay', async () => {
+      jasmine.clock().install();
+      jasmine.clock().autoTick();
       let session = createSession();
 
       // send first event with 300ms delay
@@ -155,13 +160,13 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
-      sendQueuedAjaxCalls(null, 100);
+      await sleep(100);
 
       // since 300 ms are not passed yet, the request has not been sent
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 250 ms --> both events should now have been sent
-      sendQueuedAjaxCalls(null, 250);
+      await sleep(250);
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
@@ -170,7 +175,7 @@ describe('Session', () => {
       expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected']);
     });
 
-    it('coalesces events if event provides a coalesce function', () => {
+    it('coalesces events if event provides a coalesce function', async () => {
       let session = createSession();
 
       let coalesce = function(previous) {
@@ -218,7 +223,7 @@ describe('Session', () => {
       session.sendEvent(event5);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       // after executing setTimeout there must be exactly one ajax request
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -228,7 +233,7 @@ describe('Session', () => {
       expect(requestData).toContainEvents([event1, event3, event4, event5]);
     });
 
-    it('sends requests consecutively', () => {
+    it('sends requests consecutively', async () => {
       let session = createSession();
 
       // send first request
@@ -236,7 +241,7 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // trigger sending (response not received yet)
-      jasmine.clock().tick(0);
+      await sleep();
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(true);
@@ -244,7 +249,7 @@ describe('Session', () => {
       send(session, '1', 'nodeClick');
 
       // trigger sending of second request
-      jasmine.clock().tick(0);
+      await sleep();
 
       // second request must not be sent because first is still pending
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -254,19 +259,21 @@ describe('Session', () => {
 
       // receive response for nodeSelected -> request for nodeClick gets sent
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
-      jasmine.clock().tick(0);
+      await session.whenRequestsDone();
       expect(jasmine.Ajax.requests.count()).toBe(2);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areRequestsPending()).toBe(true);
 
       // receive response for nodeClick
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1));
-      jasmine.clock().tick(0);
+      await session.whenRequestsDone();
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areRequestsPending()).toBe(false);
     });
 
-    it('sends requests consecutively and respects delay', () => {
+    it('sends requests consecutively and respects delay', async () => {
+      jasmine.clock().install();
+      jasmine.clock().autoTick();
       let session = createSession();
 
       // send first request
@@ -274,7 +281,7 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // trigger sending (response not received yet)
-      jasmine.clock().tick(0);
+      await sleep();
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(true);
@@ -283,7 +290,7 @@ describe('Session', () => {
       send(session, '1', 'nodeClick', {}, 300);
 
       // trigger sending of second request
-      jasmine.clock().tick(0);
+      await sleep();
 
       // second request must not be sent because first is still pending
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -293,13 +300,14 @@ describe('Session', () => {
 
       // receive response for nodeSelected -> request for nodeClick does not get sent because it should be sent delayed
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
+      await session.whenRequestsDone();
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(true);
       expect(session.asyncEvents[0].type).toBe('nodeClick');
 
       // trigger sending of second request
-      jasmine.clock().tick(300);
+      await sleep(300);
 
       // now second request is sent because the time elapsed
       expect(jasmine.Ajax.requests.count()).toBe(2);
@@ -308,11 +316,12 @@ describe('Session', () => {
 
       // receive response for nodeClick
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1));
+      await session.whenRequestsDone();
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areRequestsPending()).toBe(false);
     });
 
-    it('splits events into separate requests if an event requires a new request', () => {
+    it('splits events into separate requests if an event requires a new request', async () => {
       let session = createSession();
 
       let event0 = new RemoteEvent('1', 'eventType0');
@@ -340,7 +349,7 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // Send first request (other requests must not be sent yet)
-      jasmine.clock().tick(0);
+      await sleep();
       let request = jasmine.Ajax.requests.at(0);
       expect(JSON.parse(request.params)).toContainEvents([event0]);
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -349,6 +358,7 @@ describe('Session', () => {
 
       // Send second request
       receiveResponseForAjaxCall(request);
+      await session.whenRequestsDone();
       request = jasmine.Ajax.requests.at(1);
       expect(JSON.parse(request.params)).toContainEvents([event1, event2]);
       expect(jasmine.Ajax.requests.count()).toBe(2);
@@ -357,6 +367,7 @@ describe('Session', () => {
 
       // Send last request
       receiveResponseForAjaxCall(request);
+      await session.whenRequestsDone();
       request = jasmine.Ajax.requests.at(2);
       expect(JSON.parse(request.params)).toContainEvents([event3, event4]);
       expect(jasmine.Ajax.requests.count()).toBe(3);
@@ -365,7 +376,7 @@ describe('Session', () => {
       receiveResponseForAjaxCall(request);
     });
 
-    it('does not split events into separate requests if only first request requires a new request', () => {
+    it('does not split events into separate requests if only first request requires a new request', async () => {
       let session = createSession();
 
       let event0 = new RemoteEvent('1', 'eventType0', {
@@ -383,7 +394,7 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // Send request
-      jasmine.clock().tick(0);
+      await sleep();
       let request = jasmine.Ajax.requests.at(0);
       expect(JSON.parse(request.params)).toContainEvents([event0, event1, event2]);
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -391,14 +402,13 @@ describe('Session', () => {
       expect(session.areEventsQueued()).toBe(false);
     });
 
-    it('queues ?poll results when user requests are pending', () => {
+    it('queues ?poll results when user requests are pending', async () => {
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
 
       // Start ?poll request
-      session._resumeBackgroundJobPolling();
-      jasmine.clock().tick(0);
+      const promise = session._resumeBackgroundJobPolling();
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
@@ -407,7 +417,7 @@ describe('Session', () => {
 
       // Start user request
       send(session, '1', 'nodeSelected');
-      jasmine.clock().tick(0);
+      await sleep();
       expect(jasmine.Ajax.requests.count()).toBe(2);
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(true); // <--
@@ -416,7 +426,7 @@ describe('Session', () => {
 
       // Send response for ?poll request (response must be queued)
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
-      jasmine.clock().tick(0);
+      await promise;
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(true);
       expect(session.areEventsQueued()).toBe(false);
@@ -425,7 +435,7 @@ describe('Session', () => {
 
       // Send response for user request (must be executed, including the queued response)
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1));
-      jasmine.clock().tick(0);
+      await sleep();
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false); // <--
       expect(session.areEventsQueued()).toBe(false);
@@ -433,7 +443,7 @@ describe('Session', () => {
       expect(session._processSuccessResponse).toHaveBeenCalled();
     });
 
-    it('resumes polling after successful responses', () => {
+    it('resumes polling after successful responses', async () => {
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
@@ -441,8 +451,7 @@ describe('Session', () => {
       spyOn(session, '_processErrorResponse').and.callThrough();
 
       // Start ?poll request
-      session._resumeBackgroundJobPolling();
-      jasmine.clock().tick(0);
+      const promise = session._resumeBackgroundJobPolling();
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
@@ -454,7 +463,7 @@ describe('Session', () => {
         status: 200,
         responseText: '{"events": []}'
       });
-      jasmine.clock().tick(0);
+      await promise;
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
@@ -464,7 +473,7 @@ describe('Session', () => {
       expect(session._processErrorResponse).not.toHaveBeenCalled();
     });
 
-    it('does not resume polling after JS errors', () => {
+    it('does not resume polling after JS errors', async () => {
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
@@ -472,22 +481,19 @@ describe('Session', () => {
       spyOn(session, '_processErrorResponse').and.callThrough();
 
       // Start ?poll request
-      session._resumeBackgroundJobPolling();
-      jasmine.clock().tick(0);
+      const promise = session._resumeBackgroundJobPolling();
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
 
-      // Send response for ?poll request
-      expect(() => {
-        receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
-          status: 200,
-          responseText: '{"events": [ { "target": "invalidTarget" } ]}' // <-- causes a JS error
-        });
-      }).toThrow();
-      jasmine.clock().tick(0);
+      receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
+        status: 200,
+        responseText: '{"events": [ { "target": "invalidTarget" } ]}' // <-- causes a JS error
+      });
+      spyOn(App.get().errorHandler, 'handle').and.resolveTo(); // don't show message box
+      await expectAsync(promise).toBeResolved();
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.FAILURE); // <--
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
@@ -497,7 +503,7 @@ describe('Session', () => {
       expect(session._processErrorResponse).not.toHaveBeenCalled();
     });
 
-    it('does not resume polling after UI server errors', () => {
+    it('does not resume polling after UI server errors', async () => {
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
@@ -505,8 +511,7 @@ describe('Session', () => {
       spyOn(session, '_processErrorResponse').and.callThrough();
 
       // Start ?poll request
-      session._resumeBackgroundJobPolling();
-      jasmine.clock().tick(0);
+      const promise = session._resumeBackgroundJobPolling();
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
@@ -518,7 +523,7 @@ describe('Session', () => {
         status: 200,
         responseText: '{"error": true}'
       });
-      jasmine.clock().tick(0);
+      await promise;
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.FAILURE); // <--
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
@@ -528,7 +533,7 @@ describe('Session', () => {
       expect(session._processErrorResponse).not.toHaveBeenCalled();
     });
 
-    it('does not resume polling after HTTP errors', () => {
+    it('does not resume polling after HTTP errors', async () => {
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
@@ -536,8 +541,7 @@ describe('Session', () => {
       spyOn(session, '_processErrorResponse').and.callThrough();
 
       // Start ?poll request
-      session._resumeBackgroundJobPolling();
-      jasmine.clock().tick(0);
+      const promise = session._resumeBackgroundJobPolling();
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
@@ -549,7 +553,7 @@ describe('Session', () => {
         status: 404,
         responseText: 'Not found'
       });
-      jasmine.clock().tick(0);
+      await promise;
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.FAILURE); // <--
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
@@ -559,7 +563,7 @@ describe('Session', () => {
       expect(session._processErrorResponse).toHaveBeenCalled(); // <--
     });
 
-    it('does not resume polling after session terminated', () => {
+    it('does not resume polling after session terminated', async () => {
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
@@ -567,8 +571,7 @@ describe('Session', () => {
       spyOn(session, '_processErrorResponse').and.callThrough();
 
       // Start ?poll request
-      session._resumeBackgroundJobPolling();
-      jasmine.clock().tick(0);
+      const promise = session._resumeBackgroundJobPolling();
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
@@ -580,7 +583,7 @@ describe('Session', () => {
         status: 200,
         responseText: '{"sessionTerminated": true}'
       });
-      jasmine.clock().tick(0);
+      await promise;
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.STOPPED); // <--
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
@@ -593,37 +596,37 @@ describe('Session', () => {
 
   describe('init', () => {
 
-    it('sends startup parameter', () => {
+    it('sends startup parameter', async () => {
       let session = createSession();
       session.start();
 
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       let requestData = mostRecentJsonRequest();
       expect(requestData.startup).toBe(true);
 
       // don't send it on subsequent requests
       send(session, '1', 'nodeClick');
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       requestData = mostRecentJsonRequest();
       expect(requestData.startup).toBeUndefined();
     });
 
-    it('sends user agent on startup', () => {
+    it('sends user agent on startup', async () => {
       let session = createSession(new UserAgent({
         deviceType: Device.Type.MOBILE
       }));
       session.start();
 
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       let requestData = mostRecentJsonRequest();
       expect(requestData.userAgent.deviceType).toBe('MOBILE');
 
       // don't send it on subsequent requests
       send(session, '1', 'nodeClick');
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       requestData = mostRecentJsonRequest();
       expect(requestData.userAgent).toBeUndefined();

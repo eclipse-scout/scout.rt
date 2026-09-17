@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, arrays, CodeLookupCall, CodeType, HtmlComponent, InitModelOf, LookupBoxEventMap, LookupBoxModel, LookupCall, LookupCallOrModel, LookupResult, LookupRow, objects, PropertyChangeEvent, scout, Status, strings, ValueField,
-  Widget
+  AbstractLayout, arrays, CodeLookupCall, CodeType, Deferred, HtmlComponent, InitModelOf, LookupBoxEventMap, LookupBoxModel, LookupCall, LookupCallOrModel, LookupResult, LookupRow, objects, PropertyChangeEvent, scout, Status, strings,
+  ValueField, Widget
 } from '../../index';
-import $ from 'jquery';
 
 export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TValue[]> implements LookupBoxModel<TValue> {
   declare model: LookupBoxModel<TValue>;
@@ -101,15 +100,15 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     return arrays.ensure(value);
   }
 
-  protected _lookupByAll(): JQuery.Promise<LookupResult<TValue>> {
+  protected _lookupByAll(): Promise<LookupResult<TValue>> {
     if (!this.lookupCall) {
       return;
     }
 
-    let deferred = $.Deferred<LookupResult<TValue>>();
+    let deferred = new Deferred<LookupResult<TValue>>();
 
     this._executeLookup(this.lookupCall.cloneForAll(), true)
-      .done(result => {
+      .then(result => {
         this._lookupByAllDone(result);
         deferred.resolve(result);
       });
@@ -117,7 +116,7 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     return deferred.promise();
   }
 
-  protected _executeLookup(lookupCall: LookupCall<TValue>, abortExisting?: boolean): JQuery.Promise<LookupResult<TValue>> {
+  protected _executeLookup(lookupCall: LookupCall<TValue>, abortExisting?: boolean): Promise<LookupResult<TValue>> {
     this.setLoading(true);
 
     if (abortExisting && this._currentLookupCall) {
@@ -130,7 +129,7 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
 
     return lookupCall
       .execute()
-      .always(() => {
+      .finally(() => {
         this._currentLookupCall = null;
         this._lookupExecuted = true;
         this.setLoading(false);
@@ -219,7 +218,7 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     return true;
   }
 
-  protected override _formatValue(value: TValue[]): string | JQuery.Promise<string> {
+  protected override _formatValue(value: TValue[]): string | Promise<string> {
     if (objects.isNullOrUndefined(value)) {
       return '';
     }

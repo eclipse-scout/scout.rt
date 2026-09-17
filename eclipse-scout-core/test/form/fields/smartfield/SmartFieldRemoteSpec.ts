@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -188,9 +188,10 @@ describe('SmartFieldRemote', () => {
 
     beforeEach(() => {
       smartField = createSmartFieldWithAdapter();
+      jasmine.clock().uninstall();
     });
 
-    function resolveLookupCall(lookupCall) {
+    async function resolveLookupCall(lookupCall) {
       lookupCall.resolveLookup({
         queryBy: QueryBy.ALL,
         lookupRows: [scout.create(LookupRow, {
@@ -198,10 +199,10 @@ describe('SmartFieldRemote', () => {
           text: 'foo'
         })]
       });
-      jasmine.clock().tick(500);
+      await smartField.when('lookupCallDone');
     }
 
-    it('opens a touch popup when smart field gets touched', () => {
+    it('opens a touch popup when smart field gets touched', async () => {
       let lookupCallClone = null;
       smartField.touchMode = true;
       smartField.render();
@@ -210,7 +211,7 @@ describe('SmartFieldRemote', () => {
       });
 
       JQueryTesting.triggerClick(smartField.$field);
-      resolveLookupCall(lookupCallClone);
+      await resolveLookupCall(lookupCallClone);
       expect(smartField.popup.rendered).toBe(true);
       expect($('.touch-popup').length).toBe(1);
       expect($('.smart-field-popup').length).toBe(0);
@@ -222,14 +223,14 @@ describe('SmartFieldRemote', () => {
 
       // Expect same behavior after a second click
       JQueryTesting.triggerClick(smartField.$field);
-      resolveLookupCall(lookupCallClone);
+      await resolveLookupCall(lookupCallClone);
       expect(smartField.popup.rendered).toBe(true);
       expect($('.touch-popup').length).toBe(1);
       expect($('.smart-field-popup').length).toBe(0);
       smartField.popup.close();
     });
 
-    it('shows smartfield with same text as clicked smartfield', () => {
+    it('shows smartfield with same text as clicked smartfield', async () => {
       let lookupCallClone = null;
       smartField.touchMode = true;
       smartField.displayText = 'row 1';
@@ -238,13 +239,11 @@ describe('SmartFieldRemote', () => {
         lookupCallClone = event.lookupCall;
       });
       JQueryTesting.triggerClick(smartField.$field);
-      resolveLookupCall(lookupCallClone);
+      await resolveLookupCall(lookupCallClone);
       expect(smartField.popup.rendered).toBe(true);
       expect(smartField.popup._field.displayText).toBe(smartField.displayText);
       expect(smartField.popup._field.$field.val()).toBe(smartField.displayText);
       smartField.popup.close();
     });
-
   });
-
 });
