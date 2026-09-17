@@ -21,7 +21,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.UriInfo;
 
 import org.eclipse.scout.rt.platform.util.LazyValue;
-import org.eclipse.scout.rt.rest.csrf.AntiCsrfHelper;
+import org.eclipse.scout.rt.security.csrf.AntiCsrfHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ public class AntiCsrfContainerFilter implements IRestContainerRequestFilter {
 
   @Override
   public void filter(ContainerRequestContext requestContext) throws IOException {
-    if (m_requestWithHelper.get().isValidRequest(requestContext)) {
+    if (m_requestWithHelper.get().isValidRequest(requestContext.getHeaders()::containsKey, requestContext.getMethod(), requestContext.getUriInfo().getPath())) {
       return;
     }
 
