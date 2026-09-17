@@ -19,11 +19,11 @@
 export class PromiseCreator {
   results: any[];
   error: any;
-  items: (() => JQuery.Promise<any>)[];
+  items: (() => Promise<any>)[];
   currentItem: number;
   aborted: boolean;
 
-  constructor(items: (() => JQuery.Promise<any>)[]) {
+  constructor(items: (() => Promise<any>)[]) {
     this.results = [];
     this.error = null;
 
@@ -39,19 +39,20 @@ export class PromiseCreator {
     return this.currentItem < this.items.length;
   }
 
-  next(): JQuery.Promise<any> {
+  next(): Promise<any> {
     let thisItem = this.currentItem;
     return this.createPromise()
-      .done((...args) => {
-        this._addResults.apply(this, [thisItem, args]);
+      .then(result => {
+        this._addResults(thisItem, result);
+        return result;
       })
-      .fail(function() {
-        // eslint-disable-next-line prefer-rest-params
-        this.error = arguments.length > 0 ? arguments : new Error('Promise execution failed');
-      }.bind(this));
+      .catch(reason => {
+        this.error = reason !== undefined ? reason : new Error('Promise execution failed');
+        throw reason;
+      });
   }
 
-  createPromise(): JQuery.Promise<any> {
+  createPromise(): Promise<any> {
     if (this.currentItem >= this.items.length) {
       throw new Error('items out of bounds');
     }
@@ -61,16 +62,11 @@ export class PromiseCreator {
     return promise;
   }
 
-  protected _createPromise(): JQuery.Promise<any> {
+  protected _createPromise(): Promise<any> {
     return this.items[this.currentItem]();
   }
 
-  protected _addResults(index: number, result: any[]) {
-    if (result.length === 0) {
-      result = undefined;
-    } else if (result.length === 1) {
-      result = result[0];
-    }
+  protected _addResults(index: number, result: any) {
     this.results[index] = result;
   }
 

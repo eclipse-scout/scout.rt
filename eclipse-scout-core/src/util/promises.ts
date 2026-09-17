@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Abortable, AbortError, objects, PromiseCreator} from '../index';
-import $ from 'jquery';
 
 export const promises = {
 
@@ -18,8 +17,8 @@ export const promises = {
    *
    * @param {PromiseCreator} promiseCreator this function
    */
-  oneByOne(promiseCreator: PromiseCreator): JQuery.Promise<any> {
-    let deferred = $.Deferred();
+  oneByOne(promiseCreator: PromiseCreator): Promise<any> {
+    let deferred = new Deferred<any>();
     _repeat(promiseCreator);
     return deferred.promise();
 
@@ -29,18 +28,16 @@ export const promises = {
     }
 
     function onFail() {
-      // eslint-disable-next-line prefer-spread
-      deferred.reject.apply(deferred, promiseCreator.error);
+      deferred.reject(promiseCreator.error);
     }
 
     function _repeat(promiseCreator) {
       if (promiseCreator.hasNext()) {
         promiseCreator.next()
-          .done(onDone)
-          .fail(onFail);
+          .then(onDone)
+          .catch(onFail);
       } else {
-        // eslint-disable-next-line prefer-spread
-        deferred.resolve.apply(deferred, promiseCreator.results);
+        deferred.resolve(promiseCreator.results);
       }
     }
   },
@@ -49,8 +46,8 @@ export const promises = {
    * Use a promise creator to create a group of promises and wait until the whole group has been executed
    * before creating and executing promises for the next group.
    */
-  groupwise(groupSize: number, promiseCreator: PromiseCreator): JQuery.Promise<any> {
-    let deferred = $.Deferred();
+  groupwise(groupSize: number, promiseCreator: PromiseCreator): Promise<any> {
+    let deferred = new Deferred<any>();
     _repeat(promiseCreator);
     return deferred.promise();
 
@@ -60,8 +57,7 @@ export const promises = {
     }
 
     function onFail() {
-      // eslint-disable-next-line prefer-spread
-      deferred.reject.apply(deferred, promiseCreator.error);
+      deferred.reject(promiseCreator.error);
     }
 
     function _repeat(promiseCreator) {
@@ -70,12 +66,11 @@ export const promises = {
         while (promises.length < groupSize && promiseCreator.hasNext()) {
           promises.push(promiseCreator.next());
         }
-        $.promiseAll(promises, true)
-          .done(onDone)
-          .fail(onFail);
+        Promise.all(promises)
+          .then(onDone)
+          .catch(onFail);
       } else {
-        // eslint-disable-next-line prefer-spread
-        deferred.resolve.apply(deferred, promiseCreator.results);
+        deferred.resolve(promiseCreator.results);
       }
     }
   },
@@ -88,9 +83,9 @@ export const promises = {
    * @param maxPoolSize defines how many promises should be created and executed at most in parallel.
    * @param timeout specifies a timeout to wait for until the next promise will be started. If not specified, no timeout (=0) is used).
    */
-  parallel(maxPoolSize: number, promiseCreator: PromiseCreator, timeout?: number): JQuery.Promise<any> {
+  parallel(maxPoolSize: number, promiseCreator: PromiseCreator, timeout?: number): Promise<any> {
     timeout = timeout || 0;
-    let deferred = $.Deferred();
+    let deferred = new Deferred<any>();
     let poolSize = 0;
     _startNext(promiseCreator);
     return deferred.promise();
@@ -102,8 +97,7 @@ export const promises = {
     }
 
     function onFail() {
-      // eslint-disable-next-line prefer-spread
-      deferred.reject.apply(deferred, promiseCreator.error);
+      deferred.reject(promiseCreator.error);
     }
 
     function _startNext(promiseCreator) {
@@ -113,10 +107,10 @@ export const promises = {
       }
       while (promiseCreator.hasNext() && poolSize < maxPoolSize) {
         poolSize++;
-        promiseCreator.next().done(onDone).fail(onFail);
+        promiseCreator.next().then(onDone).catch(onFail);
       }
       if (poolSize === 0) {
-        deferred.resolve.apply(deferred, [promiseCreator.results]);
+        deferred.resolve(promiseCreator.results);
       }
     }
   },
@@ -128,7 +122,7 @@ export const promises = {
    * @value a promise or a value that will be passed to the callback function
    * @returns a promise or the result of the callback function
    */
-  thenOrNow<TValue, TResult>(value: TValue | JQuery.Promise<TValue>, callback: (value: TValue) => TResult): TResult | JQuery.Promise<TResult> {
+  thenOrNow<TValue, TResult>(value: TValue | Promise<TValue>, callback: (value: TValue) => TResult): TResult | Promise<TResult> {
     if (objects.isPromise(value)) {
       return value.then(callback);
     }
@@ -141,11 +135,11 @@ export const promises = {
    * If the value is a promise, that promise is returned.
    * Otherwise, a new resolved promise for the value is returned.
    */
-  ensure<T>(value: T | JQuery.Promise<T>): JQuery.Promise<T> {
+  ensure<T>(value: T | Promise<T>): Promise<T> {
     if (objects.isPromise(value)) {
       return value;
     }
-    return $.resolvedPromise(value);
+    return Promise.resolve(value);
   }
 };
 
@@ -162,17 +156,27 @@ export class Deferred<T> {
 
   protected _resolve: (value: T) => void;
   protected _reject: (reason: any) => void;
+  protected _state: 'pending' | 'resolved' | 'rejected' = 'pending';
   protected _promise = new Promise<T>((resolve, reject) => {
     this._resolve = resolve;
     this._reject = reject;
   });
 
   resolve(value?: T) {
+    this._state = 'resolved';
     this._resolve(value);
   }
 
   reject(reason?: any) {
+    this._state = 'rejected';
     this._reject(reason);
+  }
+
+  /**
+   * @returns 'pending' until {@link resolve} or {@link reject} has been called, 'resolved' or 'rejected' afterward.
+   */
+  state(): 'pending' | 'resolved' | 'rejected' {
+    return this._state;
   }
 
   promise(): Promise<T> {
