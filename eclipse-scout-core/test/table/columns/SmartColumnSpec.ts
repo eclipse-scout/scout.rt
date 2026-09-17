@@ -25,11 +25,11 @@ describe('SmartColumn', () => {
   });
 
   class SpecLookupCall extends LookupCall<string> {
-    override _getByKeys(keys: string[]): JQuery.Promise<LookupResult<string>> {
+    override _getByKeys(keys: string[]): Promise<LookupResult<string>> {
       return super._getByKeys(keys);
     }
 
-    override _getByKey(key: string): JQuery.Promise<LookupResult<string>> {
+    override _getByKey(key: string): Promise<LookupResult<string>> {
       return super._getByKey(key);
     }
   }

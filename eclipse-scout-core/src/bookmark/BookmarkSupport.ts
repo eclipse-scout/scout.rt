@@ -138,7 +138,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * @param options Optional settings to change the behavior of this method.
    * @return the created bookmark, or `null` if bookmark creation failed and the error was already handled by this method
    */
-  createBookmark(param?: CreateBookmarkParam, options?: CreateBookmarkOptions): JQuery.Promise<IBookmarkDo> {
+  createBookmark(param?: CreateBookmarkParam, options?: CreateBookmarkOptions): Promise<IBookmarkDo> {
     let builder = scout.create(BookmarkDoBuilder, $.extend({
       desktop: this.desktop,
       createTableRowSelections: false
@@ -158,7 +158,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * in that the resulting bookmark can contain non-bookmarkable pages and non-serializable data. Additionally,
    * title and description are not returned.
    */
-  createBookmarkForRefresh(param?: CreateBookmarkParam, options?: CreateBookmarkOptions): JQuery.Promise<IBookmarkDo> {
+  createBookmarkForRefresh(param?: CreateBookmarkParam, options?: CreateBookmarkOptions): Promise<IBookmarkDo> {
     return this.createBookmark($.extend({
       fallbackAllowed: false,
       persistableRequired: false,
@@ -186,7 +186,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    *
    * @param options Optional settings to change the behavior of this method
    */
-  activateBookmark(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): JQuery.Promise<void> {
+  activateBookmark(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): Promise<void> {
     return $.when(this._activateBookmarkAsync(bookmark, options));
   }
 
@@ -235,7 +235,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * @param options Optional settings to change the behavior of this method
    * @return the result of the activation, or `null` if activation failed and the error was already handled by this method
    */
-  activateBookmarkPath(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): JQuery.Promise<ActivateBookmarkPathResult> {
+  activateBookmarkPath(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): Promise<ActivateBookmarkPathResult> {
     return $.when(this._activateBookmarkPathAsync(param, options));
   }
 
@@ -399,7 +399,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   /**
    * Handles errors that occurred during bookmark creation.
    */
-  handleCreateBookmarkError(error: any): JQuery.Promise<void> {
+  handleCreateBookmarkError(error: any): Promise<void> {
     if (scout.isOneOf(error,
       BookmarkDoBuilder.ERROR_MISSING_OUTLINE,
       BookmarkDoBuilder.ERROR_MISSING_PAGE_PARAM,
@@ -417,7 +417,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   /**
    * Handles errors that occurred during bookmark activation.
    */
-  handleActivateBookmarkError(error: any): JQuery.Promise<void> {
+  handleActivateBookmarkError(error: any): Promise<void> {
     if (error === BookmarkSupport.ERROR_ALREADY_LOADING) {
       $.log.error('Another bookmark is currently loading');
       return; // ignore silently
@@ -460,7 +460,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * Same as {@link applyBookmarkToPage}, but also reloads the page. The returned promise is not resolved until the
    * reload is done.
    */
-  applyBookmarkToPageAndReload(page: Page, bookmark: IBookmarkDo, saveState = true): JQuery.Promise<void> {
+  applyBookmarkToPageAndReload(page: Page, bookmark: IBookmarkDo, saveState = true): Promise<void> {
     return $.when(this._applyBookmarkToPageAndReloadAsync(page, bookmark, saveState));
   }
 

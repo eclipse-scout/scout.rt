@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxError, AjaxSettings, App, arrays, DoEntity, icons, InitModelOf, LogLevel, MessageBox, MessageBoxActionEvent, ModelOf, NullLogger, NullWidget, numbers, ObjectModel, objects, ObjectWithType, scout, Session, Status, StatusSeverity,
-  strings, texts
+  AjaxError, AjaxSettings, App, arrays, Deferred, DoEntity, icons, InitModelOf, LogLevel, MessageBox, MessageBoxActionEvent, ModelOf, NullLogger, NullWidget, numbers, ObjectModel, objects, ObjectWithType, scout, Session, Status,
+  StatusSeverity, strings, texts
 } from './index';
 import $ from 'jquery';
 import * as sourcemappedStacktrace from 'sourcemapped-stacktrace';
@@ -187,7 +187,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
    * @param errorOrArgs error or array or array-like object containing the error and other arguments
    * @returns the analyzed errorInfo
    */
-  handle(errorOrArgs: any | IArguments | any[], ...args: any[]): JQuery.Promise<ErrorInfo> {
+  handle(errorOrArgs: any | IArguments | any[], ...args: any[]): Promise<ErrorInfo> {
     let error = errorOrArgs;
     if (errorOrArgs && args.length === 0) {
       if ((String(errorOrArgs) === '[object Arguments]')) {
@@ -209,7 +209,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
    * 3. Nothing                 (code: 'P3')
    * 4. Everything else         (code: 'P4')
    */
-  analyzeError(error?: any, ...args: any[]): JQuery.Promise<ErrorInfo> {
+  analyzeError(error?: any, ...args: any[]): Promise<ErrorInfo> {
     let errorInfo: ErrorInfo = {
       error: error,
       message: null,
@@ -226,7 +226,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     return this._analyzeError(errorInfo, ...args);
   }
 
-  protected _analyzeError(errorInfo: ErrorInfo, ...args: any[]): JQuery.Promise<ErrorInfo> {
+  protected _analyzeError(errorInfo: ErrorInfo, ...args: any[]): Promise<ErrorInfo> {
     let error = errorInfo.error;
     // 1. Regular errors
     if (error instanceof Error) {
@@ -383,8 +383,8 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     errorInfo.log = 'Unexpected error (no reason provided)';
   }
 
-  mapStack(stack: string): JQuery.Promise<string, { message: string; error: Error }> {
-    let deferred = $.Deferred();
+  mapStack(stack: string): Promise<string> {
+    let deferred = new Deferred<string>();
     try {
       sourcemappedStacktrace.mapStackTrace(stack, mappedStack => {
         deferred.resolve(arrays.format(mappedStack, '\n'));
@@ -402,7 +402,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
    * - If there is a scout session and the flag "displayError" is set, the error is shown in a message box.
    * - If there is a scout session and the flag "sendError" is set, the error is sent to the UI server.
    */
-  handleErrorInfo(errorInfo: ErrorInfo): JQuery.Promise<ErrorInfo> {
+  handleErrorInfo(errorInfo: ErrorInfo): Promise<ErrorInfo> {
     errorInfo.level = scout.nvl(errorInfo.level, LogLevel.ERROR);
     if (this.logError && errorInfo.log) {
       this._logErrorInfo(errorInfo);
@@ -499,7 +499,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     return 'J0';
   }
 
-  protected _showErrorMessageBox(session: Session, errorInfo: ErrorInfo): JQuery.Promise<MessageBoxActionEvent> {
+  protected _showErrorMessageBox(session: Session, errorInfo: ErrorInfo): Promise<MessageBoxActionEvent> {
     const parent = session.desktop || new NullWidget();
     const msgBoxModel: InitModelOf<MessageBox> = {
       parent,
@@ -548,7 +548,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     };
   }
 
-  protected _showInternalUiErrorMessageBox(session: Session, errorMessage: string, errorCode: string, logMessage: string): JQuery.Promise<void> {
+  protected _showInternalUiErrorMessageBox(session: Session, errorMessage: string, errorCode: string, logMessage: string): Promise<void> {
     let options = {
       header: session.optText('ui.UnexpectedProblem', 'Internal UI Error'),
       body: strings.join('\n\n',

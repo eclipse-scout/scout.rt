@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Call} from '../../src/index';
+import {Call, Deferred} from '../../src/index';
 import {InitModelOf, scout} from '../../src/scout';
 
 describe('Call', () => {
@@ -28,15 +28,15 @@ describe('Call', () => {
     }
 
     override _callImpl() {
-      let deferred = $.Deferred();
+      let deferred = new Deferred();
       deferred.resolve();
       return deferred.promise();
     }
   }
 
   class TestingCall extends Call {
-    override _nextRetryImpl(...args): number | boolean {
-      return super._nextRetryImpl(...args);
+    override _nextRetryImpl(result?: any): number | boolean {
+      return super._nextRetryImpl(result);
     }
 
     callAndGetRetry() {
@@ -44,7 +44,7 @@ describe('Call', () => {
       return this._nextRetryImpl();
     }
 
-    protected _callImpl(): JQuery.Promise<any> {
+    protected _callImpl(): Promise<any> {
       return $.resolvedPromise();
     }
   }
@@ -60,7 +60,7 @@ describe('Call', () => {
     }
 
     override _callImpl() {
-      let deferred = $.Deferred();
+      let deferred = new Deferred();
       deferred.reject();
       return deferred.promise();
     }
@@ -77,7 +77,7 @@ describe('Call', () => {
     }
 
     override _callImpl() {
-      let deferred = $.Deferred();
+      let deferred = new Deferred();
       if (this.callCounter > 1) {
         deferred.resolve();
       } else {
@@ -89,12 +89,12 @@ describe('Call', () => {
 
   // ----- Tests -----
 
-  it('calls done on success', () => {
+  it('calls done on success', async () => {
     let call = new SuccessCall();
     call.init();
     let done = false;
-    call.call()
-      .done(() => {
+    await call.call()
+      .then(() => {
         done = true;
       });
 
@@ -102,12 +102,12 @@ describe('Call', () => {
     expect(call.callCounter).toBe(1);
   });
 
-  it('calls fail on failure', () => {
+  it('calls fail on failure', async () => {
     let call = new FailCall();
     call.init();
     let failed = false;
-    call.call()
-      .fail(() => {
+    await call.call()
+      .catch(() => {
         failed = true;
       });
 
@@ -115,20 +115,28 @@ describe('Call', () => {
     expect(call.callCounter).toBe(1);
   });
 
-  it('retries on failure', () => {
+  it('retries on failure', async () => {
     let call = new FailOnFirstTryCall();
     call.init();
     let done = false;
     let failed = false;
-    call.call()
-      .done(() => {
+    let promise = call.call()
+      .then(() => {
         done = true;
       })
-      .fail(() => {
+      .catch(() => {
         failed = true;
       });
 
+    // let the first (failing) attempt's rejection propagate through Call's internal promise chain
+    // so that the retry gets scheduled via setTimeout before the clock is ticked
+    await Promise.resolve();
+
     jasmine.clock().tick(1000);
+
+    // wait for the retried call (started by the tick above) to settle
+    await promise;
+
     expect(done).toBe(true);
     expect(failed).toBe(false);
     expect(call.callCounter).toBe(2);

@@ -103,7 +103,7 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
     this.tagBar.updateTags();
   }
 
-  protected override _setValue(value: string[]): JQuery.Promise<void> | void {
+  protected override _setValue(value: string[]): Promise<void> | void {
     let result = super._setValue(value);
     return promises.thenOrNow(result, () => {
       // tagBar may be null during init.
@@ -116,12 +116,12 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
   }
 
-  override formatValue(value: string[]): string | JQuery.Promise<string> {
+  override formatValue(value: string[]): string | Promise<string> {
     // Info: value and displayText are not related in the TagField
     return '';
   }
 
-  protected override _validateValue(value: string[]): string[] | JQuery.Promise<string[]> {
+  protected override _validateValue(value: string[]): string[] | Promise<string[]> {
     let tags = arrays.ensure(value);
     let result: string[] = [];
     tags.forEach(tag => {
@@ -190,7 +190,7 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
     this.$field.val('');
   }
 
-  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
+  override acceptInput(whileTyping?: boolean): Promise<void> | void {
     if (this.popup) {
       if (this.popup.selectedRow()) {
         this.popup.triggerLookupRowSelected();
@@ -236,7 +236,7 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
     this._updateHasText();
   }
 
-  addTag(text: string): void | JQuery.Promise<void> {
+  addTag(text: string): void | Promise<void> {
     let value = this._parseValue(text);
     let result = this.setValue(value);
     return promises.thenOrNow(result, () => {
@@ -309,12 +309,11 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
     this.trigger('prepareLookupCall', {
       lookupCall: this._currentLookupCall
     });
-    this._currentLookupCall
-      .execute()
-      .always(() => {
-        this._currentLookupCall = null;
-      })
-      .done(this._onLookupDone.bind(this));
+    let promise = this._currentLookupCall.execute();
+    promise.finally(() => {
+      this._currentLookupCall = null;
+    });
+    promise.then(this._onLookupDone.bind(this));
   }
 
   protected _onLookupDone(result: LookupResult<string>) {

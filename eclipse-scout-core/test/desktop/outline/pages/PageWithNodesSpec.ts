@@ -181,7 +181,7 @@ describe('PageWithNodes', () => {
       let counter = 100;
 
       class SpecPageWithNodes extends PageWithNodes {
-        protected override _createChildPages(): JQuery.Promise<Page[]> {
+        protected override _createChildPages(): Promise<Page[]> {
           let pages = [
             scout.create(PageWithNodes, {
               parent: outline,
@@ -250,7 +250,7 @@ describe('PageWithNodes', () => {
 
     it('automatically sets reloadable=true when _createChildPages is overwritten', () => {
       class SpecReloadablePageWithNodes extends PageWithNodes {
-        protected override _createChildPages(): JQuery.Promise<Page[]> {
+        protected override _createChildPages(): Promise<Page[]> {
           return $.resolvedPromise([]);
         }
       }
@@ -318,7 +318,7 @@ describe('PageWithNodes', () => {
       let counter = 100;
 
       class SpecPageWithNodes extends PageWithNodes {
-        protected override _createChildPages(): JQuery.Promise<Page[]> {
+        protected override _createChildPages(): Promise<Page[]> {
           let pages = [
             scout.create(PageWithNodes, {
               parent: outline,
@@ -391,7 +391,7 @@ describe('PageWithNodes', () => {
           this.lazyExpandingEnabled = true;
         }
 
-        protected override _createChildPages(): JQuery.Promise<Page[]> {
+        protected override _createChildPages(): Promise<Page[]> {
           return $.resolvedPromise([
             scout.create(PageWithNodes, {
               parent: outline,
@@ -462,7 +462,7 @@ describe('PageWithNodes', () => {
 
   describe('detail table', () => {
     class SpecPageWithNodes extends PageWithNodes {
-      protected override _createChildPages(): JQuery.Promise<Page[]> {
+      protected override _createChildPages(): Promise<Page[]> {
         return $.resolvedPromise([
           scout.create(PageWithNodes, {
             parent: outline,

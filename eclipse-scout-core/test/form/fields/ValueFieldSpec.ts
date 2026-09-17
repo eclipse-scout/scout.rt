@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ajax, AjaxCall, App, arrays, FormField, FormFieldMenu, NumberField, ParsingFailedStatus, scout, Status, StringField, ValueField} from '../../../src/index';
+import {ajax, AjaxCall, App, arrays, Deferred, FormField, FormFieldMenu, NumberField, ParsingFailedStatus, scout, Status, StringField, ValueField} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper} from '../../../src/testing/index';
 import {ValueFieldValidator} from '../../../src/form/fields/ValueField';
 
@@ -462,7 +462,7 @@ describe('ValueField', () => {
           return value;
         },
         value => {
-          const def = $.Deferred();
+          const def = new Deferred();
           setTimeout(() => {
             if (value === 'b') {
               def.reject('b is not allowed');
@@ -472,7 +472,7 @@ describe('ValueField', () => {
           return def.promise();
         },
         value => {
-          const def = $.Deferred();
+          const def = new Deferred();
           setTimeout(() => {
             if (value === 'c') {
               def.reject(Status.error('c is not allowed'));

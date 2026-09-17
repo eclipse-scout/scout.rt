@@ -396,7 +396,7 @@ export class Group<TBody extends Widget = Widget> extends Widget implements Grou
    * Resizes the body to its preferred size by animating the height.
    */
   resizeBody() {
-    this.animateToggleCollapse().done(() => {
+    this.animateToggleCollapse().then(() => {
       if (this.bodyAnimating) {
         // Another animation has been started in the meantime -> ignore done event
         return;

@@ -23,7 +23,7 @@ export const JasmineScoutUtil = {
   /**
    * @returns the loaded JSON data structure
    */
-  loadJsonResource(jsonResourceUrl: string, options: { useCache?: boolean } = {}): JQuery.Promise<any> {
+  loadJsonResource(jsonResourceUrl: string, options: { useCache?: boolean } = {}): Promise<any> {
     scout.assertParameter('jsonResourceUrl', jsonResourceUrl);
 
     if (scout.nvl(options.useCache, true)) {
@@ -33,21 +33,21 @@ export const JasmineScoutUtil = {
       }
     }
 
-    return $.ajax({
+    return Promise.resolve($.ajax({
       async: false,
       method: 'GET',
       dataType: 'json',
       contentType: 'application/json; charset=UTF-8',
       cache: false,
       url: jsonResourceUrl
-    })
-      .done(json => {
+    }))
+      .then(json => {
         if (scout.nvl(options.useCache, true)) {
           _jsonResourceCache[jsonResourceUrl] = json;
         }
         return $.resolvedPromise(json);
       })
-      .fail((jqXHR, textStatus, errorThrown) => {
+      .catch(() => {
         throw new Error('Could not load resource from url: ' + jsonResourceUrl);
       });
   },

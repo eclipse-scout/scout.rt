@@ -28,7 +28,7 @@ export class LookupColumn<TValue> extends LookupCallColumn<TValue[], TValue> imp
     this._batchFormat = new BatchCall(this._batchFormatValues.bind(this));
   }
 
-  protected _batchFormatValues(keys: TValue[][]): JQuery.Promise<BatchCallResult<TValue[], string>> {
+  protected _batchFormatValues(keys: TValue[][]): Promise<BatchCallResult<TValue[], string>> {
     const allKeys = [...new Set(keys.flat())];
     return LookupEditor.formatValues(allKeys, this.lookupCall, lookupCall => this.trigger('prepareLookupCall', {lookupCall})).then(rows => {
       const rowsByKey = new Map(rows.map(r => [r.key, r]));
@@ -36,7 +36,7 @@ export class LookupColumn<TValue> extends LookupCallColumn<TValue[], TValue> imp
     });
   }
 
-  protected override _formatValue(value: TValue[], row?: TableRow): string | JQuery.Promise<BatchCallResult<TValue[], unknown>> {
+  protected override _formatValue(value: TValue[], row?: TableRow): string | Promise<BatchCallResult<TValue[], unknown>> {
     if (!value?.length || !this.lookupCall) {
       return '';
     }

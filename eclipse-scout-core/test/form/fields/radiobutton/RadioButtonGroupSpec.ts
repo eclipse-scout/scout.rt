@@ -154,7 +154,7 @@ describe('RadioButtonGroup', () => {
         expect(group.radioButtons.length).toBe(3);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
       jasmine.clock().tick(500);
     });
 
@@ -174,7 +174,7 @@ describe('RadioButtonGroup', () => {
         expect(group.radioButtons.length).toBe(3);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
       jasmine.clock().tick(500);
     });
 

@@ -834,7 +834,7 @@ export const scrollbars = {
 
     // Animated
     scrollbars.animateScrollTop($scrollable, scrollTop);
-    $scrollable.promise('scroll').always(() => {
+    $scrollable.promise('scroll').finally(() => {
       if (scrollbarElement) {
         scrollbarElement.notifyAfterScroll();
       }
@@ -867,7 +867,7 @@ export const scrollbars = {
 
     // Animated
     scrollbars.animateScrollLeft($scrollable, scrollLeft);
-    $scrollable.promise('scroll').always(() => {
+    $scrollable.promise('scroll').finally(() => {
       if (scrollbarElement) {
         scrollbarElement.notifyAfterScroll();
       }

@@ -16,15 +16,15 @@ import {UiPreferences, UiPreferencesDo, UiPreferencesUpdateDo} from '../index';
  */
 export class UiPreferencesStore { // cannot technically be abstract, because we use scout.create() to create an instance of the implementation
 
-  load(): JQuery.Promise<UiPreferencesDo> {
+  load(): Promise<UiPreferencesDo> {
     return $.when(this._load());
   }
 
-  store(preferences: UiPreferencesDo): JQuery.Promise<void> {
+  store(preferences: UiPreferencesDo): Promise<void> {
     return $.when(this._store(preferences));
   }
 
-  subscribeForUpdates(handler: UiPreferencesUpdateHandler): JQuery.Promise<void> {
+  subscribeForUpdates(handler: UiPreferencesUpdateHandler): Promise<void> {
     return $.when(this._subscribeForUpdates(handler));
   }
 

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectIdProvider, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session,
+  AdapterData, App, arrays, Deferred, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectIdProvider, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session,
   SessionStartupResponse, uiNotifications, uiPreferences, Widget, WidgetModel
 } from '../index';
 import {jasmineScoutMatchers, JasmineScoutUtil, LocaleSpecHelper, SpecUiPreferencesStore, TestingApp, UiNotificationsMock} from './index';
@@ -60,7 +60,7 @@ declare global {
 
   function createPropertyChangeEvent(model: { id: string }, properties: object);
 
-  function sleep(duration?: number): JQuery.Promise<void>;
+  function sleep(duration?: number): Promise<void>;
 }
 
 export interface SandboxSessionOptions {
@@ -218,14 +218,16 @@ window.createPropertyChangeEvent = (model, properties) => ({
 });
 
 window.sleep = duration => {
-  let deferred = $.Deferred();
+  let deferred = new Deferred<void>();
   setTimeout(() => deferred.resolve(), duration);
   return deferred.promise();
 };
 
 export const JasmineScout = {
   runTestSuite(context) {
-    this.startApp(TestingApp);
+    beforeAll(async () => {
+      await this.startApp(TestingApp);
+    });
 
     beforeAll(() => {
       spyOn(scout, 'reloadPage').and.callFake(() => {
@@ -256,10 +258,9 @@ export const JasmineScout = {
     context.keys().forEach(context);
   },
 
-  startApp(AppClass: new() => App) {
-    // App initialization uses promises which are executed asynchronously
-    // -> Use the clock to make sure all promise callbacks are executed before any test starts.
-    jasmine.clock().install();
+  async startApp(AppClass: new() => App) {
+    // App initialization uses native promises which are resolved asynchronously via microtasks
+    // -> await the actual init() promise instead of faking time, since jasmine's clock only fakes macrotasks (setTimeout etc.), not microtasks.
     jasmine.Ajax.install();
 
     App.addListener('prepare', () => {
@@ -267,11 +268,8 @@ export const JasmineScout = {
       JasmineScoutUtil.mockRestCall('api/codes', {});
       UiNotificationsMock.register(); // Disable endless unsuccessful polling in specs if a component subscribes for ui notifications
     });
-    new AppClass().init();
-
-    jasmine.clock().tick(1000);
+    await new AppClass().init();
 
     jasmine.Ajax.uninstall();
-    jasmine.clock().uninstall();
   }
 };

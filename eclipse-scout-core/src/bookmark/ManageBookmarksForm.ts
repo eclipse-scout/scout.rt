@@ -28,7 +28,7 @@ export class ManageBookmarksForm extends Form {
     this._installUpDownMenus();
   }
 
-  protected override _load(): JQuery.Promise<any> {
+  protected override _load(): Promise<any> {
     return BookmarkStore.get(this.session).loadAllBookmarks();
   }
 
@@ -54,7 +54,7 @@ export class ManageBookmarksForm extends Form {
     return table.rows.map(row => bookmarkColumn.cellValue(row));
   }
 
-  protected override _save(data: any): JQuery.Promise<void> {
+  protected override _save(data: any): Promise<void> {
     return BookmarkStore.get(this.session).storeAllBookmarks(data);
   }
 

@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  fields, FullModelOf, InitModelOf, keys, LookupCall, LookupResult, LookupRow, ObjectOrModel, PrepopulatedLookupCall, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup,
-  StaticLookupCall, Status, strings, ValidationFailedStatus
+  Deferred, fields, FullModelOf, InitModelOf, keys, LookupCall, LookupResult, LookupRow, ObjectOrModel, PrepopulatedLookupCall, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup,
+  SmartFieldTouchPopup, StaticLookupCall, Status, strings, ValidationFailedStatus
 } from '../../../../src/index';
 import {ColumnDescriptorDummyLookupCall, DelayedStaticLookupCall, DummyLookupCall, FormSpecHelper, JQueryTesting, MicrotaskStaticLookupCall, SpecSmartField} from '../../../../src/testing/index';
 import $ from 'jquery';
@@ -615,7 +615,7 @@ describe('SmartField', () => {
     it('lookupByKey should set first lookup-row from result as this.lookupRow', () => {
       let field = createFieldWithLookupCall();
       let displayText = null;
-      let result = field._formatValue(3) as JQuery.Promise<string>; // triggers lookup by key
+      let result = field._formatValue(3) as Promise<string>; // triggers lookup by key
       result.then(displayText0 => {
         displayText = displayText0;
       });
@@ -709,8 +709,8 @@ describe('SmartField', () => {
     class NoDataKeyLookupCall extends LookupCall<number> {
       rejectPromise: boolean;
 
-      override _getByKey(key: number): JQuery.Promise<LookupResult<number>> {
-        let deferred = $.Deferred();
+      override _getByKey(key: number): Promise<LookupResult<number>> {
+        let deferred = new Deferred<LookupResult<number>>();
         setTimeout(() => {
           if (this.rejectPromise) {
             deferred.reject();

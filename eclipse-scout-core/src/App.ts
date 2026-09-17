@@ -9,14 +9,14 @@
  */
 
 import {
-  access, AjaxError, AjaxSettings, AppEventMap, aria, codes, config, Desktop, Device, ErrorHandler, ErrorInfo, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging,
-  numbers, ObjectFactory, objects, scout, Session, SessionModel, texts, uiPreferences, webstorage, Widget
+  access, AjaxError, AjaxSettings, AppEventMap, aria, codes, config, Deferred, Desktop, Device, ErrorHandler, ErrorInfo, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales,
+  logging, numbers, ObjectFactory, objects, scout, Session, SessionModel, texts, uiPreferences, webstorage, Widget
 } from './index';
 import $ from 'jquery';
 
 let instance: App = null;
 let listeners: EventListener[] = [];
-let bootstrappers: (() => JQuery.Promise<void>)[] = [];
+let bootstrappers: (() => Promise<void>)[] = [];
 
 export interface AppModel {
   /**
@@ -74,7 +74,7 @@ export interface AppBootstrapOptions {
    * Custom functions that needs to be executed while bootstrapping.
    * All custom and default bootstrappers need to finish successfully before the app will proceed with the initialization.
    */
-  bootstrappers?: (() => JQuery.Promise<void>)[];
+  bootstrappers?: (() => Promise<void>)[];
 }
 
 export class App extends EventEmitter {
@@ -95,7 +95,7 @@ export class App extends EventEmitter {
    * Adds a function that needs to be executed while bootstrapping.
    * @see AppModel.bootstrappers
    */
-  static addBootstrapper(bootstrapper: () => JQuery.Promise<void>) {
+  static addBootstrapper(bootstrapper: () => Promise<void>) {
     if (bootstrappers.indexOf(bootstrapper) > -1) {
       throw new Error('Bootstrapper is already registered.');
     }
@@ -140,7 +140,7 @@ export class App extends EventEmitter {
   errorHandler: ErrorHandler;
   version: string;
   nonce: string;
-  bootstrappers: (() => JQuery.Promise<void>)[];
+  bootstrappers: (() => Promise<void>)[];
   protected _loadingTimeoutId: number;
 
   constructor() {
@@ -169,7 +169,7 @@ export class App extends EventEmitter {
    * During the bootstrap phase additional scripts may get loaded required for a successful session startup.<br>
    * The actual initialization does not get started before these bootstrap scripts are loaded.
    */
-  init(options?: InitModelOf<this>): JQuery.Promise<any> {
+  init(options?: InitModelOf<this>): Promise<any> {
     options = options || {} as InitModelOf<this>;
     this._initNonce(); // call before prepare as _prepareLogging already may require the nonce for log4javascript.
     return this._prepare(options)
@@ -183,9 +183,9 @@ export class App extends EventEmitter {
    * Initializes the logging framework and the object factory.
    * This happens at the prepare phase because all these things should be available from the beginning.
    */
-  protected _prepare(options: AppModel): JQuery.Promise<any> {
+  protected _prepare(options: AppModel): Promise<any> {
     return this._prepareLogging(options)
-      .done(() => {
+      .then(() => {
         this._prepareEssentials(options);
         this._prepareDone(options);
       });
@@ -202,7 +202,7 @@ export class App extends EventEmitter {
     $.log.isDebugEnabled() && $.log.debug('App prepared');
   }
 
-  protected _prepareLogging(options: AppModel): JQuery.Promise<JQuery> {
+  protected _prepareLogging(options: AppModel): Promise<JQuery> {
     return logging.bootstrap();
   }
 
@@ -212,7 +212,7 @@ export class App extends EventEmitter {
    * The actual session startup begins only when all promises of the bootstrappers are completed.
    * This gives the possibility to dynamically load additional scripts or files which are mandatory for a successful application startup.
    */
-  protected _bootstrap(options: AppBootstrapOptions): JQuery.Promise<any> {
+  protected _bootstrap(options: AppBootstrapOptions): Promise<any> {
     options = options || {};
     options.bootstrappers = options.bootstrappers || [];
     this.bootstrappers = [
@@ -227,7 +227,7 @@ export class App extends EventEmitter {
       .then(this._bootstrapDone.bind(this, options)); // BootstrapDone must only be executed if there are no boostrap errors
   }
 
-  protected _defaultBootstrappers(options: AppBootstrapOptions): (() => JQuery.Promise<void>)[] {
+  protected _defaultBootstrappers(options: AppBootstrapOptions): (() => Promise<void>)[] {
     return [
       Device.get().bootstrap.bind(Device.get()),
       fonts.bootstrap.bind(fonts, options.fonts),
@@ -240,7 +240,7 @@ export class App extends EventEmitter {
     ];
   }
 
-  protected _doBootstrap(): JQuery.Promise<any>[] {
+  protected _doBootstrap(): Promise<any>[] {
     return this.bootstrappers.map(bootstrapper => bootstrapper());
   }
 
@@ -258,7 +258,7 @@ export class App extends EventEmitter {
    *               - a {@link JQuery.jqXHR} for requests executed with {@link $.ajax}. The parameters `textStatus`, `errorThrown` and `requestOptions` are only set in this case.
    *               - a {@link JsonErrorResponseContainer} if a successful response contained a {@link JsonErrorResponse} which was transformed to an error (e.g. using {@link App.handleJsonError}).
    */
-  protected _bootstrapFail(options: AppBootstrapOptions, vararg: AjaxError | JQuery.jqXHR | JsonErrorResponseContainer, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string, requestOptions?: AjaxSettings): JQuery.Promise<any> {
+  protected _bootstrapFail(options: AppBootstrapOptions, vararg: AjaxError | JQuery.jqXHR | JsonErrorResponseContainer, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string, requestOptions?: AjaxSettings): Promise<any> {
     $.log.isInfoEnabled() && $.log.info('App bootstrap failed');
 
     // If one of the bootstrap ajax call fails due to a session timeout, the index.html is probably loaded from cache without asking the server for its validity.
@@ -321,7 +321,7 @@ export class App extends EventEmitter {
   /**
    * Initializes a session for each html element with class '.scout' and stores them in scout.sessions.
    */
-  protected _init(options: InitModelOf<this>): JQuery.Promise<any> {
+  protected _init(options: InitModelOf<this>): Promise<any> {
     options = options || {} as InitModelOf<this>;
     this.setLoading(true);
     let compatibilityPromise = this._checkBrowserCompatibility(options);
@@ -346,11 +346,11 @@ export class App extends EventEmitter {
    * Maybe implemented to load data from a server before the desktop is created.
    * @returns promise which is resolved after the loading is complete
    */
-  protected _load(options: AppModel): JQuery.Promise<any> {
+  protected _load(options: AppModel): Promise<any> {
     return $.resolvedPromise();
   }
 
-  protected _checkBrowserCompatibility(options: AppModel): JQuery.Promise<InitModelOf<this>> | null {
+  protected _checkBrowserCompatibility(options: AppModel): Promise<InitModelOf<this>> | null {
     let device = Device.get();
     $.log.isInfoEnabled() && $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);
     if (!scout.nvl(options.checkBrowserCompatibility, true) || device.isSupportedBrowser()) {
@@ -358,7 +358,7 @@ export class App extends EventEmitter {
       return;
     }
 
-    let deferred = $.Deferred();
+    let deferred = new Deferred<InitModelOf<this>>();
     let newOptions = objects.valueCopy(options);
     newOptions.checkBrowserCompatibility = false;
     $('.scout').each(function() {
@@ -524,7 +524,7 @@ export class App extends EventEmitter {
     }
   }
 
-  protected _loadSessions(options: SessionModel): JQuery.Promise<any> {
+  protected _loadSessions(options: SessionModel): Promise<any> {
     options = options || {};
     let promises = [];
     $('.scout').each((i, elem) => {
@@ -539,7 +539,7 @@ export class App extends EventEmitter {
   /**
    * @returns promise which is resolved when the session is ready
    */
-  protected _loadSession($entryPoint: JQuery, model: Omit<SessionModel, '$entryPoint'>): JQuery.Promise<any> {
+  protected _loadSession($entryPoint: JQuery, model: Omit<SessionModel, '$entryPoint'>): Promise<any> {
     let sessionModel: InitModelOf<Session> = {$entryPoint: $entryPoint};
     let options = $.extend({}, model, sessionModel);
     options.locale = options.locale || this._loadLocale();
@@ -603,7 +603,7 @@ export class App extends EventEmitter {
     $.log.isInfoEnabled() && $.log.info('App initialized');
   }
 
-  protected _fail(options: AppModel, error: any, ...args: any[]): JQuery.Promise<any> {
+  protected _fail(options: AppModel, error: any, ...args: any[]): Promise<any> {
     $.log.error('App initialization failed.');
     this.setLoading(false);
 

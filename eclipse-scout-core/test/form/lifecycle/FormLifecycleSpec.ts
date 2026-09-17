@@ -247,7 +247,7 @@ describe('FormLifecycle', () => {
       form.render();
       form.load().catch(error => {
         expect(form.destroyed).toBe(true);
-      }).always(done);
+      }).finally(done);
     });
 
     /**
@@ -631,7 +631,7 @@ describe('FormLifecycle', () => {
           expect(status.severity).toBe(Status.Severity.OK);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
       jasmine.clock().tick(0);
       expectMessageBox(true);
       helper.closeMessageBoxes(MessageBox.Buttons.YES);
@@ -645,7 +645,7 @@ describe('FormLifecycle', () => {
           expect(status.severity).toBe(Status.Severity.WARNING);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
       jasmine.clock().tick(0);
       expectMessageBox(true);
       helper.closeMessageBoxes(MessageBox.Buttons.NO);
@@ -659,7 +659,7 @@ describe('FormLifecycle', () => {
           expect(status.severity).toBe(Status.Severity.ERROR);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
       jasmine.clock().tick(0);
       expectMessageBox(true);
       helper.closeMessageBoxes(MessageBox.Buttons.YES);

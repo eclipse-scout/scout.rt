@@ -27,7 +27,7 @@ export const defaultValues = {
    */
   _objectTypeHierarchyFlat: {},
 
-  bootstrap(options?: DefaultValuesBootstrapOptions): JQuery.Promise<any> {
+  bootstrap(options?: DefaultValuesBootstrapOptions): Promise<any> {
     options = options || {};
     let defaultOptions = {
       url: 'defaultValues'

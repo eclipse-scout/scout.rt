@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, dataObjects, scout} from '../index';
+import {arrays, dataObjects, Deferred, scout} from '../index';
 import $ from 'jquery';
 
 /**
@@ -27,7 +27,7 @@ import $ from 'jquery';
  * ```ts
  * protected _batchCall = new BatchCall(this._doBatchCall.bind(this));
  *
- * protected _doBatchCall(keys: number[]): JQuery.Promise<BatchCallResult<number, string>> {
+ * protected _doBatchCall(keys: number[]): Promise<BatchCallResult<number, string>> {
  *   return ...
  * }
  *
@@ -42,8 +42,8 @@ import $ from 'jquery';
 export class BatchCall<TKey, TValue> {
 
   protected _keySet: Set<TKey> = null;
-  protected _deferred: JQuery.Deferred<BatchCallResult<TKey, TValue>> = null;
-  protected _promise: JQuery.Promise<BatchCallResult<TKey, TValue>> = null;
+  protected _deferred: Deferred<BatchCallResult<TKey, TValue>> = null;
+  protected _promise: Promise<BatchCallResult<TKey, TValue>> = null;
 
   protected _batchCall: BatchCallHandler<TKey, TValue>;
   protected _coalesceKeys: boolean;
@@ -71,9 +71,9 @@ export class BatchCall<TKey, TValue> {
   }
 
   /**
-   * @returns the {@link JQuery.Promise} which resolves when the {@link BatchCallHandler} has been completed.
+   * @returns the {@link Promise} which resolves when the {@link BatchCallHandler} has been completed.
    */
-  promise(): JQuery.Promise<BatchCallResult<TKey, TValue>> {
+  promise(): Promise<BatchCallResult<TKey, TValue>> {
     this._ensureBatchCallReady();
     return this._promise;
   }
@@ -83,7 +83,7 @@ export class BatchCall<TKey, TValue> {
       return;
     }
     this._keySet = new Set();
-    this._deferred = $.Deferred();
+    this._deferred = new Deferred();
     this._promise = this._deferred.promise();
     setTimeout(this._callBatchAsync.bind(this));
   }
@@ -100,7 +100,7 @@ export class BatchCall<TKey, TValue> {
 
     this._resetBatchCall();
 
-    let promise: JQuery.Promise<BatchCallResult<TKey, TValue>>;
+    let promise: Promise<BatchCallResult<TKey, TValue>>;
     if (this._coalesceKeys) {
       const serializedIndex = this._createSerializedIndex(keySet);
       const uniqueKeys = [...serializedIndex.values()].map(keys => keys[0]);
@@ -130,7 +130,7 @@ export class BatchCall<TKey, TValue> {
     return keyMap;
   }
 
-  protected _doBatchCall(keys: TKey[]): JQuery.Promise<BatchCallResult<TKey, TValue>> {
+  protected _doBatchCall(keys: TKey[]): Promise<BatchCallResult<TKey, TValue>> {
     if (arrays.empty(keys)) {
       return $.resolvedPromise();
     }
@@ -169,6 +169,6 @@ export type BatchCallResult<TKey, TValue> = Map<TKey, TValue>;
  * The function to load the values for all keys of a batch.
  *
  * @param keys All the unique keys that have been added to the batch.
- * @returns A {@link JQuery.promise} holding the resolved value for each key as {@link Map}.
+ * @returns A {@link Promise} holding the resolved value for each key as {@link Map}.
  */
-export type BatchCallHandler<TKey, TValue> = (keys: TKey[]) => JQuery.Promise<BatchCallResult<TKey, TValue>>;
+export type BatchCallHandler<TKey, TValue> = (keys: TKey[]) => Promise<BatchCallResult<TKey, TValue>>;

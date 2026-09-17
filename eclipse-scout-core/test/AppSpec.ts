@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, AppBootstrapOptions, Device, scout} from '../src/index';
+import {App, AppBootstrapOptions, Deferred, Device, scout} from '../src/index';
 import {AppModel} from '../src/App';
 import {TestingApp} from '../src/testing';
 
@@ -30,11 +30,11 @@ describe('App', () => {
   });
 
   class SpecApp extends App {
-    override _load(options: AppModel): JQuery.Promise<any> {
+    override _load(options: AppModel): Promise<any> {
       return super._load(options);
     }
 
-    protected override _defaultBootstrappers(options: AppBootstrapOptions): (() => JQuery.Promise<void>)[] {
+    protected override _defaultBootstrappers(options: AppBootstrapOptions): (() => Promise<void>)[] {
       return [Device.get().bootstrap.bind(Device.get())];
     }
   }
@@ -63,7 +63,7 @@ describe('App', () => {
 
       let loaded = false;
       app._load = () => {
-        let def = $.Deferred();
+        let def = new Deferred<void>();
         setTimeout(() => {
           loaded = true;
           def.resolve();
@@ -89,7 +89,7 @@ describe('App', () => {
 
       let loaded = false;
       app._load = () => {
-        let def = $.Deferred();
+        let def = new Deferred<void>();
         setTimeout(() => {
           loaded = true;
           def.reject();

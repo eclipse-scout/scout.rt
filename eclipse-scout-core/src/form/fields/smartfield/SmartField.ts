@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxError, aria, arrays, CellEditorPopup, CellEditorRenderedOptions, CodeLookupCall, CodeType, ColumnDescriptor, Device, EnumObject, fields, FormField, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LoadingSupport,
+  AjaxError, aria, arrays, CellEditorPopup, CellEditorRenderedOptions, CodeLookupCall, CodeType, ColumnDescriptor, Deferred, Device, EnumObject, fields, FormField, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext,
+  LoadingSupport,
   LookupCall, LookupCallOrModel, LookupResult, LookupRow, MaxLengthHandler, objects, promises, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke,
   SmartFieldEventMap, SmartFieldLayout, SmartFieldModel, SmartFieldPopup, SmartFieldTouchPopup, Status, strings, TreeProposalChooser, ValidationFailedStatus, ValueField
 } from '../../../index';
@@ -56,7 +57,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
   protected _userWasTyping: boolean;
   /** used to prevent multiple execution of blur/acceptInput */
   protected _acceptInputEnabled: boolean;
-  protected _acceptInputDeferred: JQuery.Deferred<any>;
+  protected _acceptInputDeferred: Deferred<any>;
   /** used to store the error state 'not unique' which must not be shown while typing, but when the field loses focus */
   protected _notUnique: boolean;
   protected _lastSearchText: string;
@@ -89,7 +90,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     this.embedded = false;
     this._userWasTyping = false;
     this._acceptInputEnabled = true;
-    this._acceptInputDeferred = $.Deferred();
+    this._acceptInputDeferred = new Deferred();
     this._notUnique = false;
     this._lastSearchText = null;
     this.lookupStatus = null;
@@ -307,7 +308,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
    *
    * @param sync optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
    */
-  override acceptInput(sync?: boolean): JQuery.Promise<void> | void {
+  override acceptInput(sync?: boolean): Promise<void> | void {
     if (!this._acceptInputEnabled) {
       $.log.isTraceEnabled() && $.log.trace('(SmartField#acceptInput) Skipped acceptInput because _acceptInputEnabled=false');
       return this._acceptInputDeferred.promise();
@@ -328,7 +329,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     this._setProperty('displayText', searchText);
 
     let oldDeferred = this._acceptInputDeferred;
-    this._acceptInputDeferred = $.Deferred();
+    this._acceptInputDeferred = new Deferred();
     if (oldDeferred.state() === 'pending') {
       // Ensure old deferred will always be resolved
       this._acceptInputDeferred.promise().then(() => oldDeferred.resolve());
@@ -385,7 +386,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
    *
    * @param sync optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
    */
-  protected _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<TValue>): JQuery.Promise<void> | void {
+  protected _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<TValue>): Promise<void> | void {
     if (this.touchMode) {
       $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptInput) Always send acceptInput for touch field');
       this._inputAccepted();
@@ -509,9 +510,9 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
 
   protected _acceptByTextAsync(searchText: string) {
     this._lastSearchText = searchText;
-    this._executeLookup(this.lookupCall.cloneForText(searchText), true)
-      .done(this._acceptByTextDone.bind(this))
-      .done(this._triggerLookupCallDone.bind(this));
+    let promise = this._executeLookup(this.lookupCall.cloneForText(searchText), true);
+    promise.then(this._acceptByTextDone.bind(this));
+    promise.then(this._triggerLookupCallDone.bind(this));
     this._triggerAcceptByText(searchText);
   }
 
@@ -631,7 +632,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     this._triggerAcceptInputFail();
   }
 
-  lookupByRec(rec: TValue): JQuery.Promise<SmartFieldLookupResult<TValue>> {
+  lookupByRec(rec: TValue): Promise<SmartFieldLookupResult<TValue>> {
     $.log.isDebugEnabled() && $.log.debug('(SmartField#lookupByRec) rec=', rec);
     this._lastSearchText = null;
     return this._executeLookup(this.lookupCall.cloneForRec(rec))
@@ -710,7 +711,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     this.setLookupCall(lookupCall);
   }
 
-  protected override _formatValue(value: TValue): string | JQuery.Promise<string> {
+  protected override _formatValue(value: TValue): string | Promise<string> {
     if (objects.isNullOrUndefined(value)) {
       return '';
     }
@@ -786,7 +787,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
    * @param browse whether or not the lookup call should execute getAll() or getByText() with the current display text.
    *     if browse is undefined, browse is set to true automatically if search text is empty
    */
-  openPopup(browse?: boolean): JQuery.Promise<any> {
+  openPopup(browse?: boolean): Promise<any> {
     // In case searchRequired is set to true, we always start a new search with the text from the field as query
     let searchText = this._readDisplayText(),
       searchAlways = this.searchRequired ? true : null;
@@ -850,7 +851,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
    *        is always performed, event when the search-text has not changed. By default the param is
    *        set to <code>false</code>.
    */
-  protected _lookupByTextOrAll(browse?: boolean, searchText?: string, searchAlways?: boolean): JQuery.Promise<any> {
+  protected _lookupByTextOrAll(browse?: boolean, searchText?: string, searchAlways?: boolean): Promise<any> {
     // default values
     searchText = scout.nvl(searchText, this._readDisplayText());
     browse = scout.nvl(browse, strings.empty(searchText));
@@ -879,7 +880,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
 
     this._clearPendingLookup();
 
-    let deferred = $.Deferred();
+    let deferred = new Deferred();
     let doneHandler = function(result) {
       this._lookupByTextOrAllDone(result);
       deferred.resolve(result);
@@ -899,18 +900,18 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
           code: SmartField.ErrorCode.SEARCH_REQUIRED
         }));
       } else {
-        this._executeLookup(this.lookupCall.cloneForAll(), true)
-          .done(doneHandler)
-          .done(this._triggerLookupCallDone.bind(this));
+        let promise = this._executeLookup(this.lookupCall.cloneForAll(), true);
+        promise.then(doneHandler);
+        promise.then(this._triggerLookupCallDone.bind(this));
       }
     } else {
       // execute lookup byText with a debounce/delay
       this._pendingLookup = setTimeout(() => {
         $.log.isDebugEnabled() && $.log.debug('(SmartField#_lookupByTextOrAll) lookup byText searchText=' + searchText);
         this._lastSearchText = searchText;
-        this._executeLookup(this.lookupCall.cloneForText(searchText), true)
-          .done(doneHandler)
-          .done(this._triggerLookupCallDone.bind(this));
+        let promise = this._executeLookup(this.lookupCall.cloneForText(searchText), true);
+        promise.then(doneHandler);
+        promise.then(this._triggerLookupCallDone.bind(this));
       }, SmartField.DEBOUNCE_DELAY);
     }
 
@@ -1492,7 +1493,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
   /**
    * A wrapper function around lookup calls used to display the state in the UI.
    */
-  protected _executeLookup(lookupCall: LookupCall<TValue>, abortExisting?: boolean): JQuery.Promise<SmartFieldLookupResult<TValue>> {
+  protected _executeLookup(lookupCall: LookupCall<TValue>, abortExisting?: boolean): Promise<SmartFieldLookupResult<TValue>> {
     this.lookupSeqNo++;
     this.setLoading(true);
 
@@ -1508,7 +1509,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
 
     return lookupCall
       .execute()
-      .always(() => {
+      .finally(() => {
         this.original()._currentLookupCall = null;
         this.setLoading(false);
         this._clearLookupStatus();
@@ -1600,13 +1601,11 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
 
   resetDisplayText() {
     let returned = this.formatValue(this.value);
-    if (returned && $.isFunction((returned as JQuery.Promise<string>).promise)) {
+    if (objects.isPromise(returned)) {
       // Promise is returned -> set display text later
-      (returned as JQuery.Promise<string>)
-        .done(this._setAndRenderDisplayText.bind(this))
-        .fail(() => {
-          $.log.isInfoEnabled() && $.log.info('Could not resolve display text for value: ' + this.value);
-        });
+      returned.then(this._setAndRenderDisplayText.bind(this), () => {
+        $.log.isInfoEnabled() && $.log.info('Could not resolve display text for value: ' + this.value);
+      });
     } else {
       this._setAndRenderDisplayText(returned as string);
     }
@@ -1630,7 +1629,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     return lookupRow.key;
   }
 
-  protected override _setValue(value: TValue): JQuery.Promise<void> | void {
+  protected override _setValue(value: TValue): Promise<void> | void {
     // set the cached lookup row to null. Keep in mind that the lookup row is set async in a timeout
     // most of the time. Thus, we must remove the reference to the old lookup row as early as possible
     if (!this._lockLookupRow) {

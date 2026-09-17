@@ -24,7 +24,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  get(url: string, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  get(url: string, options?: AjaxSettings, model?: AjaxCallModel): Promise<any> {
     let opts = $.extend({}, {
       url: url,
       method: 'GET'
@@ -42,7 +42,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  post(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  post(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): Promise<any> {
     let opts = $.extend({}, {
       url: url,
       method: 'POST',
@@ -61,7 +61,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  put(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  put(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): Promise<any> {
     let opts = $.extend({}, {
       url: url,
       method: 'PUT',
@@ -79,7 +79,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  remove(url: string, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  remove(url: string, options?: AjaxSettings, model?: AjaxCallModel): Promise<any> {
     let opts = $.extend({}, {
       url: url,
       method: 'DELETE'
@@ -96,7 +96,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  call(options: UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  call(options: UrlAjaxSettings, model?: AjaxCallModel): Promise<any> {
     return ajax.createCall(options, model).call();
   },
 
@@ -126,7 +126,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  getJson(url: string, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  getJson(url: string, options?: AjaxSettings, model?: AjaxCallModel): Promise<any> {
     let opts = $.extend({}, {
       url: url,
       method: 'GET'
@@ -144,7 +144,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  postJson(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  postJson(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): Promise<any> {
     if (!objects.isNullOrUndefined(data) && typeof data !== 'string') {
       data = JSON.stringify(data);
     }
@@ -166,7 +166,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  putJson(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  putJson(url: string, data?: any, options?: AjaxSettings, model?: AjaxCallModel): Promise<any> {
     if (!objects.isNullOrUndefined(data) && typeof data !== 'string') {
       data = JSON.stringify(data);
     }
@@ -187,7 +187,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  removeJson(url: string, options?: AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  removeJson(url: string, options?: AjaxSettings, model?: AjaxCallModel): Promise<any> {
     let opts = $.extend({}, {
       url: url,
       method: 'DELETE'
@@ -205,7 +205,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  callJson(options?: UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+  callJson(options?: UrlAjaxSettings, model?: AjaxCallModel): Promise<any> {
     return ajax.createCallJson(options, model).call();
   },
 
@@ -243,7 +243,7 @@ export const ajax = {
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  getDataObject(url: string, options?: AjaxSettings, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
+  getDataObject(url: string, options?: AjaxSettings, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): Promise<any> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'GET'
@@ -267,7 +267,7 @@ export const ajax = {
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  postDataObject(url: string, dataObject?: any, options?: AjaxSettings, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
+  postDataObject(url: string, dataObject?: any, options?: AjaxSettings, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): Promise<any> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'POST'
@@ -291,7 +291,7 @@ export const ajax = {
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  putDataObject(url: string, data?: any, options?: AjaxSettings, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
+  putDataObject(url: string, data?: any, options?: AjaxSettings, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): Promise<any> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'PUT'
@@ -315,7 +315,7 @@ export const ajax = {
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  removeDataObject(url: string, data?: any, options?: AjaxSettings, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
+  removeDataObject(url: string, data?: any, options?: AjaxSettings, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): Promise<any> {
     const opts: UrlAjaxSettings = $.extend({}, {
       url: url,
       method: 'DELETE'
@@ -338,7 +338,7 @@ export const ajax = {
    *          If the response is a data object it will be automatically converted to a {@link BaseDoEntity}.
    *          In case of an error the promise is rejected with an {@link AjaxError}.
    */
-  callDataObject(options: UrlAjaxSettings, data?: any, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): JQuery.Promise<any, AjaxError> {
+  callDataObject(options: UrlAjaxSettings, data?: any, ajaxCallModel?: AjaxCallModel, deserializerModel?: DataObjectDeserializerModel): Promise<any> {
     return ajax.createCallDataObject(options, data, ajaxCallModel, deserializerModel).call();
   },
 

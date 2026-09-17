@@ -16,6 +16,12 @@ export class AjaxCall extends Call implements AjaxCallModel {
   declare initModel: SomeRequired<this['model'], 'ajaxOptions'>;
 
   ajaxOptions: UrlAjaxSettings;
+  /**
+   * textStatus/errorThrown captured from the raw jQuery ajax callbacks (see {@link _callImpl}), since a native
+   * promise only ever carries a single value and cannot preserve jQuery's multi-argument done/fail signature.
+   */
+  protected _lastTextStatus: JQuery.Ajax.SuccessTextStatus | JQuery.Ajax.ErrorTextStatus;
+  protected _lastErrorThrown: string;
 
   constructor() {
     super();
@@ -47,31 +53,43 @@ export class AjaxCall extends Call implements AjaxCallModel {
     }
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + (this.callCounter === 1 ? '--- ' : '') + this.ajaxOptions.method + ' "' + this.ajaxOptions.url + '"' + (this.callCounter === 1 ? ' ---' : ''));
 
-    return $.ajax(this.ajaxOptions);
+    let jqXHR = $.ajax(this.ajaxOptions);
+    // Capture the extra arguments of jQuery's done/fail callbacks here (using jQuery's own multi-argument API,
+    // since the underlying $.ajax() is out of scope for the native-promise migration), so that Call's generic
+    // (single-value) then/catch handling further down the chain can still access them via these fields.
+    jqXHR
+      .done((data, textStatus) => {
+        this._lastTextStatus = textStatus;
+      })
+      .fail((xhr, textStatus, errorThrown) => {
+        this._lastTextStatus = textStatus;
+        this._lastErrorThrown = errorThrown;
+      });
+    return jqXHR;
   }
 
-  protected override _setResultFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
+  protected override _setResultFail(jqXHR?: JQuery.jqXHR) {
     // Store result as single object to make rethrowing the error easier for callers of AjaxCall
     this._setResult(new AjaxError({
       jqXHR: jqXHR,
-      textStatus: textStatus,
-      errorThrown: errorThrown,
+      textStatus: this._lastTextStatus as JQuery.Ajax.ErrorTextStatus,
+      errorThrown: this._lastErrorThrown,
       requestOptions: this.ajaxOptions
     }));
   }
 
-  protected override _onCallDone(data: any, textStatus: JQuery.Ajax.SuccessTextStatus, jqXHR: JQuery.jqXHR) {
+  protected override _onCallDone(data?: any) {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'AJAX success');
-    super._onCallDone(data, textStatus, jqXHR);
+    super._onCallDone(data);
   }
 
-  protected override _onCallFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
-    $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'AJAX fail: type=' + textStatus + ', httpStatus=' + jqXHR.status + (errorThrown ? ' "' + errorThrown + '"' : ''));
-    super._onCallFail(jqXHR, textStatus, errorThrown);
+  protected override _onCallFail(jqXHR?: JQuery.jqXHR) {
+    $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'AJAX fail: type=' + this._lastTextStatus + ', httpStatus=' + jqXHR?.status + (this._lastErrorThrown ? ' "' + this._lastErrorThrown + '"' : ''));
+    super._onCallFail(jqXHR);
   }
 
-  protected override _nextRetryImpl(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string): number | boolean {
-    let offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown);
+  protected override _nextRetryImpl(jqXHR?: JQuery.jqXHR): number | boolean {
+    let offlineError = AjaxCall.isOfflineError(jqXHR, this._lastTextStatus as JQuery.Ajax.ErrorTextStatus, this._lastErrorThrown);
     if (!offlineError) {
       $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Unexpected HTTP error');
       return false;

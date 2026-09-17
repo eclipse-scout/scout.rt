@@ -7,31 +7,30 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LookupResult, StaticLookupCall} from '../../index';
-import $ from 'jquery';
+import {Deferred, LookupResult, StaticLookupCall} from '../../index';
 
 export class MicrotaskStaticLookupCall<TKey> extends StaticLookupCall<TKey> {
 
-  protected override _getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected override _getByKey(key: TKey): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     queueMicrotask(this._queryByKey.bind(this, key));
     return this._deferred.promise();
   }
 
-  protected override _getAll(): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected override _getAll(): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     queueMicrotask(this._queryByAll.bind(this));
     return this._deferred.promise();
   }
 
-  protected override _getByText(text: string): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected override _getByText(text: string): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     queueMicrotask(this._queryByText.bind(this, text));
     return this._deferred.promise();
   }
 
-  protected override _getByRec(rec: TKey): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected override _getByRec(rec: TKey): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     queueMicrotask(this._queryByRec.bind(this, rec));
     return this._deferred.promise();
   }

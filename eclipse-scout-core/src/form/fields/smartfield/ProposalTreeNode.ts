@@ -44,7 +44,7 @@ export class ProposalTreeNode<TValue> extends TreeNode implements ProposalTreeNo
     return this.proposalChooser.isBrowseLoadIncremental();
   }
 
-  override loadChildren(): JQuery.Promise<SmartFieldLookupResult<TValue>> {
+  override loadChildren(): Promise<SmartFieldLookupResult<TValue>> {
     if (this.isBrowseLoadIncremental()) {
       let parentKey = this.lookupRow.key;
       return this.proposalChooser.smartField.lookupByRec(parentKey);

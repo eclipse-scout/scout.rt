@@ -81,7 +81,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
    *
    * @returns a promise which returns a text of the lookup row resolved by {@link getByKey}.
    */
-  textByKey(key: TKey): JQuery.Promise<string> {
+  textByKey(key: TKey): Promise<string> {
     if (objects.isNullOrUndefined(key)) {
       return $.resolvedPromise('');
     }
@@ -93,7 +93,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
    *
    * @returns a promise which returns a text of the lookup row resolved by {@link getByKey}.
    */
-  protected _textByKey(key: TKey): JQuery.Promise<string> {
+  protected _textByKey(key: TKey): Promise<string> {
     return this
       .cloneForKey(key)
       .execute()
@@ -110,7 +110,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
    *
    * @returns A promise which returns an object that maps every {@link LookupRow} key to the text of the resolved {@link LookupRow}.
    */
-  textsByKeys(keys: TKey[]): JQuery.Promise<Record<string, string>> {
+  textsByKeys(keys: TKey[]): Promise<Record<string, string>> {
     if (arrays.empty(keys)) {
       return $.resolvedPromise({});
     }
@@ -122,7 +122,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
    *
    * * @returns A promise which returns an object that maps every {@link LookupRow} key to the text of the resolved {@link LookupRow}.
    */
-  protected _textsByKeys(keys: TKey[]): JQuery.Promise<Record<string, string>> {
+  protected _textsByKeys(keys: TKey[]): Promise<Record<string, string>> {
     return this
       .cloneForKeys(keys)
       .execute()
@@ -145,7 +145,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
    *
    * You should not override this function. Instead, override {@link _getAll}.
    */
-  getAll(): JQuery.Promise<LookupResult<TKey>> {
+  getAll(): Promise<LookupResult<TKey>> {
     this.queryBy = QueryBy.ALL;
     return this._getAll();
   }
@@ -153,7 +153,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
   /**
    * Override this method to implement.
    */
-  protected _getAll(): JQuery.Promise<LookupResult<TKey>> {
+  protected _getAll(): Promise<LookupResult<TKey>> {
     throw new Error('_getAll() not implemented');
   }
 
@@ -162,7 +162,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
    *
    * You should not override this function. Instead, override {@link _getByText}.
    */
-  getByText(text: string): JQuery.Promise<LookupResult<TKey>> {
+  getByText(text: string): Promise<LookupResult<TKey>> {
     this.queryBy = QueryBy.TEXT;
     this.searchText = text;
     return this._getByText(text);
@@ -171,7 +171,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
   /**
    * Override this method to implement.
    */
-  protected _getByText(text: string): JQuery.Promise<LookupResult<TKey>> {
+  protected _getByText(text: string): Promise<LookupResult<TKey>> {
     throw new Error('_getByText() not implemented');
   }
 
@@ -180,7 +180,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
    *
    * You should not override this function. Instead, override {@link _getByKey}.
    */
-  getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
+  getByKey(key: TKey): Promise<LookupResult<TKey>> {
     this.queryBy = QueryBy.KEY;
     this.key = key;
     return this._getByKey(key);
@@ -189,7 +189,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
   /**
    * Override this method to implement.
    */
-  protected _getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
+  protected _getByKey(key: TKey): Promise<LookupResult<TKey>> {
     throw new Error('_getByKey() not implemented');
   }
 
@@ -198,7 +198,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
    *
    * You should not override this function. Instead, override {@link _getByKeys}.
    */
-  getByKeys(keys: TKey[]): JQuery.Promise<LookupResult<TKey>> {
+  getByKeys(keys: TKey[]): Promise<LookupResult<TKey>> {
     this.queryBy = QueryBy.KEYS;
     this.keys = keys;
     return this._getByKeys(keys);
@@ -207,7 +207,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
   /**
    * Override this method to implement.
    */
-  protected _getByKeys(keys: TKey[]): JQuery.Promise<LookupResult<TKey>> {
+  protected _getByKeys(keys: TKey[]): Promise<LookupResult<TKey>> {
     throw new Error('_getByKeys() not implemented');
   }
 
@@ -220,7 +220,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
    *
    * @param parentKey references the parent key
    */
-  getByRec(parentKey: TKey): JQuery.Promise<LookupResult<TKey>> {
+  getByRec(parentKey: TKey): Promise<LookupResult<TKey>> {
     this.queryBy = QueryBy.REC;
     this.parentKey = parentKey;
     if (objects.isNullOrUndefined(parentKey)) {
@@ -230,7 +230,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
     return this._getByRec(parentKey);
   }
 
-  protected _emptyRecResult(rec: TKey): JQuery.Promise<LookupResult<TKey>> {
+  protected _emptyRecResult(rec: TKey): Promise<LookupResult<TKey>> {
     return $.resolvedPromise({
       queryBy: QueryBy.REC,
       rec: rec,
@@ -241,7 +241,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
   /**
    * Override this method to implement.
    */
-  protected _getByRec(rec: TKey): JQuery.Promise<LookupResult<TKey>> {
+  protected _getByRec(rec: TKey): Promise<LookupResult<TKey>> {
     throw new Error('_getByRec() not implemented');
   }
 
@@ -249,7 +249,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
    * Executes this LookupCall. For this method to work this LookupCall must be a clone created with one of the following methods:
    * {@link cloneForAll()}, {@link cloneForText(text)}, {@link cloneForKey(key)}, {@link cloneForRec(parentKey)}
    */
-  execute(): JQuery.Promise<LookupResult<TKey>> {
+  execute(): Promise<LookupResult<TKey>> {
     if (QueryBy.KEY === this.queryBy) {
       return this._getByKey(this.key);
     }

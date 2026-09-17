@@ -361,7 +361,7 @@ describe('GroupBox', () => {
           $tmpStyle.remove();
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('triggers a property change event if grid data of a form field changes', () => {

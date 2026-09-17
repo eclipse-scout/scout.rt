@@ -10,7 +10,7 @@
 import {FormLifecycle, Status, ValidationResult} from '../../index';
 
 export class SpecLifecycle extends FormLifecycle {
-  override _validate(): JQuery.Promise<Status> {
+  override _validate(): Promise<Status> {
     return super._validate();
   }
 

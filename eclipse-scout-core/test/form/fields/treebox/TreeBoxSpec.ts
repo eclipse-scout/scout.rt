@@ -31,7 +31,7 @@ describe('TreeBox', () => {
       super._lookupByAllDone(result);
     }
 
-    override _executeLookup(lookupCall: LookupCall<T>, abortExisting?: boolean): JQuery.Promise<LookupResult<T>> {
+    override _executeLookup(lookupCall: LookupCall<T>, abortExisting?: boolean): Promise<LookupResult<T>> {
       return super._executeLookup(lookupCall, abortExisting);
     }
   }
@@ -77,7 +77,7 @@ describe('TreeBox', () => {
         expect(event.lookupCall instanceof DummyLookupCall).toBe(true);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
       jasmine.clock().tick(500);
     });
 
@@ -98,7 +98,7 @@ describe('TreeBox', () => {
         expect(box.getCheckedLookupRows().length).toBe(1);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
       jasmine.clock().tick(500);
     });
 

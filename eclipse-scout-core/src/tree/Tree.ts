@@ -1572,7 +1572,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       }
 
       if (node.expanded) {
-        node.ensureLoadChildren().done(this._addChildrenToFlatList.bind(this, node, null, renderAnimated, null, true /* required that ctrl+shift+add expands all rows of a table-page */));
+        node.ensureLoadChildren().then(this._addChildrenToFlatList.bind(this, node, null, renderAnimated, null, true /* required that ctrl+shift+add expands all rows of a table-page */));
       } else {
         this._removeChildrenFromFlatList(node, renderAnimated);
       }

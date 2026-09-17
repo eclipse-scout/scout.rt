@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Permission, PermissionCollection, PermissionCollectionType, scout} from '../../src/index';
+import {Deferred, Permission, PermissionCollection, PermissionCollectionType, scout} from '../../src/index';
 import {accessSpecHelper} from '../../src/testing';
 
 describe('PermissionCollection', () => {
@@ -17,9 +17,30 @@ describe('PermissionCollection', () => {
   }
 
   class SpecPermission extends Permission {
-    override _evalPermission(permission: Permission): JQuery.Promise<boolean> {
+    override _evalPermission(permission: Permission): Promise<boolean> {
       return super._evalPermission(permission);
     }
+  }
+
+  /**
+   * Native promises don't expose a synchronous state() like a JQuery.Promise, so track it ourselves.
+   */
+  function trackState(promise: Promise<any>): { value: string } {
+    let state = {value: 'pending'};
+    promise.then(() => {
+      state.value = 'resolved';
+    }, () => {
+      state.value = 'rejected';
+    });
+    return state;
+  }
+
+  /**
+   * Waits a real macrotask tick so that any number of chained microtask reactions (promise then-chains)
+   * have fully drained, without depending on jasmine's fake clock.
+   */
+  function flush(): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, 0));
   }
 
   describe('implies', () => {
@@ -75,51 +96,54 @@ describe('PermissionCollection', () => {
       expect(await collection.implies(Permission.quick('other'))).toBeFalse();
     });
 
-    it('resolves if first check is succeeds', () => {
-      let evalDeferred1: JQuery.Deferred<boolean>;
-      let evalDeferred2: JQuery.Deferred<boolean>;
+    it('resolves if first check is succeeds', async () => {
+      // this test drives native promises via real microtask/macrotask waits, jasmine's fake clock is not needed
+      jasmine.clock().uninstall();
+
+      let evalDeferred1: Deferred<boolean>;
+      let evalDeferred2: Deferred<boolean>;
       const permission1 = scout.create(SpecPermission, {id: 'test'});
       const permission2 = scout.create(SpecPermission, {id: 'test'});
       const collection = scout.create(PermissionCollection, accessSpecHelper.permissionCollectionModel(permission1, permission2));
 
       permission1._evalPermission = (permission: Permission) => {
-        evalDeferred1 = $.Deferred();
+        evalDeferred1 = new Deferred();
         return evalDeferred1.promise();
       };
       permission2._evalPermission = (permission: Permission) => {
-        evalDeferred2 = $.Deferred();
+        evalDeferred2 = new Deferred();
         return evalDeferred2.promise();
       };
 
-      let promise = collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue());
-      expect(promise.state()).toBe('pending');
+      let state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue()));
+      expect(state.value).toBe('pending');
       evalDeferred1.resolve(true);
-      jasmine.clock().tick(1);
-      expect(promise.state()).toBe('resolved');
+      await flush();
+      expect(state.value).toBe('resolved');
 
-      promise = collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue());
-      expect(promise.state()).toBe('pending');
+      state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue()));
+      expect(state.value).toBe('pending');
       evalDeferred2.resolve(false);
-      jasmine.clock().tick(1);
-      expect(promise.state()).toBe('pending');
+      await flush();
+      expect(state.value).toBe('pending');
       evalDeferred1.resolve(true);
-      jasmine.clock().tick(1);
-      expect(promise.state()).toBe('resolved');
+      await flush();
+      expect(state.value).toBe('resolved');
 
-      promise = collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue());
-      expect(promise.state()).toBe('pending');
+      state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue()));
+      expect(state.value).toBe('pending');
       evalDeferred2.resolve(true);
-      jasmine.clock().tick(1);
-      expect(promise.state()).toBe('resolved');
+      await flush();
+      expect(state.value).toBe('resolved');
 
-      promise = collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeFalse());
-      expect(promise.state()).toBe('pending');
+      state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeFalse()));
+      expect(state.value).toBe('pending');
       evalDeferred2.resolve(false);
-      jasmine.clock().tick(1);
-      expect(promise.state()).toBe('pending');
+      await flush();
+      expect(state.value).toBe('pending');
       evalDeferred1.resolve(false);
-      jasmine.clock().tick(1);
-      expect(promise.state()).toBe('resolved');
+      await flush();
+      expect(state.value).toBe('resolved');
     });
   });
 

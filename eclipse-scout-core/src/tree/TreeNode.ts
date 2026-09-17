@@ -60,7 +60,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
   /**
    * This internal variable stores the promise which is used when a loadChildren() operation is in progress.
    */
-  protected _loadChildrenPromise: JQuery.Promise<any>;
+  protected _loadChildrenPromise: Promise<any>;
 
   constructor() {
     this.$node = null;
@@ -204,7 +204,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
    * @returns a Promise or null when TreeNode cannot load children (which is the case for all
    *     TreeNodes in the remote case). The default impl. returns an empty resolved promise.
    */
-  loadChildren(): JQuery.Promise<any> {
+  loadChildren(): Promise<any> {
     return $.resolvedPromise();
   }
 
@@ -212,7 +212,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
    * This method calls loadChildren() but does nothing when children are already loaded or when loadChildren()
    * is already in progress.
    */
-  ensureLoadChildren(): JQuery.Promise<any> {
+  ensureLoadChildren(): Promise<any> {
     // when children are already loaded we return an already resolved promise so the caller can continue immediately
     if (this.childrenLoaded) {
       return $.resolvedPromise();

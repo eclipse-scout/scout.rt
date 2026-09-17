@@ -31,53 +31,34 @@ describe('ErrorHandler', () => {
   }
 
   describe('handle', () => {
-    it('accepts individually passed arguments', done => {
+    it('accepts individually passed arguments', () => {
       errorHandler = scout.create(ErrorHandler);
       spyOn(errorHandler, 'analyzeError').and.callThrough();
 
-      let deferred = $.Deferred();
-      deferred.promise().then(() => {
-        return $.rejectedPromise('err', 'a', 'b');
-      }).catch((...args) => {
-        return errorHandler.handle(...args);
-      }).then(() => {
-        expect(errorHandler.analyzeError).toHaveBeenCalledWith('err', 'a', 'b');
-        done();
-      });
-      deferred.resolve();
+      errorHandler.handle('err', 'a', 'b');
+
+      expect(errorHandler.analyzeError).toHaveBeenCalledWith('err', 'a', 'b');
     });
 
-    it('accepts argument like object as first param', done => {
+    it('accepts argument like object as first param', () => {
       errorHandler = scout.create(ErrorHandler);
       spyOn(errorHandler, 'analyzeError').and.callThrough();
 
-      let deferred = $.Deferred();
-      deferred.promise().then(() => {
-        return $.rejectedPromise('err', 'a', 'b');
-      }).catch(function() {
+      (function() {
         // eslint-disable-next-line prefer-rest-params
-        return errorHandler.handle(arguments);
-      }).then(() => {
-        expect(errorHandler.analyzeError).toHaveBeenCalledWith('err', 'a', 'b');
-        done();
-      });
-      deferred.resolve();
+        errorHandler.handle(arguments);
+      })('err', 'a', 'b');
+
+      expect(errorHandler.analyzeError).toHaveBeenCalledWith('err', 'a', 'b');
     });
 
-    it('accepts array as first param', done => {
+    it('accepts array as first param', () => {
       errorHandler = scout.create(ErrorHandler);
       spyOn(errorHandler, 'analyzeError').and.callThrough();
 
-      let deferred = $.Deferred();
-      deferred.promise().then(() => {
-        return $.rejectedPromise('err', 'a', 'b');
-      }).catch((...args) => {
-        return errorHandler.handle(args);
-      }).then(() => {
-        expect(errorHandler.analyzeError).toHaveBeenCalledWith('err', 'a', 'b');
-        done();
-      });
-      deferred.resolve();
+      errorHandler.handle(['err', 'a', 'b']);
+
+      expect(errorHandler.analyzeError).toHaveBeenCalledWith('err', 'a', 'b');
     });
   });
 
@@ -91,7 +72,7 @@ describe('ErrorHandler', () => {
         expect(errorInfo.message).toBe('Oops, wrong type!');
         expect(errorInfo.debugInfo).toBe('Dummy error');
         expect(errorInfo.log).toContain('Oops, wrong type!');
-      }).always(done);
+      }).finally(done);
     });
 
     it('can handle jQuery AJAX errors', done => {
@@ -125,7 +106,7 @@ describe('ErrorHandler', () => {
         expect(errorInfo.log).toContain('AJAX call "POST http://server.example/service" failed [500 Internal Server Error]');
       }));
 
-      $.promiseAll(promises).always(done);
+      $.promiseAll(promises).finally(done);
     });
 
     it('can handle no arguments', done => {
@@ -133,7 +114,7 @@ describe('ErrorHandler', () => {
         expect(errorInfo.code).toBe('P3');
         expect(errorInfo.message).toBe('Unknown error');
         expect(errorInfo.log).toContain('Unexpected error (no reason provided)');
-      }).always(done);
+      }).finally(done);
     });
 
     it('can handle arbitrary error objects', done => {
@@ -172,7 +153,7 @@ describe('ErrorHandler', () => {
         expect(errorInfo.log).toContain('Unexpected error: 1234567890');
       }));
 
-      $.promiseAll(promises).always(done);
+      $.promiseAll(promises).finally(done);
     });
 
     it('can handle ErrorDo severity', () => {
@@ -206,7 +187,7 @@ describe('ErrorHandler', () => {
         expect(errorInfo.errorDo).toBe(errorDo);
         expect(errorInfo.message).toBe(errorDo.message);
         expect(errorInfo.level).toBe(LogLevel.WARN);
-      }).always(done);
+      }).finally(done);
     });
 
     it('can handle ErrorDo logLevel', done => {
@@ -232,7 +213,7 @@ describe('ErrorHandler', () => {
         expect(errorInfo.errorDo).toBe(errorDo);
         expect(errorInfo.message).toBe(errorDo.message);
         expect(errorInfo.level).toBe(LogLevel.INFO);
-      }).always(done);
+      }).finally(done);
     });
   });
 

@@ -23,7 +23,7 @@ export const texts = {
 
   textsByLocale: {} as TextMapType,
 
-  bootstrap(url: string | string[]): JQuery.Promise<any> {
+  bootstrap(url: string | string[]): Promise<any> {
     if (!url) {
       return $.resolvedPromise({});
     }

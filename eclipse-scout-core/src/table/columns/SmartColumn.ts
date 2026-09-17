@@ -67,7 +67,7 @@ export class SmartColumn<TValue> extends LookupCallColumn<TValue> implements Sma
     }
   }
 
-  protected _batchFormatValues(keys: TValue[]): JQuery.Promise<BatchCallResult<TValue, string>> {
+  protected _batchFormatValues(keys: TValue[]): Promise<BatchCallResult<TValue, string>> {
     const lookupCall = this.lookupCall.cloneForKeys(keys);
     this.trigger('prepareLookupCall', {lookupCall});
     return lookupCall.execute().then(response => {
@@ -97,7 +97,7 @@ export class SmartColumn<TValue> extends LookupCallColumn<TValue> implements Sma
     this.setProperty('activeFilterEnabled', activeFilterEnabled);
   }
 
-  protected override _formatValue(value: TValue, row?: TableRow): string | JQuery.Promise<BatchCallResult<TValue, unknown>> {
+  protected override _formatValue(value: TValue, row?: TableRow): string | Promise<BatchCallResult<TValue, unknown>> {
     if (objects.isNullOrUndefined(value)) {
       return '';
     }

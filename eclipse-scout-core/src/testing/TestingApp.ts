@@ -11,7 +11,7 @@ import {App, AppBootstrapOptions, Device, InitModelOf, RemoteApp, Session} from 
 
 export class TestingApp extends RemoteApp {
 
-  protected override _defaultValuesBootstrapper(): () => JQuery.Promise<void> {
+  protected override _defaultValuesBootstrapper(): () => Promise<void> {
     // nop for testing
     return null;
   }
@@ -25,7 +25,7 @@ export class TestingApp extends RemoteApp {
     return super._createSession(options);
   }
 
-  protected override _defaultBootstrappers(options: AppBootstrapOptions): (() => JQuery.Promise<void>)[] {
+  protected override _defaultBootstrappers(options: AppBootstrapOptions): (() => Promise<void>)[] {
     return [Device.get().bootstrap.bind(Device.get())];
   }
 

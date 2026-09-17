@@ -59,7 +59,7 @@ describe('PageWithTable', () => {
       return super._transformTableDataToTableRows(tableData);
     }
 
-    override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+    override _loadTableData(searchFilter: any): Promise<any> {
       return super._loadTableData(searchFilter);
     }
 
@@ -284,7 +284,7 @@ describe('PageWithTable', () => {
         });
       }
 
-      protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+      protected override _loadTableData(searchFilter: any): Promise<any> {
         let data = [{
           string: 'string 1',
           smartValue: null
@@ -611,7 +611,7 @@ describe('PageWithTable', () => {
         });
       }
 
-      protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+      protected override _loadTableData(searchFilter: any): Promise<any> {
         return $.resolvedPromise(['Red', 'Green', 'Blue']);
       }
 
@@ -769,7 +769,7 @@ describe('PageWithTable', () => {
       page._loadTableData = searchFilter => $.when(loadTableDataDeferred.promise());
     };
 
-    let loadTableDataPromise: JQuery.Promise<any>;
+    let loadTableDataPromise: Promise<any>;
     const loadTableDataOrig = page.loadTableData.bind(page);
     page.loadTableData = (reloadReason?: TableReloadReason) => {
       loadTableDataPromise = loadTableDataOrig(reloadReason);
@@ -796,7 +796,7 @@ describe('PageWithTable', () => {
     class DeferredSmartColumn extends SmartColumn<number> {
 
       lastCellTextDeferred: Deferred<void> = null;
-      lastCellTextPromise: JQuery.Promise<BatchCallResult<number, string>> = null;
+      lastCellTextPromise: Promise<BatchCallResult<number, string>> = null;
 
       protected override _init(model: InitModelOf<this>) {
         super._init({
@@ -811,7 +811,7 @@ describe('PageWithTable', () => {
         });
       }
 
-      override setCellTextDeferred(promise: JQuery.Promise<BatchCallResult<number, string>>) {
+      override setCellTextDeferred(promise: Promise<BatchCallResult<number, string>>) {
         this.lastCellTextDeferred = new Deferred();
         this.lastCellTextPromise = promise.then(async result => {
           await this.lastCellTextDeferred.promise();

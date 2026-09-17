@@ -18,7 +18,7 @@ export const access = {
    * Loads all permissions from the given url to a client cache.
    * @param permissionsUrl The url to fetch the permissions from.
    */
-  bootstrap(permissionsUrl: string): JQuery.Promise<any> {
+  bootstrap(permissionsUrl: string): Promise<any> {
     if (!permissionsUrl) {
       return $.resolvedPromise();
     }
@@ -31,7 +31,7 @@ export const access = {
   /**
    * Loads permissions from the main system using the url configuration of that {@link System}.
    */
-  bootstrapSystem(): JQuery.Promise<void> {
+  bootstrapSystem(): Promise<void> {
     const url = systems.getOrCreate().getEndpointUrl('permissions');
     return access.bootstrap(url);
   },
@@ -54,7 +54,7 @@ export const access = {
   /**
    * Check `permission` against granted permissions of the current user.
    */
-  check(permission: string | Permission): JQuery.Promise<boolean> {
+  check(permission: string | Permission): Promise<boolean> {
     return check(permission);
   },
 
@@ -81,8 +81,8 @@ export const access = {
 };
 
 function check(permission: string | Permission, quick: true): boolean;
-function check(permission: string | Permission, quick?: false): JQuery.Promise<boolean>;
-function check(permission: string | Permission, quick?: boolean): boolean | JQuery.Promise<boolean> {
+function check(permission: string | Permission, quick?: false): Promise<boolean>;
+function check(permission: string | Permission, quick?: boolean): boolean | Promise<boolean> {
   if (!accessControl) {
     return quick ? false : $.resolvedPromise(false);
   }

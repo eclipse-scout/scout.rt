@@ -333,7 +333,7 @@ describe('Desktop', () => {
         expect(session.focusManager._glassPaneTargets.length).toBe(0);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('does not remove message boxes with display parent outline', () => {
@@ -1288,7 +1288,7 @@ describe('Desktop', () => {
           expect(desktop.activeForm).toBe(dialogParent);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('will send the outline to back', () => {
@@ -1332,7 +1332,7 @@ describe('Desktop', () => {
           expect(desktop.activeForm).toBe(view);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('will be set to undefined if dialog closes and there is no currentView and no display parent', done => {
@@ -1347,7 +1347,7 @@ describe('Desktop', () => {
           expect(desktop.activeForm).toBe(null);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('must not be the detail form', done => {
@@ -1365,7 +1365,7 @@ describe('Desktop', () => {
           expect(desktop.activeForm).toBe(null);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('must not be the detail form even if it is the display parent', done => {
@@ -1385,7 +1385,7 @@ describe('Desktop', () => {
           expect(desktop.activeForm).toBe(null);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('must be a form', done => {
@@ -1403,7 +1403,7 @@ describe('Desktop', () => {
           expect(desktop.activeForm).toBe(null);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('must not be a removed form', () => {
@@ -1870,7 +1870,7 @@ describe('Desktop', () => {
         expect(desktop.views).toEqual([]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close some open tabs on desktop', done => {
@@ -1886,7 +1886,7 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view3]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close others and expect to not cancel the display parent of a modal form', done => {
@@ -1913,7 +1913,7 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view1, modalView]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close tabs and save unsaved changes', done => {
@@ -1942,7 +1942,7 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view3]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close tabs and cancel UnsavedFormChangesForm', done => {
@@ -1960,7 +1960,7 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view1, view2, view3]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close tabs and dont save unsaved changes', done => {
@@ -1991,7 +1991,7 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view3]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close tabs when one tab has an open message box', () => {
@@ -2053,7 +2053,7 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view3]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close tabs when one tab has an open modal dialog with unsaved changes', done => {
@@ -2097,7 +2097,7 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view3]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close tabs when one tab has an open modal dialog without unsaved changes', done => {
@@ -2129,7 +2129,7 @@ describe('Desktop', () => {
         expect(desktop.bench.getViews()).toEqual([view3]);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('close tabs when one tab has invalid unsaved changes', () => {

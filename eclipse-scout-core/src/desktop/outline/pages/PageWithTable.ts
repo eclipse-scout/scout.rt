@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  abortableContext, AbortablePromise, AbortError, arrays, AutoLeafPageWithNodes, BookmarkSupport, BookmarkTableRowIdentifierDo, dataObjects, DoEntity, Event, EventHandler, Form, InitModelOf, LimitedResultInfoContributionDo, ObjectOrModel,
-  Page, PageWithTableEventMap, PageWithTableModel, PropertyChangeEvent, scout, SearchFilterTextBuilder, SearchFormTableControl, SearchRequiredTableStatus, Status, Table, TableAllRowsDeletedEvent, TableControl, TableMaxResultsHelper,
+  abortableContext, AbortablePromise, AbortError, arrays, AutoLeafPageWithNodes, BookmarkSupport, BookmarkTableRowIdentifierDo, dataObjects, Deferred, DoEntity, Event, EventHandler, Form, InitModelOf, LimitedResultInfoContributionDo,
+  ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel, PropertyChangeEvent, scout, SearchFilterTextBuilder, SearchFormTableControl, SearchRequiredTableStatus, Status, Table, TableAllRowsDeletedEvent, TableControl, TableMaxResultsHelper,
   TableOrganizerMenu, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
 } from '../../../index';
 import $ from 'jquery';
@@ -290,7 +290,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
     });
   }
 
-  override ensureLoadChildren(): JQuery.Promise<any> {
+  override ensureLoadChildren(): Promise<any> {
     if (this.searchRequired && !this.searchFilterCompleted) {
       // Show table status
       this.ensureDetailTable();
@@ -300,7 +300,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
     return super.ensureLoadChildren();
   }
 
-  override loadChildren(): JQuery.Promise<any> {
+  override loadChildren(): Promise<any> {
     this.ensureDetailTable();
 
     // It's allowed to have no table - but we don't have to load data in that case
@@ -309,7 +309,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
     }
 
     this.setChildrenLoaded(false);
-    const deferred = $.Deferred();
+    const deferred = new Deferred<void>();
     this.one('load error', e => deferred.resolve());
     this.detailTable.reload();
     return deferred.promise().then(() => {
@@ -408,7 +408,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
    * Typically, this method should be used before sending a request in {@link _loadTableData} to attach the row limit constraints (if existing).
    * The contribution is only added if there is a row limit. Otherwise, the request remains untouched.
    * @example
-   * protected override _loadTableData(searchFilter: MyRestrictionDo): JQuery.Promise<MyResponseDo> {
+   * protected override _loadTableData(searchFilter: MyRestrictionDo): Promise<MyResponseDo> {
    *   const request = scout.create(MyRequestDo, {
    *       ...
    *       restriction: searchFilter
@@ -425,7 +425,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
   /**
    * see Java: AbstractPageWithTable#loadChildren that's where the table is reloaded and the tree is rebuilt, called by AbstractTree#P_UIFacade
    */
-  loadTableData(reloadReason?: TableReloadReason): JQuery.Promise<any> {
+  loadTableData(reloadReason?: TableReloadReason): Promise<any> {
     this.ensureDetailTable();
     this.detailTable.setLoading(true);
     this._reloadReason = reloadReason || this._reloadReason;
@@ -526,7 +526,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
    *
    * @example simple implementation of `_loadTableData(searchFilter)`
    * ```ts
-   * protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+   * protected override _loadTableData(searchFilter: any): Promise<any> {
    *   return ajax.postDataObject('api/foo/list', this._withMaxRowCountContribution(searchFilter));
    * }
    * ```
@@ -539,7 +539,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
    *
    * @example implementation of `_loadTableData(searchFilter)` using multiple and asynchronously created rest calls
    * ```ts
-   * protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+   * protected override _loadTableData(searchFilter: any): Promise<any> {
    *   return $.when(this._loadTableDataAsync(searchFilter));
    * }
    *
@@ -556,7 +556,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
    *
    * @param searchFilter The search filter as exported by the search form or null.
    */
-  protected _loadTableData(searchFilter: any): JQuery.Promise<any> {
+  protected _loadTableData(searchFilter: any): Promise<any> {
     return $.resolvedPromise();
   }
 

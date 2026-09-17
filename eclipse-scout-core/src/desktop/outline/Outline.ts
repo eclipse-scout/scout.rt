@@ -517,7 +517,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     // This block here is similar to what's done in Java's DefaultPageChangeStrategy
     if (activePage) {
       activePage.activate();
-      activePage.ensureLoadChildren().done(
+      activePage.ensureLoadChildren().then(
         this._onLoadChildrenDone.bind(this, activePage));
     }
   }

@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxCall, LookupResult, RestLookupCall, scout} from '../../src/index';
-import Deferred = JQuery.Deferred;
+import {AjaxCall, Deferred, LookupResult, RestLookupCall, scout} from '../../src/index';
 
 describe('RestLookupCall', () => {
 
@@ -17,9 +16,9 @@ describe('RestLookupCall', () => {
   class SpecRestLookupCall extends RestLookupCall<number> {
     declare _restriction: Record<string, any>;
     declare _ajaxCall: AjaxCall;
-    declare _deferred: Deferred<LookupResult<number>, { abort: boolean }>;
+    declare _deferred: Deferred<LookupResult<number>>;
 
-    override _call(): JQuery.Promise<LookupResult<number>> {
+    override _call(): Promise<LookupResult<number>> {
       return super._call();
     }
 

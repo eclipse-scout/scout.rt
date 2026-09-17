@@ -38,7 +38,7 @@ export class UiCallbacks extends Widget {
     });
   }
 
-  protected _convertError(error: any): JQuery.Promise<UiCallbackErrorDo> {
+  protected _convertError(error: any): Promise<UiCallbackErrorDo> {
     if (error instanceof UiCallbackErrorDo) {
       return $.resolvedPromise(error);
     }
@@ -110,7 +110,7 @@ export interface UiCallbackHandler {
    * {@link Error}) will automatically be converted to a {@link UiCallbackErrorDo} using the application's
    * {@link ErrorHandler}.
    */
-  handle(param: UiCallbackParam): JQuery.Promise<any>;
+  handle(param: UiCallbackParam): Promise<any>;
 }
 
 /**

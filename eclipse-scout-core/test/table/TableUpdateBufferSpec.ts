@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {TableSpecHelper} from '../../src/testing/index';
-import {App, ChildModelOf, ErrorHandler, scout, SmartColumn, StaticLookupCall} from '../../src/index';
+import {App, ChildModelOf, Deferred, ErrorHandler, scout, SmartColumn, StaticLookupCall} from '../../src/index';
 
 describe('TableUpdateBuffer', () => {
   let session: SandboxSession, helper: TableSpecHelper, origErrorHandler: ErrorHandler, errHandlerSpy: jasmine.Spy;
@@ -34,7 +34,7 @@ describe('TableUpdateBuffer', () => {
     let table = helper.createTable(helper.createModelFixture(2, 2));
     table.render();
 
-    let deferred = $.Deferred();
+    let deferred = new Deferred<void>();
     let promise = deferred.promise();
     table.updateBuffer.pushPromise(promise);
 
@@ -88,7 +88,7 @@ describe('TableUpdateBuffer', () => {
     let table = helper.createTable(helper.createModelFixture(2, 0));
     table.render();
 
-    let deferred = $.Deferred();
+    let deferred = new Deferred<void>();
     let promise = deferred.promise();
     table.updateBuffer.pushPromise(promise);
 

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DesktopNotification, FocusRule, scout, Session, Status, Widget} from '../index';
+import {Deferred, DesktopNotification, FocusRule, scout, Session, Status, Widget} from '../index';
 import $ from 'jquery';
 
 export interface ClipboardTextCopyOptions {
@@ -41,7 +41,7 @@ export const clipboard = {
    * @param options mandatory
    * @returns a promise or null if {@link options.showNotification} is true.
    */
-  copyText(options: ClipboardTextCopyOptions): JQuery.Promise<void> {
+  copyText(options: ClipboardTextCopyOptions): Promise<void> {
     scout.assertParameter('options', options);
     if (options.parent && !options.session) {
       options.session = options.parent.session;
@@ -58,8 +58,8 @@ export const clipboard = {
   },
 
   /** @internal */
-  _copyText(options: ClipboardTextCopyOptions): JQuery.Promise<void> {
-    let deferred = $.Deferred();
+  _copyText(options: ClipboardTextCopyOptions): Promise<void> {
+    let deferred = new Deferred<void>();
 
     // Modern clipboard API
     // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
@@ -102,7 +102,7 @@ export const clipboard = {
   },
 
   /** @internal */
-  _showNotification(options: ClipboardTextCopyOptions, promise: JQuery.Promise<void>) {
+  _showNotification(options: ClipboardTextCopyOptions, promise: Promise<void>) {
     let status = clipboard._successStatus(options.parent.session);
     promise
       .catch(() => {

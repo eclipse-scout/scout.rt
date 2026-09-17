@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AnyDoEntity, App, arrays, DisposeWidgetsHybridActionDo, Event, EventHandler, EventListener, EventMapOf, Extension, Form, HybridActionContextElements, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent,
+  AnyDoEntity, App, arrays, Deferred, DisposeWidgetsHybridActionDo, Event, EventHandler, EventListener, EventMapOf, Extension, Form, HybridActionContextElements, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent,
   HybridManagerWidgetRemoveEvent, InitModelOf, ObjectOrChildModel, objects, scout, Session, strings, UuidPool, Widget
 } from '../../index';
 
@@ -42,8 +42,8 @@ export class HybridManager extends Widget {
   // static helpers
 
   static get(session?: Session, wait?: false): HybridManager;
-  static get(session?: Session, wait?: true): JQuery.Promise<HybridManager>;
-  static get(session?: Session, wait?: boolean): HybridManager | JQuery.Promise<HybridManager> {
+  static get(session?: Session, wait?: true): Promise<HybridManager>;
+  static get(session?: Session, wait?: boolean): HybridManager | Promise<HybridManager> {
     session = session || App.get().sessions[0];
     scout.assertParameter('session', session);
 
@@ -57,7 +57,7 @@ export class HybridManager extends Widget {
       return $.resolvedPromise(findHybridManager());
     }
 
-    const deferred = $.Deferred();
+    const deferred = new Deferred<HybridManager>();
     session.desktop.one('init', e => deferred.resolve(findHybridManager()));
     return deferred.promise();
   }
@@ -227,7 +227,7 @@ export class HybridManager extends Widget {
    * @see IHybridAction
    * @see AbstractHybridAction.fireHybridActionEndEvent
    */
-  callActionAndWait(actionType: string, data?: AnyDoEntity, contextElements?: HybridActionContextElements): JQuery.Promise<AnyDoEntity> {
+  callActionAndWait(actionType: string, data?: AnyDoEntity, contextElements?: HybridActionContextElements): Promise<AnyDoEntity> {
     return this.callActionAndWaitWithContext(actionType, data, contextElements)
       .then(result => result.data);
   }
@@ -241,7 +241,7 @@ export class HybridManager extends Widget {
    * @see IHybridAction
    * @see AbstractHybridAction.fireHybridActionEndEvent
    */
-  callActionAndWaitWithContext(actionType: string, data?: AnyDoEntity, contextElements?: HybridActionContextElements): JQuery.Promise<HybridManagerActionEndEventResult> {
+  callActionAndWaitWithContext(actionType: string, data?: AnyDoEntity, contextElements?: HybridActionContextElements): Promise<HybridManagerActionEndEventResult> {
     const id = this.callAction(actionType, data, contextElements);
     return this.when(`hybridActionEnd:${id}`).then(event => ({
       data: event.data,
@@ -256,7 +256,7 @@ export class HybridManager extends Widget {
    * @param data a data object that will be passed to the hybrid action
    * @returns a promise that will be resolved once the form has been created
    */
-  openForm(modelVariant: string, data?: AnyDoEntity, contextElements?: HybridActionContextElements): JQuery.Promise<Form> {
+  openForm(modelVariant: string, data?: AnyDoEntity, contextElements?: HybridActionContextElements): Promise<Form> {
     const id = this.callAction(`scout.openForm:${modelVariant}`, data, contextElements);
     return this.when(`widgetAdd:${id}`).then(event => this._onFormAdd(event.widget as Form));
   }
@@ -268,7 +268,7 @@ export class HybridManager extends Widget {
    * @param data a data object that will be passed to the hybrid action
    * @returns a promise that will be resolved once the form has been created
    */
-  createForm(modelVariant: string, data?: AnyDoEntity, contextElements?: HybridActionContextElements): JQuery.Promise<Form> {
+  createForm(modelVariant: string, data?: AnyDoEntity, contextElements?: HybridActionContextElements): Promise<Form> {
     const id = this.callAction(`scout.createForm:${modelVariant}`, data, contextElements);
     return this.when(`widgetAdd:${id}`).then(event => this._onFormAdd(event.widget as Form));
   }
@@ -346,7 +346,7 @@ export class HybridManager extends Widget {
     super.off(type as K, handler);
   }
 
-  override when<K extends string & keyof EventMapOf<this['self']>>(type: K | `${K}:${string}`): JQuery.Promise<EventMapOf<this>[K] & Event<this>> {
+  override when<K extends string & keyof EventMapOf<this['self']>>(type: K | `${K}:${string}`): Promise<EventMapOf<this>[K] & Event<this>> {
     return super.when(type as K);
   }
 }

@@ -7,13 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AggregateTableRow, Column, graphics, Table, TableRow} from '../../index';
+import {AggregateTableRow, Column, Deferred, graphics, Table, TableRow} from '../../index';
 import $ from 'jquery';
 
 export class ColumnOptimalWidthMeasurer {
   column: Column<any>;
   table: Table;
-  deferred: JQuery.Deferred<number>;
+  deferred: Deferred<number>;
   imageCount: number;
   completeImageCount: number;
   $measurement: JQuery;
@@ -31,7 +31,7 @@ export class ColumnOptimalWidthMeasurer {
     this._columnCellContents = {};
   }
 
-  measure(): number | JQuery.Promise<number> {
+  measure(): number | Promise<number> {
     $.log.isDebugEnabled() && $.log.debug('Optimal width measuring started for column ' + this.column.id);
 
     // Table is not yet available on the column in the constructor -> set it here
@@ -69,7 +69,7 @@ export class ColumnOptimalWidthMeasurer {
     $.log.isDebugEnabled() && $.log.debug('Not all images loaded, deferring measurement for column ' + this.column.id + '. Images complete: ' + this.completeImageCount + '/' + this.imageCount);
     this.$measurement[0].addEventListener('load', this._imageLoadOrErrorHandler, true);
     this.$measurement[0].addEventListener('error', this._imageLoadOrErrorHandler, true);
-    this.deferred = $.Deferred();
+    this.deferred = new Deferred();
     return this.deferred.promise();
   }
 

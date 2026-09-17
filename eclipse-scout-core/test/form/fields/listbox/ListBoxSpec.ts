@@ -54,7 +54,7 @@ describe('ListBox', () => {
       super._lookupByAllDone(result);
     }
 
-    override _executeLookup(lookupCall: LookupCall<any>, abortExisting?: boolean): JQuery.Promise<LookupResult<any>> {
+    override _executeLookup(lookupCall: LookupCall<any>, abortExisting?: boolean): Promise<LookupResult<any>> {
       return super._executeLookup(lookupCall, abortExisting);
     }
   }
@@ -100,7 +100,7 @@ describe('ListBox', () => {
         expect(event.lookupCall instanceof DummyLookupCall).toBe(true);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
       jasmine.clock().tick(500);
     });
 
@@ -121,7 +121,7 @@ describe('ListBox', () => {
         expect(box.getCheckedLookupRows().length).toBe(1);
       })
         .catch(fail)
-        .always(done);
+        .finally(done);
       jasmine.clock().tick(500);
     });
 

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper, TestingApp} from '../src/testing/index';
-import {App} from '../src';
+import {App, Deferred} from '../src';
 
 describe('RemoteApp', () => {
   let session: SandboxSession;
@@ -37,7 +37,7 @@ describe('RemoteApp', () => {
       app._createSession = options => session;
       let loaded = false;
       session.start = () => {
-        let def = $.Deferred();
+        let def = new Deferred<void>();
         setTimeout(() => {
           loaded = true;
           def.resolve();
@@ -64,7 +64,7 @@ describe('RemoteApp', () => {
       app._createSession = options => session;
       let loaded = false;
       session.start = () => {
-        let def = $.Deferred();
+        let def = new Deferred<void>();
         setTimeout(() => {
           loaded = true;
           def.reject();

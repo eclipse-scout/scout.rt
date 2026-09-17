@@ -40,9 +40,9 @@ export class Permission implements PermissionModel {
    * Quick implies is executed synchronously while non-quick implies is executed asynchronously.
    */
   implies(permission: Permission, quick: true): boolean;
-  implies(permission: Permission, quick?: false): JQuery.Promise<boolean>;
-  implies(permission: Permission, quick?: boolean): boolean | JQuery.Promise<boolean>;
-  implies(permission: Permission, quick?: boolean): boolean | JQuery.Promise<boolean> {
+  implies(permission: Permission, quick?: false): Promise<boolean>;
+  implies(permission: Permission, quick?: boolean): boolean | Promise<boolean>;
+  implies(permission: Permission, quick?: boolean): boolean | Promise<boolean> {
     if (this.matches(permission) && this.level !== Permission.Level.NONE) {
       return quick ? this._evalPermissionQuick(permission) : this._evalPermission(permission);
     }
@@ -63,7 +63,7 @@ export class Permission implements PermissionModel {
   /**
    * Precondition: `matches(permission)`
    */
-  protected _evalPermission(permission: Permission): JQuery.Promise<boolean> {
+  protected _evalPermission(permission: Permission): Promise<boolean> {
     return $.resolvedPromise(this._evalPermissionQuick(permission));
   }
 

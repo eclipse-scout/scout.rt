@@ -170,7 +170,7 @@ export class TouchPopup extends Popup {
   protected _acceptInput() {
     let promise = this._field.acceptInput();
     if (promise) {
-      promise.always(this.close.bind(this));
+      promise.finally(this.close.bind(this));
     } else {
       this.close();
     }

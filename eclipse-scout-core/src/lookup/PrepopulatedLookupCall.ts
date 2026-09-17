@@ -7,12 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, LookupCall, LookupResult, LookupRow, QueryBy, scout, strings} from '../index';
-import $ from 'jquery';
+import {arrays, Deferred, LookupCall, LookupResult, LookupRow, QueryBy, scout, strings} from '../index';
 
 export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   lookupRows: LookupRow<TKey>[];
-  protected _deferred: JQuery.Deferred<LookupResult<TKey>>;
+  protected _deferred: Deferred<LookupResult<TKey>>;
 
   constructor() {
     super();
@@ -37,8 +36,8 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
 
   // --- ALL ---
 
-  protected override _getAll(): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected override _getAll(): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     setTimeout(this._queryByAll.bind(this));
     return this._deferred.promise();
   }
@@ -58,8 +57,8 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
 
   // --- TEXT ---
 
-  protected override _getByText(text: string): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected override _getByText(text: string): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     setTimeout(this._queryByText.bind(this, text));
     return this._deferred.promise();
   }
@@ -82,8 +81,8 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
 
   // --- KEY ---
 
-  protected override _getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected override _getByKey(key: TKey): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     setTimeout(this._queryByKey.bind(this, key));
     return this._deferred.promise();
   }
@@ -106,8 +105,8 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
 
   // --- REC ---
 
-  protected override _getByRec(rec: TKey): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected override _getByRec(rec: TKey): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     setTimeout(this._queryByRec.bind(this, rec));
     return this._deferred.promise();
   }

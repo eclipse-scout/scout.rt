@@ -142,7 +142,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
    * The default reads the display text using {@link _readDisplayText} and writes it to the model by calling {@link _triggerAcceptInput}.
    * If subclasses don't have a display-text or want to write another state to the server, they may override this method.
    */
-  acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
+  acceptInput(whileTyping?: boolean): Promise<void> | void {
     whileTyping = !!whileTyping; // cast to boolean
     let displayText = scout.nvl(this._readDisplayText(), '');
 
@@ -168,7 +168,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
    *
    * @returns `void` or a promise if an asynchronous validator has been called (see {@link ValueFieldModel.validators})
    */
-  parseAndSetValue(displayText: string): JQuery.Promise<void> | void {
+  parseAndSetValue(displayText: string): Promise<void> | void {
     this.removeErrorStatus(ParsingFailedStatus);
     let parsedValue;
     try {
@@ -366,7 +366,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
    * @returns `void` or a promise if an asynchronous validator has been called (see {@link ValueFieldModel.validators})
    * @see ValueFieldModel.value
    **/
-  setValue(value: TValue | TModelValue): JQuery.Promise<void> | void {
+  setValue(value: TValue | TModelValue): Promise<void> | void {
     // Same code as in Widget#setProperty expect for the equals check
     // -> _setValue has to be called even if the value is equal so that update display text will be executed
     value = this._prepareProperty('value', value);
@@ -400,7 +400,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
   /**
    * @returns `void` or a promise if an asynchronous validator has been called (see {@link ValueFieldModel.validators})
    */
-  protected _setValue(value: TValue | TModelValue): JQuery.Promise<void> | void {
+  protected _setValue(value: TValue | TModelValue): Promise<void> | void {
     let oldValue = this.value;
     let typedValue = null;
     try {
@@ -410,7 +410,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
       return;
     }
 
-    let valueOrPromise: TValue | JQuery.Promise<TValue>;
+    let valueOrPromise: TValue | Promise<TValue>;
     try {
       valueOrPromise = this.validateValue(typedValue);
     } catch (error) {
@@ -465,7 +465,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
    *
    * @returns `void` or a promise if an asynchronous validator has been called (see {@link ValueFieldModel.validators})
    */
-  validate(): JQuery.Promise<void> | void {
+  validate(): Promise<void> | void {
     return this._setValue(this.value);
   }
 
@@ -529,7 +529,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
    * @returns the validated value or a promise if an asynchronous validator has been called (see {@link ValueFieldModel.validators})
    * @throws a message, a {@link Status} or an {@link Error} if the validation fails
    */
-  validateValue(value: TValue): TValue | JQuery.Promise<TValue> {
+  validateValue(value: TValue): TValue | Promise<TValue> {
     let defaultValidator = this._validateValue.bind(this);
 
     // Ensure value is never undefined (necessary for updateSaveNeeded and should make it easier in general)
@@ -539,7 +539,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     return this._validateValueImpl(value, validators, defaultValidator);
   }
 
-  protected _validateValueImpl(value: TValue, validators: ValueFieldValidator<TValue>[], defaultValidator: ValueFieldValidator<TValue>): TValue | JQuery.Promise<TValue> {
+  protected _validateValueImpl(value: TValue, validators: ValueFieldValidator<TValue>[], defaultValidator: ValueFieldValidator<TValue>): TValue | Promise<TValue> {
     for (let i = 0; i < validators.length; i++) {
       const validator = validators[i];
       const valueOrPromise = validator(value, defaultValidator);
@@ -555,7 +555,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
    * @returns the validated value or a promise if the validation happens asynchronously
    * @throws a message, a {@link Status} or an {@link Error} if the validation fails
    */
-  protected _validateValue(value: TValue): TValue | JQuery.Promise<TValue> {
+  protected _validateValue(value: TValue): TValue | Promise<TValue> {
     if (typeof value === 'string' && value === '') {
       // Convert empty string to null.
       // Not using strings.nullIfEmpty is by purpose because it also removes white space characters which may not be desired here
@@ -659,18 +659,16 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     if (objects.isPromise(returned)) {
       this._updateDisplayTextPending = true;
       // Promise is returned -> set display text later
-      returned
-        .done(text => this.setDisplayText(text))
-        .fail(() => {
-          // If display text was updated in the meantime, don't override the text with an empty string
-          if (this._updateDisplayTextPending) {
-            this.setDisplayText('');
-          }
-          $.log.isInfoEnabled() && $.log.info('Could not resolve display text for value: ' + value);
-        })
-        .always(() => {
-          this._updateDisplayTextPending = false;
-        });
+      returned.then(text => this.setDisplayText(text), () => {
+        // If display text was updated in the meantime, don't override the text with an empty string
+        if (this._updateDisplayTextPending) {
+          this.setDisplayText('');
+        }
+        $.log.isInfoEnabled() && $.log.info('Could not resolve display text for value: ' + value);
+      });
+      returned.finally(() => {
+        this._updateDisplayTextPending = false;
+      });
     } else {
       this.setDisplayText(returned);
       this._updateDisplayTextPending = false;
@@ -697,7 +695,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
    *
    * @returns the formatted value as display text or a promise if the formatting happens asynchronously.
    */
-  formatValue(value: TValue): string | JQuery.Promise<string> {
+  formatValue(value: TValue): string | Promise<string> {
     let defaultFormatter = this._formatValue.bind(this);
     return this.formatter(value, defaultFormatter);
   }
@@ -705,7 +703,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
   /**
    * @returns the formatted value as display text or a promise if the formatting happens asynchronously.
    */
-  protected _formatValue(value: TValue): string | JQuery.Promise<string> {
+  protected _formatValue(value: TValue): string | Promise<string> {
     return scout.nvl(value, '') + '';
   }
 
@@ -801,6 +799,6 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
 
 export type ValueFieldClearable = EnumObject<typeof ValueField.Clearable>;
 export type ValueFieldMenuType = EnumObject<typeof ValueField.MenuType>;
-export type ValueFieldValidator<TValue> = (value: TValue, defaultValidator?: ValueFieldValidator<TValue>) => TValue | JQuery.Promise<TValue>;
-export type ValueFieldFormatter<TValue> = (value: TValue, defaultFormatter?: ValueFieldFormatter<TValue>) => string | JQuery.Promise<string>;
+export type ValueFieldValidator<TValue> = (value: TValue, defaultValidator?: ValueFieldValidator<TValue>) => TValue | Promise<TValue>;
+export type ValueFieldFormatter<TValue> = (value: TValue, defaultFormatter?: ValueFieldFormatter<TValue>) => string | Promise<string>;
 export type ValueFieldParser<TValue> = (displayText: string, defaultParser?: ValueFieldParser<TValue>) => TValue;

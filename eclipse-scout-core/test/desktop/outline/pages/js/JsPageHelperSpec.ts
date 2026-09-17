@@ -1147,7 +1147,7 @@ class MyPageWithTable extends PageWithTable {
     this.jsPageHelper.destroy();
   }
 
-  protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+  protected override _loadTableData(searchFilter: any): Promise<any> {
     return $.when(this._loadTableDataAsync(searchFilter));
   }
 
@@ -1181,7 +1181,7 @@ class MyPageWithNodes extends PageWithNodes {
     this.jsPageHelper.destroy();
   }
 
-  protected override _createChildPages(): JQuery.Promise<Page[]> {
+  protected override _createChildPages(): Promise<Page[]> {
     return $.when(this._createChildPagesAsync());
   }
 

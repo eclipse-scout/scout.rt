@@ -13,7 +13,7 @@ export class ChartTableControlConfigHelper implements ObjectWithType {
 
   objectType: string;
 
-  exportConfig(page: Page): JQuery.Promise<IChartTableControlConfigDo> {
+  exportConfig(page: Page): Promise<IChartTableControlConfigDo> {
     return $.when(this._exportConfig(page));
   }
 
@@ -21,7 +21,7 @@ export class ChartTableControlConfigHelper implements ObjectWithType {
     return null;
   }
 
-  importConfig(page: Page, config: IChartTableControlConfigDo): JQuery.Promise<void> {
+  importConfig(page: Page, config: IChartTableControlConfigDo): Promise<void> {
     return $.when(this._importConfig(page, config));
   }
 

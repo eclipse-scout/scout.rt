@@ -21,7 +21,7 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
   column: Column<TValue>;
   row: TableRow;
   cell: Cell<TValue>;
-  protected _pendingCompleteCellEdit: JQuery.Promise<void>;
+  protected _pendingCompleteCellEdit: Promise<void>;
   protected _rowOrderChangedHandler: EventHandler<TableRowOrderChangedEvent>;
   protected _keyStrokeHandler: EventHandler<KeyStrokeManagerKeyStrokeEvent>;
 
@@ -186,7 +186,7 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
    * @param waitForAcceptInput default is true
    * @returns A promise resolved when acceptInput is performed on the editor field
    */
-  completeEdit(waitForAcceptInput?: boolean): JQuery.Promise<any> {
+  completeEdit(waitForAcceptInput?: boolean): Promise<any> {
     if (this._pendingCompleteCellEdit) {
       // Make sure complete cell edit does not get sent twice since it will lead to exceptions. This may happen if user clicks very fast multiple times.
       return this._pendingCompleteCellEdit;
@@ -279,7 +279,7 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
     return true;
   }
 
-  waitForCompleteCellEdit(): JQuery.Promise<void> {
+  waitForCompleteCellEdit(): Promise<void> {
     if (this._pendingCompleteCellEdit) {
       return this._pendingCompleteCellEdit.promise();
     }

@@ -64,7 +64,7 @@ describe('CodeLookupCall', () => {
           expect(result.lookupRows[0].text).toBe('code 1');
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('returns a promise which will be rejected if key doesn\' exist', done => {
@@ -112,7 +112,7 @@ describe('CodeLookupCall', () => {
           expect(result.lookupRows.length).toBe(0);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
   });
 
@@ -131,7 +131,7 @@ describe('CodeLookupCall', () => {
           expect(result.lookupRows[1].text).toBe('child code 2b');
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('returns no lookupRows if the parent code doesn\'t have children', done => {
@@ -140,7 +140,7 @@ describe('CodeLookupCall', () => {
           expect(result.lookupRows.length).toBe(0);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('returns no lookupRows if no codes match the given text', done => {
@@ -149,7 +149,7 @@ describe('CodeLookupCall', () => {
           expect(result.lookupRows.length).toBe(0);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
   });
 
@@ -176,7 +176,7 @@ describe('CodeLookupCall', () => {
           expect(result.lookupRows[3].parentKey).toBe('code.2');
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
   });
 

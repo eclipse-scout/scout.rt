@@ -50,7 +50,7 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
     let hasPopup = !!this.popup;
     let promise = this.acceptInput();
     if (promise) {
-      promise.always(this.closePopup.bind(this));
+      promise.finally(this.closePopup.bind(this));
     } else {
       this.closePopup();
     }
@@ -83,7 +83,7 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
     return value;
   }
 
-  protected override _validateValue(value: string): string | JQuery.Promise<string> {
+  protected override _validateValue(value: string): string | Promise<string> {
     if (objects.isNullOrUndefined(value)) {
       return value;
     }
@@ -177,7 +177,7 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
     this.setValue(otherField.value);
   }
 
-  protected override _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<string>): JQuery.Promise<void> | void {
+  protected override _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<string>): Promise<void> | void {
     if (this.touchMode) {
       $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) Always send acceptInput for touch field');
       // When the lookup is accepted by text (e.g. when lookupOnAcceptByText = true), the SmartField#acceptInput cannot

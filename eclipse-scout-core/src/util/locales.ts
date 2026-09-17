@@ -13,9 +13,9 @@ import $ from 'jquery';
 export const locales = {
   localesMap: {},
 
-  bootstrap(url: string): JQuery.Promise<void> {
-    let promise: JQuery.Promise<any> = url ? $.ajaxJson(url) : $.resolvedPromise([]);
-    return promise.then(locales._handleBootstrapResponse.bind(this, url));
+  bootstrap(url: string): Promise<void> {
+    let promise: PromiseLike<any> = url ? $.ajaxJson(url) : $.resolvedPromise([]);
+    return Promise.resolve(promise).then(locales._handleBootstrapResponse.bind(this, url));
   },
 
   /** @internal */

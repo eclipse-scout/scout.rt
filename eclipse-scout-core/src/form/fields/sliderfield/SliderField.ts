@@ -143,7 +143,7 @@ export class SliderField extends NumberField implements SliderFieldModel {
     }
   }
 
-  protected override _validateValue(value: number): number | JQuery.Promise<number> {
+  protected override _validateValue(value: number): number | Promise<number> {
     return super._validateValue(scout.nvl(value, this.minValue));
   }
 

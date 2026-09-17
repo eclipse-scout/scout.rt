@@ -25,11 +25,11 @@ describe('AccessControl', () => {
   class SpecAccessControl extends AccessControl {
     declare _permissionCollection: PermissionCollection;
 
-    override _load(): JQuery.Promise<void> {
+    override _load(): Promise<void> {
       return super._load();
     }
 
-    protected override _subscribeForNotifications(): JQuery.Promise<string> {
+    protected override _subscribeForNotifications(): Promise<string> {
       return $.resolvedPromise();
     }
 
@@ -78,7 +78,7 @@ describe('AccessControl', () => {
       expect(await accessControl.check(Permission.quick('test'))).toBeFalse();
     });
 
-    it('keeps last collection if request fails', () => {
+    it('keeps last collection if request fails', async () => {
       const accessControl = scout.create(SpecAccessControl, {permissionsUrl: 'permissions'});
 
       accessControl._load();
@@ -110,9 +110,9 @@ describe('AccessControl', () => {
       expect(accessControl.check(Permission.quick('other'), true)).toBeTrue();
       expect(accessControl.check(Permission.quick('test'), true)).toBeFalse();
 
-      accessControl.check(Permission.quick('some')).then(result => expect(result).toBeTrue());
-      accessControl.check(Permission.quick('other')).then(result => expect(result).toBeTrue());
-      accessControl.check(Permission.quick('test')).then(result => expect(result).toBeFalse());
+      await expectAsync(accessControl.check(Permission.quick('some'))).toBeResolvedTo(true);
+      await expectAsync(accessControl.check(Permission.quick('other'))).toBeResolvedTo(true);
+      await expectAsync(accessControl.check(Permission.quick('test'))).toBeResolvedTo(false);
 
       accessControl._load();
       jasmine.clock().tick(1000);
@@ -128,9 +128,9 @@ describe('AccessControl', () => {
       expect(accessControl.check(Permission.quick('other'), true)).toBeTrue();
       expect(accessControl.check(Permission.quick('test'), true)).toBeFalse();
 
-      accessControl.check(Permission.quick('some')).then(result => expect(result).toBeTrue());
-      accessControl.check(Permission.quick('other')).then(result => expect(result).toBeTrue());
-      accessControl.check(Permission.quick('test')).then(result => expect(result).toBeFalse());
+      await expectAsync(accessControl.check(Permission.quick('some'))).toBeResolvedTo(true);
+      await expectAsync(accessControl.check(Permission.quick('other'))).toBeResolvedTo(true);
+      await expectAsync(accessControl.check(Permission.quick('test'))).toBeResolvedTo(false);
 
       accessControl._load();
       jasmine.clock().tick(1000);
@@ -149,10 +149,9 @@ describe('AccessControl', () => {
       expect(accessControl.check(Permission.quick('other'), true)).toBeTrue();
       expect(accessControl.check(Permission.quick('test'), true)).toBeTrue();
 
-      accessControl.check(Permission.quick('some')).then(result => expect(result).toBeTrue());
-      accessControl.check(Permission.quick('other')).then(result => expect(result).toBeTrue());
-      accessControl.check(Permission.quick('test')).then(result => expect(result).toBeTrue());
-      jasmine.clock().tick(1);
+      await expectAsync(accessControl.check(Permission.quick('some'))).toBeResolvedTo(true);
+      await expectAsync(accessControl.check(Permission.quick('other'))).toBeResolvedTo(true);
+      await expectAsync(accessControl.check(Permission.quick('test'))).toBeResolvedTo(true);
     });
 
     it('creates NONE collection by default', () => {
