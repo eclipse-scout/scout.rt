@@ -39,7 +39,7 @@ export class FormFieldValidationResultProvider implements ObjectWithType {
     };
   }
 
-  protected _validatePendingPromise(): JQuery.Promise<void> {
+  protected _validatePendingPromise(): Promise<void> {
     if (this.field instanceof ValueField && this.field.validatePending) {
       return this.field.when('propertyChange:validatePending').then(() => undefined);
     }

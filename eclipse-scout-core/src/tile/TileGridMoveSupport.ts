@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {graphics, MoveData, MoveSupport, Rectangle, scout, Tile, TileGrid} from '../index';
+import {Deferred, graphics, MoveData, MoveSupport, Rectangle, scout, Tile, TileGrid} from '../index';
 
 export class TileGridMoveSupport extends MoveSupport<Tile> {
   declare _moveData: TileMoveData;
@@ -36,7 +36,7 @@ export class TileGridMoveSupport extends MoveSupport<Tile> {
     this._moveData.tileBelowCursor = tileBelowCursor;
   }
 
-  protected override _dragEnd(event: JQuery.MouseUpEvent): JQuery.Promise<Rectangle> {
+  protected override _dragEnd(event: JQuery.MouseUpEvent): Promise<Rectangle> {
     if (!this._moveData.tileBelowCursor) {
       return super._dragEnd(event);
     }
@@ -47,7 +47,7 @@ export class TileGridMoveSupport extends MoveSupport<Tile> {
     this.widget.swapTileBounds(draggedTile, tileBelowCursor);
 
     // Update element infos right after layout is done but BEFORE animation starts to get the final position of the tiles
-    let deferred = $.Deferred();
+    let deferred = new Deferred<Rectangle>();
     // Wait for layout to get correct target dimensions (grid cells may have changed size and position)
     // Cannot use 'when' because the promise would resolve while the bounds animation is already running
     this.widget.one('layoutDone', () => {

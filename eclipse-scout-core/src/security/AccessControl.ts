@@ -39,7 +39,7 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
     this.permissionsUrl = scout.assertParameter('permissionsUrl', model.permissionsUrl);
   }
 
-  bootstrap(): JQuery.Promise<void> {
+  bootstrap(): Promise<void> {
     return this._subscribeForNotifications()
       .then(() => this._load());
   }
@@ -48,7 +48,7 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
     this._unsubscribeFromNotifications();
   }
 
-  protected _subscribeForNotifications(): JQuery.Promise<string> {
+  protected _subscribeForNotifications(): Promise<string> {
     return uiNotifications.subscribe('permissionsUpdate', this._permissionUpdateEventHandler);
   }
 
@@ -74,9 +74,9 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
     }, reloadDelay);
   }
 
-  protected _load(): JQuery.Promise<void> {
+  protected _load(): Promise<void> {
     return this._loadPermissionCollection()
-      .always(() => {
+      .finally(() => {
         this._call = null; // call ended. Not necessary anymore
       })
       .then(model => {
@@ -85,7 +85,7 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
       });
   }
 
-  protected _loadPermissionCollection(): JQuery.Promise<PermissionCollectionDo, AjaxError> {
+  protected _loadPermissionCollection(): Promise<PermissionCollectionDo> {
     this._call?.abort(); // abort in case there is already a call running
     this._call = ajax.createCallDataObject({
       url: this.permissionsUrl,
@@ -103,9 +103,9 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
    * Quick check is executed synchronously while non-quick check is executed asynchronously.
    */
   check(permission: Permission, quick: true): boolean;
-  check(permission: Permission, quick?: false): JQuery.Promise<boolean>;
-  check(permission: Permission, quick?: boolean): boolean | JQuery.Promise<boolean>;
-  check(permission: Permission, quick?: boolean): boolean | JQuery.Promise<boolean> {
+  check(permission: Permission, quick?: false): Promise<boolean>;
+  check(permission: Permission, quick?: boolean): boolean | Promise<boolean>;
+  check(permission: Permission, quick?: boolean): boolean | Promise<boolean> {
     if (!this._permissionCollection) {
       return quick ? false : $.resolvedPromise(false);
     }
