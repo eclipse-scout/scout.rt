@@ -39,7 +39,7 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
     this.permissionsUrl = scout.assertParameter('permissionsUrl', model.permissionsUrl);
   }
 
-  bootstrap(): JQuery.Promise<void> {
+  bootstrap(): Promise<void> {
     return this._subscribeForNotifications()
       .then(() => this._load());
   }
@@ -48,7 +48,7 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
     this._unsubscribeFromNotifications();
   }
 
-  protected _subscribeForNotifications(): JQuery.Promise<string> {
+  protected _subscribeForNotifications(): Promise<string> {
     return uiNotifications.subscribe('permissionsUpdate', this._permissionUpdateEventHandler);
   }
 
@@ -74,20 +74,9 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
     }, reloadDelay);
   }
 
-  protected _load(): JQuery.Promise<void> {
-    return this._loadPermissionCollection()
-      .always(() => {
-        this._call = null; // call ended. Not necessary anymore
-      })
-      .then(model => {
-        // update permission collection
-        this._permissionCollection = PermissionCollection.ensure(model);
-      });
-  }
-
-  protected _loadPermissionCollection(): JQuery.Promise<PermissionCollectionDo, AjaxError> {
+  protected _load(): Promise<void> {
     this._call?.abort(); // abort in case there is already a call running
-    this._call = ajax.createCallDataObject({
+    const call = ajax.createCallDataObject({
       url: this.permissionsUrl,
       method: 'GET',
       cache: true
@@ -95,7 +84,17 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
       maxRetries: -1, // unlimited retries
       retryIntervals: [300, 500, 1000, 5000]
     });
-    return this._call.call();
+    this._call = call;
+    return call.call()
+      .finally(() => {
+        if (this._call === call) {
+          this._call = null; // Call ended. Not necessary anymore, reset unless a newer call has replaced it
+        }
+      })
+      .then(model => {
+        // update permission collection
+        this._permissionCollection = PermissionCollection.ensure(model);
+      });
   }
 
   /**
@@ -103,9 +102,9 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
    * Quick check is executed synchronously while non-quick check is executed asynchronously.
    */
   check(permission: Permission, quick: true): boolean;
-  check(permission: Permission, quick?: false): JQuery.Promise<boolean>;
-  check(permission: Permission, quick?: boolean): boolean | JQuery.Promise<boolean>;
-  check(permission: Permission, quick?: boolean): boolean | JQuery.Promise<boolean> {
+  check(permission: Permission, quick?: false): Promise<boolean>;
+  check(permission: Permission, quick?: boolean): boolean | Promise<boolean>;
+  check(permission: Permission, quick?: boolean): boolean | Promise<boolean> {
     if (!this._permissionCollection) {
       return quick ? false : $.resolvedPromise(false);
     }

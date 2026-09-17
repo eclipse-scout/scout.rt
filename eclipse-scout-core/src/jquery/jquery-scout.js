@@ -11,7 +11,7 @@
  * jQuery plugin with scout extensions
  */
 import $ from 'jquery';
-import {App, aria, arrays, Device, Dimension, events, fields, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
+import {App, aria, arrays, Deferred, Device, Dimension, events, fields, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
 
 // === internal methods ===
 
@@ -216,7 +216,7 @@ $.negate = fx => function(...args) {
 
 $.injectScript = (url, options) => {
   options = options || {};
-  let deferred = $.Deferred();
+  let deferred = new Deferred();
 
   let myDocument = options.document || window.document;
   let scriptTag = myDocument.createElement('script');
@@ -248,7 +248,7 @@ $.injectScript = (url, options) => {
 
 $.injectStyleSheet = (url, options) => {
   options = options || {};
-  let deferred = $.Deferred();
+  let deferred = new Deferred();
 
   let myDocument = options.document || window.document;
   let linkTag = myDocument.createElement('link');
@@ -305,40 +305,27 @@ $.pxToNumber = pixel => {
   return parseFloat(pixel);
 };
 
-$.resolvedDeferred = (...args) => {
-  let deferred = $.Deferred();
-  deferred.resolve(...args);
+/**
+ * @deprecated Use {@link resolvedPromise} instead.
+ */
+$.resolvedDeferred = value => {
+  let deferred = new Deferred();
+  deferred.resolve(value);
   return deferred;
 };
 
-$.resolvedPromise = (...args) => {
-  let deferred = $.Deferred();
-  deferred.resolve(...args);
-  return deferred.promise();
-};
+$.resolvedPromise = value => Promise.resolve(value);
 
-$.rejectedPromise = (...args) => {
-  let deferred = $.Deferred();
-  deferred.reject(...args);
-  return deferred.promise();
-};
+$.rejectedPromise = reason => Promise.reject(reason);
 
-$.promiseAll = (promises, asArray) => {
-  asArray = scout.nvl(asArray, false);
-  promises = arrays.ensure(promises);
-  let deferred = $.Deferred();
-  $.when(...promises).done((...args) => {
-    if (asArray) {
-      deferred.resolve(args);
-    } else {
-      deferred.resolve(...args);
-    }
-  }).fail((...args) => {
-    deferred.reject(...args);
-  });
-  return deferred.promise();
-};
+/**
+ * @deprecated use {@link Promise.all} instead.
+ */
+$.promiseAll = promises => Promise.all(arrays.ensure(promises));
 
+/**
+ * @deprecated use `ajax.getJson()` instead.
+ */
 $.ajaxJson = url => $.ajax({
   url: url,
   dataType: 'json',
@@ -347,7 +334,7 @@ $.ajaxJson = url => $.ajax({
   // Reject the promise with usual arguments (jqXHR, textStatus, errorThrown), but add the request
   // options as additional argument (e.g. to make the URL available to the error handler)
   args.push(this);
-  return $.rejectedPromise(...args);
+  return $.rejectedPromise(args);
 });
 
 $.isJqXHR = obj => (typeof obj === 'object' && obj.hasOwnProperty('readyState') && obj.hasOwnProperty('status') && obj.hasOwnProperty('statusText'));

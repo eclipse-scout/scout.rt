@@ -47,7 +47,7 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
   /**
    * Loads code types from the main system using the url configuration of that {@link System}.
    */
-  bootstrapSystem(): JQuery.Promise<void> {
+  bootstrapSystem(): Promise<void> {
     const url = systems.getOrCreate().getEndpointUrl('codes');
     return this.bootstrap(url);
   }
@@ -55,7 +55,7 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
   /**
    * Initializes the code type map with the result of the given REST url.
    */
-  bootstrap(url: string): JQuery.Promise<void> {
+  bootstrap(url: string): Promise<void> {
     if (!url) {
       return $.resolvedPromise();
     }
@@ -69,22 +69,25 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
    * @param codeTypeIds Optional list of {@link CodeType.id} to load. If not specified, all are loaded.
    * @returns The newly loaded {@link CodeType} instances.
    */
-  loadCodeTypes(codeTypeIds?: string[]): JQuery.Promise<CodeType<any, any, any>[]> {
+  loadCodeTypes(codeTypeIds?: string[]): Promise<CodeType<any, any, any>[]> {
     if (!this.url) {
       return $.resolvedPromise([]);
     }
     const request = codeTypeIds?.length ? scout.create(CodeTypeRequest, {codeTypeIds}) : null;
     this._call?.abort(); // abort in case there is already a call running
-    this._call = ajax.createCallDataObject({
+    const call = ajax.createCallDataObject({
       url: this.url,
       method: 'PUT'
     }, request, {
       maxRetries: -1, // unlimited retries, ensure the cache will be updated eventually in case of network errors
       retryIntervals: [300, 500, 1000, 5000]
     });
-    return this._call.call()
-      .always(() => {
-        this._call = null; // call ended. Not necessary anymore
+    this._call = call;
+    return call.call()
+      .finally(() => {
+        if (this._call === call) {
+          this._call = null; // Call ended. Not necessary anymore, reset unless a newer call has replaced it
+        }
       })
       .then(this._handleCodesResponse.bind(this));
   }

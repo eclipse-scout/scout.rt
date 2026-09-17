@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,7 +17,6 @@ describe('TreeProposalChooser', () => {
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
-    jasmine.clock().install();
   });
 
   afterEach(() => {
@@ -142,7 +141,7 @@ describe('TreeProposalChooser', () => {
       expect(chooser.content.nodes[1].parentNode).toBe(null);
     });
 
-    it('clears the field if a lookup row with key null is selected', () => {
+    it('clears the field if a lookup row with key null is selected', async () => {
       let smartField = scout.create(SmartField, {
         parent: session.desktop,
         browseHierarchy: true,
@@ -156,13 +155,13 @@ describe('TreeProposalChooser', () => {
       });
       smartField.render();
       smartField.setValue(1);
-      jasmine.clock().tick(300);
+      await smartField.when('lookupCallDone');
       expect(smartField.value).toBe(1);
       expect(smartField.displayText).toBe('Value 1');
 
       // Selecting lookup row with null key clears the field
       smartField.requestInput();
-      jasmine.clock().tick(300);
+      await smartField.when('lookupCallDone');
       let popup = smartField.popup as SmartFieldPopup<number>;
       let chooser = popup.proposalChooser;
       chooser.content.selectNode(chooser.content.nodes[0]);
@@ -171,7 +170,9 @@ describe('TreeProposalChooser', () => {
       expect(smartField.displayText).toBe('');
     });
 
-    it('allows selecting lookup row with null key by typing', () => {
+    it('allows selecting lookup row with null key by typing', async () => {
+      jasmine.clock().install();
+      jasmine.clock().autoTick();
       let smartField = scout.create(SmartField, {
         parent: session.desktop,
         browseHierarchy: true,
@@ -187,7 +188,7 @@ describe('TreeProposalChooser', () => {
       });
       smartField.render();
       smartField.setValue(1);
-      jasmine.clock().tick(300);
+      await smartField.when('lookupCallDone');
       expect(smartField.value).toBe(1);
       expect(smartField.displayText).toBe('Value 1');
 
@@ -195,7 +196,8 @@ describe('TreeProposalChooser', () => {
       smartField.$field.val('Null');
       // @ts-expect-error
       smartField._onFieldKeyUp({});
-      jasmine.clock().tick(300);
+      await smartField.when('lookupCallDone');
+      await sleep(300);
       let popup = smartField.popup as SmartFieldPopup<number>;
       let chooser = popup.proposalChooser;
       expect(chooser.content.nodes.length).toBe(1);
