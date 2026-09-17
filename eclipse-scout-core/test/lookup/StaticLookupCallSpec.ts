@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {scout} from '../../src/index';
-import {ActiveDummyLookupCall} from '../../src/testing';
+import {BaseDoEntity, scout, StaticLookupCall, typeName} from '../../src/index';
+import {ActiveDummyLookupCall, DummyLookupCall} from '../../src/testing';
 
 describe('StaticLookupCall', () => {
 
@@ -70,12 +70,13 @@ describe('StaticLookupCall', () => {
   });
 
   it('filter: text', () => {
-    let lookupCall = scout.create('DummyLookupCall', {
+    let lookupCall = scout.create(DummyLookupCall, {
       session: session
     });
 
     const expectLookupRows = result => expect(result.lookupRows.map(row => row.text));
 
+    // @ts-expect-error
     lookupCall.getByText().then(result => expectLookupRows(result).toEqual(['Foo', 'Bar', 'Baz']));
     jasmine.clock().tick(500);
 
@@ -116,4 +117,68 @@ describe('StaticLookupCall', () => {
     jasmine.clock().tick(500);
   });
 
+  it('filter: key', () => {
+    let lookupCall = scout.create(DummyLookupCall, {
+      session: session
+    });
+
+    const expectLookupRows = result => expect(result.lookupRows.map(row => row.text));
+    const assertNoSuccess = () => fail('call should have failed, but succeeded');
+    const assertNoFailure = () => fail('call should have succeeded, but failed');
+
+    // @ts-expect-error
+    lookupCall.getByKey().then(assertNoSuccess);
+    jasmine.clock().tick(500);
+    lookupCall.getByKey(1).then(result => expectLookupRows(result).toEqual(['Foo'])).catch(assertNoFailure);
+    jasmine.clock().tick(500);
+    lookupCall.getByKey(2).then(result => expectLookupRows(result).toEqual(['Bar'])).catch(assertNoFailure);
+    jasmine.clock().tick(500);
+    lookupCall.getByKeys([1, 2]).then(result => expectLookupRows(result).toEqual(['Foo', 'Bar'])).catch(assertNoFailure);
+    jasmine.clock().tick(500);
+    lookupCall.getByKeys([2, 1]).then(result => expectLookupRows(result).toEqual(['Bar', 'Foo'])).catch(assertNoFailure);
+    jasmine.clock().tick(500);
+    lookupCall.getByKeys([3]).then(result => expectLookupRows(result).toEqual(['Baz'])).catch(assertNoFailure);
+    jasmine.clock().tick(500);
+    lookupCall.getByKey(5).then(assertNoSuccess);
+    jasmine.clock().tick(500);
+  });
+
+  it('filter: key (data object)', () => {
+    @typeName('scout.SpecDo')
+    class SpecDo extends BaseDoEntity {
+      id: string;
+    }
+
+    class SpecLookupCall extends StaticLookupCall<SpecDo> {
+      protected override _data(): any[] {
+        return [
+          [scout.create(SpecDo, {id: '1'}), 'Foo'],
+          [scout.create(SpecDo, {id: '2'}), 'Bar'],
+          [scout.create(SpecDo, {id: '3'}), 'Baz']
+        ];
+      }
+    }
+
+    const lookupCall = scout.create(SpecLookupCall, {session});
+
+    const expectLookupRows = result => expect(result.lookupRows.map(row => row.text));
+    const assertNoSuccess = () => fail('call should have failed, but succeeded');
+    const assertNoFailure = () => fail('call should have succeeded, but failed');
+
+    // @ts-expect-error
+    lookupCall.getByKey().then(assertNoSuccess);
+    jasmine.clock().tick(500);
+    lookupCall.getByKey(scout.create(SpecDo, {id: '1'})).then(result => expectLookupRows(result).toEqual(['Foo'])).catch(assertNoFailure);
+    jasmine.clock().tick(500);
+    lookupCall.getByKey(scout.create(SpecDo, {id: '2'})).then(result => expectLookupRows(result).toEqual(['Bar'])).catch(assertNoFailure);
+    jasmine.clock().tick(500);
+    lookupCall.getByKeys([scout.create(SpecDo, {id: '1'}), scout.create(SpecDo, {id: '2'})]).then(result => expectLookupRows(result).toEqual(['Foo', 'Bar'])).catch(assertNoFailure);
+    jasmine.clock().tick(500);
+    lookupCall.getByKeys([scout.create(SpecDo, {id: '2'}), scout.create(SpecDo, {id: '1'})]).then(result => expectLookupRows(result).toEqual(['Bar', 'Foo'])).catch(assertNoFailure);
+    jasmine.clock().tick(500);
+    lookupCall.getByKeys([scout.create(SpecDo, {id: '3'})]).then(result => expectLookupRows(result).toEqual(['Baz'])).catch(assertNoFailure);
+    jasmine.clock().tick(500);
+    lookupCall.getByKey(scout.create(SpecDo, {id: '5'})).then(assertNoSuccess);
+    jasmine.clock().tick(500);
+  });
 });
