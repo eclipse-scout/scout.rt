@@ -11,7 +11,7 @@
  * jQuery plugin with scout extensions
  */
 import $ from 'jquery';
-import {App, aria, arrays, Device, Dimension, events, fields, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
+import {App, aria, arrays, Deferred, Device, Dimension, events, fields, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
 
 // === internal methods ===
 
@@ -216,7 +216,7 @@ $.negate = fx => function(...args) {
 
 $.injectScript = (url, options) => {
   options = options || {};
-  let deferred = $.Deferred();
+  let deferred = new Deferred();
 
   let myDocument = options.document || window.document;
   let scriptTag = myDocument.createElement('script');
@@ -248,7 +248,7 @@ $.injectScript = (url, options) => {
 
 $.injectStyleSheet = (url, options) => {
   options = options || {};
-  let deferred = $.Deferred();
+  let deferred = new Deferred();
 
   let myDocument = options.document || window.document;
   let linkTag = myDocument.createElement('link');
@@ -305,38 +305,40 @@ $.pxToNumber = pixel => {
   return parseFloat(pixel);
 };
 
+// a native promise only supports a single resolved/rejected value, so 0 args resolve to undefined,
+// 1 arg is passed through as-is, and 2+ args are collapsed into a single array
+// TODO CGU the explanation makes no sense to me, implementation returns value of [0] or undefined if array has one or none values, otherwise it returns the array
+function _singleValue(args) {
+  return args.length <= 1 ? args[0] : args;
+}
+
 $.resolvedDeferred = (...args) => {
-  let deferred = $.Deferred();
-  deferred.resolve(...args);
+  let deferred = new Deferred();
+  deferred.resolve(_singleValue(args));
   return deferred;
 };
 
 $.resolvedPromise = (...args) => {
-  let deferred = $.Deferred();
-  deferred.resolve(...args);
+  let deferred = new Deferred();
+  deferred.resolve(_singleValue(args));
   return deferred.promise();
 };
 
 $.rejectedPromise = (...args) => {
-  let deferred = $.Deferred();
-  deferred.reject(...args);
+  let deferred = new Deferred();
+  deferred.reject(_singleValue(args));
   return deferred.promise();
 };
 
 $.promiseAll = (promises, asArray) => {
   asArray = scout.nvl(asArray, false);
   promises = arrays.ensure(promises);
-  let deferred = $.Deferred();
-  $.when(...promises).done((...args) => {
+  return Promise.all(promises).then(results => {
     if (asArray) {
-      deferred.resolve(args);
-    } else {
-      deferred.resolve(...args);
+      return results;
     }
-  }).fail((...args) => {
-    deferred.reject(...args);
+    return _singleValue(results);
   });
-  return deferred.promise();
 };
 
 $.ajaxJson = url => $.ajax({
