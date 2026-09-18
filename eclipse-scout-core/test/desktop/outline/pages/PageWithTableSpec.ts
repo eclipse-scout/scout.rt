@@ -766,7 +766,7 @@ describe('PageWithTable', () => {
     let loadTableDataDeferred: Deferred<any>;
     const resetLoadTableData = () => {
       loadTableDataDeferred = new Deferred();
-      page._loadTableData = searchFilter => $.when(loadTableDataDeferred.promise());
+      page._loadTableData = searchFilter => loadTableDataDeferred.promise();
     };
 
     let loadTableDataPromise: Promise<any>;

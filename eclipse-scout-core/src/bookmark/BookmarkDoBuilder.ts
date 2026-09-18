@@ -62,7 +62,7 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
   // --------------------------------------
 
   build(): Promise<IBookmarkDo> {
-    return $.when(this._build());
+    return this._build();
   }
 
   protected async _build(): Promise<IBookmarkDo> {

@@ -100,13 +100,17 @@ export class BatchCall<TKey, TValue> {
 
     this._resetBatchCall();
 
-    let promise: Promise<BatchCallResult<TKey, TValue>>;
+    let promise: Promise<void>;
     if (this._coalesceKeys) {
       const serializedIndex = this._createSerializedIndex(keySet);
       const uniqueKeys = [...serializedIndex.values()].map(keys => keys[0]);
-      promise = this._doBatchCall(uniqueKeys).then(response => deferred.resolve(this._createBatchCallResultCoalesced(response, serializedIndex)));
+      promise = this._doBatchCall(uniqueKeys).then(response => {
+        deferred.resolve(this._createBatchCallResultCoalesced(response, serializedIndex));
+      });
     } else {
-      promise = this._doBatchCall([...keySet]).then(response => deferred.resolve(response));
+      promise = this._doBatchCall([...keySet]).then(response => {
+        deferred.resolve(response);
+      });
     }
     promise.catch(error => deferred.reject(error));
   }
@@ -132,11 +136,11 @@ export class BatchCall<TKey, TValue> {
 
   protected _doBatchCall(keys: TKey[]): Promise<BatchCallResult<TKey, TValue>> {
     if (arrays.empty(keys)) {
-      return $.resolvedPromise();
+      return $.resolvedPromise(new Map());
     }
 
     try {
-      return this._batchCall(keys) ?? $.resolvedPromise();
+      return this._batchCall(keys) ?? $.resolvedPromise(new Map());
     } catch (error) {
       return $.rejectedPromise(error);
     }

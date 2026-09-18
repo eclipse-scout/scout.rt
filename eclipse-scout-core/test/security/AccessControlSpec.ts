@@ -30,7 +30,7 @@ describe('AccessControl', () => {
     }
 
     protected override _subscribeForNotifications(): Promise<string> {
-      return $.resolvedPromise();
+      return $.resolvedPromise('');
     }
 
     protected override _unsubscribeFromNotifications() {

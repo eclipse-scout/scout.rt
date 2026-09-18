@@ -34,7 +34,7 @@ export const defaultValues = {
     };
     options = $.extend({}, defaultOptions, options);
     // Load default value configuration from server (and cache it)
-    return $.ajaxJson(options.url)
+    return Promise.resolve($.ajaxJson(options.url))
       .then(response => App.handleJsonError(options.url, response))
       .then(defaultValues.init.bind(this));
   },

@@ -44,7 +44,7 @@ describe('ErrorHandler', () => {
       errorHandler = scout.create(ErrorHandler);
       spyOn(errorHandler, 'analyzeError').and.callThrough();
 
-      (function() {
+      (function(...args: any[]) {
         // eslint-disable-next-line prefer-rest-params
         errorHandler.handle(arguments);
       })('err', 'a', 'b');

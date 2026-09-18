@@ -383,7 +383,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       });
     }
 
-    function onAjaxFail(jqXHR: JQuery.jqXHR, textStatus: ErrorTextStatus, errorThrown: string, ...args: any[]): Promise<any> {
+    function onAjaxFail(jqXHR: JQuery.jqXHR, textStatus?: ErrorTextStatus, errorThrown?: string, ...args: any[]): Promise<any> {
       this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
       return $.rejectedPromise(jqXHR, textStatus, errorThrown, ...args);
     }

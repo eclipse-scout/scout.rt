@@ -14,7 +14,7 @@ export class ChartTableControlConfigHelper implements ObjectWithType {
   objectType: string;
 
   exportConfig(page: Page): Promise<IChartTableControlConfigDo> {
-    return $.when(this._exportConfig(page));
+    return this._exportConfig(page);
   }
 
   protected async _exportConfig(page: Page): Promise<IChartTableControlConfigDo> {
@@ -22,7 +22,7 @@ export class ChartTableControlConfigHelper implements ObjectWithType {
   }
 
   importConfig(page: Page, config: IChartTableControlConfigDo): Promise<void> {
-    return $.when(this._importConfig(page, config));
+    return this._importConfig(page, config);
   }
 
   protected async _importConfig(page: Page, config: IChartTableControlConfigDo): Promise<void> {

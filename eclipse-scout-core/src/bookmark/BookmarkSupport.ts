@@ -187,7 +187,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * @param options Optional settings to change the behavior of this method
    */
   activateBookmark(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): Promise<void> {
-    return $.when(this._activateBookmarkAsync(bookmark, options));
+    return this._activateBookmarkAsync(bookmark, options);
   }
 
   // Native-promise version of activateBookmark()
@@ -236,7 +236,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * @return the result of the activation, or `null` if activation failed and the error was already handled by this method
    */
   activateBookmarkPath(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): Promise<ActivateBookmarkPathResult> {
-    return $.when(this._activateBookmarkPathAsync(param, options));
+    return this._activateBookmarkPathAsync(param, options);
   }
 
   // Native-promise version of activateBookmarkPath()
@@ -461,7 +461,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * reload is done.
    */
   applyBookmarkToPageAndReload(page: Page, bookmark: IBookmarkDo, saveState = true): Promise<void> {
-    return $.when(this._applyBookmarkToPageAndReloadAsync(page, bookmark, saveState));
+    return this._applyBookmarkToPageAndReloadAsync(page, bookmark, saveState);
   }
 
   // Native-promise version of applyBookmarkToPageAndReload()

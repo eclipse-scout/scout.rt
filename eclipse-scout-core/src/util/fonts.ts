@@ -53,7 +53,8 @@ export interface FontPreloadOptions {
 }
 
 export const fonts = {
-  _deferred: new Deferred<void>(),
+  // Not created eagerly: this module may be evaluated before util/promises.ts due to circular imports in the barrel, which would leave Deferred undefined at this point.
+  _deferred: null as Deferred<void>,
 
   /**
    * Indicates whether all fonts have been loaded successfully. Check this variable before
@@ -90,11 +91,19 @@ export const fonts = {
             'characters to TEST_STRING before calling app.init().');
         }
         fonts.loadingComplete = true;
-        fonts._deferred.resolve();
+        fonts._ensureDeferred().resolve();
       }
     });
 
     return $.resolvedPromise();
+  },
+
+  /** @internal */
+  _ensureDeferred(): Deferred<void> {
+    if (!fonts._deferred) {
+      fonts._deferred = new Deferred();
+    }
+    return fonts._deferred;
   },
 
   /**
@@ -105,7 +114,7 @@ export const fonts = {
    * is true, because the promise will never be resolved.
    */
   preloader(): Promise<void> {
-    return fonts._deferred.promise();
+    return fonts._ensureDeferred().promise();
   },
 
   TEST_FONTS: 'monospace',

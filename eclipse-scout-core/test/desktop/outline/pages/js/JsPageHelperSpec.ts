@@ -1148,7 +1148,7 @@ class MyPageWithTable extends PageWithTable {
   }
 
   protected override _loadTableData(searchFilter: any): Promise<any> {
-    return $.when(this._loadTableDataAsync(searchFilter));
+    return this._loadTableDataAsync(searchFilter);
   }
 
   protected async _loadTableDataAsync(searchFilter: any): Promise<any> {
@@ -1182,7 +1182,7 @@ class MyPageWithNodes extends PageWithNodes {
   }
 
   protected override _createChildPages(): Promise<Page[]> {
-    return $.when(this._createChildPagesAsync());
+    return this._createChildPagesAsync();
   }
 
   protected async _createChildPagesAsync(): Promise<Page[]> {

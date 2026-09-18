@@ -523,7 +523,9 @@ export class Form extends Widget implements FormModel, DisplayParent {
   protected _onLifecyclePostLoad(): Promise<void> {
     try {
       return this._postLoad()
-        .then(() => this.trigger('postLoad'))
+        .then(() => {
+          this.trigger('postLoad');
+        })
         .catch(error => this._handlePostLoadErrorInternal(error));
     } catch (error) {
       return this._handlePostLoadErrorInternal(error);

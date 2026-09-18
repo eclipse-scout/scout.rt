@@ -439,20 +439,17 @@ export class PageWithTable extends Page implements PageWithTableModel {
     this._abortController?.abort();
     this._abortController = new AbortController();
 
-    const promise = $
-      .when(
-        // Create an abortable context and wrap this._loadTableData(searchFilter) in an AbortablePromise.
-        // With this the load is abortable and results in an AbortError when the AbortController is aborted.
-        // All Abortables that are registered in the current abortable context during this._loadTableData(searchFilter) (e.g. ajax calls) are aborted as well.
-        abortableContext.runInContext(
-          () => {
-            const abortablePromise = AbortablePromise.of(this._loadTableData(searchFilter));
-            abortableContext.registerAbortableInCurrentContext(abortablePromise);
-            return abortablePromise;
-          },
-          this._abortController
-        )
-      )
+    // Create an abortable context and wrap this._loadTableData(searchFilter) in an AbortablePromise.
+    // With this the load is abortable and results in an AbortError when the AbortController is aborted.
+    // All Abortables that are registered in the current abortable context during this._loadTableData(searchFilter) (e.g. ajax calls) are aborted as well.
+    const promise = abortableContext.runInContext(
+      () => {
+        const abortablePromise = AbortablePromise.of(this._loadTableData(searchFilter));
+        abortableContext.registerAbortableInCurrentContext(abortablePromise);
+        return abortablePromise;
+      },
+      this._abortController
+    )
       .then(data => this._onLoadTableDataDone(data, restoreSelectionInfo))
       .catch(error => this._onLoadTableDataFail(error, restoreSelectionInfo));
 
@@ -540,7 +537,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
    * @example implementation of `_loadTableData(searchFilter)` using multiple and asynchronously created rest calls
    * ```ts
    * protected override _loadTableData(searchFilter: any): Promise<any> {
-   *   return $.when(this._loadTableDataAsync(searchFilter));
+   *   return this._loadTableDataAsync(searchFilter);
    * }
    *
    * protected async _loadTableDataAsync(searchFilter: any): Promise<any> {

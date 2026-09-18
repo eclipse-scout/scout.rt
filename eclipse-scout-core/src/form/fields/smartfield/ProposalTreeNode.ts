@@ -50,7 +50,7 @@ export class ProposalTreeNode<TValue> extends TreeNode implements ProposalTreeNo
       return this.proposalChooser.smartField.lookupByRec(parentKey);
     }
     // child nodes are already loaded -> same as parent.loadChildren
-    return $.resolvedPromise();
+    return $.resolvedPromise() as Promise<SmartFieldLookupResult<TValue>>;
   }
 
   override hasChildNodes(): boolean {

@@ -462,7 +462,7 @@ describe('ValueField', () => {
           return value;
         },
         value => {
-          const def = new Deferred();
+          const def = new Deferred<string>();
           setTimeout(() => {
             if (value === 'b') {
               def.reject('b is not allowed');
@@ -472,7 +472,7 @@ describe('ValueField', () => {
           return def.promise();
         },
         value => {
-          const def = new Deferred();
+          const def = new Deferred<string>();
           setTimeout(() => {
             if (value === 'c') {
               def.reject(Status.error('c is not allowed'));

@@ -202,7 +202,7 @@ export class App extends EventEmitter {
     $.log.isDebugEnabled() && $.log.debug('App prepared');
   }
 
-  protected _prepareLogging(options: AppModel): Promise<JQuery> {
+  protected _prepareLogging(options: AppModel): Promise<JQuery | void> {
     return logging.bootstrap();
   }
 
@@ -368,7 +368,7 @@ export class App extends EventEmitter {
       $box.load('unsupported-browser.html', () => {
         $box.find('button').on('click', () => {
           $box.remove();
-          deferred.resolve(newOptions);
+          deferred.resolve(newOptions as InitModelOf<this>);
         });
       });
     });

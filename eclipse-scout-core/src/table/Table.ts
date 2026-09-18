@@ -6606,13 +6606,12 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
         callback();
       }
     };
-    let promise = this.cellEditorPopup.waitForCompleteCellEdit();
-    if (promise.state() === 'resolved') {
+    if (this.cellEditorPopup.isCompleteCellEditResolved()) {
       // Do it immediately if promise has already been resolved.
       // This makes sure updateRow does not immediately reopen the editor after closing.
       destroyEditor();
     } else {
-      promise.then(destroyEditor);
+      this.cellEditorPopup.waitForCompleteCellEdit().then(destroyEditor);
     }
   }
 

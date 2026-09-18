@@ -22,6 +22,11 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
   row: TableRow;
   cell: Cell<TValue>;
   protected _pendingCompleteCellEdit: Promise<void>;
+  /**
+   * Tracks synchronously whether {@link _pendingCompleteCellEdit} has already resolved, since a native promise
+   * (unlike a JQuery.Promise) cannot be inspected synchronously for its state.
+   */
+  protected _completeCellEditResolved: boolean;
   protected _rowOrderChangedHandler: EventHandler<TableRowOrderChangedEvent>;
   protected _keyStrokeHandler: EventHandler<KeyStrokeManagerKeyStrokeEvent>;
 
@@ -197,9 +202,11 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
     // Otherwise call completeEdit immediately, also call it immediately if waitForAcceptInput is false (see _onKeyStroke)
     let field = this.cell.field;
     let acceptInputPromise = field.acceptInput();
+    this._completeCellEditResolved = false;
     if (!acceptInputPromise || !scout.nvl(waitForAcceptInput, true)) {
       this._pendingCompleteCellEdit = $.resolvedPromise();
       this.table.completeCellEdit();
+      this._completeCellEditResolved = true;
     } else {
       this._pendingCompleteCellEdit = acceptInputPromise.then(() => this.table.completeCellEdit());
     }
@@ -207,6 +214,7 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
     this._pendingCompleteCellEdit.then(() => {
       // Ensure complete will never be called more than once
       this._pendingCompleteCellEdit = $.resolvedPromise();
+      this._completeCellEditResolved = true;
     });
 
     return this._pendingCompleteCellEdit;
@@ -214,6 +222,13 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
 
   isCompleteCellEditRequested(): boolean {
     return !!this._pendingCompleteCellEdit;
+  }
+
+  /**
+   * @returns `true` if there is no pending complete cell edit operation, or if it has already resolved.
+   */
+  isCompleteCellEditResolved(): boolean {
+    return !this._pendingCompleteCellEdit || this._completeCellEditResolved;
   }
 
   cancelEdit() {
@@ -281,7 +296,7 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
 
   waitForCompleteCellEdit(): Promise<void> {
     if (this._pendingCompleteCellEdit) {
-      return this._pendingCompleteCellEdit.promise();
+      return this._pendingCompleteCellEdit;
     }
     return $.resolvedPromise();
   }

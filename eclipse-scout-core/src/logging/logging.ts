@@ -96,7 +96,7 @@ export const logging = {
   /***
    * Loads log4javascript.min.js if logging is enabled.
    */
-  bootstrap(options?: LoggingOptions): Promise<JQuery> {
+  bootstrap(options?: LoggingOptions): Promise<JQuery | void> {
     let location = new URL(),
       loggingParam = location.getParameter('logging'),
       logLevelParam = location.getParameter('logLevel') as string;
@@ -118,7 +118,10 @@ export const logging = {
 
     // If log4javascript is not yet installed, dynamically load the library
     return $.injectScript(resourceUrl + 'log4javascript-1.4.9/log4javascript.js')
-      .then(logging.initLog4Javascript.bind(this, logLevelParam, showPopup));
+      .then($scriptTag => {
+        logging.initLog4Javascript(logLevelParam, showPopup);
+        return $scriptTag;
+      });
   },
 
   initLog4Javascript(logLevel?: string, showPopup?: boolean) {

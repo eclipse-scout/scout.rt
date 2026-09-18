@@ -222,11 +222,6 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
       return this._loadChildrenPromise;
     }
     let promise = this.loadChildren();
-    if (promise.state() === 'resolved') {
-      this._loadChildrenPromise = null;
-      return promise;
-    }
-
     this._loadChildrenPromise = promise;
     promise.then(this._onLoadChildrenDone.bind(this));
     return promise; // we must always return a promise, never null - otherwise caller would throw an error

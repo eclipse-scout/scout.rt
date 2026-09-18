@@ -1460,7 +1460,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     });
 
     // initialize with a resolved promise in case there are no unsaved forms.
-    let waitFor: Promise<Form[]> = $.resolvedPromise();
+    let waitFor: Promise<Form[]> = $.resolvedPromise([]);
     if (unsavedForms.length > 0) {
       let unsavedFormChangesForm = scout.create(UnsavedFormChangesForm, {
         parent: this,
