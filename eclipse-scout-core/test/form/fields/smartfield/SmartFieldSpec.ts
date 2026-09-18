@@ -164,17 +164,17 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus();
       field.setValue(1);
-      await sleep(500);
-      JQueryTesting.triggerClick(field.$field);
-      await sleep(500);
+      await field.when('lookupCallDone');
+      JQueryTesting.triggerClick(field.$field); // opens the popup (browse all)
+      await field.when('lookupCallDone');
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo');
       expect(field.$field.val()).toBe('Foo');
       let popup = field.popup as SmartFieldPopup<number>;
       expect(popup.proposalChooser.content.selectedRows.length).toBe(1);
 
-      field.clear();
-      await sleep(500);
+      field.clear(); // popup is open -> browses all again
+      await field.when('lookupCallDone');
       expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
       expect(field.$field.val()).toBe('');
@@ -187,9 +187,9 @@ describe('SmartField', () => {
       });
       field.render();
       field.setValue(1);
-      await sleep(500);
-      JQueryTesting.triggerClick(field.$field);
-      await sleep(500);
+      await field.when('lookupCallDone');
+      JQueryTesting.triggerClick(field.$field); // opens the touch popup (browse all)
+      await field.when('lookupCallDone');
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo');
       expect(field.$field.text()).toBe('Foo');
@@ -198,6 +198,8 @@ describe('SmartField', () => {
 
       popup._field.$field.focus();
       popup._field.clear();
+      // popup._field is the embedded field inside the touch popup: clear() resets its value synchronously (touchMode) and only
+      // re-browses if it has its own (nested) popup open, which it doesn't here, so no lookup to await.
       await sleep(500);
       expect(popup._field.value).toBe(null);
       expect(popup._field.displayText).toBe('');
@@ -216,13 +218,12 @@ describe('SmartField', () => {
       });
       field.render();
       field.setValue(1);
-      await sleep(500);
+      await field.when('lookupCallDone');
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo');
       expect(field.$field.text()).toBe('Foo');
 
       field.clear();
-      await sleep(500);
       expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
       expect(field.lookupRow).toBe(null);
@@ -235,9 +236,10 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('b');
+      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      await sleep(500);
+      await lookupDone;
 
       // do not animate the removal of the SmartFieldPopup. Otherwise it will not be removed yet, when the new one should be opened. Then nothing is updated.
       field.popup.animateRemoval = false;
@@ -245,8 +247,8 @@ describe('SmartField', () => {
       expect(field.popup).not.toBe(null);
       expect(findTableProposals()).toEqual(['Bar', 'Baz']);
 
-      field.clear();
-      await sleep(500);
+      field.clear(); // popup is open -> browses all again
+      await field.when('lookupCallDone');
       expect(field.popup).not.toBe(null);
       expect(findTableProposals()).toEqual(['Foo', 'Bar', 'Baz']);
     });
@@ -262,9 +264,9 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus();
       field.setValue(1);
-      await sleep(500);
-      JQueryTesting.triggerClick(field.$field);
-      await sleep(500);
+      await field.when('lookupCallDone');
+      JQueryTesting.triggerClick(field.$field); // opens the touch popup (browse all)
+      await field.when('lookupCallDone');
       let popup = field.popup as SpecSmartFieldTouchPopup;
       expect(popup).not.toBe(null);
       expect(popup._field.$field.val()).toBe('Foo');
@@ -276,13 +278,12 @@ describe('SmartField', () => {
         touchMode: true,
         activeFilterEnabled: true
       });
-      field.render();
-      await sleep(500);
-      JQueryTesting.triggerClick(field.$field);
-      await sleep(500);
+      field.render(); // rendering alone doesn't trigger a lookup
+      JQueryTesting.triggerClick(field.$field); // opens the touch popup (browse all)
+      await field.when('lookupCallDone');
       let popup = field.popup as SpecSmartFieldTouchPopup;
-      popup._widget.activeFilterGroup.radioButtons[1].select();
-      await sleep(500);
+      popup._widget.activeFilterGroup.radioButtons[1].select(); // re-filters -> triggers a lookup, delegated to field's event
+      await field.when('lookupCallDone');
       expect(popup).not.toBe(null);
     });
 
@@ -293,18 +294,18 @@ describe('SmartField', () => {
         activeFilterEnabled: true
       });
       field.render();
-      await sleep(500);
-      JQueryTesting.triggerClick(field.$field);
-      await sleep(500);
+      JQueryTesting.triggerClick(field.$field); // opens the touch popup (browse all)
+      await field.when('lookupCallDone');
       let popup = field.popup as SpecSmartFieldTouchPopup;
       popup._widget.activeFilterGroup.radioButtons[1].select();
       // Simulate that lookup call does not return any data (happens if user clicks 'inactive' radio button and there are no inactive rows
       popup._field.lookupCall['data'] = [];
       popup._field.$field.focus();
       JQueryTesting.triggerKeyDown(popup._field.$field, keys.BACKSPACE);
+      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       popup._field._onFieldKeyUp({});
-      await sleep(500);
+      await lookupDone;
       expect(popup).not.toBe(null);
     });
 
@@ -316,15 +317,15 @@ describe('SmartField', () => {
         })
       });
       field.render();
-      await sleep(500);
-      JQueryTesting.triggerClick(field.$field);
-      await sleep(500);
+      JQueryTesting.triggerClick(field.$field); // opens the touch popup (browse all)
+      await field.when('lookupCallDone');
       expect(field.tooltip().rendered).toBe(false);
       let popup = field.popup as SpecSmartFieldTouchPopup;
       expect(popup._field.tooltip().rendered).toBe(true);
 
+      // Closing doesn't trigger a lookup; the delay here is for the removal animation to finish.
       popup.close();
-      await sleep(500);
+      await sleep(300);
       expect(field.popup).toBe(null);
       expect(field.tooltip().rendered).toBe(true);
     });
@@ -337,9 +338,8 @@ describe('SmartField', () => {
         })
       });
       field.render();
-      await sleep(500);
-      JQueryTesting.triggerClick(field.$field);
-      await sleep(500);
+      JQueryTesting.triggerClick(field.$field); // opens the touch popup (browse all)
+      await field.when('lookupCallDone');
       let popup = field.popup as SpecSmartFieldTouchPopup;
       expect(popup._field.tooltip().rendered).toBe(true);
       expect(popup._field.tooltip().$container.find('.glasspane').length).toBe(0);
@@ -360,15 +360,14 @@ describe('SmartField', () => {
       field.on('prepareLookupCall', onPrepareLookupCall.bind(field));
       field.on('lookupCallDone', onLookupCallDone.bind(field));
       field.render();
-      await sleep(500);
-      JQueryTesting.triggerClick(field.$field);
-      await sleep(500);
+      JQueryTesting.triggerClick(field.$field); // opens the touch popup (browse all)
+      await field.when('lookupCallDone');
 
       let popup = field.popup as SpecSmartFieldTouchPopup;
       let oldPrepareLookupCallCounter = prepareLookupCallCounter;
       let oldLookupCallDoneCounter = lookupCallDoneCounter;
       popup._field.setValue(1);
-      await sleep(500);
+      await field.when('lookupCallDone');
       JQueryTesting.triggerClick(field.$field);
 
       expect(prepareLookupCallCounter).toBe(oldPrepareLookupCallCounter + 1);
@@ -392,7 +391,7 @@ describe('SmartField', () => {
 
       // text equals case
       field.setValue(1); // set lookup row [1, Foo]
-      await sleep(500);
+      await field.when('lookupCallDone');
       expect(field.lookupRow.text).toBe('Foo');
       expect(field.$field.val()).toBe('Foo');
       expect(field.value).toBe(1);
@@ -416,7 +415,7 @@ describe('SmartField', () => {
 
       // text equals case
       field.setValue(1); // set lookup row [1, null]
-      await sleep(500);
+      await field.when('lookupCallDone');
       expect(field.lookupRow.text).toBe(null);
       expect(field.$field.val()).toBe('');
       expect(field.value).toBe(1);
@@ -470,10 +469,9 @@ describe('SmartField', () => {
       let field = createFieldWithLookupCall();
       expect(strings.hasText(field.cssClass)).toBe(false);
       field.setValue(1);
-      await sleep(500);
+      await field.when('lookupCallDone');
       expect(field.cssClass).toEqual('foo');
       field.setValue(null);
-      await sleep(500);
       expect(strings.hasText(field.cssClass)).toBe(false);
     });
 
@@ -498,12 +496,12 @@ describe('SmartField', () => {
       field.on('propertyChange:cssClass', () => eventCount++);
       expect(field.cssClass).toBe(null);
       field.setValue(1);
-      await sleep(500);
+      await field.when('lookupCallDone');
       expect(field.cssClass).toBe(null);
       expect(eventCount).toBe(0);
 
       field.setValue(2);
-      await sleep(500);
+      await field.when('lookupCallDone');
       expect(field.cssClass).toBe('cls');
       expect(eventCount).toBe(1);
     });
@@ -535,12 +533,12 @@ describe('SmartField', () => {
       });
 
       field.setValue(1); // triggers lookup call by key
-      await sleep(500);
+      await field.when('lookupCallDone');
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo' + preparedPropertyValue);
 
       field._acceptByText(false, 'Bar'); // triggers lookup call by text
-      await sleep(500);
+      await field.when('lookupCallDone');
       expect(field.value).toBe(2);
       expect(field.displayText).toBe('Bar' + preparedPropertyValue);
 
@@ -556,8 +554,7 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus();
       expect(field.lookupSeqNo).toBe(0);
-      field._lookupByTextOrAll(false, 'Bar');
-      await sleep(500);
+      await field._lookupByTextOrAll(false, 'Bar');
       expect(field.lookupSeqNo).toBe(1);
       expect(field.popup.lookupResult.seqNo).toBe(1); // seqNo must be set on the lookupResult of the popup
     });
@@ -856,13 +853,12 @@ describe('SmartField', () => {
       field.$field.focus();
 
       field.setValue(1);
-      await sleep(300);
+      await field.when('lookupCallDone');
       expect(field.displayText).toBe('Foo');
 
       field.$field.val('search!');
       field._userWasTyping = true;
       field.aboutToBlurByMouseDown(undefined);
-      await sleep(300);
 
       // test if _acceptByText has been called with sync=true
       // this should reset the display text and trigger the acceptInput event
@@ -1010,7 +1006,7 @@ describe('SmartField', () => {
     it('should not perform lookup when Ctrl+A has been pressed', async () => {
       field.render();
       field.setValue(1);
-      await sleep(300);
+      await field.when('lookupCallDone');
       expect(field.lookupRow.text).toBe('Foo');
 
       // case 1: text from lookup-row is the same as the search-text
@@ -1056,11 +1052,11 @@ describe('SmartField', () => {
       let smartField = scout.create(SmartField, model);
       expect(smartField.displayText).toBe('');
       smartField.setValue(1);
-      await sleep(300);
+      await smartField.when('lookupCallDone');
       expect(smartField.value).toBe(1);
       expect(smartField.displayText).toBe('Foo');
       smartField.setValue(2);
-      await sleep(300);
+      await smartField.when('lookupCallDone');
       expect(smartField.value).toBe(2);
       expect(smartField.displayText).toBe('Bar');
     });
@@ -1130,7 +1126,7 @@ describe('SmartField', () => {
       expect(smartField.value).toBe(2);
       expect(smartField.displayText).toBe('');
 
-      await sleep(300);
+      await smartField.when('lookupCallDone');
       expect(smartField.value).toBe(2);
       expect(smartField.displayText).toBe('Bar');
     });
@@ -1153,7 +1149,7 @@ describe('SmartField', () => {
         value: 1
       }) as FullModelOf<SmartField<number>>;
       let smartField = scout.create(SpecSmartField, model);
-      await sleep(300);
+      await smartField.when('lookupCallDone');
       smartField.render();
       expect(smartField._readDisplayText()).toEqual('1:Foo');
       expect(smartField._readSearchText()).toEqual('1:Foo\n2:Foo');
@@ -1170,7 +1166,7 @@ describe('SmartField', () => {
         value: 1
       }) as FullModelOf<SmartField<number>>;
       let smartField = scout.create(SpecSmartField, model);
-      await sleep(300);
+      await smartField.when('lookupCallDone');
       smartField.render();
       expect(smartField.value).toBe(1);
       expect(fields.valOrText(smartField.$field)).toBe('1:Foo');
@@ -1184,7 +1180,7 @@ describe('SmartField', () => {
         value: 1
       }) as FullModelOf<SmartField<number>>;
       let smartFieldMultiline = scout.create(SmartFieldMultiline, model);
-      await sleep(300);
+      await smartFieldMultiline.when('lookupCallDone');
       smartFieldMultiline.render();
       expect(smartFieldMultiline.value).toBe(1);
       expect(fields.valOrText(smartFieldMultiline.$field)).toBe('1:Foo');
@@ -1202,8 +1198,8 @@ describe('SmartField', () => {
         lookupCall: 'DummyLookupCall'
       });
       smartField.render();
-      JQueryTesting.triggerClick(smartField.$label);
-      await sleep(500);
+      JQueryTesting.triggerClick(smartField.$label); // opens the popup (browse all)
+      await smartField.when('lookupCallDone');
       expect(smartField.popup).toBeTruthy();
 
       smartField.popup.close();
@@ -1216,8 +1212,8 @@ describe('SmartField', () => {
         lookupCall: 'DummyLookupCall'
       });
       smartField.render();
-      JQueryTesting.triggerClick(smartField.$label);
-      await sleep(500);
+      JQueryTesting.triggerClick(smartField.$label); // opens the popup (browse all)
+      await smartField.when('lookupCallDone');
       expect(smartField.popup).toBeTruthy();
 
       smartField.popup.close();
@@ -1244,8 +1240,9 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('Bar');
+      let lookupDone = field.when('lookupCallDone');
       field._onFieldKeyUp($.Event('keyup', {}) as JQuery.KeyUpEvent);
-      await sleep(500);
+      await lookupDone;
       let popup = field.popup as SmartFieldPopup<any>;
       expect(popup.proposalChooser.content.rows[0].cells[0].text).toBe('Bar');
       expect(popup.proposalChooser.content.rows[0].cells[1].text).toBe('Bar column1');
@@ -1271,9 +1268,10 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('Bar');
+      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      await sleep(500);
+      await lookupDone;
       let popup = field.popup as SmartFieldPopup<any>;
       expect(popup.proposalChooser.content.rows[0].cells[0].text).toBe('Bar column1');
       expect(popup.proposalChooser.content.rows[0].cells[1].text).toBe('Bar');
@@ -1335,9 +1333,10 @@ describe('SmartField', () => {
       });
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
+      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      await sleep(500);
+      await lookupDone;
       expect(field.$screenReaderStatus).toHaveAttr('role', 'status');
       expect(field.$screenReaderStatus).toHaveClass('sr-only');
       expect(field.$screenReaderStatus.children('.sr-lookup-row-count').length).toBe(1);
@@ -1348,8 +1347,8 @@ describe('SmartField', () => {
       let field = createFieldWithLookupCall({
         value: 1
       });
+      await field.when('lookupCallDone');
       field.render();
-      await sleep(500);
       expect(field.$screenReaderStatus.children('.sr-lookup-row-count').length).toBe(0);
     });
 
@@ -1360,9 +1359,10 @@ describe('SmartField', () => {
       field.render();
       expect(field.$field).toHaveAttr('aria-expanded', 'false');
       field.$field.focus(); // must be focused, otherwise popup will not open
+      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      await sleep(500);
+      await lookupDone;
       expect(field.$field).toHaveAttr('aria-expanded', 'true');
       field.closePopup();
     });
@@ -1374,9 +1374,10 @@ describe('SmartField', () => {
       field.render();
       expect(field.$field.attr('aria-controls')).toBeFalsy();
       field.$field.focus(); // must be focused, otherwise popup will not open
+      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      await sleep(500);
+      await lookupDone;
       expect(field.$field.attr('aria-controls')).toBe(field.popup.$container.attr('id'));
       field.closePopup();
     });
@@ -1388,9 +1389,10 @@ describe('SmartField', () => {
       field.render();
       expect(field.$field.attr('aria-activedescendant')).toBeFalsy();
       field.$field.focus(); // must be focused, otherwise popup will not open
+      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      await sleep(500);
+      await lookupDone;
       JQueryTesting.triggerKeyDown(field.$field, keys.DOWN);
       expect(field.$field.attr('aria-activedescendant')).toBeTruthy();
       field.closePopup();
@@ -1412,7 +1414,7 @@ describe('SmartField', () => {
       field.on('propertyChange', event => propertyChangeEvents.push(event));
 
       field.setValue(20);
-      await sleep(500);
+      await field.when('lookupCallDone');
       expect(field.displayText).toBe('Cat');
 
       expect(propertyChangeEvents.map(event => event.propertyName)).toEqual([
@@ -1433,7 +1435,7 @@ describe('SmartField', () => {
         [30, 'Maus']
       ]);
       field.updateLookupRow();
-      await sleep(500);
+      await field.when('lookupCallDone');
       expect(field.displayText).toBe('Katze');
       expect(propertyChangeEvents.map(event => event.propertyName)).toEqual([
         // Remove old lookup row
