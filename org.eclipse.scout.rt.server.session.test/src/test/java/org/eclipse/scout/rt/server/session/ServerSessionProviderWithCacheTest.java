@@ -27,6 +27,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.security.User;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -34,7 +35,10 @@ import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 import org.eclipse.scout.rt.security.IAccessControlService;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.session.context.ServerSessionRunContext;
+import org.eclipse.scout.rt.server.session.context.ServerSessionRunContexts;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -76,7 +80,7 @@ public class ServerSessionProviderWithCacheTest {
     if (optBean != null) {
       ConcurrentExpiringMap<CompositeObject, IServerSession> cache = optBean.m_cache;
       if (cache != null) {
-        cache.forEach((c, s) -> s.stop());
+        cache.forEach((c, s) -> stopSession(s));
         cache.clear();
       }
     }
@@ -118,7 +122,7 @@ public class ServerSessionProviderWithCacheTest {
   public void testProvideSessionAndStop() {
     createAndRegisterDefaultSessionProviderWithCache();
     FixtureServerSession session = provideSession(null, "anna");
-    session.stop();
+    stopSession(session);
     assertTrue(session.isStarted());
     assertFalse(session.isActive());
     assertFalse(session.isStopping());
@@ -235,6 +239,12 @@ public class ServerSessionProviderWithCacheTest {
     return subject;
   }
 
+  private void stopSession(IServerSession session) {
+    ServerSessionRunContexts.empty()
+        .withSession(session)
+        .run(session::stop);
+  }
+
   private static class FixtureServerSession extends AbstractServerSession {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -259,6 +269,11 @@ public class ServerSessionProviderWithCacheTest {
       super.stop();
       m_stopped = true;
       s_stoppedCount.incrementAndGet();
+
+      // ensure running within a ServerSessionRunContext with this instance set as session
+      RunContext rc = ServerRunContext.CURRENT.get();
+      assertTrue(rc instanceof ServerSessionRunContext);
+      assertSame(this, ((ServerSessionRunContext) rc).getSession());
     }
 
     public boolean isStarted() {

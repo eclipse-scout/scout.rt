@@ -19,10 +19,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.security.User;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.session.context.ServerSessionRunContext;
 import org.eclipse.scout.rt.server.session.context.ServerSessionRunContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +101,14 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
     @SuppressWarnings("unchecked") final SESSION cachedServerSession = (SESSION) m_cache.putIfAbsent(sessionCacheKey, serverSession);
     if (cachedServerSession != null) {
       LOG.trace("Found a cached server session, using that one instead - stopping the replaced one.");
-      serverSession.stop();
+      final SESSION finalServerSession = serverSession;
+      // stop session within a RunContext so that transactional resources are available (e.g. a DB connection)
+      // note: the assertion below is always expected to work because the ServerSessionRunContext, which is part of this module, replaces the original ServerRunContext
+      assertInstance(serverRunContext, ServerSessionRunContext.class, "serverRunContext is required to be an instance of '{}'", ServerSessionRunContext.class.getName())
+          .copy()
+          .withTransactionScope(TransactionScope.REQUIRES_NEW) // enforce a new transaction
+          .withSession(finalServerSession)
+          .run(finalServerSession::stop);
       serverSession = cachedServerSession;
     }
 
