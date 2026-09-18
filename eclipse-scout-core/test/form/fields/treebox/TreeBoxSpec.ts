@@ -19,11 +19,6 @@ describe('TreeBox', () => {
     session = sandboxSession();
     field = new TreeBox();
     helper = new FormSpecHelper(session);
-    jasmine.clock().install();
-  });
-
-  afterEach(() => {
-    jasmine.clock().uninstall();
   });
 
   class SpecTreeBox<T> extends TreeBox<T> {
@@ -71,14 +66,12 @@ describe('TreeBox', () => {
       let lookupPrepared = box.when('prepareLookupCall');
       let lookupDone = box.when('lookupCallDone');
       box.refreshLookup();
-      jasmine.clock().tick(500);
 
-      $.promiseAll([lookupPrepared, lookupDone]).then(event => {
-        expect(event.lookupCall instanceof DummyLookupCall).toBe(true);
+      $.promiseAll([lookupPrepared, lookupDone]).then(([prepareEvent]) => {
+        expect(prepareEvent.lookupCall instanceof DummyLookupCall).toBe(true);
       })
         .catch(fail)
         .finally(done);
-      jasmine.clock().tick(500);
     });
 
     it('LookupCall can be prepared if value is configured', done => {
@@ -91,21 +84,19 @@ describe('TreeBox', () => {
       let lookupPrepared = box.when('prepareLookupCall');
       let lookupDone = box.when('lookupCallDone');
       box.render();
-      jasmine.clock().tick(500);
 
-      $.promiseAll([lookupPrepared, lookupDone]).then(event => {
-        expect(event.lookupCall instanceof DummyLookupCall).toBe(true);
+      $.promiseAll([lookupPrepared, lookupDone]).then(([prepareEvent]) => {
+        expect(prepareEvent.lookupCall instanceof DummyLookupCall).toBe(true);
         expect(box.getCheckedLookupRows().length).toBe(1);
       })
         .catch(fail)
         .finally(done);
-      jasmine.clock().tick(500);
     });
 
-    it('when setValue is called, load and set the correct lookup rows', () => {
+    it('when setValue is called, load and set the correct lookup rows', async () => {
       field = createFieldWithLookupCall();
       field.setValue([1, 3]);
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       expect(field.value).toEqual([1, 3]);
       expect(field.displayText).toBe('Foo, Baz');
       expect(field.getCheckedLookupRows().length).toBe(2);
@@ -119,7 +110,6 @@ describe('TreeBox', () => {
       expect(field.displayText).toBe('');
 
       field.setValue([2]);
-      jasmine.clock().tick(300);
       expect(field.displayText).toBe('Bar');
       expect(field.value).toEqual([2]);
       expect(field.getCheckedLookupRows().length).toBe(1);
@@ -130,37 +120,33 @@ describe('TreeBox', () => {
 
   describe('clear', () => {
 
-    it('clears the value', () => {
+    it('clears the value', async () => {
       let field = createFieldWithLookupCall();
+      await field.when('lookupCallDone');
 
       field.setValue([1, 2]);
-      jasmine.clock().tick(500);
-
       expect(field.value).toEqual([1, 2]);
       expect(field.displayText).toBe('Foo, Bar');
       expect(field.tree.checkedNodes.length).toBe(2);
       expect(field.getCheckedLookupRows().length).toBe(2);
 
       field.clear();
-      jasmine.clock().tick(500);
       expect(field.value).toEqual([]);
       expect(field.displayText).toBe('');
       expect(field.tree.checkedNodes.length).toBe(0);
       expect(field.getCheckedLookupRows()).toEqual([]);
     });
 
-    it('uncheck all rows', () => {
+    it('uncheck all rows', async () => {
       let field = createFieldWithLookupCall();
-      jasmine.clock().tick(500);
+      await field.when('lookupCallDone');
 
       field.setValue([1, 2, 3]);
-      jasmine.clock().tick(500);
       expect(field.value).toEqual([1, 2, 3]);
       expect(field.tree.checkedNodes.length).toBe(3);
       expect(field.displayText).toBe('Foo, Bar, Baz');
 
       field.clear();
-      jasmine.clock().tick(500);
       expect(field.value).toEqual([]);
       expect(field.tree.checkedNodes.length).toBe(0);
       expect(field.displayText).toBe('');
@@ -168,14 +154,13 @@ describe('TreeBox', () => {
   });
 
   describe('setEnabled', () => {
-    it('should disable check rows', () => {
+    it('should disable check rows', async () => {
       let field = createFieldWithLookupCall();
-      jasmine.clock().tick(500);
+      await field.when('lookupCallDone');
 
       field.setEnabled(false);
       field.tree.expandNode(field.tree.visibleNodesFlat[0]);
       field.tree.checkNodes(field.tree.visibleNodesFlat);
-      jasmine.clock().tick(500);
       expect(field.value).toEqual([]);
       expect(field.getCheckedLookupRows()).toEqual([]);
       expect(field.displayText).toBe('');
@@ -193,13 +178,13 @@ describe('TreeBox', () => {
 
   describe('lookupCall', () => {
 
-    it('switching should refill tree', () => {
+    it('switching should refill tree', async () => {
       let field = createFieldWithLookupCall({}, {
         objectType: LanguageDummyLookupCall
       });
 
       field.setValue([100, 500]);
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       expect(field.value).toEqual([100, 500]);
       expect(field.displayText).toBe('English, Swiss-German');
       expect(field.tree.visibleNodesFlat.length).toBe(5);
@@ -209,7 +194,7 @@ describe('TreeBox', () => {
         session: session
       });
       field.setLookupCall(newLookupCall);
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       // dont change value when lookupCall changes
       expect(field.value).toEqual([100, 500]);
       expect(field.displayText).toBe('');
@@ -219,19 +204,19 @@ describe('TreeBox', () => {
       expect(field.tree.visibleNodesFlat.length).toBe(3);
     });
 
-    it('switching to a lookup call returning no results should clear table', () => {
+    it('switching to a lookup call returning no results should clear table', async () => {
       let field = createFieldWithLookupCall({}, {
         objectType: DummyLookupCall
       });
       field.setValue([100, 500]);
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       expect(field.tree.visibleNodesFlat.length).toBe(1);
 
       let newLookupCall = scout.create(EmptyDummyLookupCall, {
         session: session
       });
       field.setLookupCall(newLookupCall);
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       // dont change value when lookupCall changes
       expect(field.value).toEqual([100, 500]);
       expect(field.displayText).toBe('');
@@ -239,23 +224,23 @@ describe('TreeBox', () => {
       expect(field.tree.visibleNodesFlat.length).toBe(0);
     });
 
-    it('switching to a lookup call without a lookup error should remove the error', () => {
+    it('switching to a lookup call without a lookup error should remove the error', async () => {
       let field = createFieldWithLookupCall({}, {
         objectType: ErroneousLookupCall
       });
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       expect(field.lookupStatus).not.toBe(null);
 
       let newLookupCall = scout.create(DummyLookupCall, {
         session: session
       });
       field.setLookupCall(newLookupCall);
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       expect(field.lookupStatus).toBe(null);
       expect(field.tree.visibleNodesFlat.length).toBe(1);
     });
 
-    it('should be cloned and prepared for each lookup', () => {
+    it('should be cloned and prepared for each lookup', async () => {
       let templatePropertyValue = 11;
       let preparedPropertyValue = 22;
       let eventCounter = 0;
@@ -279,15 +264,13 @@ describe('TreeBox', () => {
       });
 
       field.setValue([1]); // triggers lookup call by key
-      jasmine.clock().tick(500);
+      await field.when('lookupCallDone');
       expect(field.value).toEqual([1]);
       expect(field.displayText).toBe('Foo' + preparedPropertyValue);
 
       field.setValue(null);
-      jasmine.clock().tick(500);
 
       field.tree.checkNodes(field.tree.visibleNodesFlat[2]);
-      jasmine.clock().tick(500);
 
       expect(field.value).toEqual([3]);
       expect(field.displayText).toBe('Baz' + preparedPropertyValue);
@@ -308,7 +291,7 @@ describe('TreeBox', () => {
       expect(field.lookupStatus.message).toBe('a total disaster');
     });
 
-    it('_executeLookup should always remove lookup-status (but not the error-status)', () => {
+    it('_executeLookup should always remove lookup-status (but not the error-status)', async () => {
       let field = createFieldWithLookupCall();
       let lookupStatus = Status.warning({
         message: 'bar'
@@ -318,22 +301,21 @@ describe('TreeBox', () => {
       });
       field.setLookupStatus(lookupStatus);
       field.setErrorStatus(errorStatus);
-      field._executeLookup(field.lookupCall.cloneForAll());
-      jasmine.clock().tick(500);
+      await field._executeLookup(field.lookupCall.cloneForAll());
       expect(field.errorStatus).toBe(errorStatus);
       expect(field.lookupStatus).toBe(null);
     });
 
-    it('should be executed when lookup call is set', () => {
+    it('should be executed when lookup call is set', async () => {
       let field = createFieldWithLookupCall();
-      jasmine.clock().tick(500);
+      await field.when('lookupCallDone');
 
       expect(field.tree.visibleNodesFlat.length).toBe(1);
     });
 
-    it('should not set an error status if lookup returned no results', () => {
+    it('should not set an error status if lookup returned no results', async () => {
       let field = createFieldWithLookupCall({}, {objectType: EmptyDummyLookupCall});
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       expect(field.tree.visibleNodesFlat.length).toBe(0);
       expect(field.errorStatus).toBe(null);
     });
@@ -341,25 +323,22 @@ describe('TreeBox', () => {
 
   describe('value', () => {
 
-    it('should be synchronized when rows are checked', () => {
+    it('should be synchronized when rows are checked', async () => {
       let field = createFieldWithLookupCall();
-      jasmine.clock().tick(500);
+      await field.when('lookupCallDone');
 
       field.tree.expandNode(field.tree.visibleNodesFlat[0]);
       field.tree.checkNodes(field.tree.visibleNodesFlat);
-      jasmine.clock().tick(300);
       expect(field.value).toEqual([1, 2, 3]);
       expect(field.displayText).toBe('Foo, Bar, Baz');
       expect(field.tree.checkedNodes.length).toBe(3);
 
       field.tree.uncheckNodes(field.tree.visibleNodesFlat);
-      jasmine.clock().tick(300);
       expect(field.value).toEqual([]);
       expect(field.tree.checkedNodes.length).toBe(0);
       expect(field.displayText).toBe('');
 
       field.tree.checkNode(field.tree.visibleNodesFlat[1]);
-      jasmine.clock().tick(500);
       expect(field.value).toEqual([2]);
       expect(field.displayText).toBe('Bar');
       expect(field.tree.checkedNodes.length).toBe(1);
@@ -367,11 +346,11 @@ describe('TreeBox', () => {
   });
 
   describe('setValue', () => {
-    it('should check children in autoCheckMode', () => {
+    it('should check children in autoCheckMode', async () => {
       // Arrange
       let field = createFieldWithLookupCall();
       field.tree.setAutoCheckChildren(true);
-      jasmine.clock().tick(500);
+      await field.when('lookupCallDone');
 
       // Act
       field.setValue([1]);
@@ -381,11 +360,11 @@ describe('TreeBox', () => {
       expect(field.tree.checkedNodes.length).toBe(3);
     });
 
-    it('should not change value when value is set twice', () => {
+    it('should not change value when value is set twice', async () => {
       // Arrange
       let field = createFieldWithLookupCall();
       field.tree.setAutoCheckChildren(true);
-      jasmine.clock().tick(500);
+      await field.when('lookupCallDone');
 
       // Act
       field.setValue([1]);
@@ -408,18 +387,17 @@ describe('TreeBox', () => {
       });
     });
 
-    it('uses a lookup call to format the value', () => {
+    it('uses a lookup call to format the value', async () => {
       let model = helper.createFieldModel(TreeBox, session.desktop, {
         lookupCall: lookupCall
       });
       let treeBox = scout.create(TreeBox, model);
       expect(treeBox.displayText).toBe('');
       treeBox.setValue([1]);
-      jasmine.clock().tick(300);
+      await treeBox.when('lookupCallDone');
       expect(treeBox.value).toEqual([1]);
       expect(treeBox.displayText).toBe('Foo');
       treeBox.setValue([2]);
-      jasmine.clock().tick(300);
       expect(treeBox.value).toEqual([2]);
       expect(treeBox.displayText).toBe('Bar');
     });
@@ -432,12 +410,10 @@ describe('TreeBox', () => {
       expect(treeBox.displayText).toBe('');
 
       treeBox.setValue(null);
-      jasmine.clock().tick(300);
       expect(treeBox.value).toEqual([]);
       expect(treeBox.displayText).toBe('');
 
       treeBox.setValue(undefined);
-      jasmine.clock().tick(300);
       expect(treeBox.value).toEqual([]);
       expect(treeBox.displayText).toBe('');
     });

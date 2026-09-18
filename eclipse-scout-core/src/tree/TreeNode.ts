@@ -197,14 +197,14 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
   }
 
   /**
-   * This method loads the child nodes of this node and returns a jQuery.Promise to register callbacks
+   * Loads the child nodes of this node and returns a {@link Promise} to register callbacks
    * when loading is done or has failed. To skip loading the children when they are already loaded, use
-   * {@link #ensureLoadChildren} instead.
+   * {@link #ensureLoadChildren} instead or check the flag {@link childrenLoaded}.
    *
-   * @returns a Promise or null when TreeNode cannot load children (which is the case for all
-   *     TreeNodes in the remote case). The default impl. returns an empty resolved promise.
+   * @returns a Promise that is resolved when the children are loaded. Because the default implementation does not load any children, an empty resolved promise is returned.
    */
   loadChildren(): Promise<any> {
+    this.childrenLoaded = true;
     return $.resolvedPromise();
   }
 
