@@ -11,7 +11,6 @@ import {
   AbstractLayout, arrays, CodeLookupCall, CodeType, Deferred, HtmlComponent, InitModelOf, LookupBoxEventMap, LookupBoxModel, LookupCall, LookupCallOrModel, LookupResult, LookupRow, objects, PropertyChangeEvent, scout, Status, strings,
   ValueField, Widget
 } from '../../index';
-import $ from 'jquery';
 
 export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TValue[]> implements LookupBoxModel<TValue> {
   declare model: LookupBoxModel<TValue>;
@@ -112,6 +111,14 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
       .then(result => {
         this._lookupByAllDone(result);
         deferred.resolve(result);
+      })
+      .catch(e => {
+        if (objects.isPojo(e) && e.abort) {
+          // Ignore: happens when this lookup call is aborted because a newer one superseded it (see abortExisting above).
+          // The newer lookup call's own promise chain resolves the field, so nothing else needs to be done here.
+          return;
+        }
+        throw e;
       });
 
     return deferred.promise();

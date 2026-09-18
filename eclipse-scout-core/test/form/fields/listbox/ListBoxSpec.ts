@@ -20,7 +20,6 @@ describe('ListBox', () => {
     session = sandboxSession();
     field = new ListBox();
     helper = new FormSpecHelper(session);
-    jasmine.clock().install();
     codes.add([{
       id: 'ListBoxSpec_CodeType',
       objectType: CodeType,
@@ -45,7 +44,6 @@ describe('ListBox', () => {
   });
 
   afterEach(() => {
-    jasmine.clock().uninstall();
     codes.remove('ListBoxSpec_CodeType');
   });
 
@@ -94,14 +92,13 @@ describe('ListBox', () => {
       let lookupPrepared = box.when('prepareLookupCall');
       let lookupDone = box.when('lookupCallDone');
       box.refreshLookup();
-      jasmine.clock().tick(500);
 
-      $.promiseAll([lookupPrepared, lookupDone]).then(event => {
-        expect(event.lookupCall instanceof DummyLookupCall).toBe(true);
+      // $.promiseAll resolves to an array of results since 2 promises are passed
+      $.promiseAll([lookupPrepared, lookupDone]).then(([prepareEvent]) => {
+        expect(prepareEvent.lookupCall instanceof DummyLookupCall).toBe(true);
       })
         .catch(fail)
         .finally(done);
-      jasmine.clock().tick(500);
     });
 
     it('LookupCall can be prepared if value is configured', done => {
@@ -114,21 +111,20 @@ describe('ListBox', () => {
       let lookupPrepared = box.when('prepareLookupCall');
       let lookupDone = box.when('lookupCallDone');
       box.render();
-      jasmine.clock().tick(500);
 
-      $.promiseAll([lookupPrepared, lookupDone]).then(event => {
-        expect(event.lookupCall instanceof DummyLookupCall).toBe(true);
+      // $.promiseAll resolves to an array of results since 2 promises are passed
+      $.promiseAll([lookupPrepared, lookupDone]).then(([prepareEvent]) => {
+        expect(prepareEvent.lookupCall instanceof DummyLookupCall).toBe(true);
         expect(box.getCheckedLookupRows().length).toBe(1);
       })
         .catch(fail)
         .finally(done);
-      jasmine.clock().tick(500);
     });
 
-    it('when setValue is called, load and set the correct lookup rows', () => {
+    it('when setValue is called, load and set the correct lookup rows', async () => {
       field = createFieldWithLookupCall();
       field.setValue([1, 3]);
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       expect(field.value).toEqual([1, 3]);
       expect(field.displayText).toBe('Foo, Baz');
       expect(field.getCheckedLookupRows().length).toBe(2);
@@ -141,8 +137,8 @@ describe('ListBox', () => {
       expect(field.value).toEqual([]);
       expect(field.displayText).toBe('');
 
+      // lookup was already executed, table rows are already loaded -> no new lookup call, syncing the value is synchronous
       field.setValue([2]);
-      jasmine.clock().tick(300);
       expect(field.displayText).toBe('Bar');
       expect(field.value).toEqual([2]);
       expect(field.getCheckedLookupRows().length).toBe(1);
@@ -153,11 +149,11 @@ describe('ListBox', () => {
 
   describe('clear', () => {
 
-    it('clears the value', () => {
+    it('clears the value', async () => {
       let field = createFieldWithLookupCall();
+      await field.when('lookupCallDone');
 
       field.setValue([1, 2]);
-      jasmine.clock().tick(500);
 
       expect(field.value).toEqual([1, 2]);
       expect(field.displayText).toBe('Foo, Bar');
@@ -165,25 +161,22 @@ describe('ListBox', () => {
       expect(field.getCheckedLookupRows().length).toBe(2);
 
       field.clear();
-      jasmine.clock().tick(500);
       expect(field.value).toEqual([]);
       expect(field.displayText).toBe('');
       expect(field.table.checkedRows().length).toBe(0);
       expect(field.getCheckedLookupRows()).toEqual([]);
     });
 
-    it('uncheck all rows', () => {
+    it('uncheck all rows', async () => {
       let field = createFieldWithLookupCall();
-      jasmine.clock().tick(500);
+      await field.when('lookupCallDone');
 
       field.setValue([1, 2, 3]);
-      jasmine.clock().tick(500);
       expect(field.value).toEqual([1, 2, 3]);
       expect(field.table.checkedRows().length).toBe(3);
       expect(field.displayText).toBe('Foo, Bar, Baz');
 
       field.clear();
-      jasmine.clock().tick(500);
       expect(field.value).toEqual([]);
       expect(field.table.checkedRows().length).toBe(0);
       expect(field.displayText).toBe('');
@@ -191,13 +184,12 @@ describe('ListBox', () => {
   });
 
   describe('setEnabled', () => {
-    it('should disable check rows', () => {
+    it('should disable check rows', async () => {
       let field = createFieldWithLookupCall();
-      jasmine.clock().tick(500);
+      await field.when('lookupCallDone');
 
       field.setEnabled(false);
       field.table.checkAll();
-      jasmine.clock().tick(500);
       expect(field.value).toEqual([]);
       expect(field.getCheckedLookupRows()).toEqual([]);
       expect(field.displayText).toBe('');
@@ -215,13 +207,13 @@ describe('ListBox', () => {
 
   describe('lookupCall', () => {
 
-    it('switching should refill table', () => {
+    it('switching should refill table', async () => {
       let field = createFieldWithLookupCall({}, {
         objectType: LanguageDummyLookupCall
       });
 
       field.setValue([100, 500]);
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       expect(field.value).toEqual([100, 500]);
       expect(field.displayText).toBe('English, Swiss-German');
       expect(field.table.rows.length).toBe(5);
@@ -231,7 +223,7 @@ describe('ListBox', () => {
         session: session
       });
       field.setLookupCall(newLookupCall);
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       // dont change value when lookupCall changes
       expect(field.value).toEqual([100, 500]);
       expect(field.displayText).toBe('');
@@ -239,19 +231,19 @@ describe('ListBox', () => {
       expect(field.table.rows.length).toBe(3);
     });
 
-    it('switching to a lookup call returning no results should clear table', () => {
+    it('switching to a lookup call returning no results should clear table', async () => {
       let field = createFieldWithLookupCall({}, {
         objectType: DummyLookupCall
       });
+      await field.when('lookupCallDone');
       field.setValue([100, 500]);
-      jasmine.clock().tick(300);
       expect(field.table.rows.length).toBe(3);
 
       let newLookupCall = scout.create(EmptyDummyLookupCall, {
         session: session
       });
       field.setLookupCall(newLookupCall);
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       // dont change value when lookupCall changes
       expect(field.value).toEqual([100, 500]);
       expect(field.displayText).toBe('');
@@ -259,23 +251,23 @@ describe('ListBox', () => {
       expect(field.table.rows.length).toBe(0);
     });
 
-    it('switching to a lookup call without a lookup error should remove the error', () => {
+    it('switching to a lookup call without a lookup error should remove the error', async () => {
       let field = createFieldWithLookupCall({}, {
         objectType: ErroneousLookupCall
       });
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       expect(field.lookupStatus).not.toBe(null);
 
       let newLookupCall = scout.create(DummyLookupCall, {
         session: session
       });
       field.setLookupCall(newLookupCall);
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       expect(field.lookupStatus).toBe(null);
       expect(field.table.rows.length).toBe(3);
     });
 
-    it('should be cloned and prepared for each lookup', () => {
+    it('should be cloned and prepared for each lookup', async () => {
       let templatePropertyValue = 11;
       let preparedPropertyValue = 22;
       let eventCounter = 0;
@@ -299,15 +291,13 @@ describe('ListBox', () => {
       });
 
       field.setValue([1]); // triggers lookup call by key
-      jasmine.clock().tick(500);
+      await field.when('lookupCallDone');
       expect(field.value).toEqual([1]);
       expect(field.displayText).toBe('Foo' + preparedPropertyValue);
 
       field.setValue(null);
-      jasmine.clock().tick(500);
 
       field.table.checkRows(field.table.rows[2]);
-      jasmine.clock().tick(500);
 
       expect(field.value).toEqual([3]);
       expect(field.displayText).toBe('Baz' + preparedPropertyValue);
@@ -316,7 +306,6 @@ describe('ListBox', () => {
     });
 
     it('is set to CodeLookupCall if a codeType is set', async () => {
-      jasmine.clock().uninstall();
       let listBox = scout.create(ListBox, {
         parent: session.desktop,
         codeType: 'ListBoxSpec_CodeType'
@@ -328,7 +317,6 @@ describe('ListBox', () => {
     });
 
     it('is set to CodeLookupCall if a codeType is set, even dynamically', async () => {
-      jasmine.clock().uninstall();
       let listBox = scout.create(ListBox, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
@@ -353,7 +341,7 @@ describe('ListBox', () => {
       expect(field.lookupStatus.message).toBe('a total disaster');
     });
 
-    it('_executeLookup should always remove lookup-status (but not the error-status)', () => {
+    it('_executeLookup should always remove lookup-status (but not the error-status)', async () => {
       let field = createFieldWithLookupCall();
       let lookupStatus = Status.warning({
         message: 'bar'
@@ -363,22 +351,21 @@ describe('ListBox', () => {
       });
       field.setLookupStatus(lookupStatus);
       field.setErrorStatus(errorStatus);
-      field._executeLookup(field.lookupCall.cloneForAll());
-      jasmine.clock().tick(500);
+      await field._executeLookup(field.lookupCall.cloneForAll());
       expect(field.errorStatus).toBe(errorStatus);
       expect(field.lookupStatus).toBe(null);
     });
 
-    it('should be executed when lookup call is set', () => {
+    it('should be executed when lookup call is set', async () => {
       let field = createFieldWithLookupCall();
-      jasmine.clock().tick(500);
+      await field.when('lookupCallDone');
 
       expect(field.table.rows.length).toBe(3);
     });
 
-    it('should not set an error status if lookup returned no results', () => {
+    it('should not set an error status if lookup returned no results', async () => {
       let field = createFieldWithLookupCall({}, {objectType: EmptyDummyLookupCall});
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       expect(field.table.rows.length).toBe(0);
       expect(field.errorStatus).toBe(null);
     });
@@ -386,24 +373,21 @@ describe('ListBox', () => {
 
   describe('value', () => {
 
-    it('should be synchronized when rows are checked', () => {
+    it('should be synchronized when rows are checked', async () => {
       let field = createFieldWithLookupCall();
-      jasmine.clock().tick(500);
+      await field.when('lookupCallDone');
 
       field.table.checkAll();
-      jasmine.clock().tick(300);
       expect(field.value).toEqual([1, 2, 3]);
       expect(field.displayText).toBe('Foo, Bar, Baz');
       expect(field.table.checkedRows().length).toBe(3);
 
       field.table.uncheckAll();
-      jasmine.clock().tick(300);
       expect(field.value).toEqual([]);
       expect(field.table.checkedRows().length).toBe(0);
       expect(field.displayText).toBe('');
 
       field.table.checkRow(field.table.rows[1]);
-      jasmine.clock().tick(500);
       expect(field.value).toEqual([2]);
       expect(field.displayText).toBe('Bar');
       expect(field.table.checkedRows().length).toBe(1);
@@ -445,18 +429,17 @@ describe('ListBox', () => {
       });
     });
 
-    it('uses a lookup call to format the value', () => {
+    it('uses a lookup call to format the value', async () => {
       let model = helper.createFieldModel(ListBox, session.desktop, {
         lookupCall: lookupCall
       });
       let listBox = scout.create(ListBox, model);
+      await listBox.when('lookupCallDone');
       expect(listBox.displayText).toBe('');
       listBox.setValue([1]);
-      jasmine.clock().tick(300);
       expect(listBox.value).toEqual([1]);
       expect(listBox.displayText).toBe('Foo');
       listBox.setValue([2]);
-      jasmine.clock().tick(300);
       expect(listBox.value).toEqual([2]);
       expect(listBox.displayText).toBe('Bar');
     });
@@ -469,12 +452,10 @@ describe('ListBox', () => {
       expect(listBox.displayText).toBe('');
 
       listBox.setValue(null);
-      jasmine.clock().tick(300);
       expect(listBox.value).toEqual([]);
       expect(listBox.displayText).toBe('');
 
       listBox.setValue(undefined);
-      jasmine.clock().tick(300);
       expect(listBox.value).toEqual([]);
       expect(listBox.displayText).toBe('');
     });
@@ -524,16 +505,16 @@ describe('ListBox', () => {
       expect(listBox.table.$data).toHaveAttr('role', 'listbox');
     });
 
-    it('has rows with aria role option', () => {
+    it('has rows with aria role option', async () => {
       let listBox = createFieldWithLookupCall();
-      jasmine.clock().tick(500);
+      await listBox.when('lookupCallDone');
       expect(listBox.table.rows.length).toBeGreaterThan(0);
       listBox.table.rows.forEach(row => {
         expect(row.$row).toHaveAttr('role', 'option');
       });
     });
 
-    it('has rows with posinset', () => {
+    it('has rows with posinset', async () => {
       let tableHelper = new TableSpecHelper(session);
       let lookupData = [];
       for (let i = 0; i < 20; i++) {
@@ -548,7 +529,7 @@ describe('ListBox', () => {
       });
       listBox.table.setViewRangeSize(3);
       listBox.render();
-      jasmine.clock().tick(500);
+      await listBox.when('lookupCallDone');
       tableHelper.assertAriaPosInSetAndSize(listBox.table.rows, 0, 20);
       tableHelper.assertNotAriaRowIndexAndCount(listBox.table);
 
