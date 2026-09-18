@@ -512,7 +512,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     this._lastSearchText = searchText;
     let promise = this._executeLookup(this.lookupCall.cloneForText(searchText), true);
     promise.then(this._acceptByTextDone.bind(this));
-    promise.then(this._triggerLookupCallDone.bind(this));
+    promise.then(this._triggerLookupCallDone.bind(this)); // TODO CGU test
     this._triggerAcceptByText(searchText);
   }
 
@@ -902,7 +902,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
       } else {
         let promise = this._executeLookup(this.lookupCall.cloneForAll(), true);
         promise.then(doneHandler);
-        promise.then(this._triggerLookupCallDone.bind(this));
+        promise.then(this._triggerLookupCallDone.bind(this)); // TODO CGU test
       }
     } else {
       // execute lookup byText with a debounce/delay

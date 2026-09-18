@@ -361,8 +361,8 @@ export class App extends EventEmitter {
     let deferred = new Deferred<InitModelOf<this>>();
     let newOptions = objects.valueCopy(options);
     newOptions.checkBrowserCompatibility = false;
-    $('.scout').each(function() {
-      let $entryPoint = $(this);
+    const $entryPoint = $('.scout');
+    $entryPoint.each(() => {
       let $box = $entryPoint.appendDiv();
 
       $box.load('unsupported-browser.html', () => {
@@ -472,10 +472,6 @@ export class App extends EventEmitter {
    */
   protected _installErrorHandler() {
     window.onerror = this.errorHandler.windowErrorHandler;
-    // FIXME bsh, cgu: use ErrorHandler to handle unhandled promise rejections. Just replacing jQuery.Deferred.exceptionHook(error, stack) does not work
-    // because it is called on every exception and not only on unhandled.
-    // https://developer.mozilla.org/en-US/docs/Web/API/Window/unhandledrejection_event would be exactly what we need, but jQuery does not support it.
-    // Bluebird has a polyfill -> can it be ported to jQuery?
   }
 
   protected _createErrorHandler(opts?: InitModelOf<ErrorHandler>): ErrorHandler {

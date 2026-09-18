@@ -416,7 +416,7 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
 
     let deferred = new Deferred<LookupResult<TValue>>();
     this._executeLookup(this.lookupCall.cloneForAll(), true)
-      .then(result => {
+      .then(result => { // TODO CGU test, was it already always async?
         this._lookupByAllDone(result);
         deferred.resolve(result);
       });

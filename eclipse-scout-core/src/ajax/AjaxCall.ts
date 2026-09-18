@@ -53,6 +53,7 @@ export class AjaxCall extends Call implements AjaxCallModel {
     }
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + (this.callCounter === 1 ? '--- ' : '') + this.ajaxOptions.method + ' "' + this.ajaxOptions.url + '"' + (this.callCounter === 1 ? ' ---' : ''));
 
+    // TODO CGU review
     let jqXHR = $.ajax(this.ajaxOptions);
     // Capture the extra arguments of jQuery's done/fail callbacks here (using jQuery's own multi-argument API,
     // since the underlying $.ajax() is out of scope for the native-promise migration), so that Call's generic

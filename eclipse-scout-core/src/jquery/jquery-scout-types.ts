@@ -187,7 +187,7 @@ declare global {
      *
      * @returns a {@link Promise} for an already resolved {@link Deferred} object.
      */
-    resolvedPromise(): Promise<void | undefined>;
+    resolvedPromise(): Promise<undefined>;
 
     /**
      * Use this function as shorthand of this:

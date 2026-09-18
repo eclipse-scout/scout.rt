@@ -148,7 +148,7 @@ export class DesktopAdapter extends ModelAdapter {
     }
     // cancel remote forms after js forms are canceled (i.e. the promise was resolved) or the js-form-cancellation was cancelled (i.e. the promise was rejected)
     if (formIds.length) {
-      cancelJsForms.finally(() => this._send('cancelForms', {formIds}));
+      cancelJsForms.finally(() => this._send('cancelForms', {formIds})); // TODO CGU test
     }
   }
 

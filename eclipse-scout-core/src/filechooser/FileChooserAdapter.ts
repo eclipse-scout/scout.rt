@@ -39,7 +39,7 @@ export class FileChooserAdapter extends ModelAdapter {
 
     this.session.uploadFiles(this, this.widget.files, undefined, this.widget.maximumUploadSize);
 
-    this.session.listen().then(() => {
+    this.session.listen().then(() => { // TODO CGU test
       if (this.widget && this.widget.rendered) {
         this.widget.uploadButton.setEnabled(true);
       }

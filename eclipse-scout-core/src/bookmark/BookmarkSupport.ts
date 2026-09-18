@@ -191,6 +191,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   // Native-promise version of activateBookmark()
+  // TODO CGU remove method and replace overrides
   protected async _activateBookmarkAsync(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): Promise<void> {
     try {
       if (!(bookmark?.definition instanceof OutlineBookmarkDefinitionDo)) {
@@ -240,6 +241,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   // Native-promise version of activateBookmarkPath()
+  // TODO CGU remove method and replace overrides
   protected async _activateBookmarkPathAsync(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): Promise<ActivateBookmarkPathResult> {
     try {
       if (this.loading) {
@@ -465,6 +467,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 
   // Native-promise version of applyBookmarkToPageAndReload()
+  // TODO CGU remove method and replace overrides
   protected async _applyBookmarkToPageAndReloadAsync(page: Page, bookmark: IBookmarkDo, saveState = true): Promise<void> {
     if (!page || !bookmark || !bookmark.definition) {
       return;
