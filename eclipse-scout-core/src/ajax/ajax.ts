@@ -103,6 +103,10 @@ export const ajax = {
   /**
    * Prepares an {@link AjaxCall}, but does not execute it yet.
    *
+   * Use this (instead of e.g. {@link ajax.get}) when access to the HTTP status code of the response is required:
+   * the shorthand functions only ever resolve with the response body, but {@link AjaxCall.lastXhr} is available
+   * on the returned {@link AjaxCall} once its promise has settled.
+   *
    * @param options additional settings for the request.
    *        Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.
    * @param model additional properties for the {@link AjaxCall}.
@@ -212,6 +216,10 @@ export const ajax = {
   /**
    * Prepares an HTTP call with JSON as format for the request and the response, but does not execute it yet.
    * The default HTTP method is POST.
+   *
+   * Use this (instead of e.g. {@link ajax.getJson}) when access to the HTTP status code of the response is required:
+   * the shorthand functions only ever resolve with the response body, but {@link AjaxCall.lastXhr} is available
+   * on the returned {@link AjaxCall} once its promise has settled.
    *
    * @param options additional settings for the request.
    *        Since jQuery is used to perform the request, all {@link https://api.jquery.com/jQuery.ajax/ jQuery.ajax} settings are accepted.

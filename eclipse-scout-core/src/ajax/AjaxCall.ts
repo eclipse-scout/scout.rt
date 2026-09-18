@@ -17,6 +17,15 @@ export class AjaxCall extends Call implements AjaxCallModel {
 
   ajaxOptions: UrlAjaxSettings;
   /**
+   * The {@link JQuery.jqXHR} of the last performed request (successful or not), e.g. to access the HTTP status code.
+   * Not available while the call is still pending, use {@link Call.pendingCall} for that.
+   *
+   * Only set on {@link AjaxCall} instances created directly, e.g. using {@link ajax.createCall}/{@link ajax.createCallJson}:
+   * the shorthand functions like {@link ajax.get}/{@link ajax.getJson} only ever return the resolved response body,
+   * since a native promise cannot carry the jqXHR alongside it the way a jQuery done/fail callback could.
+   */
+  lastXhr: JQuery.jqXHR;
+  /**
    * textStatus/errorThrown captured from the raw jQuery ajax callbacks (see {@link _callImpl}), since a native
    * promise only ever carries a single value and cannot preserve jQuery's multi-argument done/fail signature.
    */
@@ -27,6 +36,7 @@ export class AjaxCall extends Call implements AjaxCallModel {
     super();
     this.type = 'ajax';
     this.ajaxOptions = null;
+    this.lastXhr = null;
   }
 
   override init(model: InitModelOf<this>) {
@@ -60,9 +70,11 @@ export class AjaxCall extends Call implements AjaxCallModel {
     // (single-value) then/catch handling further down the chain can still access them via these fields.
     jqXHR
       .done((data, textStatus) => {
+        this.lastXhr = jqXHR;
         this._lastTextStatus = textStatus;
       })
       .fail((xhr, textStatus, errorThrown) => {
+        this.lastXhr = jqXHR;
         this._lastTextStatus = textStatus;
         this._lastErrorThrown = errorThrown;
       });

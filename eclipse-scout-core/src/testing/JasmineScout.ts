@@ -224,10 +224,14 @@ window.sleep = duration => {
 };
 
 export const JasmineScout = {
-  runTestSuite(context) {
-    beforeAll(async () => {
-      await this.startApp(TestingApp);
-    });
+  async runTestSuite(context) {
+    // Await full completion here, before any describe()/it() blocks are registered and before the spec files
+    // are loaded (see context.keys().forEach(context) below): some specs access globally bootstrapped state
+    // (e.g. HtmlEnvironment.get()) directly in their describe() body, which runs synchronously as soon as the
+    // spec module is loaded. With jQuery Deferred, App.init() used to complete synchronously within the same
+    // call (assisted by jasmine.clock().tick()); with native promises every then() is a microtask hop, so the
+    // completion must actually be awaited before proceeding.
+    await this.startApp(TestingApp);
 
     beforeAll(() => {
       spyOn(scout, 'reloadPage').and.callFake(() => {
