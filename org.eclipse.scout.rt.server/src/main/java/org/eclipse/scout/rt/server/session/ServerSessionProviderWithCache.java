@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 import org.eclipse.scout.rt.security.IAccessControlService;
@@ -99,7 +100,13 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
     @SuppressWarnings("unchecked") final SESSION cachedServerSession = (SESSION) m_cache.putIfAbsent(sessionCacheKey, serverSession);
     if (cachedServerSession != null) {
       LOG.trace("Found a cached server session, using that one instead - stopping the replaced one.");
-      serverSession.stop();
+      final SESSION finalServerSession = serverSession;
+      // stop session within a RunContext so that transactional resources are available (e.g. a DB connection)
+      serverRunContext
+          .copy()
+          .withTransactionScope(TransactionScope.REQUIRES_NEW) // enforce a new transaction
+          .withSession(finalServerSession)
+          .run(finalServerSession::stop);
       serverSession = cachedServerSession;
     }
 
