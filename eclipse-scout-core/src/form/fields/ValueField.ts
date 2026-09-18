@@ -659,16 +659,18 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     if (objects.isPromise(returned)) {
       this._updateDisplayTextPending = true;
       // Promise is returned -> set display text later
-      returned.then(text => this.setDisplayText(text), () => {
-        // If display text was updated in the meantime, don't override the text with an empty string
-        if (this._updateDisplayTextPending) {
-          this.setDisplayText('');
-        }
-        $.log.isInfoEnabled() && $.log.info('Could not resolve display text for value: ' + value);
-      });
-      returned.finally(() => {
-        this._updateDisplayTextPending = false;
-      });
+      returned
+        .then(text => this.setDisplayText(text))
+        .catch(() => {
+          // If display text was updated in the meantime, don't override the text with an empty string
+          if (this._updateDisplayTextPending) {
+            this.setDisplayText('');
+          }
+          $.log.isInfoEnabled() && $.log.info('Could not resolve display text for value: ' + value);
+        })
+        .finally(() => {
+          this._updateDisplayTextPending = false;
+        });
     } else {
       this.setDisplayText(returned);
       this._updateDisplayTextPending = false;

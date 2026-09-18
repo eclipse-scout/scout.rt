@@ -31,11 +31,9 @@ describe('SmartField', () => {
       text: 'Foo'
     });
     helper = new FormSpecHelper(session);
-    jasmine.clock().install();
   });
 
   afterEach(() => {
-    jasmine.clock().uninstall();
     removePopups(session);
     removePopups(session, '.touch-popup');
   });
@@ -82,10 +80,10 @@ describe('SmartField', () => {
       expect(field.lookupCall instanceof DummyLookupCall).toBe(true);
     });
 
-    it('when setValue is called, load and set the correct lookup row', () => {
+    it('when setValue is called, load and set the correct lookup row', async () => {
       field = createFieldWithLookupCall();
       field.setValue(1);
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       expect(field.displayText).toBe('Foo');
       expect(field.value).toBe(1);
       expect(field.lookupRow.key).toBe(1);
@@ -97,22 +95,28 @@ describe('SmartField', () => {
       expect(field.displayText).toBe('');
 
       field.setValue(2);
-      jasmine.clock().tick(300);
+      await field.when('lookupCallDone');
       expect(field.displayText).toBe('Bar');
       expect(field.value).toBe(2);
       expect(field.lookupRow.key).toBe(2);
     });
 
-    it('load proposals for the current displayText', () => {
+    it('load proposals for the current displayText', async () => {
+      // Use a real (deterministic) fake clock here to verify the loading indicator delay; the lookup call
+      // resolution itself still needs to be awaited afterward since that always settles via a microtask.
+      jasmine.clock().install();
       field = createFieldWithLookupCall();
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('b');
+      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
       jasmine.clock().tick(300);
       expect(field.$container.hasClass('loading')).toBe(false); // loading indicator is not shown before 400 ms
       jasmine.clock().tick(300);
+      jasmine.clock().uninstall();
+      await lookupDone;
       // expect we have 2 table rows
       expect(field.popup).not.toBe(null);
       expect(findTableProposals()).toEqual(['Bar', 'Baz']);
@@ -130,7 +134,6 @@ describe('SmartField', () => {
     });
 
     it('updates display text correctly even after consecutive setValue calls', done => {
-      jasmine.clock().uninstall();
       field = createFieldWithLookupCall({}, {
         objectType: MicrotaskStaticLookupCall,
         data: [[1, 'Foo'], [2, 'Bar', 1]]
@@ -156,15 +159,14 @@ describe('SmartField', () => {
 
   describe('clear', () => {
 
-    it('clears the value', () => {
+    it('clears the value', async () => {
       let field = createFieldWithLookupCall();
-      jasmine.clock().tick(500);
       field.render();
       field.$field.focus();
       field.setValue(1);
-      jasmine.clock().tick(500);
+      await sleep(500);
       JQueryTesting.triggerClick(field.$field);
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo');
       expect(field.$field.val()).toBe('Foo');
@@ -172,22 +174,22 @@ describe('SmartField', () => {
       expect(popup.proposalChooser.content.selectedRows.length).toBe(1);
 
       field.clear();
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
       expect(field.$field.val()).toBe('');
       expect(popup.proposalChooser.content.selectedRows.length).toBe(0);
     });
 
-    it('clears the value, also in embedded mode', () => {
+    it('clears the value, also in embedded mode', async () => {
       let field = createFieldWithLookupCall({
         touchMode: true
       });
       field.render();
       field.setValue(1);
-      jasmine.clock().tick(500);
+      await sleep(500);
       JQueryTesting.triggerClick(field.$field);
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo');
       expect(field.$field.text()).toBe('Foo');
@@ -196,7 +198,7 @@ describe('SmartField', () => {
 
       popup._field.$field.focus();
       popup._field.clear();
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(popup._field.value).toBe(null);
       expect(popup._field.displayText).toBe('');
       expect(popup._field.$field.val()).toBe('');
@@ -208,26 +210,26 @@ describe('SmartField', () => {
       expect(field.$field.val()).toBe('');
     });
 
-    it('clears the value, also in touch mode', () => {
+    it('clears the value, also in touch mode', async () => {
       let field = createFieldWithLookupCall({
         touchMode: true
       });
       field.render();
       field.setValue(1);
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo');
       expect(field.$field.text()).toBe('Foo');
 
       field.clear();
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
       expect(field.lookupRow).toBe(null);
       expect(field.$field.val()).toBe('');
     });
 
-    it('does not close the popup but does a browse all', () => {
+    it('does not close the popup but does a browse all', async () => {
       // This is especially important for mobile, but makes sense for regular case too.
       let field = createFieldWithLookupCall();
       field.render();
@@ -235,7 +237,7 @@ describe('SmartField', () => {
       field.$field.val('b');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
+      await sleep(500);
 
       // do not animate the removal of the SmartFieldPopup. Otherwise it will not be removed yet, when the new one should be opened. Then nothing is updated.
       field.popup.animateRemoval = false;
@@ -244,7 +246,7 @@ describe('SmartField', () => {
       expect(findTableProposals()).toEqual(['Bar', 'Baz']);
 
       field.clear();
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.popup).not.toBe(null);
       expect(findTableProposals()).toEqual(['Foo', 'Bar', 'Baz']);
     });
@@ -253,47 +255,47 @@ describe('SmartField', () => {
 
   describe('touch popup', () => {
 
-    it('marks field as clearable even if the field is not focused', () => {
+    it('marks field as clearable even if the field is not focused', async () => {
       let field = createFieldWithLookupCall({
         touchMode: true
       });
       field.render();
       field.$field.focus();
       field.setValue(1);
-      jasmine.clock().tick(500);
+      await sleep(500);
       JQueryTesting.triggerClick(field.$field);
-      jasmine.clock().tick(500);
+      await sleep(500);
       let popup = field.popup as SpecSmartFieldTouchPopup;
       expect(popup).not.toBe(null);
       expect(popup._field.$field.val()).toBe('Foo');
       expect(popup._field.$container).toHaveClass('clearable-always');
     });
 
-    it('stays open if active / inactive radio buttons are clicked', () => {
+    it('stays open if active / inactive radio buttons are clicked', async () => {
       let field = createFieldWithLookupCall({
         touchMode: true,
         activeFilterEnabled: true
       });
       field.render();
-      jasmine.clock().tick(500);
+      await sleep(500);
       JQueryTesting.triggerClick(field.$field);
-      jasmine.clock().tick(500);
+      await sleep(500);
       let popup = field.popup as SpecSmartFieldTouchPopup;
       popup._widget.activeFilterGroup.radioButtons[1].select();
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(popup).not.toBe(null);
     });
 
-    it('stays open even if there are no results (with active filter)', () => {
+    it('stays open even if there are no results (with active filter)', async () => {
       // Use case: Click on touch smart field, select inactive radio button, clear the text in the field -> smart field has to stay open
       let field = createFieldWithLookupCall({
         touchMode: true,
         activeFilterEnabled: true
       });
       field.render();
-      jasmine.clock().tick(500);
+      await sleep(500);
       JQueryTesting.triggerClick(field.$field);
-      jasmine.clock().tick(500);
+      await sleep(500);
       let popup = field.popup as SpecSmartFieldTouchPopup;
       popup._widget.activeFilterGroup.radioButtons[1].select();
       // Simulate that lookup call does not return any data (happens if user clicks 'inactive' radio button and there are no inactive rows
@@ -302,11 +304,11 @@ describe('SmartField', () => {
       JQueryTesting.triggerKeyDown(popup._field.$field, keys.BACKSPACE);
       // @ts-expect-error
       popup._field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(popup).not.toBe(null);
     });
 
-    it('removes tooltip from original field on open and displays it again when closed', () => {
+    it('removes tooltip from original field on open and displays it again when closed', async () => {
       let field = createFieldWithLookupCall({
         touchMode: true,
         errorStatus: Status.error({
@@ -314,20 +316,20 @@ describe('SmartField', () => {
         })
       });
       field.render();
-      jasmine.clock().tick(500);
+      await sleep(500);
       JQueryTesting.triggerClick(field.$field);
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.tooltip().rendered).toBe(false);
       let popup = field.popup as SpecSmartFieldTouchPopup;
       expect(popup._field.tooltip().rendered).toBe(true);
 
       popup.close();
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.popup).toBe(null);
       expect(field.tooltip().rendered).toBe(true);
     });
 
-    it('does not draw glass pane over tooltip', () => {
+    it('does not draw glass pane over tooltip', async () => {
       let field = createFieldWithLookupCall({
         touchMode: true,
         errorStatus: Status.error({
@@ -335,15 +337,15 @@ describe('SmartField', () => {
         })
       });
       field.render();
-      jasmine.clock().tick(500);
+      await sleep(500);
       JQueryTesting.triggerClick(field.$field);
-      jasmine.clock().tick(500);
+      await sleep(500);
       let popup = field.popup as SpecSmartFieldTouchPopup;
       expect(popup._field.tooltip().rendered).toBe(true);
       expect(popup._field.tooltip().$container.find('.glasspane').length).toBe(0);
     });
 
-    it('delegates lookup events to original field', () => {
+    it('delegates lookup events to original field', async () => {
       let field = createFieldWithLookupCall({
         touchMode: true
       });
@@ -358,15 +360,15 @@ describe('SmartField', () => {
       field.on('prepareLookupCall', onPrepareLookupCall.bind(field));
       field.on('lookupCallDone', onLookupCallDone.bind(field));
       field.render();
-      jasmine.clock().tick(500);
+      await sleep(500);
       JQueryTesting.triggerClick(field.$field);
-      jasmine.clock().tick(500);
+      await sleep(500);
 
       let popup = field.popup as SpecSmartFieldTouchPopup;
       let oldPrepareLookupCallCounter = prepareLookupCallCounter;
       let oldLookupCallDoneCounter = lookupCallDoneCounter;
       popup._field.setValue(1);
-      jasmine.clock().tick(500);
+      await sleep(500);
       JQueryTesting.triggerClick(field.$field);
 
       expect(prepareLookupCallCounter).toBe(oldPrepareLookupCallCounter + 1);
@@ -377,7 +379,7 @@ describe('SmartField', () => {
 
   describe('acceptInput', () => {
 
-    it('should not be triggered, when search text is (still) empty or equals to the text of the lookup row', () => {
+    it('should not be triggered, when search text is (still) empty or equals to the text of the lookup row', async () => {
       let field = createFieldWithLookupCall();
       let eventTriggered = false;
       field.render();
@@ -390,7 +392,7 @@ describe('SmartField', () => {
 
       // text equals case
       field.setValue(1); // set lookup row [1, Foo]
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.lookupRow.text).toBe('Foo');
       expect(field.$field.val()).toBe('Foo');
       expect(field.value).toBe(1);
@@ -399,7 +401,7 @@ describe('SmartField', () => {
     });
 
     // ticket #214831
-    it('should not be triggered, when search text is (still) empty or equals to the text of the lookup row (lookupRow.text is null)', () => {
+    it('should not be triggered, when search text is (still) empty or equals to the text of the lookup row (lookupRow.text is null)', async () => {
       let field = createFieldWithLookupCall({}, {
         showText: false
       });
@@ -414,7 +416,7 @@ describe('SmartField', () => {
 
       // text equals case
       field.setValue(1); // set lookup row [1, null]
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.lookupRow.text).toBe(null);
       expect(field.$field.val()).toBe('');
       expect(field.value).toBe(1);
@@ -464,18 +466,18 @@ describe('SmartField', () => {
     });
 
     // test for ticket #228288
-    it('adds CSS class from selected lookup-row to field', () => {
+    it('adds CSS class from selected lookup-row to field', async () => {
       let field = createFieldWithLookupCall();
       expect(strings.hasText(field.cssClass)).toBe(false);
       field.setValue(1);
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.cssClass).toEqual('foo');
       field.setValue(null);
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(strings.hasText(field.cssClass)).toBe(false);
     });
 
-    it('does not trigger unnecessary property change event for cssClass when lookup-row is selected', () => {
+    it('does not trigger unnecessary property change event for cssClass when lookup-row is selected', async () => {
       let eventCount = 0;
       let field = scout.create(SmartField, {
         parent: session.desktop,
@@ -496,12 +498,12 @@ describe('SmartField', () => {
       field.on('propertyChange:cssClass', () => eventCount++);
       expect(field.cssClass).toBe(null);
       field.setValue(1);
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.cssClass).toBe(null);
       expect(eventCount).toBe(0);
 
       field.setValue(2);
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.cssClass).toBe('cls');
       expect(eventCount).toBe(1);
     });
@@ -509,7 +511,7 @@ describe('SmartField', () => {
 
   describe('lookupCall', () => {
 
-    it('should be cloned and prepared for each lookup', () => {
+    it('should be cloned and prepared for each lookup', async () => {
       let templatePropertyValue = 11;
       let preparedPropertyValue = 22;
       let eventCounter = 0;
@@ -533,12 +535,12 @@ describe('SmartField', () => {
       });
 
       field.setValue(1); // triggers lookup call by key
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo' + preparedPropertyValue);
 
       field._acceptByText(false, 'Bar'); // triggers lookup call by text
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.value).toBe(2);
       expect(field.displayText).toBe('Bar' + preparedPropertyValue);
 
@@ -549,13 +551,13 @@ describe('SmartField', () => {
 
   describe('lookup', () => {
 
-    it('should increase lookupSeqNo when a lookup is executed', () => {
+    it('should increase lookupSeqNo when a lookup is executed', async () => {
       let field = createFieldWithLookupCall();
       field.render();
       field.$field.focus();
       expect(field.lookupSeqNo).toBe(0);
       field._lookupByTextOrAll(false, 'Bar');
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.lookupSeqNo).toBe(1);
       expect(field.popup.lookupResult.seqNo).toBe(1); // seqNo must be set on the lookupResult of the popup
     });
@@ -571,7 +573,7 @@ describe('SmartField', () => {
       expect(field.errorStatus.message).toBe('a total disaster');
     });
 
-    it('_executeLookup should always remove lookup-status (but not the error-status)', () => {
+    it('_executeLookup should always remove lookup-status (but not the error-status)', async () => {
       let field = createFieldWithLookupCall();
       let lookupStatus = Status.warning({
         message: 'bar'
@@ -581,8 +583,7 @@ describe('SmartField', () => {
       });
       field.setLookupStatus(lookupStatus);
       field.setErrorStatus(errorStatus);
-      field._executeLookup(field.lookupCall.cloneForKey(1));
-      jasmine.clock().tick(500);
+      await field._executeLookup(field.lookupCall.cloneForKey(1));
       expect(field.errorStatus).toBe(errorStatus);
       expect(field.lookupStatus).toBe(null);
     });
@@ -591,56 +592,44 @@ describe('SmartField', () => {
      * The hierarchical result contains 2 lookup-rows, but only leafs are counted when the numLookupRows
      * property is set which is used to determine whether or not the result is unqiue.
      */
-    it('hierarchical lookup with unique result', () => {
+    it('hierarchical lookup with unique result', async () => {
       let field = createFieldWithLookupCall({
         browseHierarchy: true
       }, {
         hierarchical: true
       });
-      let result = null;
       field.render();
       field.$field.val('Bar');
-      field._lookupByTextOrAll()
-        .then(result0 => {
-          result = result0;
-        });
-      jasmine.clock().tick(500); // 2 ticks required for promises in StaticLookupCall.js
-      jasmine.clock().tick(500);
+      let result = await field._lookupByTextOrAll();
       expect(result.numLookupRows).toBe(1);
       expect(result.lookupRows.length).toBe(2); // 2 because parent row has been added to result
       expect(result.uniqueMatch.text).toBe('Bar');
       expect(result.byText).toBe(true);
     });
 
-    it('lookupByKey should set first lookup-row from result as this.lookupRow', () => {
+    it('lookupByKey should set first lookup-row from result as this.lookupRow', async () => {
       let field = createFieldWithLookupCall();
-      let displayText = null;
-      let result = field._formatValue(3) as Promise<string>; // triggers lookup by key
-      result.then(displayText0 => {
-        displayText = displayText0;
-      });
-      jasmine.clock().tick(500);
+      let displayText = await field._formatValue(3); // triggers lookup by key
       expect(displayText).toBe('Baz');
     });
 
-    it('lookupByKey should set a validation warning status if there was an error during processing', () => {
+    it('lookupByKey should set a validation warning status if there was an error during processing', async () => {
       let field = createFieldWithNoDataKeyLookupCall(true);
       field.setValue(4 /* non-existing key */); // triggers lookup by key
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.errorStatus).toBeInstanceOf(ValidationFailedStatus);
       expect(field.errorStatus.isWarning()).toBeTrue();
     });
 
-    it('lookupByKey should set a validation warning status if the lookup call returns no lookup row', () => {
+    it('lookupByKey should set a validation warning status if the lookup call returns no lookup row', async () => {
       let field = createFieldWithNoDataKeyLookupCall(false);
       field.setValue(0); // triggers lookup by key
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.errorStatus).toBeInstanceOf(ValidationFailedStatus);
       expect(field.errorStatus.isWarning()).toBeTrue();
     });
 
     it('lookupByKey should not set a validation warning status if lookup was aborted', async () => {
-      jasmine.clock().uninstall();
       let field = createFieldWithLookupCall({}, {
         objectType: MicrotaskStaticLookupCall,
         data: [[1, 'Foo'], [2, 'Bar', 1]]
@@ -660,7 +649,6 @@ describe('SmartField', () => {
     });
 
     it('lookupByKey should not set a validation warning status if a second setValue call sets a valid value with setTimeout', async () => {
-      jasmine.clock().uninstall();
       let field = createFieldWithLookupCall({}, {
         objectType: MicrotaskStaticLookupCall
       });
@@ -676,7 +664,6 @@ describe('SmartField', () => {
     });
 
     it('lookupByKey should not set a validation warning status if first lookup was aborted and second still running', async () => {
-      jasmine.clock().uninstall();
       let field = createFieldWithLookupCall({}, {
         objectType: DelayedStaticLookupCall,
         data: [[1, 'Foo'], [2, 'Bar', 1]]
@@ -770,51 +757,47 @@ describe('SmartField', () => {
 
   describe('searchRequired', () => {
 
-    it('opens popup if search available and searchRequired=true', () => {
+    it('opens popup if search available and searchRequired=true', async () => {
       let field = createFieldWithLookupCall();
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.setSearchRequired(true);
       field.setDisplayText('Fo'); // DummyLookupCall contains row named 'Foo'.
-      field.openPopup();
-      jasmine.clock().tick(500);
+      await field.openPopup();
 
       expect(field.isPopupOpen()).toBe(true);
       expect(findTableProposals()).toEqual(['Foo']);
       expect(field.lookupStatus).toBe(null);
     });
 
-    it('opens popup if no search available and searchRequired=false', () => {
+    it('opens popup if no search available and searchRequired=false', async () => {
       let field = createFieldWithLookupCall();
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
-      field.openPopup();
-      jasmine.clock().tick(500);
+      await field.openPopup();
 
       expect(field.isPopupOpen()).toBe(true);
       expect(findTableProposals()).toEqual(['Foo', 'Bar', 'Baz']);
     });
 
-    it('has no popup if no search available and searchRequired=true', () => {
+    it('has no popup if no search available and searchRequired=true', async () => {
       let field = createFieldWithLookupCall();
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.setSearchRequired(true);
-      field.openPopup();
-      jasmine.clock().tick(500);
+      await field.openPopup();
 
       expect(field.isPopupOpen()).toBe(false);
       expect(field.lookupStatus.code).toBe(SmartField.ErrorCode.SEARCH_REQUIRED);
     });
 
-    it('has empty popup if no search available and searchRequired=true and touch', () => {
+    it('has empty popup if no search available and searchRequired=true and touch', async () => {
       let field = createFieldWithLookupCall({
         touchMode: true
       });
       field.render();
       field.setSearchRequired(true);
-      field.openPopup();
-      jasmine.clock().tick(500);
+      await field.openPopup();
 
       expect(field.isPopupOpen()).toBe(true);
       expect(findTableProposals().length).toBe(0);
@@ -863,7 +846,7 @@ describe('SmartField', () => {
 
   describe('aboutToBlurByMouseDown', () => { // see ticket #228888
 
-    it('should not perform lookup for search by text', () => {
+    it('should not perform lookup for search by text', async () => {
       let field = createFieldWithLookupCall();
       let eventTriggered = false;
       field.render();
@@ -873,13 +856,13 @@ describe('SmartField', () => {
       field.$field.focus();
 
       field.setValue(1);
-      jasmine.clock().tick(300);
+      await sleep(300);
       expect(field.displayText).toBe('Foo');
 
       field.$field.val('search!');
       field._userWasTyping = true;
       field.aboutToBlurByMouseDown(undefined);
-      jasmine.clock().tick(300);
+      await sleep(300);
 
       // test if _acceptByText has been called with sync=true
       // this should reset the display text and trigger the acceptInput event
@@ -1024,10 +1007,10 @@ describe('SmartField', () => {
      * We expect undefined, because the function simply returns in that case. Every other logical
      * branch in the function would return a promise.
      */
-    it('should not perform lookup when Ctrl+A has been pressed', () => {
+    it('should not perform lookup when Ctrl+A has been pressed', async () => {
       field.render();
       field.setValue(1);
-      jasmine.clock().tick(300);
+      await sleep(300);
       expect(field.lookupRow.text).toBe('Foo');
 
       // case 1: text from lookup-row is the same as the search-text
@@ -1066,18 +1049,18 @@ describe('SmartField', () => {
       });
     });
 
-    it('uses a lookup call to format the value', () => {
+    it('uses a lookup call to format the value', async () => {
       let model = helper.createFieldModel('SmartField', session.desktop, {
         lookupCall: lookupCall
       });
       let smartField = scout.create(SmartField, model);
       expect(smartField.displayText).toBe('');
       smartField.setValue(1);
-      jasmine.clock().tick(300);
+      await sleep(300);
       expect(smartField.value).toBe(1);
       expect(smartField.displayText).toBe('Foo');
       smartField.setValue(2);
-      jasmine.clock().tick(300);
+      await sleep(300);
       expect(smartField.value).toBe(2);
       expect(smartField.displayText).toBe('Bar');
     });
@@ -1089,18 +1072,17 @@ describe('SmartField', () => {
       let smartField = scout.create(SmartField, model);
       expect(smartField.displayText).toBe('');
       smartField.setValue(null);
-      jasmine.clock().tick(300);
       expect(smartField.value).toBe(null);
       expect(smartField.displayText).toBe('');
       smartField.setValue(undefined);
-      jasmine.clock().tick(300);
       expect(smartField.value).toBe(null);
       expect(smartField.displayText).toBe('');
     });
 
-    it('aborts previous lookup call when setValue() is called multiple times', () => {
+    it('aborts previous lookup call when setValue() is called multiple times', async () => {
 
       // --- Case 1: initial value exists, then value is set to null ---
+      // (setValue(null) aborts the pending lookup from the initial value; the abort is caught internally, nothing more happens)
 
       let smartField = scout.create(SmartField, {
         parent: session.desktop,
@@ -1111,10 +1093,6 @@ describe('SmartField', () => {
       expect(smartField.displayText).toBe(null);
 
       smartField.setValue(null);
-      expect(smartField.value).toBe(null);
-      expect(smartField.displayText).toBe('');
-
-      jasmine.clock().tick(300);
       expect(smartField.value).toBe(null);
       expect(smartField.displayText).toBe('');
 
@@ -1135,10 +1113,6 @@ describe('SmartField', () => {
       expect(smartField.value).toBe(null);
       expect(smartField.displayText).toBe('');
 
-      jasmine.clock().tick(300);
-      expect(smartField.value).toBe(null);
-      expect(smartField.displayText).toBe('');
-
       // --- Case 3: value is set to '1', then to '2' ---
 
       smartField = scout.create(SmartField, {
@@ -1156,7 +1130,7 @@ describe('SmartField', () => {
       expect(smartField.value).toBe(2);
       expect(smartField.displayText).toBe('');
 
-      jasmine.clock().tick(300);
+      await sleep(300);
       expect(smartField.value).toBe(2);
       expect(smartField.displayText).toBe('Bar');
     });
@@ -1173,13 +1147,13 @@ describe('SmartField', () => {
       });
     });
 
-    it('_readSearchText() must concat text of input element and additional lines - required for acceptInput', () => {
+    it('_readSearchText() must concat text of input element and additional lines - required for acceptInput', async () => {
       let model = helper.createFieldModel('SmartField', session.desktop, {
         lookupCall: lookupCall,
         value: 1
       }) as FullModelOf<SmartField<number>>;
       let smartField = scout.create(SpecSmartField, model);
-      jasmine.clock().tick(300);
+      await sleep(300);
       smartField.render();
       expect(smartField._readDisplayText()).toEqual('1:Foo');
       expect(smartField._readSearchText()).toEqual('1:Foo\n2:Foo');
@@ -1189,28 +1163,28 @@ describe('SmartField', () => {
       expect(smartField._readSearchText()).toEqual('1:Meep\n2:Foo');
     });
 
-    it('multi-line lookupcall on single-line field', () => {
+    it('multi-line lookupcall on single-line field', async () => {
       // will be displayed multi-line in proposal, but single-line as display text
       let model = helper.createFieldModel('SmartField', session.desktop, {
         lookupCall: lookupCall,
         value: 1
       }) as FullModelOf<SmartField<number>>;
       let smartField = scout.create(SpecSmartField, model);
-      jasmine.clock().tick(300);
+      await sleep(300);
       smartField.render();
       expect(smartField.value).toBe(1);
       expect(fields.valOrText(smartField.$field)).toBe('1:Foo');
       expect(smartField.displayText).toEqual('1:Foo\n2:Foo');
     });
 
-    it('multi-line lookupcall on multi-line field', () => {
+    it('multi-line lookupcall on multi-line field', async () => {
       // _additionalLines will be rendered to _$multilineField
       let model = helper.createFieldModel('SmartFieldMultiline', session.desktop, {
         lookupCall: lookupCall,
         value: 1
       }) as FullModelOf<SmartField<number>>;
       let smartFieldMultiline = scout.create(SmartFieldMultiline, model);
-      jasmine.clock().tick(300);
+      await sleep(300);
       smartFieldMultiline.render();
       expect(smartFieldMultiline.value).toBe(1);
       expect(fields.valOrText(smartFieldMultiline.$field)).toBe('1:Foo');
@@ -1221,7 +1195,7 @@ describe('SmartField', () => {
 
   describe('label', () => {
 
-    it('focuses the field when clicked', () => {
+    it('focuses the field when clicked', async () => {
       let smartField = scout.create(SmartField, {
         parent: session.desktop,
         label: 'label',
@@ -1229,13 +1203,13 @@ describe('SmartField', () => {
       });
       smartField.render();
       JQueryTesting.triggerClick(smartField.$label);
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(smartField.popup).toBeTruthy();
 
       smartField.popup.close();
     });
 
-    it('focuses the field when clicked (also in multiline mode)', () => {
+    it('focuses the field when clicked (also in multiline mode)', async () => {
       let smartField = scout.create(SmartFieldMultiline, {
         parent: session.desktop,
         label: 'label',
@@ -1243,7 +1217,7 @@ describe('SmartField', () => {
       });
       smartField.render();
       JQueryTesting.triggerClick(smartField.$label);
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(smartField.popup).toBeTruthy();
 
       smartField.popup.close();
@@ -1252,7 +1226,7 @@ describe('SmartField', () => {
   });
 
   describe('column descriptors', () => {
-    it('with default lookup column at first position renders lookup row column at first position', () => {
+    it('with default lookup column at first position renders lookup row column at first position', async () => {
       let field = createFieldWithLookupCall({}, {
         objectType: ColumnDescriptorDummyLookupCall
       });
@@ -1271,14 +1245,14 @@ describe('SmartField', () => {
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('Bar');
       field._onFieldKeyUp($.Event('keyup', {}) as JQuery.KeyUpEvent);
-      jasmine.clock().tick(500);
+      await sleep(500);
       let popup = field.popup as SmartFieldPopup<any>;
       expect(popup.proposalChooser.content.rows[0].cells[0].text).toBe('Bar');
       expect(popup.proposalChooser.content.rows[0].cells[1].text).toBe('Bar column1');
       expect(popup.proposalChooser.content.rows[0].cells[2].text).toBe('Bar column2');
     });
 
-    it('with default lookup column in the middle renders lookup row column in the middle', () => {
+    it('with default lookup column in the middle renders lookup row column in the middle', async () => {
       let field = createFieldWithLookupCall({}, {
         objectType: ColumnDescriptorDummyLookupCall
       });
@@ -1299,7 +1273,7 @@ describe('SmartField', () => {
       field.$field.val('Bar');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
+      await sleep(500);
       let popup = field.popup as SmartFieldPopup<any>;
       expect(popup.proposalChooser.content.rows[0].cells[0].text).toBe('Bar column1');
       expect(popup.proposalChooser.content.rows[0].cells[1].text).toBe('Bar');
@@ -1355,7 +1329,7 @@ describe('SmartField', () => {
       expect(smartField.$field.attr('aria-label')).toBeFalsy();
     });
 
-    it('has a non empty status container that lists count of available options', () => {
+    it('has a non empty status container that lists count of available options', async () => {
       let field = createFieldWithLookupCall({}, {
         objectType: ColumnDescriptorDummyLookupCall
       });
@@ -1363,23 +1337,23 @@ describe('SmartField', () => {
       field.$field.focus(); // must be focused, otherwise popup will not open
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.$screenReaderStatus).toHaveAttr('role', 'status');
       expect(field.$screenReaderStatus).toHaveClass('sr-only');
       expect(field.$screenReaderStatus.children('.sr-lookup-row-count').length).toBe(1);
       expect(field.$screenReaderStatus.children('.sr-lookup-row-count').eq(0)).not.toBeEmpty();
     });
 
-    it('does not add status if field is not focused', () => {
+    it('does not add status if field is not focused', async () => {
       let field = createFieldWithLookupCall({
         value: 1
       });
       field.render();
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.$screenReaderStatus.children('.sr-lookup-row-count').length).toBe(0);
     });
 
-    it('has a aria-expanded set correctly if pop up is open/closed', () => {
+    it('has a aria-expanded set correctly if pop up is open/closed', async () => {
       let field = createFieldWithLookupCall({}, {
         objectType: ColumnDescriptorDummyLookupCall
       });
@@ -1388,12 +1362,12 @@ describe('SmartField', () => {
       field.$field.focus(); // must be focused, otherwise popup will not open
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.$field).toHaveAttr('aria-expanded', 'true');
       field.closePopup();
     });
 
-    it('has a aria-controls set correctly if pop up is open/closed', () => {
+    it('has a aria-controls set correctly if pop up is open/closed', async () => {
       let field = createFieldWithLookupCall({}, {
         objectType: ColumnDescriptorDummyLookupCall
       });
@@ -1402,12 +1376,12 @@ describe('SmartField', () => {
       field.$field.focus(); // must be focused, otherwise popup will not open
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.$field.attr('aria-controls')).toBe(field.popup.$container.attr('id'));
       field.closePopup();
     });
 
-    it('has a aria-activedescendant set correctly if pop up is open/closed', () => {
+    it('has a aria-activedescendant set correctly if pop up is open/closed', async () => {
       let field = createFieldWithLookupCall({}, {
         objectType: ColumnDescriptorDummyLookupCall
       });
@@ -1416,7 +1390,7 @@ describe('SmartField', () => {
       field.$field.focus(); // must be focused, otherwise popup will not open
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
+      await sleep(500);
       JQueryTesting.triggerKeyDown(field.$field, keys.DOWN);
       expect(field.$field.attr('aria-activedescendant')).toBeTruthy();
       field.closePopup();
@@ -1425,7 +1399,7 @@ describe('SmartField', () => {
 
   describe('updateLookupRow', () => {
 
-    it('rebuilds the lookup row without triggering a value property change', () => {
+    it('rebuilds the lookup row without triggering a value property change', async () => {
       const field = createFieldWithLookupCall(undefined, {
         data: [
           [10, 'Dog'],
@@ -1438,7 +1412,7 @@ describe('SmartField', () => {
       field.on('propertyChange', event => propertyChangeEvents.push(event));
 
       field.setValue(20);
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.displayText).toBe('Cat');
 
       expect(propertyChangeEvents.map(event => event.propertyName)).toEqual([
@@ -1459,7 +1433,7 @@ describe('SmartField', () => {
         [30, 'Maus']
       ]);
       field.updateLookupRow();
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(field.displayText).toBe('Katze');
       expect(propertyChangeEvents.map(event => event.propertyName)).toEqual([
         // Remove old lookup row

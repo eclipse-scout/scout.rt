@@ -511,9 +511,19 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
   protected _acceptByTextAsync(searchText: string) {
     this._lastSearchText = searchText;
     let promise = this._executeLookup(this.lookupCall.cloneForText(searchText), true);
-    promise.then(this._acceptByTextDone.bind(this));
-    promise.then(this._triggerLookupCallDone.bind(this)); // TODO CGU test
+    promise.then(this._acceptByTextDone.bind(this)).catch(this._ignoreLookupAbort.bind(this));
+    promise.then(this._triggerLookupCallDone.bind(this)).catch(this._ignoreLookupAbort.bind(this)); // TODO CGU test
     this._triggerAcceptByText(searchText);
+  }
+
+  /**
+   * Swallows the rejection caused by aborting a stale lookup call in favor of a newer one (see abortExisting in {@link _executeLookup}); any other error is rethrown.
+   */
+  protected _ignoreLookupAbort(e: any) {
+    if (objects.isPojo(e) && e.abort) {
+      return;
+    }
+    throw e;
   }
 
   protected _inputAccepted(triggerEvent?: boolean, acceptByLookupRow?: boolean) {
@@ -901,8 +911,8 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
         }));
       } else {
         let promise = this._executeLookup(this.lookupCall.cloneForAll(), true);
-        promise.then(doneHandler);
-        promise.then(this._triggerLookupCallDone.bind(this)); // TODO CGU test
+        promise.then(doneHandler).catch(this._ignoreLookupAbort.bind(this));
+        promise.then(this._triggerLookupCallDone.bind(this)).catch(this._ignoreLookupAbort.bind(this)); // TODO CGU test
       }
     } else {
       // execute lookup byText with a debounce/delay
@@ -910,8 +920,8 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
         $.log.isDebugEnabled() && $.log.debug('(SmartField#_lookupByTextOrAll) lookup byText searchText=' + searchText);
         this._lastSearchText = searchText;
         let promise = this._executeLookup(this.lookupCall.cloneForText(searchText), true);
-        promise.then(doneHandler);
-        promise.then(this._triggerLookupCallDone.bind(this));
+        promise.then(doneHandler).catch(this._ignoreLookupAbort.bind(this));
+        promise.then(this._triggerLookupCallDone.bind(this)).catch(this._ignoreLookupAbort.bind(this));
       }, SmartField.DEBOUNCE_DELAY);
     }
 

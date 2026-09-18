@@ -2242,6 +2242,10 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
           return;
         }
         let row = $row.data('row') as TableRow;
+        if (!row) {
+          // If $row has no binding to row or if the binding has already been removed, ignore it // TODO CGU happend in SmartFieldSpec, why?
+          return;
+        }
         this._removeRow(row);
       });
     }
