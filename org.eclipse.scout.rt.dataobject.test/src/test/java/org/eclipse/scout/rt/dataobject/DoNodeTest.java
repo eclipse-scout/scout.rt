@@ -127,12 +127,15 @@ public class DoNodeTest {
     FixtureDoNode<byte[]> node2 = new FixtureDoNode<>();
 
     assertEquals(node1, node2);
+    assertEquals(node1.hashCode(), node2.hashCode());
+
     node1.set(new byte[]{1, 2, 3});
     assertNotEquals(node1, node2);
     assertNotEquals(node2, node1);
 
     node2.set(new byte[]{1, 2, 3});
     assertEquals(node1, node2);
+    assertEquals(node1.hashCode(), node2.hashCode());
   }
 
   @Test
@@ -147,6 +150,7 @@ public class DoNodeTest {
 
     node2.set(new BigDecimal(100));
     assertEquals(node1, node2);
+    assertEquals(node1.hashCode(), node2.hashCode());
 
     // BigDecimal is not equals if scale does not match
     node2.set(new BigDecimal(100).setScale(100));
