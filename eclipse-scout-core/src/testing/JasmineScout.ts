@@ -30,7 +30,7 @@ declare global {
 
     override _processStartupResponse(data: SessionStartupResponse);
 
-    override _resumeBackgroundJobPolling();
+    override _resumeBackgroundJobPolling(): Promise<void>;
 
     override _processErrorJsonResponse(jsonError: JsonErrorResponse);
 

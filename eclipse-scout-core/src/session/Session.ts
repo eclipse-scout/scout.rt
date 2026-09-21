@@ -881,10 +881,10 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
    * (Re-)starts background job polling when not started yet or when an error occurred while polling.
    * In the latter case, polling is resumed when a user-initiated request has been successful.
    */
-  protected _resumeBackgroundJobPolling() {
+  protected _resumeBackgroundJobPolling(): Promise<void> {
     if (this.backgroundJobPollingSupport.enabled && this.backgroundJobPollingSupport.status !== BackgroundJobPollingStatus.RUNNING) {
       $.log.isInfoEnabled() && $.log.info('Resume background jobs polling request, status was=' + this.backgroundJobPollingSupport.status);
-      this._pollForBackgroundJobs();
+      return this._pollForBackgroundJobs();
     }
   }
 
@@ -894,7 +894,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
    * the server doesn't return until either a time-out occurs or there's something in the response when
    * a model job is done and no request initiated by a user is running.
    */
-  protected _pollForBackgroundJobs() {
+  protected _pollForBackgroundJobs(): Promise<void> {
     this.backgroundJobPollingSupport.setRunning();
 
     let request = this._newRequest({
@@ -904,7 +904,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
 
     let ajaxOptions = this.defaultAjaxOptions(request);
 
-    this._callAjax({
+    return this._callAjax({
       ajaxOptions: ajaxOptions,
       name: this._getRequestName(request, 'request')
     })
