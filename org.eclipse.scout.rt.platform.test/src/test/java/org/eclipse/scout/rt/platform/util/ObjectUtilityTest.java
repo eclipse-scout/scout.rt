@@ -79,7 +79,7 @@ public class ObjectUtilityTest {
   }
 
   /**
-   * Tests {@link org.eclipse.scout.rt.platform.util.ObjectUtility#equals(T, T) ObjectUtility#equals(T, T)} with respect
+   * Tests {@link org.eclipse.scout.rt.platform.util.ObjectUtility#equals(Object, Object)} with respect
    * to {@link java.util.Date} and {@link java.sql.Timestamp}. Comparison with null.
    */
   @Test
@@ -91,7 +91,7 @@ public class ObjectUtilityTest {
   }
 
   /**
-   * Tests {@link org.eclipse.scout.rt.platform.util.ObjectUtility#equals(T, T) ObjectUtility#equals(T, T)} with respect
+   * Tests {@link org.eclipse.scout.rt.platform.util.ObjectUtility#equals(Object, Object)} with respect
    * to {@link java.util.Date} and {@link java.sql.Timestamp}. <br>
    * Test comparison between _equal_ dates of different types.
    */
@@ -105,7 +105,7 @@ public class ObjectUtilityTest {
   }
 
   /**
-   * Tests {@link org.eclipse.scout.rt.platform.util.ObjectUtility#equals(T, T) ObjectUtility#equals(T, T)} with respect
+   * Tests {@link org.eclipse.scout.rt.platform.util.ObjectUtility#equals(Object, Object)} with respect
    * to {@link java.util.Date} and {@link java.sql.Timestamp}. <br>
    * Test comparison between _unequal_ dates of different types
    */
@@ -124,7 +124,7 @@ public class ObjectUtilityTest {
   }
 
   /**
-   * Tests {@link org.eclipse.scout.rt.platform.util.ObjectUtility#equals(T, T) ObjectUtility#equals(T, T)} with respect
+   * Tests {@link org.eclipse.scout.rt.platform.util.ObjectUtility#equals(Object, Object)} with respect
    * to {@link java.util.Date} and {@link java.sql.Timestamp}. <br>
    * Test comparison of objects of non-related types
    */
@@ -138,7 +138,7 @@ public class ObjectUtilityTest {
   }
 
   /**
-   * Tests {@link org.eclipse.scout.rt.platform.util.ObjectUtility#equals(T, T) ObjectUtility#equals(T, T)} with respect
+   * Tests {@link org.eclipse.scout.rt.platform.util.ObjectUtility#equals(Object, Object)} with respect
    * to {@link java.util.Date} and {@link java.sql.Timestamp}. <br>
    * Test comparison of non-Date/Timestamp objects
    */
@@ -173,6 +173,35 @@ public class ObjectUtilityTest {
   public void testNotEquals() {
     assertTrue(ObjectUtility.notEquals("a", "b"));
     assertFalse(ObjectUtility.notEquals("a", "a"));
+  }
+
+  @Test
+  public void testHashCode_Null() {
+    assertEquals(0, ObjectUtility.hashCode(null));
+  }
+
+  @Test
+  public void testHashCode_Strings() {
+    String s = TEST_STRING;
+    String s2 = TEST_STRING;
+
+    assertTrue(ObjectUtility.equals(s, s2));
+    assertEquals(ObjectUtility.hashCode(s), ObjectUtility.hashCode(s2));
+  }
+
+  @Test
+  public void testHashCode_Arrays() {
+    int[] arr1 = new int[]{1, 2, 3};
+    int[] arr2 = new int[]{1, 2, 3};
+
+    assertTrue(ObjectUtility.equals(arr1, arr2));
+    assertEquals(ObjectUtility.hashCode(arr1), ObjectUtility.hashCode(arr2));
+
+    Object[] nested1 = {new int[]{1, 2}, new String[]{"a", "b"}};
+    Object[] nested2 = {new int[]{1, 2}, new String[]{"a", "b"}};
+
+    assertTrue(ObjectUtility.equals(nested1, nested2));
+    assertEquals(ObjectUtility.hashCode(nested1), ObjectUtility.hashCode(nested2));
   }
 
   @Test

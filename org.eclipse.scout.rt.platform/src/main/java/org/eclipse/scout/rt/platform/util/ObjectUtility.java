@@ -128,6 +128,42 @@ public final class ObjectUtility {
   }
 
   /**
+   * <p>
+   * Computes a hash code for the given value. For non-array values, the hash code is implemented according to {@link Object#hashCode()}.
+   * </p>
+   * <p>
+   * <b>Null Values:</b> The argument may be {@code null}. In this case the method returns {@code 0}.
+   * </p>
+   * <p>
+   * <b>Arrays:</b> Arrays are hashed based on their contents rather than their identity. Multidimensional arrays are processed recursively
+   * and primitive arrays are supported as well.
+   * </p>
+   * <p>
+   * The hash code produced by this method is consistent with {@link #equals(Object, Object)}.
+   * </p>
+   *
+   * @param value
+   *     the value for which to compute the hash code.
+   * @return the hash code of the given value, or {@code 0} if the value is {@code null}.
+   */
+  public static int hashCode(Object value) {
+    if (value == null) {
+      return 0;
+    }
+
+    if (value.getClass().isArray()) {
+      int result = 1;
+      int n = Array.getLength(value);
+      for (int i = 0; i < n; i++) {
+        result = 31 * result + hashCode(Array.get(value, i));
+      }
+      return result;
+    }
+
+    return value.hashCode();
+  }
+
+  /**
    * Null-safe implementation of {@code a.compareTo(b)}.
    *
    * @return <li>{@code 0} if both values are {@code null}
