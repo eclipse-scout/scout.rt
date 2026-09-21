@@ -117,7 +117,7 @@ public class DoNode<T> {
    * default one. If overridden, make sure to override {@link #valueEquals(DoNode)} too.
    */
   protected int valueHashCode() {
-    return (m_value == null) ? 0 : m_value.hashCode();
+    return ObjectUtility.hashCode(m_value);
   }
 
   @Override
