@@ -153,8 +153,7 @@ describe('StringField', () => {
 
       // Let the response processing (which un-sets requestPending) fully settle before triggering the next send,
       // otherwise areRequestsPending() would still report true and the next debounced send would be skipped.
-      await Promise.resolve();
-      await Promise.resolve();
+      await flushMicrotasks(5);
       field.insertText('ABC2');
       let element = field.$field[0] as HTMLInputElement;
       expect(element.value).toBe('Test1ABC2');
@@ -195,8 +194,7 @@ describe('StringField', () => {
 
       // Let the response processing (which un-sets requestPending) fully settle before triggering the next send,
       // otherwise areRequestsPending() would still report true and the next debounced send would be skipped.
-      await Promise.resolve();
-      await Promise.resolve();
+      await flushMicrotasks(5);
       message = {
         events: [createPropertyChangeEvent(field, {
           insertText: 'ABC2'

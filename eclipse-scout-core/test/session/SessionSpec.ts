@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BackgroundJobPollingStatus, Device, RemoteEvent, Session, TextMap, TextMapType, texts, UserAgent} from '../../src/index';
+import {BackgroundJobPollingStatus, Deferred, Device, RemoteEvent, Session, TextMap, TextMapType, texts, UserAgent} from '../../src/index';
 import {LocaleSpecHelper} from '../../src/testing';
 
 describe('Session', () => {
@@ -36,6 +36,31 @@ describe('Session', () => {
 
   function send(session: Session, target: string, type: string, data?: object, delay?: number) {
     session.sendEvent(new RemoteEvent(target, type, data), delay);
+  }
+
+  /**
+   * Spies on obj[methodName] (like spyOn(...).and.callThrough()) and returns a promise that resolves with the
+   * call's result as soon as it is actually invoked. Precise alternative to guessing a jasmine.clock()/microtask
+   * flush count: the promise chain from a mocked ajax response (see receiveResponseForAjaxCall) through
+   * AjaxCall/Call/Session back to a specific Session method is several native-Promise .then() hops deep, and that
+   * depth depends on internal implementation details that shouldn't leak into the test.
+   */
+  function awaitMethodCall<T>(obj: T, methodName: keyof T): Promise<any> {
+    let original = (obj[methodName] as any).bind(obj);
+    let deferred = new Deferred<any>();
+    spyOn(obj as any, methodName as any).and.callFake((...args: any[]) => {
+      // Resolve as soon as the method is invoked, regardless of whether it returns normally or throws
+      // (some callers, e.g. Session#_pollForBackgroundJobs, rely on the original exception propagating).
+      try {
+        let result = original(...args);
+        deferred.resolve(result);
+        return result;
+      } catch (err) {
+        deferred.resolve(undefined);
+        throw err;
+      }
+    });
+    return deferred.promise();
   }
 
   describe('_setBusy', () => {
@@ -229,6 +254,7 @@ describe('Session', () => {
     });
 
     it('sends requests consecutively', async () => {
+      jasmine.clock().uninstall();
       let session = createSession();
 
       // send first request
@@ -236,7 +262,7 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // trigger sending (response not received yet)
-      jasmine.clock().tick(0);
+      await sleep();
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(true);
@@ -244,7 +270,7 @@ describe('Session', () => {
       send(session, '1', 'nodeClick');
 
       // trigger sending of second request
-      jasmine.clock().tick(0);
+      await sleep();
 
       // second request must not be sent because first is still pending
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -254,14 +280,14 @@ describe('Session', () => {
 
       // receive response for nodeSelected -> request for nodeClick gets sent
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
-      await flushMicrotasks();
+      await session.whenRequestsDone();
       expect(jasmine.Ajax.requests.count()).toBe(2);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areRequestsPending()).toBe(true);
 
       // receive response for nodeClick
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1));
-      await flushMicrotasks();
+      await session.whenRequestsDone();
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areRequestsPending()).toBe(false);
     });
@@ -293,7 +319,7 @@ describe('Session', () => {
 
       // receive response for nodeSelected -> request for nodeClick does not get sent because it should be sent delayed
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
-      await flushMicrotasks();
+      await session.whenRequestsDone();
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(true);
@@ -309,7 +335,7 @@ describe('Session', () => {
 
       // receive response for nodeClick
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1));
-      await flushMicrotasks();
+      await session.whenRequestsDone();
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areRequestsPending()).toBe(false);
     });
@@ -351,7 +377,7 @@ describe('Session', () => {
 
       // Send second request
       receiveResponseForAjaxCall(request);
-      await flushMicrotasks();
+      await session.whenRequestsDone();
       request = jasmine.Ajax.requests.at(1);
       expect(JSON.parse(request.params)).toContainEvents([event1, event2]);
       expect(jasmine.Ajax.requests.count()).toBe(2);
@@ -360,7 +386,7 @@ describe('Session', () => {
 
       // Send last request
       receiveResponseForAjaxCall(request);
-      await flushMicrotasks();
+      await session.whenRequestsDone();
       request = jasmine.Ajax.requests.at(2);
       expect(JSON.parse(request.params)).toContainEvents([event3, event4]);
       expect(jasmine.Ajax.requests.count()).toBe(3);
@@ -418,9 +444,10 @@ describe('Session', () => {
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
 
-      // Send response for ?poll request (response must be queued)
+      // Send response for ?poll request (response must be queued, since a user request is still pending)
+      let whenQueued = awaitMethodCall(session.responseQueue, 'add');
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
-      await flushMicrotasks();
+      await whenQueued;
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(true);
       expect(session.areEventsQueued()).toBe(false);
@@ -429,7 +456,7 @@ describe('Session', () => {
 
       // Send response for user request (must be executed, including the queued response)
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1));
-      await flushMicrotasks();
+      await session.whenRequestsDone();
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false); // <--
       expect(session.areEventsQueued()).toBe(false);
@@ -440,7 +467,6 @@ describe('Session', () => {
     it('resumes polling after successful responses', async () => {
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
-      spyOn(session, '_processSuccessResponse').and.callThrough();
       spyOn(session, '_processErrorJsonResponse').and.callThrough();
       spyOn(session, '_processErrorResponse').and.callThrough();
 
@@ -454,11 +480,12 @@ describe('Session', () => {
       expect(session.areResponsesQueued()).toBe(false);
 
       // Send response for ?poll request
+      let whenProcessed = awaitMethodCall(session, '_processSuccessResponse');
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
         status: 200,
         responseText: '{"events": []}'
       });
-      await flushMicrotasks();
+      await whenProcessed;
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
@@ -471,7 +498,6 @@ describe('Session', () => {
     it('does not resume polling after JS errors', async () => {
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
-      spyOn(session, '_processSuccessResponse').and.callThrough();
       spyOn(session, '_processErrorJsonResponse').and.callThrough();
       spyOn(session, '_processErrorResponse').and.callThrough();
 
@@ -488,11 +514,12 @@ describe('Session', () => {
       // asynchronously from within the ajax response's promise chain (see Session#_performUserAjaxRequest,
       // onAjaxAlways) instead of synchronously, so it can no longer be observed with expect(fn).toThrow();
       // the state assertions below are the actual intent of this test.
+      let whenProcessed = awaitMethodCall(session, '_processSuccessResponse');
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
         status: 200,
         responseText: '{"events": [ { "target": "invalidTarget" } ]}' // <-- causes a JS error
       });
-      await flushMicrotasks();
+      await whenProcessed;
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.FAILURE); // <--
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
@@ -506,7 +533,6 @@ describe('Session', () => {
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
-      spyOn(session, '_processErrorJsonResponse').and.callThrough();
       spyOn(session, '_processErrorResponse').and.callThrough();
 
       // Start ?poll request
@@ -519,11 +545,12 @@ describe('Session', () => {
       expect(session.areResponsesQueued()).toBe(false);
 
       // Send "UI server" response for ?poll request
+      let whenProcessed = awaitMethodCall(session, '_processErrorJsonResponse');
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
         status: 200,
         responseText: '{"error": true}'
       });
-      await flushMicrotasks();
+      await whenProcessed;
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.FAILURE); // <--
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
@@ -538,7 +565,6 @@ describe('Session', () => {
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
       spyOn(session, '_processErrorJsonResponse').and.callThrough();
-      spyOn(session, '_processErrorResponse').and.callThrough();
 
       // Start ?poll request
       session._resumeBackgroundJobPolling();
@@ -550,11 +576,12 @@ describe('Session', () => {
       expect(session.areResponsesQueued()).toBe(false);
 
       // Send "UI server" response for ?poll request
+      let whenProcessed = awaitMethodCall(session, '_processErrorResponse');
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
         status: 404,
         responseText: 'Not found'
       });
-      await flushMicrotasks();
+      await whenProcessed;
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.FAILURE); // <--
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
@@ -581,11 +608,12 @@ describe('Session', () => {
       expect(session.areResponsesQueued()).toBe(false);
 
       // Send "UI server" response for ?poll request
+      let whenStopped = awaitMethodCall(session.backgroundJobPollingSupport, 'setStopped');
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
         status: 200,
         responseText: '{"sessionTerminated": true}'
       });
-      await flushMicrotasks();
+      await whenStopped;
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.STOPPED); // <--
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);

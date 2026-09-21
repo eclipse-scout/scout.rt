@@ -1406,7 +1406,7 @@ describe('Desktop', () => {
         .finally(done);
     });
 
-    it('must not be a removed form', () => {
+    it('must not be a removed form', async () => {
       const outline = outlineHelper.createOutlineWithOneDetailForm();
       const page = outline.nodes[0];
 
@@ -1423,6 +1423,7 @@ describe('Desktop', () => {
 
       outline.selectNode(outline.nodes[1]);
       desktop.bringOutlineToFront();
+      await flushMicrotasks();
       expect(desktop.activeForm).toBeNull();
 
       outline.selectNode(page);
@@ -2138,37 +2139,43 @@ describe('Desktop', () => {
       view2.rootGroupBox.fields[0].setValue('Foo');
 
       jasmine.clock().install();
-      desktop.cancelViews([view1, view2]);
+      try {
+        desktop.cancelViews([view1, view2]);
 
-      // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
-      expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
-      let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
-      expect(openFormsField.id).toBe('OpenFormsField');
+        // UnsavedFormChangesForm should be the last child
+        let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
+        expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
+        let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
+        expect(openFormsField.id).toBe('OpenFormsField');
 
-      await openFormsField.when('lookupCallDone');
-      expect(openFormsField.value.length).toBe(1);
-      expect(openFormsField.value[0]).toEqual(view2);
-      unsavedFormChangesForm.ok();
-      await flushMicrotasks();
-      jasmine.clock().tick(10);
-      // validation message should be displayed since view2 is in invalid state
-      expect(session.$entryPoint.find('.messagebox').length).toBe(1);
-      desktop.messageBoxes[0].yesButton.doAction();
-      await flushMicrotasks();
-      jasmine.clock().tick(10);
-      // uncheck all entries to not save the unsaved changes
-      openFormsField.setValue(null);
-      unsavedFormChangesForm.ok();
-      await flushMicrotasks();
-      jasmine.clock().tick(10);
+        // UnsavedFormsLookupCall (a StaticLookupCall) resolves via a real setTimeout(..., 0), which is now a fake
+        // timer since the clock is installed -> tick it before awaiting the resulting lookupCallDone event.
+        jasmine.clock().tick(0);
+        await openFormsField.when('lookupCallDone');
+        expect(openFormsField.value.length).toBe(1);
+        expect(openFormsField.value[0]).toEqual(view2);
+        unsavedFormChangesForm.ok();
+        await flushMicrotasks();
+        jasmine.clock().tick(10);
+        // validation message should be displayed since view2 is in invalid state
+        expect(session.$entryPoint.find('.messagebox').length).toBe(1);
+        desktop.messageBoxes[0].yesButton.doAction();
+        await flushMicrotasks();
+        jasmine.clock().tick(10);
+        // uncheck all entries to not save the unsaved changes
+        openFormsField.setValue(null);
+        unsavedFormChangesForm.ok();
+        await flushMicrotasks();
+        jasmine.clock().tick(10);
 
-      expect(view1.ok).not.toHaveBeenCalled();
-      expect(view1.close).toHaveBeenCalled();
-      expect(view2.ok).not.toHaveBeenCalled();
-      expect(view2.close).toHaveBeenCalled();
-      expect(desktop.bench.getViews()).toEqual([view3]);
-      jasmine.clock().uninstall();
+        expect(view1.ok).not.toHaveBeenCalled();
+        expect(view1.close).toHaveBeenCalled();
+        expect(view2.ok).not.toHaveBeenCalled();
+        expect(view2.close).toHaveBeenCalled();
+        expect(desktop.bench.getViews()).toEqual([view3]);
+      } finally {
+        jasmine.clock().uninstall();
+      }
     });
 
     it('close tabs when one tab has a child with invalid unsaved changes', async () => {
@@ -2196,38 +2203,44 @@ describe('Desktop', () => {
       field.setValue('Foo');
 
       jasmine.clock().install();
-      desktop.cancelViews([view1, view2]);
-      // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
-      expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
-      let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
-      expect(openFormsField.id).toBe('OpenFormsField');
+      try {
+        desktop.cancelViews([view1, view2]);
+        // UnsavedFormChangesForm should be the last child
+        let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
+        expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
+        let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
+        expect(openFormsField.id).toBe('OpenFormsField');
 
-      await openFormsField.when('lookupCallDone');
-      expect(openFormsField.value.length).toBe(1);
-      expect(openFormsField.value[0]).toEqual(view2);
-      unsavedFormChangesForm.ok();
-      await flushMicrotasks();
-      jasmine.clock().tick(10);
-      // validation message should be displayed since view2 is in invalid state
-      expect(session.$entryPoint.find('.messagebox').length).toBe(1);
-      desktop.messageBoxes[0].yesButton.doAction();
-      await flushMicrotasks();
-      jasmine.clock().tick(10);
-      // uncheck all entries to not save the unsaved changes
-      openFormsField.setValue(null);
-      unsavedFormChangesForm.ok();
-      await flushMicrotasks();
-      jasmine.clock().tick(10);
+        // UnsavedFormsLookupCall (a StaticLookupCall) resolves via a real setTimeout(..., 0), which is now a fake
+        // timer since the clock is installed -> tick it before awaiting the resulting lookupCallDone event.
+        jasmine.clock().tick(0);
+        await openFormsField.when('lookupCallDone');
+        expect(openFormsField.value.length).toBe(1);
+        expect(openFormsField.value[0]).toEqual(view2);
+        unsavedFormChangesForm.ok();
+        await flushMicrotasks();
+        jasmine.clock().tick(10);
+        // validation message should be displayed since view2 is in invalid state
+        expect(session.$entryPoint.find('.messagebox').length).toBe(1);
+        desktop.messageBoxes[0].yesButton.doAction();
+        await flushMicrotasks();
+        jasmine.clock().tick(10);
+        // uncheck all entries to not save the unsaved changes
+        openFormsField.setValue(null);
+        unsavedFormChangesForm.ok();
+        await flushMicrotasks();
+        jasmine.clock().tick(10);
 
-      expect(modalDialog.ok).not.toHaveBeenCalled();
-      expect(modalDialog.close).toHaveBeenCalled();
-      expect(view1.ok).not.toHaveBeenCalled();
-      expect(view1.close).toHaveBeenCalled();
-      expect(view2.ok).not.toHaveBeenCalled();
-      expect(view2.close).toHaveBeenCalled();
-      expect(desktop.bench.getViews()).toEqual([view3]);
-      jasmine.clock().uninstall();
+        expect(modalDialog.ok).not.toHaveBeenCalled();
+        expect(modalDialog.close).toHaveBeenCalled();
+        expect(view1.ok).not.toHaveBeenCalled();
+        expect(view1.close).toHaveBeenCalled();
+        expect(view2.ok).not.toHaveBeenCalled();
+        expect(view2.close).toHaveBeenCalled();
+        expect(desktop.bench.getViews()).toEqual([view3]);
+      } finally {
+        jasmine.clock().uninstall();
+      }
     });
 
   });

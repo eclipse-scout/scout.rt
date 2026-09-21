@@ -82,8 +82,7 @@ describe('FormLifecycle', () => {
       });
       form.lifecycle.ok();
       jasmine.clock().tick(1000);
-      await Promise.resolve();
-      await Promise.resolve();
+      await flushMicrotasks(10);
       expectMessageBox(false);
       expect(saved).toBe(true);
     });
@@ -126,8 +125,7 @@ describe('FormLifecycle', () => {
       expectMessageBox(true);
       helper.closeMessageBoxes();
       jasmine.clock().tick(1000); // <- important, otherwise the promise will not be resolved somehow (?)
-      await Promise.resolve();
-      await Promise.resolve();
+      await flushMicrotasks(10);
       expect(lifecycleComplete).toBe(expected);
     }
 

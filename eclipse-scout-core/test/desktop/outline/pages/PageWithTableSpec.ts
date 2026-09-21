@@ -838,10 +838,10 @@ describe('PageWithTable', () => {
     expect(table.loading).toBeTrue();
 
     deferredSmartColumn.lastCellTextDeferred.resolve();
-    await deferredSmartColumn.lastCellTextPromise;
     // lastCellTextPromise only covers the deferred cell text lookup itself; the update buffer's own
-    // then(_onSetCellTextDeferredDone) reaction (which finally clears loading) settles one microtask later.
-    await Promise.resolve();
+    // then(_onSetCellTextDeferredDone) reaction (which finally clears loading) settles a few microtasks later.
+    // Wait for the update buffer's own 'complete' event instead of guessing the exact number of hops.
+    await table.updateBuffer.when('complete');
     expect(table.loading).toBeFalse();
 
     // double reload with column with deferred cell text
@@ -881,9 +881,8 @@ describe('PageWithTable', () => {
 
     deferredSmartColumn.lastCellTextDeferred.resolve();
     cellText2Resolved = true;
-    await deferredSmartColumn.lastCellTextPromise;
-    // see comment above: wait for the update buffer's own then() reaction to settle as well
-    await Promise.resolve();
+    // see comment above: wait for the update buffer's own 'complete' event instead of guessing hops
+    await table.updateBuffer.when('complete');
     expect(table.loading).toBeFalse();
   });
 

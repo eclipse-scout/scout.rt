@@ -59,7 +59,7 @@ describe('DesktopAdapter', () => {
       expect(desktop.activeForm).toBe(form);
 
       sendQueuedAjaxCalls();
-      await flushMicrotasks();
+      await flushMicrotasks(5);
       let event = new RemoteEvent(desktopAdapter.id, 'formActivate', {
         formId: form.modelAdapter.id
       });
@@ -69,7 +69,7 @@ describe('DesktopAdapter', () => {
       expect(desktop.activeForm).toBe(form2);
 
       sendQueuedAjaxCalls();
-      await flushMicrotasks();
+      await flushMicrotasks(5);
       event = new RemoteEvent(desktopAdapter.id, 'formActivate', {
         formId: form2.modelAdapter.id
       });
@@ -83,7 +83,7 @@ describe('DesktopAdapter', () => {
       expect(desktop.activeForm).toBe(jsForm);
 
       sendQueuedAjaxCalls();
-      await flushMicrotasks();
+      await flushMicrotasks(5);
       event = new RemoteEvent(desktopAdapter.id, 'formActivate', {
         formId: jsForm.__hybridModelAdapter.id
       });
@@ -97,7 +97,7 @@ describe('DesktopAdapter', () => {
 
       // nothing was sent to the server, the most recent request is unchanged and therefore contains the same events
       sendQueuedAjaxCalls();
-      await flushMicrotasks();
+      await flushMicrotasks(5);
       expect(mostRecentJsonRequest()).toContainEventsExactly(remoteEvents);
     });
 
@@ -113,7 +113,7 @@ describe('DesktopAdapter', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       sendQueuedAjaxCalls();
-      await flushMicrotasks;
+      await flushMicrotasks(5);
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       // ------------------------
@@ -154,7 +154,7 @@ describe('DesktopAdapter', () => {
       };
       session._processSuccessResponse(response);
       sendQueuedAjaxCalls();
-      await flushMicrotasks;
+      await flushMicrotasks(5);
 
       let expectedEvents = [
         new RemoteEvent(desktopAdapter.id, 'formActivate', {}),
@@ -181,7 +181,7 @@ describe('DesktopAdapter', () => {
       };
       session._processSuccessResponse(response);
       sendQueuedAjaxCalls();
-      await flushMicrotasks;
+      await flushMicrotasks(5);
       expect(jasmine.Ajax.requests.count()).toBe(2);
     });
   });

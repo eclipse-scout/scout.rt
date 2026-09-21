@@ -56,8 +56,7 @@ describe('BasicField', () => {
       expect(mostRecentJsonRequest()).toContainEvents(event);
       // Let the response processing (which un-sets requestPending) fully settle before triggering the next send,
       // otherwise areRequestsPending() would still report true and the next debounced send would be skipped.
-      await Promise.resolve();
-      await Promise.resolve();
+      await flushMicrotasks(5);
       JQueryTesting.triggerBlur(field.$field);
       sendQueuedAjaxCalls();
       event = new RemoteEvent(field.id, 'acceptInput', {
@@ -140,8 +139,7 @@ describe('BasicField', () => {
       expect(mostRecentJsonRequest()).toContainEvents(event);
       // Let the response processing (which un-sets requestPending) fully settle before triggering the next send,
       // otherwise areRequestsPending() would still report true and the next debounced send would be skipped.
-      await Promise.resolve();
-      await Promise.resolve();
+      await flushMicrotasks(5);
       field.setUpdateDisplayTextOnModify(false);
       JQueryTesting.triggerBlur(field.$field);
       sendQueuedAjaxCalls();
@@ -173,8 +171,7 @@ describe('BasicField', () => {
 
       // Let the response processing (which un-sets requestPending) fully settle before triggering the next send,
       // otherwise areRequestsPending() would still report true and the next debounced send would be skipped.
-      await Promise.resolve();
-      await Promise.resolve();
+      await flushMicrotasks(5);
       JQueryTesting.triggerBlur(field.$field);
       sendQueuedAjaxCalls();
       event = new RemoteEvent(field.id, 'acceptInput', {

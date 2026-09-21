@@ -2276,7 +2276,7 @@ describe('Form', () => {
 
       deferred3.resolve(Status.ok());
       jasmine.clock().tick(1000);
-      await Promise.resolve();
+      await flushMicrotasks(10);
       expect(state.value).toBe('resolved');
 
       jasmine.clock().uninstall();
@@ -2316,9 +2316,11 @@ describe('Form', () => {
       await Promise.resolve();
       expect(state.value).toBe('pending');
 
+      // Let the invalid-form message box actually render before trying to close it
+      await flushMicrotasks(10);
       helper.closeMessageBoxes();
       jasmine.clock().tick(1000);
-      await Promise.resolve();
+      await flushMicrotasks(10);
       expect(state.value).toBe('resolved');
 
       jasmine.clock().uninstall();
@@ -2445,23 +2447,20 @@ describe('Form', () => {
       jasmine.clock().uninstall();
     });
 
-    it('is automatically handled in load', done => {
+    it('is automatically handled in load', async () => {
       expect(session.desktop.busy).toBe(false);
 
       form.throwInLoad = true;
-      form.load()
+      const loadPromise = form.load()
         .then(fail)
         .catch(e => {
           expect(e).toEqual('load');
           catchCalled = true;
-        })
-        .finally(() => {
-          expect(catchCalled).toBe(true);
-          expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalledTimes(1);
-          done();
         });
 
       jasmine.clock().tick(1000);
+      // Let the load-error message box actually render before looking for it
+      await flushMicrotasks(10);
 
       const messageBoxes = helper.findMessageBoxes();
       expect(messageBoxes.size).toBe(1);
@@ -2472,6 +2471,9 @@ describe('Form', () => {
 
       helper.closeMessageBoxes();
       jasmine.clock().tick(1000);
+      await loadPromise;
+      expect(catchCalled).toBe(true);
+      expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalledTimes(1);
     });
 
     it('is automatically handled in postLoad', done => {
@@ -2486,29 +2488,22 @@ describe('Form', () => {
       jasmine.clock().tick(1000);
     });
 
-    it('is automatically handled in save', done => {
+    it('is automatically handled in save', async () => {
       expect(session.desktop.busy).toBe(false);
 
       form.throwInSave = true;
-      form.load()
-        .then(() => {
-          form.touch();
-          form.ok()
-            .then(fail)
-            .catch(e => {
-              catchCalled = true;
-              expect(e).toEqual('save');
-            })
-            .finally(() => {
-              expect(catchCalled).toBe(true);
-              expect(form.formSaved).toBe(false); // save failed: do not mark as stored
-              expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalledTimes(1);
-              done();
-            });
-        })
-        .catch(fail);
+      await form.load();
+      form.touch();
+      const okPromise = form.ok()
+        .then(fail)
+        .catch(e => {
+          catchCalled = true;
+          expect(e).toEqual('save');
+        });
 
       jasmine.clock().tick(1000);
+      // Let the save-error message box actually render before looking for it
+      await flushMicrotasks(10);
 
       const messageBoxes = helper.findMessageBoxes();
       expect(messageBoxes.size).toBe(1);
@@ -2519,6 +2514,10 @@ describe('Form', () => {
 
       helper.closeMessageBoxes();
       jasmine.clock().tick(1000);
+      await okPromise;
+      expect(catchCalled).toBe(true);
+      expect(form.formSaved).toBe(false); // save failed: do not mark as stored
+      expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalledTimes(1);
     });
 
     it('load error handling can be exchanged', done => {

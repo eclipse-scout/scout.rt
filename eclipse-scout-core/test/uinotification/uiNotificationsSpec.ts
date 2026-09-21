@@ -364,9 +364,12 @@ describe('uiNotifications', () => {
     });
 
     it('does not register the handler on errors', async () => {
-      jasmine.clock().install();
       let handler = () => undefined;
 
+      // No jasmine.clock() here: the rejection propagates through a native-Promise-backed Deferred chain
+      // (Call#deferred, src/uinotification/UiNotificationSystem#whenSubscriptionStart) that needs several
+      // microtask turns; awaiting subscribePromise directly lets them drain naturally. The retry timer
+      // scheduled by _onError() (a real setTimeout) is simply left pending; this test doesn't need it to fire.
       let subscribePromise = uiNotifications.subscribe('aaa', handler).catch(error => {
         expect(error).toBeDefined();
       });
@@ -374,18 +377,12 @@ describe('uiNotifications', () => {
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 500
       });
-      // The rejection now propagates through a native-Promise-backed Deferred chain (Call#deferred,
-      // src/uinotification/UiNotificationSystem#whenSubscriptionStart), which needs microtask turns
-      // that jasmine.clock().tick() cannot provide; the retry timer scheduled by _onError() stays fake
-      // and pending, which is fine since this test doesn't need it to fire.
-      await flushMicrotasks();
       await subscribePromise;
 
       // Handler must not be registered and poller must not be running after an unsuccessful subscribe
       let system = uiNotifications.systems.get(System.MAIN_SYSTEM);
       expect(system.events.count()).toBe(0);
       expect(system.poller).toBe(null);
-      jasmine.clock().uninstall();
     });
 
     it('starts a poller per system', () => {
@@ -863,14 +860,14 @@ describe('uiNotifications', () => {
 
       // Subscription was successful, start polling. The response is processed through a native-Promise-backed
       // Deferred (Call#deferred), so it needs a microtask flush before the next poll's setTimeout(0) can be ticked.
-      await flushMicrotasks();
+      await flushMicrotasks(8);
       jasmine.clock().tick(1);
 
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 500
       });
-      await flushMicrotasks();
+      await flushMicrotasks(8);
       jasmine.clock().tick(1);
       expect(poller.status).toBe(BackgroundJobPollingStatus.FAILURE);
 
@@ -896,7 +893,7 @@ describe('uiNotifications', () => {
       });
 
       // Subscription was successful, start polling
-      await flushMicrotasks();
+      await flushMicrotasks(8);
       jasmine.clock().tick(1);
 
       let poller = pollers().get('main');
@@ -904,7 +901,7 @@ describe('uiNotifications', () => {
         status: 200
         // no response text
       });
-      await flushMicrotasks();
+      await flushMicrotasks(8);
       jasmine.clock().tick(1);
       expect(poller.status).toBe(BackgroundJobPollingStatus.FAILURE);
 
@@ -949,7 +946,7 @@ describe('uiNotifications', () => {
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 500
       });
-      await flushMicrotasks();
+      await flushMicrotasks(8);
       jasmine.clock().tick(1);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
 
@@ -963,7 +960,7 @@ describe('uiNotifications', () => {
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 403
       });
-      await flushMicrotasks();
+      await flushMicrotasks(8);
       jasmine.clock().tick(1);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
 
@@ -978,7 +975,7 @@ describe('uiNotifications', () => {
         status: 200,
         responseText: JSON.stringify({error: {code: Session.JsonResponseError.SESSION_TIMEOUT}})
       });
-      await flushMicrotasks();
+      await flushMicrotasks(8);
       jasmine.clock().tick(1);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
 

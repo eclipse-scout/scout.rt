@@ -110,31 +110,31 @@ describe('PermissionCollection', () => {
       let state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue()));
       expect(state.value).toBe('pending');
       evalDeferred1.resolve(true);
-      await flushMicrotasks();
+      await flushMicrotasks(8);
       expect(state.value).toBe('resolved');
 
       state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue()));
       expect(state.value).toBe('pending');
       evalDeferred2.resolve(false);
-      await flushMicrotasks();
+      await flushMicrotasks(8);
       expect(state.value).toBe('pending');
       evalDeferred1.resolve(true);
-      await flushMicrotasks();
+      await flushMicrotasks(8);
       expect(state.value).toBe('resolved');
 
       state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue()));
       expect(state.value).toBe('pending');
       evalDeferred2.resolve(true);
-      await flushMicrotasks();
+      await flushMicrotasks(8);
       expect(state.value).toBe('resolved');
 
       state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeFalse()));
       expect(state.value).toBe('pending');
       evalDeferred2.resolve(false);
-      await flushMicrotasks();
+      await flushMicrotasks(8);
       expect(state.value).toBe('pending');
       evalDeferred1.resolve(false);
-      await flushMicrotasks();
+      await flushMicrotasks(8);
       expect(state.value).toBe('resolved');
     });
   });
