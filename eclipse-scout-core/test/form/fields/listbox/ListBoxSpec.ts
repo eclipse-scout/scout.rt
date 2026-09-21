@@ -434,6 +434,7 @@ describe('ListBox', () => {
         lookupCall: lookupCall
       });
       let listBox = scout.create(ListBox, model);
+      listBox.render();
       await listBox.when('lookupCallDone');
       expect(listBox.displayText).toBe('');
       listBox.setValue([1]);

@@ -44,7 +44,7 @@ describe('SmartColumn', () => {
     return lookupCall;
   }
 
-  it('rows with object key can be resolved', () => {
+  it('rows with object key can be resolved', async () => {
     const table = helper.createTable({
       columns: [{
         objectType: SmartColumn
@@ -92,6 +92,7 @@ describe('SmartColumn', () => {
     expect(lookupCall._getByKey).toHaveBeenCalledTimes(3);
 
     // rows have texts returned by lookup call
+    await flushMicrotasks(10);
     checkTableRowTexts(table, lookupRows);
   });
 
@@ -122,7 +123,7 @@ describe('SmartColumn', () => {
   /**
    * Makes sure no lookup call is executed (this would throw an error, because no lookup call is configured for the column / smart-field).
    */
-  it('must NOT execute a lookup by key when the editor is initialized', () => {
+  it('must NOT execute a lookup by key when the editor is initialized', async () => {
     let table = helper.createTable({
       columns: [{
         objectType: SmartColumn,
@@ -144,12 +145,12 @@ describe('SmartColumn', () => {
     });
     table.render();
     table.focusCell(column, row);
-    jasmine.clock().tick(0);
+    await table.when('startCellEdit');
     expect(field.displayText).toEqual('Foo');
     expect(field.value).toEqual(7);
   });
 
-  it('must use batch lookup calls when enabled', () => {
+  it('must use batch lookup calls when enabled', async () => {
     const table = helper.createTable({
       columns: [{
         objectType: SmartColumn
@@ -196,6 +197,7 @@ describe('SmartColumn', () => {
     expect(lookupCall._getByKey).toHaveBeenCalledTimes(3);
 
     // rows have texts returned by lookup call
+    await flushMicrotasks(10);
     checkTableRowTexts(table, lookupRows);
   });
 

@@ -53,14 +53,9 @@ describe('RemoteApp', () => {
         .catch(fail);
     });
 
-    it('is not executed when session startup fails', done => {
+    it('is not executed when session startup fails', async () => {
       let app = new TestingApp();
-      jasmine.clock().install();
-      app.init()
-        .catch(() => {
-          expect(app.initialized).toBe(false);
-          done();
-        });
+      let initPromise = app.init();
       app._createSession = options => session;
       let loaded = false;
       session.start = () => {
@@ -71,10 +66,14 @@ describe('RemoteApp', () => {
         });
         return def.promise();
       };
-      jasmine.clock().tick(10);
+
+      // Let the rejected startup promise propagate to the error handler, which renders a message box
+      await sleep(10);
       helper.closeMessageBoxes();
-      jasmine.clock().tick(10);
-      jasmine.clock().uninstall();
+
+      await initPromise.catch(() => {
+        expect(app.initialized).toBe(false);
+      });
     });
   });
 });

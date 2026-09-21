@@ -1994,7 +1994,7 @@ describe('Desktop', () => {
         .finally(done);
     });
 
-    it('close tabs when one tab has an open message box', () => {
+    it('close tabs when one tab has an open message box', async () => {
       let msgBox = scout.create(MessageBox, {
         parent: view3,
         displayParent: view3
@@ -2003,17 +2003,12 @@ describe('Desktop', () => {
       spyOn(msgBox, 'close').and.callThrough();
       expect(msgBox.rendered).toBe(true);
 
-      jasmine.clock().install();
-
-      desktop.cancelViews([view2, view3]);
-
-      jasmine.clock().tick(10);
+      await desktop.cancelViews([view2, view3]);
 
       expect(msgBox.close).toHaveBeenCalled();
       expect(view3.close).toHaveBeenCalled();
       expect(view2.close).toHaveBeenCalled();
       expect(desktop.bench.getViews()).toEqual([view1]);
-      jasmine.clock().uninstall();
     });
 
     it('close tabs with open file chooser and save unsaved changes', done => {
@@ -2132,7 +2127,7 @@ describe('Desktop', () => {
         .finally(done);
     });
 
-    it('close tabs when one tab has invalid unsaved changes', () => {
+    it('close tabs when one tab has invalid unsaved changes', async () => {
       view2.rootGroupBox.fields[0].setValidator(value => {
         if (strings.equalsIgnoreCase(value, 'Foo')) {
           throw new Error('Validation failed');
@@ -2150,21 +2145,22 @@ describe('Desktop', () => {
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
-      openFormsField.when('lookupCallDone').then(() => {
-        expect(openFormsField.value.length).toBe(1);
-        expect(openFormsField.value[0]).toEqual(view2);
-        unsavedFormChangesForm.ok();
-        jasmine.clock().tick(10);
-        // validation message should be displayed since view2 is in invalid state
-        expect(session.$entryPoint.find('.messagebox').length).toBe(1);
-        desktop.messageBoxes[0].yesButton.doAction();
-        jasmine.clock().tick(10);
-        // uncheck all entries to not save the unsaved changes
-        openFormsField.setValue(null);
-        unsavedFormChangesForm.ok();
-        jasmine.clock().tick(10);
-      });
 
+      await openFormsField.when('lookupCallDone');
+      expect(openFormsField.value.length).toBe(1);
+      expect(openFormsField.value[0]).toEqual(view2);
+      unsavedFormChangesForm.ok();
+      await flushMicrotasks();
+      jasmine.clock().tick(10);
+      // validation message should be displayed since view2 is in invalid state
+      expect(session.$entryPoint.find('.messagebox').length).toBe(1);
+      desktop.messageBoxes[0].yesButton.doAction();
+      await flushMicrotasks();
+      jasmine.clock().tick(10);
+      // uncheck all entries to not save the unsaved changes
+      openFormsField.setValue(null);
+      unsavedFormChangesForm.ok();
+      await flushMicrotasks();
       jasmine.clock().tick(10);
 
       expect(view1.ok).not.toHaveBeenCalled();
@@ -2175,7 +2171,7 @@ describe('Desktop', () => {
       jasmine.clock().uninstall();
     });
 
-    it('close tabs when one tab has a child with invalid unsaved changes', () => {
+    it('close tabs when one tab has a child with invalid unsaved changes', async () => {
       let modalDialog = formHelper.createFormWithOneField({
         parent: view2,
         displayParent: view2,
@@ -2206,21 +2202,22 @@ describe('Desktop', () => {
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
-      openFormsField.when('lookupCallDone').then(() => {
-        expect(openFormsField.value.length).toBe(1);
-        expect(openFormsField.value[0]).toEqual(view2);
-        unsavedFormChangesForm.ok();
-        jasmine.clock().tick(10);
-        // validation message should be displayed since view2 is in invalid state
-        expect(session.$entryPoint.find('.messagebox').length).toBe(1);
-        desktop.messageBoxes[0].yesButton.doAction();
-        jasmine.clock().tick(10);
-        // uncheck all entries to not save the unsaved changes
-        openFormsField.setValue(null);
-        unsavedFormChangesForm.ok();
-        jasmine.clock().tick(10);
-      });
 
+      await openFormsField.when('lookupCallDone');
+      expect(openFormsField.value.length).toBe(1);
+      expect(openFormsField.value[0]).toEqual(view2);
+      unsavedFormChangesForm.ok();
+      await flushMicrotasks();
+      jasmine.clock().tick(10);
+      // validation message should be displayed since view2 is in invalid state
+      expect(session.$entryPoint.find('.messagebox').length).toBe(1);
+      desktop.messageBoxes[0].yesButton.doAction();
+      await flushMicrotasks();
+      jasmine.clock().tick(10);
+      // uncheck all entries to not save the unsaved changes
+      openFormsField.setValue(null);
+      unsavedFormChangesForm.ok();
+      await flushMicrotasks();
       jasmine.clock().tick(10);
 
       expect(modalDialog.ok).not.toHaveBeenCalled();

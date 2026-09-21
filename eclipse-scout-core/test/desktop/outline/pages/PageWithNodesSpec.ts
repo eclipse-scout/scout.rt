@@ -31,14 +31,14 @@ describe('PageWithNodes', () => {
     jasmine.clock().uninstall();
   });
 
-  it('updates the detail table when child pages are changed', () => {
+  it('updates the detail table when child pages are changed', async () => {
     let page1 = scout.create(PageWithNodes, {
       parent: outline,
       text: 'Page 1'
     });
     outline.insertNode(page1);
     outline.selectNode(page1);
-    jasmine.clock().tick(1);
+    await page1.ensureLoadChildren();
 
     expect(page1.detailTable).toBeTruthy();
     expect(page1.detailTable.rows.length).toBe(0);
@@ -70,7 +70,7 @@ describe('PageWithNodes', () => {
 
     // Check that selected node pages cause the selection in the detail table of the parent node to be updated
     outline.selectNode(page3);
-    jasmine.clock().tick(1);
+    await page3.ensureLoadChildren();
     expect(page3.detailTable).toBeTruthy();
     expect(page3.detailTable.rows.length).toBe(0);
     expect(page1.detailTable.selectedRows.length).toBe(1); // <--
@@ -79,9 +79,9 @@ describe('PageWithNodes', () => {
     // Check that detail table is also updated if node is not selected
     expect(page2.detailTable).toBeFalsy();
     outline.selectNode(page2); // select to create outline content
-    jasmine.clock().tick(1);
+    await page2.ensureLoadChildren();
     outline.selectNode(page3);
-    jasmine.clock().tick(1);
+    await page3.ensureLoadChildren();
     expect(page2.detailTable.rows.length).toBe(0);
     let page4 = scout.create(PageWithNodes, {
       parent: outline,
@@ -100,7 +100,7 @@ describe('PageWithNodes', () => {
     expect(page1.detailTable.selectedRows.length).toBe(0); // <--
   });
 
-  it('updates childrenLoaded flag', () => {
+  it('updates childrenLoaded flag', async () => {
     let page = scout.create(PageWithNodes, {
       parent: outline,
       text: 'Page 1',
@@ -118,7 +118,7 @@ describe('PageWithNodes', () => {
     });
     outline.insertNode(page);
     outline.selectNode(page);
-    jasmine.clock().tick(1);
+    await page.ensureLoadChildren();
     let detailTable = page.detailTable;
     expect(detailTable).toBeTruthy();
 
@@ -129,14 +129,14 @@ describe('PageWithNodes', () => {
     expect(page.childrenLoaded).toBe(false);
     expect(detailTable.loading).toBe(false); // currently not implemented for NodePages
 
-    jasmine.clock().tick(1);
+    await Promise.resolve();
     expect(page.childrenLoaded).toBe(true);
     expect(detailTable.loading).toBe(false);
   });
 
   describe('reloadPage', () => {
 
-    it('does not reload child pages if pages are static, even when reloadable=true', () => {
+    it('does not reload child pages if pages are static, even when reloadable=true', async () => {
       let page = scout.create(PageWithNodes, {
         parent: outline,
         text: 'Page 1',
@@ -154,7 +154,7 @@ describe('PageWithNodes', () => {
       });
       outline.insertNode(page);
       outline.selectNode(page);
-      jasmine.clock().tick(1);
+      await page.ensureLoadChildren();
       let detailTable = page.detailTable;
       expect(detailTable).toBeTruthy();
 
@@ -166,7 +166,7 @@ describe('PageWithNodes', () => {
 
       expect(page.reloadable).toBe(true);
       detailTable.reload();
-      jasmine.clock().tick(1);
+      await Promise.resolve();
 
       expect(Object.entries(outline.nodesMap).length).toBe(3);
       let cp1b = page.childNodes[0];
@@ -177,7 +177,7 @@ describe('PageWithNodes', () => {
       expect(cp2b).toBe(cp2a);
     });
 
-    it('does not reload child pages if reloadable=false', () => {
+    it('does not reload child pages if reloadable=false', async () => {
       let counter = 100;
 
       class SpecPageWithNodes extends PageWithNodes {
@@ -202,7 +202,7 @@ describe('PageWithNodes', () => {
       });
       outline.insertNode(page);
       outline.selectNode(page);
-      jasmine.clock().tick(1);
+      await page.ensureLoadChildren();
       let detailTable = page.detailTable;
       expect(detailTable).toBeTruthy();
 
@@ -217,7 +217,7 @@ describe('PageWithNodes', () => {
 
       expect(page.reloadable).toBe(false);
       detailTable.reload();
-      jasmine.clock().tick(1);
+      await Promise.resolve();
 
       expect(Object.entries(outline.nodesMap).length).toBe(3);
       let cp1b = page.childNodes[0];
@@ -232,7 +232,7 @@ describe('PageWithNodes', () => {
 
       // Page _will_ reload if called explicitly
       page.reloadPage();
-      jasmine.clock().tick(1);
+      await Promise.resolve();
 
       expect(Object.entries(outline.nodesMap).length).toBe(3);
       let cp1c = page.childNodes[0];
@@ -314,7 +314,7 @@ describe('PageWithNodes', () => {
       expect(page3c.reloadable).toBe(false);
     });
 
-    it('reloads child pages if reloadable=true', () => {
+    it('reloads child pages if reloadable=true', async () => {
       let counter = 100;
 
       class SpecPageWithNodes extends PageWithNodes {
@@ -338,7 +338,7 @@ describe('PageWithNodes', () => {
       });
       outline.insertNode(page);
       outline.selectNode(page);
-      jasmine.clock().tick(1);
+      await page.ensureLoadChildren();
       let detailTable = page.detailTable;
       expect(detailTable).toBeTruthy();
 
@@ -353,7 +353,7 @@ describe('PageWithNodes', () => {
 
       expect(page.reloadable).toBe(true);
       detailTable.reload();
-      jasmine.clock().tick(1);
+      await Promise.resolve();
 
       expect(Object.entries(outline.nodesMap).length).toBe(3);
       let cp1b = page.childNodes[0];
@@ -368,7 +368,7 @@ describe('PageWithNodes', () => {
 
       // It also works when reloading the page directly
       page.reloadPage();
-      jasmine.clock().tick(1);
+      await Promise.resolve();
 
       expect(Object.entries(outline.nodesMap).length).toBe(3);
       let cp1c = page.childNodes[0];
@@ -384,7 +384,7 @@ describe('PageWithNodes', () => {
       expect(detailTable.rows[1].cells[0].text).toBe('Page 105');
     });
 
-    it('collapses lazy expanded nodes on reload', () => {
+    it('collapses lazy expanded nodes on reload', async () => {
       class LazyPageWithNodes extends PageWithNodes {
         constructor() {
           super();
@@ -414,7 +414,7 @@ describe('PageWithNodes', () => {
       });
       outline.insertNode(page);
       outline.selectNode(page);
-      jasmine.clock().tick(1);
+      await page.ensureLoadChildren();
 
       expect(page.childNodes.length).toBe(3);
       expect(page.expanded).toBe(false);
@@ -438,7 +438,7 @@ describe('PageWithNodes', () => {
 
       outline.selectNode(page);
       page.detailTable.reload();
-      jasmine.clock().tick(1);
+      await Promise.resolve();
 
       expect(page.childNodes.length).toBe(3);
       expect(page.expanded).toBe(false);
@@ -453,7 +453,7 @@ describe('PageWithNodes', () => {
       expect(page.expandedLazy).toBe(false);
 
       page.detailTable.reload();
-      jasmine.clock().tick(1);
+      await Promise.resolve();
       expect(page.childNodes.length).toBe(3);
       expect(page.expanded).toBe(true);
       expect(page.expandedLazy).toBe(false);
@@ -476,7 +476,7 @@ describe('PageWithNodes', () => {
       }
     }
 
-    it('creates rows after child pages have been loaded', () => {
+    it('creates rows after child pages have been loaded', async () => {
       let page = scout.create(SpecPageWithNodes, {
         parent: outline
       });
@@ -485,14 +485,14 @@ describe('PageWithNodes', () => {
       expect(page.detailTable).toBe(null); // not yet initialized
 
       outline.selectNode(page);
-      jasmine.clock().tick(1);
+      await page.ensureLoadChildren();
       expect(page.childrenLoaded).toBe(true);
       expect(page.childNodes.length).toBe(2);
       expect(page.detailTable).toBeTruthy();
       expect(page.detailTable.rows.length).toBe(2);
     });
 
-    it('creates rows after initializing the detail table if the child nodes were already loaded', () => {
+    it('creates rows after initializing the detail table if the child nodes were already loaded', async () => {
       let page = scout.create(SpecPageWithNodes, {
         parent: outline
       });
@@ -500,14 +500,13 @@ describe('PageWithNodes', () => {
       expect(page.childrenLoaded).toBe(false); // not yet loaded
       expect(page.detailTable).toBe(null); // not yet initialized
 
-      page.ensureLoadChildren();
-      jasmine.clock().tick(1);
+      await page.ensureLoadChildren();
       expect(page.childrenLoaded).toBe(true);
       expect(page.childNodes.length).toBe(2);
       expect(page.detailTable).toBe(null); // still not initialized
 
       outline.selectNode(page);
-      jasmine.clock().tick(1);
+      await page.ensureLoadChildren();
       expect(page.detailTable).toBeTruthy();
       expect(page.detailTable.rows.length).toBe(2);
     });

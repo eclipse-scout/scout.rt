@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxCall, AjaxCallModel, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, config, Deferred, Desktop, Device, Event, EventEmitter, EventHandler, FileInput, files as fileUtil, FocusManager, fonts, icons,
-  InitModelOf, JsonErrorResponse, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions, objects, ObjectWithType,
-  Reconnector, RemoteEvent, ResponseQueue, scout, SessionAdapter, SessionEventMap, SessionModel, SharedVariables, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UrlAjaxSettings, UserAgent, webstorage,
-  Widget
+  AjaxCall, AjaxCallModel, AjaxError, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, config, Deferred, Desktop, Device, Event, EventEmitter, EventHandler, FileInput, files as fileUtil, FocusManager,
+  fonts, icons, InitModelOf, JsonErrorResponse, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions, objects,
+  ObjectWithType, Reconnector, RemoteEvent, ResponseQueue, scout, SessionAdapter, SessionEventMap, SessionModel, SharedVariables, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UrlAjaxSettings,
+  UserAgent, webstorage, Widget
 } from '../index';
 import $ from 'jquery';
 import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
@@ -368,7 +368,10 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     // Send request
     let ajaxOptions = this.defaultAjaxOptions(request);
 
-    return Promise.resolve($.ajax(ajaxOptions))
+    return this._callAjax({
+      ajaxOptions: ajaxOptions,
+      name: this._getRequestName(request, 'startup request')
+    })
       .catch(onAjaxFail.bind(this))
       .then(onAjaxDone.bind(this));
 
@@ -383,9 +386,9 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       });
     }
 
-    function onAjaxFail(jqXHR: JQuery.jqXHR, textStatus?: ErrorTextStatus, errorThrown?: string, ...args: any[]): Promise<any> {
-      this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
-      return $.rejectedPromise(jqXHR, textStatus, errorThrown, ...args);
+    function onAjaxFail(ajaxError: AjaxError): Promise<any> {
+      this._processErrorResponse(ajaxError.jqXHR, ajaxError.textStatus, ajaxError.errorThrown, request);
+      return $.rejectedPromise(ajaxError.jqXHR, ajaxError.textStatus, ajaxError.errorThrown);
     }
   }
 
@@ -759,12 +762,16 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       success = false,
       responseData: RemoteResponse = null;
 
-    this._callAjax({
+    // Attach independent reactions (rather than chaining them) so that onAjaxAlways is not delayed by an extra
+    // microtask relative to onAjaxDone/onAjaxFail, just like the done/fail/always callbacks of a JQuery.Promise
+    // would have fired together (see Call.ts for the same pattern).
+    // TODO CGU test this, I don't think this is really necessary
+    let callPromise = this._callAjax({
       ajaxOptions: ajaxOptions,
       name: this._getRequestName(request, 'user request')
-    })
-      .then(onAjaxDone.bind(this), onAjaxFail.bind(this))
-      .finally(onAjaxAlways.bind(this));
+    });
+    callPromise.then(onAjaxDone.bind(this), onAjaxFail.bind(this));
+    callPromise.finally(onAjaxAlways.bind(this));
 
     // ----- Helper methods -----
 
@@ -784,7 +791,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       }
     }
 
-    function onAjaxFail(ajaxError: { jqXHR: JQuery.jqXHR; textStatus: ErrorTextStatus; errorThrown: string }) {
+    function onAjaxFail(ajaxError: AjaxError) {
       try {
         if (busyHandling) {
           this._setBusy(false);
@@ -862,12 +869,6 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
 
   unregisterAjaxCall(ajaxCall: AjaxCall) {
     arrays.remove(this.ajaxCalls, ajaxCall);
-  }
-
-  interruptAllAjaxCalls() {
-    // Because the error handlers alter the "this.ajaxCalls" array,
-    // the loop must operate on a copy of the original array!
-    this.ajaxCalls.slice().forEach(ajaxCall => ajaxCall.pendingCall && ajaxCall.pendingCall.abort());
   }
 
   abortAllAjaxCalls() {
@@ -957,7 +958,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       }
     }
 
-    function onAjaxFail(ajaxError: { jqXHR: JQuery.jqXHR; textStatus: ErrorTextStatus; errorThrown: string }) {
+    function onAjaxFail(ajaxError: AjaxError) {
       this.backgroundJobPollingSupport.setFailed();
       this._processErrorResponse(ajaxError.jqXHR, ajaxError.textStatus, ajaxError.errorThrown, request);
     }

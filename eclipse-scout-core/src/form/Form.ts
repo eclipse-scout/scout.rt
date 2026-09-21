@@ -730,7 +730,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
     // wait for promises and combine results
     return $.promiseAll([$.resolvedPromise(status), ...promises])
-      .then((...statusArr: Status[]) => Status.ok().addStatuses(...statusArr));
+      .then((statusArr: Status[]) => Status.ok().addStatuses(...statusArr));
   }
 
   /** @see FormModel.validators */

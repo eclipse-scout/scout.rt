@@ -63,7 +63,7 @@ describe('AccessControl', () => {
           }
         })
       });
-      jasmine.clock().tick(1000);
+      await flushMicrotasks();
       jasmine.clock().uninstall();
 
       expect(accessControl._permissionCollection).not.toBeNull();
@@ -101,7 +101,7 @@ describe('AccessControl', () => {
           }
         })
       });
-      jasmine.clock().tick(1);
+      await flushMicrotasks();
 
       expect(accessControl._permissionCollection).not.toBeNull();
       expect(accessControl._permissionCollection.type).toBe(PermissionCollectionType.DEFAULT);
@@ -119,7 +119,7 @@ describe('AccessControl', () => {
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1), {
         status: 500
       });
-      jasmine.clock().tick(1);
+      await flushMicrotasks();
 
       expect(accessControl._permissionCollection).not.toBeNull();
       expect(accessControl._permissionCollection.type).toBe(PermissionCollectionType.DEFAULT);
@@ -140,7 +140,7 @@ describe('AccessControl', () => {
           type: 'ALL'
         })
       });
-      jasmine.clock().tick(1);
+      await flushMicrotasks();
 
       expect(accessControl._permissionCollection).not.toBeNull();
       expect(accessControl._permissionCollection.type).toBe(PermissionCollectionType.ALL);

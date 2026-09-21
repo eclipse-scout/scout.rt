@@ -139,7 +139,7 @@ describe('StringField', () => {
       expect(element.value).toBe('ABC2');
     });
 
-    it('sends display text changed to server using accept text', () => {
+    it('sends display text changed to server using accept text', async () => {
       field.render();
       field.insertText('Test1');
       sendQueuedAjaxCalls();
@@ -151,6 +151,10 @@ describe('StringField', () => {
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
 
+      // Let the response processing (which un-sets requestPending) fully settle before triggering the next send,
+      // otherwise areRequestsPending() would still report true and the next debounced send would be skipped.
+      await Promise.resolve();
+      await Promise.resolve();
       field.insertText('ABC2');
       let element = field.$field[0] as HTMLInputElement;
       expect(element.value).toBe('Test1ABC2');
@@ -164,7 +168,7 @@ describe('StringField', () => {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('sends display text changed to server using accept text, twice, if updateDisplayTextOnModify=true', () => {
+    it('sends display text changed to server using accept text, twice, if updateDisplayTextOnModify=true', async () => {
       field.updateDisplayTextOnModify = true;
       field.render();
       let message = {
@@ -189,6 +193,10 @@ describe('StringField', () => {
       });
       expect(mostRecentJsonRequest()).toContainEventsExactly(events);
 
+      // Let the response processing (which un-sets requestPending) fully settle before triggering the next send,
+      // otherwise areRequestsPending() would still report true and the next debounced send would be skipped.
+      await Promise.resolve();
+      await Promise.resolve();
       message = {
         events: [createPropertyChangeEvent(field, {
           insertText: 'ABC2'

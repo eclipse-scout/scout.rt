@@ -2217,41 +2217,33 @@ describe('Form', () => {
       expect(form._showFormInvalidMessageBox).toHaveBeenCalledTimes(1);
     });
 
-    it('returns false if mandatory field is empty', done => {
-      jasmine.clock().install();
-
+    it('returns false if mandatory field is empty', async () => {
       numberField.setValue(42);
 
-      form.validate()
-        .then(status => {
-          expect(status.isValid()).toBeFalse();
-        })
-        .catch(fail)
-        .then(done);
+      const validatePromise = form.validate().then(status => {
+        expect(status.isValid()).toBeFalse();
+      });
 
-      jasmine.clock().tick(1000);
+      // Let the validate chain reach the invalid-form message box, then close it
+      await sleep(10);
       helper.closeMessageBoxes();
-      jasmine.clock().tick(1000);
-      jasmine.clock().uninstall();
+
+      await validatePromise;
     });
 
-    it('returns false if field is invalid', done => {
-      jasmine.clock().install();
-
+    it('returns false if field is invalid', async () => {
       mandatoryStringField.setValue('whatever');
       numberField.setValue('whatever');
 
-      form.validate()
-        .then(status => {
-          expect(status.isValid()).toBeFalse();
-        })
-        .catch(fail)
-        .then(done);
+      const validatePromise = form.validate().then(status => {
+        expect(status.isValid()).toBeFalse();
+      });
 
-      jasmine.clock().tick(1000);
+      // Let the validate chain reach the invalid-form message box, then close it
+      await sleep(10);
       helper.closeMessageBoxes();
-      jasmine.clock().tick(1000);
-      jasmine.clock().uninstall();
+
+      await validatePromise;
     });
 
     it('waits for all validators to complete and returns true if all are valid', async () => {

@@ -137,7 +137,7 @@ describe('RadioButtonGroup', () => {
 
   describe('lookupCall', () => {
 
-    it('can be prepared with initial value', done => {
+    it('can be prepared with initial value', async () => {
       let group = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall',
@@ -149,16 +149,13 @@ describe('RadioButtonGroup', () => {
       group.render(); // triggers the execution of the lookup call
       jasmine.clock().tick(500);
 
-      $.promiseAll([lookupPrepared, lookupDone]).then(event => {
-        expect(event.lookupCall instanceof DummyLookupCall).toBe(true);
-        expect(group.radioButtons.length).toBe(3);
-      })
-        .catch(fail)
-        .finally(done);
-      jasmine.clock().tick(500);
+      // Promise.all resolves to an array of results since 2 promises are passed
+      const [prepareEvent] = await Promise.all([lookupPrepared, lookupDone]);
+      expect(prepareEvent.lookupCall instanceof DummyLookupCall).toBe(true);
+      expect(group.radioButtons.length).toBe(3);
     });
 
-    it('can be prepared with explicit value', done => {
+    it('can be prepared with explicit value', async () => {
       let group = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
@@ -169,35 +166,36 @@ describe('RadioButtonGroup', () => {
       group.setValue(2);
       jasmine.clock().tick(500);
 
-      $.promiseAll([lookupPrepared, lookupDone]).then(event => {
-        expect(event.lookupCall instanceof DummyLookupCall).toBe(true);
-        expect(group.radioButtons.length).toBe(3);
-      })
-        .catch(fail)
-        .finally(done);
-      jasmine.clock().tick(500);
+      // Promise.all resolves to an array of results since 2 promises are passed
+      const [prepareEvent] = await Promise.all([lookupPrepared, lookupDone]);
+      expect(prepareEvent.lookupCall instanceof DummyLookupCall).toBe(true);
+      expect(group.radioButtons.length).toBe(3);
     });
 
-    it('creates a radio button for each lookup row', () => {
+    it('creates a radio button for each lookup row', async () => {
       let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
+      let lookupDone = radioButtonGroup.when('lookupCallDone');
       radioButtonGroup.render();
       jasmine.clock().tick(300);
+      await lookupDone;
       expect(radioButtonGroup.radioButtons.length).toBe(3);
       expect(radioButtonGroup.lookupCall).not.toBe(null);
       expect(radioButtonGroup.errorStatus).toBe(null);
     });
 
-    it('selects correct radio button', () => {
+    it('selects correct radio button', async () => {
       let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall',
         value: 1
       });
+      let lookupDone = radioButtonGroup.when('lookupCallDone');
       radioButtonGroup.render(); // triggers the execution of the lookup call
       jasmine.clock().tick(300);
+      await lookupDone;
       expect(radioButtonGroup.radioButtons.length).toBe(3);
       expect(radioButtonGroup.errorStatus).toBe(null);
       expect(radioButtonGroup.lookupCall).not.toBe(null);
@@ -217,14 +215,16 @@ describe('RadioButtonGroup', () => {
       expect(radioButtonGroup.value).toBe(2);
     });
 
-    it('lookupRow lives on the radioButton', () => {
+    it('lookupRow lives on the radioButton', async () => {
       let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
+      let lookupDone = radioButtonGroup.when('lookupCallDone');
       radioButtonGroup.render(); // triggers the execution of the lookup call
 
       jasmine.clock().tick(300);
+      await lookupDone;
       radioButtonGroup.setValue(2);
       expect(radioButtonGroup.value).toBe(2);
       expect(radioButtonGroup.errorStatus).toBe(null);

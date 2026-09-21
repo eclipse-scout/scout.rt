@@ -8,7 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, Deferred, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectIdProvider, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session,
+  AdapterData, App, arrays, Deferred, Desktop, FormModel, FullModelOf, GroupBoxModel, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectIdProvider, PermissionCollectionType, RemoteEvent, RemoteRequest,
+  RemoteResponse,
+  scout, Session,
   SessionStartupResponse, uiNotifications, uiPreferences, Widget, WidgetModel
 } from '../index';
 import {jasmineScoutMatchers, JasmineScoutUtil, LocaleSpecHelper, SpecUiPreferencesStore, TestingApp, UiNotificationsMock} from './index';
@@ -61,6 +63,15 @@ declare global {
   function createPropertyChangeEvent(model: { id: string }, properties: object);
 
   function sleep(duration?: number): Promise<void>;
+
+  /**
+   * Ensures promise callbacks are executed.
+   *
+   * Compared to {@link sleep}, it only executes microtasks, no macrotask (e.g. setTimeout).
+   * Because of this, it could even be used if a jasmine.clock() is installed.
+   * @param count specifies how many microtasks are executed. Defaults to 3.
+   */
+  function flushMicrotasks(count?: number): Promise<void>;
 }
 
 export interface SandboxSessionOptions {
@@ -221,6 +232,12 @@ window.sleep = duration => {
   let deferred = new Deferred<void>();
   setTimeout(() => deferred.resolve(), duration);
   return deferred.promise();
+};
+
+window.flushMicrotasks = async (count = 3) => {
+  for (let i = 0; i < count; i++) {
+    await Promise.resolve();
+  }
 };
 
 export const JasmineScout = {

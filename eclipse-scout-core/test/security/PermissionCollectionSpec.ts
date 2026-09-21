@@ -35,14 +35,6 @@ describe('PermissionCollection', () => {
     return state;
   }
 
-  /**
-   * Waits a real macrotask tick so that any number of chained microtask reactions (promise then-chains)
-   * have fully drained, without depending on jasmine's fake clock.
-   */
-  function flush(): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, 0));
-  }
-
   describe('implies', () => {
 
     beforeEach(() => {
@@ -118,31 +110,31 @@ describe('PermissionCollection', () => {
       let state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue()));
       expect(state.value).toBe('pending');
       evalDeferred1.resolve(true);
-      await flush();
+      await flushMicrotasks();
       expect(state.value).toBe('resolved');
 
       state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue()));
       expect(state.value).toBe('pending');
       evalDeferred2.resolve(false);
-      await flush();
+      await flushMicrotasks();
       expect(state.value).toBe('pending');
       evalDeferred1.resolve(true);
-      await flush();
+      await flushMicrotasks();
       expect(state.value).toBe('resolved');
 
       state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue()));
       expect(state.value).toBe('pending');
       evalDeferred2.resolve(true);
-      await flush();
+      await flushMicrotasks();
       expect(state.value).toBe('resolved');
 
       state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeFalse()));
       expect(state.value).toBe('pending');
       evalDeferred2.resolve(false);
-      await flush();
+      await flushMicrotasks();
       expect(state.value).toBe('pending');
       evalDeferred1.resolve(false);
-      await flush();
+      await flushMicrotasks();
       expect(state.value).toBe('resolved');
     });
   });

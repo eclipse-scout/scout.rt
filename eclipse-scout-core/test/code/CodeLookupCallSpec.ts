@@ -84,7 +84,7 @@ describe('CodeLookupCall', () => {
       codes.add(codeType123);
     });
 
-    it('returns the lookupRows which match the given text', done => {
+    it('returns the lookupRows which match the given text', async () => {
       let promise1 = createLookupCall(codeType123).getByText('code')
         .then(result => {
           expect(result.lookupRows.length).toBe(2);
@@ -103,7 +103,7 @@ describe('CodeLookupCall', () => {
         })
         .catch(fail);
 
-      $.promiseAll([promise1, promise2]).then(done);
+      await $.promiseAll([promise1, promise2]);
     });
 
     it('returns no lookupRows if no codes match the given text', done => {

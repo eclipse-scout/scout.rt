@@ -222,48 +222,56 @@ describe('ProposalField', () => {
       expect(field.$field).toHaveAttr('role', 'combobox');
     });
 
-    it('has a non empty status container that lists count of available options', () => {
+    it('has a non empty status container that lists count of available options', async () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
+      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
       jasmine.clock().tick(500);
+      await lookupDone;
       expect(field.$screenReaderStatus).toHaveAttr('role', 'status');
       expect(field.$screenReaderStatus).toHaveClass('sr-only');
       expect(field.$screenReaderStatus.children('.sr-lookup-row-count').length).toBe(1);
       expect(field.$screenReaderStatus.children('.sr-lookup-row-count').eq(0)).not.toBeEmpty();
     });
 
-    it('has a aria-expanded set correctly if pop up is open/closed', () => {
+    it('has a aria-expanded set correctly if pop up is open/closed', async () => {
       field.render();
       expect(field.$field).toHaveAttr('aria-expanded', 'false');
       field.$field.focus(); // must be focused, otherwise popup will not open
+      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
       jasmine.clock().tick(500);
+      await lookupDone;
       expect(field.$field).toHaveAttr('aria-expanded', 'true');
       field.closePopup();
     });
 
-    it('has a aria-controls set correctly if pop up is open/closed', () => {
+    it('has a aria-controls set correctly if pop up is open/closed', async () => {
 
       field.render();
       expect(field.$field.attr('aria-controls')).toBeFalsy();
       field.$field.focus(); // must be focused, otherwise popup will not open
+      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
       jasmine.clock().tick(500);
+      await lookupDone;
       expect(field.$field.attr('aria-controls')).toBe(field.popup.$container.attr('id'));
       field.closePopup();
     });
 
-    it('has a aria-activedescendant set correctly if pop up is open/closed', () => {
+    it('has a aria-activedescendant set correctly if pop up is open/closed', async () => {
       field.render();
       expect(field.$field.attr('aria-activedescendant')).toBeFalsy();
       field.$field.focus(); // must be focused, otherwise popup will not open
+      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
       jasmine.clock().tick(500);
+      await lookupDone;
       JQueryTesting.triggerKeyDown(field.$field, keys.DOWN);
       expect(field.$field.attr('aria-activedescendant')).toBeTruthy();
       field.closePopup();

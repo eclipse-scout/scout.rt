@@ -18,7 +18,6 @@ export class AjaxCall extends Call implements AjaxCallModel {
   ajaxOptions: UrlAjaxSettings;
   /**
    * The {@link JQuery.jqXHR} of the last performed request (successful or not), e.g. to access the HTTP status code.
-   * Not available while the call is still pending, use {@link Call.pendingCall} for that.
    *
    * Only set on {@link AjaxCall} instances created directly, e.g. using {@link ajax.createCall}/{@link ajax.createCallJson}:
    * the shorthand functions like {@link ajax.get}/{@link ajax.getJson} only ever return the resolved response body,
@@ -54,7 +53,7 @@ export class AjaxCall extends Call implements AjaxCallModel {
 
   // ==================================================================================
 
-  protected override _callImpl(): JQuery.jqXHR {
+  protected override _callImpl(): Promise<any> {
     // Mark retries by adding a URL parameter
     if (this.callCounter !== 1) {
       this.ajaxOptions.url = new URL(this.ajaxOptions.url).setParameter('retry', (this.callCounter - 1) + '').toString({
@@ -65,20 +64,21 @@ export class AjaxCall extends Call implements AjaxCallModel {
 
     // TODO CGU review
     let jqXHR = $.ajax(this.ajaxOptions);
-    // Capture the extra arguments of jQuery's done/fail callbacks here (using jQuery's own multi-argument API,
-    // since the underlying $.ajax() is out of scope for the native-promise migration), so that Call's generic
-    // (single-value) then/catch handling further down the chain can still access them via these fields.
-    jqXHR
-      .done((data, textStatus) => {
-        this.lastXhr = jqXHR;
-        this._lastTextStatus = textStatus;
-      })
-      .fail((xhr, textStatus, errorThrown) => {
-        this.lastXhr = jqXHR;
-        this._lastTextStatus = textStatus;
-        this._lastErrorThrown = errorThrown;
-      });
-    return jqXHR;
+    // Capture the extra arguments of jQuery's done/fail callbacks and create a native promise
+    return new Promise((resolve, reject) => {
+      jqXHR
+        .then((data, textStatus) => {
+          this.lastXhr = jqXHR;
+          this._lastTextStatus = textStatus;
+          resolve(data);
+        })
+        .catch((xhr, textStatus, errorThrown) => {
+          this.lastXhr = jqXHR;
+          this._lastTextStatus = textStatus;
+          this._lastErrorThrown = errorThrown;
+          reject(jqXHR);
+        });
+    });
   }
 
   protected override _setResultFail(jqXHR?: JQuery.jqXHR) {

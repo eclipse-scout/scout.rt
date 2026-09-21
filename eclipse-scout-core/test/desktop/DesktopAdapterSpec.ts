@@ -47,7 +47,7 @@ describe('DesktopAdapter', () => {
 
   describe('activateForm', () => {
 
-    it('sends formActivateEvent', () => {
+    it('sends formActivateEvent', async () => {
       let formModel = createAndRegisterFormModel();
       let formModel2 = createAndRegisterFormModel();
       let form = session.getOrCreateWidget(formModel.id, desktop) as Form;
@@ -59,6 +59,7 @@ describe('DesktopAdapter', () => {
       expect(desktop.activeForm).toBe(form);
 
       sendQueuedAjaxCalls();
+      await flushMicrotasks();
       let event = new RemoteEvent(desktopAdapter.id, 'formActivate', {
         formId: form.modelAdapter.id
       });
@@ -68,6 +69,7 @@ describe('DesktopAdapter', () => {
       expect(desktop.activeForm).toBe(form2);
 
       sendQueuedAjaxCalls();
+      await flushMicrotasks();
       event = new RemoteEvent(desktopAdapter.id, 'formActivate', {
         formId: form2.modelAdapter.id
       });
@@ -81,6 +83,7 @@ describe('DesktopAdapter', () => {
       expect(desktop.activeForm).toBe(jsForm);
 
       sendQueuedAjaxCalls();
+      await flushMicrotasks();
       event = new RemoteEvent(desktopAdapter.id, 'formActivate', {
         formId: jsForm.__hybridModelAdapter.id
       });
@@ -94,10 +97,11 @@ describe('DesktopAdapter', () => {
 
       // nothing was sent to the server, the most recent request is unchanged and therefore contains the same events
       sendQueuedAjaxCalls();
+      await flushMicrotasks();
       expect(mostRecentJsonRequest()).toContainEventsExactly(remoteEvents);
     });
 
-    it('can close and open new form in the same response', () => {
+    it('can close and open new form in the same response', async () => {
       let formModel = createAndRegisterFormModel();
       let form = session.getOrCreateWidget(formModel.id, desktop) as Form;
       desktop.dialogs = [form];
@@ -109,6 +113,7 @@ describe('DesktopAdapter', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       sendQueuedAjaxCalls();
+      await flushMicrotasks;
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       // ------------------------
@@ -149,6 +154,7 @@ describe('DesktopAdapter', () => {
       };
       session._processSuccessResponse(response);
       sendQueuedAjaxCalls();
+      await flushMicrotasks;
 
       let expectedEvents = [
         new RemoteEvent(desktopAdapter.id, 'formActivate', {}),
@@ -175,6 +181,7 @@ describe('DesktopAdapter', () => {
       };
       session._processSuccessResponse(response);
       sendQueuedAjaxCalls();
+      await flushMicrotasks;
       expect(jasmine.Ajax.requests.count()).toBe(2);
     });
   });

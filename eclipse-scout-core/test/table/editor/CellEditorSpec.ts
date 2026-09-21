@@ -21,13 +21,11 @@ describe('CellEditor', () => {
     helper = new TableSpecHelper(session);
     formHelper = new FormSpecHelper(session);
     jasmine.Ajax.install();
-    jasmine.clock().install();
   });
 
   afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
-    jasmine.clock().uninstall();
     findPopup()?.destroy();
   });
 
@@ -182,21 +180,20 @@ describe('CellEditor', () => {
       $cells0 = $rows.eq(0).find('.table-cell');
     });
 
-    it('starts the cell editor for the next editable cell', () => {
+    it('starts the cell editor for the next editable cell', async () => {
       table.rows[0].cells[0].editable = true;
       table.rows[1].cells[0].editable = true;
 
       table.focusCell(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await sleep();
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
 
       JQueryTesting.triggerKeyInputCapture($(document.activeElement as HTMLElement), keys.TAB);
-      jasmine.clock().tick(0);
-      jasmine.clock().tick(0);
+      await sleep();
       assertCellEditorIsOpen(table, table.columns[0], table.rows[1]);
     });
 
-    it('starts the cell editor for the next visible cell', () => {
+    it('starts the cell editor for the next visible cell', async () => {
       table.rows[0].cells[0].setEditable(true);
       table.rows[0].cells[1].setEditable(true);
       table.rows[1].cells[2].setEditable(true);
@@ -204,12 +201,11 @@ describe('CellEditor', () => {
       table.columns[1].setVisible(false);
 
       table.focusCell(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await sleep();
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
 
       JQueryTesting.triggerKeyInputCapture($(document.activeElement as HTMLElement), keys.TAB);
-      jasmine.clock().tick(0);
-      jasmine.clock().tick(0);
+      await sleep();
       assertCellEditorIsOpen(table, table.columns[2], table.rows[1]);
     });
   });
@@ -224,23 +220,21 @@ describe('CellEditor', () => {
       helper.applyDisplayStyle(table);
     });
 
-    it('creates field and calls start', () => {
+    it('creates field and calls start', async () => {
       table.columns[0].setEditable(true);
       spyOn(table, 'startCellEdit').and.callThrough();
 
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       expect(table.startCellEdit).toHaveBeenCalled();
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
     });
 
-    it('copies the value to the field if cell was valid', () => {
+    it('copies the value to the field if cell was valid', async () => {
       let column = table.columns[0];
       let row = table.rows[0];
       column.setEditable(true);
       column.setCellValue(row, 'valid value');
-      table.prepareCellEdit(column, row);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(column, row);
       assertCellEditorIsOpen(table, column, row);
       let field = table.cellEditorPopup.cell.field;
       expect(field.value).toEqual('valid value');
@@ -248,15 +242,14 @@ describe('CellEditor', () => {
       expect(field.errorStatus).toEqual(null);
     });
 
-    it('copies the text and the error to the field if cell was invalid', () => {
+    it('copies the text and the error to the field if cell was invalid', async () => {
       let column = table.columns[0];
       let row = table.rows[0];
       column.setEditable(true);
       column.setCellValue(row, 'valid value');
       column.setCellText(row, 'invalid value');
       column.setCellErrorStatus(row, Status.error('error'));
-      table.prepareCellEdit(column, row);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(column, row);
       assertCellEditorIsOpen(table, column, row);
       let field = table.cellEditorPopup.cell.field;
       expect(field.value).toEqual(null);
@@ -264,19 +257,18 @@ describe('CellEditor', () => {
       expect(field.errorStatus.message).toEqual('error');
     });
 
-    it('triggers prepareCellEdit event', () => {
+    it('triggers prepareCellEdit event', async () => {
       let triggeredEvent;
       table.columns[0].setEditable(true);
       table.on('prepareCellEdit', event => {
         triggeredEvent = event;
       });
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       expect(triggeredEvent.column).toBe(table.columns[0]);
       expect(triggeredEvent.row).toBe(table.rows[0]);
     });
 
-    it('can open the field popup', () => {
+    it('can open the field popup', async () => {
       table.insertColumn({
         objectType: SmartColumn,
         lookupCall: {objectType: DummyLookupCall},
@@ -287,7 +279,7 @@ describe('CellEditor', () => {
       expect(table.cellEditorPopup).toBe(null);
 
       // Update buffer is updating because rows with smart values are inserted -> wait until lookup call is resolved and table.loading set to false
-      jasmine.clock().tick(500);
+      await sleep(500);
       let field = (table.cellEditorPopup.cell.field as SmartField<any>);
       expect(field.$field).toBeFocused();
       expect(field.popup.rendered).toBe(true);
@@ -303,7 +295,7 @@ describe('CellEditor', () => {
       // Again, wait for lookup call. Loading indicator is drawn on a glass pane and indicator removed by CSS animation.
       // Glass pane must be deactivated immediately not only when the animation finishes,
       // otherwise it would prevent the popup from being opened because smart field does not have the focus, see isFocused() in SmartField._lookupByTextOrAllDone.
-      jasmine.clock().tick(500);
+      await sleep(500);
       field = (table.cellEditorPopup.cell.field as SmartField<any>);
       expect(field.$field).toBeFocused();
       expect(field.popup.rendered).toBe(true);
@@ -346,14 +338,13 @@ describe('CellEditor', () => {
       });
     });
 
-    it('triggers startCellEdit event', () => {
+    it('triggers startCellEdit event', async () => {
       let triggeredEvent;
       table.columns[0].setEditable(true);
       table.on('startCellEdit', event => {
         triggeredEvent = event;
       });
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       expect(triggeredEvent.row).toBe(table.rows[0]);
       expect(triggeredEvent.column).toBe(table.columns[0]);
       expect(triggeredEvent.field instanceof Widget).toBe(true);
@@ -383,7 +374,7 @@ describe('CellEditor', () => {
       expect(table.cellEditorPopup.cell.field).toBe(field);
     });
 
-    it('postpones opening if update buffer is buffering', () => {
+    it('postpones opening if update buffer is buffering', async () => {
       table.insertColumn({
         objectType: SmartColumn,
         lookupCall: {objectType: DummyLookupCall},
@@ -396,7 +387,7 @@ describe('CellEditor', () => {
       table.startCellEdit(table.columns[2], table.rows[0], field);
       expect(table.cellEditorPopup).toBe(null);
 
-      jasmine.clock().tick(500);
+      await sleep(500);
       expect(table.updateBuffer.isBuffering()).toBe(false);
       assertCellEditorIsOpen(table, table.columns[2], table.rows[0]);
       expect(table.cellEditorPopup.cell.field).toBe(field);
@@ -469,7 +460,7 @@ describe('CellEditor', () => {
       expect(triggeredEvents).toBe(1);
     });
 
-    it('ends existing cell edit if an editor is open', () => {
+    it('ends existing cell edit if an editor is open', async () => {
       table.columns[0].setEditable(true);
       table.insertColumn({
         objectType: SmartColumn,
@@ -479,7 +470,7 @@ describe('CellEditor', () => {
       table.insertRows({cells: ['a', 'b', 'key0']});
       let field = table.columns[2].createEditor(table.rows[0]);
       table.startCellEdit(table.columns[2], table.rows[0], field);
-      jasmine.clock().tick(500);
+      await sleep(500);
       assertCellEditorIsOpen(table, table.columns[2], table.rows[0]);
       let popup = table.cellEditorPopup;
       expect(popup.cell.field).toBe(field);
@@ -517,11 +508,10 @@ describe('CellEditor', () => {
       helper.applyDisplayStyle(table);
     });
 
-    it('triggers completeCellEdit event', () => {
+    it('triggers completeCellEdit event', async () => {
       let triggeredEvent;
       table.columns[0].setEditable(true);
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       table.on('completeCellEdit', event => {
         triggeredEvent = event;
       });
@@ -531,33 +521,30 @@ describe('CellEditor', () => {
       expect(triggeredEvent.field).toBe(table.rows[0].cells[0].field);
     });
 
-    it('calls endCellEdit with saveEditorValue=true', () => {
+    it('calls endCellEdit with saveEditorValue=true', async () => {
       table.columns[0].setEditable(true);
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       spyOn(table, 'endCellEdit').and.callThrough();
       let field = table.cellEditorPopup.cell.field;
 
       table.completeCellEdit();
       expect(table.endCellEdit).toHaveBeenCalledWith(field, true);
-      jasmine.clock().tick(0);
+      await Promise.resolve();
       expect($findPopup().length).toBe(0);
     });
 
-    it('saves editor value', () => {
+    it('saves editor value', async () => {
       table.columns[0].setEditable(true);
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       table.cellEditorPopup.cell.field.setValue('my new value');
 
       table.completeCellEdit();
       expect(table.rows[0].cells[0].value).toBe('my new value');
     });
 
-    it('copies the value to the cell if field was valid', () => {
+    it('copies the value to the cell if field was valid', async () => {
       table.columns[0].setEditable(true);
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       table.cellEditorPopup.cell.field.setValue('my new value');
 
       table.completeCellEdit();
@@ -568,7 +555,7 @@ describe('CellEditor', () => {
       expect($('.tooltip').length).toBe(0);
     });
 
-    it('copies the text and error to the cell if field was invalid', () => {
+    it('copies the text and error to the cell if field was invalid', async () => {
       let column = table.columns[0];
       let row = table.rows[0];
       let cell = row.cells[0];
@@ -576,8 +563,7 @@ describe('CellEditor', () => {
 
       column.setEditable(true);
       column.setCellValue(row, 'valid value');
-      table.prepareCellEdit(column, row);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(column, row);
 
       let field = table.cellEditorPopup.cell.field;
       field.setValidator(value => {
@@ -595,7 +581,7 @@ describe('CellEditor', () => {
       expect($('.tooltip')).toContainText('Validation failed');
     });
 
-    it('clears the error if value is now valid', () => {
+    it('clears the error if value is now valid', async () => {
       let column = table.columns[0];
       let row = table.rows[0];
       let cell = row.cells[0];
@@ -603,8 +589,7 @@ describe('CellEditor', () => {
 
       column.setEditable(true);
       column.setCellValue(row, 'valid value');
-      table.prepareCellEdit(column, row);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(column, row);
 
       let field = table.cellEditorPopup.cell.field;
       field.setValidator(value => {
@@ -622,8 +607,7 @@ describe('CellEditor', () => {
       expect($('.tooltip')).toContainText('Validation failed');
 
       // Second time -> make it valid
-      table.prepareCellEdit(column, row);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(column, row);
       field = table.cellEditorPopup.cell.field;
       field.setValidator(null);
       field.setValue('new valid value');
@@ -637,7 +621,7 @@ describe('CellEditor', () => {
       expect($('.tooltip').length).toBe(0);
     });
 
-    it('clears the error if value is now valid even when changed to the original value', () => {
+    it('clears the error if value is now valid even when changed to the original value', async () => {
       let column = table.columns[0];
       let row = table.rows[0];
       let cell = row.cells[0];
@@ -645,8 +629,7 @@ describe('CellEditor', () => {
 
       column.setEditable(true);
       column.setCellValue(row, 'valid value');
-      table.prepareCellEdit(column, row);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(column, row);
 
       let field = table.cellEditorPopup.cell.field;
       field.setValidator(value => {
@@ -664,8 +647,7 @@ describe('CellEditor', () => {
       expect($('.tooltip')).toContainText('Validation failed');
 
       // Second time -> make it valid
-      table.prepareCellEdit(column, row);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(column, row);
       field = table.cellEditorPopup.cell.field;
       field.setValidator(null);
       field.setValue('valid value'); // Same as at the beginning
@@ -679,10 +661,9 @@ describe('CellEditor', () => {
       expect($('.tooltip').length).toBe(0);
     });
 
-    it('does not reopen the editor again', () => {
+    it('does not reopen the editor again', async () => {
       table.columns[0].setEditable(true);
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       table.cellEditorPopup.cell.field.setValue('my new value');
 
       let triggeredStartCellEditEvent = null;
@@ -694,10 +675,9 @@ describe('CellEditor', () => {
       expect(triggeredStartCellEditEvent).toBe(null);
     });
 
-    it('is called when another popup opens', () => {
+    it('is called when another popup opens', async () => {
       table.columns[0].setEditable(true);
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       table.cellEditorPopup.cell.field.setValue('my new value');
 
       scout.create(Popup, {parent: session.desktop}).open();
@@ -733,7 +713,6 @@ describe('CellEditor', () => {
     });
 
     it('does not fail when completing edit after removing a value', done => {
-      jasmine.clock().uninstall();
       table.columns[0].setEditable(true);
       table.sort(table.columns[0]); // Column needs to be sorted to force a re-rendering of the rows at the end when rows are updated (_sortAfterUpdate)
       table.prepareCellEdit(table.columns[0], table.rows[0], true).then(() => {
@@ -755,13 +734,13 @@ describe('CellEditor', () => {
       });
     });
 
-    it('triggers update row event containing row with correct state', () => {
+    it('triggers update row event containing row with correct state', async () => {
       table.columns[0].setEditable(true);
       table.markRowsAsNonChanged();
       table.prepareCellEdit(table.columns[0], table.rows[0], true);
-      jasmine.clock().tick(300);
+      await sleep(300);
       table.cellEditorPopup.cell.field.setValue('key1');
-      jasmine.clock().tick(300);
+      await sleep(300);
       let updateRowCount = 0;
       table.on('rowsUpdated', event => {
         expect(event.rows[0].cells[0].value).toBe('key1');
@@ -770,28 +749,27 @@ describe('CellEditor', () => {
         updateRowCount++;
       });
       table.completeCellEdit();
-      jasmine.clock().tick(300);
+      await sleep(300);
       expect(updateRowCount).toBe(1);
     });
 
-    it('updates the value even if the table has been removed in the meantime', () => {
+    it('updates the value even if the table has been removed in the meantime', async () => {
       table.columns[0].setEditable(true);
       table.markRowsAsNonChanged();
       table.prepareCellEdit(table.columns[0], table.rows[0], true);
-      jasmine.clock().tick(300);
+      await sleep(300);
       let field = table.cellEditorPopup.cell.field as SpecSmartField;
       field.$field.val('Key 1');
       field._userWasTyping = true;
       table.cellEditorPopup.completeEdit(); // Will execute table.completeCellEdit async
       table.remove();
-      jasmine.clock().tick(300);
+      await sleep(300);
       expect(table.rows[0].cells[0].value).toBe('key1');
       expect(table.rows[0].cells[0].text).toBe('Key 1');
       expect(table.rows[0].status).toBe(TableRow.Status.UPDATED);
     });
 
     it('closes the editor even if acceptInput was called again', async () => {
-      jasmine.clock().uninstall();
       table.columns[0].setEditable(true);
       lookupCall.setDelay(5);
       await table.prepareCellEdit(table.columns[0], table.rows[0], true);
@@ -819,11 +797,10 @@ describe('CellEditor', () => {
       helper.applyDisplayStyle(table);
     });
 
-    it('triggers cancelCellEdit event', () => {
+    it('triggers cancelCellEdit event', async () => {
       let triggeredEvent;
       table.columns[0].setEditable(true);
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       table.on('cancelCellEdit', event => {
         triggeredEvent = event;
       });
@@ -833,23 +810,21 @@ describe('CellEditor', () => {
       expect(triggeredEvent.field).toBe(table.rows[0].cells[0].field);
     });
 
-    it('calls endCellEdit with saveEditorValue=false', () => {
+    it('calls endCellEdit with saveEditorValue=false', async () => {
       table.columns[0].setEditable(true);
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       spyOn(table, 'endCellEdit').and.callThrough();
       let field = table.cellEditorPopup.cell.field;
 
       table.cancelCellEdit();
       expect(table.endCellEdit).toHaveBeenCalledWith(field);
-      jasmine.clock().tick(0);
+      await Promise.resolve();
       expect($findPopup().length).toBe(0);
     });
 
-    it('does not save editor value', () => {
+    it('does not save editor value', async () => {
       table.columns[0].setEditable(true);
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       table.cellEditorPopup.cell.field.setValue('my new value');
 
       table.cancelCellEdit();
@@ -867,9 +842,8 @@ describe('CellEditor', () => {
       helper.applyDisplayStyle(table);
     });
 
-    it('destroys the field', () => {
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+    it('destroys the field', async () => {
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       let popup = table.cellEditorPopup;
       let field = popup.cell.field;
       expect(field.destroyed).toBe(false);
@@ -878,15 +852,14 @@ describe('CellEditor', () => {
       expect(field.destroyed).toBe(true);
     });
 
-    it('removes the cell editor popup', () => {
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+    it('removes the cell editor popup', async () => {
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       let popup = table.cellEditorPopup;
       let field = popup.cell.field;
       expect(field.destroyed).toBe(false);
 
       table.endCellEdit(field);
-      jasmine.clock().tick(0);
+      await Promise.resolve();
       expect($findPopup().length).toBe(0);
       expect($findPopup().find('.form-field').length).toBe(0);
       expect(popup.rendered).toBe(false);
@@ -934,13 +907,12 @@ describe('CellEditor', () => {
       row0 = table.rows[0];
     });
 
-    it('reopens popup if row gets updated', () => {
+    it('reopens popup if row gets updated', async () => {
       row0.cells[0].editable = true;
       table.render();
       $cells0 = table.$cellsForRow(row0.$row);
       $cell0_0 = $cells0.eq(0);
-      table.prepareCellEdit(table.columns[0], row0);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], row0);
       expect(table.cellEditorPopup.row).toBe(row0);
       expect(table.cellEditorPopup.$anchor[0]).toBe($cell0_0[0]);
 
@@ -959,11 +931,10 @@ describe('CellEditor', () => {
       expect(oldPopup.destroyed).toBe(true);
     });
 
-    it('closes popup if row gets deleted', () => {
+    it('closes popup if row gets deleted', async () => {
       row0.cells[0].editable = true;
       table.render();
-      table.prepareCellEdit(table.columns[0], row0);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], row0);
       spyOn(table, 'cancelCellEdit');
 
       table.deleteRows([row0]);
@@ -975,11 +946,10 @@ describe('CellEditor', () => {
       expect(table.cancelCellEdit).toHaveBeenCalled();
     });
 
-    it('closes popup if all rows get deleted', () => {
+    it('closes popup if all rows get deleted', async () => {
       row0.cells[0].editable = true;
       table.render();
-      table.prepareCellEdit(table.columns[0], row0);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], row0);
       spyOn(table, 'cancelCellEdit');
 
       table.deleteAllRows();
@@ -991,15 +961,14 @@ describe('CellEditor', () => {
       expect(table.cancelCellEdit).toHaveBeenCalled();
     });
 
-    it('removes popup when table is detached', () => {
+    it('removes popup when table is detached', async () => {
       row0.cells[0].editable = true;
       table.render();
-      table.prepareCellEdit(table.columns[0], row0);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], row0);
       expect(table.cellEditorPopup).toBeTruthy();
       table.cellEditorPopup.cell.field.setValue('my new value');
       table.detach();
-      jasmine.clock().tick(0);
+      await Promise.resolve();
       expect(table.cellEditorPopup.rendered).toBe(false);
 
       // Destroys popup after complete edit, even if table is not attached anymore
@@ -1008,15 +977,14 @@ describe('CellEditor', () => {
       expect(table.cellEditorPopup).toBe(null);
     });
 
-    it('removes popup when table is removed', () => {
+    it('removes popup when table is removed', async () => {
       row0.cells[0].editable = true;
       table.render();
-      table.prepareCellEdit(table.columns[0], row0);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], row0);
       expect(table.cellEditorPopup).toBeTruthy();
       table.cellEditorPopup.cell.field.setValue('my new value');
       table.remove();
-      jasmine.clock().tick(0);
+      await Promise.resolve();
       expect(table.cellEditorPopup.rendered).toBe(false);
       expect(table.cellEditorPopup.cell.field.rendered).toBe(false);
 
@@ -1026,14 +994,13 @@ describe('CellEditor', () => {
       expect(table.cellEditorPopup).toBe(null);
     });
 
-    it('does not fail if table is detached and attached again', () => {
+    it('does not fail if table is detached and attached again', async () => {
       row0.cells[0].editable = true;
       table.render();
-      table.prepareCellEdit(table.columns[0], row0);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], row0);
       expect(table.cellEditorPopup).toBeTruthy();
       table.detach();
-      jasmine.clock().tick(0);
+      await Promise.resolve();
       expect(table.cellEditorPopup.rendered).toBe(false);
 
       table.attach();
@@ -1041,14 +1008,13 @@ describe('CellEditor', () => {
       expect(table.cellEditorPopup.cell.field.rendered).toBe(true);
     });
 
-    it('does not fail if table is removed and rendered again', () => {
+    it('does not fail if table is removed and rendered again', async () => {
       row0.cells[0].editable = true;
       table.render();
-      table.prepareCellEdit(table.columns[0], row0);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], row0);
       expect(table.cellEditorPopup).toBeTruthy();
       table.remove();
-      jasmine.clock().tick(0);
+      await Promise.resolve();
       expect(table.cellEditorPopup.rendered).toBe(false);
 
       table.render();
@@ -1082,14 +1048,14 @@ describe('CellEditor', () => {
   });
 
   describe('close', () => {
-    it('calls completeCellEdit', () => {
+    it('calls completeCellEdit', async () => {
       let model = helper.createModelFixture(2, 2);
       let table = helper.createTable(model);
       table.render();
       table.columns[0].setEditable(true);
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      let preparePromise = table.prepareCellEdit(table.columns[0], table.rows[0]);
       spyOn(table, 'completeCellEdit');
-      jasmine.clock().tick(0);
+      await preparePromise;
 
       // Editing is normally finished by calling completeCellEdit or cancelCellEdit
       // Calling close just destroys the editor, and it will be re-opened once the table resp. the row will be re-rendered again because the table still has a reference.

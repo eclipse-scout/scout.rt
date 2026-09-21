@@ -172,6 +172,7 @@ export abstract class Call implements CallModel, ObjectWithType {
     let clearPendingCall = () => {
       this.pendingCall = null;
     };
+    // TODO CGU review, can maybe simplified
     // Note: attach independent reactions (rather than chaining them) so that each one is executed for the original
     // result/reason of _callImpl(), just like the done/fail/always callbacks of a JQuery.Promise would have been.
     call.then(clearPendingCall, clearPendingCall);

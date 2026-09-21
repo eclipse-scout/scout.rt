@@ -614,7 +614,7 @@ describe('Column', () => {
       expect(resizeToFitSpy.calls.count()).toBe(1);
     });
 
-    it('considers images', () => {
+    it('considers images', async () => {
       let model = helper.createModelFixture(3, 2);
       model.columns[1].autoOptimizeWidth = true;
       (model.rows[0].cells[1] as Cell).iconId = 'fancyIcon.png';
@@ -632,7 +632,8 @@ describe('Column', () => {
 
       // Simulate image load event
       JQueryTesting.triggerImageLoadCapture(table.columns[1].optimalWidthMeasurer.$measurement.find('img'));
-      // Image has been loaded and the promise is resolved -> _resizeToFit will be called
+      // Image has been loaded and the promise is resolved -> _resizeToFit will be called (asynchronously, via finally())
+      await Promise.resolve();
       expect(resizeToFit.calls.count()).toBe(1);
       expect(_resizeToFit.calls.count()).toBe(1);
     });
