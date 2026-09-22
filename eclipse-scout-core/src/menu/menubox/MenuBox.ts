@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -31,7 +31,10 @@ export class MenuBox extends Widget implements MenuBoxModel {
 
   protected override _init(options: InitModelOf<this>) {
     super._init(options);
-    this.tabbableCoordinator = scout.create(TabbableCoordinator, {parent: this});
+    this.tabbableCoordinator = scout.create(TabbableCoordinator, {
+      parent: this,
+      initialItemProvider: () => this.menus.find(m => m.defaultMenu && m.isTabTarget())
+    });
     this._setMenus(this.menus);
   }
 
