@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ValueFieldModel} from '../../../index';
+import {AllowedDateProvider, ValueFieldModel} from '../../../index';
 
 export interface DateFieldModel extends ValueFieldModel<Date, Date | string> {
   /**
@@ -28,8 +28,13 @@ export interface DateFieldModel extends ValueFieldModel<Date, Date | string> {
    * If the given array contains elements, the dates contained in the list can be chosen in the date-picker or entered manually in the date-field.
    * All other dates are disabled.
    * If the list is empty or null, all dates are available again.
+   * If {@link allowedDateProvider} is set, this value will be ignored;
    */
   allowedDates?: (string | Date)[];
+  /**
+   * Provides allowed dates to be chosen in the date-picker or entered manually in the date-field. If no {@link AllowedDateProvider} is set {@link allowedDates} are used.
+   */
+  allowedDateProvider?: AllowedDateProvider;
   /**
    * Configures whether a field to enter a date should be shown.
    *
