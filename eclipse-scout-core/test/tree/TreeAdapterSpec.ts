@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AdapterTreeNode, defaultValues, RemoteEvent, Tree, TreeAdapter} from '../../src/index';
+import {AdapterTreeNode, defaultValues, RemoteEvent, Tree, TreeAdapter, TreeNode} from '../../src/index';
 import {JQueryTesting, TreeSpecHelper} from '../../src/testing/index';
 
 describe('TreeAdapter', () => {
@@ -349,6 +349,25 @@ describe('TreeAdapter', () => {
     });
   });
 
+  describe('expandAll', () => {
+    it('sends nodeCollapsed for every expanded node', () => {
+      let model = helper.createModelFixture(3, 2, false);
+      let adapter = helper.createTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop) as Tree;
+      tree.render();
+
+      let allNodes: TreeNode[] = [];
+      tree.visitNodes(node => {
+        allNodes.push(node);
+      });
+
+      tree.expandAll();
+      // A nodeCollapsed event must be sent for every node because all nodes were initially collapsed
+      sendQueuedAjaxCalls();
+      expect(mostRecentJsonRequest().events).toHaveSize(allNodes.length);
+    });
+  });
+
   describe('collapseAll', () => {
     it('sends nodeExpanded for every collapsed node', () => {
       let model = helper.createModelFixture(3, 2, true);
@@ -356,7 +375,7 @@ describe('TreeAdapter', () => {
       let tree = adapter.createWidget(model, session.desktop) as Tree;
       tree.render();
 
-      let allNodes = [];
+      let allNodes: TreeNode[] = [];
       tree.visitNodes(node => {
         allNodes.push(node);
       });
@@ -364,7 +383,7 @@ describe('TreeAdapter', () => {
       tree.collapseAll();
       // A nodeExpanded event must be sent for every node because all nodes were initially expanded
       sendQueuedAjaxCalls();
-      expect(mostRecentJsonRequest().events.length).toBe(allNodes.length);
+      expect(mostRecentJsonRequest().events).toHaveSize(allNodes.length);
     });
   });
 
