@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, DateFormat, DatePickerEventMap, DatePickerModel, dates, Device, events, graphics, HtmlComponent, InitModelOf, JQueryWheelEvent, objects, scout, SwipeCallbackEvent, Widget} from '../index';
+import {AllowedDateProvider, arrays, DateFormat, DatePickerEventMap, DatePickerModel, dates, Device, events, graphics, HtmlComponent, InitModelOf, JQueryWheelEvent, objects, scout, SwipeCallbackEvent, Widget} from '../index';
 import $ from 'jquery';
 
 export type DatePickerMonth = { viewDate: Date; rendered: boolean; $container: JQuery; $weekendSeparator?: JQuery };
@@ -22,6 +22,7 @@ export class DatePicker extends Widget implements DatePickerModel {
   dateFormat: DateFormat;
   viewDate: Date;
   allowedDates: Date[];
+  allowedDateProvider: AllowedDateProvider;
   touch: boolean;
 
   currentMonth: DatePickerMonth;
@@ -35,6 +36,7 @@ export class DatePicker extends Widget implements DatePickerModel {
   protected _showWeekendSeparator: boolean;
   protected _boxWidth: number;
   protected _$header: JQuery;
+  protected _defaultAllowedDateProvider: AllowedDateProvider;
 
   constructor() {
     super();
@@ -48,6 +50,7 @@ export class DatePicker extends Widget implements DatePickerModel {
     this.$scrollable = null;
     this.months = [];
     this._showWeekendSeparator = true;
+    this._defaultAllowedDateProvider = this._provideAllowedDate.bind(this);
   }
 
   protected override _init(options: InitModelOf<this>) {
@@ -365,7 +368,7 @@ export class DatePicker extends Widget implements DatePickerModel {
     let date = this.preselectedDate;
 
     if (this.selectedDate) {
-      if (this.allowedDates.length > 0) {
+      if (this._allowedDateProvider) {
         date = this._findNextAllowedDate(years, months, days);
       } else {
         date = dates.shift(this.selectedDate, years, months, days);
@@ -379,10 +382,45 @@ export class DatePicker extends Widget implements DatePickerModel {
     this.selectDate(date, true);
   }
 
+  protected get _allowedDateProvider(): AllowedDateProvider {
+    if (this.allowedDateProvider) {
+      return this.allowedDateProvider;
+    }
+    if (this.allowedDates?.length) {
+      return this._defaultAllowedDateProvider;
+    }
+    return null;
+  }
+
+  protected _provideAllowedDate(date: Date, direction: 1 | -1, allowCurrentDate: boolean): Date {
+    if (arrays.empty(this.allowedDates)) {
+      return null;
+    }
+    let referenceDate = dates.trunc(date);
+    // The allowed dates are sorted ascended, when they are set.
+    // Iterate over the allowed dates to find an allowed date after the given date or the given date itself, if allowed
+    if (direction === 1) {
+      for (const allowedDate of this.allowedDates) {
+        if (dates.compare(referenceDate, allowedDate) < (allowCurrentDate ? 1 : 0)) {
+          return allowedDate;
+        }
+      }
+      return null;
+    }
+    // Iterate over the allowed dates in reverse order to find an allowed date before the given date or the given date itself, if allowed
+    for (let i = this.allowedDates.length - 1; i >= 0; i--) {
+      let allowedDate = this.allowedDates[i];
+      if (dates.compare(referenceDate, allowedDate) > (allowCurrentDate ? -1 : 0)) {
+        return allowedDate;
+      }
+    }
+    return null;
+  }
+
   protected _findNextAllowedDate(years: number, months: number, days: number): Date {
     let i, date: Date,
       sum = years + months + days,
-      dir = sum > 0 ? 1 : -1,
+      dir: 1 | -1 = sum > 0 ? 1 : -1,
       now = this.selectedDate || dates.trunc(new Date());
 
     // if we shift by year or month, shift the 'now' date and then use that date as starting point
@@ -392,34 +430,15 @@ export class DatePicker extends Widget implements DatePickerModel {
     } else if (months !== 0) {
       now = dates.shift(now, 0, months, 0);
     }
-
-    if (dir === 1) { // find next allowed date, starting from currently selected date
-      for (i = 0; i < this.allowedDates.length; i++) {
-        date = this.allowedDates[i];
-        if (dates.compare(now, date) < 0) {
-          return date;
-        }
-      }
-    } else if (dir === -1) { // find previous allowed date, starting from currently selected date
-      for (i = this.allowedDates.length - 1; i >= 0; i--) {
-        date = this.allowedDates[i];
-        if (dates.compare(now, date) > 0) {
-          return date;
-        }
-      }
-    }
-
-    return null;
+    return this._allowedDateProvider(now, dir, false);
   }
 
   protected _isDateAllowed(date: Date): boolean {
-    // when allowedDates is empty or not set, any date is allowed
-    if (this.allowedDates.length === 0) {
+    // when allowedDateProvider is not set, any date is allowed
+    if (!this._allowedDateProvider) {
       return true;
     }
-    // when allowedDates is set, only dates contained in this array are allowed
-    let dateAsTimestamp = dates.trunc(date).getTime();
-    return this.allowedDates.some(allowedDate => allowedDate.getTime() === dateAsTimestamp);
+    return dates.equals(dates.trunc(this._allowedDateProvider(date, 1, true)), dates.trunc(date));
   }
 
   protected _build$DateBox(viewDate: Date): JQuery {
