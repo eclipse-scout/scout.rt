@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  DateField, DateFieldAcceptInputEvent, DateFieldModel, DateFieldPredictionResult, DateFormat, DatePicker, DatePickerTouchPopup, dates, FullModelOf, keys, Popup, RemoteEvent, scout, Status, TimePicker, TimePickerTouchPopup,
-  ValidationFailedStatus
+  AllowedDateProvider, DateField, DateFieldAcceptInputEvent, DateFieldModel, DateFieldPredictionResult, DateFormat, DatePicker, DatePickerTouchPopup, dates, FullModelOf, keys, Popup, RemoteEvent, scout, Status, TimePicker,
+  TimePickerTouchPopup, ValidationFailedStatus
 } from '../../../../src/index';
 import {FormSpecHelper, JQueryTesting} from '../../../../src/testing/index';
 
@@ -55,6 +55,10 @@ describe('DateField', () => {
 
     override _setAllowedDates(allowedDates: (string | Date)[]) {
       super._setAllowedDates(allowedDates);
+    }
+
+    override get _allowedDateProvider(): AllowedDateProvider {
+      return super._allowedDateProvider;
     }
   }
 
@@ -1036,6 +1040,56 @@ describe('DateField', () => {
       expectDate(dateField.allowedDates[1], 2016, 5, 18, 0, 0);
     });
 
+    it('allowedDatesProvider uses allowedDates as default', () => {
+      let dateField = scout.create(SpecDateField, {
+        parent: session.desktop
+      });
+      dateField._setAllowedDates(['2016-02-14', '2016-03-14', '2016-04-14']);
+      expectDate(dateField._allowedDateProvider(new Date('2016-03-14'), 1, true), 2016, 3, 14, 0, 0);
+      expectDate(dateField._allowedDateProvider(new Date('2016-03-14'), 1, false), 2016, 4, 14, 0, 0);
+      expectDate(dateField._allowedDateProvider(new Date('2016-03-14'), -1, true), 2016, 3, 14, 0, 0);
+      expectDate(dateField._allowedDateProvider(new Date('2016-03-14'), -1, false), 2016, 2, 14, 0, 0);
+    });
+
+    it('allowedDates are ignored when allowedDatesProvider is set', () => {
+      let dateField = scout.create(SpecDateField, {
+        parent: session.desktop
+      });
+      dateField._setAllowedDates(['2016-02-14', '2016-03-14', '2016-04-14']);
+      dateField.setAllowedDateProvider((date, direction, allowCurrentDate) => {
+        return dates.trunc(dates.shift(date, 0, 1));
+      });
+      expectDate(dateField._allowedDateProvider(new Date('2016-03-18'), 1, true), 2016, 4, 18, 0, 0);
+      expectDate(dateField._allowedDateProvider(new Date('2016-03-18'), -1, true), 2016, 4, 18, 0, 0);
+    });
+
+    it('allowedDatesProvider return first of the month', () => {
+      let dateField = scout.create(SpecDateField, {
+        parent: session.desktop
+      });
+      dateField.setAllowedDateProvider((date, direction, allowCurrentDate) => {
+        if (date.getDate() === 1 && allowCurrentDate) {
+          return dates.trunc(date);
+        }
+        let allowedDate = new Date(date);
+        allowedDate.setDate(1);
+        if (direction === 1) {
+          allowedDate = dates.shift(allowedDate, 0, 1);
+        } else if (date.getDate() === 1) {
+          allowedDate = dates.shift(allowedDate, 0, -1);
+        }
+        return dates.trunc(allowedDate);
+      });
+      expectDate(dateField._allowedDateProvider(new Date('2016-03-01'), 1, true), 2016, 3, 1, 0, 0);
+      expectDate(dateField._allowedDateProvider(new Date('2016-03-01'), 1, false), 2016, 4, 1, 0, 0);
+      expectDate(dateField._allowedDateProvider(new Date('2016-03-01'), -1, true), 2016, 3, 1, 0, 0);
+      expectDate(dateField._allowedDateProvider(new Date('2016-03-01'), -1, false), 2016, 2, 1, 0, 0);
+
+      expectDate(dateField._allowedDateProvider(new Date('2016-03-18'), 1, true), 2016, 4, 1, 0, 0);
+      expectDate(dateField._allowedDateProvider(new Date('2016-03-18'), 1, false), 2016, 4, 1, 0, 0);
+      expectDate(dateField._allowedDateProvider(new Date('2016-03-18'), -1, true), 2016, 3, 1, 0, 0);
+      expectDate(dateField._allowedDateProvider(new Date('2016-03-18'), -1, false), 2016, 3, 1, 0, 0);
+    });
   });
 
   describe('touch = true', () => {
