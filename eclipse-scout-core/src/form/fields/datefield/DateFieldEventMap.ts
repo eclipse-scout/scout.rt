@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {PropertyChangeEvent, Status, ValueFieldAcceptInputEvent, ValueFieldEventMap} from '../../../index';
+import {AllowedDateProvider, PropertyChangeEvent, Status, ValueFieldAcceptInputEvent, ValueFieldEventMap} from '../../../index';
 
 export interface DateFieldAcceptInputEvent extends ValueFieldAcceptInputEvent<Date> {
   errorStatus: Status;
@@ -17,6 +17,7 @@ export interface DateFieldAcceptInputEvent extends ValueFieldAcceptInputEvent<Da
 export interface DateFieldEventMap extends ValueFieldEventMap<Date> {
   'acceptInput': DateFieldAcceptInputEvent;
   'propertyChange:allowedDates': PropertyChangeEvent<Date[]>;
+  'propertyChange:allowedDateProvider': PropertyChangeEvent<AllowedDateProvider>;
   'propertyChange:autoDate': PropertyChangeEvent<Date>;
   'propertyChange:dateFocused': PropertyChangeEvent<boolean>;
   'propertyChange:dateFormatPattern': PropertyChangeEvent<string>;
