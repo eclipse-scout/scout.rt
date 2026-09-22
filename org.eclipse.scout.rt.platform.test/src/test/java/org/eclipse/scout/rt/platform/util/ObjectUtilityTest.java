@@ -1,11 +1,15 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
- * SPDX-License-Identifier: EPL-2.0
+ * AI Disclosure: This file was partially AI-generated.
+ * The AI-generated portions are made available under CC0-1.0
+ * and not subject to the project's licence.
+ *
+ * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
 package org.eclipse.scout.rt.platform.util;
 
@@ -202,6 +206,33 @@ public class ObjectUtilityTest {
 
     assertTrue(ObjectUtility.equals(nested1, nested2));
     assertEquals(ObjectUtility.hashCode(nested1), ObjectUtility.hashCode(nested2));
+  }
+
+  @Test
+  public void testHashCode_EmptyArray() {
+    // empty arrays are content-equal, hence must share the same hash code (1, consistent with Arrays.hashCode())
+    assertTrue(ObjectUtility.equals(new int[0], new int[0]));
+    assertEquals(1, ObjectUtility.hashCode(new int[0]));
+    assertEquals(ObjectUtility.hashCode(new int[0]), ObjectUtility.hashCode(new int[0]));
+    assertEquals(ObjectUtility.hashCode(new String[0]), ObjectUtility.hashCode(new String[0]));
+
+    // empty is distinct from null
+    assertFalse(ObjectUtility.equals(new int[0], null));
+    assertNotEquals(ObjectUtility.hashCode(new int[0]), ObjectUtility.hashCode(null));
+  }
+
+  /**
+   * {@link ObjectUtility#equals(Object, Object)} treats a {@link Date} and a {@link Timestamp} representing the same
+   * point in time as equal, so {@link ObjectUtility#hashCode(Object)} must produce the same hash code for both.
+   */
+  @Test
+  public void testHashCode_TimestampDate() {
+    assertTrue(ObjectUtility.equals(m_testDate, m_testTimestamp));
+    assertEquals(ObjectUtility.hashCode(m_testDate), ObjectUtility.hashCode(m_testTimestamp));
+
+    // consistency must also hold when such values are nested in arrays
+    assertTrue(ObjectUtility.equals(new Object[]{m_testDate}, new Object[]{m_testTimestamp}));
+    assertEquals(ObjectUtility.hashCode(new Object[]{m_testDate}), ObjectUtility.hashCode(new Object[]{m_testTimestamp}));
   }
 
   @Test
