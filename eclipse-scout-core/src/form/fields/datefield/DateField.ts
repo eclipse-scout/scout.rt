@@ -38,6 +38,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
   isolatedDateFormat: DateFormat;
   isolatedTimeFormat: DateFormat;
   allowedDates: Date[];
+  allowedDateProvider: (date: Date, direction: 1 | -1, allowCurrentDate: boolean) => Date;
   htmlDateTimeComposite: HtmlComponent;
 
   $dateField: JQuery;
@@ -134,7 +135,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
       boundToAnchor: !this.touchMode,
       closeOnAnchorMouseDown: false,
       field: this,
-      allowedDates: this.allowedDates,
+      allowedDateProvider: this.allowedDateProvider,
       dateFormat: this.isolatedDateFormat
     });
   }
@@ -472,11 +473,10 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
   }
 
   isDateAllowed(date: Date): boolean {
-    if (!date || this.allowedDates.length === 0 || this.embedded) { // in embedded mode, main date field must take care of validation, otherwise error status won't be shown
+    if (!date || !this.allowedDateProvider || this.embedded) { // in embedded mode, main date field must take care of validation, otherwise error status won't be shown
       return true;
     }
-    let dateAsTimestamp = dates.trunc(date).getTime();
-    return this.allowedDates.some(allowedDate => allowedDate.getTime() === dateAsTimestamp);
+    return this.allowedDateProvider(date, 1, true) === date;
   }
 
   protected override _valueEquals(valueA: Date, valueB: Date): boolean {
@@ -505,6 +505,36 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     });
     truncDates = truncDates.sort(dates.compare);
     this._setProperty('allowedDates', truncDates);
+    if (arrays.empty(truncDates) && this.allowedDateProvider === this._provideAllowedDate) {
+      delete this.allowedDateProvider;
+    } else if (allowedDates.length > 0 && !this.allowedDateProvider) {
+      this.setAllowedDateProvider(this._provideAllowedDate);
+    }
+  }
+
+  setAllowedDateProvider(allowedDateProvider: (date: Date, direction: 1 | -1, allowCurrentDate: boolean) => Date) {
+    this.setProperty('allowedDateProvider', allowedDateProvider);
+  }
+
+  protected _provideAllowedDate(date: Date, direction: 1 | -1, allowCurrentDate: boolean): Date {
+    if (arrays.empty(this.allowedDates)) {
+      return null;
+    }
+    if (direction === 1) {
+      for (const allowedDate of this.allowedDates) {
+        if (dates.compare(date, allowedDate) < (allowCurrentDate ? 1 : 0)) {
+          return allowedDate;
+        }
+      }
+    } else {
+      for (let i = this.allowedDates.length - 1; i >= 0; i--) {
+        let allowedDate = this.allowedDates[i];
+        if (dates.compare(date, allowedDate) > (allowCurrentDate ? -1 : 0)) {
+          return allowedDate;
+        }
+      }
+    }
+    return null;
   }
 
   protected override _updateAriaDescAndErrorMessage() {
@@ -1357,7 +1387,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     } else {
       referenceDate = dates.trunc(dates.newDate());
     }
-    if (this.allowedDates) {
+    if (this.allowedDateProvider) {
       referenceDate = this._findAllowedReferenceDate(referenceDate);
     }
     return referenceDate;
@@ -1368,20 +1398,12 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
    */
   protected _findAllowedReferenceDate(referenceDate: Date): Date {
     // 1st: try to find a date which is equals or greater than the referenceDate (today)
-    for (let i = 0; i < this.allowedDates.length; i++) {
-      let allowedDate = this.allowedDates[i];
-      if (dates.compare(allowedDate, referenceDate) >= 0) {
-        return allowedDate;
-      }
-    }
+    let allowedDate = this.allowedDateProvider(referenceDate, 1, true);
     // 2nd: try to find an allowed date in the past
-    for (let i = this.allowedDates.length - 1; i >= 0; i--) {
-      let allowedDate = this.allowedDates[i];
-      if (dates.compare(allowedDate, referenceDate) <= 0) {
-        return allowedDate;
-      }
+    if (!allowedDate) {
+      allowedDate = this.allowedDateProvider(referenceDate, -1, false);
     }
-    return referenceDate;
+    return allowedDate || referenceDate;
   }
 
   openDatePopup() {

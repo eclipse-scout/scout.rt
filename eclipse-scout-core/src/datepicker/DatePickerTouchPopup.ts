@@ -25,7 +25,7 @@ export class DatePickerTouchPopup extends TouchPopup {
     this._widget = scout.create(DatePicker, {
       parent: this,
       dateFormat: options.dateFormat,
-      allowedDates: options.allowedDates
+      allowedDateProvider: options.allowedDateProvider
     });
   }
 
