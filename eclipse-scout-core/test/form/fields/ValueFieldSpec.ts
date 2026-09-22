@@ -326,7 +326,7 @@ describe('ValueField', () => {
         status: 200,
         responseText: request.params + ' validated'
       });
-      await field.when('propertyChange:validatePending');
+      await field.when('propertyChange:validatePending'); // TODO CGU why was this resolved _after_ validationSucceeded is called in 26.2? now it is called before why?
       expect(field.value).toBe('y validated');
       expect(field.displayText).toBe('y validated');
       expect(field._validationSucceeded).toHaveBeenCalledTimes(1);

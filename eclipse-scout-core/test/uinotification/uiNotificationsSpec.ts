@@ -34,6 +34,22 @@ describe('uiNotifications', () => {
     return jasmine.Ajax.requests.mostRecent().data();
   }
 
+  /**
+   * Waits until the poller has actually issued its next request (see UiNotificationPoller#_schedulePoll), instead
+   * of guessing a fixed delay with sleep(): the poller schedules the next poll via a *real* setTimeout(0), which
+   * races unpredictably against an independently scheduled sleep(1) (and can additionally be superseded by a
+   * restart() triggered from within the same test, e.g. when subscribing to another topic right after awaiting).
+   * Waiting for the observable effect (a new request exists) instead of a fixed duration avoids that race.
+   */
+  async function waitForRequestCount(count: number): Promise<void> {
+    for (let i = 0; jasmine.Ajax.requests.count() < count; i++) {
+      if (i > 1000) {
+        throw new Error(`Timed out waiting for request count to reach ${count}, current count is ${jasmine.Ajax.requests.count()}`);
+      }
+      await sleep(1);
+    }
+  }
+
   function pollers(): Map<string, UiNotificationPoller> {
     return new Map<string, UiNotificationPoller>(Array.from(uiNotifications.systems.entries())
       .filter(([, system]) => !!system.poller)
@@ -424,12 +440,13 @@ describe('uiNotifications', () => {
           message: {}
         }]
       });
+      let requestCount = jasmine.Ajax.requests.count();
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
         responseText: dataObjects.stringify(response)
       });
 
-      await sleep(1);
+      await waitForRequestCount(requestCount + 1);
       expect(mostRecentRequestData()['topics']).toEqual([{
         _type: 'scout.Topic',
         name: 'aaa',
@@ -465,12 +482,13 @@ describe('uiNotifications', () => {
           message: {}
         }]
       });
+      requestCount = jasmine.Ajax.requests.count();
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
         responseText: dataObjects.stringify(response2)
       });
 
-      await sleep(1);
+      await waitForRequestCount(requestCount + 1);
       expect(mostRecentRequestData()['topics']).toEqual([{
         _type: 'scout.Topic',
         name: 'aaa', lastNotifications: [{
@@ -499,12 +517,13 @@ describe('uiNotifications', () => {
           message: {}
         }]
       });
+      requestCount = jasmine.Ajax.requests.count();
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
         responseText: dataObjects.stringify(response3)
       });
 
-      await sleep(1);
+      await waitForRequestCount(requestCount + 1);
       expect(mostRecentRequestData()['topics']).toEqual([{
         _type: 'scout.Topic',
         name: 'aaa', lastNotifications: [{

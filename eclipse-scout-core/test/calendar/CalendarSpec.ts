@@ -832,6 +832,9 @@ describe('Calendar', () => {
         let lookupDone = calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
         jasmine.clock().tick(500); // fire the lookup call's setTimeout
         await lookupDone; // let the microtask chain that resolves the lookup and triggers 'lookupCallDone' actually run
+        // The splitter is expanded based on Calendar#showResourcePanel (default false), independently of whether the
+        // panel is displayable. Without this, the panel stays collapsed (height <= 40) even though 2 resources are set.
+        calendar.calendarSidebar.setResourcePanelExpanded(true);
         calendar.calendarSidebar.revalidateLayout(); // apply the layout change resulting from the newly populated tree box
 
         // Act
@@ -856,6 +859,9 @@ describe('Calendar', () => {
         calendar.setResources([...calendar.resources, otherRes]);
         jasmine.clock().tick(500); // fire the lookup call's setTimeout
         await lookupDone;
+        // The splitter is expanded based on Calendar#showResourcePanel (default false), independently of whether the
+        // panel is displayable. Without this, the panel stays collapsed (height <= 40) even though 2 resources are set.
+        calendar.calendarSidebar.setResourcePanelExpanded(true);
         calendar.calendarSidebar.revalidateLayout(); // apply the layout change resulting from the newly populated tree box
         let panelVisibleAfter = isResourcePanelVisible(calendar);
 

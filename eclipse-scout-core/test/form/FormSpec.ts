@@ -2276,11 +2276,12 @@ describe('Form', () => {
 
       deferred3.resolve(Status.ok());
       jasmine.clock().tick(1000);
-      await flushMicrotasks(10);
+      // resultPromise is chained off the same "validate" promise, registered after trackState()'s own .then() -> by
+      // the time resultPromise settles, state.value has already been updated (promise reactions run in registration order).
+      await resultPromise;
       expect(state.value).toBe('resolved');
 
       jasmine.clock().uninstall();
-      await resultPromise;
     });
 
     it('waits for all validators to complete and returns false if at least one is invalid', async () => {
@@ -2502,8 +2503,12 @@ describe('Form', () => {
         });
 
       jasmine.clock().tick(1000);
-      // Let the save-error message box actually render before looking for it
-      await flushMicrotasks(10);
+      // Wait for the save-error message box to actually be added (and thus rendered, see MessageBoxController) before
+      // looking for it. The error propagates through more promise hops on the save path than on the load path
+      // (see the "is automatically handled in load" test above), so a fixed flushMicrotasks() count isn't reliable here.
+      if (!helper.findMessageBoxes().size) {
+        await session.desktop.when('propertyChange:messageBoxes');
+      }
 
       const messageBoxes = helper.findMessageBoxes();
       expect(messageBoxes.size).toBe(1);
