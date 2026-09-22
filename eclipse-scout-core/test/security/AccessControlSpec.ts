@@ -14,12 +14,10 @@ describe('AccessControl', () => {
 
   beforeEach(() => {
     jasmine.Ajax.install();
-    jasmine.clock().install();
   });
 
   afterEach(() => {
     jasmine.Ajax.uninstall();
-    jasmine.clock().uninstall();
   });
 
   class SpecAccessControl extends AccessControl {
@@ -43,8 +41,7 @@ describe('AccessControl', () => {
     it('creates a PermissionCollection for the returned model', async () => {
       const accessControl = scout.create(SpecAccessControl, {permissionsUrl: 'permissions'});
 
-      accessControl._load();
-      jasmine.clock().tick(1000);
+      const promise = accessControl._load();
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
         status: 200,
         responseText: JSON.stringify({
@@ -63,8 +60,7 @@ describe('AccessControl', () => {
           }
         })
       });
-      await flushMicrotasks(8);
-      jasmine.clock().uninstall();
+      await promise;
 
       expect(accessControl._permissionCollection).not.toBeNull();
       expect(accessControl._permissionCollection.type).toBe(PermissionCollectionType.DEFAULT);
@@ -81,8 +77,7 @@ describe('AccessControl', () => {
     it('keeps last collection if request fails', async () => {
       const accessControl = scout.create(SpecAccessControl, {permissionsUrl: 'permissions'});
 
-      accessControl._load();
-      jasmine.clock().tick(1000);
+      let promise = accessControl._load();
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
         status: 200,
         responseText: JSON.stringify({
@@ -101,7 +96,7 @@ describe('AccessControl', () => {
           }
         })
       });
-      await flushMicrotasks(8);
+      await promise;
 
       expect(accessControl._permissionCollection).not.toBeNull();
       expect(accessControl._permissionCollection.type).toBe(PermissionCollectionType.DEFAULT);
@@ -114,12 +109,15 @@ describe('AccessControl', () => {
       await expectAsync(accessControl.check(Permission.quick('other'))).toBeResolvedTo(true);
       await expectAsync(accessControl.check(Permission.quick('test'))).toBeResolvedTo(false);
 
-      accessControl._load();
-      jasmine.clock().tick(1000);
-      receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1), {
-        status: 500
-      });
-      await flushMicrotasks(8);
+      try {
+        promise = accessControl._load();
+        receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1), {
+          status: 500
+        });
+        await promise;
+      } catch (e) {
+        // nop
+      }
 
       expect(accessControl._permissionCollection).not.toBeNull();
       expect(accessControl._permissionCollection.type).toBe(PermissionCollectionType.DEFAULT);
@@ -132,15 +130,14 @@ describe('AccessControl', () => {
       await expectAsync(accessControl.check(Permission.quick('other'))).toBeResolvedTo(true);
       await expectAsync(accessControl.check(Permission.quick('test'))).toBeResolvedTo(false);
 
-      accessControl._load();
-      jasmine.clock().tick(1000);
+      promise = accessControl._load();
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(2), {
         status: 200,
         responseText: JSON.stringify({
           type: 'ALL'
         })
       });
-      await flushMicrotasks(8);
+      await promise;
 
       expect(accessControl._permissionCollection).not.toBeNull();
       expect(accessControl._permissionCollection.type).toBe(PermissionCollectionType.ALL);

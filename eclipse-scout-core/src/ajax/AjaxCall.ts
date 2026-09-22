@@ -12,7 +12,6 @@ import $ from 'jquery';
 
 export class AjaxCall extends Call implements AjaxCallModel {
   declare model: AjaxCallModel;
-  declare pendingCall: JQuery.jqXHR;
   declare initModel: SomeRequired<this['model'], 'ajaxOptions'>;
 
   ajaxOptions: UrlAjaxSettings;
@@ -30,6 +29,12 @@ export class AjaxCall extends Call implements AjaxCallModel {
    */
   protected _lastTextStatus: JQuery.Ajax.SuccessTextStatus | JQuery.Ajax.ErrorTextStatus;
   protected _lastErrorThrown: string;
+  /**
+   * The {@link JQuery.jqXHR} of the currently pending request, if any. {@link pendingCall} (inherited from {@link Call})
+   * is the native promise wrapping it (see {@link _callImpl}) and has no `abort()` method, so this field is what
+   * {@link _abortImpl} actually aborts.
+   */
+  protected _xhr: JQuery.jqXHR;
 
   constructor() {
     super();
@@ -64,6 +69,8 @@ export class AjaxCall extends Call implements AjaxCallModel {
 
     // TODO CGU review
     let jqXHR = $.ajax(this.ajaxOptions);
+    // TODO CGU do we really have to keep twi instances of xhr?
+    this._xhr = jqXHR;
     // Capture the extra arguments of jQuery's done/fail callbacks and create a native promise
     return new Promise((resolve, reject) => {
       jqXHR
@@ -135,9 +142,7 @@ export class AjaxCall extends Call implements AjaxCallModel {
   }
 
   protected override _abortImpl() {
-    if (this.pendingCall && typeof this.pendingCall.abort === 'function') {
-      this.pendingCall.abort();
-    }
+    this._xhr?.abort();
   }
 }
 

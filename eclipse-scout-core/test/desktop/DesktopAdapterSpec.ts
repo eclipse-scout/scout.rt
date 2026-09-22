@@ -16,7 +16,6 @@ describe('DesktopAdapter', () => {
   beforeEach(() => {
     setFixtures(sandbox());
     jasmine.Ajax.install();
-    jasmine.clock().install();
     session = sandboxSession({
       desktop: {
         benchVisible: true
@@ -32,7 +31,6 @@ describe('DesktopAdapter', () => {
 
   afterEach(() => {
     jasmine.Ajax.uninstall();
-    jasmine.clock().uninstall();
   });
 
   function createAndRegisterFormModel() {
@@ -58,8 +56,7 @@ describe('DesktopAdapter', () => {
       desktop.activateForm(form);
       expect(desktop.activeForm).toBe(form);
 
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       let event = new RemoteEvent(desktopAdapter.id, 'formActivate', {
         formId: form.modelAdapter.id
       });
@@ -68,8 +65,7 @@ describe('DesktopAdapter', () => {
       desktop.activateForm(form2);
       expect(desktop.activeForm).toBe(form2);
 
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       event = new RemoteEvent(desktopAdapter.id, 'formActivate', {
         formId: form2.modelAdapter.id
       });
@@ -82,8 +78,7 @@ describe('DesktopAdapter', () => {
       desktop.activateForm(jsForm);
       expect(desktop.activeForm).toBe(jsForm);
 
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       event = new RemoteEvent(desktopAdapter.id, 'formActivate', {
         formId: jsForm.__hybridModelAdapter.id
       });
@@ -96,8 +91,7 @@ describe('DesktopAdapter', () => {
       expect(desktop.activeForm).toBe(jsOnlyForm);
 
       // nothing was sent to the server, the most recent request is unchanged and therefore contains the same events
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(mostRecentJsonRequest()).toContainEventsExactly(remoteEvents);
     });
 
@@ -112,8 +106,7 @@ describe('DesktopAdapter', () => {
 
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       // ------------------------
@@ -153,8 +146,7 @@ describe('DesktopAdapter', () => {
         ]
       };
       session._processSuccessResponse(response);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
 
       let expectedEvents = [
         new RemoteEvent(desktopAdapter.id, 'formActivate', {}),
@@ -180,15 +172,14 @@ describe('DesktopAdapter', () => {
         ]
       };
       session._processSuccessResponse(response);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(2);
     });
   });
 
   describe('onFormShow', () => {
 
-    it('activates form but does not send an activate form event', () => {
+    it('activates form but does not send an activate form event', async () => {
       session._renderDesktop();
       let formModel = createAndRegisterFormModel();
 
@@ -201,7 +192,7 @@ describe('DesktopAdapter', () => {
       expect(form.rendered).toBe(true);
       expect(desktop.activeForm).toBe(form);
 
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       // only the desktop ready request is in the queue
       expect(jasmine.Ajax.requests.count()).toBe(1);

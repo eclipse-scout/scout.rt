@@ -8,9 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, Deferred, Desktop, FormModel, FullModelOf, GroupBoxModel, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectIdProvider, PermissionCollectionType, RemoteEvent, RemoteRequest,
-  RemoteResponse,
-  scout, Session,
+  AdapterData, App, arrays, Deferred, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectIdProvider, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session,
   SessionStartupResponse, uiNotifications, uiPreferences, Widget, WidgetModel
 } from '../index';
 import {jasmineScoutMatchers, JasmineScoutUtil, LocaleSpecHelper, SpecUiPreferencesStore, TestingApp, UiNotificationsMock} from './index';
@@ -57,6 +55,8 @@ declare global {
   function sandboxDesktop();
 
   function sendQueuedAjaxCalls(response?: JasmineAjaxResponse, time?: number);
+
+  function sendQueuedAjaxCallsAsync(session: Session, response?: JasmineAjaxResponse, time?: number): Promise<void>;
 
   function receiveResponseForAjaxCall(request: JasmineAjaxRequest, response?: JasmineAjaxResponse);
 
@@ -198,13 +198,39 @@ window.sandboxDesktop = () => {
 
 /**
  * Sends the queued requests and simulates a response as well.
+ *
+ * The session does not send the events immediately but schedules a job to do it.
+ * Uses {@link jasmine.clock} to trigger the scheduled job.
+ *
  * @param response if not set an empty success response will be generated
  */
 window.sendQueuedAjaxCalls = (response, time) => {
   time = time || 0;
   jasmine.clock().tick(time);
 
+  // TODO CGU compared to previous behavior, onAjaxDone/always is not executed after this call, maybe we should better migrate every test to new async method
+
   window.receiveResponseForAjaxCall(null, response);
+};
+
+/**
+ * Sends the queued requests and simulates a response as well.
+ *
+ * The session does not send the events immediately but schedules a job to do it.
+ * Uses {@link sleep} to trigger the scheduled job.
+ *
+ * @param response if not set an empty success response will be generated
+ */
+window.sendQueuedAjaxCallsAsync = async (session, response, time) => {
+  time = time || 0;
+
+  // Triggers the scheduled request in Session.ts
+  await sleep(time);
+
+  window.receiveResponseForAjaxCall(null, response);
+
+  // Wait for the response to be processed
+  await session.whenRequestsDone();
 };
 
 window.receiveResponseForAjaxCall = (request, response) => {
@@ -265,6 +291,14 @@ export const JasmineScout = {
       const $sandbox = $('#sandbox');
       const session = $sandbox.data('sandboxSession');
       $sandbox.removeData('sandboxSession');
+      if (session) {
+        // Cancel a still-pending event send (see Session#sendEvent). If jasmine.clock() is not installed,
+        // this becomes a *real* setTimeout: if a test doesn't flush it (e.g. via sendQueuedAjaxCallsAsync),
+        // it would otherwise fire later, after this test's (and its jasmine.Ajax mock's) teardown, triggering a real
+        // network call whose rejection becomes an unhandled promise rejection.
+        clearTimeout(session._sendTimeoutId);
+        session._sendTimeoutId = null;
+      }
       if (session?.layoutValidator) {
         (session.layoutValidator as { _postValidateFunctions: (() => void)[] })._postValidateFunctions = [];
         session.layoutValidator.desktop = null;

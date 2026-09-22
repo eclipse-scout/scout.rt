@@ -460,7 +460,7 @@ describe('JsPageHelper', () => {
       // setTimeout(0); let it fire before checking the request that was actually sent to the server.
       await sleep(0);
 
-      expect(sendQueuedCallsAndGetMostRecentRequest()).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
+      expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
         id: idSingle,
         data: {
@@ -485,7 +485,7 @@ describe('JsPageHelper', () => {
       await hybridManager.when('hybridAction');
       await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
-      expect(sendQueuedCallsAndGetMostRecentRequest()).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
+      expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
         id: idMultiple,
         data: {
@@ -511,7 +511,7 @@ describe('JsPageHelper', () => {
       await hybridManager.when('hybridAction');
       await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
-      expect(sendQueuedCallsAndGetMostRecentRequest()).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
+      expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
         id: idDuplicate,
         data: {
@@ -541,7 +541,7 @@ describe('JsPageHelper', () => {
       await hybridManager.when('hybridAction');
       await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
-      expect(sendQueuedCallsAndGetMostRecentRequest()).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
+      expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
         id: idSingle,
         data: {
@@ -566,7 +566,7 @@ describe('JsPageHelper', () => {
       await hybridManager.when('hybridAction');
       await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
-      expect(sendQueuedCallsAndGetMostRecentRequest()).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
+      expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
         id: idMultiple,
         data: {
@@ -592,7 +592,7 @@ describe('JsPageHelper', () => {
       await hybridManager.when('hybridAction');
       await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
-      expect(sendQueuedCallsAndGetMostRecentRequest()).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
+      expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
         id: idDuplicate,
         data: {
@@ -622,7 +622,7 @@ describe('JsPageHelper', () => {
       await hybridManager.when('hybridAction');
       await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
-      expect(sendQueuedCallsAndGetMostRecentRequest()).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
+      expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
         id: idMixed,
         data: {
@@ -652,7 +652,7 @@ describe('JsPageHelper', () => {
       await hybridManager.when('hybridAction');
       await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
-      expect(sendQueuedCallsAndGetMostRecentRequest()).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
+      expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
         id: idFalse,
         data: {
@@ -677,7 +677,7 @@ describe('JsPageHelper', () => {
       await hybridManager.when('hybridAction');
       await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
-      expect(sendQueuedCallsAndGetMostRecentRequest()).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
+      expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
         id: idTrue,
         data: {
@@ -710,7 +710,7 @@ describe('JsPageHelper', () => {
       await hybridManager.when('hybridAction');
       await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
-      expect(sendQueuedCallsAndGetMostRecentRequest()).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
+      expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
         id: idFirst,
         data: {
@@ -740,7 +740,7 @@ describe('JsPageHelper', () => {
       await hybridManager.when('hybridAction');
       await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
-      expect(sendQueuedCallsAndGetMostRecentRequest()).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
+      expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
         id: idSecond,
         data: {
@@ -767,7 +767,7 @@ describe('JsPageHelper', () => {
 
       await hybridManager.when('hybridAction');
 
-      sendQueuedCalls();
+      await sendQueuedAjaxCallsAsync(session);
       session._processSuccessResponse({
         events: [
           {
@@ -836,7 +836,7 @@ describe('JsPageHelper', () => {
 
       await hybridManager.when('hybridAction');
 
-      sendQueuedCalls();
+      await sendQueuedAjaxCallsAsync(session);
       session._processSuccessResponse({
         events: [
           {
@@ -875,7 +875,7 @@ describe('JsPageHelper', () => {
 
       await hybridManager.when('hybridAction');
 
-      sendQueuedCalls();
+      await sendQueuedAjaxCallsAsync(session);
       session._processSuccessResponse({
         events: [
           {
@@ -914,7 +914,7 @@ describe('JsPageHelper', () => {
 
       await hybridManager.when('hybridAction');
 
-      sendQueuedCalls();
+      await sendQueuedAjaxCallsAsync(session);
       session._processSuccessResponse({
         events: [
           {
@@ -970,7 +970,7 @@ describe('JsPageHelper', () => {
 
       await hybridManager.when('hybridAction');
 
-      sendQueuedCalls();
+      await sendQueuedAjaxCallsAsync(session);
       session._processSuccessResponse({
         events: [
           {
@@ -1016,7 +1016,7 @@ describe('JsPageHelper', () => {
 
       await hybridManager.when('hybridAction');
 
-      sendQueuedCalls();
+      await sendQueuedAjaxCallsAsync(session);
       session._processSuccessResponse({
         events: [
           {
@@ -1059,7 +1059,7 @@ describe('JsPageHelper', () => {
 
       await hybridManager.when('hybridAction');
 
-      sendQueuedCalls();
+      await sendQueuedAjaxCallsAsync(session);
       session._processSuccessResponse({
         events: [
           {
@@ -1098,14 +1098,8 @@ describe('JsPageHelper', () => {
   });
 });
 
-function sendQueuedCalls() {
-  jasmine.clock().install();
-  sendQueuedAjaxCalls();
-  jasmine.clock().uninstall();
-}
-
-function sendQueuedCallsAndGetMostRecentRequest(): RemoteRequest {
-  sendQueuedCalls();
+async function sendQueuedCallsAndGetMostRecentRequest(session: SandboxSession): Promise<RemoteRequest> {
+  await sendQueuedAjaxCallsAsync(session);
   return mostRecentJsonRequest();
 }
 

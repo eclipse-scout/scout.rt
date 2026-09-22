@@ -688,38 +688,34 @@ describe('TreeAdapter', () => {
     });
 
     it('nodesSelected', async () => {
+      jasmine.clock().uninstall();
       tree.selectNodes([jsNode, hybridNode, remoteNode]);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest()).toContainEventsExactly([
         new RemoteEvent(adapter.id, 'nodesSelected', {nodeIds: [hybridNode.id, remoteNode.id]})
       ]);
 
       tree.selectNodes([jsNode]);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(1); // nothing is sent
 
       tree.selectNodes([hybridNode]);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(2);
       expect(mostRecentJsonRequest()).toContainEventsExactly([
         new RemoteEvent(adapter.id, 'nodesSelected', {nodeIds: [hybridNode.id]})
       ]);
 
       tree.selectNodes([remoteNode]);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(3);
       expect(mostRecentJsonRequest()).toContainEventsExactly([
         new RemoteEvent(adapter.id, 'nodesSelected', {nodeIds: [remoteNode.id]})
       ]);
 
       tree.selectNodes([]);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(4);
       expect(mostRecentJsonRequest()).toContainEventsExactly([
         new RemoteEvent(adapter.id, 'nodesSelected', {nodeIds: []})
@@ -774,61 +770,54 @@ describe('TreeAdapter', () => {
     });
 
     it('nodesChecked', async () => {
+      jasmine.clock().uninstall();
       tree.checkable = true;
 
       tree.checkNodes([jsNode, hybridNode, remoteNode]);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest()).toContainEventsExactly([
         new RemoteEvent(adapter.id, 'nodesChecked', {nodes: [{nodeId: hybridNode.id, checked: true}, {nodeId: remoteNode.id, checked: true}]})
       ]);
 
       tree.checkNodes([jsNode, hybridNode, remoteNode], {checked: false});
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(2);
       expect(mostRecentJsonRequest()).toContainEventsExactly([
         new RemoteEvent(adapter.id, 'nodesChecked', {nodes: [{nodeId: hybridNode.id, checked: false}, {nodeId: remoteNode.id, checked: false}]})
       ]);
 
       tree.checkNodes([jsNode]);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(2); // nothing is sent
 
       tree.checkNodes([jsNode, hybridNode, remoteNode], {checked: false});
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(2); // nothing is sent
 
       tree.checkNodes([hybridNode]);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(3);
       expect(mostRecentJsonRequest()).toContainEventsExactly([
         new RemoteEvent(adapter.id, 'nodesChecked', {nodes: [{nodeId: hybridNode.id, checked: true}]})
       ]);
 
       tree.checkNodes([jsNode, hybridNode, remoteNode], {checked: false});
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(4);
       expect(mostRecentJsonRequest()).toContainEventsExactly([
         new RemoteEvent(adapter.id, 'nodesChecked', {nodes: [{nodeId: hybridNode.id, checked: false}]})
       ]);
 
       tree.checkNodes([remoteNode]);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(5);
       expect(mostRecentJsonRequest()).toContainEventsExactly([
         new RemoteEvent(adapter.id, 'nodesChecked', {nodes: [{nodeId: remoteNode.id, checked: true}]})
       ]);
 
       tree.checkNodes([jsNode, hybridNode, remoteNode], {checked: false});
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(6);
       expect(mostRecentJsonRequest()).toContainEventsExactly([
         new RemoteEvent(adapter.id, 'nodesChecked', {nodes: [{nodeId: remoteNode.id, checked: false}]})

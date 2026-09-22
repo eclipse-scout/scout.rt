@@ -20,11 +20,9 @@ describe('StringField', () => {
     field = createField(createModel());
     linkWidgetAndAdapter(field, 'StringFieldAdapter');
     jasmine.Ajax.install();
-    jasmine.clock().install();
   });
 
   afterEach(() => {
-    jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
   });
 
@@ -142,7 +140,7 @@ describe('StringField', () => {
     it('sends display text changed to server using accept text', async () => {
       field.render();
       field.insertText('Test1');
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(1);
       let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1',
@@ -151,13 +149,10 @@ describe('StringField', () => {
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
 
-      // Let the response processing (which un-sets requestPending) fully settle before triggering the next send,
-      // otherwise areRequestsPending() would still report true and the next debounced send would be skipped.
-      await flushMicrotasks(5);
       field.insertText('ABC2');
       let element = field.$field[0] as HTMLInputElement;
       expect(element.value).toBe('Test1ABC2');
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(2);
       event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1ABC2',
@@ -176,7 +171,7 @@ describe('StringField', () => {
         })]
       };
       session._processSuccessResponse(message);
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(1);
       let events = [];
       // acceptInput needs to be sent twice, with whileTyping = true and = false
@@ -192,9 +187,6 @@ describe('StringField', () => {
       });
       expect(mostRecentJsonRequest()).toContainEventsExactly(events);
 
-      // Let the response processing (which un-sets requestPending) fully settle before triggering the next send,
-      // otherwise areRequestsPending() would still report true and the next debounced send would be skipped.
-      await flushMicrotasks(5);
       message = {
         events: [createPropertyChangeEvent(field, {
           insertText: 'ABC2'
@@ -203,7 +195,7 @@ describe('StringField', () => {
       session._processSuccessResponse(message);
       let element = field.$field[0] as HTMLInputElement;
       expect(element.value).toBe('Test1ABC2');
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(2);
       events = [];
       events[0] = new RemoteEvent(field.id, 'acceptInput', {
