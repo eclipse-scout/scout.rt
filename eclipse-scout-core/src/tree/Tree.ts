@@ -1487,6 +1487,19 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     this.setNodeExpanded(node, false, opts);
   }
 
+  expandAll() {
+    this.rebuildSuppressed = true;
+    // Expande all collapsed child nodes (only model)
+    this.visitNodes(node => this.expandNode(node));
+
+    if (this.rendered) {
+      // ensure correct rendering
+      this._rerenderViewport();
+    }
+
+    this.rebuildSuppressed = false;
+  }
+
   collapseAll() {
     this.rebuildSuppressed = true;
     // Collapse all expanded child nodes (only model)

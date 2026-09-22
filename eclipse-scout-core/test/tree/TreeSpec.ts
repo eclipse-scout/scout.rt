@@ -2930,26 +2930,48 @@ describe('Tree', () => {
     });
   });
 
-  describe('collapseAll', () => {
+  describe('expandAll', () => {
 
-    it('collapses all nodes', () => {
-      let i;
-      let model = helper.createModelFixture(3, 2, true);
+    it('expands all nodes', () => {
+      let model = helper.createModelFixture(3, 2, false);
       let tree = helper.createTree(model);
       tree.render();
 
-      let allNodes = [];
+      let allNodes: TreeNode[] = [];
       tree.visitNodes(node => {
         allNodes.push(node);
       });
 
-      for (i = 0; i < allNodes.length; i++) {
-        expect(allNodes[i].expanded).toBe(true);
+      for (let node of allNodes) {
+        expect(node.expanded).toBe(false);
+      }
+
+      tree.expandAll();
+      for (let node of allNodes) {
+        expect(node.expanded).toBe(true);
+      }
+    });
+  });
+
+  describe('collapseAll', () => {
+
+    it('collapses all nodes', () => {
+      let model = helper.createModelFixture(3, 2, true);
+      let tree = helper.createTree(model);
+      tree.render();
+
+      let allNodes: TreeNode[] = [];
+      tree.visitNodes(node => {
+        allNodes.push(node);
+      });
+
+      for (let node of allNodes) {
+        expect(node.expanded).toBe(true);
       }
 
       tree.collapseAll();
-      for (i = 0; i < allNodes.length; i++) {
-        expect(allNodes[i].expanded).toBe(false);
+      for (let node of allNodes) {
+        expect(node.expanded).toBe(false);
       }
     });
   });
