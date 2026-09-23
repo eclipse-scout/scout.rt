@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -99,6 +99,12 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
       @Override
       protected String modelValue() {
         return getModel().getTooltipText();
+      }
+    });
+    putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_TOOLTIP_HTML_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isTooltipHtmlEnabled();
       }
     });
     putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_TOOLTIP_ANCHOR, model) {
