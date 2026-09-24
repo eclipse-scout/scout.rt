@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -286,6 +286,16 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   @Override
+  public Integer getAutoReloadRate() {
+    return (Integer) propertySupport.getProperty(PROP_AUTO_RELOAD_RATE);
+  }
+
+  @Override
+  public void setAutoReloadRate(Integer autoReloadRate) {
+    propertySupport.setProperty(PROP_AUTO_RELOAD_RATE, autoReloadRate);
+  }
+
+  @Override
   public String getDisplayStyle() {
     return propertySupport.getPropertyString(PROP_DISPLAY_STYLE);
   }
@@ -441,7 +451,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   protected void execLoadData() {
     ITileDataLoader dataLoader = createDataLoader();
     if (dataLoader != null) {
-      dataLoader.loadData();
+      dataLoader.loadData(false);
     }
   }
 
@@ -478,7 +488,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   @FunctionalInterface
   public interface ITileDataLoader {
 
-    void loadData();
+    void loadData(boolean autoReloadMode);
   }
 
   /**
@@ -503,11 +513,11 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
 
     @SuppressWarnings("squid:S1181")
     @Override
-    public void loadData() {
-      if (isLoading()) {
+    public void loadData(boolean autoReloadMode) {
+      if (isLoading(autoReloadMode)) {
         return;
       }
-      setLoading(true);
+      ensureLoading(autoReloadMode);
       try {
         ITileGrid tileGridParent = getParentOfType(ITileGrid.class);
         IForm formParent = getParentOfType(IForm.class);
@@ -515,15 +525,13 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
           try {
             final DATA data = doLoadData();
             BEANS.get(TileDataLoadManager.class).runInModelJob(() -> {
-              m_loadJobFuture = null;
-              setLoading(false);
+              releaseLoading(autoReloadMode);
               updateModelData(data);
             });
           }
           catch (final Throwable e) { // Catch Throwable so we can handle all AbstractInterruptionError accordingly
             BEANS.get(TileDataLoadManager.class).runInModelJob(() -> {
-              m_loadJobFuture = null; // Needs to be done before setLoading(false) because setLoading(false) may re-schedule another load job, see reloadData()
-              setLoading(false);
+              releaseLoading(autoReloadMode);
               handleLoadDataException(e);
             });
           }
@@ -533,8 +541,30 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
             .withForm(formParent != null ? formParent : IForm.CURRENT.get())));
       }
       catch (RuntimeException e) {
-        setLoading(false);
+        releaseLoading(autoReloadMode);
         handleLoadDataException(e);
+      }
+    }
+
+    protected boolean isLoading(boolean autoReloadMode) {
+      if (!autoReloadMode) {
+        return AbstractTile.super.isLoading();
+      }
+      else {
+        return m_loadJobFuture != null && !m_loadJobFuture.isFinished();
+      }
+    }
+
+    protected void ensureLoading(boolean autoReloadMode) {
+      if (!autoReloadMode) {
+        setLoading(true);
+      }
+    }
+
+    protected void releaseLoading(boolean autoReloadMode) {
+      m_loadJobFuture = null; // Needs to be done before setLoading(false) because setLoading(false) may re-schedule another load job, see reloadData()
+      if (!autoReloadMode) {
+        setLoading(false);
       }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -57,4 +57,10 @@ export interface TileModel extends WidgetModel {
    * Default is false.
    */
   resizable?: boolean;
+  /**
+   * Specifies the time interval after which the tile is reloaded. Null means that the tile is not automatically reloaded.
+   *
+   * Default is null.
+   */
+  autoReloadRate?: number;
 }
