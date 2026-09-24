@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 import org.eclipse.scout.rt.testing.platform.runner.statement.AssertNoRunningJobsStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsCleanupStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsInitStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.CleanupStaticFieldsStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ClearThreadInterruptionStatusStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.PlatformStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
@@ -161,11 +162,18 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
   }
 
   protected Statement interceptBeforeClassStatement(Statement beforeClassStatement, Class<?> javaClass) {
-    return interceptClassLevelStatement(beforeClassStatement, javaClass);
+    final Statement s2 = new SubjectStatement(beforeClassStatement, javaClass.getAnnotation(RunWithSubject.class));
+    final Statement s1 = new RegisterBeanStatement(s2, new BeanMetaData(JUnitExceptionHandler.class).withReplace(true).withOrder(-1000)); // exception handler to not silently swallow handled exceptions.
+
+    return s1;
   }
 
-  protected Statement interceptAfterClassStatement(Statement beforeClassStatement, Class<?> javaClass) {
-    return interceptClassLevelStatement(beforeClassStatement, javaClass);
+  protected Statement interceptAfterClassStatement(Statement afterClassStatement, Class<?> javaClass) {
+    final Statement s3 = new CleanupStaticFieldsStatement(afterClassStatement, javaClass);
+    final Statement s2 = new SubjectStatement(s3, javaClass.getAnnotation(RunWithSubject.class));
+    final Statement s1 = new RegisterBeanStatement(s2, new BeanMetaData(JUnitExceptionHandler.class).withReplace(true).withOrder(-1000)); // exception handler to not silently swallow handled exceptions.
+
+    return s1;
   }
 
   protected Statement interceptBeforeStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
@@ -208,7 +216,10 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    * @return the head of the chain to be invoked first.
    */
   protected Statement interceptClassLevelStatement(final Statement next, final Class<?> testClass) {
-    final Statement s2 = new SubjectStatement(next, testClass.getAnnotation(RunWithSubject.class));
+    final List<FrameworkMethod> afters = getTestClass().getAnnotatedMethods(AfterClass.class);
+
+    final Statement s3 = afters.isEmpty() ? new CleanupStaticFieldsStatement(next, testClass) : next;
+    final Statement s2 = new SubjectStatement(s3, testClass.getAnnotation(RunWithSubject.class));
     final Statement s1 = new RegisterBeanStatement(s2, new BeanMetaData(JUnitExceptionHandler.class).withReplace(true).withOrder(-1000)); // exception handler to not silently swallow handled exceptions.
 
     return s1;
