@@ -447,6 +447,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
     // Add gui only row icon column at the beginning
     if (this.rowIconVisible) {
+      this._calculateCheckableColumn();
       this._insertRowIconColumn();
     }
 
