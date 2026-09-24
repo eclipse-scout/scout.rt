@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,14 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.rest.csrf;
+package org.eclipse.scout.rt.security.csrf;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import jakarta.ws.rs.client.ClientRequestContext;
-import jakarta.ws.rs.container.ContainerRequestContext;
 
 public class HttpMethodAntiCsrfFilterExclusion implements IAntiCsrfFilterExclusion {
   private final Set<String> m_methodsToIgnore;
@@ -30,13 +27,8 @@ public class HttpMethodAntiCsrfFilterExclusion implements IAntiCsrfFilterExclusi
   }
 
   @Override
-  public boolean isIgnored(ContainerRequestContext requestContext) {
-    return ignoreMethod(requestContext.getMethod());
-  }
-
-  @Override
-  public boolean isIgnored(ClientRequestContext requestContext) {
-    return ignoreMethod(requestContext.getMethod());
+  public boolean isIgnored(String method, String path) {
+    return ignoreMethod(method);
   }
 
   /**
@@ -51,10 +43,6 @@ public class HttpMethodAntiCsrfFilterExclusion implements IAntiCsrfFilterExclusi
    */
   protected void adaptMethodsToIgnore(Set<String> methodsToIgnore) {
     // nop
-  }
-
-  protected boolean ignoreMethod(ClientRequestContext requestContext) {
-    return ignoreMethod(requestContext.getMethod());
   }
 
   protected boolean ignoreMethod(String method) {
