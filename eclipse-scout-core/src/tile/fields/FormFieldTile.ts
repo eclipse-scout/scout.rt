@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, BrowserField, Device, EnumObject, FormField, FormFieldLayout, PropertyChangeEvent, Tile, Widget, WidgetTile, WidgetTileEventMap} from '../../index';
+import {aria, BrowserField, Device, EnumObject, FormField, FormFieldLayout, HybridActionContextElements, HybridManager, PropertyChangeEvent, scout, Tile, Widget, WidgetTile, WidgetTileEventMap} from '../../index';
 
 export type FormFieldTileDisplayStyle = EnumObject<typeof FormFieldTile.DisplayStyle>;
 
@@ -16,6 +16,7 @@ export class FormFieldTile extends WidgetTile {
   declare eventMap: FormFieldTileEventMap;
   declare self: FormFieldTile;
   declare tileWidget: FormField;
+  declare pollTimeout: number;
 
   constructor() {
     super();
@@ -87,6 +88,37 @@ export class FormFieldTile extends WidgetTile {
       if (this.rendered) {
         this._renderFieldLabelVisible();
       }
+    }
+  }
+
+  protected override _render() {
+    super._render();
+    this._installReloadHandler();
+  }
+
+  private _installReloadHandler() {
+    let autoReloadRate = this.autoReloadRate;
+    if (autoReloadRate) {
+      this.pollTimeout = setTimeout(() => this._reloadTileChanges(), autoReloadRate * 1000);
+    }
+  }
+
+  protected async _reloadTileChanges() {
+    const hybridManager = HybridManager.get(this.session);
+    await hybridManager.callActionAndWait( // wait for response to prevent messages from being overtaken during long load times
+      'scout.ReloadTile',
+      undefined,
+      scout.create(HybridActionContextElements).withElement('tile', this)
+    ).then(() => {
+      // set next polling time
+      this._installReloadHandler();
+    });
+  }
+
+  protected override _remove() {
+    super._remove();
+    if (this.pollTimeout) {
+      clearTimeout(this.pollTimeout);
     }
   }
 }

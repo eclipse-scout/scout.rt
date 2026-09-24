@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -71,6 +71,12 @@ public class JsonTile<T extends ITile> extends AbstractJsonWidget<T> {
       @Override
       public Object prepareValueForToJson(Object value) {
         return JsonGridData.toJson((GridData) value);
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(ITile.PROP_AUTO_RELOAD_RATE, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getAutoReloadRate();
       }
     });
   }

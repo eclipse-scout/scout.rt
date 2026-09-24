@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,6 +30,7 @@ export class Tile extends Widget implements TileModel {
   resizable: boolean;
   resizableProducer: () => Resizable;
   plainText: string;
+  autoReloadRate: number;
 
   constructor() {
     super();
@@ -46,6 +47,7 @@ export class Tile extends Widget implements TileModel {
     this.plainText = null;
     // Null to let TileGrid decide whether to enable animation
     this.animateRemoval = null;
+    this.autoReloadRate = null;
     this._addPropertyDimensionAlias('visible', 'filterAccepted');
   }
 
