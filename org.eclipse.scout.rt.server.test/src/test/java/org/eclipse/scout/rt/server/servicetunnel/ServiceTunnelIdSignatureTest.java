@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.server.servicetunnel;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
+import static org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelOptions.ID_SIGNATURE_PROP;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -102,6 +103,19 @@ public class ServiceTunnelIdSignatureTest {
 
     assertThrows(PlatformException.class, () -> callServiceTunnelEchoService(new EchoBean(createSingleIdDo()), new EchoBean(createSingleIdDoRaw(true)), false));
 
+    RunContexts.copyCurrent()
+        .withProperty(ID_SIGNATURE_PROP, true).
+        run(() -> {
+          var header = callServiceTunnelEchoService(null, null, false).getRight();
+          assertFalse(Boolean.TRUE.toString().equals(header));
+        });
+    RunContexts.copyCurrent()
+        .withProperty(ID_SIGNATURE_PROP, false).
+        run(() -> {
+          var header = callServiceTunnelEchoService(null, null, false).getRight();
+          assertFalse(Boolean.TRUE.toString().equals(header));
+        });
+
     // signed request
     assertThrows(PlatformException.class, () -> callServiceTunnelEchoService(new EchoBean(createSingleIdDo()), new EchoBean(createSingleIdDoRaw(false)), true));
 
@@ -109,6 +123,19 @@ public class ServiceTunnelIdSignatureTest {
     echoBean = assertInstance(echoResponseIdSignatureRequestHeaderPair.getLeft(), EchoBean.class);
     assertEchoBean(createSingleIdDo(), echoBean);
     assertTrue(Boolean.TRUE.toString().equals(echoResponseIdSignatureRequestHeaderPair.getRight()));
+
+    RunContexts.copyCurrent()
+        .withProperty(ID_SIGNATURE_PROP, true).
+        run(() -> {
+          var header = callServiceTunnelEchoService(null, null, true).getRight();
+          assertTrue(Boolean.TRUE.toString().equals(header));
+        });
+    RunContexts.copyCurrent()
+        .withProperty(ID_SIGNATURE_PROP, false).
+        run(() -> {
+          var header = callServiceTunnelEchoService(null, null, true).getRight();
+          assertTrue(Boolean.TRUE.toString().equals(header));
+        });
   }
 
   protected Pair<Object /* echo response */, String /* id signature request header */> callServiceTunnelEchoService(Object o, Object echoResponseRaw, boolean idSignature) throws IOException {
