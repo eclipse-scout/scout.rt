@@ -279,7 +279,8 @@ describe('CellEditor', () => {
       expect(table.cellEditorPopup).toBe(null);
 
       // Update buffer is updating because rows with smart values are inserted -> wait until lookup call is resolved and table.loading set to false
-      await sleep(500);
+      await table.columns[2].when('lookupCallDone');
+
       let field = (table.cellEditorPopup.cell.field as SmartField<any>);
       expect(field.$field).toBeFocused();
       expect(field.popup.rendered).toBe(true);
@@ -295,7 +296,7 @@ describe('CellEditor', () => {
       // Again, wait for lookup call. Loading indicator is drawn on a glass pane and indicator removed by CSS animation.
       // Glass pane must be deactivated immediately not only when the animation finishes,
       // otherwise it would prevent the popup from being opened because smart field does not have the focus, see isFocused() in SmartField._lookupByTextOrAllDone.
-      await sleep(500);
+      await table.columns[2].when('lookupCallDone');
       field = (table.cellEditorPopup.cell.field as SmartField<any>);
       expect(field.$field).toBeFocused();
       expect(field.popup.rendered).toBe(true);
@@ -470,7 +471,7 @@ describe('CellEditor', () => {
       table.insertRows({cells: ['a', 'b', 'key0']});
       let field = table.columns[2].createEditor(table.rows[0]);
       table.startCellEdit(table.columns[2], table.rows[0], field);
-      await sleep(500);
+      await sleep(500); // TODO CGU check sleep() with a timeout > 0 across all specs and use autotick or smaller timeout
       assertCellEditorIsOpen(table, table.columns[2], table.rows[0]);
       let popup = table.cellEditorPopup;
       expect(popup.cell.field).toBe(field);

@@ -67,24 +67,29 @@ export class AjaxCall extends Call implements AjaxCallModel {
     }
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + (this.callCounter === 1 ? '--- ' : '') + this.ajaxOptions.method + ' "' + this.ajaxOptions.url + '"' + (this.callCounter === 1 ? ' ---' : ''));
 
-    // TODO CGU review
     let jqXHR = $.ajax(this.ajaxOptions);
     // TODO CGU do we really have to keep twi instances of xhr?
     this._xhr = jqXHR;
-    // Capture the extra arguments of jQuery's done/fail callbacks and create a native promise
+    // Capture the extra arguments of jQuery's done/fail callbacks and create a native promise.
+    // Note: use the two-argument form of then() (rather than .then(fn).catch(fn)) so success and failure each
+    // incur exactly one jQuery.Deferred#then() scheduling hop (jQuery defers then() reactions via setTimeout,
+    // even for an already-settled Deferred). Chaining .then(fn).catch(fn) instead would need two such hops for
+    // a rejection (one to pass it through the first then(), one for catch() to actually handle it), which can
+    // let an unrelated, later-settling success elsewhere resolve before an earlier rejection is fully processed.
     return new Promise((resolve, reject) => {
-      jqXHR
-        .then((data, textStatus) => {
+      jqXHR.then(
+        (data, textStatus) => {
           this.lastXhr = jqXHR;
           this._lastTextStatus = textStatus;
           resolve(data);
-        })
-        .catch((xhr, textStatus, errorThrown) => {
+        },
+        (xhr, textStatus, errorThrown) => {
           this.lastXhr = jqXHR;
           this._lastTextStatus = textStatus;
           this._lastErrorThrown = errorThrown;
           reject(jqXHR);
-        });
+        }
+      );
     });
   }
 

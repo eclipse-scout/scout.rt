@@ -205,8 +205,8 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
     this._completeCellEditResolved = false;
     if (!acceptInputPromise || !scout.nvl(waitForAcceptInput, true)) {
       this._pendingCompleteCellEdit = $.resolvedPromise();
-      this.table.completeCellEdit();
       this._completeCellEditResolved = true;
+      this.table.completeCellEdit();
     } else {
       this._pendingCompleteCellEdit = acceptInputPromise.then(() => this.table.completeCellEdit());
     }

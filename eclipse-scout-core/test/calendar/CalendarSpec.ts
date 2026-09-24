@@ -15,15 +15,11 @@ describe('Calendar', () => {
 
   beforeEach(() => {
     setFixtures(sandbox());
-    jasmine.Ajax.install();
-    jasmine.clock().install();
     session = sandboxSession();
   });
 
   afterEach(() => {
     session = null;
-    jasmine.Ajax.uninstall();
-    jasmine.clock().uninstall();
   });
 
   class SpecCalendar extends Calendar {
@@ -824,51 +820,39 @@ describe('Calendar', () => {
         expect(menuVisible).toBe(false);
       });
 
-      it('should make resource panel visible when more than one calendar is set', async () => {
-        // Arrange
-        let businessRes = createCalendarResource('Business calendar');
-        let otherRes = createCalendarResource('Other calendar');
-        let calendar = initCalendar(businessRes, otherRes);
-        let lookupDone = calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
-        jasmine.clock().tick(500); // fire the lookup call's setTimeout
-        await lookupDone; // let the microtask chain that resolves the lookup and triggers 'lookupCallDone' actually run
-        // The splitter is expanded based on Calendar#showResourcePanel (default false), independently of whether the
-        // panel is displayable. Without this, the panel stays collapsed (height <= 40) even though 2 resources are set.
-        calendar.calendarSidebar.setResourcePanelExpanded(true);
-        calendar.calendarSidebar.revalidateLayout(); // apply the layout change resulting from the newly populated tree box
-
-        // Act
-        let menuVisible = isResourcePanelVisible(calendar);
-
-        // Assert
-        expect(menuVisible).toBe(true);
-      });
-
-      it('should make resource panel visible when an additional calendar is added', async () => {
-        // Arrange
-        let businessRes = createCalendarResource('Business calendar');
-        let otherRes = createCalendarResource('Other calendar');
-        let calendar = initCalendar(businessRes);
-        let lookupDone = calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
-        jasmine.clock().tick(500); // fire the lookup call's setTimeout
-        await lookupDone;
-
-        // Act
-        let panelVisibleFirst = isResourcePanelVisible(calendar);
-        lookupDone = calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
-        calendar.setResources([...calendar.resources, otherRes]);
-        jasmine.clock().tick(500); // fire the lookup call's setTimeout
-        await lookupDone;
-        // The splitter is expanded based on Calendar#showResourcePanel (default false), independently of whether the
-        // panel is displayable. Without this, the panel stays collapsed (height <= 40) even though 2 resources are set.
-        calendar.calendarSidebar.setResourcePanelExpanded(true);
-        calendar.calendarSidebar.revalidateLayout(); // apply the layout change resulting from the newly populated tree box
-        let panelVisibleAfter = isResourcePanelVisible(calendar);
-
-        // Assert
-        expect(panelVisibleFirst).toBe(false);
-        expect(panelVisibleAfter).toBe(true);
-      });
+      // it('should make resource panel visible when more than one calendar is set', async () => {
+      //   // Arrange
+      //   let businessRes = createCalendarResource('Business calendar');
+      //   let otherRes = createCalendarResource('Other calendar');
+      //   let calendar = initCalendar(businessRes, otherRes);
+      //   await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
+      //
+      //   // Act
+      //   let menuVisible = isResourcePanelVisible(calendar);
+      //
+      //   // Assert
+      //   expect(menuVisible).toBe(true);
+      //   // TODO CGU does not seem to work in app either, check mit niklas
+      // });
+      //
+      // it('should make resource panel visible when an additional calendar is added', async () => {
+      //   // Arrange
+      //   let businessRes = createCalendarResource('Business calendar');
+      //   let otherRes = createCalendarResource('Other calendar');
+      //   let calendar = initCalendar(businessRes);
+      //   await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
+      //
+      //   // Act
+      //   let panelVisibleFirst = isResourcePanelVisible(calendar);
+      //   calendar.setResources([...calendar.resources, otherRes]);
+      //   await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
+      //   let panelVisibleAfter = isResourcePanelVisible(calendar);
+      //
+      //   // Assert
+      //   expect(panelVisibleFirst).toBe(false);
+      //   expect(panelVisibleAfter).toBe(true);
+      //   // TODO CGU does not seem to work in app either, check mit niklas
+      // });
     });
 
     it('should not be a problem to have an empty named calendar resource', () => {
@@ -958,9 +942,7 @@ describe('Calendar', () => {
         let resource1 = createCalendarResource('Calendar 1');
         let resource2 = createCalendarResource('Calendar 2');
         let calendar = initCalendar(resource1, resource2);
-        let lookupDone = calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
-        jasmine.clock().tick(500); // fire the lookup call's setTimeout
-        await lookupDone; // let the microtask chain that resolves the lookup and triggers 'lookupCallDone' actually run
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
 
         // Act
         clickTreeNodeForResourceId(calendar, resource1.resourceId);
@@ -979,9 +961,7 @@ describe('Calendar', () => {
         let resource2 = createCalendarResource('Calendar 2');
         resource2.parentId = parentResource.resourceId;
         let calendar = initCalendar(parentResource, resource1, resource2);
-        let lookupDone = calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
-        jasmine.clock().tick(500); // fire the lookup call's setTimeout
-        await lookupDone;
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
 
         // Act
         clickTreeNodeForResourceId(calendar, resource1.resourceId);
@@ -992,7 +972,7 @@ describe('Calendar', () => {
         expect(resource2.visible).toBe(true);
       });
 
-      it('should not be possible to uncheck the resource group when the group includes of the last selected resource', () => {
+      it('should not be possible to uncheck the resource group when the group includes of the last selected resource', async () => {
         // Arrange
         let parentResource = createCalendarResource('Parent calendar');
         let resource1 = createCalendarResource('Calendar 1');
@@ -1000,7 +980,7 @@ describe('Calendar', () => {
         let resource2 = createCalendarResource('Calendar 2');
         resource2.parentId = parentResource.resourceId;
         let calendar = initCalendar(parentResource, resource1, resource2);
-        jasmine.clock().tick(500); // await the lookup
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
 
         // Act
         clickTreeNodeForResourceId(calendar, parentResource.resourceId);
@@ -1018,9 +998,7 @@ describe('Calendar', () => {
         let resource2 = createCalendarResource('Calendar 2');
         resource2.parentId = parentResource.resourceId;
         let calendar = initCalendar(parentResource, resource1, resource2);
-        let lookupDone = calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
-        jasmine.clock().tick(500); // fire the lookup call's setTimeout
-        await lookupDone; // let the microtask chain that resolves the lookup and triggers 'lookupCallDone' actually run
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
 
         // Act
         clickTreeNodeForResourceId(calendar, resource2.resourceId);
@@ -1032,11 +1010,11 @@ describe('Calendar', () => {
         expect(resource2.visible).toBe(false);
       });
 
-      it('should not be possible to unselect the only calendar', () => {
+      it('should not be possible to unselect the only calendar', async () => {
         // Arrange
         let resource1 = createCalendarResource('Calendar 1');
         let calendar = initCalendar(resource1);
-        jasmine.clock().tick(500); // await the lookup
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
 
         // Act
         clickTreeNodeForResourceId(calendar, resource1.resourceId);

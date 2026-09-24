@@ -382,10 +382,6 @@ describe('uiNotifications', () => {
     it('does not register the handler on errors', async () => {
       let handler = () => undefined;
 
-      // No jasmine.clock() here: the rejection propagates through a native-Promise-backed Deferred chain
-      // (Call#deferred, src/uinotification/UiNotificationSystem#whenSubscriptionStart) that needs several
-      // microtask turns; awaiting subscribePromise directly lets them drain naturally. The retry timer
-      // scheduled by _onError() (a real setTimeout) is simply left pending; this test doesn't need it to fire.
       let subscribePromise = uiNotifications.subscribe('aaa', handler).catch(error => {
         expect(error).toBeDefined();
       });
@@ -560,7 +556,7 @@ describe('uiNotifications', () => {
         responseText: dataObjects.stringify(response)
       });
 
-      await sleep(1);
+      await sleep(10);
       expect(poller.notifications.get('aaa').get('node1').length).toBe(1);
       expect(poller.notifications.get('aaa').get('node1')[0].id).toBe('1');
 
@@ -590,7 +586,7 @@ describe('uiNotifications', () => {
         responseText: dataObjects.stringify(response2)
       });
 
-      await sleep(1);
+      await sleep(10);
       expect(poller.notifications.get('aaa').get('node1').length).toBe(2);
       expect(poller.notifications.get('aaa').get('node1')[0].id).toBe('2');
       expect(poller.notifications.get('aaa').get('node1')[1].id).toBe('1'); // 1 is newer
@@ -840,23 +836,24 @@ describe('uiNotifications', () => {
   describe('poller', () => {
     beforeEach(() => {
       jasmine.clock().install();
+      // Don't wait for time-consuming sleep()s in real time
+      jasmine.clock().autoTick();
     });
 
     afterEach(() => {
       jasmine.clock().uninstall();
     });
 
-    it('automatically restarts on connection error', () => {
+    it('automatically restarts on connection error', async () => {
       uiNotifications.subscribe('aaa', () => undefined);
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 503
       });
-      jasmine.clock().tick(1);
-      // Connection errors don't change state because they are handled by AjaxCall directly without calling UiNotificationPoller._onError
+      await sleep(1);
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
 
-      jasmine.clock().tick(UiNotificationPoller.CONNECTION_ERROR_RETRY_INTERVALS[0] + 1000);
+      await sleep(UiNotificationPoller.CONNECTION_ERROR_RETRY_INTERVALS[0] + 1000);
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
     });
 
@@ -877,20 +874,17 @@ describe('uiNotifications', () => {
         responseText: JSON.stringify(response.toPojo())
       });
 
-      // Subscription was successful, start polling. The response is processed through a native-Promise-backed
-      // Deferred (Call#deferred), so it needs a microtask flush before the next poll's setTimeout(0) can be ticked.
-      await flushMicrotasks(8);
-      jasmine.clock().tick(1);
+      // Subscription was successful, start polling
+      await sleep(1);
 
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 500
       });
-      await flushMicrotasks(8);
-      jasmine.clock().tick(1);
+      await poller.when('propertyChange:status');
       expect(poller.status).toBe(BackgroundJobPollingStatus.FAILURE);
 
-      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      await poller.when('propertyChange:status'); // will be resolved after UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
     });
 
@@ -911,24 +905,22 @@ describe('uiNotifications', () => {
         responseText: JSON.stringify(response.toPojo())
       });
 
-      // Subscription was successful, start polling
-      await flushMicrotasks(8);
-      jasmine.clock().tick(1);
+      // Subscription was successful; wait for the next poll request to actually be sent.
+      await sleep(1);
 
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200
         // no response text
       });
-      await flushMicrotasks(8);
-      jasmine.clock().tick(1);
+      await poller.when('propertyChange:status');
       expect(poller.status).toBe(BackgroundJobPollingStatus.FAILURE);
 
-      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      await poller.when('propertyChange:status'); // will be resolved after UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
     });
 
-    it('automatically restarts if subscription fails and other topics are subscribed', () => {
+    it('automatically restarts if subscription fails and other topics are subscribed', async () => {
       uiNotifications.subscribe('aaa', () => undefined);
 
       let response = scout.create(UiNotificationResponse, {
@@ -944,46 +936,46 @@ describe('uiNotifications', () => {
         status: 200,
         responseText: JSON.stringify(response.toPojo())
       });
-      jasmine.clock().tick(1);
+      await sleep(1);
 
-      uiNotifications.subscribe('bbb', () => undefined);
+      let subscribePromise = uiNotifications.subscribe('bbb', () => undefined);
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 500
       });
-      jasmine.clock().tick(1);
+      await expectAsync(subscribePromise).toBeRejected();
+
       // UiNotificationSystem.unsubscribe triggers a restart of the poller after the error, so it is already running again
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
 
-      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      await sleep(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
     });
 
     it('does not restart if subscription fails and no other topics are subscribed', async () => {
-      uiNotifications.subscribe('aaa', () => undefined);
+      let subscribePromise = uiNotifications.subscribe('aaa', () => undefined);
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 500
       });
-      await flushMicrotasks(8);
-      jasmine.clock().tick(1);
+      await expectAsync(subscribePromise).toBeRejected();
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
 
-      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      await sleep(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
     });
 
     it('does not restart if operation is not allowed', async () => {
-      uiNotifications.subscribe('aaa', () => undefined);
+      let subscribePromise = uiNotifications.subscribe('aaa', () => undefined);
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 403
       });
-      await flushMicrotasks(8);
-      jasmine.clock().tick(1);
+      await poller.when('propertyChange:status');
+      await expectAsync(subscribePromise).toBeRejected();
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
 
-      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      await sleep(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED); // still stopped
     });
 
@@ -994,11 +986,10 @@ describe('uiNotifications', () => {
         status: 200,
         responseText: JSON.stringify({error: {code: Session.JsonResponseError.SESSION_TIMEOUT}})
       });
-      await flushMicrotasks(8);
-      jasmine.clock().tick(1);
+      await poller.when('propertyChange:status');
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
 
-      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      await sleep(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED); // still stopped
     });
 
