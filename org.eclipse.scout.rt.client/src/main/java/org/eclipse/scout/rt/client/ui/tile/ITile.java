@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,6 +26,7 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
   String PROP_COLOR_SCHEME = "colorScheme";
   String PROP_GRID_DATA_HINTS = "gridDataHints";
   String PROP_DISPLAY_STYLE = "displayStyle";
+  String PROP_AUTO_RELOAD_RATE = "autoReloadRate";
 
   /**
    * This is the default display style. If it is active, default styling is applied like visualizing the selection.
@@ -43,6 +44,10 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
   IColorScheme getColorScheme();
 
   void setColorScheme(IColorScheme colorScheme);
+
+  Integer getAutoReloadRate();
+
+  void setAutoReloadRate(Integer autoReloadRate);
 
   /**
    * @return the grid data hints used by the logical grids to create the final grid data
