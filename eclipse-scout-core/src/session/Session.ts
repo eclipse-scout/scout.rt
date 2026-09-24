@@ -941,6 +941,9 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
         if (!this.loggedOut && data.redirectUrl) {
           this.logout(data.redirectUrl);
         }
+        if (!this.loggedOut && data.sessionReload) {
+          this.logoutWithReload();
+        }
       } else {
         try {
           // No need to change backgroundJobPollingSupport state, it should still be RUNNING
@@ -1563,6 +1566,14 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
   }
 
+  logoutWithReload() {
+    $.log.info('Session reloading...');
+    this.loggedOut = true;
+    setTimeout(() => {
+      scout.reloadPage();
+    });
+  }
+
   protected _onDisposeAdapter(event: RemoteEvent & { adapter?: string }) {
     // Model adapter was disposed on server -> dispose it on the UI, too
     let adapter = this.getModelAdapter(event.adapter);
@@ -1711,6 +1722,7 @@ export interface RemoteResponse {
   events?: RemoteEvent[];
   error?: JsonErrorResponse;
   redirectUrl?: string;
+  sessionReload?: boolean;
   sessionTerminated?: boolean;
   combined?: boolean;
 }
