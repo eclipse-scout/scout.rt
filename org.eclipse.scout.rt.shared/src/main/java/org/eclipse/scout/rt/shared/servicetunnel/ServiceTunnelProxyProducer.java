@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,11 +12,13 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 import static org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelOptions.ID_SIGNATURE_PROP;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.interceptor.DecoratingProxy;
 import org.eclipse.scout.rt.platform.interceptor.IInstanceInvocationHandler;
@@ -60,15 +62,29 @@ public class ServiceTunnelProxyProducer<T> implements IBeanInstanceProducer<T>, 
 
     Callable<Object> invokeService = () -> BEANS.get(IServiceTunnel.class).invokeService(getInterfaceClass(), method, args);
 
-    // check the idSignature flag
-    if (getOptions().isIdSignature()) {
-      // add run context property
-      return RunContexts.copyCurrent()
-          .withProperty(ID_SIGNATURE_PROP, true)
-          .call(invokeService);
+    RunContext rc = createInvokeServiceRunContext();
+    if (rc != null) {
+      return rc.call(invokeService);
     }
 
     return invokeService.call();
+  }
+
+  /**
+   * Creates a {@link RunContext} for the call of {@link IServiceTunnel#invokeService(Class, Method, Object[])} if a special {@link RunContext} is needed.
+   * If the current {@link RunContext} satisfies all constraints {@code null} is returned.<br>
+   * Constraints that are checked are:
+   * <ul>
+   * <li>run context property {@link ServiceTunnelOptions#ID_SIGNATURE_PROP} has the same value as {@link ServiceTunnelOptions#isIdSignature()}
+   * </ul>
+   */
+  protected RunContext createInvokeServiceRunContext() {
+    // check the idSignature flag and create a new run context if it does not match
+    if (Objects.equals(getOptions().getIdSignature(), RunContext.CURRENT.get().getPropertyOrDefault(ID_SIGNATURE_PROP, false))) {
+      return null;
+    }
+    return RunContexts.copyCurrent()
+        .withProperty(ID_SIGNATURE_PROP, getOptions().getIdSignature());
   }
 
   protected Class<?> getInterfaceClass() {
