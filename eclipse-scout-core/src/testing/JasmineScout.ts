@@ -292,12 +292,13 @@ export const JasmineScout = {
       const session = $sandbox.data('sandboxSession');
       $sandbox.removeData('sandboxSession');
       if (session) {
-        // Cancel a still-pending event send (see Session#sendEvent). If jasmine.clock() is not installed,
-        // this becomes a *real* setTimeout: if a test doesn't flush it (e.g. via sendQueuedAjaxCallsAsync),
+        // Destroy cancels a scheduled send (see Session.sendEvent). If jasmine.clock() is not installed,
+        // this becomes a real setTimeout: if a test doesn't flush it (e.g. via sendQueuedAjaxCallsAsync),
         // it would otherwise fire later, after this test's (and its jasmine.Ajax mock's) teardown, triggering a real
         // network call whose rejection becomes an unhandled promise rejection.
-        clearTimeout(session._sendTimeoutId);
-        session._sendTimeoutId = null;
+        // It also ensures, a new event cannot be scheduled again, which could happen if an async operation in a test calls sendEvent.
+        // For example: a focused field is removed and the focus context blurs the removed field which triggers an accept input event
+        session.destroy();
       }
       if (session?.layoutValidator) {
         (session.layoutValidator as { _postValidateFunctions: (() => void)[] })._postValidateFunctions = [];

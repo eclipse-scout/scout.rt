@@ -18,6 +18,7 @@ let instance: App = null;
 let listeners: EventListener[] = [];
 let bootstrappers: (() => Promise<void>)[] = [];
 
+// TODO CGU for the final commit -> squash, reset, ensure commit hooks are ready (format, inspection), commit
 export interface AppModel {
   /**
    * Object to configure the session, see {@link Session.init} for the available options.
@@ -253,12 +254,11 @@ export class App extends EventEmitter {
   }
 
   /**
-   * @param vararg may either be
+   * @param error may either be
    *               - an {@link AjaxError} for requests executed with {@link ajax} or {@link AjaxCall}
-   *               - a {@link JQuery.jqXHR} for requests executed with {@link $.ajax}. The parameters `textStatus`, `errorThrown` and `requestOptions` are only set in this case.
    *               - a {@link JsonErrorResponseContainer} if a successful response contained a {@link JsonErrorResponse} which was transformed to an error (e.g. using {@link App.handleJsonError}).
    */
-  protected _bootstrapFail(options: AppBootstrapOptions, vararg: AjaxError | JQuery.jqXHR | JsonErrorResponseContainer, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string, requestOptions?: AjaxSettings): Promise<any> {
+  protected _bootstrapFail(options: AppBootstrapOptions, error: AjaxError | JsonErrorResponseContainer): Promise<any> {
     $.log.isInfoEnabled() && $.log.info('App bootstrap failed');
 
     // If one of the bootstrap ajax call fails due to a session timeout, the index.html is probably loaded from cache without asking the server for its validity.
@@ -270,7 +270,7 @@ export class App extends EventEmitter {
     // will be done which eventually will be forwarded to the login page.
     // Additionally, requests may fail due to other various reasons, e.g. Chrome may report ERR_NETWORK_CHANGED or ERR_CERT_VERIFER_CHANGED.
     // Since a page reload normally solves these issues as well, the reload is done on any error not just session timeouts.
-    let {url, message} = this._analyzeBootstrapError(vararg, textStatus, errorThrown, requestOptions);
+    let {url, message} = this._analyzeBootstrapError(error);
     $.log.isInfoEnabled() && $.log.info(`Error for resource ${url}. Reloading page...`);
     if (webstorage.getItemFromSessionStorage('scout:bootstrapErrorPageReload')) {
       // Prevent loop in case reloading did not solve the problem
@@ -281,21 +281,17 @@ export class App extends EventEmitter {
     webstorage.setItemToSessionStorage('scout:bootstrapErrorPageReload', 'true');
     scout.reloadPage();
 
-    // Make sure promise will be rejected with all original arguments so that it can be eventually handled by this._fail
-    // eslint-disable-next-line prefer-rest-params
-    let args = objects.argumentsToArray(arguments).slice(1);
-    return $.rejectedPromise(...args);
+    // Make sure promise will be rejected with the original error so that it can be eventually handled by this._fail
+    return $.rejectedPromise(error);
   }
 
-  protected _analyzeBootstrapError(vararg: AjaxError | JQuery.jqXHR | JsonErrorResponseContainer, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string, requestOptions?: AjaxSettings) {
+  protected _analyzeBootstrapError(error: AjaxError | JsonErrorResponseContainer) {
     let ajaxError: AjaxError;
     let jsonError: JsonErrorResponseContainer;
-    if (vararg instanceof AjaxError) {
-      ajaxError = vararg;
-    } else if ($.isJqXHR(vararg)) {
-      ajaxError = new AjaxError({jqXHR: vararg, textStatus: textStatus, errorThrown: errorThrown, requestOptions: requestOptions});
-    } else if (objects.isObject(vararg) && vararg.error) {
-      jsonError = vararg;
+    if (error instanceof AjaxError) {
+      ajaxError = error;
+    } else if (objects.isObject(error) && error.error) {
+      jsonError = error;
     }
     let url;
     let message;
@@ -599,7 +595,7 @@ export class App extends EventEmitter {
     $.log.isInfoEnabled() && $.log.info('App initialized');
   }
 
-  protected _fail(options: AppModel, error: any, ...args: any[]): Promise<any> {
+  protected _fail(options: AppModel, error: any): Promise<any> {
     $.log.error('App initialization failed.');
     this.setLoading(false);
 
@@ -607,7 +603,7 @@ export class App extends EventEmitter {
     if (webstorage.getItemFromSessionStorage('scout:bootstrapErrorPageReload')) {
       // Do not append a message, page is about to be reloaded
     } else if (this.sessions.length === 0) {
-      promises.push(this.errorHandler.handle(error, ...args)
+      promises.push(this.errorHandler.handle(error)
         .then(errorInfo => {
           this._appendStartupError($('body'), errorInfo);
         }));
@@ -629,8 +625,8 @@ export class App extends EventEmitter {
 
     this.trigger('fail', {error});
 
-    // Reject with original rejection arguments
-    return $.promiseAll(promises).then(errorInfo => $.rejectedPromise(error, ...args));
+    // Reject with the original rejection reason
+    return $.promiseAll(promises).then(() => $.rejectedPromise(error));
   }
 
   protected _appendStartupError($parent: JQuery, errorInfo: ErrorInfo) {

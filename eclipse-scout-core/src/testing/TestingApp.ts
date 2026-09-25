@@ -19,6 +19,7 @@ export class TestingApp extends RemoteApp {
   protected override _installErrorHandler() {
     // nop for testing
     // otherwise, it might overwrite the global error handler of Jasmine which will then not be notified about failing specs.
+    window.addEventListener('unhandledrejection', e => console.error('Unhandled promise rejection details', e.reason, e.promise));
   }
 
   override _createSession(options: InitModelOf<Session>): Session {

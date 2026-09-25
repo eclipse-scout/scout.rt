@@ -305,6 +305,10 @@ export class HybridManager extends Widget {
     if (!this._widgetsToBeDisposed) {
       this._widgetsToBeDisposed = new Set<HybridManagerWidget>();
       queueMicrotask(() => {
+        if (this.destroyed) {
+          return;
+        }
+
         // collect remote ids, transfer widget ids to this._widgetsToBeDisposed and reset next batch
         const remoteIds: string[] = [];
         for (const widget of [...this._widgetsToBeDisposed]) {

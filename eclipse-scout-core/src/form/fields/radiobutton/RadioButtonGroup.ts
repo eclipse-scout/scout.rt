@@ -416,9 +416,17 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
 
     let deferred = new Deferred<LookupResult<TValue>>();
     this._executeLookup(this.lookupCall.cloneForAll(), true)
-      .then(result => { // TODO CGU test, was it already always async?
+      .then(result => {
         this._lookupByAllDone(result);
         deferred.resolve(result);
+      })
+      .catch(e => {
+        if (objects.isPojo(e) && e.abort) {
+          // Ignore: happens when this lookup call is aborted because a newer one superseded it (see abortExisting above).
+          // The newer lookup call's own promise chain resolves the field, so nothing else needs to be done here.
+          return;
+        }
+        throw e;
       });
 
     return deferred.promise();
