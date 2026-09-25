@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -228,15 +228,15 @@ export class BenchColumn extends Widget implements BenchColumnModel {
         let componentsBefore = this.components.slice(0, i).reverse() as SimpleTabBox<OutlineContent>[];
         let componentsAfter = this.components.slice(i + 1) as SimpleTabBox<OutlineContent>[];
         // shrink
-        if (componentsBefore.filter(tab => this._getTabBoxLayoutData(tab).shrink > 0).length > 0
-          && componentsAfter.filter(tab => this._getTabBoxLayoutData(tab).grow > 0).length > 0) {
+        if (componentsBefore.some(tab => this._getTabBoxLayoutData(tab).shrink > 0)
+          && componentsAfter.some(tab => this._getTabBoxLayoutData(tab).grow > 0)) {
           c.setEnabled(true);
           c.on('move', this._onSplitterMove.bind(this));
           return;
         }
         // grow
-        if (componentsBefore.filter(c => this._getTabBoxLayoutData(c).grow > 0).length > 0
-          && componentsAfter.filter(c => this._getTabBoxLayoutData(c).shrink > 0).length > 0) {
+        if (componentsBefore.some(tab => this._getTabBoxLayoutData(tab).grow > 0)
+          && componentsAfter.some(tab => this._getTabBoxLayoutData(tab).shrink > 0)) {
           c.setEnabled(true);
           c.on('move', this._onSplitterMove.bind(this));
           return;

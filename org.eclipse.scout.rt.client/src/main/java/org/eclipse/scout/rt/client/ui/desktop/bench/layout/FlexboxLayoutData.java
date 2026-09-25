@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,13 +13,35 @@ package org.eclipse.scout.rt.client.ui.desktop.bench.layout;
  * The layout data for a FlexboxLayout (JS).
  */
 public class FlexboxLayoutData {
+
+  private double m_initial = 100.0 / 3.0;
   private boolean m_relative = true;
   private double m_grow = 1;
   private double m_shrink = 1;
-  private double m_initial = 100.0 / 3.0;
 
   /**
-   * Use relative to evaluate the size (inital) against other relative datas. All absolute parts are subtracted from the
+   * If the part has a relative layout data (see {@link FlexboxLayoutData#isRelative()}) the initial value describes the
+   * size in relation to relative sibling parts. If the part is not relative the initial value is an absolute pixel
+   * value.
+   *
+   * @param initial
+   *     the initial size for the part.
+   * @see FlexboxLayoutData#withRelative(boolean)
+   */
+  public FlexboxLayoutData withInitial(double initial) {
+    m_initial = initial;
+    return this;
+  }
+
+  /**
+   * @see FlexboxLayoutData#withInitial(double)
+   */
+  public double getInitial() {
+    return m_initial;
+  }
+
+  /**
+   * Use relative to evaluate the size (initial) against other relative datas. All absolute parts are subtracted from the
    * total space to distribute. The rest is distributed to all relative parts relative to their initial sizes.<br>
    * E.g.<br>
    *
@@ -86,28 +108,6 @@ public class FlexboxLayoutData {
     return m_shrink;
   }
 
-  /**
-   * If the part has a relative layout data (see {@link FlexboxLayoutData#isRelative()}) the initial value describes the
-   * size in relation to relative sibling parts. If the part is not relative the initial value is a absolute pixel
-   * value.
-   *
-   * @param initial
-   *     the initial size for the part.
-   * @return
-   * @see FlexboxLayoutData#withRelative(boolean)
-   */
-  public FlexboxLayoutData withInitial(double initial) {
-    m_initial = initial;
-    return this;
-  }
-
-  /**
-   * @see FlexboxLayoutData#withInitial(double)
-   */
-  public double getInitial() {
-    return m_initial;
-  }
-
   public FlexboxLayoutData copy() {
     return copyValues(new FlexboxLayoutData());
   }
@@ -124,14 +124,10 @@ public class FlexboxLayoutData {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    long temp;
-    temp = Double.doubleToLongBits(m_initial);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
+    result = prime * result + Double.hashCode(m_initial);
     result = prime * result + (m_relative ? 1231 : 1237);
-    temp = Double.doubleToLongBits(m_grow);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(m_shrink);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
+    result = prime * result + Double.hashCode(m_grow);
+    result = prime * result + Double.hashCode(m_shrink);
     return result;
   }
 
