@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.platform.util;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -242,5 +243,247 @@ public class StreamUtilityTest {
     assertEquals(List.of(10, 20, 30, 12, 11, 10), StreamUtility.concat(IntStream.of(10, 20, 30).boxed(), IntStream.of(12, 11, 10).boxed()).collect(Collectors.toList()));
     assertEquals(List.of(10, 20, 33, 44, 5, 6), StreamUtility.concat(IntStream.of(10, 20).boxed(), IntStream.of(33, 44).boxed(), IntStream.of(5, 6).boxed()).collect(Collectors.toList()));
     assertEquals(List.of(10, 20, 5, 6), StreamUtility.concat(IntStream.of(10, 20).boxed(), Stream.empty(), null, IntStream.of(5, 6).boxed()).collect(Collectors.toList()));
+  }
+
+  @Test
+  public void testFlatten() {
+    assertEquals(List.of(), StreamUtility.flatten(null, 0).toList());
+    assertEquals(List.of(), StreamUtility.flatten(null, 1).toList());
+    assertEquals(List.of(), StreamUtility.flatten(null, 2).toList());
+    assertEquals(List.of(), StreamUtility.flatten(Stream.empty(), 0).toList());
+    assertEquals(List.of(), StreamUtility.flatten(Stream.of(null, null), 0).toList());
+
+    // no collections
+    assertEquals(
+        List.of(1, 2, 3),
+        StreamUtility.flatten(
+            Stream.of(
+                1, 2, 3
+            ),
+            0
+        ).toList()
+    );
+
+    // top level collections
+    assertEquals(
+        List.of(1, 2, 3),
+        StreamUtility.flatten(
+            Stream.of(
+                List.of(1, 2, 3)
+            ),
+            0
+        ).toList()
+    );
+    assertEquals(
+        List.of(1, 2, 3),
+        StreamUtility.flatten(
+            Stream.of(
+                List.of(1, 2),
+                3
+            ),
+            0
+        ).toList()
+    );
+    assertEquals(
+        List.of(1, 2, 3),
+        StreamUtility.flatten(
+            Stream.of(
+                List.of(1, 2),
+                List.of(3)
+            ),
+            0
+        ).toList()
+    );
+
+    // nested collections (2 levels)
+    assertEquals(
+        List.of(
+            List.of(1, 2),
+            3
+        ),
+        StreamUtility.flatten(
+            Stream.of(
+                List.of(
+                    List.of(1, 2),
+                    3
+                )
+            ),
+            0
+        ).toList()
+    );
+    assertEquals(
+        List.of(1, 2, 3),
+        StreamUtility.flatten(
+            Stream.of(
+                List.of(
+                    List.of(1, 2),
+                    3
+                )
+            ),
+            1
+        ).toList()
+    );
+    assertEquals(
+        List.of(1, 2, 3),
+        StreamUtility.flatten(
+            Stream.of(
+                List.of(
+                    List.of(1, 2),
+                    List.of(3)
+                )
+            ),
+            1
+        ).toList()
+    );
+
+    // nested collections (3 levels)
+    assertEquals(
+        List.of(
+            List.of(
+                List.of(1, 2, 3, 4, 5)
+            )
+        ),
+        StreamUtility.flatten(
+            Stream.of(
+                List.of(
+                    List.of(
+                        List.of(1, 2, 3, 4, 5)
+                    )
+                )
+            ),
+            0
+        ).toList()
+    );
+    assertEquals(
+        List.of(
+            List.of(1, 2, 3, 4, 5)
+        ),
+        StreamUtility.flatten(
+            Stream.of(
+                List.of(
+                    List.of(
+                        List.of(1, 2, 3, 4, 5)
+                    )
+                )
+            ),
+            1
+        ).toList()
+    );
+    assertEquals(
+        List.of(1, 2, 3, 4, 5),
+        StreamUtility.flatten(
+            Stream.of(
+                List.of(
+                    List.of(
+                        List.of(1, 2, 3, 4, 5)
+                    )
+                )
+            ),
+            2
+        ).toList()
+    );
+    assertEquals(
+        List.of(
+            List.of(
+                List.of(1, 2),
+                3
+            ),
+            List.of(4),
+            5,
+            List.of(6),
+            7, 8
+        ),
+        StreamUtility.flatten(
+            Stream.of(
+                List.of(
+                    List.of(
+                        List.of(1, 2),
+                        3
+                    ),
+                    List.of(4)
+                ),
+                List.of(
+                    5,
+                    List.of(6)
+                ),
+                7, 8
+            ),
+            0
+        ).toList()
+    );
+    assertEquals(
+        List.of(
+            List.of(1, 2),
+            3, 4, 5, 6, 7, 8
+        ),
+        StreamUtility.flatten(
+            Stream.of(
+                List.of(
+                    List.of(
+                        List.of(1, 2),
+                        3
+                    ),
+                    List.of(4)
+                ),
+                List.of(
+                    5,
+                    List.of(6)
+                ),
+                7, 8
+            ),
+            1
+        ).toList()
+    );
+    assertEquals(
+        List.of(1, 2, 3, 4, 5, 6, 7, 8),
+        StreamUtility.flatten(
+            Stream.of(
+                List.of(
+                    List.of(
+                        List.of(1, 2),
+                        3
+                    ),
+                    List.of(4)
+                ),
+                List.of(
+                    5,
+                    List.of(6)
+                ),
+                7, 8
+            ),
+            2
+        ).toList()
+    );
+    assertEquals(
+        List.of(1, 2, 3, 4, 5, 6, 7, 8),
+        StreamUtility.flatten(
+            Stream.of(
+                List.of(
+                    List.of(
+                        List.of(1, 2),
+                        3
+                    ),
+                    List.of(4)
+                ),
+                List.of(
+                    5,
+                    List.of(6)
+                ),
+                7, 8
+            ),
+            -1
+        ).toList()
+    );
+
+    // excessively deep
+    var list = new ArrayList<ArrayList<?>>();
+    //noinspection CollectionAddedToSelf
+    list.add(list);
+    assertEquals(list, StreamUtility.flatten(list.stream(), 0).toList());
+    assertEquals(list, StreamUtility.flatten(list.stream(), 1).toList());
+    assertEquals(list, StreamUtility.flatten(list.stream(), 2).toList());
+    assertEquals(list, StreamUtility.flatten(list.stream(), 3).toList());
+    var stream = StreamUtility.flatten(list.stream(), -1);
+    assertThrows(StackOverflowError.class, () -> stream.toList());
   }
 }

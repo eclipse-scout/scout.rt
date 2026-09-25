@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.platform.util;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -282,5 +283,45 @@ public final class StreamUtility {
     return Arrays.stream(streams)
         .filter(Objects::nonNull)
         .reduce(Stream.empty(), Stream::concat, Stream::concat);
+  }
+
+  /**
+   * Flattens a {@link Stream} of nested {@link Collection}s until the given depth. A negative depth means infinite depth.<br>
+   * Examples:
+   * <ul>
+   *   <li> 1, 2, 3 -> 1, 2, 3
+   *   <li> [1, 2, 3] -> 1, 2, 3
+   *   <li> [1, 2], 3 -> 1, 2, 3
+   *   <li> [1, 2], [3] -> 1, 2, 3
+   *   <li> [[1, 2], 3]
+   *     <ul>
+   *       <li> depth 0 -> [1, 2], 3
+   *       <li> depth 1 -> 1, 2, 3
+   *     </ul>
+   *   </li>
+   *   <li> [[[1, 2], 3], [4]], [5, [6]], 7, 8
+   *     <ul>
+   *       <li> depth 0 -> [[1, 2], 3], [4], 5, [6], 7, 8
+   *       <li> depth 1 -> [1, 2], 3, 4, 5, 6, 7, 8
+   *       <li> depth 2 -> 1, 2, 3, 4, 5, 6, 7, 8
+   *       <li> depth -1 -> 1, 2, 3, 4, 5, 6, 7, 8
+   *     </ul>
+   *   </li>
+   * </ul>
+   */
+  public static Stream<?> flatten(Stream<?> stream, int depth) {
+    if (stream == null) {
+      return Stream.empty();
+    }
+    return stream.flatMap(o -> {
+      if (o instanceof Collection<?> collection) {
+        if (depth == 0) {
+          return collection.stream();
+        }
+        return collection.stream()
+            .flatMap(element -> flatten(Stream.ofNullable(element), depth > 0 ? depth - 1 : -1));
+      }
+      return Stream.ofNullable(o);
+    });
   }
 }
