@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -105,12 +105,7 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
 
     this.setLayoutData(this.desktop.benchLayoutData);
     this._createColumns();
-    this.headerTabArea = model.headerTabArea;
-    // controller for headerTabArea
-    if (this.headerTabArea) {
-      this.headerTabAreaController = scout.create(HeaderTabBoxController);
-      this.headerTabAreaController.install(this, this.headerTabArea);
-    }
+    this._setTabArea(this.headerTabArea);
     this.outlineContentVisible = scout.nvl(model.outlineContentVisible, true);
     this.setOutline(this.desktop.outline);
     this.updateNavigationHandleVisibility();
@@ -119,7 +114,13 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
   /** @internal */
   _setTabArea(headerTabArea: DesktopTabArea) {
     this.headerTabArea = headerTabArea;
+
     if (this.headerTabAreaController) {
+      this.headerTabAreaController.uninstall();
+      this.headerTabAreaController = null;
+    }
+    if (this.headerTabArea) {
+      this.headerTabAreaController = scout.create(HeaderTabBoxController);
       this.headerTabAreaController.install(this, this.headerTabArea);
       // for all views
       let tabBox = this.getTabBox('C');
@@ -610,19 +611,20 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
         let componentsBefore = this.components.slice(0, i).reverse() as BenchColumn[];
         let componentsAfter = this.components.slice(i + 1) as BenchColumn[];
         // shrink
-        if (componentsBefore.filter(col => col.getLayoutData().shrink > 0).length > 0 && componentsAfter.filter(c => c.getLayoutData().grow > 0).length > 0) {
+        if (componentsBefore.some(c => c.getLayoutData().shrink > 0)
+          && componentsAfter.some(c => c.getLayoutData().grow > 0)) {
           c.setEnabled(true);
           c.on('move', this._onSplitterMove.bind(this));
           return;
         }
         // grow
-        if (componentsBefore.filter(c => c.getLayoutData().grow > 0).length > 0 && componentsAfter.filter(c => c.getLayoutData().shrink > 0).length > 0) {
+        if (componentsBefore.some(c => c.getLayoutData().grow > 0)
+          && componentsAfter.some(c => c.getLayoutData().shrink > 0)) {
           c.setEnabled(true);
           c.on('move', this._onSplitterMove.bind(this));
           return;
         }
         c.setEnabled(false);
-
       }
     });
   }

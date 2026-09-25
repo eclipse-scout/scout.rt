@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,21 +13,24 @@ import {FlexboxLayoutDataModel, InitModelOf, LayoutData} from '../../index';
 export class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
   declare model: FlexboxLayoutDataModel;
 
-  grow: number;
+  static readonly MIN_SIZE = 20;
+
   initial: number;
-  order: number;
   relative: boolean;
+  grow: number;
   shrink: number;
+  order: number;
+
   sizePx: number;
   initialPx: number;
   diff: number;
 
   constructor(model?: InitModelOf<FlexboxLayoutData>) {
     // initial
+    this.initial = 1;
     this.relative = true;
     this.grow = 1;
     this.shrink = 1;
-    this.initial = 1;
     this.order = 0;
     $.extend(this, model);
     // ui properties
@@ -58,15 +61,22 @@ export class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
     return size;
   }
 
+  reset() {
+    this.sizePx = 0;
+    this.initialPx = 0;
+    this.diff = null;
+  }
+
   protected _grow(delta: number, apply?: boolean): number {
-    let maxDelta = 0,
-      consumedDelta = 0;
+    let maxDelta = 0;
     if (this.grow > 0) {
       maxDelta = delta;
     } else if (this.initialPx > this.sizePx) {
+      // was previously shrunken, can only grow back to initial size
       maxDelta = this.initialPx - this.sizePx;
     }
-    consumedDelta = Math.min(delta, maxDelta);
+
+    let consumedDelta = Math.min(delta, maxDelta);
     if (apply) {
       this.sizePx = this.sizePx + consumedDelta;
     }
@@ -74,15 +84,15 @@ export class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
   }
 
   protected _shrink(delta: number, apply?: boolean): number {
-    let maxDelta = 0,
-      consumedDelta = 0;
+    let maxDelta = 0;
     if (this.shrink > 0) {
-      maxDelta = -this.sizePx + 20;
-
+      maxDelta = -this.sizePx + FlexboxLayoutData.MIN_SIZE;
     } else if (this.initialPx < this.sizePx) {
+      // was previously grown, can only shrink back to initialize size
       maxDelta = this.initialPx - this.sizePx;
     }
-    consumedDelta = Math.max(delta, maxDelta);
+
+    let consumedDelta = Math.max(delta, maxDelta);
     if (apply) {
       this.sizePx = this.sizePx + consumedDelta;
     }
@@ -91,8 +101,8 @@ export class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
 
   static fixed(size?: number): FlexboxLayoutData {
     let layoutData = new FlexboxLayoutData();
-    layoutData.relative = false;
     layoutData.initial = size || -1;
+    layoutData.relative = false;
     layoutData.grow = 0;
     layoutData.shrink = 0;
     return layoutData;
