@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -51,11 +51,23 @@ export class HeaderTabBoxController extends DesktopTabBoxController {
 
   /** @internal */
   _onViewsChanged() {
-    if (this.bench.getViews().some(view => 'C' !== view.displayViewId)) {
-      // has views in other view stacks
+    // Allow the tab area in the header as long as the center stack is the top left.
+    // This is the case when no other view is placed above or on the left of C.
+    //   ____                                 ____
+    // / Tab \                              / Tab \
+    // +------+------+------+               +-------------+------+
+    // | (NW) | (N)  |  NE  |               |             |  NE  |
+    // +------+------+------+               |      C      +------+
+    // |  (W) |  C   |  E   |      -->      |             |  E   |
+    // +------+------+------+               +-------------+------+
+    // | (SW) |  S   |  SE  |               |      S      |  SE  |
+    // +------+------+------+               +-------------+------+
+    //
+    if (this.bench.getViews().some(view => scout.isOneOf(view.displayViewId, 'N', 'W', 'NW', 'SW'))) {
+      // has views in N, W, NW, SW
       this._setViewTabAreaInHeader(false);
     } else {
-      // has only views in center
+      // has only views in center or on the right or below
       this._setViewTabAreaInHeader(true);
     }
   }
