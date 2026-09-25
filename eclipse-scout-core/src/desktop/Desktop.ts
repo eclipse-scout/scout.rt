@@ -635,6 +635,8 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this.$container.toggleClass('in-background', this.inBackground && this.displayStyle !== Desktop.DisplayStyle.COMPACT);
     if (this.bench) {
       this.bench.$container.toggleClass('drop-shadow', this.inBackground);
+      // Border of bench may have changed -> reposition content
+      this.bench.invalidateLayoutTree(false);
     }
   }
 
