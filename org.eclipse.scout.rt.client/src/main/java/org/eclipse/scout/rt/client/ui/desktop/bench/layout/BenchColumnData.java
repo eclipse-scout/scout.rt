@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,9 +17,11 @@ import org.eclipse.scout.rt.platform.util.Assertions;
  * @author Andreas Hoegger
  */
 public class BenchColumnData extends FlexboxLayoutData {
+
   public static final int NORTH = 0;
   public static final int CENTER = 1;
   public static final int SOUTH = 2;
+
   private final FlexboxLayoutData[] m_rows = {
       new FlexboxLayoutData(),
       new FlexboxLayoutData(),
@@ -33,7 +35,6 @@ public class BenchColumnData extends FlexboxLayoutData {
   /**
    * To provide a configuration of the north view stack. Null for default values.
    *
-   * @param data
    * @return this fluent API
    */
   public BenchColumnData withNorth(FlexboxLayoutData data) {
@@ -51,7 +52,6 @@ public class BenchColumnData extends FlexboxLayoutData {
   /**
    * To provide a configuration of the Center view stack. Null for default values.
    *
-   * @param data
    * @return this fluent API
    */
   public BenchColumnData withCenter(FlexboxLayoutData data) {
@@ -69,7 +69,6 @@ public class BenchColumnData extends FlexboxLayoutData {
   /**
    * To provide a configuration of the south view stack. Null for default values.
    *
-   * @param data
    * @return this fluent API
    */
   public BenchColumnData withSouth(FlexboxLayoutData data) {
@@ -95,8 +94,8 @@ public class BenchColumnData extends FlexboxLayoutData {
   }
 
   @Override
-  public BenchColumnData withGrow(double rise) {
-    return (BenchColumnData) super.withGrow(rise);
+  public BenchColumnData withGrow(double grow) {
+    return (BenchColumnData) super.withGrow(grow);
   }
 
   @Override

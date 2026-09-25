@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,11 +12,13 @@ package org.eclipse.scout.rt.client.ui.desktop.bench.layout;
 import java.util.Arrays;
 
 public class BenchLayoutData {
+
   public static final int WEST = 0;
   public static final int CENTER = 1;
   public static final int EAST = 2;
 
-  private String m_cacheKey;
+  private String m_cacheKey = null;
+
   private final BenchColumnData[] m_columns = {
       new BenchColumnData(),
       new BenchColumnData(),
@@ -50,7 +52,6 @@ public class BenchLayoutData {
   /**
    * To provide a configuration of all west view stacks (NW, W, SW). Null for default values.
    *
-   * @param data
    * @return this fluent API
    */
   public BenchLayoutData withWest(BenchColumnData data) {
@@ -68,7 +69,6 @@ public class BenchLayoutData {
   /**
    * To provide a configuration of all center view stacks (N, C, S). Null for default values.
    *
-   * @param data
    * @return this fluent API
    */
   public BenchLayoutData withCenter(BenchColumnData data) {
@@ -86,7 +86,6 @@ public class BenchLayoutData {
   /**
    * To provide a configuration of all east view stacks (NE, E, SE). Null for default values.
    *
-   * @param data
    * @return this fluent API
    */
   public BenchLayoutData withEast(BenchColumnData data) {
