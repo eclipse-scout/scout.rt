@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,28 +10,19 @@
 import {AbstractLayout, Dimension, EnumObject, FlexboxLayoutData, HtmlComponent, HtmlCompPrefSizeOptions, Rectangle, webstorage} from '../../index';
 import $ from 'jquery';
 
-export type FlexboxDirection = EnumObject<typeof FlexboxLayout.Direction>;
-
 export class FlexboxLayout extends AbstractLayout {
-  childrenLayoutDatas: FlexboxLayoutData[];
+
+  static readonly STORAGE_KEY = 'scout.flexboxLayout';
+
+  direction: FlexboxDirection;
   cacheKey: string[];
-  protected _getDimensionValue: (dimension: Dimension) => number;
-  protected _layoutFromLayoutData: (children: HtmlComponent[], containerSize: Dimension) => void;
+
+  protected _layoutDatasToReset = new Set<FlexboxLayoutData>();
 
   constructor(direction: FlexboxDirection, cacheKey: string[]) {
     super();
-    this.childrenLayoutDatas = [];
-    this.cacheKey = null;
-    this.setCacheKey(cacheKey);
-    if (direction === FlexboxLayout.Direction.ROW) {
-      this.preferredLayoutSize = this.preferredLayoutSizeRow;
-      this._getDimensionValue = this._getWidth;
-      this._layoutFromLayoutData = this._layoutFromLayoutDataRow;
-    } else {
-      this.preferredLayoutSize = this.preferredLayoutSizeColumn;
-      this._getDimensionValue = this._getHeight;
-      this._layoutFromLayoutData = this._layoutFromLayoutDataColumn;
-    }
+    this.direction = direction;
+    this.cacheKey = cacheKey;
   }
 
   static Direction = {
@@ -40,28 +31,24 @@ export class FlexboxLayout extends AbstractLayout {
   } as const;
 
   setCacheKey(cacheKey: string[]) {
-    this.cacheKey = cacheKey;
-    if (this.cacheKey && this.cacheKey.length > 0) {
-      this.cacheKey.unshift('scout.flexboxLayout');
-    }
+    this.cacheKey = cacheKey ? [...cacheKey] : null;
   }
 
   protected _readCache(childCount: number): number[] {
     if (!this.cacheKey || this.cacheKey.length === 0 || childCount < 2) {
       return;
     }
-    let keySequence = this.cacheKey.slice(),
-      cacheValue = webstorage.getItemFromLocalStorage(keySequence[0]),
-      i = 1,
-      cacheObj;
-    keySequence.push('' + childCount);
-    if (cacheValue) {
-      cacheObj = JSON.parse(cacheValue);
-    }
+
+    let keySequence = [...this.cacheKey, String(childCount)];
+    let cacheValue = webstorage.getItemFromLocalStorage(FlexboxLayout.STORAGE_KEY);
+    let cacheObj = cacheValue ? JSON.parse(cacheValue) : null;
+
+    let i = 0;
     while (cacheObj && i < keySequence.length) {
       cacheObj = cacheObj[keySequence[i]];
       i++;
     }
+
     return cacheObj;
   }
 
@@ -69,54 +56,37 @@ export class FlexboxLayout extends AbstractLayout {
     if (!this.cacheKey || this.cacheKey.length === 0 || childCount < 2) {
       return;
     }
-    let keySequence = this.cacheKey.slice(),
-      cacheValue = webstorage.getItemFromLocalStorage(keySequence[0]),
-      i = 1,
-      cacheObj,
-      cachedSizes;
-    keySequence.push('' + childCount);
-    if (cacheValue) {
-      cacheObj = JSON.parse(cacheValue);
-    } else {
-      cacheObj = {};
-    }
-    cachedSizes = cacheObj;
+
+    let keySequence = [...this.cacheKey, String(childCount)];
+    let cacheValue = webstorage.getItemFromLocalStorage(FlexboxLayout.STORAGE_KEY);
+    let cacheObj = cacheValue ? JSON.parse(cacheValue) : {};
+
+    let cachedSizes = cacheObj;
+    let i = 0;
     while (i < keySequence.length - 1) {
-      if (!cachedSizes[keySequence[i]]) {
-        cachedSizes[keySequence[i]] = {};
-      }
+      cachedSizes[keySequence[i]] = cachedSizes[keySequence[i]] || {};
       cachedSizes = cachedSizes[keySequence[i]];
       i++;
     }
     cachedSizes[keySequence[i]] = sizes;
-    webstorage.setItemToLocalStorage(keySequence[0], JSON.stringify(cacheObj));
-  }
 
-  protected _computeCacheKey(childCount: number): string {
-    // no need to cache bounds of a single child
-    if (!this.cacheKey || childCount < 2) {
-      return;
-    }
-    return this.cacheKey + '-' + childCount;
+    webstorage.setItemToLocalStorage(FlexboxLayout.STORAGE_KEY, JSON.stringify(cacheObj));
   }
 
   // layout functions
+
   override layout($container: JQuery) {
-    let children = this._getChildren($container),
-      htmlContainer = HtmlComponent.get($container),
-      containerSize = htmlContainer.availableSize({
-        exact: true
-      }),
-      splitterWithDelta;
+    let htmlContainer = HtmlComponent.get($container);
+    let availableSize = htmlContainer.availableSize({exact: true})
+      .subtract(htmlContainer.insets());
 
-    containerSize = containerSize.subtract(htmlContainer.insets());
+    let children = this._getChildren($container);
+    let splitterWithDiff = children.find(c => (c.layoutData as FlexboxLayoutData).diff);
 
-    splitterWithDelta = children.filter(c => (<FlexboxLayoutData>c.layoutData).diff)[0];
-
-    if (splitterWithDelta) {
-      this._layoutDelta(children, splitterWithDelta, containerSize);
+    if (splitterWithDiff) {
+      this._layoutDelta(children, splitterWithDiff, availableSize);
     } else {
-      this._layoutComponents(children, containerSize);
+      this._layoutComponents(children, availableSize);
     }
   }
 
@@ -135,50 +105,44 @@ export class FlexboxLayout extends AbstractLayout {
   }
 
   reset() {
-    this.childrenLayoutDatas.forEach(ld => {
-      ld.sizePx = 0;
-      ld.initialPx = 0;
-      ld.diff = null;
-    });
-    this.childrenLayoutDatas = [];
+    this._layoutDatasToReset.forEach(ld => ld.reset());
+    this._layoutDatasToReset.clear();
   }
 
   protected _layoutDelta(children: HtmlComponent[], deltaComp: HtmlComponent, containerSize: Dimension) {
-    this.ensureInitialValues(children, containerSize);
-    let delta = (<FlexboxLayoutData>deltaComp.layoutData).diff,
-      componentsBefore = children.slice(0, children.indexOf(deltaComp)).reverse(),
-      componentsAfter = children.slice(children.indexOf(deltaComp) + 1),
-      deltaDiffPrev,
-      deltaDiffNext;
+    this._ensureInitialValues(children, containerSize);
+
+    let delta = (deltaComp.layoutData as FlexboxLayoutData).diff;
+    let componentsBefore = children.slice(0, children.indexOf(deltaComp)).reverse();
+    let componentsAfter = children.slice(children.indexOf(deltaComp) + 1);
 
     // calculate if the delta can be applied to the previous and following columns
-    deltaDiffPrev = _distributeDelta(componentsBefore, delta, false);
-    deltaDiffNext = -_distributeDelta(componentsAfter, -delta, false);
-    // compute the max delta could be applied
+    let deltaDiffPrev = distributeDelta(componentsBefore, delta, false);
+    let deltaDiffNext = -distributeDelta(componentsAfter, -delta, false);
 
+    // compute the max delta could be applied
     delta = Math.sign(delta) * (Math.min(Math.abs(delta - deltaDiffPrev), Math.abs(delta - deltaDiffNext)));
 
     if (delta !== 0) {
       // apply the delta to the previous and following columns
-      _distributeDelta(componentsBefore, delta, true);
-      _distributeDelta(componentsAfter, -delta, true);
+      distributeDelta(componentsBefore, delta, true);
+      distributeDelta(componentsAfter, -delta, true);
     }
 
     this._layoutFromLayoutDataWithCache(children, containerSize);
 
-    /* private functions */
-    function _distributeDelta(components, delta, applyDelta) {
-      return components.reduce((diff, c) => {
-        if (diff !== 0) {
-          diff = c.layoutData.acceptDelta(diff, applyDelta);
+    function distributeDelta(components, delta, applyDelta) {
+      return components.reduce((delta, c) => {
+        if (delta !== 0) {
+          delta = c.layoutData.acceptDelta(delta, applyDelta);
         }
-        return diff;
+        return delta;
       }, delta);
     }
   }
 
   protected _layoutComponents(children: HtmlComponent[], containerSize: Dimension) {
-    let delta = this.ensureInitialValues(children, containerSize);
+    let delta = this._ensureInitialValues(children, containerSize);
     if (delta < 0) {
       this._adjust(children, delta, ld => ld.shrink);
     } else if (delta > 0) {
@@ -188,26 +152,30 @@ export class FlexboxLayout extends AbstractLayout {
   }
 
   protected _adjust(children: HtmlComponent[], delta: number, getWeightFunction: (ld: FlexboxLayoutData) => number) {
-    let weightSum,
-      deltaFactor,
-      layoutDatas = children.map(c => c.layoutData as FlexboxLayoutData).filter(ld => {
-        // resizable
+    let flexibleLayoutDatas = children
+      .map(c => c.layoutData as FlexboxLayoutData)
+      .filter(ld => {
         return ld.acceptDelta(Math.sign(delta)) === 0;
       });
+    // If some parts are absolute and some parts are relative, only adjust the relative parts
+    if (flexibleLayoutDatas.some(ld => ld.relative) && flexibleLayoutDatas.some(ld => !ld.relative)) {
+      flexibleLayoutDatas = flexibleLayoutDatas.filter(ld => ld.relative);
+    }
 
-    if (layoutDatas.length < 1) {
+    if (!flexibleLayoutDatas.length) {
       return;
     }
 
-    weightSum = layoutDatas.reduce((sum, ld) => {
-      return sum + getWeightFunction(ld);
+    let weightSum = flexibleLayoutDatas.reduce((weight, ld) => {
+      return weight + getWeightFunction(ld);
     }, 0);
+    let deltaFactor = delta / weightSum;
 
-    // delta factor
-    deltaFactor = delta / weightSum;
-    delta = layoutDatas.reduce((delta, ld) => {
+    // Apply delta
+    delta = flexibleLayoutDatas.reduce((delta, ld) => {
       return ld.acceptDelta(deltaFactor * getWeightFunction(ld), true);
     }, delta);
+
     if (Math.abs(delta) > 0.2) {
       this._adjust(children, delta, getWeightFunction);
     }
@@ -218,55 +186,54 @@ export class FlexboxLayout extends AbstractLayout {
       .add(htmlComp.margins());
   }
 
-  ensureInitialValues(children: HtmlComponent[], containerSize: Dimension): number {
-    let totalPx = this._getDimensionValue(containerSize),
-      sumOfAbsolutePx = 0,
-      sumOfRelatives = 0,
-      colLayoutDatas = children.map(c => {
-        return c.layoutData as FlexboxLayoutData;
-      }),
-      cachedSizes = this._readCache(children.length) || [];
-
-    // setup initial values
-    children.forEach((comp, i) => {
+  protected _ensureInitialValues(children: HtmlComponent[], containerSize: Dimension): number {
+    // Setup initial values
+    let totalPx = this._getDimensionValue(containerSize);
+    let sumOfAbsolutePx = 0;
+    let sumOfRelatives = 0;
+    let relatives: HtmlComponent[] = [];
+    children.forEach(comp => {
       let ld = comp.layoutData as FlexboxLayoutData;
+      this._layoutDatasToReset.add(ld); // remember for later reset()
 
       if (ld.sizePx) {
         sumOfAbsolutePx += ld.sizePx;
       } else if (ld.initial < 0) {
-        // use ui height
+        // use ui size
         ld.initialPx = this._getDimensionValue(this._getPreferredSize(comp));
         sumOfAbsolutePx += ld.initialPx;
-
       } else if (ld.relative) {
         sumOfRelatives += ld.initial;
+        relatives.push(comp);
       } else {
         ld.initialPx = ld.initial;
         sumOfAbsolutePx += ld.initialPx;
       }
     });
 
-    let relativeFactor = (totalPx - sumOfAbsolutePx) / sumOfRelatives;
-    colLayoutDatas.filter(ld => {
-      return ld.relative && ld.initial > -1 && !ld.sizePx;
-    }).reduce((restWidth, ld) => {
-      ld.initialPx = Math.max(30, relativeFactor * ld.initial);
-      return restWidth - ld.initialPx;
-    }, (totalPx - sumOfAbsolutePx));
+    // Distribute remaining size to all relative parts without fixed size
+    if (sumOfRelatives) {
+      let totalRemainderPx = totalPx - sumOfAbsolutePx;
+      let relativeFactor = totalRemainderPx / sumOfRelatives;
+      relatives.forEach(comp => {
+        let ld = comp.layoutData as FlexboxLayoutData;
+        ld.initialPx = Math.max(30, relativeFactor * ld.initial);
+      });
+    }
 
-    // set px values
-    return colLayoutDatas
-      .reduce((restWidth, ld, i) => {
-        if (!ld.sizePx) {
-          if (cachedSizes[i]) {
-            ld.sizePx = ld.validate(Math.round(totalPx * cachedSizes[i]));
-          } else {
-            ld.sizePx = ld.initialPx;
-          }
+    // Set sizePx and return "delta" value (remainder that was not distributed to any part)
+    let cachedSizes = this._readCache(children.length) || [];
+    return children.reduce((remainderPx, comp, i) => {
+      let ld = comp.layoutData as FlexboxLayoutData;
+      if (!ld.sizePx) {
+        if (cachedSizes[i]) {
+          ld.sizePx = ld.validate(Math.round(totalPx * cachedSizes[i]));
+        } else {
+          ld.sizePx = ld.initialPx;
         }
-        this.childrenLayoutDatas.push(ld);
-        return restWidth - ld.sizePx;
-      }, totalPx);
+      }
+      return remainderPx - ld.sizePx;
+    }, totalPx);
   }
 
   protected _layoutFromLayoutDataWithCache(children: HtmlComponent[], containerSize: Dimension) {
@@ -276,43 +243,29 @@ export class FlexboxLayout extends AbstractLayout {
 
   protected _cacheSizes(children: HtmlComponent[], containerSize: Dimension) {
     let totalPx = this._getDimensionValue(containerSize);
-    let value = children.map(c => (<FlexboxLayoutData>c.layoutData).sizePx / totalPx);
+    let value = children.map(c => (c.layoutData as FlexboxLayoutData).sizePx / totalPx);
     this._writeCache(children.length, value);
   }
 
   // functions differ from row to column mode
 
-  preferredLayoutSizeColumn($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
-    return this._getChildren($container).reduce((size, c) => {
-      let prefSize = this._getPreferredSize(c);
-      size.width = Math.max(prefSize.width, size.width);
-      size.height += prefSize.height;
-      return size;
-    }, new Dimension(0, 0));
+  protected _getDimensionValue(dimension: Dimension): number {
+    return this.direction === FlexboxLayout.Direction.ROW
+      ? dimension.width
+      : dimension.height;
   }
 
-  preferredLayoutSizeRow($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
-    return this._getChildren($container).reduce((size, c) => {
-      let prefSize = this._getPreferredSize(c);
-      size.height = Math.max(prefSize.height, size.height);
-      size.width += prefSize.width;
-      return size;
-    }, new Dimension(0, 0));
-  }
-
-  protected _getWidth(dimension: Dimension): number {
-    return dimension.width;
-  }
-
-  protected _getHeight(dimension: Dimension): number {
-    return dimension.height;
+  protected _layoutFromLayoutData(children: HtmlComponent[], containerSize: Dimension) {
+    return this.direction === FlexboxLayout.Direction.ROW
+      ? this._layoutFromLayoutDataRow(children, containerSize)
+      : this._layoutFromLayoutDataColumn(children, containerSize);
   }
 
   protected _layoutFromLayoutDataRow(children: HtmlComponent[], containerSize: Dimension) {
     children.reduce((x, comp) => {
       let margins = comp.margins();
       let insets = comp.insets();
-      let w = (<FlexboxLayoutData>comp.layoutData).sizePx;
+      let w = (comp.layoutData as FlexboxLayoutData).sizePx;
       let bounds = new Rectangle(x - insets.left - margins.left, 0, w + insets.left + insets.right, containerSize.height);
       comp.setBounds(bounds);
       return x + w;
@@ -323,10 +276,36 @@ export class FlexboxLayout extends AbstractLayout {
     children.reduce((y, comp) => {
       let margins = comp.margins();
       let insets = comp.insets();
-      let h = (<FlexboxLayoutData>comp.layoutData).sizePx;
+      let h = (comp.layoutData as FlexboxLayoutData).sizePx;
       let bounds = new Rectangle(0, y - insets.top - margins.top, containerSize.width, h + insets.top + insets.bottom);
       comp.setBounds(bounds);
       return y + h;
     }, 0);
   }
+
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
+    return this.direction === FlexboxLayout.Direction.ROW
+      ? this._preferredLayoutSizeRow($container, options)
+      : this._preferredLayoutSizeColumn($container, options);
+  }
+
+  protected _preferredLayoutSizeRow($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
+    return this._getChildren($container).reduce((size, c) => {
+      let prefSize = this._getPreferredSize(c);
+      size.height = Math.max(prefSize.height, size.height);
+      size.width += prefSize.width;
+      return size;
+    }, new Dimension(0, 0));
+  }
+
+  protected _preferredLayoutSizeColumn($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
+    return this._getChildren($container).reduce((size, c) => {
+      let prefSize = this._getPreferredSize(c);
+      size.width = Math.max(prefSize.width, size.width);
+      size.height += prefSize.height;
+      return size;
+    }, new Dimension(0, 0));
+  }
 }
+
+export type FlexboxDirection = EnumObject<typeof FlexboxLayout.Direction>;
