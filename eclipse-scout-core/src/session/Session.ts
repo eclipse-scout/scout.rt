@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxCall, AjaxCallModel, AjaxError, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, config, Deferred, Desktop, Device, Event, EventEmitter, EventHandler, FileInput, files as fileUtil, FocusManager,
-  fonts, icons, InitModelOf, JsonErrorResponse, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions, objects,
-  ObjectWithType, Reconnector, RemoteEvent, ResponseQueue, scout, SessionAdapter, SessionEventMap, SessionModel, SharedVariables, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UrlAjaxSettings,
+  ajax, AjaxCall, AjaxCallModel, AjaxError, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, config, Deferred, Desktop, Device, Event, EventEmitter, EventHandler, FileInput, files as fileUtil,
+  FocusManager, fonts, icons, InitModelOf, JsonErrorResponse, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions,
+  objects, ObjectWithType, Reconnector, RemoteEvent, ResponseQueue, scout, SessionAdapter, SessionEventMap, SessionModel, SharedVariables, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UrlAjaxSettings,
   UserAgent, webstorage, Widget
 } from '../index';
 import $ from 'jquery';
@@ -75,6 +75,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   root: Widget;
   widget: Widget; // same as root
   $entryPoint: JQuery;
+  destroyed = false;
 
   protected _adapterDataCache: Record<string, AdapterData>;
   protected _deferredEventTypes: string[];
@@ -328,6 +329,9 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
    * request at the end of the user interaction
    */
   sendEvent(event: RemoteEvent, delay?: number) {
+    if (this.destroyed) {
+      return;
+    }
     delay = delay || 0;
 
     this.asyncEvents = this._coalesceEvents(this.asyncEvents, event);
@@ -1413,8 +1417,9 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       };
     }
 
-    // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once
-    $.ajax(this.defaultAjaxOptions(request));
+    // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once.
+    // Fire-and-forget by design, but still catch to avoid an unhandled promise rejection.
+    ajax.call(this.defaultAjaxOptions(request)).catch(() => {});
   }
 
   /** @internal */
@@ -1496,7 +1501,10 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   }
 
   destroy() {
-    // NOP
+    clearTimeout(this._sendTimeoutId);
+    this._sendTimeoutId = null;
+    this._asyncDelay = null;
+    this.destroyed = true;
   }
 
   exportAdapterData(adapterData: AdapterData): AdapterData {

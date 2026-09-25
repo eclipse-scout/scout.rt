@@ -163,6 +163,7 @@ describe('JsFormAdapter', () => {
       expect(form).toBeDefined();
       await form.whenPostLoad();
 
+      s.destroy();
       return d;
     };
 

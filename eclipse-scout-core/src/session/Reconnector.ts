@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import $ from 'jquery';
-import {Session} from '../index';
+import {ajax, AjaxError, Session} from '../index';
 
 export class Reconnector {
   session: Session;
@@ -78,18 +78,18 @@ export class Reconnector {
 
     $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ' + pingAjaxOptions.method + ' "' + pingAjaxOptions.url + '"');
     this.pingStartTimestamp = Date.now();
-    $.ajax(pingAjaxOptions)
-      .done(this._onPingDone.bind(this))
-      .fail(this._onPingFail.bind(this));
+    ajax.call(pingAjaxOptions)
+      .then(this._onPingDone.bind(this))
+      .catch(this._onPingFail.bind(this));
   }
 
-  protected _onPingDone(data: any, textStatus: JQuery.Ajax.SuccessTextStatus, jqXHR: JQuery.jqXHR) {
+  protected _onPingDone() {
     $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping success -> connection re-established!');
     this.session.onReconnectingSucceeded();
     this.stop();
   }
 
-  protected _onPingFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
+  protected _onPingFail(error: AjaxError) {
     let handleFailedPing = function handleFailedPing() {
       $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping failed');
       this.session.onReconnectingFailed();

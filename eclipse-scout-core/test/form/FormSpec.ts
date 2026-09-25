@@ -2490,6 +2490,7 @@ describe('Form', () => {
     });
 
     it('is automatically handled in save', async () => {
+      jasmine.clock().uninstall();
       expect(session.desktop.busy).toBe(false);
 
       form.throwInSave = true;
@@ -2502,14 +2503,7 @@ describe('Form', () => {
           expect(e).toEqual('save');
         });
 
-      jasmine.clock().tick(1000);
-      // Wait for the save-error message box to actually be added (and thus rendered, see MessageBoxController) before
-      // looking for it. The error propagates through more promise hops on the save path than on the load path
-      // (see the "is automatically handled in load" test above), so a fixed flushMicrotasks() count isn't reliable here.
-      if (!helper.findMessageBoxes().size) {
-        await session.desktop.when('propertyChange:messageBoxes');
-      }
-
+      await sleep(); // Wait for error handler to show message box
       const messageBoxes = helper.findMessageBoxes();
       expect(messageBoxes.size).toBe(1);
       expect(session.desktop.busy).toBe(false);
@@ -2518,7 +2512,6 @@ describe('Form', () => {
       expect(messageBox.$container.children('.glasspane').length).toBe(0); // not blocked
 
       helper.closeMessageBoxes();
-      jasmine.clock().tick(1000);
       await okPromise;
       expect(catchCalled).toBe(true);
       expect(form.formSaved).toBe(false); // save failed: do not mark as stored

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxSettings, Box, Device, InitModelOf, LoginAppModel, strings, TextMap} from '../index';
+import {ajax, AjaxError, AjaxSettings, Box, Device, InitModelOf, LoginAppModel, strings, TextMap} from '../index';
 import $ from 'jquery';
 
 export class LoginBox extends Box {
@@ -160,9 +160,9 @@ export class LoginBox extends Box {
       url: url,
       data: data
     });
-    $.ajax(options)
-      .done(this._onPostDone.bind(this))
-      .fail(this._onPostFail.bind(this));
+    ajax.call(options)
+      .then(this._onPostDone.bind(this))
+      .catch(this._onPostFail.bind(this));
   }
 
   checkTwoFactorResponse(data: Record<string, any>) {
@@ -228,12 +228,12 @@ export class LoginBox extends Box {
     this.onPostDoneFunc.call(this, data);
   }
 
-  protected _onPostFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
+  protected _onPostFail(error: AjaxError) {
     // execute delayed to make sure loading animation is visible, otherwise (if it is very fast), it flickers
-    setTimeout(this._onPostFailImpl.bind(this, jqXHR, textStatus, errorThrown), 300);
+    setTimeout(this._onPostFailImpl.bind(this), 300);
   }
 
-  protected _onPostFailImpl(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
+  protected _onPostFailImpl() {
     if (this.$token) {
       this.$password = this._createPasswortField();
       this.$token

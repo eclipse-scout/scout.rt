@@ -820,39 +820,39 @@ describe('Calendar', () => {
         expect(menuVisible).toBe(false);
       });
 
-      // it('should make resource panel visible when more than one calendar is set', async () => {
-      //   // Arrange
-      //   let businessRes = createCalendarResource('Business calendar');
-      //   let otherRes = createCalendarResource('Other calendar');
-      //   let calendar = initCalendar(businessRes, otherRes);
-      //   await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
-      //
-      //   // Act
-      //   let menuVisible = isResourcePanelVisible(calendar);
-      //
-      //   // Assert
-      //   expect(menuVisible).toBe(true);
-      //   // TODO CGU does not seem to work in app either, check mit niklas
-      // });
-      //
-      // it('should make resource panel visible when an additional calendar is added', async () => {
-      //   // Arrange
-      //   let businessRes = createCalendarResource('Business calendar');
-      //   let otherRes = createCalendarResource('Other calendar');
-      //   let calendar = initCalendar(businessRes);
-      //   await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
-      //
-      //   // Act
-      //   let panelVisibleFirst = isResourcePanelVisible(calendar);
-      //   calendar.setResources([...calendar.resources, otherRes]);
-      //   await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
-      //   let panelVisibleAfter = isResourcePanelVisible(calendar);
-      //
-      //   // Assert
-      //   expect(panelVisibleFirst).toBe(false);
-      //   expect(panelVisibleAfter).toBe(true);
-      //   // TODO CGU does not seem to work in app either, check mit niklas
-      // });
+      xit('should make resource panel visible when more than one calendar is set', async () => {
+        // Arrange
+        let businessRes = createCalendarResource('Business calendar');
+        let otherRes = createCalendarResource('Other calendar');
+        let calendar = initCalendar(businessRes, otherRes);
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
+
+        // Act
+        let menuVisible = isResourcePanelVisible(calendar);
+
+        // Assert
+        expect(menuVisible).toBe(true);
+        // TODO CGU does not seem to work in app either, check mit niklas
+      });
+
+      xit('should make resource panel visible when an additional calendar is added', async () => {
+        // Arrange
+        let businessRes = createCalendarResource('Business calendar');
+        let otherRes = createCalendarResource('Other calendar');
+        let calendar = initCalendar(businessRes);
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
+
+        // Act
+        let panelVisibleFirst = isResourcePanelVisible(calendar);
+        calendar.setResources([...calendar.resources, otherRes]);
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
+        let panelVisibleAfter = isResourcePanelVisible(calendar);
+
+        // Assert
+        expect(panelVisibleFirst).toBe(false);
+        expect(panelVisibleAfter).toBe(true);
+        // TODO CGU does not seem to work in app either, check mit niklas
+      });
     });
 
     it('should not be a problem to have an empty named calendar resource', () => {

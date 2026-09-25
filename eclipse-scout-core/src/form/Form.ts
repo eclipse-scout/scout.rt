@@ -520,16 +520,20 @@ export class Form extends Widget implements FormModel, DisplayParent {
     return this.when('postLoad');
   }
 
-  protected _onLifecyclePostLoad(): Promise<void> {
+  protected _onLifecyclePostLoad() {
+    let promise: Promise<void>;
     try {
-      return this._postLoad()
+      promise = this._postLoad()
         .then(() => {
           this.trigger('postLoad');
         })
         .catch(error => this._handlePostLoadErrorInternal(error));
     } catch (error) {
-      return this._handlePostLoadErrorInternal(error);
+      promise = this._handlePostLoadErrorInternal(error);
     }
+    promise.catch(e => {
+      // It is not necessary to return the promise, catch it to prevent unhandled promise rejection error
+    });
   }
 
   /**
@@ -649,7 +653,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
       });
     }
     return promise.then(() => {
-      throw error; // always throw so it can be catched.
+      throw error; // always throw so it can be catched. // TODO CGU this is probably a bad idea if we want to use the global rejection handler
     });
   }
 

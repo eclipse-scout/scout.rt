@@ -11,11 +11,6 @@ import {defaultValues} from '../../src/index';
 
 describe('defaultValues', () => {
 
-  afterEach(() => {
-    // Reload default values to not influence other tests
-    defaultValues.bootstrap();
-  });
-
   describe('init', () => {
 
     it('can load invalid configurations', () => {
@@ -43,7 +38,6 @@ describe('defaultValues', () => {
         });
       }).toThrow();
     });
-
   });
 
   describe('applyTo', () => {
@@ -277,7 +271,5 @@ describe('defaultValues', () => {
       expect(testObjects[1].rows).toEqual([]);
       expect(testObjects[2].rows).toEqual(['three']);
     });
-
   });
-
 });

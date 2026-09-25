@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractConstructor, arrays, AutoLeafPageWithNodes, BaseDoEntity, Constructor, dataObjects, DoEntity, HybridActionEvent, HybridManager, ObjectFactory, Page, PageWithNodes, PageWithTable, scout, Session, strings, TypeDescriptor, Widget
+  AbstractConstructor, ajax, arrays, AutoLeafPageWithNodes, BaseDoEntity, Constructor, dataObjects, DoEntity, HybridActionEvent, HybridManager, ObjectFactory, Page, PageWithNodes, PageWithTable, scout, Session, strings, TypeDescriptor,
+  Widget
 } from '../index';
 import $ from 'jquery';
 import 'jasmine-ajax';
@@ -33,14 +34,7 @@ export const JasmineScoutUtil = {
       }
     }
 
-    return Promise.resolve($.ajax({
-      async: false,
-      method: 'GET',
-      dataType: 'json',
-      contentType: 'application/json; charset=UTF-8',
-      cache: false,
-      url: jsonResourceUrl
-    }))
+    return ajax.getJson(jsonResourceUrl, {async: false, cache: false})
       .then(json => {
         if (scout.nvl(options.useCache, true)) {
           _jsonResourceCache[jsonResourceUrl] = json;

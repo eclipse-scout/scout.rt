@@ -264,7 +264,7 @@ describe('RestLookupCall', () => {
     });
   });
 
-  it('aborts calls', () => {
+  it('aborts calls', async () => {
     let lookupCall = scout.create(SpecRestLookupCall, {
       session: session,
       resourceUrl: 'test-api/dummy'
@@ -277,7 +277,7 @@ describe('RestLookupCall', () => {
     lookupCall.abort();
 
     // call lookup and abort again
-    lookupCall.getAll();
+    const promise = lookupCall.getAll();
     expect(lookupCall._deferred).not.toBeNull();
     expect(lookupCall._deferred.state()).toBe('pending');
     expect(lookupCall._ajaxCall).not.toBeNull();
@@ -289,6 +289,6 @@ describe('RestLookupCall', () => {
     expect(lookupCall._deferred.state()).toBe('rejected');
     expect(lookupCall._ajaxCall).not.toBeNull();
     expect(lookupCall._ajaxCall.aborted).toBeTrue();
+    await expectAsync(promise).toBeRejectedWith({abort: true});
   });
-
 });
