@@ -104,6 +104,16 @@ public class BenchColumnData extends FlexboxLayoutData {
   }
 
   @Override
+  public BenchColumnData withMin(double min) {
+    return (BenchColumnData) super.withMin(min);
+  }
+
+  @Override
+  public BenchColumnData withMax(double max) {
+    return (BenchColumnData) super.withMax(max);
+  }
+
+  @Override
   public BenchColumnData copy() {
     return copyValues(new BenchColumnData());
   }

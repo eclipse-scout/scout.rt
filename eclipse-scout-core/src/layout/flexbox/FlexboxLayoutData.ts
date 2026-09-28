@@ -19,6 +19,8 @@ export class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
   relative: boolean;
   grow: number;
   shrink: number;
+  min: number;
+  max: number;
   order: number;
 
   sizePx: number;
@@ -31,6 +33,8 @@ export class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
     this.relative = true;
     this.grow = 1;
     this.shrink = 1;
+    this.min = -1;
+    this.max = -1;
     this.order = 0;
     $.extend(this, model);
     // ui properties
@@ -44,6 +48,24 @@ export class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
     return this;
   }
 
+  withMin(min: number): this {
+    this.min = min;
+    return this;
+  }
+
+  withMax(max: number): this {
+    this.max = max;
+    return this;
+  }
+
+  protected _minSize(): number {
+    return this.min < 0 ? FlexboxLayoutData.MIN_SIZE : this.min;
+  }
+
+  protected _maxSize(): number {
+    return this.max < 0 ? Number.MAX_SAFE_INTEGER : Math.max(this.max, this._minSize());
+  }
+
   acceptDelta(delta: number, apply?: boolean): number {
     if (delta > 0) {
       return this._grow(delta, apply);
@@ -51,27 +73,29 @@ export class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
     return this._shrink(delta, apply);
   }
 
-  validate(size: number): number {
+  validate(sizePx: number): number {
     if (this.grow === 0) {
-      size = Math.min(this.initialPx, size);
+      sizePx = Math.min(this.initialPx, sizePx);
     }
     if (this.shrink === 0) {
-      size = Math.max(this.initialPx, size);
+      sizePx = Math.max(this.initialPx, sizePx);
     }
-    return size;
+    sizePx = Math.max(this._minSize(), sizePx);
+    sizePx = Math.min(this._maxSize(), sizePx);
+    return sizePx;
   }
 
   reset() {
-    this.sizePx = 0;
-    this.initialPx = 0;
+    this.sizePx = null;
+    this.initialPx = null;
     this.diff = null;
   }
 
   protected _grow(delta: number, apply?: boolean): number {
     let maxDelta = 0;
     if (this.grow > 0) {
-      maxDelta = delta;
-    } else if (this.initialPx > this.sizePx) {
+      maxDelta = Math.min(delta, Math.max(0, this._maxSize() - this.sizePx));
+    } else if (this.sizePx < this.initialPx) {
       // was previously shrunken, can only grow back to initial size
       maxDelta = this.initialPx - this.sizePx;
     }
@@ -86,8 +110,8 @@ export class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
   protected _shrink(delta: number, apply?: boolean): number {
     let maxDelta = 0;
     if (this.shrink > 0) {
-      maxDelta = -this.sizePx + FlexboxLayoutData.MIN_SIZE;
-    } else if (this.initialPx < this.sizePx) {
+      maxDelta = Math.max(delta, Math.min(0, this._minSize() - this.sizePx));
+    } else if (this.sizePx > this.initialPx) {
       // was previously grown, can only shrink back to initialize size
       maxDelta = this.initialPx - this.sizePx;
     }
