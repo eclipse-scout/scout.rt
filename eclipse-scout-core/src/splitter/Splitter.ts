@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -176,6 +176,7 @@ export class Splitter extends Widget implements SplitterModel {
       .one('mouseup', this._onMouseUp.bind(this));
     // Ensure the correct cursor is always shown while moving
     this._$body.addClass(this.splitHorizontal ? 'col-resize' : 'row-resize');
+    this.$container.addClass('dragging');
     $('iframe').addClass('dragging-in-progress');
     this._cursorOffset = {
       left: splitterCenter.x - event.pageX,
@@ -214,6 +215,7 @@ export class Splitter extends Widget implements SplitterModel {
     // Remove listeners and reset cursor
     this._$window.off('mousemove.splitter');
     this._$body.removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
+    this.$container.removeClass('dragging');
     $('iframe').removeClass('dragging-in-progress');
     this.trigger('moveEnd', {
       position: this.position
