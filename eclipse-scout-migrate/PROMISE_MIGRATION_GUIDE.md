@@ -9,16 +9,59 @@ You cannot assume you can build or run tests in this environment — verify ever
 Grep for **all** of these patterns, not just type annotations — a file can use `.done()/.fail()/.always()` on a promise with no `JQuery.Promise` type anywhere in sight, and a narrower grep will silently miss it (this happened during the reference migration: an initial pass using only `JQuery\.(Promise|Deferred)|\$\.Deferred\(` missed several real files with raw `.done()/.fail()`):
 
 ```
-JQuery\.(Promise|Deferred)|\$\.Deferred\(|\.done\(|\.fail\(|\.always\(
+JQuery\.(Promise|Deferred)|JQueryPromise|JQueryDeferred|\$\.Deferred\(|\$\.when\(|\$\.promiseAll\(|\.done\(|\.fail\(|\.always\(|\.state\(\)|JQuery\.jqXHR
 ```
 
+Even this pattern is not enough on its own. It also misses these, which were found in later migrations:
+
+- **Legacy global types `JQueryPromise<T>` / `JQueryDeferred<T>`** (without the `JQuery.` namespace). They are easy to overlook because they don't match `JQuery\.Promise`.
+- **`$.when(...)`** — see §4a.
+- **`$.promiseAll(...)` without `asArray`** — its resolve value changed shape, see §4.
+- **Callbacks with several parameters or rest parameters** on `.then/.catch`, e.g. `.then((a, b) => ...)`, `.catch((...args) => ...)`, `.fail((error, ...args) => ...)`. Find them with:
+  ```
+  \.(then|catch|finally)\(\s*(function\s*)?\(\s*(\.\.\.|[a-zA-Z_$][\w$]*\s*(:\s*[^,()]+)?\s*,)
+  ```
+
 Run this across every module before giving a file/effort estimate. Fix foundational/shared modules first (whatever other modules in this project depend on), then work outward.
+
+### Use the TypeScript compiler as your main survey and verification tool
+
+A plain `tsc --noEmit` run against the already-migrated `@eclipse-scout/core` sources is the most reliable way to find what still needs migrating. It is far more precise than grep. Every call site that still expects a jQuery promise shows
+up as an error, for example:
+
+- `TS2740: Type 'Promise<X>' is missing the following properties from type 'Promise<X, any, any>': always, done, fail, progress...`
+- `TS2739: ... missing ... finally, [Symbol.toStringTag]`
+- `TS2416: Property '_load' ... is not assignable to the same property in base type`
+
+Workflow:
+
+1. Save a baseline error list per module *before* changing anything.
+2. Diff against it after each module; the goal is zero promise-related errors and no new errors.
+3. Also type-check downstream modules. Errors often surface in a module that consumes an unmigrated API rather than in the module that defines it.
+
+If `node_modules` symlinks are broken in your environment (e.g. they point to a Windows path that isn't mounted), don't give up on type-checking. Generate a throwaway tsconfig outside the repo that:
+
+- extends the project's base tsconfig,
+- maps every workspace package with `compilerOptions.paths` (`"@eclipse-scout/core": [".../eclipse-scout-core/src/index.ts"]`, `"<pkg>/testing"`, `"<pkg>/src/*"`, plus `jquery` → `@types/jquery`),
+- sets `typeRoots`/`types` for jquery and jasmine.
+
+Errors for missing third-party modules (TS2307) are expected in that setup and can be ignored.
+
+The compiler cannot see everything. Callbacks typed `any` or annotated with the wrong shape (e.g. `.then((setting: SettingDo) => setting)` on a `Promise<any>`) type-check fine but are wrong at runtime. So always combine tsc with the grep
+patterns above.
 
 ## 2. Mechanical vs. manual changes — don't treat them the same
 
 - **Type-only** (`JQuery.Promise<T>` → `Promise<T>`) is safe to batch with `sed` across a whole file, **except** the 2-argument jQuery form `JQuery.Promise<TResolve, TReject>` — drop the second type param entirely (native `Promise<T>` has no typed-rejection equivalent); handle those by hand.
 - **Any real `$.Deferred()`, `.done()`, `.fail()`, `.always()` usage needs individual, careful review** — see the translation rules below. Do not regex-replace these.
-- For every `protected override` method whose return type you're touching, verify the **exact** signature against the base class in `@eclipse-scout/core` (e.g. `Form._load()`, `Form._save()`, `PageWithTable._loadTableData()`, `ValueField._validateValue()`) — TS allows a narrower override, but confirm it, don't assume.
+- For every `protected override` method whose return type you're touching, verify the **exact** signature against the base class in `@eclipse-scout/core` (e.g. `Form._load()`, `Form._save()`, `PageWithTable._loadTableData()`,
+  `ValueField._validateValue()`, `BasicField.acceptInput()`, `App._init()`/`_load()`/`_defaultBootstrappers()`, `UiCallbackHandler.handle()`) — TS allows a narrower override, but confirm it, don't assume.
+- **Not everything named `JQuery.Promise` should be migrated.** jQuery *animation* promises (`$elem.animate(...).promise()`, e.g. `TileGridLayout._animateTiles(): JQuery.Promise<JQuery>[]`) remain jQuery promises in the base framework;
+  overrides must keep that type. Also leave vendored third-party code alone (e.g. a bundled editor library with its own `.done()/.fail()` API).
+- **Type errors can expose pre-existing bugs.** Example: `_installMonaco(): Promise<Monaco>` whose `.then(monaco => { this.monaco = monaco; })` never returned the value. jQuery's typings didn't complain; native `Promise<void>` vs
+  `Promise<Monaco>` does. Fix the implementation (`return monaco;`), not the declared type, after checking which consumers rely on the value.
+- **Loosen parameter types that accept promises from not-yet-migrated callers.** For example, change a loader parameter typed `() => JQuery.jqXHR` to `() => PromiseLike<T>`, and wrap its result with `Promise.resolve(loader())`. That way
+  downstream repositories that still pass a jqXHR keep compiling and working.
 
 ## 3. `.done()/.fail()/.always()` vs. `.then()/.catch()/.finally()` — the semantic differences
 
@@ -73,6 +116,19 @@ returnValue.then(
 ```
 So the rule for `.always(fn)` → `.finally(fn)` (from earlier migration work in this codebase) needs this extra condition: safe only if the result is returned/chained onward, `fn` never throws, **and `fn` doesn't need the resolved/rejected value**.
 
+A bound function can also receive the value *by accident*. In `promise.always(this._postProcessIcon.bind(this))`, where `_postProcessIcon(zoomFactor?: number)`, the old code passed `undefined` on success but the rejection *string* on
+failure as `zoomFactor`. Translate this to what was actually intended, e.g. `.finally(() => this._postProcessIcon(null))`, not to a literal equivalent.
+
+**c2) A detached `.always()`/`.fail()` branch becomes an unhandled rejection.** Pattern:
+
+```js
+promise.always(() => this.setBusy(false));   // separate statement, result discarded
+return promise.then(...);
+```
+
+Under jQuery the discarded branch was harmless. Natively, `promise.finally(...)` returns a *new* promise that rejects whenever `promise` rejects. Nobody observes that new promise, so it surfaces as an unhandled rejection even though the
+caller handles the main chain. Fold the cleanup into the chain that is actually returned, stored or awaited (`return promise.finally(() => this.setBusy(false)).then(...)`) instead of translating the statement one-to-one.
+
 **d) A `.done()` callback throwing does not invoke `.fail()`/`.always()` — it's just an uncaught exception.** A `.then()` callback throwing correctly invokes the chain's `.catch()`. If migrated code seems to have swallowed errors that used to escape loudly (or vice versa), check whether the original relied on this asymmetry.
 
 ## 4. Multi-argument resolve/reject has no native equivalent
@@ -88,11 +144,62 @@ jQuery's `deferred.resolve(a, b, c)` supports multiple arguments; native `Promis
   // new — statusArr is already the array, no rest-spread:
   $.promiseAll([...]).then(statusArr => { ... });
   ```
+- **The dangerous `$.promiseAll` case is the one that still compiles:** a callback that only wanted the *first* value, e.g. `.then((setting: SettingDo) => setting)`. Under jQuery that received the first resolved value. Now it silently
+  receives (and returns) the whole array. Write `.then(([setting]) => setting)`. Only calls **without** `asArray` changed; `$.promiseAll(promises, true)` always resolved with an array and needs no change.
 - Ajax success handlers used to receive `(data, textStatus, jqXHR)` as separate arguments — the native-Promise-based `ajax.*` helpers only ever resolve with the response body. If you need the status/jqXHR/error details, check whether the framework wraps them in something like `AjaxError` on the rejection path — use that instead of expecting extra success-handler arguments.
+  - Watch for indexed access that compensated for this. When a jqXHR went through `$.when`/`$.promiseAll`, its three resolve values were collapsed into an array, so code read `response[0].settings` (typed e.g. `[ResponseDo, any, any]`).
+    That must now be `response.settings`.
+- **Rejections are single-valued too.** Replace `.fail((error, ...args) => this._handleError(error, ...args))` / `.catch((...args) => errorHandler.handle(...args))` with `.catch(error => ...)`. The ajax helpers reject with a single
+  `AjaxError` (with `jqXHR`, `textStatus`, `errorThrown`, `requestOptions`). If a **public** callback receives the argument list (e.g. `onError(args: any[])`), keep its signature stable and pass `[error]`, and check the downstream
+  implementations. Don't silently change a public API's argument shape.
+
+### 4a. `$.when(...)`
+
+- `$.when(this._asyncMethod())`, typically used to turn an `async` function's native Promise into a jQuery promise for an override: drop the wrapper and return the promise directly.
+- `$.when(...promises)` used as "wait for all": use `Promise.all(promises).then(() => undefined)` when the result is `Promise<void>`, or destructure the array if the values are used (§4).
+- `$.when(value)` with a non-promise value: `Promise.resolve(value)` / `$.resolvedPromise(value)`.
 
 ## 5. `promise.state()` / `deferred.state()` don't exist on native Promise
 
 There is no synchronous way to query whether a native `Promise` is pending/resolved/rejected. If code relies on `.state()`, check whether the framework's own `Deferred` class (`promises.ts` in `@eclipse-scout/core`) exposes an equivalent wrapper (`state(): 'pending' | 'resolved' | 'rejected'`) — use that instead of a raw native Promise if you need to introspect state, or track the state yourself alongside the promise.
+
+When the promise comes from somewhere else (e.g. an ajax call), track the state explicitly. Guard the update with an identity check (§8) so a superseded promise can't overwrite the state of the current one:
+
+```ts
+protected
+_trackState(promise
+:
+Promise<void>
+)
+{
+  this._promiseState = 'pending';
+  promise.then(
+    () => this._updateState(promise, 'resolved'),
+    () => this._updateState(promise, 'rejected')); // error is reported by the main chain
+}
+protected
+_updateState(promise
+:
+Promise<void>, state
+:
+'resolved' | 'rejected'
+)
+{
+  if (this._currentPromise === promise) {
+    this._promiseState = state;
+  }
+}
+```
+
+Keep in mind that the tracked state flips one microtask *after* settlement, while jQuery flipped it synchronously. Code that checks the state immediately after resolving (in the same tick) sees `'pending'`.
+
+In specs, `expect(promise.state()).toBe('pending')` can become a settled flag, e.g. `promise.then(() => settled = true, () => settled = true)`, while still awaiting the original promise for the real assertion.
+
+**Framework `Deferred` is not a thenable.** A jQuery Deferred *was* a promise, so code could return or await the deferred itself. The core `Deferred` is a separate holder object. Always hand out `deferred.promise()`, e.g.
+`spyOn(x, 'load').and.callFake(() => deferred.promise())` and `await deferred.promise()`. Awaiting the `Deferred` object itself resolves immediately with the object and doesn't wait for anything. Give it a precise type parameter (
+`new Deferred<string>()`), otherwise `resolve()` accepts anything and the returned promise is `Promise<unknown>`.
+
+Native typings are stricter in other places too. For example, `new Deferred<ArrayBuffer>()` resolved with `fileReader.result` needs a cast (`fileReader.result as ArrayBuffer`), because `result` is typed `string | ArrayBuffer`.
 
 ## 6. The trap that costs the most time: fake timers and microtasks
 
@@ -182,6 +289,19 @@ myPromise.then(
 ```
 This is correct regardless of settle order. If you find this bug, also check whether the same class (or a subclass, e.g. `SmartField` extends `ValueField`) shares the affected method — the fix usually applies broadly.
 
+The same applies to **"clear the pending promise when done"** cleanup, e.g. `.always(() => this._pendingPromise = null)` right after an `abortAndReset()` of the previous request. Under jQuery the aborted request's cleanup ran synchronously
+during the abort, *before* the new promise was assigned. Natively it runs later and wipes out the *new* request's promise. Make the cleanup conditional:
+
+```ts
+const myPromise = deferred.promise();
+this._pendingPromise = myPromise;
+request.finally(() => {
+  if (this._pendingPromise === myPromise) {
+    this._pendingPromise = null;
+  }
+});
+```
+
 ## 9. Test-only gotchas (recap)
 
 - `FakeXMLHttpRequest already completed` from jasmine-ajax almost always means your synchronization assumption was wrong — some earlier async step you assumed had completed (e.g. a poller's next request being sent) actually hadn't yet, so `jasmine.Ajax.requests.mostRecent()` returns a stale, already-answered request. Fix by waiting for the actual effect (e.g. poll count increased), not a fixed tick/sleep amount.
@@ -189,8 +309,12 @@ This is correct regardless of settle order. If you find this bug, also check whe
 
 ## 10. General workflow
 
-1. Grep the whole codebase with the full pattern from §1; don't trust a narrower first pass.
-2. Fix foundational modules first.
-3. For each file: bulk-swap pure type annotations, then hand-review every `$.Deferred()`/`.done/.fail/.always` site using the rules in §3–§5 and §8.
-4. Grep again after each module with the same full pattern to catch anything missed (do this even for modules you think are "done" — re-run the wider pattern, not just what caught your eye).
-5. Report a clear diff summary; you likely can't run this project's test suite yourself, so flag anything you're less than fully confident about rather than asserting it's correct.
+1. Grep the whole codebase with the full pattern from §1 (including the multi-argument callback pattern); don't trust a narrower first pass.
+2. Record a `tsc --noEmit` baseline per module (§1).
+3. Fix foundational modules first.
+4. For each file: bulk-swap pure type annotations, then hand-review every `$.Deferred()`/`$.when`/`$.promiseAll`/`.done/.fail/.always`/`.state()` site using the rules in §3–§5 and §8.
+5. Grep again after each module with the same full pattern to catch anything missed (do this even for modules you think are "done" — re-run the wider pattern, not just what caught your eye), and diff the tsc output against the baseline,
+   including downstream modules.
+6. Modules reported as "already migrated" are not necessarily done. Re-check them with tsc and the full pattern. Leftovers there tend to be exactly the cases a narrow first pass misses (`$.when`, `$.promiseAll` arity, `.state()` in specs,
+   indexed ajax results).
+7. Report a clear diff summary; you likely can't run this project's test suite yourself, so flag anything you're less than fully confident about rather than asserting it's correct.
