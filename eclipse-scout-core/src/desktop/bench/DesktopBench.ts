@@ -582,7 +582,7 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
             $root: this.$container
           });
           splitter.render();
-          splitter.setLayoutData(FlexboxLayoutData.fixed().withOrder(col.getLayoutData().order - 1));
+          splitter.setLayoutData(FlexboxLayoutData.fixed().withOrder(col.getLayoutData().order - 1).withMin(0));
           splitter.$container.addClass('line');
 
           arr.push(splitter);

@@ -12,5 +12,7 @@ export interface FlexboxLayoutDataModel {
   relative?: boolean;
   grow?: number;
   shrink?: number;
+  min?: number;
+  max?: number;
   order?: number;
 }
