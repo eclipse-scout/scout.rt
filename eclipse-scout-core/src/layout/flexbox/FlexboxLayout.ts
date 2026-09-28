@@ -131,10 +131,13 @@ export class FlexboxLayout extends AbstractLayout {
 
     this._layoutFromLayoutDataWithCache(children, containerSize);
 
-    function distributeDelta(components, delta, applyDelta) {
-      return components.reduce((delta, c) => {
+    // -----
+
+    function distributeDelta(components: HtmlComponent[], delta: number, applyDelta: boolean) {
+      return components.reduce((delta, comp) => {
         if (delta !== 0) {
-          delta = c.layoutData.acceptDelta(delta, applyDelta);
+          let ld = comp.layoutData as FlexboxLayoutData;
+          delta = ld.acceptDelta(delta, applyDelta);
         }
         return delta;
       }, delta);
@@ -155,9 +158,11 @@ export class FlexboxLayout extends AbstractLayout {
     let flexibleLayoutDatas = children
       .map(c => c.layoutData as FlexboxLayoutData)
       .filter(ld => {
+        // Check if at least one pixel can be consumed by this part
         return ld.acceptDelta(Math.sign(delta)) === 0;
       });
-    // If some parts are absolute and some parts are relative, only adjust the relative parts
+    // If some parts are absolute and some parts are relative, only adjust the relative parts.
+    // For example, keep sidebar the same size when browser window is maximized.
     if (flexibleLayoutDatas.some(ld => ld.relative) && flexibleLayoutDatas.some(ld => !ld.relative)) {
       flexibleLayoutDatas = flexibleLayoutDatas.filter(ld => ld.relative);
     }
@@ -196,7 +201,7 @@ export class FlexboxLayout extends AbstractLayout {
       let ld = comp.layoutData as FlexboxLayoutData;
       this._layoutDatasToReset.add(ld); // remember for later reset()
 
-      if (ld.sizePx) {
+      if (ld.sizePx !== null) {
         sumOfAbsolutePx += ld.sizePx;
       } else if (ld.initial < 0) {
         // use ui size
@@ -221,15 +226,15 @@ export class FlexboxLayout extends AbstractLayout {
       });
     }
 
-    // Set sizePx and return "delta" value (remainder that was not distributed to any part)
+    // Set sizePx and return the remainder that was not distributed to any part ("delta")
     let cachedSizes = this._readCache(children.length) || [];
     return children.reduce((remainderPx, comp, i) => {
       let ld = comp.layoutData as FlexboxLayoutData;
-      if (!ld.sizePx) {
+      if (ld.sizePx === null) {
         if (cachedSizes[i]) {
           ld.sizePx = ld.validate(Math.round(totalPx * cachedSizes[i]));
         } else {
-          ld.sizePx = ld.initialPx;
+          ld.sizePx = ld.validate(ld.initialPx);
         }
       }
       return remainderPx - ld.sizePx;
