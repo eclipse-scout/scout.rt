@@ -61,6 +61,10 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   protected _queryByAll() {
+    if (this.session.destroyed) {
+      // May cause unhandled rejection errors if session is destroyed
+      return;
+    }
     this._deferred.resolve({
       queryBy: QueryBy.ALL,
       lookupRows: this._lookupRowsByAll()
@@ -180,6 +184,10 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   protected _queryByKey(key: TKey) {
+    if (this.session.destroyed) {
+      // May cause unhandled rejection errors if session is destroyed
+      return;
+    }
     let lookupRow = this._lookupRowByKey(key);
     if (lookupRow) {
       this._deferred.resolve({
@@ -198,6 +206,10 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   protected _queryByKeys(keys: TKey[]) {
+    if (this.session.destroyed) {
+      // May cause unhandled rejection errors if session is destroyed
+      return;
+    }
     const lookupRows = arrays.ensure(keys).map(key => this._lookupRowByKey(key)).filter(row => !!row);
     if (lookupRows.length) {
       this._deferred.resolve({
@@ -224,6 +236,10 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   protected _queryByRec(rec: TKey) {
+    if (this.session.destroyed) {
+      // May cause unhandled rejection errors if session is destroyed
+      return;
+    }
     this._deferred.resolve({
       queryBy: QueryBy.REC,
       rec: rec,

@@ -238,7 +238,11 @@ afterEach(() => {
   jasmine.clock().uninstall(); // also cleanly stops the auto-tick loop
 });
 ```
-It continuously fires the next due fake timer and yields to a real macrotask in between (letting any native-Promise chain — and anything it schedules — run to completion) automatically, without you needing to know the hop count. It still fast-forwards long fake delays (e.g. a 30s retry interval) without the test actually waiting 30 real seconds. Combine it with real `await sleep(N)` (a small real wait, e.g. 50ms) at points where you just need to let things settle with no specific event to await, and with precise signals (`widget.when('propertyChange:xyz')`, a returned promise, a request-count check) wherever the code exposes one — always prefer a precise signal over a guessed wait when one is available.
+
+It continuously fires the next due fake timer and yields to a real macrotask in between (letting any native-Promise chain — and anything it schedules — run to completion) automatically, without you needing to know the hop count. It still
+fast-forwards long fake delays (e.g. a 30s retry interval) without the test actually waiting 30 real seconds. Combine it with real `await sleep(N)` (a small real wait, e.g. 50ms) at points where you just need to let things settle with no
+specific event to await, and with precise signals (`widget.when('propertyChange:xyz')`, `desktop.when('propertyChange:messageBoxes')`, `form.whenClose()`/`whenLoad()`, a returned promise) wherever the code exposes one — always prefer a
+precise signal over a guessed wait when one is available.
 
 When wrapping a raw `$.ajax()`/jqXHR directly, prefer this project's/framework's own `ajax.getJson()`/`ajax.postJson()`/`AjaxCall` (native-Promise, already migrated) over hand-rolling a new wrapper. If you must wrap a raw jqXHR yourself, use the **single two-argument** `jqXHR.then(onFulfilled, onRejected)`, not `jqXHR.then(onFulfilled).catch(onRejected)`. The chained form costs the rejection path *two* jQuery-internal scheduling hops instead of one — a real asymmetry that can flip the relative order in which two competing async operations (e.g. an aborted call vs. a fresh one) settle, compared to what the pre-migration code guaranteed.
 
@@ -305,6 +309,26 @@ request.finally(() => {
 ## 9. Test-only gotchas (recap)
 
 - `FakeXMLHttpRequest already completed` from jasmine-ajax almost always means your synchronization assumption was wrong — some earlier async step you assumed had completed (e.g. a poller's next request being sent) actually hadn't yet, so `jasmine.Ajax.requests.mostRecent()` returns a stale, already-answered request. Fix by waiting for the actual effect (e.g. poll count increased), not a fixed tick/sleep amount.
+- **Beware of the silent version of the same bug.** Scout's `receiveResponseForAjaxCall(request, response)` falls back to `jasmine.Ajax.requests.mostRecent()` when `request` is undefined. A helper like
+  `receiveResponseForAjaxCall(arrays.last(jasmine.Ajax.requests.filter('api/unlock')), ...)` that runs *before* the request is sent (it is now sent a few microtasks later, after an earlier promise settles) therefore answers a *different*
+  pending request, or does nothing. The spec then hangs until the jasmine timeout. Two fixes:
+  - Assert that the request exists before responding, so the helper fails fast.
+  - Better still, stub requests that are sent asynchronously up front with `jasmine.Ajax.stubRequest(...)` / `JasmineScoutUtil.mockRestCall(...)`. They are then answered whenever they are sent, and the test simply awaits the production
+    promise.
+- **`jasmine.clock().install()` → `tick()` → `uninstall()` blocks around code that is now native-Promise-based are usually just dead weight.** They don't drive the promise chain; they only turn timers into fake timers that are dropped on
+  uninstall. Replace them with:
+  - an `await` on the returned promise or on an event the framework already fires. There usually is one, so look for it before inventing a mechanism:
+    - message box opened: `await session.desktop.when('propertyChange:messageBoxes')`, or `await form.when('propertyChange:messageBoxes')` if the form is the message box's display parent;
+    - form lifecycle: `form.whenClose()`, `form.whenLoad()`, `form.whenSave()`;
+    - any property: `widget.when('propertyChange:xyz')`;
+  - if the remaining work after that signal is only a known, short promise tail (e.g. one or two `.finally()` callbacks), a plain `await sleep()` per step, with a comment naming what it waits for (
+    `await sleep(); // 2nd finally in semaphores.ts`);
+  - `autoTick()` if a long timeout needs fast-forwarding. Then `await sleep(N)` advances fake time deterministically, e.g. `sleep(500)` → "not yet expired", `sleep(510)` → "expired" for a 1s timeout.
+
+  Don't write generic polling helpers (`waitFor(() => condition)`). They hide which signal the test actually depends on, and they are not wanted in this codebase.
+
+  Once the clock is gone, timers the code under test schedules become *real*. Destroy the objects that own them (e.g. a message box with an auto-close timeout) in the test's cleanup, or they fire during a later spec.
+- For "nothing happens" assertions (e.g. `expect(findMessageBoxes().size).toBe(0)` right after triggering an asynchronous handler), first give the handler a chance to run (`await sleep(50)`). Otherwise, the assertion is trivially true.
 - See §6 for `expectAsync` timing and §7 for the general unhandled-rejection checklist.
 
 ## 10. General workflow

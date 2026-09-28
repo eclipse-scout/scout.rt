@@ -43,6 +43,10 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   }
 
   protected _queryByAll() {
+    if (this.session.destroyed) {
+      // May cause unhandled rejection errors if session is destroyed
+      return;
+    }
     this._deferred.resolve({
       queryBy: QueryBy.ALL,
       lookupRows: this._lookupRowsByAll()
@@ -64,6 +68,10 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   }
 
   protected _queryByText(text: string) {
+    if (this.session.destroyed) {
+      // May cause unhandled rejection errors if session is destroyed
+      return;
+    }
     this._deferred.resolve({
       queryBy: QueryBy.TEXT,
       text: text,
@@ -88,6 +96,10 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   }
 
   protected _queryByKey(key: TKey) {
+    if (this.session.destroyed) {
+      // May cause unhandled rejection errors if session is destroyed
+      return;
+    }
     let lookupRow = this._lookupRowByKey(key);
     if (lookupRow) {
       this._deferred.resolve({
@@ -112,6 +124,10 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   }
 
   protected _queryByRec(rec: TKey) {
+    if (this.session.destroyed) {
+      // May cause unhandled rejection errors if session is destroyed
+      return;
+    }
     this._deferred.resolve({
       queryBy: QueryBy.REC,
       rec: rec,
