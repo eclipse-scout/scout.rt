@@ -196,7 +196,7 @@ export class BenchColumn extends Widget implements BenchColumnModel {
             splitHorizontal: false
           });
           splitter.render();
-          splitter.setLayoutData(FlexboxLayoutData.fixed().withOrder(this._getTabBoxLayoutData(col).order - 1));
+          splitter.setLayoutData(FlexboxLayoutData.fixed().withOrder(this._getTabBoxLayoutData(col).order - 1).withMin(0));
           splitter.$container.addClass('line');
           arr.push(splitter);
         }
