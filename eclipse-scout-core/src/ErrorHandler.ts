@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxError, AjaxSettings, App, arrays, Deferred, DoEntity, icons, InitModelOf, LogLevel, MessageBox, MessageBoxActionEvent, ModelOf, NullLogger, NullWidget, numbers, ObjectModel, objects, ObjectWithType, scout, Session, Status,
+  AbortError, AjaxError, AjaxSettings, App, arrays, Deferred, DoEntity, icons, InitModelOf, LogLevel, MessageBox, MessageBoxActionEvent, ModelOf, NullLogger, NullWidget, numbers, ObjectModel, objects, ObjectWithType, scout, Session, Status,
   StatusSeverity, strings, texts
 } from './index';
 import $ from 'jquery';
@@ -116,6 +116,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     this.displayError = true;
     this.sendError = false;
     this.windowErrorHandler = this._onWindowError.bind(this);
+    this.unhandledRejectionHandler = this._onUnhandledRejection.bind(this);
     this.session = null;
   }
 
@@ -134,7 +135,6 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
   // Signature matches the "window.onerror" event handler
   // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
   protected _onWindowError(errorMessage: string, fileName?: string, lineNumber?: number, columnNumber?: number, error?: Error) {
-    // TODO CGU add global promise error handler
     try {
       if (this._isIgnorableScriptError(errorMessage, fileName, lineNumber, columnNumber, error)) {
         this.handleErrorInfo({
@@ -167,6 +167,17 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     }
   }
 
+  protected _onUnhandledRejection(event: PromiseRejectionEvent) {
+    const reason = event.reason;
+    if (this.isIgnorableRejection(reason)) {
+      $.log.isDebugEnabled() && $.log.debug('Ignored unhandled rejection', reason);
+      event.preventDefault();
+      return;
+    }
+    // TODO CGU use analyseError and _sendErrorMessage and _logErrorInfo. OR: create messagebox and remove unnecessary error handler calls in the code base?
+    console.log('Unhandled promise rejection', event);
+  }
+
   protected _isIgnorableScriptError(message: string, fileName?: string, lineNumber?: number, columnNumber?: number, error?: Error): boolean {
     // Ignore errors caused by scripts from a different origin.
     // Example: Firefox on iOS throws an error, probably caused by an internal Firefox script.
@@ -174,6 +185,19 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     // In that case the error must not be shown to the user, instead just log it silently.
     // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
     return message && message.toLowerCase().indexOf('script error') > -1 && !fileName && !lineNumber && !columnNumber && !error;
+  }
+
+  /**
+   * @returns true if the given rejection reason is an expected cancellation that does not need to be reported:
+   * no reason (`undefined` or `null`, used for control flow, e.g. the user clicked "No"),
+   * an {@link AbortError}, an {@link AjaxError} of an aborted request (`textStatus === 'abort'`, e.g. a superseded {@link AjaxCall}) or `{abort: true}` (aborted lookup calls).
+   */
+  isIgnorableRejection(reason: any): boolean {
+    return reason === undefined || reason === null
+      || reason instanceof AbortError
+      // TODO CGU Should AjaxCall create the AbortError?
+      || reason instanceof AjaxError && reason.textStatus === 'abort'
+      || objects.isPojo(reason) && reason.abort;
   }
 
   /**
@@ -413,7 +437,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     // Note: The error handler is installed globally, and we cannot tell in which scout session the error happened.
     // We simply use the first scout session to display the message box and log the error. This is not ideal in the
     // multi-session-case (portlet), but currently there is no other way. Besides, this feature is not in use yet.
-    let session = this.session || App.get()?.sessions[0]; // TODO CGU fixes many errors in specs, why is app not there anymore? promise resolves after spec run?
+    let session = this.session || App.get().sessions[0];
     if (session) {
       if (this.sendError) {
         this._sendErrorMessage(session, errorInfo.log, errorInfo.level);
