@@ -2243,8 +2243,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
           return;
         }
         let row = $row.data('row') as TableRow;
-        if (!row) {
-          // If $row has no binding to row or if the binding has already been removed, ignore it // TODO CGU happend in SmartFieldSpec, why?
+        if (!row && !$row.isAttached()) {
+          // $row (and probably $data as well) is not attached anymore, maybe the table was in a popup that should be removed using an animation but was detached in the meantime
           return;
         }
         this._removeRow(row);

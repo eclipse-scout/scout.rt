@@ -103,7 +103,7 @@ module.exports = (config, specEntryPoint) => {
       ...scoutExternals.map(external => ({pattern: external.path, watched: false})),
       {pattern: specIndex, watched: false}
     ],
-    frameworks: ['webpack', 'jasmine-scout', 'jasmine-jquery', 'jasmine-ajax', 'jasmine'], /* order of the frameworks is relevant! */
+    frameworks: ['webpack', 'jasmine-scout', 'jasmine-jquery', 'jasmine-ajax', 'jasmine', 'jasmine-scout-preload'], /* order of the frameworks is relevant! */
     // Reporter for "Jasmine Spec Runner" results in browser
     // https://www.npmjs.com/package/karma-jasmine-html-reporter
     reporters: ['kjhtml', 'junit'],
