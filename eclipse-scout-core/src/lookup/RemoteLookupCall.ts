@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Deferred, LookupCall, LookupFieldAdapter, LookupResult, LookupRow, objects, QueryBy, RemoteLookupRequest, scout} from '../index';
+import {AbortError, arrays, Deferred, LookupCall, LookupFieldAdapter, LookupResult, LookupRow, objects, QueryBy, RemoteLookupRequest, scout} from '../index';
 import $ from 'jquery';
 
 export class RemoteLookupCall<TKey> extends LookupCall<TKey> {
@@ -76,9 +76,7 @@ export class RemoteLookupCall<TKey> extends LookupCall<TKey> {
    */
   protected _newDeferred(requestParameter: RemoteLookupRequest<string | TKey | void>) {
     if (this.deferred) {
-      this.deferred.reject({
-        abort: true
-      });
+      this.deferred.reject(new AbortError());
     }
     this.deferred = new Deferred<LookupResult<TKey>>();
     this.deferred.requestParameter = requestParameter;
