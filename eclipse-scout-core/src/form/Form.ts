@@ -653,7 +653,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
       });
     }
     return promise.then(() => {
-      throw error; // always throw so it can be catched. // TODO CGU this is probably a bad idea if we want to use the global rejection handler
+      throw error; // always throw so it can be catched. // TODO CGU this is probably a bad idea if we want to use the global rejection handler. If we remove it, callers need to be checked for catch()
     });
   }
 

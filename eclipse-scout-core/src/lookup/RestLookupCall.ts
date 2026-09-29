@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ajax, AjaxCall, arrays, BaseDoEntity, Deferred, InitModelOf, LookupCall, LookupResult, LookupRow, objects, RestLookupCallModel, scout, typeName} from '../index';
+import {AbortError, ajax, AjaxCall, arrays, BaseDoEntity, Deferred, InitModelOf, LookupCall, LookupResult, LookupRow, objects, RestLookupCallModel, scout, typeName} from '../index';
 import $ from 'jquery';
 
 /**
@@ -186,9 +186,7 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
   }
 
   override abort() {
-    this._deferred?.reject({
-      abort: true
-    });
+    this._deferred?.reject(new AbortError());
     this._ajaxCall?.abort();
     super.abort();
   }

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Deferred, LookupCall, LookupResult, LookupRow, QueryBy, scout, strings} from '../index';
+import {AbortError, arrays, Deferred, LookupCall, LookupResult, LookupRow, QueryBy, scout, strings} from '../index';
 
 export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   lookupRows: LookupRow<TKey>[];
@@ -20,9 +20,7 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   }
 
   override abort() {
-    this._deferred?.reject({
-      abort: true
-    });
+    this._deferred?.reject(new AbortError());
     super.abort();
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxCall, Deferred, LookupResult, RestLookupCall, scout} from '../../src/index';
+import {AbortError, AjaxCall, Deferred, LookupResult, RestLookupCall, scout} from '../../src/index';
 
 describe('RestLookupCall', () => {
 
@@ -289,6 +289,6 @@ describe('RestLookupCall', () => {
     expect(lookupCall._deferred.state()).toBe('rejected');
     expect(lookupCall._ajaxCall).not.toBeNull();
     expect(lookupCall._ajaxCall.aborted).toBeTrue();
-    await expectAsync(promise).toBeRejectedWith({abort: true});
+    await expectAsync(promise).toBeRejectedWith(new AbortError());
   });
 });
