@@ -47,7 +47,7 @@ If `node_modules` symlinks are broken in your environment (e.g. they point to a 
 
 Errors for missing third-party modules (TS2307) are expected in that setup and can be ignored.
 
-The compiler cannot see everything. Callbacks typed `any` or annotated with the wrong shape (e.g. `.then((setting: SettingDo) => setting)` on a `Promise<any>`) type-check fine but are wrong at runtime. So always combine tsc with the grep
+The compiler cannot see everything. Callbacks typed `any` or annotated with the wrong shape (e.g. `.then((result: ResultDo) => result)` on a `Promise<any>`) type-check fine but are wrong at runtime. So always combine tsc with the grep
 patterns above.
 
 ## 2. Mechanical vs. manual changes — don't treat them the same
@@ -58,8 +58,8 @@ patterns above.
   `ValueField._validateValue()`, `BasicField.acceptInput()`, `App._init()`/`_load()`/`_defaultBootstrappers()`, `UiCallbackHandler.handle()`) — TS allows a narrower override, but confirm it, don't assume.
 - **Not everything named `JQuery.Promise` should be migrated.** jQuery *animation* promises (`$elem.animate(...).promise()`, e.g. `TileGridLayout._animateTiles(): JQuery.Promise<JQuery>[]`) remain jQuery promises in the base framework;
   overrides must keep that type. Also leave vendored third-party code alone (e.g. a bundled editor library with its own `.done()/.fail()` API).
-- **Type errors can expose pre-existing bugs.** Example: `_installMonaco(): Promise<Monaco>` whose `.then(monaco => { this.monaco = monaco; })` never returned the value. jQuery's typings didn't complain; native `Promise<void>` vs
-  `Promise<Monaco>` does. Fix the implementation (`return monaco;`), not the declared type, after checking which consumers rely on the value.
+- **Type errors can expose pre-existing bugs.** Example: `_installEditor(): Promise<Editor>` whose `.then(editor => { this.editor = editor; })` never returned the value. jQuery's typings didn't complain; native `Promise<void>` vs
+  `Promise<Editor>` does. Fix the implementation (`return editor;`), not the declared type, after checking which consumers rely on the value.
 - **Loosen parameter types that accept promises from not-yet-migrated callers.** For example, change a loader parameter typed `() => JQuery.jqXHR` to `() => PromiseLike<T>`, and wrap its result with `Promise.resolve(loader())`. That way
   downstream repositories that still pass a jqXHR keep compiling and working.
 
@@ -116,8 +116,8 @@ returnValue.then(
 ```
 So the rule for `.always(fn)` → `.finally(fn)` (from earlier migration work in this codebase) needs this extra condition: safe only if the result is returned/chained onward, `fn` never throws, **and `fn` doesn't need the resolved/rejected value**.
 
-A bound function can also receive the value *by accident*. In `promise.always(this._postProcessIcon.bind(this))`, where `_postProcessIcon(zoomFactor?: number)`, the old code passed `undefined` on success but the rejection *string* on
-failure as `zoomFactor`. Translate this to what was actually intended, e.g. `.finally(() => this._postProcessIcon(null))`, not to a literal equivalent.
+A bound function can also receive the value *by accident*. In `promise.always(this._postProcess.bind(this))`, where `_postProcess(zoomFactor?: number)` falls back to a default for a missing argument, the old code passed `undefined` on
+success but the rejection *string* on failure as `zoomFactor`. Translate this to what was actually intended, e.g. `.finally(() => this._postProcess(null))`, not to a literal equivalent.
 
 **c2) A detached `.always()`/`.fail()` branch becomes an unhandled rejection.** Pattern:
 
@@ -144,11 +144,11 @@ jQuery's `deferred.resolve(a, b, c)` supports multiple arguments; native `Promis
   // new — statusArr is already the array, no rest-spread:
   $.promiseAll([...]).then(statusArr => { ... });
   ```
-- **The dangerous `$.promiseAll` case is the one that still compiles:** a callback that only wanted the *first* value, e.g. `.then((setting: SettingDo) => setting)`. Under jQuery that received the first resolved value. Now it silently
-  receives (and returns) the whole array. Write `.then(([setting]) => setting)`. Only calls **without** `asArray` changed; `$.promiseAll(promises, true)` always resolved with an array and needs no change.
+- **The dangerous `$.promiseAll` case is the one that still compiles:** a callback that only wanted the *first* value, e.g. `.then((result: ResultDo) => result)`. Under jQuery that received the first resolved value. Now it silently
+  receives (and returns) the whole array. Write `.then(([result]) => result)`. Only calls **without** `asArray` changed; `$.promiseAll(promises, true)` always resolved with an array and needs no change.
 - Ajax success handlers used to receive `(data, textStatus, jqXHR)` as separate arguments — the native-Promise-based `ajax.*` helpers only ever resolve with the response body. If you need the status/jqXHR/error details, check whether the framework wraps them in something like `AjaxError` on the rejection path — use that instead of expecting extra success-handler arguments.
-  - Watch for indexed access that compensated for this. When a jqXHR went through `$.when`/`$.promiseAll`, its three resolve values were collapsed into an array, so code read `response[0].settings` (typed e.g. `[ResponseDo, any, any]`).
-    That must now be `response.settings`.
+  - Watch for indexed access that compensated for this. When a jqXHR went through `$.when`/`$.promiseAll`, its three resolve values were collapsed into an array, so code read `response[0].items` (typed e.g. `[ResponseDo, any, any]`).
+    That must now be `response.items`.
 - **Rejections are single-valued too.** Replace `.fail((error, ...args) => this._handleError(error, ...args))` / `.catch((...args) => errorHandler.handle(...args))` with `.catch(error => ...)`. The ajax helpers reject with a single
   `AjaxError` (with `jqXHR`, `textStatus`, `errorThrown`, `requestOptions`). If a **public** callback receives the argument list (e.g. `onError(args: any[])`), keep its signature stable and pass `[error]`, and check the downstream
   implementations. Don't silently change a public API's argument shape.
@@ -166,8 +166,7 @@ There is no synchronous way to query whether a native `Promise` is pending/resol
 When the promise comes from somewhere else (e.g. an ajax call), track the state explicitly. Guard the update with an identity check (§8) so a superseded promise can't overwrite the state of the current one:
 
 ```ts
-protected
-_trackState(promise
+protected_trackState(promise
 :
 Promise<void>
 )
@@ -177,8 +176,7 @@ Promise<void>
     () => this._updateState(promise, 'resolved'),
     () => this._updateState(promise, 'rejected')); // error is reported by the main chain
 }
-protected
-_updateState(promise
+protected_updateState(promise
 :
 Promise<void>, state
 :
@@ -246,6 +244,29 @@ precise signal over a guessed wait when one is available.
 
 When wrapping a raw `$.ajax()`/jqXHR directly, prefer this project's/framework's own `ajax.getJson()`/`ajax.postJson()`/`AjaxCall` (native-Promise, already migrated) over hand-rolling a new wrapper. If you must wrap a raw jqXHR yourself, use the **single two-argument** `jqXHR.then(onFulfilled, onRejected)`, not `jqXHR.then(onFulfilled).catch(onRejected)`. The chained form costs the rejection path *two* jQuery-internal scheduling hops instead of one — a real asymmetry that can flip the relative order in which two competing async operations (e.g. an aborted call vs. a fresh one) settle, compared to what the pre-migration code guaranteed.
 
+**Third: timer steps that are still there, and why specs now overtake them.** Even the migrated framework still defers some work via `setTimeout`:
+
+- `AjaxCall` wraps the jqXHR with jQuery's `.then()`, so every ajax response costs one timer step (this includes every `RestLookupCall`);
+- `StaticLookupCall` resolves its results in a `setTimeout`;
+- `BatchCall` collects calls and executes the batch in a `setTimeout`.
+
+Before the migration, the *spec's own* chain (`widget.whenReady().then(...).then(...)`) was jQuery-based too. Each step was a `setTimeout` queued *behind* those timers, so a lookup started during the action had always finished by the time
+the assertions ran. Natively the spec's chain continues as microtasks and **overtakes** them. So the assertion sees the state from *before* the lookup finished. Typical symptoms:
+
+- labels missing the part that comes from a lookup ('Company' instead of 'Company: Commercial');
+- empty display texts of smart fields;
+- values or counts that are exactly one step behind (`Expected 1 to be 2`);
+- a different widget type than expected, because a mode switch that the lookup triggers hasn't happened yet.
+
+Production code is usually fine here, since it always worked asynchronously. Fix the spec by awaiting the property the deferred work writes (see §9 for how).
+
+Similar hidden deferrals in core widgets:
+
+- `Table.startCellEdit()` defers opening the cell editor until the table's `updateBuffer` completes, if it is buffering. After `focusCell()` the editor field may already exist in `table.children` while the popup isn't open and
+  `startCellEdit` hasn't fired. Wait with `table.when('startCellEdit')`, registered *before* `focusCell()`.
+- Widgets that expose a busy counter or a `whenReady()` method give an exact "the async processing is done" signal, e.g. a widget that calls `setBusy(true)` synchronously when it starts processing a change and `setBusy(false)` in the
+  chain's `.finally()`, with `whenReady()` resolving once the counter is back to 0. After an action that changes such a widget (e.g. closing a sub-form that writes a value into it), add `.then(() => widget.whenReady())` before asserting.
+
 **Audit your own test helpers for the same disease.** Any shared test utility that "flushes" queued ajax calls or their responses using `jasmine.clock().tick()` alone (implicitly assuming synchronous jQuery-Deferred resolution — e.g. a `sendQueuedAjaxCalls()`-style helper) will likely stop working once the production code it drives switches from `.done()` to `.then()`. `tick()` cannot flush the resulting native-Promise chain. Write an `async` equivalent that awaits a real completion signal instead (e.g. the framework's `session.whenRequestsDone()`), convert every caller from the sync helper to the async one, and mark those tests `async`.
 
 ## 7. The other big class of bug: fire-and-forget promises and unhandled rejections
@@ -255,6 +276,13 @@ Native Promises trigger a global "unhandled rejection" error when nothing ever a
 - **Expected errors need explicit handling.** E.g. aborting an in-flight lookup/search call is expected to reject — make sure the abort path has a real `.catch()`, not just an assumption that nobody's listening (see any `LookupBox`/search-abort style code as an example of the pattern to check).
 - **Stray timers firing after a test (or the object) is gone.** A `setTimeout` scheduled by, say, a debounced "send" method can fire after the test ends and hit a partially torn-down mock, producing an unhandled rejection in an unrelated later test's `afterAll`. Any `destroy()`-style method should explicitly `clearTimeout` whatever it scheduled (check the base framework's own `Session.destroy()`/`HybridManager.destroy()`-equivalents for the pattern, and make sure your test teardown actually calls `destroy()`/cancels those timers between tests).
 - **A leftover ajax call executing after the test ends.** Make sure `jasmine.Ajax.install()`/`uninstall()` bracket every test that can trigger a request, so a request that fires later doesn't escape as a real network call.
+- **A spec that doesn't return (or await) its promise chain.** E.g. `.then(() => { ...; SpecUtil.checkReimport(widget, expected); })` without `return`. Under jQuery the chain ran on and nobody noticed. Natively the spec finishes
+  first, and `afterEach` tears down state the rest of the chain still needs (permissions, mocks, the session). The chain then fails with a *misleading* error, reported as an unhandled rejection "in afterAll" of an unrelated spec. In the
+  reference migration an `assertValue()` failed with `Missing value`, because the permission that made a UI element available had already been uninstalled by the spec's `afterEach`. When an error surfaces "in afterAll", first look for an
+  unreturned chain in the specs that ran just before.
+- **Timers that used to die with the fake clock.** Pending fake timers are discarded by `jasmine.clock().uninstall()`. Specs that used to run under the clock therefore never executed deferred work, such as a `BatchCall` (batched cell-text
+  lookups), a debounced update, or a `StaticLookupCall`. With the clock gone, that work now runs for real, possibly after the rows/widgets it refers to are gone (e.g. `TypeError: Cannot read properties of undefined` inside a batch
+  callback). If the same can happen in production (rows replaced before the batch fires), make the callback tolerate it (e.g. `cellByValue.get(value)?.config`); otherwise destroy/cancel the owner in the spec's cleanup.
 - **For genuinely expected rejections, write `expectAsync(promise).toBeRejected()`** rather than letting the rejection go unhandled or wrapping it in a try/catch that swallows the assertion value. But note the timing trap: **the call itself is what attaches the handler**; the `await` of its result can happen later. If you call `expectAsync(...)` only at the end of a test, after the promise already rejected earlier in the test body, Karma has already flagged it as unhandled by the time you get there:
   ```ts
   let promise = doSomethingThatWillReject();
@@ -266,7 +294,32 @@ Native Promises trigger a global "unhandled rejection" error when nothing ever a
 **Don't reach for a bare `.catch(() => {})` / `.then(fn, () => {})` as the default fix for a fire-and-forget call site (typical for UI event handlers where nobody awaits the result).** That was jQuery's actual behavior — silently dropping the error — and reproducing it mechanically throws away exactly the diagnostic value native Promise gives you over jQuery. Before adding a no-op guard, decide which of these two cases you're in:
 
 - **The error is already reported somewhere in the call chain** (e.g. an inner call already goes through the framework's `ErrorHandler`, or an event that already gets to a caller that handles it, before rethrowing/settling as rejected). Here an empty guard purely to prevent an unhandled-rejection failure is fine — add a one-line comment saying so, so the next reader doesn't mistake it for a silent swallow.
-- **There is genuinely no other reporting path.** Don't paper over this with a local `.catch(error => someErrorHandler.handle(error))` at every call site either — that just trades one form of clutter (silent swallow) for another (per-call-site error-handling boilerplate), and this project may already be planning (or have) a global unhandled-rejection handler analogous to its synchronous one. If so, the correct migration is usually to **do nothing** — leave the rejection unhandled and let it surface; that's the notification, and it's exactly what a global handler is meant to catch. Ask the project owner before inventing a per-site reporting convention.
+- **There is genuinely no other reporting path.** Don't paper over this with a local `.catch(error => someErrorHandler.handle(error))` at every call site either. That just trades one form of clutter (silent swallow) for another (
+  per-call-site error-handling boilerplate). Scout has a global unhandled-rejection handler analogous to its synchronous one (see §7a), so the correct migration is usually to **do nothing**: leave the rejection unhandled and let it surface.
+  That's the notification, and it's exactly what the global handler is meant to catch. Ask the project owner before inventing a per-site reporting convention.
+
+### 7a. Expected cancellations (`AbortError`, `{abort: true}`) are ignored globally
+
+Much Scout code rejects *on purpose* to cancel the remainder of a chain:
+
+- `throw new AbortError()` when a widget was destroyed in the meantime (e.g. a `cancelIfDestroyed(widget)` utility called at the start of each `.then()` step), or error helpers that pass an `AbortError` on as a rejection to skip later
+  `.then()`s;
+- `LookupCall.abort()` implementations reject with `{abort: true}` (`RestLookupCall`, `StaticLookupCall`, …).
+
+jQuery silently dropped these at the end of every chain. Natively each one becomes an unhandled rejection, which in a real test run means hundreds of `Unhandled promise rejection: [object Object] thrown ... in afterAll` errors. **Don't add
+a per-site abort filter to every chain end.** The framework handles this centrally:
+
+- `ErrorHandler.isIgnorableRejection(reason)` returns `true` for `AbortError` and `{abort: true}`.
+- `App._installErrorHandler()` registers `errorHandler.unhandledRejectionHandler` for `unhandledrejection`, and it calls `preventDefault()` for ignorable rejections.
+- In Karma/Jasmine the app's handlers are not installed (`TestingApp` overrides `_installErrorHandler()`), and Jasmine fails the spec on any unhandled rejection. Jasmine's own listener is registered when its env boots, before any spec or
+  app code runs. So a listener added later can't stop it, not even with `stopImmediatePropagation()`, and in the reference migration a capture-phase listener didn't work either. The solution:
+  - `karma-jasmine-scout` provides the framework `jasmine-scout-preload`. It loads `unhandledRejectionFilter.js` *before* `jasmine.js`, so its listener is registered first.
+  - That listener calls `window.jasmineScoutUnhandledRejectionFilter(event)`, which `TestingApp` sets (delegating to `errorHandler.isIgnorableRejection()`). If the filter returns `true`, it calls `preventDefault()` +
+    `stopImmediatePropagation()`, so Jasmine never sees the rejection.
+  - `jasmine-scout-preload` must be listed **after** `jasmine` in the Karma `frameworks` (Karma initializes frameworks in order and `jasmine` prepends its files). `karma-defaults.js` does this; a module that sets its own `frameworks` must
+    add it too.
+
+Real errors are unaffected and still fail the spec.
 
 Two related patterns to get right while you're in this territory:
 
@@ -293,7 +346,7 @@ myPromise.then(
 ```
 This is correct regardless of settle order. If you find this bug, also check whether the same class (or a subclass, e.g. `SmartField` extends `ValueField`) shares the affected method — the fix usually applies broadly.
 
-The same applies to **"clear the pending promise when done"** cleanup, e.g. `.always(() => this._pendingPromise = null)` right after an `abortAndReset()` of the previous request. Under jQuery the aborted request's cleanup ran synchronously
+The same applies to **"clear the pending promise when done"** cleanup, e.g. `.always(() => this._pendingPromise = null)` right after aborting the previous request. Under jQuery the aborted request's cleanup ran synchronously
 during the abort, *before* the new promise was assigned. Natively it runs later and wipes out the *new* request's promise. Make the cleanup conditional:
 
 ```ts
@@ -320,15 +373,29 @@ request.finally(() => {
   - an `await` on the returned promise or on an event the framework already fires. There usually is one, so look for it before inventing a mechanism:
     - message box opened: `await session.desktop.when('propertyChange:messageBoxes')`, or `await form.when('propertyChange:messageBoxes')` if the form is the message box's display parent;
     - form lifecycle: `form.whenClose()`, `form.whenLoad()`, `form.whenSave()`;
-    - any property: `widget.when('propertyChange:xyz')`;
+    - any property: `widget.when('propertyChange:xyz')`. This also works on non-widgets that are a `PropertyEventEmitter`, e.g. a table `Column` (`column.when('propertyChange:text')`);
+    - the property a lookup finally writes: `smartField.when('propertyChange:displayText')`, `column.when('propertyChange:text')`;
+    - custom widget events the production code triggers at the end of a flow, e.g. `widget.when('valueApplied')`; or the value a flow restores, e.g. `field.when('propertyChange:value')`;
+    - keep it plain: write the `when(...)` inline in the spec. Don't add wrapper helpers or "already resolved?" guards around it unless a spec actually needs one;
+    - **when to register the listener:** *before* the action if the event can fire during it (e.g. `const p = widget.when('valueApplied'); formSpecHelper.closeMessageBoxes(MessageBox.Buttons.YES); await p;`). But register it *after* a
+      synchronous call that fires
+      an unrelated early change of the same property. E.g. a type switch first clears a smart field (`displayText` → `''`) and the lookup sets the real text later, so call `setValue()` first, then
+      `await field.when('propertyChange:displayText')`;
+    - the event must actually fire: `setProperty()` doesn't fire if the value doesn't change, so check that the action really changes it (e.g. a `setValue()` with the current value never triggers a lookup);
   - if the remaining work after that signal is only a known, short promise tail (e.g. one or two `.finally()` callbacks), a plain `await sleep()` per step, with a comment naming what it waits for (
-    `await sleep(); // 2nd finally in semaphores.ts`);
-  - `autoTick()` if a long timeout needs fast-forwarding. Then `await sleep(N)` advances fake time deterministically, e.g. `sleep(500)` → "not yet expired", `sleep(510)` → "expired" for a 1s timeout.
+    `await sleep(); // 2nd finally in MyService.ts`);
+  - `autoTick()` if a long timeout needs fast-forwarding. Then `await sleep(N)` advances fake time deterministically, e.g. `sleep(500)` → "not yet expired", `sleep(510)` → "expired" for a 1s timeout. If the only asynchronous part is a
+    lookup (no long timeout), you don't need the clock at all. Drop `install()`/`autoTick()`/`uninstall()` and await the property the lookup writes instead of `sleep(N)`.
 
   Don't write generic polling helpers (`waitFor(() => condition)`). They hide which signal the test actually depends on, and they are not wanted in this codebase.
 
   Once the clock is gone, timers the code under test schedules become *real*. Destroy the objects that own them (e.g. a message box with an auto-close timeout) in the test's cleanup, or they fire during a later spec.
 - For "nothing happens" assertions (e.g. `expect(findMessageBoxes().size).toBe(0)` right after triggering an asynchronous handler), first give the handler a chance to run (`await sleep(50)`). Otherwise, the assertion is trivially true.
+- **Karma "Disconnected, because no message in 30000 ms"** means no spec finished for 30s. A spec that merely waits on a promise that never resolves fails after the Jasmine timeout (default 5s) instead, unless it has a long custom timeout (
+  `it(..., 100_000)`). In the reference migration the disconnect disappeared once the unhandled rejections (§7a) and the unreturned/overtaking chains (§6, §7) were fixed, without a dedicated fix. If it persists, narrow it down: put
+  `fdescribe` on groups of spec files, or pause the debugger in the Karma debug tab when the log stalls.
+- **Work through failures in rounds, noisiest first.** Fix the global abort handling (§7a) before anything else, because hundreds of abort rejections bury the real failures. Then re-run and fix the now-visible failures by root cause, one
+  group at a time (lagging values, missing lookup texts, unreturned chains, …). A single root cause often explains a dozen failing specs.
 - See §6 for `expectAsync` timing and §7 for the general unhandled-rejection checklist.
 
 ## 10. General workflow
