@@ -468,6 +468,7 @@ export class App extends EventEmitter {
    */
   protected _installErrorHandler() {
     window.onerror = this.errorHandler.windowErrorHandler;
+    window.addEventListener('unhandledrejection', this.errorHandler.unhandledRejectionHandler);
   }
 
   protected _createErrorHandler(opts?: InitModelOf<ErrorHandler>): ErrorHandler {

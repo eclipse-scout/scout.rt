@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxError, AjaxSettings, App, arrays, Deferred, DoEntity, icons, InitModelOf, LogLevel, MessageBox, MessageBoxActionEvent, ModelOf, NullLogger, NullWidget, numbers, ObjectModel, objects, ObjectWithType, scout, Session, Status,
+  AbortError, AjaxError, AjaxSettings, App, arrays, Deferred, DoEntity, icons, InitModelOf, LogLevel, MessageBox, MessageBoxActionEvent, ModelOf, NullLogger, NullWidget, numbers, ObjectModel, objects, ObjectWithType, scout, Session, Status,
   StatusSeverity, strings, texts
 } from './index';
 import $ from 'jquery';
@@ -116,6 +116,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     this.displayError = true;
     this.sendError = false;
     this.windowErrorHandler = this._onWindowError.bind(this);
+    this.unhandledRejectionHandler = this._onUnhandledRejection.bind(this);
     this.session = null;
   }
 
@@ -167,6 +168,17 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     }
   }
 
+  protected _onUnhandledRejection(event: PromiseRejectionEvent) {
+    const reason = event.reason;
+    if (this.isIgnorableRejection(event.reason)) {
+      $.log.isDebugEnabled() && $.log.debug('Ignored abort error', reason);
+      event.preventDefault();
+      return;
+    }
+    // TODO CGU use analyseError and _sendErrorMessage and _logErrorInfo
+    console.log('Unhandled promise rejection', event);
+  }
+
   protected _isIgnorableScriptError(message: string, fileName?: string, lineNumber?: number, columnNumber?: number, error?: Error): boolean {
     // Ignore errors caused by scripts from a different origin.
     // Example: Firefox on iOS throws an error, probably caused by an internal Firefox script.
@@ -174,6 +186,10 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     // In that case the error must not be shown to the user, instead just log it silently.
     // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
     return message && message.toLowerCase().indexOf('script error') > -1 && !fileName && !lineNumber && !columnNumber && !error;
+  }
+
+  isIgnorableRejection(reason: any) {
+    return reason instanceof AbortError || objects.isPojo(reason) && reason.abort;
   }
 
   /**
