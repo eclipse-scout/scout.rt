@@ -17,9 +17,12 @@ export class TestingApp extends RemoteApp {
   }
 
   protected override _installErrorHandler() {
-    // nop for testing
-    // otherwise, it might overwrite the global error handler of Jasmine which will then not be notified about failing specs.
-    window.addEventListener('unhandledrejection', e => console.error('Unhandled promise rejection details', e.reason, e.promise));
+    // Don't install the regular error handlers for testing,
+    // otherwise, they might overwrite the global error handlers of Jasmine which will then not be notified about failing specs.
+
+    // Jasmine registers its 'unhandledrejection' listener before any spec code runs, so a listener added here cannot stop it.
+    // Instead, the listener registered by karma-jasmine-scout (unhandledRejectionFilter.js, loaded before jasmine-core) consults this filter.
+    (window as JasmineScoutWindow).jasmineScoutUnhandledRejectionFilter = this._onUnhandledRejection.bind(this);
   }
 
   override _createSession(options: InitModelOf<Session>): Session {
@@ -33,4 +36,22 @@ export class TestingApp extends RemoteApp {
   static set(newApp: App) {
     App._set(newApp);
   }
+
+  protected _onUnhandledRejection(event: PromiseRejectionEvent) {
+    const reason = event.reason;
+    if (this.errorHandler.isIgnorableRejection(reason)) {
+      // Expected cancellation -> must not fail the spec
+      return true;
+    }
+    console.error('Unhandled promise rejection details', event.reason, event.promise);
+    return false;
+  }
 }
+
+type JasmineScoutWindow = Window & {
+  /**
+   * Called by the 'unhandledrejection' listener of karma-jasmine-scout, which runs before Jasmine's listener.
+   * If it returns true, the rejection is not reported to Jasmine.
+   */
+  jasmineScoutUnhandledRejectionFilter?: (event: PromiseRejectionEvent) => boolean;
+};
