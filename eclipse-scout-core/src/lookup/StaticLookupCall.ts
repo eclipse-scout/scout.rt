@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Deferred, HierarchicalLookupResultBuilder, InitModelOf, LookupCall, LookupResult, LookupRow, objects, QueryBy, scout, StaticLookupCallModel, strings} from '../index';
+import {AbortError, arrays, Deferred, HierarchicalLookupResultBuilder, InitModelOf, LookupCall, LookupResult, LookupRow, objects, QueryBy, scout, StaticLookupCallModel, strings} from '../index';
 import $ from 'jquery';
 
 /**
@@ -48,9 +48,7 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   override abort() {
-    this._deferred?.reject({
-      abort: true
-    });
+    this._deferred?.reject(new AbortError());
     super.abort();
   }
 

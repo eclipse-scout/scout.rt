@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,15 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Deferred, LookupResult, StaticLookupCall} from '../../index';
+import {AbortError, Deferred, LookupResult, StaticLookupCall} from '../../index';
 
 export class DelayedStaticLookupCall<TKey> extends StaticLookupCall<TKey> {
   protected _delayDeferred: Deferred<any>;
 
   override abort() {
-    this._delayDeferred?.reject({
-      abort: true
-    });
+    this._delayDeferred?.reject(new AbortError());
     super.abort();
   }
 
