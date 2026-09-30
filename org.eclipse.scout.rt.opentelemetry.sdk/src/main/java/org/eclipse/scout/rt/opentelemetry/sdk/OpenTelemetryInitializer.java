@@ -39,6 +39,7 @@ import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk;
 import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdkBuilder;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.metrics.Aggregation;
+import io.opentelemetry.sdk.metrics.ExplicitBucketHistogramOptions;
 import io.opentelemetry.sdk.metrics.InstrumentSelector;
 import io.opentelemetry.sdk.metrics.InstrumentType;
 import io.opentelemetry.sdk.metrics.SdkMeterProviderBuilder;
@@ -139,7 +140,9 @@ public class OpenTelemetryInitializer implements IPlatformListener {
               .setType(InstrumentType.HISTOGRAM)
               .build(),
           View.builder()
-              .setAggregation(Aggregation.explicitBucketHistogram(viewHintProvider.getExplicitBuckets()))
+              .setAggregation(Aggregation.explicitBucketHistogram(ExplicitBucketHistogramOptions.builder()
+                  .setBucketBoundaries(viewHintProvider.getExplicitBuckets())
+                  .build()))
               .build());
     }
     return builder;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -44,7 +44,7 @@ public class OpenTelemetryFilter implements Filter {
     HttpServletRequest request = (HttpServletRequest) request0;
     HttpServletResponse response = (HttpServletResponse) response0;
 
-    Context parentContext = GlobalOpenTelemetry.get().getPropagators().getTextMapPropagator()
+    Context parentContext = GlobalOpenTelemetry.getOrNoop().getPropagators().getTextMapPropagator()
         .extract(Context.current(), request, BEANS.get(HttpServletRequestTextMapGetter.class));
 
     if (!m_instrumenter.shouldStart(parentContext, request)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,7 +43,7 @@ public class OpenTelemetryFilterInstrumenterFactory {
     SpanNameExtractor<? super HttpServletRequest> spanNameExtractor = HttpSpanNameExtractor.create(attributesGetter);
 
     return Instrumenter.<HttpServletRequest, HttpServletResponse> builder(
-            GlobalOpenTelemetry.get(), INSTRUMENTATION_NAME, spanNameExtractor)
+            GlobalOpenTelemetry.getOrNoop(), INSTRUMENTATION_NAME, spanNameExtractor)
         .setSpanStatusExtractor(HttpSpanStatusExtractor.create(attributesGetter))
         .addAttributesExtractor(HttpServerAttributesExtractor.builder(attributesGetter).build())
         .addContextCustomizer(new SpanNamePropagationFromDownstream())
