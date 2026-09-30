@@ -131,7 +131,7 @@
     <logback.version>1.6.4</logback.version>
     <jackson.version>2.22.3</jackson.version>
     <io.netty-version>4.2.18.Final</io.netty-version>
-    <apache.tika-version>3.3.2</apache.tika-version>
+    <apache.tika-version>4.1.0</apache.tika-version>
     <batik.version>1.19</batik.version>
     <activemq.version>6.3.2</activemq.version>
     <artemis.version>2.57.0</artemis.version>
@@ -1027,7 +1027,7 @@
       <dependency>
         <!-- do not import tika-bom as its maven-parent includes lots of dependency-management with partly overwrites some scout versions (e.g. jetty) -->
         <groupId>org.apache.tika</groupId>
-        <artifactId>tika-parser-text-module</artifactId>
+        <artifactId>tika-encoding-detector-icu4j</artifactId>
         <version>${apache.tika-version}</version>
         <exclusions>
           <!-- org.apache.tika.parser.txt.UniversalEncodingListener is currently not used -->
