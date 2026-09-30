@@ -129,12 +129,12 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<ITableRowTileMapping> getTileMappings() {
-    return (List<ITableRowTileMapping>) propertySupport.getProperty(PROP_TILE_MAPPINGS);
+  public List<? extends ITableRowTileMapping> getTileMappings() {
+    return (List<? extends ITableRowTileMapping>) propertySupport.getProperty(PROP_TILE_MAPPINGS);
   }
 
   @Override
-  public void setTileMappings(List<ITableRowTileMapping> tiles) {
+  public void setTileMappings(List<? extends ITableRowTileMapping> tiles) {
     propertySupport.setProperty(PROP_TILE_MAPPINGS, tiles);
   }
 

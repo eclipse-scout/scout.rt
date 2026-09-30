@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,9 +29,9 @@ public interface ITableTileGridMediator extends IPropertyObserver {
   String PROP_TILE_GRID_LAYOUT_CONFIG = "tileGridLayoutConfig";
   String PROP_WITH_PLACEHOLDERS = "withPlaceholders";
 
-  List<ITableRowTileMapping> getTileMappings();
+  List<? extends ITableRowTileMapping> getTileMappings();
 
-  void setTileMappings(List<ITableRowTileMapping> tileMappings);
+  void setTileMappings(List<? extends ITableRowTileMapping> tileMappings);
 
   boolean isExclusiveExpand();
 
