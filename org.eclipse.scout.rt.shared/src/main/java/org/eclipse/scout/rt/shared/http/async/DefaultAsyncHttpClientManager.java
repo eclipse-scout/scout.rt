@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -182,7 +182,7 @@ public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManage
    * Initializes metrics for this connection manager.
    */
   protected void initMetrics(PoolingAsyncClientConnectionManager connectionManager) {
-    Meter meter = GlobalOpenTelemetry.get().getMeter(getClass().getName());
+    Meter meter = GlobalOpenTelemetry.getOrNoop().getMeter(getClass().getName());
     BEANS.get(HttpClientMetricsHelper.class).initMetrics(meter, getName(), connectionManager::getTotalStats);
   }
 

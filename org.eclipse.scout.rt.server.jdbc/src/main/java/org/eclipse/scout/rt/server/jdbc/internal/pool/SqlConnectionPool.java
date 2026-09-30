@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -101,7 +101,7 @@ public class SqlConnectionPool {
    * Semantic Conventions for Database Metrics</a>
    */
   private void initMetrics() {
-    Meter meter = GlobalOpenTelemetry.get().getMeter("scout.SqlConnectionPool");
+    Meter meter = GlobalOpenTelemetry.getOrNoop().getMeter("scout.SqlConnectionPool");
 
     ObservableLongMeasurement connectionsUsage = meter.upDownCounterBuilder("db.client.connections.usage")
         .setDescription("The number of connections that are currently in state described by the state attribute.")
