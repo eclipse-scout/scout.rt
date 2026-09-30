@@ -4718,7 +4718,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   @Override
-  public List<ITableRowTileMapping> createTiles(List<? extends ITableRow> rows) {
+  public List<? extends ITableRowTileMapping> createTiles(List<? extends ITableRow> rows) {
     return rows.stream()
         .map(row -> {
           ITile tile = interceptCreateTile(row);
