@@ -1018,7 +1018,7 @@
       <dependency>
         <!-- do not import tika-bom as its maven-parent includes lots of dependency-management with partly overwrites some scout versions (e.g. jetty) -->
         <groupId>org.apache.tika</groupId>
-        <artifactId>tika-parser-text-module</artifactId>
+        <artifactId>tika-encoding-detector-icu4j</artifactId>
         <version>${apache.tika-version}</version>
         <exclusions>
           <!-- org.apache.tika.parser.txt.UniversalEncodingListener is currently not used -->

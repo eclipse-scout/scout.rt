@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import org.apache.tika.parser.txt.CharsetMatch;
+import org.apache.tika.detect.icu4j.CharsetMatch;
 import org.eclipse.scout.rt.platform.Bean;
 
 /**
@@ -140,7 +140,7 @@ public class CharsetDetector {
    * UTF-8 is returned.
    */
   public Charset guessCharset(byte[] data, int limit) {
-    org.apache.tika.parser.txt.CharsetDetector detector = new org.apache.tika.parser.txt.CharsetDetector(limit);
+    org.apache.tika.detect.icu4j.CharsetDetector detector = new org.apache.tika.detect.icu4j.CharsetDetector(limit);
     detector.setText(data);
     return Arrays.stream(detector.detectAll())
         .map(CharsetMatch::getName)
