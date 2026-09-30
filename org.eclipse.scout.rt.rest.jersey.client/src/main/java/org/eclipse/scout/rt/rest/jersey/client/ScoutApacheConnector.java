@@ -247,7 +247,7 @@ public class ScoutApacheConnector implements Connector {
   protected void initMetrics(Configuration config, PoolingHttpClientConnectionManager connectionManager) {
     Object httpClientName = config.getProperty(RestClientProperties.OTEL_HTTP_CLIENT_NAME);
     if (httpClientName instanceof String) {
-      Meter meter = GlobalOpenTelemetry.get().getMeter(getClass().getName());
+      Meter meter = GlobalOpenTelemetry.getOrNoop().getMeter(getClass().getName());
       BEANS.get(HttpClientMetricsHelper.class).initMetrics(meter, (String) httpClientName, connectionManager::getTotalStats);
     }
   }

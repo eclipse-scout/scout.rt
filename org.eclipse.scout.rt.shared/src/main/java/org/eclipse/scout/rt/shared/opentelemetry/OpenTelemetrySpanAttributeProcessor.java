@@ -41,7 +41,7 @@ public class OpenTelemetrySpanAttributeProcessor implements ICallableDecorator {
 
     current.setAttribute(getUserIdKey(), getUserIdValue());
 
-    return () -> current.setAttribute(getUserIdKey(), null);
+    return () -> current.setAttribute(getUserIdKey(), (String) null);
   }
 
   /***

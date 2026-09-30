@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -83,7 +83,7 @@ public class OpenTelemetryInitializerTest {
 
     OpenTelemetrySdk scoutOpenTelemetry = initializer.m_openTelemetry;
     assertNotNull(scoutOpenTelemetry);
-    OpenTelemetry globalOpenTelemetry = GlobalOpenTelemetry.get();
+    OpenTelemetry globalOpenTelemetry = GlobalOpenTelemetry.getOrNoop();
     assertNotNull(globalOpenTelemetry);
     assertSame(scoutOpenTelemetry.getPropagators(), globalOpenTelemetry.getPropagators());
     assertSame(scoutOpenTelemetry.getLogsBridge(), globalOpenTelemetry.getLogsBridge());
@@ -106,7 +106,7 @@ public class OpenTelemetryInitializerTest {
 
     OpenTelemetrySdk scoutOpenTelemetry = initializer.m_openTelemetry;
     assertNull(scoutOpenTelemetry);
-    OpenTelemetry globalOpenTelemetry = GlobalOpenTelemetry.get();
+    OpenTelemetry globalOpenTelemetry = GlobalOpenTelemetry.getOrNoop();
     assertSame(OpenTelemetry.noop(), globalOpenTelemetry);
 
     initializer.shutdownOpenTelemetry();
