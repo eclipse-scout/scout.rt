@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -56,7 +56,7 @@ public class HttpServiceTunnelInstrumenterFactory {
         // nop
       }
     };
-    return Instrumenter.<ServiceTunnelRequest, Void> builder(GlobalOpenTelemetry.get(),
+    return Instrumenter.<ServiceTunnelRequest, Void> builder(GlobalOpenTelemetry.getOrNoop(),
             INSTRUMENTATION_NAME,
             spanNameExtractor)
         .addAttributesExtractor(attributesExtractor)

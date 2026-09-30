@@ -156,7 +156,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
    * Initializes metrics for this connection manager.
    */
   protected void initMetrics(IHttpTransportManager manager, PoolingHttpClientConnectionManager connectionManager) {
-    Meter meter = GlobalOpenTelemetry.get().getMeter(getClass().getName());
+    Meter meter = GlobalOpenTelemetry.getOrNoop().getMeter(getClass().getName());
     BEANS.get(HttpClientMetricsHelper.class).initMetrics(meter, manager.getName(), connectionManager::getTotalStats);
   }
 
