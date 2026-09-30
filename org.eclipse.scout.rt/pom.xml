@@ -138,8 +138,8 @@
     <com.google.http-client.version>2.2.0</com.google.http-client.version>
     <org.apache.httpcomponents.version>5.5.1</org.apache.httpcomponents.version>
     <opentelemetry.version>1.66.0</opentelemetry.version>
-    <opentelemetry.instrumentation.version>2.22.0</opentelemetry.instrumentation.version>
-    <opentelemetry.instrumentation.alpha.version>2.22.0-alpha</opentelemetry.instrumentation.alpha.version>
+    <opentelemetry.instrumentation.version>2.31.1</opentelemetry.instrumentation.version>
+    <opentelemetry.instrumentation.alpha.version>2.31.1-alpha</opentelemetry.instrumentation.alpha.version>
     <selenium.version>4.49.0</selenium.version>
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.rt/target/jacoco-all.exec</master_coverage_jacoco_destFile>
@@ -1092,7 +1092,7 @@
       </dependency>
       <dependency>
         <groupId>io.opentelemetry.instrumentation</groupId>
-        <artifactId>opentelemetry-runtime-telemetry-java8</artifactId>
+        <artifactId>opentelemetry-runtime-telemetry</artifactId>
         <version>${opentelemetry.instrumentation.alpha.version}</version>
       </dependency>
     </dependencies>
