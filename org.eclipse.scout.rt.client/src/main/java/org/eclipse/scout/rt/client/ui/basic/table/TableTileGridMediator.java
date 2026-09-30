@@ -12,10 +12,12 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.tile.TileGridLayoutConfig;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -114,6 +116,13 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
     if (m_table.isTileMode()) {
       loadTiles(m_table.getRows());
     }
+    else if (getTileMappings() != null) {
+      getTileMappings().stream()
+          .map(ITableRowTileMapping::getTile)
+          .filter(Objects::nonNull)
+          .forEach(IWidget::dispose);
+      setTileMappings(new ArrayList<>());
+    }
     // Store user preferences here (instead of when setting the property on the table). This ensures that the tileMode was at least used once.
     ClientUIPreferences.getInstance().setTableTileMode(m_table, m_table.isTileMode());
   }
@@ -129,12 +138,12 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<ITableRowTileMapping> getTileMappings() {
-    return (List<ITableRowTileMapping>) propertySupport.getProperty(PROP_TILE_MAPPINGS);
+  public List<? extends ITableRowTileMapping> getTileMappings() {
+    return (List<? extends ITableRowTileMapping>) propertySupport.getProperty(PROP_TILE_MAPPINGS);
   }
 
   @Override
-  public void setTileMappings(List<ITableRowTileMapping> tiles) {
+  public void setTileMappings(List<? extends ITableRowTileMapping> tiles) {
     propertySupport.setProperty(PROP_TILE_MAPPINGS, tiles);
   }
 

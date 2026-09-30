@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,9 +19,9 @@ public interface ITableRowTileMapping extends IPropertyObserver {
 
   ITableRow getTableRow();
 
-  TableRowTileMapping withTableRow(ITableRow tableRow);
+  ITableRowTileMapping withTableRow(ITableRow tableRow);
 
   ITile getTile();
 
-  TableRowTileMapping withTile(ITile tile);
+  ITableRowTileMapping withTile(ITile tile);
 }

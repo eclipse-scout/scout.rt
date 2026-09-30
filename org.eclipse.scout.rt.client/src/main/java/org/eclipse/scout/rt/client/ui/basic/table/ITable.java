@@ -1363,7 +1363,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   /**
    * @since 10.0
    */
-  List<ITableRowTileMapping> createTiles(List<? extends ITableRow> rows);
+  List<? extends ITableRowTileMapping> createTiles(List<? extends ITableRow> rows);
 
   /**
    * @since 10.0
