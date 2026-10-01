@@ -149,7 +149,13 @@ public class ScoutApacheConnector implements Connector {
     // (4) setup custom retry handling
     BEANS.get(ApacheHttpTransportFactory.class).addRetrySettings(clientBuilder);
 
-    // (5) setup and build HTTP client
+    // (5) Disable automatic content compression handling.
+    // Jersey's GZipEncoder is responsible for request compression and response decompression.
+    // Keeping HttpClient content decompression enabled may result in duplicate response decompression
+    // when Content-Encoding headers are propagated to Jersey.
+    clientBuilder.disableContentCompression();
+
+    // (6) setup and build HTTP client
     m_requestConfig = buildRequestConfig(requestConfigBuilder);
     clientBuilder.setDefaultRequestConfig(m_requestConfig);
     clientBuilder.disableDefaultUserAgent(); // disable sending user agent header like "Apache-HttpClient/4.5.13 (Java/1.8.0_191)"

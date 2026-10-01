@@ -93,6 +93,12 @@ public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManage
         LOG.isDebugEnabled() ? createAsyncInvocationHandler(AsyncEntityProducer.class, entityProducer) : entityProducer,
         scope,
         LOG.isDebugEnabled() ? createAsyncInvocationHandler(AsyncExecCallback.class, asyncExecCallback) : asyncExecCallback));
+
+    // Disable automatic content compression handling.
+    // Transparent response decompression may leave Content-Encoding headers
+    // intact while the response body is already decompressed. This can lead
+    // to invalid responses when headers are forwarded unchanged.
+    builder.disableContentCompression();
   }
 
   protected void installConfigurableProxySelector(HttpAsyncClientBuilder builder) {
