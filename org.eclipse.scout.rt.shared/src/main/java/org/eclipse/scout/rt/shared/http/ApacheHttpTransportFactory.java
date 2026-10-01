@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,8 +11,6 @@ package org.eclipse.scout.rt.shared.http;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.SSLSocketFactory;
-
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.DefaultClientConnectionReuseStrategy;
@@ -23,9 +21,10 @@ import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
 import org.apache.hc.client5.http.io.HttpClientConnectionManager;
-import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
 import org.apache.hc.client5.http.ssl.HttpsSupport;
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.TlsSocketStrategy;
+import org.apache.hc.core5.ssl.SSLContexts;
 import org.apache.hc.core5.util.TimeValue;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -131,7 +130,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     // see very similar code in org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager.createConnectionManager(), unfortunately there is no common interface
     PoolingHttpClientConnectionManagerBuilder builder = PoolingHttpClientConnectionManagerBuilder.create();
 
-    builder.setSSLSocketFactory(createSSLConnectionSocketFactory());
+    builder.setTlsSocketStrategy(createTlsStrategy());
     builder.setDefaultConnectionConfig(ConnectionConfig.custom()
         .setTimeToLive(CONFIG.getPropertyValue(ApacheHttpTransportConnectionTimeToLiveProperty.class), TimeUnit.MILLISECONDS)
         .setValidateAfterInactivity(1, TimeUnit.MILLISECONDS)
@@ -160,18 +159,15 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     BEANS.get(HttpClientMetricsHelper.class).initMetrics(meter, manager.getName(), connectionManager::getTotalStats);
   }
 
-  protected SSLConnectionSocketFactory createSSLConnectionSocketFactory() {
+  protected TlsSocketStrategy createTlsStrategy() {
     String[] sslProtocols = StringUtility.split(System.getProperty("https.protocols"), "\\s*,\\s*");
     String[] sslCipherSuites = StringUtility.split(System.getProperty("https.cipherSuites"), "\\s*,\\s*");
-    return new SSLConnectionSocketFactory(
-        (SSLSocketFactory) SSLSocketFactory.getDefault(),
-        sslProtocols != null && sslProtocols.length > 0 ? sslProtocols : null,
-        sslCipherSuites != null && sslCipherSuites.length > 0 ? sslCipherSuites : null,
-        HttpsSupport.getDefaultHostnameVerifier());
-  }
-
-  protected PlainConnectionSocketFactory createPlainSocketFactory() {
-    return PlainConnectionSocketFactory.getSocketFactory();
+    return ClientTlsStrategyBuilder.create()
+        .setSslContext(SSLContexts.createDefault())
+        .setTlsVersions(sslProtocols)
+        .setCiphers(sslCipherSuites)
+        .setHostnameVerifier(HttpsSupport.getDefaultHostnameVerifier())
+        .buildClassic();
   }
 
   /**

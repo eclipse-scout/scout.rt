@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.core.Configuration;
@@ -50,15 +49,14 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.io.ManagedHttpClientConnectionFactory;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
 import org.apache.hc.client5.http.io.HttpClientConnectionManager;
 import org.apache.hc.client5.http.io.ManagedHttpClientConnection;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.client5.http.protocol.RedirectLocations;
-import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
-import org.apache.hc.client5.http.socket.LayeredConnectionSocketFactory;
-import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
+import org.apache.hc.client5.http.ssl.TlsSocketStrategy;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HeaderElements;
@@ -66,12 +64,12 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.HttpRequest;
-import org.apache.hc.core5.http.config.RegistryBuilder;
 import org.apache.hc.core5.http.impl.io.DefaultHttpRequestWriterFactory;
 import org.apache.hc.core5.http.io.HttpConnectionFactory;
 import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.http.io.entity.AbstractHttpEntity;
 import org.apache.hc.core5.http.io.entity.BufferedHttpEntity;
+import org.apache.hc.core5.ssl.SSLContexts;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -149,7 +147,13 @@ public class ScoutApacheConnector implements Connector {
     // (4) setup custom retry handling
     BEANS.get(ApacheHttpTransportFactory.class).addRetrySettings(clientBuilder);
 
-    // (5) setup and build HTTP client
+    // (5) Disable automatic content compression handling.
+    // Jersey's GZipEncoder is responsible for request compression and response decompression.
+    // Keeping HttpClient content decompression enabled may result in duplicate response decompression
+    // when Content-Encoding headers are propagated to Jersey.
+    clientBuilder.disableContentCompression();
+
+    // (6) setup and build HTTP client
     m_requestConfig = buildRequestConfig(requestConfigBuilder);
     clientBuilder.setDefaultRequestConfig(m_requestConfig);
     clientBuilder.disableDefaultUserAgent(); // disable sending user agent header like "Apache-HttpClient/4.5.13 (Java/1.8.0_191)"
@@ -159,19 +163,11 @@ public class ScoutApacheConnector implements Connector {
   /**
    * Creates a preconfigured Apache HTTP {@link HttpClientConnectionManager}
    */
-  @SuppressWarnings("deprecation")
   protected HttpClientConnectionManager createConnectionManager(Client client, Configuration config, SSLContext sslContext) {
     String[] sslProtocols = split(System.getProperty("https.protocols"));
     String[] sslCipherSuites = split(System.getProperty("https.cipherSuites"));
 
     HostnameVerifier hostnameVerifier = client.getHostnameVerifier();
-    LayeredConnectionSocketFactory sslConnectionSocketFactory;
-    if (sslContext != null) {
-      sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext, sslProtocols, sslCipherSuites, hostnameVerifier);
-    }
-    else {
-      sslConnectionSocketFactory = new SSLConnectionSocketFactory((SSLSocketFactory) SSLSocketFactory.getDefault(), sslProtocols, sslCipherSuites, hostnameVerifier);
-    }
 
     HttpConnectionFactory<ManagedHttpClientConnection> connFactory = null;
     IRestHttpRequestUriEncoder uriEncoder = (IRestHttpRequestUriEncoder) config.getProperty(RestClientProperties.REQUEST_URI_ENCODER);
@@ -186,12 +182,18 @@ public class ScoutApacheConnector implements Connector {
     Timeout socketTimeout = getReadTimeoutMillis(config);
     TimeValue connectionTimeToLive = TimeValue.ofMilliseconds(getConnectionTimeToLiveMillis(config));
 
-    final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
-        RegistryBuilder.<ConnectionSocketFactory> create()
-            .register("http", PlainConnectionSocketFactory.getSocketFactory())
-            .register("https", sslConnectionSocketFactory)
-            .build(),
-        null, null, connectionTimeToLive, connFactory);
+    TlsSocketStrategy tlsStrategy = ClientTlsStrategyBuilder.create()
+        .setSslContext(sslContext != null ? sslContext : SSLContexts.createDefault())
+        .setTlsVersions(sslProtocols)
+        .setCiphers(sslCipherSuites)
+        .setHostnameVerifier(hostnameVerifier)
+        .buildClassic();
+
+    PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+        .setTlsSocketStrategy(tlsStrategy)
+        // Note: The socket timeout in ConnectionConfig specifically applies to the connection phase, affecting how long the client will wait for a response after establishing a connection.
+        .setConnectionFactory(connFactory)
+        .build();
 
     Builder connectionConfigBuilder = ConnectionConfig.custom()
         .setConnectTimeout(connectTimeout)
@@ -560,15 +562,6 @@ public class ScoutApacheConnector implements Connector {
    * no user agent header is present.
    */
   protected void ensureDefaultUserAgent(ClientRequest clientRequest) {
-    // Remove default jersey user agent which is added by org.glassfish.jersey.client.ClientRuntime.addUserAgent()
-    // Default user agent should be suppressed by org.eclipse.scout.rt.rest.jersey.client.ScoutInvocationBuilderListener but
-    // this feature is currently broken see https://github.com/eclipse-ee4j/jersey/issues/5994
-    // TODO Remove this condition when Jersey issue 5994 was fixed
-    boolean hasDefaultJerseyUserAgent = DEFAULT_JERSEY_USER_AGENT.equals(clientRequest.getHeaderString(HttpHeaders.USER_AGENT));
-    if (hasDefaultJerseyUserAgent) {
-      clientRequest.getHeaders().remove(HttpHeaders.USER_AGENT);
-    }
-
     boolean suppressDefaultUserAgent = BooleanUtility.nvl(clientRequest.resolveProperty(RestClientProperties.SUPPRESS_DEFAULT_USER_AGENT, false));
     if (!suppressDefaultUserAgent && !clientRequest.getHeaders().containsKey(HttpHeaders.USER_AGENT)) {
       clientRequest.getHeaders().add(HttpHeaders.USER_AGENT, "Generic");
@@ -614,7 +607,7 @@ public class ScoutApacheConnector implements Connector {
     }
     else {
       if (c != null) {
-        LOG.debug("non-null cancellable has unexpected type: " + c.getClass());
+        LOG.debug("non-null cancellable has unexpected type: {}", c.getClass());
       }
       cancellable = requestAborter;
     }

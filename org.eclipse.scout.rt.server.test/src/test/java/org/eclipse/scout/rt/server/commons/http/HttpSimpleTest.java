@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,8 +19,6 @@ import java.nio.charset.StandardCharsets;
 import org.apache.hc.core5.http.ContentType;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.ISocketReadInterceptor;
-import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.ISocketWriteInterceptor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +34,7 @@ import com.google.api.client.http.HttpResponse;
  * called 'apache level') works as expected.
  * <p>
  * The Google HTTP Client API is not only an API, it contains an execution loop that handles various retry scenarios.
- * However in its core it uses a http transport - hers it is Apache HTTP Client.
+ * However, in its core it uses an http transport - hers it is Apache HTTP Client.
  * <p>
  * Apache HTTP client also handles various http retry scenarios in its exec loop.
  */
@@ -44,14 +42,9 @@ public class HttpSimpleTest {
   private TestingHttpClient m_client;
   private TestingHttpServer m_server;
 
-  private StringBuffer m_clientRead = new StringBuffer();
-  private StringBuffer m_clientWrite = new StringBuffer();
-
   @Before
   public void before() {
-    m_client = new TestingHttpClient()
-        .withSocketReadInterceptor(this::createClientReadInterceptor)
-        .withSocketWriteInterceptor(this::createClientWriteInterceptor);
+    m_client = new TestingHttpClient();
     m_server = new TestingHttpServer(TestingHttpPorts.PORT_33001);
     m_server.start();
   }
@@ -60,42 +53,6 @@ public class HttpSimpleTest {
   public void after() {
     m_client.stop();
     m_server.stop();
-    System.out.println("# HttpClient.write\n" + m_clientWrite);
-    System.out.println("# HttpClient.read\n" + m_clientRead);
-  }
-
-  private ISocketReadInterceptor createClientReadInterceptor() {
-    return new ISocketReadInterceptor() {
-      @Override
-      public int read(InputStream in, byte[] b, int off, int len) throws IOException {
-        int n = in.read(b, off, len);
-        m_clientRead.append(new String(b, off, len));
-        return n;
-      }
-
-      @Override
-      public int read(InputStream in) throws IOException {
-        int b = in.read();
-        m_clientRead.append((char) b);
-        return b;
-      }
-    };
-  }
-
-  private ISocketWriteInterceptor createClientWriteInterceptor() {
-    return new ISocketWriteInterceptor() {
-      @Override
-      public void write(OutputStream out, byte[] b, int off, int len) throws IOException {
-        m_clientWrite.append(new String(b, off, len));
-        out.write(b, off, len);
-      }
-
-      @Override
-      public void write(OutputStream out, int b) throws IOException {
-        m_clientWrite.append((char) b);
-        out.write(b);
-      }
-    };
   }
 
   @Test

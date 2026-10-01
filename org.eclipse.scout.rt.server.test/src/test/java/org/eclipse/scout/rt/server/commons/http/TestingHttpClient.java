@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,13 +10,10 @@
 package org.eclipse.scout.rt.server.commons.http;
 
 import java.io.IOException;
-import java.net.Socket;
-import java.util.function.Supplier;
 
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.io.HttpClientConnectionManager;
-import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
 import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpException;
@@ -50,26 +47,6 @@ public class TestingHttpClient extends DefaultHttpTransportManager {
    */
   private class ApacheHttpTransportFactoryEx extends ApacheHttpTransportFactory {
     @Override
-    protected PlainConnectionSocketFactory createPlainSocketFactory() {
-      return new PlainConnectionSocketFactory() {
-        @Override
-        public Socket createSocket(HttpContext context) throws IOException {
-          if (m_socketReadInterceptor == null && m_socketWriteInterceptor == null) {
-            return super.createSocket(context);
-          }
-          SocketWithInterception socket = new SocketWithInterception();
-          if (m_socketReadInterceptor != null) {
-            socket.withInterceptRead(m_socketReadInterceptor.get());
-          }
-          if (m_socketWriteInterceptor != null) {
-            socket.withInterceptWrite(m_socketWriteInterceptor.get());
-          }
-          return socket;
-        }
-      };
-    }
-
-    @Override
     protected HttpClientConnectionManager createHttpClientConnectionManager(IHttpTransportManager manager) {
       PoolingHttpClientConnectionManager connManager = (PoolingHttpClientConnectionManager) super.createHttpClientConnectionManager(manager);
       connManager.setDefaultConnectionConfig(
@@ -81,9 +58,6 @@ public class TestingHttpClient extends DefaultHttpTransportManager {
   }
 
   private IExecuteInterceptor m_executeInterceptor;
-
-  private Supplier<SocketWithInterception.ISocketReadInterceptor> m_socketReadInterceptor;
-  private Supplier<SocketWithInterception.ISocketWriteInterceptor> m_socketWriteInterceptor;
 
   @Override
   protected HttpTransport createHttpTransport() {
@@ -97,23 +71,13 @@ public class TestingHttpClient extends DefaultHttpTransportManager {
       @Override
       public ClassicHttpResponse execute(ClassicHttpRequest request, HttpClientConnection conn, HttpResponseInformationCallback informationCallback, HttpContext context) throws IOException, HttpException {
         if (m_executeInterceptor != null) {
-          return m_executeInterceptor.execute(request, conn, informationCallback, context, (request0, conn0, informationCallback0, context0, interceptor) -> super.execute(request0, conn0, informationCallback0, context0));
+          return m_executeInterceptor.execute(request, conn, informationCallback, context, (request0, conn0, informationCallback0, context0, _) -> super.execute(request0, conn0, informationCallback0, context0));
         }
         else {
           return super.execute(request, conn, informationCallback, context);
         }
       }
     });
-  }
-
-  public TestingHttpClient withSocketReadInterceptor(Supplier<SocketWithInterception.ISocketReadInterceptor> socketReadInterceptor) {
-    m_socketReadInterceptor = socketReadInterceptor;
-    return this;
-  }
-
-  public TestingHttpClient withSocketWriteInterceptor(Supplier<SocketWithInterception.ISocketWriteInterceptor> socketWriteInterceptor) {
-    m_socketWriteInterceptor = socketWriteInterceptor;
-    return this;
   }
 
   public void stop() {
