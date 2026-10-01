@@ -29,9 +29,8 @@
   }
 
   &.drop-shadow {
+    border-left: none;
     .desktop-bench-drop-shadow();
-    // Make the border transparent instead of removing it to avoid shifting the bench content
-    border-left-color: transparent;
 
     .desktop:not(.first-tab-selected):not(.navigation-invisible):not(.view-tab-area-in-bench) > & {
       border-top-left-radius: @desktop-bench-drop-shadow-border-top-left-radius;
