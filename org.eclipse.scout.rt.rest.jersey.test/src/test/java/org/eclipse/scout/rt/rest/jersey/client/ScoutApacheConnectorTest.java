@@ -39,9 +39,11 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation.Builder;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Variant;
 
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -80,6 +82,7 @@ import org.eclipse.scout.rt.testing.platform.mock.MockConfigPropertyRule;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.ClientRequest;
+import org.glassfish.jersey.message.GZipEncoder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -824,5 +827,33 @@ public class ScoutApacheConnectorTest {
     when(clientRequest.getUri()).thenReturn(inputUri);
     HttpUriRequestBase uriHttpRequest = connector.getUriHttpRequest(clientRequest);
     assertEquals(expectedUriForRequest, uriHttpRequest.getUri());
+  }
+
+  @Test
+  public void testGzipRequestAndResponse() {
+    String payload = "gzip test";
+
+    WebTarget target = newHelper((_, clientBuilder) ->
+        clientBuilder.register(GZipEncoder.class))
+        .target("echo")
+        .queryParam(STATUS, Status.OK.getStatusCode())
+        .queryParam(GZIP, true);
+
+    Builder builder = target
+        .request()
+        .accept(MediaType.APPLICATION_JSON);
+
+    Response response = builder.post(Entity.entity(payload, new Variant(MediaType.TEXT_PLAIN_TYPE, (String) null, "gzip")));
+
+    assertNotNull(response);
+    assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    assertEquals("gzip", response.getHeaderString(HttpHeaders.CONTENT_ENCODING));
+
+    RestClientTestEchoResponse entity = response.readEntity(RestClientTestEchoResponse.class);
+    assertEquals(Status.OK.getStatusCode(), entity.getEcho().getCode().intValue());
+    assertEquals("gzip", entity.getReceivedHeaders().get(HttpHeaders.CONTENT_ENCODING));
+    assertEquals(payload, entity.getEcho().getBody());
+
+    response.close();
   }
 }
