@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -52,4 +52,9 @@ public final class EchoServletParameters {
    * String parameter controlling whether to return a redirection to given URL.
    */
   public static final String REDIRECT_URL = "redirectUrl";
+
+  /**
+   * Boolean parameter controlling whether the request and response must be gzip-encoded.
+   */
+  public static final String GZIP = "gzip";
 }
