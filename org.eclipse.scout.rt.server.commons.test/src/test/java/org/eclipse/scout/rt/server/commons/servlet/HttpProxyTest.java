@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.commons.servlet;
 import static java.util.Collections.*;
 import static org.eclipse.scout.rt.platform.util.CollectionUtility.*;
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -599,6 +600,11 @@ public class HttpProxyTest {
 
   @Test
   public void testUnexpectedCompletedAsyncContextDuringFailureMustNotAffectOtherRequests() {
+    // only run test for DefaultAsyncHttpClientManager
+    // this test cannot be applied for H2AsyncHttpClientManager and ForceHttp2DefaultAsyncHttpClientManager
+    // because the AsyncContext#complete() method is not called at all
+    assumeTrue(DefaultAsyncHttpClientManager.class.equals(m_httpProxyTestParameter.m_clientManagerClazz));
+
     Handler.Abstract handler = new Handler.Abstract() {
       @Override
       public boolean handle(Request request, Response response, Callback callback) {
