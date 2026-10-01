@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,10 +13,13 @@ import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.*;
 
 import java.io.IOException;
 import java.io.Serial;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
@@ -112,7 +115,22 @@ public class RestClientTestEchoServlet extends HttpServlet {
       return;
     }
 
-    String body = IOUtility.readStringUTF8(req.getInputStream());
+    boolean gzip = Boolean.parseBoolean(req.getParameter("gzip"));
+
+    String body;
+    if (gzip) {
+      if (!"gzip".equalsIgnoreCase(req.getHeader(HttpHeaders.CONTENT_ENCODING))) {
+        resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Expected gzip request");
+        return;
+      }
+
+      try (GZIPInputStream in = new GZIPInputStream(req.getInputStream())) {
+        body = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+      }
+    }
+    else {
+      body = IOUtility.readStringUTF8(req.getInputStream());
+    }
 
     Map<String, String> receivedHeaders = new HashMap<>();
     for (Enumeration<String> headerNames = req.getHeaderNames(); headerNames.hasMoreElements(); ) {
@@ -138,7 +156,17 @@ public class RestClientTestEchoServlet extends HttpServlet {
       echoResponse.getEcho().withData(sb.toString());
     }
 
-    BEANS.get(IDataObjectMapper.class).writeValue(resp.getOutputStream(), echoResponse);
+    if (gzip) {
+      resp.setHeader(HttpHeaders.CONTENT_ENCODING, "gzip");
+
+      try (GZIPOutputStream out = new GZIPOutputStream(resp.getOutputStream())) {
+        BEANS.get(IDataObjectMapper.class).writeValue(out, echoResponse);
+        out.finish();
+      }
+    }
+    else {
+      BEANS.get(IDataObjectMapper.class).writeValue(resp.getOutputStream(), echoResponse);
+    }
   }
 
   protected void sendErrorResponse(HttpServletRequest req, HttpServletResponse resp, int statusCode, Status status) throws IOException {

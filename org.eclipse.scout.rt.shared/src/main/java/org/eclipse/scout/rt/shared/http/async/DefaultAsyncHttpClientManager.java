@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -93,6 +93,15 @@ public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManage
         LOG.isDebugEnabled() ? createAsyncInvocationHandler(AsyncEntityProducer.class, entityProducer) : entityProducer,
         scope,
         LOG.isDebugEnabled() ? createAsyncInvocationHandler(AsyncExecCallback.class, asyncExecCallback) : asyncExecCallback));
+
+    // Disable transparent response decompression (added to the async client in HttpClient 5.6, enabled by default).
+    // This client is used by HttpProxy, which must forward the response body and headers unchanged
+    // (incl. Content-Encoding negotiated by the browser's Accept-Encoding). Decompressing would
+    // 1) leave stale Content-Encoding/Content-Length headers (HTTPCLIENT-2409),
+    // 2) fail for encodings HttpClient cannot decode (e.g. zstd), and
+    // 3) send the response to the browser uncompressed.
+    // Disabling restores the behavior of HttpClient < 5.6.
+    builder.disableContentCompression();
   }
 
   protected void installConfigurableProxySelector(HttpAsyncClientBuilder builder) {
