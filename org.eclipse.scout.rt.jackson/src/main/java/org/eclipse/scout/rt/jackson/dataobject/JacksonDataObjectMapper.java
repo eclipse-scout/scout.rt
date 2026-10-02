@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
@@ -35,21 +34,20 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.StreamReadConstraints;
+import tools.jackson.core.StreamWriteConstraints;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.core.json.JsonFactoryBuilder;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
- * {@link IDataObjectMapper} implementation based on Jackson databind {@link ObjectMapper}.
+ * {@link IDataObjectMapper} implementation based on Jackson databind {@link JsonMapper}.
  */
 @ApplicationScoped
 public class JacksonDataObjectMapper implements IDataObjectMapper {
 
-  private final LazyValue<ObjectMapper> m_objectMapper = new LazyValue<>(() -> createObjectMapperInstance(false));
-  private final LazyValue<ObjectMapper> m_rawObjectMapper = new LazyValue<>(() -> createObjectMapperInstance(true));
+  private final LazyValue<JsonMapper> m_objectMapper = new LazyValue<>(() -> createObjectMapperInstance(false));
+  private final LazyValue<JsonMapper> m_rawObjectMapper = new LazyValue<>(() -> createObjectMapperInstance(true));
 
   @Override
   public <T> T readValue(InputStream inputStream, Class<T> valueType) {
@@ -57,7 +55,7 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
     try {
       return m_objectMapper.get().readValue(inputStream, valueType);
     }
-    catch (IOException e) {
+    catch (Exception e) {
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
     }
   }
@@ -70,7 +68,7 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
     try {
       return m_objectMapper.get().readValue(value, valueType);
     }
-    catch (IOException e) {
+    catch (Exception e) {
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
     }
   }
@@ -81,7 +79,7 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
     try {
       return m_rawObjectMapper.get().readValue(inputStream, IDataObject.class); // use IDataObject as fixed valueType
     }
-    catch (IOException e) {
+    catch (Exception e) {
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
     }
   }
@@ -94,7 +92,7 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
     try {
       return m_rawObjectMapper.get().readValue(value, IDataObject.class); // use IDataObject as fixed valueType
     }
-    catch (IOException e) {
+    catch (Exception e) {
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
     }
   }
@@ -108,7 +106,7 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
     try {
       m_objectMapper.get().writeValue(outputStream, value);
     }
-    catch (IOException e) {
+    catch (Exception e) {
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
     }
   }
@@ -121,42 +119,45 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
     try {
       return m_objectMapper.get().writeValueAsString(value);
     }
-    catch (JsonProcessingException e) {
+    catch (Exception e) {
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
     }
   }
 
   /**
    * <b>Note</b> This method is exposed only for internal framework usage. It is recommended to use the
-   * {@link IDataObjectMapper} representation of the object mapper and not to use {@link ObjectMapper} instances
+   * {@link IDataObjectMapper} representation of the object mapper and not to use {@link JsonMapper} instances
    * directly in code.
    *
    * @deprecated Use Scout data object mapper instead, see BEANS.get(IDataObjectMapper.class)
    */
   @Deprecated
   @SuppressWarnings("DeprecatedIsStillUsed")
-  public ObjectMapper getObjectMapper() {
+  public JsonMapper getObjectMapper() {
     return m_objectMapper.get();
   }
 
   /**
-   * Creates new {@link ObjectMapper} instance configured to be used with {@link IDoEntity}.
+   * Creates new {@link JsonMapper} instance configured to be used with {@link IDoEntity}.
    */
-  protected ObjectMapper createObjectMapperInstance(boolean ignoreTypeAttribute) {
-    // setup custom-configured JsonFactory used for ObjectMapper
-    JsonFactory jsonFactory = JsonFactory.builder()
-        .streamReadConstraints(CONFIG.getPropertyValue(StreamReadConstraintsConfigProperty.class))
-        .streamWriteConstraints(CONFIG.getPropertyValue(StreamWriteConstraintsConfigProperty.class))
-        .build();
-    ObjectMapper om = new ObjectMapper(jsonFactory);
+  protected JsonMapper createObjectMapperInstance(boolean ignoreTypeAttribute) {
+    return createObjectMapperBuilder(ignoreTypeAttribute).build();
+  }
+
+  protected JsonMapper.Builder createObjectMapperBuilder(boolean ignoreTypeAttribute) {
     ScoutDataObjectModule scoutDataObjectModule = BEANS.get(ScoutDataObjectModule.class).withIgnoreTypeAttribute(ignoreTypeAttribute);
     prepareScoutDataModuleContext(scoutDataObjectModule.getModuleContext());
-    om.registerModule(scoutDataObjectModule);
-    om.setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN)); // TODO [23.0] pbz: [JSON] check if it can be moved to ScoutDataObjectModule class
-    om.deactivateDefaultTyping(); // disabled for security reasons
-    //noinspection deprecation
-    om.enable(MapperFeature.BLOCK_UNSAFE_POLYMORPHIC_BASE_TYPES); // enabled block-unsafe for security reasons
-    return om;
+
+    return JsonMapper.builder(createJsonFactoryBuilder().build())
+        .addModule(scoutDataObjectModule)
+        .defaultDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN)) // TODO [23.0] pbz: [JSON] check if it can be moved to ScoutDataObjectModule class
+        .deactivateDefaultTyping(); // disabled for security reasons
+  }
+
+  protected JsonFactoryBuilder createJsonFactoryBuilder() {
+    return JsonFactory.builder()
+        .streamReadConstraints(CONFIG.getPropertyValue(StreamReadConstraintsConfigProperty.class))
+        .streamWriteConstraints(CONFIG.getPropertyValue(StreamWriteConstraintsConfigProperty.class));
   }
 
   /**

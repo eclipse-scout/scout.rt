@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.IOException;
-import java.io.Serial;
 import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.dataobject.BigDecimalDataObjectValue;
@@ -21,41 +19,40 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.LongDataObjectValue;
 import org.eclipse.scout.rt.dataobject.StringDataObjectValue;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
+import tools.jackson.databind.jsontype.TypeDeserializer;
 
 /**
  * Generic Deserializer for {@link IDataObject} delegating to {@link DoEntityDeserializer} /
  * {@link DoCollectionDeserializer} according to content.
  */
 public class DataObjectDeserializer extends StdDeserializer<IDataObject> {
-  @Serial
-  private static final long serialVersionUID = 1L;
 
   public DataObjectDeserializer(Class<?> type) {
     super(type);
   }
 
   @Override
-  public IDataObject deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+  public IDataObject deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
     return deserializeDataObject(p, ctxt, null);
   }
 
   @Override
-  public IDataObject deserializeWithType(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException {
+  public IDataObject deserializeWithType(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws JacksonException {
     return deserializeDataObject(p, ctxt, typeDeserializer);
   }
 
-  protected IDataObject deserializeDataObject(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException {
+  protected IDataObject deserializeDataObject(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws JacksonException {
     return switch (p.currentToken()) {
-      case START_OBJECT -> p.getCodec().readValue(p, IDoEntity.class); // delegate to DoEntityDeserializer for object-like structure
-      case START_ARRAY -> p.getCodec().readValue(p, DoList.class); // delegate to DoCollectionDeserializer for collection-like structure (using DoList as generic structure instead of DoSet or DoCollection)
+      case START_OBJECT -> ctxt.readValue(p, IDoEntity.class); // delegate to DoEntityDeserializer for object-like structure
+      case START_ARRAY -> ctxt.readValue(p, DoList.class); // delegate to DoCollectionDeserializer for collection-like structure (using DoList as generic structure instead of DoSet or DoCollection)
       case VALUE_STRING -> new StringDataObjectValue().withValue(p.getValueAsString());
       case VALUE_NUMBER_INT -> new LongDataObjectValue().withValue(p.getValueAsLong());
-      case VALUE_NUMBER_FLOAT -> new BigDecimalDataObjectValue().withValue(p.getCodec().readValue(p, BigDecimal.class)); // deserialize floating point numbers as BigDecimal
+      case VALUE_NUMBER_FLOAT -> new BigDecimalDataObjectValue().withValue(ctxt.readValue(p, BigDecimal.class)); // deserialize floating point numbers as BigDecimal
       case VALUE_TRUE -> new BooleanDataObjectValue().withValue(true);
       case VALUE_FALSE -> new BooleanDataObjectValue().withValue(false);
       default -> throw ctxt.wrongTokenException(p, handledType(), JsonToken.START_OBJECT, null);

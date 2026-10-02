@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,8 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
-import com.fasterxml.jackson.core.JsonToken;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DatabindContext;
 
 @Bean
 public class RawDoEntityDeserializerTypeStrategy implements IDoEntityDeserializerTypeStrategy {
@@ -32,7 +33,7 @@ public class RawDoEntityDeserializerTypeStrategy implements IDoEntityDeserialize
   }
 
   @Override
-  public Optional<AttributeType> resolveAttributeType(Class<? extends IDoEntity> entityClass, String attributeName, JsonToken currentToken) {
+  public Optional<AttributeType> resolveAttributeType(Class<? extends IDoEntity> entityClass, String attributeName, JsonToken currentToken, DatabindContext ctxt) {
     return Optional.empty();
   }
 

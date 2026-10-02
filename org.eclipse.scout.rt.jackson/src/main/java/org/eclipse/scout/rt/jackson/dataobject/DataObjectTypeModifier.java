@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,11 +14,11 @@ import java.lang.reflect.Type;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.Bean;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.ReferenceType;
-import com.fasterxml.jackson.databind.type.TypeBindings;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.fasterxml.jackson.databind.type.TypeModifier;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.type.ReferenceType;
+import tools.jackson.databind.type.TypeBindings;
+import tools.jackson.databind.type.TypeFactory;
+import tools.jackson.databind.type.TypeModifier;
 
 /**
  * Type modifier used to add contained type information for {@link DoValue} reference type.

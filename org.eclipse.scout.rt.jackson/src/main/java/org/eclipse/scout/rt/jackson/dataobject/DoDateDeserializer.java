@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.IOException;
-import java.io.Serial;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,30 +18,29 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.ValueFormat;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.DateDeserializers.DateDeserializer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.jdk.JavaUtilDateDeserializer;
 
 /**
- * Custom {@link DateDeserializer} handling date values within {@link IDoEntity} which are annotated with custom
+ * Custom {@link JavaUtilDateDeserializer} handling date values within {@link IDoEntity} which are annotated with custom
  * {@link ValueFormat} format.
  */
-public class DoDateDeserializer extends DateDeserializer {
-  @Serial
-  private static final long serialVersionUID = 1L;
+public class DoDateDeserializer extends JavaUtilDateDeserializer {
 
   protected final LazyValue<DoDateSerializationHelper> m_helper = new LazyValue<>(DoDateSerializationHelper.class);
 
   public DoDateDeserializer() {
   }
 
-  public DoDateDeserializer(DateDeserializer base, DateFormat df, String formatString) {
+  public DoDateDeserializer(JavaUtilDateDeserializer base, DateFormat df, String formatString) {
     super(base, df, formatString);
   }
 
   @Override
-  protected Date _parseDate(JsonParser p, DeserializationContext ctxt) throws IOException {
-    SimpleDateFormat formatter = m_helper.get().findFormatter(p.getParsingContext());
+  protected Date _parseDate(JsonParser p, DeserializationContext ctxt) throws JacksonException {
+    SimpleDateFormat formatter = m_helper.get().findFormatter(p.streamReadContext());
     if (formatter != null) {
       // TODO [23.0] bsh, pbz: Set the time zone of the formatter to the time zone of Jackson here
       // This would allow setting a custom time zone on the ObjectMapper. However, we should also set the default time zone
@@ -54,10 +51,10 @@ public class DoDateDeserializer extends DateDeserializer {
       // adjustments to existing code, it should only be considered in a future major release.
       // Note: The same issue exist in DoDateSerializer.
 
-      String str = p.getText().trim();
+      String str = p.getString().trim();
       // Treat empty string and 'null' string as null value (as default Jackson date deserializer)
       if (str.isEmpty() || _hasTextualNull(str)) {
-        return getNullValue(ctxt);
+        return (Date) getNullValue(ctxt);
       }
       try {
         return formatter.parse(str);
@@ -70,7 +67,7 @@ public class DoDateDeserializer extends DateDeserializer {
   }
 
   @Override
-  protected DateDeserializer withDateFormat(DateFormat df, String formatString) {
+  protected JavaUtilDateDeserializer withDateFormat(DateFormat df, String formatString) {
     return new DoDateDeserializer(this, df, formatString);
   }
 }
