@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,13 +18,13 @@ import org.eclipse.scout.rt.dataobject.id.IdCodec.IIdCodecFlag;
 import org.eclipse.scout.rt.jackson.dataobject.ScoutDataObjectModuleContext;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
-import com.fasterxml.jackson.databind.JsonSerializer;
+import tools.jackson.databind.ValueSerializer;
 
 /**
- * Abstract {@link JsonSerializer} with {@link ScoutDataObjectModuleContext} that provides an {@link IdCodec} and
+ * Abstract {@link ValueSerializer} with {@link ScoutDataObjectModuleContext} that provides an {@link IdCodec} and
  * information about the {@link IIdCodecFlag}s of the context.
  */
-public abstract class AbstractIdCodecMapKeySerializer<T> extends JsonSerializer<T> {
+public abstract class AbstractIdCodecMapKeySerializer<T> extends ValueSerializer<T> {
 
   protected final ScoutDataObjectModuleContext m_moduleContext;
 

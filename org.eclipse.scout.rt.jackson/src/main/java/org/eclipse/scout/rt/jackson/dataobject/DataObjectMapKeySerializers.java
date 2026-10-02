@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,11 +12,13 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.ser.Serializers;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import tools.jackson.databind.BeanDescription;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.SerializationConfig;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.ser.Serializers;
 
 /**
  * Set of custom serializers handling map keys.
@@ -42,13 +44,13 @@ public class DataObjectMapKeySerializers extends Serializers.Base {
   }
 
   @Override
-  public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type, BeanDescription beanDesc) {
+  public ValueSerializer<?> findSerializer(SerializationConfig config, JavaType type, BeanDescription.Supplier beanDescRef, JsonFormat.Value formatOverrides) {
     for (IDataObjectSerializerProvider provider : BEANS.all(IDataObjectSerializerProvider.class)) {
-      JsonSerializer<?> serializer = provider.findKeySerializer(getModuleContext(), type, config, beanDesc);
+      ValueSerializer<?> serializer = provider.findKeySerializer(getModuleContext(), type, config, beanDescRef, formatOverrides);
       if (serializer != null) {
         return serializer;
       }
     }
-    return super.findSerializer(config, type, beanDesc);
+    return super.findSerializer(config, type, beanDescRef, formatOverrides);
   }
 }
